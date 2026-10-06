@@ -1,0 +1,12 @@
+name: mm_tool
+description: Cross-platform developer task runner (invoked via ./mm, mm.ps1, mm.cmd).
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+# Intentionally no dependencies: the runner must work before `pub get` has
+# ever been run, since one of its jobs is to run it.
+dev_dependencies:
+  lints: ^6.0.0

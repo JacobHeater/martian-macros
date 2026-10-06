@@ -1,0 +1,7 @@
+include: ../../analysis_options.yaml
+
+linter:
+  rules:
+    # Drift's CHECK-constraint idiom references the column inside its own
+    # getter (`integer().check(id.equals(1))`); it is not real recursion.
+    recursive_getters: false

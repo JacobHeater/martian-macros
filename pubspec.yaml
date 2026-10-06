@@ -1,0 +1,16 @@
+name: martian_macros_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+# Pub workspace: one lockfile and one resolution for every package.
+workspace:
+  - apps/mobile
+  - packages/domain
+  - packages/engine
+  - packages/data
+  - tool
+
+dev_dependencies:
+  lints: ^6.0.0

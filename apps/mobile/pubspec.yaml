@@ -1,0 +1,28 @@
+name: martian_macros
+description: Martian Macros — body-composition coaching app.
+publish_to: none
+version: 0.1.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  drift_flutter: ^0.3.1
+  fl_chart: ^1.2.0
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  intl: ^0.20.3
+  mm_data: any
+  mm_domain: any
+  mm_engine: any
+
+dev_dependencies:
+  drift: ^2.35.1
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
