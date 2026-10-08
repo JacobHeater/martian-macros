@@ -29,6 +29,10 @@ final _commands = <String, (String, Command)>{
   'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
+  'evidence': (
+    'Copy docs/evidence.md into the app assets: mm evidence [--check]',
+    _evidence,
+  ),
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
   'gen': ('Run code generation in packages that use build_runner', _gen),
@@ -188,6 +192,22 @@ Future<int> _goldens(Toolchain tc, List<String> args) async {
     'test/goldens',
     if (args.contains('--update')) '--update-goldens',
   ], inDir: 'apps/mobile');
+}
+
+/// The app ships a copy of the evidence register (MM-143); this keeps it in step.
+Future<int> _evidence(Toolchain tc, List<String> args) async {
+  final source = File('docs/evidence.md');
+  final copy = File('apps/mobile/assets/evidence.md');
+  if (args.contains('--check')) {
+    final same =
+        copy.existsSync() &&
+        source.readAsStringSync() == copy.readAsStringSync();
+    if (!same) stderr.writeln('Run "mm evidence" to refresh the app copy.');
+    return same ? 0 : 1;
+  }
+  copy.writeAsStringSync(source.readAsStringSync());
+  stdout.writeln('Copied docs/evidence.md to apps/mobile/assets/evidence.md.');
+  return 0;
 }
 
 Future<int> _analyze(Toolchain tc, List<String> args) =>

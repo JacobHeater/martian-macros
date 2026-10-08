@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
@@ -25,6 +26,12 @@ final setupProvider = StreamProvider<UserSetup?>(
 /// Light, dark or follow the phone (MM-165).
 final themePreferenceProvider = StreamProvider<ThemePreference>(
   (ref) => ref.watch(preferencesReaderProvider).watchThemePreference(),
+);
+
+/// The evidence register shipped with the app (MM-143).
+final evidenceRegisterProvider = FutureProvider<EvidenceRegister>(
+  (ref) async =>
+      EvidenceRegister.parse(await rootBundle.loadString('assets/evidence.md')),
 );
 
 final weightsProvider = StreamProvider<List<WeightObservation>>(

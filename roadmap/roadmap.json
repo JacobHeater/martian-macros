@@ -1223,6 +1223,7 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-143",
           "MM-144"
         ],
         "remaining": [
@@ -1236,8 +1237,7 @@
           "MM-130",
           "MM-137",
           "MM-138",
-          "MM-139",
-          "MM-143"
+          "MM-139"
         ]
       },
       "sequence": [
