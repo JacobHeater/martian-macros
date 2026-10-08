@@ -75,6 +75,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       profile: profile,
       screening: _screening,
       today: _today,
+      weightKg: _weightKg,
     );
   }
 

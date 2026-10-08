@@ -15,7 +15,11 @@ DailyTargets computeTargets(TargetInputs i) {
   var mode = i.mode;
   if (!i.policy.allowedModes.contains(mode)) {
     mode = GoalMode.maintenance;
-    flags.add(TargetFlag.modeNotAllowed);
+    flags.add(
+      i.policy.underweight
+          ? TargetFlag.underweightMaintenance
+          : TargetFlag.modeNotAllowed,
+    );
   }
 
   var rate = _weeklyRate(mode, i);
@@ -37,11 +41,15 @@ DailyTargets computeTargets(TargetInputs i) {
 
   final previous = i.previous;
   if (previous != null) {
-    // A raise the safety rules ask for is not step-limited: a diet break and
-    // a too-fast loss both exist to put calories back now. Reductions and
+    // A raise the safety rules ask for is not step-limited: a diet break, a
+    // too-fast loss, and a deficit the health check or body weight no longer
+    // allows all exist to put calories back now. Reductions and
     // ordinary changes keep the limit.
     final exemptRaise =
-        flags.contains(TargetFlag.dietBreak) && kcal > previous.kcal;
+        (flags.contains(TargetFlag.dietBreak) ||
+            flags.contains(TargetFlag.underweightMaintenance) ||
+            flags.contains(TargetFlag.modeNotAllowed)) &&
+        kcal > previous.kcal;
     if (!exemptRaise) {
       final maxStep = SafetyBounds.maxWeeklyTargetChange(previous.kcal);
       final limited = kcal.clamp(
@@ -121,8 +129,11 @@ double _weeklyRate(GoalMode mode, TargetInputs i) {
   };
   return switch (mode) {
     GoalMode.fatLoss => -math.min(
-      i.requestedLossFraction ?? 0.0075,
-      SafetyBounds.maxWeeklyLossFraction(i.sex, bf),
+      math.min(
+        i.requestedLossFraction ?? 0.0075,
+        SafetyBounds.maxWeeklyLossFraction(i.sex, bf),
+      ),
+      i.policy.maxWeeklyLossFraction ?? double.infinity,
     ),
     GoalMode.recomp => highBodyFat ? -0.0025 : -0.001,
     GoalMode.leanGain => switch (i.trainingStatus) {

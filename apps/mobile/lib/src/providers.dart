@@ -98,7 +98,18 @@ final checkInProvider = Provider<void>((ref) {
     history: history,
     today: ref.watch(todayProvider),
   );
-  if (next != null) ref.read(targetsHistoryWriterProvider).saveTargets(next);
+  if (next == null) return;
+  // Targets first: the goal change below re-runs this provider.
+  final saved = ref.read(targetsHistoryWriterProvider).saveTargets(next);
+  if (next.targets.flags.contains(TargetFlag.underweightMaintenance)) {
+    // Low body weight ended the deficit: make maintenance the user's goal, so
+    // a deficit does not resume by itself when weight recovers (MM-111).
+    saved.then(
+      (_) => ref
+          .read(setupWriterProvider)
+          .saveSetup(setup.copyWith(goalMode: GoalMode.maintenance)),
+    );
+  }
 });
 
 /// The first day targets may next change.
