@@ -2,6 +2,9 @@ enum ModeReason {
   /// Policy forbids deficits (screening).
   deficitNotAllowed,
 
+  /// Body mass index is below 18.5 (MM-111).
+  underweight,
+
   /// Body fat high enough that faster visible loss matters most.
   highBodyFat,
 

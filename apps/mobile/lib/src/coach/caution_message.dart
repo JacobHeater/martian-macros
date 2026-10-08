@@ -20,6 +20,13 @@ extension CautionMessage on Caution {
     Caution.menopause =>
       'Hormonal changes can shift energy needs and water retention. The '
           'app adapts to your measured results.',
+    Caution.underweight =>
+      'Your weight is below the range where the app will plan a calorie '
+          'deficit, so it holds you at maintenance. If you are not eating '
+          'enough, or you are losing weight without trying, talk to a clinician.',
+    Caution.lowBodyWeight =>
+      'Your weight is close to the low end of the healthy range, so the app '
+          'only plans the gentlest pace of loss.',
     Caution.thyroidCondition =>
       'Thyroid conditions affect energy needs. The app adapts to your '
           'measured results; keep your treatment stable where you can.',

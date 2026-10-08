@@ -6,6 +6,7 @@ import 'compute_targets.dart';
 import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
 import 'loss_safety_raise.dart';
+import 'target_flag.dart';
 import 'target_inputs.dart';
 import 'targets_record.dart';
 import 'tdee_status.dart';
@@ -31,13 +32,8 @@ TargetsRecord? nextTargets({
     DailyTargets? previous,
     int deficitWeeks = 0,
     double safetyRaiseKcal = 0,
-  }) => TargetsRecord(
-    effectiveFrom: today,
-    mode: setup.goalMode,
-    tdeeKcal: snapshot.tdee.kcal,
-    tdeeSigmaKcal: snapshot.tdee.sigmaKcal,
-    tdeeStatus: snapshot.tdee.status,
-    targets: computeTargets(
+  }) {
+    final targets = computeTargets(
       TargetInputs(
         sex: setup.profile.sex,
         heightCm: setup.profile.heightCm,
@@ -53,12 +49,31 @@ TargetsRecord? nextTargets({
         requestedLossFraction: setup.requestedLossFraction,
         safetyRaiseKcal: safetyRaiseKcal,
       ),
-    ),
-  );
+    );
+    return TargetsRecord(
+      effectiveFrom: today,
+      // A deficit ended by low body weight is stored as the maintenance it
+      // became; the app also moves the user's goal there, so it does not
+      // resume by itself when weight recovers (MM-111).
+      mode: targets.flags.contains(TargetFlag.underweightMaintenance)
+          ? GoalMode.maintenance
+          : setup.goalMode,
+      tdeeKcal: snapshot.tdee.kcal,
+      tdeeSigmaKcal: snapshot.tdee.sigmaKcal,
+      tdeeStatus: snapshot.tdee.status,
+      targets: targets,
+    );
+  }
 
   if (history.isEmpty) return build();
   final last = history.last;
-  if (last.mode != setup.goalMode) return build();
+  // A goal change applies at once. Not when the last record already holds the
+  // user at maintenance because their weight is too low for the goal they
+  // still have stored (the app then moves the goal itself, MM-111).
+  final heldForLowWeight =
+      last.targets.flags.contains(TargetFlag.underweightMaintenance) &&
+      !snapshot.policy.allowedModes.contains(setup.goalMode);
+  if (last.mode != setup.goalMode && !heldForLowWeight) return build();
 
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return null;
   // Losing faster than the safe pace is not noise, so this runs through
@@ -70,7 +85,12 @@ TargetsRecord? nextTargets({
     bodyFat: snapshot.bodyFat,
     resistanceTrained: setup.trainingStatus.isResistanceTrained,
   );
-  if (raise > 0) {
+  // A deficit the policy no longer allows (body weight has fallen into the
+  // underweight range, MM-111) ends at this check-in, calibration or not.
+  final deficitNoLongerAllowed =
+      last.targets.weeklyRateFraction < 0 &&
+      !snapshot.policy.allowedModes.contains(setup.goalMode);
+  if (raise > 0 || deficitNoLongerAllowed) {
     return build(
       previous: last.targets,
       deficitWeeks: consecutiveDeficitWeeks(history, today),
