@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 2,
+  "product": "Martian Macros",
+  "status": "design direction; implementation state is tracked by requirements/. Palette checked numerically, not yet reviewed rendered on a device.",
+  "supersedes": "schemaVersion 1 (warm rust field instrument), rejected by the product owner as muddy and low-energy",
+  "sourceOfTruth": {
+    "behavior": "../requirements/README.md",
+    "deliveryOrder": "../roadmap/README.md",
+    "architecture": "../docs/architecture.md",
+    "designSystemWorkstream": "../roadmap/ws-03-design-system-and-app-shell.md"
+  },
+  "brand": {
+    "concept": "Red planet, blue sunset",
+    "summary": "Cool ink canvas, one hot Ember action, one cool Ion measurement color, a restrained orbital signature",
+    "ember": "primary action and current location; solid only",
+    "ion": "measurement and estimates"
+  },
+  "designPrinciples": [
+    {
+      "id": "energy-is-a-requirement",
+      "rule": "Energy comes from contrast, craft and precision, never from reward mechanics or decoration."
+    },
+    {
+      "id": "evidence-before-certainty",
+      "name": "State what the evidence supports",
+      "rule": "Distinguish measurements, estimates, recommendations, and confidence; disclose uncertainty where it changes interpretation."
+    },
+    {
+      "id": "task-first",
+      "name": "Make the next useful action obvious",
+      "rule": "Dashboard prioritizes intake and protein, trend, then coach status; food and weigh-in actions start in one tap."
+    },
+    {
+      "id": "restraint",
+      "name": "Treat restraint as a trust feature",
+      "rule": "One primary emphasis per screen; semantic color only; remove elements without user value."
+    },
+    {
+      "id": "non-judgment",
+      "name": "Motivate without moral accounting",
+      "rule": "Never praise restriction, a larger deficit, lowest weight, or low-intake streaks."
+    },
+    {
+      "id": "explainable-change",
+      "name": "Explain change without forcing a lecture",
+      "rule": "Summarize what changed, when, why, and confidence; progressively disclose detail."
+    },
+    {
+      "id": "humane-safety",
+      "name": "Make safety humane and available",
+      "rule": "Use direct, non-shaming safeguards and never gate them behind monetization."
+    },
+    {
+      "id": "lightweight-daily-use",
+      "name": "Keep daily work lightweight",
+      "rule": "Optimize frequent logging; disclose provenance and expert detail progressively."
+    },
+    {
+      "id": "weight-agency",
+      "name": "Protect agency around weight",
+      "rule": "Honor global raw-weight visibility preferences; treat observations as data, not scores."
+    },
+    {
+      "id": "earned-delight",
+      "name": "Make delight earned",
+      "rule": "Prefer fast, satisfying interactions to decoration; celebrate only permitted user-valued outcomes."
+    },
+    {
+      "id": "prevent-visual-debt",
+      "name": "Prevent visual debt at the source",
+      "rule": "Use shared semantic tokens, components, language, and chart grammar."
+    },
+    {
+      "id": "identity-is-a-layer",
+      "rule": "The space signature has a fixed budget and never reduces legibility or adds a control."
+    }
+  ],
+  "colorRoles": {
+    "canvas": {
+      "group": "neutral",
+      "intent": "Page background",
+      "dark": "#090D15",
+      "light": "#F3F5FA"
+    },
+    "surface": {
+      "group": "neutral",
+      "intent": "Grouped content",
+      "dark": "#101624",
+      "light": "#FFFFFF"
+    },
+    "raised": {
+      "group": "neutral",
+      "intent": "Nav bar, sheets, menus",
+      "dark": "#171F32",
+      "light": "#FFFFFF"
+    },
+    "overlay": {
+      "group": "neutral",
+      "intent": "Dialogs and popovers",
+      "dark": "#1F2A42",
+      "light": "#FFFFFF"
+    },
+    "sunken": {
+      "group": "neutral",
+      "intent": "Wells, input fills, skeletons",
+      "dark": "#0D1220",
+      "light": "#E8ECF5"
+    },
+    "track": {
+      "group": "neutral",
+      "intent": "Empty part of bars and the arc",
+      "dark": "#1F2940",
+      "light": "#EBEFF7"
+    },
+    "selected": {
+      "group": "neutral",
+      "intent": "Selected row, chip, nav indicator; never an Ember tint",
+      "dark": "#1C2842",
+      "light": "#E3E8F5"
+    },
+    "outline": {
+      "group": "neutral",
+      "intent": "Decorative dividers and hairlines",
+      "dark": "#2B3853",
+      "light": "#CBD3E3"
+    },
+    "outlineStrong": {
+      "group": "neutral",
+      "intent": "Control boundaries; 3:1 required",
+      "dark": "#5A6A8C",
+      "light": "#7C88A3"
+    },
+    "text": {
+      "group": "text",
+      "intent": "Primary text and figures",
+      "dark": "#ECF0F8",
+      "light": "#0C1220"
+    },
+    "text2": {
+      "group": "text",
+      "intent": "Secondary text",
+      "dark": "#A9B4CA",
+      "light": "#46526B"
+    },
+    "text3": {
+      "group": "text",
+      "intent": "Captions",
+      "dark": "#8F9BB5",
+      "light": "#5A6680"
+    },
+    "ember": {
+      "group": "brand",
+      "intent": "Primary action and current location. Solid only; never tinted",
+      "dark": "#FF6A45",
+      "light": "#CC3210"
+    },
+    "onEmber": {
+      "group": "brand",
+      "intent": "Content on an Ember fill",
+      "dark": "#1A0802",
+      "light": "#FFFFFF"
+    },
+    "ion": {
+      "group": "measurement",
+      "intent": "Trend line, estimate band, anything the engine inferred",
+      "dark": "#3FD8F0",
+      "light": "#0A7890"
+    },
+    "energy": {
+      "group": "measurement",
+      "intent": "Calorie arc; reuses the text color on purpose",
+      "dark": "#ECF0F8",
+      "light": "#0C1220"
+    },
+    "protein": {
+      "group": "macro",
+      "intent": "Protein everywhere",
+      "dark": "#5B9DFF",
+      "light": "#1646A6"
+    },
+    "carbs": {
+      "group": "macro",
+      "intent": "Carbohydrate everywhere",
+      "dark": "#F6C453",
+      "light": "#BF7A00"
+    },
+    "fat": {
+      "group": "macro",
+      "intent": "Fat everywhere",
+      "dark": "#7F57FF",
+      "light": "#7448E6"
+    },
+    "positive": {
+      "group": "state",
+      "intent": "A permitted achievement; never for eating or weighing less",
+      "dark": "#4FDB8A",
+      "light": "#117A3E"
+    },
+    "caution": {
+      "group": "state",
+      "intent": "Health and safety notices; icon, text or stroke only",
+      "dark": "#FFB84D",
+      "light": "#8F5600"
+    },
+    "info": {
+      "group": "state",
+      "intent": "Explanations and calibration; icon, text or stroke only",
+      "dark": "#7FB8FF",
+      "light": "#1C62C9"
+    },
+    "danger": {
+      "group": "state",
+      "intent": "Destructive actions only; icon, text or stroke only",
+      "dark": "#FF7A7A",
+      "light": "#B3261E"
+    }
+  },
+  "themeStructure": {
+    "approach": "explicit ColorScheme per theme; no seed palette; same role names, different values",
+    "light": "cool-gray canvas, white surfaces with hairline and soft shadow, deeper accent values",
+    "dark": "ink-navy canvas, surfaces step lighter with elevation, no shadows, 1dp top highlight, brighter accent values",
+    "surfaceLevels": [
+      "canvas",
+      "surface",
+      "raised",
+      "overlay"
+    ],
+    "emberRule": "never tinted, washed or used as a background",
+    "gradients": [
+      "limb-glow",
+      "horizon-arc",
+      "ember-halo"
+    ],
+    "elevationTint": "off (surfaceTint transparent)"
+  },
+  "contrast": {
+    "normalText": "4.5:1",
+    "largeText": "3:1",
+    "nonText": "3:1",
+    "verifiedWith": "WCAG 2.x relative luminance; CIE76 ΔE with Machado 2009 CVD matrices",
+    "knownTightPairs": [
+      "protein/fat under deutan (light 20) and tritan (light 18): carried by lightness gap, label and bar height",
+      "fat as text on dark surfaces is 4.1:1: graphic only",
+      "ember as text on light sunken is 4.4:1: do not use"
+    ]
+  },
+  "typography": {
+    "families": {
+      "display": "Space Grotesk (bundled, OFL)",
+      "ui": "Inter (bundled, OFL)"
+    },
+    "networkFonts": false,
+    "roles": {
+      "figureXL": {
+        "family": "display",
+        "size": 48,
+        "line": 52,
+        "weight": 600
+      },
+      "figure": {
+        "family": "display",
+        "size": 32,
+        "line": 36,
+        "weight": 600
+      },
+      "title": {
+        "family": "display",
+        "size": 22,
+        "line": 28,
+        "weight": 600
+      },
+      "heading": {
+        "family": "ui",
+        "size": 17,
+        "line": 24,
+        "weight": 600
+      },
+      "body": {
+        "family": "ui",
+        "size": 15,
+        "line": 22,
+        "weight": 400
+      },
+      "label": {
+        "family": "ui",
+        "size": 13,
+        "line": 16,
+        "weight": 600,
+        "tracking": 0.2
+      },
+      "caption": {
+        "family": "ui",
+        "size": 12,
+        "line": 16,
+        "weight": 400
+      }
+    },
+    "tabularFigures": true,
+    "minimumSp": 12
+  },
+  "spacingDp": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32
+  ],
+  "radiiDp": {
+    "group": 16,
+    "control": 12,
+    "chip": 8,
+    "bar": "full",
+    "sheetTop": 24
+  },
+  "motion": {
+    "durationsMs": {
+      "fast": 100,
+      "base": 180,
+      "slow": 280,
+      "reveal": 600
+    },
+    "signatureMoments": [
+      "arc-draw-in-once-per-cold-start",
+      "log-confirmation",
+      "strength-pr-pulse",
+      "primary-press"
+    ],
+    "reduceMotion": "durations 0 except 100ms fades",
+    "forbidden": [
+      "count-up numbers",
+      "perpetual animation",
+      "parallax",
+      "overshoot",
+      "particles"
+    ]
+  },
+  "spaceSignature": {
+    "horizonArc": {
+      "where": "today hero",
+      "limit": 1
+    },
+    "orbitHairline": {
+      "where": "behind hero figures",
+      "limit": 1
+    },
+    "limbGlow": {
+      "alpha": {
+        "dark": 0.12,
+        "light": 0.08
+      },
+      "limit": 1,
+      "neverBehindTextUnder": "22sp"
+    },
+    "starfield": {
+      "where": [
+        "onboarding-welcome",
+        "coach-unlock"
+      ],
+      "maxPoints": 24,
+      "maxOpacity": 0.3,
+      "animated": false
+    },
+    "naming": "marketing and icon only; never functional labels",
+    "forbidden": [
+      "planets",
+      "rockets",
+      "astronauts",
+      "mascots",
+      "galaxy wallpaper",
+      "HUD frames",
+      "lens flares",
+      "parallax"
+    ]
+  },
+  "antiSlopRules": {
+    "primaryEmphasisPerScreen": 1,
+    "emberFillsPerScreen": 1,
+    "figureXLPerScreen": 1,
+    "maxPrimaryDestinations": 5,
+    "maxDashboardDirectActions": 3,
+    "dashboardFirstGroupsFitWithoutScroll": 3,
+    "nestedContentCards": 0,
+    "prominentNonCriticalCallouts": 1,
+    "allowMultipleRequiredSafetyNotices": true,
+    "requireSharedSemanticColors": true,
+    "requireChartTextEquivalent": true,
+    "colorSludge": [
+      "no Color(0x...) or fromSeed/colorSchemeSeed outside theme files",
+      "Ember is never tinted or used as a background",
+      "semantic colors are icon/text/stroke only, never fills",
+      "no beige, cream, tan, brown, clay, terracotta, salmon, peach, dusty pink, olive",
+      "no pure black canvas, no pure white text on dark",
+      "every theme foreground/background pair meets the contrast thresholds, tested"
+    ],
+    "reject": [
+      "purple-blue AI gradients",
+      "glassmorphism and blurred floating orbs",
+      "neon glows",
+      "generic pastel wellness sameness",
+      "dashboard KPI walls",
+      "unlabeled icons and color-only meaning",
+      "routine logging confetti or restriction rewards",
+      "unexplained certainty from coach recommendations",
+      "design by card stack"
+    ],
+    "diagnosedCurrentSlop": [
+      "colorSchemeSeed rust seed (root cause of muddy palette)",
+      "single Notice style in secondaryContainer for every message",
+      "Coach: 4 identical InfoCards + up to 5 identical Notices",
+      "macro colors are primary/tertiary/secondary by accident",
+      "app bar repeats tab label",
+      "one card per meal plus a full card for a rare action",
+      "default tonal FAB and nav indicator"
+    ],
+    "oneImplementationPerControl": true,
+    "rawMaterialControlsInScreens": 0,
+    "componentsAcceptStyling": false
+  },
+  "navigationModel": {
+    "initialDestination": "dashboard",
+    "type": "labeled Material bottom navigation",
+    "destinations": [
+      "dashboard",
+      "food",
+      "progress",
+      "coach",
+      "train"
+    ],
+    "trainEnabledWhen": "training-log destination is implemented",
+    "settingsEntry": "app-bar action",
+    "preserveDestinationState": true,
+    "destinationLimit": 5
+  },
+  "screens": [
+    {
+      "id": "today",
+      "name": "Today (becomes Dashboard + Food)",
+      "tone": "energetic hero, calm log",
+      "density": "medium",
+      "primaryAction": "Log food",
+      "emphasis": "horizon arc and calories left",
+      "deemphasize": [
+        "day completeness",
+        "provenance",
+        "carbs and fat detail"
+      ],
+      "neverCluttered": "the hero: no second Ember fill, no streaks, no stacked banners",
+      "maxTopLevelGroups": 3,
+      "energy": "hero",
+      "roadmap": "WS-03"
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "tone": "scannable, energetic only in the hero",
+      "density": "low-to-medium",
+      "primaryAction": "Log food",
+      "emphasis": "intake with protein, then trend weight",
+      "deemphasize": [
+        "coach line",
+        "secondary actions"
+      ],
+      "neverCluttered": "no KPI wall, no second hero",
+      "maxTopLevelGroups": 5,
+      "energy": "hero",
+      "roadmap": "WS-03"
+    },
+    {
+      "id": "food-logging",
+      "name": "Food logging and add sheet",
+      "tone": "fast, factual, calm",
+      "density": "high-but-quiet",
+      "primaryAction": "Add (when a food is selected)",
+      "emphasis": "speed of the add path",
+      "deemphasize": [
+        "source tier",
+        "secondary nutrients"
+      ],
+      "neverCluttered": "the sheet: one Ember action",
+      "maxTopLevelGroups": 2,
+      "energy": "action",
+      "roadmap": "WS-08"
+    },
+    {
+      "id": "search-scan-quickadd",
+      "name": "Search, barcode, quick add",
+      "tone": "fast, factual",
+      "density": "high-task",
+      "primaryAction": "Add",
+      "emphasis": "the match being confirmed",
+      "deemphasize": [
+        "nutrient tables"
+      ],
+      "neverCluttered": "no HUD overlay on the camera view, no tinted result rows",
+      "maxTopLevelGroups": 2,
+      "energy": "action",
+      "roadmap": "WS-04/WS-08"
+    },
+    {
+      "id": "progress",
+      "name": "Progress and trend",
+      "tone": "measured, explanatory",
+      "density": "medium",
+      "primaryAction": "Add weigh-in",
+      "emphasis": "Ion trend line and its band",
+      "deemphasize": [
+        "raw readings",
+        "gridlines"
+      ],
+      "neverCluttered": "chart: no flat invented trends, no goal finish line",
+      "maxTopLevelGroups": 4,
+      "energy": "line",
+      "roadmap": "WS-07"
+    },
+    {
+      "id": "coach",
+      "name": "Coach insights",
+      "tone": "calm, evidence-led",
+      "density": "medium, disclosed in layers",
+      "primaryAction": "the one next step, if any",
+      "emphasis": "targets and confidence",
+      "deemphasize": [
+        "metabolism detail",
+        "history"
+      ],
+      "neverCluttered": "no card stack, no per-feature notice style",
+      "maxTopLevelGroups": 3,
+      "energy": "calm",
+      "roadmap": "WS-06/WS-09"
+    },
+    {
+      "id": "onboarding",
+      "name": "Onboarding and setup",
+      "tone": "focused, plain, low-pressure",
+      "density": "one question per screen",
+      "primaryAction": "Continue",
+      "emphasis": "the question",
+      "deemphasize": [
+        "explanations"
+      ],
+      "neverCluttered": "no long questionnaires on one screen; no default for biological sex",
+      "maxTopLevelGroups": 2,
+      "energy": "welcome-moment",
+      "roadmap": "WS-05"
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "tone": "quiet, grouped",
+      "density": "medium",
+      "primaryAction": "none",
+      "emphasis": "none",
+      "deemphasize": [
+        "everything"
+      ],
+      "neverCluttered": "no marketing, no section per ticket",
+      "maxTopLevelGroups": 6,
+      "energy": "none",
+      "roadmap": "WS-05+"
+    },
+    {
+      "id": "states",
+      "name": "Empty, loading, error",
+      "tone": "truthful, actionable",
+      "density": "low",
+      "primaryAction": "the one next step",
+      "emphasis": "what failed or is absent",
+      "deemphasize": [
+        "decoration"
+      ],
+      "neverCluttered": "no fake numbers, no failed-read-as-zero",
+      "maxTopLevelGroups": 1,
+      "energy": "calm",
+      "roadmap": "WS-03"
+    }
+  ],
+  "primaryFlows": [
+    {
+      "id": "daily-check",
+      "steps": [
+        "Dashboard",
+        "review intake and trend summary",
+        "open Food or Progress for detail"
+      ],
+      "qualityBar": "The dashboard is a summary; detailed destinations remain authoritative."
+    },
+    {
+      "id": "log-food",
+      "steps": [
+        "Dashboard or Food",
+        "Add food",
+        "search, scan, select recent, or enter manually as available",
+        "confirm entry",
+        "return to originating summary with updated values"
+      ],
+      "qualityBar": "Preserve context and data; avoid guilt language and duplicate routes."
+    },
+    {
+      "id": "weigh-in",
+      "steps": [
+        "Dashboard when no reading today, or Progress",
+        "enter measurement",
+        "save",
+        "show trend and uncertainty with visibility preference honored"
+      ],
+      "qualityBar": "Never present one observation as a trend or use weight as a reward."
+    },
+    {
+      "id": "weekly-check-in",
+      "steps": [
+        "Coach",
+        "review target and confidence",
+        "read concise change reason",
+        "open contribution detail or next action when useful"
+      ],
+      "qualityBar": "Explain the target change without implying punishment for one day's intake."
+    },
+    {
+      "id": "return-after-gap",
+      "steps": [
+        "neutral welcome",
+        "brief recovery check-in as required",
+        "resume logging or coaching with policy-safe guidance"
+      ],
+      "qualityBar": "Do not shame, assume low intake, or obscure safety support."
+    },
+    {
+      "id": "start-workout",
+      "steps": [
+        "Train",
+        "choose exercise",
+        "log or repeat set with last-session context",
+        "persist progress as it is entered"
+      ],
+      "qualityBar": "Usable between sets; interrupted sessions remain recoverable."
+    }
+  ],
+  "componentFamilies": [
+    "theme-and-tokens",
+    "surface-and-group",
+    "figure-with-unit",
+    "macro-bar",
+    "horizon-arc",
+    "notice-family(info|caution|required)",
+    "entry-row-and-meal-group",
+    "status-row",
+    "choice-card",
+    "add-sheet",
+    "empty-loading-error",
+    "trend-chart",
+    "navigation-bar",
+    "primary-action(fab)",
+    "signature(orbit-hairline|limb-glow|starfield)"
+  ],
+  "visualToneByArea": {
+    "today": "energetic hero, calm log",
+    "dashboard": "scannable, energetic only in the hero",
+    "food-logging": "fast, factual, calm",
+    "search-scan-quickadd": "fast, factual",
+    "progress": "measured, explanatory",
+    "coach": "calm, evidence-led",
+    "onboarding": "focused, plain, low-pressure",
+    "settings": "quiet, grouped",
+    "states": "truthful, actionable"
+  },
+  "interactionPatterns": [
+    "immediate, truthful action feedback",
+    "undo for reversible changes",
+    "confirmation for irreversible changes",
+    "progressive disclosure of detail, never of material safety",
+    "visible alternatives to gestures",
+    "system reduce-motion support",
+    "no reward framing for restriction or scale outcomes"
+  ],
+  "implementationNotes": [
+    "Build both ColorSchemes explicitly; never call fromSeed; set surfaceTint transparent.",
+    "Expose protein/carbs/fat/trend/etc. through a ThemeExtension (context.mm); screens never read colorScheme for meaning.",
+    "Bundle Space Grotesk and Inter as assets; never use google_fonts (offline-only).",
+    "Verify tabular figures in the gallery; fall back to Inter for figures if Space Grotesk lacks them.",
+    "Test contrast of every token pair per theme from this file's colorRoles.",
+    "Keep domain and engine logic independent of Flutter.",
+    "Treat loading, empty, error and legitimate zero as distinct states.",
+    "Follow roadmap dependencies; this file does not imply implementation status."
+  ],
+  "contractsWithRequirements": {
+    "MM-102": "palette direction superseded here; ticket updated, status proposed until rendered review",
+    "MM-103": "typeface and radius proposals changed here; ticket updated",
+    "MM-105": "gallery hosts the palette sheet and contrast test",
+    "MM-106": "accessibility thresholds are the minimum",
+    "MM-109": "icon should be built from the arc motif",
+    "MM-163": "one implementation per control; reusable view parts are components; enforced by mm arch",
+    "MM-159": "engineering rules (SOLID, L and I first, one declaration per file) bind the design system code too"
+  }
+}

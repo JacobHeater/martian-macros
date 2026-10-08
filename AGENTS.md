@@ -33,7 +33,10 @@ requirements, and [docs/architecture.md](docs/architecture.md).
 - `apps/mobile/` is the Flutter UI.
 - `packages/domain/` contains pure-Dart domain types and rules.
 - `packages/engine/` contains pure-Dart calculations and coaching logic.
-- `packages/data/` contains Drift/SQLite persistence and `MmStore`.
+- `packages/data/` contains Drift/SQLite persistence and `MmStore` (to be replaced
+  by repository interfaces and implementations, MM-161).
+- `packages/fixtures/` (planned, MM-161) holds in-memory implementations of
+  every interface, for tests, demos and early work.
 - `tool/` contains the dependency-light `mm` task runner.
 - `requirements/` is the source of truth for planned and shipped product
   behavior; `docs/architecture.md` records cross-cutting design.
@@ -48,6 +51,44 @@ requirements, and [docs/architecture.md](docs/architecture.md).
 - A change to any table bumps `AppDatabase.currentSchemaVersion` by one, adds
   the step to `migrationSteps`, and runs `mm schema` to export the snapshot.
   Only one schema change is in flight at a time (see `roadmap/README.md`).
+
+## Engineering principles (binding)
+
+These are the product owner's rules for how the code is built (MM-159). They
+override convenience. Where principles conflict, Liskov substitution (L) and
+interface segregation (I) win.
+
+1. Follow SOLID, and design for **L** and **I** first.
+2. Every integration point is an interface that any subtype can replace
+   (food source, barcode scanner, health source, backup provider, entitlement,
+   clock). Never import a vendor or platform package outside the one
+   registration file.
+3. Consumers depend on the **narrowest** interface they need
+   (`WeightReader`, not a store). Interfaces are `abstract interface class`;
+   they live with the consumer's layer (`packages/domain`).
+4. If a product or vendor decision is open, build against the interface and an
+   in-memory fixture (`packages/fixtures`) and carry on. Do not wait for the
+   decision.
+5. **One declaration per file.** Every model, interface, class, enum,
+   extension and typedef has its own file, named for it in snake_case. No file
+   defines more than one. Barrel files only `export`. Generated files are
+   exempt. `mm arch` enforces it.
+6. All database access goes through a repository interface with a Drift
+   implementation and an in-memory fixture. Screens and providers never use
+   Drift or a concrete store.
+7. Every interface has a contract test suite run against **every**
+   implementation, fixtures included. That is how substitutability is proved.
+8. A reusable part of a view is a design-system component, written once. A
+   screen never uses a raw Material control (`FilledButton`, `TextField`,
+   `DropdownButton`, `Card`, …); it uses the component. Components take
+   meaning (`MmButtonKind.primary`), never a color, radius or padding.
+9. Prefer composition to inheritance, and stateless or `ConsumerWidget`
+   widgets, so the one-declaration rule does not force public `State` classes.
+
+New code follows these now. Existing code that does not is listed in the
+baseline (`tool/arch_baseline.txt`, once MM-160 lands) and is fixed by the
+tickets MM-160 to MM-163, not opportunistically inside unrelated changes. Do not
+add to the baseline.
 
 ## Validation
 

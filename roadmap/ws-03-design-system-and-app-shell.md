@@ -1,6 +1,6 @@
 # WS-03: Design system and app shell
 
-**Order** 3 · **Group** A (start now) · **State** partly built · **Risk** medium
+**Order** 2 (after WS-14, since 2026-10-08) · **Group** A (start now) · **State** in progress · **Risk** medium
 
 ## Summary
 Give every later screen a component library, a string catalog, a shared chart
@@ -46,11 +46,12 @@ navigation structure that will not move under them.
 - Reward mechanics: WS-09.
 
 ## Prerequisites
-None in code. Two product-owner decisions gate two steps:
-- the visual direction (palette and type) before step 1;
-- the dashboard's contents and order before step 3.
-
-Both tickets carry a proposal marked as the author's choice.
+None in code. Two product-owner decisions gated two steps:
+- the visual direction (palette and type): **decided 2026-10-08**, recorded in
+  [`design/`](../design/README.md) and previewed in
+  `design/palette-preview.html`; MM-102 and MM-103 stay `proposed` until it is
+  seen in the app and the gallery;
+- the dashboard's contents and order before step 3 (MM-98): still open.
 
 ## Enables
 Every workstream with a screen: WS-05, WS-06, WS-07, WS-08, WS-09, WS-10. And
@@ -80,20 +81,32 @@ WS-13, which needs accessibility, both themes and the icon.
   reading is one dot" rules live in one place.
 
 ## Sequence
-1. **Tokens and component library; migrate the existing screens
-   (MM-102, MM-103, MM-104).** M2. Split `onboarding_screen.dart` (531 lines)
+1. **Theme, then components and gallery; migrate the existing screens
+   (MM-102, MM-103, MM-104, MM-105, MM-163).** M0. Staged:
+   - **1a, theme only.** Replace `colorSchemeSeed` with explicit light and dark
+     color schemes and the color tokens (`design/color-and-theme-system.md`),
+     component themes (navigation bar, FAB, buttons, inputs, cards), spacing
+     and radius constants. No layout change; the existing screens lose the muddy
+     palette at once. Keep the platform font until the font decision is made.
+   - **1b, components, gallery, migration.** Waits for WS-14 step 1 (one
+     declaration per file, so components and screens are written that way). Each
+     component takes meaning, never styling, and a screen may not use a raw
+     Material control (MM-163, enforced by `mm arch`). Shared components, the gallery
+     with a palette sheet and a contrast test (this is where MM-102's rendered
+     review is completed), then migrate screens. Split `onboarding_screen.dart` (531 lines)
    into one file per step as part of the migration; five workstreams add to
    onboarding later.
-2. **Strings (MM-108).** M2. One pass over all text into localization files,
+2. **Strings (MM-108).** M0. One pass over all text into localization files,
    with the glossary and the banned-word test. Do it immediately after step 1
    while the screens are fresh.
-3. **Navigation and dashboard (MM-99, MM-98, MM-100).** M2. Rename Today to
+3. **Navigation and dashboard (MM-99, MM-98, MM-100).** M0. Includes the Today
+   redesign in `design/screen-direction.md`. Rename Today to
    Food, move the calibration banner to the dashboard, keep each destination's
    state.
-4. **Charts (MM-107).** M2. Move the trend chart into the shared component;
+4. **Charts (MM-107).** M0. Move the trend chart into the shared component;
    add the small trend line the dashboard needs.
-5. **Gallery, screenshot tests, dark theme, small screens, accessibility
-   (MM-105, MM-91, MM-106).** M3.
+5. **Dark-theme, small-screen, large-text and accessibility verification
+   (MM-91, MM-106).** M2. The gallery (MM-105) moved to step 1.
 6. **Icon and launch screen (MM-109).** M3.
 
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
@@ -117,7 +130,7 @@ conflicts with this one.
 - Built: MM-90 (three tabs and day rollover; superseded in part by the
   dashboard navigation).
 - Remaining: MM-102, MM-103, MM-104, MM-108, MM-99, MM-98, MM-100, MM-107,
-  MM-105, MM-91, MM-106, MM-109. Epics: MM-89, MM-97, MM-101.
+  MM-105, MM-91, MM-106, MM-109, MM-163. Epics: MM-89, MM-97, MM-101.
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.

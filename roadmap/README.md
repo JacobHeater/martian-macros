@@ -6,7 +6,7 @@ requirements of its own.
 
 - **`requirements/`** answers *what must be true*. One ticket per decision or
   piece of work, grouped by feature.
-- **`roadmap/`** answers *what next*. Thirteen workstreams, grouped by how the
+- **`roadmap/`** answers *what next*. Fourteen workstreams, grouped by how the
   work is actually delivered, with the dependencies between them.
 
 If the two disagree about what a feature does, the ticket is right. If a
@@ -45,26 +45,29 @@ to exactly one workstream.
 
 ## The workstreams
 
-| Order | Id | Workstream | State on 2026-10-07 | Group |
+| Order | Id | Workstream | State on 2026-10-08 | Group |
 | --- | --- | --- | --- | --- |
-| 1 | WS-01 | [Delivery foundations](ws-01-delivery-foundations.md) | partly built | A |
-| 2 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built | A |
-| 3 | WS-03 | [Design system and app shell](ws-03-design-system-and-app-shell.md) | partly built | A |
-| 4 | WS-04 | [Food data pack](ws-04-food-data-pack.md) | not started | A |
-| 5 | WS-05 | [Setup, screening and profile lifecycle](ws-05-setup-screening-and-profile.md) | partly built | B |
-| 6 | WS-06 | [Targets and the explainable check-in](ws-06-targets-and-explainable-check-in.md) | not started | B |
-| 7 | WS-07 | [Progress and measurement](ws-07-progress-and-measurement.md) | partly built | B |
-| 8 | WS-08 | [Food logging experience](ws-08-food-logging-experience.md) | partly built | B |
-| 9 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | not started | C |
-| 10 | WS-10 | [Training log and strength](ws-10-training-log-and-strength.md) | not started | C |
-| 11 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | not started | C |
-| 12 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | not started | C |
-| 13 | WS-13 | [Commercial and release readiness](ws-13-commercial-and-release-readiness.md) | not started | D |
+| 1 | WS-14 | [Architecture and module boundaries](ws-14-architecture-and-module-boundaries.md) | not started | A |
+| 2 | WS-03 | [Design system and app shell](ws-03-design-system-and-app-shell.md) | in progress | A |
+| 3 | WS-01 | [Delivery foundations](ws-01-delivery-foundations.md) | partly built | A |
+| 4 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built | A |
+| 5 | WS-04 | [Food data pack](ws-04-food-data-pack.md) | not started | A |
+| 6 | WS-05 | [Setup, screening and profile lifecycle](ws-05-setup-screening-and-profile.md) | partly built | B |
+| 7 | WS-06 | [Targets and the explainable check-in](ws-06-targets-and-explainable-check-in.md) | not started | B |
+| 8 | WS-07 | [Progress and measurement](ws-07-progress-and-measurement.md) | partly built | B |
+| 9 | WS-08 | [Food logging experience](ws-08-food-logging-experience.md) | partly built | B |
+| 10 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | not started | C |
+| 11 | WS-10 | [Training log and strength](ws-10-training-log-and-strength.md) | not started | C |
+| 12 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | not started | C |
+| 13 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | not started | C |
+| 14 | WS-13 | [Commercial and release readiness](ws-13-commercial-and-release-readiness.md) | not started | D |
 
 Ids are stable labels. If the order changes, `recommendedOrder` changes and
-the ids do not.
+the ids do not. WS-03 was moved to order 1 on 2026-10-08 (design first); the
+ids were not renumbered.
 
 ```
+WS-14 architecture ──► (everything below builds to its rules)
 Group A (start now)      Group B                    Group C                 Group D
 WS-01 foundations  ──┬─► WS-05 setup/screening ─┐
 WS-02 engine       ──┼─► WS-06 targets ─────────┼─► WS-09 coaching ──────┐
@@ -78,9 +81,16 @@ of them block only some steps of the dependent workstream.
 
 ## Milestones
 
-Order within a workstream follows three milestones. A step's `milestone` in
+Order within a workstream follows four milestones, starting with M0. A step's `milestone` in
 `roadmap.json` says which one it serves.
 
+0. **M0, structure, look, voice and shell.** Internal staging, not a release
+   gate. The foundations exist before feature work multiplies: the engineering
+   rules enforced (one declaration per file, repository and integration
+   interfaces with fixtures, WS-14) and the design system (theme, components,
+   strings, navigation, charts; [`design/`](../design/README.md), WS-03). The
+   engine and safety lane (M1) runs beside it because the two touch different
+   files.
 1. **M1, a trustworthy first check-in.** The coach's first adaptive change
    happens on day 14. Three known defects affect that number (MM-120, MM-131,
    MM-115), nothing explains it to the user (MM-138), and a health change after
@@ -98,6 +108,10 @@ Order within a workstream follows three milestones. A step's `milestone` in
 
 In this order of precedence:
 
+0. **Structure, then design, before features.** WS-14 (the engineering rules
+   in `AGENTS.md`) and WS-03 (the design system) are milestone M0: every later
+   file and screen is built to them, not reworked afterwards. This does not
+   delay safety: engine defects are a separate lane and proceed in parallel.
 1. **Safety.** A defect that could give a user a wrong or unsafe target comes
    before any feature. This is why WS-02 is second only to the ability to
    change the schema.
@@ -206,22 +220,25 @@ dependency:
 | WS-01 step 1 | MM-61 | Blocks more than any other ticket. |
 | WS-02 step 1 | MM-120 | A small, self-contained defect in a headline number. |
 | WS-02 step 2 | MM-131 | The largest risk to the product's central claim; starts by measuring it. |
-| WS-03 step 1 | MM-102, MM-103, MM-104 | Cheapest while four screens exist. Needs the visual direction confirmed. |
+| WS-14 step 1 | MM-160 | **Start here.** Enforces one declaration per file and splits the packages; nearly every file is touched, so it goes before other work in those packages. |
+| WS-03 step 1 | MM-102, MM-103, MM-104, MM-105, MM-163 | 1a (theme) is done. 1b (components, gallery, one implementation per control, screen migration) waits for WS-14 step 1. |
 | WS-04 step 1 | MM-51 | Starts the longest lead time. |
-| WS-05 step 1 | MM-83 | Screening answers cannot be corrected at all today. Needed for M1; if built before WS-03 step 1 it is restyled there. |
+| WS-05 step 1 | MM-83 | Screening answers cannot be corrected at all today. Needed for M1; build it after WS-03 steps 1 and 2 so it is born in the new system. |
 | WS-06 step 1 | MM-143, MM-144 | Documents and one test. Makes the professional review cheaper. |
 | WS-10 step 1, WS-11 step 1 | MM-76, MM-67 | New data and a new package with no dependencies. Not urgent (M3); good work to hand off. |
 | WS-12 step 1, WS-13 step 1 | MM-65, MM-88, MM-95 | Research and documents with no code. |
 
 ### What not to touch yet
 
+- **No new `MmStore` methods and no new file with several declarations.** The rules are in `AGENTS.md`; after MM-161, persistence is a new narrow repository interface.
 - **No new tables or columns** until MM-61 is done.
 - **No changes to what a target contains** (protein minimum, explanation,
   bands) until WS-02 steps 1 to 4 are done.
 - **No stall diagnosis, insight or adherence feature** until targets carry
   bands and a confidence level (WS-06's gate).
 - **No new screens in large numbers** until the component library and string
-  catalog exist. A screen built before them is built twice.
+  catalog exist (WS-03 steps 1 and 2, M0). A screen built before them is built
+  twice. Engine work is not affected.
 - **No purchase or trial code** until MM-88 has answered how each store allows
   a trial for a one-time purchase.
 
@@ -263,6 +280,8 @@ computed from ticket status. Move the id from `remaining` to `built` in
 **When a new workstream seems needed:** it is, if the new tickets share an
 ownership area nobody has and would otherwise be scattered across three or
 more workstreams. Otherwise they belong to the existing ones.
+
+**Restaged 2026-10-08:** design first. See `restaged` in `roadmap.json`.
 
 **Checks worth running after any edit** (none is automated yet; a `mm roadmap`
 command that performs them would be a reasonable addition to `tool/`):

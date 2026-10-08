@@ -154,6 +154,32 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
   with RIR, weekly hard sets per muscle group, and double-progression
   suggestions.
 
+## Code structure principles
+
+Binding rules from the product owner (MM-159); the short form is in
+[AGENTS.md](../AGENTS.md).
+
+- **SOLID, with Liskov substitution and Interface segregation first.**
+  Integration points are narrow interfaces that any subtype can replace; a
+  consumer depends on the smallest role it needs and never on a concrete class.
+- **Ports and adapters.** Interfaces are owned by the layer that uses them
+  (`packages/domain`); Drift and vendor code are adapters in `packages/data` and
+  the integration packages; one registration file chooses implementations.
+- **Fixtures keep work moving.** Every interface has an in-memory
+  implementation in `packages/fixtures`, so screens, tests and early work do
+  not wait on a vendor, a store rule or a product decision.
+- **Contract tests prove substitutability.** One abstract suite per interface,
+  run against every implementation.
+- **Repositories for all persistence** (MM-161), designed as small role
+  interfaces (`WeightReader`, `WeightWriter`, ...), not one store.
+- **One declaration per file** (MM-160), checked by `mm arch`.
+- **One implementation per control** (MM-163): reusable view parts are
+  design-system components; screens never use raw Material controls.
+
+State on 2026-10-08: none of this is yet true of the code. 24 of 42 library
+files define several types, there are no interfaces, and the app depends on
+`MmStore` directly. The work to get there is workstream WS-14.
+
 ## Developer experience
 
 - `mm` is a zero-dependency Dart CLI (`tool/`), launched by `mm.ps1`,
@@ -167,6 +193,6 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
 ## Roadmap
 
 What to build next, in what order, and what blocks what is in
-[`roadmap/`](../roadmap/README.md): thirteen workstreams with their
+[`roadmap/`](../roadmap/README.md): fourteen workstreams with their
 dependencies, and the same as data in `roadmap/roadmap.json`. The list that
 used to be here is superseded by it.
