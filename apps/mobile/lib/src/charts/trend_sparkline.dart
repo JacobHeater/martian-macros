@@ -19,7 +19,12 @@ class TrendSparkline extends StatelessWidget {
     final points = trend.length > days
         ? trend.sublist(trend.length - days)
         : trend;
-    if (points.length < 2) return const SizedBox(height: 56);
+    if (points.length < 2) {
+      return Text(
+        'A trend needs more weigh-ins.',
+        style: Theme.of(context).textTheme.bodySmall,
+      );
+    }
     FlSpot spot(int i, double sigmas) => FlSpot(
       i.toDouble(),
       points[i].levelKg + sigmas * points[i].levelSigmaKg,
