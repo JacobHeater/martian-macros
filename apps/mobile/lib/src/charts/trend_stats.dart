@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
+import '../theme/mm_colors_context.dart';
 
 class TrendStats extends StatelessWidget {
   const TrendStats({super.key, required this.trend, required this.fmt});
@@ -18,7 +19,10 @@ class TrendStats extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: text.labelMedium),
+          Text(
+            label,
+            style: text.labelMedium?.copyWith(color: context.mm.text2),
+          ),
           Text(value, style: text.titleLarge),
         ],
       ),

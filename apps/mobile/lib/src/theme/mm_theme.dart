@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'mm_colors.dart';
 import 'mm_radius.dart';
+import 'mm_type.dart';
 
 /// The light or dark theme. Both are built from the same roles; there is no
 /// seed palette, so no Material-generated tint can reach a screen.
@@ -55,8 +56,11 @@ ThemeData mmTheme(Brightness brightness) {
     useMaterial3: true,
     colorScheme: scheme,
     scaffoldBackgroundColor: c.canvas,
+    textTheme: MmType.textTheme(c),
     extensions: [c],
   );
+
+  final button = base.textTheme.titleMedium!.copyWith(fontSize: 15);
 
   return base.copyWith(
     appBarTheme: AppBarTheme(
@@ -65,6 +69,8 @@ ThemeData mmTheme(Brightness brightness) {
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
+      centerTitle: false,
+      titleTextStyle: base.textTheme.headlineSmall,
     ),
     cardTheme: CardThemeData(
       color: c.surface,
@@ -87,6 +93,7 @@ ThemeData mmTheme(Brightness brightness) {
       ),
       labelTextStyle: WidgetStateProperty.resolveWith(
         (states) => TextStyle(
+          fontFamily: 'Inter',
           fontSize: 12,
           height: 16 / 12,
           fontWeight: states.contains(WidgetState.selected)
@@ -111,6 +118,7 @@ ThemeData mmTheme(Brightness brightness) {
         backgroundColor: c.ember,
         foregroundColor: c.onEmber,
         minimumSize: const Size(64, 48),
+        textStyle: button,
         shape: rounded(MmRadius.control),
       ),
     ),
@@ -118,6 +126,7 @@ ThemeData mmTheme(Brightness brightness) {
       style: OutlinedButton.styleFrom(
         foregroundColor: c.text,
         minimumSize: const Size(64, 48),
+        textStyle: button,
         side: BorderSide(color: c.outlineStrong),
         shape: rounded(MmRadius.control),
       ),
@@ -126,6 +135,7 @@ ThemeData mmTheme(Brightness brightness) {
       style: TextButton.styleFrom(
         foregroundColor: c.ember,
         minimumSize: const Size(48, 48),
+        textStyle: button,
         shape: rounded(MmRadius.control),
       ),
     ),

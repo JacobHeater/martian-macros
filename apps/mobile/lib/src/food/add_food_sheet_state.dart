@@ -20,7 +20,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _protein = TextEditingController();
   final _carbs = TextEditingController();
   final _fat = TextEditingController();
-  late Meal _meal = _defaultMeal();
+  late Meal _meal = widget.meal ?? _defaultMeal();
   var _source = QuantitySource.labelServing;
 
   @override

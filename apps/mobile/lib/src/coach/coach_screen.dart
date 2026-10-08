@@ -12,6 +12,7 @@ import '../ui/info_card.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
 import 'caution_message.dart';
 import 'metabolism_summary.dart';
@@ -45,6 +46,7 @@ class CoachScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Notice(
+              kind: NoticeKind.caution,
               icon: Icons.medical_information_outlined,
               text: caution.message,
             ),
@@ -64,10 +66,7 @@ class CoachScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  Fmt.kcal(current.targets.kcal),
-                  style: text.headlineMedium,
-                ),
+                Text(Fmt.kcal(current.targets.kcal), style: text.displaySmall),
                 const SizedBox(height: 8),
                 StatRow('Protein', Fmt.grams(current.targets.proteinG)),
                 StatRow('Carbs', Fmt.grams(current.targets.carbsG)),
@@ -86,7 +85,7 @@ class CoachScreen extends ConsumerWidget {
                 for (final flag in current.targets.flags)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Notice(icon: Icons.info_outline, text: flag.message),
+                    child: Notice(kind: NoticeKind.caution, text: flag.message),
                   ),
               ],
             ),

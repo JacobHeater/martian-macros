@@ -195,12 +195,12 @@ void main() {
 
     // Logging from the dashboard leaves the user on the dashboard; the log
     // itself is on the Food tab.
-    expect(find.textContaining('remaining'), findsOneWidget);
+    expect(find.textContaining('kcal left'), findsOneWidget);
     await tester.tap(find.text('Food'));
     await tester.pumpAndSettle();
     expect(find.text('Chicken and rice'), findsOneWidget);
     expect(find.text('510'), findsWidgets);
-    expect(find.textContaining('remaining'), findsOneWidget);
+    expect(find.textContaining('kcal left'), findsOneWidget);
 
     await tester.tap(find.text('Complete'));
     await tester.pumpAndSettle();

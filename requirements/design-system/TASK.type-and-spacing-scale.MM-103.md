@@ -55,3 +55,8 @@ Scenario: Large text
 ## Progress (step 1a)
 - `MmSpace` and `MmRadius` constants exist in `theme/mm_theme.dart`, and the component themes use them. Type roles, bundled fonts and the
   migration of screens onto the spacing scale are not done (step 1b).
+
+## Progress (restyle)
+- Type roles from design/visual-language.md are in the theme (`theme/mm_type.dart`): Inter and Space Grotesk are bundled (OFL, `apps/mobile/assets/fonts/`), mapped onto Material text slots with tabular figures.
+- The look is applied: horizon arc hero (`CalorieHero`, `HorizonArc`, `MmHeroSurface`), status row, notice family without fills (`NoticeKind`), macro rows with protein emphasized, per-meal add buttons, day header in the app bar, nav hairline, FAB halo in dark. Tested in light and dark on the emulator.
+- **Not verified**: Space Grotesk tabular figures were not checked digit by digit; golden images still need Linux CI (MM-105). **Not done**: onboarding, Settings and Coach layouts are restyled only through the theme, not redesigned per screen-direction.md.
