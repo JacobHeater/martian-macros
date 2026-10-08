@@ -10,3 +10,4 @@ environment:
 # ever been run, since one of its jobs is to run it.
 dev_dependencies:
   lints: ^6.0.0
+  test: ^1.26.0

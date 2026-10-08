@@ -1,6 +1,3 @@
-/// The coaching phase the user is in.
-enum GoalMode { fatLoss, recomp, leanGain, maintenance }
-
 /// Resistance-training background, which drives recomp eligibility and the
 /// lean/fat partition of weight change.
 enum TrainingStatus {

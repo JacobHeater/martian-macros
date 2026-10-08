@@ -1,0 +1,27 @@
+# Files that do not yet follow the engineering rules (MM-160).
+# This list can only shrink: do not add to it. `mm arch` fails if a
+# listed file is fixed and left here.
+apps/mobile/lib/src/app.dart
+apps/mobile/lib/src/coach/coach_screen.dart
+apps/mobile/lib/src/format.dart
+apps/mobile/lib/src/onboarding/onboarding_screen.dart
+apps/mobile/lib/src/progress/progress_screen.dart
+apps/mobile/lib/src/settings/settings_screen.dart
+apps/mobile/lib/src/today/add_food_sheet.dart
+apps/mobile/lib/src/today/today_screen.dart
+apps/mobile/lib/src/widgets.dart
+packages/data/lib/src/database.dart
+packages/data/lib/src/store.dart
+packages/data/test/migration_test.dart
+packages/engine/lib/src/body_composition.dart
+packages/engine/lib/src/coach.dart
+packages/engine/lib/src/energy_expenditure.dart
+packages/engine/lib/src/mode_advisor.dart
+packages/engine/lib/src/safety_bounds.dart
+packages/engine/lib/src/targets.dart
+packages/engine/lib/src/tdee_estimator.dart
+packages/engine/lib/src/weight_trend.dart
+packages/engine/test/support/coach_loop.dart
+packages/engine/test/tdee_estimator_test.dart
+tool/src/commands.dart
+tool/src/requirements.dart
