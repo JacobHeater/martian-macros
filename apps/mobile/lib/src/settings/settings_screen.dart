@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
+import '../about/how_this_works_screen.dart';
 import '../format/daily_activity_label.dart';
 import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
@@ -121,6 +122,18 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           const ProfileSection(),
+          const GroupHeader('About'),
+          MmListRow(
+            leadingIcon: Icons.menu_book_outlined,
+            title: 'How this works',
+            subtitle: 'Where each number comes from, and how sure we are.',
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const HowThisWorksScreen(),
+              ),
+            ),
+          ),
           const GroupHeader('Data'),
           const MmListRow(
             leadingIcon: Icons.lock_outline,
