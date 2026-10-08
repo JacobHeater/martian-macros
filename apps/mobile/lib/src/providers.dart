@@ -1,58 +1,52 @@
-import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mm_data/mm_data.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+
+import 'integration_providers.dart';
+import 'repository_role_providers.dart';
 
 /// Build environment from `--dart-define-from-file=config/<env>.json`.
 const appEnv = String.fromEnvironment('MM_ENV', defaultValue: 'dev');
 
-/// The local database. Overridden with an in-memory database in tests.
-final storeProvider = Provider<MmStore>((ref) {
-  final store = MmStore(AppDatabase(driftDatabase(name: 'martian_macros')));
-  ref.onDispose(store.close);
-  return store;
-});
-
 /// The user's current calendar day. Invalidated when the app resumes, so a
 /// session left open overnight rolls over.
 final todayProvider = Provider<CalendarDate>(
-  (ref) => CalendarDate.fromDateTime(DateTime.now()),
+  (ref) => ref.watch(clockProvider).today(),
 );
 
 final setupProvider = StreamProvider<UserSetup?>(
-  (ref) => ref.watch(storeProvider).watchSetup(),
+  (ref) => ref.watch(setupReaderProvider).watchSetup(),
 );
 
 final weightsProvider = StreamProvider<List<WeightObservation>>(
-  (ref) => ref.watch(storeProvider).watchWeights(),
+  (ref) => ref.watch(weightReaderProvider).watchWeights(),
 );
 
 final waistProvider = StreamProvider<List<WaistObservation>>(
-  (ref) => ref.watch(storeProvider).watchWaist(),
+  (ref) => ref.watch(waistReaderProvider).watchWaist(),
 );
 
 /// Intake for the engine: the last 60 days is more than any window needs.
 final intakeDaysProvider = StreamProvider<List<IntakeDay>>((ref) {
   final since = ref.watch(todayProvider).addDays(-60);
-  return ref.watch(storeProvider).watchIntakeDays(since: since);
+  return ref.watch(intakeReaderProvider).watchIntakeDays(since: since);
 });
 
 final targetsHistoryProvider = StreamProvider<List<TargetsRecord>>(
-  (ref) => ref.watch(storeProvider).watchTargetsHistory(),
+  (ref) => ref.watch(targetsHistoryReaderProvider).watchTargetsHistory(),
 );
 
 final foodForDayProvider = StreamProvider.family<List<FoodEntry>, CalendarDate>(
-  (ref, date) => ref.watch(storeProvider).watchFood(date),
+  (ref, date) => ref.watch(foodDayReaderProvider).watchFood(date),
 );
 
 final completenessProvider =
     StreamProvider.family<DayCompleteness, CalendarDate>(
-      (ref, date) => ref.watch(storeProvider).watchCompleteness(date),
+      (ref, date) => ref.watch(dayMarkReaderProvider).watchCompleteness(date),
     );
 
 final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
-  (ref) => ref.watch(storeProvider).watchRecentFoods(),
+  (ref) => ref.watch(recentFoodReaderProvider).watchRecentFoods(),
 );
 
 /// The engine's current view of the user; null until setup and a first
@@ -95,7 +89,7 @@ final checkInProvider = Provider<void>((ref) {
     history: history,
     today: ref.watch(todayProvider),
   );
-  if (next != null) ref.read(storeProvider).saveTargets(next);
+  if (next != null) ref.read(targetsHistoryWriterProvider).saveTargets(next);
 });
 
 /// The first day targets may next change.

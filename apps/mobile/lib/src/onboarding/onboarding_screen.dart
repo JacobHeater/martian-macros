@@ -6,6 +6,7 @@ import 'package:mm_engine/mm_engine.dart';
 import '../format.dart';
 import '../providers.dart';
 import '../widgets.dart';
+import '../repository_role_providers.dart';
 
 /// Collects everything the engine needs before it can coach. Biological
 /// sex has no default and nothing proceeds without it.
@@ -154,20 +155,23 @@ class _OnboardingState extends ConsumerState<OnboardingScreen> {
     final recommended = _recommendation!.mode;
     final chosen = _mode ?? recommended;
     setState(() => _saving = true);
-    final store = ref.read(storeProvider);
-    await store.saveWeight(_today, _weightKg!);
-    await store.saveSetup(
-      UserSetup(
-        profile: profile,
-        screening: _screening,
-        trainingStatus: _status,
-        trainingDaysPerWeek: _trainingDays,
-        goalMode: policy.allowedModes.contains(chosen) ? chosen : recommended,
-        onboardedOn: _today,
-        unitSystem: _units,
-        bodyFatPercent: _bodyFat,
-      ),
-    );
+    await ref.read(weightWriterProvider).saveWeight(_today, _weightKg!);
+    await ref
+        .read(setupWriterProvider)
+        .saveSetup(
+          UserSetup(
+            profile: profile,
+            screening: _screening,
+            trainingStatus: _status,
+            trainingDaysPerWeek: _trainingDays,
+            goalMode: policy.allowedModes.contains(chosen)
+                ? chosen
+                : recommended,
+            onboardedOn: _today,
+            unitSystem: _units,
+            bodyFatPercent: _bodyFat,
+          ),
+        );
   }
 
   @override

@@ -10,6 +10,7 @@ import '../format.dart';
 import '../providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../widgets.dart';
+import '../repository_role_providers.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -48,8 +49,9 @@ class _ProgressState extends ConsumerState<ProgressScreen> {
               ? null
               : fmt.weightFromKg(todays.weightKg).toStringAsFixed(1),
           hint: 'First thing in the morning, after the bathroom.',
-          onSave: (value) =>
-              ref.read(storeProvider).saveWeight(today, fmt.weightToKg(value)),
+          onSave: (value) => ref
+              .read(weightWriterProvider)
+              .saveWeight(today, fmt.weightToKg(value)),
         ),
         InfoCard(
           title: 'Weight trend',
@@ -100,8 +102,9 @@ class _ProgressState extends ConsumerState<ProgressScreen> {
               ? 'Measure at the navel, relaxed. Take three and enter the '
                     'middle one. Once a week is plenty.'
               : _waistSummary(waist, fmt),
-          onSave: (value) =>
-              ref.read(storeProvider).saveWaist(today, fmt.lengthToCm(value)),
+          onSave: (value) => ref
+              .read(waistWriterProvider)
+              .saveWaist(today, fmt.lengthToCm(value)),
         ),
       ],
     );
