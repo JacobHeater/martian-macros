@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'arch/arch_command.dart';
+import 'command.dart';
+import 'requirements.dart';
 import 'toolchain.dart';
 
 /// Workspace packages. `flutter: true` packages are tested with
@@ -8,22 +11,30 @@ const _packages = <({String path, bool flutter})>[
   (path: 'packages/domain', flutter: false),
   (path: 'packages/engine', flutter: false),
   (path: 'packages/data', flutter: false),
+  (path: 'packages/fixtures', flutter: false),
   (path: 'apps/mobile', flutter: true),
+  (path: 'tool', flutter: false),
 ];
+
+/// A test that waits longer than this fails instead of hanging the run (MM-93).
+/// Widget tests run on a fake clock, so one that awaits real I/O never ends.
+const _testTimeout = '60s';
 
 const _appDir = 'apps/mobile';
 const _envs = ['dev', 'prod'];
 
-typedef _Command = Future<int> Function(Toolchain tc, List<String> args);
-
-final _commands = <String, (String, _Command)>{
+final _commands = <String, (String, Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
-  'check': ('CI gate: format check, analyze, test', _check),
+  'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
   'gen': ('Run code generation in packages that use build_runner', _gen),
+  'schema': (
+    'Export the database schema snapshot for the current version',
+    _schema,
+  ),
   'run': (
     'Run the app (starts an emulator if needed): mm run [--env ..]',
     _run,
@@ -34,6 +45,14 @@ final _commands = <String, (String, _Command)>{
   ),
   'build': ('Build: mm build <android|ios> [--env dev|prod]', _build),
   'clean': ('Remove build outputs and caches', _clean),
+  'arch': (
+    'Engineering rules: one declaration per file (--init writes the baseline)',
+    _arch,
+  ),
+  'req': (
+    'Requirements: mm req [list | next | show <id>] (no args validates)',
+    _req,
+  ),
 };
 
 Future<int> runCli(List<String> args) async {
@@ -112,6 +131,8 @@ Future<int> _bootstrap(Toolchain tc, List<String> args) =>
 Future<int> _check(Toolchain tc, List<String> args) async {
   for (final step in <Future<int> Function()>[
     () => _format(tc, const ['--check']),
+    () => _req(tc, const []),
+    () => _arch(tc, const []),
     () => _analyze(tc, const []),
     () => _test(tc, const []),
   ]) {
@@ -136,8 +157,8 @@ Future<int> _test(Toolchain tc, List<String> args) async {
   for (final p in selected) {
     if (!Directory('${tc.repoRoot.path}/${p.path}/test').existsSync()) continue;
     final code = p.flutter
-        ? await tc.flutter(['test'], inDir: p.path)
-        : await tc.dart(['test'], inDir: p.path);
+        ? await tc.flutter(['test', '--timeout', _testTimeout], inDir: p.path)
+        : await tc.dart(['test', '--timeout', _testTimeout], inDir: p.path);
     if (code != 0) failed++;
   }
   return failed == 0 ? 0 : 1;
@@ -168,6 +189,54 @@ Future<int> _gen(Toolchain tc, List<String> args) async {
   }
   if (!ran) stdout.writeln('No packages use build_runner yet.');
   return 0;
+}
+
+const _dataDir = 'packages/data';
+const _schemaDir = 'drift_schemas';
+
+/// Exports the Drift schema snapshot for the current `schemaVersion` and
+/// regenerates the helpers the migration tests read.
+///
+/// Refuses to replace an existing snapshot: a released version's schema
+/// never changes, so a changed table needs a version bump first.
+Future<int> _schema(Toolchain tc, List<String> args) async {
+  final dataDir = '${tc.repoRoot.path}/$_dataDir';
+  final source = File('$dataDir/lib/src/app_database.dart').readAsStringSync();
+  final version = RegExp(r'currentSchemaVersion = (\d+);')
+      .firstMatch(source)
+      ?.group(1);
+  if (version == null) {
+    stderr.writeln('Could not find currentSchemaVersion in app_database.dart.');
+    return 1;
+  }
+  final snapshot = File('$dataDir/$_schemaDir/drift_schema_v$version.json');
+  if (snapshot.existsSync() && !args.contains('--force')) {
+    stderr.writeln(
+      'A snapshot for schema version $version already exists. If a table '
+      'changed, bump currentSchemaVersion and add a migration step first. '
+      '(--force replaces it; only for a version that was never released.)',
+    );
+    return 1;
+  }
+  var code = await tc.dart([
+    'run',
+    'drift_dev',
+    'schema',
+    'dump',
+    'lib/src/app_database.dart',
+    '$_schemaDir/',
+  ], inDir: _dataDir);
+  if (code != 0) return code;
+  code = await tc.dart([
+    'run',
+    'drift_dev',
+    'schema',
+    'generate',
+    '$_schemaDir/',
+    'test/generated_migrations/',
+  ], inDir: _dataDir);
+  if (code != 0) return code;
+  return tc.dart(['format', '$_dataDir/test/generated_migrations']);
 }
 
 /// Makes sure a phone or emulator is connected, starting an emulator if
@@ -315,3 +384,9 @@ bool _samePath(String a, String b) {
       s.replaceAll(r'\', '/').replaceAll(RegExp(r'^\./|/$'), '');
   return norm(a) == norm(b) || norm(b).endsWith('/${norm(a)}');
 }
+
+Future<int> _req(Toolchain tc, List<String> args) =>
+    runRequirements(tc.repoRoot, args);
+
+Future<int> _arch(Toolchain tc, List<String> args) =>
+    runArch(tc.repoRoot, args);

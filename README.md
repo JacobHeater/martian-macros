@@ -39,6 +39,8 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android\|ios` | Builds an app bundle or IPA (iOS requires macOS) |
 | `mm gen` | Runs `build_runner` in packages that use it |
+| `mm schema` | Exports the database schema snapshot after a `schemaVersion` bump (migration tests read it) |
+| `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
 | `mm clean` | Removes build outputs |
 
 ## Layout
@@ -50,8 +52,17 @@ packages/engine/    Pure Dart: weight trend, adaptive TDEE, partition, safety bo
 packages/data/      Pure Dart: Drift/SQLite database and the MmStore API (run `mm gen` after schema changes)
 tool/               The mm task runner (zero dependencies)
 config/             Per-environment --dart-define files
-docs/               Architecture and product decisions
+requirements/       Every epic, story, task, bug and spike, as files (start with its README)
+roadmap/            What to build next and in what order: workstreams, dependencies, roadmap.json
+docs/               Architecture overview
 ```
+
+## Requirements come first
+
+Work is tracked as tickets in [requirements/](requirements/README.md), each
+with a short id such as `MM-42`. Before changing how the app behaves, write
+or update the ticket for it; a pull request without one is rejected. Run
+`mm req next` for the next id and `mm req` to check the folder.
 
 This is a [pub workspace](https://dart.dev/tools/pub/workspaces): one
 lockfile and one dependency resolution for all packages.

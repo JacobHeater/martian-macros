@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
+
+import '../format/fmt.dart';
+import '../theme/mm_colors_context.dart';
+import '../ui/horizon_arc.dart';
+import '../ui/macro_bar.dart';
+import '../ui/macro_kind.dart';
+import '../ui/mm_hero_surface.dart';
+import '../ui/status_row.dart';
+
+/// The hero of a day: calories as a horizon arc, what is left, the macros, and
+/// optionally one status line. Used by the dashboard and the Food screen.
+class CalorieHero extends StatelessWidget {
+  const CalorieHero({
+    required this.intake,
+    required this.targets,
+    this.macros = MacroKind.values,
+    this.status,
+    this.onStatusTap,
+    this.onTap,
+    super.key,
+  });
+
+  final IntakeDay intake;
+  final DailyTargets? targets;
+
+  /// Which macros to show; protein is always emphasized.
+  final List<MacroKind> macros;
+
+  /// One line about the coach (calibration, a recent change).
+  final String? status;
+  final VoidCallback? onStatusTap;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final t = targets;
+    final left = t == null ? null : t.kcal - intake.kcal;
+    final over = left != null && left < 0;
+    final figure = left == null
+        ? Fmt.whole(intake.kcal)
+        : Fmt.whole(over ? -left : left);
+    final caption = left == null
+        ? 'kcal logged'
+        : over
+        ? 'kcal over ${Fmt.whole(t!.kcal)}'
+        : 'kcal left of ${Fmt.whole(t!.kcal)}';
+    return MmHeroSurface(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          HorizonArc(
+            progress: t == null || t.kcal <= 0 ? 0 : intake.kcal / t.kcal,
+            semanticsLabel: '$figure $caption',
+          ),
+          Text(figure, style: text.displayLarge, textAlign: TextAlign.center),
+          Text(
+            caption,
+            style: text.bodyMedium?.copyWith(color: context.mm.text2),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          for (final macro in macros) ...[
+            MacroBar(
+              macro: macro,
+              grams: switch (macro) {
+                MacroKind.protein => intake.proteinG,
+                MacroKind.carbs => intake.carbsG,
+                MacroKind.fat => intake.fatG,
+              },
+              target: switch (macro) {
+                MacroKind.protein => t?.proteinG,
+                MacroKind.carbs => t?.carbsG,
+                MacroKind.fat => t?.fatG,
+              },
+              emphasized: macro == MacroKind.protein,
+            ),
+            if (macro != macros.last) const SizedBox(height: 12),
+          ],
+          if (status != null) ...[
+            const SizedBox(height: 12),
+            Divider(color: context.mm.outline),
+            StatusRow(text: status!, onTap: onStatusTap ?? () {}),
+          ],
+        ],
+      ),
+    );
+  }
+}

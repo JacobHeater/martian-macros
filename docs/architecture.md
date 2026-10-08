@@ -1,7 +1,14 @@
 # Architecture and product decisions
 
-Status: founding decisions, October 2026. Change them by editing this file in
-the same PR as the code.
+Status: founding decisions, October 2026. This is the overview.
+
+**The requirements live in [`requirements/`](../requirements/README.md)**, one
+ticket per decision or piece of work, each with a short id (`MM-n`). Where
+this file and a ticket disagree, the ticket is right; fix this file.
+
+**Product design guidance lives in [`design/`](../design/README.md)** and
+translates requirements and roadmap decisions into shared visual, interaction,
+accessibility, and Flutter implementation rules.
 
 ## Product
 
@@ -76,6 +83,11 @@ the Mifflin-St Jeor × activity prior by inverse variance.
   as partial and excluded. Days the user marks complete are always used.
 - A logging-style switch (weighed share changes by more than 0.5) restarts
   the window, because the logging bias changed.
+- For 10 days after the calorie target changes by more than 10% of TDEE
+  (starting or ending a deficit), glycogen, water and gut contents move the
+  scale by a kilogram or two. The trend filter lets level and slope move
+  freely on those days, and the estimator leaves them out. A user who starts
+  in a deficit therefore gets a first measurement at day 28, not day 14.
 - The result is clamped to 1.1–3.0 × BMR.
 - The estimate is maintenance *in the user's logging units*. Consistent
   under-logging is absorbed by the closed loop.
@@ -95,8 +107,8 @@ before launch.
 | Goal body-fat floors (warn / reject) | 10% / 8% | 18% / 16% |
 | Minimum fat | max(0.5 g/kg, 20% kcal) | max(0.6 g/kg, 20% kcal) |
 
-- Protein is 1.6–2.2 g/kg of reference weight (the BMI-25 weight when
-  BMI ≥ 30), or 2.3–3.1 g/kg FFM for lean users in a deficit (Helms 2014).
+- Protein is 1.6–2.2 g/kg of reference weight (body weight up to BMI 25,
+  then the BMI-25 weight plus a quarter of the excess), or 2.3–3.1 g/kg FFM for lean users in a deficit (Helms 2014).
   It is capped at 0.8 g/kg for chronic kidney disease.
 - Weekly target change is at most min(100 kcal, 5%).
 
@@ -142,6 +154,32 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
   with RIR, weekly hard sets per muscle group, and double-progression
   suggestions.
 
+## Code structure principles
+
+Binding rules from the product owner (MM-159); the short form is in
+[AGENTS.md](../AGENTS.md).
+
+- **SOLID, with Liskov substitution and Interface segregation first.**
+  Integration points are narrow interfaces that any subtype can replace; a
+  consumer depends on the smallest role it needs and never on a concrete class.
+- **Ports and adapters.** Interfaces are owned by the layer that uses them
+  (`packages/domain`); Drift and vendor code are adapters in `packages/data` and
+  the integration packages; one registration file chooses implementations.
+- **Fixtures keep work moving.** Every interface has an in-memory
+  implementation in `packages/fixtures`, so screens, tests and early work do
+  not wait on a vendor, a store rule or a product decision.
+- **Contract tests prove substitutability.** One abstract suite per interface,
+  run against every implementation.
+- **Repositories for all persistence** (MM-161), designed as small role
+  interfaces (`WeightReader`, `WeightWriter`, ...), not one store.
+- **One declaration per file** (MM-160), checked by `mm arch`.
+- **One implementation per control** (MM-163): reusable view parts are
+  design-system components; screens never use raw Material controls.
+
+State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
+`mm arch` enforces one declaration per file, layering and design-system use with an empty
+baseline; repositories and integration seams have fixtures and contract suites. Workstream WS-14.
+
 ## Developer experience
 
 - `mm` is a zero-dependency Dart CLI (`tool/`), launched by `mm.ps1`,
@@ -154,22 +192,7 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
 
 ## Roadmap
 
-1. ✅ Monorepo, task runner, `mm_domain`, and engine v1 (trend, TDEE, bounds,
-   targets) with the simulator.
-2. ✅ `packages/data`: Drift schema (setup, weigh-ins, food log, day marks,
-   waist, targets history) behind `MmStore`. Sex is CHECK-constrained in the
-   schema. Still to do: migrations beyond v1.
-3. ✅ App vertical slice: onboarding and screening, Today (targets, manual
-   food logging with recents, day completeness), Progress (weigh-in, trend
-   chart with uncertainty band, waist), Coach (goal, targets, TDEE status,
-   cautions), Settings. The weekly check-in runs through `coach.dart`.
-4. `tools/food_pipeline` and `packages/food_catalog`: DuckDB ETL, a US pack,
-   FTS search, GTIN lookup, then search and barcode scanning in the
-   add-food sheet.
-5. `packages/health_ingest`: Health Connect first, behind a `HealthSource`
-   interface with a fake for Windows development. HealthKit comes when
-   development moves to the Mac.
-6. Training log, the progress screen (waist, e1RM, recomp signal), and the
-   monthly report.
-7. Backup providers, the Coach unlock and trial, and dietitian review of
-   `SafetyBounds`.
+What to build next, in what order, and what blocks what is in
+[`roadmap/`](../roadmap/README.md): fourteen workstreams with their
+dependencies, and the same as data in `roadmap/roadmap.json`. The list that
+used to be here is superseded by it.

@@ -3,9 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
-import '../format.dart';
+import '../format/fmt.dart';
+import '../format/goal_mode_label.dart';
 import '../providers.dart';
-import '../widgets.dart';
+import '../repository_role_providers.dart';
+import '../ui/choice_card.dart';
+import '../theme/mm_colors_context.dart';
+import '../ui/info_card.dart';
+import '../ui/macro_figure.dart';
+import '../ui/macro_kind.dart';
+import '../ui/mm_hero_surface.dart';
+import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
+import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
+import '../ui/stat_row.dart';
+import 'caution_message.dart';
+import 'metabolism_summary.dart';
+import 'target_flag_message.dart';
 
 /// What the engine believes, why, and what it will do next.
 class CoachScreen extends ConsumerWidget {
@@ -35,32 +50,53 @@ class CoachScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Notice(
+              kind: NoticeKind.caution,
               icon: Icons.medical_information_outlined,
               text: caution.message,
             ),
           ),
-        InfoCard(
-          title: 'Goal: ${setup.goalMode.label}',
-          trailing: TextButton(
-            onPressed: () => _changeGoal(context, ref, setup, snapshot),
-            child: const Text('Change'),
-          ),
-          child: Text(setup.goalMode.blurb),
-        ),
         if (current != null)
-          InfoCard(
-            title: 'Daily targets',
+          MmHeroSurface(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  Fmt.kcal(current.targets.kcal),
-                  style: text.headlineMedium,
+                  'Daily targets',
+                  style: text.labelMedium?.copyWith(color: context.mm.text2),
                 ),
-                const SizedBox(height: 8),
-                StatRow('Protein', Fmt.grams(current.targets.proteinG)),
-                StatRow('Carbs', Fmt.grams(current.targets.carbsG)),
-                StatRow('Fat', Fmt.grams(current.targets.fatG)),
+                const SizedBox(height: 4),
+                Text(Fmt.whole(current.targets.kcal), style: text.displayLarge),
+                Text(
+                  'kcal a day',
+                  style: text.bodyMedium?.copyWith(color: context.mm.text2),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.protein,
+                        value: Fmt.grams(current.targets.proteinG),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.carbs,
+                        value: Fmt.grams(current.targets.carbsG),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.fat,
+                        value: Fmt.grams(current.targets.fatG),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Divider(color: context.mm.outline),
                 StatRow(
                   'Intended pace',
                   current.targets.weeklyRateFraction == 0
@@ -75,14 +111,23 @@ class CoachScreen extends ConsumerWidget {
                 for (final flag in current.targets.flags)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Notice(icon: Icons.info_outline, text: flag.message),
+                    child: Notice(kind: NoticeKind.caution, text: flag.message),
                   ),
               ],
             ),
           ),
         InfoCard(
+          title: 'Goal: ${setup.goalMode.label}',
+          trailing: MmButton(
+            label: 'Change',
+            kind: MmButtonKind.text,
+            onPressed: () => _changeGoal(context, ref, setup, snapshot),
+          ),
+          child: Text(setup.goalMode.blurb),
+        ),
+        InfoCard(
           title: 'Your metabolism',
-          child: _Metabolism(
+          child: MetabolismSummary(
             snapshot: snapshot,
             calibrating: setup.onboardedOn.daysUntil(today) < calibrationDays,
           ),
@@ -145,111 +190,9 @@ class CoachScreen extends ConsumerWidget {
       ),
     );
     if (chosen != null && chosen != setup.goalMode) {
-      await ref.read(storeProvider).saveSetup(setup.copyWith(goalMode: chosen));
+      await ref
+          .read(setupWriterProvider)
+          .saveSetup(setup.copyWith(goalMode: chosen));
     }
   }
-}
-
-class _Metabolism extends StatelessWidget {
-  const _Metabolism({required this.snapshot, required this.calibrating});
-
-  final CoachSnapshot snapshot;
-  final bool calibrating;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final tdee = snapshot.tdee;
-    final measured = tdee.status == TdeeStatus.updated;
-    const estimator = TdeeEstimator();
-    final needDays = estimator.minIntakeDays - tdee.usableIntakeDays;
-    final needWeighIns = estimator.minWeighIns - tdee.weighIns;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${Fmt.whole(tdee.kcal)} ± ${Fmt.whole(tdee.sigmaKcal)} kcal / day',
-          style: text.headlineSmall,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          measured
-              ? 'Measured from your logged food and weight trend.'
-              : 'Starting estimate from your height, weight, age, and sex. '
-                    'It gets replaced by a measurement of your body.',
-          style: text.bodyMedium,
-        ),
-        const SizedBox(height: 12),
-        if (measured) ...[
-          StatRow('Logged days used', '${tdee.usableIntakeDays}'),
-          StatRow('Weigh-ins used', '${tdee.weighIns}'),
-          if (tdee.excludedPartialDays > 0)
-            StatRow('Partial days left out', '${tdee.excludedPartialDays}'),
-          if (tdee.clampedToBounds)
-            const Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Notice(
-                icon: Icons.warning_amber_outlined,
-                text:
-                    'Your logs and weight trend don’t add up to a plausible '
-                    'number, which usually means food is going unlogged. '
-                    'The estimate is being held at a safe limit.',
-              ),
-            ),
-        ] else
-          Notice(
-            icon: Icons.hourglass_bottom,
-            text:
-                'Needs ${[if (needDays > 0) '$needDays more fully logged day${needDays == 1 ? '' : 's'}', if (needWeighIns > 0) '$needWeighIns more weigh-in${needWeighIns == 1 ? '' : 's'}', if (needDays <= 0 && needWeighIns <= 0) calibrating ? 'two full weeks of data' : 'a little more consistent data'].join(' and ')} '
-                'before your first measurement.',
-          ),
-      ],
-    );
-  }
-}
-
-extension on Caution {
-  String get message => switch (this) {
-    Caution.pregnancy =>
-      'Pregnancy: the app holds you at maintenance and will not prescribe '
-          'a deficit. Follow your clinician’s guidance on intake.',
-    Caution.breastfeeding =>
-      'Breastfeeding: targets include extra energy for milk production '
-          'and the app will not prescribe a deficit.',
-    Caution.eatingDisorderHistory =>
-      'Deficit modes are switched off. If food or weight tracking starts '
-          'to feel distressing, stop and talk to your care team.',
-    Caution.chronicKidneyDisease =>
-      'Kidney disease: protein is capped low. Confirm your protein and '
-          'energy targets with your nephrologist or dietitian.',
-    Caution.pcos =>
-      'PCOS can change how your body responds. The app adapts to your '
-          'measured results; keep your clinician in the loop.',
-    Caution.menopause =>
-      'Hormonal changes can shift energy needs and water retention. The '
-          'app adapts to your measured results.',
-    Caution.thyroidCondition =>
-      'Thyroid conditions affect energy needs. The app adapts to your '
-          'measured results; keep your treatment stable where you can.',
-  };
-}
-
-extension on TargetFlag {
-  String get message => switch (this) {
-    TargetFlag.flooredAtSafetyMinimum =>
-      'Your calories are at the lowest level the app will set. Going '
-          'lower risks your health and your muscle.',
-    TargetFlag.rateLimited =>
-      'This week’s change was limited to a small step. Targets move '
-          'gradually so one odd week can’t swing them.',
-    TargetFlag.dietBreak =>
-      'You’ve been in a deficit for 16 weeks. This is a maintenance '
-          'break to recover before continuing.',
-    TargetFlag.modeNotAllowed =>
-      'Your chosen goal isn’t available with your health check, so the '
-          'app is holding you at maintenance.',
-    TargetFlag.proteinCapped =>
-      'Protein is capped because of your health check.',
-  };
 }

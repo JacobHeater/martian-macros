@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Martian Macros palette preview</title>
+<style>
+  /* Static preview of design/color-and-theme-system.md. Not app code. */
+  :root { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { margin: 0; padding: 32px 16px 64px; background: #e9ecf3; color: #0c1220; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.note { margin: 0 0 24px; color: #46526b; max-width: 760px; font-size: 14px; line-height: 1.5; }
+  .row { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; }
+  .theme-dark {
+    --canvas:#090D15; --surface:#101624; --raised:#171F32; --overlay:#1F2A42; --sunken:#0D1220;
+    --track:#1F2940; --selected:#1C2842; --outline:#2B3853; --outlineStrong:#5A6A8C;
+    --text:#ECF0F8; --text2:#A9B4CA; --text3:#8F9BB5;
+    --ember:#FF6A45; --onEmber:#1A0802; --ion:#3FD8F0; --energy:#ECF0F8;
+    --protein:#5B9DFF; --carbs:#F6C453; --fat:#7F57FF;
+    --positive:#4FDB8A; --caution:#FFB84D; --info:#7FB8FF; --danger:#FF7A7A;
+    --glow: rgba(63,216,240,.12); --hair: rgba(236,240,248,.06); --card-shadow: none;
+    --highlight: inset 0 1px 0 rgba(236,240,248,.06); --fab-shadow: 0 8px 24px rgba(255,106,69,.25);
+  }
+  .theme-light {
+    --canvas:#F3F5FA; --surface:#FFFFFF; --raised:#FFFFFF; --overlay:#FFFFFF; --sunken:#E8ECF5;
+    --track:#EBEFF7; --selected:#E3E8F5; --outline:#CBD3E3; --outlineStrong:#7C88A3;
+    --text:#0C1220; --text2:#46526B; --text3:#5A6680;
+    --ember:#CC3210; --onEmber:#FFFFFF; --ion:#0A7890; --energy:#0C1220;
+    --protein:#1646A6; --carbs:#BF7A00; --fat:#7448E6;
+    --positive:#117A3E; --caution:#8F5600; --info:#1C62C9; --danger:#B3261E;
+    --glow: rgba(10,120,144,.08); --hair: rgba(12,18,32,.05); --card-shadow: 0 1px 2px rgba(12,18,32,.06);
+    --highlight: none; --fab-shadow: 0 8px 24px rgba(12,18,32,.14);
+  }
+  .phone { width: 360px; height: 760px; border-radius: 28px; overflow: hidden; position: relative;
+    background: var(--canvas); color: var(--text); box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+  .scroll { padding: 0 16px; }
+  .status { height: 24px; }
+  .header { height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .header .day { display: flex; align-items: center; gap: 4px; }
+  .title { font: 600 22px/28px "Space Grotesk", Inter, system-ui, sans-serif; }
+  .ico { width: 48px; height: 48px; display: grid; place-items: center; color: var(--text2); }
+  .ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .card { background: var(--surface); border-radius: 16px; box-shadow: var(--card-shadow), var(--highlight);
+    outline: 1px solid var(--outline); outline-offset: -1px; position: relative; overflow: hidden; }
+  .hero { padding: 24px 24px 0; }
+  .hero::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 100% 0%, var(--glow), transparent 60%); }
+  .hero .orbit { position: absolute; right: -90px; top: -90px; width: 260px; height: 260px; pointer-events: none; }
+  .arc { display: block; width: 100%; height: auto; position: relative; }
+  .big { text-align: center; position: relative; margin-top: -8px; }
+  .big .n { font: 600 48px/52px "Space Grotesk", Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
+  .big .u { font-size: 15px; line-height: 22px; color: var(--text2); }
+  .macros { margin-top: 16px; display: grid; gap: 12px; position: relative; }
+  .m .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .m .lab { font-size: 13px; line-height: 16px; font-weight: 600; letter-spacing: .2px; }
+  .m .val { font-size: 15px; line-height: 22px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .m.protein .val { color: var(--text); }
+  .bar { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 999px; }
+  .m.protein .bar { height: 8px; }
+  .status-row { margin: 16px -24px 0; height: 48px; padding: 0 24px; display: flex; align-items: center; gap: 12px;
+    border-top: 1px solid var(--outline); position: relative; }
+  .status-row .t { flex: 1; }
+  .status-row .t b { display: block; font-size: 13px; line-height: 16px; font-weight: 600; }
+  .status-row .t span { font-size: 12px; line-height: 16px; color: var(--text2); }
+  .status-row svg { width: 20px; height: 20px; fill: none; stroke: var(--info); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .status-row svg.chev { stroke: var(--text2); }
+  .log { margin-top: 12px; }
+  .grp { height: 48px; padding: 0 16px; display: flex; align-items: center; border-top: 1px solid var(--outline); }
+  .grp:first-child { border-top: 0; }
+  .grp .name { font-size: 13px; font-weight: 600; letter-spacing: .2px; flex: 1; }
+  .grp .sub { font-size: 12px; color: var(--text2); margin-right: 4px; }
+  .grp .add { width: 48px; height: 48px; margin-right: -12px; display: grid; place-items: center; color: var(--text2); }
+  .grp .add svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .entry { height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--outline); }
+  .entry .n { flex: 1; font-size: 15px; line-height: 22px; }
+  .entry .n small { display: block; font-size: 12px; line-height: 16px; color: var(--text2); }
+  .entry .k { font: 600 17px/24px Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: var(--raised);
+    border-top: 1px solid var(--outline); display: flex; }
+  .nav div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--text2); font-size: 12px; font-weight: 500; }
+  .nav .pill { width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+  .nav svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav .sel { color: var(--ember); font-weight: 700; }
+  .nav .sel .pill { background: var(--selected); }
+  .nav .sel svg { fill: currentColor; }
+  .fab { position: absolute; right: 16px; bottom: 88px; height: 56px; padding: 0 20px; border-radius: 16px;
+    background: var(--ember); color: var(--onEmber); display: flex; align-items: center; gap: 8px;
+    font: 600 15px/22px Inter, system-ui, sans-serif; box-shadow: var(--fab-shadow); }
+  .fab svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+  .label-tag { text-align: center; font-size: 12px; color: #46526b; margin-top: 8px; }
+  section { margin-top: 48px; }
+  h2 { font-size: 16px; margin: 0 0 12px; text-align: center; }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; padding: 16px; border-radius: 16px;
+    background: var(--canvas); max-width: 560px; }
+  .sw { background: var(--surface); border-radius: 12px; padding: 8px; outline: 1px solid var(--outline); outline-offset: -1px; }
+  .sw i { display: block; height: 32px; border-radius: 8px; margin-bottom: 6px; outline: 1px solid var(--outline); outline-offset: -1px; }
+  .sw b { display: block; font-size: 12px; color: var(--text); }
+  .sw span { font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .sheet-demo { display: grid; gap: 12px; padding: 16px; border-radius: 16px; background: var(--canvas); color: var(--text); width: 328px; }
+  .notice { background: var(--surface); border-radius: 16px; padding: 12px 16px; display: flex; gap: 12px; font-size: 15px; line-height: 22px; outline: 1px solid var(--outline); outline-offset: -1px; }
+  .notice svg { width: 20px; height: 20px; flex: none; margin-top: 1px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .notice.caution { outline: 1px solid var(--caution); } .notice.caution svg { stroke: var(--caution); }
+  .notice.required { outline: 1.5px solid var(--caution); } .notice.required svg { stroke: var(--caution); }
+  .notice.info svg { stroke: var(--info); }
+  .notice b { display: block; font-size: 13px; letter-spacing: .2px; }
+  .btn { height: 48px; border-radius: 12px; display: grid; place-items: center; font: 600 15px Inter, system-ui, sans-serif; }
+  .btn.p { background: var(--ember); color: var(--onEmber); }
+  .btn.o { outline: 1px solid var(--outlineStrong); outline-offset: -1px; color: var(--text); }
+  .gray { filter: grayscale(1); }
+</style>
+</head>
+<body>
+<h1>Martian Macros palette preview</h1>
+<p class="note">Static rendering of <code>design/color-and-theme-system.md</code> and the Today layout in <code>screen-direction.md</code>. It is a judgment aid for MM-102, not app code; fonts fall back to the system sans if Space Grotesk and Inter are not installed, so figure shapes will differ from the proposal. The grayscale phone at the bottom checks that the macros still separate without color.</p>
+
+<div class="row">
+  <div>
+    <div class="phone theme-dark" id="dark"></div>
+    <div class="label-tag">Dark</div>
+  </div>
+  <div>
+    <div class="phone theme-light" id="light"></div>
+    <div class="label-tag">Light</div>
+  </div>
+</div>
+
+<section>
+  <h2>Notice family and buttons (no colored fills)</h2>
+  <div class="row">
+    <div class="theme-dark"><div class="sheet-demo" id="n-dark"></div></div>
+    <div class="theme-light"><div class="sheet-demo" id="n-light"></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Swatches</h2>
+  <div class="row">
+    <div class="theme-dark"><div class="swatches" id="sw-dark"></div></div>
+    <div class="theme-light"><div class="swatches" id="sw-light"></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Grayscale check (macros must still separate)</h2>
+  <div class="row">
+    <div class="theme-dark gray"><div class="sheet-demo" id="g-dark"></div></div>
+    <div class="theme-light gray"><div class="sheet-demo" id="g-light"></div></div>
+  </div>
+</section>
+
+<script>
+  const I = {
+    left: '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+    right: '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+    gear: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 00-2-1.2L14 3h-4l-.6 2.7a7 7 0 00-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 005 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 002 1.2L10 21h4l.6-2.7a7 7 0 002-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>',
+    tune: '<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
+    plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+    food: '<svg viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 004 0V3M7 11v10M17 3c-2 2-3 5-3 8h3v10"/></svg>',
+    chart: '<svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 3 7-9"/></svg>',
+    insight: '<svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-7"/></svg>',
+    info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+    warn: '<svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  };
+  // Horizon arc: a shallow circular arc across 312 x ~92. Progress along it.
+  function arc(pct) {
+    const w = 312, h = 96, r = 220, cx = w / 2, cy = h + r - 52; // circle center below
+    const half = Math.asin((w / 2 - 8) / r);
+    const start = -Math.PI / 2 - half, end = -Math.PI / 2 + half;
+    const pt = t => { const a = start + (end - start) * t; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    const [x0, y0] = pt(0), [x1, y1] = pt(1), [xp, yp] = pt(pct);
+    const large = 0;
+    return `<svg class="arc" viewBox="0 0 ${w} ${h}" role="img" aria-label="Arc showing ${Math.round(pct*100)} percent of calories eaten">
+      <path d="M${x0} ${y0} A${r} ${r} 0 ${large} 1 ${x1} ${y1}" fill="none" stroke="var(--track)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M${x0} ${y0} A${r} ${r} 0 ${large} 1 ${xp} ${yp}" fill="none" stroke="var(--energy)" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="${xp}" cy="${yp}" r="10" fill="var(--ion)" opacity=".18"/>
+      <circle cx="${xp}" cy="${yp}" r="6" fill="var(--energy)" stroke="var(--surface)" stroke-width="2"/>
+    </svg>`;
+  }
+  const orbit = '<svg class="orbit" viewBox="0 0 260 260" fill="none" stroke="var(--hair)" stroke-width="1"><circle cx="130" cy="130" r="60"/><circle cx="130" cy="130" r="95"/><circle cx="130" cy="130" r="128"/></svg>';
+  function macro(cls, name, v, t, color) {
+    return `<div class="m ${cls}"><div class="top"><span class="lab">${name}</span><span class="val">${v} / ${t} g</span></div><div class="bar"><i style="width:${Math.min(100, v / t * 100)}%;background:${color}"></i></div></div>`;
+  }
+  function phone() {
+    return `<div class="scroll"><div class="status"></div>
+      <div class="header"><div class="day"><span class="ico">${I.left}</span><span class="title">Today</span><span class="ico">${I.right}</span></div><span class="ico">${I.gear}</span></div>
+      <div class="card hero">${orbit}
+        ${arc(0.57)}
+        <div class="big"><div class="n">1,060</div><div class="u">kcal left of 2,480</div></div>
+        <div class="macros">
+          ${macro('protein', 'Protein', 96, 180, 'var(--protein)')}
+          ${macro('carbs', 'Carbs', 160, 260, 'var(--carbs)')}
+          ${macro('fat', 'Fat', 38, 78, 'var(--fat)')}
+        </div>
+        <div class="status-row">${I.tune}<div class="t"><b>Calibration, day 4 of 14</b><span>Targets hold while the app learns</span></div><svg class="chev" viewBox="0 0 24 24">${'<path d="M9 6l6 6-6 6"/>'}</svg></div>
+      </div>
+      <div class="card log">
+        <div class="grp"><span class="name">Breakfast</span><span class="sub">520 kcal</span><span class="add">${I.plus}</span></div>
+        <div class="entry"><div class="n">Greek yogurt, plain<small>P 22 · C 8 · F 4</small></div><div class="k">130</div></div>
+        <div class="entry"><div class="n">Oats with banana<small>P 12 · C 66 · F 8</small></div><div class="k">390</div></div>
+        <div class="grp"><span class="name">Lunch</span><span class="sub">900 kcal</span><span class="add">${I.plus}</span></div>
+        <div class="grp"><span class="name">Dinner</span><span class="add" style="margin-left:auto">${I.plus}</span></div>
+      </div>
+    </div>
+    <div class="fab">${I.plus}Log food</div>
+    <div class="nav">
+      <div class="sel"><span class="pill">${I.food}</span>Today</div>
+      <div><span class="pill">${I.chart}</span>Progress</div>
+      <div><span class="pill">${I.insight}</span>Coach</div>
+    </div>`;
+  }
+  document.getElementById('dark').innerHTML = phone();
+  document.getElementById('light').innerHTML = phone();
+
+  const notices = `
+    <div class="notice info">${I.info}<div><b>Info</b>Waiting for early water changes to settle.</div></div>
+    <div class="notice caution">${I.warn}<div><b>Heads up</b>Your calorie target was raised to the safe minimum.</div></div>
+    <div class="notice required">${I.warn}<div><b>Safety</b>We can't set a fat-loss target at this body weight. Maintenance is available.</div></div>
+    <div class="btn p">Continue</div><div class="btn o">Not now</div>`;
+  ['n-dark', 'n-light'].forEach(id => document.getElementById(id).innerHTML = notices);
+
+  const tokens = {
+    dark: ['canvas','surface','raised','overlay','selected','track','text','text2','ember','ion','protein','carbs','fat','positive','caution','info','danger'],
+  };
+  function swatches(id, cls) {
+    const host = document.querySelector('.' + cls);
+    const cs = getComputedStyle(host);
+    document.getElementById(id).innerHTML = tokens.dark.map(t => {
+      const v = cs.getPropertyValue('--' + t).trim();
+      return `<div class="sw"><i style="background:${v}"></i><b>${t}</b><span>${v}</span></div>`;
+    }).join('');
+  }
+  swatches('sw-dark', 'theme-dark'); swatches('sw-light', 'theme-light');
+
+  const macrosOnly = `<div class="macros" style="background:var(--surface);padding:16px;border-radius:16px;">
+    ${macro('protein','Protein',96,180,'var(--protein)')}${macro('carbs','Carbs',160,260,'var(--carbs)')}${macro('fat','Fat',38,78,'var(--fat)')}</div>`;
+  document.getElementById('g-dark').innerHTML = macrosOnly;
+  document.getElementById('g-light').innerHTML = macrosOnly;
+</script>
+</body>
+</html>

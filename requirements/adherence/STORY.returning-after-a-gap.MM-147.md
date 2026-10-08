@@ -1,0 +1,91 @@
+---
+id: MM-147
+status: proposed
+component: adherence
+related: [MM-145, MM-16, MM-18, MM-23, MM-24, MM-31, MM-92, MM-98, MM-108, MM-112, MM-135, MM-139, MM-146, MM-148]
+---
+
+# Story: Come back after a gap and pick up where a good coach would
+
+## Context
+See MM-145. A user stops for three weeks: a holiday, a bad month, a new baby. They open the app again. What they find today is a
+dashboard of empty cards, a trend chart with a hole in it, targets from a month ago, and, if rewards exist by then, a broken streak.
+Every element says "you failed". The likeliest next action is to close it.
+
+The engine side is mostly right already: missing days are missing, never zero (MM-23); the trend predicts across a gap with growing
+uncertainty (MM-18); targets hold without data (MM-24). What is missing is a deliberate re-entry and a few rules about what a gap *means*.
+
+## Decisions
+Choices I made without asking (say if any is wrong):
+- **A gap is 7 or more consecutive days with no weigh-in and no food logged**, not covered by a pause (MM-148).
+- **On the first opening after a gap, one screen is shown before the dashboard**: "Welcome back. To pick up, the coach needs one thing: a
+  weigh-in." With a field for it, and "Later". Nothing else: no count of days missed, no summary of the gap, no streak.
+- **What happens next depends on the gap's length**:
+
+| gap | coach behavior |
+|---|---|
+| 7 to 27 days | targets unchanged; the expenditure estimate is kept; confidence drops to Fair until the window refills (MM-139) |
+| 28 to 89 days | targets unchanged for a 7-day re-calibration, then check-ins resume; the last measured expenditure becomes the starting estimate with its uncertainty widened to 10% |
+| 90 days or more | as above, and the health check is asked again (MM-112) and the goal is re-confirmed on a single screen |
+
+- **If weight has changed by more than 5% across the gap**, the last measured expenditure is rescaled by the change in resting energy and
+  treated as a starting estimate, whatever the gap's length.
+- **A gap of 14 days or more counts as a break from the deficit**: the unbroken-deficit count restarts (MM-31, MM-135). The app does not
+  know what was eaten, and assuming a continued deficit would force a diet break on someone who has just had one.
+- **Streaks and summaries treat the gap as absent, not failed** (MM-92): process counts restart at zero without a "lost" message, and the
+  monthly report covering the gap says "no data from the 3rd to the 24th" and nothing more.
+- **The trend chart draws the gap as a gap**: the band widens, and no line is drawn through days with no reading beyond the filter's
+  prediction (shown dashed).
+- **Nothing was sent during the gap** (MM-146), and nothing refers to it afterwards.
+
+Where the experts disagreed:
+- The physique expert wanted the return screen to show the weight change over the gap, as the fact the user most needs. The
+  behavior-change expert: it is the fact most likely to end the session; the user will see the trend as soon as they look at Progress,
+  on their own terms. Not on the welcome screen.
+- The engineer questioned keeping the old expenditure estimate after a month. Expenditure changes slowly unless weight or activity
+  changed a lot; widening the uncertainty and re-measuring is better than discarding a hard-won number. The 5% rule covers the case
+  where it is clearly stale.
+
+## Description
+Gap detection in the shell; a return screen; gap-length rules in `analyze` and `nextTargets`.
+
+## Acceptance Criteria
+```gherkin
+Scenario: A three-week gap
+  Given no weigh-in or food for 21 days, then the app is opened
+  Then the welcome-back screen is shown, asking only for a weigh-in
+
+Scenario: After the weigh-in
+  When a weigh-in is saved
+  Then the dashboard is shown with the previous targets and a confidence of Fair
+
+Scenario: Nothing about failure
+  Then no text on the return screen or dashboard states how many days were missed or that a streak ended
+
+Scenario: A two-month gap
+  Given a 60-day gap
+  Then targets are held for 7 days after return, and the first check-in after that starts from the last measured expenditure with a
+    wider uncertainty
+
+Scenario: A long gap
+  Given a 120-day gap
+  Then the health check and goal are confirmed before coaching resumes
+
+Scenario: Weight changed a lot
+  Given a 40-day gap across which weight rose 6%
+  Then the starting estimate is rescaled for the new weight
+
+Scenario: The deficit count
+  Given 11 unbroken weeks of deficit before a 16-day gap
+  Then the count after returning is zero
+
+Scenario: Later
+  When "Later" is chosen
+  Then the dashboard is shown, and the weight card asks for a weigh-in as it normally would
+```
+
+## Notes
+- Priority: must-have before month two after launch; it costs little and addresses the commonest way users are lost.
+- A connected scale (MM-68) may have kept recording through the gap. Then there was no gap in weigh-ins and this flow does not trigger,
+  which is right; the food-log gap is handled by the estimator as missing days.
+- A simulator test should cover a user who lapses for four weeks mid-cut and returns (MM-30).
