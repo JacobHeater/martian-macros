@@ -1,0 +1,740 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-10-07",
+  "generatedFrom": {
+    "requirements": "requirements/ (158 tickets, MM-1 to MM-158; 33 done, 7 in-progress, 118 proposed)",
+    "statusSource": "mm req list (ticket status in requirements/ is authoritative; the built/remaining lists here are a snapshot)",
+    "documents": [
+      "requirements/README.md",
+      "docs/architecture.md",
+      "README.md",
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".claude/agents/requirements-reviewer.md",
+      ".claude/agents/dart-reviewer.md"
+    ],
+    "code": [
+      "apps/mobile/lib",
+      "packages/domain/lib",
+      "packages/engine/lib",
+      "packages/engine/test/support",
+      "packages/data/lib",
+      "tool/src"
+    ]
+  },
+  "conventions": {
+    "workstreamStatus": {
+      "not-started": "No ticket in the workstream is built.",
+      "partially-built": "Some tickets are done; the remaining ones are not being worked on.",
+      "in-progress": "Remaining tickets are actively being built.",
+      "done": "Every ticket is done."
+    },
+    "edgeDirection": "An edge runs from the prerequisite workstream (from) to the dependent workstream (to).",
+    "edgeTypes": {
+      "hard-blocker": "The dependent steps cannot be built correctly until the satisfiedBy tickets are done.",
+      "contract-dependency": "The dependent steps build on a shared type, API, schema or component that the prerequisite defines. Starting early is possible only by agreeing the contract first; otherwise expect rework.",
+      "soft-preferred-order": "Either order works. The stated order avoids rework or gives a better result.",
+      "integration-risk": "No ordering is implied. Both workstreams change the same code and must coordinate."
+    },
+    "edgeSatisfied": "An edge is satisfied when every ticket in satisfiedBy has status done in requirements/. An edge with an empty satisfiedBy is never 'satisfied'; it is a standing coordination note.",
+    "edgeScope": "scope is 'all' or a list of step numbers in the dependent workstream's sequence. Steps not listed are not affected by the edge.",
+    "stepAvailable": "A step is available when every hard-blocker and contract-dependency edge whose scope includes it is satisfied, and every earlier step in the same workstream that it builds on is done. Steps within a workstream are in recommended order; a later step may start early only if its own tickets say nothing depends on the earlier ones.",
+    "dependsOnAndUnlocks": "dependsOn and unlocks on a workstream are derived from hard-blocker and contract-dependency edges only."
+  },
+  "sharedContracts": [
+    {
+      "id": "SC-schema",
+      "name": "Database schema and migrations",
+      "location": "packages/data/lib/src/database.dart (schemaVersion is 1; no migrations exist yet)",
+      "rule": "One schema change in flight at a time. Each change adds exactly one schemaVersion step with a migration and a migration test. See HS-schema-lane."
+    },
+    {
+      "id": "SC-store",
+      "name": "MmStore API",
+      "location": "packages/data/lib/src/store.dart",
+      "rule": "The app reads and writes only through MmStore. New tables get new methods; existing method signatures change only with every caller updated in the same change."
+    },
+    {
+      "id": "SC-setup",
+      "name": "UserSetup, ScreeningAnswers and CoachingPolicy",
+      "location": "packages/domain/lib/src/user_setup.dart, screening.dart, profile.dart, goal.dart",
+      "rule": "Every new setting or screening answer lands here and in the Setups table. WS-02, WS-05 and WS-06 all add fields; add them additively with defaults and never repurpose a field."
+    },
+    {
+      "id": "SC-food-entry",
+      "name": "FoodEntry, QuantitySource and IntakeDay",
+      "location": "packages/domain/lib/src/food_entry.dart, quantity_source.dart, observations.dart",
+      "rule": "A new way of measuring food is a new QuantitySource value with an uncertainty, never a new entry type. The estimator's logging-style rule (MM-27) must be told about every new value."
+    },
+    {
+      "id": "SC-targets",
+      "name": "Target calculation contract",
+      "location": "packages/engine/lib/src/targets.dart, coach.dart (TargetInputs, computeTargets, TargetFlag, TargetsRecord, nextTargets)",
+      "rule": "WS-02 owns the semantics (step limit, floors, flags). WS-06 owns what a target contains (protein minimum, explanation). Change the output shape once, in WS-06 step 3, not ticket by ticket."
+    },
+    {
+      "id": "SC-analysis",
+      "name": "Analysis snapshot and trend model inputs",
+      "location": "packages/engine/lib/src/coach.dart (analyze, CoachSnapshot), weight_trend.dart, tdee_estimator.dart",
+      "rule": "New inputs to analyze (events, pauses, phase changes) are optional parameters with a no-data default that reproduces today's behavior."
+    },
+    {
+      "id": "SC-safety",
+      "name": "SafetyBounds",
+      "location": "packages/engine/lib/src/safety_bounds.dart",
+      "rule": "Every public constant needs a row in the evidence register once MM-143 exists. Limits change only with their ticket and test."
+    },
+    {
+      "id": "SC-simulator",
+      "name": "Synthetic user and closed-loop harness",
+      "location": "packages/engine/test/support/synthetic_user.dart, coach_loop.dart",
+      "rule": "New physiology or behavior is an optional parameter that defaults to off, so existing seeds and tests keep their results."
+    },
+    {
+      "id": "SC-nav",
+      "name": "App shell, navigation and providers",
+      "location": "apps/mobile/lib/src/app.dart, providers.dart",
+      "rule": "WS-03 owns the destination list. Other workstreams add a destination or a provider; they do not restructure the shell."
+    },
+    {
+      "id": "SC-ui-kit",
+      "name": "Tokens, component library, chart components and strings",
+      "location": "apps/mobile/lib/src/widgets.dart, format.dart today; a shared component package and localization files after MM-104 and MM-108",
+      "rule": "After WS-03 steps 1 and 2, screens use library components and localized strings only. No inline colors, spacing or user-facing text."
+    },
+    {
+      "id": "SC-food-pack",
+      "name": "Food pack format and reader API",
+      "location": "packages/food_catalog (to be created by MM-55)",
+      "rule": "The pack format is versioned. WS-08 depends on the reader API and a fixture pack, not on the full pipeline."
+    },
+    {
+      "id": "SC-health-source",
+      "name": "HealthSource interface and fake",
+      "location": "packages/health_ingest (to be created by MM-67)",
+      "rule": "Everything above the interface is built and tested against the fake on Windows."
+    },
+    {
+      "id": "SC-entitlements",
+      "name": "Free and paid feature gate",
+      "location": "not yet in code; defined by MM-85",
+      "rule": "Coach features built in WS-06 and WS-09 read one entitlement interface that returns 'unlocked' until WS-13 implements it. Safety features are never gated."
+    }
+  ],
+  "coordinationHotspots": [
+    {
+      "id": "HS-schema-lane",
+      "surface": "packages/data/lib/src/database.dart, database.g.dart, store.dart",
+      "workstreams": ["WS-01", "WS-05", "WS-06", "WS-07", "WS-08", "WS-09", "WS-10", "WS-11", "WS-12"],
+      "rule": "Serialize. Only one branch may hold the next schemaVersion number. Batch a workstream step's columns and tables into one migration. Regenerate with mm gen and never hand-edit generated code."
+    },
+    {
+      "id": "HS-compute-targets",
+      "surface": "packages/engine/lib/src/targets.dart, coach.dart, safety_bounds.dart",
+      "workstreams": ["WS-02", "WS-06", "WS-09"],
+      "rule": "WS-02 steps 1 to 5 finish before WS-06 step 2 begins. After that, WS-06 owns these files and WS-09 adds new functions beside them without changing computeTargets."
+    },
+    {
+      "id": "HS-policy",
+      "surface": "packages/domain/lib/src/screening.dart",
+      "workstreams": ["WS-02", "WS-05"],
+      "rule": "MM-111 (WS-02) and MM-112 (WS-05) both extend CoachingPolicy.derive. Land MM-111 first; MM-112 rebases onto it."
+    },
+    {
+      "id": "HS-estimator-style",
+      "surface": "packages/engine/lib/src/tdee_estimator.dart (logging-style switch, partial-day rule)",
+      "workstreams": ["WS-02", "WS-06", "WS-08"],
+      "rule": "MM-131 changes the window; MM-124 changes day-to-day intake shape; MM-150 and MM-46 add logging styles. Each must re-run the full simulator suite, and they must not be in flight together."
+    },
+    {
+      "id": "HS-simulator",
+      "surface": "packages/engine/test/support/synthetic_user.dart",
+      "workstreams": ["WS-02", "WS-06", "WS-07", "WS-08", "WS-09"],
+      "rule": "Additive, default-off parameters only. A change that alters existing seeded results is a regression."
+    },
+    {
+      "id": "HS-nav",
+      "surface": "apps/mobile/lib/src/app.dart",
+      "workstreams": ["WS-03", "WS-10", "WS-09"],
+      "rule": "MM-99 restructures the shell once. The Train destination (MM-75), the return screen (MM-147) and the repeat health check (MM-112) are added after it."
+    },
+    {
+      "id": "HS-strings",
+      "surface": "all user-facing text in apps/mobile/lib/src",
+      "workstreams": ["WS-03", "WS-05", "WS-06", "WS-07", "WS-08", "WS-09", "WS-10"],
+      "rule": "MM-108 moves every string into localization files in one pass. Do it while only four screens exist. Until it lands, new UI work should be limited to what the milestone needs."
+    },
+    {
+      "id": "HS-coach-screen",
+      "surface": "apps/mobile/lib/src/coach/coach_screen.dart",
+      "workstreams": ["WS-05", "WS-06", "WS-09"],
+      "rule": "WS-06 restructures the screen into cards (targets, confidence, explanation). WS-05 and WS-09 add cards and do not edit each other's."
+    },
+    {
+      "id": "HS-onboarding-screen",
+      "surface": "apps/mobile/lib/src/onboarding/onboarding_screen.dart (531 lines, one file)",
+      "workstreams": ["WS-03", "WS-05", "WS-06", "WS-07", "WS-09"],
+      "rule": "Split the file by step when WS-03 migrates it to library components. Later additions (MM-158, the pace control in MM-128, the creatine question in MM-136, the reminder offer in MM-146) each touch one step file."
+    },
+    {
+      "id": "HS-progress-screen",
+      "surface": "apps/mobile/lib/src/progress/progress_screen.dart",
+      "workstreams": ["WS-03", "WS-07", "WS-09", "WS-10", "WS-11"],
+      "rule": "WS-07 owns the screen. WS-10 adds strength cards and WS-11 adds source labels through components WS-07 exposes."
+    },
+    {
+      "id": "HS-food-screen",
+      "surface": "apps/mobile/lib/src/today/today_screen.dart, add_food_sheet.dart",
+      "workstreams": ["WS-03", "WS-06", "WS-08"],
+      "rule": "WS-03 renames Today to Food and moves the calibration banner. WS-06 changes the summary card (bands, protein minimum). WS-08 owns the add-food flow. Summary card and add-food flow are separate files after the WS-03 migration."
+    },
+    {
+      "id": "HS-weight-entries",
+      "surface": "WeightEntries table and MmStore.saveWeight",
+      "workstreams": ["WS-07", "WS-11"],
+      "rule": "MM-71 changes one-reading-per-day into a rule over several sourced readings. WS-07 display settings and events must read the chosen reading through one accessor."
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Trustworthy first check-in",
+      "intent": "Nobody outside the project should reach their first adaptive target change (day 14) before this is done. It fixes known defects in the first number the coach produces and makes that number explainable.",
+      "requires": [
+        { "workstream": "WS-01", "tickets": ["MM-61"] },
+        { "workstream": "WS-02", "tickets": ["MM-120", "MM-131", "MM-115", "MM-132", "MM-111"] },
+        { "workstream": "WS-05", "tickets": ["MM-83", "MM-112"] },
+        { "workstream": "WS-06", "tickets": ["MM-143", "MM-144", "MM-121", "MM-138", "MM-139"] }
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Closed beta",
+      "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating.",
+      "requires": [
+        { "workstream": "WS-01", "tickets": ["MM-93", "MM-7"] },
+        { "workstream": "WS-02", "tickets": ["MM-135"] },
+        { "workstream": "WS-03", "tickets": ["MM-102", "MM-103", "MM-104", "MM-108", "MM-99", "MM-98", "MM-100", "MM-107"] },
+        { "workstream": "WS-04", "tickets": ["MM-51", "MM-53", "MM-54", "MM-55", "MM-52", "MM-153", "MM-57", "MM-56"] },
+        { "workstream": "WS-05", "tickets": ["MM-134", "MM-158"] },
+        { "workstream": "WS-06", "tickets": ["MM-123", "MM-128", "MM-130"] },
+        { "workstream": "WS-07", "tickets": ["MM-155", "MM-136", "MM-20", "MM-142"] },
+        { "workstream": "WS-08", "tickets": ["MM-48", "MM-47", "MM-150", "MM-152", "MM-42", "MM-49", "MM-43", "MM-151"] },
+        { "workstream": "WS-09", "tickets": ["MM-149", "MM-147", "MM-114", "MM-141", "MM-140"] }
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "Public release (United States)",
+      "intent": "Everything the store listing promises exists, every external review is recorded, and the free tier and the Coach unlock work as sold.",
+      "requires": [
+        { "workstream": "WS-01", "tickets": ["MM-8"] },
+        { "workstream": "WS-03", "tickets": ["MM-105", "MM-91", "MM-106", "MM-109"] },
+        { "workstream": "WS-08", "tickets": ["MM-45"] },
+        { "workstream": "WS-09", "tickets": ["MM-148", "MM-146", "MM-92", "MM-33"] },
+        { "workstream": "WS-10", "tickets": ["MM-76", "MM-75", "MM-77"] },
+        { "workstream": "WS-11", "tickets": ["MM-67", "MM-71", "MM-68", "MM-73"] },
+        { "workstream": "WS-12", "tickets": ["MM-65", "MM-63", "MM-64"] },
+        { "workstream": "WS-13", "tickets": ["MM-88", "MM-95", "MM-29", "MM-85", "MM-86", "MM-87", "MM-96", "MM-94"] }
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Depth after launch",
+      "intent": "Everything else: remaining tickets in every workstream, in each workstream's own order.",
+      "requires": []
+    }
+  ],
+  "workstreams": [
+    {
+      "id": "WS-01",
+      "name": "Delivery foundations",
+      "file": "ws-01-delivery-foundations.md",
+      "intent": "Make it safe to change the schema and safe to merge: migrations, tests for what shipped untested, and CI.",
+      "recommendedOrder": 1,
+      "status": "partially-built",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-A",
+      "dependsOn": [],
+      "unlocks": ["WS-05", "WS-06", "WS-07", "WS-08", "WS-09", "WS-10", "WS-11", "WS-12", "WS-13"],
+      "primaryOwnership": ["tool/", "packages/data/lib/src/database.dart (migration framework)", "packages/data/test", "apps/mobile/test", ".github/"],
+      "sharedContracts": ["SC-schema", "SC-store"],
+      "coordinationHotspots": ["HS-schema-lane"],
+      "sourceRequirements": {
+        "built": ["MM-2", "MM-3", "MM-4", "MM-5", "MM-6", "MM-60", "MM-62"],
+        "remaining": ["MM-1", "MM-7", "MM-8", "MM-61", "MM-93"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Schema migrations and a migration test harness", "tickets": ["MM-61"], "milestone": "M1" },
+        { "step": 2, "title": "Test timeout guard, then tests for shipped-but-untested behavior", "tickets": ["MM-93"], "milestone": "M2" },
+        { "step": 3, "title": "Continuous integration running mm check", "tickets": ["MM-7"], "milestone": "M2" },
+        { "step": 4, "title": "Separate dev and prod app ids", "tickets": ["MM-8"], "milestone": "M3" }
+      ],
+      "gate": { "tickets": ["MM-61"], "meaning": "Any workstream may add tables or columns once migrations exist and are tested." },
+      "notes": "MM-61 is the single most blocking ticket in the repository: ten later workstream steps add tables or columns and the schema is still at version 1 with no upgrade path."
+    },
+    {
+      "id": "WS-02",
+      "name": "Engine truth and safety limits",
+      "file": "ws-02-engine-truth-and-safety-limits.md",
+      "intent": "Fix the known defects in the trend, the expenditure estimate and the limits before anything is built on top of them.",
+      "recommendedOrder": 2,
+      "status": "partially-built",
+      "riskLevel": "high",
+      "parallelGroup": "PG-A",
+      "dependsOn": [],
+      "unlocks": ["WS-06", "WS-07", "WS-09", "WS-13"],
+      "primaryOwnership": ["packages/engine/lib", "packages/engine/test", "packages/domain/lib/src/screening.dart (MM-111 only)"],
+      "sharedContracts": ["SC-targets", "SC-analysis", "SC-safety", "SC-simulator", "SC-setup"],
+      "coordinationHotspots": ["HS-compute-targets", "HS-policy", "HS-estimator-style", "HS-simulator"],
+      "sourceRequirements": {
+        "built": ["MM-18", "MM-19", "MM-23", "MM-24", "MM-25", "MM-26", "MM-27", "MM-28", "MM-30", "MM-31"],
+        "remaining": ["MM-22", "MM-35", "MM-110", "MM-111", "MM-115", "MM-120", "MM-131", "MM-132", "MM-135"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Remove the protein step at BMI 30", "tickets": ["MM-120"], "milestone": "M1" },
+        { "step": 2, "title": "Glycogen and water at phase changes: simulate, measure, fix", "tickets": ["MM-131"], "milestone": "M1" },
+        { "step": 3, "title": "Safety raises exempt from the step limit; raise when loss outruns the limit", "tickets": ["MM-115"], "milestone": "M1" },
+        { "step": 4, "title": "Body-fat thresholds applied with uncertainty and hysteresis", "tickets": ["MM-132"], "milestone": "M1" },
+        { "step": 5, "title": "Underweight guard in the coaching policy", "tickets": ["MM-111"], "milestone": "M1" },
+        { "step": 6, "title": "Diet-break policy: product-owner decision, then engine change", "tickets": ["MM-135"], "milestone": "M2" },
+        { "step": 7, "title": "Joint body-composition model spike", "tickets": ["MM-35"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-120", "MM-131", "MM-115", "MM-132"], "meaning": "The target calculation's semantics are settled; WS-06 may change what a target contains and WS-09 may reason about stalls." },
+      "notes": "Pure Dart, no schema, no UI: it can start today and run beside WS-01, WS-03 and WS-04 with no shared files. MM-131 is a predicted defect; its first acceptance criterion is to reproduce and measure it."
+    },
+    {
+      "id": "WS-03",
+      "name": "Design system and app shell",
+      "file": "ws-03-design-system-and-app-shell.md",
+      "intent": "Give every later screen a component library, a string catalog, a chart language and the dashboard-first navigation, while only four screens exist to migrate.",
+      "recommendedOrder": 3,
+      "status": "partially-built",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-A",
+      "dependsOn": [],
+      "unlocks": ["WS-05", "WS-06", "WS-07", "WS-08", "WS-09", "WS-10", "WS-13"],
+      "primaryOwnership": ["apps/mobile/lib/src/app.dart", "apps/mobile/lib/src/widgets.dart", "apps/mobile/lib/src/format.dart", "a shared UI component package (new)", "localization files (new)", "a dashboard screen (new)"],
+      "sharedContracts": ["SC-nav", "SC-ui-kit"],
+      "coordinationHotspots": ["HS-nav", "HS-strings", "HS-onboarding-screen", "HS-progress-screen", "HS-food-screen"],
+      "sourceRequirements": {
+        "built": ["MM-90"],
+        "remaining": ["MM-89", "MM-91", "MM-97", "MM-98", "MM-99", "MM-100", "MM-101", "MM-102", "MM-103", "MM-104", "MM-105", "MM-106", "MM-107", "MM-108", "MM-109"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Tokens, scales and the component library; migrate the existing screens onto them", "tickets": ["MM-102", "MM-103", "MM-104"], "milestone": "M2" },
+        { "step": 2, "title": "Move all text into localization files; glossary and banned-word test", "tickets": ["MM-108"], "milestone": "M2" },
+        { "step": 3, "title": "Dashboard-first navigation, the dashboard, quick actions", "tickets": ["MM-99", "MM-98", "MM-100"], "milestone": "M2" },
+        { "step": 4, "title": "Shared chart components and the uncertainty language", "tickets": ["MM-107"], "milestone": "M2" },
+        { "step": 5, "title": "Gallery and screenshot tests; dark theme, small screens, accessibility", "tickets": ["MM-105", "MM-91", "MM-106"], "milestone": "M3" },
+        { "step": 6, "title": "App icon and launch screen", "tickets": ["MM-109"], "milestone": "M3" }
+      ],
+      "gate": { "tickets": ["MM-104", "MM-108", "MM-99"], "meaning": "Feature workstreams can add screens without restyling, re-wording or re-plumbing navigation later." },
+      "notes": "The visual direction in MM-102 and MM-109 and the dashboard contents in MM-98 are the author's proposals and need product-owner confirmation before step 1 and step 3."
+    },
+    {
+      "id": "WS-04",
+      "name": "Food data pack",
+      "file": "ws-04-food-data-pack.md",
+      "intent": "Build the offline US food pack and the reader the app queries, as new packages that touch nothing existing.",
+      "recommendedOrder": 4,
+      "status": "not-started",
+      "riskLevel": "high",
+      "parallelGroup": "PG-A",
+      "dependsOn": [],
+      "unlocks": ["WS-08", "WS-13"],
+      "primaryOwnership": ["tools/food_pipeline (new)", "packages/food_catalog (new)", "packages/domain (nutrition validation, MM-53)"],
+      "sharedContracts": ["SC-food-pack", "SC-food-entry"],
+      "coordinationHotspots": [],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-50", "MM-51", "MM-52", "MM-53", "MM-54", "MM-55", "MM-56", "MM-57", "MM-153"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Sources, conflict rule and pack size spike", "tickets": ["MM-51"], "milestone": "M2" },
+        { "step": 2, "title": "Validation rules and barcode normalization as pure functions", "tickets": ["MM-53", "MM-54"], "milestone": "M2" },
+        { "step": 3, "title": "Pack format, reader API and a small fixture pack", "tickets": ["MM-55"], "milestone": "M2" },
+        { "step": 4, "title": "The pipeline, with trust tiers computed in it", "tickets": ["MM-52", "MM-153"], "milestone": "M2" },
+        { "step": 5, "title": "Licensing and attribution review", "tickets": ["MM-57"], "milestone": "M2" },
+        { "step": 6, "title": "Pack download and update", "tickets": ["MM-56"], "milestone": "M2" }
+      ],
+      "gate": { "tickets": ["MM-55"], "meaning": "WS-08 can build search and scanning against the reader API and the fixture pack before the real pack exists." },
+      "notes": "The longest lead time in the product and the least coupled. Start early. The trust-tier display half of MM-153 is built in WS-08 with search."
+    },
+    {
+      "id": "WS-05",
+      "name": "Setup, screening and profile lifecycle",
+      "file": "ws-05-setup-screening-and-profile.md",
+      "intent": "Make everything the user told the app at onboarding correctable, repeatable and wider, so the coaching policy is right on day 120 as well as day 0.",
+      "recommendedOrder": 5,
+      "status": "partially-built",
+      "riskLevel": "high",
+      "parallelGroup": "PG-B",
+      "dependsOn": ["WS-01", "WS-03"],
+      "unlocks": ["WS-06", "WS-09", "WS-13"],
+      "primaryOwnership": ["packages/domain/lib/src/screening.dart", "packages/domain/lib/src/user_setup.dart", "apps/mobile/lib/src/onboarding", "apps/mobile/lib/src/settings"],
+      "sharedContracts": ["SC-setup", "SC-schema", "SC-store", "SC-ui-kit", "SC-nav"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-policy", "HS-onboarding-screen", "HS-coach-screen", "HS-strings"],
+      "sourceRequirements": {
+        "built": ["MM-9", "MM-10", "MM-11", "MM-12", "MM-13", "MM-14", "MM-81", "MM-82"],
+        "remaining": ["MM-80", "MM-83", "MM-112", "MM-113", "MM-134", "MM-158"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Correct profile and screening answers after onboarding, and recompute", "tickets": ["MM-83"], "milestone": "M1" },
+        { "step": 2, "title": "Wider health check, asked again every 90 days and on entering a deficit", "tickets": ["MM-112"], "milestone": "M1" },
+        { "step": 3, "title": "Goals that need training say so (goal-sheet notes; lapse rules wait for WS-10)", "tickets": ["MM-134"], "milestone": "M2" },
+        { "step": 4, "title": "What-to-expect screen", "tickets": ["MM-158"], "milestone": "M2" },
+        { "step": 5, "title": "Weight-loss medication support", "tickets": ["MM-113"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-112"], "meaning": "CoachingPolicy has its full set of fields; WS-06 and WS-09 can read pace limits and flags from it." },
+      "notes": "Step 1 needs no schema change and can start before MM-61. Biological sex stays a strict male/female enum at every layer (MM-14); new female-only questions follow the existing pattern."
+    },
+    {
+      "id": "WS-06",
+      "name": "Targets and the explainable check-in",
+      "file": "ws-06-targets-and-explainable-check-in.md",
+      "intent": "Turn the weekly number into something an expert would sign and a user can understand: better macros, tolerance bands, a chosen pace, and a stated reason and confidence for every change.",
+      "recommendedOrder": 6,
+      "status": "not-started",
+      "riskLevel": "high",
+      "parallelGroup": "PG-B",
+      "dependsOn": ["WS-01", "WS-02", "WS-03", "WS-05"],
+      "unlocks": ["WS-09", "WS-13"],
+      "primaryOwnership": ["packages/engine/lib/src/targets.dart", "packages/engine/lib/src/coach.dart", "apps/mobile/lib/src/coach", "docs/evidence.md (new)", "docs/non-goals.md (new)"],
+      "sharedContracts": ["SC-targets", "SC-safety", "SC-setup", "SC-schema", "SC-store", "SC-entitlements", "SC-ui-kit"],
+      "coordinationHotspots": ["HS-compute-targets", "HS-schema-lane", "HS-coach-screen", "HS-food-screen", "HS-estimator-style", "HS-simulator", "HS-onboarding-screen", "HS-strings"],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-119", "MM-121", "MM-122", "MM-123", "MM-124", "MM-128", "MM-129", "MM-130", "MM-137", "MM-138", "MM-139", "MM-143", "MM-144"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Evidence register with its completeness test; non-goals document", "tickets": ["MM-143", "MM-144"], "milestone": "M1" },
+        { "step": 2, "title": "Protein minimum and goal-specific target", "tickets": ["MM-121"], "milestone": "M1" },
+        { "step": 3, "title": "Structured explanation stored with every target; confidence levels", "tickets": ["MM-138", "MM-139"], "milestone": "M1" },
+        { "step": 4, "title": "Display rounding and tolerance bands", "tickets": ["MM-123"], "milestone": "M2" },
+        { "step": 5, "title": "Fat-loss pace control and the deficit-fraction limit", "tickets": ["MM-128"], "milestone": "M2" },
+        { "step": 6, "title": "Maintenance band and the planned exit from a deficit", "tickets": ["MM-130"], "milestone": "M2" },
+        { "step": 7, "title": "Carbohydrate and fat preference; week shape with higher days", "tickets": ["MM-122", "MM-124"], "milestone": "M4" },
+        { "step": 8, "title": "Lean-gain guardrails", "tickets": ["MM-129"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-121", "MM-123", "MM-138", "MM-139"], "meaning": "Targets carry a minimum, a band, an explanation and a confidence. WS-09 can summarize adherence and diagnose stalls against them." },
+      "notes": "Step 1 is documentation plus a test and can start today. Introduce the entitlement interface (SC-entitlements) in step 3, returning unlocked. MM-144's document half can be written at any time; several of its entries need product-owner sign-off."
+    },
+    {
+      "id": "WS-07",
+      "name": "Progress and measurement",
+      "file": "ws-07-progress-and-measurement.md",
+      "intent": "Make waist, weight context and the scale display trustworthy enough for the coach to reason from, and for the user to believe.",
+      "recommendedOrder": 7,
+      "status": "partially-built",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-B",
+      "dependsOn": ["WS-01", "WS-02", "WS-03"],
+      "unlocks": ["WS-09"],
+      "primaryOwnership": ["apps/mobile/lib/src/progress", "packages/domain/lib/src/observations.dart", "packages/engine (measurement-change function, weight events, jump explanation)"],
+      "sharedContracts": ["SC-analysis", "SC-schema", "SC-store", "SC-simulator", "SC-ui-kit"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-progress-screen", "HS-simulator", "HS-weight-entries", "HS-onboarding-screen", "HS-strings"],
+      "sourceRequirements": {
+        "built": ["MM-16", "MM-17", "MM-21"],
+        "remaining": ["MM-15", "MM-20", "MM-34", "MM-118", "MM-136", "MM-142", "MM-154", "MM-155", "MM-156", "MM-157"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Waist protocol, three-reading entry, noise model and the one shared 'has it changed' function", "tickets": ["MM-155"], "milestone": "M2" },
+        { "step": 2, "title": "Weight events (creatine, illness, travel)", "tickets": ["MM-136"], "milestone": "M2" },
+        { "step": 3, "title": "Log period days", "tickets": ["MM-20"], "milestone": "M2" },
+        { "step": 4, "title": "Explain a weight jump from the last 48 hours", "tickets": ["MM-142"], "milestone": "M2" },
+        { "step": 5, "title": "Weight display setting: everything, trend only, hidden", "tickets": ["MM-118"], "milestone": "M4" },
+        { "step": 6, "title": "More measurement sites (generic measurement table)", "tickets": ["MM-156"], "milestone": "M4" },
+        { "step": 7, "title": "Body-fat range from the user's own measurements", "tickets": ["MM-34"], "milestone": "M4" },
+        { "step": 8, "title": "Progress photos", "tickets": ["MM-157"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-155"], "meaning": "Every feature that asks whether waist changed gets one noise-aware answer." },
+      "notes": "MM-136 reuses the lasting-shift mechanism MM-131 builds in the trend filter; design the two together. If MM-156 is likely soon, make MM-155's table generic by site so waist is migrated once."
+    },
+    {
+      "id": "WS-08",
+      "name": "Food logging experience",
+      "file": "ws-08-food-logging-experience.md",
+      "intent": "Make logging a real day fast and honest: search, barcode, edit, copy, custom foods, rough estimates, and the nutrient detail the targets need.",
+      "recommendedOrder": 8,
+      "status": "partially-built",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-B",
+      "dependsOn": ["WS-01", "WS-03", "WS-04"],
+      "unlocks": [],
+      "primaryOwnership": ["apps/mobile/lib/src/today (add-food flow, entry rows)", "packages/domain/lib/src/food_entry.dart", "packages/domain/lib/src/quantity_source.dart"],
+      "sharedContracts": ["SC-food-entry", "SC-food-pack", "SC-schema", "SC-store", "SC-ui-kit"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-food-screen", "HS-estimator-style", "HS-simulator", "HS-strings"],
+      "sourceRequirements": {
+        "built": ["MM-38", "MM-39", "MM-40", "MM-41"],
+        "remaining": ["MM-37", "MM-42", "MM-43", "MM-44", "MM-45", "MM-46", "MM-47", "MM-48", "MM-49", "MM-58", "MM-126", "MM-127", "MM-150", "MM-151", "MM-152"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Edit a logged entry; copy a meal or a day", "tickets": ["MM-48", "MM-47"], "milestone": "M2" },
+        { "step": 2, "title": "Estimated meal entry; the easy-to-miss prompt", "tickets": ["MM-150", "MM-152"], "milestone": "M2" },
+        { "step": 3, "title": "Custom foods and recipes", "tickets": ["MM-45"], "milestone": "M3" },
+        { "step": 4, "title": "Search the pack; store every nutrient; detail level", "tickets": ["MM-42", "MM-49"], "milestone": "M2" },
+        { "step": 5, "title": "Barcode scanning; raw or cooked", "tickets": ["MM-43", "MM-151"], "milestone": "M2" },
+        { "step": 6, "title": "Alcohol and fiber against the targets", "tickets": ["MM-127", "MM-126"], "milestone": "M4" },
+        { "step": 7, "title": "Hand-portion logging", "tickets": ["MM-46"], "milestone": "M4" },
+        { "step": 8, "title": "Nutrition-label scanning; live lookup with consent", "tickets": ["MM-44", "MM-58"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-42", "MM-49"], "meaning": "Entries from the database carry full nutrient data; insights and guides that need fiber, sodium or alcohol have something to read." },
+      "notes": "Steps 1 and 2 need neither the pack nor a schema change and can start as soon as WS-03's component library exists. MM-150 and MM-46 each add a logging style the estimator must learn (HS-estimator-style)."
+    },
+    {
+      "id": "WS-09",
+      "name": "Coaching intelligence and adherence",
+      "file": "ws-09-coaching-intelligence-and-adherence.md",
+      "intent": "Everything the coach says and does beyond the weekly number: adherence, stalls, safety notices, gaps and pauses, recovery, recomp verdicts, rewards and reports.",
+      "recommendedOrder": 9,
+      "status": "not-started",
+      "riskLevel": "high",
+      "parallelGroup": "PG-C",
+      "dependsOn": ["WS-01", "WS-02", "WS-03", "WS-05", "WS-06", "WS-07", "WS-10"],
+      "unlocks": ["WS-13"],
+      "primaryOwnership": ["packages/engine (new modules: adherence, insights, stall, notices, gap and pause rules)", "apps/mobile (insight card, summaries, return screen, pause, reminders, recovery sheet, report)"],
+      "sharedContracts": ["SC-analysis", "SC-targets", "SC-setup", "SC-schema", "SC-store", "SC-entitlements", "SC-ui-kit", "SC-nav", "SC-simulator"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-compute-targets", "HS-coach-screen", "HS-nav", "HS-simulator", "HS-progress-screen", "HS-onboarding-screen", "HS-strings"],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-32", "MM-33", "MM-36", "MM-92", "MM-114", "MM-116", "MM-117", "MM-125", "MM-133", "MM-140", "MM-141", "MM-145", "MM-146", "MM-147", "MM-148", "MM-149"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Weekly adherence summary (five facts, no score)", "tickets": ["MM-149"], "milestone": "M2" },
+        { "step": 2, "title": "Returning after a gap; persistent under-eating notice", "tickets": ["MM-147", "MM-114"], "milestone": "M2" },
+        { "step": 3, "title": "Insight framework, built with its first rule: stall diagnosis", "tickets": ["MM-141", "MM-140"], "milestone": "M2" },
+        { "step": 4, "title": "Pause coaching; local reminders", "tickets": ["MM-148", "MM-146"], "milestone": "M3" },
+        { "step": 5, "title": "Weekly recovery check-in and the offer to ease a deficit", "tickets": ["MM-116", "MM-117"], "milestone": "M4" },
+        { "step": 6, "title": "Recomp review and recomp signal", "tickets": ["MM-133", "MM-32"], "milestone": "M4" },
+        { "step": 7, "title": "Process rewards; monthly report", "tickets": ["MM-92", "MM-33"], "milestone": "M3" },
+        { "step": 8, "title": "Protein across meals; phase planning", "tickets": ["MM-125", "MM-36"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-149", "MM-114", "MM-147"], "meaning": "The safety and re-entry behavior a public release needs exists." },
+      "notes": "New engine code goes in new files beside coach.dart, not inside computeTargets. Step 6 and the strength trigger of MM-117 wait for WS-10; everything earlier does not. Safety insights are never behind the paywall."
+    },
+    {
+      "id": "WS-10",
+      "name": "Training log and strength",
+      "file": "ws-10-training-log-and-strength.md",
+      "intent": "Log workouts set by set and derive the strength trend, the third headline measure and the signal recomp coaching needs.",
+      "recommendedOrder": 10,
+      "status": "not-started",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-C",
+      "dependsOn": ["WS-01", "WS-03"],
+      "unlocks": ["WS-09"],
+      "primaryOwnership": ["apps/mobile/lib/src/train (new)", "packages/domain (workout types, new)", "packages/engine (e1RM, volume, progression; new files)", "exercise library data (new)"],
+      "sharedContracts": ["SC-schema", "SC-store", "SC-nav", "SC-ui-kit"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-nav", "HS-progress-screen", "HS-strings"],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-74", "MM-75", "MM-76", "MM-77", "MM-78", "MM-79"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Exercise library as shipped data", "tickets": ["MM-76"], "milestone": "M3" },
+        { "step": 2, "title": "Log a workout; the Train destination", "tickets": ["MM-75"], "milestone": "M3" },
+        { "step": 3, "title": "Estimated one-rep max and the strength trend", "tickets": ["MM-77"], "milestone": "M3" },
+        { "step": 4, "title": "Weekly hard sets per muscle group", "tickets": ["MM-78"], "milestone": "M4" },
+        { "step": 5, "title": "Progression suggestions", "tickets": ["MM-79"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-77"], "meaning": "A smoothed strength trend per lift exists for the recomp signal, the recomp review and the recovery rule." },
+      "notes": "Almost entirely new files. Its only contention is the schema lane and one navigation destination, which makes it the safest large workstream to delegate once WS-01 and WS-03's gates are met."
+    },
+    {
+      "id": "WS-11",
+      "name": "Health platform sync",
+      "file": "ws-11-health-platform-sync.md",
+      "intent": "Read weigh-ins and related data from Health Connect and, later, HealthKit, behind an interface that can be faked on Windows.",
+      "recommendedOrder": 11,
+      "status": "not-started",
+      "riskLevel": "high",
+      "parallelGroup": "PG-C",
+      "dependsOn": ["WS-01"],
+      "unlocks": [],
+      "primaryOwnership": ["packages/health_ingest (new)", "Android manifest and permissions", "apps/mobile settings (connection screen)"],
+      "sharedContracts": ["SC-health-source", "SC-schema", "SC-store"],
+      "coordinationHotspots": ["HS-schema-lane", "HS-weight-entries", "HS-progress-screen"],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-66", "MM-67", "MM-68", "MM-69", "MM-70", "MM-71", "MM-72", "MM-73"]
+      },
+      "sequence": [
+        { "step": 1, "title": "HealthSource interface and a fake that replays recorded histories", "tickets": ["MM-67"], "milestone": "M3" },
+        { "step": 2, "title": "Duplicate handling and source precedence", "tickets": ["MM-71"], "milestone": "M3" },
+        { "step": 3, "title": "Import from Health Connect", "tickets": ["MM-68"], "milestone": "M3" },
+        { "step": 4, "title": "History backfill on first connection", "tickets": ["MM-73"], "milestone": "M3" },
+        { "step": 5, "title": "Background sync", "tickets": ["MM-72"], "milestone": "M4" },
+        { "step": 6, "title": "Write nutrition to the health platform", "tickets": ["MM-70"], "milestone": "M4" },
+        { "step": 7, "title": "Import from HealthKit (needs the Mac)", "tickets": ["MM-69"], "milestone": "M4" }
+      ],
+      "gate": { "tickets": ["MM-67", "MM-71"], "meaning": "Weigh-ins have a source and a precedence rule; other workstreams read the chosen reading through one accessor." },
+      "notes": "Step 1 is a new package with no schema change and can start at any time. Step 7 cannot be built or tested on the Windows development machine."
+    },
+    {
+      "id": "WS-12",
+      "name": "Backup and portability",
+      "file": "ws-12-backup-and-portability.md",
+      "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose.",
+      "recommendedOrder": 12,
+      "status": "not-started",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-C",
+      "dependsOn": ["WS-01"],
+      "unlocks": ["WS-13"],
+      "primaryOwnership": ["packages/data (snapshot, encrypt, restore)", "a backup providers package (new)", "apps/mobile settings (backup screen)"],
+      "sharedContracts": ["SC-schema", "SC-store"],
+      "coordinationHotspots": ["HS-schema-lane"],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-59", "MM-63", "MM-64", "MM-65"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Platform backup rules for health data (spike)", "tickets": ["MM-65"], "milestone": "M3" },
+        { "step": 2, "title": "Encrypted backup and restore to a file", "tickets": ["MM-63"], "milestone": "M3" },
+        { "step": 3, "title": "Storage providers", "tickets": ["MM-64"], "milestone": "M3" }
+      ],
+      "gate": { "tickets": ["MM-63"], "meaning": "A backup made at one schema version restores at a later one." },
+      "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring."
+    },
+    {
+      "id": "WS-13",
+      "name": "Commercial and release readiness",
+      "file": "ws-13-commercial-and-release-readiness.md",
+      "intent": "The Coach unlock and trial, the external reviews, the store obligations, and the release itself.",
+      "recommendedOrder": 13,
+      "status": "not-started",
+      "riskLevel": "high",
+      "parallelGroup": "PG-D",
+      "dependsOn": ["WS-01", "WS-02", "WS-03", "WS-04", "WS-05", "WS-06", "WS-09", "WS-12"],
+      "unlocks": [],
+      "primaryOwnership": ["a purchases and entitlement package (new)", "store listings, privacy policy and declarations (outside the repository or in docs/)", "release configuration"],
+      "sharedContracts": ["SC-entitlements"],
+      "coordinationHotspots": [],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": ["MM-29", "MM-84", "MM-85", "MM-86", "MM-87", "MM-88", "MM-94", "MM-95", "MM-96"]
+      },
+      "sequence": [
+        { "step": 1, "title": "Long-lead items: store trial mechanics spike; privacy policy and data declarations draft", "tickets": ["MM-88", "MM-95"], "milestone": "M3" },
+        { "step": 2, "title": "Professional review of limits, screening and safeguards", "tickets": ["MM-29"], "milestone": "M3" },
+        { "step": 3, "title": "Free tier boundary and the real entitlement implementation", "tickets": ["MM-85"], "milestone": "M3" },
+        { "step": 4, "title": "Coach trial and one-time purchase", "tickets": ["MM-86", "MM-87"], "milestone": "M3" },
+        { "step": 5, "title": "Health-claims review of the app and listing", "tickets": ["MM-96"], "milestone": "M3" },
+        { "step": 6, "title": "Store release", "tickets": ["MM-94"], "milestone": "M3" }
+      ],
+      "gate": { "tickets": ["MM-94"], "meaning": "The app is live in the United States on both stores." },
+      "notes": "Step 1 has no code dependency and should start well before the rest: finding a reviewer for MM-29 and learning the stores' trial rules both take calendar time, not engineering time."
+    }
+  ],
+  "dependencyEdges": [
+    { "from": "WS-01", "to": "WS-05", "type": "hard-blocker", "scope": [2, 5], "satisfiedBy": ["MM-61"], "reason": "New screening answers and a last-confirmed date are new columns on the Setups table." },
+    { "from": "WS-01", "to": "WS-06", "type": "hard-blocker", "scope": [3, 5, 7], "satisfiedBy": ["MM-61"], "reason": "Explanations are stored with targets history; pace, macro balance and week shape are stored settings." },
+    { "from": "WS-01", "to": "WS-07", "type": "hard-blocker", "scope": "all", "satisfiedBy": ["MM-61"], "reason": "Three-reading measurements, weight events, cycle days, display settings and photos all add tables or columns." },
+    { "from": "WS-01", "to": "WS-08", "type": "hard-blocker", "scope": [3, 4, 5, 6, 7, 8], "satisfiedBy": ["MM-61"], "reason": "Custom foods, recipes and per-entry nutrients need new tables and columns. Editing, copying and estimates do not." },
+    { "from": "WS-01", "to": "WS-09", "type": "hard-blocker", "scope": [2, 3, 4, 5, 7], "satisfiedBy": ["MM-61"], "reason": "Notice and insight state, pauses, reminder settings, recovery answers and stored reports need tables. The adherence summary is a pure function." },
+    { "from": "WS-01", "to": "WS-10", "type": "hard-blocker", "scope": [2, 3, 4, 5], "satisfiedBy": ["MM-61"], "reason": "Workouts, exercises and sets are new tables." },
+    { "from": "WS-01", "to": "WS-11", "type": "hard-blocker", "scope": [2, 3, 4, 5, 6, 7], "satisfiedBy": ["MM-61"], "reason": "Source and precedence change the weigh-in table; imported data adds tables. The interface and fake do not." },
+    { "from": "WS-01", "to": "WS-12", "type": "hard-blocker", "scope": [2, 3], "satisfiedBy": ["MM-61"], "reason": "Restore must migrate a backup made at an older schema version." },
+    { "from": "WS-01", "to": "WS-13", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-7", "MM-8"], "reason": "A release is built by CI with production app ids." },
+
+    { "from": "WS-02", "to": "WS-06", "type": "contract-dependency", "scope": [2, 3, 4, 5, 6, 7, 8], "satisfiedBy": ["MM-120", "MM-115", "MM-132"], "reason": "Reference weight, step-limit semantics, target flags and threshold handling must be settled before the target's contents and its explanation are rebuilt on them." },
+    { "from": "WS-02", "to": "WS-06", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-131"], "reason": "Leaving a deficit causes a glycogen rebound the engine would read as a surplus and answer by cutting calories." },
+    { "from": "WS-02", "to": "WS-07", "type": "contract-dependency", "scope": [2], "satisfiedBy": ["MM-131"], "reason": "Weight events reuse the trend filter's lasting-shift and widened-noise mechanism built for phase changes." },
+    { "from": "WS-02", "to": "WS-07", "type": "contract-dependency", "scope": [7], "satisfiedBy": ["MM-35"], "reason": "The body-fat estimate needs the spike's decision on which model produces it." },
+    { "from": "WS-02", "to": "WS-09", "type": "hard-blocker", "scope": [2, 3], "satisfiedBy": ["MM-131", "MM-115"], "reason": "A stall diagnosis or an under-eating notice built on an estimate that misreads phase changes would be confidently wrong." },
+    { "from": "WS-02", "to": "WS-13", "type": "hard-blocker", "scope": [2, 6], "satisfiedBy": ["MM-120", "MM-131", "MM-115", "MM-132", "MM-111", "MM-135"], "reason": "The professional review should review the corrected limits, and they are must-haves for release." },
+    { "from": "WS-02", "to": "WS-05", "type": "integration-risk", "scope": [2], "satisfiedBy": ["MM-111"], "reason": "MM-111 and MM-112 both extend CoachingPolicy.derive in screening.dart." },
+    { "from": "WS-02", "to": "WS-08", "type": "integration-risk", "scope": [2, 7], "satisfiedBy": [], "reason": "Estimated meals and hand portions add logging styles that the estimator's style-switch rule must learn." },
+
+    { "from": "WS-03", "to": "WS-05", "type": "contract-dependency", "scope": [3, 4, 5], "satisfiedBy": ["MM-104", "MM-108"], "reason": "Onboarding and settings are migrated onto the component library and string catalog before they grow." },
+    { "from": "WS-03", "to": "WS-05", "type": "soft-preferred-order", "scope": [1, 2], "satisfiedBy": ["MM-104", "MM-108"], "reason": "The profile-correction and health re-check screens are needed for M1 and may be built first; if so they are migrated with the other screens in WS-03 steps 1 and 2." },
+    { "from": "WS-03", "to": "WS-06", "type": "contract-dependency", "scope": [4, 5, 6, 7, 8], "satisfiedBy": ["MM-104", "MM-108", "MM-99"], "reason": "Bands, the pace control and later target UI are new surface on the Coach, Food and dashboard screens." },
+    { "from": "WS-03", "to": "WS-06", "type": "soft-preferred-order", "scope": [3], "satisfiedBy": ["MM-104", "MM-108"], "reason": "The check-in summary and confidence card are needed for M1 and may be built first; if so they are migrated in WS-03 steps 1 and 2." },
+    { "from": "WS-03", "to": "WS-07", "type": "contract-dependency", "scope": "all", "satisfiedBy": ["MM-104", "MM-108", "MM-107"], "reason": "Measurement charts use the shared chart components and uncertainty language." },
+    { "from": "WS-03", "to": "WS-08", "type": "contract-dependency", "scope": "all", "satisfiedBy": ["MM-104", "MM-108", "MM-99"], "reason": "The Today screen becomes Food and the add-food flow is rebuilt from library components." },
+    { "from": "WS-03", "to": "WS-09", "type": "contract-dependency", "scope": [2, 3, 4, 5, 6, 7, 8], "satisfiedBy": ["MM-104", "MM-108", "MM-99", "MM-98"], "reason": "Insights, notices and summaries appear on the dashboard and use the notice and card components." },
+    { "from": "WS-03", "to": "WS-10", "type": "contract-dependency", "scope": [2, 3, 4, 5], "satisfiedBy": ["MM-104", "MM-108", "MM-99"], "reason": "Train is a new navigation destination and its set-entry controls are library components." },
+    { "from": "WS-03", "to": "WS-13", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-91", "MM-106", "MM-109"], "reason": "Accessibility, dark theme and the icon are release requirements." },
+
+    { "from": "WS-04", "to": "WS-08", "type": "hard-blocker", "scope": [4, 5, 6, 7, 8], "satisfiedBy": ["MM-55"], "reason": "Search, scanning, raw-or-cooked pairs, nutrients and food densities all read the pack." },
+    { "from": "WS-04", "to": "WS-13", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-57", "MM-52", "MM-56"], "reason": "The pack must exist, be downloadable and be licensed correctly before release." },
+
+    { "from": "WS-05", "to": "WS-06", "type": "contract-dependency", "scope": [2, 5], "satisfiedBy": ["MM-112"], "reason": "Pace limits and the protein floor for older adults are read from the coaching policy." },
+    { "from": "WS-05", "to": "WS-09", "type": "contract-dependency", "scope": [2, 3], "satisfiedBy": ["MM-112"], "reason": "The gap flow re-runs the health check; notices and insights read screening flags." },
+    { "from": "WS-05", "to": "WS-13", "type": "hard-blocker", "scope": [2, 6], "satisfiedBy": ["MM-83", "MM-112"], "reason": "The repeated health check is a release must-have and part of what the professional reviews." },
+
+    { "from": "WS-06", "to": "WS-09", "type": "hard-blocker", "scope": "all", "satisfiedBy": ["MM-121", "MM-123", "MM-138", "MM-139"], "reason": "Adherence is measured against bands and the protein minimum; stall diagnosis requires a confidence level and explains itself through the target explanation." },
+    { "from": "WS-06", "to": "WS-13", "type": "hard-blocker", "scope": [2], "satisfiedBy": ["MM-143"], "reason": "The professional reviews against the evidence register." },
+    { "from": "WS-06", "to": "WS-13", "type": "contract-dependency", "scope": [3, 4], "satisfiedBy": ["MM-138"], "reason": "Paid features must already read the entitlement interface that WS-13 implements." },
+
+    { "from": "WS-07", "to": "WS-09", "type": "hard-blocker", "scope": [3, 6], "satisfiedBy": ["MM-155"], "reason": "The masked-stall branch, the recomp review and the recomp signal all ask whether waist changed beyond its noise." },
+    { "from": "WS-07", "to": "WS-09", "type": "contract-dependency", "scope": [8], "satisfiedBy": ["MM-34"], "reason": "Phase planning projects from a body-fat estimate better than the formula." },
+    { "from": "WS-07", "to": "WS-06", "type": "soft-preferred-order", "scope": [8], "satisfiedBy": ["MM-155"], "reason": "The fat-heavy-gain notice uses the waist change function." },
+    { "from": "WS-07", "to": "WS-11", "type": "integration-risk", "scope": [2, 3], "satisfiedBy": [], "reason": "Both change how a day's weigh-in is stored and chosen." },
+
+    { "from": "WS-08", "to": "WS-07", "type": "soft-preferred-order", "scope": [4], "satisfiedBy": ["MM-49"], "reason": "The weight-jump explanation is better with sodium and reliable carbohydrate data; it works without them." },
+    { "from": "WS-08", "to": "WS-09", "type": "soft-preferred-order", "scope": [1, 8], "satisfiedBy": ["MM-150", "MM-49"], "reason": "The adherence summary reports estimate-heavy weeks, and the protein-across-meals rule is more useful with real food data." },
+
+    { "from": "WS-09", "to": "WS-13", "type": "hard-blocker", "scope": [4, 6], "satisfiedBy": ["MM-149", "MM-114", "MM-147", "MM-33"], "reason": "The trial is timed to end after the user has seen what the coach measured, and the safety notices are release must-haves." },
+
+    { "from": "WS-10", "to": "WS-09", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-77"], "reason": "The recomp review and the recomp signal need a strength trend." },
+    { "from": "WS-10", "to": "WS-06", "type": "soft-preferred-order", "scope": [8], "satisfiedBy": ["MM-77"], "reason": "Lean-gain guardrails use strength as the muscle signal." },
+    { "from": "WS-10", "to": "WS-02", "type": "integration-risk", "scope": "all", "satisfiedBy": [], "reason": "The energy-availability floor takes training energy as an input that is zero until workouts are logged (MM-28)." },
+    { "from": "WS-10", "to": "WS-11", "type": "integration-risk", "scope": [3], "satisfiedBy": ["MM-75"], "reason": "Imported workout sessions appear as workouts; agree the workout table before Health Connect import." },
+
+    { "from": "WS-11", "to": "WS-07", "type": "soft-preferred-order", "scope": [7], "satisfiedBy": ["MM-68"], "reason": "Smart-scale body-fat readings are one input to the body-fat estimate." },
+    { "from": "WS-11", "to": "WS-13", "type": "soft-preferred-order", "scope": [1, 6], "satisfiedBy": ["MM-68"], "reason": "The store data declarations list exactly the health permissions that ship." },
+
+    { "from": "WS-12", "to": "WS-13", "type": "hard-blocker", "scope": [6], "satisfiedBy": ["MM-65", "MM-63", "MM-64"], "reason": "Backup is part of the free tier the listing promises, and its platform rules affect the privacy declarations." }
+  ],
+  "parallelGroups": [
+    {
+      "id": "PG-A",
+      "name": "Foundations",
+      "workstreams": ["WS-01", "WS-02", "WS-03", "WS-04"],
+      "startCondition": "Now.",
+      "whySafe": "Four disjoint ownership areas: tool/ and the data package; the engine; the app's shell and components; two packages that do not exist yet.",
+      "coordination": [
+        "WS-01 step 2 writes widget tests for screens WS-03 is restructuring. Write tests against behavior and keys, or do the screen tests after WS-03 step 3.",
+        "WS-02 step 5 edits screening.dart, which nothing else in this group touches."
+      ]
+    },
+    {
+      "id": "PG-B",
+      "name": "Core product",
+      "workstreams": ["WS-05", "WS-06", "WS-07", "WS-08"],
+      "startCondition": "MM-61 done; WS-03's gate (MM-104, MM-108, MM-99) done; WS-02's gate done for WS-06 and WS-07 step 2; MM-55 done for WS-08 step 4 onward.",
+      "whySafe": "Each owns a different screen family and a different part of the domain: setup and policy; targets and the Coach screen; Progress; the add-food flow.",
+      "coordination": [
+        "All four add schema. Take turns in the schema lane (HS-schema-lane).",
+        "WS-05 and WS-06 both add fields to UserSetup and read CoachingPolicy. WS-05 step 2 lands before WS-06 step 5.",
+        "WS-06 and WS-08 both change the Food screen: WS-06 the summary card, WS-08 the add-food flow.",
+        "WS-06 step 7 and WS-08 steps 2 and 7 each change what the expenditure estimator must tolerate. One at a time, each with a full simulator run."
+      ]
+    },
+    {
+      "id": "PG-C",
+      "name": "Depth",
+      "workstreams": ["WS-09", "WS-10", "WS-11", "WS-12"],
+      "startCondition": "WS-06's gate done for WS-09. MM-61 and WS-03's gate done for WS-10. MM-61 done for WS-11 step 2 onward and WS-12 step 2 onward.",
+      "whySafe": "WS-10, WS-11 and WS-12 are mostly new packages and new screens. WS-09 adds new engine modules and cards.",
+      "coordination": [
+        "WS-10 and WS-11 must agree the workout table before Health Connect import.",
+        "WS-11 changes the weigh-in table that WS-07 reads.",
+        "WS-09 step 6 waits for WS-10 step 3.",
+        "WS-10, WS-11 and WS-12 may start earlier than WS-09 if capacity allows: their real prerequisites are WS-01 and, for WS-10, WS-03."
+      ]
+    },
+    {
+      "id": "PG-D",
+      "name": "Ship",
+      "workstreams": ["WS-13"],
+      "startCondition": "Step 1 now. Step 2 after MM-143 and WS-02's gate. Steps 3 to 6 as their edges are satisfied.",
+      "whySafe": "Step 1 is research and documents with no code.",
+      "coordination": [
+        "Step 2 depends on a person outside the project. Begin finding them during PG-A."
+      ]
+    }
+  ]
+}

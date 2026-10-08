@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'requirements.dart';
 import 'toolchain.dart';
 
 /// Workspace packages. `flutter: true` packages are tested with
@@ -19,7 +20,7 @@ typedef _Command = Future<int> Function(Toolchain tc, List<String> args);
 final _commands = <String, (String, _Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
-  'check': ('CI gate: format check, analyze, test', _check),
+  'check': ('CI gate: format, requirements, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
@@ -34,6 +35,10 @@ final _commands = <String, (String, _Command)>{
   ),
   'build': ('Build: mm build <android|ios> [--env dev|prod]', _build),
   'clean': ('Remove build outputs and caches', _clean),
+  'req': (
+    'Requirements: mm req [list | next | show <id>] (no args validates)',
+    _req,
+  ),
 };
 
 Future<int> runCli(List<String> args) async {
@@ -112,6 +117,7 @@ Future<int> _bootstrap(Toolchain tc, List<String> args) =>
 Future<int> _check(Toolchain tc, List<String> args) async {
   for (final step in <Future<int> Function()>[
     () => _format(tc, const ['--check']),
+    () => _req(tc, const []),
     () => _analyze(tc, const []),
     () => _test(tc, const []),
   ]) {
@@ -315,3 +321,6 @@ bool _samePath(String a, String b) {
       s.replaceAll(r'\', '/').replaceAll(RegExp(r'^\./|/$'), '');
   return norm(a) == norm(b) || norm(b).endsWith('/${norm(a)}');
 }
+
+Future<int> _req(Toolchain tc, List<String> args) =>
+    runRequirements(tc.repoRoot, args);
