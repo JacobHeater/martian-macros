@@ -8,7 +8,11 @@ import '../format/goal_mode_label.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/choice_card.dart';
+import '../theme/mm_colors_context.dart';
 import '../ui/info_card.dart';
+import '../ui/macro_figure.dart';
+import '../ui/macro_kind.dart';
+import '../ui/mm_hero_surface.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/notice.dart';
@@ -51,26 +55,48 @@ class CoachScreen extends ConsumerWidget {
               text: caution.message,
             ),
           ),
-        InfoCard(
-          title: 'Goal: ${setup.goalMode.label}',
-          trailing: MmButton(
-            label: 'Change',
-            kind: MmButtonKind.text,
-            onPressed: () => _changeGoal(context, ref, setup, snapshot),
-          ),
-          child: Text(setup.goalMode.blurb),
-        ),
         if (current != null)
-          InfoCard(
-            title: 'Daily targets',
+          MmHeroSurface(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(Fmt.kcal(current.targets.kcal), style: text.displaySmall),
-                const SizedBox(height: 8),
-                StatRow('Protein', Fmt.grams(current.targets.proteinG)),
-                StatRow('Carbs', Fmt.grams(current.targets.carbsG)),
-                StatRow('Fat', Fmt.grams(current.targets.fatG)),
+                Text(
+                  'Daily targets',
+                  style: text.labelMedium?.copyWith(color: context.mm.text2),
+                ),
+                const SizedBox(height: 4),
+                Text(Fmt.whole(current.targets.kcal), style: text.displayLarge),
+                Text(
+                  'kcal a day',
+                  style: text.bodyMedium?.copyWith(color: context.mm.text2),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.protein,
+                        value: Fmt.grams(current.targets.proteinG),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.carbs,
+                        value: Fmt.grams(current.targets.carbsG),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: MacroFigure(
+                        macro: MacroKind.fat,
+                        value: Fmt.grams(current.targets.fatG),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Divider(color: context.mm.outline),
                 StatRow(
                   'Intended pace',
                   current.targets.weeklyRateFraction == 0
@@ -90,6 +116,15 @@ class CoachScreen extends ConsumerWidget {
               ],
             ),
           ),
+        InfoCard(
+          title: 'Goal: ${setup.goalMode.label}',
+          trailing: MmButton(
+            label: 'Change',
+            kind: MmButtonKind.text,
+            onPressed: () => _changeGoal(context, ref, setup, snapshot),
+          ),
+          child: Text(setup.goalMode.blurb),
+        ),
         InfoCard(
           title: 'Your metabolism',
           child: MetabolismSummary(

@@ -9,7 +9,7 @@ import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
-import '../ui/mm_progress_bar.dart';
+import '../ui/step_progress.dart';
 import 'about_you_step.dart';
 import 'activity_step.dart';
 import 'goal_step.dart';
@@ -242,7 +242,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: MmProgressBar(value: (_step + 1) / _stepCount),
+              child: StepProgress(current: _step, count: _stepCount),
             ),
             Expanded(
               child: SingleChildScrollView(

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../ui/day_stepper.dart';
 import '../ui/macro_bar.dart';
+import '../ui/macro_figure.dart';
 import '../ui/macro_kind.dart';
 import '../ui/mm_progress_bar.dart';
 import '../ui/mm_spinner.dart';
 import '../ui/number_entry_card.dart';
+import '../ui/step_progress.dart';
 
 /// Progress, macro bars, the day stepper and the number-entry card.
 class DataSpecimens extends StatelessWidget {
@@ -16,6 +18,10 @@ class DataSpecimens extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const MmProgressBar(value: 0.57),
+      const SizedBox(height: 16),
+      const StepProgress(current: 2, count: 6),
+      const SizedBox(height: 16),
+      const MacroFigure(macro: MacroKind.protein, value: '177 g'),
       const SizedBox(height: 16),
       const Row(
         children: [
