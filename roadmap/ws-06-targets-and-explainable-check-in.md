@@ -115,7 +115,8 @@ beside anything.
 
 ## Requirement sources
 - Built (since this was written): MM-144 (non-goals).
-- Remaining: MM-143, MM-121, MM-138, MM-139, MM-123, MM-128, MM-130,
+- Built (since this was written): MM-143 (evidence register).
+- Remaining: MM-121, MM-138, MM-139, MM-123, MM-128, MM-130,
   MM-122, MM-124, MM-129. Epics: MM-119, MM-137.
 
 ## Notes for whoever builds it
