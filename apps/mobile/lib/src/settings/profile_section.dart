@@ -29,6 +29,7 @@ class ProfileSection extends ConsumerWidget {
     final ticked = _tickedCount(setup.screening);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const GroupHeader('Profile'),
         MmListRow(
