@@ -6,6 +6,7 @@ import 'drift_data_eraser.dart';
 import 'drift_day_mark_repository.dart';
 import 'drift_food_repository.dart';
 import 'drift_intake_reader.dart';
+import 'drift_preferences_repository.dart';
 import 'drift_setup_repository.dart';
 import 'drift_targets_history_repository.dart';
 import 'drift_waist_repository.dart';
@@ -23,6 +24,7 @@ final class DriftRepositories {
       dayMarks = DriftDayMarkRepository(db),
       intake = DriftIntakeReader(db),
       targets = DriftTargetsHistoryRepository(db),
+      preferences = DriftPreferencesRepository(db),
       eraser = DriftDataEraser(db);
 
   final AppDatabase _db;
@@ -33,6 +35,7 @@ final class DriftRepositories {
   final DayMarkRepository dayMarks;
   final IntakeReader intake;
   final TargetsHistoryRepository targets;
+  final PreferencesRepository preferences;
   final DataEraser eraser;
 
   /// Closes the underlying database.

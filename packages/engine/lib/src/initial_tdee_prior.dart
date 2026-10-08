@@ -1,17 +1,21 @@
+import 'package:mm_domain/mm_domain.dart';
+
+import 'activity_factor.dart';
 import 'tdee_prior.dart';
 
-/// Starting TDEE before any adaptive data: BMR times a deliberately
-/// conservative activity factor, with a wide (15%) uncertainty that the
-/// estimator quickly overrides.
+/// Starting TDEE before any adaptive data: resting energy times the activity
+/// factor for the user's daily activity and training days, with a wide (15%)
+/// uncertainty that the estimator quickly overrides.
 TdeePrior initialTdeePrior({
   required double bmrKcal,
+  required DailyActivity dailyActivity,
   required int trainingDaysPerWeek,
 }) {
-  final factor = switch (trainingDaysPerWeek) {
-    <= 2 => 1.35,
-    <= 4 => 1.45,
-    _ => 1.55,
-  };
-  final kcal = bmrKcal * factor;
+  final kcal =
+      bmrKcal *
+      activityFactor(
+        dailyActivity: dailyActivity,
+        trainingDaysPerWeek: trainingDaysPerWeek,
+      );
   return TdeePrior(kcal: kcal, sigmaKcal: kcal * 0.15);
 }

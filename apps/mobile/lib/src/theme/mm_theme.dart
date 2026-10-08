@@ -221,6 +221,11 @@ ThemeData mmTheme(Brightness brightness) {
       linearMinHeight: 8,
       borderRadius: BorderRadius.circular(4),
     ),
-    listTileTheme: ListTileThemeData(iconColor: c.text2, textColor: c.text),
+    listTileTheme: ListTileThemeData(
+      iconColor: c.text2,
+      textColor: c.text,
+      titleTextStyle: base.textTheme.bodyLarge,
+      subtitleTextStyle: base.textTheme.bodySmall,
+    ),
   );
 }

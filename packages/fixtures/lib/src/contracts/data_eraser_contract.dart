@@ -14,6 +14,7 @@ void dataEraserContract(
     WeightRepository weights,
     FoodRepository food,
     TargetsHistoryRepository targets,
+    PreferencesRepository preferences,
   })
   Function()
   create,
@@ -37,6 +38,7 @@ void dataEraserContract(
           source: QuantitySource.weighed,
         ),
       );
+      await r.preferences.saveThemePreference(ThemePreference.dark);
       await r.targets.saveTargets(
         TargetsRecord(
           effectiveFrom: day,
@@ -60,6 +62,10 @@ void dataEraserContract(
       expect(await r.weights.watchWeights().first, isEmpty);
       expect(await r.food.watchFood(day).first, isEmpty);
       expect(await r.targets.watchTargetsHistory().first, isEmpty);
+      expect(
+        await r.preferences.watchThemePreference().first,
+        ThemePreference.system,
+      );
     });
   });
 }

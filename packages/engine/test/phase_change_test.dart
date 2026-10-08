@@ -188,7 +188,10 @@ void main() {
     test('the defect: without settling, the first measurement is far too '
         'high and its uncertainty is not honest', () {
       final broken = run(glycogen: 0.02, settle: false);
-      expect(broken.firstError, greaterThan(250));
+      // Was 250 before the starting prior used daily activity (MM-164); the
+      // simulated users start from a lower prior, so the error is 236. It is
+      // still about twice the bound the fixed version must meet (125).
+      expect(broken.firstError, greaterThan(200));
       expect(broken.coverage, lessThan(0.85));
     });
 

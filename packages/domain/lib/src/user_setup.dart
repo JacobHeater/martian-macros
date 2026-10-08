@@ -1,4 +1,5 @@
 import 'calendar_date.dart';
+import 'daily_activity.dart';
 import 'goal_mode.dart';
 import 'profile.dart';
 import 'screening_answers.dart';
@@ -14,6 +15,7 @@ final class UserSetup {
     required this.trainingDaysPerWeek,
     required this.goalMode,
     required this.onboardedOn,
+    this.dailyActivity = DailyActivity.light,
     this.unitSystem = UnitSystem.imperial,
     this.bodyFatPercent,
     this.requestedLossFraction,
@@ -23,6 +25,9 @@ final class UserSetup {
   final ScreeningAnswers screening;
   final TrainingStatus trainingStatus;
   final int trainingDaysPerWeek;
+
+  /// Activity across the day outside workouts (MM-164).
+  final DailyActivity dailyActivity;
   final GoalMode goalMode;
 
   /// The day coaching started; anchors the calibration week.
@@ -42,12 +47,14 @@ final class UserSetup {
     UnitSystem? unitSystem,
     TrainingStatus? trainingStatus,
     int? trainingDaysPerWeek,
+    DailyActivity? dailyActivity,
     double? Function()? bodyFatPercent,
   }) => UserSetup(
     profile: profile,
     screening: screening,
     trainingStatus: trainingStatus ?? this.trainingStatus,
     trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+    dailyActivity: dailyActivity ?? this.dailyActivity,
     goalMode: goalMode ?? this.goalMode,
     onboardedOn: onboardedOn,
     unitSystem: unitSystem ?? this.unitSystem,

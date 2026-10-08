@@ -33,6 +33,13 @@ void setupRepositoryContract(String name, SetupRepository Function() create) {
       expect(loaded.screening.pregnant, isFalse);
     });
 
+    test('keeps daily activity, and a new setup defaults to light', () async {
+      await repo.saveSetup(typicalSetup(dailyActivity: DailyActivity.onFeet));
+      expect((await repo.loadSetup())!.dailyActivity, DailyActivity.onFeet);
+      await repo.saveSetup(typicalSetup());
+      expect((await repo.loadSetup())!.dailyActivity, DailyActivity.light);
+    });
+
     test('keeps screening answers', () async {
       await repo.saveSetup(
         typicalSetup(

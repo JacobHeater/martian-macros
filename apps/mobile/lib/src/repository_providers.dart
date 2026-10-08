@@ -43,6 +43,10 @@ final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );
 
+final preferencesRepositoryProvider = Provider<PreferencesRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).preferences,
+);
+
 final dataEraserProvider = Provider<DataEraser>(
   (ref) => ref.watch(_driftRepositoriesProvider).eraser,
 );

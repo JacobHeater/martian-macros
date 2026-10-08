@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
 import '../format/fmt.dart';
+import '../format/daily_activity_label.dart';
+import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
 import '../gallery/gallery_screen.dart';
 import '../providers.dart';
@@ -39,6 +41,22 @@ class SettingsScreen extends ConsumerWidget {
       appBar: const MmAppBar(title: 'Settings'),
       body: ListView(
         children: [
+          const GroupHeader('Appearance'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: MmSegmented<ThemePreference>(
+              segments: [
+                for (final p in ThemePreference.values) MmSegment(p, p.label),
+              ],
+              selected: {
+                ref.watch(themePreferenceProvider).value ??
+                    ThemePreference.system,
+              },
+              onChanged: (s) => ref
+                  .read(preferencesWriterProvider)
+                  .saveThemePreference(s.first),
+            ),
+          ),
           const GroupHeader('Units'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -52,7 +70,19 @@ class SettingsScreen extends ConsumerWidget {
                   setupWriter.saveSetup(setup.copyWith(unitSystem: s.first)),
             ),
           ),
-          const GroupHeader('Training'),
+          const GroupHeader('Activity and training'),
+          MmListRow(
+            title: 'Daily activity',
+            subtitle: setup.dailyActivity.label,
+            trailing: MmMenuButton<DailyActivity>(
+              icon: Icons.edit_outlined,
+              onSelected: (a) =>
+                  setupWriter.saveSetup(setup.copyWith(dailyActivity: a)),
+              items: [
+                for (final a in DailyActivity.values) MmMenuItem(a, a.label),
+              ],
+            ),
+          ),
           MmListRow(
             title: 'Experience',
             subtitle: setup.trainingStatus.label,

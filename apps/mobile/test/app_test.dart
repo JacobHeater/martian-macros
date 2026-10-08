@@ -102,6 +102,9 @@ void main() {
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Your day'), findsOneWidget);
+    await tester.tap(find.text('Next')); // activity
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Next')); // training
     await tester.pumpAndSettle();
     // Male profile: female-only questions are not offered.
@@ -153,7 +156,9 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Next'));
+    await tester.tap(find.text('Next')); // activity
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // training
     await tester.pumpAndSettle();
 
     expect(find.text('Pregnant'), findsOneWidget);

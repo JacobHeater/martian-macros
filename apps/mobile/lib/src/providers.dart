@@ -22,6 +22,11 @@ final setupProvider = StreamProvider<UserSetup?>(
   (ref) => ref.watch(setupReaderProvider).watchSetup(),
 );
 
+/// Light, dark or follow the phone (MM-165).
+final themePreferenceProvider = StreamProvider<ThemePreference>(
+  (ref) => ref.watch(preferencesReaderProvider).watchThemePreference(),
+);
+
 final weightsProvider = StreamProvider<List<WeightObservation>>(
   (ref) => ref.watch(weightReaderProvider).watchWeights(),
 );

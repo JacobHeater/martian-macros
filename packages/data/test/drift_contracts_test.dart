@@ -16,6 +16,7 @@ void main() {
   setupRepositoryContract('Drift', () => open().setup);
   weightRepositoryContract('Drift', () => open().weights);
   waistRepositoryContract('Drift', () => open().waist);
+  preferencesRepositoryContract('Drift', () => open().preferences);
   foodRepositoryContract('Drift', () => open().food);
   dayMarkRepositoryContract('Drift', () => open().dayMarks);
   targetsHistoryRepositoryContract('Drift', () => open().targets);
@@ -31,6 +32,7 @@ void main() {
       weights: r.weights,
       food: r.food,
       targets: r.targets,
+      preferences: r.preferences,
     );
   });
 }

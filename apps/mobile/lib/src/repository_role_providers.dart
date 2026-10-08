@@ -20,6 +20,14 @@ final setupWriterProvider = Provider<SetupWriter>(
   (ref) => ref.watch(setupRepositoryProvider),
 );
 
+final preferencesReaderProvider = Provider<PreferencesReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final preferencesWriterProvider = Provider<PreferencesWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final weightReaderProvider = Provider<WeightReader>(
   (ref) => ref.watch(weightRepositoryProvider),
 );
