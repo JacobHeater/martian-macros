@@ -15,6 +15,9 @@ class Setups extends Table {
   TextColumn get trainingStatus => textEnum<TrainingStatus>()();
   IntColumn get trainingDaysPerWeek => integer()();
 
+  /// Added in schema version 4 (MM-83); existing rows read as 0.
+  IntColumn get profileRevision => integer().withDefault(const Constant(0))();
+
   /// Added in schema version 2 (MM-164); existing rows read as `light`.
   TextColumn get dailyActivity =>
       textEnum<DailyActivity>().withDefault(const Constant('light'))();
