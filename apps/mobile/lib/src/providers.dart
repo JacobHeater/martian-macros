@@ -8,6 +8,10 @@ import 'repository_role_providers.dart';
 /// Build environment from `--dart-define-from-file=config/<env>.json`.
 const appEnv = String.fromEnvironment('MM_ENV', defaultValue: 'dev');
 
+/// The build environment (`dev` or `prod`). Overridable so tests can check
+/// what production hides.
+final appEnvProvider = Provider<String>((ref) => appEnv);
+
 /// The user's current calendar day. Invalidated when the app resumes, so a
 /// session left open overnight rolls over.
 final todayProvider = Provider<CalendarDate>(

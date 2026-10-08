@@ -1,6 +1,6 @@
 ---
 id: MM-102
-status: in-progress
+status: done
 component: design-system
 related: [MM-101, MM-91, MM-104, MM-106, MM-107]
 ---
@@ -71,3 +71,8 @@ Scenario: Without color vision
 - **Not yet done**: macro bars were seen only empty (no food logged), so the macro colors are unseen in the app; the rendered gallery and
   palette sheet (MM-105); the Coach, Onboarding and Settings screens in the new theme; grayscale and color-blind review on device; the
   `Notice` and `ChoiceCard` still use their old shapes (step 1b). Status stays in-progress until the gallery shows the palette.
+
+## Notes (completed)
+- Both themes, the semantic tokens, the contrast test, the no-stray-colors test and the rendered review (`design/palette-preview.html`, and the in-app gallery's color swatches, MM-105) exist. The
+  product owner reviewed the rendered palette and approved it.
+- **Not verified**: grayscale and color-blind review was done numerically (L* separation and simulated ΔE in `design/color-and-theme-system.md`), not with a person who has color-vision deficiency.

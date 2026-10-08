@@ -1,6 +1,6 @@
 ---
 id: MM-104
-status: proposed
+status: done
 component: design-system
 related: [MM-101, MM-102, MM-103, MM-105, MM-106, MM-98]
 ---
@@ -56,3 +56,7 @@ Scenario: Screens changed over
 ## Notes
 - Do this before the dashboard (MM-98), which needs Summary card, Figure and Empty state, or the dashboard will grow its own private
   versions.
+
+## Notes (built and verified)
+- The component library is `apps/mobile/lib/src/ui/` (35 files; see MM-163) and `charts/`. Every existing screen was migrated onto it and split one declaration per file. It is a folder in the app,
+  not yet a `packages/ui` package; that move is not needed until a second app or tool shares it.

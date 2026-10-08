@@ -1,6 +1,6 @@
 ---
 id: MM-107
-status: proposed
+status: done
 component: design-system
 related: [MM-101, MM-102, MM-17, MM-23, MM-34, MM-77, MM-98]
 ---
@@ -53,3 +53,10 @@ Scenario: In words
 
 ## Notes
 - The existing trend chart already draws dots, a line and a two-sigma band; this makes that the rule and moves it into a shared component.
+
+## Notes (built and verified)
+- Shared chart components in `apps/mobile/lib/src/charts/`: `TrendChart` (readings as dots, estimate as a line, uncertainty as a band, in the `ion` and `text2` tokens), `TrendStats`, and `TrendSparkline`
+  (the same line and band, no axes or dots) used on the dashboard. The Progress chart has a screen-reader caption and a single reading says "A trend needs more weigh-ins."
+  (`apps/mobile/test/charts_test.dart`). Token contrast is tested in `theme_test.dart`.
+- **Not built**: the range bar and weekly bars, because no screen uses them yet; waist and strength charts do not exist. Add them to `charts/` when they do.
+- **Not verified**: the line, band and dots in both themes were checked by token contrast, and by eye only in dark mode on the emulator earlier.

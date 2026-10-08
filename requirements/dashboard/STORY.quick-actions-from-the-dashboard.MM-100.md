@@ -1,6 +1,6 @@
 ---
 id: MM-100
-status: proposed
+status: done
 component: dashboard
 related: [MM-97, MM-98, MM-16, MM-38, MM-42, MM-43, MM-75]
 ---
@@ -44,3 +44,8 @@ Scenario: Already weighed in
   Given a weigh-in today
   Then the weight card has no entry field
 ```
+
+## Notes (built and verified)
+- The dashboard has the same Add food button as Food (it logs to today, meal from the clock) and stays on the dashboard afterwards. With no weigh-in today the weight card is a number field with Save;
+  once saved it shows the trend (`dashboard_test.dart`). Scanner and Start workout are not added because those features do not exist.
+- **Not verified**: "one tap from a cold start" was reasoned from the layout, not timed on a device.

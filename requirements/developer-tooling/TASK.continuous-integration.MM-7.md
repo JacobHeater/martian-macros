@@ -1,6 +1,6 @@
 ---
 id: MM-7
-status: proposed
+status: in-progress
 component: developer-tooling
 related: [MM-1, MM-2, MM-4, MM-6]
 ---
@@ -37,3 +37,9 @@ Scenario: The pinned version is the one used
 ## Notes
 - Open question: whether generated Drift code is committed (as now) or regenerated in CI with a "no diff" check. Committed is simpler;
   the no-diff check catches a forgotten `mm gen`.
+
+## Progress
+- `.github/workflows/ci.yml`: on pull requests and pushes to `main` it reads the Flutter version from `.fvmrc`, installs exactly that, then runs `./mm bootstrap`, `./mm check` and
+  `./mm build android --env dev` on Linux. It calls `mm`, never `flutter`.
+- **Not verified**: the workflow has never run (nothing is pushed); the action versions and the Android build step are unproven. **Not done**: the iOS build on macOS (the project does not build for iOS yet).
+  Status stays in-progress until a pull request has gone green.

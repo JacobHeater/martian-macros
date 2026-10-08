@@ -1,6 +1,6 @@
 ---
 id: MM-99
-status: proposed
+status: done
 component: dashboard
 related: [MM-97, MM-98, MM-90, MM-41, MM-75, MM-80]
 ---
@@ -56,3 +56,8 @@ Scenario: Keeping place
 ## Notes
 - On a wide screen (a tablet, or a phone in landscape) a bottom bar wastes space; a navigation rail is the Material answer. Out of scope
   until tablets matter.
+
+## Notes (built and verified)
+- Navigation is Dashboard, Food, Progress, Coach (`MmNavigationBar`), opening on Dashboard; selection lives in `homeTabProvider`. Today was renamed Food (`apps/mobile/lib/src/food/`). Each destination keeps
+  its state (`IndexedStack`). Settings stays behind the gear. Train is not added (no training log yet).
+- Tests: `dashboard_test.dart` (opens on the dashboard, four labelled destinations, drill-in) and the updated `app_test.dart`.

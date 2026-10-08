@@ -5,22 +5,27 @@ import '../coach/coach_screen.dart';
 import '../progress/progress_screen.dart';
 import '../providers.dart';
 import '../settings/settings_screen.dart';
-import '../today/add_food_button.dart';
-import '../today/today_screen.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../food/add_food_button.dart';
+import '../food/food_screen.dart';
 import '../ui/mm_app_bar.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/mm_nav_destination.dart';
 import '../ui/mm_navigation_bar.dart';
+import 'home_destination.dart';
 import 'home_shell.dart';
+import 'home_tab_provider.dart';
 
 class HomeShellState extends ConsumerState<HomeShell>
     with WidgetsBindingObserver {
-  var _index = 0;
-
-  static const _titles = ['Today', 'Progress', 'Coach'];
   static const _destinations = [
     MmNavDestination(
-      label: 'Today',
+      label: 'Dashboard',
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home,
+    ),
+    MmNavDestination(
+      label: 'Food',
       icon: Icons.restaurant_outlined,
       selectedIcon: Icons.restaurant,
     ),
@@ -53,10 +58,11 @@ class HomeShellState extends ConsumerState<HomeShell>
   @override
   Widget build(BuildContext context) {
     ref.watch(checkInProvider);
+    final destination = ref.watch(homeTabProvider);
 
     return Scaffold(
       appBar: MmAppBar(
-        title: _titles[_index],
+        title: destination.label,
         actions: [
           MmIconButton(
             tooltip: 'Settings',
@@ -68,14 +74,25 @@ class HomeShellState extends ConsumerState<HomeShell>
         ],
       ),
       body: IndexedStack(
-        index: _index,
-        children: const [TodayScreen(), ProgressScreen(), CoachScreen()],
+        index: destination.index,
+        children: const [
+          DashboardScreen(),
+          FoodScreen(),
+          ProgressScreen(),
+          CoachScreen(),
+        ],
       ),
-      floatingActionButton: _index == 0 ? const AddFoodButton() : null,
+      floatingActionButton:
+          destination == HomeDestination.dashboard ||
+              destination == HomeDestination.food
+          ? const AddFoodButton()
+          : null,
       bottomNavigationBar: MmNavigationBar(
         destinations: _destinations,
-        selectedIndex: _index,
-        onSelected: (i) => setState(() => _index = i),
+        selectedIndex: destination.index,
+        onSelected: (i) => ref
+            .read(homeTabProvider.notifier)
+            .select(HomeDestination.values[i]),
       ),
     );
   }

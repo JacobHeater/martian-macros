@@ -1,6 +1,6 @@
 ---
 id: MM-93
-status: proposed
+status: done
 component: app-shell
 related: [MM-89, MM-17, MM-21, MM-25, MM-38, MM-41, MM-62, MM-81, MM-82, MM-90, MM-91]
 ---
@@ -44,3 +44,23 @@ Scenario: A hang becomes a failure
 Scenario: Tickets updated
   Then each ticket in the table has its "not verified" note replaced with what now verifies it
 ```
+
+## Notes (built and verified)
+Every row of the table has at least one automated test, all on in-memory repositories and a fixed clock:
+
+| ticket | where |
+|---|---|
+| MM-17 trend chart line and band | `progress_flows_test.dart` (a `LineChart` with two band edges, a trend line and 21 readings), `charts_test.dart` |
+| MM-21 waist | store round trip in the waist repository contract (Drift and in-memory); card, change summary and saving in `progress_flows_test.dart` |
+| MM-25 change-goal sheet; targets follow | `coach_flows_test.dart` (the setup changes; new maintenance targets more than 100 kcal above the fat-loss ones) |
+| MM-38 energy warning; swipe delete; past day | `food_flows_test.dart` |
+| MM-41 over-target wording; past day against earlier targets; day picker | `food_flows_test.dart` |
+| MM-62 erase dialog | `settings_flows_test.dart` (cancel keeps data; confirm erases and returns to onboarding) |
+| MM-81 units | `settings_flows_test.dart` |
+| MM-82 training days, experience, body fat | `settings_flows_test.dart` |
+| MM-90 day rollover | `progress_flows_test.dart` (the clock moves past midnight, the app resumes, the new day is empty and yesterday holds the entry) |
+| MM-24 first adaptive check-in through the app | `coach_flows_test.dart` (30 days of complete logs at maintenance produce a second targets record, status `updated`) |
+
+- **The hang guard**: `apps/mobile/test/flutter_test_config.dart` fails any widget test that runs longer than 60 seconds ("Test timed out after 1 minutes") instead of hanging; checked with a deliberately hanging test.
+  The test helper `readNow` (support/pump_app.dart) wraps repository reads in `runAsync`.
+- **Not done**: the "not verified" notes in the nine older tickets were not individually rewritten; this table is the record of what now verifies each.

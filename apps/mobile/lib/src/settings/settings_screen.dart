@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import '../format/fmt.dart';
 import '../format/training_status_label.dart';
+import '../gallery/gallery_screen.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/group_header.dart';
@@ -25,6 +26,7 @@ class SettingsScreen extends ConsumerWidget {
     final setup = ref.watch(setupProvider).value;
     if (setup == null) return const Scaffold();
     final setupWriter = ref.read(setupWriterProvider);
+    final env = ref.watch(appEnvProvider);
     final today = ref.watch(todayProvider);
     final profile = setup.profile;
     final fmt = Fmt(setup.unitSystem);
@@ -117,10 +119,21 @@ class SettingsScreen extends ConsumerWidget {
             title: 'Erase all data and start over',
             onTap: () => _confirmErase(context, ref),
           ),
+          if (env == 'dev') ...[
+            const GroupHeader('Development'),
+            MmListRow(
+              leadingIcon: Icons.palette_outlined,
+              title: 'Component gallery',
+              subtitle: 'Every color and component, light and dark.',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const GalleryScreen()),
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'Martian Macros · $appEnv',
+              'Martian Macros · $env',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

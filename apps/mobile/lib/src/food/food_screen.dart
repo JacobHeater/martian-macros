@@ -9,32 +9,24 @@ import '../ui/day_stepper.dart';
 import '../ui/info_card.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
-import '../ui/notice.dart';
 import 'day_summary_card.dart';
 import 'meal_section.dart';
 import 'selected_day_provider.dart';
 import 'targets_on.dart';
 
-import 'package:mm_engine/mm_engine.dart';
-
-class TodayScreen extends ConsumerWidget {
-  const TodayScreen({super.key});
+class FoodScreen extends ConsumerWidget {
+  const FoodScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = ref.watch(todayProvider);
     final day = shownDay(ref);
-    final setup = ref.watch(setupProvider).value;
     final entries = ref.watch(foodForDayProvider(day)).value ?? const [];
     final history = ref.watch(targetsHistoryProvider).value ?? const [];
     final targets = targetsOn(history, day);
     final completeness =
         ref.watch(completenessProvider(day)).value ?? DayCompleteness.unmarked;
     final intake = intakeDayFrom(day, entries);
-
-    final calibrationDay = setup == null
-        ? null
-        : setup.onboardedOn.daysUntil(today) + 1;
 
     void go(CalendarDate target) => ref
         .read(selectedDayProvider.notifier)
@@ -49,17 +41,6 @@ class TodayScreen extends ConsumerWidget {
           onNext: day.isBefore(today) ? () => go(day.addDays(1)) : null,
           onLabelTap: day == today ? null : () => go(today),
         ),
-        if (calibrationDay != null && calibrationDay <= calibrationDays)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Notice(
-              icon: Icons.tune,
-              text:
-                  'Calibration, day $calibrationDay of $calibrationDays. '
-                  'Log everything and weigh in each morning. Your targets '
-                  'stay put while the app learns your metabolism.',
-            ),
-          ),
         DaySummaryCard(intake: intake, targets: targets?.targets),
         for (final meal in Meal.values)
           MealSection(

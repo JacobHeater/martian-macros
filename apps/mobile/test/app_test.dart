@@ -192,6 +192,12 @@ void main() {
     // 45*4 + 60*4 + 10*9 = 510 kcal, calculated from macros.
     final logged = await io(tester, () => repos.food.watchFood(today).first);
     expect(logged.single.kcal, 510);
+
+    // Logging from the dashboard leaves the user on the dashboard; the log
+    // itself is on the Food tab.
+    expect(find.textContaining('remaining'), findsOneWidget);
+    await tester.tap(find.text('Food'));
+    await tester.pumpAndSettle();
     expect(find.text('Chicken and rice'), findsOneWidget);
     expect(find.text('510'), findsWidgets);
     expect(find.textContaining('remaining'), findsOneWidget);

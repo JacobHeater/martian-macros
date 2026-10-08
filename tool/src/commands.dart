@@ -16,6 +16,10 @@ const _packages = <({String path, bool flutter})>[
   (path: 'tool', flutter: false),
 ];
 
+/// A test that waits longer than this fails instead of hanging the run (MM-93).
+/// Widget tests run on a fake clock, so one that awaits real I/O never ends.
+const _testTimeout = '60s';
+
 const _appDir = 'apps/mobile';
 const _envs = ['dev', 'prod'];
 
@@ -153,8 +157,8 @@ Future<int> _test(Toolchain tc, List<String> args) async {
   for (final p in selected) {
     if (!Directory('${tc.repoRoot.path}/${p.path}/test').existsSync()) continue;
     final code = p.flutter
-        ? await tc.flutter(['test'], inDir: p.path)
-        : await tc.dart(['test'], inDir: p.path);
+        ? await tc.flutter(['test', '--timeout', _testTimeout], inDir: p.path)
+        : await tc.dart(['test', '--timeout', _testTimeout], inDir: p.path);
     if (code != 0) failed++;
   }
   return failed == 0 ? 0 : 1;

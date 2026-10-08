@@ -6,6 +6,7 @@ class MmSurface extends StatelessWidget {
     required this.child,
     this.padded = true,
     this.clip = false,
+    this.onTap,
     super.key,
   });
 
@@ -17,12 +18,18 @@ class MmSurface extends StatelessWidget {
   /// Clip the content to the surface's rounded corners (for edge-to-edge rows).
   final bool clip;
 
+  /// Makes the whole surface tappable (a summary that opens its detail).
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) => Card(
     margin: const EdgeInsets.only(bottom: 12),
-    clipBehavior: clip ? Clip.antiAlias : Clip.none,
-    child: padded
-        ? Padding(padding: const EdgeInsets.all(16), child: child)
-        : child,
+    clipBehavior: clip || onTap != null ? Clip.antiAlias : Clip.none,
+    child: InkWell(
+      onTap: onTap,
+      child: padded
+          ? Padding(padding: const EdgeInsets.all(16), child: child)
+          : child,
+    ),
   );
 }
