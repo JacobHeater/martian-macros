@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:mm_domain/mm_domain.dart';
@@ -21,6 +22,8 @@ void main() {
 
   setUpAll(() async {
     if (linux) await loadGoldenFonts();
+    // Tests flatten shadows by default; the screens have soft ones.
+    debugDisableShadows = false;
   });
 
   Future<InMemoryRepositories> seeded({required bool dark}) async {
