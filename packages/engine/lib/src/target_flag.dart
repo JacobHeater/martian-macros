@@ -2,6 +2,14 @@ enum TargetFlag {
   /// The calorie target was raised to the safety floor.
   flooredAtSafetyMinimum,
 
+  /// The user was losing faster than the fastest pace allowed for their
+  /// body fat, so the target was raised beyond the usual weekly step (MM-115).
+  raisedForSafePace,
+
+  /// The target was not lowered this week because last week's was raised for
+  /// a too-fast loss: a raise is not walked straight back (MM-115).
+  heldAfterSafetyRaise,
+
   /// The change from last week was limited.
   rateLimited,
 

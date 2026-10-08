@@ -18,6 +18,7 @@ final class TargetInputs {
     this.previous,
     this.consecutiveDeficitWeeks = 0,
     this.requestedLossFraction,
+    this.safetyRaiseKcal = 0,
   });
 
   final BiologicalSex sex;
@@ -43,4 +44,8 @@ final class TargetInputs {
   /// Fat-loss pace chosen by the user (positive fraction per week, e.g.
   /// 0.0075). Clamped to the safety maximum. Defaults to 0.75%.
   final double? requestedLossFraction;
+
+  /// Added to last week's target even beyond the weekly step limit, because
+  /// the user is losing faster than the safe pace (`lossSafetyRaiseKcal`).
+  final double safetyRaiseKcal;
 }

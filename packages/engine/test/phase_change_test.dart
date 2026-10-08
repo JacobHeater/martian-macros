@@ -16,11 +16,22 @@ void main() {
   );
   final day0 = CalendarDate(2026, 1, 1);
 
-  // Mifflin-St Jeor x 1.45 is about 2,640 kcal for this person, so the
-  // starting estimate is right and any error comes from the weight data.
+  // The starting estimate for this person (light daily activity, three
+  // training days) is the truth, so any error comes from the weight data.
+  final startingEstimateKcal = initialTdeePrior(
+    bmrKcal: mifflinStJeorKcal(
+      sex: profile.sex,
+      weightKg: 85,
+      heightCm: profile.heightCm,
+      ageYears: profile.ageOn(day0),
+    ),
+    dailyActivity: DailyActivity.light,
+    trainingDaysPerWeek: 3,
+  ).kcal;
+
   SyntheticUser user(int seed, {double glycogen = 0.02}) => SyntheticUser(
     seed: seed,
-    baseTdeeKcal: 2640,
+    baseTdeeKcal: startingEstimateKcal,
     startWeightKg: 85,
     bodyFatPercent: 22,
     skipLogProbability: 0.03,
@@ -188,10 +199,7 @@ void main() {
     test('the defect: without settling, the first measurement is far too '
         'high and its uncertainty is not honest', () {
       final broken = run(glycogen: 0.02, settle: false);
-      // Was 250 before the starting prior used daily activity (MM-164); the
-      // simulated users start from a lower prior, so the error is 236. It is
-      // still about twice the bound the fixed version must meet (125).
-      expect(broken.firstError, greaterThan(200));
+      expect(broken.firstError, greaterThan(250));
       expect(broken.coverage, lessThan(0.85));
     });
 

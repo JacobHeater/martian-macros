@@ -1,6 +1,20 @@
 /// Days of logging before targets may first adapt (the calibration period).
 const int calibrationDays = 14;
 
+/// Days of weigh-ins the safety check on the pace of loss looks back over.
+const int safetyRaiseLookbackDays = 14;
+
+/// Weigh-ins, outside settling windows, needed in that look-back before the
+/// pace of loss can trigger a safety raise.
+const int safetyRaiseMinWeighIns = 8;
+
+/// A loss pace counts as over the limit only if it is over by more than this
+/// many of its own standard deviations.
+const double safetyRaiseSigmas = 1.5;
+
+/// The most a single check-in raises the target for a too-fast loss, kcal.
+const double safetyRaiseCapKcal = 400;
+
 /// Days between target changes.
 const int checkInIntervalDays = 7;
 

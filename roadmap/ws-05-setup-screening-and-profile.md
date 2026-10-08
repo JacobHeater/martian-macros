@@ -117,7 +117,7 @@ turns in the schema lane and keep to separate cards.
 ## Requirement sources
 - Built: MM-10, MM-11, MM-12, MM-13, MM-14 (profile, screening,
   recommendation, adults only, biological sex); MM-81, MM-82 (units, training
-  and body fat in Settings).
+  and body fat in Settings); MM-164 (daily activity in the starting estimate).
 - Remaining: MM-83, MM-112, MM-134, MM-158, MM-113. Epics: MM-9, MM-80.
 
 ## Notes for whoever builds it
