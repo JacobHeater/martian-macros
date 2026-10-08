@@ -125,7 +125,8 @@ void main() {
       foods: [food('Big meal', 3000, today)],
     );
     await openFood(tester);
-    expect(find.text('600 kcal over'), findsOneWidget);
+    expect(find.text('600'), findsOneWidget);
+    expect(find.text('kcal over 2,400'), findsOneWidget);
   });
 
   testWidgets('a past day is measured against the targets of that day', (
@@ -136,11 +137,11 @@ void main() {
       foods: [food('Old meal', 1000, today.addDays(-1))],
     );
     await openFood(tester);
-    expect(find.textContaining('of 2,000 kcal'), findsOneWidget);
+    expect(find.textContaining('left of 2,000'), findsOneWidget);
     await tester.tap(find.byTooltip('Previous day'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('of 2,400 kcal'), findsOneWidget);
-    expect(find.text('1,400 kcal remaining'), findsOneWidget);
+    expect(find.textContaining('left of 2,400'), findsOneWidget);
+    expect(find.text('1,400'), findsOneWidget);
   });
 
   testWidgets('the day picker steps back and returns to today', (tester) async {

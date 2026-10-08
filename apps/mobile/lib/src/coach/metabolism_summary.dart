@@ -3,6 +3,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
 
 class MetabolismSummary extends StatelessWidget {
@@ -29,7 +30,7 @@ class MetabolismSummary extends StatelessWidget {
       children: [
         Text(
           '${Fmt.whole(tdee.kcal)} ± ${Fmt.whole(tdee.sigmaKcal)} kcal / day',
-          style: text.headlineSmall,
+          style: text.displaySmall,
         ),
         const SizedBox(height: 4),
         Text(
@@ -49,7 +50,7 @@ class MetabolismSummary extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 8),
               child: Notice(
-                icon: Icons.warning_amber_outlined,
+                kind: NoticeKind.caution,
                 text:
                     'Your logs and weight trend don’t add up to a plausible '
                     'number, which usually means food is going unlogged. '

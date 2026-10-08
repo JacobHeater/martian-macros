@@ -23,7 +23,7 @@ class DayStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min,
     children: [
       MmIconButton(
         icon: Icons.chevron_left,
@@ -33,7 +33,7 @@ class DayStepper extends StatelessWidget {
       if (onLabelTap == null)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(label, style: Theme.of(context).textTheme.titleMedium),
+          child: Text(label, style: Theme.of(context).textTheme.titleLarge),
         )
       else
         MmButton(label: label, kind: MmButtonKind.text, onPressed: onLabelTap),

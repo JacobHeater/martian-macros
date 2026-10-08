@@ -4,14 +4,14 @@ import 'package:mm_domain/mm_domain.dart';
 
 import '../app/home_destination.dart';
 import '../app/home_tab_provider.dart';
+import '../food/calorie_hero.dart';
 import '../food/selected_day_provider.dart';
 import '../food/targets_on.dart';
 import '../format/fmt.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
-import 'coach_line_card.dart';
+import '../ui/macro_kind.dart';
 import 'coach_line_text.dart';
-import 'intake_card.dart';
 import 'weight_card.dart';
 
 /// How the user is doing today, with a way into each detail screen.
@@ -33,11 +33,14 @@ class DashboardScreen extends ConsumerWidget {
         ref.read(homeTabProvider.notifier).select(destination);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 112),
       children: [
-        IntakeCard(
+        CalorieHero(
           intake: intakeDayFrom(today, entries),
           targets: targetsOn(history, today)?.targets,
+          macros: const [MacroKind.protein],
+          status: coachLineText(setup: setup, history: history, today: today),
+          onStatusTap: () => open(HomeDestination.coach),
           onTap: () {
             ref.read(selectedDayProvider.notifier).set(null);
             open(HomeDestination.food);
@@ -50,10 +53,6 @@ class DashboardScreen extends ConsumerWidget {
           onSaveWeight: (kg) =>
               ref.read(weightWriterProvider).saveWeight(today, kg),
           onTap: () => open(HomeDestination.progress),
-        ),
-        CoachLineCard(
-          text: coachLineText(setup: setup, history: history, today: today),
-          onTap: () => open(HomeDestination.coach),
         ),
       ],
     );

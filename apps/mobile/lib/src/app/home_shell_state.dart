@@ -7,6 +7,7 @@ import '../providers.dart';
 import '../settings/settings_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../food/add_food_button.dart';
+import '../food/food_day_header.dart';
 import '../food/food_screen.dart';
 import '../ui/mm_app_bar.dart';
 import '../ui/mm_icon_button.dart';
@@ -62,7 +63,14 @@ class HomeShellState extends ConsumerState<HomeShell>
 
     return Scaffold(
       appBar: MmAppBar(
-        title: destination.label,
+        title: switch (destination) {
+          HomeDestination.food => null,
+          HomeDestination.dashboard => 'Today',
+          _ => destination.label,
+        },
+        titleWidget: destination == HomeDestination.food
+            ? const FoodDayHeader()
+            : null,
         actions: [
           MmIconButton(
             tooltip: 'Settings',

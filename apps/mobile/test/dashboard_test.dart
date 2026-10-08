@@ -92,7 +92,7 @@ void main() {
       findsNothing,
       reason: 'food is not showing',
     );
-    expect(find.textContaining('remaining'), findsOneWidget);
+    expect(find.textContaining('kcal left'), findsOneWidget);
   });
 
   testWidgets('a normal day shows calories, protein and the trend weight', (
@@ -103,9 +103,8 @@ void main() {
       foods: [food('Lunch', 700, 45), food('Dinner', 700, 50)],
     );
     await pumpApp(tester);
-    expect(find.text('1,400'), findsOneWidget);
-    expect(find.text('of 2,400 kcal'), findsOneWidget);
-    expect(find.text('1,000 kcal remaining'), findsOneWidget);
+    expect(find.text('1,000'), findsOneWidget);
+    expect(find.text('kcal left of 2,400'), findsOneWidget);
     expect(find.text('95 / 170 g'), findsOneWidget);
     expect(find.text('Trend weight'), findsOneWidget);
     expect(find.text('Last 7 days'), findsOneWidget);
@@ -164,7 +163,7 @@ void main() {
   testWidgets('tapping the intake card opens the Food screen', (tester) async {
     await seed(history: [targets(today.addDays(-30), 2400)]);
     await pumpApp(tester);
-    await tester.tap(find.textContaining('remaining'));
+    await tester.tap(find.textContaining('kcal left'));
     await tester.pumpAndSettle();
     expect(find.byType(FoodScreen), findsOneWidget);
   });
