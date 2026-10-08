@@ -10,6 +10,10 @@ enum TargetFlag {
   /// a too-fast loss: a raise is not walked straight back (MM-115).
   heldAfterSafetyRaise,
 
+  /// The user kept last week's targets for now, instead of a reduction
+  /// (MM-138). Allowed once, never twice running.
+  heldByUser,
+
   /// The change from last week was limited.
   rateLimited,
 

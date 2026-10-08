@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/explanation_line_text.dart';
 import '../format/fmt.dart';
+import '../repository_role_providers.dart';
 import '../ui/info_card.dart';
-import 'target_change_sheet.dart';
+import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
+import 'show_target_change_sheet.dart';
+import 'targets_history_screen.dart';
 
 /// The most recent change to the user's targets, in one line, and the way to
-/// the full account (MM-138).
-class LastChangeCard extends StatelessWidget {
+/// the full account and to the whole history (MM-138).
+class LastChangeCard extends ConsumerWidget {
   const LastChangeCard({
     required this.history,
     required this.today,
@@ -24,10 +29,9 @@ class LastChangeCard extends StatelessWidget {
   final String? holdNote;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (history.isEmpty) return const SizedBox.shrink();
     final current = history.last;
-    final previous = history.length > 1 ? history[history.length - 2] : null;
     final explanation = current.explanation;
 
     final summary = explanation == null
@@ -42,11 +46,17 @@ class LastChangeCard extends StatelessWidget {
 
     return InfoCard(
       title: 'Last change · ${Fmt.day(current.effectiveFrom, today)}',
-      onTap: () => showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        builder: (_) => TargetChangeSheet(current: current, previous: previous),
+      trailing: MmButton(
+        label: 'History',
+        kind: MmButtonKind.text,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const TargetsHistoryScreen()),
+        ),
+      ),
+      onTap: () => showTargetChangeSheet(
+        context,
+        ref.read(targetsHistoryWriterProvider),
+        history,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
