@@ -117,7 +117,6 @@ void main() {
   }) async {
     // Tests flatten shadows by default; the screens have soft ones.
     debugDisableShadows = false;
-    addTearDown(() => debugDisableShadows = true);
     await pumpApp(tester, repos, FixedClock(today));
     // A small phone, so one screenshot shows what a user sees first.
     tester.view.physicalSize = const Size(720, 1600);
@@ -129,10 +128,18 @@ void main() {
     }
   }
 
-  Future<void> shot(WidgetTester tester, String name) => expectLater(
-    find.byType(MartianMacrosApp),
-    matchesGoldenFile('images/$name.png'),
-  );
+  /// Every test ends here, so the shadow flag is put back before the test
+  /// framework checks that no debug flag was left changed.
+  Future<void> shot(WidgetTester tester, String name) async {
+    try {
+      await expectLater(
+        find.byType(MartianMacrosApp),
+        matchesGoldenFile('images/$name.png'),
+      );
+    } finally {
+      debugDisableShadows = true;
+    }
+  }
 
   for (final dark in [false, true]) {
     final mode = dark ? 'dark' : 'light';
