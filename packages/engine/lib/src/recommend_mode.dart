@@ -14,6 +14,12 @@ ModeRecommendation recommendMode({
   required TrainingStatus trainingStatus,
   required CoachingPolicy policy,
 }) {
+  if (policy.underweight) {
+    return const ModeRecommendation(
+      GoalMode.maintenance,
+      ModeReason.underweight,
+    );
+  }
   if (!policy.allowedModes.contains(GoalMode.fatLoss)) {
     return const ModeRecommendation(
       GoalMode.maintenance,

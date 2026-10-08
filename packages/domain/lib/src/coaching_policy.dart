@@ -1,4 +1,5 @@
 import 'biological_sex.dart';
+import 'body_mass_index.dart';
 import 'calendar_date.dart';
 import 'caution.dart';
 import 'goal_mode.dart';
@@ -14,15 +15,22 @@ final class CoachingPolicy {
     this.proteinCapGPerKg,
     this.suppressWeightRewards = false,
     this.elevatedMuscleGainPrior = false,
+    this.underweight = false,
+    this.maxWeeklyLossFraction,
     this.cautions = const {},
   });
 
   /// Derives the policy. Throws [ArgumentError] for answers that contradict
   /// biological sex (pregnancy, breastfeeding, PCOS, menopause for males).
+  ///
+  /// [weightKg] is the user's current (trend) weight. With it, a body mass
+  /// index below [underweightBmi] removes the deficit goals, and one below
+  /// [lowWeightCautionBmi] limits loss to the gentlest pace (MM-111).
   factory CoachingPolicy.derive({
     required Profile profile,
     required ScreeningAnswers screening,
     required CalendarDate today,
+    double? weightKg,
   }) {
     final s = screening;
     if (profile.sex == BiologicalSex.male &&
@@ -45,14 +53,27 @@ final class CoachingPolicy {
       allowedModes = GoalMode.values.toSet();
     }
 
+    final bmi = weightKg == null
+        ? null
+        : bodyMassIndex(weightKg: weightKg, heightCm: profile.heightCm);
+    final underweight = bmi != null && bmi < underweightBmi;
+    final lowWeight = bmi != null && !underweight && bmi < lowWeightCautionBmi;
+    final offered = underweight
+        ? allowedModes.difference({GoalMode.fatLoss, GoalMode.recomp})
+        : allowedModes;
+
     return CoachingPolicy._(
       blocked: false,
-      allowedModes: allowedModes,
+      allowedModes: offered,
       maintenanceOffsetKcal: s.breastfeeding ? 400 : 0,
       proteinCapGPerKg: s.chronicKidneyDisease ? 0.8 : null,
       suppressWeightRewards: s.eatingDisorderHistory,
       elevatedMuscleGainPrior: s.androgenUse,
+      underweight: underweight,
+      maxWeeklyLossFraction: lowWeight ? lowWeightMaxLossFraction : null,
       cautions: {
+        if (underweight) Caution.underweight,
+        if (lowWeight) Caution.lowBodyWeight,
         if (s.pregnant) Caution.pregnancy,
         if (s.breastfeeding) Caution.breastfeeding,
         if (s.eatingDisorderHistory) Caution.eatingDisorderHistory,
@@ -77,6 +98,13 @@ final class CoachingPolicy {
 
   final bool suppressWeightRewards;
   final bool elevatedMuscleGainPrior;
+
+  /// Body mass index is below 18.5: no deficit is planned (MM-111).
+  final bool underweight;
+
+  /// Upper limit on weekly loss, as a fraction of body weight; null when only
+  /// the body-fat limit applies.
+  final double? maxWeeklyLossFraction;
 
   final Set<Caution> cautions;
 }

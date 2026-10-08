@@ -17,6 +17,10 @@ extension TargetFlagMessage on TargetFlag {
     TargetFlag.dietBreak =>
       'You’ve been in a deficit for 16 weeks. This is a maintenance '
           'break to recover before continuing.',
+    TargetFlag.underweightMaintenance =>
+      'Your weight is below the range where the app will plan a calorie '
+          'deficit, so targets are at maintenance. If you are not eating '
+          'enough, talk to a clinician.',
     TargetFlag.modeNotAllowed =>
       'Your chosen goal isn’t available with your health check, so the '
           'app is holding you at maintenance.',

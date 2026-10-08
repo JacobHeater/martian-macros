@@ -16,6 +16,10 @@ enum TargetFlag {
   /// Continuous deficit hit its limit; this week is at maintenance.
   dietBreak,
 
+  /// Body mass index is below 18.5, so the deficit was replaced by
+  /// maintenance (MM-111).
+  underweightMaintenance,
+
   /// The requested mode isn't allowed by the coaching policy; maintenance
   /// was used instead.
   modeNotAllowed,
