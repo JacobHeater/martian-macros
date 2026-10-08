@@ -2,8 +2,8 @@ name: CI
 
 # Runs the same commands as a developer: `mm bootstrap` and `mm check`, then an
 # Android build. CI calls `mm`, never `flutter` directly, so local and CI
-# behavior cannot drift (MM-7). Goldens (MM-105) will be generated here, on
-# Linux, once they exist.
+# behavior cannot drift (MM-7). The screenshot tests (MM-105) run here, on Linux,
+# as part of `mm check`; the "Update goldens" workflow regenerates their images.
 
 on:
   pull_request:
@@ -21,7 +21,7 @@ jobs:
         id: flutter
         run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -41,6 +41,14 @@ jobs:
         run: ./mm check
         env:
           MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+
+      - name: Keep the screenshots that differ
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: apps/mobile/test/goldens/failures
+          if-no-files-found: ignore
 
       - name: Build Android (dev)
         run: ./mm build android --env dev
