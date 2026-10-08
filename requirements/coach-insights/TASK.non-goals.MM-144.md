@@ -1,6 +1,6 @@
 ---
 id: MM-144
-status: proposed
+status: done
 component: coach-insights
 related: [MM-137, MM-23, MM-44, MM-74, MM-79, MM-92, MM-96, MM-108, MM-124, MM-125, MM-128, MM-130, MM-143]
 ---
@@ -88,3 +88,9 @@ Scenario: No drift in the app
   previously decided (meal plans, supplements, fasting windows, micronutrients, AI advice at run time).
 - The fixed product constraint that the app models biological sex as male or female and nothing else (MM-14) is a decision already
   recorded, not a non-goal to be argued here.
+
+## Progress (built and verified)
+- `docs/non-goals.md` lists all 25 items, each with its reason, the tickets that hold the detail, and the condition under which it would be reconsidered. `AGENTS.md` links it and says a change that proposes one needs the reopen condition met.
+- The banned-word test now also fails on "starvation mode", "metabolic damage" and "toning" ("burn off", "earn" and "cheat" were already there).
+- **Where the ticket gave no reason**: it listed 12 items without one. I wrote their reasons and marked them *(panel)* in the document, which says plainly that these are the review panel's positions and not decisions the product owner has made. Read them as closely as any feature: meal plans, supplements, fasting windows, micronutrients, weight-cut tools, contest preparation, body-fat from a single measurement, comparison imagery, hormone explanations, and the product items.
+- **Not verified**: that every one of the 25 is something the product owner agrees with (only they can say).

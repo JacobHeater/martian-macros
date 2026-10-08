@@ -41,7 +41,8 @@ requirements, and [docs/architecture.md](docs/architecture.md).
   raw Material controls.
 - `tool/` contains the dependency-light `mm` task runner.
 - `requirements/` is the source of truth for planned and shipped product
-  behavior; `docs/architecture.md` records cross-cutting design.
+  behavior; `docs/architecture.md` records cross-cutting design; `docs/non-goals.md` lists what the
+  app will not do, and a change that proposes one needs its reopen condition met.
 - `roadmap/` orders the work. Read [roadmap/README.md](roadmap/README.md) and
   `roadmap/roadmap.json` to choose what to build next and to see what is
   blocked. It adds no requirements of its own.
