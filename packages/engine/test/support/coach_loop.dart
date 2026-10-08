@@ -112,13 +112,14 @@ List<WeekResult> runCoachLoop({
       );
     }
 
+    TargetsExplanation? explanation;
     // As in `nextTargets`: nothing changes during calibration or while the
     // estimate is held, and a change of goal applies at once, unthrottled.
     if (targets == null ||
         modeChanged ||
         safetyRaise > 0 ||
         (week >= 2 && tdee.status == TdeeStatus.updated)) {
-      targets = computeTargets(
+      final traced = computeTargetsTraced(
         TargetInputs(
           sex: profile.sex,
           heightCm: profile.heightCm,
@@ -135,6 +136,18 @@ List<WeekResult> runCoachLoop({
           safetyRaiseKcal: modeChanged ? 0 : safetyRaise,
         ),
       );
+      targets = traced.targets;
+      explanation = explainTargets(
+        trigger: history.isEmpty
+            ? ExplanationTrigger.firstTargets
+            : modeChanged
+            ? ExplanationTrigger.goalChange
+            : ExplanationTrigger.checkIn,
+        previous: history.isEmpty ? null : history.last,
+        targets: traced.targets,
+        trace: traced.trace,
+        tdee: tdee,
+      );
     }
     if (history.isEmpty || history.last.targets != targets) {
       history.add(
@@ -145,6 +158,7 @@ List<WeekResult> runCoachLoop({
           tdeeKcal: tdee.kcal,
           tdeeSigmaKcal: tdee.sigmaKcal,
           tdeeStatus: tdee.status,
+          explanation: explanation,
         ),
       );
     }
@@ -162,6 +176,7 @@ List<WeekResult> runCoachLoop({
         trueTdeeKcal: user.trueTdeeKcal,
         trueWeightKg: user.weightKg,
         underReportFraction: user.underReportFraction,
+        explanation: explanation,
       ),
     );
 

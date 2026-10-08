@@ -10,6 +10,7 @@ TargetsRecord _record(
   Set<TargetFlag>? flags,
   double? safetyBodyFatPercent,
   int profileRevision = 0,
+  TargetsExplanation? explanation,
 }) => TargetsRecord(
   effectiveFrom: from,
   mode: GoalMode.fatLoss,
@@ -18,6 +19,7 @@ TargetsRecord _record(
   tdeeStatus: TdeeStatus.held,
   safetyBodyFatPercent: safetyBodyFatPercent,
   profileRevision: profileRevision,
+  explanation: explanation,
   targets: DailyTargets(
     kcal: kcal,
     proteinG: 160,
@@ -54,6 +56,38 @@ void targetsHistoryRepositoryContract(
       final history = await repo.watchTargetsHistory().first;
       expect(history.first.profileRevision, 2);
       expect(history.last.profileRevision, 0);
+    });
+
+    test('keeps why the targets were issued, or none', () async {
+      final why = TargetsExplanation(
+        lines: const [
+          ExplanationLine(
+            ExplanationReason.expenditureEstimate,
+            -90,
+            from: 2950,
+            to: 2860,
+          ),
+          ExplanationLine(ExplanationReason.stepLimit, 15),
+        ],
+        previousKcal: 2400,
+        newKcal: 2325,
+        estimateStatus: TdeeStatus.updated,
+        usableIntakeDays: 12,
+        excludedPartialDays: 2,
+        weighIns: 11,
+      );
+      await repo.saveTargets(_record(d1, 2325, explanation: why));
+      await repo.saveTargets(_record(d2, 2300));
+      final history = await repo.watchTargetsHistory().first;
+      final back = history.first.explanation!;
+      expect(back.newKcal, 2325);
+      expect(back.previousKcal, 2400);
+      expect(back.weighIns, 11);
+      expect(
+        [for (final l in back.lines) (l.reason, l.kcal, l.from, l.to)],
+        [for (final l in why.lines) (l.reason, l.kcal, l.from, l.to)],
+      );
+      expect(history.last.explanation, isNull);
     });
 
     test('starts empty', () async {

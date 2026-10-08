@@ -19,6 +19,7 @@ import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
 import 'caution_message.dart';
+import 'last_change_card.dart';
 import 'metabolism_summary.dart';
 import 'target_flag_message.dart';
 
@@ -116,6 +117,11 @@ class CoachScreen extends ConsumerWidget {
               ],
             ),
           ),
+        LastChangeCard(
+          history: ref.watch(targetsHistoryProvider).value ?? const [],
+          today: today,
+          holdNote: _holdNote(setup, snapshot, today),
+        ),
         InfoCard(
           title: 'Goal: ${setup.goalMode.label}',
           trailing: MmButton(
@@ -151,6 +157,28 @@ class CoachScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  /// After calibration, while the estimate is held for lack of data, targets
+  /// stay as they are; say so, and what is needed.
+  String? _holdNote(
+    UserSetup setup,
+    CoachSnapshot snapshot,
+    CalendarDate today,
+  ) {
+    if (setup.onboardedOn.daysUntil(today) < calibrationDays ||
+        snapshot.tdee.status != TdeeStatus.held) {
+      return null;
+    }
+    const estimator = TdeeEstimator();
+    final days = estimator.minIntakeDays - snapshot.tdee.usableIntakeDays;
+    final weighIns = estimator.minWeighIns - snapshot.tdee.weighIns;
+    final needs = [
+      if (days > 0) '$days more fully logged day${days == 1 ? '' : 's'}',
+      if (weighIns > 0) '$weighIns more weigh-in${weighIns == 1 ? '' : 's'}',
+    ];
+    return 'Targets are unchanged because there is not enough data yet.'
+        '${needs.isEmpty ? '' : ' Needs ${needs.join(' and ')}.'}';
   }
 
   Future<void> _changeGoal(
