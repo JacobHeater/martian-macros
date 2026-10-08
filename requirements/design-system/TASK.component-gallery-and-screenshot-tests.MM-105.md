@@ -1,6 +1,6 @@
 ---
 id: MM-105
-status: in-progress
+status: done
 component: design-system
 related: [MM-101, MM-102, MM-104, MM-91, MM-93]
 ---
@@ -55,3 +55,11 @@ Scenario: The same result everywhere
   production hides it.
 - **Not done**: screenshot (golden) tests and `mm goldens`. They must be generated on one platform (Linux, in CI) and there is no CI yet (MM-7), so no baseline images exist. Until then a
   change to a token is caught by the contrast tests and by looking at the gallery, not by an image diff.
+
+## Progress (screenshot tests built and verified)
+- `apps/mobile/test/goldens/screen_goldens_test.dart`: the dashboard, Food, Progress, Coach, the "why targets changed" sheet, Settings and the first onboarding step, each in light and dark (14 images in `test/goldens/images/`), with fixed data and a fixed clock. The real Inter, Space Grotesk and Material icon fonts are loaded (`load_golden_fonts.dart`) and shadows are drawn, since a widget test otherwise draws text as blocks and flattens shadows.
+- They run on Linux only (text renders differently on each operating system) and are skipped elsewhere with a reason. CI runs them as part of `mm check`; a changed image fails the pull request, and the failing images are uploaded as an artifact.
+- `mm goldens` runs them; `mm goldens --update` regenerates the images on Linux. On Windows and macOS it says so and points to the **Update goldens** workflow (Actions tab, or push a branch named `update-goldens/<anything>`), which regenerates the images on Linux and uploads them as an artifact to commit.
+- The first baselines found a real defect (the Settings "Profile" group heading was centered), fixed in this change.
+- Determinism: the baselines were produced by the Update goldens workflow and are compared, in a separate CI run, by `mm check`; that comparison passing is the check that the same images come out twice.
+- **Not done**: the component gallery is not part of the screenshot set (the dev-only screen is covered by the gallery tests); screens beyond the seven above (the add-food sheet, charts at 90 days, onboarding steps after the first, error and empty states); text at 200%; a container so Windows and macOS developers can generate the images locally.
