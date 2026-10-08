@@ -12,7 +12,7 @@ The task runner, the monorepo, the requirements tracker, the version 1 schema
 and data erasure are built. What is missing is small and blocks almost
 everything:
 
-- **The schema cannot change.** `database.dart` declares `schemaVersion => 1`
+- **The schema cannot change.** `app_database.dart` declares `schemaVersion => 1`
   and has no migration strategy. Nine later workstreams add tables or columns.
   The first one to do so without a framework either breaks every existing
   install or invents its own approach.
@@ -50,7 +50,7 @@ Every workstream that persists anything: WS-05, WS-06, WS-07, WS-08, WS-09,
 WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 
 ## Packages and surfaces
-- `packages/data/lib/src/database.dart`, `store.dart`, `packages/data/test`
+- `packages/data/lib/src/app_database.dart`, `mm_store.dart`, `packages/data/test`
 - `tool/src/commands.dart` (test timeout)
 - `apps/mobile/test`
 - `.github/` (workflow)

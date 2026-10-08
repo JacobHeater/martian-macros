@@ -7,21 +7,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:test/test.dart';
 
 import 'generated_migrations/schema.dart';
-
-/// A future schema, standing in for versions that do not exist yet so the
-/// migration machinery is proven before a feature depends on it.
-class _LaterDatabase extends AppDatabase {
-  _LaterDatabase(super.executor, this.version, this.steps);
-
-  final int version;
-  final Map<int, MigrationStep> steps;
-
-  @override
-  int get schemaVersion => version;
-
-  @override
-  Map<int, MigrationStep> get migrationSteps => steps;
-}
+import 'support/later_database.dart';
 
 void main() {
   const current = AppDatabase.currentSchemaVersion;
@@ -119,7 +105,7 @@ void main() {
   group('upgrading', () {
     test('keeps every row and sets the new version', () async {
       await writeVersion1Data();
-      final db = _LaterDatabase(NativeDatabase(file), current + 1, {
+      final db = LaterDatabase(NativeDatabase(file), current + 1, {
         current: addColumn('note'),
       });
       addTearDown(db.close);
@@ -132,7 +118,7 @@ void main() {
     test('runs each step in turn when several versions behind', () async {
       await writeVersion1Data();
       final ran = <int>[];
-      final db = _LaterDatabase(NativeDatabase(file), current + 2, {
+      final db = LaterDatabase(NativeDatabase(file), current + 2, {
         current: (m) async {
           ran.add(current);
           await addColumn('first')(m);
@@ -151,7 +137,7 @@ void main() {
 
     test('keeps the sex constraint', () async {
       await writeVersion1Data();
-      final db = _LaterDatabase(NativeDatabase(file), current + 1, {
+      final db = LaterDatabase(NativeDatabase(file), current + 1, {
         current: addColumn('note'),
       });
       addTearDown(db.close);
@@ -174,7 +160,7 @@ void main() {
 
     test('leaves the database as it was when a later step throws', () async {
       await writeVersion1Data();
-      final failing = _LaterDatabase(NativeDatabase(file), current + 2, {
+      final failing = LaterDatabase(NativeDatabase(file), current + 2, {
         current: addColumn('first'),
         current + 1: (m) async => throw StateError('boom'),
       });
@@ -195,7 +181,7 @@ void main() {
 
     test('refuses when a step is missing', () async {
       await writeVersion1Data();
-      final incomplete = _LaterDatabase(NativeDatabase(file), current + 2, {
+      final incomplete = LaterDatabase(NativeDatabase(file), current + 2, {
         current: addColumn('first'),
       });
       await expectLater(
@@ -209,7 +195,7 @@ void main() {
 
     test('refuses data saved by a newer version of the app', () async {
       await writeVersion1Data();
-      final newer = _LaterDatabase(NativeDatabase(file), current + 1, {
+      final newer = LaterDatabase(NativeDatabase(file), current + 1, {
         current: addColumn('note'),
       });
       await newer.customSelect('SELECT 1').get();

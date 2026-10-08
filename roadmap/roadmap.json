@@ -45,13 +45,13 @@
     {
       "id": "SC-schema",
       "name": "Database schema and migrations",
-      "location": "packages/data/lib/src/database.dart (schemaVersion is 1; no migrations exist yet)",
+      "location": "packages/data/lib/src/app_database.dart (schemaVersion is 1; no migrations exist yet)",
       "rule": "One schema change in flight at a time. Each change adds exactly one schemaVersion step with a migration and a migration test. See HS-schema-lane."
     },
     {
       "id": "SC-store",
       "name": "MmStore API",
-      "location": "packages/data/lib/src/store.dart",
+      "location": "packages/data/lib/src/mm_store.dart",
       "rule": "The app reads and writes only through MmStore. New tables get new methods; existing method signatures change only with every caller updated in the same change."
     },
     {
@@ -130,7 +130,7 @@
   "coordinationHotspots": [
     {
       "id": "HS-schema-lane",
-      "surface": "packages/data/lib/src/database.dart, database.g.dart, store.dart",
+      "surface": "packages/data/lib/src/app_database.dart, app_database.g.dart, mm_store.dart",
       "workstreams": [
         "WS-01",
         "WS-05",
@@ -275,7 +275,7 @@
     },
     {
       "id": "HS-persistence-access",
-      "surface": "packages/data/lib/src/store.dart and apps/mobile/lib/src/providers.dart",
+      "surface": "packages/data/lib/src/mm_store.dart and apps/mobile/lib/src/providers.dart",
       "workstreams": [
         "WS-14",
         "WS-05",
@@ -628,7 +628,7 @@
       ],
       "primaryOwnership": [
         "tool/",
-        "packages/data/lib/src/database.dart (migration framework)",
+        "packages/data/lib/src/app_database.dart (migration framework)",
         "packages/data/test",
         "apps/mobile/test",
         ".github/"

@@ -2,73 +2,11 @@ import 'dart:math' as math;
 
 import 'package:mm_domain/mm_domain.dart';
 
-import 'energy_expenditure.dart';
-import 'weight_trend.dart';
-
-enum TdeeStatus {
-  /// Enough data: the estimate reflects observed intake and weight change.
-  updated,
-
-  /// Not enough usable data in the window; the prior is returned unchanged
-  /// and targets must be held, never guessed.
-  held,
-}
-
-final class TdeeEstimate {
-  const TdeeEstimate({
-    required this.kcal,
-    required this.sigmaKcal,
-    required this.status,
-    this.usableIntakeDays = 0,
-    this.excludedPartialDays = 0,
-    this.weighIns = 0,
-    this.windowStart,
-    this.clampedToBounds = false,
-    this.settlingUntil,
-  });
-
-  /// Maintenance intake, in the user's own logging units.
-  ///
-  /// Consistent logging bias (always under-logging oil, say) is absorbed
-  /// here, so targets expressed in the same units still produce the
-  /// intended outcome. Weight change is valued in true kcal, so this is
-  /// exact once intake is steady at target; the weekly loop converges to
-  /// that fixed point.
-  final double kcal;
-  final double sigmaKcal;
-  final TdeeStatus status;
-  final int usableIntakeDays;
-  final int excludedPartialDays;
-  final int weighIns;
-
-  /// First day of the window actually used (later than the nominal window
-  /// start when a logging-style switch truncated it).
-  final CalendarDate? windowStart;
-
-  /// True if the raw estimate fell outside the plausible range and was
-  /// clamped; a strong hint that logging is unreliable.
-  final bool clampedToBounds;
-
-  /// Set when the estimate is held because too few days remain once a
-  /// [SettlingWindow] is left out: the last day of that window.
-  final CalendarDate? settlingUntil;
-}
-
-/// Days on which the scale moves for reasons that are not tissue: the
-/// first days after energy intake changes level, when glycogen, the water
-/// stored with it, and gut contents shift by a kilogram or two. The
-/// estimator ignores weight change and intake inside the window.
-final class SettlingWindow {
-  const SettlingWindow(this.start, this.end);
-
-  /// The first day at the new intake.
-  final CalendarDate start;
-
-  /// The last day left out, inclusive.
-  final CalendarDate end;
-
-  bool contains(CalendarDate day) => !day.isBefore(start) && !day.isAfter(end);
-}
+import 'settling_window.dart';
+import 'tdee_estimate.dart';
+import 'tdee_prior.dart';
+import 'tdee_status.dart';
+import 'weight_trend_point.dart';
 
 /// Windowed energy-balance TDEE estimator.
 ///

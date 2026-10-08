@@ -2,91 +2,11 @@ import 'dart:math' as math;
 
 import 'package:mm_domain/mm_domain.dart';
 
-import 'body_composition.dart';
+import 'daily_targets.dart';
 import 'partition.dart';
 import 'safety_bounds.dart';
-
-enum TargetFlag {
-  /// The calorie target was raised to the safety floor.
-  flooredAtSafetyMinimum,
-
-  /// The change from last week was limited.
-  rateLimited,
-
-  /// Continuous deficit hit its limit; this week is at maintenance.
-  dietBreak,
-
-  /// The requested mode isn't allowed by the coaching policy; maintenance
-  /// was used instead.
-  modeNotAllowed,
-
-  /// Protein was capped by the coaching policy.
-  proteinCapped,
-}
-
-final class DailyTargets {
-  const DailyTargets({
-    required this.kcal,
-    required this.proteinG,
-    required this.fatG,
-    required this.carbsG,
-    required this.weeklyRateFraction,
-    this.flags = const {},
-  });
-
-  final double kcal;
-  final double proteinG;
-  final double fatG;
-  final double carbsG;
-
-  /// Intended body-weight change per week as a fraction of body weight
-  /// (negative = loss).
-  final double weeklyRateFraction;
-
-  final Set<TargetFlag> flags;
-}
-
-final class TargetInputs {
-  const TargetInputs({
-    required this.sex,
-    required this.heightCm,
-    required this.trendWeightKg,
-    required this.bodyFat,
-    required this.mode,
-    required this.trainingStatus,
-    required this.policy,
-    required this.tdeeKcal,
-    required this.bmrKcal,
-    this.trainingKcalPerDay = 0,
-    this.previous,
-    this.consecutiveDeficitWeeks = 0,
-    this.requestedLossFraction,
-  });
-
-  final BiologicalSex sex;
-  final double heightCm;
-  final double trendWeightKg;
-  final BodyFatEstimate bodyFat;
-  final GoalMode mode;
-  final TrainingStatus trainingStatus;
-  final CoachingPolicy policy;
-
-  /// From `TdeeEstimator`, in logging units.
-  final double tdeeKcal;
-  final double bmrKcal;
-
-  /// Estimated from logged training (not wearable active energy).
-  final double trainingKcalPerDay;
-
-  /// Last week's targets, for rate limiting; null on the first week.
-  final DailyTargets? previous;
-
-  final int consecutiveDeficitWeeks;
-
-  /// Fat-loss pace chosen by the user (positive fraction per week, e.g.
-  /// 0.0075). Clamped to the safety maximum. Defaults to 0.75%.
-  final double? requestedLossFraction;
-}
+import 'target_flag.dart';
+import 'target_inputs.dart';
 
 /// Computes the week's daily targets. Pure function of [i].
 DailyTargets computeTargets(TargetInputs i) {

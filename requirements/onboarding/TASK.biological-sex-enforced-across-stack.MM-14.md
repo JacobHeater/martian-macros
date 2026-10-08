@@ -47,7 +47,7 @@ Scenario: Sex-specific formulas differ
 ```
 
 ## Notes (built and verified)
-- `packages/domain/lib/src/biological_sex.dart`; the `sex` column in `packages/data/lib/src/database.dart`.
+- `packages/domain/lib/src/biological_sex.dart`; the `sex` column in `packages/data/lib/src/app_database.dart`.
 - Domain test "rejects anything outside the binary instead of defaulting"; data test "the schema itself rejects any sex outside the binary"
   (four bad values and null).
 - Health platform pre-fill is not built (MM-69). Correcting a mis-tapped sex after onboarding is not built (MM-83).

@@ -2,25 +2,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import 'synthetic_user.dart';
-
-/// Weekly snapshot from a closed-loop run.
-final class WeekResult {
-  const WeekResult({
-    required this.week,
-    required this.targets,
-    required this.tdee,
-    required this.trueTdeeKcal,
-    required this.trueWeightKg,
-    required this.underReportFraction,
-  });
-
-  final int week;
-  final DailyTargets targets;
-  final TdeeEstimate tdee;
-  final double trueTdeeKcal;
-  final double trueWeightKg;
-  final double underReportFraction;
-}
+import 'week_result.dart';
 
 /// Runs the full coaching loop the app will run: daily logs and weigh-ins,
 /// a weekly check-in that re-smooths the trend, re-estimates TDEE, and

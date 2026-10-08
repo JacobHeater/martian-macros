@@ -42,7 +42,7 @@ Scenario: A forgotten bump
 ```
 
 ## Notes (built and verified)
-- `AppDatabase.migration` in `packages/data/lib/src/database.dart`: one step per version in `migrationSteps`, all steps in one
+- `AppDatabase.migration` in `packages/data/lib/src/app_database.dart`: one step per version in `migrationSteps`, all steps in one
   transaction, `SchemaMigrationException` on failure with a message that says the data is safe. `mm schema` exports the snapshot for
   the current version to `packages/data/drift_schemas/` and regenerates the test helpers in `test/generated_migrations/`; it refuses to
   replace an existing snapshot.

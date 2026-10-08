@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'requirements_scan.dart';
+import 'ticket.dart';
+
 /// The requirements tracker: validates `requirements/` against the rules in
 /// its README and answers questions about tickets.
 ///
@@ -96,36 +99,8 @@ final _fileName = RegExp(
 );
 final _idPattern = RegExp(r'^MM-\d+$');
 
-final class _Ticket {
-  _Ticket({
-    required this.component,
-    required this.fileName,
-    required this.type,
-    required this.slug,
-    required this.id,
-    required this.number,
-    required this.status,
-    required this.related,
-  });
-
-  final String component;
-  final String fileName;
-  final String type;
-  final String slug;
-  final String id;
-  final int number;
-  final String status;
-  final List<String> related;
-}
-
-typedef _Scan = ({
-  List<_Ticket> tickets,
-  List<String> problems,
-  int highestNumber,
-});
-
-_Scan _scan(Directory root) {
-  final tickets = <_Ticket>[];
+RequirementsScan _scan(Directory root) {
+  final tickets = <Ticket>[];
   final problems = <String>[];
 
   for (final entity
@@ -190,7 +165,7 @@ _Scan _scan(Directory root) {
         }
       }
       tickets.add(
-        _Ticket(
+        Ticket(
           component: name,
           fileName: fileName,
           type: match[1]!,
@@ -204,7 +179,7 @@ _Scan _scan(Directory root) {
     }
   }
 
-  final byId = <String, List<_Ticket>>{};
+  final byId = <String, List<Ticket>>{};
   for (final t in tickets) {
     byId.putIfAbsent(t.id, () => []).add(t);
   }

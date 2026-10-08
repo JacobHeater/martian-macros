@@ -152,7 +152,7 @@ starting it, why it is safe, and the specific collisions to manage.
 
 ### The schema lane
 
-`packages/data/lib/src/database.dart` is at `schemaVersion` 1 with no
+`packages/data/lib/src/app_database.dart` is at `schemaVersion` 1 with no
 migrations. Nine workstreams need to change it. Rules, once MM-61 lands:
 
 - **One schema change in flight at a time.** The branch that takes the next
@@ -161,7 +161,7 @@ migrations. Nine workstreams need to change it. Rules, once MM-61 lands:
   and columns.
 - **Every migration has a test** that upgrades a database created at the
   previous version, with data in it.
-- **Run `mm gen`; never hand-edit `database.g.dart`.**
+- **Run `mm gen`; never hand-edit `app_database.g.dart`.**
 - **Additive by default.** New columns are nullable or have defaults. A
   destructive change needs its own ticket.
 

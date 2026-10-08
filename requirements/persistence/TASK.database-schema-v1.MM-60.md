@@ -60,7 +60,7 @@ Scenario: Nothing leaks
 ```
 
 ## Notes (built and verified)
-- `packages/data/lib/src/database.dart` and `store.dart`; generated code in `database.g.dart` (run `mm gen` after a schema change).
+- `packages/data/lib/src/app_database.dart` and `mm_store.dart`; generated code in `app_database.g.dart` (run `mm gen` after a schema change).
   Fourteen tests in `store_test.dart` against an in-memory database.
 - Verified on an Android emulator: the app opens the database, and onboarding and targets persist.
 - **No test covers waist entries.**

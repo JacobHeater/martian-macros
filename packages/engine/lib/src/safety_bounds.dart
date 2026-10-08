@@ -2,6 +2,9 @@ import 'dart:math' as math;
 
 import 'package:mm_domain/mm_domain.dart';
 
+import 'goal_body_fat_check.dart';
+import 'protein_range.dart';
+
 /// Hard physiological limits. Every target the engine emits passes through
 /// these.
 ///
@@ -157,14 +160,3 @@ abstract final class SafetyBounds {
     return GoalBodyFatCheck.accepted;
   }
 }
-
-final class ProteinRange {
-  const ProteinRange(this.minG, this.maxG);
-
-  final double minG;
-  final double maxG;
-
-  double get midG => (minG + maxG) / 2;
-}
-
-enum GoalBodyFatCheck { accepted, warnAndTimeLimit, rejected }
