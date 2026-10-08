@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'arch/arch_command.dart';
 import 'requirements.dart';
 import 'toolchain.dart';
 
@@ -10,6 +11,7 @@ const _packages = <({String path, bool flutter})>[
   (path: 'packages/engine', flutter: false),
   (path: 'packages/data', flutter: false),
   (path: 'apps/mobile', flutter: true),
+  (path: 'tool', flutter: false),
 ];
 
 const _appDir = 'apps/mobile';
@@ -20,7 +22,7 @@ typedef _Command = Future<int> Function(Toolchain tc, List<String> args);
 final _commands = <String, (String, _Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
-  'check': ('CI gate: format, requirements, analyze, test', _check),
+  'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
@@ -39,6 +41,10 @@ final _commands = <String, (String, _Command)>{
   ),
   'build': ('Build: mm build <android|ios> [--env dev|prod]', _build),
   'clean': ('Remove build outputs and caches', _clean),
+  'arch': (
+    'Engineering rules: one declaration per file (--init writes the baseline)',
+    _arch,
+  ),
   'req': (
     'Requirements: mm req [list | next | show <id>] (no args validates)',
     _req,
@@ -122,6 +128,7 @@ Future<int> _check(Toolchain tc, List<String> args) async {
   for (final step in <Future<int> Function()>[
     () => _format(tc, const ['--check']),
     () => _req(tc, const []),
+    () => _arch(tc, const []),
     () => _analyze(tc, const []),
     () => _test(tc, const []),
   ]) {
@@ -376,3 +383,6 @@ bool _samePath(String a, String b) {
 
 Future<int> _req(Toolchain tc, List<String> args) =>
     runRequirements(tc.repoRoot, args);
+
+Future<int> _arch(Toolchain tc, List<String> args) =>
+    runArch(tc.repoRoot, args);

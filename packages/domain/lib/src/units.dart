@@ -8,6 +8,3 @@ abstract final class Units {
   static double inchesToCm(double inches) => inches * cmPerInch;
   static double cmToInches(double cm) => cm / cmPerInch;
 }
-
-/// Display preference only; never affects stored values.
-enum UnitSystem { imperial, metric }

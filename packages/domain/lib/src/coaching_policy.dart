@@ -1,44 +1,9 @@
 import 'biological_sex.dart';
 import 'calendar_date.dart';
-import 'goal.dart';
+import 'caution.dart';
+import 'goal_mode.dart';
 import 'profile.dart';
-
-/// Answers to the onboarding health screen.
-final class ScreeningAnswers {
-  const ScreeningAnswers({
-    this.pregnant = false,
-    this.breastfeeding = false,
-    this.eatingDisorderHistory = false,
-    this.chronicKidneyDisease = false,
-    this.androgenUse = false,
-    this.pcos = false,
-    this.menopause = false,
-    this.thyroidCondition = false,
-  });
-
-  final bool pregnant;
-  final bool breastfeeding;
-  final bool eatingDisorderHistory;
-  final bool chronicKidneyDisease;
-
-  /// TRT or anabolic steroid use. Not blocking; raises the muscle-gain prior.
-  final bool androgenUse;
-
-  final bool pcos;
-  final bool menopause;
-  final bool thyroidCondition;
-}
-
-/// Conditions that warrant a "talk to your clinician" note.
-enum Caution {
-  pregnancy,
-  breastfeeding,
-  eatingDisorderHistory,
-  chronicKidneyDisease,
-  pcos,
-  menopause,
-  thyroidCondition,
-}
+import 'screening_answers.dart';
 
 /// What coaching the engine may offer, derived from profile and screening.
 final class CoachingPolicy {
