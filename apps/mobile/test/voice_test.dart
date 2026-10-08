@@ -21,6 +21,9 @@ void main() {
     'naughty',
     'indulg',
     'deserve',
+    'starvation mode',
+    'metabolic damage',
+    'toning',
   ];
 
   // Single- and double-quoted string literals on one line.

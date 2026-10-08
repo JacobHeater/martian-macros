@@ -1222,7 +1222,9 @@
         "HS-persistence-access"
       ],
       "sourceRequirements": {
-        "built": [],
+        "built": [
+          "MM-144"
+        ],
         "remaining": [
           "MM-119",
           "MM-121",
@@ -1235,8 +1237,7 @@
           "MM-137",
           "MM-138",
           "MM-139",
-          "MM-143",
-          "MM-144"
+          "MM-143"
         ]
       },
       "sequence": [
