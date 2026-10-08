@@ -8,6 +8,7 @@ import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import '../support/pump_app.dart';
+import 'load_golden_fonts.dart';
 
 /// Screenshot tests (MM-105): every main screen, light and dark, with fixed
 /// data and a fixed clock. The images are generated on Linux only, because
@@ -17,6 +18,10 @@ import '../support/pump_app.dart';
 void main() {
   final today = CalendarDate(2026, 10, 5);
   final linux = Platform.isLinux;
+
+  setUpAll(() async {
+    if (linux) await loadGoldenFonts();
+  });
 
   Future<InMemoryRepositories> seeded({required bool dark}) async {
     final repos = InMemoryRepositories();
@@ -150,8 +155,11 @@ void main() {
 
     testWidgets('why targets changed, $mode', (tester) async {
       await open(tester, await seeded(dark: dark), tab: 'Coach');
+      await tester.ensureVisible(find.text('See why'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('See why'));
       await tester.pumpAndSettle();
+      expect(find.text('What changed'), findsOneWidget);
       await shot(tester, 'why_$mode');
     }, skip: !linux);
 
