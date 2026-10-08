@@ -11,6 +11,9 @@ extension TargetFlagMessage on TargetFlag {
     TargetFlag.heldAfterSafetyRaise =>
       'Your targets went up last week because you were losing faster than '
           'the app aims for. They hold at that level this week.',
+    TargetFlag.heldByUser =>
+      'You kept last week’s targets. They may come down at the next '
+          'check-in.',
     TargetFlag.rateLimited =>
       'This week’s change was limited to a small step. Targets move '
           'gradually so one odd week can’t swing them.',

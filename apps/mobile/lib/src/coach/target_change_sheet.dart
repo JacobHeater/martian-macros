@@ -5,6 +5,8 @@ import '../format/explanation_line_text.dart';
 import '../format/fmt.dart';
 import '../format/what_would_change_it.dart';
 import '../theme/mm_colors_context.dart';
+import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
 import '../ui/section_label.dart';
 
 /// Why a set of targets was issued, in four parts: what changed, why (lines
@@ -13,11 +15,16 @@ class TargetChangeSheet extends StatelessWidget {
   const TargetChangeSheet({
     required this.current,
     required this.previous,
+    this.onHold,
     super.key,
   });
 
   final TargetsRecord current;
   final TargetsRecord? previous;
+
+  /// Set when the user may keep last week's targets for now (a single
+  /// deferral of an ordinary reduction).
+  final VoidCallback? onHold;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +87,23 @@ class TargetChangeSheet extends StatelessWidget {
             Text(
               whatWouldChangeIt(explanation),
               style: text.bodyMedium?.copyWith(color: context.mm.text2),
+            ),
+          ],
+          if (onHold != null) ...[
+            const SizedBox(height: 24),
+            MmButton(
+              label: 'Keep last week’s targets for now',
+              kind: MmButtonKind.secondary,
+              onPressed: () {
+                Navigator.of(context).pop();
+                onHold!();
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Targets stay as they are this week, and the change can come at '
+              'the next check-in. You can do this once; not twice running.',
+              style: text.bodySmall,
             ),
           ],
         ],

@@ -18,6 +18,7 @@ export 'src/explanation_line.dart';
 export 'src/explanation_reason.dart';
 export 'src/explanation_trigger.dart';
 export 'src/goal_body_fat_check.dart';
+export 'src/hold_reduction.dart';
 export 'src/initial_tdee_prior.dart';
 export 'src/loss_safety_raise.dart';
 export 'src/mode_reason.dart';
