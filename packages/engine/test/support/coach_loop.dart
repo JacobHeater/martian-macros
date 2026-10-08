@@ -62,6 +62,7 @@ List<WeekResult> runCoachLoop({
   DailyTargets? targets;
   var trendWeight = user.weightKg;
   var deficitWeeks = 0;
+  double? safetyBf;
   final results = <WeekResult>[];
   final history = <TargetsRecord>[];
 
@@ -100,11 +101,13 @@ List<WeekResult> runCoachLoop({
       );
       // As in `nextTargets`: a too-fast loss is not noise, so it can raise
       // targets during calibration and while the estimate is held.
+      safetyBf = safetyBodyFatPercent(startBodyFat, previous: safetyBf);
       safetyRaise = lossSafetyRaiseKcal(
         trend: trend,
         history: history,
         sex: profile.sex,
         bodyFat: startBodyFat,
+        safetyBodyFatPercent: safetyBf,
         resistanceTrained: trainingStatus.isResistanceTrained,
       );
     }
@@ -128,6 +131,7 @@ List<WeekResult> runCoachLoop({
           bmrKcal: bmrFor(trendWeight),
           previous: modeChanged ? null : targets,
           consecutiveDeficitWeeks: deficitWeeks,
+          safetyBodyFatPercent: safetyBf,
           safetyRaiseKcal: modeChanged ? 0 : safetyRaise,
         ),
       );

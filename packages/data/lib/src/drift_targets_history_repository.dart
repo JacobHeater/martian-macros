@@ -33,6 +33,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           tdeeKcal: record.tdeeKcal,
           tdeeSigmaKcal: record.tdeeSigmaKcal,
           tdeeStatus: record.tdeeStatus,
+          safetyBodyFatPercent: Value(record.safetyBodyFatPercent),
         ),
       );
 
@@ -42,6 +43,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
     tdeeKcal: r.tdeeKcal,
     tdeeSigmaKcal: r.tdeeSigmaKcal,
     tdeeStatus: r.tdeeStatus,
+    safetyBodyFatPercent: r.safetyBodyFatPercent,
     targets: DailyTargets(
       kcal: r.kcal,
       proteinG: r.proteinG,

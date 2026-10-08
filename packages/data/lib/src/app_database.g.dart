@@ -2576,6 +2576,17 @@ class $TargetsHistoryTable extends TargetsHistory
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _safetyBodyFatPercentMeta =
+      const VerificationMeta('safetyBodyFatPercent');
+  @override
+  late final GeneratedColumn<double> safetyBodyFatPercent =
+      GeneratedColumn<double>(
+        'safety_body_fat_percent',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
   @override
   late final GeneratedColumnWithTypeConverter<TdeeStatus, String> tdeeStatus =
       GeneratedColumn<String>(
@@ -2597,6 +2608,7 @@ class $TargetsHistoryTable extends TargetsHistory
     flags,
     tdeeKcal,
     tdeeSigmaKcal,
+    safetyBodyFatPercent,
     tdeeStatus,
   ];
   @override
@@ -2688,6 +2700,15 @@ class $TargetsHistoryTable extends TargetsHistory
     } else if (isInserting) {
       context.missing(_tdeeSigmaKcalMeta);
     }
+    if (data.containsKey('safety_body_fat_percent')) {
+      context.handle(
+        _safetyBodyFatPercentMeta,
+        safetyBodyFatPercent.isAcceptableOrUnknown(
+          data['safety_body_fat_percent']!,
+          _safetyBodyFatPercentMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2739,6 +2760,10 @@ class $TargetsHistoryTable extends TargetsHistory
         DriftSqlType.double,
         data['${effectivePrefix}tdee_sigma_kcal'],
       )!,
+      safetyBodyFatPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}safety_body_fat_percent'],
+      ),
       tdeeStatus: $TargetsHistoryTable.$convertertdeeStatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -2772,6 +2797,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
   final String flags;
   final double tdeeKcal;
   final double tdeeSigmaKcal;
+
+  /// Added in schema version 3 (MM-132); null on older rows.
+  final double? safetyBodyFatPercent;
   final TdeeStatus tdeeStatus;
   const TargetsRow({
     required this.effectiveEpochDay,
@@ -2784,6 +2812,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     required this.flags,
     required this.tdeeKcal,
     required this.tdeeSigmaKcal,
+    this.safetyBodyFatPercent,
     required this.tdeeStatus,
   });
   @override
@@ -2803,6 +2832,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     map['flags'] = Variable<String>(flags);
     map['tdee_kcal'] = Variable<double>(tdeeKcal);
     map['tdee_sigma_kcal'] = Variable<double>(tdeeSigmaKcal);
+    if (!nullToAbsent || safetyBodyFatPercent != null) {
+      map['safety_body_fat_percent'] = Variable<double>(safetyBodyFatPercent);
+    }
     {
       map['tdee_status'] = Variable<String>(
         $TargetsHistoryTable.$convertertdeeStatus.toSql(tdeeStatus),
@@ -2823,6 +2855,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       flags: Value(flags),
       tdeeKcal: Value(tdeeKcal),
       tdeeSigmaKcal: Value(tdeeSigmaKcal),
+      safetyBodyFatPercent: safetyBodyFatPercent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(safetyBodyFatPercent),
       tdeeStatus: Value(tdeeStatus),
     );
   }
@@ -2847,6 +2882,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       flags: serializer.fromJson<String>(json['flags']),
       tdeeKcal: serializer.fromJson<double>(json['tdeeKcal']),
       tdeeSigmaKcal: serializer.fromJson<double>(json['tdeeSigmaKcal']),
+      safetyBodyFatPercent: serializer.fromJson<double?>(
+        json['safetyBodyFatPercent'],
+      ),
       tdeeStatus: $TargetsHistoryTable.$convertertdeeStatus.fromJson(
         serializer.fromJson<String>(json['tdeeStatus']),
       ),
@@ -2868,6 +2906,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       'flags': serializer.toJson<String>(flags),
       'tdeeKcal': serializer.toJson<double>(tdeeKcal),
       'tdeeSigmaKcal': serializer.toJson<double>(tdeeSigmaKcal),
+      'safetyBodyFatPercent': serializer.toJson<double?>(safetyBodyFatPercent),
       'tdeeStatus': serializer.toJson<String>(
         $TargetsHistoryTable.$convertertdeeStatus.toJson(tdeeStatus),
       ),
@@ -2885,6 +2924,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     String? flags,
     double? tdeeKcal,
     double? tdeeSigmaKcal,
+    Value<double?> safetyBodyFatPercent = const Value.absent(),
     TdeeStatus? tdeeStatus,
   }) => TargetsRow(
     effectiveEpochDay: effectiveEpochDay ?? this.effectiveEpochDay,
@@ -2897,6 +2937,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     flags: flags ?? this.flags,
     tdeeKcal: tdeeKcal ?? this.tdeeKcal,
     tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
+    safetyBodyFatPercent: safetyBodyFatPercent.present
+        ? safetyBodyFatPercent.value
+        : this.safetyBodyFatPercent,
     tdeeStatus: tdeeStatus ?? this.tdeeStatus,
   );
   TargetsRow copyWithCompanion(TargetsHistoryCompanion data) {
@@ -2917,6 +2960,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       tdeeSigmaKcal: data.tdeeSigmaKcal.present
           ? data.tdeeSigmaKcal.value
           : this.tdeeSigmaKcal,
+      safetyBodyFatPercent: data.safetyBodyFatPercent.present
+          ? data.safetyBodyFatPercent.value
+          : this.safetyBodyFatPercent,
       tdeeStatus: data.tdeeStatus.present
           ? data.tdeeStatus.value
           : this.tdeeStatus,
@@ -2936,6 +2982,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           ..write('flags: $flags, ')
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
+          ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
           ..write(')'))
         .toString();
@@ -2953,6 +3000,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     flags,
     tdeeKcal,
     tdeeSigmaKcal,
+    safetyBodyFatPercent,
     tdeeStatus,
   );
   @override
@@ -2969,6 +3017,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           other.flags == this.flags &&
           other.tdeeKcal == this.tdeeKcal &&
           other.tdeeSigmaKcal == this.tdeeSigmaKcal &&
+          other.safetyBodyFatPercent == this.safetyBodyFatPercent &&
           other.tdeeStatus == this.tdeeStatus);
 }
 
@@ -2983,6 +3032,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   final Value<String> flags;
   final Value<double> tdeeKcal;
   final Value<double> tdeeSigmaKcal;
+  final Value<double?> safetyBodyFatPercent;
   final Value<TdeeStatus> tdeeStatus;
   const TargetsHistoryCompanion({
     this.effectiveEpochDay = const Value.absent(),
@@ -2995,6 +3045,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.flags = const Value.absent(),
     this.tdeeKcal = const Value.absent(),
     this.tdeeSigmaKcal = const Value.absent(),
+    this.safetyBodyFatPercent = const Value.absent(),
     this.tdeeStatus = const Value.absent(),
   });
   TargetsHistoryCompanion.insert({
@@ -3008,6 +3059,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.flags = const Value.absent(),
     required double tdeeKcal,
     required double tdeeSigmaKcal,
+    this.safetyBodyFatPercent = const Value.absent(),
     required TdeeStatus tdeeStatus,
   }) : mode = Value(mode),
        kcal = Value(kcal),
@@ -3029,6 +3081,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Expression<String>? flags,
     Expression<double>? tdeeKcal,
     Expression<double>? tdeeSigmaKcal,
+    Expression<double>? safetyBodyFatPercent,
     Expression<String>? tdeeStatus,
   }) {
     return RawValuesInsertable({
@@ -3043,6 +3096,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       if (flags != null) 'flags': flags,
       if (tdeeKcal != null) 'tdee_kcal': tdeeKcal,
       if (tdeeSigmaKcal != null) 'tdee_sigma_kcal': tdeeSigmaKcal,
+      if (safetyBodyFatPercent != null)
+        'safety_body_fat_percent': safetyBodyFatPercent,
       if (tdeeStatus != null) 'tdee_status': tdeeStatus,
     });
   }
@@ -3058,6 +3113,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Value<String>? flags,
     Value<double>? tdeeKcal,
     Value<double>? tdeeSigmaKcal,
+    Value<double?>? safetyBodyFatPercent,
     Value<TdeeStatus>? tdeeStatus,
   }) {
     return TargetsHistoryCompanion(
@@ -3071,6 +3127,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       flags: flags ?? this.flags,
       tdeeKcal: tdeeKcal ?? this.tdeeKcal,
       tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
+      safetyBodyFatPercent: safetyBodyFatPercent ?? this.safetyBodyFatPercent,
       tdeeStatus: tdeeStatus ?? this.tdeeStatus,
     );
   }
@@ -3110,6 +3167,11 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     if (tdeeSigmaKcal.present) {
       map['tdee_sigma_kcal'] = Variable<double>(tdeeSigmaKcal.value);
     }
+    if (safetyBodyFatPercent.present) {
+      map['safety_body_fat_percent'] = Variable<double>(
+        safetyBodyFatPercent.value,
+      );
+    }
     if (tdeeStatus.present) {
       map['tdee_status'] = Variable<String>(
         $TargetsHistoryTable.$convertertdeeStatus.toSql(tdeeStatus.value),
@@ -3131,6 +3193,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
           ..write('flags: $flags, ')
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
+          ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
           ..write(')'))
         .toString();
@@ -4650,6 +4713,7 @@ typedef $$TargetsHistoryTableCreateCompanionBuilder =
       Value<String> flags,
       required double tdeeKcal,
       required double tdeeSigmaKcal,
+      Value<double?> safetyBodyFatPercent,
       required TdeeStatus tdeeStatus,
     });
 typedef $$TargetsHistoryTableUpdateCompanionBuilder =
@@ -4664,6 +4728,7 @@ typedef $$TargetsHistoryTableUpdateCompanionBuilder =
       Value<String> flags,
       Value<double> tdeeKcal,
       Value<double> tdeeSigmaKcal,
+      Value<double?> safetyBodyFatPercent,
       Value<TdeeStatus> tdeeStatus,
     });
 
@@ -4724,6 +4789,11 @@ class $$TargetsHistoryTableFilterComposer
 
   ColumnFilters<double> get tdeeSigmaKcal => $composableBuilder(
     column: $table.tdeeSigmaKcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get safetyBodyFatPercent => $composableBuilder(
+    column: $table.safetyBodyFatPercent,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4793,6 +4863,11 @@ class $$TargetsHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get safetyBodyFatPercent => $composableBuilder(
+    column: $table.safetyBodyFatPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get tdeeStatus => $composableBuilder(
     column: $table.tdeeStatus,
     builder: (column) => ColumnOrderings(column),
@@ -4841,6 +4916,11 @@ class $$TargetsHistoryTableAnnotationComposer
 
   GeneratedColumn<double> get tdeeSigmaKcal => $composableBuilder(
     column: $table.tdeeSigmaKcal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get safetyBodyFatPercent => $composableBuilder(
+    column: $table.safetyBodyFatPercent,
     builder: (column) => column,
   );
 
@@ -4894,6 +4974,7 @@ class $$TargetsHistoryTableTableManager
                 Value<String> flags = const Value.absent(),
                 Value<double> tdeeKcal = const Value.absent(),
                 Value<double> tdeeSigmaKcal = const Value.absent(),
+                Value<double?> safetyBodyFatPercent = const Value.absent(),
                 Value<TdeeStatus> tdeeStatus = const Value.absent(),
               }) => TargetsHistoryCompanion(
                 effectiveEpochDay: effectiveEpochDay,
@@ -4906,6 +4987,7 @@ class $$TargetsHistoryTableTableManager
                 flags: flags,
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
+                safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
               ),
           createCompanionCallback:
@@ -4920,6 +5002,7 @@ class $$TargetsHistoryTableTableManager
                 Value<String> flags = const Value.absent(),
                 required double tdeeKcal,
                 required double tdeeSigmaKcal,
+                Value<double?> safetyBodyFatPercent = const Value.absent(),
                 required TdeeStatus tdeeStatus,
               }) => TargetsHistoryCompanion.insert(
                 effectiveEpochDay: effectiveEpochDay,
@@ -4932,6 +5015,7 @@ class $$TargetsHistoryTableTableManager
                 flags: flags,
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
+                safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
               ),
           withReferenceMapper: (p0) => p0

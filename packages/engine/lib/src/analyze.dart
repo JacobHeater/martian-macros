@@ -55,7 +55,7 @@ CoachSnapshot? analyze({
 
   final measured = setup.bodyFatPercent;
   final bodyFat = measured != null
-      ? BodyFatEstimate(percent: measured, sigmaPercent: 3)
+      ? BodyFatEstimate(percent: measured, sigmaPercent: 4)
       : deurenbergBodyFat(
           sex: profile.sex,
           weightKg: trendWeight,

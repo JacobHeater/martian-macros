@@ -6,6 +6,7 @@ import 'compute_targets.dart';
 import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
 import 'loss_safety_raise.dart';
+import 'safety_body_fat.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
 import 'targets_record.dart';
@@ -28,6 +29,14 @@ TargetsRecord? nextTargets({
 }) {
   if (snapshot.policy.blocked) return null;
 
+  final lastSafetyBf = history.isEmpty
+      ? null
+      : history.last.safetyBodyFatPercent;
+  final safetyBf = safetyBodyFatPercent(
+    snapshot.bodyFat,
+    previous: lastSafetyBf,
+  );
+
   TargetsRecord build({
     DailyTargets? previous,
     int deficitWeeks = 0,
@@ -47,6 +56,7 @@ TargetsRecord? nextTargets({
         previous: previous,
         consecutiveDeficitWeeks: deficitWeeks,
         requestedLossFraction: setup.requestedLossFraction,
+        safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal: safetyRaiseKcal,
       ),
     );
@@ -61,6 +71,7 @@ TargetsRecord? nextTargets({
       tdeeKcal: snapshot.tdee.kcal,
       tdeeSigmaKcal: snapshot.tdee.sigmaKcal,
       tdeeStatus: snapshot.tdee.status,
+      safetyBodyFatPercent: safetyBf,
       targets: targets,
     );
   }
@@ -75,6 +86,18 @@ TargetsRecord? nextTargets({
       !snapshot.policy.allowedModes.contains(setup.goalMode);
   if (last.mode != setup.goalMode && !heldForLowWeight) return build();
 
+  // A body-fat estimate that has moved leaner, say because the user corrected
+  // it in Settings, applies the stricter limits at once; one that moved
+  // fatter waits for the check-in (MM-132).
+  if (lastSafetyBf != null &&
+      cautiousBodyFatPercent(snapshot.bodyFat) <
+          lastSafetyBf - safetyBodyFatDeadbandPercent) {
+    return build(
+      previous: last.targets,
+      deficitWeeks: consecutiveDeficitWeeks(history, today),
+    );
+  }
+
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return null;
   // Losing faster than the safe pace is not noise, so this runs through
   // calibration and while the estimate is held.
@@ -83,6 +106,7 @@ TargetsRecord? nextTargets({
     history: history,
     sex: setup.profile.sex,
     bodyFat: snapshot.bodyFat,
+    safetyBodyFatPercent: safetyBf,
     resistanceTrained: setup.trainingStatus.isResistanceTrained,
   );
   // A deficit the policy no longer allows (body weight has fallen into the
