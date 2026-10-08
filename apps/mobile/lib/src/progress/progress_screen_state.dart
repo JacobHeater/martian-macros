@@ -10,8 +10,8 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/number_entry_card.dart';
 import 'progress_screen.dart';
-import 'trend_chart.dart';
-import 'trend_stats.dart';
+import '../charts/trend_chart.dart';
+import '../charts/trend_stats.dart';
 import 'waist_summary.dart';
 
 class ProgressScreenState extends ConsumerState<ProgressScreen> {
@@ -63,16 +63,29 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
                   children: [
                     TrendStats(trend: trend, fmt: fmt),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      height: 220,
-                      child: TrendChart(
-                        trend: trend,
-                        weights: weights,
-                        today: today,
-                        rangeDays: _rangeDays,
-                        fmt: fmt,
+                    Semantics(
+                      label:
+                          'Weight trend over the last $_rangeDays days. '
+                          'Trend weight ${fmt.weight(trend.last.levelKg)}, '
+                          'from ${weights.length} '
+                          'weigh-in${weights.length == 1 ? '' : 's'}.',
+                      child: ExcludeSemantics(
+                        child: SizedBox(
+                          height: 220,
+                          child: TrendChart(
+                            trend: trend,
+                            weights: weights,
+                            today: today,
+                            rangeDays: _rangeDays,
+                            fmt: fmt,
+                          ),
+                        ),
                       ),
                     ),
+                    if (weights.length < 2) ...[
+                      const SizedBox(height: 8),
+                      const Text('A trend needs more weigh-ins.'),
+                    ],
                     const SizedBox(height: 8),
                     Text(
                       'Dots are weigh-ins. The line is your trend with water '

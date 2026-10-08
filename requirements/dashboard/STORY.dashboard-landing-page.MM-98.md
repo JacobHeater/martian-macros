@@ -1,6 +1,6 @@
 ---
 id: MM-98
-status: proposed
+status: done
 component: dashboard
 related: [MM-97, MM-99, MM-100, MM-17, MM-23, MM-24, MM-32, MM-41, MM-77, MM-92, MM-104]
 ---
@@ -66,3 +66,10 @@ Scenario: Drilling in
 ## Notes
 - The calibration banner now on the Today screen (MM-41) moves here; showing it in both places is noise.
 - Trend weight needs at least one weigh-in, which onboarding guarantees.
+
+## Notes (built and verified)
+- `apps/mobile/lib/src/dashboard/`: `DashboardScreen` with `IntakeCard` (calories, remaining, protein), `WeightCard` (trend weight, 7-day and since-start change, 30-day trend line; or an in-place
+  weigh-in field when there is none today) and `CoachLineCard` (calibration day, what changed at the last check-in, or the next check-in). Each card opens its detail screen. The calibration banner
+  moved here from Food. Tests in `apps/mobile/test/dashboard_test.dart` follow the scenarios above.
+- Built as proposed; the product owner has not yet confirmed the contents. **Not built**: "This week" and the recomp signal (their features do not exist yet).
+- **Not verified**: the first three cards fitting one phone screen without scrolling was not measured on a device; layout is the stock Material look, not the `design/` hero.

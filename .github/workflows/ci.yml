@@ -1,0 +1,48 @@
+name: CI
+
+# Runs the same commands as a developer: `mm bootstrap` and `mm check`, then an
+# Android build. CI calls `mm`, never `flutter` directly, so local and CI
+# behavior cannot drift (MM-7). Goldens (MM-105) will be generated here, on
+# Linux, once they exist.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the pinned Flutter version
+        id: flutter
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Bootstrap
+        run: ./mm bootstrap
+        env:
+          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+
+      - name: Check (format, requirements, architecture, analyze, test)
+        run: ./mm check
+        env:
+          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+
+      - name: Build Android (dev)
+        run: ./mm build android --env dev
+        env:
+          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}

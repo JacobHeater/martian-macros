@@ -8,24 +8,26 @@ import '../ui/macro_kind.dart';
 import '../ui/mm_progress_bar.dart';
 import '../ui/mm_surface.dart';
 
-/// Calories and macros eaten against the day's targets.
-class DaySummaryCard extends StatelessWidget {
-  const DaySummaryCard({
+/// Today's calories against the target, and protein. Opens the Food screen.
+class IntakeCard extends StatelessWidget {
+  const IntakeCard({
     required this.intake,
     required this.targets,
+    required this.onTap,
     super.key,
   });
 
   final IntakeDay intake;
   final DailyTargets? targets;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
     final t = targets;
     final remaining = t == null ? null : t.kcal - intake.kcal;
     return MmSurface(
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -34,11 +36,13 @@ class DaySummaryCard extends StatelessWidget {
             children: [
               Text(Fmt.whole(intake.kcal), style: text.displaySmall),
               const SizedBox(width: 8),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  t == null ? 'kcal' : 'of ${Fmt.kcal(t.kcal)}',
-                  style: text.bodyLarge,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    t == null ? 'kcal' : 'of ${Fmt.kcal(t.kcal)}',
+                    style: text.bodyLarge,
+                  ),
                 ),
               ),
             ],
@@ -51,36 +55,14 @@ class DaySummaryCard extends StatelessWidget {
               remaining! >= 0
                   ? '${Fmt.whole(remaining)} kcal remaining'
                   : '${Fmt.whole(-remaining)} kcal over',
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+              style: text.bodyMedium,
             ),
           ],
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: MacroBar(
-                  macro: MacroKind.protein,
-                  grams: intake.proteinG,
-                  target: t?.proteinG,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: MacroBar(
-                  macro: MacroKind.carbs,
-                  grams: intake.carbsG,
-                  target: t?.carbsG,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: MacroBar(
-                  macro: MacroKind.fat,
-                  grams: intake.fatG,
-                  target: t?.fatG,
-                ),
-              ),
-            ],
+          MacroBar(
+            macro: MacroKind.protein,
+            grams: intake.proteinG,
+            target: t?.proteinG,
           ),
         ],
       ),

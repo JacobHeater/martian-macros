@@ -8,6 +8,7 @@ class InfoCard extends StatelessWidget {
     required this.title,
     required this.child,
     this.trailing,
+    this.onTap,
     super.key,
   });
 
@@ -15,8 +16,12 @@ class InfoCard extends StatelessWidget {
   final Widget child;
   final Widget? trailing;
 
+  /// Makes the card open its detail screen when tapped.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) => MmSurface(
+    onTap: onTap,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

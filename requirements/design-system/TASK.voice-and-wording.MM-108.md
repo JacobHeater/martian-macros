@@ -1,6 +1,6 @@
 ---
 id: MM-108
-status: proposed
+status: in-progress
 component: design-system
 related: [MM-101, MM-11, MM-41, MM-92, MM-96, MM-106]
 ---
@@ -52,3 +52,9 @@ Scenario: Checked automatically where possible
 ## Notes
 - All user-facing text is currently written inline in screen files. Collecting it (Flutter's localization files) makes this checkable
   and is a prerequisite for ever translating the app. Worth doing as part of this.
+
+## Progress
+- Built: the written guide and glossary (`design/voice-and-wording.md`) and an automated test (`apps/mobile/test/voice_test.dart`) that scans every string in the app and fails on a banned word
+  (good, bad, clean, junk, guilt, cheat, oops, earn, burn off, lbs, true weight, and others). It passes.
+- **Not done**: moving every string into localization files (Flutter ARB / gen-l10n), which would also let the glossary and uncertainty rules be checked in one place. That is a large change to every
+  screen and a new generated-code convention that needs the `mm arch` rule adjusted; it is deferred, not abandoned.

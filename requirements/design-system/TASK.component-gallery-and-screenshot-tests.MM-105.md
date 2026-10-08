@@ -1,6 +1,6 @@
 ---
 id: MM-105
-status: proposed
+status: in-progress
 component: design-system
 related: [MM-101, MM-102, MM-104, MM-91, MM-93]
 ---
@@ -48,3 +48,10 @@ Scenario: The same result everywhere
 - Widgetbook is the common ready-made gallery for Flutter. A hand-written gallery screen is less to depend on for a library this small;
   decide when building.
 - This is also the practical way to do the dark-theme and small-screen check (MM-91).
+
+## Progress
+- Built: the gallery (`apps/mobile/lib/src/gallery/`, one file per section): every color token, the type roles, every `ui/` component in its states, with switches for light and dark and for 100% or
+  200% text. It is reachable from Settings in the `dev` environment only (`appEnvProvider`). Tests (`gallery_test.dart`) open it in both themes, switch theme and text size without errors, and check that
+  production hides it.
+- **Not done**: screenshot (golden) tests and `mm goldens`. They must be generated on one platform (Linux, in CI) and there is no CI yet (MM-7), so no baseline images exist. Until then a
+  change to a token is caught by the contrast tests and by looking at the gallery, not by an image diff.
