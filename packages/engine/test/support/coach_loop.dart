@@ -33,6 +33,9 @@ List<WeekResult> runCoachLoop({
   TrainingStatus trainingStatus = TrainingStatus.intermediate,
   int trainingDaysPerWeek = 3,
   void Function(int week, SyntheticUser user)? beforeWeek,
+  TdeeEstimator estimator = const TdeeEstimator(),
+  bool settle = true,
+  GoalMode Function(int week)? modeAt,
 }) {
   final policy = CoachingPolicy.derive(
     profile: profile,
@@ -42,7 +45,6 @@ List<WeekResult> runCoachLoop({
   final intakeLog = <IntakeDay>[];
   final weightLog = <WeightObservation>[];
   const trendModel = WeightTrendModel();
-  const estimator = TdeeEstimator();
 
   double bmrFor(double weightKg) => mifflinStJeorKcal(
     sex: profile.sex,
@@ -72,13 +74,25 @@ List<WeekResult> runCoachLoop({
   var trendWeight = user.weightKg;
   var deficitWeeks = 0;
   final results = <WeekResult>[];
+  final history = <TargetsRecord>[];
 
+  var currentMode = mode;
   for (var week = 0; week < weeks; week++) {
     beforeWeek?.call(week, user);
+    final weekMode = modeAt?.call(week) ?? mode;
+    final modeChanged = weekMode != currentMode;
+    currentMode = weekMode;
 
     if (week > 0) {
       final asOf = user.today.addDays(-1);
-      final trend = trendModel.smooth(weightLog, through: asOf);
+      final settling = settle
+          ? settlingWindows(history)
+          : const <SettlingWindow>[];
+      final trend = trendModel.smooth(
+        weightLog,
+        through: asOf,
+        shift: settlingShift(settling, user.startWeightKg),
+      );
       trendWeight = trend.last.levelKg;
       final bmr = bmrFor(trendWeight);
       tdee = estimator.estimate(
@@ -92,24 +106,40 @@ List<WeekResult> runCoachLoop({
           fatMassKg: startBodyFat.fatMassKg(trendWeight),
           resistanceTrained: trainingStatus.isResistanceTrained,
         ),
+        settling: settling,
       );
     }
 
-    // Calibration week: hold the initial targets, never adjust.
-    if (targets == null || week >= 2) {
+    // As in `nextTargets`: nothing changes during calibration or while the
+    // estimate is held, and a change of goal applies at once, unthrottled.
+    if (targets == null ||
+        modeChanged ||
+        (week >= 2 && tdee.status == TdeeStatus.updated)) {
       targets = computeTargets(
         TargetInputs(
           sex: profile.sex,
           heightCm: profile.heightCm,
           trendWeightKg: trendWeight,
           bodyFat: startBodyFat,
-          mode: mode,
+          mode: currentMode,
           trainingStatus: trainingStatus,
           policy: policy,
           tdeeKcal: tdee.kcal,
           bmrKcal: bmrFor(trendWeight),
-          previous: targets,
+          previous: modeChanged ? null : targets,
           consecutiveDeficitWeeks: deficitWeeks,
+        ),
+      );
+    }
+    if (history.isEmpty || history.last.targets != targets) {
+      history.add(
+        TargetsRecord(
+          effectiveFrom: user.today,
+          targets: targets,
+          mode: currentMode,
+          tdeeKcal: tdee.kcal,
+          tdeeSigmaKcal: tdee.sigmaKcal,
+          tdeeStatus: tdee.status,
         ),
       );
     }

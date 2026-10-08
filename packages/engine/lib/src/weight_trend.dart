@@ -45,6 +45,18 @@ final class WeightTrendPoint {
 /// meal or a hard leg day raises it for a few days, then it decays. Modelling
 /// it explicitly stops multi-day water swings being read as tissue change
 /// and keeps the reported uncertainty honest. Noise scales with body weight.
+/// Extra movement the trend is allowed on one day, beyond ordinary tissue
+/// change: used on days when intake has just changed level.
+final class TrendShift {
+  const TrendShift({
+    required this.levelSigmaKg,
+    required this.slopeSigmaKgPerDay,
+  });
+
+  final double levelSigmaKg;
+  final double slopeSigmaKgPerDay;
+}
+
 final class WeightTrendModel {
   const WeightTrendModel({
     this.relativeWaterSigma = 0.006,
@@ -88,6 +100,7 @@ final class WeightTrendModel {
     Iterable<WeightObservation> observations, {
     CalendarDate? through,
     double Function(CalendarDate date)? noiseMultiplier,
+    TrendShift? Function(CalendarDate date)? shift,
   }) {
     final byDay = <int, double>{};
     for (final o in observations) {
@@ -135,7 +148,20 @@ final class WeightTrendModel {
         );
       } else {
         final x = filtered.last;
-        prior = _Gaussian(f.apply(x.mean), f.mul(x.cov).mul(f.t()).add(q));
+        // A day that may carry a shift lets level and slope move freely,
+        // so a step is not smeared into the slope and a change of pace is
+        // not resisted for weeks.
+        final extra = shift?.call(date);
+        final qDay = extra == null
+            ? q
+            : q.add(
+                _Mat.diagonal([
+                  _sq(extra.levelSigmaKg),
+                  _sq(extra.slopeSigmaKgPerDay),
+                  0,
+                ]),
+              );
+        prior = _Gaussian(f.apply(x.mean), f.mul(x.cov).mul(f.t()).add(qDay));
       }
       predicted.add(prior);
 

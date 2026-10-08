@@ -61,11 +61,15 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
   final setup = ref.watch(setupProvider).value;
   final weights = ref.watch(weightsProvider).value;
   final intake = ref.watch(intakeDaysProvider).value;
-  if (setup == null || weights == null || intake == null) return null;
+  final history = ref.watch(targetsHistoryProvider).value;
+  if (setup == null || weights == null || intake == null || history == null) {
+    return null;
+  }
   return analyze(
     setup: setup,
     weights: weights,
     intake: intake,
+    history: history,
     today: ref.watch(todayProvider),
   );
 });

@@ -288,8 +288,8 @@
       "sharedContracts": ["SC-targets", "SC-analysis", "SC-safety", "SC-simulator", "SC-setup"],
       "coordinationHotspots": ["HS-compute-targets", "HS-policy", "HS-estimator-style", "HS-simulator"],
       "sourceRequirements": {
-        "built": ["MM-18", "MM-19", "MM-23", "MM-24", "MM-25", "MM-26", "MM-27", "MM-28", "MM-30", "MM-31", "MM-120"],
-        "remaining": ["MM-22", "MM-35", "MM-110", "MM-111", "MM-115", "MM-131", "MM-132", "MM-135"]
+        "built": ["MM-18", "MM-19", "MM-23", "MM-24", "MM-25", "MM-26", "MM-27", "MM-28", "MM-30", "MM-31", "MM-120", "MM-131"],
+        "remaining": ["MM-22", "MM-35", "MM-110", "MM-111", "MM-115", "MM-132", "MM-135"]
       },
       "sequence": [
         { "step": 1, "title": "Remove the protein step at BMI 30", "tickets": ["MM-120"], "milestone": "M1" },

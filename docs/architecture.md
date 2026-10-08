@@ -83,6 +83,11 @@ the Mifflin-St Jeor × activity prior by inverse variance.
   as partial and excluded. Days the user marks complete are always used.
 - A logging-style switch (weighed share changes by more than 0.5) restarts
   the window, because the logging bias changed.
+- For 10 days after the calorie target changes by more than 10% of TDEE
+  (starting or ending a deficit), glycogen, water and gut contents move the
+  scale by a kilogram or two. The trend filter lets level and slope move
+  freely on those days, and the estimator leaves them out. A user who starts
+  in a deficit therefore gets a first measurement at day 28, not day 14.
 - The result is clamped to 1.1–3.0 × BMR.
 - The estimate is maintenance *in the user's logging units*. Consistent
   under-logging is absorbed by the closed loop.
