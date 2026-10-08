@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import 'daily_targets.dart';
 import 'partition.dart';
+import 'safety_body_fat.dart';
 import 'safety_bounds.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
@@ -11,6 +12,7 @@ import 'target_inputs.dart';
 /// Computes the week's daily targets. Pure function of [i].
 DailyTargets computeTargets(TargetInputs i) {
   final flags = <TargetFlag>{};
+  final safetyBf = i.safetyBodyFatPercent ?? cautiousBodyFatPercent(i.bodyFat);
 
   var mode = i.mode;
   if (!i.policy.allowedModes.contains(mode)) {
@@ -22,7 +24,7 @@ DailyTargets computeTargets(TargetInputs i) {
     );
   }
 
-  var rate = _weeklyRate(mode, i);
+  var rate = _weeklyRate(mode, i, safetyBf);
   if (rate < 0 &&
       i.consecutiveDeficitWeeks >= SafetyBounds.maxContinuousDeficitWeeks) {
     rate = 0;
@@ -78,7 +80,7 @@ DailyTargets computeTargets(TargetInputs i) {
   final floor = SafetyBounds.calorieFloorKcal(
     sex: i.sex,
     bmrKcal: i.bmrKcal,
-    bodyFatPercent: i.bodyFat.percent,
+    bodyFatPercent: safetyBf,
     fatFreeMassUpperKg: i.bodyFat.fatFreeMassUpperKg(i.trendWeightKg),
     trainingKcalPerDay: i.trainingKcalPerDay,
   );
@@ -91,7 +93,7 @@ DailyTargets computeTargets(TargetInputs i) {
     sex: i.sex,
     weightKg: i.trendWeightKg,
     heightCm: i.heightCm,
-    bodyFatPercent: i.bodyFat.percent,
+    bodyFatPercent: safetyBf,
     inDeficit: rate < 0,
     capGPerKg: i.policy.proteinCapGPerKg,
   );
@@ -121,7 +123,7 @@ DailyTargets computeTargets(TargetInputs i) {
   );
 }
 
-double _weeklyRate(GoalMode mode, TargetInputs i) {
+double _weeklyRate(GoalMode mode, TargetInputs i, double safetyBf) {
   final bf = i.bodyFat.percent;
   final highBodyFat = switch (i.sex) {
     BiologicalSex.male => bf >= 20,
@@ -131,7 +133,7 @@ double _weeklyRate(GoalMode mode, TargetInputs i) {
     GoalMode.fatLoss => -math.min(
       math.min(
         i.requestedLossFraction ?? 0.0075,
-        SafetyBounds.maxWeeklyLossFraction(i.sex, bf),
+        SafetyBounds.maxWeeklyLossFraction(i.sex, safetyBf),
       ),
       i.policy.maxWeeklyLossFraction ?? double.infinity,
     ),

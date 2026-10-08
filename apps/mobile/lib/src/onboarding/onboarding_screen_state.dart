@@ -84,7 +84,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (profile == null || weight == null) return null;
     final measured = _bodyFat;
     return measured != null
-        ? BodyFatEstimate(percent: measured, sigmaPercent: 3)
+        ? BodyFatEstimate(percent: measured, sigmaPercent: 4)
         : deurenbergBodyFat(
             sex: profile.sex,
             weightKg: weight,
