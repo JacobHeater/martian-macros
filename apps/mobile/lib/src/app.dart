@@ -6,27 +6,19 @@ import 'onboarding/onboarding_screen.dart';
 import 'progress/progress_screen.dart';
 import 'providers.dart';
 import 'settings/settings_screen.dart';
+import 'theme/mm_theme.dart';
 import 'today/today_screen.dart';
-
-const _mars = Color(0xFFC1440E);
 
 class MartianMacrosApp extends StatelessWidget {
   const MartianMacrosApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme(Brightness brightness) => ThemeData(
-      colorSchemeSeed: _mars,
-      brightness: brightness,
-      inputDecorationTheme: const InputDecorationTheme(
-        border: OutlineInputBorder(),
-      ),
-    );
     return MaterialApp(
       title: 'Martian Macros',
       debugShowCheckedModeBanner: false,
-      theme: theme(Brightness.light),
-      darkTheme: theme(Brightness.dark),
+      theme: mmTheme(Brightness.light),
+      darkTheme: mmTheme(Brightness.dark),
       home: const _Root(),
     );
   }

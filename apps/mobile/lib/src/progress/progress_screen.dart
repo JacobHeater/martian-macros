@@ -8,6 +8,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format.dart';
 import '../providers.dart';
+import '../theme/mm_colors_context.dart';
 import '../widgets.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
@@ -263,7 +264,7 @@ class _TrendChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final mm = context.mm;
     final text = Theme.of(context).textTheme;
     final start = today.addDays(1 - rangeDays);
 
@@ -315,7 +316,7 @@ class _TrendChart extends StatelessWidget {
         gridData: FlGridData(
           drawVerticalLine: false,
           getDrawingHorizontalLine: (_) =>
-              FlLine(color: scheme.outlineVariant, strokeWidth: 0.5),
+              FlLine(color: mm.outline, strokeWidth: 1),
         ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
@@ -349,7 +350,7 @@ class _TrendChart extends StatelessWidget {
           BetweenBarsData(
             fromIndex: 0,
             toIndex: 1,
-            color: scheme.primary.withValues(alpha: 0.15),
+            color: mm.ion.withValues(alpha: 0.14),
           ),
         ],
         lineBarsData: [
@@ -357,7 +358,7 @@ class _TrendChart extends StatelessWidget {
           hidden(upper),
           LineChartBarData(
             spots: line,
-            color: scheme.primary,
+            color: mm.ion,
             barWidth: 3,
             isCurved: true,
             preventCurveOverShooting: true,
@@ -370,7 +371,7 @@ class _TrendChart extends StatelessWidget {
             dotData: FlDotData(
               getDotPainter: (_, _, _, _) => FlDotCirclePainter(
                 radius: 2.5,
-                color: scheme.onSurfaceVariant,
+                color: mm.text2,
                 strokeWidth: 0,
               ),
             ),
