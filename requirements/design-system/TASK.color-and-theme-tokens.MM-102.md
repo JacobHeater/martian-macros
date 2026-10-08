@@ -1,6 +1,6 @@
 ---
 id: MM-102
-status: proposed
+status: in-progress
 component: design-system
 related: [MM-101, MM-91, MM-104, MM-106, MM-107]
 ---
@@ -13,7 +13,9 @@ idea is colored differently in different places: protein is `primary` on the Tod
 
 ## Decisions
 Choices I made without asking (say if any is wrong):
-- **Keep Material 3's generated palette as the base**, seeded from the rust accent, for surfaces, text and controls.
+- **Superseded by the product owner's redesign brief (see `design/color-and-theme-system.md`).** No seed palette: define both `ColorScheme`s explicitly
+  (cool ink canvas, Ember action, Ion measurement color, blue/gold/violet macros). Ember is never tinted. The rust-seed proposal that was here
+  produced the muddy look and is withdrawn.
 - **Add a small set of named, semantic colors on top**, each defined for light and for dark:
 
 | token | used for |
@@ -28,8 +30,8 @@ Choices I made without asking (say if any is wrong):
 
 - **Being over a calorie target is not `danger` and not red.** It is stated in the normal text color (MM-108).
 - **Macro colors are distinguishable without color vision**: they differ in lightness as well as hue, and are always labelled.
-- **The direction for the palette**: warm and earthy, built around the rust accent, with a cool contrasting color for the trend line so it
-  reads clearly against warm surfaces. This is a proposal for the product owner to react to.
+- **The direction for the palette**: see `design/color-and-theme-system.md`. Values were checked for contrast and color-blind separation but
+  not yet seen rendered in the app; `design/palette-preview.html` is the review sheet. Still a proposal until the gallery (MM-105) shows it.
 - **Screens use tokens, never literal colors.** A lint or a test flags a `Color(0x...)` outside the theme files.
 
 ## Description
@@ -58,3 +60,14 @@ Scenario: Without color vision
 ## Notes
 - Show the proposed palette as a rendered sheet (in the gallery, MM-105) before applying it to screens; a table of hex values cannot be
   judged.
+## Progress (step 1a, built and verified)
+- Built: `apps/mobile/lib/src/theme/` (`mm_colors.dart`: `MmColors` theme extension with light and dark values and `context.mm`;
+  `mm_theme.dart`: explicit `ColorScheme`s, no seed, no surface tint, and component themes for navigation bar, FAB, buttons, inputs, cards,
+  sheets, dialogs, snack bars, switches, progress). `app.dart` uses it. Today's macro bars use the macro tokens; the Progress chart uses the
+  trend token; swipe-to-delete no longer uses a tinted error container.
+- Verified: `apps/mobile/test/theme_test.dart` computes contrast for every token pair in both themes (text 4.5:1; graphics and bars 3:1),
+  lightness separation of the three macros, both themes defined, and fails on a literal `Color(0x…)` or a seed palette outside the theme
+  folder, or on a tinted Ember. `mm check` passes (80 app tests). Seen on the Android emulator in light and dark on Today and Progress.
+- **Not yet done**: macro bars were seen only empty (no food logged), so the macro colors are unseen in the app; the rendered gallery and
+  palette sheet (MM-105); the Coach, Onboarding and Settings screens in the new theme; grayscale and color-blind review on device; the
+  `Notice` and `ChoiceCard` still use their old shapes (step 1b). Status stays in-progress until the gallery shows the palette.
