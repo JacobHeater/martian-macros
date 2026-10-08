@@ -30,7 +30,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 3;
+  static const currentSchemaVersion = 4;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -47,6 +47,11 @@ class AppDatabase extends _$AppDatabase {
     // 2 to 3: the body-fat figure the safety rules used (MM-132).
     2: (m) async {
       await m.addColumn(targetsHistory, targetsHistory.safetyBodyFatPercent);
+    },
+    // 3 to 4: corrections to the profile or health check (MM-83).
+    3: (m) async {
+      await m.addColumn(setups, setups.profileRevision);
+      await m.addColumn(targetsHistory, targetsHistory.profileRevision);
     },
   };
 

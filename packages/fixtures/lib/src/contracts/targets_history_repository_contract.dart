@@ -9,6 +9,7 @@ TargetsRecord _record(
   double kcal, {
   Set<TargetFlag>? flags,
   double? safetyBodyFatPercent,
+  int profileRevision = 0,
 }) => TargetsRecord(
   effectiveFrom: from,
   mode: GoalMode.fatLoss,
@@ -16,6 +17,7 @@ TargetsRecord _record(
   tdeeSigmaKcal: 300,
   tdeeStatus: TdeeStatus.held,
   safetyBodyFatPercent: safetyBodyFatPercent,
+  profileRevision: profileRevision,
   targets: DailyTargets(
     kcal: kcal,
     proteinG: 160,
@@ -44,6 +46,14 @@ void targetsHistoryRepositoryContract(
       final history = await repo.watchTargetsHistory().first;
       expect(history.first.safetyBodyFatPercent, closeTo(14.63, 1e-9));
       expect(history.last.safetyBodyFatPercent, isNull);
+    });
+
+    test('keeps the profile revision the targets were made for', () async {
+      await repo.saveTargets(_record(d1, 2200, profileRevision: 2));
+      await repo.saveTargets(_record(d2, 2300));
+      final history = await repo.watchTargetsHistory().first;
+      expect(history.first.profileRevision, 2);
+      expect(history.last.profileRevision, 0);
     });
 
     test('starts empty', () async {

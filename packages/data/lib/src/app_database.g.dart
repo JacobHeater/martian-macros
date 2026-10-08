@@ -69,6 +69,18 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _profileRevisionMeta = const VerificationMeta(
+    'profileRevision',
+  );
+  @override
+  late final GeneratedColumn<int> profileRevision = GeneratedColumn<int>(
+    'profile_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   late final GeneratedColumnWithTypeConverter<DailyActivity, String>
   dailyActivity = GeneratedColumn<String>(
@@ -255,6 +267,7 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     heightCm,
     trainingStatus,
     trainingDaysPerWeek,
+    profileRevision,
     dailyActivity,
     goalMode,
     unitSystem,
@@ -322,6 +335,15 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
       );
     } else if (isInserting) {
       context.missing(_trainingDaysPerWeekMeta);
+    }
+    if (data.containsKey('profile_revision')) {
+      context.handle(
+        _profileRevisionMeta,
+        profileRevision.isAcceptableOrUnknown(
+          data['profile_revision']!,
+          _profileRevisionMeta,
+        ),
+      );
     }
     if (data.containsKey('onboarded_epoch_day')) {
       context.handle(
@@ -450,6 +472,10 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         DriftSqlType.int,
         data['${effectivePrefix}training_days_per_week'],
       )!,
+      profileRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_revision'],
+      )!,
       dailyActivity: $SetupsTable.$converterdailyActivity.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -545,6 +571,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   final TrainingStatus trainingStatus;
   final int trainingDaysPerWeek;
 
+  /// Added in schema version 4 (MM-83); existing rows read as 0.
+  final int profileRevision;
+
   /// Added in schema version 2 (MM-164); existing rows read as `light`.
   final DailyActivity dailyActivity;
   final GoalMode goalMode;
@@ -567,6 +596,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     required this.heightCm,
     required this.trainingStatus,
     required this.trainingDaysPerWeek,
+    required this.profileRevision,
     required this.dailyActivity,
     required this.goalMode,
     required this.unitSystem,
@@ -595,6 +625,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       );
     }
     map['training_days_per_week'] = Variable<int>(trainingDaysPerWeek);
+    map['profile_revision'] = Variable<int>(profileRevision);
     {
       map['daily_activity'] = Variable<String>(
         $SetupsTable.$converterdailyActivity.toSql(dailyActivity),
@@ -636,6 +667,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       heightCm: Value(heightCm),
       trainingStatus: Value(trainingStatus),
       trainingDaysPerWeek: Value(trainingDaysPerWeek),
+      profileRevision: Value(profileRevision),
       dailyActivity: Value(dailyActivity),
       goalMode: Value(goalMode),
       unitSystem: Value(unitSystem),
@@ -673,6 +705,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       trainingDaysPerWeek: serializer.fromJson<int>(
         json['trainingDaysPerWeek'],
       ),
+      profileRevision: serializer.fromJson<int>(json['profileRevision']),
       dailyActivity: $SetupsTable.$converterdailyActivity.fromJson(
         serializer.fromJson<String>(json['dailyActivity']),
       ),
@@ -713,6 +746,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
         $SetupsTable.$convertertrainingStatus.toJson(trainingStatus),
       ),
       'trainingDaysPerWeek': serializer.toJson<int>(trainingDaysPerWeek),
+      'profileRevision': serializer.toJson<int>(profileRevision),
       'dailyActivity': serializer.toJson<String>(
         $SetupsTable.$converterdailyActivity.toJson(dailyActivity),
       ),
@@ -745,6 +779,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     double? heightCm,
     TrainingStatus? trainingStatus,
     int? trainingDaysPerWeek,
+    int? profileRevision,
     DailyActivity? dailyActivity,
     GoalMode? goalMode,
     UnitSystem? unitSystem,
@@ -766,6 +801,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     heightCm: heightCm ?? this.heightCm,
     trainingStatus: trainingStatus ?? this.trainingStatus,
     trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+    profileRevision: profileRevision ?? this.profileRevision,
     dailyActivity: dailyActivity ?? this.dailyActivity,
     goalMode: goalMode ?? this.goalMode,
     unitSystem: unitSystem ?? this.unitSystem,
@@ -799,6 +835,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       trainingDaysPerWeek: data.trainingDaysPerWeek.present
           ? data.trainingDaysPerWeek.value
           : this.trainingDaysPerWeek,
+      profileRevision: data.profileRevision.present
+          ? data.profileRevision.value
+          : this.profileRevision,
       dailyActivity: data.dailyActivity.present
           ? data.dailyActivity.value
           : this.dailyActivity,
@@ -845,6 +884,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ..write('heightCm: $heightCm, ')
           ..write('trainingStatus: $trainingStatus, ')
           ..write('trainingDaysPerWeek: $trainingDaysPerWeek, ')
+          ..write('profileRevision: $profileRevision, ')
           ..write('dailyActivity: $dailyActivity, ')
           ..write('goalMode: $goalMode, ')
           ..write('unitSystem: $unitSystem, ')
@@ -864,13 +904,14 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     sex,
     birthEpochDay,
     heightCm,
     trainingStatus,
     trainingDaysPerWeek,
+    profileRevision,
     dailyActivity,
     goalMode,
     unitSystem,
@@ -885,7 +926,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     pcos,
     menopause,
     thyroidCondition,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -896,6 +937,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           other.heightCm == this.heightCm &&
           other.trainingStatus == this.trainingStatus &&
           other.trainingDaysPerWeek == this.trainingDaysPerWeek &&
+          other.profileRevision == this.profileRevision &&
           other.dailyActivity == this.dailyActivity &&
           other.goalMode == this.goalMode &&
           other.unitSystem == this.unitSystem &&
@@ -919,6 +961,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
   final Value<double> heightCm;
   final Value<TrainingStatus> trainingStatus;
   final Value<int> trainingDaysPerWeek;
+  final Value<int> profileRevision;
   final Value<DailyActivity> dailyActivity;
   final Value<GoalMode> goalMode;
   final Value<UnitSystem> unitSystem;
@@ -940,6 +983,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.heightCm = const Value.absent(),
     this.trainingStatus = const Value.absent(),
     this.trainingDaysPerWeek = const Value.absent(),
+    this.profileRevision = const Value.absent(),
     this.dailyActivity = const Value.absent(),
     this.goalMode = const Value.absent(),
     this.unitSystem = const Value.absent(),
@@ -962,6 +1006,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     required double heightCm,
     required TrainingStatus trainingStatus,
     required int trainingDaysPerWeek,
+    this.profileRevision = const Value.absent(),
     this.dailyActivity = const Value.absent(),
     required GoalMode goalMode,
     required UnitSystem unitSystem,
@@ -991,6 +1036,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Expression<double>? heightCm,
     Expression<String>? trainingStatus,
     Expression<int>? trainingDaysPerWeek,
+    Expression<int>? profileRevision,
     Expression<String>? dailyActivity,
     Expression<String>? goalMode,
     Expression<String>? unitSystem,
@@ -1014,6 +1060,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       if (trainingStatus != null) 'training_status': trainingStatus,
       if (trainingDaysPerWeek != null)
         'training_days_per_week': trainingDaysPerWeek,
+      if (profileRevision != null) 'profile_revision': profileRevision,
       if (dailyActivity != null) 'daily_activity': dailyActivity,
       if (goalMode != null) 'goal_mode': goalMode,
       if (unitSystem != null) 'unit_system': unitSystem,
@@ -1041,6 +1088,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Value<double>? heightCm,
     Value<TrainingStatus>? trainingStatus,
     Value<int>? trainingDaysPerWeek,
+    Value<int>? profileRevision,
     Value<DailyActivity>? dailyActivity,
     Value<GoalMode>? goalMode,
     Value<UnitSystem>? unitSystem,
@@ -1063,6 +1111,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       heightCm: heightCm ?? this.heightCm,
       trainingStatus: trainingStatus ?? this.trainingStatus,
       trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+      profileRevision: profileRevision ?? this.profileRevision,
       dailyActivity: dailyActivity ?? this.dailyActivity,
       goalMode: goalMode ?? this.goalMode,
       unitSystem: unitSystem ?? this.unitSystem,
@@ -1104,6 +1153,9 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     }
     if (trainingDaysPerWeek.present) {
       map['training_days_per_week'] = Variable<int>(trainingDaysPerWeek.value);
+    }
+    if (profileRevision.present) {
+      map['profile_revision'] = Variable<int>(profileRevision.value);
     }
     if (dailyActivity.present) {
       map['daily_activity'] = Variable<String>(
@@ -1171,6 +1223,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           ..write('heightCm: $heightCm, ')
           ..write('trainingStatus: $trainingStatus, ')
           ..write('trainingDaysPerWeek: $trainingDaysPerWeek, ')
+          ..write('profileRevision: $profileRevision, ')
           ..write('dailyActivity: $dailyActivity, ')
           ..write('goalMode: $goalMode, ')
           ..write('unitSystem: $unitSystem, ')
@@ -2576,6 +2629,18 @@ class $TargetsHistoryTable extends TargetsHistory
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _profileRevisionMeta = const VerificationMeta(
+    'profileRevision',
+  );
+  @override
+  late final GeneratedColumn<int> profileRevision = GeneratedColumn<int>(
+    'profile_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _safetyBodyFatPercentMeta =
       const VerificationMeta('safetyBodyFatPercent');
   @override
@@ -2608,6 +2673,7 @@ class $TargetsHistoryTable extends TargetsHistory
     flags,
     tdeeKcal,
     tdeeSigmaKcal,
+    profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
   ];
@@ -2700,6 +2766,15 @@ class $TargetsHistoryTable extends TargetsHistory
     } else if (isInserting) {
       context.missing(_tdeeSigmaKcalMeta);
     }
+    if (data.containsKey('profile_revision')) {
+      context.handle(
+        _profileRevisionMeta,
+        profileRevision.isAcceptableOrUnknown(
+          data['profile_revision']!,
+          _profileRevisionMeta,
+        ),
+      );
+    }
     if (data.containsKey('safety_body_fat_percent')) {
       context.handle(
         _safetyBodyFatPercentMeta,
@@ -2760,6 +2835,10 @@ class $TargetsHistoryTable extends TargetsHistory
         DriftSqlType.double,
         data['${effectivePrefix}tdee_sigma_kcal'],
       )!,
+      profileRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_revision'],
+      )!,
       safetyBodyFatPercent: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}safety_body_fat_percent'],
@@ -2798,6 +2877,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
   final double tdeeKcal;
   final double tdeeSigmaKcal;
 
+  /// Added in schema version 4 (MM-83); older rows read as 0.
+  final int profileRevision;
+
   /// Added in schema version 3 (MM-132); null on older rows.
   final double? safetyBodyFatPercent;
   final TdeeStatus tdeeStatus;
@@ -2812,6 +2894,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     required this.flags,
     required this.tdeeKcal,
     required this.tdeeSigmaKcal,
+    required this.profileRevision,
     this.safetyBodyFatPercent,
     required this.tdeeStatus,
   });
@@ -2832,6 +2915,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     map['flags'] = Variable<String>(flags);
     map['tdee_kcal'] = Variable<double>(tdeeKcal);
     map['tdee_sigma_kcal'] = Variable<double>(tdeeSigmaKcal);
+    map['profile_revision'] = Variable<int>(profileRevision);
     if (!nullToAbsent || safetyBodyFatPercent != null) {
       map['safety_body_fat_percent'] = Variable<double>(safetyBodyFatPercent);
     }
@@ -2855,6 +2939,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       flags: Value(flags),
       tdeeKcal: Value(tdeeKcal),
       tdeeSigmaKcal: Value(tdeeSigmaKcal),
+      profileRevision: Value(profileRevision),
       safetyBodyFatPercent: safetyBodyFatPercent == null && nullToAbsent
           ? const Value.absent()
           : Value(safetyBodyFatPercent),
@@ -2882,6 +2967,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       flags: serializer.fromJson<String>(json['flags']),
       tdeeKcal: serializer.fromJson<double>(json['tdeeKcal']),
       tdeeSigmaKcal: serializer.fromJson<double>(json['tdeeSigmaKcal']),
+      profileRevision: serializer.fromJson<int>(json['profileRevision']),
       safetyBodyFatPercent: serializer.fromJson<double?>(
         json['safetyBodyFatPercent'],
       ),
@@ -2906,6 +2992,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       'flags': serializer.toJson<String>(flags),
       'tdeeKcal': serializer.toJson<double>(tdeeKcal),
       'tdeeSigmaKcal': serializer.toJson<double>(tdeeSigmaKcal),
+      'profileRevision': serializer.toJson<int>(profileRevision),
       'safetyBodyFatPercent': serializer.toJson<double?>(safetyBodyFatPercent),
       'tdeeStatus': serializer.toJson<String>(
         $TargetsHistoryTable.$convertertdeeStatus.toJson(tdeeStatus),
@@ -2924,6 +3011,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     String? flags,
     double? tdeeKcal,
     double? tdeeSigmaKcal,
+    int? profileRevision,
     Value<double?> safetyBodyFatPercent = const Value.absent(),
     TdeeStatus? tdeeStatus,
   }) => TargetsRow(
@@ -2937,6 +3025,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     flags: flags ?? this.flags,
     tdeeKcal: tdeeKcal ?? this.tdeeKcal,
     tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
+    profileRevision: profileRevision ?? this.profileRevision,
     safetyBodyFatPercent: safetyBodyFatPercent.present
         ? safetyBodyFatPercent.value
         : this.safetyBodyFatPercent,
@@ -2960,6 +3049,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       tdeeSigmaKcal: data.tdeeSigmaKcal.present
           ? data.tdeeSigmaKcal.value
           : this.tdeeSigmaKcal,
+      profileRevision: data.profileRevision.present
+          ? data.profileRevision.value
+          : this.profileRevision,
       safetyBodyFatPercent: data.safetyBodyFatPercent.present
           ? data.safetyBodyFatPercent.value
           : this.safetyBodyFatPercent,
@@ -2982,6 +3074,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           ..write('flags: $flags, ')
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
+          ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
           ..write(')'))
@@ -3000,6 +3093,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     flags,
     tdeeKcal,
     tdeeSigmaKcal,
+    profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
   );
@@ -3017,6 +3111,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           other.flags == this.flags &&
           other.tdeeKcal == this.tdeeKcal &&
           other.tdeeSigmaKcal == this.tdeeSigmaKcal &&
+          other.profileRevision == this.profileRevision &&
           other.safetyBodyFatPercent == this.safetyBodyFatPercent &&
           other.tdeeStatus == this.tdeeStatus);
 }
@@ -3032,6 +3127,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   final Value<String> flags;
   final Value<double> tdeeKcal;
   final Value<double> tdeeSigmaKcal;
+  final Value<int> profileRevision;
   final Value<double?> safetyBodyFatPercent;
   final Value<TdeeStatus> tdeeStatus;
   const TargetsHistoryCompanion({
@@ -3045,6 +3141,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.flags = const Value.absent(),
     this.tdeeKcal = const Value.absent(),
     this.tdeeSigmaKcal = const Value.absent(),
+    this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     this.tdeeStatus = const Value.absent(),
   });
@@ -3059,6 +3156,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.flags = const Value.absent(),
     required double tdeeKcal,
     required double tdeeSigmaKcal,
+    this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     required TdeeStatus tdeeStatus,
   }) : mode = Value(mode),
@@ -3081,6 +3179,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Expression<String>? flags,
     Expression<double>? tdeeKcal,
     Expression<double>? tdeeSigmaKcal,
+    Expression<int>? profileRevision,
     Expression<double>? safetyBodyFatPercent,
     Expression<String>? tdeeStatus,
   }) {
@@ -3096,6 +3195,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       if (flags != null) 'flags': flags,
       if (tdeeKcal != null) 'tdee_kcal': tdeeKcal,
       if (tdeeSigmaKcal != null) 'tdee_sigma_kcal': tdeeSigmaKcal,
+      if (profileRevision != null) 'profile_revision': profileRevision,
       if (safetyBodyFatPercent != null)
         'safety_body_fat_percent': safetyBodyFatPercent,
       if (tdeeStatus != null) 'tdee_status': tdeeStatus,
@@ -3113,6 +3213,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Value<String>? flags,
     Value<double>? tdeeKcal,
     Value<double>? tdeeSigmaKcal,
+    Value<int>? profileRevision,
     Value<double?>? safetyBodyFatPercent,
     Value<TdeeStatus>? tdeeStatus,
   }) {
@@ -3127,6 +3228,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       flags: flags ?? this.flags,
       tdeeKcal: tdeeKcal ?? this.tdeeKcal,
       tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
+      profileRevision: profileRevision ?? this.profileRevision,
       safetyBodyFatPercent: safetyBodyFatPercent ?? this.safetyBodyFatPercent,
       tdeeStatus: tdeeStatus ?? this.tdeeStatus,
     );
@@ -3167,6 +3269,9 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     if (tdeeSigmaKcal.present) {
       map['tdee_sigma_kcal'] = Variable<double>(tdeeSigmaKcal.value);
     }
+    if (profileRevision.present) {
+      map['profile_revision'] = Variable<int>(profileRevision.value);
+    }
     if (safetyBodyFatPercent.present) {
       map['safety_body_fat_percent'] = Variable<double>(
         safetyBodyFatPercent.value,
@@ -3193,6 +3298,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
           ..write('flags: $flags, ')
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
+          ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
           ..write(')'))
@@ -3449,6 +3555,7 @@ typedef $$SetupsTableCreateCompanionBuilder = SetupsCompanion Function({
   required double heightCm,
   required TrainingStatus trainingStatus,
   required int trainingDaysPerWeek,
+  Value<int> profileRevision,
   Value<DailyActivity> dailyActivity,
   required GoalMode goalMode,
   required UnitSystem unitSystem,
@@ -3471,6 +3578,7 @@ typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<double> heightCm,
   Value<TrainingStatus> trainingStatus,
   Value<int> trainingDaysPerWeek,
+  Value<int> profileRevision,
   Value<DailyActivity> dailyActivity,
   Value<GoalMode> goalMode,
   Value<UnitSystem> unitSystem,
@@ -3524,6 +3632,11 @@ class $$SetupsTableFilterComposer
 
   ColumnFilters<int> get trainingDaysPerWeek => $composableBuilder(
     column: $table.trainingDaysPerWeek,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3640,6 +3753,11 @@ class $$SetupsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get dailyActivity => $composableBuilder(
     column: $table.dailyActivity,
     builder: (column) => ColumnOrderings(column),
@@ -3745,6 +3863,11 @@ class $$SetupsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
+    builder: (column) => column,
+  );
+
   GeneratedColumnWithTypeConverter<DailyActivity, String> get dailyActivity =>
       $composableBuilder(
         column: $table.dailyActivity,
@@ -3844,6 +3967,7 @@ class $$SetupsTableTableManager
                 Value<double> heightCm = const Value.absent(),
                 Value<TrainingStatus> trainingStatus = const Value.absent(),
                 Value<int> trainingDaysPerWeek = const Value.absent(),
+                Value<int> profileRevision = const Value.absent(),
                 Value<DailyActivity> dailyActivity = const Value.absent(),
                 Value<GoalMode> goalMode = const Value.absent(),
                 Value<UnitSystem> unitSystem = const Value.absent(),
@@ -3865,6 +3989,7 @@ class $$SetupsTableTableManager
                 heightCm: heightCm,
                 trainingStatus: trainingStatus,
                 trainingDaysPerWeek: trainingDaysPerWeek,
+                profileRevision: profileRevision,
                 dailyActivity: dailyActivity,
                 goalMode: goalMode,
                 unitSystem: unitSystem,
@@ -3888,6 +4013,7 @@ class $$SetupsTableTableManager
                 required double heightCm,
                 required TrainingStatus trainingStatus,
                 required int trainingDaysPerWeek,
+                Value<int> profileRevision = const Value.absent(),
                 Value<DailyActivity> dailyActivity = const Value.absent(),
                 required GoalMode goalMode,
                 required UnitSystem unitSystem,
@@ -3909,6 +4035,7 @@ class $$SetupsTableTableManager
                 heightCm: heightCm,
                 trainingStatus: trainingStatus,
                 trainingDaysPerWeek: trainingDaysPerWeek,
+                profileRevision: profileRevision,
                 dailyActivity: dailyActivity,
                 goalMode: goalMode,
                 unitSystem: unitSystem,
@@ -4713,6 +4840,7 @@ typedef $$TargetsHistoryTableCreateCompanionBuilder =
       Value<String> flags,
       required double tdeeKcal,
       required double tdeeSigmaKcal,
+      Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       required TdeeStatus tdeeStatus,
     });
@@ -4728,6 +4856,7 @@ typedef $$TargetsHistoryTableUpdateCompanionBuilder =
       Value<String> flags,
       Value<double> tdeeKcal,
       Value<double> tdeeSigmaKcal,
+      Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       Value<TdeeStatus> tdeeStatus,
     });
@@ -4789,6 +4918,11 @@ class $$TargetsHistoryTableFilterComposer
 
   ColumnFilters<double> get tdeeSigmaKcal => $composableBuilder(
     column: $table.tdeeSigmaKcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4863,6 +4997,11 @@ class $$TargetsHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get safetyBodyFatPercent => $composableBuilder(
     column: $table.safetyBodyFatPercent,
     builder: (column) => ColumnOrderings(column),
@@ -4916,6 +5055,11 @@ class $$TargetsHistoryTableAnnotationComposer
 
   GeneratedColumn<double> get tdeeSigmaKcal => $composableBuilder(
     column: $table.tdeeSigmaKcal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get profileRevision => $composableBuilder(
+    column: $table.profileRevision,
     builder: (column) => column,
   );
 
@@ -4974,6 +5118,7 @@ class $$TargetsHistoryTableTableManager
                 Value<String> flags = const Value.absent(),
                 Value<double> tdeeKcal = const Value.absent(),
                 Value<double> tdeeSigmaKcal = const Value.absent(),
+                Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 Value<TdeeStatus> tdeeStatus = const Value.absent(),
               }) => TargetsHistoryCompanion(
@@ -4987,6 +5132,7 @@ class $$TargetsHistoryTableTableManager
                 flags: flags,
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
+                profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
               ),
@@ -5002,6 +5148,7 @@ class $$TargetsHistoryTableTableManager
                 Value<String> flags = const Value.absent(),
                 required double tdeeKcal,
                 required double tdeeSigmaKcal,
+                Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 required TdeeStatus tdeeStatus,
               }) => TargetsHistoryCompanion.insert(
@@ -5015,6 +5162,7 @@ class $$TargetsHistoryTableTableManager
                 flags: flags,
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
+                profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
               ),
