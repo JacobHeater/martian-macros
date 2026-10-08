@@ -1,6 +1,6 @@
 ---
 id: MM-143
-status: proposed
+status: done
 component: coach-insights
 related: [MM-137, MM-18, MM-19, MM-23, MM-25, MM-26, MM-28, MM-29, MM-96, MM-108, MM-121, MM-128, MM-132, MM-135, MM-141]
 ---
@@ -82,3 +82,16 @@ Scenario: Reviewed
   25% for the energy floor, MM-28); whether Mifflin-St Jeor is the right starting formula for users who supply a body-fat figure (a
   fat-free-mass formula such as Cunningham or Katch-McArdle is generally closer in lean, muscular people); the 0.5 halving of lean loss
   for trained users (MM-26).
+
+## Progress (built and verified)
+- `docs/evidence.md`: the grades (strong, moderate, emerging, judgement, and the words the app uses for each), a plain-language set of 7 questions, and a register of one row per constant or rule that decides something about a body or about safety, with value, where used, what it decides, source, grade, population and a Checked column.
+- Domain: `EvidenceRegister.parse` reads the file and throws on a malformed row or a question without a `Rows:` line (tested).
+- Engine test `evidence_register_test.dart` fails `mm check` when a `SafetyBounds` constant, a partition constant or a default in the weight-trend model or the TDEE estimator has no row, when row names repeat, when a row has an empty field, and when a question names a row that does not exist.
+- App: a **How this works** screen under Settings (About). It lists the questions; each opens the answer, the rules behind it with their grade in words, and the value, source and population one tap down. The file is shipped as `assets/evidence.md`; a test fails when it differs from `docs/evidence.md`, and `mm evidence` refreshes the copy.
+- **Not verified / not done**:
+  - Every row's Checked column is **No**. The citations are as recorded in the code and in tickets, from literature search and secondary summaries; nobody has read the primary sources against the rows. Nothing has been reviewed by a professional (MM-29).
+  - The test does not detect a *stale* row for names it does not scan (the rule functions and the coach, safety-body-fat and BMI constants are listed by hand), nor a changed value.
+  - "No explanation claims more than its row's grade" is not automated.
+  - No entry point from the Coach screen yet, only Settings.
+  - No screenshot baseline for the new screens.
+
