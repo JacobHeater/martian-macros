@@ -6,6 +6,7 @@ import 'package:mm_engine/mm_engine.dart';
 import '../format.dart';
 import '../providers.dart';
 import '../widgets.dart';
+import '../repository_role_providers.dart';
 
 /// What the engine believes, why, and what it will do next.
 class CoachScreen extends ConsumerWidget {
@@ -145,7 +146,9 @@ class CoachScreen extends ConsumerWidget {
       ),
     );
     if (chosen != null && chosen != setup.goalMode) {
-      await ref.read(storeProvider).saveSetup(setup.copyWith(goalMode: chosen));
+      await ref
+          .read(setupWriterProvider)
+          .saveSetup(setup.copyWith(goalMode: chosen));
     }
   }
 }

@@ -11,6 +11,7 @@ const _packages = <({String path, bool flutter})>[
   (path: 'packages/domain', flutter: false),
   (path: 'packages/engine', flutter: false),
   (path: 'packages/data', flutter: false),
+  (path: 'packages/fixtures', flutter: false),
   (path: 'apps/mobile', flutter: true),
   (path: 'tool', flutter: false),
 ];

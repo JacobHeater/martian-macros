@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import '../format.dart';
 import '../providers.dart';
+import '../repository_role_providers.dart';
 
 /// Logs one food by its macros. Recent foods refill the form in one tap.
 /// (Database search and barcode scanning arrive with the food pack.)
@@ -81,7 +82,7 @@ class _AddFoodSheetState extends ConsumerState<AddFoodSheet> {
 
   Future<void> _save() async {
     await ref
-        .read(storeProvider)
+        .read(foodEntryWriterProvider)
         .addFood(
           FoodEntry(
             id: 0,

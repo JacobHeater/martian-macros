@@ -24,8 +24,8 @@ void main() {
   tearDown(() => dir.deleteSync(recursive: true));
 
   Future<void> writeVersion1Data() async {
-    final store = MmStore(AppDatabase(NativeDatabase(file)));
-    await store.saveSetup(
+    final repos = DriftRepositories(AppDatabase(NativeDatabase(file)));
+    await repos.setup.saveSetup(
       UserSetup(
         profile: Profile(
           sex: BiologicalSex.female,
@@ -39,8 +39,8 @@ void main() {
         onboardedOn: day,
       ),
     );
-    await store.saveWeight(day, 64.2);
-    await store.addFood(
+    await repos.weights.saveWeight(day, 64.2);
+    await repos.food.addFood(
       FoodEntry(
         id: 0,
         date: day,
@@ -53,16 +53,16 @@ void main() {
         source: QuantitySource.labelServing,
       ),
     );
-    await store.close();
+    await repos.close();
   }
 
   Future<void> expectVersion1DataIntact(AppDatabase db) async {
-    final store = MmStore(db);
-    final setup = await store.loadSetup();
+    final repos = DriftRepositories(db);
+    final setup = await repos.setup.loadSetup();
     expect(setup!.profile.sex, BiologicalSex.female);
     expect(setup.screening.thyroidCondition, isTrue);
-    expect((await store.watchWeights().first).single.weightKg, 64.2);
-    expect((await store.watchFood(day).first).single.name, 'Rice bowl');
+    expect((await repos.weights.watchWeights().first).single.weightKg, 64.2);
+    expect((await repos.food.watchFood(day).first).single.name, 'Rice bowl');
   }
 
   Future<int> userVersion(AppDatabase db) async =>

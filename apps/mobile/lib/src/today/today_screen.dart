@@ -8,6 +8,7 @@ import '../providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../widgets.dart';
 import 'add_food_sheet.dart';
+import '../repository_role_providers.dart';
 
 /// The day shown on the Today tab; null follows the real current day.
 final selectedDayProvider = NotifierProvider<SelectedDay, CalendarDate?>(
@@ -90,7 +91,7 @@ class TodayScreen extends ConsumerWidget {
                     if (completeness != DayCompleteness.unmarked) completeness,
                   },
                   onSelectionChanged: (s) => ref
-                      .read(storeProvider)
+                      .read(dayMarkWriterProvider)
                       .setCompleteness(
                         day,
                         s.isEmpty ? DayCompleteness.unmarked : s.first,
@@ -294,7 +295,8 @@ class _MealSection extends ConsumerWidget {
                 padding: const EdgeInsets.only(right: 16),
                 child: Icon(Icons.delete_outline, color: context.mm.danger),
               ),
-              onDismissed: (_) => ref.read(storeProvider).deleteFood(e.id),
+              onDismissed: (_) =>
+                  ref.read(foodEntryWriterProvider).deleteFood(e.id),
               child: ListTile(
                 dense: true,
                 title: Text(e.name),

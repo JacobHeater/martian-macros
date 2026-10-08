@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import '../format.dart';
 import '../providers.dart';
+import '../repository_role_providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -12,7 +13,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final setup = ref.watch(setupProvider).value;
     if (setup == null) return const Scaffold();
-    final store = ref.read(storeProvider);
+    final setupWriter = ref.read(setupWriterProvider);
     final today = ref.watch(todayProvider);
     final profile = setup.profile;
     final fmt = Fmt(setup.unitSystem);
@@ -38,7 +39,7 @@ class SettingsScreen extends ConsumerWidget {
               ],
               selected: {setup.unitSystem},
               onSelectionChanged: (s) =>
-                  store.saveSetup(setup.copyWith(unitSystem: s.first)),
+                  setupWriter.saveSetup(setup.copyWith(unitSystem: s.first)),
             ),
           ),
           const _Header('Training'),
@@ -48,7 +49,7 @@ class SettingsScreen extends ConsumerWidget {
             trailing: PopupMenuButton<TrainingStatus>(
               icon: const Icon(Icons.edit_outlined),
               onSelected: (s) =>
-                  store.saveSetup(setup.copyWith(trainingStatus: s)),
+                  setupWriter.saveSetup(setup.copyWith(trainingStatus: s)),
               itemBuilder: (_) => [
                 for (final s in TrainingStatus.values)
                   PopupMenuItem(value: s, child: Text(s.label)),
@@ -61,7 +62,7 @@ class SettingsScreen extends ConsumerWidget {
               value: setup.trainingDaysPerWeek.toDouble(),
               max: 7,
               divisions: 7,
-              onChanged: (v) => store.saveSetup(
+              onChanged: (v) => setupWriter.saveSetup(
                 setup.copyWith(trainingDaysPerWeek: v.round()),
               ),
             ),
@@ -77,7 +78,7 @@ class SettingsScreen extends ConsumerWidget {
               'Enter one only if you have a recent measurement.',
             ),
             value: setup.bodyFatPercent != null,
-            onChanged: (on) => store.saveSetup(
+            onChanged: (on) => setupWriter.saveSetup(
               setup.copyWith(bodyFatPercent: () => on ? 25 : null),
             ),
           ),
@@ -88,7 +89,7 @@ class SettingsScreen extends ConsumerWidget {
               max: 55,
               divisions: 50,
               label: '${setup.bodyFatPercent!.round()}%',
-              onChanged: (v) => store.saveSetup(
+              onChanged: (v) => setupWriter.saveSetup(
                 setup.copyWith(bodyFatPercent: () => v.roundToDouble()),
               ),
             ),
@@ -156,7 +157,7 @@ class SettingsScreen extends ConsumerWidget {
     );
     if (confirmed != true || !context.mounted) return;
     Navigator.of(context).pop();
-    await ref.read(storeProvider).wipe();
+    await ref.read(dataEraserProvider).eraseAll();
   }
 }
 
