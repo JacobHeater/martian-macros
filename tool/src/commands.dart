@@ -28,6 +28,7 @@ final _commands = <String, (String, Command)>{
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
   'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
+  'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
   'gen': ('Run code generation in packages that use build_runner', _gen),
@@ -162,6 +163,31 @@ Future<int> _test(Toolchain tc, List<String> args) async {
     if (code != 0) failed++;
   }
   return failed == 0 ? 0 : 1;
+}
+
+/// Runs the screenshot tests, or regenerates their images with `--update`.
+///
+/// The images are generated on one platform only, Linux (CI), because text
+/// renders differently on each operating system (MM-105). Elsewhere this
+/// explains how to get them instead of producing images that would not match.
+Future<int> _goldens(Toolchain tc, List<String> args) async {
+  if (!Platform.isLinux && !args.contains('--force')) {
+    stdout.writeln(
+      'Screenshot tests run on Linux only (text renders differently on each '
+      'operating system).\n'
+      'To update the images, run the "Update goldens" workflow on GitHub '
+      '(Actions tab), download its artifact and commit the images; CI runs '
+      'the comparison on every pull request.',
+    );
+    return 0;
+  }
+  return tc.flutter([
+    'test',
+    '--timeout',
+    _testTimeout,
+    'test/goldens',
+    if (args.contains('--update')) '--update-goldens',
+  ], inDir: 'apps/mobile');
 }
 
 Future<int> _analyze(Toolchain tc, List<String> args) =>

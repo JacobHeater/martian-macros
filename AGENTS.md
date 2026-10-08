@@ -100,6 +100,10 @@ PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
   `mm test packages/engine`.
 - `mm analyze` for static analysis.
 - `mm format --check` to verify formatting.
+- `mm goldens` runs the screenshot tests (Linux only; CI runs them in `mm check`).
+  When a change alters how a screen looks, run the **Update goldens** workflow
+  (or push a branch named `update-goldens/<name>`), commit the images it
+  produces, and let the pull request show them.
 - `mm check` before considering a change complete; it runs the CI checks
   across the workspace.
 
