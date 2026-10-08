@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
-import '../format/fmt.dart';
 import '../format/daily_activity_label.dart';
 import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
@@ -19,6 +18,7 @@ import '../ui/mm_segmented.dart';
 import '../ui/mm_slider.dart';
 import '../ui/mm_switch_row.dart';
 import '../ui/show_mm_confirm.dart';
+import 'profile_section.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -29,14 +29,6 @@ class SettingsScreen extends ConsumerWidget {
     if (setup == null) return const Scaffold();
     final setupWriter = ref.read(setupWriterProvider);
     final env = ref.watch(appEnvProvider);
-    final today = ref.watch(todayProvider);
-    final profile = setup.profile;
-    final fmt = Fmt(setup.unitSystem);
-    final height = fmt.imperial
-        ? '${Units.cmToInches(profile.heightCm) ~/ 12}′ '
-              '${(Units.cmToInches(profile.heightCm) % 12).round()}″'
-        : '${profile.heightCm.round()} cm';
-
     return Scaffold(
       appBar: const MmAppBar(title: 'Settings'),
       body: ListView(
@@ -128,15 +120,7 @@ class SettingsScreen extends ConsumerWidget {
                 setup.copyWith(bodyFatPercent: () => v.roundToDouble()),
               ),
             ),
-          const GroupHeader('Profile'),
-          MmListRow(
-            title: 'Biological sex',
-            trailing: Text(
-              profile.sex == BiologicalSex.male ? 'Male' : 'Female',
-            ),
-          ),
-          MmListRow(title: 'Age', trailing: Text('${profile.ageOn(today)}')),
-          MmListRow(title: 'Height', trailing: Text(height)),
+          const ProfileSection(),
           const GroupHeader('Data'),
           const MmListRow(
             leadingIcon: Icons.lock_outline,

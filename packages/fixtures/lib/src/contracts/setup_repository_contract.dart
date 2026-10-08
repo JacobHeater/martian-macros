@@ -40,6 +40,13 @@ void setupRepositoryContract(String name, SetupRepository Function() create) {
       expect((await repo.loadSetup())!.dailyActivity, DailyActivity.light);
     });
 
+    test('keeps the profile revision', () async {
+      await repo.saveSetup(typicalSetup().copyWith(profileRevision: 3));
+      expect((await repo.loadSetup())!.profileRevision, 3);
+      await repo.saveSetup(typicalSetup());
+      expect((await repo.loadSetup())!.profileRevision, 0);
+    });
+
     test('keeps screening answers', () async {
       await repo.saveSetup(
         typicalSetup(

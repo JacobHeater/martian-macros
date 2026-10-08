@@ -60,14 +60,17 @@ TargetsRecord? nextTargets({
         safetyRaiseKcal: safetyRaiseKcal,
       ),
     );
+    final forcedToMaintenance =
+        targets.flags.contains(TargetFlag.underweightMaintenance) ||
+        targets.flags.contains(TargetFlag.modeNotAllowed);
     return TargetsRecord(
       effectiveFrom: today,
-      // A deficit ended by low body weight is stored as the maintenance it
-      // became; the app also moves the user's goal there, so it does not
-      // resume by itself when weight recovers (MM-111).
-      mode: targets.flags.contains(TargetFlag.underweightMaintenance)
-          ? GoalMode.maintenance
-          : setup.goalMode,
+      profileRevision: setup.profileRevision,
+      // A goal the policy no longer allows (low body weight, MM-111; a health
+      // check answer, MM-83) is stored as the maintenance it became; the app
+      // also moves the user's goal there, so it does not resume by itself
+      // when the reason goes away.
+      mode: forcedToMaintenance ? GoalMode.maintenance : setup.goalMode,
       tdeeKcal: snapshot.tdee.kcal,
       tdeeSigmaKcal: snapshot.tdee.sigmaKcal,
       tdeeStatus: snapshot.tdee.status,
@@ -79,12 +82,21 @@ TargetsRecord? nextTargets({
   if (history.isEmpty) return build();
   final last = history.last;
   // A goal change applies at once. Not when the last record already holds the
-  // user at maintenance because their weight is too low for the goal they
-  // still have stored (the app then moves the goal itself, MM-111).
-  final heldForLowWeight =
-      last.targets.flags.contains(TargetFlag.underweightMaintenance) &&
+  // user at maintenance because their weight or health check rules out the
+  // goal they still have stored (the app then moves the goal itself,
+  // MM-111, MM-83).
+  final heldAtMaintenance =
+      (last.targets.flags.contains(TargetFlag.underweightMaintenance) ||
+          last.targets.flags.contains(TargetFlag.modeNotAllowed)) &&
       !snapshot.policy.allowedModes.contains(setup.goalMode);
-  if (last.mode != setup.goalMode && !heldForLowWeight) return build();
+  if (last.mode != setup.goalMode && !heldAtMaintenance) return build();
+
+  // A corrected sex, date of birth, height or health check: the old targets
+  // were made for someone else, so new ones start now, without the weekly
+  // step limit (MM-83).
+  if (setup.profileRevision != last.profileRevision) {
+    return build(deficitWeeks: consecutiveDeficitWeeks(history, today));
+  }
 
   // A body-fat estimate that has moved leaner, say because the user corrected
   // it in Settings, applies the stricter limits at once; one that moved

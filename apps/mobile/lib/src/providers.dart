@@ -101,9 +101,11 @@ final checkInProvider = Provider<void>((ref) {
   if (next == null) return;
   // Targets first: the goal change below re-runs this provider.
   final saved = ref.read(targetsHistoryWriterProvider).saveTargets(next);
-  if (next.targets.flags.contains(TargetFlag.underweightMaintenance)) {
-    // Low body weight ended the deficit: make maintenance the user's goal, so
-    // a deficit does not resume by itself when weight recovers (MM-111).
+  if (next.mode == GoalMode.maintenance &&
+      setup.goalMode != GoalMode.maintenance) {
+    // Low body weight (MM-111) or a health check answer (MM-83) ruled the
+    // goal out: make maintenance the user's goal, so a deficit does not
+    // resume by itself when the reason goes away.
     saved.then(
       (_) => ref
           .read(setupWriterProvider)

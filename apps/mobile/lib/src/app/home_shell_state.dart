@@ -58,7 +58,6 @@ class HomeShellState extends ConsumerState<HomeShell>
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(checkInProvider);
     final destination = ref.watch(homeTabProvider);
 
     return Scaffold(
