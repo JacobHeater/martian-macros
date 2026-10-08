@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format.dart';
 import '../providers.dart';
+import '../theme/mm_colors_context.dart';
 import '../widgets.dart';
 import 'add_food_sheet.dart';
 
@@ -165,6 +166,7 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final mm = context.mm;
     final t = targets;
     final remaining = t == null ? null : t.kcal - intake.kcal;
     return Card(
@@ -208,11 +210,11 @@ class _SummaryCard extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                _Macro('Protein', intake.proteinG, t?.proteinG, scheme.primary),
+                _Macro('Protein', intake.proteinG, t?.proteinG, mm.protein),
                 const SizedBox(width: 12),
-                _Macro('Carbs', intake.carbsG, t?.carbsG, scheme.tertiary),
+                _Macro('Carbs', intake.carbsG, t?.carbsG, mm.carbs),
                 const SizedBox(width: 12),
-                _Macro('Fat', intake.fatG, t?.fatG, scheme.secondary),
+                _Macro('Fat', intake.fatG, t?.fatG, mm.fat),
               ],
             ),
           ],
@@ -287,10 +289,10 @@ class _MealSection extends ConsumerWidget {
               key: ValueKey(e.id),
               direction: DismissDirection.endToStart,
               background: Container(
-                color: Theme.of(context).colorScheme.errorContainer,
+                color: context.mm.sunken,
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 16),
-                child: const Icon(Icons.delete_outline),
+                child: Icon(Icons.delete_outline, color: context.mm.danger),
               ),
               onDismissed: (_) => ref.read(storeProvider).deleteFood(e.id),
               child: ListTile(
