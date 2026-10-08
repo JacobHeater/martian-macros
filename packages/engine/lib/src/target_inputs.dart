@@ -18,6 +18,7 @@ final class TargetInputs {
     this.previous,
     this.consecutiveDeficitWeeks = 0,
     this.requestedLossFraction,
+    this.safetyBodyFatPercent,
     this.safetyRaiseKcal = 0,
   });
 
@@ -44,6 +45,11 @@ final class TargetInputs {
   /// Fat-loss pace chosen by the user (positive fraction per week, e.g.
   /// 0.0075). Clamped to the safety maximum. Defaults to 0.75%.
   final double? requestedLossFraction;
+
+  /// The body-fat figure the safety thresholds (loss limit, protein rule,
+  /// energy-availability floor) are applied to, from `safetyBodyFatPercent`.
+  /// Null: the cautious value of [bodyFat] with no memory of last week.
+  final double? safetyBodyFatPercent;
 
   /// Added to last week's target even beyond the weekly step limit, because
   /// the user is losing faster than the safe pace (`lossSafetyRaiseKcal`).

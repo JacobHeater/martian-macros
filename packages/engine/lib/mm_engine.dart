@@ -23,6 +23,7 @@ export 'src/partition.dart';
 export 'src/protein_range.dart';
 export 'src/recommend_mode.dart';
 export 'src/resting_energy_equations.dart';
+export 'src/safety_body_fat.dart';
 export 'src/safety_bounds.dart';
 export 'src/settling_shift.dart';
 export 'src/settling_window.dart';

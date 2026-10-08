@@ -1,6 +1,6 @@
 ---
 id: MM-132
-status: proposed
+status: done
 component: adaptive-coach
 related: [MM-12, MM-22, MM-28, MM-34, MM-82, MM-111, MM-120, MM-121, MM-128, MM-133, MM-139, MM-143]
 ---
@@ -91,3 +91,19 @@ Scenario: The recommendation admits it
   is why 27% fails and 29% passes.
 - The thresholds themselves are product judgement (MM-12, MM-28) and go to MM-29. This ticket is only about applying them to an uncertain
   number.
+
+## Progress (built and verified)
+- `packages/engine/lib/src/safety_body_fat.dart`: `cautiousBodyFatPercent` (the estimate less 0.6745 of its deviations, which is the same as "a quarter chance of being at or under the threshold"), `safetyBodyFatPercent` (that figure held against moves of 2 points or less from the last check-in's), and `bodyFatClearlyAbove` (a three-quarters chance of being over a line).
+- The loss limit, the protein rule and the energy-availability floor in `computeTargets`, and the limit in the fast-loss raise (MM-115), now use the cautious figure. The goal recommendation and the recomp pace keep the point estimate.
+- Uncertainty: formula 5 points (as before), the user's own figure 4 (was 3).
+- The figure used is stored with each set of targets (`TargetsRecord.safetyBodyFatPercent`; schema version 3 adds a nullable column, migration tested from every earlier version), so the next check-in starts from it. This is what stops an estimate hovering at a threshold from flipping a rule.
+- A correction toward leaner (more than 2 points under the stored figure) applies the stricter limits at once, ahead of the weekly check-in; toward fatter waits for it.
+- The goal recommendation says body fat is an estimate that can be off by a few points either way.
+- Tests: every scenario in the criteria (plausibly lean at 18%, clearly not lean at 26%, a better measurement, no flipping across 18.0, 18.6, 18.2, 18.9 and a counter-test showing it flips without the hold, faster needs to be clear at 27% and 29%, correcting toward leaner or fatter), the stored figure through the Drift and in-memory repositories, and the recommendation wording.
+- **Deviations**
+  - The hold is a dead band of 2 points around the figure last used, not "2 points past the threshold the other way". It is simpler, needs no list of thresholds, and cannot flip on a small move; the cost is that a user who keeps drifting leaner or fatter by under 2 points stays on the old figure until the drift passes 2.
+  - "At least what the smoothed lean rule in MM-121 gives at 15%": MM-121 is not built, so the test compares with the current lean rule at 15%.
+  - Whether "Faster" is offered (MM-128) is not built; the rule it needs (`bodyFatClearlyAbove`) is, and tested.
+  - The announcement of a change at a threshold waits for MM-138.
+- **Cost, as the ticket says**: users near a threshold with only a formula estimate get slower limits and higher protein than their true body fat might warrant.
+- **Not verified**: real users; the effect of the larger own-figure uncertainty on users who enter a measurement (their limits relax later than before).

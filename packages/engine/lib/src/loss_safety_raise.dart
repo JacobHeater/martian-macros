@@ -30,6 +30,7 @@ double lossSafetyRaiseKcal({
   required List<TargetsRecord> history,
   required BiologicalSex sex,
   required BodyFatEstimate bodyFat,
+  required double safetyBodyFatPercent,
   required bool resistanceTrained,
 }) {
   if (trend.isEmpty) return 0;
@@ -45,7 +46,7 @@ double lossSafetyRaiseKcal({
   if (weighIns < safetyRaiseMinWeighIns) return 0;
 
   final level = last.levelKg;
-  final limit = SafetyBounds.maxWeeklyLossFraction(sex, bodyFat.percent);
+  final limit = SafetyBounds.maxWeeklyLossFraction(sex, safetyBodyFatPercent);
   final loss = -last.slopeKgPerDay * 7 / level;
   final sigma = math.sqrt(last.slopeVariance) * 7 / level;
   if (loss - safetyRaiseSigmas * sigma <= limit) return 0;

@@ -116,8 +116,9 @@ is changing.
   MM-27, MM-28 (estimate, check-in, goals, partition, partial days, limits);
   MM-30 (simulator); MM-31 (diet break as built); MM-120, MM-131 (reference
   weight, settling after a phase change); MM-115 (raise when loss outruns the
-  limit); MM-111 (underweight guard).
-- Remaining: MM-132, MM-135, MM-35. Epics: MM-22, MM-110.
+  limit); MM-111 (underweight guard); MM-132 (body-fat thresholds under
+  uncertainty).
+- Remaining: MM-135, MM-35. Epics: MM-22, MM-110.
 
 ## Notes for whoever builds it
 - Simulator changes are additive and default off. A simulated user created

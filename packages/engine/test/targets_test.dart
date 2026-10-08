@@ -206,7 +206,8 @@ void main() {
     });
 
     test('caps the requested loss pace at the safety maximum', () {
-      final t = computeTargets(inputs(bodyFat: 13, requestedLoss: 0.01));
+      // 14.5% with a 2-point deviation is clearly in the 12% to 15% band.
+      final t = computeTargets(inputs(bodyFat: 14.5, requestedLoss: 0.01));
       expect(t.weeklyRateFraction, -0.007);
     });
 
