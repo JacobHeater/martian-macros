@@ -45,6 +45,9 @@ requirements, and [docs/architecture.md](docs/architecture.md).
 - After changing a database schema or other generated source, use `mm gen` and
   include the resulting generated changes when appropriate; do not hand-edit
   generated output.
+- A change to any table bumps `AppDatabase.currentSchemaVersion` by one, adds
+  the step to `migrationSteps`, and runs `mm schema` to export the snapshot.
+  Only one schema change is in flight at a time (see `roadmap/README.md`).
 
 ## Validation
 

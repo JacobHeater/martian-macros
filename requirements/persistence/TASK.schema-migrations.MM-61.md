@@ -1,6 +1,6 @@
 ---
 id: MM-61
-status: proposed
+status: done
 component: persistence
 related: [MM-59, MM-60, MM-45, MM-63]
 ---
@@ -41,6 +41,17 @@ Scenario: A forgotten bump
   Then a test fails
 ```
 
-## Notes
+## Notes (built and verified)
+- `AppDatabase.migration` in `packages/data/lib/src/database.dart`: one step per version in `migrationSteps`, all steps in one
+  transaction, `SchemaMigrationException` on failure with a message that says the data is safe. `mm schema` exports the snapshot for
+  the current version to `packages/data/drift_schemas/` and regenerates the test helpers in `test/generated_migrations/`; it refuses to
+  replace an existing snapshot.
+- Tests in `packages/data/test/migration_test.dart`. The schema is still at version 1, so the upgrade, multi-step, failure,
+  missing-step and newer-data cases run against a test-only later version that adds a column. The forgotten-bump test was checked by
+  adding a column without a bump: it failed with "unexpected entries", and the change was reverted.
+- **A database written by a newer app is refused** (not in the original description; needed for restore, MM-63).
+- **Not verified**: the error on a device. The app's existing "Could not open your data" screen prints the exception, which carries
+  the message; nobody has seen it there. The first real migration (version 1 to 2) will be the first use on real data.
+- The rule for contributors is in `AGENTS.md` and the roadmap README's schema lane.
 - A backup made by an older version must restore into a newer app (MM-63): restoring is opening an old database, so it uses these same
   migrations.

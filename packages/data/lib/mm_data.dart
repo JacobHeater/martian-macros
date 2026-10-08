@@ -2,5 +2,6 @@
 /// executor and talks to it only through [MmStore].
 library;
 
-export 'src/database.dart' show AppDatabase;
+export 'src/database.dart'
+    show AppDatabase, MigrationStep, SchemaMigrationException;
 export 'src/store.dart';

@@ -120,6 +120,61 @@ class TargetsHistory extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
+  /// Bump this with every change to a table, add the step to
+  /// [migrationSteps], and run `mm schema` to export the new snapshot.
+  static const currentSchemaVersion = 1;
+
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => currentSchemaVersion;
+
+  /// One step per released version, keyed by the version it upgrades
+  /// *from*. Step `n` takes a database at version `n` to version `n + 1`.
+  /// Overridden only by tests.
+  Map<int, MigrationStep> get migrationSteps => const {};
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from > to) throw SchemaMigrationException.newerData(from, to);
+      try {
+        // All steps or none: a failure leaves the database at `from`.
+        await transaction(() async {
+          for (var version = from; version < to; version++) {
+            final step = migrationSteps[version];
+            if (step == null) {
+              throw StateError('No migration from schema version $version.');
+            }
+            await step(m);
+          }
+        });
+      } catch (cause) {
+        throw SchemaMigrationException(from, to, cause);
+      }
+    },
+  );
+}
+
+/// Upgrades the schema by exactly one version.
+typedef MigrationStep = Future<void> Function(Migrator m);
+
+/// The stored database could not be brought to the current schema. The
+/// upgrade ran in a transaction, so the stored data is unchanged.
+final class SchemaMigrationException implements Exception {
+  SchemaMigrationException(this.from, this.to, this.cause);
+
+  /// The data was written by a newer version of the app than this one.
+  SchemaMigrationException.newerData(this.from, this.to) : cause = null;
+
+  final int from;
+  final int to;
+  final Object? cause;
+
+  @override
+  String toString() => cause == null
+      ? 'This data was saved by a newer version of the app (data version '
+            '$from, app version $to). Your data is safe and unchanged. '
+            'Update the app to open it.'
+      : 'Your data is safe and unchanged, but it could not be upgraded '
+            'from version $from to version $to. Cause: $cause';
 }

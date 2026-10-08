@@ -39,6 +39,7 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android\|ios` | Builds an app bundle or IPA (iOS requires macOS) |
 | `mm gen` | Runs `build_runner` in packages that use it |
+| `mm schema` | Exports the database schema snapshot after a `schemaVersion` bump (migration tests read it) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
 | `mm clean` | Removes build outputs |
 
