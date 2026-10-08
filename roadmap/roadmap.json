@@ -530,7 +530,7 @@
       "file": "ws-14-architecture-and-module-boundaries.md",
       "intent": "Make the code follow the product owner's engineering rules before more is built on it: one declaration per file, narrow interfaces for every repository and integration point, fixtures that let work proceed without waiting on a decision.",
       "recommendedOrder": 1,
-      "status": "not-started",
+      "status": "partially-built",
       "riskLevel": "medium",
       "parallelGroup": "PG-A",
       "dependsOn": [],
@@ -562,12 +562,13 @@
         "HS-persistence-access"
       ],
       "sourceRequirements": {
-        "built": [],
-        "remaining": [
-          "MM-159",
+        "built": [
           "MM-160",
           "MM-161",
           "MM-162"
+        ],
+        "remaining": [
+          "MM-159"
         ]
       },
       "sequence": [

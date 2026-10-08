@@ -1,6 +1,6 @@
 ---
 id: MM-161
-status: proposed
+status: done
 component: architecture
 related: [MM-159, MM-160, MM-60, MM-61, MM-62, MM-63]
 ---
@@ -56,3 +56,18 @@ Scenario: Streams behave the same
 - This is a refactor; schema and data are untouched. It does not need the schema lane.
 - `mm check` should gain a rule (in `mm arch`) that `apps/` does not import `package:drift` or `mm_data` outside the one registration file.
 - The fixtures package also serves MM-162 and the design-system gallery (MM-105): screens render from fixtures with no database.
+
+## Notes (built and verified)
+- Role interfaces in `packages/domain/lib/src/repositories/` (`WeightReader`, `WeightWriter`, `FoodDayReader`, `RecentFoodReader`, `FoodEntryWriter`, `SetupReader`, `SetupWriter`,
+  `WaistReader`/`Writer`, `DayMarkReader`/`Writer`, `IntakeReader`, `DataEraser`) with composites (`WeightRepository`, ...). The targets-history roles live in `packages/engine` because
+  `TargetsRecord` is an engine type and the domain cannot depend on the engine.
+- Drift implementations in `packages/data` (`DriftWeightRepository`, ... and `DriftRepositories`). `MmStore` is deleted. Intake is formed by one shared function, `intakeDaysFrom`, used by
+  both implementations.
+- `packages/fixtures` holds `InMemoryRepositories` and the contract suites. **The same eight suites run against the Drift and the in-memory implementations**
+  (`packages/data/test/drift_contracts_test.dart`, `packages/fixtures/test/in_memory_contracts_test.dart`). A first version of the "emits the current value first" contract raced with
+  Drift's lazy first query; the helper now waits for the first emission before writing.
+- The app's tests run the real screens on in-memory repositories with no database and no change to any screen (80 tests). Screens depend on narrow role providers
+  (`repository_role_providers.dart`); `repository_providers.dart` is the one file that knows Drift, enforced by `mm arch`.
+- **Deviations**: no `UnitOfWork` interface was added because no operation spans repositories today; add one when the first appears. Onboarding saves the first weigh-in and the setup as two
+  writes, as before (not atomic).
+- **Not verified**: the Drift implementations across a real upgrade on a device database (the migration tests use `AppDatabase` and the repositories on files).

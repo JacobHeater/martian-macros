@@ -176,9 +176,9 @@ Binding rules from the product owner (MM-159); the short form is in
 - **One implementation per control** (MM-163): reusable view parts are
   design-system components; screens never use raw Material controls.
 
-State on 2026-10-08: none of this is yet true of the code. 24 of 42 library
-files define several types, there are no interfaces, and the app depends on
-`MmStore` directly. The work to get there is workstream WS-14.
+State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
+`mm arch` enforces one declaration per file, layering and design-system use with an empty
+baseline; repositories and integration seams have fixtures and contract suites. Workstream WS-14.
 
 ## Developer experience
 

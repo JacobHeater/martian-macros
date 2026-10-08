@@ -47,7 +47,7 @@ to exactly one workstream.
 
 | Order | Id | Workstream | State on 2026-10-08 | Group |
 | --- | --- | --- | --- | --- |
-| 1 | WS-14 | [Architecture and module boundaries](ws-14-architecture-and-module-boundaries.md) | not started | A |
+| 1 | WS-14 | [Architecture and module boundaries](ws-14-architecture-and-module-boundaries.md) | built (epic open) | A |
 | 2 | WS-03 | [Design system and app shell](ws-03-design-system-and-app-shell.md) | in progress | A |
 | 3 | WS-01 | [Delivery foundations](ws-01-delivery-foundations.md) | partly built | A |
 | 4 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built | A |

@@ -1,6 +1,6 @@
 ---
 id: MM-162
-status: proposed
+status: done
 component: architecture
 related: [MM-159, MM-161, MM-51, MM-55, MM-56, MM-64, MM-67, MM-85, MM-88]
 ---
@@ -65,3 +65,13 @@ Scenario: Clock
 ## Notes
 - The real implementations stay in WS-04, WS-08, WS-11, WS-12 and WS-13. Their tickets say "implements the seam from MM-162" in place of choosing a vendor first.
 - This is the mechanism for the product owner's rule that Claude should not be blocked on decisions: where a decision (vendor, store rule) is open, the fixture is the default and the decision becomes one registration.
+
+## Notes (built and verified)
+- Delivered in `packages/domain/lib/src/integration/`: `Outcome<T>` (`Succeeded`, `NotFound`, `Unavailable`, `Denied`), `Clock` and `SystemClock`, `FoodItem`, `FoodSearch`,
+  `FoodBarcodeLookup`, `BackupReader`/`BackupWriter`/`BackupStorage`, `Entitlement`, `EntitlementStatus`, `EntitlementReader`.
+- Fixtures: `FixedClock`, `InMemoryFoodCatalog`, `InMemoryBackupStorage`, `InMemoryEntitlement`; the catalog and the storage can be scripted to fail (`failWith(Unavailable|Denied)`).
+  Contract suites for each seam (`mm_fixtures_contracts.dart`); the fixtures pass them.
+- App: `integration_providers.dart` registers `clockProvider` (the real clock) and four others that throw until a real provider is registered; `todayProvider` now reads the clock, and the app
+  tests fix the day by overriding it.
+- **Deviations**: `TrialClock` and `ReminderScheduler` were not added (nothing needs them yet). Health sources are MM-67's, with the same pattern.
+- **Not verified**: no real provider has been run through the contracts yet; the first one (the local food pack, MM-55) will be the real test of the food contracts.

@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../coach/coach_screen.dart';
+import '../progress/progress_screen.dart';
+import '../providers.dart';
+import '../settings/settings_screen.dart';
+import '../today/add_food_button.dart';
+import '../today/today_screen.dart';
+import '../ui/mm_app_bar.dart';
+import '../ui/mm_icon_button.dart';
+import '../ui/mm_nav_destination.dart';
+import '../ui/mm_navigation_bar.dart';
+import 'home_shell.dart';
+
+class HomeShellState extends ConsumerState<HomeShell>
+    with WidgetsBindingObserver {
+  var _index = 0;
+
+  static const _titles = ['Today', 'Progress', 'Coach'];
+  static const _destinations = [
+    MmNavDestination(
+      label: 'Today',
+      icon: Icons.restaurant_outlined,
+      selectedIcon: Icons.restaurant,
+    ),
+    MmNavDestination(label: 'Progress', icon: Icons.show_chart),
+    MmNavDestination(
+      label: 'Coach',
+      icon: Icons.insights_outlined,
+      selectedIcon: Icons.insights,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Roll the calendar day over if the app was left open overnight.
+    if (state == AppLifecycleState.resumed) ref.invalidate(todayProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(checkInProvider);
+
+    return Scaffold(
+      appBar: MmAppBar(
+        title: _titles[_index],
+        actions: [
+          MmIconButton(
+            tooltip: 'Settings',
+            icon: Icons.settings_outlined,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+            ),
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: _index,
+        children: const [TodayScreen(), ProgressScreen(), CoachScreen()],
+      ),
+      floatingActionButton: _index == 0 ? const AddFoodButton() : null,
+      bottomNavigationBar: MmNavigationBar(
+        destinations: _destinations,
+        selectedIndex: _index,
+        onSelected: (i) => setState(() => _index = i),
+      ),
+    );
+  }
+}
