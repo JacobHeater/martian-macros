@@ -37,6 +37,8 @@ extension ExplanationLineText on ExplanationLine {
       ExplanationReason.safetyRaise =>
         'You were losing faster than the app aims for at your body fat, so '
             'targets went up ($size).',
+      ExplanationReason.userHold =>
+        'You kept last week’s targets for now ($size).',
       ExplanationReason.calorieFloor =>
         'Your calorie floor is ${Fmt.kcal(to!)}; the target would otherwise '
             'be ${Fmt.kcal(from!)}.',

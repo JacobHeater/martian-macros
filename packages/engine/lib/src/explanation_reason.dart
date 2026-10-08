@@ -37,6 +37,9 @@ enum ExplanationReason {
   /// The user was losing faster than the safe pace, so calories went up.
   safetyRaise,
 
+  /// The user kept last week's targets for now.
+  userHold,
+
   /// The calorie floor held the target up.
   calorieFloor,
 
