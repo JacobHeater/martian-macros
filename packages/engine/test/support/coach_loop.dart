@@ -19,6 +19,9 @@ List<WeekResult> runCoachLoop({
   TdeeEstimator estimator = const TdeeEstimator(),
   bool settle = true,
   GoalMode Function(int week)? modeAt,
+
+  /// The body-fat estimate the engine works from; by default the formula one.
+  BodyFatEstimate? bodyFat,
 }) {
   final policy = CoachingPolicy.derive(
     profile: profile,
@@ -47,12 +50,14 @@ List<WeekResult> runCoachLoop({
     sigmaKcal: prior.sigmaKcal,
     status: TdeeStatus.held,
   );
-  final startBodyFat = deurenbergBodyFat(
-    sex: profile.sex,
-    weightKg: user.weightKg,
-    heightCm: profile.heightCm,
-    ageYears: profile.ageOn(user.today),
-  );
+  final startBodyFat =
+      bodyFat ??
+      deurenbergBodyFat(
+        sex: profile.sex,
+        weightKg: user.weightKg,
+        heightCm: profile.heightCm,
+        ageYears: profile.ageOn(user.today),
+      );
 
   DailyTargets? targets;
   var trendWeight = user.weightKg;
@@ -67,6 +72,7 @@ List<WeekResult> runCoachLoop({
     final modeChanged = weekMode != currentMode;
     currentMode = weekMode;
 
+    var safetyRaise = 0.0;
     if (week > 0) {
       final asOf = user.today.addDays(-1);
       final settling = settle
@@ -92,12 +98,22 @@ List<WeekResult> runCoachLoop({
         ),
         settling: settling,
       );
+      // As in `nextTargets`: a too-fast loss is not noise, so it can raise
+      // targets during calibration and while the estimate is held.
+      safetyRaise = lossSafetyRaiseKcal(
+        trend: trend,
+        history: history,
+        sex: profile.sex,
+        bodyFat: startBodyFat,
+        resistanceTrained: trainingStatus.isResistanceTrained,
+      );
     }
 
     // As in `nextTargets`: nothing changes during calibration or while the
     // estimate is held, and a change of goal applies at once, unthrottled.
     if (targets == null ||
         modeChanged ||
+        safetyRaise > 0 ||
         (week >= 2 && tdee.status == TdeeStatus.updated)) {
       targets = computeTargets(
         TargetInputs(
@@ -112,6 +128,7 @@ List<WeekResult> runCoachLoop({
           bmrKcal: bmrFor(trendWeight),
           previous: modeChanged ? null : targets,
           consecutiveDeficitWeeks: deficitWeeks,
+          safetyRaiseKcal: modeChanged ? 0 : safetyRaise,
         ),
       );
     }

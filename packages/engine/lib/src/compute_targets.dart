@@ -37,13 +37,34 @@ DailyTargets computeTargets(TargetInputs i) {
 
   final previous = i.previous;
   if (previous != null) {
-    final maxStep = SafetyBounds.maxWeeklyTargetChange(previous.kcal);
-    final limited = kcal.clamp(
-      previous.kcal - maxStep,
-      previous.kcal + maxStep,
-    );
-    if (limited != kcal) flags.add(TargetFlag.rateLimited);
-    kcal = limited;
+    // A raise the safety rules ask for is not step-limited: a diet break and
+    // a too-fast loss both exist to put calories back now. Reductions and
+    // ordinary changes keep the limit.
+    final exemptRaise =
+        flags.contains(TargetFlag.dietBreak) && kcal > previous.kcal;
+    if (!exemptRaise) {
+      final maxStep = SafetyBounds.maxWeeklyTargetChange(previous.kcal);
+      final limited = kcal.clamp(
+        previous.kcal - maxStep,
+        previous.kcal + maxStep,
+      );
+      if (limited != kcal) flags.add(TargetFlag.rateLimited);
+      kcal = limited;
+    }
+    if (previous.flags.contains(TargetFlag.raisedForSafePace) &&
+        i.safetyRaiseKcal == 0 &&
+        kcal < previous.kcal) {
+      kcal = previous.kcal;
+      flags
+        ..remove(TargetFlag.rateLimited)
+        ..add(TargetFlag.heldAfterSafetyRaise);
+    }
+    if (i.safetyRaiseKcal > 0 && previous.kcal + i.safetyRaiseKcal > kcal) {
+      kcal = previous.kcal + i.safetyRaiseKcal;
+      flags
+        ..remove(TargetFlag.rateLimited)
+        ..add(TargetFlag.raisedForSafePace);
+    }
   }
 
   final floor = SafetyBounds.calorieFloorKcal(

@@ -30,6 +30,7 @@ void main() {
     CoachingPolicy? policy,
     TrainingStatus status = TrainingStatus.intermediate,
     double? requestedLoss,
+    double safetyRaise = 0,
   }) => TargetInputs(
     sex: sex,
     heightCm: 178,
@@ -43,6 +44,7 @@ void main() {
     previous: previous,
     consecutiveDeficitWeeks: deficitWeeks,
     requestedLossFraction: requestedLoss,
+    safetyRaiseKcal: safetyRaise,
   );
 
   group('SafetyBounds', () {
@@ -226,6 +228,59 @@ void main() {
       final next = computeTargets(inputs(tdee: 2300, previous: first));
       expect(first.kcal - next.kcal, closeTo(100, 1e-9));
       expect(next.flags, contains(TargetFlag.rateLimited));
+    });
+
+    test('a safety raise is not step-limited, and is flagged', () {
+      final first = computeTargets(inputs(tdee: 2800));
+      final raised = computeTargets(
+        inputs(tdee: 2800, previous: first, safetyRaise: 300),
+      );
+      expect(raised.kcal, closeTo(first.kcal + 300, 1e-9));
+      expect(raised.flags, contains(TargetFlag.raisedForSafePace));
+      expect(raised.flags, isNot(contains(TargetFlag.rateLimited)));
+    });
+
+    test('a safety raise never lowers a target the formula already raised', () {
+      final first = computeTargets(inputs(tdee: 2400));
+      final plain = computeTargets(inputs(tdee: 3300, previous: first));
+      final raised = computeTargets(
+        inputs(tdee: 3300, previous: first, safetyRaise: 50),
+      );
+      // The ordinary step (+100) is already above first + 50.
+      expect(raised.kcal, closeTo(plain.kcal, 1e-9));
+      expect(raised.flags, isNot(contains(TargetFlag.raisedForSafePace)));
+    });
+
+    test('reductions are still limited when no raise applies', () {
+      final first = computeTargets(inputs(tdee: 2800));
+      final next = computeTargets(inputs(tdee: 2000, previous: first));
+      expect(first.kcal - next.kcal, closeTo(100, 1e-9));
+    });
+
+    test('the week after a safety raise does not lower the target', () {
+      final first = computeTargets(inputs(tdee: 2800));
+      final raised = computeTargets(
+        inputs(tdee: 2800, previous: first, safetyRaise: 300),
+      );
+      // The formula now wants less than the raised target.
+      final after = computeTargets(inputs(tdee: 2400, previous: raised));
+      expect(after.kcal, raised.kcal);
+      expect(after.flags, contains(TargetFlag.heldAfterSafetyRaise));
+      // The hold lasts one check-in; the week after, the ordinary limit
+      // applies again.
+      final later = computeTargets(inputs(tdee: 2400, previous: after));
+      expect(after.kcal - later.kcal, closeTo(100, 1e-9));
+      expect(later.flags, isNot(contains(TargetFlag.heldAfterSafetyRaise)));
+    });
+
+    test('a diet break returns calories at once, not 100 at a time', () {
+      final deficit = computeTargets(inputs());
+      final onBreak = computeTargets(
+        inputs(previous: deficit, deficitWeeks: 16),
+      );
+      expect(onBreak.flags, contains(TargetFlag.dietBreak));
+      expect(onBreak.kcal, closeTo(2800, 1e-9));
+      expect(onBreak.kcal - deficit.kcal, greaterThan(100));
     });
 
     test('forces a diet break after 16 deficit weeks', () {

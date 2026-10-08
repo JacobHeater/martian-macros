@@ -1,6 +1,6 @@
 ---
 id: MM-115
-status: proposed
+status: done
 component: safeguards
 related: [MM-110, MM-24, MM-25, MM-28, MM-30, MM-31, MM-113, MM-128, MM-131, MM-138]
 ---
@@ -79,3 +79,19 @@ Scenario: Lean limit
 - Priority: must-have before public release. It also settles the open note in MM-31: a diet break is a safety raise and is exempt.
 - Depends on MM-131 for the first-days exclusion to be principled rather than a fixed number.
 - The mirror case (gaining faster than intended on lean gain) is not a safety matter and stays step-limited (MM-129).
+
+## Progress (built and verified)
+- `lossSafetyRaiseKcal` (`packages/engine/lib/src/loss_safety_raise.dart`): the trigger and the amount, with the constants in `coach_constants.dart` (14-day look-back, 8 weigh-ins outside settling windows, 1.5 standard deviations, 400 kcal cap).
+  It uses the trend model's current slope and its uncertainty, which already smooth over the recent weigh-ins, not a separate 14-day regression.
+- `nextTargets` runs it before the calibration and holding gates, so it works during calibration. `computeTargets` takes `safetyRaiseKcal`: the raise is `max(ordinary step-limited target, last target + raise)`, never lower, flagged `raisedForSafePace`.
+- **A diet break is exempt from the step limit when it raises the target** (settles the note in MM-31).
+- **Added, not in the ticket: a one-check-in hold.** The week after a safety raise the target is not lowered (`heldAfterSafetyRaise`). Without it the ordinary step limit walked the raise straight back (100 kcal a week for several weeks) and the "no oscillation" scenario failed in simulation. The hold lasts one check-in.
+- The simulator (`test/support/coach_loop.dart`) calls the same function, so it cannot drift from the app.
+- Tests: unit tests for the trigger (first week of a deficit, too few weigh-ins, uncertain pace, lean limit, cap, no raise when gaining or holding), `computeTargets` tests (not step-limited, never lowers, reductions still limited, diet-break exemption, hold), `nextTargets` tests (raises during calibration; waits when not too fast; waits until the check-in is due), and closed-loop tests over 20 simulated users.
+- **Measured** (20 simulated 80 kg men at 25% body fat, expenditure 600 kcal above the starting estimate): a raise is issued for every one, in weeks 3 to 8 (median 4 to 5), each by more than 100 and at most 400 kcal, and the true loss in the three weeks after is under 1.0% a week. With the estimate right, none of 20 users gets a raise. Over 40 noisy users for 16 weeks, no raise was followed by two full-step falls.
+- **Deviations from the ticket text**
+  - The ticket's example (expenditure 400 kcal above the estimate) does not exceed the limit for a 92 kg man: he loses about 1.0% a week, at the limit, so correctly nothing is raised. The scenario uses an 80 kg man and 600 kcal.
+  - The raise is not as early as "within one check-in of the slope becoming clear" might suggest: the trend's pace is noisy for the first weeks after the settling window, and the rule waits until it is over the limit by 1.5 of its own deviations. Trying 1.0 deviations gave first raises in weeks 3 to 6 instead of 3 to 8, with no raises for correctly estimated users in the same 20, but only about 9% fewer weeks over the limit. The ticket's 1.5 is kept; changing it is one constant.
+  - The explanation shown to the user is generic ("You were losing weight faster than the app aims for at your body fat, because faster loss costs more muscle. Targets went up."). The numbers in the ticket's example message need MM-138.
+- **Not verified**: a real user's data; the effect on a user who is under-eating relative to their target (the raise does not change what they eat); the rule when the estimator itself is held for lack of data (the trend still has to show 8 weigh-ins).
+- **Residual risk**: after a raise, a noisy expenditure estimate can lower the target again and the loss can drift back over the limit; the rule acts again once that is clear. That is the estimator's noise (MM-24), not this rule.

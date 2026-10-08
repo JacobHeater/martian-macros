@@ -15,6 +15,7 @@ export 'src/daily_targets.dart';
 export 'src/deurenberg_body_fat.dart';
 export 'src/goal_body_fat_check.dart';
 export 'src/initial_tdee_prior.dart';
+export 'src/loss_safety_raise.dart';
 export 'src/mode_reason.dart';
 export 'src/mode_recommendation.dart';
 export 'src/next_targets.dart';
