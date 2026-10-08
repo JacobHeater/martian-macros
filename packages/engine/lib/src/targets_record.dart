@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 
 import 'daily_targets.dart';
+import 'targets_explanation.dart';
 import 'tdee_status.dart';
 
 /// Targets in force from [effectiveFrom], with the TDEE they were based on.
@@ -14,6 +15,7 @@ final class TargetsRecord {
     required this.tdeeStatus,
     this.safetyBodyFatPercent,
     this.profileRevision = 0,
+    this.explanation,
   });
 
   final CalendarDate effectiveFrom;
@@ -33,4 +35,8 @@ final class TargetsRecord {
   /// with a different revision (sex, date of birth, height or health check
   /// corrected, MM-83) gets new targets at once.
   final int profileRevision;
+
+  /// Why these targets were issued (MM-138). Null on records made before
+  /// explanations were kept.
+  final TargetsExplanation? explanation;
 }

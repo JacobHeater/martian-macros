@@ -20,6 +20,10 @@ class TargetsHistory extends Table {
   RealColumn get tdeeKcal => real()();
   RealColumn get tdeeSigmaKcal => real()();
 
+  /// Why these targets were issued, as JSON (`TargetsExplanation.encode`).
+  /// Added in schema version 5 (MM-138); null on older rows.
+  TextColumn get explanation => text().nullable()();
+
   /// Added in schema version 4 (MM-83); older rows read as 0.
   IntColumn get profileRevision => integer().withDefault(const Constant(0))();
 

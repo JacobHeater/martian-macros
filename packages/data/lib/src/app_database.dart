@@ -30,7 +30,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 4;
+  static const currentSchemaVersion = 5;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -52,6 +52,10 @@ class AppDatabase extends _$AppDatabase {
     3: (m) async {
       await m.addColumn(setups, setups.profileRevision);
       await m.addColumn(targetsHistory, targetsHistory.profileRevision);
+    },
+    // 4 to 5: why each set of targets was issued (MM-138).
+    4: (m) async {
+      await m.addColumn(targetsHistory, targetsHistory.explanation);
     },
   };
 

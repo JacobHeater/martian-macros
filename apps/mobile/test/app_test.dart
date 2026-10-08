@@ -246,6 +246,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Goal: Fat loss'), findsOneWidget);
     expect(find.text('Daily targets'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('before your first measurement'),
+      300,
+    );
     expect(
       find.textContaining('before your first measurement'),
       findsOneWidget,

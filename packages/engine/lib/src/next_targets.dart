@@ -5,6 +5,8 @@ import 'coach_snapshot.dart';
 import 'compute_targets.dart';
 import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
+import 'explain_targets.dart';
+import 'explanation_trigger.dart';
 import 'loss_safety_raise.dart';
 import 'safety_body_fat.dart';
 import 'target_flag.dart';
@@ -41,8 +43,9 @@ TargetsRecord? nextTargets({
     DailyTargets? previous,
     int deficitWeeks = 0,
     double safetyRaiseKcal = 0,
+    ExplanationTrigger trigger = ExplanationTrigger.checkIn,
   }) {
-    final targets = computeTargets(
+    final traced = computeTargetsTraced(
       TargetInputs(
         sex: setup.profile.sex,
         heightCm: setup.profile.heightCm,
@@ -60,6 +63,7 @@ TargetsRecord? nextTargets({
         safetyRaiseKcal: safetyRaiseKcal,
       ),
     );
+    final targets = traced.targets;
     final forcedToMaintenance =
         targets.flags.contains(TargetFlag.underweightMaintenance) ||
         targets.flags.contains(TargetFlag.modeNotAllowed);
@@ -76,6 +80,19 @@ TargetsRecord? nextTargets({
       tdeeStatus: snapshot.tdee.status,
       safetyBodyFatPercent: safetyBf,
       targets: targets,
+      explanation: explainTargets(
+        trigger: targets.flags.contains(TargetFlag.underweightMaintenance)
+            ? ExplanationTrigger.underweightRule
+            : targets.flags.contains(TargetFlag.modeNotAllowed)
+            ? ExplanationTrigger.healthRule
+            : history.isEmpty
+            ? ExplanationTrigger.firstTargets
+            : trigger,
+        previous: history.isEmpty ? null : history.last,
+        targets: targets,
+        trace: traced.trace,
+        tdee: snapshot.tdee,
+      ),
     );
   }
 
@@ -89,13 +106,18 @@ TargetsRecord? nextTargets({
       (last.targets.flags.contains(TargetFlag.underweightMaintenance) ||
           last.targets.flags.contains(TargetFlag.modeNotAllowed)) &&
       !snapshot.policy.allowedModes.contains(setup.goalMode);
-  if (last.mode != setup.goalMode && !heldAtMaintenance) return build();
+  if (last.mode != setup.goalMode && !heldAtMaintenance) {
+    return build(trigger: ExplanationTrigger.goalChange);
+  }
 
   // A corrected sex, date of birth, height or health check: the old targets
   // were made for someone else, so new ones start now, without the weekly
   // step limit (MM-83).
   if (setup.profileRevision != last.profileRevision) {
-    return build(deficitWeeks: consecutiveDeficitWeeks(history, today));
+    return build(
+      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      trigger: ExplanationTrigger.profileCorrection,
+    );
   }
 
   // A body-fat estimate that has moved leaner, say because the user corrected
@@ -107,6 +129,7 @@ TargetsRecord? nextTargets({
     return build(
       previous: last.targets,
       deficitWeeks: consecutiveDeficitWeeks(history, today),
+      trigger: ExplanationTrigger.bodyFatCorrection,
     );
   }
 
