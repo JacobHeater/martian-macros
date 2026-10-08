@@ -22,8 +22,6 @@ void main() {
 
   setUpAll(() async {
     if (linux) await loadGoldenFonts();
-    // Tests flatten shadows by default; the screens have soft ones.
-    debugDisableShadows = false;
   });
 
   Future<InMemoryRepositories> seeded({required bool dark}) async {
@@ -117,6 +115,9 @@ void main() {
     InMemoryRepositories repos, {
     String? tab,
   }) async {
+    // Tests flatten shadows by default; the screens have soft ones.
+    debugDisableShadows = false;
+    addTearDown(() => debugDisableShadows = true);
     await pumpApp(tester, repos, FixedClock(today));
     // A small phone, so one screenshot shows what a user sees first.
     tester.view.physicalSize = const Size(720, 1600);
