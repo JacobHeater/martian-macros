@@ -7,4 +7,10 @@ enum Caution {
   pcos,
   menopause,
   thyroidCondition,
+
+  /// Body mass index below 18.5: no deficit is planned (MM-111).
+  underweight,
+
+  /// Body mass index from 18.5 to 20: deficits only at the gentlest pace.
+  lowBodyWeight,
 }

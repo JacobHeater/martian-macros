@@ -7,6 +7,7 @@ library;
 export 'src/biological_sex.dart';
 export 'src/body_fat_method.dart';
 export 'src/body_fat_observation.dart';
+export 'src/body_mass_index.dart';
 export 'src/calendar_date.dart';
 export 'src/caution.dart';
 export 'src/coaching_policy.dart';

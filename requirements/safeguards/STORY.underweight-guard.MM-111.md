@@ -1,6 +1,6 @@
 ---
 id: MM-111
-status: proposed
+status: done
 component: safeguards
 related: [MM-110, MM-11, MM-25, MM-28, MM-29, MM-36, MM-132]
 ---
@@ -69,3 +69,15 @@ Scenario: Above the caution zone
 - BMI cut-offs are not adjusted by sex, age or ancestry here. Lower healthy-weight cut-offs are sometimes used for Asian populations at
   the *upper* end; the underweight boundary is the same. Confirm in MM-29.
 - An older adult (65+) loses more function per kilogram lost. Whether the block should sit higher for them is a question for MM-112.
+
+## Progress (built and verified)
+- `bodyMassIndex` and the thresholds (`underweightBmi` 18.5, `lowWeightCautionBmi` 20, 0.5% gentlest pace) in `packages/domain/lib/src/body_mass_index.dart`.
+- `CoachingPolicy.derive` takes the user's weight. Below 18.5 it removes fat loss and recomp (maintenance and lean gain remain; pregnancy, lactation and eating-disorder rules still narrow it further, never widen it) and adds the `underweight` caution. From 18.5 up to 20 it caps weekly loss at 0.5% and adds the `lowBodyWeight` caution. Both cautions show on the Coach screen.
+- `analyze` judges the policy on the **highest trend weight of the last seven days**, so one low reading, or a dip that lasts a day, changes nothing; weight has to stay at or under the threshold for the whole week.
+- `nextTargets` ends a deficit the policy no longer allows at the next check-in, during calibration too. `computeTargets` produces maintenance, flagged `underweightMaintenance`, and is **not step-limited** upward (so the ticket's "more than 100 kcal above the previous ones" holds).
+- Onboarding passes the entered weight, so the plan step offers only the allowed goals and says why (`ModeReason.underweight`).
+- **Added, not in the ticket:** when a deficit is ended this way the app also sets the user's goal to maintenance (and the record is stored as maintenance), so a deficit does not resume by itself when weight recovers above 18.5. Going back to a deficit is then the user's choice. Without this the stored goal stayed "Fat loss" and the deficit would have restarted automatically.
+- Tests: policy (thresholds, boundaries, combination with other rules), engine (what weight the rule is judged on, pace cap, forced maintenance not step-limited, calibration, check-in cadence, no rewrite loop), and app (onboarding offers maintenance and lean gain only with the reason; the caution zone caution on the Coach screen; the end-to-end switch to maintenance and the goal change).
+- **Not done**: "A goal weight below BMI 18.5 is refused" (there are no goal weights yet; MM-36). The pace cap in the caution zone is a policy limit; MM-128 (choosing a pace) does not exist yet.
+- **Not verified**: a real user's data; the look of the new caution on a device; whether 18.5 should sit higher for people 65 and over (MM-112), or differ by ancestry (MM-29).
+- The ticket says both "below 18.5" and "at or below 18.5"; the code uses below throughout.

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:mm_domain/mm_domain.dart';
 
 import 'body_fat_estimate.dart';
@@ -29,12 +31,6 @@ CoachSnapshot? analyze({
 }) {
   if (weights.isEmpty) return null;
   final profile = setup.profile;
-  final policy = CoachingPolicy.derive(
-    profile: profile,
-    screening: setup.screening,
-    today: today,
-  );
-
   final settling = settlingWindows(history);
   final trend = trendModel.smooth(
     weights,
@@ -45,6 +41,16 @@ CoachSnapshot? analyze({
         : settlingShift(settling, weights.first.weightKg),
   );
   final trendWeight = trend.last.levelKg;
+  // Body mass index is judged on the highest trend weight of the last seven
+  // days, so one low reading, or a dip that lasts a day, changes nothing
+  // (MM-111).
+  final recent = trend.length > 7 ? trend.sublist(trend.length - 7) : trend;
+  final policy = CoachingPolicy.derive(
+    profile: profile,
+    screening: setup.screening,
+    today: today,
+    weightKg: recent.map((p) => p.levelKg).reduce(math.max),
+  );
   final age = profile.ageOn(today);
 
   final measured = setup.bodyFatPercent;
