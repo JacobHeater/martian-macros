@@ -8,6 +8,10 @@ name: Update goldens
 
 on:
   workflow_dispatch:
+  # Pushing a branch named update-goldens/<anything> does the same, from the
+  # branch's own copy of this file.
+  push:
+    branches: ['update-goldens/**']
 
 jobs:
   update:
