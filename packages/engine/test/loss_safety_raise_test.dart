@@ -19,6 +19,7 @@ void main() {
     history: history,
     sex: BiologicalSex.male,
     bodyFat: bodyFat,
+    safetyBodyFatPercent: bodyFat.percent,
     resistanceTrained: true,
   );
 

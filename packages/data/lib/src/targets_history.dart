@@ -19,6 +19,9 @@ class TargetsHistory extends Table {
 
   RealColumn get tdeeKcal => real()();
   RealColumn get tdeeSigmaKcal => real()();
+
+  /// Added in schema version 3 (MM-132); null on older rows.
+  RealColumn get safetyBodyFatPercent => real().nullable()();
   TextColumn get tdeeStatus => textEnum<TdeeStatus>()();
 
   @override

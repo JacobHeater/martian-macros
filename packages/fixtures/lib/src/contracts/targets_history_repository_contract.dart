@@ -8,12 +8,14 @@ TargetsRecord _record(
   CalendarDate from,
   double kcal, {
   Set<TargetFlag>? flags,
+  double? safetyBodyFatPercent,
 }) => TargetsRecord(
   effectiveFrom: from,
   mode: GoalMode.fatLoss,
   tdeeKcal: 2600,
   tdeeSigmaKcal: 300,
   tdeeStatus: TdeeStatus.held,
+  safetyBodyFatPercent: safetyBodyFatPercent,
   targets: DailyTargets(
     kcal: kcal,
     proteinG: 160,
@@ -35,6 +37,14 @@ void targetsHistoryRepositoryContract(
     final d2 = CalendarDate(2026, 1, 8);
 
     setUp(() => repo = create());
+
+    test('keeps the body-fat figure the safety rules used, or none', () async {
+      await repo.saveTargets(_record(d1, 2200, safetyBodyFatPercent: 14.63));
+      await repo.saveTargets(_record(d2, 2300));
+      final history = await repo.watchTargetsHistory().first;
+      expect(history.first.safetyBodyFatPercent, closeTo(14.63, 1e-9));
+      expect(history.last.safetyBodyFatPercent, isNull);
+    });
 
     test('starts empty', () async {
       expect(await repo.watchTargetsHistory().first, isEmpty);
