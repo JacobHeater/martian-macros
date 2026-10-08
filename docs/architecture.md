@@ -102,8 +102,8 @@ before launch.
 | Goal body-fat floors (warn / reject) | 10% / 8% | 18% / 16% |
 | Minimum fat | max(0.5 g/kg, 20% kcal) | max(0.6 g/kg, 20% kcal) |
 
-- Protein is 1.6–2.2 g/kg of reference weight (the BMI-25 weight when
-  BMI ≥ 30), or 2.3–3.1 g/kg FFM for lean users in a deficit (Helms 2014).
+- Protein is 1.6–2.2 g/kg of reference weight (body weight up to BMI 25,
+  then the BMI-25 weight plus a quarter of the excess), or 2.3–3.1 g/kg FFM for lean users in a deficit (Helms 2014).
   It is capped at 0.8 g/kg for chronic kidney disease.
 - Weekly target change is at most min(100 kcal, 5%).
 

@@ -261,8 +261,8 @@
       "sharedContracts": ["SC-schema", "SC-store"],
       "coordinationHotspots": ["HS-schema-lane"],
       "sourceRequirements": {
-        "built": ["MM-2", "MM-3", "MM-4", "MM-5", "MM-6", "MM-60", "MM-62"],
-        "remaining": ["MM-1", "MM-7", "MM-8", "MM-61", "MM-93"]
+        "built": ["MM-2", "MM-3", "MM-4", "MM-5", "MM-6", "MM-60", "MM-61", "MM-62"],
+        "remaining": ["MM-1", "MM-7", "MM-8", "MM-93"]
       },
       "sequence": [
         { "step": 1, "title": "Schema migrations and a migration test harness", "tickets": ["MM-61"], "milestone": "M1" },
@@ -288,8 +288,8 @@
       "sharedContracts": ["SC-targets", "SC-analysis", "SC-safety", "SC-simulator", "SC-setup"],
       "coordinationHotspots": ["HS-compute-targets", "HS-policy", "HS-estimator-style", "HS-simulator"],
       "sourceRequirements": {
-        "built": ["MM-18", "MM-19", "MM-23", "MM-24", "MM-25", "MM-26", "MM-27", "MM-28", "MM-30", "MM-31"],
-        "remaining": ["MM-22", "MM-35", "MM-110", "MM-111", "MM-115", "MM-120", "MM-131", "MM-132", "MM-135"]
+        "built": ["MM-18", "MM-19", "MM-23", "MM-24", "MM-25", "MM-26", "MM-27", "MM-28", "MM-30", "MM-31", "MM-120"],
+        "remaining": ["MM-22", "MM-35", "MM-110", "MM-111", "MM-115", "MM-131", "MM-132", "MM-135"]
       },
       "sequence": [
         { "step": 1, "title": "Remove the protein step at BMI 30", "tickets": ["MM-120"], "milestone": "M1" },

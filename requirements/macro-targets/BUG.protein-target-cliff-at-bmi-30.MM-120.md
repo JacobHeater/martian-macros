@@ -1,6 +1,6 @@
 ---
 id: MM-120
-status: proposed
+status: done
 component: macro-targets
 related: [MM-119, MM-28, MM-29, MM-121, MM-138]
 ---
@@ -73,7 +73,15 @@ Scenario: Lean rule unaffected
   Then the 2.3 to 3.1 g per kg of fat-free mass rule still applies
 ```
 
-## Notes
+## Notes (built and verified)
+- `SafetyBounds.referenceWeightKg` in `packages/engine/lib/src/safety_bounds.dart`, used by `proteinRangeG` and `minFatG` (which now
+  takes height). Tests in `targets_test.dart` cover each scenario above, sweeping 150 to 200 cm, both sexes, BMI 18 to 50 in 0.5 kg
+  steps.
+- Built with the proposed rule (a quarter of the excess over the BMI 25 weight) on the product owner's go-ahead to start; the two
+  alternatives above remain open to MM-29.
+- The kidney-disease cap still uses body weight, as MM-11 specifies.
+- **Not verified in the app**: no screen was looked at. A user between BMI 25 and 30 gets a slightly lower protein target than before
+  (for a 180 cm, 90 kg man, 158 g instead of 171 g) at their next check-in.
 - Priority: fix before the first adaptive check-in reaches real users; it is a visible, unexplainable jump in a headline number.
 - The lean-user rule has its own step at the body-fat threshold (15% for men, 23% for women); MM-132 covers thresholds on an uncertain
   body-fat figure, and MM-121 the size of that step.

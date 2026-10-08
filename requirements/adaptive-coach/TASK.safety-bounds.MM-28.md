@@ -64,4 +64,5 @@ Scenario: Small steps
 - Sources: NIH minimum-intake guidance for the absolute floors; Loucks on energy availability; Garthe et al. (2011) on slower loss
   preserving lean mass; Helms et al. (2014) on protein. The goal body-fat floors and the lean thresholds are product judgement.
 - Goal body-fat checking exists in the engine but no screen lets the user set a body-fat goal yet (MM-36).
+- The reference-weight rule above (a switch at BMI 30) was replaced by a continuous one in MM-120.
 - Training energy is always passed as zero for now; nothing estimates it until the training log exists (MM-75).
