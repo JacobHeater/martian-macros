@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
-import 'database.dart';
+import 'app_database.dart';
 
 /// Typed access to everything the app persists. Speaks domain objects;
 /// nothing outside this package sees table rows.

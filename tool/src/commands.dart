@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'arch/arch_command.dart';
+import 'command.dart';
 import 'requirements.dart';
 import 'toolchain.dart';
 
@@ -17,9 +18,7 @@ const _packages = <({String path, bool flutter})>[
 const _appDir = 'apps/mobile';
 const _envs = ['dev', 'prod'];
 
-typedef _Command = Future<int> Function(Toolchain tc, List<String> args);
-
-final _commands = <String, (String, _Command)>{
+final _commands = <String, (String, Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
   'check': ('CI gate: format, requirements, arch, analyze, test', _check),
@@ -197,12 +196,12 @@ const _schemaDir = 'drift_schemas';
 /// never changes, so a changed table needs a version bump first.
 Future<int> _schema(Toolchain tc, List<String> args) async {
   final dataDir = '${tc.repoRoot.path}/$_dataDir';
-  final source = File('$dataDir/lib/src/database.dart').readAsStringSync();
+  final source = File('$dataDir/lib/src/app_database.dart').readAsStringSync();
   final version = RegExp(r'currentSchemaVersion = (\d+);')
       .firstMatch(source)
       ?.group(1);
   if (version == null) {
-    stderr.writeln('Could not find currentSchemaVersion in database.dart.');
+    stderr.writeln('Could not find currentSchemaVersion in app_database.dart.');
     return 1;
   }
   final snapshot = File('$dataDir/$_schemaDir/drift_schema_v$version.json');
@@ -219,7 +218,7 @@ Future<int> _schema(Toolchain tc, List<String> args) async {
     'drift_dev',
     'schema',
     'dump',
-    'lib/src/database.dart',
+    'lib/src/app_database.dart',
     '$_schemaDir/',
   ], inDir: _dataDir);
   if (code != 0) return code;

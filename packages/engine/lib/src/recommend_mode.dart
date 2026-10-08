@@ -1,28 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 
-enum ModeReason {
-  /// Policy forbids deficits (screening).
-  deficitNotAllowed,
-
-  /// Body fat high enough that faster visible loss matters most.
-  highBodyFat,
-
-  /// Novice, returning, or high body fat: recomp is realistic (Barakat 2020).
-  recompEligible,
-
-  /// Lean and trained: building needs a surplus.
-  leanAndTrained,
-
-  /// Default: trained, moderate body fat, so cut first.
-  cutFirst,
-}
-
-final class ModeRecommendation {
-  const ModeRecommendation(this.mode, this.reason);
-
-  final GoalMode mode;
-  final ModeReason reason;
-}
+import 'mode_reason.dart';
+import 'mode_recommendation.dart';
 
 /// Recommends a starting mode. The user may pick any mode the policy
 /// allows; this only decides the default and the onboarding copy.

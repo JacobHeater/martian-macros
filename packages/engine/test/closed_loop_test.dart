@@ -3,6 +3,7 @@ import 'package:test/test.dart';
 
 import 'support/coach_loop.dart';
 import 'support/synthetic_user.dart';
+import 'support/week_result.dart';
 
 /// End-to-end behaviour of the weekly coaching loop against simulated users
 /// whose true physiology the engine never sees.
