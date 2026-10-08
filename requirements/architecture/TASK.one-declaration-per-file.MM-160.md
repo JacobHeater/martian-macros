@@ -1,6 +1,6 @@
 ---
 id: MM-160
-status: proposed
+status: done
 component: architecture
 related: [MM-159, MM-104, MM-5, MM-2]
 ---
@@ -56,3 +56,16 @@ Scenario: No behavior change
 - `mm check` order: format, req, arch, analyze, test.
 - A barrel file (only `export` lines) is allowed and is recognized by having no declarations.
 - Splitting `database.dart` changes what Drift's generator sees; run `mm gen` and `mm schema`'s snapshot test to prove the schema did not change.
+
+## Notes (built and verified)
+- `tool/src/arch/` (itself one declaration per file) with tests in `tool/test/`. `mm arch` runs in `mm check`. It checks one declaration per file, that the file is named for it,
+  layering imports (MM-161, MM-162) and raw Material controls (MM-163).
+- The split is complete: `domain`, `engine`, `data`, `tool` and `apps/mobile` (284 Dart files). **`tool/arch_baseline.txt` is empty**, so nothing is exempt.
+- `tool` is now a tested package and part of `mm test`. The Drift schema snapshot test passes unchanged after the split.
+- **Sealed hierarchies**: Dart requires the subtypes of a `sealed` class to share a library. `Outcome` keeps one declaration per file by making its cases `part of` files. This is the only
+  use of `part` other than Drift's generated code.
+- **Public State classes**: where a screen needs state, the `State` class is public in its own file (`OnboardingScreenState`, `AddFoodSheetState`, ...). The rule forces it; widgets that can be
+  stateless are.
+- Top-level functions and constants are not "types": a file may hold one function or a cohesive group (`coach_constants.dart`); they never share a file with a type.
+- **Not verified**: the split was checked by analysis and the tests, and the app was seen on the Android emulator (Today, Coach, Progress). Settings and Onboarding were exercised by widget
+  tests only.

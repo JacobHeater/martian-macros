@@ -1,6 +1,6 @@
 # WS-14: Architecture and module boundaries
 
-**Order** 1 · **Group** A (start now) · **State** not started · **Risk** medium
+**Order** 1 · **Group** A · **State** built (epic open until MM-163) · **Risk** medium
 
 ## Summary
 Make the code follow the product owner's engineering rules (MM-159) before more
@@ -91,7 +91,7 @@ Engine work that changes behavior (WS-02) is independent in logic but shares
 files during the engine split: do the split first.
 
 ## Requirement sources
-- Remaining: MM-159 (epic), MM-160, MM-161, MM-162.
+- Built: MM-160, MM-161, MM-162. Remaining: MM-159 (epic), open until the design-system control rule in WS-03 step 1 is done.
 
 ## Notes for whoever builds it
 - Liskov is proved by tests, not asserted: write the contract suite before the

@@ -1,6 +1,6 @@
 ---
 id: MM-163
-status: proposed
+status: in-progress
 component: design-system
 related: [MM-159, MM-160, MM-101, MM-102, MM-103, MM-104, MM-105]
 ---
@@ -53,3 +53,11 @@ Scenario: A reusable part
 ## Notes
 - This is what MM-104 was always meant to do; this ticket adds the enforcement and the "components take meaning" rule. Build them together.
 - Dropdown, date picker and number-entry components will be needed by onboarding and settings; define them from the existing uses, not speculatively.
+
+## Progress (built and verified)
+- `apps/mobile/lib/src/ui/` holds 35 files, one declaration each: the components (`MmButton`, `MmIconButton`, `MmTextField`, `MmSlider`, `MmSegmented`, `MmSwitchRow`, `MmCheckRow`,
+  `MmListRow`, `MmChoiceChip`, `MmActionChip`, `MmProgressBar`, `MmSpinner`, `MmAppBar`, `MmNavigationBar`, `MmFab`, `MmSurface`, `MmMenuButton`, `MacroBar`, `DayStepper`, `NumberEntryCard`,
+  `Notice`, `InfoCard`, `ChoiceCard`, `StatRow`, `SectionLabel`, `GroupHeader`, `showMmConfirm`, `showMmSnackBar`) and their kinds and state classes. Every screen is built from them.
+- `mm arch` fails any file outside `ui/` and `theme/` that uses one of 34 raw Material controls (`tool/src/arch/default_identifier_rules.dart`). There are no exceptions and no baseline entries.
+- **Not done**: the gallery (MM-105) does not exist yet, so components are not shown in every state and theme; the components still have the stock Material look (the `design/` redesign is a visual
+  change to these files); nothing mechanical yet stops a component from accepting a styling argument (it holds by convention). Status stays in-progress until the gallery lands.

@@ -1,12 +1,4 @@
 # Files that do not yet follow the engineering rules (MM-160).
 # This list can only shrink: do not add to it. `mm arch` fails if a
 # listed file is fixed and left here.
-apps/mobile/lib/src/app.dart
-apps/mobile/lib/src/coach/coach_screen.dart
-apps/mobile/lib/src/format.dart
-apps/mobile/lib/src/onboarding/onboarding_screen.dart
-apps/mobile/lib/src/progress/progress_screen.dart
-apps/mobile/lib/src/settings/settings_screen.dart
-apps/mobile/lib/src/today/add_food_sheet.dart
-apps/mobile/lib/src/today/today_screen.dart
-apps/mobile/lib/src/widgets.dart
+# (Empty: the codebase follows the rules.)

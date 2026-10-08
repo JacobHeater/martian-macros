@@ -2,9 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
-import '../format.dart';
+import '../format/fmt.dart';
+import '../format/training_status_label.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
+import '../ui/group_header.dart';
+import '../ui/mm_app_bar.dart';
+import '../ui/mm_list_row.dart';
+import '../ui/mm_menu_button.dart';
+import '../ui/mm_menu_item.dart';
+import '../ui/mm_segment.dart';
+import '../ui/mm_segmented.dart';
+import '../ui/mm_slider.dart';
+import '../ui/mm_switch_row.dart';
+import '../ui/show_mm_confirm.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -23,42 +34,38 @@ class SettingsScreen extends ConsumerWidget {
         : '${profile.heightCm.round()} cm';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: const MmAppBar(title: 'Settings'),
       body: ListView(
         children: [
-          const _Header('Units'),
+          const GroupHeader('Units'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SegmentedButton<UnitSystem>(
+            child: MmSegmented<UnitSystem>(
               segments: const [
-                ButtonSegment(
-                  value: UnitSystem.imperial,
-                  label: Text('lb / in'),
-                ),
-                ButtonSegment(value: UnitSystem.metric, label: Text('kg / cm')),
+                MmSegment(UnitSystem.imperial, 'lb / in'),
+                MmSegment(UnitSystem.metric, 'kg / cm'),
               ],
               selected: {setup.unitSystem},
-              onSelectionChanged: (s) =>
+              onChanged: (s) =>
                   setupWriter.saveSetup(setup.copyWith(unitSystem: s.first)),
             ),
           ),
-          const _Header('Training'),
-          ListTile(
-            title: const Text('Experience'),
-            subtitle: Text(setup.trainingStatus.label),
-            trailing: PopupMenuButton<TrainingStatus>(
-              icon: const Icon(Icons.edit_outlined),
+          const GroupHeader('Training'),
+          MmListRow(
+            title: 'Experience',
+            subtitle: setup.trainingStatus.label,
+            trailing: MmMenuButton<TrainingStatus>(
+              icon: Icons.edit_outlined,
               onSelected: (s) =>
                   setupWriter.saveSetup(setup.copyWith(trainingStatus: s)),
-              itemBuilder: (_) => [
-                for (final s in TrainingStatus.values)
-                  PopupMenuItem(value: s, child: Text(s.label)),
+              items: [
+                for (final s in TrainingStatus.values) MmMenuItem(s, s.label),
               ],
             ),
           ),
-          ListTile(
-            title: Text('Training days per week: ${setup.trainingDaysPerWeek}'),
-            subtitle: Slider(
+          MmListRow(
+            title: 'Training days per week: ${setup.trainingDaysPerWeek}',
+            detail: MmSlider(
               value: setup.trainingDaysPerWeek.toDouble(),
               max: 7,
               divisions: 7,
@@ -67,23 +74,19 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const _Header('Body fat estimate'),
-          SwitchListTile(
-            title: Text(
-              setup.bodyFatPercent == null
-                  ? 'Let the app estimate'
-                  : 'About ${setup.bodyFatPercent!.round()}%',
-            ),
-            subtitle: const Text(
-              'Enter one only if you have a recent measurement.',
-            ),
+          const GroupHeader('Body fat estimate'),
+          MmSwitchRow(
+            title: setup.bodyFatPercent == null
+                ? 'Let the app estimate'
+                : 'About ${setup.bodyFatPercent!.round()}%',
+            subtitle: 'Enter one only if you have a recent measurement.',
             value: setup.bodyFatPercent != null,
             onChanged: (on) => setupWriter.saveSetup(
               setup.copyWith(bodyFatPercent: () => on ? 25 : null),
             ),
           ),
           if (setup.bodyFatPercent != null)
-            Slider(
+            MmSlider(
               value: setup.bodyFatPercent!.clamp(5, 55),
               min: 5,
               max: 55,
@@ -93,32 +96,25 @@ class SettingsScreen extends ConsumerWidget {
                 setup.copyWith(bodyFatPercent: () => v.roundToDouble()),
               ),
             ),
-          const _Header('Profile'),
-          ListTile(
-            title: const Text('Biological sex'),
+          const GroupHeader('Profile'),
+          MmListRow(
+            title: 'Biological sex',
             trailing: Text(
               profile.sex == BiologicalSex.male ? 'Male' : 'Female',
             ),
           ),
-          ListTile(
-            title: const Text('Age'),
-            trailing: Text('${profile.ageOn(today)}'),
+          MmListRow(title: 'Age', trailing: Text('${profile.ageOn(today)}')),
+          MmListRow(title: 'Height', trailing: Text(height)),
+          const GroupHeader('Data'),
+          const MmListRow(
+            leadingIcon: Icons.lock_outline,
+            title: 'Stored only on this device',
+            subtitle: 'Nothing is uploaded. Encrypted backup is coming.',
           ),
-          ListTile(title: const Text('Height'), trailing: Text(height)),
-          const _Header('Data'),
-          ListTile(
-            leading: const Icon(Icons.lock_outline),
-            title: const Text('Stored only on this device'),
-            subtitle: const Text(
-              'Nothing is uploaded. Encrypted backup is coming.',
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.delete_forever_outlined,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            title: const Text('Erase all data and start over'),
+          MmListRow(
+            leadingIcon: Icons.delete_forever_outlined,
+            danger: true,
+            title: 'Erase all data and start over',
             onTap: () => _confirmErase(context, ref),
           ),
           const SizedBox(height: 24),
@@ -135,44 +131,16 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _confirmErase(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Erase everything?'),
-        content: const Text(
+    final confirmed = await showMmConfirm(
+      context,
+      title: 'Erase everything?',
+      message:
           'This permanently deletes your profile, food log, weigh-ins, and '
           'targets from this device. It cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Erase'),
-          ),
-        ],
-      ),
+      confirmLabel: 'Erase',
     );
-    if (confirmed != true || !context.mounted) return;
+    if (!confirmed || !context.mounted) return;
     Navigator.of(context).pop();
     await ref.read(dataEraserProvider).eraseAll();
   }
-}
-
-class _Header extends StatelessWidget {
-  const _Header(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-    child: Text(
-      text,
-      style: Theme.of(context).textTheme.titleSmall
-          ?.copyWith(color: Theme.of(context).colorScheme.primary),
-    ),
-  );
 }

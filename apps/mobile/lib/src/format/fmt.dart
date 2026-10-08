@@ -1,8 +1,8 @@
 import 'package:intl/intl.dart';
 import 'package:mm_domain/mm_domain.dart';
 
-/// Unit-aware formatting and parsing. Storage is always SI; this is the
-/// only place imperial units exist.
+/// Unit-aware formatting. Storage is always SI; this is the only place
+/// imperial units exist.
 final class Fmt {
   const Fmt(this.units);
 
@@ -59,56 +59,4 @@ final class Fmt {
   static final _whole = NumberFormat.decimalPattern('en_US');
   static final _dayFormat = DateFormat('EEE, MMM d');
   static final _shortFormat = DateFormat('MMM d');
-}
-
-/// Parses user-typed numbers, tolerating a comma decimal separator.
-double? parseNumber(String text) =>
-    double.tryParse(text.trim().replaceAll(',', '.'));
-
-extension GoalModeLabel on GoalMode {
-  String get label => switch (this) {
-    GoalMode.fatLoss => 'Fat loss',
-    GoalMode.recomp => 'Recomp',
-    GoalMode.leanGain => 'Lean gain',
-    GoalMode.maintenance => 'Maintenance',
-  };
-
-  String get blurb => switch (this) {
-    GoalMode.fatLoss => 'Lose fat at a steady pace while keeping muscle.',
-    GoalMode.recomp =>
-      'Hold weight roughly steady while trading fat for muscle.',
-    GoalMode.leanGain => 'Build muscle in a small, controlled surplus.',
-    GoalMode.maintenance => 'Hold where you are.',
-  };
-}
-
-extension TrainingStatusLabel on TrainingStatus {
-  String get label => switch (this) {
-    TrainingStatus.untrained => 'Not lifting yet',
-    TrainingStatus.novice => 'Under 1 year',
-    TrainingStatus.returning => 'Returning after 6+ months off',
-    TrainingStatus.intermediate => '1–3 years',
-    TrainingStatus.advanced => '3+ years',
-  };
-}
-
-extension MealLabel on Meal {
-  String get label => switch (this) {
-    Meal.breakfast => 'Breakfast',
-    Meal.lunch => 'Lunch',
-    Meal.dinner => 'Dinner',
-    Meal.snack => 'Snacks',
-  };
-}
-
-extension QuantitySourceLabel on QuantitySource {
-  String get label => switch (this) {
-    QuantitySource.weighed => 'Weighed',
-    QuantitySource.labelServing => 'Label serving',
-    QuantitySource.householdMeasure => 'Cup / spoon',
-    QuantitySource.palm => 'Palm',
-    QuantitySource.cuppedHand => 'Cupped hand',
-    QuantitySource.thumb => 'Thumb',
-    QuantitySource.quickAdd => 'Estimate',
-  };
 }

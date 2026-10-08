@@ -33,10 +33,12 @@ requirements, and [docs/architecture.md](docs/architecture.md).
 - `apps/mobile/` is the Flutter UI.
 - `packages/domain/` contains pure-Dart domain types and rules.
 - `packages/engine/` contains pure-Dart calculations and coaching logic.
-- `packages/data/` contains Drift/SQLite persistence and `MmStore` (to be replaced
-  by repository interfaces and implementations, MM-161).
-- `packages/fixtures/` (planned, MM-161) holds in-memory implementations of
-  every interface, for tests, demos and early work.
+- `packages/data/` contains Drift/SQLite persistence: the Drift implementations of the
+  repository interfaces (`DriftRepositories`).
+- `packages/fixtures/` holds in-memory implementations of every interface and the
+  contract test suites, for tests, demos and early work.
+- `apps/mobile/lib/src/ui/` is the design-system component library; screens use it and never
+  raw Material controls.
 - `tool/` contains the dependency-light `mm` task runner.
 - `requirements/` is the source of truth for planned and shipped product
   behavior; `docs/architecture.md` records cross-cutting design.
@@ -85,10 +87,8 @@ interface segregation (I) win.
 9. Prefer composition to inheritance, and stateless or `ConsumerWidget`
    widgets, so the one-declaration rule does not force public `State` classes.
 
-New code follows these now. Existing code that does not is listed in the
-baseline (`tool/arch_baseline.txt`, once MM-160 lands) and is fixed by the
-tickets MM-160 to MM-163, not opportunistically inside unrelated changes. Do not
-add to the baseline.
+`mm arch` (part of `mm check`) enforces rules 2 (no vendor outside the registration
+file), 5, 6 and 8. Its baseline, `tool/arch_baseline.txt`, is empty; do not add to it.
 
 ## Validation
 

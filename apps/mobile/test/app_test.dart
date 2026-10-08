@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:martian_macros/src/app.dart';
+import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/integration_providers.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';

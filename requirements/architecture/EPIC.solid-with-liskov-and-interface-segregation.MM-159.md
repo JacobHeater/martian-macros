@@ -1,6 +1,6 @@
 ---
 id: MM-159
-status: proposed
+status: in-progress
 component: architecture
 related: [MM-160, MM-161, MM-162, MM-163, MM-104, MM-5, MM-60]
 ---
@@ -51,3 +51,7 @@ Done when `mm check` fails a change that breaks any of the mechanical rules (7, 
 ## Notes
 - Rules 3 to 5 are why this comes before most feature work: WS-04, WS-08, WS-11, WS-12 and WS-13 each name a vendor or store decision that is not made yet. With the seams in place those workstreams build against fixtures and the decision becomes a later registration.
 - Principles that cannot be checked mechanically (Liskov in full, Open/Closed, Single responsibility) are enforced by contract tests and by review against the checklist in `AGENTS.md`.
+
+## Progress
+MM-160, MM-161 and MM-162 are done; MM-163 (design system) is in progress and needs the gallery. Measured at the end of this work: 0 of 284 Dart files define more than one type (it was 24 of 42
+library files), 18 repository interfaces and 16 integration files exist with in-memory fixtures and contract suites (there were no interfaces), and the app depends on no concrete store.
