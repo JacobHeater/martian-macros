@@ -1,0 +1,62 @@
+---
+id: MM-103
+status: in-progress
+component: design-system
+related: [MM-101, MM-104, MM-106]
+---
+
+# Task: A type scale and a spacing scale
+
+## Context
+See MM-101. Screens currently pick a Material text style and a padding number each time: 4, 6, 8, 12, 16, 24, 28 and 96 all appear as
+gaps, and the same kind of number (a headline figure) is `displaySmall` in one place and `headlineMedium` in another.
+
+## Decisions
+Choices I made without asking (say if any is wrong):
+- **Roles, not sizes.** A screen asks for a role and the system decides the style:
+
+| role | used for | Material style |
+|---|---|---|
+| figure | the one big number on a card (calories, trend weight, expenditure) | `displaySmall` |
+| figure unit | the unit or "of 2,473 kcal" beside a figure | `bodyLarge` |
+| screen title | the top bar | `titleLarge` |
+| card title | the heading of a card | `titleMedium` |
+| label | field labels, small headings, stat names | `labelMedium` |
+| body | sentences | `bodyMedium` |
+| caption | explanations under a control or a chart | `bodySmall` |
+
+- **Numbers that change or line up use tabular figures**, so digits do not shift sideways as values update.
+- **Proposed change (design/visual-language.md): bundle Space Grotesk for figures and titles and Inter for the rest**, as app assets, never fetched
+  over the network. Needs product-owner approval and a tabular-figure check in the gallery; the platform default is the fallback.
+- **Spacing is a scale of 4**: 4, 8, 12, 16, 24, 32. Screen edge padding is 16; the gap between cards is 12; padding inside a card is 16.
+  Nothing else is used.
+- **Corner radius** (proposed change, see design/visual-language.md): 16 for cards and hero, 12 for controls, 8 for chips, full-round for bars, 24 for sheet tops.
+- **Text respects the system's text size**, up to the largest setting (MM-106).
+
+## Description
+Named text roles and spacing constants in the theme, with existing screens changed to use them.
+
+## Acceptance Criteria
+```gherkin
+Scenario: The same role looks the same
+  Then the headline figure on the Food, Progress and Coach screens uses the same style
+
+Scenario: Only the scale
+  Then no screen file contains a padding, gap or radius outside the scale
+
+Scenario: Steady digits
+  Given a calorie figure changing from 1,199 to 1,200
+  Then the digits to its left do not move
+
+Scenario: Large text
+  Given the largest system text size
+  Then every role scales and nothing is clipped
+```
+## Progress (step 1a)
+- `MmSpace` and `MmRadius` constants exist in `theme/mm_theme.dart`, and the component themes use them. Type roles, bundled fonts and the
+  migration of screens onto the spacing scale are not done (step 1b).
+
+## Progress (restyle)
+- Type roles from design/visual-language.md are in the theme (`theme/mm_type.dart`): Inter and Space Grotesk are bundled (OFL, `apps/mobile/assets/fonts/`), mapped onto Material text slots with tabular figures.
+- The look is applied: horizon arc hero (`CalorieHero`, `HorizonArc`, `MmHeroSurface`), status row, notice family without fills (`NoticeKind`), macro rows with protein emphasized, per-meal add buttons, day header in the app bar, nav hairline, FAB halo in dark. Tested in light and dark on the emulator.
+- **Not verified**: Space Grotesk tabular figures were not checked digit by digit; golden images still need Linux CI (MM-105). **Not done**: onboarding, Settings and Coach layouts are restyled only through the theme, not redesigned per screen-direction.md.

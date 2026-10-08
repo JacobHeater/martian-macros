@@ -1,5 +1,11 @@
 include: ../../analysis_options.yaml
 
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    # Written by `mm schema` (drift_dev).
+    - test/generated_migrations/**
+
 linter:
   rules:
     # Drift's CHECK-constraint idiom references the column inside its own

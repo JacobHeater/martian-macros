@@ -2,6 +2,9 @@ import 'dart:math' as math;
 
 import 'package:mm_domain/mm_domain.dart';
 
+import 'goal_body_fat_check.dart';
+import 'protein_range.dart';
+
 /// Hard physiological limits. Every target the engine emits passes through
 /// these.
 ///
@@ -73,24 +76,45 @@ abstract final class SafetyBounds {
     currentKcal * maxWeeklyTargetChangeFraction,
   );
 
-  /// Minimum daily fat, g: the larger of a per-kg floor and 20% of energy.
+  /// Share of the weight above BMI 25 that counts toward
+  /// [referenceWeightKg].
+  static const excessWeightFraction = 0.25;
+
+  /// The weight per-kilogram macro rules scale with: body weight up to
+  /// BMI 25, then the BMI-25 weight plus a quarter of the excess (the
+  /// "adjusted body weight" convention). Continuous, and it never falls as
+  /// weight rises, so a target cannot jump when a user crosses a BMI line.
+  static double referenceWeightKg({
+    required double weightKg,
+    required double heightCm,
+  }) {
+    final heightM = heightCm / 100;
+    final atBmi25 = 25 * heightM * heightM;
+    if (weightKg <= atBmi25) return weightKg;
+    return atBmi25 + excessWeightFraction * (weightKg - atBmi25);
+  }
+
+  /// Minimum daily fat, g: the larger of a floor per kg of reference weight
+  /// and 20% of energy.
   static double minFatG({
     required BiologicalSex sex,
     required double weightKg,
+    required double heightCm,
     required double kcal,
   }) {
     final perKg = switch (sex) {
       BiologicalSex.male => 0.5,
       BiologicalSex.female => 0.6,
     };
-    return math.max(perKg * weightKg, 0.20 * kcal / 9);
+    final reference = referenceWeightKg(weightKg: weightKg, heightCm: heightCm);
+    return math.max(perKg * reference, 0.20 * kcal / 9);
   }
 
   /// Daily protein range, g.
   ///
   /// Lean users in a deficit get 2.3–3.1 g/kg fat-free mass (Helms 2014).
-  /// Otherwise 1.6–2.2 g/kg of reference weight, where users with BMI ≥ 30
-  /// use the weight at BMI 25 so obese users don't get absurd targets.
+  /// Otherwise 1.6–2.2 g/kg of [referenceWeightKg], so heavier users don't
+  /// get absurd targets.
   /// [capGPerKg] (kidney disease) caps everything.
   static ProteinRange proteinRangeG({
     required BiologicalSex sex,
@@ -109,9 +133,10 @@ abstract final class SafetyBounds {
       final ffm = weightKg * (1 - bodyFatPercent / 100);
       range = ProteinRange(2.3 * ffm, 3.1 * ffm);
     } else {
-      final heightM = heightCm / 100;
-      final bmi = weightKg / (heightM * heightM);
-      final reference = bmi >= 30 ? 25 * heightM * heightM : weightKg;
+      final reference = referenceWeightKg(
+        weightKg: weightKg,
+        heightCm: heightCm,
+      );
       range = ProteinRange(1.6 * reference, 2.2 * reference);
     }
     if (capGPerKg != null) {
@@ -135,14 +160,3 @@ abstract final class SafetyBounds {
     return GoalBodyFatCheck.accepted;
   }
 }
-
-final class ProteinRange {
-  const ProteinRange(this.minG, this.maxG);
-
-  final double minG;
-  final double maxG;
-
-  double get midG => (minG + maxG) / 2;
-}
-
-enum GoalBodyFatCheck { accepted, warnAndTimeLimit, rejected }

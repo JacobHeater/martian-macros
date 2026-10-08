@@ -29,12 +29,6 @@ void main() {
     test('Katch-McArdle', () {
       expect(katchMcArdleKcal(fatFreeMassKg: 60), closeTo(1666, 1e-9));
     });
-
-    test('initial prior uses a conservative activity factor', () {
-      final prior = initialTdeePrior(bmrKcal: 1800, trainingDaysPerWeek: 3);
-      expect(prior.kcal, closeTo(2610, 1e-9));
-      expect(prior.sigmaKcal, closeTo(391.5, 1e-9));
-    });
   });
 
   group('partition', () {

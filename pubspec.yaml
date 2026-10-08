@@ -9,6 +9,7 @@ workspace:
   - apps/mobile
   - packages/domain
   - packages/engine
+  - packages/fixtures
   - packages/data
   - tool
 

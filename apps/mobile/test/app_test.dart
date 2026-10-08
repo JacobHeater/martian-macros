@@ -1,17 +1,18 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:martian_macros/src/app.dart';
-import 'package:martian_macros/src/providers.dart';
-import 'package:mm_data/mm_data.dart';
+import 'package:martian_macros/src/app/martian_macros_app.dart';
+import 'package:martian_macros/src/integration_providers.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_fixtures/mm_fixtures.dart';
+
+import 'support/in_memory_overrides.dart';
 
 void main() {
   final today = CalendarDate(2026, 10, 5);
-  late MmStore store;
+  late InMemoryRepositories repos;
 
-  setUp(() => store = MmStore(AppDatabase(NativeDatabase.memory())));
+  setUp(() => repos = InMemoryRepositories());
 
   Future<void> pumpApp(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
@@ -20,8 +21,8 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          storeProvider.overrideWithValue(store),
-          todayProvider.overrideWithValue(today),
+          ...inMemoryOverrides(repos),
+          clockProvider.overrideWithValue(FixedClock(today)),
         ],
         child: const MartianMacrosApp(),
       ),
@@ -29,11 +30,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// Unmounts the app and lets Drift's stream-cleanup timers fire.
+  /// Unmounts the app and lets pending stream timers fire.
   Future<void> shutDown(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
-    await tester.runAsync(store.close);
+    await tester.runAsync(repos.close);
   }
 
   Future<void> seedSetup(
@@ -42,8 +43,8 @@ void main() {
     UnitSystem units = UnitSystem.imperial,
   }) async {
     await tester.runAsync(() async {
-      await store.saveWeight(today, 90);
-      await store.saveSetup(
+      await repos.weights.saveWeight(today, 90);
+      await repos.setup.saveSetup(
         UserSetup(
           profile: Profile(
             sex: BiologicalSex.male,
@@ -101,6 +102,9 @@ void main() {
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Your day'), findsOneWidget);
+    await tester.tap(find.text('Next')); // activity
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Next')); // training
     await tester.pumpAndSettle();
     // Male profile: female-only questions are not offered.
@@ -113,17 +117,17 @@ void main() {
     await tester.tap(find.text('Start'));
     await tester.pumpAndSettle();
 
-    final setup = (await io(tester, store.loadSetup))!;
+    final setup = (await io(tester, repos.setup.loadSetup))!;
     expect(setup.profile.sex, BiologicalSex.male);
     expect(setup.profile.heightCm, closeTo(180.3, 0.1));
-    final weights = await io(tester, () => store.watchWeights().first);
+    final weights = await io(tester, () => repos.weights.watchWeights().first);
     expect(weights.single.weightKg, closeTo(90.7, 0.1));
 
     // Lands on the main shell with targets already issued.
     expect(find.text('Add food'), findsOneWidget);
     expect(find.textContaining('Calibration, day 1 of 14'), findsOneWidget);
     expect(
-      await io(tester, () => store.watchTargetsHistory().first),
+      await io(tester, () => repos.targets.watchTargetsHistory().first),
       hasLength(1),
     );
     await shutDown(tester);
@@ -152,7 +156,9 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Next'));
+    await tester.tap(find.text('Next')); // activity
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // training
     await tester.pumpAndSettle();
 
     expect(find.text('Pregnant'), findsOneWidget);
@@ -189,16 +195,22 @@ void main() {
     await tester.pumpAndSettle();
 
     // 45*4 + 60*4 + 10*9 = 510 kcal, calculated from macros.
-    final logged = await io(tester, () => store.watchFood(today).first);
+    final logged = await io(tester, () => repos.food.watchFood(today).first);
     expect(logged.single.kcal, 510);
+
+    // Logging from the dashboard leaves the user on the dashboard; the log
+    // itself is on the Food tab.
+    expect(find.textContaining('kcal left'), findsOneWidget);
+    await tester.tap(find.text('Food'));
+    await tester.pumpAndSettle();
     expect(find.text('Chicken and rice'), findsOneWidget);
     expect(find.text('510'), findsWidgets);
-    expect(find.textContaining('remaining'), findsOneWidget);
+    expect(find.textContaining('kcal left'), findsOneWidget);
 
     await tester.tap(find.text('Complete'));
     await tester.pumpAndSettle();
     expect(
-      await io(tester, () => store.watchCompleteness(today).first),
+      await io(tester, () => repos.dayMarks.watchCompleteness(today).first),
       DayCompleteness.complete,
     );
     await shutDown(tester);
@@ -210,7 +222,7 @@ void main() {
     await seedSetup(tester, units: UnitSystem.metric);
     await tester.runAsync(() async {
       for (var d = 1; d <= 10; d++) {
-        await store.saveWeight(today.addDays(-d), 90 + d * 0.1);
+        await repos.weights.saveWeight(today.addDays(-d), 90 + d * 0.1);
       }
     });
     await pumpApp(tester);
@@ -227,7 +239,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('save-weigh-in')));
     await tester.pumpAndSettle();
-    final weights = await io(tester, () => store.watchWeights().first);
+    final weights = await io(tester, () => repos.weights.watchWeights().first);
     expect(weights.last.weightKg, 89.5);
 
     await tester.tap(find.text('Coach'));
