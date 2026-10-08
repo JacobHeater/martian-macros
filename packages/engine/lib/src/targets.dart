@@ -152,6 +152,7 @@ DailyTargets computeTargets(TargetInputs i) {
   final minFat = SafetyBounds.minFatG(
     sex: i.sex,
     weightKg: i.trendWeightKg,
+    heightCm: i.heightCm,
     kcal: kcal,
   );
   var fatG = math.max(minFat, 0.25 * kcal / 9);

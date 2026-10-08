@@ -104,16 +104,76 @@ void main() {
       expect(range.maxG, closeTo(3.1 * 70.4, 1e-9));
     });
 
-    test('protein uses BMI-25 reference weight for obese users', () {
+    double proteinTarget(
+      double weightKg, {
+      double heightCm = 180,
+      BiologicalSex sex = BiologicalSex.male,
+    }) => SafetyBounds.proteinRangeG(
+      sex: sex,
+      weightKg: weightKg,
+      heightCm: heightCm,
+      bodyFatPercent: 35,
+      inDeficit: true,
+    ).midG;
+
+    test('reference weight is body weight up to BMI 25, then a quarter of '
+        'the excess', () {
+      double reference(double kg) =>
+          SafetyBounds.referenceWeightKg(weightKg: kg, heightCm: 180);
+      expect(reference(70), 70);
+      expect(reference(81), closeTo(81, 1e-9));
+      expect(reference(121), closeTo(91, 1e-9));
+    });
+
+    test('protein is unchanged at a healthy weight', () {
       final range = SafetyBounds.proteinRangeG(
-        sex: BiologicalSex.female,
-        weightKg: 120,
-        heightCm: 165,
-        bodyFatPercent: 45,
-        inDeficit: true,
+        sex: BiologicalSex.male,
+        weightKg: 77.8, // BMI 24 at 180 cm
+        heightCm: 180,
+        bodyFatPercent: 20,
+        inDeficit: false,
       );
-      final reference = 25 * 1.65 * 1.65;
-      expect(range.minG, closeTo(1.6 * reference, 1e-9));
+      expect(range.minG, closeTo(1.6 * 77.8, 1e-9));
+      expect(range.maxG, closeTo(2.2 * 77.8, 1e-9));
+    });
+
+    test('protein does not step at BMI 30', () {
+      expect((proteinTarget(97.3) - proteinTarget(96.9)).abs(), lessThan(2));
+    });
+
+    test('protein is continuous and never falls as weight rises', () {
+      for (final sex in BiologicalSex.values) {
+        for (var heightCm = 150.0; heightCm <= 200; heightCm += 10) {
+          final heightM = heightCm / 100;
+          var previous = 0.0;
+          for (
+            var kg = 18 * heightM * heightM;
+            kg <= 50 * heightM * heightM;
+            kg += 0.5
+          ) {
+            final target = proteinTarget(kg, heightCm: heightCm, sex: sex);
+            if (previous > 0) {
+              expect(target, greaterThanOrEqualTo(previous));
+              expect(target - previous, lessThan(2));
+            }
+            previous = target;
+          }
+        }
+      }
+    });
+
+    test('protein stays sensible at a high weight', () {
+      expect(proteinTarget(140), inInclusiveRange(150, 200));
+    });
+
+    test('the fat minimum uses the same reference weight', () {
+      final fat = SafetyBounds.minFatG(
+        sex: BiologicalSex.male,
+        weightKg: 121,
+        heightCm: 180,
+        kcal: 1500,
+      );
+      expect(fat, closeTo(0.5 * 91, 1e-9));
     });
 
     test('kidney-disease cap overrides protein', () {
