@@ -24,6 +24,7 @@ final class TdeeEstimate {
     this.weighIns = 0,
     this.windowStart,
     this.clampedToBounds = false,
+    this.settlingUntil,
   });
 
   /// Maintenance intake, in the user's own logging units.
@@ -47,6 +48,26 @@ final class TdeeEstimate {
   /// True if the raw estimate fell outside the plausible range and was
   /// clamped; a strong hint that logging is unreliable.
   final bool clampedToBounds;
+
+  /// Set when the estimate is held because too few days remain once a
+  /// [SettlingWindow] is left out: the last day of that window.
+  final CalendarDate? settlingUntil;
+}
+
+/// Days on which the scale moves for reasons that are not tissue: the
+/// first days after energy intake changes level, when glycogen, the water
+/// stored with it, and gut contents shift by a kilogram or two. The
+/// estimator ignores weight change and intake inside the window.
+final class SettlingWindow {
+  const SettlingWindow(this.start, this.end);
+
+  /// The first day at the new intake.
+  final CalendarDate start;
+
+  /// The last day left out, inclusive.
+  final CalendarDate end;
+
+  bool contains(CalendarDate day) => !day.isBefore(start) && !day.isAfter(end);
 }
 
 /// Windowed energy-balance TDEE estimator.
@@ -104,16 +125,22 @@ final class TdeeEstimator {
     required TdeePrior prior,
     required double bmrKcal,
     required double Function(double slopeKgPerDay) energyDensityForSlope,
+    List<SettlingWindow> settling = const [],
   }) {
-    TdeeEstimate held({int usable = 0, int partial = 0, int weighIns = 0}) =>
-        TdeeEstimate(
-          kcal: prior.kcal,
-          sigmaKcal: prior.sigmaKcal,
-          status: TdeeStatus.held,
-          usableIntakeDays: usable,
-          excludedPartialDays: partial,
-          weighIns: weighIns,
-        );
+    TdeeEstimate held({
+      int usable = 0,
+      int partial = 0,
+      int weighIns = 0,
+      CalendarDate? settlingUntil,
+    }) => TdeeEstimate(
+      kcal: prior.kcal,
+      sigmaKcal: prior.sigmaKcal,
+      status: TdeeStatus.held,
+      usableIntakeDays: usable,
+      excludedPartialDays: partial,
+      weighIns: weighIns,
+      settlingUntil: settlingUntil,
+    );
 
     // The window starts no earlier than the first weigh-in, so early
     // check-ins can update from a shorter (but at least minSpanDays) window.
@@ -130,20 +157,38 @@ final class TdeeEstimator {
     }
     if (start.daysUntil(asOf) + 1 < minSpanDays) return held();
 
+    // Stretches of the window outside every settling window. Weight change
+    // is summed over these only.
+    final segments = _cleanSegments(start, asOf, settling);
+    final spanDays = segments.fold(0, (sum, s) => sum + s.$1.daysUntil(s.$2));
+    if (spanDays + 1 < minSpanDays) {
+      // Only settling windows can have shortened the span.
+      final ends = [
+        for (final w in settling)
+          if (!w.end.isBefore(start) && !w.start.isAfter(asOf)) w.end,
+      ]..sort();
+      return held(settlingUntil: ends.last);
+    }
+    bool clean(CalendarDate day) =>
+        segments.any((s) => !day.isBefore(s.$1) && !day.isAfter(s.$2));
+    days = days.where((d) => clean(d.date)).toList();
+
     final (usable, partialCount) = _usableDays(days);
 
     final trendByDay = {for (final p in trend) p.date.epochDay: p};
-    final startPoint = trendByDay[start.epochDay];
-    final endPoint = trendByDay[asOf.epochDay];
     final weighIns = [
-      for (var d = start.epochDay; d <= asOf.epochDay; d++)
-        if (trendByDay[d]?.observed ?? false) d,
+      for (final (from, to) in segments)
+        for (var d = from.epochDay; d <= to.epochDay; d++)
+          if (trendByDay[d]?.observed ?? false) d,
     ].length;
+    final ends = [
+      for (final (from, to) in segments)
+        (trendByDay[from.epochDay], trendByDay[to.epochDay]),
+    ];
 
     if (usable.length < minIntakeDays ||
         weighIns < minWeighIns ||
-        startPoint == null ||
-        endPoint == null) {
+        ends.any((e) => e.$1 == null || e.$2 == null)) {
       return held(
         usable: usable.length,
         partial: partialCount,
@@ -151,10 +196,15 @@ final class TdeeEstimator {
       );
     }
 
-    final spanDays = start.daysUntil(asOf);
-    final slope = (endPoint.levelKg - startPoint.levelKg) / spanDays;
+    final slope =
+        ends.fold(0.0, (sum, e) => sum + e.$2!.levelKg - e.$1!.levelKg) /
+        spanDays;
     final slopeVariance =
-        (endPoint.levelVariance + startPoint.levelVariance) / _sq(spanDays);
+        ends.fold(
+          0.0,
+          (sum, e) => sum + e.$2!.levelVariance + e.$1!.levelVariance,
+        ) /
+        _sq(spanDays);
     final rho = energyDensityForSlope(slope);
 
     final n = usable.length;
@@ -168,7 +218,7 @@ final class TdeeEstimator {
         ? 0.0
         : usable.fold(0.0, (sum, d) => sum + _sq(d.kcal - meanIntake)) /
               (n - 1);
-    final windowLength = spanDays + 1;
+    final windowLength = spanDays + segments.length;
     final samplingVar = sampleVar / n * (1 - n / windowLength);
 
     final observedKcal = meanIntake - rho * slope;
@@ -193,6 +243,30 @@ final class TdeeEstimator {
       windowStart: start,
       clampedToBounds: clamped != posterior,
     );
+  }
+
+  /// [start]..[end] with every settling window cut out. A piece runs from
+  /// the day after one window to the first day of the next, whose morning
+  /// weigh-in precedes the change. Pieces of a single day carry no weight
+  /// change and are dropped.
+  List<(CalendarDate, CalendarDate)> _cleanSegments(
+    CalendarDate start,
+    CalendarDate end,
+    List<SettlingWindow> settling,
+  ) {
+    final windows = [
+      for (final w in settling)
+        if (!w.end.isBefore(start) && !w.start.isAfter(end)) w,
+    ]..sort((a, b) => a.start.compareTo(b.start));
+    final segments = <(CalendarDate, CalendarDate)>[];
+    var from = start;
+    for (final w in windows) {
+      if (w.start.isAfter(from)) segments.add((from, w.start));
+      final next = w.end.addDays(1);
+      if (next.isAfter(from)) from = next;
+    }
+    if (end.isAfter(from)) segments.add((from, end));
+    return segments;
   }
 
   List<IntakeDay> _daysInWindow(

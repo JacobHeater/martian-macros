@@ -197,7 +197,16 @@ class _Metabolism extends StatelessWidget {
                     'The estimate is being held at a safe limit.',
               ),
             ),
-        ] else
+        ] else if (tdee.settlingUntil case final settlingUntil?)
+          Notice(
+            icon: Icons.hourglass_bottom,
+            text:
+                'Waiting for early water changes to settle. When how much '
+                'you eat changes, the scale moves a few pounds that are not '
+                'fat. Your measurement will use the days after '
+                '${Fmt.longDate(settlingUntil)}, and needs two weeks of them.',
+          )
+        else
           Notice(
             icon: Icons.hourglass_bottom,
             text:

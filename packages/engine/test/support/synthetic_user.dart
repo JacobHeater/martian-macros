@@ -10,6 +10,12 @@ import 'package:mm_engine/mm_engine.dart';
 /// comes from the same Forbes/Hall partition the engine assumes; true TDEE
 /// adapts by [adaptationKcalPerKg] per kg lost; day-to-day weigh-ins carry
 /// AR(1) water noise plus scale noise.
+///
+/// With [glycogenSwingFraction] above zero the scale also carries a
+/// glycogen-and-gut store that follows energy balance: it empties over a
+/// few days in a deficit and refills at maintenance. It is water and food
+/// mass, not tissue, and is deliberately a different model from anything
+/// the engine assumes.
 final class SyntheticUser {
   SyntheticUser({
     required int seed,
@@ -28,6 +34,9 @@ final class SyntheticUser {
     this.weighedShare = 0,
     this.resistanceTrained = true,
     this.adaptationKcalPerKg = 22,
+    this.glycogenSwingFraction = 0,
+    this.glycogenTimeConstantDays = 3,
+    this.glycogenFullDeficitFraction = 0.2,
   }) : _random = math.Random(seed),
        today = start ?? CalendarDate(2026, 1, 1),
        weightKg = startWeightKg,
@@ -44,6 +53,17 @@ final class SyntheticUser {
   final bool resistanceTrained;
   final double adaptationKcalPerKg;
 
+  /// Scale weight lost to the glycogen-and-gut store in a sustained
+  /// deficit, as a fraction of starting weight. Zero switches it off.
+  final double glycogenSwingFraction;
+
+  /// Days for the store to cover about two thirds of the way to its level.
+  final double glycogenTimeConstantDays;
+
+  /// The deficit, as a fraction of expenditure, at which the store is as
+  /// empty as it gets.
+  final double glycogenFullDeficitFraction;
+
   // Mutable so tests can change behaviour mid-run.
   double underReportFraction;
   double skipLogProbability;
@@ -54,6 +74,10 @@ final class SyntheticUser {
   double weightKg;
   double fatMassKg;
   double _water = 0;
+  double _glycogenKg = 0;
+
+  /// What the store currently adds to the scale (negative when depleted).
+  double get glycogenOffsetKg => _glycogenKg;
 
   double get trueTdeeKcal =>
       baseTdeeKcal + adaptationKcalPerKg * (weightKg - startWeightKg);
@@ -70,7 +94,7 @@ final class SyntheticUser {
         ? null
         : WeightObservation(
             date: today,
-            weightKg: weightKg + _water + _gauss() * 0.1,
+            weightKg: weightKg + _glycogenKg + _water + _gauss() * 0.1,
           );
 
     // The user eats what they believe is the target; under-reporting means
@@ -97,6 +121,14 @@ final class SyntheticUser {
     }
 
     final balance = actual - trueTdeeKcal;
+    if (glycogenSwingFraction > 0) {
+      // Depletes fully at the reference deficit; a surplus overfills it a
+      // little.
+      final fill = (balance / (glycogenFullDeficitFraction * trueTdeeKcal))
+          .clamp(-1.0, 0.25);
+      final level = glycogenSwingFraction * startWeightKg * fill;
+      _glycogenKg += (level - _glycogenKg) / glycogenTimeConstantDays;
+    }
     final leanFraction = leanFractionOfChange(
       fatMassKg: fatMassKg,
       losing: balance < 0,

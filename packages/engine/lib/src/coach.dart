@@ -57,6 +57,60 @@ const int calibrationDays = 14;
 /// Days between target changes.
 const int checkInIntervalDays = 7;
 
+/// Days after a change in intake level during which the scale is moved by
+/// glycogen, water and gut contents, not tissue.
+const int settlingDays = 10;
+
+/// A change in calorie target larger than this share of expenditure counts
+/// as a change of intake level.
+const double phaseChangeFraction = 0.10;
+
+/// How far the trend level may shift per day inside a settling window, as
+/// a share of body weight, beyond ordinary tissue change.
+const double settlingShiftFraction = 0.004;
+
+/// How far the trend's slope may change per day inside a settling window,
+/// as a share of body weight per day. A change of intake level is a change
+/// of pace.
+const double settlingSlopeShiftFraction = 0.0004;
+
+/// For the trend filter: the extra movement allowed on each day of a
+/// settling window.
+TrendShift? Function(CalendarDate) settlingShift(
+  List<SettlingWindow> windows,
+  double weightKg,
+) {
+  final shift = TrendShift(
+    levelSigmaKg: settlingShiftFraction * weightKg,
+    slopeSigmaKgPerDay: settlingSlopeShiftFraction * weightKg,
+  );
+  return (date) => windows.any((w) => w.contains(date)) ? shift : null;
+}
+
+/// The settling window after each change of intake level in [history].
+///
+/// The first targets are compared with expenditure, on the assumption that
+/// the user was eating at maintenance before they started.
+List<SettlingWindow> settlingWindows(List<TargetsRecord> history) {
+  final windows = <SettlingWindow>[];
+  TargetsRecord? previous;
+  for (final record in history) {
+    final change = previous == null
+        ? record.targets.kcal - record.tdeeKcal
+        : record.targets.kcal - previous.targets.kcal;
+    if (change.abs() > phaseChangeFraction * record.tdeeKcal) {
+      windows.add(
+        SettlingWindow(
+          record.effectiveFrom,
+          record.effectiveFrom.addDays(settlingDays - 1),
+        ),
+      );
+    }
+    previous = record;
+  }
+  return windows;
+}
+
 /// Analyses stored history. Returns null until there is a weigh-in.
 ///
 /// TDEE is estimated as of yesterday: today's intake is still in progress.
@@ -66,6 +120,7 @@ CoachSnapshot? analyze({
   required List<IntakeDay> intake,
   required CalendarDate today,
   List<MenstruationDay> flowDays = const [],
+  List<TargetsRecord> history = const [],
   WeightTrendModel trendModel = const WeightTrendModel(),
   TdeeEstimator estimator = const TdeeEstimator(),
 }) {
@@ -77,10 +132,14 @@ CoachSnapshot? analyze({
     today: today,
   );
 
+  final settling = settlingWindows(history);
   final trend = trendModel.smooth(
     weights,
     through: today,
     noiseMultiplier: flowDays.isEmpty ? null : cycleNoiseMultiplier(flowDays),
+    shift: settling.isEmpty
+        ? null
+        : settlingShift(settling, weights.first.weightKg),
   );
   final trendWeight = trend.last.levelKg;
   final age = profile.ageOn(today);
@@ -115,6 +174,7 @@ CoachSnapshot? analyze({
       fatMassKg: bodyFat.fatMassKg(trendWeight),
       resistanceTrained: setup.trainingStatus.isResistanceTrained,
     ),
+    settling: settling,
   );
 
   return CoachSnapshot(

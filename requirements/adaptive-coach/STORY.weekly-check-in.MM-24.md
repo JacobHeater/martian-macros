@@ -62,4 +62,7 @@ Scenario: A biased, sloppy logger still progresses
   `closed_loop_test.dart`.
 - **Only day-one targets have been seen in the app.** The first adaptive change needs two weeks of data and has not been driven through the
   app; the engine tests cover the logic.
+- Since MM-131, a user whose first targets are more than 10% away from their expenditure (anyone starting in a deficit or surplus) has
+  the first ten days left out of the measurement, so their first adaptive change comes at day 28, not day 14. The "first adaptive
+  change" scenario above holds as written only for a user who starts at maintenance.
 - A user is never told that targets changed; they have to notice. A notice or summary at check-in belongs with MM-33.
