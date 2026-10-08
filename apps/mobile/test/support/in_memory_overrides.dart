@@ -12,5 +12,6 @@ List<Override> inMemoryOverrides(InMemoryRepositories repos) => [
   dayMarkRepositoryProvider.overrideWithValue(repos.dayMarks),
   intakeReaderProvider.overrideWithValue(repos.intake),
   targetsHistoryRepositoryProvider.overrideWithValue(repos.targets),
+  preferencesRepositoryProvider.overrideWithValue(repos.preferences),
   dataEraserProvider.overrideWithValue(repos.eraser),
 ];

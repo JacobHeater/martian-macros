@@ -7,6 +7,10 @@ void main() {
   setupRepositoryContract('In-memory', () => InMemoryRepositories().setup);
   weightRepositoryContract('In-memory', () => InMemoryRepositories().weights);
   waistRepositoryContract('In-memory', () => InMemoryRepositories().waist);
+  preferencesRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().preferences,
+  );
   foodRepositoryContract('In-memory', () => InMemoryRepositories().food);
   dayMarkRepositoryContract('In-memory', () => InMemoryRepositories().dayMarks);
   targetsHistoryRepositoryContract(
@@ -25,6 +29,7 @@ void main() {
       weights: r.weights,
       food: r.food,
       targets: r.targets,
+      preferences: r.preferences,
     );
   });
 }

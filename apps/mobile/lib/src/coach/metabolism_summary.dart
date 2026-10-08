@@ -36,8 +36,9 @@ class MetabolismSummary extends StatelessWidget {
         Text(
           measured
               ? 'Measured from your logged food and weight trend.'
-              : 'Starting estimate from your height, weight, age, and sex. '
-                    'It gets replaced by a measurement of your body.',
+              : 'Starting estimate from your sex, age, height, weight, daily '
+                    'activity and training days. It gets replaced by a '
+                    'measurement of your body.',
           style: text.bodyMedium,
         ),
         const SizedBox(height: 12),

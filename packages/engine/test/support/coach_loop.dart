@@ -14,6 +14,7 @@ List<WeekResult> runCoachLoop({
   required int weeks,
   TrainingStatus trainingStatus = TrainingStatus.intermediate,
   int trainingDaysPerWeek = 3,
+  DailyActivity dailyActivity = DailyActivity.light,
   void Function(int week, SyntheticUser user)? beforeWeek,
   TdeeEstimator estimator = const TdeeEstimator(),
   bool settle = true,
@@ -38,6 +39,7 @@ List<WeekResult> runCoachLoop({
   final startBmr = bmrFor(user.weightKg);
   final prior = initialTdeePrior(
     bmrKcal: startBmr,
+    dailyActivity: dailyActivity,
     trainingDaysPerWeek: trainingDaysPerWeek,
   );
   var tdee = TdeeEstimate(

@@ -5,6 +5,7 @@ UserSetup typicalSetup({
   GoalMode goalMode = GoalMode.fatLoss,
   BiologicalSex sex = BiologicalSex.male,
   ScreeningAnswers screening = const ScreeningAnswers(),
+  DailyActivity dailyActivity = DailyActivity.light,
   CalendarDate? onboardedOn,
 }) => UserSetup(
   profile: Profile(
@@ -15,6 +16,7 @@ UserSetup typicalSetup({
   screening: screening,
   trainingStatus: TrainingStatus.novice,
   trainingDaysPerWeek: 3,
+  dailyActivity: dailyActivity,
   goalMode: goalMode,
   onboardedOn: onboardedOn ?? CalendarDate(2026, 10, 1),
 );

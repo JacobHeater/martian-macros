@@ -102,6 +102,40 @@ void main() {
     }
   });
 
+  group('from released version 1 (MM-164, MM-165)', () {
+    test('a saved setup survives, reads as light activity, and the '
+        'display preference is the system default', () async {
+      final schema = await verifier.schemaAt(1);
+      schema.rawDatabase.execute(
+        'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, '
+        'training_status, training_days_per_week, goal_mode, unit_system, '
+        'onboarded_epoch_day, thyroid_condition) VALUES '
+        "(1, 'female', ${CalendarDate(1992, 4, 20).epochDay}, 168, 'novice', "
+        "3, 'recomp', 'imperial', ${day.epochDay}, 1)",
+      );
+      final db = AppDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 2);
+
+      final repos = DriftRepositories(db);
+      final setup = (await repos.setup.loadSetup())!;
+      expect(setup.profile.sex, BiologicalSex.female);
+      expect(setup.screening.thyroidCondition, isTrue);
+      expect(setup.trainingDaysPerWeek, 3);
+      expect(setup.goalMode, GoalMode.recomp);
+      expect(setup.dailyActivity, DailyActivity.light);
+      expect(
+        await repos.preferences.watchThemePreference().first,
+        ThemePreference.system,
+      );
+      await repos.preferences.saveThemePreference(ThemePreference.dark);
+      expect(
+        await repos.preferences.watchThemePreference().first,
+        ThemePreference.dark,
+      );
+    });
+  });
+
   group('upgrading', () {
     test('keeps every row and sets the new version', () async {
       await writeVersion1Data();

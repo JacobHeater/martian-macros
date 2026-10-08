@@ -69,6 +69,7 @@ CoachSnapshot? analyze({
     trend: trend,
     prior: initialTdeePrior(
       bmrKcal: bmr,
+      dailyActivity: setup.dailyActivity,
       trainingDaysPerWeek: setup.trainingDaysPerWeek,
     ),
     bmrKcal: bmr,

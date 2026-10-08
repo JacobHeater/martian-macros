@@ -3,6 +3,7 @@
 /// recomputed from history (e.g. after a profile correction).
 library;
 
+export 'src/activity_factor.dart';
 export 'src/analyze.dart';
 export 'src/body_fat_estimate.dart';
 export 'src/coach_constants.dart';

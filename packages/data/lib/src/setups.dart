@@ -14,6 +14,10 @@ class Setups extends Table {
   RealColumn get heightCm => real()();
   TextColumn get trainingStatus => textEnum<TrainingStatus>()();
   IntColumn get trainingDaysPerWeek => integer()();
+
+  /// Added in schema version 2 (MM-164); existing rows read as `light`.
+  TextColumn get dailyActivity =>
+      textEnum<DailyActivity>().withDefault(const Constant('light'))();
   TextColumn get goalMode => textEnum<GoalMode>()();
   TextColumn get unitSystem => textEnum<UnitSystem>()();
   IntColumn get onboardedEpochDay => integer()();

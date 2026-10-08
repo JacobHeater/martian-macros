@@ -35,7 +35,7 @@ void main() {
 
   testWidgets('experience can be changed', (tester) async {
     await openSettings(tester);
-    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.tap(find.byType(PopupMenuButton<TrainingStatus>));
     await tester.pumpAndSettle();
     await tester.tap(find.text('3+ years').last);
     await tester.pumpAndSettle();

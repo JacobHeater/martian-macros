@@ -70,6 +70,16 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     requiredDuringInsert: true,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<DailyActivity, String>
+  dailyActivity = GeneratedColumn<String>(
+    'daily_activity',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('light'),
+  ).withConverter<DailyActivity>($SetupsTable.$converterdailyActivity);
+  @override
   late final GeneratedColumnWithTypeConverter<GoalMode, String> goalMode =
       GeneratedColumn<String>(
         'goal_mode',
@@ -245,6 +255,7 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     heightCm,
     trainingStatus,
     trainingDaysPerWeek,
+    dailyActivity,
     goalMode,
     unitSystem,
     onboardedEpochDay,
@@ -439,6 +450,12 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         DriftSqlType.int,
         data['${effectivePrefix}training_days_per_week'],
       )!,
+      dailyActivity: $SetupsTable.$converterdailyActivity.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}daily_activity'],
+        )!,
+      ),
       goalMode: $SetupsTable.$convertergoalMode.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -507,6 +524,10 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
   $convertertrainingStatus = const EnumNameConverter<TrainingStatus>(
     TrainingStatus.values,
   );
+  static JsonTypeConverter2<DailyActivity, String, String>
+  $converterdailyActivity = const EnumNameConverter<DailyActivity>(
+    DailyActivity.values,
+  );
   static JsonTypeConverter2<GoalMode, String, String> $convertergoalMode =
       const EnumNameConverter<GoalMode>(GoalMode.values);
   static JsonTypeConverter2<UnitSystem, String, String> $converterunitSystem =
@@ -523,6 +544,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   final double heightCm;
   final TrainingStatus trainingStatus;
   final int trainingDaysPerWeek;
+
+  /// Added in schema version 2 (MM-164); existing rows read as `light`.
+  final DailyActivity dailyActivity;
   final GoalMode goalMode;
   final UnitSystem unitSystem;
   final int onboardedEpochDay;
@@ -543,6 +567,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     required this.heightCm,
     required this.trainingStatus,
     required this.trainingDaysPerWeek,
+    required this.dailyActivity,
     required this.goalMode,
     required this.unitSystem,
     required this.onboardedEpochDay,
@@ -570,6 +595,11 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       );
     }
     map['training_days_per_week'] = Variable<int>(trainingDaysPerWeek);
+    {
+      map['daily_activity'] = Variable<String>(
+        $SetupsTable.$converterdailyActivity.toSql(dailyActivity),
+      );
+    }
     {
       map['goal_mode'] = Variable<String>(
         $SetupsTable.$convertergoalMode.toSql(goalMode),
@@ -606,6 +636,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       heightCm: Value(heightCm),
       trainingStatus: Value(trainingStatus),
       trainingDaysPerWeek: Value(trainingDaysPerWeek),
+      dailyActivity: Value(dailyActivity),
       goalMode: Value(goalMode),
       unitSystem: Value(unitSystem),
       onboardedEpochDay: Value(onboardedEpochDay),
@@ -641,6 +672,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       ),
       trainingDaysPerWeek: serializer.fromJson<int>(
         json['trainingDaysPerWeek'],
+      ),
+      dailyActivity: $SetupsTable.$converterdailyActivity.fromJson(
+        serializer.fromJson<String>(json['dailyActivity']),
       ),
       goalMode: $SetupsTable.$convertergoalMode.fromJson(
         serializer.fromJson<String>(json['goalMode']),
@@ -679,6 +713,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
         $SetupsTable.$convertertrainingStatus.toJson(trainingStatus),
       ),
       'trainingDaysPerWeek': serializer.toJson<int>(trainingDaysPerWeek),
+      'dailyActivity': serializer.toJson<String>(
+        $SetupsTable.$converterdailyActivity.toJson(dailyActivity),
+      ),
       'goalMode': serializer.toJson<String>(
         $SetupsTable.$convertergoalMode.toJson(goalMode),
       ),
@@ -708,6 +745,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     double? heightCm,
     TrainingStatus? trainingStatus,
     int? trainingDaysPerWeek,
+    DailyActivity? dailyActivity,
     GoalMode? goalMode,
     UnitSystem? unitSystem,
     int? onboardedEpochDay,
@@ -728,6 +766,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     heightCm: heightCm ?? this.heightCm,
     trainingStatus: trainingStatus ?? this.trainingStatus,
     trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+    dailyActivity: dailyActivity ?? this.dailyActivity,
     goalMode: goalMode ?? this.goalMode,
     unitSystem: unitSystem ?? this.unitSystem,
     onboardedEpochDay: onboardedEpochDay ?? this.onboardedEpochDay,
@@ -760,6 +799,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       trainingDaysPerWeek: data.trainingDaysPerWeek.present
           ? data.trainingDaysPerWeek.value
           : this.trainingDaysPerWeek,
+      dailyActivity: data.dailyActivity.present
+          ? data.dailyActivity.value
+          : this.dailyActivity,
       goalMode: data.goalMode.present ? data.goalMode.value : this.goalMode,
       unitSystem: data.unitSystem.present
           ? data.unitSystem.value
@@ -803,6 +845,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ..write('heightCm: $heightCm, ')
           ..write('trainingStatus: $trainingStatus, ')
           ..write('trainingDaysPerWeek: $trainingDaysPerWeek, ')
+          ..write('dailyActivity: $dailyActivity, ')
           ..write('goalMode: $goalMode, ')
           ..write('unitSystem: $unitSystem, ')
           ..write('onboardedEpochDay: $onboardedEpochDay, ')
@@ -828,6 +871,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     heightCm,
     trainingStatus,
     trainingDaysPerWeek,
+    dailyActivity,
     goalMode,
     unitSystem,
     onboardedEpochDay,
@@ -852,6 +896,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           other.heightCm == this.heightCm &&
           other.trainingStatus == this.trainingStatus &&
           other.trainingDaysPerWeek == this.trainingDaysPerWeek &&
+          other.dailyActivity == this.dailyActivity &&
           other.goalMode == this.goalMode &&
           other.unitSystem == this.unitSystem &&
           other.onboardedEpochDay == this.onboardedEpochDay &&
@@ -874,6 +919,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
   final Value<double> heightCm;
   final Value<TrainingStatus> trainingStatus;
   final Value<int> trainingDaysPerWeek;
+  final Value<DailyActivity> dailyActivity;
   final Value<GoalMode> goalMode;
   final Value<UnitSystem> unitSystem;
   final Value<int> onboardedEpochDay;
@@ -894,6 +940,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.heightCm = const Value.absent(),
     this.trainingStatus = const Value.absent(),
     this.trainingDaysPerWeek = const Value.absent(),
+    this.dailyActivity = const Value.absent(),
     this.goalMode = const Value.absent(),
     this.unitSystem = const Value.absent(),
     this.onboardedEpochDay = const Value.absent(),
@@ -915,6 +962,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     required double heightCm,
     required TrainingStatus trainingStatus,
     required int trainingDaysPerWeek,
+    this.dailyActivity = const Value.absent(),
     required GoalMode goalMode,
     required UnitSystem unitSystem,
     required int onboardedEpochDay,
@@ -943,6 +991,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Expression<double>? heightCm,
     Expression<String>? trainingStatus,
     Expression<int>? trainingDaysPerWeek,
+    Expression<String>? dailyActivity,
     Expression<String>? goalMode,
     Expression<String>? unitSystem,
     Expression<int>? onboardedEpochDay,
@@ -965,6 +1014,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       if (trainingStatus != null) 'training_status': trainingStatus,
       if (trainingDaysPerWeek != null)
         'training_days_per_week': trainingDaysPerWeek,
+      if (dailyActivity != null) 'daily_activity': dailyActivity,
       if (goalMode != null) 'goal_mode': goalMode,
       if (unitSystem != null) 'unit_system': unitSystem,
       if (onboardedEpochDay != null) 'onboarded_epoch_day': onboardedEpochDay,
@@ -991,6 +1041,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Value<double>? heightCm,
     Value<TrainingStatus>? trainingStatus,
     Value<int>? trainingDaysPerWeek,
+    Value<DailyActivity>? dailyActivity,
     Value<GoalMode>? goalMode,
     Value<UnitSystem>? unitSystem,
     Value<int>? onboardedEpochDay,
@@ -1012,6 +1063,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       heightCm: heightCm ?? this.heightCm,
       trainingStatus: trainingStatus ?? this.trainingStatus,
       trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+      dailyActivity: dailyActivity ?? this.dailyActivity,
       goalMode: goalMode ?? this.goalMode,
       unitSystem: unitSystem ?? this.unitSystem,
       onboardedEpochDay: onboardedEpochDay ?? this.onboardedEpochDay,
@@ -1052,6 +1104,11 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     }
     if (trainingDaysPerWeek.present) {
       map['training_days_per_week'] = Variable<int>(trainingDaysPerWeek.value);
+    }
+    if (dailyActivity.present) {
+      map['daily_activity'] = Variable<String>(
+        $SetupsTable.$converterdailyActivity.toSql(dailyActivity.value),
+      );
     }
     if (goalMode.present) {
       map['goal_mode'] = Variable<String>(
@@ -1114,6 +1171,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           ..write('heightCm: $heightCm, ')
           ..write('trainingStatus: $trainingStatus, ')
           ..write('trainingDaysPerWeek: $trainingDaysPerWeek, ')
+          ..write('dailyActivity: $dailyActivity, ')
           ..write('goalMode: $goalMode, ')
           ..write('unitSystem: $unitSystem, ')
           ..write('onboardedEpochDay: $onboardedEpochDay, ')
@@ -3079,6 +3137,221 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   }
 }
 
+class $UserPreferencesTable extends UserPreferences
+    with TableInfo<$UserPreferencesTable, PreferencesRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserPreferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    check: () => id.equals(1),
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<ThemePreference, String>
+  themePreference =
+      GeneratedColumn<String>(
+        'theme_preference',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('system'),
+      ).withConverter<ThemePreference>(
+        $UserPreferencesTable.$converterthemePreference,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [id, themePreference];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_preferences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PreferencesRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PreferencesRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PreferencesRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      themePreference: $UserPreferencesTable.$converterthemePreference.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}theme_preference'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $UserPreferencesTable createAlias(String alias) {
+    return $UserPreferencesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<ThemePreference, String, String>
+  $converterthemePreference = const EnumNameConverter<ThemePreference>(
+    ThemePreference.values,
+  );
+}
+
+class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
+  final int id;
+  final ThemePreference themePreference;
+  const PreferencesRow({required this.id, required this.themePreference});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['theme_preference'] = Variable<String>(
+        $UserPreferencesTable.$converterthemePreference.toSql(themePreference),
+      );
+    }
+    return map;
+  }
+
+  UserPreferencesCompanion toCompanion(bool nullToAbsent) {
+    return UserPreferencesCompanion(
+      id: Value(id),
+      themePreference: Value(themePreference),
+    );
+  }
+
+  factory PreferencesRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PreferencesRow(
+      id: serializer.fromJson<int>(json['id']),
+      themePreference: $UserPreferencesTable.$converterthemePreference.fromJson(
+        serializer.fromJson<String>(json['themePreference']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'themePreference': serializer.toJson<String>(
+        $UserPreferencesTable.$converterthemePreference.toJson(themePreference),
+      ),
+    };
+  }
+
+  PreferencesRow copyWith({int? id, ThemePreference? themePreference}) =>
+      PreferencesRow(
+        id: id ?? this.id,
+        themePreference: themePreference ?? this.themePreference,
+      );
+  PreferencesRow copyWithCompanion(UserPreferencesCompanion data) {
+    return PreferencesRow(
+      id: data.id.present ? data.id.value : this.id,
+      themePreference: data.themePreference.present
+          ? data.themePreference.value
+          : this.themePreference,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferencesRow(')
+          ..write('id: $id, ')
+          ..write('themePreference: $themePreference')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, themePreference);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PreferencesRow &&
+          other.id == this.id &&
+          other.themePreference == this.themePreference);
+}
+
+class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
+  final Value<int> id;
+  final Value<ThemePreference> themePreference;
+  const UserPreferencesCompanion({
+    this.id = const Value.absent(),
+    this.themePreference = const Value.absent(),
+  });
+  UserPreferencesCompanion.insert({
+    this.id = const Value.absent(),
+    this.themePreference = const Value.absent(),
+  });
+  static Insertable<PreferencesRow> custom({
+    Expression<int>? id,
+    Expression<String>? themePreference,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (themePreference != null) 'theme_preference': themePreference,
+    });
+  }
+
+  UserPreferencesCompanion copyWith({
+    Value<int>? id,
+    Value<ThemePreference>? themePreference,
+  }) {
+    return UserPreferencesCompanion(
+      id: id ?? this.id,
+      themePreference: themePreference ?? this.themePreference,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (themePreference.present) {
+      map['theme_preference'] = Variable<String>(
+        $UserPreferencesTable.$converterthemePreference.toSql(
+          themePreference.value,
+        ),
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserPreferencesCompanion(')
+          ..write('id: $id, ')
+          ..write('themePreference: $themePreference')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3088,6 +3361,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DayMarksTable dayMarks = $DayMarksTable(this);
   late final $WaistEntriesTable waistEntries = $WaistEntriesTable(this);
   late final $TargetsHistoryTable targetsHistory = $TargetsHistoryTable(this);
+  late final $UserPreferencesTable userPreferences = $UserPreferencesTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3099,6 +3375,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dayMarks,
     waistEntries,
     targetsHistory,
+    userPreferences,
   ];
 }
 
@@ -3109,6 +3386,7 @@ typedef $$SetupsTableCreateCompanionBuilder = SetupsCompanion Function({
   required double heightCm,
   required TrainingStatus trainingStatus,
   required int trainingDaysPerWeek,
+  Value<DailyActivity> dailyActivity,
   required GoalMode goalMode,
   required UnitSystem unitSystem,
   required int onboardedEpochDay,
@@ -3130,6 +3408,7 @@ typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<double> heightCm,
   Value<TrainingStatus> trainingStatus,
   Value<int> trainingDaysPerWeek,
+  Value<DailyActivity> dailyActivity,
   Value<GoalMode> goalMode,
   Value<UnitSystem> unitSystem,
   Value<int> onboardedEpochDay,
@@ -3183,6 +3462,12 @@ class $$SetupsTableFilterComposer
   ColumnFilters<int> get trainingDaysPerWeek => $composableBuilder(
     column: $table.trainingDaysPerWeek,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DailyActivity, DailyActivity, String>
+  get dailyActivity => $composableBuilder(
+    column: $table.dailyActivity,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnWithTypeConverterFilters<GoalMode, GoalMode, String> get goalMode =>
@@ -3292,6 +3577,11 @@ class $$SetupsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get dailyActivity => $composableBuilder(
+    column: $table.dailyActivity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get goalMode => $composableBuilder(
     column: $table.goalMode,
     builder: (column) => ColumnOrderings(column),
@@ -3392,6 +3682,12 @@ class $$SetupsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumnWithTypeConverter<DailyActivity, String> get dailyActivity =>
+      $composableBuilder(
+        column: $table.dailyActivity,
+        builder: (column) => column,
+      );
+
   GeneratedColumnWithTypeConverter<GoalMode, String> get goalMode =>
       $composableBuilder(column: $table.goalMode, builder: (column) => column);
 
@@ -3485,6 +3781,7 @@ class $$SetupsTableTableManager
                 Value<double> heightCm = const Value.absent(),
                 Value<TrainingStatus> trainingStatus = const Value.absent(),
                 Value<int> trainingDaysPerWeek = const Value.absent(),
+                Value<DailyActivity> dailyActivity = const Value.absent(),
                 Value<GoalMode> goalMode = const Value.absent(),
                 Value<UnitSystem> unitSystem = const Value.absent(),
                 Value<int> onboardedEpochDay = const Value.absent(),
@@ -3505,6 +3802,7 @@ class $$SetupsTableTableManager
                 heightCm: heightCm,
                 trainingStatus: trainingStatus,
                 trainingDaysPerWeek: trainingDaysPerWeek,
+                dailyActivity: dailyActivity,
                 goalMode: goalMode,
                 unitSystem: unitSystem,
                 onboardedEpochDay: onboardedEpochDay,
@@ -3527,6 +3825,7 @@ class $$SetupsTableTableManager
                 required double heightCm,
                 required TrainingStatus trainingStatus,
                 required int trainingDaysPerWeek,
+                Value<DailyActivity> dailyActivity = const Value.absent(),
                 required GoalMode goalMode,
                 required UnitSystem unitSystem,
                 required int onboardedEpochDay,
@@ -3547,6 +3846,7 @@ class $$SetupsTableTableManager
                 heightCm: heightCm,
                 trainingStatus: trainingStatus,
                 trainingDaysPerWeek: trainingDaysPerWeek,
+                dailyActivity: dailyActivity,
                 goalMode: goalMode,
                 unitSystem: unitSystem,
                 onboardedEpochDay: onboardedEpochDay,
@@ -4668,6 +4968,162 @@ typedef $$TargetsHistoryTableProcessedTableManager =
       TargetsRow,
       PrefetchHooks Function()
     >;
+typedef $$UserPreferencesTableCreateCompanionBuilder =
+    UserPreferencesCompanion Function({
+      Value<int> id,
+      Value<ThemePreference> themePreference,
+    });
+typedef $$UserPreferencesTableUpdateCompanionBuilder =
+    UserPreferencesCompanion Function({
+      Value<int> id,
+      Value<ThemePreference> themePreference,
+    });
+
+class $$UserPreferencesTableFilterComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTable> {
+  $$UserPreferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<ThemePreference, ThemePreference, String>
+  get themePreference => $composableBuilder(
+    column: $table.themePreference,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+}
+
+class $$UserPreferencesTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTable> {
+  $$UserPreferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get themePreference => $composableBuilder(
+    column: $table.themePreference,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UserPreferencesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTable> {
+  $$UserPreferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<ThemePreference, String>
+  get themePreference => $composableBuilder(
+    column: $table.themePreference,
+    builder: (column) => column,
+  );
+}
+
+class $$UserPreferencesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UserPreferencesTable,
+          PreferencesRow,
+          $$UserPreferencesTableFilterComposer,
+          $$UserPreferencesTableOrderingComposer,
+          $$UserPreferencesTableAnnotationComposer,
+          $$UserPreferencesTableCreateCompanionBuilder,
+          $$UserPreferencesTableUpdateCompanionBuilder,
+          (
+            PreferencesRow,
+            BaseReferences<
+              _$AppDatabase,
+              $UserPreferencesTable,
+              PreferencesRow
+            >,
+          ),
+          PreferencesRow,
+          PrefetchHooks Function()
+        > {
+  $$UserPreferencesTableTableManager(
+    _$AppDatabase db,
+    $UserPreferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserPreferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserPreferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserPreferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<ThemePreference> themePreference = const Value.absent(),
+              }) => UserPreferencesCompanion(
+                id: id,
+                themePreference: themePreference,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<ThemePreference> themePreference = const Value.absent(),
+              }) => UserPreferencesCompanion.insert(
+                id: id,
+                themePreference: themePreference,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$UserPreferencesTable, PreferencesRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $UserPreferencesTable,
+                    PreferencesRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UserPreferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UserPreferencesTable,
+      PreferencesRow,
+      $$UserPreferencesTableFilterComposer,
+      $$UserPreferencesTableOrderingComposer,
+      $$UserPreferencesTableAnnotationComposer,
+      $$UserPreferencesTableCreateCompanionBuilder,
+      $$UserPreferencesTableUpdateCompanionBuilder,
+      (
+        PreferencesRow,
+        BaseReferences<_$AppDatabase, $UserPreferencesTable, PreferencesRow>,
+      ),
+      PreferencesRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4684,4 +5140,6 @@ class $AppDatabaseManager {
       $$WaistEntriesTableTableManager(_db, _db.waistEntries);
   $$TargetsHistoryTableTableManager get targetsHistory =>
       $$TargetsHistoryTableTableManager(_db, _db.targetsHistory);
+  $$UserPreferencesTableTableManager get userPreferences =>
+      $$UserPreferencesTableTableManager(_db, _db.userPreferences);
 }

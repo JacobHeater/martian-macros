@@ -11,6 +11,7 @@ import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_progress_bar.dart';
 import 'about_you_step.dart';
+import 'activity_step.dart';
 import 'goal_step.dart';
 import 'health_step.dart';
 import 'measurements_step.dart';
@@ -18,7 +19,7 @@ import 'onboarding_screen.dart';
 import 'training_step.dart';
 
 class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const _stepCount = 5;
+  static const _stepCount = 6;
   var _step = 0;
   var _saving = false;
 
@@ -29,6 +30,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   double? _weightKg;
   var _status = TrainingStatus.novice;
   var _trainingDays = 3;
+  var _activity = DailyActivity.light;
   double? _bodyFat;
   var _screening = const ScreeningAnswers();
   GoalMode? _mode;
@@ -164,6 +166,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             screening: _screening,
             trainingStatus: _status,
             trainingDaysPerWeek: _trainingDays,
+            dailyActivity: _activity,
             goalMode: policy.allowedModes.contains(chosen)
                 ? chosen
                 : recommended,
@@ -202,7 +205,11 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       }),
       onChanged: () => setState(_readMeasurements),
     ),
-    2 => TrainingStep(
+    2 => ActivityStep(
+      activity: _activity,
+      onActivity: (activity) => setState(() => _activity = activity),
+    ),
+    3 => TrainingStep(
       status: _status,
       trainingDays: _trainingDays,
       bodyFat: _bodyFat,
@@ -213,7 +220,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
       onBodyFat: (value) => setState(() => _bodyFat = value),
     ),
-    3 => HealthStep(
+    4 => HealthStep(
       screening: _screening,
       female: _sex == BiologicalSex.female,
       onChanged: (answers) => setState(() => _screening = answers),
