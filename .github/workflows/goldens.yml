@@ -1,0 +1,48 @@
+name: Update goldens
+
+# Regenerates the screenshot test images on Linux, the one platform they are
+# generated on (MM-105), and uploads them as an artifact. Run it from the
+# Actions tab on the branch whose screens changed, download the artifact, copy
+# the images into apps/mobile/test/goldens/images/ and commit them. The pull
+# request then shows the changed images.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the pinned Flutter version
+        id: flutter
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Bootstrap
+        run: ./mm bootstrap
+        env:
+          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+
+      - name: Regenerate the images
+        run: ./mm goldens --update
+        env:
+          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: goldens
+          path: apps/mobile/test/goldens/images/*.png
+          if-no-files-found: error
