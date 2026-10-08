@@ -1,7 +1,14 @@
 # Architecture and product decisions
 
-Status: founding decisions, October 2026. Change them by editing this file in
-the same PR as the code.
+Status: founding decisions, October 2026. This is the overview.
+
+**The requirements live in [`requirements/`](../requirements/README.md)**, one
+ticket per decision or piece of work, each with a short id (`MM-n`). Where
+this file and a ticket disagree, the ticket is right; fix this file.
+
+**Product design guidance lives in [`design/`](../design/README.md)** and
+translates requirements and roadmap decisions into shared visual, interaction,
+accessibility, and Flutter implementation rules.
 
 ## Product
 
@@ -154,22 +161,7 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
 
 ## Roadmap
 
-1. ✅ Monorepo, task runner, `mm_domain`, and engine v1 (trend, TDEE, bounds,
-   targets) with the simulator.
-2. ✅ `packages/data`: Drift schema (setup, weigh-ins, food log, day marks,
-   waist, targets history) behind `MmStore`. Sex is CHECK-constrained in the
-   schema. Still to do: migrations beyond v1.
-3. ✅ App vertical slice: onboarding and screening, Today (targets, manual
-   food logging with recents, day completeness), Progress (weigh-in, trend
-   chart with uncertainty band, waist), Coach (goal, targets, TDEE status,
-   cautions), Settings. The weekly check-in runs through `coach.dart`.
-4. `tools/food_pipeline` and `packages/food_catalog`: DuckDB ETL, a US pack,
-   FTS search, GTIN lookup, then search and barcode scanning in the
-   add-food sheet.
-5. `packages/health_ingest`: Health Connect first, behind a `HealthSource`
-   interface with a fake for Windows development. HealthKit comes when
-   development moves to the Mac.
-6. Training log, the progress screen (waist, e1RM, recomp signal), and the
-   monthly report.
-7. Backup providers, the Coach unlock and trial, and dietitian review of
-   `SafetyBounds`.
+What to build next, in what order, and what blocks what is in
+[`roadmap/`](../roadmap/README.md): thirteen workstreams with their
+dependencies, and the same as data in `roadmap/roadmap.json`. The list that
+used to be here is superseded by it.
