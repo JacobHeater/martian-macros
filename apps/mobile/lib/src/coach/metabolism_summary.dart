@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
+import '../theme/mm_colors_context.dart';
 import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
@@ -30,7 +31,7 @@ class MetabolismSummary extends StatelessWidget {
       children: [
         Text(
           '${Fmt.whole(tdee.kcal)} ± ${Fmt.whole(tdee.sigmaKcal)} kcal / day',
-          style: text.displaySmall,
+          style: text.displaySmall?.copyWith(color: context.mm.ion),
         ),
         const SizedBox(height: 4),
         Text(
