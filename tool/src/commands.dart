@@ -25,6 +25,10 @@ final _commands = <String, (String, _Command)>{
   'analyze': ('Static analysis for every package', _analyze),
   'format': ('Format all Dart code (--check to verify only)', _format),
   'gen': ('Run code generation in packages that use build_runner', _gen),
+  'schema': (
+    'Export the database schema snapshot for the current version',
+    _schema,
+  ),
   'run': (
     'Run the app (starts an emulator if needed): mm run [--env ..]',
     _run,
@@ -174,6 +178,54 @@ Future<int> _gen(Toolchain tc, List<String> args) async {
   }
   if (!ran) stdout.writeln('No packages use build_runner yet.');
   return 0;
+}
+
+const _dataDir = 'packages/data';
+const _schemaDir = 'drift_schemas';
+
+/// Exports the Drift schema snapshot for the current `schemaVersion` and
+/// regenerates the helpers the migration tests read.
+///
+/// Refuses to replace an existing snapshot: a released version's schema
+/// never changes, so a changed table needs a version bump first.
+Future<int> _schema(Toolchain tc, List<String> args) async {
+  final dataDir = '${tc.repoRoot.path}/$_dataDir';
+  final source = File('$dataDir/lib/src/database.dart').readAsStringSync();
+  final version = RegExp(r'currentSchemaVersion = (\d+);')
+      .firstMatch(source)
+      ?.group(1);
+  if (version == null) {
+    stderr.writeln('Could not find currentSchemaVersion in database.dart.');
+    return 1;
+  }
+  final snapshot = File('$dataDir/$_schemaDir/drift_schema_v$version.json');
+  if (snapshot.existsSync() && !args.contains('--force')) {
+    stderr.writeln(
+      'A snapshot for schema version $version already exists. If a table '
+      'changed, bump currentSchemaVersion and add a migration step first. '
+      '(--force replaces it; only for a version that was never released.)',
+    );
+    return 1;
+  }
+  var code = await tc.dart([
+    'run',
+    'drift_dev',
+    'schema',
+    'dump',
+    'lib/src/database.dart',
+    '$_schemaDir/',
+  ], inDir: _dataDir);
+  if (code != 0) return code;
+  code = await tc.dart([
+    'run',
+    'drift_dev',
+    'schema',
+    'generate',
+    '$_schemaDir/',
+    'test/generated_migrations/',
+  ], inDir: _dataDir);
+  if (code != 0) return code;
+  return tc.dart(['format', '$_dataDir/test/generated_migrations']);
 }
 
 /// Makes sure a phone or emulator is connected, starting an emulator if
