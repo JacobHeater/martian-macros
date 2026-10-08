@@ -9,6 +9,7 @@ final class WeekResult {
     required this.trueTdeeKcal,
     required this.trueWeightKg,
     required this.underReportFraction,
+    this.explanation,
   });
 
   final int week;
@@ -17,4 +18,8 @@ final class WeekResult {
   final double trueTdeeKcal;
   final double trueWeightKg;
   final double underReportFraction;
+
+  /// Why the targets issued this week were issued; null on weeks they did
+  /// not change.
+  final TargetsExplanation? explanation;
 }

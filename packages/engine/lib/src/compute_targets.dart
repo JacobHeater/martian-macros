@@ -8,9 +8,16 @@ import 'safety_body_fat.dart';
 import 'safety_bounds.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
+import 'targets_trace.dart';
 
 /// Computes the week's daily targets. Pure function of [i].
-DailyTargets computeTargets(TargetInputs i) {
+DailyTargets computeTargets(TargetInputs i) => computeTargetsTraced(i).targets;
+
+/// [computeTargets], with the calorie target at each stage, so a change can
+/// be explained (MM-138).
+({DailyTargets targets, TargetsTrace trace}) computeTargetsTraced(
+  TargetInputs i,
+) {
   final flags = <TargetFlag>{};
   final safetyBf = i.safetyBodyFatPercent ?? cautiousBodyFatPercent(i.bodyFat);
 
@@ -40,6 +47,10 @@ DailyTargets computeTargets(TargetInputs i) {
   );
   final dailyEnergyDelta = rho * rate * i.trendWeightKg / 7;
   var kcal = i.tdeeKcal + dailyEnergyDelta + i.policy.maintenanceOffsetKcal;
+  final formulaKcal = kcal;
+  var limitedKcal = kcal;
+  var heldKcal = kcal;
+  var raisedKcal = kcal;
 
   final previous = i.previous;
   if (previous != null) {
@@ -61,6 +72,7 @@ DailyTargets computeTargets(TargetInputs i) {
       if (limited != kcal) flags.add(TargetFlag.rateLimited);
       kcal = limited;
     }
+    limitedKcal = kcal;
     if (previous.flags.contains(TargetFlag.raisedForSafePace) &&
         i.safetyRaiseKcal == 0 &&
         kcal < previous.kcal) {
@@ -69,12 +81,14 @@ DailyTargets computeTargets(TargetInputs i) {
         ..remove(TargetFlag.rateLimited)
         ..add(TargetFlag.heldAfterSafetyRaise);
     }
+    heldKcal = kcal;
     if (i.safetyRaiseKcal > 0 && previous.kcal + i.safetyRaiseKcal > kcal) {
       kcal = previous.kcal + i.safetyRaiseKcal;
       flags
         ..remove(TargetFlag.rateLimited)
         ..add(TargetFlag.raisedForSafePace);
     }
+    raisedKcal = kcal;
   }
 
   final floor = SafetyBounds.calorieFloorKcal(
@@ -113,13 +127,22 @@ DailyTargets computeTargets(TargetInputs i) {
     carbsG = math.max(0, (kcal - 4 * proteinG - 9 * fatG) / 4);
   }
 
-  return DailyTargets(
-    kcal: kcal,
-    proteinG: proteinG,
-    fatG: fatG,
-    carbsG: carbsG,
-    weeklyRateFraction: rate,
-    flags: flags,
+  return (
+    targets: DailyTargets(
+      kcal: kcal,
+      proteinG: proteinG,
+      fatG: fatG,
+      carbsG: carbsG,
+      weeklyRateFraction: rate,
+      flags: flags,
+    ),
+    trace: TargetsTrace(
+      formulaKcal: formulaKcal,
+      limitedKcal: limitedKcal,
+      heldKcal: heldKcal,
+      raisedKcal: raisedKcal,
+      finalKcal: kcal,
+    ),
   );
 }
 

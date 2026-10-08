@@ -137,6 +137,10 @@ void main() {
       await pumpApp(tester, repos, FixedClock(today));
       await tester.tap(find.text('Coach'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.textContaining('daily activity and training days'),
+        300,
+      );
       expect(
         find.textContaining(
           'sex, age, height, weight, daily activity and training days',

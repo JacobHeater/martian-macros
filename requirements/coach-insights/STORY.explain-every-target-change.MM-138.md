@@ -1,6 +1,6 @@
 ---
 id: MM-138
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-137, MM-23, MM-24, MM-28, MM-31, MM-33, MM-60, MM-98, MM-108, MM-115, MM-123, MM-139, MM-146]
 ---
@@ -98,3 +98,11 @@ Scenario: Never blame
 - Needs a schema change to store explanations with targets (MM-61). Existing records get a "no explanation recorded" reason.
 - The weekly short version promised in MM-33 is this summary; that ticket should reuse it.
 - A notification that a summary is ready is covered by MM-146.
+
+## Progress (first increment built and verified)
+- **Engine.** `computeTargetsTraced` returns the calorie target at each stage (formula, after the weekly step limit, after a hold following a safety raise, after a safety raise, after the floor). `explainTargets` turns that into a `TargetsExplanation`: signed lines in the order expenditure, the rest of the formula (named for its cause: pace and weight, goal change, profile correction, health rule, underweight rule, body-fat estimate or a diet break), step limit, hold after a raise, safety raise, calorie floor. The lines add up to the change exactly (lines under half a kcal are dropped, so by at most 2 kcal); a 16-week simulation of 12 users checks that every change adds up within the ticket's 5 kcal. It also holds what the estimate rested on: days of food, days left out as partial, weigh-ins and whether expenditure was measured.
+- **Stored.** `TargetsRecord.explanation`, kept as JSON in a new nullable column (schema version 5, migrated from every earlier version); older records read as "no explanation recorded".
+- **Shown.** The Coach screen has a Last change card: old and new calories and the largest cause in one line, and "See why" opens the four parts (what changed, why, what it was based on, what would change it). After calibration, while expenditure is held for lack of data, the card says targets are unchanged because there is not enough data yet and what is needed. The words never put a change down to what the user ate (tested).
+- Tests: engine (ordinary change with a step-limit line, floor named with what the target would otherwise be, goal change as the cause, first targets, JSON round trip, the 16-week sum), repositories (explanation through Drift and in-memory), and app (the card and all four parts, old records, first targets, the held note).
+- **Not done yet**: the target history screen and "Keep last week's targets for now" (a single deferral of a reduction); a "no change" line for a check-in that changed nothing (needs a record that a check-in happened, which is not stored today); the same summary for an in-app update's rule change; the dashboard line (MM-98). The confidence level in "what it was based on" waits for MM-139.
+- **Deviation**: "Keep last week's targets" and the history screen are planned for a second increment under this ticket; the status stays in progress until then.
