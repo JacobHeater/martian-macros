@@ -16,6 +16,7 @@ final class UserSetup {
     required this.goalMode,
     required this.onboardedOn,
     this.dailyActivity = DailyActivity.light,
+    this.profileRevision = 0,
     this.unitSystem = UnitSystem.imperial,
     this.bodyFatPercent,
     this.requestedLossFraction,
@@ -28,6 +29,11 @@ final class UserSetup {
 
   /// Activity across the day outside workouts (MM-164).
   final DailyActivity dailyActivity;
+
+  /// Counts corrections to sex, date of birth, height or the health check
+  /// (MM-83). Targets records remember the revision they were made for; a
+  /// mismatch makes the engine issue new targets at once.
+  final int profileRevision;
   final GoalMode goalMode;
 
   /// The day coaching started; anchors the calibration week.
@@ -43,6 +49,9 @@ final class UserSetup {
   final double? requestedLossFraction;
 
   UserSetup copyWith({
+    Profile? profile,
+    ScreeningAnswers? screening,
+    int? profileRevision,
     GoalMode? goalMode,
     UnitSystem? unitSystem,
     TrainingStatus? trainingStatus,
@@ -50,11 +59,12 @@ final class UserSetup {
     DailyActivity? dailyActivity,
     double? Function()? bodyFatPercent,
   }) => UserSetup(
-    profile: profile,
-    screening: screening,
+    profile: profile ?? this.profile,
+    screening: screening ?? this.screening,
     trainingStatus: trainingStatus ?? this.trainingStatus,
     trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
     dailyActivity: dailyActivity ?? this.dailyActivity,
+    profileRevision: profileRevision ?? this.profileRevision,
     goalMode: goalMode ?? this.goalMode,
     onboardedOn: onboardedOn,
     unitSystem: unitSystem ?? this.unitSystem,

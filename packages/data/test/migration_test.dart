@@ -102,9 +102,9 @@ void main() {
     }
   });
 
-  group('from released version 1 (MM-164, MM-165)', () {
-    test('a saved setup survives, reads as light activity, and the '
-        'display preference is the system default', () async {
+  group('from released version 1 (MM-164, MM-165, MM-132, MM-83)', () {
+    test('a saved setup and targets survive every later step, with each new '
+        'field at its default', () async {
       final schema = await verifier.schemaAt(1);
       schema.rawDatabase.execute(
         'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, '
@@ -113,9 +113,15 @@ void main() {
         "(1, 'female', ${CalendarDate(1992, 4, 20).epochDay}, 168, 'novice', "
         "3, 'recomp', 'imperial', ${day.epochDay}, 1)",
       );
+      schema.rawDatabase.execute(
+        'INSERT INTO targets_history (effective_epoch_day, mode, kcal, '
+        'protein_g, fat_g, carbs_g, weekly_rate_fraction, tdee_kcal, '
+        "tdee_sigma_kcal, tdee_status) VALUES (${day.epochDay}, 'recomp', "
+        "2200, 150, 60, 250, -0.001, 2500, 300, 'held')",
+      );
       final db = AppDatabase(schema.newConnection());
       addTearDown(db.close);
-      await verifier.migrateAndValidate(db, 2);
+      await verifier.migrateAndValidate(db, current);
 
       final repos = DriftRepositories(db);
       final setup = (await repos.setup.loadSetup())!;
@@ -124,6 +130,11 @@ void main() {
       expect(setup.trainingDaysPerWeek, 3);
       expect(setup.goalMode, GoalMode.recomp);
       expect(setup.dailyActivity, DailyActivity.light);
+      expect(setup.profileRevision, 0);
+      final targets = (await repos.targets.watchTargetsHistory().first).single;
+      expect(targets.mode, GoalMode.recomp);
+      expect(targets.safetyBodyFatPercent, isNull);
+      expect(targets.profileRevision, 0);
       expect(
         await repos.preferences.watchThemePreference().first,
         ThemePreference.system,

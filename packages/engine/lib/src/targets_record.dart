@@ -13,6 +13,7 @@ final class TargetsRecord {
     required this.tdeeSigmaKcal,
     required this.tdeeStatus,
     this.safetyBodyFatPercent,
+    this.profileRevision = 0,
   });
 
   final CalendarDate effectiveFrom;
@@ -27,4 +28,9 @@ final class TargetsRecord {
   /// from it, so a rule does not flip on a small move. Null on records made
   /// before MM-132.
   final double? safetyBodyFatPercent;
+
+  /// The `UserSetup.profileRevision` these targets were made for. A setup
+  /// with a different revision (sex, date of birth, height or health check
+  /// corrected, MM-83) gets new targets at once.
+  final int profileRevision;
 }

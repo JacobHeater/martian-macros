@@ -1,6 +1,6 @@
 ---
 id: MM-83
-status: proposed
+status: done
 component: settings
 related: [MM-80, MM-11, MM-14, MM-24, MM-62]
 ---
@@ -55,3 +55,13 @@ Scenario: Under 18 by correction
 ## Notes
 - The engine already recomputes from history on every change; what is missing is the screens, and the "apply immediately" rule in
   `nextTargets` (today only a goal change bypasses the weekly wait).
+
+## Progress (built and verified)
+- Settings has a Profile group (`settings/profile_section.dart`): biological sex (a confirmation that says what is recalculated and that food and weigh-ins are kept; female-only health answers are cleared when changing to male), date of birth (a date picker), height (a sheet in feet and inches or centimetres that saves only 100 to 250 cm), and a Health check screen that reuses the onboarding questions and saves each change at once.
+- Every change bumps `UserSetup.profileRevision`; each targets record stores the revision it was made for (`TargetsRecord.profileRevision`). When they differ, `nextTargets` issues new targets that day with no weekly wait and no step limit. Past targets are not changed. Schema version 4 adds both columns (default 0); a test migrates a populated version-1 database through every step.
+- A health answer that rules the goal out (pregnant, breastfeeding, an eating-disorder history) makes the record maintenance with `modeNotAllowed` (the Coach screen says why) and the app moves the stored goal to maintenance, as MM-111 does for low weight, so a deficit does not resume by itself when the answer is unticked. Unticking offers every goal again; it does not choose one.
+- A date of birth that makes the user under 18 shows an adults-only screen (`app/adults_only_screen.dart`) with a way back to Settings to correct it; coaching is off.
+- **Found and fixed on the way**: the check-in ran inside the home screen, and Riverpod pauses watchers under a covered route, so a change made in Settings did not take effect until the user went back. It now runs above the navigator (`app/check_in_host.dart`). This also affected earlier flows that change setup from Settings.
+- Tests: engine (new revision issues targets at once and unthrottled; same revision waits; a health answer makes maintenance flagged; no rewrite loop), repositories (revision round-trips through Drift and in-memory), and app (correct sex, cancel, male clears female-only answers, pregnant, no longer breastfeeding and every goal offered again, under 18, height, an implausible height cannot be saved).
+- **Not verified**: on a device; a user whose weigh-ins or food are many days old when they correct a profile. Whether unticking pregnancy should hold the user at maintenance for a while (postpartum) is a question for MM-112.
+- **Not done**: a changed health answer explains itself only through the existing Coach flag text; the fuller "why targets changed" explanation is MM-138.
