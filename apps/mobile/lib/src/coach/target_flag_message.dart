@@ -5,6 +5,12 @@ extension TargetFlagMessage on TargetFlag {
     TargetFlag.flooredAtSafetyMinimum =>
       'Your calories are at the lowest level the app will set. Going '
           'lower risks your health and your muscle.',
+    TargetFlag.raisedForSafePace =>
+      'You were losing weight faster than the app aims for at your body '
+          'fat, because faster loss costs more muscle. Targets went up.',
+    TargetFlag.heldAfterSafetyRaise =>
+      'Your targets went up last week because you were losing faster than '
+          'the app aims for. They hold at that level this week.',
     TargetFlag.rateLimited =>
       'This week’s change was limited to a small step. Targets move '
           'gradually so one odd week can’t swing them.',
