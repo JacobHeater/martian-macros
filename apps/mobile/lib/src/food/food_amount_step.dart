@@ -15,6 +15,7 @@ class FoodAmountStep extends ConsumerStatefulWidget {
     required this.day,
     required this.meal,
     required this.onBack,
+    this.custom,
     super.key,
   });
 
@@ -23,6 +24,9 @@ class FoodAmountStep extends ConsumerStatefulWidget {
   final CalendarDate day;
   final Meal meal;
   final VoidCallback onBack;
+
+  /// Set when the food is one the user saved: its numbers are per serving.
+  final CustomFood? custom;
 
   @override
   ConsumerState<FoodAmountStep> createState() => FoodAmountStepState();

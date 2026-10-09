@@ -64,6 +64,14 @@ final foodEntryWriterProvider = Provider<FoodEntryWriter>(
   (ref) => ref.watch(foodRepositoryProvider),
 );
 
+final customFoodReaderProvider = Provider<CustomFoodReader>(
+  (ref) => ref.watch(customFoodRepositoryProvider),
+);
+
+final customFoodWriterProvider = Provider<CustomFoodWriter>(
+  (ref) => ref.watch(customFoodRepositoryProvider),
+);
+
 final dayMarkReaderProvider = Provider<DayMarkReader>(
   (ref) => ref.watch(dayMarkRepositoryProvider),
 );

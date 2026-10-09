@@ -10,6 +10,7 @@ List<Override> inMemoryOverrides(InMemoryRepositories repos) => [
   weightEventRepositoryProvider.overrideWithValue(repos.weightEvents),
   waistRepositoryProvider.overrideWithValue(repos.waist),
   foodRepositoryProvider.overrideWithValue(repos.food),
+  customFoodRepositoryProvider.overrideWithValue(repos.customFoods),
   dayMarkRepositoryProvider.overrideWithValue(repos.dayMarks),
   intakeReaderProvider.overrideWithValue(repos.intake),
   targetsHistoryRepositoryProvider.overrideWithValue(repos.targets),
