@@ -70,6 +70,11 @@ final customFoodsProvider = StreamProvider<List<CustomFood>>(
   (ref) => ref.watch(customFoodReaderProvider).watchCustomFoods(),
 );
 
+/// The setting for the easy-to-miss line (MM-152).
+final easyToMissProvider = StreamProvider<EasyToMissPreference>(
+  (ref) => ref.watch(easyToMissReaderProvider).watchEasyToMiss(),
+);
+
 final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
   (ref) => ref.watch(recentFoodReaderProvider).watchRecentFoods(),
 );

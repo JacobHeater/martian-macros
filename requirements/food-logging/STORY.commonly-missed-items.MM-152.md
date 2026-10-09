@@ -1,6 +1,6 @@
 ---
 id: MM-152
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-23, MM-27, MM-39, MM-40, MM-108, MM-114, MM-127, MM-140, MM-151]
 ---
@@ -84,3 +84,16 @@ Scenario: Turned off
 - Priority: could-have. Small, and likely to improve data quality more than its size suggests; hard to prove without analytics the app
   will not have.
 - A teaspoon of oil is about 4.5 g and 40 kcal; a tablespoon about 13.5 g and 120 kcal.
+
+## Progress
+Built: under a day marked complete, one line "Easy to miss" with four buttons: cooking oil, drinks, sauces (each opens add-food with that
+word already searched) and bites and tastes (opens the estimate sheet at Light). It is a prompt: the day is already stored as complete.
+The rule (`easyToMissVisible`, tested): shown every time in the first 14 days of use, afterwards on the first completed day in a week
+(not again for 7 days), and for the rest of the day it first appeared on; never when turned off or for someone with an eating-disorder
+history. A setting in Settings turns it off. The setting and the last day shown are stored with the display preferences (schema 13,
+migration 12 to 13, contract tests for both stores). Widget tests cover each scenario except the cooking-fat control.
+
+Not built: "Cooked with oil?" on the amount step and the user's usual cooking fat; add-food filtered to a kind of item (the pack has
+no categories, so the buttons search a word, and the user's own recent items are not yet ranked first for it); suppression while the
+under-eating notice is active (that notice, MM-114, is not built); the fade is by calendar days since onboarding, not days with a log.
+Not seen on the emulator.

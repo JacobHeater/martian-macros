@@ -9,6 +9,12 @@ class UserPreferences extends Table {
   TextColumn get themePreference =>
       textEnum<ThemePreference>().withDefault(const Constant('system'))();
 
+  /// The easy-to-miss line (MM-152): on unless turned off, and the last day
+  /// it was shown.
+  BoolColumn get easyToMissEnabled =>
+      boolean().withDefault(const Constant(true))();
+  IntColumn get easyToMissLastShownEpochDay => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
