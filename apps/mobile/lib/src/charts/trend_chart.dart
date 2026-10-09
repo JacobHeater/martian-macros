@@ -16,6 +16,7 @@ class TrendChart extends StatelessWidget {
     required this.today,
     required this.rangeDays,
     required this.fmt,
+    this.weightEvents = const [],
   });
 
   final List<WeightTrendPoint> trend;
@@ -23,6 +24,7 @@ class TrendChart extends StatelessWidget {
   final CalendarDate today;
   final int rangeDays;
   final Fmt fmt;
+  final List<WeightEvent> weightEvents;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,16 @@ class TrendChart extends StatelessWidget {
       for (final w in weights)
         if (!w.date.isBefore(start))
           FlSpot(x(w.date), fmt.weightFromKg(w.weightKg)),
+    ];
+    final eventLines = [
+      for (final event in weightEvents)
+        if (!event.date.isBefore(start) && !event.date.isAfter(today))
+          VerticalLine(
+            x: x(event.date),
+            color: mm.caution,
+            strokeWidth: 1,
+            dashArray: [3, 3],
+          ),
     ];
     if (points.isEmpty) {
       return const Center(child: Text('No weigh-ins in this range.'));
@@ -75,6 +87,7 @@ class TrendChart extends StatelessWidget {
         minY: minY - pad,
         maxY: maxY + pad,
         lineTouchData: const LineTouchData(enabled: false),
+        extraLinesData: ExtraLinesData(verticalLines: eventLines),
         gridData: FlGridData(
           drawVerticalLine: false,
           getDrawingHorizontalLine: (_) =>

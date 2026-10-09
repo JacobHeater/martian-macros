@@ -56,6 +56,7 @@ void main() {
           trainingDaysPerWeek: 3,
           goalMode: mode,
           onboardedOn: today,
+          healthCheckConfirmedOn: today,
           unitSystem: units,
         ),
       );
@@ -105,6 +106,12 @@ void main() {
     expect(find.text('Your day'), findsOneWidget);
     await tester.tap(find.text('Next')); // activity
     await tester.pumpAndSettle();
+    await tester.tap(find.text('I currently take creatine'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('When did you start?'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Next')); // training
     await tester.pumpAndSettle();
     // Male profile: female-only questions are not offered.
@@ -120,6 +127,7 @@ void main() {
     final setup = (await io(tester, repos.setup.loadSetup))!;
     expect(setup.profile.sex, BiologicalSex.male);
     expect(setup.profile.heightCm, closeTo(180.3, 0.1));
+    expect(setup.creatineStartedOn, today);
     final weights = await io(tester, () => repos.weights.watchWeights().first);
     expect(weights.single.weightKg, closeTo(90.7, 0.1));
 
@@ -244,8 +252,13 @@ void main() {
 
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
-    expect(find.text('Goal: Fat loss'), findsOneWidget);
     expect(find.text('Daily targets'), findsOneWidget);
+    final metabolismTitle = find.text('Your metabolism estimate');
+    await tester.scrollUntilVisible(metabolismTitle, 300);
+    await tester.ensureVisible(metabolismTitle);
+    await tester.pumpAndSettle();
+    await tester.tap(metabolismTitle);
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.textContaining('before your first measurement'),
       300,

@@ -15,6 +15,7 @@ void main() {
 
   setupRepositoryContract('Drift', () => open().setup);
   weightRepositoryContract('Drift', () => open().weights);
+  weightEventRepositoryContract('Drift', () => open().weightEvents);
   waistRepositoryContract('Drift', () => open().waist);
   preferencesRepositoryContract('Drift', () => open().preferences);
   foodRepositoryContract('Drift', () => open().food);
@@ -30,6 +31,7 @@ void main() {
       eraser: r.eraser,
       setup: r.setup,
       weights: r.weights,
+      weightEvents: r.weightEvents,
       food: r.food,
       targets: r.targets,
       preferences: r.preferences,

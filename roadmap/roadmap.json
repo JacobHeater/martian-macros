@@ -1180,7 +1180,7 @@
       "file": "ws-06-targets-and-explainable-check-in.md",
       "intent": "Turn the weekly number into something an expert would sign and a user can understand: better macros, tolerance bands, a chosen pace, and a stated reason and confidence for every change.",
       "recommendedOrder": 7,
-      "status": "not-started",
+      "status": "in-progress",
       "riskLevel": "high",
       "parallelGroup": "PG-B",
       "dependsOn": [

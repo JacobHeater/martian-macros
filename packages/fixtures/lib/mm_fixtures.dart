@@ -16,5 +16,6 @@ export 'src/in_memory_repositories.dart';
 export 'src/in_memory_setup_repository.dart';
 export 'src/in_memory_targets_history_repository.dart';
 export 'src/in_memory_waist_repository.dart';
+export 'src/in_memory_weight_event_repository.dart';
 export 'src/in_memory_weight_repository.dart';
 export 'src/typical_setup.dart';

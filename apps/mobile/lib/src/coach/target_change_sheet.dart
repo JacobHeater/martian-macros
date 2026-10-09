@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import '../format/coach_confidence_text.dart';
 import '../format/explanation_line_text.dart';
 import '../format/fmt.dart';
 import '../format/what_would_change_it.dart';
@@ -32,6 +33,14 @@ class TargetChangeSheet extends StatelessWidget {
     final explanation = current.explanation;
     final t = current.targets;
     final p = previous?.targets;
+    final confidence = explanation?.confidence;
+    final remainder = explanation == null
+        ? null
+        : _roundingRemainder(explanation);
+    final confidenceNote = confidence == null
+        ? ''
+        : ' Coach confidence: '
+              '${confidenceLabel(confidence.level)}.';
 
     String change(String label, double? before, double after, String unit) {
       if (before == null) return '$label ${Fmt.whole(after)}$unit';
@@ -51,7 +60,9 @@ class TargetChangeSheet extends StatelessWidget {
           Text(
             [
               change('Calories', p?.kcal, t.kcal, ''),
-              change('Protein', p?.proteinG, t.proteinG, ' g'),
+              if (t.proteinMinimumG case final minimum?)
+                change('Protein minimum', p?.proteinMinimumG, minimum, ' g'),
+              change('Protein target', p?.proteinG, t.proteinG, ' g'),
               change('Carbohydrate', p?.carbsG, t.carbsG, ' g'),
               change('Fat', p?.fatG, t.fatG, ' g'),
             ].join('. '),
@@ -65,13 +76,18 @@ class TargetChangeSheet extends StatelessWidget {
               style: text.bodyMedium,
             )
           else if (explanation.lines.isEmpty)
-            Text('Nothing moved the calorie target.', style: text.bodyMedium)
+            Text(
+              'No calculated contribution was large enough to move the '
+              'calorie target.',
+              style: text.bodyMedium,
+            )
           else
             for (final line in explanation.lines)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(line.text, style: text.bodyMedium),
               ),
+          if (remainder != null) Text(remainder, style: text.bodyMedium),
           if (explanation != null) ...[
             const SizedBox(height: 8),
             const SectionLabel('What it was based on'),
@@ -79,7 +95,8 @@ class TargetChangeSheet extends StatelessWidget {
               '${explanation.usableIntakeDays} days of food'
               '${explanation.excludedPartialDays > 0 ? ', ${explanation.excludedPartialDays} left out as partial' : ''}'
               ' and ${explanation.weighIns} weigh-ins. '
-              '${explanation.estimateStatus == TdeeStatus.updated ? 'Your expenditure is measured.' : 'Your expenditure is still the starting estimate.'}',
+              '${explanation.estimateStatus == TdeeStatus.updated ? 'Your expenditure is measured.' : 'Your expenditure is still the starting estimate.'}'
+              '$confidenceNote',
               style: text.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -109,5 +126,15 @@ class TargetChangeSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String? _roundingRemainder(TargetsExplanation explanation) {
+    final change = explanation.change;
+    if (change == null) return null;
+    final remainder = change - explanation.linesTotal;
+    if (remainder.abs() < 0.5) return null;
+    final sign = remainder < 0 ? '−' : '+';
+    return 'And $sign${Fmt.whole(remainder.abs())} kcal from rounding '
+        'and limits.';
   }
 }

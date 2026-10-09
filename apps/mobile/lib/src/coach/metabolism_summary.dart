@@ -26,23 +26,23 @@ class MetabolismSummary extends StatelessWidget {
     final needDays = estimator.minIntakeDays - tdee.usableIntakeDays;
     final needWeighIns = estimator.minWeighIns - tdee.weighIns;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: EdgeInsets.zero,
+      title: const Text('Your metabolism estimate'),
+      subtitle: Text(
+        measured
+            ? 'Measured from your logged food and weight trend.'
+            : 'Starting estimate; it improves as you log food and weight.',
+      ),
       children: [
         Text(
-          '${Fmt.whole(tdee.kcal)} ± ${Fmt.whole(tdee.sigmaKcal)} kcal / day',
-          style: text.displaySmall?.copyWith(color: context.mm.ion),
+          'Probably between '
+          '${Fmt.whole(tdee.kcal - tdee.sigmaKcal)} and '
+          '${Fmt.whole(tdee.kcal + tdee.sigmaKcal)} kcal a day.',
+          style: text.bodyMedium?.copyWith(color: context.mm.ion),
         ),
-        const SizedBox(height: 4),
-        Text(
-          measured
-              ? 'Measured from your logged food and weight trend.'
-              : 'Starting estimate from your sex, age, height, weight, daily '
-                    'activity and training days. It gets replaced by a '
-                    'measurement of your body.',
-          style: text.bodyMedium,
-        ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         if (measured) ...[
           StatRow('Logged days used', '${tdee.usableIntakeDays}'),
           StatRow('Weigh-ins used', '${tdee.weighIns}'),
@@ -69,11 +69,23 @@ class MetabolismSummary extends StatelessWidget {
                 '${Fmt.longDate(settlingUntil)}, and needs two weeks of them.',
           )
         else
-          Notice(
-            icon: Icons.hourglass_bottom,
-            text:
-                'Needs ${[if (needDays > 0) '$needDays more fully logged day${needDays == 1 ? '' : 's'}', if (needWeighIns > 0) '$needWeighIns more weigh-in${needWeighIns == 1 ? '' : 's'}', if (needDays <= 0 && needWeighIns <= 0) calibrating ? 'two full weeks of data' : 'a little more consistent data'].join(' and ')} '
-                'before your first measurement.',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Starting estimate from your sex, age, height, weight, daily '
+                'activity and training days. It gets replaced by a '
+                'measurement of your body.',
+                style: text.bodyMedium,
+              ),
+              const SizedBox(height: 8),
+              Notice(
+                icon: Icons.hourglass_bottom,
+                text:
+                    'Needs ${[if (needDays > 0) '$needDays more fully logged day${needDays == 1 ? '' : 's'}', if (needWeighIns > 0) '$needWeighIns more weigh-in${needWeighIns == 1 ? '' : 's'}', if (needDays <= 0 && needWeighIns <= 0) calibrating ? 'two full weeks of data' : 'a little more consistent data'].join(' and ')} '
+                    'before your first measurement.',
+              ),
+            ],
           ),
       ],
     );

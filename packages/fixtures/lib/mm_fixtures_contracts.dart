@@ -16,4 +16,5 @@ export 'src/contracts/preferences_repository_contract.dart';
 export 'src/contracts/setup_repository_contract.dart';
 export 'src/contracts/targets_history_repository_contract.dart';
 export 'src/contracts/waist_repository_contract.dart';
+export 'src/contracts/weight_event_repository_contract.dart';
 export 'src/contracts/weight_repository_contract.dart';

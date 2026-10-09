@@ -9,6 +9,7 @@ import 'in_memory_preferences_repository.dart';
 import 'in_memory_setup_repository.dart';
 import 'in_memory_targets_history_repository.dart';
 import 'in_memory_waist_repository.dart';
+import 'in_memory_weight_event_repository.dart';
 import 'in_memory_weight_repository.dart';
 
 /// Every repository, in memory, sharing state where the real ones do (the
@@ -18,6 +19,7 @@ final class InMemoryRepositories {
   factory InMemoryRepositories() {
     final setup = InMemorySetupRepository();
     final weights = InMemoryWeightRepository();
+    final weightEvents = InMemoryWeightEventRepository();
     final waist = InMemoryWaistRepository();
     final food = InMemoryFoodRepository();
     final dayMarks = InMemoryDayMarkRepository();
@@ -26,6 +28,7 @@ final class InMemoryRepositories {
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
+      weightEvents: weightEvents,
       waist: waist,
       food: food,
       dayMarks: dayMarks,
@@ -35,6 +38,7 @@ final class InMemoryRepositories {
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
+        weightEvents.clear,
         waist.clear,
         food.clear,
         dayMarks.clear,
@@ -47,6 +51,7 @@ final class InMemoryRepositories {
   InMemoryRepositories._({
     required this.setup,
     required this.weights,
+    required this.weightEvents,
     required this.waist,
     required this.food,
     required this.dayMarks,
@@ -58,6 +63,7 @@ final class InMemoryRepositories {
 
   final SetupRepository setup;
   final WeightRepository weights;
+  final WeightEventRepository weightEvents;
   final WaistRepository waist;
   final FoodRepository food;
   final DayMarkRepository dayMarks;

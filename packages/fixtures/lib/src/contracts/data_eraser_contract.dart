@@ -12,6 +12,7 @@ void dataEraserContract(
     DataEraser eraser,
     SetupRepository setup,
     WeightRepository weights,
+    WeightEventRepository weightEvents,
     FoodRepository food,
     TargetsHistoryRepository targets,
     PreferencesRepository preferences,
@@ -25,6 +26,9 @@ void dataEraserContract(
       final day = CalendarDate(2026, 1, 1);
       await r.setup.saveSetup(typicalSetup());
       await r.weights.saveWeight(day, 80);
+      await r.weightEvents.saveWeightEvent(
+        WeightEvent(date: day, type: WeightEventType.illness),
+      );
       await r.food.addFood(
         FoodEntry(
           id: 0,
@@ -60,6 +64,7 @@ void dataEraserContract(
 
       expect(await r.setup.loadSetup(), isNull);
       expect(await r.weights.watchWeights().first, isEmpty);
+      expect(await r.weightEvents.watchWeightEvents().first, isEmpty);
       expect(await r.food.watchFood(day).first, isEmpty);
       expect(await r.targets.watchTargetsHistory().first, isEmpty);
       expect(

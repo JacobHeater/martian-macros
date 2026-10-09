@@ -70,6 +70,7 @@ final class TdeeEstimator {
       int partial = 0,
       int weighIns = 0,
       CalendarDate? settlingUntil,
+      CalendarDate? styleRestartOn,
     }) => TdeeEstimate(
       kcal: prior.kcal,
       sigmaKcal: prior.sigmaKcal,
@@ -78,6 +79,7 @@ final class TdeeEstimator {
       excludedPartialDays: partial,
       weighIns: weighIns,
       settlingUntil: settlingUntil,
+      styleRestartOn: styleRestartOn,
     );
 
     // The window starts no earlier than the first weigh-in, so early
@@ -93,7 +95,9 @@ final class TdeeEstimator {
       start = switchDay;
       days = days.where((d) => !d.date.isBefore(switchDay)).toList();
     }
-    if (start.daysUntil(asOf) + 1 < minSpanDays) return held();
+    if (start.daysUntil(asOf) + 1 < minSpanDays) {
+      return held(styleRestartOn: switchDay);
+    }
 
     // Stretches of the window outside every settling window. Weight change
     // is summed over these only.
@@ -105,7 +109,7 @@ final class TdeeEstimator {
         for (final w in settling)
           if (!w.end.isBefore(start) && !w.start.isAfter(asOf)) w.end,
       ]..sort();
-      return held(settlingUntil: ends.last);
+      return held(settlingUntil: ends.last, styleRestartOn: switchDay);
     }
     bool clean(CalendarDate day) =>
         segments.any((s) => !day.isBefore(s.$1) && !day.isAfter(s.$2));
@@ -180,7 +184,18 @@ final class TdeeEstimator {
       weighIns: weighIns,
       windowStart: start,
       clampedToBounds: clamped != posterior,
+      styleRestartOn: switchDay,
     );
+  }
+
+  /// Counts days the estimator could use in an inclusive date range.
+  int countUsableIntakeDays({
+    required Iterable<IntakeDay> intake,
+    required CalendarDate start,
+    required CalendarDate end,
+  }) {
+    final days = _daysInWindow(intake, start, end);
+    return _usableDays(days).$1.length;
   }
 
   /// [start]..[end] with every settling window cut out. A piece runs from

@@ -85,4 +85,105 @@ void main() {
     );
     expect(pregnant.allowedModes, {GoalMode.maintenance});
   });
+
+  test('age and insulin treatment set policy limits and protein floor', () {
+    final older = Profile(
+      sex: BiologicalSex.male,
+      birthDate: CalendarDate(1960, 1, 1),
+      heightCm: 170,
+    );
+    final p = CoachingPolicy.derive(
+      profile: older,
+      screening: const ScreeningAnswers(insulinOrSulfonylurea: true),
+      today: today,
+      weightKg: 80,
+    );
+    expect(p.maxWeeklyLossFraction, 0.005);
+    expect(p.minimumProteinGPerKgReferenceWeight, 1.2);
+    expect(p.cautions, contains(Caution.insulinOrSulfonylurea));
+  });
+
+  test('age-based policy starts on the sixty-fifth birthday', () {
+    final profile = Profile(
+      sex: BiologicalSex.male,
+      birthDate: CalendarDate(1961, 10, 6),
+      heightCm: 170,
+    );
+    CoachingPolicy derive(CalendarDate date) => CoachingPolicy.derive(
+      profile: profile,
+      screening: const ScreeningAnswers(),
+      today: date,
+      weightKg: 80,
+    );
+
+    final dayBefore = derive(CalendarDate(2026, 10, 5));
+    expect(dayBefore.maxWeeklyLossFraction, isNull);
+    expect(dayBefore.minimumProteinGPerKgReferenceWeight, isNull);
+
+    final birthday = derive(CalendarDate(2026, 10, 6));
+    expect(birthday.maxWeeklyLossFraction, 0.005);
+    expect(birthday.minimumProteinGPerKgReferenceWeight, 1.2);
+  });
+
+  test('a confirmed care-team discussion removes the insulin pace limit', () {
+    final p = CoachingPolicy.derive(
+      profile: Profile(
+        sex: BiologicalSex.male,
+        birthDate: CalendarDate(1990, 1, 1),
+        heightCm: 170,
+      ),
+      screening: const ScreeningAnswers(
+        insulinOrSulfonylurea: true,
+        insulinCareTeamConfirmed: true,
+      ),
+      today: today,
+      weightKg: 80,
+    );
+    expect(p.maxWeeklyLossFraction, isNull);
+  });
+
+  test('bariatric surgery disables targets without blocking the app', () {
+    final p = CoachingPolicy.derive(
+      profile: Profile(
+        sex: BiologicalSex.female,
+        birthDate: CalendarDate(1990, 1, 1),
+        heightCm: 170,
+      ),
+      screening: const ScreeningAnswers(bariatricSurgery: true),
+      today: today,
+      weightKg: 80,
+    );
+    expect(p.blocked, isFalse);
+    expect(p.targetsAllowed, isFalse);
+    expect(p.cautions, contains(Caution.bariatricSurgery));
+  });
+
+  test('weight-affecting medication adds a caution without blocking', () {
+    final p = policy(
+      sex: BiologicalSex.male,
+      heightCm: 180,
+      screening: const ScreeningAnswers(weightAffectingMedication: true),
+    );
+    expect(p.blocked, isFalse);
+    expect(p.targetsAllowed, isTrue);
+    expect(p.cautions, contains(Caution.weightAffectingMedication));
+  });
+
+  test('health check becomes due on the ninetieth day', () {
+    final setup = UserSetup(
+      profile: Profile(
+        sex: BiologicalSex.female,
+        birthDate: CalendarDate(1990, 1, 1),
+        heightCm: 170,
+      ),
+      screening: const ScreeningAnswers(),
+      trainingStatus: TrainingStatus.novice,
+      trainingDaysPerWeek: 3,
+      goalMode: GoalMode.maintenance,
+      onboardedOn: CalendarDate(2026, 1, 1),
+      healthCheckConfirmedOn: CalendarDate(2026, 1, 1),
+    );
+    expect(setup.healthCheckDueOn(CalendarDate(2026, 3, 31)), isFalse);
+    expect(setup.healthCheckDueOn(CalendarDate(2026, 4, 1)), isTrue);
+  });
 }

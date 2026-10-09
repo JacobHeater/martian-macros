@@ -26,6 +26,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           mode: record.mode,
           kcal: record.targets.kcal,
           proteinG: record.targets.proteinG,
+          proteinMinimumG: Value(record.targets.proteinMinimumG),
           fatG: record.targets.fatG,
           carbsG: record.targets.carbsG,
           weeklyRateFraction: record.targets.weeklyRateFraction,
@@ -35,9 +36,22 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           tdeeStatus: record.tdeeStatus,
           safetyBodyFatPercent: Value(record.safetyBodyFatPercent),
           profileRevision: Value(record.profileRevision),
+          targetRulesVersion: Value(record.targetRulesVersion),
           explanation: Value(record.explanation?.encode()),
+          summarySeen: Value(record.summarySeen),
         ),
       );
+
+  @override
+  Future<void> markSummariesSeenThrough(CalendarDate effectiveFrom) =>
+      (_db.update(_db.targetsHistory)..where(
+            (t) =>
+                t.effectiveEpochDay.isSmallerOrEqualValue(
+                  effectiveFrom.epochDay,
+                ) &
+                t.summarySeen.equals(false),
+          ))
+          .write(const TargetsHistoryCompanion(summarySeen: Value(true)));
 
   TargetsRecord _targets(TargetsRow r) => TargetsRecord(
     effectiveFrom: CalendarDate.fromEpochDay(r.effectiveEpochDay),
@@ -47,12 +61,15 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
     tdeeStatus: r.tdeeStatus,
     safetyBodyFatPercent: r.safetyBodyFatPercent,
     profileRevision: r.profileRevision,
+    targetRulesVersion: r.targetRulesVersion,
     explanation: r.explanation == null
         ? null
         : TargetsExplanation.decode(r.explanation!),
+    summarySeen: r.summarySeen,
     targets: DailyTargets(
       kcal: r.kcal,
       proteinG: r.proteinG,
+      proteinMinimumG: r.proteinMinimumG,
       fatG: r.fatG,
       carbsG: r.carbsG,
       weeklyRateFraction: r.weeklyRateFraction,

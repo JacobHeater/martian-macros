@@ -57,9 +57,11 @@ TargetsRecord holdReduction(List<TargetsRecord> history) {
     tdeeStatus: current.tdeeStatus,
     safetyBodyFatPercent: current.safetyBodyFatPercent,
     profileRevision: current.profileRevision,
+    targetRulesVersion: current.targetRulesVersion,
     targets: DailyTargets(
       kcal: held.kcal,
       proteinG: held.proteinG,
+      proteinMinimumG: held.proteinMinimumG,
       fatG: held.fatG,
       carbsG: held.carbsG,
       weeklyRateFraction: held.weeklyRateFraction,

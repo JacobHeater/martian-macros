@@ -5,6 +5,7 @@ enum ExplanationTrigger {
   checkIn,
   goalChange,
   profileCorrection,
+  appRuleUpdate,
   healthRule,
   underweightRule,
   bodyFatCorrection,

@@ -119,7 +119,7 @@ turns in the schema lane and keep to separate cards.
   recommendation, adults only, biological sex); MM-81, MM-82 (units, training
   and body fat in Settings); MM-164 (daily activity in the starting estimate); MM-83 (correct profile and
   health check).
-- Remaining: MM-112, MM-134, MM-158, MM-113. Epics: MM-9, MM-80.
+- Remaining: MM-134, MM-158, MM-113. Epics: MM-9, MM-80.
 
 ## Notes for whoever builds it
 - Biological sex is a strict male/female enum with no default, enforced by

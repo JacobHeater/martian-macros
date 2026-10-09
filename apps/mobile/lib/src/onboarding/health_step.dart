@@ -29,6 +29,10 @@ class HealthStep extends StatelessWidget {
       bool? pcos,
       bool? menopause,
       bool? thyroidCondition,
+      bool? insulinOrSulfonylurea,
+      bool? insulinCareTeamConfirmed,
+      bool? bariatricSurgery,
+      bool? weightAffectingMedication,
     }) => ScreeningAnswers(
       pregnant: pregnant ?? s.pregnant,
       breastfeeding: breastfeeding ?? s.breastfeeding,
@@ -38,6 +42,12 @@ class HealthStep extends StatelessWidget {
       pcos: pcos ?? s.pcos,
       menopause: menopause ?? s.menopause,
       thyroidCondition: thyroidCondition ?? s.thyroidCondition,
+      insulinOrSulfonylurea: insulinOrSulfonylurea ?? s.insulinOrSulfonylurea,
+      insulinCareTeamConfirmed:
+          insulinCareTeamConfirmed ?? s.insulinCareTeamConfirmed,
+      bariatricSurgery: bariatricSurgery ?? s.bariatricSurgery,
+      weightAffectingMedication:
+          weightAffectingMedication ?? s.weightAffectingMedication,
     );
     Widget item(
       String title,
@@ -87,6 +97,27 @@ class HealthStep extends StatelessWidget {
           'Testosterone therapy or anabolic steroids',
           s.androgenUse,
           (v) => copy(androgenUse: v),
+        ),
+        item(
+          'Diabetes treated with insulin or a sulfonylurea',
+          s.insulinOrSulfonylurea,
+          (v) => copy(insulinOrSulfonylurea: v),
+        ),
+        if (s.insulinOrSulfonylurea)
+          item(
+            'I have discussed a calorie deficit with my care team',
+            s.insulinCareTeamConfirmed,
+            (v) => copy(insulinCareTeamConfirmed: v),
+          ),
+        item(
+          'I have had bariatric surgery',
+          s.bariatricSurgery,
+          (v) => copy(bariatricSurgery: v),
+        ),
+        item(
+          'A medication I take can change my weight or water retention',
+          s.weightAffectingMedication,
+          (v) => copy(weightAffectingMedication: v),
         ),
         const SizedBox(height: 8),
         Text(

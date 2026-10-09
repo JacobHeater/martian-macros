@@ -38,6 +38,7 @@ void main() {
   TargetsRecord last({
     required int revision,
     GoalMode mode = GoalMode.fatLoss,
+    int rulesVersion = currentTargetRulesVersion,
   }) => TargetsRecord(
     effectiveFrom: start.addDays(29),
     mode: mode,
@@ -45,6 +46,7 @@ void main() {
     tdeeSigmaKcal: 250,
     tdeeStatus: TdeeStatus.updated,
     profileRevision: revision,
+    targetRulesVersion: rulesVersion,
     safetyBodyFatPercent: 15,
     targets: const DailyTargets(
       kcal: 2200,
@@ -80,6 +82,33 @@ void main() {
       ),
       isNull,
     );
+  });
+
+  test('a target-rules update applies before the next weekly check-in', () {
+    final s = setup();
+    final next = nextTargets(
+      setup: s,
+      snapshot: snapshotFor(s),
+      history: [last(revision: 0, rulesVersion: currentTargetRulesVersion - 1)],
+      today: start.addDays(30),
+    );
+    expect(next, isNotNull);
+    expect(next!.targetRulesVersion, currentTargetRulesVersion);
+    expect(
+      next.explanation!.lines.map((line) => line.reason),
+      contains(ExplanationReason.appRuleUpdate),
+    );
+  });
+
+  test('the current target-rules version waits for the normal check-in', () {
+    final s = setup();
+    final next = nextTargets(
+      setup: s,
+      snapshot: snapshotFor(s),
+      history: [last(revision: 0)],
+      today: start.addDays(30),
+    );
+    expect(next, isNull);
   });
 
   test('a health answer that rules the goal out makes it maintenance, '

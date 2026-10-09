@@ -111,7 +111,9 @@ final class WeightTrendModel {
                   0,
                 ]),
               );
-        prior = Gaussian(f.apply(x.mean), f.mul(x.cov).mul(f.t()).add(qDay));
+        final mean = f.apply(x.mean);
+        if (extra != null) mean[0] += extra.levelMeanKg;
+        prior = Gaussian(mean, f.mul(x.cov).mul(f.t()).add(qDay));
       }
       predicted.add(prior);
 

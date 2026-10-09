@@ -259,6 +259,99 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _insulinOrSulfonylureaMeta =
+      const VerificationMeta('insulinOrSulfonylurea');
+  @override
+  late final GeneratedColumn<bool> insulinOrSulfonylurea =
+      GeneratedColumn<bool>(
+        'insulin_or_sulfonylurea',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("insulin_or_sulfonylurea" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _insulinCareTeamConfirmedMeta =
+      const VerificationMeta('insulinCareTeamConfirmed');
+  @override
+  late final GeneratedColumn<bool> insulinCareTeamConfirmed =
+      GeneratedColumn<bool>(
+        'insulin_care_team_confirmed',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("insulin_care_team_confirmed" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _bariatricSurgeryMeta = const VerificationMeta(
+    'bariatricSurgery',
+  );
+  @override
+  late final GeneratedColumn<bool> bariatricSurgery = GeneratedColumn<bool>(
+    'bariatric_surgery',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("bariatric_surgery" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _weightAffectingMedicationMeta =
+      const VerificationMeta('weightAffectingMedication');
+  @override
+  late final GeneratedColumn<bool> weightAffectingMedication =
+      GeneratedColumn<bool>(
+        'weight_affecting_medication',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("weight_affecting_medication" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _healthCheckConfirmedEpochDayMeta =
+      const VerificationMeta('healthCheckConfirmedEpochDay');
+  @override
+  late final GeneratedColumn<int> healthCheckConfirmedEpochDay =
+      GeneratedColumn<int>(
+        'health_check_confirmed_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _healthCheckSkipCountMeta =
+      const VerificationMeta('healthCheckSkipCount');
+  @override
+  late final GeneratedColumn<int> healthCheckSkipCount = GeneratedColumn<int>(
+    'health_check_skip_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _creatineStartedEpochDayMeta =
+      const VerificationMeta('creatineStartedEpochDay');
+  @override
+  late final GeneratedColumn<int> creatineStartedEpochDay =
+      GeneratedColumn<int>(
+        'creatine_started_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -282,6 +375,13 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     pcos,
     menopause,
     thyroidCondition,
+    insulinOrSulfonylurea,
+    insulinCareTeamConfirmed,
+    bariatricSurgery,
+    weightAffectingMedication,
+    healthCheckConfirmedEpochDay,
+    healthCheckSkipCount,
+    creatineStartedEpochDay,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -437,6 +537,69 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         ),
       );
     }
+    if (data.containsKey('insulin_or_sulfonylurea')) {
+      context.handle(
+        _insulinOrSulfonylureaMeta,
+        insulinOrSulfonylurea.isAcceptableOrUnknown(
+          data['insulin_or_sulfonylurea']!,
+          _insulinOrSulfonylureaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('insulin_care_team_confirmed')) {
+      context.handle(
+        _insulinCareTeamConfirmedMeta,
+        insulinCareTeamConfirmed.isAcceptableOrUnknown(
+          data['insulin_care_team_confirmed']!,
+          _insulinCareTeamConfirmedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bariatric_surgery')) {
+      context.handle(
+        _bariatricSurgeryMeta,
+        bariatricSurgery.isAcceptableOrUnknown(
+          data['bariatric_surgery']!,
+          _bariatricSurgeryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('weight_affecting_medication')) {
+      context.handle(
+        _weightAffectingMedicationMeta,
+        weightAffectingMedication.isAcceptableOrUnknown(
+          data['weight_affecting_medication']!,
+          _weightAffectingMedicationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('health_check_confirmed_epoch_day')) {
+      context.handle(
+        _healthCheckConfirmedEpochDayMeta,
+        healthCheckConfirmedEpochDay.isAcceptableOrUnknown(
+          data['health_check_confirmed_epoch_day']!,
+          _healthCheckConfirmedEpochDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('health_check_skip_count')) {
+      context.handle(
+        _healthCheckSkipCountMeta,
+        healthCheckSkipCount.isAcceptableOrUnknown(
+          data['health_check_skip_count']!,
+          _healthCheckSkipCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('creatine_started_epoch_day')) {
+      context.handle(
+        _creatineStartedEpochDayMeta,
+        creatineStartedEpochDay.isAcceptableOrUnknown(
+          data['creatine_started_epoch_day']!,
+          _creatineStartedEpochDayMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -538,6 +701,34 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         DriftSqlType.bool,
         data['${effectivePrefix}thyroid_condition'],
       )!,
+      insulinOrSulfonylurea: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}insulin_or_sulfonylurea'],
+      )!,
+      insulinCareTeamConfirmed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}insulin_care_team_confirmed'],
+      )!,
+      bariatricSurgery: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}bariatric_surgery'],
+      )!,
+      weightAffectingMedication: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}weight_affecting_medication'],
+      )!,
+      healthCheckConfirmedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}health_check_confirmed_epoch_day'],
+      ),
+      healthCheckSkipCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}health_check_skip_count'],
+      )!,
+      creatineStartedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}creatine_started_epoch_day'],
+      ),
     );
   }
 
@@ -589,6 +780,13 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   final bool pcos;
   final bool menopause;
   final bool thyroidCondition;
+  final bool insulinOrSulfonylurea;
+  final bool insulinCareTeamConfirmed;
+  final bool bariatricSurgery;
+  final bool weightAffectingMedication;
+  final int? healthCheckConfirmedEpochDay;
+  final int healthCheckSkipCount;
+  final int? creatineStartedEpochDay;
   const SetupRow({
     required this.id,
     required this.sex,
@@ -611,6 +809,13 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     required this.pcos,
     required this.menopause,
     required this.thyroidCondition,
+    required this.insulinOrSulfonylurea,
+    required this.insulinCareTeamConfirmed,
+    required this.bariatricSurgery,
+    required this.weightAffectingMedication,
+    this.healthCheckConfirmedEpochDay,
+    required this.healthCheckSkipCount,
+    this.creatineStartedEpochDay,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -656,6 +861,25 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     map['pcos'] = Variable<bool>(pcos);
     map['menopause'] = Variable<bool>(menopause);
     map['thyroid_condition'] = Variable<bool>(thyroidCondition);
+    map['insulin_or_sulfonylurea'] = Variable<bool>(insulinOrSulfonylurea);
+    map['insulin_care_team_confirmed'] = Variable<bool>(
+      insulinCareTeamConfirmed,
+    );
+    map['bariatric_surgery'] = Variable<bool>(bariatricSurgery);
+    map['weight_affecting_medication'] = Variable<bool>(
+      weightAffectingMedication,
+    );
+    if (!nullToAbsent || healthCheckConfirmedEpochDay != null) {
+      map['health_check_confirmed_epoch_day'] = Variable<int>(
+        healthCheckConfirmedEpochDay,
+      );
+    }
+    map['health_check_skip_count'] = Variable<int>(healthCheckSkipCount);
+    if (!nullToAbsent || creatineStartedEpochDay != null) {
+      map['creatine_started_epoch_day'] = Variable<int>(
+        creatineStartedEpochDay,
+      );
+    }
     return map;
   }
 
@@ -686,6 +910,18 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       pcos: Value(pcos),
       menopause: Value(menopause),
       thyroidCondition: Value(thyroidCondition),
+      insulinOrSulfonylurea: Value(insulinOrSulfonylurea),
+      insulinCareTeamConfirmed: Value(insulinCareTeamConfirmed),
+      bariatricSurgery: Value(bariatricSurgery),
+      weightAffectingMedication: Value(weightAffectingMedication),
+      healthCheckConfirmedEpochDay:
+          healthCheckConfirmedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(healthCheckConfirmedEpochDay),
+      healthCheckSkipCount: Value(healthCheckSkipCount),
+      creatineStartedEpochDay: creatineStartedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(creatineStartedEpochDay),
     );
   }
 
@@ -732,6 +968,25 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       pcos: serializer.fromJson<bool>(json['pcos']),
       menopause: serializer.fromJson<bool>(json['menopause']),
       thyroidCondition: serializer.fromJson<bool>(json['thyroidCondition']),
+      insulinOrSulfonylurea: serializer.fromJson<bool>(
+        json['insulinOrSulfonylurea'],
+      ),
+      insulinCareTeamConfirmed: serializer.fromJson<bool>(
+        json['insulinCareTeamConfirmed'],
+      ),
+      bariatricSurgery: serializer.fromJson<bool>(json['bariatricSurgery']),
+      weightAffectingMedication: serializer.fromJson<bool>(
+        json['weightAffectingMedication'],
+      ),
+      healthCheckConfirmedEpochDay: serializer.fromJson<int?>(
+        json['healthCheckConfirmedEpochDay'],
+      ),
+      healthCheckSkipCount: serializer.fromJson<int>(
+        json['healthCheckSkipCount'],
+      ),
+      creatineStartedEpochDay: serializer.fromJson<int?>(
+        json['creatineStartedEpochDay'],
+      ),
     );
   }
   @override
@@ -769,6 +1024,21 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       'pcos': serializer.toJson<bool>(pcos),
       'menopause': serializer.toJson<bool>(menopause),
       'thyroidCondition': serializer.toJson<bool>(thyroidCondition),
+      'insulinOrSulfonylurea': serializer.toJson<bool>(insulinOrSulfonylurea),
+      'insulinCareTeamConfirmed': serializer.toJson<bool>(
+        insulinCareTeamConfirmed,
+      ),
+      'bariatricSurgery': serializer.toJson<bool>(bariatricSurgery),
+      'weightAffectingMedication': serializer.toJson<bool>(
+        weightAffectingMedication,
+      ),
+      'healthCheckConfirmedEpochDay': serializer.toJson<int?>(
+        healthCheckConfirmedEpochDay,
+      ),
+      'healthCheckSkipCount': serializer.toJson<int>(healthCheckSkipCount),
+      'creatineStartedEpochDay': serializer.toJson<int?>(
+        creatineStartedEpochDay,
+      ),
     };
   }
 
@@ -794,6 +1064,13 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     bool? pcos,
     bool? menopause,
     bool? thyroidCondition,
+    bool? insulinOrSulfonylurea,
+    bool? insulinCareTeamConfirmed,
+    bool? bariatricSurgery,
+    bool? weightAffectingMedication,
+    Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+    int? healthCheckSkipCount,
+    Value<int?> creatineStartedEpochDay = const Value.absent(),
   }) => SetupRow(
     id: id ?? this.id,
     sex: sex ?? this.sex,
@@ -820,6 +1097,19 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     pcos: pcos ?? this.pcos,
     menopause: menopause ?? this.menopause,
     thyroidCondition: thyroidCondition ?? this.thyroidCondition,
+    insulinOrSulfonylurea: insulinOrSulfonylurea ?? this.insulinOrSulfonylurea,
+    insulinCareTeamConfirmed:
+        insulinCareTeamConfirmed ?? this.insulinCareTeamConfirmed,
+    bariatricSurgery: bariatricSurgery ?? this.bariatricSurgery,
+    weightAffectingMedication:
+        weightAffectingMedication ?? this.weightAffectingMedication,
+    healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay.present
+        ? healthCheckConfirmedEpochDay.value
+        : this.healthCheckConfirmedEpochDay,
+    healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+    creatineStartedEpochDay: creatineStartedEpochDay.present
+        ? creatineStartedEpochDay.value
+        : this.creatineStartedEpochDay,
   );
   SetupRow copyWithCompanion(SetupsCompanion data) {
     return SetupRow(
@@ -872,6 +1162,27 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       thyroidCondition: data.thyroidCondition.present
           ? data.thyroidCondition.value
           : this.thyroidCondition,
+      insulinOrSulfonylurea: data.insulinOrSulfonylurea.present
+          ? data.insulinOrSulfonylurea.value
+          : this.insulinOrSulfonylurea,
+      insulinCareTeamConfirmed: data.insulinCareTeamConfirmed.present
+          ? data.insulinCareTeamConfirmed.value
+          : this.insulinCareTeamConfirmed,
+      bariatricSurgery: data.bariatricSurgery.present
+          ? data.bariatricSurgery.value
+          : this.bariatricSurgery,
+      weightAffectingMedication: data.weightAffectingMedication.present
+          ? data.weightAffectingMedication.value
+          : this.weightAffectingMedication,
+      healthCheckConfirmedEpochDay: data.healthCheckConfirmedEpochDay.present
+          ? data.healthCheckConfirmedEpochDay.value
+          : this.healthCheckConfirmedEpochDay,
+      healthCheckSkipCount: data.healthCheckSkipCount.present
+          ? data.healthCheckSkipCount.value
+          : this.healthCheckSkipCount,
+      creatineStartedEpochDay: data.creatineStartedEpochDay.present
+          ? data.creatineStartedEpochDay.value
+          : this.creatineStartedEpochDay,
     );
   }
 
@@ -898,7 +1209,16 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ..write('androgenUse: $androgenUse, ')
           ..write('pcos: $pcos, ')
           ..write('menopause: $menopause, ')
-          ..write('thyroidCondition: $thyroidCondition')
+          ..write('thyroidCondition: $thyroidCondition, ')
+          ..write('insulinOrSulfonylurea: $insulinOrSulfonylurea, ')
+          ..write('insulinCareTeamConfirmed: $insulinCareTeamConfirmed, ')
+          ..write('bariatricSurgery: $bariatricSurgery, ')
+          ..write('weightAffectingMedication: $weightAffectingMedication, ')
+          ..write(
+            'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
+          )
+          ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
+          ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -926,6 +1246,13 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     pcos,
     menopause,
     thyroidCondition,
+    insulinOrSulfonylurea,
+    insulinCareTeamConfirmed,
+    bariatricSurgery,
+    weightAffectingMedication,
+    healthCheckConfirmedEpochDay,
+    healthCheckSkipCount,
+    creatineStartedEpochDay,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -951,7 +1278,15 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           other.androgenUse == this.androgenUse &&
           other.pcos == this.pcos &&
           other.menopause == this.menopause &&
-          other.thyroidCondition == this.thyroidCondition);
+          other.thyroidCondition == this.thyroidCondition &&
+          other.insulinOrSulfonylurea == this.insulinOrSulfonylurea &&
+          other.insulinCareTeamConfirmed == this.insulinCareTeamConfirmed &&
+          other.bariatricSurgery == this.bariatricSurgery &&
+          other.weightAffectingMedication == this.weightAffectingMedication &&
+          other.healthCheckConfirmedEpochDay ==
+              this.healthCheckConfirmedEpochDay &&
+          other.healthCheckSkipCount == this.healthCheckSkipCount &&
+          other.creatineStartedEpochDay == this.creatineStartedEpochDay);
 }
 
 class SetupsCompanion extends UpdateCompanion<SetupRow> {
@@ -976,6 +1311,13 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
   final Value<bool> pcos;
   final Value<bool> menopause;
   final Value<bool> thyroidCondition;
+  final Value<bool> insulinOrSulfonylurea;
+  final Value<bool> insulinCareTeamConfirmed;
+  final Value<bool> bariatricSurgery;
+  final Value<bool> weightAffectingMedication;
+  final Value<int?> healthCheckConfirmedEpochDay;
+  final Value<int> healthCheckSkipCount;
+  final Value<int?> creatineStartedEpochDay;
   const SetupsCompanion({
     this.id = const Value.absent(),
     this.sex = const Value.absent(),
@@ -998,6 +1340,13 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.pcos = const Value.absent(),
     this.menopause = const Value.absent(),
     this.thyroidCondition = const Value.absent(),
+    this.insulinOrSulfonylurea = const Value.absent(),
+    this.insulinCareTeamConfirmed = const Value.absent(),
+    this.bariatricSurgery = const Value.absent(),
+    this.weightAffectingMedication = const Value.absent(),
+    this.healthCheckConfirmedEpochDay = const Value.absent(),
+    this.healthCheckSkipCount = const Value.absent(),
+    this.creatineStartedEpochDay = const Value.absent(),
   });
   SetupsCompanion.insert({
     this.id = const Value.absent(),
@@ -1021,6 +1370,13 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.pcos = const Value.absent(),
     this.menopause = const Value.absent(),
     this.thyroidCondition = const Value.absent(),
+    this.insulinOrSulfonylurea = const Value.absent(),
+    this.insulinCareTeamConfirmed = const Value.absent(),
+    this.bariatricSurgery = const Value.absent(),
+    this.weightAffectingMedication = const Value.absent(),
+    this.healthCheckConfirmedEpochDay = const Value.absent(),
+    this.healthCheckSkipCount = const Value.absent(),
+    this.creatineStartedEpochDay = const Value.absent(),
   }) : sex = Value(sex),
        birthEpochDay = Value(birthEpochDay),
        heightCm = Value(heightCm),
@@ -1051,6 +1407,13 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Expression<bool>? pcos,
     Expression<bool>? menopause,
     Expression<bool>? thyroidCondition,
+    Expression<bool>? insulinOrSulfonylurea,
+    Expression<bool>? insulinCareTeamConfirmed,
+    Expression<bool>? bariatricSurgery,
+    Expression<bool>? weightAffectingMedication,
+    Expression<int>? healthCheckConfirmedEpochDay,
+    Expression<int>? healthCheckSkipCount,
+    Expression<int>? creatineStartedEpochDay,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1078,6 +1441,19 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       if (pcos != null) 'pcos': pcos,
       if (menopause != null) 'menopause': menopause,
       if (thyroidCondition != null) 'thyroid_condition': thyroidCondition,
+      if (insulinOrSulfonylurea != null)
+        'insulin_or_sulfonylurea': insulinOrSulfonylurea,
+      if (insulinCareTeamConfirmed != null)
+        'insulin_care_team_confirmed': insulinCareTeamConfirmed,
+      if (bariatricSurgery != null) 'bariatric_surgery': bariatricSurgery,
+      if (weightAffectingMedication != null)
+        'weight_affecting_medication': weightAffectingMedication,
+      if (healthCheckConfirmedEpochDay != null)
+        'health_check_confirmed_epoch_day': healthCheckConfirmedEpochDay,
+      if (healthCheckSkipCount != null)
+        'health_check_skip_count': healthCheckSkipCount,
+      if (creatineStartedEpochDay != null)
+        'creatine_started_epoch_day': creatineStartedEpochDay,
     });
   }
 
@@ -1103,6 +1479,13 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Value<bool>? pcos,
     Value<bool>? menopause,
     Value<bool>? thyroidCondition,
+    Value<bool>? insulinOrSulfonylurea,
+    Value<bool>? insulinCareTeamConfirmed,
+    Value<bool>? bariatricSurgery,
+    Value<bool>? weightAffectingMedication,
+    Value<int?>? healthCheckConfirmedEpochDay,
+    Value<int>? healthCheckSkipCount,
+    Value<int?>? creatineStartedEpochDay,
   }) {
     return SetupsCompanion(
       id: id ?? this.id,
@@ -1128,6 +1511,18 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       pcos: pcos ?? this.pcos,
       menopause: menopause ?? this.menopause,
       thyroidCondition: thyroidCondition ?? this.thyroidCondition,
+      insulinOrSulfonylurea:
+          insulinOrSulfonylurea ?? this.insulinOrSulfonylurea,
+      insulinCareTeamConfirmed:
+          insulinCareTeamConfirmed ?? this.insulinCareTeamConfirmed,
+      bariatricSurgery: bariatricSurgery ?? this.bariatricSurgery,
+      weightAffectingMedication:
+          weightAffectingMedication ?? this.weightAffectingMedication,
+      healthCheckConfirmedEpochDay:
+          healthCheckConfirmedEpochDay ?? this.healthCheckConfirmedEpochDay,
+      healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+      creatineStartedEpochDay:
+          creatineStartedEpochDay ?? this.creatineStartedEpochDay,
     );
   }
 
@@ -1211,6 +1606,39 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     if (thyroidCondition.present) {
       map['thyroid_condition'] = Variable<bool>(thyroidCondition.value);
     }
+    if (insulinOrSulfonylurea.present) {
+      map['insulin_or_sulfonylurea'] = Variable<bool>(
+        insulinOrSulfonylurea.value,
+      );
+    }
+    if (insulinCareTeamConfirmed.present) {
+      map['insulin_care_team_confirmed'] = Variable<bool>(
+        insulinCareTeamConfirmed.value,
+      );
+    }
+    if (bariatricSurgery.present) {
+      map['bariatric_surgery'] = Variable<bool>(bariatricSurgery.value);
+    }
+    if (weightAffectingMedication.present) {
+      map['weight_affecting_medication'] = Variable<bool>(
+        weightAffectingMedication.value,
+      );
+    }
+    if (healthCheckConfirmedEpochDay.present) {
+      map['health_check_confirmed_epoch_day'] = Variable<int>(
+        healthCheckConfirmedEpochDay.value,
+      );
+    }
+    if (healthCheckSkipCount.present) {
+      map['health_check_skip_count'] = Variable<int>(
+        healthCheckSkipCount.value,
+      );
+    }
+    if (creatineStartedEpochDay.present) {
+      map['creatine_started_epoch_day'] = Variable<int>(
+        creatineStartedEpochDay.value,
+      );
+    }
     return map;
   }
 
@@ -1237,7 +1665,16 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           ..write('androgenUse: $androgenUse, ')
           ..write('pcos: $pcos, ')
           ..write('menopause: $menopause, ')
-          ..write('thyroidCondition: $thyroidCondition')
+          ..write('thyroidCondition: $thyroidCondition, ')
+          ..write('insulinOrSulfonylurea: $insulinOrSulfonylurea, ')
+          ..write('insulinCareTeamConfirmed: $insulinCareTeamConfirmed, ')
+          ..write('bariatricSurgery: $bariatricSurgery, ')
+          ..write('weightAffectingMedication: $weightAffectingMedication, ')
+          ..write(
+            'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
+          )
+          ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
+          ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -2568,6 +3005,17 @@ class $TargetsHistoryTable extends TargetsHistory
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _proteinMinimumGMeta = const VerificationMeta(
+    'proteinMinimumG',
+  );
+  @override
+  late final GeneratedColumn<double> proteinMinimumG = GeneratedColumn<double>(
+    'protein_minimum_g',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _fatGMeta = const VerificationMeta('fatG');
   @override
   late final GeneratedColumn<double> fatG = GeneratedColumn<double>(
@@ -2640,6 +3088,32 @@ class $TargetsHistoryTable extends TargetsHistory
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _summarySeenMeta = const VerificationMeta(
+    'summarySeen',
+  );
+  @override
+  late final GeneratedColumn<bool> summarySeen = GeneratedColumn<bool>(
+    'summary_seen',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("summary_seen" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _targetRulesVersionMeta =
+      const VerificationMeta('targetRulesVersion');
+  @override
+  late final GeneratedColumn<int> targetRulesVersion = GeneratedColumn<int>(
+    'target_rules_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(currentTargetRulesVersion),
+  );
   static const VerificationMeta _profileRevisionMeta = const VerificationMeta(
     'profileRevision',
   );
@@ -2678,6 +3152,7 @@ class $TargetsHistoryTable extends TargetsHistory
     mode,
     kcal,
     proteinG,
+    proteinMinimumG,
     fatG,
     carbsG,
     weeklyRateFraction,
@@ -2685,6 +3160,8 @@ class $TargetsHistoryTable extends TargetsHistory
     tdeeKcal,
     tdeeSigmaKcal,
     explanation,
+    summarySeen,
+    targetRulesVersion,
     profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
@@ -2725,6 +3202,15 @@ class $TargetsHistoryTable extends TargetsHistory
       );
     } else if (isInserting) {
       context.missing(_proteinGMeta);
+    }
+    if (data.containsKey('protein_minimum_g')) {
+      context.handle(
+        _proteinMinimumGMeta,
+        proteinMinimumG.isAcceptableOrUnknown(
+          data['protein_minimum_g']!,
+          _proteinMinimumGMeta,
+        ),
+      );
     }
     if (data.containsKey('fat_g')) {
       context.handle(
@@ -2787,6 +3273,24 @@ class $TargetsHistoryTable extends TargetsHistory
         ),
       );
     }
+    if (data.containsKey('summary_seen')) {
+      context.handle(
+        _summarySeenMeta,
+        summarySeen.isAcceptableOrUnknown(
+          data['summary_seen']!,
+          _summarySeenMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_rules_version')) {
+      context.handle(
+        _targetRulesVersionMeta,
+        targetRulesVersion.isAcceptableOrUnknown(
+          data['target_rules_version']!,
+          _targetRulesVersionMeta,
+        ),
+      );
+    }
     if (data.containsKey('profile_revision')) {
       context.handle(
         _profileRevisionMeta,
@@ -2832,6 +3336,10 @@ class $TargetsHistoryTable extends TargetsHistory
         DriftSqlType.double,
         data['${effectivePrefix}protein_g'],
       )!,
+      proteinMinimumG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}protein_minimum_g'],
+      ),
       fatG: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}fat_g'],
@@ -2860,6 +3368,14 @@ class $TargetsHistoryTable extends TargetsHistory
         DriftSqlType.string,
         data['${effectivePrefix}explanation'],
       ),
+      summarySeen: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}summary_seen'],
+      )!,
+      targetRulesVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_rules_version'],
+      )!,
       profileRevision: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}profile_revision'],
@@ -2893,6 +3409,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
   final GoalMode mode;
   final double kcal;
   final double proteinG;
+  final double? proteinMinimumG;
   final double fatG;
   final double carbsG;
   final double weeklyRateFraction;
@@ -2906,6 +3423,13 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
   /// Added in schema version 5 (MM-138); null on older rows.
   final String? explanation;
 
+  /// Existing target history should not trigger new summary dialogs.
+  final bool summarySeen;
+
+  /// Rules used to issue targets; bump [currentTargetRulesVersion] when target
+  /// calculation behavior changes.
+  final int targetRulesVersion;
+
   /// Added in schema version 4 (MM-83); older rows read as 0.
   final int profileRevision;
 
@@ -2917,6 +3441,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     required this.mode,
     required this.kcal,
     required this.proteinG,
+    this.proteinMinimumG,
     required this.fatG,
     required this.carbsG,
     required this.weeklyRateFraction,
@@ -2924,6 +3449,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     required this.tdeeKcal,
     required this.tdeeSigmaKcal,
     this.explanation,
+    required this.summarySeen,
+    required this.targetRulesVersion,
     required this.profileRevision,
     this.safetyBodyFatPercent,
     required this.tdeeStatus,
@@ -2939,6 +3466,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     }
     map['kcal'] = Variable<double>(kcal);
     map['protein_g'] = Variable<double>(proteinG);
+    if (!nullToAbsent || proteinMinimumG != null) {
+      map['protein_minimum_g'] = Variable<double>(proteinMinimumG);
+    }
     map['fat_g'] = Variable<double>(fatG);
     map['carbs_g'] = Variable<double>(carbsG);
     map['weekly_rate_fraction'] = Variable<double>(weeklyRateFraction);
@@ -2948,6 +3478,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     if (!nullToAbsent || explanation != null) {
       map['explanation'] = Variable<String>(explanation);
     }
+    map['summary_seen'] = Variable<bool>(summarySeen);
+    map['target_rules_version'] = Variable<int>(targetRulesVersion);
     map['profile_revision'] = Variable<int>(profileRevision);
     if (!nullToAbsent || safetyBodyFatPercent != null) {
       map['safety_body_fat_percent'] = Variable<double>(safetyBodyFatPercent);
@@ -2966,6 +3498,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       mode: Value(mode),
       kcal: Value(kcal),
       proteinG: Value(proteinG),
+      proteinMinimumG: proteinMinimumG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(proteinMinimumG),
       fatG: Value(fatG),
       carbsG: Value(carbsG),
       weeklyRateFraction: Value(weeklyRateFraction),
@@ -2975,6 +3510,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       explanation: explanation == null && nullToAbsent
           ? const Value.absent()
           : Value(explanation),
+      summarySeen: Value(summarySeen),
+      targetRulesVersion: Value(targetRulesVersion),
       profileRevision: Value(profileRevision),
       safetyBodyFatPercent: safetyBodyFatPercent == null && nullToAbsent
           ? const Value.absent()
@@ -2995,6 +3532,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       ),
       kcal: serializer.fromJson<double>(json['kcal']),
       proteinG: serializer.fromJson<double>(json['proteinG']),
+      proteinMinimumG: serializer.fromJson<double?>(json['proteinMinimumG']),
       fatG: serializer.fromJson<double>(json['fatG']),
       carbsG: serializer.fromJson<double>(json['carbsG']),
       weeklyRateFraction: serializer.fromJson<double>(
@@ -3004,6 +3542,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       tdeeKcal: serializer.fromJson<double>(json['tdeeKcal']),
       tdeeSigmaKcal: serializer.fromJson<double>(json['tdeeSigmaKcal']),
       explanation: serializer.fromJson<String?>(json['explanation']),
+      summarySeen: serializer.fromJson<bool>(json['summarySeen']),
+      targetRulesVersion: serializer.fromJson<int>(json['targetRulesVersion']),
       profileRevision: serializer.fromJson<int>(json['profileRevision']),
       safetyBodyFatPercent: serializer.fromJson<double?>(
         json['safetyBodyFatPercent'],
@@ -3023,6 +3563,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       ),
       'kcal': serializer.toJson<double>(kcal),
       'proteinG': serializer.toJson<double>(proteinG),
+      'proteinMinimumG': serializer.toJson<double?>(proteinMinimumG),
       'fatG': serializer.toJson<double>(fatG),
       'carbsG': serializer.toJson<double>(carbsG),
       'weeklyRateFraction': serializer.toJson<double>(weeklyRateFraction),
@@ -3030,6 +3571,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       'tdeeKcal': serializer.toJson<double>(tdeeKcal),
       'tdeeSigmaKcal': serializer.toJson<double>(tdeeSigmaKcal),
       'explanation': serializer.toJson<String?>(explanation),
+      'summarySeen': serializer.toJson<bool>(summarySeen),
+      'targetRulesVersion': serializer.toJson<int>(targetRulesVersion),
       'profileRevision': serializer.toJson<int>(profileRevision),
       'safetyBodyFatPercent': serializer.toJson<double?>(safetyBodyFatPercent),
       'tdeeStatus': serializer.toJson<String>(
@@ -3043,6 +3586,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     GoalMode? mode,
     double? kcal,
     double? proteinG,
+    Value<double?> proteinMinimumG = const Value.absent(),
     double? fatG,
     double? carbsG,
     double? weeklyRateFraction,
@@ -3050,6 +3594,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     double? tdeeKcal,
     double? tdeeSigmaKcal,
     Value<String?> explanation = const Value.absent(),
+    bool? summarySeen,
+    int? targetRulesVersion,
     int? profileRevision,
     Value<double?> safetyBodyFatPercent = const Value.absent(),
     TdeeStatus? tdeeStatus,
@@ -3058,6 +3604,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     mode: mode ?? this.mode,
     kcal: kcal ?? this.kcal,
     proteinG: proteinG ?? this.proteinG,
+    proteinMinimumG: proteinMinimumG.present
+        ? proteinMinimumG.value
+        : this.proteinMinimumG,
     fatG: fatG ?? this.fatG,
     carbsG: carbsG ?? this.carbsG,
     weeklyRateFraction: weeklyRateFraction ?? this.weeklyRateFraction,
@@ -3065,6 +3614,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     tdeeKcal: tdeeKcal ?? this.tdeeKcal,
     tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
     explanation: explanation.present ? explanation.value : this.explanation,
+    summarySeen: summarySeen ?? this.summarySeen,
+    targetRulesVersion: targetRulesVersion ?? this.targetRulesVersion,
     profileRevision: profileRevision ?? this.profileRevision,
     safetyBodyFatPercent: safetyBodyFatPercent.present
         ? safetyBodyFatPercent.value
@@ -3079,6 +3630,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       mode: data.mode.present ? data.mode.value : this.mode,
       kcal: data.kcal.present ? data.kcal.value : this.kcal,
       proteinG: data.proteinG.present ? data.proteinG.value : this.proteinG,
+      proteinMinimumG: data.proteinMinimumG.present
+          ? data.proteinMinimumG.value
+          : this.proteinMinimumG,
       fatG: data.fatG.present ? data.fatG.value : this.fatG,
       carbsG: data.carbsG.present ? data.carbsG.value : this.carbsG,
       weeklyRateFraction: data.weeklyRateFraction.present
@@ -3092,6 +3646,12 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       explanation: data.explanation.present
           ? data.explanation.value
           : this.explanation,
+      summarySeen: data.summarySeen.present
+          ? data.summarySeen.value
+          : this.summarySeen,
+      targetRulesVersion: data.targetRulesVersion.present
+          ? data.targetRulesVersion.value
+          : this.targetRulesVersion,
       profileRevision: data.profileRevision.present
           ? data.profileRevision.value
           : this.profileRevision,
@@ -3111,6 +3671,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           ..write('mode: $mode, ')
           ..write('kcal: $kcal, ')
           ..write('proteinG: $proteinG, ')
+          ..write('proteinMinimumG: $proteinMinimumG, ')
           ..write('fatG: $fatG, ')
           ..write('carbsG: $carbsG, ')
           ..write('weeklyRateFraction: $weeklyRateFraction, ')
@@ -3118,6 +3679,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
           ..write('explanation: $explanation, ')
+          ..write('summarySeen: $summarySeen, ')
+          ..write('targetRulesVersion: $targetRulesVersion, ')
           ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
@@ -3131,6 +3694,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     mode,
     kcal,
     proteinG,
+    proteinMinimumG,
     fatG,
     carbsG,
     weeklyRateFraction,
@@ -3138,6 +3702,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     tdeeKcal,
     tdeeSigmaKcal,
     explanation,
+    summarySeen,
+    targetRulesVersion,
     profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
@@ -3150,6 +3716,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           other.mode == this.mode &&
           other.kcal == this.kcal &&
           other.proteinG == this.proteinG &&
+          other.proteinMinimumG == this.proteinMinimumG &&
           other.fatG == this.fatG &&
           other.carbsG == this.carbsG &&
           other.weeklyRateFraction == this.weeklyRateFraction &&
@@ -3157,6 +3724,8 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           other.tdeeKcal == this.tdeeKcal &&
           other.tdeeSigmaKcal == this.tdeeSigmaKcal &&
           other.explanation == this.explanation &&
+          other.summarySeen == this.summarySeen &&
+          other.targetRulesVersion == this.targetRulesVersion &&
           other.profileRevision == this.profileRevision &&
           other.safetyBodyFatPercent == this.safetyBodyFatPercent &&
           other.tdeeStatus == this.tdeeStatus);
@@ -3167,6 +3736,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   final Value<GoalMode> mode;
   final Value<double> kcal;
   final Value<double> proteinG;
+  final Value<double?> proteinMinimumG;
   final Value<double> fatG;
   final Value<double> carbsG;
   final Value<double> weeklyRateFraction;
@@ -3174,6 +3744,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   final Value<double> tdeeKcal;
   final Value<double> tdeeSigmaKcal;
   final Value<String?> explanation;
+  final Value<bool> summarySeen;
+  final Value<int> targetRulesVersion;
   final Value<int> profileRevision;
   final Value<double?> safetyBodyFatPercent;
   final Value<TdeeStatus> tdeeStatus;
@@ -3182,6 +3754,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.mode = const Value.absent(),
     this.kcal = const Value.absent(),
     this.proteinG = const Value.absent(),
+    this.proteinMinimumG = const Value.absent(),
     this.fatG = const Value.absent(),
     this.carbsG = const Value.absent(),
     this.weeklyRateFraction = const Value.absent(),
@@ -3189,6 +3762,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.tdeeKcal = const Value.absent(),
     this.tdeeSigmaKcal = const Value.absent(),
     this.explanation = const Value.absent(),
+    this.summarySeen = const Value.absent(),
+    this.targetRulesVersion = const Value.absent(),
     this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     this.tdeeStatus = const Value.absent(),
@@ -3198,6 +3773,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     required GoalMode mode,
     required double kcal,
     required double proteinG,
+    this.proteinMinimumG = const Value.absent(),
     required double fatG,
     required double carbsG,
     required double weeklyRateFraction,
@@ -3205,6 +3781,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     required double tdeeKcal,
     required double tdeeSigmaKcal,
     this.explanation = const Value.absent(),
+    this.summarySeen = const Value.absent(),
+    this.targetRulesVersion = const Value.absent(),
     this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     required TdeeStatus tdeeStatus,
@@ -3222,6 +3800,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Expression<String>? mode,
     Expression<double>? kcal,
     Expression<double>? proteinG,
+    Expression<double>? proteinMinimumG,
     Expression<double>? fatG,
     Expression<double>? carbsG,
     Expression<double>? weeklyRateFraction,
@@ -3229,6 +3808,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Expression<double>? tdeeKcal,
     Expression<double>? tdeeSigmaKcal,
     Expression<String>? explanation,
+    Expression<bool>? summarySeen,
+    Expression<int>? targetRulesVersion,
     Expression<int>? profileRevision,
     Expression<double>? safetyBodyFatPercent,
     Expression<String>? tdeeStatus,
@@ -3238,6 +3819,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       if (mode != null) 'mode': mode,
       if (kcal != null) 'kcal': kcal,
       if (proteinG != null) 'protein_g': proteinG,
+      if (proteinMinimumG != null) 'protein_minimum_g': proteinMinimumG,
       if (fatG != null) 'fat_g': fatG,
       if (carbsG != null) 'carbs_g': carbsG,
       if (weeklyRateFraction != null)
@@ -3246,6 +3828,9 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       if (tdeeKcal != null) 'tdee_kcal': tdeeKcal,
       if (tdeeSigmaKcal != null) 'tdee_sigma_kcal': tdeeSigmaKcal,
       if (explanation != null) 'explanation': explanation,
+      if (summarySeen != null) 'summary_seen': summarySeen,
+      if (targetRulesVersion != null)
+        'target_rules_version': targetRulesVersion,
       if (profileRevision != null) 'profile_revision': profileRevision,
       if (safetyBodyFatPercent != null)
         'safety_body_fat_percent': safetyBodyFatPercent,
@@ -3258,6 +3843,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Value<GoalMode>? mode,
     Value<double>? kcal,
     Value<double>? proteinG,
+    Value<double?>? proteinMinimumG,
     Value<double>? fatG,
     Value<double>? carbsG,
     Value<double>? weeklyRateFraction,
@@ -3265,6 +3851,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Value<double>? tdeeKcal,
     Value<double>? tdeeSigmaKcal,
     Value<String?>? explanation,
+    Value<bool>? summarySeen,
+    Value<int>? targetRulesVersion,
     Value<int>? profileRevision,
     Value<double?>? safetyBodyFatPercent,
     Value<TdeeStatus>? tdeeStatus,
@@ -3274,6 +3862,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       mode: mode ?? this.mode,
       kcal: kcal ?? this.kcal,
       proteinG: proteinG ?? this.proteinG,
+      proteinMinimumG: proteinMinimumG ?? this.proteinMinimumG,
       fatG: fatG ?? this.fatG,
       carbsG: carbsG ?? this.carbsG,
       weeklyRateFraction: weeklyRateFraction ?? this.weeklyRateFraction,
@@ -3281,6 +3870,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       tdeeKcal: tdeeKcal ?? this.tdeeKcal,
       tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
       explanation: explanation ?? this.explanation,
+      summarySeen: summarySeen ?? this.summarySeen,
+      targetRulesVersion: targetRulesVersion ?? this.targetRulesVersion,
       profileRevision: profileRevision ?? this.profileRevision,
       safetyBodyFatPercent: safetyBodyFatPercent ?? this.safetyBodyFatPercent,
       tdeeStatus: tdeeStatus ?? this.tdeeStatus,
@@ -3304,6 +3895,9 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     if (proteinG.present) {
       map['protein_g'] = Variable<double>(proteinG.value);
     }
+    if (proteinMinimumG.present) {
+      map['protein_minimum_g'] = Variable<double>(proteinMinimumG.value);
+    }
     if (fatG.present) {
       map['fat_g'] = Variable<double>(fatG.value);
     }
@@ -3324,6 +3918,12 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     }
     if (explanation.present) {
       map['explanation'] = Variable<String>(explanation.value);
+    }
+    if (summarySeen.present) {
+      map['summary_seen'] = Variable<bool>(summarySeen.value);
+    }
+    if (targetRulesVersion.present) {
+      map['target_rules_version'] = Variable<int>(targetRulesVersion.value);
     }
     if (profileRevision.present) {
       map['profile_revision'] = Variable<int>(profileRevision.value);
@@ -3348,6 +3948,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
           ..write('mode: $mode, ')
           ..write('kcal: $kcal, ')
           ..write('proteinG: $proteinG, ')
+          ..write('proteinMinimumG: $proteinMinimumG, ')
           ..write('fatG: $fatG, ')
           ..write('carbsG: $carbsG, ')
           ..write('weeklyRateFraction: $weeklyRateFraction, ')
@@ -3355,6 +3956,8 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
           ..write('explanation: $explanation, ')
+          ..write('summarySeen: $summarySeen, ')
+          ..write('targetRulesVersion: $targetRulesVersion, ')
           ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
@@ -3578,6 +4181,234 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   }
 }
 
+class $WeightEventsTable extends WeightEvents
+    with TableInfo<$WeightEventsTable, WeightEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeightEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateEpochDayMeta = const VerificationMeta(
+    'dateEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> dateEpochDay = GeneratedColumn<int>(
+    'date_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<WeightEventType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<WeightEventType>($WeightEventsTable.$convertertype);
+  @override
+  List<GeneratedColumn> get $columns => [dateEpochDay, type];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weight_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WeightEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date_epoch_day')) {
+      context.handle(
+        _dateEpochDayMeta,
+        dateEpochDay.isAcceptableOrUnknown(
+          data['date_epoch_day']!,
+          _dateEpochDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dateEpochDayMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {dateEpochDay, type};
+  @override
+  WeightEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WeightEventRow(
+      dateEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}date_epoch_day'],
+      )!,
+      type: $WeightEventsTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $WeightEventsTable createAlias(String alias) {
+    return $WeightEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<WeightEventType, String, String> $convertertype =
+      const EnumNameConverter<WeightEventType>(WeightEventType.values);
+}
+
+class WeightEventRow extends DataClass implements Insertable<WeightEventRow> {
+  final int dateEpochDay;
+  final WeightEventType type;
+  const WeightEventRow({required this.dateEpochDay, required this.type});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date_epoch_day'] = Variable<int>(dateEpochDay);
+    {
+      map['type'] = Variable<String>(
+        $WeightEventsTable.$convertertype.toSql(type),
+      );
+    }
+    return map;
+  }
+
+  WeightEventsCompanion toCompanion(bool nullToAbsent) {
+    return WeightEventsCompanion(
+      dateEpochDay: Value(dateEpochDay),
+      type: Value(type),
+    );
+  }
+
+  factory WeightEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WeightEventRow(
+      dateEpochDay: serializer.fromJson<int>(json['dateEpochDay']),
+      type: $WeightEventsTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dateEpochDay': serializer.toJson<int>(dateEpochDay),
+      'type': serializer.toJson<String>(
+        $WeightEventsTable.$convertertype.toJson(type),
+      ),
+    };
+  }
+
+  WeightEventRow copyWith({int? dateEpochDay, WeightEventType? type}) =>
+      WeightEventRow(
+        dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+        type: type ?? this.type,
+      );
+  WeightEventRow copyWithCompanion(WeightEventsCompanion data) {
+    return WeightEventRow(
+      dateEpochDay: data.dateEpochDay.present
+          ? data.dateEpochDay.value
+          : this.dateEpochDay,
+      type: data.type.present ? data.type.value : this.type,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightEventRow(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('type: $type')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(dateEpochDay, type);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WeightEventRow &&
+          other.dateEpochDay == this.dateEpochDay &&
+          other.type == this.type);
+}
+
+class WeightEventsCompanion extends UpdateCompanion<WeightEventRow> {
+  final Value<int> dateEpochDay;
+  final Value<WeightEventType> type;
+  final Value<int> rowid;
+  const WeightEventsCompanion({
+    this.dateEpochDay = const Value.absent(),
+    this.type = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WeightEventsCompanion.insert({
+    required int dateEpochDay,
+    required WeightEventType type,
+    this.rowid = const Value.absent(),
+  }) : dateEpochDay = Value(dateEpochDay),
+       type = Value(type);
+  static Insertable<WeightEventRow> custom({
+    Expression<int>? dateEpochDay,
+    Expression<String>? type,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (dateEpochDay != null) 'date_epoch_day': dateEpochDay,
+      if (type != null) 'type': type,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WeightEventsCompanion copyWith({
+    Value<int>? dateEpochDay,
+    Value<WeightEventType>? type,
+    Value<int>? rowid,
+  }) {
+    return WeightEventsCompanion(
+      dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+      type: type ?? this.type,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (dateEpochDay.present) {
+      map['date_epoch_day'] = Variable<int>(dateEpochDay.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $WeightEventsTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightEventsCompanion(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('type: $type, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3590,6 +4421,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UserPreferencesTable userPreferences = $UserPreferencesTable(
     this,
   );
+  late final $WeightEventsTable weightEvents = $WeightEventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3602,6 +4434,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     waistEntries,
     targetsHistory,
     userPreferences,
+    weightEvents,
   ];
 }
 
@@ -3627,6 +4460,13 @@ typedef $$SetupsTableCreateCompanionBuilder = SetupsCompanion Function({
   Value<bool> pcos,
   Value<bool> menopause,
   Value<bool> thyroidCondition,
+  Value<bool> insulinOrSulfonylurea,
+  Value<bool> insulinCareTeamConfirmed,
+  Value<bool> bariatricSurgery,
+  Value<bool> weightAffectingMedication,
+  Value<int?> healthCheckConfirmedEpochDay,
+  Value<int> healthCheckSkipCount,
+  Value<int?> creatineStartedEpochDay,
 });
 typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<int> id,
@@ -3650,6 +4490,13 @@ typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<bool> pcos,
   Value<bool> menopause,
   Value<bool> thyroidCondition,
+  Value<bool> insulinOrSulfonylurea,
+  Value<bool> insulinCareTeamConfirmed,
+  Value<bool> bariatricSurgery,
+  Value<bool> weightAffectingMedication,
+  Value<int?> healthCheckConfirmedEpochDay,
+  Value<int> healthCheckSkipCount,
+  Value<int?> creatineStartedEpochDay,
 });
 
 class $$SetupsTableFilterComposer
@@ -3769,6 +4616,41 @@ class $$SetupsTableFilterComposer
     column: $table.thyroidCondition,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<bool> get insulinOrSulfonylurea => $composableBuilder(
+    column: $table.insulinOrSulfonylurea,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get insulinCareTeamConfirmed => $composableBuilder(
+    column: $table.insulinCareTeamConfirmed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get bariatricSurgery => $composableBuilder(
+    column: $table.bariatricSurgery,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get weightAffectingMedication => $composableBuilder(
+    column: $table.weightAffectingMedication,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get healthCheckConfirmedEpochDay => $composableBuilder(
+    column: $table.healthCheckConfirmedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get healthCheckSkipCount => $composableBuilder(
+    column: $table.healthCheckSkipCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$SetupsTableOrderingComposer
@@ -3884,6 +4766,41 @@ class $$SetupsTableOrderingComposer
     column: $table.thyroidCondition,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get insulinOrSulfonylurea => $composableBuilder(
+    column: $table.insulinOrSulfonylurea,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get insulinCareTeamConfirmed => $composableBuilder(
+    column: $table.insulinCareTeamConfirmed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get bariatricSurgery => $composableBuilder(
+    column: $table.bariatricSurgery,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get weightAffectingMedication => $composableBuilder(
+    column: $table.weightAffectingMedication,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get healthCheckConfirmedEpochDay => $composableBuilder(
+    column: $table.healthCheckConfirmedEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get healthCheckSkipCount => $composableBuilder(
+    column: $table.healthCheckSkipCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SetupsTableAnnotationComposer
@@ -3988,6 +4905,41 @@ class $$SetupsTableAnnotationComposer
     column: $table.thyroidCondition,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get insulinOrSulfonylurea => $composableBuilder(
+    column: $table.insulinOrSulfonylurea,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get insulinCareTeamConfirmed => $composableBuilder(
+    column: $table.insulinCareTeamConfirmed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get bariatricSurgery => $composableBuilder(
+    column: $table.bariatricSurgery,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get weightAffectingMedication => $composableBuilder(
+    column: $table.weightAffectingMedication,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get healthCheckConfirmedEpochDay => $composableBuilder(
+    column: $table.healthCheckConfirmedEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get healthCheckSkipCount => $composableBuilder(
+    column: $table.healthCheckSkipCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => column,
+  );
 }
 
 class $$SetupsTableTableManager
@@ -4039,6 +4991,13 @@ class $$SetupsTableTableManager
                 Value<bool> pcos = const Value.absent(),
                 Value<bool> menopause = const Value.absent(),
                 Value<bool> thyroidCondition = const Value.absent(),
+                Value<bool> insulinOrSulfonylurea = const Value.absent(),
+                Value<bool> insulinCareTeamConfirmed = const Value.absent(),
+                Value<bool> bariatricSurgery = const Value.absent(),
+                Value<bool> weightAffectingMedication = const Value.absent(),
+                Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+                Value<int> healthCheckSkipCount = const Value.absent(),
+                Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion(
                 id: id,
                 sex: sex,
@@ -4061,6 +5020,13 @@ class $$SetupsTableTableManager
                 pcos: pcos,
                 menopause: menopause,
                 thyroidCondition: thyroidCondition,
+                insulinOrSulfonylurea: insulinOrSulfonylurea,
+                insulinCareTeamConfirmed: insulinCareTeamConfirmed,
+                bariatricSurgery: bariatricSurgery,
+                weightAffectingMedication: weightAffectingMedication,
+                healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
+                healthCheckSkipCount: healthCheckSkipCount,
+                creatineStartedEpochDay: creatineStartedEpochDay,
               ),
           createCompanionCallback:
               ({
@@ -4085,6 +5051,13 @@ class $$SetupsTableTableManager
                 Value<bool> pcos = const Value.absent(),
                 Value<bool> menopause = const Value.absent(),
                 Value<bool> thyroidCondition = const Value.absent(),
+                Value<bool> insulinOrSulfonylurea = const Value.absent(),
+                Value<bool> insulinCareTeamConfirmed = const Value.absent(),
+                Value<bool> bariatricSurgery = const Value.absent(),
+                Value<bool> weightAffectingMedication = const Value.absent(),
+                Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+                Value<int> healthCheckSkipCount = const Value.absent(),
+                Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion.insert(
                 id: id,
                 sex: sex,
@@ -4107,6 +5080,13 @@ class $$SetupsTableTableManager
                 pcos: pcos,
                 menopause: menopause,
                 thyroidCondition: thyroidCondition,
+                insulinOrSulfonylurea: insulinOrSulfonylurea,
+                insulinCareTeamConfirmed: insulinCareTeamConfirmed,
+                bariatricSurgery: bariatricSurgery,
+                weightAffectingMedication: weightAffectingMedication,
+                healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
+                healthCheckSkipCount: healthCheckSkipCount,
+                creatineStartedEpochDay: creatineStartedEpochDay,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4891,6 +5871,7 @@ typedef $$TargetsHistoryTableCreateCompanionBuilder =
       required GoalMode mode,
       required double kcal,
       required double proteinG,
+      Value<double?> proteinMinimumG,
       required double fatG,
       required double carbsG,
       required double weeklyRateFraction,
@@ -4898,6 +5879,8 @@ typedef $$TargetsHistoryTableCreateCompanionBuilder =
       required double tdeeKcal,
       required double tdeeSigmaKcal,
       Value<String?> explanation,
+      Value<bool> summarySeen,
+      Value<int> targetRulesVersion,
       Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       required TdeeStatus tdeeStatus,
@@ -4908,6 +5891,7 @@ typedef $$TargetsHistoryTableUpdateCompanionBuilder =
       Value<GoalMode> mode,
       Value<double> kcal,
       Value<double> proteinG,
+      Value<double?> proteinMinimumG,
       Value<double> fatG,
       Value<double> carbsG,
       Value<double> weeklyRateFraction,
@@ -4915,6 +5899,8 @@ typedef $$TargetsHistoryTableUpdateCompanionBuilder =
       Value<double> tdeeKcal,
       Value<double> tdeeSigmaKcal,
       Value<String?> explanation,
+      Value<bool> summarySeen,
+      Value<int> targetRulesVersion,
       Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       Value<TdeeStatus> tdeeStatus,
@@ -4950,6 +5936,11 @@ class $$TargetsHistoryTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<double> get proteinMinimumG => $composableBuilder(
+    column: $table.proteinMinimumG,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<double> get fatG => $composableBuilder(
     column: $table.fatG,
     builder: (column) => ColumnFilters(column),
@@ -4982,6 +5973,16 @@ class $$TargetsHistoryTableFilterComposer
 
   ColumnFilters<String> get explanation => $composableBuilder(
     column: $table.explanation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetRulesVersion => $composableBuilder(
+    column: $table.targetRulesVersion,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5031,6 +6032,11 @@ class $$TargetsHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get proteinMinimumG => $composableBuilder(
+    column: $table.proteinMinimumG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get fatG => $composableBuilder(
     column: $table.fatG,
     builder: (column) => ColumnOrderings(column),
@@ -5063,6 +6069,16 @@ class $$TargetsHistoryTableOrderingComposer
 
   ColumnOrderings<String> get explanation => $composableBuilder(
     column: $table.explanation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetRulesVersion => $composableBuilder(
+    column: $table.targetRulesVersion,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5105,6 +6121,11 @@ class $$TargetsHistoryTableAnnotationComposer
   GeneratedColumn<double> get proteinG =>
       $composableBuilder(column: $table.proteinG, builder: (column) => column);
 
+  GeneratedColumn<double> get proteinMinimumG => $composableBuilder(
+    column: $table.proteinMinimumG,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get fatG =>
       $composableBuilder(column: $table.fatG, builder: (column) => column);
 
@@ -5129,6 +6150,16 @@ class $$TargetsHistoryTableAnnotationComposer
 
   GeneratedColumn<String> get explanation => $composableBuilder(
     column: $table.explanation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetRulesVersion => $composableBuilder(
+    column: $table.targetRulesVersion,
     builder: (column) => column,
   );
 
@@ -5186,6 +6217,7 @@ class $$TargetsHistoryTableTableManager
                 Value<GoalMode> mode = const Value.absent(),
                 Value<double> kcal = const Value.absent(),
                 Value<double> proteinG = const Value.absent(),
+                Value<double?> proteinMinimumG = const Value.absent(),
                 Value<double> fatG = const Value.absent(),
                 Value<double> carbsG = const Value.absent(),
                 Value<double> weeklyRateFraction = const Value.absent(),
@@ -5193,6 +6225,8 @@ class $$TargetsHistoryTableTableManager
                 Value<double> tdeeKcal = const Value.absent(),
                 Value<double> tdeeSigmaKcal = const Value.absent(),
                 Value<String?> explanation = const Value.absent(),
+                Value<bool> summarySeen = const Value.absent(),
+                Value<int> targetRulesVersion = const Value.absent(),
                 Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 Value<TdeeStatus> tdeeStatus = const Value.absent(),
@@ -5201,6 +6235,7 @@ class $$TargetsHistoryTableTableManager
                 mode: mode,
                 kcal: kcal,
                 proteinG: proteinG,
+                proteinMinimumG: proteinMinimumG,
                 fatG: fatG,
                 carbsG: carbsG,
                 weeklyRateFraction: weeklyRateFraction,
@@ -5208,6 +6243,8 @@ class $$TargetsHistoryTableTableManager
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
                 explanation: explanation,
+                summarySeen: summarySeen,
+                targetRulesVersion: targetRulesVersion,
                 profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
@@ -5218,6 +6255,7 @@ class $$TargetsHistoryTableTableManager
                 required GoalMode mode,
                 required double kcal,
                 required double proteinG,
+                Value<double?> proteinMinimumG = const Value.absent(),
                 required double fatG,
                 required double carbsG,
                 required double weeklyRateFraction,
@@ -5225,6 +6263,8 @@ class $$TargetsHistoryTableTableManager
                 required double tdeeKcal,
                 required double tdeeSigmaKcal,
                 Value<String?> explanation = const Value.absent(),
+                Value<bool> summarySeen = const Value.absent(),
+                Value<int> targetRulesVersion = const Value.absent(),
                 Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 required TdeeStatus tdeeStatus,
@@ -5233,6 +6273,7 @@ class $$TargetsHistoryTableTableManager
                 mode: mode,
                 kcal: kcal,
                 proteinG: proteinG,
+                proteinMinimumG: proteinMinimumG,
                 fatG: fatG,
                 carbsG: carbsG,
                 weeklyRateFraction: weeklyRateFraction,
@@ -5240,6 +6281,8 @@ class $$TargetsHistoryTableTableManager
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
                 explanation: explanation,
+                summarySeen: summarySeen,
+                targetRulesVersion: targetRulesVersion,
                 profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
@@ -5434,6 +6477,161 @@ typedef $$UserPreferencesTableProcessedTableManager =
       PreferencesRow,
       PrefetchHooks Function()
     >;
+typedef $$WeightEventsTableCreateCompanionBuilder =
+    WeightEventsCompanion Function({
+      required int dateEpochDay,
+      required WeightEventType type,
+      Value<int> rowid,
+    });
+typedef $$WeightEventsTableUpdateCompanionBuilder =
+    WeightEventsCompanion Function({
+      Value<int> dateEpochDay,
+      Value<WeightEventType> type,
+      Value<int> rowid,
+    });
+
+class $$WeightEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<WeightEventType, WeightEventType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+}
+
+class $$WeightEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WeightEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<WeightEventType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+}
+
+class $$WeightEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WeightEventsTable,
+          WeightEventRow,
+          $$WeightEventsTableFilterComposer,
+          $$WeightEventsTableOrderingComposer,
+          $$WeightEventsTableAnnotationComposer,
+          $$WeightEventsTableCreateCompanionBuilder,
+          $$WeightEventsTableUpdateCompanionBuilder,
+          (
+            WeightEventRow,
+            BaseReferences<_$AppDatabase, $WeightEventsTable, WeightEventRow>,
+          ),
+          WeightEventRow,
+          PrefetchHooks Function()
+        > {
+  $$WeightEventsTableTableManager(_$AppDatabase db, $WeightEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WeightEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WeightEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WeightEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> dateEpochDay = const Value.absent(),
+                Value<WeightEventType> type = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEventsCompanion(
+                dateEpochDay: dateEpochDay,
+                type: type,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int dateEpochDay,
+                required WeightEventType type,
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEventsCompanion.insert(
+                dateEpochDay: dateEpochDay,
+                type: type,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WeightEventsTable, WeightEventRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $WeightEventsTable,
+                    WeightEventRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WeightEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WeightEventsTable,
+      WeightEventRow,
+      $$WeightEventsTableFilterComposer,
+      $$WeightEventsTableOrderingComposer,
+      $$WeightEventsTableAnnotationComposer,
+      $$WeightEventsTableCreateCompanionBuilder,
+      $$WeightEventsTableUpdateCompanionBuilder,
+      (
+        WeightEventRow,
+        BaseReferences<_$AppDatabase, $WeightEventsTable, WeightEventRow>,
+      ),
+      WeightEventRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5452,4 +6650,6 @@ class $AppDatabaseManager {
       $$TargetsHistoryTableTableManager(_db, _db.targetsHistory);
   $$UserPreferencesTableTableManager get userPreferences =>
       $$UserPreferencesTableTableManager(_db, _db.userPreferences);
+  $$WeightEventsTableTableManager get weightEvents =>
+      $$WeightEventsTableTableManager(_db, _db.weightEvents);
 }
