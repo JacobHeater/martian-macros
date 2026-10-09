@@ -20,7 +20,7 @@ Choices I made without asking (say if any is wrong):
 - **A mismatch warns and does not block.** Labels round, and fiber and alcohol break the arithmetic. The warning says what the macros add
   up to and to double-check the label.
 - **The meal defaults from the clock**: breakfast before 11, lunch before 3, dinner before 9, otherwise snacks.
-- **How it was measured**: weighed (5% uncertainty), label serving (10%), cup or spoon (15%), estimate (20%), palm (25%), cupped hand
+- **How it was measured**: weighed (5% uncertainty), label serving (10%), cup or spoon (15%), estimate (40%, changed from 20% by MM-167), palm (25%), cupped hand
   (30%), thumb (40%). The default is label serving.
 - **Entries are deleted by swiping.** There is no undo and no confirmation.
 

@@ -35,9 +35,13 @@ class MmTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TextField(
     controller: controller,
-    keyboardType: kind == MmTextFieldKind.number
-        ? const TextInputType.numberWithOptions(decimal: true)
-        : null,
+    keyboardType: switch (kind) {
+      MmTextFieldKind.number => const TextInputType.numberWithOptions(
+        decimal: true,
+      ),
+      MmTextFieldKind.quantity => TextInputType.text,
+      MmTextFieldKind.text => null,
+    },
     textCapitalization: kind == MmTextFieldKind.text
         ? TextCapitalization.sentences
         : TextCapitalization.none,

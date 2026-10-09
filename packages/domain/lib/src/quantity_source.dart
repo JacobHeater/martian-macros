@@ -9,7 +9,7 @@ enum QuantitySource {
   palm(0.25),
   cuppedHand(0.30),
   thumb(0.40),
-  quickAdd(0.20);
+  quickAdd(0.40);
 
   const QuantitySource(this.relativeSigma);
 
