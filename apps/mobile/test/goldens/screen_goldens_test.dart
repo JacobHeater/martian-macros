@@ -207,6 +207,9 @@ void main() {
         dark ? ThemePreference.dark : ThemePreference.light,
       );
       await open(tester, repos);
+      await shot(tester, 'welcome_$mode');
+      await tester.tap(find.text('Get started'));
+      await tester.pumpAndSettle();
       await shot(tester, 'onboarding_$mode');
     }, skip: !linux);
   }

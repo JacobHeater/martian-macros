@@ -71,6 +71,9 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    expect(find.text('Get started'), findsOneWidget);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
     expect(find.text('Biological sex'), findsOneWidget);
 
     FilledButton next() =>
@@ -145,6 +148,8 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();
