@@ -13,6 +13,7 @@ class StatRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
           child: Text(
@@ -22,7 +23,7 @@ class StatRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
+        Flexible(
           child: Text(
             value,
             textAlign: TextAlign.end,
