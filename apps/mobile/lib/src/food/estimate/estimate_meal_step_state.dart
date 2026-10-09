@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
+import '../../format/fmt.dart';
 import '../../format/meal_label.dart';
 import '../../providers.dart';
 import '../../repository_role_providers.dart';
@@ -65,7 +66,7 @@ class EstimateMealStepState extends ConsumerState<EstimateMealStep> {
         Text('Estimate a meal', style: text.titleLarge),
         const SizedBox(height: 4),
         Text(
-          'For a restaurant, a friend\'s cooking or a buffet. Restaurant meals '
+          'For a restaurant, a friend’s cooking or a buffet. Restaurant meals '
           'usually have more than they look. A rough entry beats a missing '
           'one.',
           style: text.bodySmall,
@@ -88,7 +89,7 @@ class EstimateMealStepState extends ConsumerState<EstimateMealStep> {
                 MmChoiceChip(
                   label:
                       '${size.label} · about '
-                      '${mealKcal(size, maintenance).round()} kcal',
+                      '${Fmt.whole(mealKcal(size, maintenance))} kcal',
                   selected: _size == size,
                   onSelected: () => setState(() => _size = size),
                 ),
