@@ -13,6 +13,7 @@ import '../repository_role_providers.dart';
 import '../ui/day_stepper.dart';
 import '../ui/mm_action_chip.dart';
 import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
 import '../ui/mm_choice_chip.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
@@ -20,10 +21,12 @@ import '../ui/mm_list_row.dart';
 import 'add_food_sheet.dart';
 import 'food_amount_step.dart';
 import 'food_search_results.dart';
+import 'scan/barcode_scan_step.dart';
 
 class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _search = TextEditingController();
   CatalogFood? _picked;
+  var _scanning = false;
   final _name = TextEditingController();
   final _kcal = TextEditingController();
   final _protein = TextEditingController();
@@ -136,6 +139,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         ),
       );
     }
+    if (_scanning) {
+      return _sheet(
+        BarcodeScanStep(
+          onFound: (food) => setState(() {
+            _scanning = false;
+            _picked = food;
+          }),
+          onManual: () => setState(() => _scanning = false),
+          onBack: () => setState(() => _scanning = false),
+        ),
+      );
+    }
     final matchingRecents = query.isEmpty
         ? const <FoodEntry>[]
         : recents
@@ -167,6 +182,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
               controller: _search,
               label: 'Search foods',
               onChanged: (_) => setState(() {}),
+            ),
+          if (!editing && query.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: MmButton(
+                key: const ValueKey('food-scan'),
+                label: 'Scan a barcode',
+                kind: MmButtonKind.secondary,
+                icon: Icons.qr_code_scanner,
+                expand: true,
+                onPressed: () => setState(() => _scanning = true),
+              ),
             ),
           if (editing)
             DayStepper(
