@@ -91,12 +91,15 @@ Scenario: Wording follows level
   Learning boundary. Tune the others on the simulator so that Good means the truth is within about 200 kcal nine times in ten.
 - Food-source quality (MM-153) could become a fifth part once the database exists.
 
-## Progress (implemented; validation still needed)
+## Progress (implemented; partially simulator-validated)
 - Added the Learning/Fair/Good assessment from estimate uncertainty, usable food days, weigh-ins and recent stability, with one next-step
   code. Learning now holds ordinary adaptive target updates while safety raises and user-requested goal/profile corrections remain immediate.
 - Added full Coach-screen part states and next steps, a one-word dashboard label, approximate wording at Learning/Fair, and an expandable
   metabolism estimate shown as a range instead of a visible `±` statistic.
 - Saved confidence with each target explanation's JSON, preserving old explanation records that have no confidence field.
-- **Not done:** calibrating the Good threshold against simulated users; connecting dated weight events once MM-136 exists; validating
-  threshold behavior in a simulator. Next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this
-  ticket in progress until the outstanding calibration and event integration are checked.
+- **Baseline simulation passed.** [coach_confidence_simulation_test.dart](../../packages/engine/test/coach_confidence_simulation_test.dart)
+  runs 100 deterministic users; at least 70 must reach Good, and at least 90% of those estimates must be within 200 kcal of their
+  28-day true expenditure. This validates only the baseline synthetic setup, not weight-event behavior.
+- **Not done:** connecting dated weight events once MM-136 exists and validating the confidence behavior with those events in a
+  simulator. Next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this ticket in progress
+  until event integration and validation are checked.
