@@ -14,7 +14,7 @@ class StatRow extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(
       children: [
-        Expanded(
+        Flexible(
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium
@@ -22,7 +22,7 @@ class StatRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Flexible(
+        Expanded(
           child: Text(
             value,
             textAlign: TextAlign.end,
