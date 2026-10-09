@@ -231,7 +231,7 @@ void main() {
             ('{"packs":[{"id":"barcode_us","title":"Barcode foods, United '
                     'States","version":"2026-10-09","formatVersion":1,'
                     '"url":"https://packs.example.test/barcode_us.pack.gz",'
-                    '"bytes":48234496,"sha256":"${'b' * 64}"}]}')
+                    '"bytes":46739747,"sha256":"${'b' * 64}"}]}')
                 .codeUnits,
       });
       final overrides = <Override>[
@@ -274,13 +274,13 @@ void main() {
             version: '2026-10-09',
             formatVersion: 1,
             url: Uri.parse('https://packs.example.test/barcode_us.pack.gz'),
-            downloadBytes: 46 * 1024 * 1024,
+            downloadBytes: 46000000,
             sha256: 'c' * 64,
           ),
           progress: const PackDownloadProgress(
             phase: PackDownloadPhase.downloading,
-            receivedBytes: 17 * 1024 * 1024,
-            totalBytes: 46 * 1024 * 1024,
+            receivedBytes: 17000000,
+            totalBytes: 46000000,
           ),
         ),
       );

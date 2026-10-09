@@ -115,7 +115,10 @@ class PackDownloadCard extends ConsumerWidget {
           ],
         );
       case PackDownloadStatus.done:
-        return Notice(text: '${listing.title} is on your phone.');
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Notice(text: '${listing.title} is on your phone.'),
+        );
       case PackDownloadStatus.idle:
         return const SizedBox.shrink();
     }
