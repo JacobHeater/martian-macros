@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 13;
+  static const currentSchemaVersion = 14;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -130,6 +130,23 @@ class AppDatabase extends _$AppDatabase {
           userPreferences,
           userPreferences.easyToMissLastShownEpochDay,
         );
+      }
+    },
+    // 13 to 14: the food an entry was logged from (MM-167).
+    13: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(food_entries)',
+        ).get())
+          row.read<String>('name'),
+      };
+      for (final (name, column) in [
+        ('origin_pack_id', foodEntries.originPackId),
+        ('origin_food_id', foodEntries.originFoodId),
+        ('origin_source', foodEntries.originSource),
+        ('origin_source_id', foodEntries.originSourceId),
+      ]) {
+        if (!existing.contains(name)) await m.addColumn(foodEntries, column);
       }
     },
   };
