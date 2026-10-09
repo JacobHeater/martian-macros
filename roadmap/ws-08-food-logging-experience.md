@@ -10,7 +10,7 @@ foods, rough estimates, and the nutrient detail the targets need.
 Logging is the app's most frequent task and its least developed. What exists:
 typing a food's name and macros, recent foods, marking a day complete or
 partial, and the day's summary against targets. A logged entry can now be
-edited and a delete undone (MM-48). Search of the installed packs works with
+edited and a delete undone (MM-48), and a meal or a day copied (MM-47). Search of the installed packs works with
 trust tiers shown (MM-42, MM-153, both in progress); there is no barcode and
 no saved food yet.
 

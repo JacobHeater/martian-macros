@@ -1,6 +1,6 @@
 ---
 id: MM-47
-status: proposed
+status: done
 component: food-logging
 related: [MM-37, MM-39, MM-45, MM-48]
 ---
@@ -32,3 +32,11 @@ Scenario: Independent afterwards
   Given a copied entry is edited
   Then the original is unchanged
 ```
+
+## Progress
+Built: "Copy yesterday" on an empty day whose previous day has entries (every entry, same meals; the completeness mark is not
+copied); a "Copy <meal> to today" button on any meal of a past day, adding to what is already there. Copies are new entries, so
+editing one leaves the original alone. Tested in `food_copy_test.dart`.
+
+Limits: copying a meal to a day other than today is not offered (only today); a day that already has entries does not offer
+"Copy yesterday". Not seen on the emulator yet.
