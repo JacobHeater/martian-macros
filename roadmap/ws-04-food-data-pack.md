@@ -102,8 +102,9 @@ Everything. Its only contact with existing code is the validation function in
 `packages/domain`, which WS-08 also calls; define it in step 2 and both use it.
 
 ## Requirement sources
-- Built: MM-53 (nutrition checks), MM-54 (barcode normalization).
-- Remaining: MM-51, MM-55, MM-52, MM-153, MM-57, MM-56.
+- Built: MM-53 (nutrition checks), MM-54 (barcode normalization), MM-52 (the pipeline).
+- In progress: MM-51 (spike: hand check and pantry test open), MM-55 (format and reader: fixture is 30 foods).
+- Remaining: MM-153, MM-57, MM-56.
   Epic: MM-50.
 
 ## Notes for whoever builds it

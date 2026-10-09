@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'arch/arch_command.dart';
 import 'command.dart';
+import 'food/food_command.dart';
 import 'requirements.dart';
 import 'roadmap/roadmap_report_command.dart';
 import 'toolchain.dart';
@@ -13,6 +14,7 @@ const _packages = <({String path, bool flutter})>[
   (path: 'packages/engine', flutter: false),
   (path: 'packages/data', flutter: false),
   (path: 'packages/food_catalog', flutter: false),
+  (path: 'packages/food_pipeline', flutter: false),
   (path: 'packages/fixtures', flutter: false),
   (path: 'apps/mobile', flutter: true),
   (path: 'tool', flutter: false),
@@ -31,6 +33,10 @@ final _commands = <String, (String, Command)>{
   'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
+  'food': (
+    'Build the food packs: mm food fetch | mm food build [--cache DIR] [--out DIR]',
+    _food,
+  ),
   'roadmap': (
     'Write roadmap/progress.html, the progress page: mm roadmap [--check]',
     _roadmap,
@@ -439,6 +445,8 @@ bool _samePath(String a, String b) {
 
 Future<int> _req(Toolchain tc, List<String> args) =>
     runRequirements(tc.repoRoot, args);
+
+Future<int> _food(Toolchain tc, List<String> args) => runFood(tc, args);
 
 Future<int> _roadmap(Toolchain tc, List<String> args) =>
     runRoadmapReport(tc.repoRoot, args);

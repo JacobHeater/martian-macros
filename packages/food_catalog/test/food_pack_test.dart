@@ -53,6 +53,7 @@ void main() {
     expect(food.proteinG, 31);
     expect(food.fatG, 3.6);
     expect(food.tier, TrustTier.reference);
+    expect(food.sourceId, startsWith('fixture-'), reason: 'provenance');
     expect(food.preparation, PreparationState.cooked);
   });
 

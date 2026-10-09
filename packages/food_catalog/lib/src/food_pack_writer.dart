@@ -52,8 +52,9 @@ final class FoodPackWriter {
         v == null ? null : (v * FoodPackFormat.nutrientScale).round();
     final insertFood = db.prepare(
       'INSERT INTO foods (id, name, brand, kcal, protein, carbs, fat, fiber, '
-      'sodium_mg, alcohol, preparation, pair_id, density, source, tier, '
-      'tier_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'sodium_mg, alcohol, preparation, pair_id, density, source, source_id, '
+      'tier, tier_reason) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     );
     final insertServing = db.prepare(
       'INSERT INTO servings (food_id, description, grams) VALUES (?, ?, ?)',
@@ -80,6 +81,7 @@ final class FoodPackWriter {
             ? null
             : (f.densityGPerMl! * FoodPackFormat.densityScale).round(),
         f.source,
+        f.sourceId,
         f.tier.code,
         f.tierReason,
       ]);

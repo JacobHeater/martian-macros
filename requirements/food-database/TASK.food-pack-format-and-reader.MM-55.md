@@ -63,3 +63,6 @@ Scenario: A newer format
   - Multi-pack ranking merges by each pack's own relevance score, which is only roughly comparable between packs.
   - No pipeline writes packs yet (MM-52), and nothing in the app reads them (WS-08).
 
+## Progress (second increment)
+- The format gained `source_id` (the food's id in its source), so a pack entry can be traced back; the format is not yet released, so the version stays 1. The pipeline (MM-52) now writes real packs in this format: a 140 MB barcode pack and a 2.5 MB generic pack, both readable by `SqliteFoodPack`.
+
