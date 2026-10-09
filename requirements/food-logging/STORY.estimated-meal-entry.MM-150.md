@@ -1,6 +1,6 @@
 ---
 id: MM-150
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-27, MM-38, MM-40, MM-42, MM-45, MM-46, MM-139, MM-141, MM-149, MM-153, MM-167]
 ---
@@ -93,3 +93,18 @@ Scenario: Reuse
 is right is an open decision in MM-167.
 
 Decided with the product owner (MM-167): Estimate's uncertainty is 40%, as here, and MM-38's 20% is to be changed to match.
+
+## Progress
+Built: "Estimate a meal" on the add-food sheet; sizes Light, Regular, Large and Very large shown with their calories, scaled to the
+coach's maintenance estimate (a third of it for Regular; 0.6, 1.5 and 2.2 times that for the others; rounded to 50 kcal, so 550, 900,
+1,350 and 2,000 for 2,700); four kinds, each a macro split by share of energy (balanced 20/50/30 protein/carbohydrate/fat, mostly
+carbohydrate 15/65/20, mostly protein 35/30/35, rich 12/38/50; judgement, not data); an optional name; the line "restaurant meals
+usually have more than they look". The entry is an ordinary one measured by estimate, shown as "Estimated totals", at 40% uncertainty
+(decided in MM-167). Domain: `estimateMeal`, `mealKcal`; app: `EstimateMealStep`. Tested in `estimate_meal_test.dart` (domain and
+widget).
+
+Not built: the estimator's logging-style rule for estimates (the window restarting when someone moves from weighing to mostly
+estimating), the adherence summary and insight about estimate-heavy weeks (MM-149, MM-139, MM-141), simulator users with noisy or
+biased estimates (MM-30), reuse from recents with the estimate mark (the entry appears in recents like any other, as typed totals),
+and the Estimate-heavy day check. Before the coach has a maintenance estimate the sizes are not shown and the sheet says so. Not seen
+on the emulator.
