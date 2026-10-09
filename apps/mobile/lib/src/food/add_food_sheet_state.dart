@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
+import '../format/fmt.dart';
 import '../format/meal_label.dart';
 import '../format/parse_number.dart';
 import '../format/quantity_source_label.dart';
 import '../food_packs/food_catalog_provider.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
+import '../ui/day_stepper.dart';
 import '../ui/mm_action_chip.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_choice_chip.dart';
@@ -27,8 +29,19 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _protein = TextEditingController();
   final _carbs = TextEditingController();
   final _fat = TextEditingController();
-  late Meal _meal = widget.meal ?? _defaultMeal();
+  late Meal _meal = widget.entry?.meal ?? widget.meal ?? _defaultMeal();
+  late CalendarDate _day = widget.entry?.date ?? widget.day;
   var _source = QuantitySource.labelServing;
+
+  @override
+  void initState() {
+    super.initState();
+    final entry = widget.entry;
+    if (entry != null) {
+      _fill(entry);
+      _search.clear();
+    }
+  }
 
   @override
   void dispose() {
@@ -86,21 +99,20 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   });
 
   Future<void> _save() async {
-    await ref
-        .read(foodEntryWriterProvider)
-        .addFood(
-          FoodEntry(
-            id: 0,
-            date: widget.day,
-            meal: _meal,
-            name: _name.text.trim(),
-            kcal: _energy!,
-            proteinG: _p,
-            carbsG: _c,
-            fatG: _f,
-            source: _source,
-          ),
-        );
+    final editing = widget.entry;
+    final entry = FoodEntry(
+      id: editing?.id ?? 0,
+      date: _day,
+      meal: _meal,
+      name: _name.text.trim(),
+      kcal: _energy!,
+      proteinG: _p,
+      carbsG: _c,
+      fatG: _f,
+      source: _source,
+    );
+    final writer = ref.read(foodEntryWriterProvider);
+    await (editing == null ? writer.addFood(entry) : writer.updateFood(entry));
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -108,6 +120,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final recents = ref.watch(recentFoodsProvider).value ?? const [];
+    final editing = widget.entry != null;
     final query = _search.text.trim();
     final picked = _picked;
     if (picked != null) {
@@ -146,15 +159,25 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Add food', style: text.titleLarge),
+          Text(editing ? 'Edit food' : 'Add food', style: text.titleLarge),
           const SizedBox(height: 12),
-          MmTextField(
-            key: const ValueKey('food-search'),
-            controller: _search,
-            label: 'Search foods',
-            onChanged: (_) => setState(() {}),
-          ),
-          if (query.isNotEmpty) ...[
+          if (!editing)
+            MmTextField(
+              key: const ValueKey('food-search'),
+              controller: _search,
+              label: 'Search foods',
+              onChanged: (_) => setState(() {}),
+            ),
+          if (editing)
+            DayStepper(
+              label: Fmt.day(_day, ref.watch(todayProvider)),
+              onPrevious: () => setState(() => _day = _day.addDays(-1)),
+              onNext: _day.isBefore(ref.watch(todayProvider))
+                  ? () => setState(() => _day = _day.addDays(1))
+                  : null,
+              onLabelTap: null,
+            ),
+          if (!editing && query.isNotEmpty) ...[
             for (final e in matchingRecents)
               MmListRow(
                 title: e.name,
@@ -170,7 +193,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
               }),
             ),
           ] else ...[
-            if (recents.isNotEmpty) ...[
+            if (!editing && recents.isNotEmpty) ...[
               const SizedBox(height: 12),
               SizedBox(
                 height: 40,
@@ -247,7 +270,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
             const SizedBox(height: 16),
             MmButton(
               key: const ValueKey('food-save'),
-              label: 'Log it',
+              label: editing ? 'Save changes' : 'Log it',
               expand: true,
               onPressed: _valid ? _save : null,
             ),

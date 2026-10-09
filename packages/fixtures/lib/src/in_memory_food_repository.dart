@@ -40,6 +40,13 @@ final class InMemoryFoodRepository implements FoodRepository {
   }
 
   @override
+  Future<void> updateFood(FoodEntry entry) async {
+    _entries.value = [
+      for (final e in _entries.value) e.id == entry.id ? entry : e,
+    ];
+  }
+
+  @override
   Future<void> deleteFood(int id) async {
     _entries.value = [
       for (final e in _entries.value)
