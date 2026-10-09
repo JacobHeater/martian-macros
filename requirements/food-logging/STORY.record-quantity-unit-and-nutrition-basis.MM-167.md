@@ -253,3 +253,16 @@ density-based conversion.
 Not built: schema and migration, repository changes, the amount step and manual form, edit restore, legacy display, the portion
 summary, and the fix to the label-serving mapping. The totals-versus-descriptive rule (typed totals never scaled) is a UI and
 persistence rule and has no code yet. No behavior of the app has changed.
+
+Step 2 of the plan, persistence, is built and tested. `FoodEntry` has an optional `Portion`; schema version 11 adds nullable
+columns to `food_entries` (quantity, unit, nutrition basis, the reference nutrition and its basis, the serving's description,
+grams, millilitres and unit, and a density) with migration step 10 to 11; the Drift repository, the in-memory repository and the
+shared repository contract read and write them. Tests: a version-10 database with a food keeps its totals and method and gets no
+portion ("nothing is invented"); a calculated portion round-trips every field; typed totals keep their quantity but are not scaled;
+an update can change or clear the portion. The schema snapshot for version 11 is exported and the upgrade-from-every-version
+tests pass.
+
+Still not stored: the source food (pack id, food id, source, source id), the conversion record (kind, factor, model version) and
+the raw or cooked state. They need the pack integration and the hand model and are the next persistence addition. Backups are
+not changed: the encrypted backup (MM-63) is not built, and its format must carry these columns when it is. No screen reads or
+writes a portion yet, so the app behaves as before.
