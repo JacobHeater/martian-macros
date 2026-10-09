@@ -176,8 +176,13 @@ TargetsRecord? nextTargets({
     return null;
   }
 
-  return build(
+  final next = build(
     previous: last.targets,
     deficitWeeks: consecutiveDeficitWeeks(history, today),
   );
+  if (snapshot.creatineReductionPausedOn(today) &&
+      next.targets.kcal < last.targets.kcal) {
+    return null;
+  }
+  return next;
 }

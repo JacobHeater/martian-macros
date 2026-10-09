@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
+import 'package:martian_macros/src/progress/progress_screen.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
@@ -38,6 +38,9 @@ void main() {
         84.0 - (30 - d) * 0.06 + (d.isEven ? 0.25 : -0.25),
       );
     }
+    await repos.weightEvents.saveWeightEvent(
+      WeightEvent(date: today.addDays(-7), type: WeightEventType.travel),
+    );
     final meals = [
       ('Oats with milk', Meal.breakfast, 380.0, 18.0, 58.0, 9.0),
       ('Chicken and rice', Meal.lunch, 610.0, 48.0, 70.0, 12.0),
@@ -157,6 +160,23 @@ void main() {
     testWidgets('progress, $mode', (tester) async {
       await open(tester, await seeded(dark: dark), tab: 'Progress');
       await shot(tester, 'progress_$mode');
+    }, skip: !linux);
+
+    testWidgets('weight event entry, $mode', (tester) async {
+      await open(tester, await seeded(dark: dark), tab: 'Progress');
+      await tester.scrollUntilVisible(
+        find.text('Add'),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(ProgressScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+      await shot(tester, 'weight_event_entry_$mode');
     }, skip: !linux);
 
     testWidgets('coach, $mode', (tester) async {

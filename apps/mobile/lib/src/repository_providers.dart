@@ -23,6 +23,10 @@ final weightRepositoryProvider = Provider<WeightRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).weights,
 );
 
+final weightEventRepositoryProvider = Provider<WeightEventRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).weightEvents,
+);
+
 final waistRepositoryProvider = Provider<WaistRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).waist,
 );

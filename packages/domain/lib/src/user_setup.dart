@@ -22,6 +22,7 @@ final class UserSetup {
     this.requestedLossFraction,
     this.healthCheckConfirmedOn,
     this.healthCheckSkipCount = 0,
+    this.creatineStartedOn,
   });
 
   static const healthCheckIntervalDays = 90;
@@ -58,6 +59,9 @@ final class UserSetup {
   /// Consecutive skipped re-checks; two pauses deficit coaching.
   final int healthCheckSkipCount;
 
+  /// When the user started taking creatine, if they currently take it (MM-136).
+  final CalendarDate? creatineStartedOn;
+
   bool healthCheckDueOn(CalendarDate today) {
     final confirmed = healthCheckConfirmedOn;
     return confirmed == null ||
@@ -77,6 +81,7 @@ final class UserSetup {
     double? Function()? requestedLossFraction,
     CalendarDate? Function()? healthCheckConfirmedOn,
     int? healthCheckSkipCount,
+    CalendarDate? Function()? creatineStartedOn,
   }) => UserSetup(
     profile: profile ?? this.profile,
     screening: screening ?? this.screening,
@@ -97,5 +102,8 @@ final class UserSetup {
         ? this.healthCheckConfirmedOn
         : healthCheckConfirmedOn(),
     healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+    creatineStartedOn: creatineStartedOn == null
+        ? this.creatineStartedOn
+        : creatineStartedOn(),
   );
 }

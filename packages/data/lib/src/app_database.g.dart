@@ -341,6 +341,17 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _creatineStartedEpochDayMeta =
+      const VerificationMeta('creatineStartedEpochDay');
+  @override
+  late final GeneratedColumn<int> creatineStartedEpochDay =
+      GeneratedColumn<int>(
+        'creatine_started_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -370,6 +381,7 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     weightAffectingMedication,
     healthCheckConfirmedEpochDay,
     healthCheckSkipCount,
+    creatineStartedEpochDay,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -579,6 +591,15 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         ),
       );
     }
+    if (data.containsKey('creatine_started_epoch_day')) {
+      context.handle(
+        _creatineStartedEpochDayMeta,
+        creatineStartedEpochDay.isAcceptableOrUnknown(
+          data['creatine_started_epoch_day']!,
+          _creatineStartedEpochDayMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -704,6 +725,10 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         DriftSqlType.int,
         data['${effectivePrefix}health_check_skip_count'],
       )!,
+      creatineStartedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}creatine_started_epoch_day'],
+      ),
     );
   }
 
@@ -761,6 +786,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   final bool weightAffectingMedication;
   final int? healthCheckConfirmedEpochDay;
   final int healthCheckSkipCount;
+  final int? creatineStartedEpochDay;
   const SetupRow({
     required this.id,
     required this.sex,
@@ -789,6 +815,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     required this.weightAffectingMedication,
     this.healthCheckConfirmedEpochDay,
     required this.healthCheckSkipCount,
+    this.creatineStartedEpochDay,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -848,6 +875,11 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       );
     }
     map['health_check_skip_count'] = Variable<int>(healthCheckSkipCount);
+    if (!nullToAbsent || creatineStartedEpochDay != null) {
+      map['creatine_started_epoch_day'] = Variable<int>(
+        creatineStartedEpochDay,
+      );
+    }
     return map;
   }
 
@@ -887,6 +919,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ? const Value.absent()
           : Value(healthCheckConfirmedEpochDay),
       healthCheckSkipCount: Value(healthCheckSkipCount),
+      creatineStartedEpochDay: creatineStartedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(creatineStartedEpochDay),
     );
   }
 
@@ -949,6 +984,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       healthCheckSkipCount: serializer.fromJson<int>(
         json['healthCheckSkipCount'],
       ),
+      creatineStartedEpochDay: serializer.fromJson<int?>(
+        json['creatineStartedEpochDay'],
+      ),
     );
   }
   @override
@@ -998,6 +1036,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
         healthCheckConfirmedEpochDay,
       ),
       'healthCheckSkipCount': serializer.toJson<int>(healthCheckSkipCount),
+      'creatineStartedEpochDay': serializer.toJson<int?>(
+        creatineStartedEpochDay,
+      ),
     };
   }
 
@@ -1029,6 +1070,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     bool? weightAffectingMedication,
     Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
     int? healthCheckSkipCount,
+    Value<int?> creatineStartedEpochDay = const Value.absent(),
   }) => SetupRow(
     id: id ?? this.id,
     sex: sex ?? this.sex,
@@ -1065,6 +1107,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
         ? healthCheckConfirmedEpochDay.value
         : this.healthCheckConfirmedEpochDay,
     healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+    creatineStartedEpochDay: creatineStartedEpochDay.present
+        ? creatineStartedEpochDay.value
+        : this.creatineStartedEpochDay,
   );
   SetupRow copyWithCompanion(SetupsCompanion data) {
     return SetupRow(
@@ -1135,6 +1180,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       healthCheckSkipCount: data.healthCheckSkipCount.present
           ? data.healthCheckSkipCount.value
           : this.healthCheckSkipCount,
+      creatineStartedEpochDay: data.creatineStartedEpochDay.present
+          ? data.creatineStartedEpochDay.value
+          : this.creatineStartedEpochDay,
     );
   }
 
@@ -1169,7 +1217,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ..write(
             'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
           )
-          ..write('healthCheckSkipCount: $healthCheckSkipCount')
+          ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
+          ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -1203,6 +1252,7 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     weightAffectingMedication,
     healthCheckConfirmedEpochDay,
     healthCheckSkipCount,
+    creatineStartedEpochDay,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1235,7 +1285,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           other.weightAffectingMedication == this.weightAffectingMedication &&
           other.healthCheckConfirmedEpochDay ==
               this.healthCheckConfirmedEpochDay &&
-          other.healthCheckSkipCount == this.healthCheckSkipCount);
+          other.healthCheckSkipCount == this.healthCheckSkipCount &&
+          other.creatineStartedEpochDay == this.creatineStartedEpochDay);
 }
 
 class SetupsCompanion extends UpdateCompanion<SetupRow> {
@@ -1266,6 +1317,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
   final Value<bool> weightAffectingMedication;
   final Value<int?> healthCheckConfirmedEpochDay;
   final Value<int> healthCheckSkipCount;
+  final Value<int?> creatineStartedEpochDay;
   const SetupsCompanion({
     this.id = const Value.absent(),
     this.sex = const Value.absent(),
@@ -1294,6 +1346,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.weightAffectingMedication = const Value.absent(),
     this.healthCheckConfirmedEpochDay = const Value.absent(),
     this.healthCheckSkipCount = const Value.absent(),
+    this.creatineStartedEpochDay = const Value.absent(),
   });
   SetupsCompanion.insert({
     this.id = const Value.absent(),
@@ -1323,6 +1376,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.weightAffectingMedication = const Value.absent(),
     this.healthCheckConfirmedEpochDay = const Value.absent(),
     this.healthCheckSkipCount = const Value.absent(),
+    this.creatineStartedEpochDay = const Value.absent(),
   }) : sex = Value(sex),
        birthEpochDay = Value(birthEpochDay),
        heightCm = Value(heightCm),
@@ -1359,6 +1413,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Expression<bool>? weightAffectingMedication,
     Expression<int>? healthCheckConfirmedEpochDay,
     Expression<int>? healthCheckSkipCount,
+    Expression<int>? creatineStartedEpochDay,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1397,6 +1452,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
         'health_check_confirmed_epoch_day': healthCheckConfirmedEpochDay,
       if (healthCheckSkipCount != null)
         'health_check_skip_count': healthCheckSkipCount,
+      if (creatineStartedEpochDay != null)
+        'creatine_started_epoch_day': creatineStartedEpochDay,
     });
   }
 
@@ -1428,6 +1485,7 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Value<bool>? weightAffectingMedication,
     Value<int?>? healthCheckConfirmedEpochDay,
     Value<int>? healthCheckSkipCount,
+    Value<int?>? creatineStartedEpochDay,
   }) {
     return SetupsCompanion(
       id: id ?? this.id,
@@ -1463,6 +1521,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
       healthCheckConfirmedEpochDay:
           healthCheckConfirmedEpochDay ?? this.healthCheckConfirmedEpochDay,
       healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+      creatineStartedEpochDay:
+          creatineStartedEpochDay ?? this.creatineStartedEpochDay,
     );
   }
 
@@ -1574,6 +1634,11 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
         healthCheckSkipCount.value,
       );
     }
+    if (creatineStartedEpochDay.present) {
+      map['creatine_started_epoch_day'] = Variable<int>(
+        creatineStartedEpochDay.value,
+      );
+    }
     return map;
   }
 
@@ -1608,7 +1673,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           ..write(
             'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
           )
-          ..write('healthCheckSkipCount: $healthCheckSkipCount')
+          ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
+          ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -4115,6 +4181,234 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   }
 }
 
+class $WeightEventsTable extends WeightEvents
+    with TableInfo<$WeightEventsTable, WeightEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeightEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateEpochDayMeta = const VerificationMeta(
+    'dateEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> dateEpochDay = GeneratedColumn<int>(
+    'date_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<WeightEventType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<WeightEventType>($WeightEventsTable.$convertertype);
+  @override
+  List<GeneratedColumn> get $columns => [dateEpochDay, type];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weight_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WeightEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date_epoch_day')) {
+      context.handle(
+        _dateEpochDayMeta,
+        dateEpochDay.isAcceptableOrUnknown(
+          data['date_epoch_day']!,
+          _dateEpochDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dateEpochDayMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {dateEpochDay, type};
+  @override
+  WeightEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WeightEventRow(
+      dateEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}date_epoch_day'],
+      )!,
+      type: $WeightEventsTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $WeightEventsTable createAlias(String alias) {
+    return $WeightEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<WeightEventType, String, String> $convertertype =
+      const EnumNameConverter<WeightEventType>(WeightEventType.values);
+}
+
+class WeightEventRow extends DataClass implements Insertable<WeightEventRow> {
+  final int dateEpochDay;
+  final WeightEventType type;
+  const WeightEventRow({required this.dateEpochDay, required this.type});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date_epoch_day'] = Variable<int>(dateEpochDay);
+    {
+      map['type'] = Variable<String>(
+        $WeightEventsTable.$convertertype.toSql(type),
+      );
+    }
+    return map;
+  }
+
+  WeightEventsCompanion toCompanion(bool nullToAbsent) {
+    return WeightEventsCompanion(
+      dateEpochDay: Value(dateEpochDay),
+      type: Value(type),
+    );
+  }
+
+  factory WeightEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WeightEventRow(
+      dateEpochDay: serializer.fromJson<int>(json['dateEpochDay']),
+      type: $WeightEventsTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dateEpochDay': serializer.toJson<int>(dateEpochDay),
+      'type': serializer.toJson<String>(
+        $WeightEventsTable.$convertertype.toJson(type),
+      ),
+    };
+  }
+
+  WeightEventRow copyWith({int? dateEpochDay, WeightEventType? type}) =>
+      WeightEventRow(
+        dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+        type: type ?? this.type,
+      );
+  WeightEventRow copyWithCompanion(WeightEventsCompanion data) {
+    return WeightEventRow(
+      dateEpochDay: data.dateEpochDay.present
+          ? data.dateEpochDay.value
+          : this.dateEpochDay,
+      type: data.type.present ? data.type.value : this.type,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightEventRow(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('type: $type')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(dateEpochDay, type);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WeightEventRow &&
+          other.dateEpochDay == this.dateEpochDay &&
+          other.type == this.type);
+}
+
+class WeightEventsCompanion extends UpdateCompanion<WeightEventRow> {
+  final Value<int> dateEpochDay;
+  final Value<WeightEventType> type;
+  final Value<int> rowid;
+  const WeightEventsCompanion({
+    this.dateEpochDay = const Value.absent(),
+    this.type = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WeightEventsCompanion.insert({
+    required int dateEpochDay,
+    required WeightEventType type,
+    this.rowid = const Value.absent(),
+  }) : dateEpochDay = Value(dateEpochDay),
+       type = Value(type);
+  static Insertable<WeightEventRow> custom({
+    Expression<int>? dateEpochDay,
+    Expression<String>? type,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (dateEpochDay != null) 'date_epoch_day': dateEpochDay,
+      if (type != null) 'type': type,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WeightEventsCompanion copyWith({
+    Value<int>? dateEpochDay,
+    Value<WeightEventType>? type,
+    Value<int>? rowid,
+  }) {
+    return WeightEventsCompanion(
+      dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+      type: type ?? this.type,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (dateEpochDay.present) {
+      map['date_epoch_day'] = Variable<int>(dateEpochDay.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $WeightEventsTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightEventsCompanion(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('type: $type, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4127,6 +4421,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UserPreferencesTable userPreferences = $UserPreferencesTable(
     this,
   );
+  late final $WeightEventsTable weightEvents = $WeightEventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4139,6 +4434,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     waistEntries,
     targetsHistory,
     userPreferences,
+    weightEvents,
   ];
 }
 
@@ -4170,6 +4466,7 @@ typedef $$SetupsTableCreateCompanionBuilder = SetupsCompanion Function({
   Value<bool> weightAffectingMedication,
   Value<int?> healthCheckConfirmedEpochDay,
   Value<int> healthCheckSkipCount,
+  Value<int?> creatineStartedEpochDay,
 });
 typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<int> id,
@@ -4199,6 +4496,7 @@ typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<bool> weightAffectingMedication,
   Value<int?> healthCheckConfirmedEpochDay,
   Value<int> healthCheckSkipCount,
+  Value<int?> creatineStartedEpochDay,
 });
 
 class $$SetupsTableFilterComposer
@@ -4348,6 +4646,11 @@ class $$SetupsTableFilterComposer
     column: $table.healthCheckSkipCount,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$SetupsTableOrderingComposer
@@ -4493,6 +4796,11 @@ class $$SetupsTableOrderingComposer
     column: $table.healthCheckSkipCount,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SetupsTableAnnotationComposer
@@ -4627,6 +4935,11 @@ class $$SetupsTableAnnotationComposer
     column: $table.healthCheckSkipCount,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get creatineStartedEpochDay => $composableBuilder(
+    column: $table.creatineStartedEpochDay,
+    builder: (column) => column,
+  );
 }
 
 class $$SetupsTableTableManager
@@ -4684,6 +4997,7 @@ class $$SetupsTableTableManager
                 Value<bool> weightAffectingMedication = const Value.absent(),
                 Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
                 Value<int> healthCheckSkipCount = const Value.absent(),
+                Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion(
                 id: id,
                 sex: sex,
@@ -4712,6 +5026,7 @@ class $$SetupsTableTableManager
                 weightAffectingMedication: weightAffectingMedication,
                 healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
                 healthCheckSkipCount: healthCheckSkipCount,
+                creatineStartedEpochDay: creatineStartedEpochDay,
               ),
           createCompanionCallback:
               ({
@@ -4742,6 +5057,7 @@ class $$SetupsTableTableManager
                 Value<bool> weightAffectingMedication = const Value.absent(),
                 Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
                 Value<int> healthCheckSkipCount = const Value.absent(),
+                Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion.insert(
                 id: id,
                 sex: sex,
@@ -4770,6 +5086,7 @@ class $$SetupsTableTableManager
                 weightAffectingMedication: weightAffectingMedication,
                 healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
                 healthCheckSkipCount: healthCheckSkipCount,
+                creatineStartedEpochDay: creatineStartedEpochDay,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6160,6 +6477,161 @@ typedef $$UserPreferencesTableProcessedTableManager =
       PreferencesRow,
       PrefetchHooks Function()
     >;
+typedef $$WeightEventsTableCreateCompanionBuilder =
+    WeightEventsCompanion Function({
+      required int dateEpochDay,
+      required WeightEventType type,
+      Value<int> rowid,
+    });
+typedef $$WeightEventsTableUpdateCompanionBuilder =
+    WeightEventsCompanion Function({
+      Value<int> dateEpochDay,
+      Value<WeightEventType> type,
+      Value<int> rowid,
+    });
+
+class $$WeightEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<WeightEventType, WeightEventType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+}
+
+class $$WeightEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WeightEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WeightEventsTable> {
+  $$WeightEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<WeightEventType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+}
+
+class $$WeightEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WeightEventsTable,
+          WeightEventRow,
+          $$WeightEventsTableFilterComposer,
+          $$WeightEventsTableOrderingComposer,
+          $$WeightEventsTableAnnotationComposer,
+          $$WeightEventsTableCreateCompanionBuilder,
+          $$WeightEventsTableUpdateCompanionBuilder,
+          (
+            WeightEventRow,
+            BaseReferences<_$AppDatabase, $WeightEventsTable, WeightEventRow>,
+          ),
+          WeightEventRow,
+          PrefetchHooks Function()
+        > {
+  $$WeightEventsTableTableManager(_$AppDatabase db, $WeightEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WeightEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WeightEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WeightEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> dateEpochDay = const Value.absent(),
+                Value<WeightEventType> type = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEventsCompanion(
+                dateEpochDay: dateEpochDay,
+                type: type,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int dateEpochDay,
+                required WeightEventType type,
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEventsCompanion.insert(
+                dateEpochDay: dateEpochDay,
+                type: type,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WeightEventsTable, WeightEventRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $WeightEventsTable,
+                    WeightEventRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WeightEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WeightEventsTable,
+      WeightEventRow,
+      $$WeightEventsTableFilterComposer,
+      $$WeightEventsTableOrderingComposer,
+      $$WeightEventsTableAnnotationComposer,
+      $$WeightEventsTableCreateCompanionBuilder,
+      $$WeightEventsTableUpdateCompanionBuilder,
+      (
+        WeightEventRow,
+        BaseReferences<_$AppDatabase, $WeightEventsTable, WeightEventRow>,
+      ),
+      WeightEventRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6178,4 +6650,6 @@ class $AppDatabaseManager {
       $$TargetsHistoryTableTableManager(_db, _db.targetsHistory);
   $$UserPreferencesTableTableManager get userPreferences =>
       $$UserPreferencesTableTableManager(_db, _db.userPreferences);
+  $$WeightEventsTableTableManager get weightEvents =>
+      $$WeightEventsTableTableManager(_db, _db.weightEvents);
 }

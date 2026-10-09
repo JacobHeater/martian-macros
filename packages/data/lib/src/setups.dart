@@ -50,6 +50,7 @@ class Setups extends Table {
   IntColumn get healthCheckConfirmedEpochDay => integer().nullable()();
   IntColumn get healthCheckSkipCount =>
       integer().withDefault(const Constant(0))();
+  IntColumn get creatineStartedEpochDay => integer().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};

@@ -51,5 +51,6 @@ export 'src/tdee_estimator.dart';
 export 'src/tdee_prior.dart';
 export 'src/tdee_status.dart';
 export 'src/trend_shift.dart';
+export 'src/weight_event_effects.dart';
 export 'src/weight_trend_model.dart';
 export 'src/weight_trend_point.dart';
