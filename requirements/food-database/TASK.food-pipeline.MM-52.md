@@ -61,3 +61,6 @@ Scenario: Provenance
   - USDA household measures come from Foundation and SR Legacy portion data; Branded foods carry only their one labeled serving, and only when it is in grams. Open Food Facts servings are taken from its serving quantity, assumed to be grams. Raw/cooked pair links and densities are not populated yet (MM-43, MM-46).
   - DuckDB version used: 1.5.6. The pipeline needs its command-line tool installed.
 
+## Progress (conflict rule decided)
+The default conflict rule is now `MostRecentPolicy` (the fresher of two consistent records wins, Open Food Facts on a tie; a more than 10% difference is marked check-this), chosen by the product owner's delegation after measuring recency (see MM-51). `--prefer off|usda_branded` still forces a source. Rebuilding the real sources gave the same packs and counts as before (Open Food Facts won every shared barcode either way). The candidates file gained an `updated_at` column.
+

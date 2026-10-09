@@ -7,7 +7,7 @@ import 'fetch_food_sources.dart';
 /// `mm food fetch | build` (MM-52).
 ///
 ///   mm food fetch [--cache DIR]      download the sources (reused if present)
-///   mm food build [--cache DIR] [--out DIR] [--prefer off|usda_branded]
+///   mm food build [--cache DIR] [--out DIR] [--prefer recent|off|usda_branded]
 ///                                     extract with DuckDB, then build the packs
 ///
 /// The cache defaults to `.food_cache/` and the output to `.food_cache/packs/`;
@@ -29,7 +29,7 @@ Future<int> runFood(Toolchain tc, List<String> args) async {
         tc,
         cache,
         Directory(option('--out') ?? '${cache.path}/packs'),
-        option('--prefer') ?? 'off',
+        option('--prefer') ?? 'recent',
       );
   }
   stderr.writeln('Usage: mm food <fetch|build> [--cache DIR] [--out DIR]');

@@ -49,6 +49,7 @@ CandidateFood candidateFromRow(List<String> header, List<String> row) {
     alcoholG: number('alcohol'),
     servings: servingsJson == null ? const [] : _servings(servingsJson),
     versionKey: int.tryParse(text('version_key') ?? '') ?? 0,
+    updatedAt: int.tryParse(text('updated_at') ?? '') ?? 0,
   );
 }
 

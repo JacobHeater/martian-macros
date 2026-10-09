@@ -6,7 +6,8 @@
 --
 -- Columns: source, source_id, kind, name, brand, gtin, kcal, protein, carbs,
 -- fat, fiber, sodium_mg, alcohol, servings (JSON [{"d": text, "g": grams}]),
--- version_key (orders versions of one product within a source; highest wins).
+-- version_key (orders versions of one product within a source; highest wins),
+-- updated_at (when the source last changed the record, seconds since 1970).
 -- All nutrients are per 100 g.
 
 COPY (
@@ -46,7 +47,8 @@ COPY (
                                       bf.serving_size || ' g'),
                         'g': try_cast(bf.serving_size AS DOUBLE)}])
     END AS servings,
-    try_cast(bf.fdc_id AS BIGINT) AS version_key
+    try_cast(bf.fdc_id AS BIGINT) AS version_key,
+    CAST(epoch(try_cast(bf.modified_date AS DATE)) AS BIGINT) AS updated_at
   FROM bf
   JOIN fd USING (fdc_id)
   LEFT JOIN nut USING (fdc_id)
@@ -65,6 +67,7 @@ COPY (
     CASE WHEN try_cast(serving_quantity AS DOUBLE) > 0 AND serving_size <> ''
          THEN to_json([{'d': serving_size, 'g': try_cast(serving_quantity AS DOUBLE)}])
     END,
+    coalesce(try_cast(last_modified_t AS BIGINT), 0),
     coalesce(try_cast(last_modified_t AS BIGINT), 0)
   FROM read_csv('{{cache}}/off.csv.gz', delim = chr(9), header = true, quote = '',
                 all_varchar = true, ignore_errors = true, sample_size = -1)
@@ -140,7 +143,7 @@ COPY (
     NULL AS brand, NULL AS gtin,
     coalesce(nut.kcal, nut.kcal_atwater) AS kcal,
     nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
-    portions.servings, 0 AS version_key
+    portions.servings, 0 AS version_key, 0 AS updated_at
   FROM fd
   LEFT JOIN nut ON nut.source = fd.source AND nut.fdc_id = fd.fdc_id
   LEFT JOIN portions ON portions.source = fd.source AND portions.fdc_id = fd.fdc_id

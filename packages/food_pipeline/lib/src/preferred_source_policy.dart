@@ -17,10 +17,11 @@ final class PreferredSourcePolicy implements ConflictPolicy {
         second.source == preferredSource && first.source != second.source
         ? second
         : first;
-    return ConflictResolution(winner: winner, disagree: _differ(first, second));
+    return ConflictResolution(winner: winner, disagree: differ(first, second));
   }
 
-  static bool _differ(CandidateFood a, CandidateFood b) {
+  /// Whether two records differ by more than 10% in energy or a macro.
+  static bool differ(CandidateFood a, CandidateFood b) {
     bool far(double? x, double? y, double floor) {
       if (x == null || y == null) return false;
       final larger = x > y ? x : y;
