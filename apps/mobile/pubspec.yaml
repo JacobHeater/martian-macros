@@ -17,8 +17,11 @@ dependencies:
   mm_data: any
   mm_domain: any
   mm_engine: any
+  mm_food_catalog: any
+  path_provider: ^2.1.5
 
 dev_dependencies:
+  crypto: ^3.0.6
   drift: ^2.35.1
   flutter_lints: ^6.0.0
   flutter_test:

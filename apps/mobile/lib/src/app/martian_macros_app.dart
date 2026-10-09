@@ -6,6 +6,7 @@ import '../providers.dart';
 import '../theme/mm_theme.dart';
 import 'app_root.dart';
 import 'check_in_host.dart';
+import 'download_status_host.dart';
 
 class MartianMacrosApp extends ConsumerWidget {
   const MartianMacrosApp({super.key});
@@ -21,7 +22,8 @@ class MartianMacrosApp extends ConsumerWidget {
       ThemePreference.dark => ThemeMode.dark,
       _ => ThemeMode.system,
     },
-    builder: (context, child) => CheckInHost(child: child!),
+    builder: (context, child) =>
+        CheckInHost(child: DownloadStatusHost(child: child!)),
     home: const AppRoot(),
   );
 }

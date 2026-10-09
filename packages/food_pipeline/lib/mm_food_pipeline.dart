@@ -12,6 +12,7 @@ export 'src/food_kind.dart';
 export 'src/most_recent_policy.dart';
 export 'src/pack_build_result.dart';
 export 'src/pack_builder.dart';
+export 'src/package_packs.dart';
 export 'src/preferred_source_policy.dart';
 export 'src/read_candidates.dart';
 export 'src/read_extract.dart';
