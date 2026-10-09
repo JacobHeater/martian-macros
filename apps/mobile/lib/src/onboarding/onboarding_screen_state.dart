@@ -17,9 +17,11 @@ import 'health_step.dart';
 import 'measurements_step.dart';
 import 'onboarding_screen.dart';
 import 'training_step.dart';
+import 'welcome_step.dart';
 
 class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   static const _stepCount = 6;
+  var _welcomed = false;
   var _step = 0;
   var _saving = false;
 
@@ -268,6 +270,13 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_welcomed) {
+      return Scaffold(
+        body: SafeArea(
+          child: WelcomeStep(onStart: () => setState(() => _welcomed = true)),
+        ),
+      );
+    }
     final last = _step == _stepCount - 1;
     return Scaffold(
       body: SafeArea(
