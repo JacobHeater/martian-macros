@@ -93,6 +93,6 @@ void main() {
       await readNow(tester, () => repos.weights.watchWeights().first),
       isEmpty,
     );
-    expect(find.text('Biological sex'), findsOneWidget);
+    expect(find.text('Get started'), findsOneWidget);
   });
 }

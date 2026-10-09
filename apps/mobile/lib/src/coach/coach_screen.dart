@@ -13,6 +13,7 @@ import '../theme/mm_colors_context.dart';
 import '../ui/info_card.dart';
 import '../ui/macro_figure.dart';
 import '../ui/macro_kind.dart';
+import '../ui/mm_disclosure.dart';
 import '../ui/mm_hero_surface.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
@@ -104,11 +105,30 @@ class CoachScreen extends ConsumerWidget {
                 Divider(color: context.mm.outline),
                 StatRow(
                   'Intended pace',
-                  _paceText(snapshot, current.targets.weeklyRateFraction, fmt),
+                  current.targets.weeklyRateFraction == 0
+                      ? 'Hold weight'
+                      : Fmt.percentPerWeek(current.targets.weeklyRateFraction),
                 ),
+                if (_paceDetail(
+                      snapshot,
+                      current.targets.weeklyRateFraction,
+                      fmt,
+                    )
+                    case final detail?)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      detail,
+                      style: text.bodySmall?.copyWith(color: context.mm.text2),
+                    ),
+                  ),
                 StatRow(
                   'Next check-in',
                   Fmt.day(nextCheckIn(setup, current), today),
+                ),
+                StatRow(
+                  'Coach confidence',
+                  confidenceLabel(snapshot.confidence.level),
                 ),
                 for (final flag in current.targets.flags)
                   Padding(
@@ -124,6 +144,13 @@ class CoachScreen extends ConsumerWidget {
           holdNote: _holdNote(setup, snapshot, today),
         ),
         InfoCard(
+          title: 'Your metabolism',
+          child: MetabolismSummary(
+            snapshot: snapshot,
+            calibrating: setup.onboardedOn.daysUntil(today) < calibrationDays,
+          ),
+        ),
+        InfoCard(
           title:
               'Coach confidence · '
               '${confidenceLabel(snapshot.confidence.level)}',
@@ -135,23 +162,31 @@ class CoachScreen extends ConsumerWidget {
                   padding: EdgeInsets.only(bottom: 8),
                   child: Text('Targets are held while the coach learns.'),
                 ),
-              StatRow(
-                'Estimate',
-                confidenceLabel(snapshot.confidence.estimate),
-              ),
-              StatRow('Food log', confidenceLabel(snapshot.confidence.foodLog)),
-              StatRow(
-                'Weigh-ins',
-                confidenceLabel(snapshot.confidence.weighIns),
-              ),
-              StatRow(
-                'Stability',
-                confidenceLabel(snapshot.confidence.stability),
-              ),
               const SizedBox(height: 8),
               Text(
                 confidenceNextStepText(snapshot.confidence),
                 style: text.bodyMedium,
+              ),
+              MmDisclosure(
+                title: 'What this rests on',
+                children: [
+                  StatRow(
+                    'Estimate',
+                    confidenceLabel(snapshot.confidence.estimate),
+                  ),
+                  StatRow(
+                    'Food log',
+                    confidenceLabel(snapshot.confidence.foodLog),
+                  ),
+                  StatRow(
+                    'Weigh-ins',
+                    confidenceLabel(snapshot.confidence.weighIns),
+                  ),
+                  StatRow(
+                    'Stability',
+                    confidenceLabel(snapshot.confidence.stability),
+                  ),
+                ],
               ),
             ],
           ),
@@ -164,13 +199,6 @@ class CoachScreen extends ConsumerWidget {
             onPressed: () => _changeGoal(context, ref, setup, snapshot),
           ),
           child: Text(setup.goalMode.blurb),
-        ),
-        InfoCard(
-          title: 'Your metabolism',
-          child: MetabolismSummary(
-            snapshot: snapshot,
-            calibrating: setup.onboardedOn.daysUntil(today) < calibrationDays,
-          ),
         ),
         InfoCard(
           title: 'Body',
@@ -193,14 +221,13 @@ class CoachScreen extends ConsumerWidget {
     );
   }
 
-  String _paceText(CoachSnapshot snapshot, double rate, Fmt fmt) {
-    if (rate == 0) return 'Hold weight';
-    final pace =
-        '${Fmt.percentPerWeek(rate)} '
-        '(${fmt.weightDelta(rate * snapshot.trendWeightKg)})';
+  /// The pace in weight, worded as approximate until the coach is sure.
+  String? _paceDetail(CoachSnapshot snapshot, double rate, Fmt fmt) {
+    if (rate == 0) return null;
+    final change = '${fmt.weightDelta(rate * snapshot.trendWeightKg)} a week';
     return snapshot.confidence.level == ConfidenceLevel.good
-        ? pace
-        : 'About $pace so far';
+        ? change
+        : 'About $change so far';
   }
 
   /// After calibration, while the estimate is held for lack of data, targets
