@@ -136,6 +136,7 @@ void main() {
       expect(setup.screening.bariatricSurgery, isFalse);
       expect(setup.healthCheckConfirmedOn, isNull);
       expect(setup.healthCheckSkipCount, 0);
+      expect(setup.creatineStartedOn, isNull);
       final targets = (await repos.targets.watchTargetsHistory().first).single;
       expect(targets.mode, GoalMode.recomp);
       expect(targets.safetyBodyFatPercent, isNull);

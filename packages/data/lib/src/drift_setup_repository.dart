@@ -55,6 +55,7 @@ final class DriftSetupRepository implements SetupRepository {
             setup.healthCheckConfirmedOn?.epochDay,
           ),
           healthCheckSkipCount: Value(setup.healthCheckSkipCount),
+          creatineStartedEpochDay: Value(setup.creatineStartedOn?.epochDay),
         ),
       );
 
@@ -94,5 +95,8 @@ final class DriftSetupRepository implements SetupRepository {
               ? null
               : CalendarDate.fromEpochDay(r.healthCheckConfirmedEpochDay!),
           healthCheckSkipCount: r.healthCheckSkipCount,
+          creatineStartedOn: r.creatineStartedEpochDay == null
+              ? null
+              : CalendarDate.fromEpochDay(r.creatineStartedEpochDay!),
         );
 }

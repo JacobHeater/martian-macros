@@ -91,9 +91,10 @@ register, and the paywall gates features built here.
    parts. One migration. Introduce the entitlement interface here, returning
    "unlocked". Current implementation includes stored confidence, the
    confidence card, one-time next-open summary, versioned app-rule updates, a
-   no-change reason and held-entry history detail; simulator calibration,
-   MM-136 event integration and product-owner confirmation of the hold behavior
-   remain.
+   no-change reason and held-entry history detail. MM-136 now supplies dated
+   weight events, with deterministic creatine/travel simulations. Broader
+   confidence next-step/data-boundary simulations and product-owner
+   confirmation of the hold behavior remain.
 4. **Rounding and bands (MM-123).** M2.
 5. **Fat-loss pace (MM-128).** M2. After WS-05 step 2.
 6. **Maintenance band and leaving a deficit (MM-130).** M2. After WS-02

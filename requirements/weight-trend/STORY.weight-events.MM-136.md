@@ -1,8 +1,8 @@
 ---
 id: MM-136
-status: proposed
+status: in-progress
 component: weight-trend
-related: [MM-15, MM-17, MM-18, MM-19, MM-20, MM-23, MM-30, MM-131, MM-139, MM-142, MM-148]
+related: [MM-15, MM-17, MM-18, MM-19, MM-20, MM-23, MM-30, MM-61, MM-131, MM-139, MM-142, MM-148]
 ---
 
 # Story: Tell the app about things that move the scale without moving fat
@@ -30,6 +30,8 @@ Choices I made without asking (say if any is wrong):
   - **Lasting shifts** (creatine start and stop): the trend is allowed a step of body water that persists. The step's size is estimated
     from the data within a prior of 1.5 kg (start) or -1.5 kg (stop), spread over the following 21 days, and is excluded from the
     tissue slope the expenditure estimate uses.
+    Ordinary adaptive calorie reductions are deferred for the following four weeks so that a water-related change in trend weight
+    cannot lower the target. Safety changes and explicit goal/profile corrections still apply.
   - **Passing events** (the rest): readings in a window around the date (the day before to four days after; seven days for illness) get
     wider noise, exactly as cycle days do (MM-19), so they pull the trend less.
 - **The chart marks events**, so the user can see why the band widened or the line stepped (MM-17).
@@ -57,12 +59,15 @@ be tested against them.
 Scenario: Creatine during a cut, declared
   Given a simulated user on a steady 500 kcal deficit who starts creatine in week four and gains 1.5 kg of water over ten days
   And a "started creatine" event on that date
+  And the cut began with an established expenditure estimate of 2800 kcal/day and a 2300 kcal/day target
   Then the expenditure estimate falls by less than 100 kcal because of it
   And no check-in in the following four weeks lowers the target on that account
+  And Coach explains that calorie reductions are paused while the creatine change settles
 
 Scenario: The same, undeclared
-  Given the same user and no event
-  Then this ticket records how far the estimate moves, so the value of asking is known
+  Given the same seed-314 simulator user and no event
+  And a no-step control with identical food and weigh-in noise
+  Then at the day-35 check-in the expenditure estimate is 435 kcal/day lower than the control, within 25 kcal
 
 Scenario: A passing event
   Given a "travel" event and readings 1.2 kg high for the three days after it
@@ -79,6 +84,18 @@ Scenario: Not an excuse
 
 Scenario: Shown on the chart
   Then each event appears as a mark on the trend chart at its date
+
+Scenario: Creatine at onboarding
+  Given a user is on the onboarding training step
+  When they say they currently take creatine and select a start date
+  Then that start date is saved with their setup
+  And no duplicate event entry is required
+
+Scenario: Reporting a later creatine change
+  Given an onboarded user opens Progress
+  Then the weight-events card asks them to record starting or stopping creatine
+  When they add a started-creatine event
+  Then the saved event recomputes the trend and estimate
 ```
 
 ## Notes
@@ -86,3 +103,24 @@ Scenario: Shown on the chart
 - Shares its mechanism for lasting shifts with the glycogen work (MM-131); build them together.
 - A user who pauses (MM-148) for illness gets an illness event without being asked twice.
 - Medications that move water or weight are covered as a standing caution in MM-112, not as events.
+
+## Progress (implemented; deterministic simulator-validated)
+- Added the event model and repository contract, Drift and in-memory implementations, and schema version 10 for events plus the nullable
+  onboarding creatine start date. Migration snapshots and repository, erasure, and setup round-trip tests cover both implementations.
+- Onboarding asks whether the user currently takes creatine and records the selected start date. Later events can be recorded on Progress
+  for today or any of the previous 28 days; they remain visible in the event list and are marked on the trend chart. The onboarding
+  creatine date also appears as a chart/list marker without requiring a duplicate event row.
+- Creatine start/stop applies a signed Gaussian prior with mean +1.5/-1.5 kg and standard deviation 1.5 kg, distributed over 21 daily
+  updates. The observed weights determine the resulting shift; 1.5 kg is not forced as a fixed jump. The transition window is excluded
+  from the TDEE tissue-slope calculation. While it overlaps the estimator window, the engine carries forward the last updated
+  pre-transition estimate rather than falling back to its formula prior.
+- Transient events widen scale noise from the day before through four days after (seven for illness). Events are accepted chronologically:
+  no more than two accepted events lie in any rolling 14-day interval; later entries stay visible with an explicit no-effect explanation.
+- Deterministic simulation (`weight_event_simulation_test.dart`, seed 314) uses a steady 500 kcal deficit and adds 1.5 kg over ten days
+  starting on day 21 (week four), with a 2800 kcal pre-cut estimate and 2300 kcal target recorded on day 0. Undeclared, the day-35
+  estimate falls by about 435 kcal compared with the no-step control. Declared, any fall from the pre-event estimate or the matched
+  no-step control is below 100 kcal at each weekly check-in in the following four weeks, and no check-in lowers
+  the existing target. Ordinary reductions are deferred during those four weeks; safety and user-driven changes still apply. A three-day 1.2 kg travel
+  rise also moves the trend less when declared than when unmarked.
+- Validation currently covers deterministic scenarios, not population-level event calibration. MM-139's synthetic population checks
+  for confidence/next-step boundaries remain separate.

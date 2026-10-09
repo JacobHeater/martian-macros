@@ -8,10 +8,12 @@
 /// change: used on days when intake has just changed level.
 final class TrendShift {
   const TrendShift({
+    this.levelMeanKg = 0,
     required this.levelSigmaKg,
     required this.slopeSigmaKgPerDay,
   });
 
+  final double levelMeanKg;
   final double levelSigmaKg;
   final double slopeSigmaKgPerDay;
 }

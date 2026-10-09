@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/progress/progress_screen.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
@@ -51,6 +52,16 @@ void main() {
     await repos.waist.saveWaist(today.addDays(-14), 90);
     await repos.waist.saveWaist(today, 88.5);
     await openProgress(tester);
+    await tester.scrollUntilVisible(
+      find.textContaining('Latest:'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ProgressScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     expect(find.textContaining('Latest:'), findsOneWidget);
     expect(find.textContaining('since'), findsWidgets);
     // 90 cm to 88.5 cm is a fall of 0.6 in.
@@ -60,7 +71,16 @@ void main() {
   testWidgets('a waist measurement can be saved from its card', (tester) async {
     await repos.weights.saveWeight(today, 82);
     await openProgress(tester);
-    await tester.ensureVisible(find.byKey(const ValueKey('entry-waist')));
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('entry-waist')),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ProgressScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     await tester.enterText(find.byKey(const ValueKey('entry-waist')), '35');
     await tester.pump();
     await tester.ensureVisible(find.byKey(const ValueKey('save-waist')));

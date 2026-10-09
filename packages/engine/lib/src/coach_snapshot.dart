@@ -4,6 +4,7 @@ import 'body_fat_estimate.dart';
 import 'coach_confidence.dart';
 import 'mode_recommendation.dart';
 import 'tdee_estimate.dart';
+import 'weight_event_effects.dart';
 import 'weight_trend_point.dart';
 
 /// Everything the engine currently believes about the user.
@@ -17,6 +18,7 @@ final class CoachSnapshot {
     required this.tdee,
     required this.confidence,
     required this.recommendation,
+    this.lastCreatineEventOn,
   });
 
   final CoachingPolicy policy;
@@ -29,4 +31,12 @@ final class CoachSnapshot {
   final TdeeEstimate tdee;
   final CoachConfidence confidence;
   final ModeRecommendation recommendation;
+  final CalendarDate? lastCreatineEventOn;
+
+  bool creatineReductionPausedOn(CalendarDate today) {
+    final event = lastCreatineEventOn;
+    return event != null &&
+        !event.isAfter(today) &&
+        event.daysUntil(today) <= weightEventReductionPauseDays;
+  }
 }

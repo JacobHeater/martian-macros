@@ -36,6 +36,14 @@ final weightWriterProvider = Provider<WeightWriter>(
   (ref) => ref.watch(weightRepositoryProvider),
 );
 
+final weightEventReaderProvider = Provider<WeightEventReader>(
+  (ref) => ref.watch(weightEventRepositoryProvider),
+);
+
+final weightEventWriterProvider = Provider<WeightEventWriter>(
+  (ref) => ref.watch(weightEventRepositoryProvider),
+);
+
 final waistReaderProvider = Provider<WaistReader>(
   (ref) => ref.watch(waistRepositoryProvider),
 );

@@ -38,6 +38,10 @@ final weightsProvider = StreamProvider<List<WeightObservation>>(
   (ref) => ref.watch(weightReaderProvider).watchWeights(),
 );
 
+final weightEventsProvider = StreamProvider<List<WeightEvent>>(
+  (ref) => ref.watch(weightEventReaderProvider).watchWeightEvents(),
+);
+
 final waistProvider = StreamProvider<List<WaistObservation>>(
   (ref) => ref.watch(waistReaderProvider).watchWaist(),
 );
@@ -70,9 +74,14 @@ final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
 final coachProvider = Provider<CoachSnapshot?>((ref) {
   final setup = ref.watch(setupProvider).value;
   final weights = ref.watch(weightsProvider).value;
+  final weightEvents = ref.watch(weightEventsProvider).value;
   final intake = ref.watch(intakeDaysProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
-  if (setup == null || weights == null || intake == null || history == null) {
+  if (setup == null ||
+      weights == null ||
+      weightEvents == null ||
+      intake == null ||
+      history == null) {
     return null;
   }
   return analyze(
@@ -80,6 +89,7 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
     weights: weights,
     intake: intake,
     history: history,
+    weightEvents: weightEvents,
     today: ref.watch(todayProvider),
   );
 });

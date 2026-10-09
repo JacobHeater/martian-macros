@@ -222,6 +222,23 @@ void main() {
     );
   });
 
+  testWidgets('a creatine change explains the reduction pause', (tester) async {
+    await seed([record(30, 2400)]);
+    await repos.weightEvents.saveWeightEvent(
+      WeightEvent(
+        date: today.addDays(-7),
+        type: WeightEventType.startedCreatine,
+      ),
+    );
+    await openCoach(tester);
+    expect(
+      find.textContaining(
+        'Calorie reductions are paused while your creatine change settles.',
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('an app rule update is named as the cause', (tester) async {
     await seed([
       record(9, 2400),

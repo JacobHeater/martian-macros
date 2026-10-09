@@ -11,6 +11,7 @@ import 'targets_history.dart';
 import 'user_preferences.dart';
 import 'waist_entries.dart';
 import 'weight_entries.dart';
+import 'weight_events.dart';
 
 part 'app_database.g.dart';
 
@@ -23,6 +24,7 @@ part 'app_database.g.dart';
     WaistEntries,
     TargetsHistory,
     UserPreferences,
+    WeightEvents,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -30,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 9;
+  static const currentSchemaVersion = 10;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -77,6 +79,11 @@ class AppDatabase extends _$AppDatabase {
     // 8 to 9: track which target-calculation rules issued each record.
     8: (m) async {
       await m.addColumn(targetsHistory, targetsHistory.targetRulesVersion);
+    },
+    // 9 to 10: persist weight events and the onboarding creatine start date.
+    9: (m) async {
+      await m.addColumn(setups, setups.creatineStartedEpochDay);
+      await m.createTable(weightEvents);
     },
   };
 

@@ -58,6 +58,7 @@ Scenario: A new user
 
 Scenario: Good data
   Given 28 days with 24 usable food days, 25 weigh-ins and a measurement with a standard deviation of 170 kcal
+  And stability is Good with no recent qualifying change and no estimate clamp
   Then the level is Good
 
 Scenario: One weak part
@@ -100,6 +101,8 @@ Scenario: Wording follows level
 - **Baseline simulation passed.** [coach_confidence_simulation_test.dart](../../packages/engine/test/coach_confidence_simulation_test.dart)
   runs 100 deterministic users; at least 70 must reach Good, and at least 90% of those estimates must be within 200 kcal of their
   28-day true expenditure. This validates only the baseline synthetic setup, not weight-event behavior.
-- **Not done:** connecting dated weight events once MM-136 exists and validating the confidence behavior with those events in a
-  simulator. Next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this ticket in progress
-  until event integration and validation are checked.
+- **Weight-event integration is in place.** `analyze` supplies the latest lasting-event date to the stability assessment. Engine simulation
+  coverage confirms a recent creatine event lowers stability; MM-136 also tests that event noise reduces the trend response to a
+  deterministic travel-related water rise. This is behavioral validation, not population calibration.
+- **Not done:** next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this ticket in progress
+  until those remaining simulations are checked.

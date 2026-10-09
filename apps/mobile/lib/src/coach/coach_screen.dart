@@ -210,6 +210,10 @@ class CoachScreen extends ConsumerWidget {
     CoachSnapshot snapshot,
     CalendarDate today,
   ) {
+    if (snapshot.creatineReductionPausedOn(today)) {
+      return 'Calorie reductions are paused while your creatine change '
+          'settles. Safety corrections still apply.';
+    }
     if (setup.onboardedOn.daysUntil(today) < calibrationDays ||
         snapshot.tdee.status != TdeeStatus.held) {
       return null;

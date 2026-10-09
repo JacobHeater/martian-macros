@@ -13,6 +13,7 @@ import 'progress_screen.dart';
 import '../charts/trend_chart.dart';
 import '../charts/trend_stats.dart';
 import 'waist_summary.dart';
+import 'weight_events_card.dart';
 
 class ProgressScreenState extends ConsumerState<ProgressScreen> {
   var _rangeDays = 30;
@@ -26,6 +27,21 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
     final weights = ref.watch(weightsProvider).value ?? const [];
     final waist = ref.watch(waistProvider).value ?? const [];
     final trend = ref.watch(coachProvider)?.trend ?? const [];
+    final weightEvents = ref.watch(weightEventsProvider).value ?? const [];
+    final creatineStartedOn = setup.creatineStartedOn;
+    final chartEvents = [
+      ...weightEvents,
+      if (creatineStartedOn != null &&
+          !weightEvents.any(
+            (event) =>
+                event.date == creatineStartedOn &&
+                event.type == WeightEventType.startedCreatine,
+          ))
+        WeightEvent(
+          date: creatineStartedOn,
+          type: WeightEventType.startedCreatine,
+        ),
+    ];
 
     WeightObservation? todays;
     for (final w in weights) {
@@ -78,6 +94,7 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
                             today: today,
                             rangeDays: _rangeDays,
                             fmt: fmt,
+                            weightEvents: chartEvents,
                           ),
                         ),
                       ),
@@ -90,12 +107,14 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
                     Text(
                       'Dots are weigh-ins. The line is your trend with water '
                       'swings filtered out; the band is its uncertainty. '
-                      'Daily jumps inside the band are noise, not fat.',
+                      'Daily jumps inside the band are noise, not fat. Dashed '
+                      'markers show recorded weight events.',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
         ),
+        const WeightEventsCard(),
         NumberEntryCard(
           key: ValueKey('waist-${waist.length}-${fmt.units}'),
           title: 'Waist',

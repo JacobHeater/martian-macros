@@ -67,6 +67,15 @@ not read as tissue change.
 - Outliers beyond 5σ are rejected, which catches pound/kilogram mix-ups.
 - After 3 rejections in a row the reading is accepted anyway, so a real step
   change gets through.
+- Dated weight events are persisted behind narrow reader/writer interfaces
+  (MM-136). At most two passing events per rolling 14 days widen reading
+  noise. Creatine start/stop allows a lasting level shift over 21 days,
+  separately from phase-change slope noise. The TDEE estimator excludes
+  that transition and uses the last measured pre-event estimate as its prior
+  while the transition overlaps its window. Corrected profiles never reuse
+  an estimate from an older profile revision.
+  Ordinary calorie reductions wait four weeks after a creatine change;
+  safety corrections and explicit goal/profile changes still apply.
 
 **Fat vs. lean split.** Use a model, not BIA. The lean fraction of a weight
 change comes from the Forbes/Hall curve, `p = 10.4 / (10.4 + FM)`, halved for
