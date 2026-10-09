@@ -75,6 +75,11 @@ final easyToMissProvider = StreamProvider<EasyToMissPreference>(
   (ref) => ref.watch(easyToMissReaderProvider).watchEasyToMiss(),
 );
 
+/// How much nutrition to show (MM-49).
+final detailLevelProvider = StreamProvider<DetailLevel>(
+  (ref) => ref.watch(detailLevelReaderProvider).watchDetailLevel(),
+);
+
 final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
   (ref) => ref.watch(recentFoodReaderProvider).watchRecentFoods(),
 );

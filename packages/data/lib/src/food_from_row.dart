@@ -15,4 +15,7 @@ FoodEntry foodFromRow(FoodRow r) => FoodEntry(
   fatG: r.fatG,
   source: r.quantitySource,
   portion: portionFromRow(r),
+  fiberG: r.fiberG,
+  sodiumMg: r.sodiumMg,
+  alcoholG: r.alcoholG,
 );

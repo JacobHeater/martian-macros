@@ -16,6 +16,9 @@ final class FoodEntry {
     required this.fatG,
     required this.source,
     this.portion,
+    this.fiberG,
+    this.sodiumMg,
+    this.alcoholG,
   });
 
   /// Database id; 0 for an entry not yet saved.
@@ -33,4 +36,16 @@ final class FoodEntry {
   /// entry logged before portions were recorded, and nothing is invented for
   /// it. When present, its method is [source].
   final Portion? portion;
+
+  /// Nutrients beyond the four macros, kept when the source states them and
+  /// shown at Full detail (MM-49). Null means not known, never zero.
+  final double? fiberG;
+  final double? sodiumMg;
+  final double? alcoholG;
+
+  /// Carbohydrate less fiber, or null when fiber is not known.
+  double? get netCarbsG {
+    final fiber = fiberG;
+    return fiber == null ? null : (carbsG - fiber).clamp(0, double.infinity);
+  }
 }

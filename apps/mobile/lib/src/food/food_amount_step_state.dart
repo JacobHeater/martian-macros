@@ -147,6 +147,12 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
     return '${line(widget.food)}. ${line(widget.alternate!)}.';
   }
 
+  /// A per-100 g nutrient for the grams eaten, or null when not known.
+  double? _extra(double? per100g) {
+    final grams = _grams;
+    return per100g == null || grams == null ? null : per100g * grams / 100;
+  }
+
   Future<void> _log() async {
     final food = _food;
     final totals = _totals!;
@@ -165,6 +171,9 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
             carbsG: totals.carbsG,
             fatG: totals.fatG,
             source: _method,
+            fiberG: _extra(food.fiberG),
+            sodiumMg: _extra(food.sodiumMg),
+            alcoholG: _extra(food.alcoholG),
             portion: Portion(
               method: _method,
               basis: NutritionBasis.calculated,

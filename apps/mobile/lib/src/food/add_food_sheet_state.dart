@@ -254,6 +254,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         quantity: _amount,
         unit: _unit,
         reference: calc,
+        origin: widget.entry?.portion?.origin,
       );
     }
     if (_source == QuantitySource.quickAdd) {
@@ -266,6 +267,16 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       unit: _basis == NutritionBasis.calculated ? PortionUnit.serving : _unit,
       reference: _perServingRef,
     );
+  }
+
+  /// An edited entry keeps the nutrients beyond the macros its source stated,
+  /// scaled by how much its energy changed (they scale with the amount).
+  double? _scaledExtra(double? value) {
+    final editing = widget.entry;
+    final totals = _totals;
+    if (value == null || editing == null || totals == null) return null;
+    if (editing.kcal <= 0) return value;
+    return value * totals.kcal / editing.kcal;
   }
 
   Future<void> _save() async {
@@ -283,6 +294,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       fatG: totals.fatG,
       source: portion?.method ?? _source,
       portion: portion,
+      fiberG: _scaledExtra(editing?.fiberG),
+      sodiumMg: _scaledExtra(editing?.sodiumMg),
+      alcoholG: _scaledExtra(editing?.alcoholG),
     );
     final writer = ref.read(foodEntryWriterProvider);
     await (editing == null ? writer.addFood(entry) : writer.updateFood(entry));

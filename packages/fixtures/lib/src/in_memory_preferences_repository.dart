@@ -30,6 +30,15 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
         lastShown: day,
       );
 
+  final _detail = ObservableValue<DetailLevel>(DetailLevel.standard);
+
+  @override
+  Stream<DetailLevel> watchDetailLevel() => _detail.watch();
+
+  @override
+  Future<void> saveDetailLevel(DetailLevel level) async =>
+      _detail.value = level;
+
   @override
   Future<void> saveThemePreference(ThemePreference preference) async =>
       _theme.value = preference;
@@ -38,5 +47,6 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
   void clear() {
     _theme.value = ThemePreference.system;
     _easyToMiss.value = const EasyToMissPreference();
+    _detail.value = DetailLevel.standard;
   }
 }
