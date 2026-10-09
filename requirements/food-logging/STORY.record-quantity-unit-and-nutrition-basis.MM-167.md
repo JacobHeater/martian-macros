@@ -209,17 +209,21 @@ Scenario: The same behavior from search, barcode and manual entry
 - **Nothing here is built.** What exists is described in the first section. The amount step from MM-42 collects quantity and unit and
   then drops them, and maps every serving to "cup / spoon", including a label serving from a barcode, which contradicts the rule above;
   both are implementation gaps against this ticket, not satisfied by it.
-- **Open decisions** (not resolvable from the documentation; need the product owner):
-  1. **Estimate's uncertainty**: MM-38 and the code say 20%; MM-150 says 40%. Pick one and update both and MM-27's simulator.
-  2. **The US cup**: legal 236.588 mL or the label cup of 240 mL. Foods whose serving is defined by the source avoid the question;
-     densities do not. Proposed: use the source's serving; for a density-based conversion use 236.588 mL; confirm.
-  3. **Does "For everything you ate" stay the manual default**, or should a per-serving basis be the default because that is what labels
-     show? Proposed: totals, with a one-tap switch; per-100 g only if the owner wants it in the first version.
-  4. **Fist**: MM-46 lists it; the method list has no fist. Add it or drop it.
-  5. **Hand-portion defaults and the hand model** (MM-46 owns this): until it lands, hand methods are a count plus typed totals.
-  6. **Fractions in the field**: simple fractions are proposed; confirm, or accept decimals only.
-  7. **Whether quantity is required for typed totals under "Weighed"**: proposed required for Weighed, Label serving, Cup / spoon and hand
-     portions (descriptive), and none for Estimate.
+- **Decisions made by the product owner** (all seven open questions of the first draft, answered as recommended):
+  1. **Estimate's uncertainty is 40%** everywhere. MM-38's 20% and `QuantitySource.quickAdd`'s value are to change to 40% when this
+     is built, with the simulator re-run (MM-30); MM-150 already says 40%.
+  2. **The US cup is the legal 236.588 mL** (tablespoon 14.787 mL, teaspoon 4.929 mL) for density-based conversion; a serving the source
+     defines in cups uses its own gram weight.
+  3. **The manual form's default basis is "For everything you ate"**, with a one-tap switch to per serving (from the label). Per 100 g
+     is not offered for typed values in the first version.
+  4. **There is no fist method.** Palm, cupped hand and thumb only; MM-46 is amended.
+  5. **Until MM-46's hand model exists**, palm, cupped hand and thumb are logged as a count plus typed totals, labelled as an estimate
+     with that method's uncertainty. No grams are invented.
+  6. **Simple fractions are accepted** ("1/2", "1 1/2") as well as decimals.
+  7. **An amount is required for Weighed, Label serving, Cup / spoon and the hand portions** (descriptive only when totals are typed),
+     and none for Estimate.
+  These are recorded as decisions; **none is built**, and the code still has Estimate at 20%, a fist-free method list, no quantity fields
+  and no fraction parsing.
 - **Implementation plan** (for a later change; each step is its own pull request):
   1. *Domain*: a `Portion` value (method, quantity, unit, basis, reference, serving, conversion), unit enums with exact conversion
      constants, and pure functions for scaling, ounce and volume conversion and quantity parsing and validation, with tests that cover
