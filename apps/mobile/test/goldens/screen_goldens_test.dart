@@ -1,13 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/food_packs/food_pack_providers.dart';
+import 'package:martian_macros/src/food_packs/pack_download_state.dart';
+import 'package:martian_macros/src/food_packs/pack_download_status.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/progress/progress_screen.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
+import 'package:mm_food_catalog/mm_food_catalog.dart';
 
+import '../support/fake_pack_download_controller.dart';
 import '../support/pump_app.dart';
 import 'load_golden_fonts.dart';
 
@@ -117,10 +123,11 @@ void main() {
     WidgetTester tester,
     InMemoryRepositories repos, {
     String? tab,
+    List<Override> overrides = const [],
   }) async {
     // Tests flatten shadows by default; the screens have soft ones.
     debugDisableShadows = false;
-    await pumpApp(tester, repos, FixedClock(today));
+    await pumpApp(tester, repos, FixedClock(today), overrides: overrides);
     // A small phone, so one screenshot shows what a user sees first.
     tester.view.physicalSize = const Size(720, 1600);
     tester.view.devicePixelRatio = 2;
@@ -211,6 +218,73 @@ void main() {
       await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
       await shot(tester, 'onboarding_$mode');
+    }, skip: !linux);
+
+    Future<void> openFoodDatabase(
+      WidgetTester tester, {
+      required PackDownloadState download,
+      bool offer = false,
+    }) async {
+      final manifestUrl = Uri.parse('https://packs.example.test/manifest.json');
+      final http = InMemoryPackHttp({
+        manifestUrl:
+            ('{"packs":[{"id":"barcode_us","title":"Barcode foods, United '
+                    'States","version":"2026-10-09","formatVersion":1,'
+                    '"url":"https://packs.example.test/barcode_us.pack.gz",'
+                    '"bytes":48234496,"sha256":"${'b' * 64}"}]}')
+                .codeUnits,
+      });
+      final overrides = <Override>[
+        packHttpProvider.overrideWithValue(http),
+        packManifestUrlProvider.overrideWithValue(manifestUrl.toString()),
+        installedPacksProvider.overrideWith((ref) async => const []),
+        packDownloadControllerProvider.overrideWith(
+          () => FakePackDownloadController(download),
+        ),
+      ];
+      await open(tester, await seeded(dark: dark), overrides: overrides);
+      await tester.tap(find.byTooltip('Settings'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Food database'), 300);
+      await tester.tap(find.text('Food database'));
+      await tester.pumpAndSettle();
+      if (offer) {
+        await tester.tap(find.text('See what is available'));
+        await tester.pumpAndSettle();
+      }
+    }
+
+    testWidgets('food database offer, $mode', (tester) async {
+      await openFoodDatabase(
+        tester,
+        download: const PackDownloadState(),
+        offer: true,
+      );
+      await shot(tester, 'food_database_offer_$mode');
+    }, skip: !linux);
+
+    testWidgets('food database downloading, $mode', (tester) async {
+      await openFoodDatabase(
+        tester,
+        download: PackDownloadState(
+          status: PackDownloadStatus.running,
+          listing: PackListing(
+            id: 'barcode_us',
+            title: 'Barcode foods, United States',
+            version: '2026-10-09',
+            formatVersion: 1,
+            url: Uri.parse('https://packs.example.test/barcode_us.pack.gz'),
+            downloadBytes: 46 * 1024 * 1024,
+            sha256: 'c' * 64,
+          ),
+          progress: const PackDownloadProgress(
+            phase: PackDownloadPhase.downloading,
+            receivedBytes: 17 * 1024 * 1024,
+            totalBytes: 46 * 1024 * 1024,
+          ),
+        ),
+      );
+      await shot(tester, 'food_database_downloading_$mode');
     }, skip: !linux);
   }
 }
