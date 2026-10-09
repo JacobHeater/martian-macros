@@ -73,6 +73,16 @@ void main() {
     expect(http.requests, isEmpty);
   });
 
+  testWidgets('the sources are credited on the screen', (tester) async {
+    await openScreen(tester);
+    await tester.scrollUntilVisible(
+      find.textContaining('Open Food Facts'),
+      200,
+    );
+    expect(find.textContaining('Open Database License'), findsOneWidget);
+    expect(find.textContaining('USDA FoodData Central'), findsOneWidget);
+  });
+
   testWidgets(
     'opening the screen fetches nothing; the list is read when asked, '
     'and the download waits for its own button',
