@@ -2217,6 +2217,37 @@ class $FoodEntriesTable extends FoodEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _fiberGMeta = const VerificationMeta('fiberG');
+  @override
+  late final GeneratedColumn<double> fiberG = GeneratedColumn<double>(
+    'fiber_g',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sodiumMgMeta = const VerificationMeta(
+    'sodiumMg',
+  );
+  @override
+  late final GeneratedColumn<double> sodiumMg = GeneratedColumn<double>(
+    'sodium_mg',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _alcoholGMeta = const VerificationMeta(
+    'alcoholG',
+  );
+  @override
+  late final GeneratedColumn<double> alcoholG = GeneratedColumn<double>(
+    'alcohol_g',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2257,6 +2288,9 @@ class $FoodEntriesTable extends FoodEntries
     originFoodId,
     originSource,
     originSourceId,
+    fiberG,
+    sodiumMg,
+    alcoholG,
     createdAt,
   ];
   @override
@@ -2439,6 +2473,24 @@ class $FoodEntriesTable extends FoodEntries
         ),
       );
     }
+    if (data.containsKey('fiber_g')) {
+      context.handle(
+        _fiberGMeta,
+        fiberG.isAcceptableOrUnknown(data['fiber_g']!, _fiberGMeta),
+      );
+    }
+    if (data.containsKey('sodium_mg')) {
+      context.handle(
+        _sodiumMgMeta,
+        sodiumMg.isAcceptableOrUnknown(data['sodium_mg']!, _sodiumMgMeta),
+      );
+    }
+    if (data.containsKey('alcohol_g')) {
+      context.handle(
+        _alcoholGMeta,
+        alcoholG.isAcceptableOrUnknown(data['alcohol_g']!, _alcoholGMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -2570,6 +2622,18 @@ class $FoodEntriesTable extends FoodEntries
         DriftSqlType.string,
         data['${effectivePrefix}origin_source_id'],
       ),
+      fiberG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fiber_g'],
+      ),
+      sodiumMg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sodium_mg'],
+      ),
+      alcoholG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}alcohol_g'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -2641,6 +2705,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
   final int? originFoodId;
   final String? originSource;
   final String? originSourceId;
+  final double? fiberG;
+  final double? sodiumMg;
+  final double? alcoholG;
   final DateTime createdAt;
   const FoodRow({
     required this.id,
@@ -2669,6 +2736,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     this.originFoodId,
     this.originSource,
     this.originSourceId,
+    this.fiberG,
+    this.sodiumMg,
+    this.alcoholG,
     required this.createdAt,
   });
   @override
@@ -2750,6 +2820,15 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     if (!nullToAbsent || originSourceId != null) {
       map['origin_source_id'] = Variable<String>(originSourceId);
     }
+    if (!nullToAbsent || fiberG != null) {
+      map['fiber_g'] = Variable<double>(fiberG);
+    }
+    if (!nullToAbsent || sodiumMg != null) {
+      map['sodium_mg'] = Variable<double>(sodiumMg);
+    }
+    if (!nullToAbsent || alcoholG != null) {
+      map['alcohol_g'] = Variable<double>(alcoholG);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2816,6 +2895,15 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       originSourceId: originSourceId == null && nullToAbsent
           ? const Value.absent()
           : Value(originSourceId),
+      fiberG: fiberG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fiberG),
+      sodiumMg: sodiumMg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sodiumMg),
+      alcoholG: alcoholG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(alcoholG),
       createdAt: Value(createdAt),
     );
   }
@@ -2870,6 +2958,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       originFoodId: serializer.fromJson<int?>(json['originFoodId']),
       originSource: serializer.fromJson<String?>(json['originSource']),
       originSourceId: serializer.fromJson<String?>(json['originSourceId']),
+      fiberG: serializer.fromJson<double?>(json['fiberG']),
+      sodiumMg: serializer.fromJson<double?>(json['sodiumMg']),
+      alcoholG: serializer.fromJson<double?>(json['alcoholG']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2915,6 +3006,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       'originFoodId': serializer.toJson<int?>(originFoodId),
       'originSource': serializer.toJson<String?>(originSource),
       'originSourceId': serializer.toJson<String?>(originSourceId),
+      'fiberG': serializer.toJson<double?>(fiberG),
+      'sodiumMg': serializer.toJson<double?>(sodiumMg),
+      'alcoholG': serializer.toJson<double?>(alcoholG),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2946,6 +3040,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     Value<int?> originFoodId = const Value.absent(),
     Value<String?> originSource = const Value.absent(),
     Value<String?> originSourceId = const Value.absent(),
+    Value<double?> fiberG = const Value.absent(),
+    Value<double?> sodiumMg = const Value.absent(),
+    Value<double?> alcoholG = const Value.absent(),
     DateTime? createdAt,
   }) => FoodRow(
     id: id ?? this.id,
@@ -2996,6 +3093,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     originSourceId: originSourceId.present
         ? originSourceId.value
         : this.originSourceId,
+    fiberG: fiberG.present ? fiberG.value : this.fiberG,
+    sodiumMg: sodiumMg.present ? sodiumMg.value : this.sodiumMg,
+    alcoholG: alcoholG.present ? alcoholG.value : this.alcoholG,
     createdAt: createdAt ?? this.createdAt,
   );
   FoodRow copyWithCompanion(FoodEntriesCompanion data) {
@@ -3062,6 +3162,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       originSourceId: data.originSourceId.present
           ? data.originSourceId.value
           : this.originSourceId,
+      fiberG: data.fiberG.present ? data.fiberG.value : this.fiberG,
+      sodiumMg: data.sodiumMg.present ? data.sodiumMg.value : this.sodiumMg,
+      alcoholG: data.alcoholG.present ? data.alcoholG.value : this.alcoholG,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -3095,6 +3198,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           ..write('originFoodId: $originFoodId, ')
           ..write('originSource: $originSource, ')
           ..write('originSourceId: $originSourceId, ')
+          ..write('fiberG: $fiberG, ')
+          ..write('sodiumMg: $sodiumMg, ')
+          ..write('alcoholG: $alcoholG, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -3128,6 +3234,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     originFoodId,
     originSource,
     originSourceId,
+    fiberG,
+    sodiumMg,
+    alcoholG,
     createdAt,
   ]);
   @override
@@ -3160,6 +3269,9 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           other.originFoodId == this.originFoodId &&
           other.originSource == this.originSource &&
           other.originSourceId == this.originSourceId &&
+          other.fiberG == this.fiberG &&
+          other.sodiumMg == this.sodiumMg &&
+          other.alcoholG == this.alcoholG &&
           other.createdAt == this.createdAt);
 }
 
@@ -3190,6 +3302,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
   final Value<int?> originFoodId;
   final Value<String?> originSource;
   final Value<String?> originSourceId;
+  final Value<double?> fiberG;
+  final Value<double?> sodiumMg;
+  final Value<double?> alcoholG;
   final Value<DateTime> createdAt;
   const FoodEntriesCompanion({
     this.id = const Value.absent(),
@@ -3218,6 +3333,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.originFoodId = const Value.absent(),
     this.originSource = const Value.absent(),
     this.originSourceId = const Value.absent(),
+    this.fiberG = const Value.absent(),
+    this.sodiumMg = const Value.absent(),
+    this.alcoholG = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   FoodEntriesCompanion.insert({
@@ -3247,6 +3365,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.originFoodId = const Value.absent(),
     this.originSource = const Value.absent(),
     this.originSourceId = const Value.absent(),
+    this.fiberG = const Value.absent(),
+    this.sodiumMg = const Value.absent(),
+    this.alcoholG = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : epochDay = Value(epochDay),
        meal = Value(meal),
@@ -3283,6 +3404,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Expression<int>? originFoodId,
     Expression<String>? originSource,
     Expression<String>? originSourceId,
+    Expression<double>? fiberG,
+    Expression<double>? sodiumMg,
+    Expression<double>? alcoholG,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -3312,6 +3436,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       if (originFoodId != null) 'origin_food_id': originFoodId,
       if (originSource != null) 'origin_source': originSource,
       if (originSourceId != null) 'origin_source_id': originSourceId,
+      if (fiberG != null) 'fiber_g': fiberG,
+      if (sodiumMg != null) 'sodium_mg': sodiumMg,
+      if (alcoholG != null) 'alcohol_g': alcoholG,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -3343,6 +3470,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Value<int?>? originFoodId,
     Value<String?>? originSource,
     Value<String?>? originSourceId,
+    Value<double?>? fiberG,
+    Value<double?>? sodiumMg,
+    Value<double?>? alcoholG,
     Value<DateTime>? createdAt,
   }) {
     return FoodEntriesCompanion(
@@ -3372,6 +3502,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       originFoodId: originFoodId ?? this.originFoodId,
       originSource: originSource ?? this.originSource,
       originSourceId: originSourceId ?? this.originSourceId,
+      fiberG: fiberG ?? this.fiberG,
+      sodiumMg: sodiumMg ?? this.sodiumMg,
+      alcoholG: alcoholG ?? this.alcoholG,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -3469,6 +3602,15 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     if (originSourceId.present) {
       map['origin_source_id'] = Variable<String>(originSourceId.value);
     }
+    if (fiberG.present) {
+      map['fiber_g'] = Variable<double>(fiberG.value);
+    }
+    if (sodiumMg.present) {
+      map['sodium_mg'] = Variable<double>(sodiumMg.value);
+    }
+    if (alcoholG.present) {
+      map['alcohol_g'] = Variable<double>(alcoholG.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3504,6 +3646,9 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
           ..write('originFoodId: $originFoodId, ')
           ..write('originSource: $originSource, ')
           ..write('originSourceId: $originSourceId, ')
+          ..write('fiberG: $fiberG, ')
+          ..write('sodiumMg: $sodiumMg, ')
+          ..write('alcoholG: $alcoholG, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -4990,11 +5135,22 @@ class $UserPreferencesTable extends UserPreferences
         requiredDuringInsert: false,
       );
   @override
+  late final GeneratedColumnWithTypeConverter<DetailLevel, String> detailLevel =
+      GeneratedColumn<String>(
+        'detail_level',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('standard'),
+      ).withConverter<DetailLevel>($UserPreferencesTable.$converterdetailLevel);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     themePreference,
     easyToMissEnabled,
     easyToMissLastShownEpochDay,
+    detailLevel,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5056,6 +5212,12 @@ class $UserPreferencesTable extends UserPreferences
         DriftSqlType.int,
         data['${effectivePrefix}easy_to_miss_last_shown_epoch_day'],
       ),
+      detailLevel: $UserPreferencesTable.$converterdetailLevel.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}detail_level'],
+        )!,
+      ),
     );
   }
 
@@ -5068,6 +5230,8 @@ class $UserPreferencesTable extends UserPreferences
   $converterthemePreference = const EnumNameConverter<ThemePreference>(
     ThemePreference.values,
   );
+  static JsonTypeConverter2<DetailLevel, String, String> $converterdetailLevel =
+      const EnumNameConverter<DetailLevel>(DetailLevel.values);
 }
 
 class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
@@ -5078,11 +5242,15 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
   /// it was shown.
   final bool easyToMissEnabled;
   final int? easyToMissLastShownEpochDay;
+
+  /// How much nutrition to show (MM-49).
+  final DetailLevel detailLevel;
   const PreferencesRow({
     required this.id,
     required this.themePreference,
     required this.easyToMissEnabled,
     this.easyToMissLastShownEpochDay,
+    required this.detailLevel,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5099,6 +5267,11 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
         easyToMissLastShownEpochDay,
       );
     }
+    {
+      map['detail_level'] = Variable<String>(
+        $UserPreferencesTable.$converterdetailLevel.toSql(detailLevel),
+      );
+    }
     return map;
   }
 
@@ -5111,6 +5284,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           easyToMissLastShownEpochDay == null && nullToAbsent
           ? const Value.absent()
           : Value(easyToMissLastShownEpochDay),
+      detailLevel: Value(detailLevel),
     );
   }
 
@@ -5128,6 +5302,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       easyToMissLastShownEpochDay: serializer.fromJson<int?>(
         json['easyToMissLastShownEpochDay'],
       ),
+      detailLevel: $UserPreferencesTable.$converterdetailLevel.fromJson(
+        serializer.fromJson<String>(json['detailLevel']),
+      ),
     );
   }
   @override
@@ -5142,6 +5319,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       'easyToMissLastShownEpochDay': serializer.toJson<int?>(
         easyToMissLastShownEpochDay,
       ),
+      'detailLevel': serializer.toJson<String>(
+        $UserPreferencesTable.$converterdetailLevel.toJson(detailLevel),
+      ),
     };
   }
 
@@ -5150,6 +5330,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     ThemePreference? themePreference,
     bool? easyToMissEnabled,
     Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
+    DetailLevel? detailLevel,
   }) => PreferencesRow(
     id: id ?? this.id,
     themePreference: themePreference ?? this.themePreference,
@@ -5157,6 +5338,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     easyToMissLastShownEpochDay: easyToMissLastShownEpochDay.present
         ? easyToMissLastShownEpochDay.value
         : this.easyToMissLastShownEpochDay,
+    detailLevel: detailLevel ?? this.detailLevel,
   );
   PreferencesRow copyWithCompanion(UserPreferencesCompanion data) {
     return PreferencesRow(
@@ -5170,6 +5352,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       easyToMissLastShownEpochDay: data.easyToMissLastShownEpochDay.present
           ? data.easyToMissLastShownEpochDay.value
           : this.easyToMissLastShownEpochDay,
+      detailLevel: data.detailLevel.present
+          ? data.detailLevel.value
+          : this.detailLevel,
     );
   }
 
@@ -5179,7 +5364,8 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           ..write('id: $id, ')
           ..write('themePreference: $themePreference, ')
           ..write('easyToMissEnabled: $easyToMissEnabled, ')
-          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay')
+          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay, ')
+          ..write('detailLevel: $detailLevel')
           ..write(')'))
         .toString();
   }
@@ -5190,6 +5376,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     themePreference,
     easyToMissEnabled,
     easyToMissLastShownEpochDay,
+    detailLevel,
   );
   @override
   bool operator ==(Object other) =>
@@ -5199,7 +5386,8 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           other.themePreference == this.themePreference &&
           other.easyToMissEnabled == this.easyToMissEnabled &&
           other.easyToMissLastShownEpochDay ==
-              this.easyToMissLastShownEpochDay);
+              this.easyToMissLastShownEpochDay &&
+          other.detailLevel == this.detailLevel);
 }
 
 class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
@@ -5207,23 +5395,27 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   final Value<ThemePreference> themePreference;
   final Value<bool> easyToMissEnabled;
   final Value<int?> easyToMissLastShownEpochDay;
+  final Value<DetailLevel> detailLevel;
   const UserPreferencesCompanion({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.easyToMissEnabled = const Value.absent(),
     this.easyToMissLastShownEpochDay = const Value.absent(),
+    this.detailLevel = const Value.absent(),
   });
   UserPreferencesCompanion.insert({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.easyToMissEnabled = const Value.absent(),
     this.easyToMissLastShownEpochDay = const Value.absent(),
+    this.detailLevel = const Value.absent(),
   });
   static Insertable<PreferencesRow> custom({
     Expression<int>? id,
     Expression<String>? themePreference,
     Expression<bool>? easyToMissEnabled,
     Expression<int>? easyToMissLastShownEpochDay,
+    Expression<String>? detailLevel,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5231,6 +5423,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
       if (easyToMissEnabled != null) 'easy_to_miss_enabled': easyToMissEnabled,
       if (easyToMissLastShownEpochDay != null)
         'easy_to_miss_last_shown_epoch_day': easyToMissLastShownEpochDay,
+      if (detailLevel != null) 'detail_level': detailLevel,
     });
   }
 
@@ -5239,6 +5432,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     Value<ThemePreference>? themePreference,
     Value<bool>? easyToMissEnabled,
     Value<int?>? easyToMissLastShownEpochDay,
+    Value<DetailLevel>? detailLevel,
   }) {
     return UserPreferencesCompanion(
       id: id ?? this.id,
@@ -5246,6 +5440,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
       easyToMissEnabled: easyToMissEnabled ?? this.easyToMissEnabled,
       easyToMissLastShownEpochDay:
           easyToMissLastShownEpochDay ?? this.easyToMissLastShownEpochDay,
+      detailLevel: detailLevel ?? this.detailLevel,
     );
   }
 
@@ -5270,6 +5465,11 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
         easyToMissLastShownEpochDay.value,
       );
     }
+    if (detailLevel.present) {
+      map['detail_level'] = Variable<String>(
+        $UserPreferencesTable.$converterdetailLevel.toSql(detailLevel.value),
+      );
+    }
     return map;
   }
 
@@ -5279,7 +5479,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
           ..write('id: $id, ')
           ..write('themePreference: $themePreference, ')
           ..write('easyToMissEnabled: $easyToMissEnabled, ')
-          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay')
+          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay, ')
+          ..write('detailLevel: $detailLevel')
           ..write(')'))
         .toString();
   }
@@ -7685,6 +7886,9 @@ typedef $$FoodEntriesTableCreateCompanionBuilder =
       Value<int?> originFoodId,
       Value<String?> originSource,
       Value<String?> originSourceId,
+      Value<double?> fiberG,
+      Value<double?> sodiumMg,
+      Value<double?> alcoholG,
       Value<DateTime> createdAt,
     });
 typedef $$FoodEntriesTableUpdateCompanionBuilder =
@@ -7715,6 +7919,9 @@ typedef $$FoodEntriesTableUpdateCompanionBuilder =
       Value<int?> originFoodId,
       Value<String?> originSource,
       Value<String?> originSourceId,
+      Value<double?> fiberG,
+      Value<double?> sodiumMg,
+      Value<double?> alcoholG,
       Value<DateTime> createdAt,
     });
 
@@ -7863,6 +8070,21 @@ class $$FoodEntriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<double> get fiberG => $composableBuilder(
+    column: $table.fiberG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sodiumMg => $composableBuilder(
+    column: $table.sodiumMg,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get alcoholG => $composableBuilder(
+    column: $table.alcoholG,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -8008,6 +8230,21 @@ class $$FoodEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get fiberG => $composableBuilder(
+    column: $table.fiberG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sodiumMg => $composableBuilder(
+    column: $table.sodiumMg,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get alcoholG => $composableBuilder(
+    column: $table.alcoholG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8142,6 +8379,15 @@ class $$FoodEntriesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<double> get fiberG =>
+      $composableBuilder(column: $table.fiberG, builder: (column) => column);
+
+  GeneratedColumn<double> get sodiumMg =>
+      $composableBuilder(column: $table.sodiumMg, builder: (column) => column);
+
+  GeneratedColumn<double> get alcoholG =>
+      $composableBuilder(column: $table.alcoholG, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
@@ -8200,6 +8446,9 @@ class $$FoodEntriesTableTableManager
                 Value<int?> originFoodId = const Value.absent(),
                 Value<String?> originSource = const Value.absent(),
                 Value<String?> originSourceId = const Value.absent(),
+                Value<double?> fiberG = const Value.absent(),
+                Value<double?> sodiumMg = const Value.absent(),
+                Value<double?> alcoholG = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion(
                 id: id,
@@ -8228,6 +8477,9 @@ class $$FoodEntriesTableTableManager
                 originFoodId: originFoodId,
                 originSource: originSource,
                 originSourceId: originSourceId,
+                fiberG: fiberG,
+                sodiumMg: sodiumMg,
+                alcoholG: alcoholG,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -8258,6 +8510,9 @@ class $$FoodEntriesTableTableManager
                 Value<int?> originFoodId = const Value.absent(),
                 Value<String?> originSource = const Value.absent(),
                 Value<String?> originSourceId = const Value.absent(),
+                Value<double?> fiberG = const Value.absent(),
+                Value<double?> sodiumMg = const Value.absent(),
+                Value<double?> alcoholG = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion.insert(
                 id: id,
@@ -8286,6 +8541,9 @@ class $$FoodEntriesTableTableManager
                 originFoodId: originFoodId,
                 originSource: originSource,
                 originSourceId: originSourceId,
+                fiberG: fiberG,
+                sodiumMg: sodiumMg,
+                alcoholG: alcoholG,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -9065,6 +9323,7 @@ typedef $$UserPreferencesTableCreateCompanionBuilder =
       Value<ThemePreference> themePreference,
       Value<bool> easyToMissEnabled,
       Value<int?> easyToMissLastShownEpochDay,
+      Value<DetailLevel> detailLevel,
     });
 typedef $$UserPreferencesTableUpdateCompanionBuilder =
     UserPreferencesCompanion Function({
@@ -9072,6 +9331,7 @@ typedef $$UserPreferencesTableUpdateCompanionBuilder =
       Value<ThemePreference> themePreference,
       Value<bool> easyToMissEnabled,
       Value<int?> easyToMissLastShownEpochDay,
+      Value<DetailLevel> detailLevel,
     });
 
 class $$UserPreferencesTableFilterComposer
@@ -9103,6 +9363,12 @@ class $$UserPreferencesTableFilterComposer
     column: $table.easyToMissLastShownEpochDay,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<DetailLevel, DetailLevel, String>
+  get detailLevel => $composableBuilder(
+    column: $table.detailLevel,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 }
 
 class $$UserPreferencesTableOrderingComposer
@@ -9131,6 +9397,11 @@ class $$UserPreferencesTableOrderingComposer
 
   ColumnOrderings<int> get easyToMissLastShownEpochDay => $composableBuilder(
     column: $table.easyToMissLastShownEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get detailLevel => $composableBuilder(
+    column: $table.detailLevel,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -9162,6 +9433,12 @@ class $$UserPreferencesTableAnnotationComposer
     column: $table.easyToMissLastShownEpochDay,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<DetailLevel, String> get detailLevel =>
+      $composableBuilder(
+        column: $table.detailLevel,
+        builder: (column) => column,
+      );
 }
 
 class $$UserPreferencesTableTableManager
@@ -9205,11 +9482,13 @@ class $$UserPreferencesTableTableManager
                 Value<ThemePreference> themePreference = const Value.absent(),
                 Value<bool> easyToMissEnabled = const Value.absent(),
                 Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
+                Value<DetailLevel> detailLevel = const Value.absent(),
               }) => UserPreferencesCompanion(
                 id: id,
                 themePreference: themePreference,
                 easyToMissEnabled: easyToMissEnabled,
                 easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
+                detailLevel: detailLevel,
               ),
           createCompanionCallback:
               ({
@@ -9217,11 +9496,13 @@ class $$UserPreferencesTableTableManager
                 Value<ThemePreference> themePreference = const Value.absent(),
                 Value<bool> easyToMissEnabled = const Value.absent(),
                 Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
+                Value<DetailLevel> detailLevel = const Value.absent(),
               }) => UserPreferencesCompanion.insert(
                 id: id,
                 themePreference: themePreference,
                 easyToMissEnabled: easyToMissEnabled,
                 easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
+                detailLevel: detailLevel,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -1,6 +1,6 @@
 ---
 id: MM-49
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-38, MM-41, MM-46, MM-55]
 ---
@@ -43,3 +43,14 @@ Scenario: A drink
 ## Notes
 - Leucine and micronutrients were mentioned in planning as an expert want. The sources carry them patchily; leave them out until someone
   asks.
+
+## Progress
+Built: a Detail setting in Settings (Simple, Standard, Full; Standard by default) stored on the device (schema version 15).
+Entries now store fiber, sodium and alcohol when their source states them (pack and barcode foods, scaled to the amount eaten);
+a typed entry has none, shown as unknown, never zero. Net carbohydrate is carbohydrate less fiber, and only where fiber is known.
+Entry rows show protein only at Simple, the macros at Standard, and fiber, net carbs, sodium and alcohol at Full. Switching
+level reveals what was stored all along. Editing a calculated entry scales its extra nutrients with the amount. Tested in the
+preference and food repository contracts (memory and Drift), the migration test, and `detail_level_test.dart`.
+
+Not built: sugars and saturated fat (the packs do not carry them), the Today summary and the add-food form following the level
+(only entry rows do), and the energy check already counts alcohol and fiber (MM-53) so needed no change. Not seen on the emulator.

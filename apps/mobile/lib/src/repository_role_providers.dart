@@ -32,6 +32,14 @@ final easyToMissWriterProvider = Provider<EasyToMissWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
 
+final detailLevelReaderProvider = Provider<DetailLevelReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final detailLevelWriterProvider = Provider<DetailLevelWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );

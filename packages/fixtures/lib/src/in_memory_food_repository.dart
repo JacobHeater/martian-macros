@@ -35,6 +35,9 @@ final class InMemoryFoodRepository implements FoodRepository {
         fatG: entry.fatG,
         source: entry.source,
         portion: entry.portion,
+        fiberG: entry.fiberG,
+        sodiumMg: entry.sodiumMg,
+        alcoholG: entry.alcoholG,
       ),
     ];
     return id;

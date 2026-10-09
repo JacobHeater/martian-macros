@@ -203,6 +203,38 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
       },
     );
 
+    test(
+      'nutrients beyond the macros are kept, and unknown stays unknown',
+      () async {
+        final id = await repo.addFood(
+          FoodEntry(
+            id: 0,
+            date: d1,
+            meal: Meal.dinner,
+            name: 'Lentils',
+            kcal: 230,
+            proteinG: 18,
+            carbsG: 40,
+            fatG: 1,
+            source: QuantitySource.weighed,
+            fiberG: 16,
+            sodiumMg: 4,
+          ),
+        );
+        await repo.addFood(_entry(d1, 'Plain'));
+        final byName = {
+          for (final e in await repo.watchFood(d1).first) e.name: e,
+        };
+        expect(byName['Lentils']!.id, id);
+        expect(byName['Lentils']!.fiberG, 16);
+        expect(byName['Lentils']!.sodiumMg, 4);
+        expect(byName['Lentils']!.alcoholG, isNull);
+        expect(byName['Lentils']!.netCarbsG, 24);
+        expect(byName['Plain']!.fiberG, isNull);
+        expect(byName['Plain']!.netCarbsG, isNull);
+      },
+    );
+
     test('an update can change or clear the portion', () async {
       final id = await repo.addFood(
         FoodEntry(

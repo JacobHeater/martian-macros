@@ -5,6 +5,7 @@ import 'package:mm_domain/mm_domain.dart';
 import '../about/how_this_works_screen.dart';
 import '../food_packs/food_database_screen.dart';
 import '../format/daily_activity_label.dart';
+import '../format/detail_level_label.dart';
 import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
 import '../gallery/gallery_screen.dart';
@@ -134,6 +135,33 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const ProfileSection(),
+          const GroupHeader('Nutrition detail'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MmSegmented<DetailLevel>(
+                  segments: [
+                    for (final l in DetailLevel.values) MmSegment(l, l.label),
+                  ],
+                  selected: {
+                    ref.watch(detailLevelProvider).value ??
+                        DetailLevel.standard,
+                  },
+                  onChanged: (s) => ref
+                      .read(detailLevelWriterProvider)
+                      .saveDetailLevel(s.first),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${(ref.watch(detailLevelProvider).value ?? DetailLevel.standard).description} '
+                  'Changes what is shown, never what is stored.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
           const GroupHeader('Food logging'),
           MmListGroup(
             children: [
