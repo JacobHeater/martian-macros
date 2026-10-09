@@ -9,10 +9,34 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
   @override
   Stream<ThemePreference> watchThemePreference() => _theme.watch();
 
+  final _easyToMiss = ObservableValue<EasyToMissPreference>(
+    const EasyToMissPreference(),
+  );
+
+  @override
+  Stream<EasyToMissPreference> watchEasyToMiss() => _easyToMiss.watch();
+
+  @override
+  Future<void> saveEasyToMissEnabled(bool enabled) async =>
+      _easyToMiss.value = EasyToMissPreference(
+        enabled: enabled,
+        lastShown: _easyToMiss.value.lastShown,
+      );
+
+  @override
+  Future<void> markEasyToMissShown(CalendarDate day) async =>
+      _easyToMiss.value = EasyToMissPreference(
+        enabled: _easyToMiss.value.enabled,
+        lastShown: day,
+      );
+
   @override
   Future<void> saveThemePreference(ThemePreference preference) async =>
       _theme.value = preference;
 
   /// Back to the defaults (used by [InMemoryDataEraser]).
-  void clear() => _theme.value = ThemePreference.system;
+  void clear() {
+    _theme.value = ThemePreference.system;
+    _easyToMiss.value = const EasyToMissPreference();
+  }
 }
