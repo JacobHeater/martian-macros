@@ -26,6 +26,7 @@ CREATE TABLE foods (
   pair_id INTEGER,
   density INTEGER,
   source TEXT NOT NULL,
+  source_id TEXT,
   tier INTEGER NOT NULL,
   tier_reason TEXT NOT NULL
 );

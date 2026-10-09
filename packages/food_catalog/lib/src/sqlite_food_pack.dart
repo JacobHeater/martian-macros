@@ -59,7 +59,7 @@ final class SqliteFoodPack implements FoodPack {
   static const _columns =
       'f.id, f.name, f.brand, f.kcal, f.protein, f.carbs, f.fat, f.fiber, '
       'f.sodium_mg, f.alcohol, f.preparation, f.pair_id, f.density, '
-      'f.source, f.tier, f.tier_reason';
+      'f.source, f.source_id, f.tier, f.tier_reason';
 
   @override
   List<SearchHit> search(String query, {int limit = 25, int offset = 0}) {
@@ -134,6 +134,7 @@ final class SqliteFoodPack implements FoodPack {
           ? null
           : density / FoodPackFormat.densityScale,
       source: row['source']! as String,
+      sourceId: row['source_id'] as String?,
       tier: TrustTier.fromCode(row['tier']! as int),
       tierReason: row['tier_reason']! as String,
     );

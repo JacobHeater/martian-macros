@@ -12,6 +12,7 @@ workspace:
   - packages/fixtures
   - packages/data
   - packages/food_catalog
+  - packages/food_pipeline
   - tool
 
 dev_dependencies:
