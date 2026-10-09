@@ -60,3 +60,6 @@ Scenario: Switching to a scale
 A hand portion is stored as a count of palms, cupped hands or thumbs, the model and its version, and the grams it implies as an
 estimate. Until the hand model exists, hand methods are a count plus typed totals. Whether "fist" is a method is an open decision in
 MM-167.
+
+Decided with the product owner (MM-167): there is **no fist portion**; the hand methods are palm, cupped hand and thumb. Vegetables
+use a cupped hand or a cup. Until the hand model is built, these are logged as a count plus typed totals, labelled as an estimate.

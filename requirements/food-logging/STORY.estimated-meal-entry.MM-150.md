@@ -91,3 +91,5 @@ Scenario: Reuse
 ## Clarified by MM-167 (proposed)
 "Estimate" means entered or preset totals with no quantity or unit. Its uncertainty is 40% here and 20% in MM-38 and the code; which
 is right is an open decision in MM-167.
+
+Decided with the product owner (MM-167): Estimate's uncertainty is 40%, as here, and MM-38's 20% is to be changed to match.

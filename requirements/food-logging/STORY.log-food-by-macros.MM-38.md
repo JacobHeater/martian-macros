@@ -66,3 +66,6 @@ Scenario: Logging to a past day
 What the form records today is a method and four totals; MM-167 requires a quantity and unit for each method, states that the typed
 macros are "for everything you ate" unless another basis is chosen, defines Estimate as entered totals with no unit, and says what is
 stored. This ticket's "how it was measured" behavior stands until MM-167 is built.
+
+Decided with the product owner (MM-167): Estimate's uncertainty becomes 40%, to match MM-150. The "estimate (20%)" above is what shipped
+and is to be changed with MM-167.
