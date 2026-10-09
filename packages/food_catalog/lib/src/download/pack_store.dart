@@ -31,6 +31,7 @@ final class PackStore {
         version: json['version']! as String,
         path: file.path,
         bytes: file.lengthSync(),
+        title: json['title'] as String?,
       );
     } on Object {
       return null;
@@ -46,7 +47,7 @@ final class PackStore {
   /// Puts the checked, unpacked [staged] file in place of any earlier pack. The
   /// earlier pack is kept until the new one is in place, so a failure here
   /// leaves it working.
-  void commit(String id, File staged, String version) {
+  void commit(String id, File staged, String version, {String? title}) {
     root.createSync(recursive: true);
     final target = installedFile(id);
     final backup = File('${target.path}.old');
@@ -54,7 +55,8 @@ final class PackStore {
     if (target.existsSync()) target.renameSync(backup.path);
     try {
       staged.renameSync(target.path);
-      _metaFile(id).writeAsStringSync(jsonEncode({'version': version}));
+      _metaFile(id)
+          .writeAsStringSync(jsonEncode({'version': version, 'title': ?title}));
     } on Object {
       if (backup.existsSync()) {
         if (target.existsSync()) target.deleteSync();

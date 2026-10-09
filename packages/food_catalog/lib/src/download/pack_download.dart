@@ -218,7 +218,7 @@ final class PackDownload {
       _discard(staged, part);
       throw PackDownloadFailed(PackDownloadProblem.unreadablePack, '$e');
     }
-    _store.commit(listing.id, staged, listing.version);
+    _store.commit(listing.id, staged, listing.version, title: listing.title);
     if (part.existsSync()) part.deleteSync();
   }
 

@@ -59,7 +59,7 @@ class FoodDatabaseScreen extends ConsumerWidget {
               else
                 for (final pack in installed)
                   MmListRow(
-                    title: titles[pack.id] ?? pack.id,
+                    title: pack.title ?? titles[pack.id] ?? pack.id,
                     subtitle:
                         'Version ${pack.version} · ${megabytes(pack.bytes)}',
                     trailing: MmButton(
