@@ -1,6 +1,6 @@
 ---
 id: MM-153
-status: proposed
+status: in-progress
 component: food-database
 related: [MM-50, MM-42, MM-43, MM-44, MM-45, MM-51, MM-52, MM-53, MM-55, MM-57, MM-58, MM-123, MM-139, MM-150, MM-151]
 ---
@@ -94,3 +94,12 @@ Scenario: No false verification
 - The 20% cross-source disagreement rule interacts with the open question in MM-51 about which source wins on conflict; this ticket
   assumes manufacturer data wins on a barcode, which is that spike's recommendation and not yet the product owner's decision.
 - Licensing: showing "Open Food Facts" as a source also serves attribution (MM-57).
+
+## Progress
+Done: the tier and its reason are computed in the pipeline and stored in the pack (MM-52, MM-55); source wording
+(`food_source_label.dart`), tier wording with no "verified" (`trust_tier_label.dart`), the rounded-to-zero rule
+(`rounded_to_zero_note.dart`) and the `FoodTrustMark` widget, with tests.
+
+Not done, because the screens they belong on do not exist yet (MM-42, MM-43): ranking by tier in search, the amount-step display,
+hiding lower-tier duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the pipeline rules still
+provisional in `pack_entry_for.dart` (near-tolerance, missing fields, older than five years). The ticket stays in progress.
