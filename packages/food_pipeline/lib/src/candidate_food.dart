@@ -21,6 +21,7 @@ final class CandidateFood {
     this.alcoholG,
     this.servings = const [],
     this.versionKey = 0,
+    this.updatedAt = 0,
   });
 
   /// `usda_branded`, `usda_foundation`, `usda_sr_legacy` or `off`.
@@ -45,4 +46,8 @@ final class CandidateFood {
 
   /// Orders versions of the same product within one source: the highest wins.
   final int versionKey;
+
+  /// When the source last changed this record, in seconds since 1970; 0 when
+  /// the source does not say.
+  final int updatedAt;
 }

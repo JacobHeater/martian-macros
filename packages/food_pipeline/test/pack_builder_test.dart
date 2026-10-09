@@ -19,6 +19,7 @@ CandidateFood product(
   double? fat = 4.4,
   int version = 0,
   List<CatalogServing> servings = const [],
+  int updatedAt = 0,
 }) => CandidateFood(
   source: source,
   sourceId: id,
@@ -31,6 +32,7 @@ CandidateFood product(
   fatG: fat,
   versionKey: version,
   servings: servings,
+  updatedAt: updatedAt,
 );
 
 CandidateFood generic(String id, String name) => CandidateFood(
@@ -50,6 +52,70 @@ Future<PackBuildResult> build(List<CandidateFood> foods) =>
     const PackBuilder(policy: policy).build(Stream.fromIterable(foods));
 
 void main() {
+  group('most recent policy', () {
+    const recent = PackBuilder(policy: MostRecentPolicy(tieBreak: 'off'));
+
+    test(
+      'the fresher of two consistent records wins, from either source',
+      () async {
+        for (final usdaNewer in [false, true]) {
+          final result = await recent.build(
+            Stream.fromIterable([
+              product('usda_branded', 'u', updatedAt: usdaNewer ? 200 : 100),
+              product('off', 'o', updatedAt: usdaNewer ? 100 : 200),
+            ]),
+          );
+          expect(
+            result.barcode.single.food.source,
+            usdaNewer ? 'usda_branded' : 'off',
+          );
+          expect(
+            result.report.dropped.values.single[DropReason.lostConflict],
+            1,
+          );
+        }
+      },
+    );
+
+    test('equally recent records go to the tie-break source', () async {
+      final result = await recent.build(
+        Stream.fromIterable([
+          product('usda_branded', 'u', updatedAt: 5),
+          product('off', 'o', updatedAt: 5),
+        ]),
+      );
+      expect(result.barcode.single.food.source, 'off');
+    });
+
+    test('a fresher record that fails the checks still loses', () async {
+      final result = await recent.build(
+        Stream.fromIterable([
+          product('usda_branded', 'u', updatedAt: 1),
+          product(
+            'off',
+            'o',
+            updatedAt: 9,
+            kcal: 900,
+            protein: 1,
+            carbs: 1,
+            fat: 1,
+          ),
+        ]),
+      );
+      expect(result.barcode.single.food.source, 'usda_branded');
+    });
+
+    test('a 10% disagreement is still marked check this', () async {
+      final result = await recent.build(
+        Stream.fromIterable([
+          product('usda_branded', 'u', updatedAt: 1),
+          product('off', 'o', updatedAt: 9, kcal: 130, fat: 8),
+        ]),
+      );
+      expect(result.barcode.single.food.tierReason, contains('disagree'));
+    });
+  });
+
   test(
     'entries failing the nutrition checks are dropped with a reason',
     () async {
