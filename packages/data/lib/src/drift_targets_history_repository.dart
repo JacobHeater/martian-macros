@@ -37,8 +37,20 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           safetyBodyFatPercent: Value(record.safetyBodyFatPercent),
           profileRevision: Value(record.profileRevision),
           explanation: Value(record.explanation?.encode()),
+          summarySeen: Value(record.summarySeen),
         ),
       );
+
+  @override
+  Future<void> markSummariesSeenThrough(CalendarDate effectiveFrom) =>
+      (_db.update(_db.targetsHistory)..where(
+            (t) =>
+                t.effectiveEpochDay.isSmallerOrEqualValue(
+                  effectiveFrom.epochDay,
+                ) &
+                t.summarySeen.equals(false),
+          ))
+          .write(const TargetsHistoryCompanion(summarySeen: Value(true)));
 
   TargetsRecord _targets(TargetsRow r) => TargetsRecord(
     effectiveFrom: CalendarDate.fromEpochDay(r.effectiveEpochDay),
@@ -51,6 +63,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
     explanation: r.explanation == null
         ? null
         : TargetsExplanation.decode(r.explanation!),
+    summarySeen: r.summarySeen,
     targets: DailyTargets(
       kcal: r.kcal,
       proteinG: r.proteinG,

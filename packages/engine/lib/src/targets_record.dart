@@ -16,6 +16,7 @@ final class TargetsRecord {
     this.safetyBodyFatPercent,
     this.profileRevision = 0,
     this.explanation,
+    this.summarySeen = true,
   });
 
   final CalendarDate effectiveFrom;
@@ -39,4 +40,22 @@ final class TargetsRecord {
   /// Why these targets were issued (MM-138). Null on records made before
   /// explanations were kept.
   final TargetsExplanation? explanation;
+
+  /// Whether the target-change summary has been shown on app open. New engine
+  /// check-ins mark their records unread; existing/imported records default
+  /// to seen so they do not produce a backlog of dialogs.
+  final bool summarySeen;
+
+  TargetsRecord copyWith({bool? summarySeen}) => TargetsRecord(
+    effectiveFrom: effectiveFrom,
+    targets: targets,
+    mode: mode,
+    tdeeKcal: tdeeKcal,
+    tdeeSigmaKcal: tdeeSigmaKcal,
+    tdeeStatus: tdeeStatus,
+    safetyBodyFatPercent: safetyBodyFatPercent,
+    profileRevision: profileRevision,
+    explanation: explanation,
+    summarySeen: summarySeen ?? this.summarySeen,
+  );
 }

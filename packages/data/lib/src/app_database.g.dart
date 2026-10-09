@@ -3022,6 +3022,21 @@ class $TargetsHistoryTable extends TargetsHistory
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _summarySeenMeta = const VerificationMeta(
+    'summarySeen',
+  );
+  @override
+  late final GeneratedColumn<bool> summarySeen = GeneratedColumn<bool>(
+    'summary_seen',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("summary_seen" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   static const VerificationMeta _profileRevisionMeta = const VerificationMeta(
     'profileRevision',
   );
@@ -3068,6 +3083,7 @@ class $TargetsHistoryTable extends TargetsHistory
     tdeeKcal,
     tdeeSigmaKcal,
     explanation,
+    summarySeen,
     profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
@@ -3179,6 +3195,15 @@ class $TargetsHistoryTable extends TargetsHistory
         ),
       );
     }
+    if (data.containsKey('summary_seen')) {
+      context.handle(
+        _summarySeenMeta,
+        summarySeen.isAcceptableOrUnknown(
+          data['summary_seen']!,
+          _summarySeenMeta,
+        ),
+      );
+    }
     if (data.containsKey('profile_revision')) {
       context.handle(
         _profileRevisionMeta,
@@ -3256,6 +3281,10 @@ class $TargetsHistoryTable extends TargetsHistory
         DriftSqlType.string,
         data['${effectivePrefix}explanation'],
       ),
+      summarySeen: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}summary_seen'],
+      )!,
       profileRevision: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}profile_revision'],
@@ -3303,6 +3332,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
   /// Added in schema version 5 (MM-138); null on older rows.
   final String? explanation;
 
+  /// Existing target history should not trigger new summary dialogs.
+  final bool summarySeen;
+
   /// Added in schema version 4 (MM-83); older rows read as 0.
   final int profileRevision;
 
@@ -3322,6 +3354,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     required this.tdeeKcal,
     required this.tdeeSigmaKcal,
     this.explanation,
+    required this.summarySeen,
     required this.profileRevision,
     this.safetyBodyFatPercent,
     required this.tdeeStatus,
@@ -3349,6 +3382,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     if (!nullToAbsent || explanation != null) {
       map['explanation'] = Variable<String>(explanation);
     }
+    map['summary_seen'] = Variable<bool>(summarySeen);
     map['profile_revision'] = Variable<int>(profileRevision);
     if (!nullToAbsent || safetyBodyFatPercent != null) {
       map['safety_body_fat_percent'] = Variable<double>(safetyBodyFatPercent);
@@ -3379,6 +3413,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       explanation: explanation == null && nullToAbsent
           ? const Value.absent()
           : Value(explanation),
+      summarySeen: Value(summarySeen),
       profileRevision: Value(profileRevision),
       safetyBodyFatPercent: safetyBodyFatPercent == null && nullToAbsent
           ? const Value.absent()
@@ -3409,6 +3444,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       tdeeKcal: serializer.fromJson<double>(json['tdeeKcal']),
       tdeeSigmaKcal: serializer.fromJson<double>(json['tdeeSigmaKcal']),
       explanation: serializer.fromJson<String?>(json['explanation']),
+      summarySeen: serializer.fromJson<bool>(json['summarySeen']),
       profileRevision: serializer.fromJson<int>(json['profileRevision']),
       safetyBodyFatPercent: serializer.fromJson<double?>(
         json['safetyBodyFatPercent'],
@@ -3436,6 +3472,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       'tdeeKcal': serializer.toJson<double>(tdeeKcal),
       'tdeeSigmaKcal': serializer.toJson<double>(tdeeSigmaKcal),
       'explanation': serializer.toJson<String?>(explanation),
+      'summarySeen': serializer.toJson<bool>(summarySeen),
       'profileRevision': serializer.toJson<int>(profileRevision),
       'safetyBodyFatPercent': serializer.toJson<double?>(safetyBodyFatPercent),
       'tdeeStatus': serializer.toJson<String>(
@@ -3457,6 +3494,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     double? tdeeKcal,
     double? tdeeSigmaKcal,
     Value<String?> explanation = const Value.absent(),
+    bool? summarySeen,
     int? profileRevision,
     Value<double?> safetyBodyFatPercent = const Value.absent(),
     TdeeStatus? tdeeStatus,
@@ -3475,6 +3513,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     tdeeKcal: tdeeKcal ?? this.tdeeKcal,
     tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
     explanation: explanation.present ? explanation.value : this.explanation,
+    summarySeen: summarySeen ?? this.summarySeen,
     profileRevision: profileRevision ?? this.profileRevision,
     safetyBodyFatPercent: safetyBodyFatPercent.present
         ? safetyBodyFatPercent.value
@@ -3505,6 +3544,9 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
       explanation: data.explanation.present
           ? data.explanation.value
           : this.explanation,
+      summarySeen: data.summarySeen.present
+          ? data.summarySeen.value
+          : this.summarySeen,
       profileRevision: data.profileRevision.present
           ? data.profileRevision.value
           : this.profileRevision,
@@ -3532,6 +3574,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
           ..write('explanation: $explanation, ')
+          ..write('summarySeen: $summarySeen, ')
           ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
@@ -3553,6 +3596,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
     tdeeKcal,
     tdeeSigmaKcal,
     explanation,
+    summarySeen,
     profileRevision,
     safetyBodyFatPercent,
     tdeeStatus,
@@ -3573,6 +3617,7 @@ class TargetsRow extends DataClass implements Insertable<TargetsRow> {
           other.tdeeKcal == this.tdeeKcal &&
           other.tdeeSigmaKcal == this.tdeeSigmaKcal &&
           other.explanation == this.explanation &&
+          other.summarySeen == this.summarySeen &&
           other.profileRevision == this.profileRevision &&
           other.safetyBodyFatPercent == this.safetyBodyFatPercent &&
           other.tdeeStatus == this.tdeeStatus);
@@ -3591,6 +3636,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
   final Value<double> tdeeKcal;
   final Value<double> tdeeSigmaKcal;
   final Value<String?> explanation;
+  final Value<bool> summarySeen;
   final Value<int> profileRevision;
   final Value<double?> safetyBodyFatPercent;
   final Value<TdeeStatus> tdeeStatus;
@@ -3607,6 +3653,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     this.tdeeKcal = const Value.absent(),
     this.tdeeSigmaKcal = const Value.absent(),
     this.explanation = const Value.absent(),
+    this.summarySeen = const Value.absent(),
     this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     this.tdeeStatus = const Value.absent(),
@@ -3624,6 +3671,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     required double tdeeKcal,
     required double tdeeSigmaKcal,
     this.explanation = const Value.absent(),
+    this.summarySeen = const Value.absent(),
     this.profileRevision = const Value.absent(),
     this.safetyBodyFatPercent = const Value.absent(),
     required TdeeStatus tdeeStatus,
@@ -3649,6 +3697,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Expression<double>? tdeeKcal,
     Expression<double>? tdeeSigmaKcal,
     Expression<String>? explanation,
+    Expression<bool>? summarySeen,
     Expression<int>? profileRevision,
     Expression<double>? safetyBodyFatPercent,
     Expression<String>? tdeeStatus,
@@ -3667,6 +3716,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       if (tdeeKcal != null) 'tdee_kcal': tdeeKcal,
       if (tdeeSigmaKcal != null) 'tdee_sigma_kcal': tdeeSigmaKcal,
       if (explanation != null) 'explanation': explanation,
+      if (summarySeen != null) 'summary_seen': summarySeen,
       if (profileRevision != null) 'profile_revision': profileRevision,
       if (safetyBodyFatPercent != null)
         'safety_body_fat_percent': safetyBodyFatPercent,
@@ -3687,6 +3737,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     Value<double>? tdeeKcal,
     Value<double>? tdeeSigmaKcal,
     Value<String?>? explanation,
+    Value<bool>? summarySeen,
     Value<int>? profileRevision,
     Value<double?>? safetyBodyFatPercent,
     Value<TdeeStatus>? tdeeStatus,
@@ -3704,6 +3755,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
       tdeeKcal: tdeeKcal ?? this.tdeeKcal,
       tdeeSigmaKcal: tdeeSigmaKcal ?? this.tdeeSigmaKcal,
       explanation: explanation ?? this.explanation,
+      summarySeen: summarySeen ?? this.summarySeen,
       profileRevision: profileRevision ?? this.profileRevision,
       safetyBodyFatPercent: safetyBodyFatPercent ?? this.safetyBodyFatPercent,
       tdeeStatus: tdeeStatus ?? this.tdeeStatus,
@@ -3751,6 +3803,9 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
     if (explanation.present) {
       map['explanation'] = Variable<String>(explanation.value);
     }
+    if (summarySeen.present) {
+      map['summary_seen'] = Variable<bool>(summarySeen.value);
+    }
     if (profileRevision.present) {
       map['profile_revision'] = Variable<int>(profileRevision.value);
     }
@@ -3782,6 +3837,7 @@ class TargetsHistoryCompanion extends UpdateCompanion<TargetsRow> {
           ..write('tdeeKcal: $tdeeKcal, ')
           ..write('tdeeSigmaKcal: $tdeeSigmaKcal, ')
           ..write('explanation: $explanation, ')
+          ..write('summarySeen: $summarySeen, ')
           ..write('profileRevision: $profileRevision, ')
           ..write('safetyBodyFatPercent: $safetyBodyFatPercent, ')
           ..write('tdeeStatus: $tdeeStatus')
@@ -5452,6 +5508,7 @@ typedef $$TargetsHistoryTableCreateCompanionBuilder =
       required double tdeeKcal,
       required double tdeeSigmaKcal,
       Value<String?> explanation,
+      Value<bool> summarySeen,
       Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       required TdeeStatus tdeeStatus,
@@ -5470,6 +5527,7 @@ typedef $$TargetsHistoryTableUpdateCompanionBuilder =
       Value<double> tdeeKcal,
       Value<double> tdeeSigmaKcal,
       Value<String?> explanation,
+      Value<bool> summarySeen,
       Value<int> profileRevision,
       Value<double?> safetyBodyFatPercent,
       Value<TdeeStatus> tdeeStatus,
@@ -5542,6 +5600,11 @@ class $$TargetsHistoryTableFilterComposer
 
   ColumnFilters<String> get explanation => $composableBuilder(
     column: $table.explanation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5631,6 +5694,11 @@ class $$TargetsHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get profileRevision => $composableBuilder(
     column: $table.profileRevision,
     builder: (column) => ColumnOrderings(column),
@@ -5702,6 +5770,11 @@ class $$TargetsHistoryTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get summarySeen => $composableBuilder(
+    column: $table.summarySeen,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get profileRevision => $composableBuilder(
     column: $table.profileRevision,
     builder: (column) => column,
@@ -5764,6 +5837,7 @@ class $$TargetsHistoryTableTableManager
                 Value<double> tdeeKcal = const Value.absent(),
                 Value<double> tdeeSigmaKcal = const Value.absent(),
                 Value<String?> explanation = const Value.absent(),
+                Value<bool> summarySeen = const Value.absent(),
                 Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 Value<TdeeStatus> tdeeStatus = const Value.absent(),
@@ -5780,6 +5854,7 @@ class $$TargetsHistoryTableTableManager
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
                 explanation: explanation,
+                summarySeen: summarySeen,
                 profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,
@@ -5798,6 +5873,7 @@ class $$TargetsHistoryTableTableManager
                 required double tdeeKcal,
                 required double tdeeSigmaKcal,
                 Value<String?> explanation = const Value.absent(),
+                Value<bool> summarySeen = const Value.absent(),
                 Value<int> profileRevision = const Value.absent(),
                 Value<double?> safetyBodyFatPercent = const Value.absent(),
                 required TdeeStatus tdeeStatus,
@@ -5814,6 +5890,7 @@ class $$TargetsHistoryTableTableManager
                 tdeeKcal: tdeeKcal,
                 tdeeSigmaKcal: tdeeSigmaKcal,
                 explanation: explanation,
+                summarySeen: summarySeen,
                 profileRevision: profileRevision,
                 safetyBodyFatPercent: safetyBodyFatPercent,
                 tdeeStatus: tdeeStatus,

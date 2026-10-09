@@ -82,6 +82,7 @@ TargetsRecord? nextTargets({
       tdeeStatus: snapshot.tdee.status,
       safetyBodyFatPercent: safetyBf,
       targets: targets,
+      summarySeen: false,
       explanation: explainTargets(
         trigger: targets.flags.contains(TargetFlag.underweightMaintenance)
             ? ExplanationTrigger.underweightRule

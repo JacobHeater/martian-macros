@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers.dart';
+import 'check_in.dart';
 
 /// Keeps the check-in running for as long as the app is open. It sits above
 /// the navigator: a widget under a covered route is paused, which would hold

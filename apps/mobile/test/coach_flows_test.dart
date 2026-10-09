@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
@@ -93,6 +94,12 @@ void main() {
       history.last.targets.kcal - history.first.targets.kcal,
       greaterThan(100),
     );
+    expect(find.text('Why your targets are what they are'), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await pumpApp(tester, repos, FixedClock(today));
+    expect(find.text('Why your targets are what they are'), findsOneWidget);
   });
 
   testWidgets('the first adaptive check-in runs through the app', (

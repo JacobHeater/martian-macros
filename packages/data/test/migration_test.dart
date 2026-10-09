@@ -141,6 +141,7 @@ void main() {
       expect(targets.safetyBodyFatPercent, isNull);
       expect(targets.profileRevision, 0);
       expect(targets.targets.proteinMinimumG, isNull);
+      expect(targets.summarySeen, isTrue);
       expect(
         await repos.preferences.watchThemePreference().first,
         ThemePreference.system,

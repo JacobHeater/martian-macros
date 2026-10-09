@@ -99,37 +99,6 @@ final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
   return history == null || history.isEmpty ? null : history.last;
 });
 
-/// Runs the check-in: whenever the engine says targets should change,
-/// persists them. Watching this provider keeps it active. Saving is
-/// idempotent (one record per effective day), and once saved the engine
-/// stops asking.
-final checkInProvider = Provider<void>((ref) {
-  final setup = ref.watch(setupProvider).value;
-  final snapshot = ref.watch(coachProvider);
-  final history = ref.watch(targetsHistoryProvider).value;
-  if (setup == null || snapshot == null || history == null) return;
-  final next = nextTargets(
-    setup: setup,
-    snapshot: snapshot,
-    history: history,
-    today: ref.watch(todayProvider),
-  );
-  if (next == null) return;
-  // Targets first: the goal change below re-runs this provider.
-  final saved = ref.read(targetsHistoryWriterProvider).saveTargets(next);
-  if (next.mode == GoalMode.maintenance &&
-      setup.goalMode != GoalMode.maintenance) {
-    // Low body weight (MM-111) or a health check answer (MM-83) ruled the
-    // goal out: make maintenance the user's goal, so a deficit does not
-    // resume by itself when the reason goes away.
-    saved.then(
-      (_) => ref
-          .read(setupWriterProvider)
-          .saveSetup(setup.copyWith(goalMode: GoalMode.maintenance)),
-    );
-  }
-});
-
 /// The first day targets may next change.
 CalendarDate nextCheckIn(UserSetup setup, TargetsRecord current) {
   final weekly = current.effectiveFrom.addDays(checkInIntervalDays);

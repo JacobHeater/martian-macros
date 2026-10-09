@@ -89,9 +89,9 @@ register, and the paywall gates features built here.
    change to the shape of the target record: add the minimum, the signed
    contributions with reason codes, the inputs used, and the confidence
    parts. One migration. Introduce the entitlement interface here, returning
-   "unlocked". Current implementation includes stored confidence and the
-   confidence card; simulator calibration and the one-time next-open summary
-   remain.
+   "unlocked". Current implementation includes stored confidence, the
+   confidence card and the one-time next-open summary; simulator calibration,
+   MM-136 event integration and other MM-138 gaps remain.
 4. **Rounding and bands (MM-123).** M2.
 5. **Fat-loss pace (MM-128).** M2. After WS-05 step 2.
 6. **Maintenance band and leaving a deficit (MM-130).** M2. After WS-02

@@ -53,7 +53,7 @@ to exactly one workstream.
 | 4 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built | A |
 | 5 | WS-04 | [Food data pack](ws-04-food-data-pack.md) | not started | A |
 | 6 | WS-05 | [Setup, screening and profile lifecycle](ws-05-setup-screening-and-profile.md) | partly built | B |
-| 7 | WS-06 | [Targets and the explainable check-in](ws-06-targets-and-explainable-check-in.md) | not started | B |
+| 7 | WS-06 | [Targets and the explainable check-in](ws-06-targets-and-explainable-check-in.md) | in progress | B |
 | 8 | WS-07 | [Progress and measurement](ws-07-progress-and-measurement.md) | partly built | B |
 | 9 | WS-08 | [Food logging experience](ws-08-food-logging-experience.md) | partly built | B |
 | 10 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | not started | C |

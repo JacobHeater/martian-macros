@@ -25,6 +25,9 @@ class TargetsHistory extends Table {
   /// Added in schema version 5 (MM-138); null on older rows.
   TextColumn get explanation => text().nullable()();
 
+  /// Existing target history should not trigger new summary dialogs.
+  BoolColumn get summarySeen => boolean().withDefault(const Constant(true))();
+
   /// Added in schema version 4 (MM-83); older rows read as 0.
   IntColumn get profileRevision => integer().withDefault(const Constant(0))();
 
