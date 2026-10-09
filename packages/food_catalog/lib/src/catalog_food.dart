@@ -21,6 +21,7 @@ final class CatalogFood {
     this.preparation = PreparationState.unspecified,
     this.pairedFoodId,
     this.densityGPerMl,
+    this.sourceId,
   });
 
   /// Unique within its pack.
@@ -43,6 +44,10 @@ final class CatalogFood {
   /// Grams per millilitre, for foods measured by volume.
   final double? densityGPerMl;
   final String source;
+
+  /// The food's id in that source (a USDA `fdc_id`, an Open Food Facts
+  /// `code`), so a pack entry can be traced back to where it came from.
+  final String? sourceId;
   final TrustTier tier;
 
   /// Why it has that tier, in a sentence.

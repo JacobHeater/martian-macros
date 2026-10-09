@@ -30,3 +30,6 @@ config/*.local.json
 # Food pipeline inputs and outputs (large; rebuilt by `mm food`)
 tools/food_pipeline/.cache/
 tools/food_pipeline/out/
+
+# Food pipeline: downloaded sources and built packs (MM-52)
+.food_cache/
