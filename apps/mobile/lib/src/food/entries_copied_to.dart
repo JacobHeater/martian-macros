@@ -19,5 +19,6 @@ List<FoodEntry> entriesCopiedTo(
       carbsG: e.carbsG,
       fatG: e.fatG,
       source: e.source,
+      portion: e.portion,
     ),
 ];

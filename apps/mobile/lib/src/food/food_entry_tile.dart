@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mm_domain/mm_domain.dart';
 
 import '../format/fmt.dart';
-import '../format/quantity_source_label.dart';
+import '../format/portion_summary.dart';
 import '../theme/mm_colors_context.dart';
 
 /// One logged food: name, macros and where the quantity came from, with its
@@ -28,8 +28,13 @@ class FoodEntryTile extends StatelessWidget {
                   Text(entry.name, style: text.bodyLarge),
                   Text(
                     'P ${entry.proteinG.round()} · C ${entry.carbsG.round()} · '
-                    'F ${entry.fatG.round()} · ${entry.source.label}',
+                    'F ${entry.fatG.round()}',
                     style: text.bodySmall,
+                  ),
+                  Text(
+                    portionSummary(entry),
+                    key: const ValueKey('entry-portion'),
+                    style: text.bodySmall?.copyWith(color: context.mm.text3),
                   ),
                 ],
               ),
