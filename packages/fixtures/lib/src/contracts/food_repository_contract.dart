@@ -134,6 +134,12 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
               quantity: 1.5,
               unit: PortionUnit.serving,
               reference: reference,
+              origin: FoodOrigin(
+                packId: 'usda',
+                foodId: 7,
+                source: 'usda_branded',
+                sourceId: '123456',
+              ),
             ),
           ),
         );
@@ -171,6 +177,16 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
         expect(c.reference!.servingMilliliters, 55);
         expect(c.reference!.servingUnit, PortionUnit.serving);
         expect(c.reference!.densityGPerMl, 0.73);
+        expect(
+          c.origin,
+          const FoodOrigin(
+            packId: 'usda',
+            foodId: 7,
+            source: 'usda_branded',
+            sourceId: '123456',
+          ),
+        );
+        expect(byId[typed]!.portion!.origin, isNull);
         expect(byId[calculated]!.kcal, 240, reason: 'totals stay as logged');
 
         final t = byId[typed]!.portion!;

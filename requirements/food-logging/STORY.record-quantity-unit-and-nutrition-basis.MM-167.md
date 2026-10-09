@@ -290,3 +290,5 @@ MM-46's model exists; "One serving" is offered only under Label serving; the bac
 
 Done since: `QuantitySource.quickAdd` (Estimate) is now 0.40, as decided; the domain and engine tests pass unchanged. The adaptive simulator
 was not given a new estimate-heavy user (MM-30, MM-150 own that).
+
+Done since: the source food is stored. A portion carries an optional `FoodOrigin` (pack, food id, source, source id); schema version 14 adds four nullable columns to `food_entries` (migration 13 to 14, guarded); foods logged from a pack, barcode or saved food record it. Still not stored: the conversion record and the raw or cooked state (the latter can be read back through the origin). Contract and migration tests pass.
