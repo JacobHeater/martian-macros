@@ -991,13 +991,13 @@
       "coordinationHotspots": [],
       "sourceRequirements": {
         "built": [
+          "MM-52",
           "MM-53",
           "MM-54"
         ],
         "remaining": [
           "MM-50",
           "MM-51",
-          "MM-52",
           "MM-55",
           "MM-56",
           "MM-57",

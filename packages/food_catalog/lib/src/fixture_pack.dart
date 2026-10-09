@@ -56,6 +56,7 @@ abstract final class FixturePack {
       preparation: preparation,
       pairedFoodId: pair,
       source: 'fixture',
+      sourceId: 'fixture-$id',
       tier: brand == null ? TrustTier.reference : TrustTier.label,
       tierReason: _reason,
     ),

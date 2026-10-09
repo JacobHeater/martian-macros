@@ -1,0 +1,15 @@
+name: mm_food_pipeline
+description: Builds the offline food packs from the open data sources (a developer tool, never shipped in the app). Pure Dart.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  mm_domain: any
+  mm_food_catalog: any
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0

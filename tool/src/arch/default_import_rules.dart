@@ -48,4 +48,17 @@ const defaultImportRules = <ForbiddenImportRule>[
         'the food pack reader is pure Dart and reads the pack, never the '
         "user's database",
   ),
+  ForbiddenImportRule(
+    appliesTo: 'packages/food_pipeline/lib/',
+    forbidden: [
+      'package:flutter',
+      'package:drift',
+      'package:mm_data',
+      'package:mm_engine',
+      'package:mm_fixtures',
+    ],
+    reason:
+        'the food pipeline is a pure Dart developer tool: it builds packs and '
+        "never touches the user's database or the app",
+  ),
 ];
