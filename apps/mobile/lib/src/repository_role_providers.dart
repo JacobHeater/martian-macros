@@ -24,6 +24,14 @@ final preferencesReaderProvider = Provider<PreferencesReader>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
 
+final easyToMissReaderProvider = Provider<EasyToMissReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final easyToMissWriterProvider = Provider<EasyToMissWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );

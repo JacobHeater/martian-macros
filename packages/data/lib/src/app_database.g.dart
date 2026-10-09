@@ -4745,8 +4745,39 @@ class $UserPreferencesTable extends UserPreferences
       ).withConverter<ThemePreference>(
         $UserPreferencesTable.$converterthemePreference,
       );
+  static const VerificationMeta _easyToMissEnabledMeta = const VerificationMeta(
+    'easyToMissEnabled',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, themePreference];
+  late final GeneratedColumn<bool> easyToMissEnabled = GeneratedColumn<bool>(
+    'easy_to_miss_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("easy_to_miss_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _easyToMissLastShownEpochDayMeta =
+      const VerificationMeta('easyToMissLastShownEpochDay');
+  @override
+  late final GeneratedColumn<int> easyToMissLastShownEpochDay =
+      GeneratedColumn<int>(
+        'easy_to_miss_last_shown_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    themePreference,
+    easyToMissEnabled,
+    easyToMissLastShownEpochDay,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4761,6 +4792,24 @@ class $UserPreferencesTable extends UserPreferences
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('easy_to_miss_enabled')) {
+      context.handle(
+        _easyToMissEnabledMeta,
+        easyToMissEnabled.isAcceptableOrUnknown(
+          data['easy_to_miss_enabled']!,
+          _easyToMissEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('easy_to_miss_last_shown_epoch_day')) {
+      context.handle(
+        _easyToMissLastShownEpochDayMeta,
+        easyToMissLastShownEpochDay.isAcceptableOrUnknown(
+          data['easy_to_miss_last_shown_epoch_day']!,
+          _easyToMissLastShownEpochDayMeta,
+        ),
+      );
     }
     return context;
   }
@@ -4781,6 +4830,14 @@ class $UserPreferencesTable extends UserPreferences
           data['${effectivePrefix}theme_preference'],
         )!,
       ),
+      easyToMissEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}easy_to_miss_enabled'],
+      )!,
+      easyToMissLastShownEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}easy_to_miss_last_shown_epoch_day'],
+      ),
     );
   }
 
@@ -4798,7 +4855,17 @@ class $UserPreferencesTable extends UserPreferences
 class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
   final int id;
   final ThemePreference themePreference;
-  const PreferencesRow({required this.id, required this.themePreference});
+
+  /// The easy-to-miss line (MM-152): on unless turned off, and the last day
+  /// it was shown.
+  final bool easyToMissEnabled;
+  final int? easyToMissLastShownEpochDay;
+  const PreferencesRow({
+    required this.id,
+    required this.themePreference,
+    required this.easyToMissEnabled,
+    this.easyToMissLastShownEpochDay,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -4808,6 +4875,12 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
         $UserPreferencesTable.$converterthemePreference.toSql(themePreference),
       );
     }
+    map['easy_to_miss_enabled'] = Variable<bool>(easyToMissEnabled);
+    if (!nullToAbsent || easyToMissLastShownEpochDay != null) {
+      map['easy_to_miss_last_shown_epoch_day'] = Variable<int>(
+        easyToMissLastShownEpochDay,
+      );
+    }
     return map;
   }
 
@@ -4815,6 +4888,11 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     return UserPreferencesCompanion(
       id: Value(id),
       themePreference: Value(themePreference),
+      easyToMissEnabled: Value(easyToMissEnabled),
+      easyToMissLastShownEpochDay:
+          easyToMissLastShownEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(easyToMissLastShownEpochDay),
     );
   }
 
@@ -4828,6 +4906,10 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       themePreference: $UserPreferencesTable.$converterthemePreference.fromJson(
         serializer.fromJson<String>(json['themePreference']),
       ),
+      easyToMissEnabled: serializer.fromJson<bool>(json['easyToMissEnabled']),
+      easyToMissLastShownEpochDay: serializer.fromJson<int?>(
+        json['easyToMissLastShownEpochDay'],
+      ),
     );
   }
   @override
@@ -4838,20 +4920,38 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       'themePreference': serializer.toJson<String>(
         $UserPreferencesTable.$converterthemePreference.toJson(themePreference),
       ),
+      'easyToMissEnabled': serializer.toJson<bool>(easyToMissEnabled),
+      'easyToMissLastShownEpochDay': serializer.toJson<int?>(
+        easyToMissLastShownEpochDay,
+      ),
     };
   }
 
-  PreferencesRow copyWith({int? id, ThemePreference? themePreference}) =>
-      PreferencesRow(
-        id: id ?? this.id,
-        themePreference: themePreference ?? this.themePreference,
-      );
+  PreferencesRow copyWith({
+    int? id,
+    ThemePreference? themePreference,
+    bool? easyToMissEnabled,
+    Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
+  }) => PreferencesRow(
+    id: id ?? this.id,
+    themePreference: themePreference ?? this.themePreference,
+    easyToMissEnabled: easyToMissEnabled ?? this.easyToMissEnabled,
+    easyToMissLastShownEpochDay: easyToMissLastShownEpochDay.present
+        ? easyToMissLastShownEpochDay.value
+        : this.easyToMissLastShownEpochDay,
+  );
   PreferencesRow copyWithCompanion(UserPreferencesCompanion data) {
     return PreferencesRow(
       id: data.id.present ? data.id.value : this.id,
       themePreference: data.themePreference.present
           ? data.themePreference.value
           : this.themePreference,
+      easyToMissEnabled: data.easyToMissEnabled.present
+          ? data.easyToMissEnabled.value
+          : this.easyToMissEnabled,
+      easyToMissLastShownEpochDay: data.easyToMissLastShownEpochDay.present
+          ? data.easyToMissLastShownEpochDay.value
+          : this.easyToMissLastShownEpochDay,
     );
   }
 
@@ -4859,49 +4959,75 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
   String toString() {
     return (StringBuffer('PreferencesRow(')
           ..write('id: $id, ')
-          ..write('themePreference: $themePreference')
+          ..write('themePreference: $themePreference, ')
+          ..write('easyToMissEnabled: $easyToMissEnabled, ')
+          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, themePreference);
+  int get hashCode => Object.hash(
+    id,
+    themePreference,
+    easyToMissEnabled,
+    easyToMissLastShownEpochDay,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PreferencesRow &&
           other.id == this.id &&
-          other.themePreference == this.themePreference);
+          other.themePreference == this.themePreference &&
+          other.easyToMissEnabled == this.easyToMissEnabled &&
+          other.easyToMissLastShownEpochDay ==
+              this.easyToMissLastShownEpochDay);
 }
 
 class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   final Value<int> id;
   final Value<ThemePreference> themePreference;
+  final Value<bool> easyToMissEnabled;
+  final Value<int?> easyToMissLastShownEpochDay;
   const UserPreferencesCompanion({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
+    this.easyToMissEnabled = const Value.absent(),
+    this.easyToMissLastShownEpochDay = const Value.absent(),
   });
   UserPreferencesCompanion.insert({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
+    this.easyToMissEnabled = const Value.absent(),
+    this.easyToMissLastShownEpochDay = const Value.absent(),
   });
   static Insertable<PreferencesRow> custom({
     Expression<int>? id,
     Expression<String>? themePreference,
+    Expression<bool>? easyToMissEnabled,
+    Expression<int>? easyToMissLastShownEpochDay,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (themePreference != null) 'theme_preference': themePreference,
+      if (easyToMissEnabled != null) 'easy_to_miss_enabled': easyToMissEnabled,
+      if (easyToMissLastShownEpochDay != null)
+        'easy_to_miss_last_shown_epoch_day': easyToMissLastShownEpochDay,
     });
   }
 
   UserPreferencesCompanion copyWith({
     Value<int>? id,
     Value<ThemePreference>? themePreference,
+    Value<bool>? easyToMissEnabled,
+    Value<int?>? easyToMissLastShownEpochDay,
   }) {
     return UserPreferencesCompanion(
       id: id ?? this.id,
       themePreference: themePreference ?? this.themePreference,
+      easyToMissEnabled: easyToMissEnabled ?? this.easyToMissEnabled,
+      easyToMissLastShownEpochDay:
+          easyToMissLastShownEpochDay ?? this.easyToMissLastShownEpochDay,
     );
   }
 
@@ -4918,6 +5044,14 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
         ),
       );
     }
+    if (easyToMissEnabled.present) {
+      map['easy_to_miss_enabled'] = Variable<bool>(easyToMissEnabled.value);
+    }
+    if (easyToMissLastShownEpochDay.present) {
+      map['easy_to_miss_last_shown_epoch_day'] = Variable<int>(
+        easyToMissLastShownEpochDay.value,
+      );
+    }
     return map;
   }
 
@@ -4925,7 +5059,9 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   String toString() {
     return (StringBuffer('UserPreferencesCompanion(')
           ..write('id: $id, ')
-          ..write('themePreference: $themePreference')
+          ..write('themePreference: $themePreference, ')
+          ..write('easyToMissEnabled: $easyToMissEnabled, ')
+          ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay')
           ..write(')'))
         .toString();
   }
@@ -8625,11 +8761,15 @@ typedef $$UserPreferencesTableCreateCompanionBuilder =
     UserPreferencesCompanion Function({
       Value<int> id,
       Value<ThemePreference> themePreference,
+      Value<bool> easyToMissEnabled,
+      Value<int?> easyToMissLastShownEpochDay,
     });
 typedef $$UserPreferencesTableUpdateCompanionBuilder =
     UserPreferencesCompanion Function({
       Value<int> id,
       Value<ThemePreference> themePreference,
+      Value<bool> easyToMissEnabled,
+      Value<int?> easyToMissLastShownEpochDay,
     });
 
 class $$UserPreferencesTableFilterComposer
@@ -8651,6 +8791,16 @@ class $$UserPreferencesTableFilterComposer
     column: $table.themePreference,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
+
+  ColumnFilters<bool> get easyToMissEnabled => $composableBuilder(
+    column: $table.easyToMissEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get easyToMissLastShownEpochDay => $composableBuilder(
+    column: $table.easyToMissLastShownEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$UserPreferencesTableOrderingComposer
@@ -8671,6 +8821,16 @@ class $$UserPreferencesTableOrderingComposer
     column: $table.themePreference,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get easyToMissEnabled => $composableBuilder(
+    column: $table.easyToMissEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get easyToMissLastShownEpochDay => $composableBuilder(
+    column: $table.easyToMissLastShownEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserPreferencesTableAnnotationComposer
@@ -8688,6 +8848,16 @@ class $$UserPreferencesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<ThemePreference, String>
   get themePreference => $composableBuilder(
     column: $table.themePreference,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get easyToMissEnabled => $composableBuilder(
+    column: $table.easyToMissEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get easyToMissLastShownEpochDay => $composableBuilder(
+    column: $table.easyToMissLastShownEpochDay,
     builder: (column) => column,
   );
 }
@@ -8731,17 +8901,25 @@ class $$UserPreferencesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<ThemePreference> themePreference = const Value.absent(),
+                Value<bool> easyToMissEnabled = const Value.absent(),
+                Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
               }) => UserPreferencesCompanion(
                 id: id,
                 themePreference: themePreference,
+                easyToMissEnabled: easyToMissEnabled,
+                easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<ThemePreference> themePreference = const Value.absent(),
+                Value<bool> easyToMissEnabled = const Value.absent(),
+                Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
               }) => UserPreferencesCompanion.insert(
                 id: id,
                 themePreference: themePreference,
+                easyToMissEnabled: easyToMissEnabled,
+                easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
               ),
           withReferenceMapper: (p0) => p0
               .map(

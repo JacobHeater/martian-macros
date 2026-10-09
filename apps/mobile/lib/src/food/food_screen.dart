@@ -13,6 +13,7 @@ import '../ui/mm_surface.dart';
 import 'calorie_hero.dart';
 import 'copy_entries.dart';
 import 'entries_copied_to.dart';
+import 'easy_to_miss_line.dart';
 import 'meal_section.dart';
 import 'selected_day_provider.dart';
 import 'targets_on.dart';
@@ -113,6 +114,8 @@ class FoodScreen extends ConsumerWidget {
                 ),
           ),
           const SizedBox(height: 8),
+          if (completeness == DayCompleteness.complete)
+            EasyToMissLine(day: day),
           Text(
             'Partial days are left out of your metabolism estimate '
             'instead of being read as under-eating.',

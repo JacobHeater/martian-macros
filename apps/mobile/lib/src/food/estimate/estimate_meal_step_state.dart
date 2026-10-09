@@ -17,7 +17,7 @@ import 'meal_size_label.dart';
 
 class EstimateMealStepState extends ConsumerState<EstimateMealStep> {
   final _name = TextEditingController();
-  var _size = MealSize.regular;
+  late var _size = widget.initialSize;
   var _kind = MealKind.balanced;
   late Meal _meal = widget.meal;
 

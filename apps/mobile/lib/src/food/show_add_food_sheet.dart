@@ -10,9 +10,17 @@ Future<void> showAddFoodSheet(
   CalendarDate day, {
   Meal? meal,
   FoodEntry? entry,
+  String? initialQuery,
+  MealSize? estimateSize,
 }) => showModalBottomSheet<void>(
   context: context,
   isScrollControlled: true,
   useSafeArea: true,
-  builder: (_) => AddFoodSheet(day: day, meal: meal, entry: entry),
+  builder: (_) => AddFoodSheet(
+    day: day,
+    meal: meal,
+    entry: entry,
+    initialQuery: initialQuery,
+    estimateSize: estimateSize,
+  ),
 );

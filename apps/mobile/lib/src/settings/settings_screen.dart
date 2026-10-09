@@ -134,6 +134,21 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const ProfileSection(),
+          const GroupHeader('Food logging'),
+          MmListGroup(
+            children: [
+              MmSwitchRow(
+                title: 'Easy-to-miss reminder',
+                subtitle:
+                    'A line under a completed day that names things people '
+                    'often forget to log.',
+                value: ref.watch(easyToMissProvider).value?.enabled ?? true,
+                onChanged: (on) => ref
+                    .read(easyToMissWriterProvider)
+                    .saveEasyToMissEnabled(on),
+              ),
+            ],
+          ),
           const GroupHeader('About'),
           MmListGroup(
             children: [
