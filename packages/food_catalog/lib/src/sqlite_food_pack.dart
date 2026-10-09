@@ -100,6 +100,16 @@ final class SqliteFoodPack implements FoodPack {
   }
 
   @override
+  CatalogFood? pairOf(CatalogFood food) {
+    final pairId = food.pairedFoodId;
+    if (pairId == null || food.packId != header.packId) return null;
+    final rows = _db.select('SELECT $_columns FROM foods f WHERE f.id = ?', [
+      pairId,
+    ]);
+    return rows.isEmpty ? null : _food(rows.first);
+  }
+
+  @override
   List<CatalogServing> servingsOf(CatalogFood food) {
     if (food.packId != header.packId) return const [];
     return [
