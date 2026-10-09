@@ -969,7 +969,7 @@
       "file": "ws-04-food-data-pack.md",
       "intent": "Build the offline US food pack and the reader the app queries, as new packages that touch nothing existing.",
       "recommendedOrder": 5,
-      "status": "not-started",
+      "status": "partially-built",
       "riskLevel": "high",
       "parallelGroup": "PG-A",
       "dependsOn": [
@@ -990,13 +990,14 @@
       ],
       "coordinationHotspots": [],
       "sourceRequirements": {
-        "built": [],
+        "built": [
+          "MM-53",
+          "MM-54"
+        ],
         "remaining": [
           "MM-50",
           "MM-51",
           "MM-52",
-          "MM-53",
-          "MM-54",
           "MM-55",
           "MM-56",
           "MM-57",
