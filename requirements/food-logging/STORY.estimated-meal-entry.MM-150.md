@@ -2,7 +2,7 @@
 id: MM-150
 status: proposed
 component: food-logging
-related: [MM-37, MM-27, MM-38, MM-40, MM-42, MM-45, MM-46, MM-139, MM-141, MM-149, MM-153]
+related: [MM-37, MM-27, MM-38, MM-40, MM-42, MM-45, MM-46, MM-139, MM-141, MM-149, MM-153, MM-167]
 ---
 
 # Story: Log a rough estimate when I cannot log the meal properly
@@ -87,3 +87,7 @@ Scenario: Reuse
 - Priority: should-have, early; it is the cheapest protection against the weekend that ends a streak of good data.
 - The simulator (MM-30) should gain a user whose estimates are unbiased but noisy (40%), and one whose estimates run 25% low, to confirm
   the adaptive loop absorbs both as it does other consistent bias (MM-23).
+
+## Clarified by MM-167 (proposed)
+"Estimate" means entered or preset totals with no quantity or unit. Its uncertainty is 40% here and 20% in MM-38 and the code; which
+is right is an open decision in MM-167.

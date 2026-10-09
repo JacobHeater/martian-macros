@@ -2,7 +2,7 @@
 id: MM-42
 status: in-progress
 component: food-logging
-related: [MM-37, MM-38, MM-45, MM-50, MM-55]
+related: [MM-37, MM-38, MM-45, MM-50, MM-55, MM-167]
 ---
 
 # Story: Find a food by searching
@@ -67,3 +67,8 @@ first, only recents do; collapsing branded variants under a generic one (results
 against the hundred most common US foods; the 150 ms bound measured on a phone (the pack-level search is timed in the
 food_catalog tests, the UI is not); search results are not paged. Reference-first ordering holds across packs, not within one
 pack's top 20.
+
+## Clarified by MM-167 (proposed, not built)
+The amount step collects a quantity and unit and then stores only totals and a method, and it records every serving as a cup-or-spoon
+measurement. MM-167 requires the quantity, unit, serving and reference basis to be stored and a label serving to be recorded as a label
+serving. Those are implementation gaps, not met by this ticket's progress.

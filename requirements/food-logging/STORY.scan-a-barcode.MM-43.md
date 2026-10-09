@@ -2,7 +2,7 @@
 id: MM-43
 status: proposed
 component: food-logging
-related: [MM-37, MM-42, MM-44, MM-54, MM-55, MM-58]
+related: [MM-37, MM-42, MM-44, MM-54, MM-55, MM-58, MM-167]
 ---
 
 # Story: Log a packaged food by scanning its barcode
@@ -49,3 +49,7 @@ Scenario: Camera denied
 ## Notes
 - Likely plugin: `mobile_scanner`. Confirm it still wraps ML Kit and Vision without bundling a large model.
 - Test with real packaging: curved cans, glossy film, small EAN-8 codes.
+
+## Clarified by MM-167 (proposed, not built)
+A scanned product's default of one label serving is recorded as the label-serving method with a quantity of servings and the serving's
+weight (MM-167); today it is recorded by the amount step's cup-or-spoon mapping.

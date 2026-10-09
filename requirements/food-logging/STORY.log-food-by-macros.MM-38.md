@@ -2,7 +2,7 @@
 id: MM-38
 status: done
 component: food-logging
-related: [MM-37, MM-39, MM-41, MM-27, MM-53]
+related: [MM-37, MM-39, MM-41, MM-27, MM-53, MM-167]
 ---
 
 # Story: Log a food by typing its macros
@@ -61,3 +61,8 @@ Scenario: Logging to a past day
 - The widget test "logging food updates the day against its targets" covers the first scenario. **The mismatch warning, deletion and
   past-day logging have no test** and were not exercised on a device (MM-93).
 - Alcohol (7 kcal per gram) and fiber are not fields, so a drink or a high-fiber food will trip the warning. Both arrive with MM-49.
+
+## Clarified by MM-167 (proposed, not built)
+What the form records today is a method and four totals; MM-167 requires a quantity and unit for each method, states that the typed
+macros are "for everything you ate" unless another basis is chosen, defines Estimate as entered totals with no unit, and says what is
+stored. This ticket's "how it was measured" behavior stands until MM-167 is built.

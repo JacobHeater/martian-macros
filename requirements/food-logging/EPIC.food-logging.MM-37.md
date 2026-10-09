@@ -2,7 +2,7 @@
 id: MM-37
 status: in-progress
 component: food-logging
-related: [MM-38, MM-39, MM-40, MM-41, MM-42, MM-43, MM-44, MM-45, MM-46, MM-47, MM-48, MM-49, MM-50, MM-22, MM-85]
+related: [MM-38, MM-39, MM-40, MM-41, MM-42, MM-43, MM-44, MM-45, MM-46, MM-47, MM-48, MM-49, MM-50, MM-22, MM-85, MM-167]
 ---
 
 # Epic: Food logging

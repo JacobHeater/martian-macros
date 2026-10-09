@@ -1511,7 +1511,8 @@
           "MM-127",
           "MM-150",
           "MM-151",
-          "MM-152"
+          "MM-152",
+          "MM-167"
         ]
       },
       "sequence": [
@@ -1520,8 +1521,7 @@
           "title": "Edit a logged entry; copy a meal or a day",
           "tickets": [
             "MM-48",
-            "MM-47"
-          ],
+            "MM-47"],
           "milestone": "M2"
         },
         {
@@ -1546,7 +1546,8 @@
           "title": "Search the pack; store every nutrient; detail level",
           "tickets": [
             "MM-42",
-            "MM-49"
+            "MM-49",
+          "MM-167"
           ],
           "milestone": "M2"
         },
