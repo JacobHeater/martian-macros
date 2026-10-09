@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-08",
+  "asOf": "2026-10-09",
   "generatedFrom": {
     "requirements": "requirements/ (158 tickets, MM-1 to MM-158; 33 done, 7 in-progress, 118 proposed)",
     "statusSource": "mm req list (ticket status in requirements/ is authoritative; the built/remaining lists here are a snapshot)",
@@ -1494,7 +1494,8 @@
           "MM-38",
           "MM-39",
           "MM-40",
-          "MM-41"
+          "MM-41",
+          "MM-48"
         ],
         "remaining": [
           "MM-37",
@@ -1504,7 +1505,6 @@
           "MM-45",
           "MM-46",
           "MM-47",
-          "MM-48",
           "MM-49",
           "MM-58",
           "MM-126",

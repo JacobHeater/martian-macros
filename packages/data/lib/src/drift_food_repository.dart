@@ -35,6 +35,21 @@ final class DriftFoodRepository implements FoodRepository {
       );
 
   @override
+  Future<void> updateFood(FoodEntry entry) =>
+      (_db.update(_db.foodEntries)..where((t) => t.id.equals(entry.id))).write(
+        FoodEntriesCompanion(
+          epochDay: Value(entry.date.epochDay),
+          meal: Value(entry.meal),
+          name: Value(entry.name),
+          kcal: Value(entry.kcal),
+          proteinG: Value(entry.proteinG),
+          carbsG: Value(entry.carbsG),
+          fatG: Value(entry.fatG),
+          quantitySource: Value(entry.source),
+        ),
+      );
+
+  @override
   Future<void> deleteFood(int id) =>
       (_db.delete(_db.foodEntries)..where((t) => t.id.equals(id))).go();
 
