@@ -64,6 +64,7 @@ Not verified: reading a real barcode with a camera (the emulator's scene has non
 notes say); iOS (Info.plist text added, never built). Not built: the live lookup (MM-58) and label scan (MM-44) steps of the
 fallback order, so an unknown code offers manual entry only; our own sentence before the system prompt (the sheet's line is
 shown behind it).
+
 ## Clarified by MM-167 (proposed, not built)
 A scanned product's default of one label serving is recorded as the label-serving method with a quantity of servings and the serving's
 weight (MM-167); today it is recorded by the amount step's cup-or-spoon mapping.
