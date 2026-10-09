@@ -43,10 +43,18 @@ ordered by barcode (or name). The same sources give byte-identical packs.
 
 ## Publishing (MM-56)
 
-`./mm food package --base-url https://example.org/food/` compresses the packs
-in `.food_cache/packs/` and writes `.food_cache/publish/manifest.json`, which
-lists each pack with its size and SHA-256. Upload the contents of `publish/` to
-a static host that serves files over https and honours `Range` requests, then
-set `MM_FOOD_PACK_MANIFEST_URL` in `config/prod.json` to the manifest's URL.
-The command uploads nothing, and **no pack should be published before the
-licensing (MM-57) has been reviewed**.
+The packs are published as a GitHub Release of
+[martian-macros-food-data](https://github.com/JacobHeater/martian-macros-food-data)
+(files are attached to the release, not committed to git).
+
+```
+./mm food package --base-url https://github.com/JacobHeater/martian-macros-food-data/releases/download/<TAG>
+gh release create <TAG> .food_cache/publish/* --repo JacobHeater/martian-macros-food-data   --title "Food databases <TAG>" --notes-file notes.md
+```
+
+`package` writes `.food_cache/publish/manifest.json` and the compressed packs
+and uploads nothing. The app reads
+`releases/latest/download/manifest.json` (`MM_FOOD_PACK_MANIFEST_URL` in
+`config/*.json`), so a new release needs no app change. Name the source
+versions and the pipeline commit in the release notes. The licensing is
+provisional and has not been reviewed (MM-57).
