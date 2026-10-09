@@ -27,17 +27,9 @@ class AboutYouStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Martian Macros', style: theme.textTheme.headlineMedium),
-        const SizedBox(height: 8),
-        const Text(
-          'Coaching for fat loss and muscle gain that adapts to your body, '
-          'not a formula. A few questions first.',
-        ),
-        const SizedBox(height: 28),
         const SectionLabel('Biological sex'),
         const Text(
           'Energy needs, safe body-fat ranges, and safety limits differ '

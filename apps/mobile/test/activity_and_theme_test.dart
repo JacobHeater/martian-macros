@@ -16,6 +16,8 @@ void main() {
   /// Walks onboarding up to (and showing) the daily-activity step.
   Future<void> reachActivityStep(WidgetTester tester) async {
     await pumpApp(tester, repos, FixedClock(today));
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Male'));
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();
