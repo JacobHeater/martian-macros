@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Martian Macros progress</title>
+<style>
+  :root {
+    --bg: #f6f3ef; --surface: #ffffff; --ink: #1c1a19; --muted: #6b6560;
+    --line: #e2dcd5; --done: #1aa6bd; --doing: #e8552b; --todo: #cfc7bf;
+    --warn: #b7791f; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14100f; --surface: #1e1917; --ink: #f1ebe6; --muted: #a39a93;
+      --line: #342d2a; --done: #3cc8de; --doing: #ff7048; --todo: #4a4140;
+      --warn: #e0a84a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14100f; --surface: #1e1917; --ink: #f1ebe6; --muted: #a39a93;
+    --line: #342d2a; --done: #3cc8de; --doing: #ff7048; --todo: #4a4140;
+    --warn: #e0a84a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  h3 { font-size: 16px; margin: 0; }
+  .sub { color: var(--muted); margin: 0; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .hero { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+  .ring { width: 150px; height: 150px; flex: none; }
+  .ring text { fill: var(--ink); font-weight: 700; }
+  .hero-body { flex: 1; min-width: 240px; }
+  .stats { display: flex; gap: 20px; flex-wrap: wrap; margin: 12px 0; }
+  .stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: var(--todo); }
+  .bar i { display: block; height: 100%; }
+  .done { background: var(--done); } .doing { background: var(--doing); } .todo { background: var(--todo); }
+  .legend { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .row { display: grid; grid-template-columns: 1fr 140px 64px; gap: 12px; align-items: center; padding: 10px 0; }
+  .row + .row, details + details { border-top: 1px solid var(--line); }
+  .pct { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--bg); font-variant-numeric: tabular-nums; cursor: default;
+  }
+  .chip.done { background: color-mix(in srgb, var(--done) 22%, var(--surface)); border-color: var(--done); }
+  .chip.doing { background: color-mix(in srgb, var(--doing) 22%, var(--surface)); border-color: var(--doing); }
+  .chip.missing { border-style: dashed; color: var(--warn); border-color: var(--warn); }
+  summary { cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary .row { padding: 12px 0; }
+  .tag { font-size: 12px; color: var(--muted); }
+  .tickets { margin: 0 0 12px; padding: 0; list-style: none; }
+  .tickets li { display: flex; gap: 8px; padding: 4px 0; font-size: 14px; }
+  .tickets .st { flex: none; width: 74px; font-size: 12px; color: var(--muted); }
+  .tickets .id { flex: none; width: 58px; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .warn { border-color: var(--warn); }
+  .warn h3 { color: var(--warn); }
+  button.theme {
+    float: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 13px;
+  }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 1fr 56px; }
+    .row .bar { grid-column: 1 / -1; grid-row: 2; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <button class="theme" id="theme" type="button">Theme</button>
+  <h1>Martian Macros progress</h1>
+  <p class="sub" id="generated"></p>
+
+  <section class="card hero" id="overall"></section>
+
+  <h2>Milestones</h2>
+  <div class="grid" id="milestones"></div>
+
+  <h2>Workstreams, in recommended order</h2>
+  <section class="card" id="workstreams"></section>
+
+  <h2>The application, by area</h2>
+  <section class="card" id="components"></section>
+
+  <h2>Where the roadmap and the tickets disagree</h2>
+  <section id="drift"></section>
+
+  <p class="note">
+    Completeness counts tickets by the status written in each ticket (done, in progress, proposed).
+    It does not weigh effort: a small ticket and a large one count the same. "Done" means the ticket says
+    done, not that it has been tried on a device or reviewed by a professional. This page is generated
+    from <code>requirements/</code> and <code>roadmap/roadmap.json</code>; run <code>./mm roadmap</code>
+    to refresh it.
+  </p>
+</main>
+
+<script>
+const DATA = /*DATA*/null/*END*/;
+
+const T = DATA.tickets;
+const STATUS_CLASS = { 'done': 'done', 'in-progress': 'doing', 'proposed': 'todo' };
+const STATUS_WORD = { 'done': 'Done', 'in-progress': 'In progress', 'proposed': 'Proposed' };
+
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else e.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+function ticketNum(id) { return parseInt(id.split('-')[1], 10); }
+function count(ids) {
+  const c = { done: 0, doing: 0, todo: 0, missing: 0, total: ids.length };
+  for (const id of ids) {
+    const t = T[id];
+    if (!t) c.missing++;
+    else if (t.status === 'done') c.done++;
+    else if (t.status === 'in-progress') c.doing++;
+    else c.todo++;
+  }
+  return c;
+}
+function pct(c) { return c.total ? Math.round((100 * c.done) / c.total) : 0; }
+function bar(c) {
+  const b = el('div', { class: 'bar', title: `${c.done} done, ${c.doing} in progress, ${c.todo + c.missing} not started` });
+  for (const k of ['done', 'doing']) {
+    if (c[k]) b.append(Object.assign(el('i', { class: k }), { style: `width:${(100 * c[k]) / c.total}%` }));
+  }
+  return b;
+}
+function chip(id) {
+  const t = T[id];
+  if (!t) return el('span', { class: 'chip missing', title: 'No ticket with this id', text: id });
+  return el('span', { class: 'chip ' + STATUS_CLASS[t.status], title: `${STATUS_WORD[t.status]}: ${t.title}`, text: id });
+}
+function legend() {
+  const l = el('div', { class: 'legend' });
+  for (const [k, w] of [['done', 'Done'], ['doing', 'In progress'], ['todo', 'Not started']]) {
+    l.append(el('span', {}, el('span', { class: 'dot ' + k }), w));
+  }
+  return l;
+}
+
+// Overall
+const all = Object.keys(T);
+const total = count(all);
+document.getElementById('generated').textContent =
+  `Roadmap as of ${DATA.generatedOn}. ${total.total} tickets.`;
+
+(function overall() {
+  const r = 62, circ = 2 * Math.PI * r;
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 150 150'); svg.setAttribute('class', 'ring');
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `${pct(total)} percent of tickets done`);
+  const seg = (frac, offset, color) => {
+    const c = document.createElementNS(ns, 'circle');
+    for (const [k, v] of Object.entries({ cx: 75, cy: 75, r, fill: 'none', 'stroke-width': 16, stroke: color,
+      'stroke-dasharray': `${frac * circ} ${circ}`, 'stroke-dashoffset': -offset * circ, transform: 'rotate(-90 75 75)' })) c.setAttribute(k, v);
+    return c;
+  };
+  const fd = total.done / total.total, fg = total.doing / total.total;
+  svg.append(seg(1, 0, 'var(--todo)'));
+  if (fd) svg.append(seg(fd, 0, 'var(--done)'));
+  if (fg) svg.append(seg(fg, fd, 'var(--doing)'));
+  const txt = document.createElementNS(ns, 'text');
+  txt.setAttribute('x', 75); txt.setAttribute('y', 84); txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-size', 30);
+  txt.textContent = pct(total) + '%';
+  svg.append(txt);
+  const stat = (n, label) => el('div', { class: 'stat' }, el('b', { text: String(n) }), el('span', { text: label }));
+  const body = el('div', { class: 'hero-body' },
+    el('h3', { text: 'Tickets done' }),
+    el('div', { class: 'stats' },
+      stat(total.done, 'done'), stat(total.doing, 'in progress'), stat(total.todo, 'proposed'), stat(total.total, 'total')),
+    bar(total), legend());
+  document.getElementById('overall').append(svg, body);
+})();
+
+// Milestones
+(function milestones() {
+  const host = document.getElementById('milestones');
+  for (const m of DATA.milestones) {
+    const ids = [...new Set(m.requires.flatMap(r => r.tickets))];
+    const c = count(ids);
+    const chips = el('div', { class: 'chips' });
+    for (const id of ids.sort((a, b) => ticketNum(a) - ticketNum(b))) chips.append(chip(id));
+    host.append(el('div', { class: 'card' },
+      el('div', { class: 'tag', text: m.id }),
+      el('h3', { text: m.name }),
+      el('p', { class: 'sub', text: `${c.done} of ${c.total} required tickets done (${pct(c)}%)` }),
+      bar(c), chips));
+  }
+})();
+
+// Workstreams
+const placed = new Set();
+(function workstreams() {
+  const host = document.getElementById('workstreams');
+  const list = [...DATA.workstreams].sort((a, b) => a.order - b.order);
+  for (const w of list) {
+    const ids = new Set([...(w.listed.built || []), ...(w.listed.remaining || [])]);
+    for (const s of w.sequence || []) for (const id of s.tickets || []) ids.add(id);
+    const sorted = [...ids].sort((a, b) => ticketNum(a) - ticketNum(b));
+    sorted.forEach(id => placed.add(id));
+    const c = count(sorted);
+    const dep = (w.dependsOn || []).length ? 'after ' + w.dependsOn.join(', ') : 'no prerequisites';
+    const items = el('ul', { class: 'tickets' });
+    for (const id of sorted) {
+      const t = T[id];
+      items.append(el('li', {},
+        el('span', { class: 'st', text: t ? STATUS_WORD[t.status] : 'Missing' }),
+        el('span', { class: 'id', text: id }),
+        el('span', { text: t ? t.title : 'No ticket with this id' })));
+    }
+    host.append(el('details', {},
+      el('summary', {}, el('div', { class: 'row' },
+        el('div', {}, el('h3', { text: `${w.id} · ${w.name}` }), el('span', { class: 'tag', text: `${dep} · risk ${w.risk}` })),
+        bar(c), el('div', { class: 'pct', text: `${c.done}/${c.total}` }))),
+      el('p', { class: 'sub', text: w.intent }), items));
+  }
+})();
+
+// Components
+(function components() {
+  const by = {};
+  for (const [id, t] of Object.entries(T)) (by[t.component] ||= []).push(id);
+  const host = document.getElementById('components');
+  const rows = Object.entries(by).map(([name, ids]) => [name, count(ids)]).sort((a, b) => pct(b[1]) - pct(a[1]) || b[1].total - a[1].total);
+  for (const [name, c] of rows) {
+    host.append(el('div', { class: 'row' },
+      el('div', { text: name.replace(/-/g, ' ') }), bar(c), el('div', { class: 'pct', text: `${c.done}/${c.total}` })));
+  }
+  host.append(legend());
+})();
+
+// Disagreements
+(function drift() {
+  const host = document.getElementById('drift');
+  const msgs = [];
+  for (const w of DATA.workstreams) {
+    for (const id of w.listed.built || []) {
+      const t = T[id];
+      if (!t) msgs.push(`${w.id} lists ${id} as built, but no such ticket exists.`);
+      else if (t.status !== 'done') msgs.push(`${w.id} lists ${id} as built, but the ticket says ${STATUS_WORD[t.status].toLowerCase()}.`);
+    }
+    for (const id of w.listed.remaining || []) {
+      const t = T[id];
+      if (!t) msgs.push(`${w.id} lists ${id} as remaining, but no such ticket exists.`);
+      else if (t.status === 'done') msgs.push(`${w.id} lists ${id} as remaining, but the ticket says done.`);
+    }
+  }
+  for (const m of DATA.milestones) {
+    for (const r of m.requires) for (const id of r.tickets) {
+      if (!T[id]) msgs.push(`Milestone ${m.id} requires ${id}, but no such ticket exists.`);
+    }
+  }
+  const unplanned = Object.keys(T).filter(id => !placed.has(id));
+  const card = el('div', { class: 'card' + (msgs.length ? ' warn' : '') });
+  if (!msgs.length) card.append(el('p', { class: 'sub', text: 'None: every built and remaining list matches the tickets.' }));
+  else {
+    card.append(el('h3', { text: `${msgs.length} to fix in roadmap.json` }));
+    const ul = el('ul', { class: 'tickets' });
+    for (const m of msgs) ul.append(el('li', { text: m }));
+    card.append(ul);
+  }
+  host.append(card);
+  if (unplanned.length) {
+    const done = unplanned.filter(id => T[id].status === 'done').length;
+    host.append(el('p', { class: 'note',
+      text: `${unplanned.length} tickets belong to no workstream (${done} of them done); they count in the totals above but not under a workstream.` }));
+  }
+})();
+
+// Theme toggle (remembered where the browser allows it)
+(function theme() {
+  const root = document.documentElement;
+  try { const s = localStorage.getItem('mm-theme'); if (s) root.dataset.theme = s; } catch (e) {}
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark'
+      : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('mm-theme', root.dataset.theme); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
