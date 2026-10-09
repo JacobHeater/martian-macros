@@ -184,6 +184,17 @@ void main() {
     expect(catalog.search('oats').first.food.tier, TrustTier.reference);
   });
 
+  test('a food finds its raw or cooked counterpart (MM-151)', () {
+    final pack = fixture();
+    final cooked = pack.search('rice cooked').first.food;
+    final raw = pack.pairOf(cooked)!;
+    expect(raw.name, 'White rice, raw');
+    expect(pack.pairOf(raw)!.id, cooked.id);
+    expect(FoodCatalog([pack]).pairOf(cooked)!.name, 'White rice, raw');
+    final banana = pack.search('banana').first.food;
+    expect(pack.pairOf(banana), isNull, reason: 'one state only');
+  });
+
   test('several packs read as one ranked list', () {
     final catalog = FoodCatalog([fixture(), fixture()]);
     final hits = catalog.search('banana');

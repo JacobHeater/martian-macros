@@ -1,6 +1,6 @@
 ---
 id: MM-151
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-42, MM-45, MM-46, MM-52, MM-55, MM-153]
 ---
@@ -81,3 +81,18 @@ Scenario: Not for servings
 - Priority: should-have, with the food database (MM-50).
 - Oil and fat absorbed in cooking is a related and larger hole (pan-fried against grilled); see MM-152.
 - Recipes (MM-45) ask for the cooked weight of the whole dish; that ticket's rule stands.
+
+## Progress
+Built: the pipeline now sets a preparation state on every generic food (raw or dry, cooked, or neither, from USDA's comma-separated
+names) and links a food's raw and cooked entries to each other when the source has both (the raw one points to its plain cooked entry:
+boiled, steamed, roasted, baked, grilled in that order; every cooked entry points to the raw one); branded and barcode foods are marked
+as packaged. The reader gained `pairOf` (pack and catalog). In the amount step, a food with a pair shows "Weighed as: Cooked / Raw"
+(or "Dry") while logging by weight, with "200 g cooked is about 260 kcal. 200 g raw is about 730 kcal" under it; switching changes which
+entry is logged and its name; no switch is shown for a serving or a food with one state. Tests: `preparation_link_test.dart`,
+the pack test for `pairOf`, and `raw_or_cooked_test.dart`.
+
+Not done: the choice is not remembered per food (that needs the source food stored with an entry, MM-167's remaining persistence);
+the published packs predate this and have no preparation or pairs until the pipeline is run on the downloaded sources and a new release
+is published (not run: the source downloads are large); the rule was tested on names written from USDA's style, not yet on the real
+files, so how many foods pair is unknown; "default to the state people weigh" for search ordering; branded foods say "as packaged" only
+in the data, not on screen.
