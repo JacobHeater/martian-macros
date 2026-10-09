@@ -153,6 +153,17 @@ class FoodDatabaseScreen extends ConsumerWidget {
               ),
             ),
           ],
+          const GroupHeader('Where the foods come from'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Food data from Open Food Facts (openfoodfacts.org), available '
+              'under the Open Database License, and USDA FoodData Central. '
+              'The files are published at '
+              'github.com/JacobHeater/martian-macros-food-data.',
+              style: muted,
+            ),
+          ),
         ],
       ),
     );
