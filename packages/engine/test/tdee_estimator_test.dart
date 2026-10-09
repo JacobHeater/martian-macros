@@ -184,6 +184,32 @@ void main() {
     expect(result.kcal, closeTo(0.95 * windowMean(logs.trueTdee, 21), 300));
   });
 
+  test('restarts the window when weighing gives way to estimates (MM-150)', () {
+    final user = SyntheticUser(
+      seed: 13,
+      baseTdeeKcal: 2800,
+      underReportFraction: 0.05,
+      weighedShare: 1,
+    );
+    final logs = simulate(
+      user,
+      days: 42,
+      loggedKcal: 2400,
+      beforeDay: (day, u) {
+        if (day == 21) {
+          // Weighing stops; meals are estimated and run low.
+          u
+            ..underReportFraction = 0.25
+            ..weighedShare = 0;
+        }
+      },
+    );
+    final result = estimate(user, logs);
+    final switchDay = CalendarDate(2026, 1, 1).addDays(21);
+    expect(result.styleRestartOn, isNotNull);
+    expect(switchDay.daysUntil(result.windowStart!), inInclusiveRange(0, 2));
+  });
+
   test('clamps implausible results to the BMR band', () {
     final user = SyntheticUser(seed: 12, baseTdeeKcal: 2800);
     // Logs only a token amount yet holds weight: physically impossible.
