@@ -18,6 +18,7 @@ dependencies:
   mm_domain: any
   mm_engine: any
   mm_food_catalog: any
+  mobile_scanner: 7.4.2
   path_provider: ^2.1.5
 
 dev_dependencies:

@@ -1,6 +1,6 @@
 ---
 id: MM-43
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-42, MM-44, MM-54, MM-55, MM-58]
 ---
@@ -49,3 +49,18 @@ Scenario: Camera denied
 ## Notes
 - Likely plugin: `mobile_scanner`. Confirm it still wraps ML Kit and Vision without bundling a large model.
 - Test with real packaging: curved cans, glossy film, small EAN-8 codes.
+
+## Progress
+Built: a "Scan a barcode" button on the add-food sheet opens a live camera (`mobile_scanner`, ML Kit bundled on Android, so no
+download and no network) with a torch toggle and a field to type the digits. A read code is normalized (UPC-E expanded, check
+digit verified, MM-54), looked up in the installed packs, and a found product opens the same amount step as search. Not found
+and invalid digits say so and offer "Enter manually". The camera is behind a `BarcodeScanner` interface with a test fake.
+
+Checked on the Android emulator: the app builds with the plugin; the system permission prompt appears when Scan is opened;
+"Don't allow" shows the explanation with typing still available; granted, the live camera shows. Widget tests cover a scan,
+unknown code, camera unavailable and invalid digits.
+
+Not verified: reading a real barcode with a camera (the emulator's scene has none; needs a phone and real packaging, as the
+notes say); iOS (Info.plist text added, never built). Not built: the live lookup (MM-58) and label scan (MM-44) steps of the
+fallback order, so an unknown code offers manual entry only; our own sentence before the system prompt (the sheet's line is
+shown behind it).
