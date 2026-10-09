@@ -2173,6 +2173,50 @@ class $FoodEntriesTable extends FoodEntries
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _originPackIdMeta = const VerificationMeta(
+    'originPackId',
+  );
+  @override
+  late final GeneratedColumn<String> originPackId = GeneratedColumn<String>(
+    'origin_pack_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originFoodIdMeta = const VerificationMeta(
+    'originFoodId',
+  );
+  @override
+  late final GeneratedColumn<int> originFoodId = GeneratedColumn<int>(
+    'origin_food_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originSourceMeta = const VerificationMeta(
+    'originSource',
+  );
+  @override
+  late final GeneratedColumn<String> originSource = GeneratedColumn<String>(
+    'origin_source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originSourceIdMeta = const VerificationMeta(
+    'originSourceId',
+  );
+  @override
+  late final GeneratedColumn<String> originSourceId = GeneratedColumn<String>(
+    'origin_source_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2209,6 +2253,10 @@ class $FoodEntriesTable extends FoodEntries
     servingMilliliters,
     servingUnit,
     densityGPerMl,
+    originPackId,
+    originFoodId,
+    originSource,
+    originSourceId,
     createdAt,
   ];
   @override
@@ -2355,6 +2403,42 @@ class $FoodEntriesTable extends FoodEntries
         ),
       );
     }
+    if (data.containsKey('origin_pack_id')) {
+      context.handle(
+        _originPackIdMeta,
+        originPackId.isAcceptableOrUnknown(
+          data['origin_pack_id']!,
+          _originPackIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origin_food_id')) {
+      context.handle(
+        _originFoodIdMeta,
+        originFoodId.isAcceptableOrUnknown(
+          data['origin_food_id']!,
+          _originFoodIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origin_source')) {
+      context.handle(
+        _originSourceMeta,
+        originSource.isAcceptableOrUnknown(
+          data['origin_source']!,
+          _originSourceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origin_source_id')) {
+      context.handle(
+        _originSourceIdMeta,
+        originSourceId.isAcceptableOrUnknown(
+          data['origin_source_id']!,
+          _originSourceIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -2470,6 +2554,22 @@ class $FoodEntriesTable extends FoodEntries
         DriftSqlType.double,
         data['${effectivePrefix}density_g_per_ml'],
       ),
+      originPackId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_pack_id'],
+      ),
+      originFoodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}origin_food_id'],
+      ),
+      originSource: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_source'],
+      ),
+      originSourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_source_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -2537,6 +2637,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
   final double? servingMilliliters;
   final PortionUnit? servingUnit;
   final double? densityGPerMl;
+  final String? originPackId;
+  final int? originFoodId;
+  final String? originSource;
+  final String? originSourceId;
   final DateTime createdAt;
   const FoodRow({
     required this.id,
@@ -2561,6 +2665,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     this.servingMilliliters,
     this.servingUnit,
     this.densityGPerMl,
+    this.originPackId,
+    this.originFoodId,
+    this.originSource,
+    this.originSourceId,
     required this.createdAt,
   });
   @override
@@ -2630,6 +2738,18 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     if (!nullToAbsent || densityGPerMl != null) {
       map['density_g_per_ml'] = Variable<double>(densityGPerMl);
     }
+    if (!nullToAbsent || originPackId != null) {
+      map['origin_pack_id'] = Variable<String>(originPackId);
+    }
+    if (!nullToAbsent || originFoodId != null) {
+      map['origin_food_id'] = Variable<int>(originFoodId);
+    }
+    if (!nullToAbsent || originSource != null) {
+      map['origin_source'] = Variable<String>(originSource);
+    }
+    if (!nullToAbsent || originSourceId != null) {
+      map['origin_source_id'] = Variable<String>(originSourceId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2684,6 +2804,18 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       densityGPerMl: densityGPerMl == null && nullToAbsent
           ? const Value.absent()
           : Value(densityGPerMl),
+      originPackId: originPackId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originPackId),
+      originFoodId: originFoodId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originFoodId),
+      originSource: originSource == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originSource),
+      originSourceId: originSourceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originSourceId),
       createdAt: Value(createdAt),
     );
   }
@@ -2734,6 +2866,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
         serializer.fromJson<String?>(json['servingUnit']),
       ),
       densityGPerMl: serializer.fromJson<double?>(json['densityGPerMl']),
+      originPackId: serializer.fromJson<String?>(json['originPackId']),
+      originFoodId: serializer.fromJson<int?>(json['originFoodId']),
+      originSource: serializer.fromJson<String?>(json['originSource']),
+      originSourceId: serializer.fromJson<String?>(json['originSourceId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2775,6 +2911,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
         $FoodEntriesTable.$converterservingUnitn.toJson(servingUnit),
       ),
       'densityGPerMl': serializer.toJson<double?>(densityGPerMl),
+      'originPackId': serializer.toJson<String?>(originPackId),
+      'originFoodId': serializer.toJson<int?>(originFoodId),
+      'originSource': serializer.toJson<String?>(originSource),
+      'originSourceId': serializer.toJson<String?>(originSourceId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2802,6 +2942,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     Value<double?> servingMilliliters = const Value.absent(),
     Value<PortionUnit?> servingUnit = const Value.absent(),
     Value<double?> densityGPerMl = const Value.absent(),
+    Value<String?> originPackId = const Value.absent(),
+    Value<int?> originFoodId = const Value.absent(),
+    Value<String?> originSource = const Value.absent(),
+    Value<String?> originSourceId = const Value.absent(),
     DateTime? createdAt,
   }) => FoodRow(
     id: id ?? this.id,
@@ -2846,6 +2990,12 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     densityGPerMl: densityGPerMl.present
         ? densityGPerMl.value
         : this.densityGPerMl,
+    originPackId: originPackId.present ? originPackId.value : this.originPackId,
+    originFoodId: originFoodId.present ? originFoodId.value : this.originFoodId,
+    originSource: originSource.present ? originSource.value : this.originSource,
+    originSourceId: originSourceId.present
+        ? originSourceId.value
+        : this.originSourceId,
     createdAt: createdAt ?? this.createdAt,
   );
   FoodRow copyWithCompanion(FoodEntriesCompanion data) {
@@ -2900,6 +3050,18 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       densityGPerMl: data.densityGPerMl.present
           ? data.densityGPerMl.value
           : this.densityGPerMl,
+      originPackId: data.originPackId.present
+          ? data.originPackId.value
+          : this.originPackId,
+      originFoodId: data.originFoodId.present
+          ? data.originFoodId.value
+          : this.originFoodId,
+      originSource: data.originSource.present
+          ? data.originSource.value
+          : this.originSource,
+      originSourceId: data.originSourceId.present
+          ? data.originSourceId.value
+          : this.originSourceId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -2929,6 +3091,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           ..write('servingMilliliters: $servingMilliliters, ')
           ..write('servingUnit: $servingUnit, ')
           ..write('densityGPerMl: $densityGPerMl, ')
+          ..write('originPackId: $originPackId, ')
+          ..write('originFoodId: $originFoodId, ')
+          ..write('originSource: $originSource, ')
+          ..write('originSourceId: $originSourceId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -2958,6 +3124,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     servingMilliliters,
     servingUnit,
     densityGPerMl,
+    originPackId,
+    originFoodId,
+    originSource,
+    originSourceId,
     createdAt,
   ]);
   @override
@@ -2986,6 +3156,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           other.servingMilliliters == this.servingMilliliters &&
           other.servingUnit == this.servingUnit &&
           other.densityGPerMl == this.densityGPerMl &&
+          other.originPackId == this.originPackId &&
+          other.originFoodId == this.originFoodId &&
+          other.originSource == this.originSource &&
+          other.originSourceId == this.originSourceId &&
           other.createdAt == this.createdAt);
 }
 
@@ -3012,6 +3186,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
   final Value<double?> servingMilliliters;
   final Value<PortionUnit?> servingUnit;
   final Value<double?> densityGPerMl;
+  final Value<String?> originPackId;
+  final Value<int?> originFoodId;
+  final Value<String?> originSource;
+  final Value<String?> originSourceId;
   final Value<DateTime> createdAt;
   const FoodEntriesCompanion({
     this.id = const Value.absent(),
@@ -3036,6 +3214,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.servingMilliliters = const Value.absent(),
     this.servingUnit = const Value.absent(),
     this.densityGPerMl = const Value.absent(),
+    this.originPackId = const Value.absent(),
+    this.originFoodId = const Value.absent(),
+    this.originSource = const Value.absent(),
+    this.originSourceId = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   FoodEntriesCompanion.insert({
@@ -3061,6 +3243,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.servingMilliliters = const Value.absent(),
     this.servingUnit = const Value.absent(),
     this.densityGPerMl = const Value.absent(),
+    this.originPackId = const Value.absent(),
+    this.originFoodId = const Value.absent(),
+    this.originSource = const Value.absent(),
+    this.originSourceId = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : epochDay = Value(epochDay),
        meal = Value(meal),
@@ -3093,6 +3279,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Expression<double>? servingMilliliters,
     Expression<String>? servingUnit,
     Expression<double>? densityGPerMl,
+    Expression<String>? originPackId,
+    Expression<int>? originFoodId,
+    Expression<String>? originSource,
+    Expression<String>? originSourceId,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -3118,6 +3308,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       if (servingMilliliters != null) 'serving_milliliters': servingMilliliters,
       if (servingUnit != null) 'serving_unit': servingUnit,
       if (densityGPerMl != null) 'density_g_per_ml': densityGPerMl,
+      if (originPackId != null) 'origin_pack_id': originPackId,
+      if (originFoodId != null) 'origin_food_id': originFoodId,
+      if (originSource != null) 'origin_source': originSource,
+      if (originSourceId != null) 'origin_source_id': originSourceId,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -3145,6 +3339,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Value<double?>? servingMilliliters,
     Value<PortionUnit?>? servingUnit,
     Value<double?>? densityGPerMl,
+    Value<String?>? originPackId,
+    Value<int?>? originFoodId,
+    Value<String?>? originSource,
+    Value<String?>? originSourceId,
     Value<DateTime>? createdAt,
   }) {
     return FoodEntriesCompanion(
@@ -3170,6 +3368,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       servingMilliliters: servingMilliliters ?? this.servingMilliliters,
       servingUnit: servingUnit ?? this.servingUnit,
       densityGPerMl: densityGPerMl ?? this.densityGPerMl,
+      originPackId: originPackId ?? this.originPackId,
+      originFoodId: originFoodId ?? this.originFoodId,
+      originSource: originSource ?? this.originSource,
+      originSourceId: originSourceId ?? this.originSourceId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -3255,6 +3457,18 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     if (densityGPerMl.present) {
       map['density_g_per_ml'] = Variable<double>(densityGPerMl.value);
     }
+    if (originPackId.present) {
+      map['origin_pack_id'] = Variable<String>(originPackId.value);
+    }
+    if (originFoodId.present) {
+      map['origin_food_id'] = Variable<int>(originFoodId.value);
+    }
+    if (originSource.present) {
+      map['origin_source'] = Variable<String>(originSource.value);
+    }
+    if (originSourceId.present) {
+      map['origin_source_id'] = Variable<String>(originSourceId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3286,6 +3500,10 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
           ..write('servingMilliliters: $servingMilliliters, ')
           ..write('servingUnit: $servingUnit, ')
           ..write('densityGPerMl: $densityGPerMl, ')
+          ..write('originPackId: $originPackId, ')
+          ..write('originFoodId: $originFoodId, ')
+          ..write('originSource: $originSource, ')
+          ..write('originSourceId: $originSourceId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -7463,6 +7681,10 @@ typedef $$FoodEntriesTableCreateCompanionBuilder =
       Value<double?> servingMilliliters,
       Value<PortionUnit?> servingUnit,
       Value<double?> densityGPerMl,
+      Value<String?> originPackId,
+      Value<int?> originFoodId,
+      Value<String?> originSource,
+      Value<String?> originSourceId,
       Value<DateTime> createdAt,
     });
 typedef $$FoodEntriesTableUpdateCompanionBuilder =
@@ -7489,6 +7711,10 @@ typedef $$FoodEntriesTableUpdateCompanionBuilder =
       Value<double?> servingMilliliters,
       Value<PortionUnit?> servingUnit,
       Value<double?> densityGPerMl,
+      Value<String?> originPackId,
+      Value<int?> originFoodId,
+      Value<String?> originSource,
+      Value<String?> originSourceId,
       Value<DateTime> createdAt,
     });
 
@@ -7617,6 +7843,26 @@ class $$FoodEntriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get originPackId => $composableBuilder(
+    column: $table.originPackId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get originFoodId => $composableBuilder(
+    column: $table.originFoodId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originSource => $composableBuilder(
+    column: $table.originSource,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originSourceId => $composableBuilder(
+    column: $table.originSourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -7742,6 +7988,26 @@ class $$FoodEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get originPackId => $composableBuilder(
+    column: $table.originPackId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get originFoodId => $composableBuilder(
+    column: $table.originFoodId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originSource => $composableBuilder(
+    column: $table.originSource,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originSourceId => $composableBuilder(
+    column: $table.originSourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -7856,6 +8122,26 @@ class $$FoodEntriesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get originPackId => $composableBuilder(
+    column: $table.originPackId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get originFoodId => $composableBuilder(
+    column: $table.originFoodId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originSource => $composableBuilder(
+    column: $table.originSource,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originSourceId => $composableBuilder(
+    column: $table.originSourceId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
@@ -7910,6 +8196,10 @@ class $$FoodEntriesTableTableManager
                 Value<double?> servingMilliliters = const Value.absent(),
                 Value<PortionUnit?> servingUnit = const Value.absent(),
                 Value<double?> densityGPerMl = const Value.absent(),
+                Value<String?> originPackId = const Value.absent(),
+                Value<int?> originFoodId = const Value.absent(),
+                Value<String?> originSource = const Value.absent(),
+                Value<String?> originSourceId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion(
                 id: id,
@@ -7934,6 +8224,10 @@ class $$FoodEntriesTableTableManager
                 servingMilliliters: servingMilliliters,
                 servingUnit: servingUnit,
                 densityGPerMl: densityGPerMl,
+                originPackId: originPackId,
+                originFoodId: originFoodId,
+                originSource: originSource,
+                originSourceId: originSourceId,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -7960,6 +8254,10 @@ class $$FoodEntriesTableTableManager
                 Value<double?> servingMilliliters = const Value.absent(),
                 Value<PortionUnit?> servingUnit = const Value.absent(),
                 Value<double?> densityGPerMl = const Value.absent(),
+                Value<String?> originPackId = const Value.absent(),
+                Value<int?> originFoodId = const Value.absent(),
+                Value<String?> originSource = const Value.absent(),
+                Value<String?> originSourceId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion.insert(
                 id: id,
@@ -7984,6 +8282,10 @@ class $$FoodEntriesTableTableManager
                 servingMilliliters: servingMilliliters,
                 servingUnit: servingUnit,
                 densityGPerMl: densityGPerMl,
+                originPackId: originPackId,
+                originFoodId: originFoodId,
+                originSource: originSource,
+                originSourceId: originSourceId,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

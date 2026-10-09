@@ -9,6 +9,9 @@ Portion? portionFromRow(FoodRow r) {
   final basis = r.nutritionBasis;
   if (basis == null) return null;
   final refBasis = r.referenceBasis;
+  final originPackId = r.originPackId;
+  final originFoodId = r.originFoodId;
+  final originSource = r.originSource;
   final kcal = r.referenceKcal;
   final protein = r.referenceProteinG;
   final carbs = r.referenceCarbsG;
@@ -40,6 +43,14 @@ Portion? portionFromRow(FoodRow r) {
     quantity: r.portionQuantity,
     unit: r.portionUnit,
     reference: reference,
+    origin: originPackId == null || originFoodId == null || originSource == null
+        ? null
+        : FoodOrigin(
+            packId: originPackId,
+            foodId: originFoodId,
+            source: originSource,
+            sourceId: r.originSourceId,
+          ),
   );
 }
 
@@ -60,5 +71,9 @@ FoodEntriesCompanion withPortion(FoodEntriesCompanion row, Portion? portion) {
     servingMilliliters: Value(reference?.servingMilliliters),
     servingUnit: Value(reference?.servingUnit),
     densityGPerMl: Value(reference?.densityGPerMl),
+    originPackId: Value(portion?.origin?.packId),
+    originFoodId: Value(portion?.origin?.foodId),
+    originSource: Value(portion?.origin?.source),
+    originSourceId: Value(portion?.origin?.sourceId),
   );
 }

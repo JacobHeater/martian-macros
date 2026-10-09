@@ -171,6 +171,12 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
               quantity: _amount,
               unit: _choice.unit,
               reference: _reference,
+              origin: FoodOrigin(
+                packId: food.packId,
+                foodId: food.id,
+                source: food.source,
+                sourceId: food.sourceId,
+              ),
             ),
           ),
         );
