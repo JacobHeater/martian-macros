@@ -103,8 +103,11 @@ usually have more than they look". The entry is an ordinary one measured by esti
 (decided in MM-167). Domain: `estimateMeal`, `mealKcal`; app: `EstimateMealStep`. Tested in `estimate_meal_test.dart` (domain and
 widget).
 
-Not built: the estimator's logging-style rule for estimates (the window restarting when someone moves from weighing to mostly
-estimating), the adherence summary and insight about estimate-heavy weeks (MM-149, MM-139, MM-141), simulator users with noisy or
+The logging-style rule needed no new code for weighing giving way to estimates: the estimator restarts the window on a drop in the
+weighed share of calories, and estimates are not weighed. A test in `tdee_estimator_test.dart` covers it. What it cannot yet tell apart
+is estimates from hand portions or label servings (both "not weighed"); that needs MM-46's styles.
+
+Not built: the adherence summary and insight about estimate-heavy weeks (MM-149, MM-139, MM-141), simulator users with noisy or
 biased estimates (MM-30), reuse from recents with the estimate mark (the entry appears in recents like any other, as typed totals),
 and the Estimate-heavy day check. Before the coach has a maintenance estimate the sizes are not shown and the sheet says so. Not seen
 on the emulator.
