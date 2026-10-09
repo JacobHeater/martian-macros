@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
 import '../about/how_this_works_screen.dart';
+import '../food_packs/food_database_screen.dart';
 import '../format/daily_activity_label.dart';
 import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
@@ -152,6 +153,19 @@ class SettingsScreen extends ConsumerWidget {
           const GroupHeader('Data'),
           MmListGroup(
             children: [
+              MmListRow(
+                leadingIcon: Icons.download_outlined,
+                title: 'Food database',
+                subtitle:
+                    'Optional download for barcode scanning. The only thing '
+                    'this app ever fetches.',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const FoodDatabaseScreen(),
+                  ),
+                ),
+              ),
               const MmListRow(
                 leadingIcon: Icons.lock_outline,
                 title: 'Stored only on this device',
