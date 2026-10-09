@@ -2,7 +2,7 @@
 id: MM-45
 status: proposed
 component: food-logging
-related: [MM-37, MM-39, MM-42, MM-44, MM-47, MM-61]
+related: [MM-37, MM-39, MM-42, MM-44, MM-47, MM-61, MM-167]
 ---
 
 # Story: Save my own foods and recipes
@@ -44,3 +44,6 @@ Scenario: The energy check
 - Needs new tables, so it is the first real use of schema migrations (MM-61).
 - Cooked-versus-raw weight is the classic recipe error (raw rice weighs a third of cooked). Ask for the cooked weight of the whole recipe
   as an optional step; do not try to model cooking loss.
+
+## Clarified by MM-167 (proposed)
+Logging a custom food or recipe "in any number of servings or grams" writes the same quantity, unit and basis fields as any other food.

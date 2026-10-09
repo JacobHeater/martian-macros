@@ -2,7 +2,7 @@
 id: MM-48
 status: done
 component: food-logging
-related: [MM-37, MM-38, MM-41]
+related: [MM-37, MM-38, MM-41, MM-167]
 ---
 
 # Story: Edit an entry after logging it
@@ -42,3 +42,7 @@ be changed and saved in place (`FoodEntryWriter.updateFood`, with a contract tes
 
 Limits: Undo logs the entry again, so it takes a new id and sorts to the end of its meal; the snackbar's length is the
 framework default, not tuned. Not seen on the emulator yet.
+
+## Clarified by MM-167 (proposed, not built)
+Editing restores name, macros, method, meal and day only. MM-167 requires it to restore the quantity, unit, serving and basis too, to
+show legacy entries as "Amount not recorded", and to avoid scaling totals twice.
