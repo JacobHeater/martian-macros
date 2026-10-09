@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import 'goal_body_fat_check.dart';
 import 'protein_range.dart';
+import 'protein_targets.dart';
 
 /// Hard physiological limits. Every target the engine emits passes through
 /// these.
@@ -110,7 +111,49 @@ abstract final class SafetyBounds {
     return math.max(perKg * reference, 0.20 * kcal / 9);
   }
 
-  /// Daily protein range, g.
+  /// Chooses the protein minimum and target for the user's goal and training.
+  static ProteinTargets proteinTargetsG({
+    required BiologicalSex sex,
+    required double weightKg,
+    required double heightCm,
+    required double bodyFatPercent,
+    required bool inDeficit,
+    required bool lifting,
+    required CoachingPolicy policy,
+  }) {
+    final reference = referenceWeightKg(weightKg: weightKg, heightCm: heightCm);
+    var minimum = (lifting ? 1.6 : 1.2) * reference;
+    var target = (lifting ? (inDeficit ? 2.0 : 1.8) : 1.6) * reference;
+
+    if (inDeficit) {
+      final leanThreshold = switch (sex) {
+        BiologicalSex.male => 15.0,
+        BiologicalSex.female => 23.0,
+      };
+      final leanShare = ((leanThreshold + 3 - bodyFatPercent) / 3)
+          .clamp(0.0, 1.0)
+          .toDouble();
+      if (leanShare > 0) {
+        final fatFreeMass = weightKg * (1 - bodyFatPercent / 100);
+        minimum = minimum * (1 - leanShare) + 2.3 * fatFreeMass * leanShare;
+        target = target * (1 - leanShare) + 2.6 * fatFreeMass * leanShare;
+      }
+    }
+
+    final seniorFloor = policy.minimumProteinGPerKgReferenceWeight;
+    if (seniorFloor != null) {
+      minimum = math.max(minimum, seniorFloor * reference);
+    }
+
+    final kidneyCap = policy.proteinCapGPerKg;
+    if (kidneyCap != null) {
+      final capped = kidneyCap * weightKg;
+      return ProteinTargets(minimumG: capped, targetG: capped);
+    }
+    return ProteinTargets(minimumG: minimum, targetG: target);
+  }
+
+  /// Evidence range for protein, g; production targets use [proteinTargetsG].
   ///
   /// Lean users in a deficit get 2.3–3.1 g/kg fat-free mass (Helms 2014).
   /// Otherwise 1.6–2.2 g/kg of [referenceWeightKg], so heavier users don't

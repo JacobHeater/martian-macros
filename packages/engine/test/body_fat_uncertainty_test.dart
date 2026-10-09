@@ -41,14 +41,16 @@ void main() {
     final t = targetsFor(formula(18));
     expect(t.weeklyRateFraction, closeTo(-0.007, 1e-12));
     // At least what the lean rule gives at 15%.
-    final atFifteen = SafetyBounds.proteinRangeG(
+    final atFifteen = SafetyBounds.proteinTargetsG(
       sex: BiologicalSex.male,
       weightKg: 90,
       heightCm: 180,
       bodyFatPercent: 15,
       inDeficit: true,
+      lifting: true,
+      policy: policy(),
     );
-    expect(t.proteinG, greaterThanOrEqualTo(atFifteen.midG));
+    expect(t.proteinG, greaterThanOrEqualTo(atFifteen.targetG));
     // The energy-availability floor applies: 30 kcal per kg of fat-free mass.
     final floor = SafetyBounds.calorieFloorKcal(
       sex: BiologicalSex.male,
@@ -168,6 +170,7 @@ void main() {
         bodyFat: estimate,
         bmrKcal: base.bmrKcal,
         tdee: base.tdee,
+        confidence: base.confidence,
         recommendation: base.recommendation,
       );
     }

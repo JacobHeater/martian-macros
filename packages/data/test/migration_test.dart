@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:mm_data/mm_data.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 import 'package:test/test.dart';
 
 import 'generated_migrations/schema.dart';
@@ -131,10 +132,15 @@ void main() {
       expect(setup.goalMode, GoalMode.recomp);
       expect(setup.dailyActivity, DailyActivity.light);
       expect(setup.profileRevision, 0);
+      expect(setup.screening.insulinOrSulfonylurea, isFalse);
+      expect(setup.screening.bariatricSurgery, isFalse);
+      expect(setup.healthCheckConfirmedOn, isNull);
+      expect(setup.healthCheckSkipCount, 0);
       final targets = (await repos.targets.watchTargetsHistory().first).single;
       expect(targets.mode, GoalMode.recomp);
       expect(targets.safetyBodyFatPercent, isNull);
       expect(targets.profileRevision, 0);
+      expect(targets.targets.proteinMinimumG, isNull);
       expect(
         await repos.preferences.watchThemePreference().first,
         ThemePreference.system,
@@ -144,6 +150,68 @@ void main() {
         await repos.preferences.watchThemePreference().first,
         ThemePreference.dark,
       );
+    });
+
+    test('MM-112 health answers and re-check state round-trip', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final repos = DriftRepositories(db);
+      final confirmed = CalendarDate(2026, 10, 5);
+      final setup = UserSetup(
+        profile: Profile(
+          sex: BiologicalSex.female,
+          birthDate: CalendarDate(1960, 1, 1),
+          heightCm: 168,
+        ),
+        screening: const ScreeningAnswers(
+          insulinOrSulfonylurea: true,
+          insulinCareTeamConfirmed: true,
+          bariatricSurgery: true,
+          weightAffectingMedication: true,
+        ),
+        trainingStatus: TrainingStatus.novice,
+        trainingDaysPerWeek: 3,
+        goalMode: GoalMode.maintenance,
+        onboardedOn: confirmed,
+        healthCheckConfirmedOn: confirmed,
+        healthCheckSkipCount: 1,
+      );
+      await repos.setup.saveSetup(setup);
+
+      final loaded = (await repos.setup.loadSetup())!;
+      expect(loaded.screening.insulinOrSulfonylurea, isTrue);
+      expect(loaded.screening.insulinCareTeamConfirmed, isTrue);
+      expect(loaded.screening.bariatricSurgery, isTrue);
+      expect(loaded.screening.weightAffectingMedication, isTrue);
+      expect(loaded.healthCheckConfirmedOn, confirmed);
+      expect(loaded.healthCheckSkipCount, 1);
+    });
+
+    test('MM-121 protein minimum round-trips with target history', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final repos = DriftRepositories(db);
+      await repos.targets.saveTargets(
+        TargetsRecord(
+          effectiveFrom: day,
+          mode: GoalMode.fatLoss,
+          tdeeKcal: 2800,
+          tdeeSigmaKcal: 250,
+          tdeeStatus: TdeeStatus.updated,
+          targets: const DailyTargets(
+            kcal: 2200,
+            proteinG: 160,
+            proteinMinimumG: 128,
+            fatG: 70,
+            carbsG: 230,
+            weeklyRateFraction: -0.0075,
+          ),
+        ),
+      );
+
+      final loaded = (await repos.targets.watchTargetsHistory().first).single;
+      expect(loaded.targets.proteinMinimumG, 128);
+      expect(loaded.targets.proteinG, 160);
     });
   });
 

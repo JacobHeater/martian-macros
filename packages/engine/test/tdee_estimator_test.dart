@@ -180,6 +180,7 @@ void main() {
     final switchDay = CalendarDate(2026, 1, 1).addDays(14);
     expect(switchDay.daysUntil(result.windowStart!), inInclusiveRange(0, 2));
     expect(result.status, TdeeStatus.updated);
+    expect(result.styleRestartOn, isNotNull);
     expect(result.kcal, closeTo(0.95 * windowMean(logs.trueTdee, 21), 300));
   });
 

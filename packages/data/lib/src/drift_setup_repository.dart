@@ -43,6 +43,18 @@ final class DriftSetupRepository implements SetupRepository {
           pcos: Value(setup.screening.pcos),
           menopause: Value(setup.screening.menopause),
           thyroidCondition: Value(setup.screening.thyroidCondition),
+          insulinOrSulfonylurea: Value(setup.screening.insulinOrSulfonylurea),
+          insulinCareTeamConfirmed: Value(
+            setup.screening.insulinCareTeamConfirmed,
+          ),
+          bariatricSurgery: Value(setup.screening.bariatricSurgery),
+          weightAffectingMedication: Value(
+            setup.screening.weightAffectingMedication,
+          ),
+          healthCheckConfirmedEpochDay: Value(
+            setup.healthCheckConfirmedOn?.epochDay,
+          ),
+          healthCheckSkipCount: Value(setup.healthCheckSkipCount),
         ),
       );
 
@@ -64,6 +76,10 @@ final class DriftSetupRepository implements SetupRepository {
             pcos: r.pcos,
             menopause: r.menopause,
             thyroidCondition: r.thyroidCondition,
+            insulinOrSulfonylurea: r.insulinOrSulfonylurea,
+            insulinCareTeamConfirmed: r.insulinCareTeamConfirmed,
+            bariatricSurgery: r.bariatricSurgery,
+            weightAffectingMedication: r.weightAffectingMedication,
           ),
           trainingStatus: r.trainingStatus,
           trainingDaysPerWeek: r.trainingDaysPerWeek,
@@ -74,5 +90,9 @@ final class DriftSetupRepository implements SetupRepository {
           unitSystem: r.unitSystem,
           bodyFatPercent: r.bodyFatPercent,
           requestedLossFraction: r.requestedLossFraction,
+          healthCheckConfirmedOn: r.healthCheckConfirmedEpochDay == null
+              ? null
+              : CalendarDate.fromEpochDay(r.healthCheckConfirmedEpochDay!),
+          healthCheckSkipCount: r.healthCheckSkipCount,
         );
 }

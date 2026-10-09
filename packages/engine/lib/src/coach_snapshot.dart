@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 
 import 'body_fat_estimate.dart';
+import 'coach_confidence.dart';
 import 'mode_recommendation.dart';
 import 'tdee_estimate.dart';
 import 'weight_trend_point.dart';
@@ -14,6 +15,7 @@ final class CoachSnapshot {
     required this.bodyFat,
     required this.bmrKcal,
     required this.tdee,
+    required this.confidence,
     required this.recommendation,
   });
 
@@ -25,5 +27,6 @@ final class CoachSnapshot {
   final BodyFatEstimate bodyFat;
   final double bmrKcal;
   final TdeeEstimate tdee;
+  final CoachConfidence confidence;
   final ModeRecommendation recommendation;
 }

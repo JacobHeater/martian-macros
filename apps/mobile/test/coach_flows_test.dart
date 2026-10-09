@@ -61,6 +61,7 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today));
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
     expect(find.text('Goal: Fat loss'), findsOneWidget);
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
@@ -77,6 +78,7 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today));
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Maintenance'));

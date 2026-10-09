@@ -29,6 +29,8 @@ class HealthCheckScreen extends ConsumerWidget {
                 setup.copyWith(
                   screening: answers,
                   profileRevision: setup.profileRevision + 1,
+                  healthCheckConfirmedOn: () => ref.read(todayProvider),
+                  healthCheckSkipCount: 0,
                 ),
               ),
         ),

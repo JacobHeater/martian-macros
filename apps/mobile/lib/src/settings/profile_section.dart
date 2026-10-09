@@ -70,6 +70,9 @@ class ProfileSection extends ConsumerWidget {
     s.pcos,
     s.menopause,
     s.thyroidCondition,
+    s.insulinOrSulfonylurea,
+    s.bariatricSurgery,
+    s.weightAffectingMedication,
   ].where((v) => v).length;
 
   /// Saves a corrected profile or health check and marks it, so the engine
@@ -86,6 +89,8 @@ class ProfileSection extends ConsumerWidget {
           profile: profile,
           screening: screening,
           profileRevision: setup.profileRevision + 1,
+          healthCheckConfirmedOn: () => ref.read(todayProvider),
+          healthCheckSkipCount: 0,
         ),
       );
 
@@ -122,6 +127,10 @@ class ProfileSection extends ConsumerWidget {
               chronicKidneyDisease: s.chronicKidneyDisease,
               androgenUse: s.androgenUse,
               thyroidCondition: s.thyroidCondition,
+              insulinOrSulfonylurea: s.insulinOrSulfonylurea,
+              insulinCareTeamConfirmed: s.insulinCareTeamConfirmed,
+              bariatricSurgery: s.bariatricSurgery,
+              weightAffectingMedication: s.weightAffectingMedication,
             )
           : null,
     );

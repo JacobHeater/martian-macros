@@ -10,6 +10,7 @@ class TargetsHistory extends Table {
   TextColumn get mode => textEnum<GoalMode>()();
   RealColumn get kcal => real()();
   RealColumn get proteinG => real()();
+  RealColumn get proteinMinimumG => real().nullable()();
   RealColumn get fatG => real()();
   RealColumn get carbsG => real()();
   RealColumn get weeklyRateFraction => real()();

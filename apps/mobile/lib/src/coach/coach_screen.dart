@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
+import '../format/coach_confidence_text.dart';
 import '../format/goal_mode_label.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
@@ -19,6 +20,7 @@ import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
 import 'caution_message.dart';
+import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
 import 'target_flag_message.dart';
@@ -96,14 +98,13 @@ class CoachScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (current.targets.proteinMinimumG case final minimum?)
+                  StatRow('Protein minimum', Fmt.grams(minimum)),
                 const SizedBox(height: 16),
                 Divider(color: context.mm.outline),
                 StatRow(
                   'Intended pace',
-                  current.targets.weeklyRateFraction == 0
-                      ? 'Hold weight'
-                      : '${Fmt.percentPerWeek(current.targets.weeklyRateFraction)}'
-                            ' (${fmt.weightDelta(current.targets.weeklyRateFraction * snapshot.trendWeightKg)})',
+                  _paceText(snapshot, current.targets.weeklyRateFraction, fmt),
                 ),
                 StatRow(
                   'Next check-in',
@@ -121,6 +122,39 @@ class CoachScreen extends ConsumerWidget {
           history: ref.watch(targetsHistoryProvider).value ?? const [],
           today: today,
           holdNote: _holdNote(setup, snapshot, today),
+        ),
+        InfoCard(
+          title:
+              'Coach confidence · '
+              '${confidenceLabel(snapshot.confidence.level)}',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (snapshot.confidence.level == ConfidenceLevel.learning)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Text('Targets are held while the coach learns.'),
+                ),
+              StatRow(
+                'Estimate',
+                confidenceLabel(snapshot.confidence.estimate),
+              ),
+              StatRow('Food log', confidenceLabel(snapshot.confidence.foodLog)),
+              StatRow(
+                'Weigh-ins',
+                confidenceLabel(snapshot.confidence.weighIns),
+              ),
+              StatRow(
+                'Stability',
+                confidenceLabel(snapshot.confidence.stability),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                confidenceNextStepText(snapshot.confidence),
+                style: text.bodyMedium,
+              ),
+            ],
+          ),
         ),
         InfoCard(
           title: 'Goal: ${setup.goalMode.label}',
@@ -157,6 +191,16 @@ class CoachScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  String _paceText(CoachSnapshot snapshot, double rate, Fmt fmt) {
+    if (rate == 0) return 'Hold weight';
+    final pace =
+        '${Fmt.percentPerWeek(rate)} '
+        '(${fmt.weightDelta(rate * snapshot.trendWeightKg)})';
+    return snapshot.confidence.level == ConfidenceLevel.good
+        ? pace
+        : 'About $pace so far';
   }
 
   /// After calibration, while the estimate is held for lack of data, targets
@@ -217,7 +261,19 @@ class CoachScreen extends ConsumerWidget {
         ),
       ),
     );
+    if (!context.mounted) return;
     if (chosen != null && chosen != setup.goalMode) {
+      if (chosen == GoalMode.fatLoss || chosen == GoalMode.recomp) {
+        await Navigator.of(context).push<bool>(
+          MaterialPageRoute<bool>(
+            builder: (_) => HealthRecheckScreen(
+              pendingGoal: chosen,
+              allowSkip: setup.healthCheckSkipCount < 2,
+            ),
+          ),
+        );
+        return;
+      }
       await ref
           .read(setupWriterProvider)
           .saveSetup(setup.copyWith(goalMode: chosen));

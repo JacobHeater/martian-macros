@@ -1,6 +1,6 @@
 ---
 id: MM-139
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-137, MM-23, MM-27, MM-40, MM-98, MM-107, MM-131, MM-132, MM-136, MM-138, MM-140, MM-149, MM-153]
 ---
@@ -29,7 +29,9 @@ Choices I made without asking (say if any is wrong):
 | stability | nothing below | a logging-style restart (MM-27), a phase change (MM-131) or a lasting weight event (MM-136) in the last 14 days | the estimate is at one of its limits (1.1 or 3.0 times resting energy, MM-23) |
 
 - **One next step, the one that would help most**, chosen by which part is worst: "Weigh in on 4 more mornings this week", "Mark days
-  complete when they are", "Nothing to do: the estimate is settling after you changed goal."
+  complete when they are", "Nothing to do: the estimate is settling after you changed goal." When parts tie, prefer (in order) waiting
+  for stability, completing the food log, recording weight, then continuing to log for a clearer estimate. If the estimate is clamped to a
+  safety bound, review food logging first regardless of ties.
 - **Level drives behavior that already exists, and is how it is explained**: at Learning the engine holds targets (MM-23, MM-24); the card
   says targets are held *because* the coach is still learning.
 - **Level drives wording everywhere**: at Learning and Fair, statements about pace, expenditure and progress use "about" and "so far";
@@ -70,6 +72,11 @@ Scenario: At a limit
   Given the estimate is held at 1.1 times resting energy
   Then the level is Learning and the card says food is probably going unlogged
 
+Scenario: A deterministic next step when data parts tie
+  Given the estimate is not clamped and has been stable recently
+  And there are 6 usable food days and 5 weigh-ins in the last 28 days
+  Then the next step is to complete the food log before recording more weights
+
 Scenario: No score
   Then no screen shows confidence as a number, percentage or progress bar
 
@@ -83,3 +90,13 @@ Scenario: Wording follows level
 - The thresholds are starting values chosen to match the engine's existing "enough data" rule (10 usable days, 8 weigh-ins, MM-23) at the
   Learning boundary. Tune the others on the simulator so that Good means the truth is within about 200 kcal nine times in ten.
 - Food-source quality (MM-153) could become a fifth part once the database exists.
+
+## Progress (implemented; validation still needed)
+- Added the Learning/Fair/Good assessment from estimate uncertainty, usable food days, weigh-ins and recent stability, with one next-step
+  code. Learning now holds ordinary adaptive target updates while safety raises and user-requested goal/profile corrections remain immediate.
+- Added full Coach-screen part states and next steps, a one-word dashboard label, approximate wording at Learning/Fair, and an expandable
+  metabolism estimate shown as a range instead of a visible `±` statistic.
+- Saved confidence with each target explanation's JSON, preserving old explanation records that have no confidence field.
+- **Not done:** calibrating the Good threshold against simulated users; connecting dated weight events once MM-136 exists; validating
+  threshold behavior in a simulator. Next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this
+  ticket in progress until the outstanding calibration and event integration are checked.

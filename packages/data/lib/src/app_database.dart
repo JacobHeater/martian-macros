@@ -30,7 +30,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 5;
+  static const currentSchemaVersion = 7;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -56,6 +56,19 @@ class AppDatabase extends _$AppDatabase {
     // 4 to 5: why each set of targets was issued (MM-138).
     4: (m) async {
       await m.addColumn(targetsHistory, targetsHistory.explanation);
+    },
+    // 5 to 6: expanded screening and repeat-check state (MM-112).
+    5: (m) async {
+      await m.addColumn(setups, setups.insulinOrSulfonylurea);
+      await m.addColumn(setups, setups.insulinCareTeamConfirmed);
+      await m.addColumn(setups, setups.bariatricSurgery);
+      await m.addColumn(setups, setups.weightAffectingMedication);
+      await m.addColumn(setups, setups.healthCheckConfirmedEpochDay);
+      await m.addColumn(setups, setups.healthCheckSkipCount);
+    },
+    // 6 to 7: the protein minimum stored with each target (MM-121).
+    6: (m) async {
+      await m.addColumn(targetsHistory, targetsHistory.proteinMinimumG);
     },
   };
 

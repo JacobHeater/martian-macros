@@ -22,7 +22,15 @@ class FoodScreen extends ConsumerWidget {
     final day = shownDay(ref);
     final entries = ref.watch(foodForDayProvider(day)).value ?? const [];
     final history = ref.watch(targetsHistoryProvider).value ?? const [];
-    final targets = targetsOn(history, day);
+    final setup = ref.watch(setupProvider).value;
+    final targetsAllowed =
+        setup != null &&
+        CoachingPolicy.derive(
+          profile: setup.profile,
+          screening: setup.screening,
+          today: ref.watch(todayProvider),
+        ).targetsAllowed;
+    final targets = targetsOn(history, day, targetsAllowed: targetsAllowed);
     final completeness =
         ref.watch(completenessProvider(day)).value ?? DayCompleteness.unmarked;
     final text = Theme.of(context).textTheme;

@@ -8,6 +8,10 @@ import 'screening_answers.dart';
 
 /// What coaching the engine may offer, derived from profile and screening.
 final class CoachingPolicy {
+  static const seniorMinimumProteinGPerKgReferenceWeight = 1.2;
+  static const seniorMaxWeeklyLossFraction = 0.005;
+  static const insulinUnconfirmedMaxWeeklyLossFraction = 0.005;
+
   const CoachingPolicy._({
     required this.blocked,
     required this.allowedModes,
@@ -15,6 +19,8 @@ final class CoachingPolicy {
     this.proteinCapGPerKg,
     this.suppressWeightRewards = false,
     this.elevatedMuscleGainPrior = false,
+    this.targetsAllowed = true,
+    this.minimumProteinGPerKgReferenceWeight,
     this.underweight = false,
     this.maxWeeklyLossFraction,
     this.cautions = const {},
@@ -58,6 +64,13 @@ final class CoachingPolicy {
         : bodyMassIndex(weightKg: weightKg, heightCm: profile.heightCm);
     final underweight = bmi != null && bmi < underweightBmi;
     final lowWeight = bmi != null && !underweight && bmi < lowWeightCautionBmi;
+    final age = profile.ageOn(today);
+    final maxLossLimits = [
+      if (lowWeight) lowWeightMaxLossFraction,
+      if (age >= 65) seniorMaxWeeklyLossFraction,
+      if (s.insulinOrSulfonylurea && !s.insulinCareTeamConfirmed)
+        insulinUnconfirmedMaxWeeklyLossFraction,
+    ];
     final offered = underweight
         ? allowedModes.difference({GoalMode.fatLoss, GoalMode.recomp})
         : allowedModes;
@@ -67,10 +80,16 @@ final class CoachingPolicy {
       allowedModes: offered,
       maintenanceOffsetKcal: s.breastfeeding ? 400 : 0,
       proteinCapGPerKg: s.chronicKidneyDisease ? 0.8 : null,
+      minimumProteinGPerKgReferenceWeight: age >= 65
+          ? seniorMinimumProteinGPerKgReferenceWeight
+          : null,
       suppressWeightRewards: s.eatingDisorderHistory,
       elevatedMuscleGainPrior: s.androgenUse,
+      targetsAllowed: !s.bariatricSurgery,
       underweight: underweight,
-      maxWeeklyLossFraction: lowWeight ? lowWeightMaxLossFraction : null,
+      maxWeeklyLossFraction: maxLossLimits.isEmpty
+          ? null
+          : maxLossLimits.reduce((a, b) => a < b ? a : b),
       cautions: {
         if (underweight) Caution.underweight,
         if (lowWeight) Caution.lowBodyWeight,
@@ -81,6 +100,9 @@ final class CoachingPolicy {
         if (s.pcos) Caution.pcos,
         if (s.menopause) Caution.menopause,
         if (s.thyroidCondition) Caution.thyroidCondition,
+        if (s.insulinOrSulfonylurea) Caution.insulinOrSulfonylurea,
+        if (s.bariatricSurgery) Caution.bariatricSurgery,
+        if (s.weightAffectingMedication) Caution.weightAffectingMedication,
       },
     );
   }
@@ -98,6 +120,12 @@ final class CoachingPolicy {
 
   final bool suppressWeightRewards;
   final bool elevatedMuscleGainPrior;
+
+  /// False when targets must be set by a user's surgical care team.
+  final bool targetsAllowed;
+
+  /// A lower bound for protein per kg of reference weight, when applicable.
+  final double? minimumProteinGPerKgReferenceWeight;
 
   /// Body mass index is below 18.5: no deficit is planned (MM-111).
   final bool underweight;

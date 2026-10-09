@@ -60,6 +60,7 @@ TargetsRecord holdReduction(List<TargetsRecord> history) {
     targets: DailyTargets(
       kcal: held.kcal,
       proteinG: held.proteinG,
+      proteinMinimumG: held.proteinMinimumG,
       fatG: held.fatG,
       carbsG: held.carbsG,
       weeklyRateFraction: held.weeklyRateFraction,

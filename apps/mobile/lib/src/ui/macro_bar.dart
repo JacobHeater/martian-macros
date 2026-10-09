@@ -12,6 +12,7 @@ class MacroBar extends StatelessWidget {
     required this.macro,
     required this.grams,
     this.target,
+    this.minimum,
     this.emphasized = false,
     super.key,
   });
@@ -21,6 +22,7 @@ class MacroBar extends StatelessWidget {
 
   /// Null before targets exist; the bar is then empty.
   final double? target;
+  final double? minimum;
   final bool emphasized;
 
   @override
@@ -33,6 +35,8 @@ class MacroBar extends StatelessWidget {
       MacroKind.fat => mm.fat,
     };
     final t = target;
+    final min = minimum;
+    final value = t == null || t <= 0 ? 0.0 : (grams / t).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,6 +49,9 @@ class MacroBar extends StatelessWidget {
                 textAlign: TextAlign.end,
                 t == null
                     ? '${grams.round()} g'
+                    : min != null
+                    ? '${grams.round()} g · min ${min.round()} · '
+                          'target ${t.round()}'
                     : '${grams.round()} / ${t.round()} g',
                 style: text.bodyMedium?.copyWith(
                   color: emphasized ? mm.text : mm.text2,
@@ -55,7 +62,12 @@ class MacroBar extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         MmProgressBar(
-          value: t == null || t <= 0 ? 0 : (grams / t).clamp(0, 1),
+          value: value,
+          markers: min == null || t == null || t <= 0
+              ? const []
+              : min == t
+              ? const [1]
+              : [(min / t).clamp(0.0, 1.0), 1],
           color: color,
           height: emphasized ? 8 : 6,
         ),

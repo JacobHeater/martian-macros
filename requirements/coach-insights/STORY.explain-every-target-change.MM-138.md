@@ -64,8 +64,9 @@ Scenario: It adds up
   Then the listed contributions sum to the change in calories to within 5 kcal
 
 Scenario: No change
-  Given a check-in that changes nothing
+  Given a check-in that changes nothing because no calculated contribution moved the target
   Then the Coach card says it checked, when, and why nothing changed
+  And the details identify that no contribution was large enough to move the target
 
 Scenario: Held for lack of data
   Given three weeks with no food logged
@@ -78,6 +79,30 @@ Scenario: A floor
 Scenario: History
   Given six target records
   Then the history lists six entries, and each opens the reasons it was issued with
+
+Scenario: One-time next-open summary
+  Given a target change with a summary that has not been shown
+  When the user opens the app
+  Then the summary is shown once
+  And the same explanation remains available in target history
+  When the user opens the app again
+  Then the summary is not shown again
+
+Scenario Outline: Explain a change outside check-in
+  Given existing targets and an explanation for a <trigger> change
+  When the app applies the changed targets
+  Then the summary names the <trigger> and its contribution
+  And the explanation is available in target history
+
+  Examples:
+    | trigger |
+    | goal |
+    | pace |
+    | safety |
+    | diet break |
+    | health screening |
+    | profile correction |
+    | app rule update |
 
 Scenario: Holding a reduction
   Given a summary lowering calories by 75 kcal
@@ -106,5 +131,4 @@ Scenario: Never blame
 - **History.** A History button on the card opens every set of targets, newest first (`coach/targets_history_screen.dart`); each opens its reasons.
 - **Keeping last week's targets.** On the latest, ordinary reduction (causes limited to expenditure, pace and weight, and the step limit; never an increase, a safety change, or something the user changed), "Keep last week's targets for now" replaces that day's record with last week's numbers, flagged `heldByUser`, with an explanation that still adds up (to no change). It is not offered the week after a hold, nor on older records in the history. The next check-in starts from the held targets as usual, so the reduction is deferred by one check-in, not cancelled.
 - Tests: engine (ordinary change with a step-limit line, floor named with what the target would otherwise be, goal change as the cause, first targets, JSON round trip, the 16-week sum; every hold rule), repositories (explanation through Drift and in-memory), app (the card and its four parts, old records, first targets, the held note, the history of six, a hold once and not again, not on an increase), and screenshot baselines for the Coach screen and the sheet.
-- **Not done**: the summary is not shown by itself on the next opening of the app (it is on the Coach screen and in the history; showing it once needs a stored "seen" marker); the dashboard line (MM-98); the confidence level in "what it was based on" (MM-139); the same summary for a rule change in an app update; the history does not yet show which entries the user held.
-- **Deviation**: where the ticket's "no change" line says why nothing changed ("your estimate has not moved"), the card says calories are unchanged and the sheet says nothing moved the target; it does not give a reason beyond that.
+- **Not done**: the summary is not shown by itself on the next opening of the app (it is on the Coach screen and in the history; showing it once needs a stored "seen" marker); rule changes in an app update do not yet get the same summary; the history does not yet show which entries the user held; a no-change summary does not yet explain why no contribution moved the target.

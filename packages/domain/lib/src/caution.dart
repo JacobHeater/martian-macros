@@ -7,6 +7,9 @@ enum Caution {
   pcos,
   menopause,
   thyroidCondition,
+  insulinOrSulfonylurea,
+  bariatricSurgery,
+  weightAffectingMedication,
 
   /// Body mass index below 18.5: no deficit is planned (MM-111).
   underweight,

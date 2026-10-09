@@ -26,6 +26,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           mode: record.mode,
           kcal: record.targets.kcal,
           proteinG: record.targets.proteinG,
+          proteinMinimumG: Value(record.targets.proteinMinimumG),
           fatG: record.targets.fatG,
           carbsG: record.targets.carbsG,
           weeklyRateFraction: record.targets.weeklyRateFraction,
@@ -53,6 +54,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
     targets: DailyTargets(
       kcal: r.kcal,
       proteinG: r.proteinG,
+      proteinMinimumG: r.proteinMinimumG,
       fatG: r.fatG,
       carbsG: r.carbsG,
       weeklyRateFraction: r.weeklyRateFraction,

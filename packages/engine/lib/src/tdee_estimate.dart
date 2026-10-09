@@ -14,6 +14,7 @@ final class TdeeEstimate {
     this.windowStart,
     this.clampedToBounds = false,
     this.settlingUntil,
+    this.styleRestartOn,
   });
 
   /// Maintenance intake, in the user's own logging units.
@@ -41,4 +42,7 @@ final class TdeeEstimate {
   /// Set when the estimate is held because too few days remain once a
   /// [SettlingWindow] is left out: the last day of that window.
   final CalendarDate? settlingUntil;
+
+  /// First day of a new logging-style regime inside the estimator window.
+  final CalendarDate? styleRestartOn;
 }

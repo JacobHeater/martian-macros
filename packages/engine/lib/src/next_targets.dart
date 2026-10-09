@@ -3,6 +3,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'coach_constants.dart';
 import 'coach_snapshot.dart';
 import 'compute_targets.dart';
+import 'confidence_level.dart';
 import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
 import 'explain_targets.dart';
@@ -29,7 +30,7 @@ TargetsRecord? nextTargets({
   required List<TargetsRecord> history,
   required CalendarDate today,
 }) {
-  if (snapshot.policy.blocked) return null;
+  if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return null;
 
   final lastSafetyBf = history.isEmpty
       ? null
@@ -53,6 +54,7 @@ TargetsRecord? nextTargets({
         bodyFat: snapshot.bodyFat,
         mode: setup.goalMode,
         trainingStatus: setup.trainingStatus,
+        trainingDaysPerWeek: setup.trainingDaysPerWeek,
         policy: snapshot.policy,
         tdeeKcal: snapshot.tdee.kcal,
         bmrKcal: snapshot.bmrKcal,
@@ -92,6 +94,7 @@ TargetsRecord? nextTargets({
         targets: targets,
         trace: traced.trace,
         tdee: snapshot.tdee,
+        confidence: snapshot.confidence,
       ),
     );
   }
@@ -158,7 +161,10 @@ TargetsRecord? nextTargets({
   }
 
   if (setup.onboardedOn.daysUntil(today) < calibrationDays) return null;
-  if (snapshot.tdee.status == TdeeStatus.held) return null;
+  if (snapshot.tdee.status == TdeeStatus.held ||
+      snapshot.confidence.level == ConfidenceLevel.learning) {
+    return null;
+  }
 
   return build(
     previous: last.targets,

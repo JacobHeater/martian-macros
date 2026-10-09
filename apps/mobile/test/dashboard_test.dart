@@ -157,7 +157,10 @@ void main() {
       ],
     );
     await pumpApp(tester);
-    expect(find.textContaining('Targets went down 80 kcal'), findsOneWidget);
+    expect(
+      find.textContaining('Targets went down about 80 kcal'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('tapping the intake card opens the Food screen', (tester) async {
