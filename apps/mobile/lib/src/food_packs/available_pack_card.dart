@@ -23,6 +23,7 @@ class AvailablePackCard extends ConsumerWidget {
         ?.where((p) => p.id == listing.id)
         .firstOrNull;
     final upToDate = installed?.version == listing.version;
+    final running = ref.watch(packDownloadControllerProvider).isRunning;
     final style = Theme.of(context).textTheme;
     final muted = style.bodyMedium?.copyWith(color: context.mm.text2);
     final host = listing.url.host;
@@ -38,8 +39,7 @@ class AvailablePackCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Foods you can find by barcode or by name. It is stored on this '
-            'phone and used without a connection.',
+            'It is stored on this phone and used without a connection.',
             style: muted,
           ),
           const SizedBox(height: 8),
@@ -57,7 +57,7 @@ class AvailablePackCard extends ConsumerWidget {
                 : upToDate
                 ? 'Up to date'
                 : 'Update',
-            onPressed: upToDate
+            onPressed: upToDate || running
                 ? null
                 : () => ref
                       .read(packDownloadControllerProvider.notifier)
