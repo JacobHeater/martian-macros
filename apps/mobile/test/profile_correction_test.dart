@@ -140,6 +140,9 @@ void main() {
   ) async {
     await seed(sex: BiologicalSex.female);
     await openSettings(tester);
+    await tester.scrollUntilVisible(find.text('Health check'), 300);
+    await tester.ensureVisible(find.text('Health check'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Health check'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Pregnant'));
@@ -159,6 +162,9 @@ void main() {
   ) async {
     await seed();
     await openSettings(tester);
+    await tester.scrollUntilVisible(find.text('Health check'), 300);
+    await tester.ensureVisible(find.text('Health check'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Health check'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
@@ -185,6 +191,9 @@ void main() {
       mode: GoalMode.maintenance,
     );
     await openSettings(tester);
+    await tester.scrollUntilVisible(find.text('Health check'), 300);
+    await tester.ensureVisible(find.text('Health check'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Health check'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Breastfeeding'));

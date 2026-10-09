@@ -26,6 +26,10 @@ void main() {
 
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Coach confidence · Learning'),
+      300,
+    );
     expect(find.text('Coach confidence · Learning'), findsOneWidget);
     expect(
       find.text('Targets are held while the coach learns.'),

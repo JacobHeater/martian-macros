@@ -16,6 +16,8 @@ void main() {
   testWidgets('a 170 cm woman at 50 kg is offered maintenance and lean gain '
       'only, and told why', (tester) async {
     await pumpApp(tester, repos, FixedClock(today));
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();

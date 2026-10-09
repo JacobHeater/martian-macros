@@ -13,8 +13,9 @@ class StatRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
+        Flexible(
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium
