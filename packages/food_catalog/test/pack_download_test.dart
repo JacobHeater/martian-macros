@@ -68,6 +68,11 @@ void main() {
 
     final installed = store.installed('barcode_us')!;
     expect(installed.version, '2026-10-09');
+    expect(
+      installed.title,
+      'Barcode foods, United States',
+      reason: 'remembered, so the list can name it without the network',
+    );
     final pack = SqliteFoodPack.open(installed.path);
     addTearDown(pack.close);
     expect(pack.search('banana'), isNotEmpty);

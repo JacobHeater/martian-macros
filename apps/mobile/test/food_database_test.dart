@@ -24,7 +24,7 @@ void main() {
     version: '2026-10-09',
     formatVersion: 1,
     url: Uri.parse('https://packs.example.test/barcode_us.pack.gz'),
-    downloadBytes: 46 * 1024 * 1024,
+    downloadBytes: 46000000,
     sha256: 'c' * 64,
   );
   late InMemoryRepositories repos;
@@ -37,7 +37,7 @@ void main() {
           ('{"packs":[{"id":"barcode_us","title":"Barcode foods, United '
                   'States","version":"2026-10-09","formatVersion":1,'
                   '"url":"https://packs.example.test/barcode_us.pack.gz",'
-                  '"bytes":48234496,"sha256":"${'b' * 64}"}]}')
+                  '"bytes":46739747,"sha256":"${'b' * 64}"}]}')
               .codeUnits,
     });
   });
@@ -99,7 +99,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(http.requests.single.url, manifestUrl);
       expect(find.text('Barcode foods, United States'), findsOneWidget);
-      expect(find.textContaining('46 MB to download'), findsOneWidget);
+      expect(find.textContaining('47 MB to download'), findsOneWidget);
       expect(
         find.textContaining('tells the host your IP address'),
         findsOneWidget,
@@ -137,8 +137,8 @@ void main() {
           listing: listing,
           progress: const PackDownloadProgress(
             phase: PackDownloadPhase.downloading,
-            receivedBytes: 12 * 1024 * 1024,
-            totalBytes: 46 * 1024 * 1024,
+            receivedBytes: 12000000,
+            totalBytes: 46000000,
           ),
         ),
       );
@@ -158,7 +158,7 @@ void main() {
       state: PackDownloadState(
         status: PackDownloadStatus.paused,
         listing: listing,
-        keptBytes: 20 * 1024 * 1024,
+        keptBytes: 20000000,
       ),
     );
     expect(find.text('Paused'), findsOneWidget);
@@ -199,8 +199,8 @@ void main() {
         listing: listing,
         progress: const PackDownloadProgress(
           phase: PackDownloadPhase.downloading,
-          receivedBytes: 23 * 1024 * 1024,
-          totalBytes: 46 * 1024 * 1024,
+          receivedBytes: 23000000,
+          totalBytes: 46000000,
         ),
       ),
     );
