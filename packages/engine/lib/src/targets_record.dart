@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 
 import 'daily_targets.dart';
+import 'target_rules_version.dart';
 import 'targets_explanation.dart';
 import 'tdee_status.dart';
 
@@ -15,6 +16,7 @@ final class TargetsRecord {
     required this.tdeeStatus,
     this.safetyBodyFatPercent,
     this.profileRevision = 0,
+    this.targetRulesVersion = currentTargetRulesVersion,
     this.explanation,
     this.summarySeen = true,
   });
@@ -37,6 +39,9 @@ final class TargetsRecord {
   /// corrected, MM-83) gets new targets at once.
   final int profileRevision;
 
+  /// The target-calculation rules used to issue these targets.
+  final int targetRulesVersion;
+
   /// Why these targets were issued (MM-138). Null on records made before
   /// explanations were kept.
   final TargetsExplanation? explanation;
@@ -55,6 +60,7 @@ final class TargetsRecord {
     tdeeStatus: tdeeStatus,
     safetyBodyFatPercent: safetyBodyFatPercent,
     profileRevision: profileRevision,
+    targetRulesVersion: targetRulesVersion,
     explanation: explanation,
     summarySeen: summarySeen ?? this.summarySeen,
   );

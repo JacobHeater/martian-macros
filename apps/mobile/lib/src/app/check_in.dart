@@ -7,8 +7,8 @@ import '../repository_role_providers.dart';
 
 final checkInProvider = NotifierProvider<CheckIn, Set<int>>(CheckIn.new);
 
-/// Persists engine decisions and records which changes were generated this
-/// launch, so their summaries wait until the next app opening.
+/// Persists engine decisions and records target changes generated this launch,
+/// so their summaries wait until the next app opening.
 class CheckIn extends Notifier<Set<int>> {
   final _generatedThisLaunch = <int>{};
 
@@ -27,7 +27,7 @@ class CheckIn extends Notifier<Set<int>> {
       today: ref.watch(todayProvider),
     );
     if (next == null) return Set.unmodifiable(_generatedThisLaunch);
-    if ((next.explanation?.change?.round() ?? 0) != 0) {
+    if (next.explanation?.previousKcal != null) {
       _generatedThisLaunch.add(next.effectiveFrom.epochDay);
     }
 

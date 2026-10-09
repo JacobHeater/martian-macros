@@ -39,7 +39,9 @@ class LastChangeCard extends ConsumerWidget {
         : explanation.previousKcal == null
         ? 'Your first targets.'
         : explanation.lines.isEmpty
-        ? 'Calories unchanged at ${Fmt.kcal(explanation.newKcal)}.'
+        ? 'Checked ${Fmt.day(current.effectiveFrom, today)}. No change: '
+              'no calculated contribution was large enough to move your '
+              'calorie target.'
         : 'Calories ${Fmt.whole(explanation.previousKcal!)} → '
               '${Fmt.whole(explanation.newKcal)}. '
               '${_largest(explanation).text}';

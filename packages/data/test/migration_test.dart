@@ -140,6 +140,7 @@ void main() {
       expect(targets.mode, GoalMode.recomp);
       expect(targets.safetyBodyFatPercent, isNull);
       expect(targets.profileRevision, 0);
+      expect(targets.targetRulesVersion, currentTargetRulesVersion);
       expect(targets.targets.proteinMinimumG, isNull);
       expect(targets.summarySeen, isTrue);
       expect(
@@ -213,6 +214,33 @@ void main() {
       final loaded = (await repos.targets.watchTargetsHistory().first).single;
       expect(loaded.targets.proteinMinimumG, 128);
       expect(loaded.targets.proteinG, 160);
+    });
+
+    test('target-rules version round-trips with target history', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final repos = DriftRepositories(db);
+      final rulesVersion = currentTargetRulesVersion - 1;
+      await repos.targets.saveTargets(
+        TargetsRecord(
+          effectiveFrom: day,
+          mode: GoalMode.fatLoss,
+          tdeeKcal: 2800,
+          tdeeSigmaKcal: 250,
+          tdeeStatus: TdeeStatus.updated,
+          targetRulesVersion: rulesVersion,
+          targets: const DailyTargets(
+            kcal: 2200,
+            proteinG: 160,
+            fatG: 70,
+            carbsG: 230,
+            weeklyRateFraction: -0.0075,
+          ),
+        ),
+      );
+
+      final loaded = (await repos.targets.watchTargetsHistory().first).single;
+      expect(loaded.targetRulesVersion, rulesVersion);
     });
   });
 

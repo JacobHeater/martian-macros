@@ -16,6 +16,9 @@ enum ExplanationReason {
   /// The user corrected their sex, date of birth, height or health check.
   profileCorrection,
 
+  /// Target-calculation rules changed in an app update.
+  appRuleUpdate,
+
   /// A health-check answer rules the goal out.
   healthRule,
 

@@ -36,6 +36,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
           tdeeStatus: record.tdeeStatus,
           safetyBodyFatPercent: Value(record.safetyBodyFatPercent),
           profileRevision: Value(record.profileRevision),
+          targetRulesVersion: Value(record.targetRulesVersion),
           explanation: Value(record.explanation?.encode()),
           summarySeen: Value(record.summarySeen),
         ),
@@ -60,6 +61,7 @@ final class DriftTargetsHistoryRepository implements TargetsHistoryRepository {
     tdeeStatus: r.tdeeStatus,
     safetyBodyFatPercent: r.safetyBodyFatPercent,
     profileRevision: r.profileRevision,
+    targetRulesVersion: r.targetRulesVersion,
     explanation: r.explanation == null
         ? null
         : TargetsExplanation.decode(r.explanation!),
