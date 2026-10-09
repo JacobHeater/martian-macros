@@ -61,6 +61,11 @@ void main() {
     });
   });
 
+  test('an Estimate is 40% uncertain, a weighed entry 5% (MM-167, MM-150)', () {
+    expect(QuantitySource.quickAdd.relativeSigma, 0.40);
+    expect(QuantitySource.weighed.relativeSigma, 0.05);
+  });
+
   group('dailyRelativeSigma', () {
     test('combines entry errors in quadrature', () {
       final sigma = dailyRelativeSigma([

@@ -266,3 +266,27 @@ Still not stored: the source food (pack id, food id, source, source id), the con
 the raw or cooked state. They need the pack integration and the hand model and are the next persistence addition. Backups are
 not changed: the encrypted backup (MM-63) is not built, and its format must carry these columns when it is. No screen reads or
 writes a portion yet, so the app behaves as before.
+
+Steps 3 to 5, calculation and screens, are built (`apps/mobile`, tests in `food_portion_test.dart`).
+- **Manual form**: after "How was it measured?" the sheet asks for the amount that method needs: grams or ounces for Weighed,
+  servings for Label serving, cups, tablespoons, teaspoons or millilitres for Cup / spoon, a count for palm, cupped hand and thumb,
+  and nothing for Estimate. Amounts take decimals and simple fractions; empty, zero, negative and non-numeric amounts disable
+  "Log it" and say why. "The numbers below are for" says "Everything you ate", and under Label serving offers "One serving", which
+  scales the typed numbers by the servings eaten (the calories label becomes "Calories per serving" and the sheet shows what will be
+  logged). Typed totals are never multiplied by the amount. Changing the method clears the amount and unit.
+- **Search and barcode results** use the same domain scaling, record the quantity, unit, serving and the food's per-100 g numbers as
+  a calculated portion, and a label serving of a packaged product is recorded as a label serving (generic foods' servings as a
+  household measure, weights as weighed). The amount step also offers ounces and takes fractions.
+- **Editing** restores the method, amount and unit. A calculated entry shows its amount and units and recalculates the totals from
+  the stored numbers (no double scaling), with "Enter the totals myself" to type them instead. An entry from before amounts were
+  recorded says so, asks for no amount and keeps its totals.
+- **Logged foods** show a portion line: "150 g · calculated from 89 kcal per 100 g", "1.5 servings · calculated from 160 kcal per
+  serving", "2 cupped hands · estimated", "Estimated totals", or "Weighed · amount not recorded". Copying an entry keeps its portion.
+- Checked on the Android emulator: the new sheet and the Weighed view were seen. Goldens for the screens that changed are
+  regenerated on CI.
+
+Remaining: the source food, conversion record and raw/cooked state are not stored; hand portions are a count with typed totals until
+MM-46's model exists; "One serving" is offered only under Label serving; the backup format (MM-63) is unbuilt. The ticket stays in progress for those.
+
+Done since: `QuantitySource.quickAdd` (Estimate) is now 0.40, as decided; the domain and engine tests pass unchanged. The adaptive simulator
+was not given a new estimate-heavy user (MM-30, MM-150 own that).

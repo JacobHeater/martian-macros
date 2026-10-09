@@ -4,8 +4,8 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import '../format/meal_label.dart';
-import '../format/parse_number.dart';
-import '../format/rounded_to_zero_note.dart';
+import '../format/portion_unit_label.dart';
+import '../format/quantity_text.dart';
 import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
@@ -14,20 +14,25 @@ import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
 import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
+import '../format/rounded_to_zero_note.dart';
+import 'amount_choice.dart';
 import 'food_amount_step.dart';
 import 'food_trust_mark.dart';
 
 class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   final _quantity = TextEditingController();
-
-  /// The chosen serving, or null for grams.
-  late CatalogServing? _serving = widget.servings.firstOrNull;
+  late final List<AmountChoice> _choices = [
+    for (final s in widget.servings) AmountChoice(PortionUnit.serving, s),
+    const AmountChoice(PortionUnit.gram, null),
+    const AmountChoice(PortionUnit.ounce, null),
+  ];
+  late AmountChoice _choice = _choices.first;
   late Meal _meal = widget.meal;
 
   @override
   void initState() {
     super.initState();
-    _quantity.text = _serving == null ? '100' : '1';
+    _quantity.text = _defaultQuantity(_choice);
   }
 
   @override
@@ -36,17 +41,60 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
     super.dispose();
   }
 
-  double get _grams {
-    final q = parseNumber(_quantity.text) ?? 0;
-    return q * (_serving?.grams ?? 1);
+  static String _defaultQuantity(AmountChoice c) => switch (c.unit) {
+    PortionUnit.gram => '100',
+    PortionUnit.ounce => '4',
+    _ => '1',
+  };
+
+  /// The food's nutrition for 100 g, with the chosen serving's details so the
+  /// entry can say what it was scaled from.
+  ReferenceNutrition get _reference {
+    final food = widget.food;
+    final serving = _choice.serving;
+    return ReferenceNutrition(
+      basis: ReferenceBasis.per100g,
+      nutrition: NutritionTotals(
+        kcal: food.kcal,
+        proteinG: food.proteinG,
+        carbsG: food.carbsG,
+        fatG: food.fatG,
+      ),
+      servingDescription: serving?.description,
+      servingGrams: serving?.grams,
+      servingUnit: serving == null ? null : PortionUnit.serving,
+      densityGPerMl: food.densityGPerMl,
+    );
   }
 
-  double _per(double per100) => per100 * _grams / 100;
+  double? get _amount => parseQuantity(_quantity.text);
+
+  NutritionTotals? get _totals {
+    final q = _amount;
+    return q == null ? null : scaleNutrition(q, _choice.unit, _reference);
+  }
+
+  double? get _grams {
+    final q = _amount;
+    return q == null ? null : gramsFor(q, _choice.unit, _reference);
+  }
+
+  /// A label serving from a packaged product is recorded as one; a serving of
+  /// a generic food is a household measure; a weight is a weighing.
+  QuantitySource get _method {
+    if (_choice.unit.isWeight) return QuantitySource.weighed;
+    final packaged =
+        widget.food.source == 'usda_branded' || widget.food.source == 'off';
+    return packaged
+        ? QuantitySource.labelServing
+        : QuantitySource.householdMeasure;
+  }
 
   String _n(double v) => v.round().toString();
 
   Future<void> _log() async {
     final food = widget.food;
+    final totals = _totals!;
     await ref
         .read(foodEntryWriterProvider)
         .addFood(
@@ -57,33 +105,45 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
             name: food.brand == null
                 ? food.name
                 : '${food.name} (${food.brand})',
-            kcal: _per(food.kcal),
-            proteinG: _per(food.proteinG),
-            carbsG: _per(food.carbsG),
-            fatG: _per(food.fatG),
-            source: _serving == null
-                ? QuantitySource.weighed
-                : QuantitySource.householdMeasure,
+            kcal: totals.kcal,
+            proteinG: totals.proteinG,
+            carbsG: totals.carbsG,
+            fatG: totals.fatG,
+            source: _method,
+            portion: Portion(
+              method: _method,
+              basis: NutritionBasis.calculated,
+              quantity: _amount,
+              unit: _choice.unit,
+              reference: _reference,
+            ),
           ),
         );
     if (mounted) Navigator.of(context).pop();
   }
 
-  void _pick(CatalogServing? serving) => setState(() {
-    _serving = serving;
-    _quantity.text = serving == null ? '100' : '1';
+  void _pick(AmountChoice c) => setState(() {
+    _choice = c;
+    _quantity.text = _defaultQuantity(c);
   });
+
+  String _label(AmountChoice c) => c.serving != null
+      ? '${c.serving!.description} (${_n(c.serving!.grams)} g)'
+      : c.unit.chipLabel;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final food = widget.food;
+    final totals = _totals;
     final grams = _grams;
-    final note = roundedToZeroNote(
-      food,
-      _serving ??
-          CatalogServing(description: 'grams', grams: grams > 0 ? grams : 100),
-    );
+    final note = grams == null
+        ? null
+        : roundedToZeroNote(
+            food,
+            CatalogServing(description: 'amount', grams: grams),
+          );
+    final invalid = _quantity.text.trim().isNotEmpty && _amount == null;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,34 +156,36 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         Wrap(
           spacing: 8,
           children: [
-            for (final s in widget.servings)
+            for (final c in _choices)
               MmChoiceChip(
-                label: '${s.description} (${s.grams.round()} g)',
-                selected: _serving == s,
-                onSelected: () => _pick(s),
+                label: _label(c),
+                selected: identical(_choice, c),
+                onSelected: () => _pick(c),
               ),
-            MmChoiceChip(
-              label: 'Grams',
-              selected: _serving == null,
-              onSelected: () => _pick(null),
-            ),
           ],
         ),
         const SizedBox(height: 12),
         MmTextField(
           key: const ValueKey('amount-quantity'),
           controller: _quantity,
-          label: _serving == null ? 'Grams' : 'How many',
-          kind: MmTextFieldKind.number,
-          helper: _serving == null ? null : '${_n(grams)} g',
+          label: _choice.unit == PortionUnit.serving
+              ? 'How many servings'
+              : 'Amount (${_choice.unit.of(2)})',
+          kind: MmTextFieldKind.quantity,
+          helper: invalid || _amount == null
+              ? 'An amount above zero is needed.'
+              : _choice.unit == PortionUnit.serving && grams != null
+              ? '${quantityText(double.parse(grams.toStringAsFixed(0)))} g'
+              : null,
+          helperIsWarning: invalid,
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 12),
         Text(
-          '${_n(_per(food.kcal))} kcal · '
-          '${_n(_per(food.proteinG))} g protein · '
-          '${_n(_per(food.carbsG))} g carbs · '
-          '${_n(_per(food.fatG))} g fat',
+          totals == null
+              ? 'Enter an amount to see the totals.'
+              : '${_n(totals.kcal)} kcal · ${_n(totals.proteinG)} g protein · '
+                    '${_n(totals.carbsG)} g carbs · ${_n(totals.fatG)} g fat',
           key: const ValueKey('amount-macros'),
           style: text.titleMedium,
         ),
@@ -148,7 +210,7 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
           key: const ValueKey('amount-log'),
           label: 'Log it',
           expand: true,
-          onPressed: grams > 0 ? _log : null,
+          onPressed: totals == null ? null : _log,
         ),
         MmButton(
           label: 'Back to search',
