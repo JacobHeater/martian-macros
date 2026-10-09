@@ -2,9 +2,11 @@ import 'package:drift/drift.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import 'custom_foods.dart';
 import 'day_marks.dart';
 import 'food_entries.dart';
 import 'migration_step.dart';
+import 'recipe_ingredients.dart';
 import 'schema_migration_exception.dart';
 import 'setups.dart';
 import 'targets_history.dart';
@@ -25,6 +27,8 @@ part 'app_database.g.dart';
     TargetsHistory,
     UserPreferences,
     WeightEvents,
+    CustomFoods,
+    RecipeIngredients,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -32,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 11;
+  static const currentSchemaVersion = 12;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -101,6 +105,11 @@ class AppDatabase extends _$AppDatabase {
       await m.addColumn(foodEntries, foodEntries.servingMilliliters);
       await m.addColumn(foodEntries, foodEntries.servingUnit);
       await m.addColumn(foodEntries, foodEntries.densityGPerMl);
+    },
+    // 11 to 12: the user's own foods and recipes (MM-45).
+    11: (m) async {
+      await m.createTable(customFoods);
+      await m.createTable(recipeIngredients);
     },
   };
 

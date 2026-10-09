@@ -35,6 +35,10 @@ final foodRepositoryProvider = Provider<FoodRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).food,
 );
 
+final customFoodRepositoryProvider = Provider<CustomFoodRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).customFoods,
+);
+
 final dayMarkRepositoryProvider = Provider<DayMarkRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).dayMarks,
 );

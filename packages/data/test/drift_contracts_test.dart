@@ -19,6 +19,7 @@ void main() {
   waistRepositoryContract('Drift', () => open().waist);
   preferencesRepositoryContract('Drift', () => open().preferences);
   foodRepositoryContract('Drift', () => open().food);
+  customFoodRepositoryContract('Drift', () => open().customFoods);
   dayMarkRepositoryContract('Drift', () => open().dayMarks);
   targetsHistoryRepositoryContract('Drift', () => open().targets);
   intakeReaderContract('Drift', () {

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import 'barcode_scan_step_state.dart';
@@ -10,12 +11,14 @@ import 'barcode_scan_step_state.dart';
 class BarcodeScanStep extends ConsumerStatefulWidget {
   const BarcodeScanStep({
     required this.onFound,
+    required this.onFoundCustom,
     required this.onManual,
     required this.onBack,
     super.key,
   });
 
   final ValueChanged<CatalogFood> onFound;
+  final ValueChanged<CustomFood> onFoundCustom;
   final VoidCallback onManual;
   final VoidCallback onBack;
 

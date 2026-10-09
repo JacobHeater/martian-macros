@@ -5,6 +5,7 @@ library;
 
 export 'src/contracts/backup_storage_contract.dart';
 export 'src/contracts/clock_contract.dart';
+export 'src/contracts/custom_food_repository_contract.dart';
 export 'src/contracts/data_eraser_contract.dart';
 export 'src/contracts/day_mark_repository_contract.dart';
 export 'src/contracts/entitlement_reader_contract.dart';
