@@ -1,6 +1,6 @@
 ---
 id: MM-54
-status: proposed
+status: done
 component: food-database
 related: [MM-50, MM-43, MM-52, MM-55]
 ---
@@ -41,3 +41,9 @@ Scenario: EAN-8
 ## Notes
 - UPC-E and EAN-8 are both 8 digits. The scanner reports the symbology; the function takes it as an argument and does not guess from
   length.
+
+## Progress (built and verified)
+- `normalizeBarcode(raw, {symbology})` in `mm_domain` (`food/normalize_barcode.dart`), with `BarcodeSymbology` (UPC-A, UPC-E, EAN-13, EAN-8, GTIN-14). It drops non-digits, expands a UPC-E (told by the caller, never guessed from length) to its UPC-A, verifies the check digit and left-pads to 14 digits; it returns null for a bad check digit or a length outside 8 to 14 digits.
+- Tests: UPC-A, EAN-13 with a leading zero and UPC-E give one GTIN-14; a leading zero lost by a source is restored; wrong check digits are rejected; eight digits are an EAN-8 unless told UPC-E; all five UPC-E expansion patterns, against check digits computed independently in the test; nonsense is rejected.
+- **Choices to know about**: without a symbology, codes shorter than 8 digits are rejected, so a number that lost more than three leading zeros is not recovered; and a code that happens to pass the check digit under a wrong guess still matches only if that exact product exists in the pack.
+- **Not done**: the scanner and the pipeline do not exist yet to call it.

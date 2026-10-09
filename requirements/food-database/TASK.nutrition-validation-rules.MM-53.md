@@ -1,6 +1,6 @@
 ---
 id: MM-53
-status: proposed
+status: done
 component: food-database
 related: [MM-50, MM-52, MM-38, MM-44, MM-45]
 ---
@@ -53,3 +53,9 @@ Scenario: Water
 ## Notes
 - `macrosMatchEnergy` in `mm_domain` already implements the basic energy check for typed entries (MM-38). This ticket extends it and makes
   it the single source.
+
+## Progress (built and verified)
+- `checkNutrition(NutritionPer100g)` in `mm_domain` (`food/check_nutrition.dart`) returns the first `NutritionProblem` (missing name, missing value, negative value, macros over 100 g, energy over 900 kcal, energy disagreeing with macros) or null. Energy must be within the larger of 15% and 20 kcal of 4P + 4C + 9F + 7 per gram of alcohol; with fiber given it also passes if it matches carbohydrate with fiber at 2 kcal per gram, either counted inside or outside the carbohydrate figure. Water and other zero-energy foods pass.
+- `macrosMatchEnergy`, which typed entries already use, now calls the same `energyAgreesWithMacros`, so there is one rule. Its behaviour without fiber or alcohol is unchanged.
+- Tests cover each acceptance scenario plus alcohol and each rejection reason.
+- **Not done**: the pipeline, label reading and custom foods that should call it do not exist yet, and the typed-entry warning does not ask for fiber, so it applies the plain rule. The 900 kcal and 100 g limits are from the ticket, not checked against a source.
