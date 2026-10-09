@@ -35,4 +35,17 @@ const defaultImportRules = <ForbiddenImportRule>[
     forbidden: ['package:flutter', 'package:mm_fixtures'],
     reason: 'persistence is pure Dart and does not depend on test fixtures',
   ),
+  ForbiddenImportRule(
+    appliesTo: 'packages/food_catalog/lib/',
+    forbidden: [
+      'package:flutter',
+      'package:drift',
+      'package:mm_data',
+      'package:mm_engine',
+      'package:mm_fixtures',
+    ],
+    reason:
+        'the food pack reader is pure Dart and reads the pack, never the '
+        "user's database",
+  ),
 ];
