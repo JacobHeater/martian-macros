@@ -38,7 +38,7 @@ final _commands = <String, (String, Command)>{
     _food,
   ),
   'roadmap': (
-    'Write roadmap/progress.html, the progress page: mm roadmap [--check]',
+    'Write roadmap/progress.html, the progress page and open it: mm roadmap [--check] [--no-open]',
     _roadmap,
   ),
   'evidence': (
