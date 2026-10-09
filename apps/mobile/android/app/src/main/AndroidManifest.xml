@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Used only to download the optional food database the user asks for
+         (MM-56). The app sends no analytics and uploads nothing. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="martian_macros"
         android:name="${applicationName}"

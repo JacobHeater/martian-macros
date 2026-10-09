@@ -23,9 +23,17 @@ final class SqliteFoodPack implements FoodPack {
 
   /// Wraps an already open pack database (tests, in-memory packs).
   factory SqliteFoodPack.fromDatabase(Database db) {
+    try {
+      return SqliteFoodPack._read(db);
+    } on Object {
+      db.close(); // never leave a file open that turned out not to be a pack
+      rethrow;
+    }
+  }
+
+  factory SqliteFoodPack._read(Database db) {
     final version = db.select('PRAGMA user_version').first.values.first! as int;
     if (version != FoodPackFormat.version) {
-      db.close();
       throw UnsupportedPackVersion(
         found: version,
         supported: FoodPackFormat.version,

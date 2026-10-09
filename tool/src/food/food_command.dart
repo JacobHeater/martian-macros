@@ -9,6 +9,8 @@ import 'fetch_food_sources.dart';
 ///   mm food fetch [--cache DIR]      download the sources (reused if present)
 ///   mm food build [--cache DIR] [--out DIR] [--prefer recent|off|usda_branded]
 ///                                     extract with DuckDB, then build the packs
+///   mm food package --base-url https://...   compress the packs and write the
+///                                     manifest to publish (uploads nothing)
 ///
 /// The cache defaults to `.food_cache/` and the output to `.food_cache/packs/`;
 /// neither is committed. `build` needs the DuckDB command-line tool on PATH.
@@ -24,6 +26,22 @@ Future<int> runFood(Toolchain tc, List<String> args) async {
   switch (args.firstOrNull) {
     case 'fetch':
       return fetchFoodSources(cache);
+    case 'package':
+      final base = option('--base-url');
+      if (base == null) {
+        stderr.writeln('mm food package needs --base-url https://...');
+        return 64;
+      }
+      return tc.dart([
+        'run',
+        'bin/package_packs.dart',
+        '--packs',
+        option('--packs') ?? '${cache.absolute.path}/packs',
+        '--out',
+        option('--out') ?? '${cache.absolute.path}/publish',
+        '--base-url',
+        base,
+      ], inDir: 'packages/food_pipeline');
     case 'build':
       return _build(
         tc,
@@ -32,7 +50,9 @@ Future<int> runFood(Toolchain tc, List<String> args) async {
         option('--prefer') ?? 'recent',
       );
   }
-  stderr.writeln('Usage: mm food <fetch|build> [--cache DIR] [--out DIR]');
+  stderr.writeln(
+    'Usage: mm food <fetch|build|package> [--cache DIR] [--out DIR]',
+  );
   return 64;
 }
 

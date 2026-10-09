@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/integration_providers.dart';
@@ -11,8 +12,9 @@ import 'in_memory_overrides.dart';
 Future<void> pumpApp(
   WidgetTester tester,
   InMemoryRepositories repos,
-  FixedClock clock,
-) async {
+  FixedClock clock, {
+  List<Override> overrides = const [],
+}) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.5;
   addTearDown(tester.view.reset);
@@ -21,6 +23,7 @@ Future<void> pumpApp(
       overrides: [
         ...inMemoryOverrides(repos),
         clockProvider.overrideWithValue(clock),
+        ...overrides,
       ],
       child: const MartianMacrosApp(),
     ),
