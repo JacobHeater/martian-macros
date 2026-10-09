@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import '../format/meal_label.dart';
 import '../format/parse_number.dart';
 import '../format/quantity_source_label.dart';
+import '../food_packs/food_catalog_provider.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/mm_action_chip.dart';
@@ -12,9 +14,14 @@ import '../ui/mm_button.dart';
 import '../ui/mm_choice_chip.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
+import '../ui/mm_list_row.dart';
 import 'add_food_sheet.dart';
+import 'food_amount_step.dart';
+import 'food_search_results.dart';
 
 class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
+  final _search = TextEditingController();
+  CatalogFood? _picked;
   final _name = TextEditingController();
   final _kcal = TextEditingController();
   final _protein = TextEditingController();
@@ -25,7 +32,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
 
   @override
   void dispose() {
-    for (final c in [_name, _kcal, _protein, _carbs, _fat]) {
+    for (final c in [_search, _name, _kcal, _protein, _carbs, _fat]) {
       c.dispose();
     }
     super.dispose();
@@ -75,6 +82,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     _carbs.text = n(e.carbsG);
     _fat.text = n(e.fatG);
     _source = e.source;
+    _search.clear();
   });
 
   Future<void> _save() async {
@@ -100,6 +108,26 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final recents = ref.watch(recentFoodsProvider).value ?? const [];
+    final query = _search.text.trim();
+    final picked = _picked;
+    if (picked != null) {
+      return _sheet(
+        FoodAmountStep(
+          food: picked,
+          servings:
+              ref.watch(foodCatalogProvider).value?.servingsOf(picked) ??
+              const [],
+          day: widget.day,
+          meal: _meal,
+          onBack: () => setState(() => _picked = null),
+        ),
+      );
+    }
+    final matchingRecents = query.isEmpty
+        ? const <FoodEntry>[]
+        : recents
+              .where((e) => e.name.toLowerCase().contains(query.toLowerCase()))
+              .toList();
 
     Widget number(TextEditingController c, String label, String key) =>
         Expanded(
@@ -113,19 +141,35 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           ),
         );
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Add food', style: text.titleLarge),
+    return _sheet(
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Add food', style: text.titleLarge),
+          const SizedBox(height: 12),
+          MmTextField(
+            key: const ValueKey('food-search'),
+            controller: _search,
+            label: 'Search foods',
+            onChanged: (_) => setState(() {}),
+          ),
+          if (query.isNotEmpty) ...[
+            for (final e in matchingRecents)
+              MmListRow(
+                title: e.name,
+                subtitle: 'Your recent food · ${e.kcal.round()} kcal',
+                onTap: () => _fill(e),
+              ),
+            FoodSearchResults(
+              query: query,
+              onPick: (food) => setState(() => _picked = food),
+              onEnterManually: () => setState(() {
+                _name.text = query;
+                _search.clear();
+              }),
+            ),
+          ] else ...[
             if (recents.isNotEmpty) ...[
               const SizedBox(height: 12),
               SizedBox(
@@ -208,8 +252,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
               onPressed: _valid ? _save : null,
             ),
           ],
-        ),
+        ],
       ),
     );
   }
+
+  Widget _sheet(Widget child) => Padding(
+    padding: EdgeInsets.fromLTRB(
+      16,
+      16,
+      16,
+      16 + MediaQuery.viewInsetsOf(context).bottom,
+    ),
+    child: SingleChildScrollView(child: child),
+  );
 }

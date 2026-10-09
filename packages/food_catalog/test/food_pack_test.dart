@@ -142,6 +142,48 @@ void main() {
     );
   });
 
+  test('reference foods list before label and check-this foods', () {
+    SqliteFoodPack pack(String id, TrustTier tier, String name) {
+      final h = FixturePack.header;
+      return SqliteFoodPack.fromDatabase(
+        const FoodPackWriter().writeInMemory(
+          FoodPackHeader(
+            packId: id,
+            formatVersion: h.formatVersion,
+            builtOn: h.builtOn,
+            region: h.region,
+            sources: h.sources,
+            license: h.license,
+            attribution: h.attribution,
+          ),
+          [
+            PackEntry(
+              food: CatalogFood(
+                id: 1,
+                packId: id,
+                name: name,
+                kcal: 100,
+                proteinG: 5,
+                carbsG: 15,
+                fatG: 2,
+                source: 'test',
+                tier: tier,
+                tierReason: 'test',
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // The branded name matches "oats" more tightly, but is the weaker tier.
+    final catalog = FoodCatalog([
+      pack('b', TrustTier.checkThis, 'Oats'),
+      pack('g', TrustTier.reference, 'Oats, rolled, dry, plain, whole grain'),
+    ]);
+    expect(catalog.search('oats').first.food.tier, TrustTier.reference);
+  });
+
   test('several packs read as one ranked list', () {
     final catalog = FoodCatalog([fixture(), fixture()]);
     final hits = catalog.search('banana');
