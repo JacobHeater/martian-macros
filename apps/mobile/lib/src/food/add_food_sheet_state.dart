@@ -65,6 +65,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   void initState() {
     super.initState();
     final entry = widget.entry;
+    final query = widget.initialQuery;
+    if (query != null) _search.text = query;
+    if (widget.estimateSize != null) _estimating = true;
     if (entry == null) return;
     final portion = entry.portion;
     _name.text = entry.name;
@@ -330,6 +333,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         EstimateMealStep(
           day: widget.day,
           meal: _meal,
+          initialSize: widget.estimateSize ?? MealSize.regular,
           onBack: () => setState(() => _estimating = false),
         ),
       );

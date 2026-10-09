@@ -12,12 +12,14 @@ class EstimateMealStep extends ConsumerStatefulWidget {
     required this.day,
     required this.meal,
     required this.onBack,
+    this.initialSize = MealSize.regular,
     super.key,
   });
 
   final CalendarDate day;
   final Meal meal;
   final VoidCallback onBack;
+  final MealSize initialSize;
 
   @override
   ConsumerState<EstimateMealStep> createState() => EstimateMealStepState();

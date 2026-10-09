@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 12;
+  static const currentSchemaVersion = 13;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -110,6 +110,27 @@ class AppDatabase extends _$AppDatabase {
     11: (m) async {
       await m.createTable(customFoods);
       await m.createTable(recipeIngredients);
+    },
+    // 12 to 13: the easy-to-miss line's setting and when it was last shown
+    // (MM-152).
+    12: (m) async {
+      // The table is created at its current shape when a database is old
+      // enough to lack it (step 1), so only add what is not there yet.
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(user_preferences)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('easy_to_miss_enabled')) {
+        await m.addColumn(userPreferences, userPreferences.easyToMissEnabled);
+      }
+      if (!existing.contains('easy_to_miss_last_shown_epoch_day')) {
+        await m.addColumn(
+          userPreferences,
+          userPreferences.easyToMissLastShownEpochDay,
+        );
+      }
     },
   };
 

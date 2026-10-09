@@ -67,6 +67,8 @@ void main() {
       find.text('Erase all data and start over'),
       300,
     );
+    await tester.drag(find.byType(ListView).first, const Offset(0, -1500));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Erase all data and start over'));
     await tester.pumpAndSettle();
     expect(find.text('Erase everything?'), findsOneWidget);
@@ -84,6 +86,8 @@ void main() {
       find.text('Erase all data and start over'),
       300,
     );
+    await tester.drag(find.byType(ListView).first, const Offset(0, -1500));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Erase all data and start over'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Erase'));
