@@ -300,6 +300,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       return _sheet(
         FoodAmountStep(
           food: picked,
+          alternate: ref.watch(foodCatalogProvider).value?.pairOf(picked),
           servings:
               ref.watch(foodCatalogProvider).value?.servingsOf(picked) ??
               const [],

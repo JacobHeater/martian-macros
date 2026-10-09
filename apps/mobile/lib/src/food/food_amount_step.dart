@@ -16,6 +16,7 @@ class FoodAmountStep extends ConsumerStatefulWidget {
     required this.meal,
     required this.onBack,
     this.custom,
+    this.alternate,
     super.key,
   });
 
@@ -27,6 +28,10 @@ class FoodAmountStep extends ConsumerStatefulWidget {
 
   /// Set when the food is one the user saved: its numbers are per serving.
   final CustomFood? custom;
+
+  /// The raw or cooked counterpart of [food], when the source has both
+  /// (MM-151): offered as a switch while logging by weight.
+  final CatalogFood? alternate;
 
   @override
   ConsumerState<FoodAmountStep> createState() => FoodAmountStepState();
