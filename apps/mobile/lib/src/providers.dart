@@ -86,6 +86,15 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
 
 /// The targets in force today, if any have been issued.
 final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  if (setup == null ||
+      !CoachingPolicy.derive(
+        profile: setup.profile,
+        screening: setup.screening,
+        today: ref.watch(todayProvider),
+      ).targetsAllowed) {
+    return null;
+  }
   final history = ref.watch(targetsHistoryProvider).value;
   return history == null || history.isEmpty ? null : history.last;
 });

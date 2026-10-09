@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../app/home_destination.dart';
 import '../app/home_tab_provider.dart';
@@ -8,6 +9,7 @@ import '../food/calorie_hero.dart';
 import '../food/selected_day_provider.dart';
 import '../food/targets_on.dart';
 import '../format/fmt.dart';
+import '../format/coach_confidence_text.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/macro_kind.dart';
@@ -26,8 +28,14 @@ class DashboardScreen extends ConsumerWidget {
     final entries = ref.watch(foodForDayProvider(today)).value ?? const [];
     final history = ref.watch(targetsHistoryProvider).value ?? const [];
     final weights = ref.watch(weightsProvider).value ?? const [];
-    final trend = ref.watch(coachProvider)?.trend ?? const [];
+    final coach = ref.watch(coachProvider);
+    final trend = coach?.trend ?? const [];
     final fmt = Fmt(setup.unitSystem);
+    final targetsAllowed = CoachingPolicy.derive(
+      profile: setup.profile,
+      screening: setup.screening,
+      today: today,
+    ).targetsAllowed;
 
     void open(HomeDestination destination) =>
         ref.read(homeTabProvider.notifier).select(destination);
@@ -37,9 +45,21 @@ class DashboardScreen extends ConsumerWidget {
       children: [
         CalorieHero(
           intake: intakeDayFrom(today, entries),
-          targets: targetsOn(history, today)?.targets,
+          targets: targetsOn(
+            history,
+            today,
+            targetsAllowed: targetsAllowed,
+          )?.targets,
           macros: const [MacroKind.protein],
-          status: coachLineText(setup: setup, history: history, today: today),
+          status: coachLineText(
+            setup: setup,
+            history: history,
+            today: today,
+            confidence: coach?.confidence.level ?? ConfidenceLevel.learning,
+          ),
+          confidence: coach == null
+              ? null
+              : confidenceLabel(coach.confidence.level),
           onStatusTap: () => open(HomeDestination.coach),
           onTap: () {
             ref.read(selectedDayProvider.notifier).set(null);

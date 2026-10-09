@@ -1,6 +1,6 @@
 ---
 id: MM-112
-status: proposed
+status: done
 component: safeguards
 related: [MM-110, MM-11, MM-13, MM-14, MM-29, MM-83, MM-113, MM-121, MM-128, MM-147]
 ---
@@ -39,6 +39,9 @@ Choices I made without asking (say if any is wrong):
 - **A changed answer acts immediately**: the coaching policy is re-derived and targets follow at once, not step-limited.
 - **Skipping the repeat check is allowed once.** After a second skip a deficit goal pauses at maintenance until the check is answered. A
   deficit that continues unexamined is the failure being prevented.
+- **The next opportunity after a skip is the next app launch.** A first skip
+  does not re-prompt during the current launch. After the second skip, a
+  deficit goal is moved to maintenance, and the next launch requires an answer.
 - **Answers are editable in Settings at any time** (this is the part of MM-83 that concerns screening).
 
 Where the experts disagreed:
@@ -72,17 +75,54 @@ Scenario: Skipped twice
   Given a user on a deficit who has skipped the repeat check twice
   Then targets are at maintenance until the check is answered
 
+Scenario: One skip defers until next launch
+  Given a user has skipped the due health check once
+  Then the app remains usable for the current launch
+  And the check is shown again on the next app launch
+
+Scenario: Second skip requires an answer on the next launch
+  Given a user has skipped the due health check twice
+  Then the next app launch requires an answer before normal coaching resumes
+
 Scenario: Insulin
   Given the insulin answer is ticked and not yet confirmed with a care team
   Then the fastest fat-loss pace offered is 0.5% a week and the caution is shown on the Coach screen
+
+Scenario: Insulin care-team confirmation
+  Given insulin or sulfonylurea treatment is reported
+  When the user confirms discussing a deficit with their care team
+  Then the insulin-specific pace limit no longer applies
 
 Scenario: Sixty-five
   Given a 67-year-old man of 80 kg on fat loss
   Then his pace is at most 0.5% a week and his protein minimum is at least 96 g
 
+Scenario: Crossing age sixty-five
+  Given a user is 64 the day before his sixty-fifth birthday
+  When the policy is derived on his birthday
+  Then the 0.5% pace limit and 1.2 g/kg protein floor apply immediately
+
 Scenario: Male profiles
   Given a male profile
   Then the repeat check shows no pregnancy or breastfeeding question
+
+Scenario: Female profiles
+  Given a female profile
+  Then pregnancy and breastfeeding appear before the other health questions
+
+Scenario: Bariatric surgery
+  Given a user reports prior bariatric surgery
+  Then coaching targets are not issued
+  And food logging, weight trends, and measurements remain available
+
+Scenario: Weight-affecting medication
+  Given a user reports medication that can change weight or water retention
+  Then a caution is shown without blocking coaching targets
+
+Scenario: New answers in Settings
+  Given a user opens the Health check from Settings
+  When they change a new screening answer
+  Then the answer is saved and the health policy is re-derived immediately
 ```
 
 ## Notes
@@ -91,3 +131,10 @@ Scenario: Male profiles
   cancer treatment, recent major surgery). The panel's view was that a long list gets skimmed; a final "any other condition your doctor
   treats you for" answer with a general caution may serve better than ten checkboxes.
 - The age rule uses the birthday, so a user can cross it while using the app; the change is announced, not silent (MM-138).
+
+## Implementation and verification
+- Added the screening answers, age-derived policy limits, and schema v6 persistence for the new answers and repeat-check state.
+- Added onboarding and Settings editing, the app-launch re-check flow, deficit-entry confirmation, skip/pause handling, Coach cautions, and bariatric target suppression.
+- Verified with focused health-check, Settings, policy, migration, and target-safety tests, then `fvm dart run tool/bin/mm.dart check` (full workspace).
+
+The age-transition explanation is part of MM-138; MM-112 derives the policy from today's date so its limits change on the birthday.

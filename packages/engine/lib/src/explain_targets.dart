@@ -1,3 +1,4 @@
+import 'coach_confidence.dart';
 import 'daily_targets.dart';
 import 'explanation_line.dart';
 import 'explanation_reason.dart';
@@ -21,6 +22,7 @@ TargetsExplanation explainTargets({
   required DailyTargets targets,
   required TargetsTrace trace,
   required TdeeEstimate tdee,
+  CoachConfidence? confidence,
 }) {
   final lines = <ExplanationLine>[];
   void add(ExplanationReason reason, double kcal, {double? from, double? to}) {
@@ -75,5 +77,6 @@ TargetsExplanation explainTargets({
     usableIntakeDays: tdee.usableIntakeDays,
     excludedPartialDays: tdee.excludedPartialDays,
     weighIns: tdee.weighIns,
+    confidence: confidence,
   );
 }

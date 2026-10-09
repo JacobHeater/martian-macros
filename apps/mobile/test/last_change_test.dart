@@ -82,7 +82,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('What changed'), findsOneWidget);
     expect(
-      find.textContaining('Calories 2,400 → 2,325. Protein unchanged'),
+      find.textContaining('Calories 2,400 → 2,325. Protein target unchanged'),
       findsOneWidget,
     );
     expect(find.textContaining('Carbohydrate 255 → 240 g'), findsOneWidget);

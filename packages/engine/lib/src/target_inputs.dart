@@ -14,6 +14,7 @@ final class TargetInputs {
     required this.policy,
     required this.tdeeKcal,
     required this.bmrKcal,
+    this.trainingDaysPerWeek = 0,
     this.trainingKcalPerDay = 0,
     this.previous,
     this.consecutiveDeficitWeeks = 0,
@@ -33,6 +34,7 @@ final class TargetInputs {
   /// From `TdeeEstimator`, in logging units.
   final double tdeeKcal;
   final double bmrKcal;
+  final int trainingDaysPerWeek;
 
   /// Estimated from logged training (not wearable active energy).
   final double trainingKcalPerDay;

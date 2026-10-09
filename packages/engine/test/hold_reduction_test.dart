@@ -22,6 +22,7 @@ void main() {
     targets: DailyTargets(
       kcal: kcal,
       proteinG: 170,
+      proteinMinimumG: 128,
       fatG: 70,
       carbsG: 240,
       weeklyRateFraction: -0.0075,
@@ -62,6 +63,7 @@ void main() {
     expect(held.effectiveFrom, h.last.effectiveFrom);
     expect(held.targets.kcal, 2400);
     expect(held.targets.proteinG, h.first.targets.proteinG);
+    expect(held.targets.proteinMinimumG, h.first.targets.proteinMinimumG);
     expect(held.targets.flags, {TargetFlag.heldByUser});
     final e = held.explanation!;
     expect(e.change, 0);

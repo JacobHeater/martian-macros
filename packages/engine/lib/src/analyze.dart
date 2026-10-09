@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:mm_domain/mm_domain.dart';
 
 import 'body_fat_estimate.dart';
+import 'coach_confidence.dart';
 import 'coach_snapshot.dart';
 import 'cycle_noise.dart';
 import 'deurenberg_body_fat.dart';
@@ -94,6 +95,13 @@ CoachSnapshot? analyze({
     bodyFat: bodyFat,
     bmrKcal: bmr,
     tdee: tdee,
+    confidence: assessCoachConfidence(
+      estimate: tdee,
+      asOf: today.addDays(-1),
+      intake: intake,
+      trend: trend,
+      history: history,
+    ),
     recommendation: recommendMode(
       sex: profile.sex,
       bodyFatPercent: bodyFat.percent,

@@ -54,11 +54,12 @@ Rows: computeTargets.weeklyRate, SafetyBounds.maxWeeklyLossFraction, SafetyBound
 
 Protein is set in grams from your body weight, using a reference weight that
 counts only part of any weight above a body mass index of 25, so heavier people
-are not given very large targets. Lean people in a deficit get a higher target,
-set from their fat-free mass. If you have chronic kidney disease the target is
-capped low and you are told to confirm it with your clinician.
+are not given very large targets. You see both a minimum and a target; the
+minimum depends on your goal and training, and the target rises in a lean
+deficit. If you have chronic kidney disease, both are capped and you are told
+to confirm them with your clinician.
 
-Rows: SafetyBounds.proteinRangeG, SafetyBounds.referenceWeightKg, SafetyBounds.excessWeightFraction, SafetyBounds.minFatG, computeTargets.macroSplit
+Rows: SafetyBounds.proteinRangeG, SafetyBounds.proteinTargetsG, SafetyBounds.referenceWeightKg, SafetyBounds.excessWeightFraction, SafetyBounds.minFatG, computeTargets.macroSplit
 
 ### How does the app know how much energy I use?
 
@@ -88,6 +89,15 @@ losing faster than the app aims for, calories go back up at once.
 
 Rows: SafetyBounds.maxWeeklyTargetChangeKcal, SafetyBounds.maxWeeklyTargetChangeFraction, SafetyBounds.maxWeeklyTargetChange, checkInIntervalDays, safetyRaiseLookbackDays, safetyRaiseMinWeighIns, safetyRaiseSigmas, safetyRaiseCapKcal
 
+### How sure is my coach?
+
+Confidence is shown as Learning, Fair or Good, based on the weakest of the
+expenditure estimate, recent usable food days, weigh-ins and stability. It is
+not a score. At Learning, ordinary target changes wait while the coach learns;
+the Coach screen shows the part that needs attention and one next step.
+
+Rows: assessCoachConfidence, confidenceGoodEstimateSigmaKcal, confidenceLearningEstimateSigmaKcal, confidenceGoodFoodDays, confidenceMinimumFoodDays, confidenceGoodWeighInDays, confidenceMinimumWeighInDays, confidenceStabilityDays
+
 ### When does the app slow or stop a deficit?
 
 A deficit is not offered below a body mass index of 18.5, and loss is limited to
@@ -105,6 +115,14 @@ plausibly be on it, and does not switch back and forth on a small change.
 
 Rows: deurenbergBodyFat, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
 
+### When does the app ask about my health?
+
+The health check is repeated every 90 days and before you switch to a deficit.
+You can defer it once; after a second skip, deficit coaching pauses at
+maintenance until you confirm your answers.
+
+Rows: UserSetup.healthCheckIntervalDays, CoachingPolicy.seniorMaxWeeklyLossFraction, CoachingPolicy.seniorMinimumProteinGPerKgReferenceWeight, CoachingPolicy.insulinUnconfirmedMaxWeeklyLossFraction, CoachingPolicy.targetsAllowed
+
 ## Register
 
 | Name | Value | Where | Decides | Source | Grade | Population | Checked |
@@ -121,7 +139,8 @@ Rows: deurenbergBodyFat, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBou
 | `SafetyBounds.referenceWeightKg` | Body weight up to BMI 25, then a quarter of the excess | engine safety_bounds.dart | The weight that protein and fat rules scale with | The adjusted-body-weight convention (MM-120) | judgement | Adults with obesity | No |
 | `SafetyBounds.maxWeeklyLossFraction` | 0.5%, 0.7% or 1.0% of body weight a week by body fat (cut-offs 12% and 15% men, 22% and 25% women) | engine safety_bounds.dart | The fastest allowed pace of loss | Slower loss preserving lean mass: Garthe 2011, Helms 2014, as cited (that direction is moderate). The cut-offs are product judgement | judgement | Athletes (Garthe, Helms); the cut-offs are not from them | No |
 | `SafetyBounds.minFatG` | The larger of 0.5 g (men) or 0.6 g (women) per kg of reference weight, and 20% of energy | engine safety_bounds.dart | The lowest daily fat target | Product judgement | judgement | None | No |
-| `SafetyBounds.proteinRangeG` | 1.6 to 2.2 g per kg of reference weight; 2.3 to 3.1 g per kg fat-free mass for lean users in a deficit; capped for kidney disease | engine safety_bounds.dart | The daily protein target | Morton 2018 for the general range and Helms 2014 for lean people in a deficit, as cited; the kidney cap is product judgement | moderate | Trained adults (Morton); lean resistance-trained athletes dieting (Helms); the cap is not from either | No |
+| `SafetyBounds.proteinRangeG` | Evidence range: 1.6 to 2.2 g per kg of reference weight; 2.3 to 3.1 g per kg fat-free mass for lean users in a deficit; capped for kidney disease | engine safety_bounds.dart | The evidence-backed range used to inform target selection; not the selected app target | Morton 2018 for the general range and Helms 2014 for lean people in a deficit, as cited; the kidney cap is product judgement | moderate | Trained adults (Morton); lean resistance-trained athletes dieting (Helms); the cap is not from either | No |
+| `SafetyBounds.proteinTargetsG` | Minimum and target vary by goal and lifting; lean-deficit target interpolates over 3 body-fat points; kidney disease sets both to 0.8 g/kg body weight | engine safety_bounds.dart | The minimum to clear and goal-specific target (MM-121) | Moderate evidence from Morton 2018, Nunes 2022, and Helms 2014 informs the selection; exact points, interpolation, and kidney cap are product judgement | judgement | Adults by goal and training status; lean dieters; kidney disease cap is not from the cited protein trials | No |
 | `SafetyBounds.checkGoalBodyFat` | Rejected under 8% men or 16% women; warned under 10% or 18% | engine safety_bounds.dart | Whether a goal body fat is accepted | Product judgement | judgement | None | No |
 | `fatMassKcalPerKg` | 9,440 kcal per kg (39.5 MJ) | engine partition.dart | The energy in a kilogram of fat | Hall 2008, as cited | strong | Adults | No |
 | `fatFreeMassKcalPerKg` | 1,815 kcal per kg (7.6 MJ) | engine partition.dart | The energy in a kilogram of lean tissue | Hall 2008, as cited | moderate | Adults | No |
@@ -157,6 +176,14 @@ Rows: deurenbergBodyFat, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBou
 | `safetyRaiseSigmas` | 1.5 deviations | engine coach_constants.dart | How clearly over the limit the pace must be | Product judgement (MM-115), compared at 1.0 in simulation | judgement | None | No |
 | `safetyRaiseCapKcal` | 400 kcal | engine coach_constants.dart | The most one check-in raises targets for a too-fast loss | Product judgement (MM-115) | judgement | None | No |
 | `checkInIntervalDays` | 7 days | engine coach_constants.dart | How often targets can change | Product judgement | judgement | None | No |
+| `assessCoachConfidence` | The worst of four states: estimate, usable food days, weigh-ins and stability; Learning holds adaptive target changes | engine coach_confidence.dart | Confidence wording and whether an ordinary target update proceeds | Product judgement; thresholds and behavior are defined in MM-139 | judgement | None | No |
+| `confidenceGoodEstimateSigmaKcal` | Under 200 kcal standard deviation | engine coach_confidence.dart | The Good estimate boundary | Product judgement; requires simulator calibration | judgement | Not calibrated for a population | No |
+| `confidenceLearningEstimateSigmaKcal` | Over 350 kcal standard deviation | engine coach_confidence.dart | The Learning estimate boundary | Product judgement; requires simulator calibration | judgement | Not calibrated for a population | No |
+| `confidenceGoodFoodDays` | 20 usable days in the past 28 | engine coach_confidence.dart | The Good food-log boundary | Product judgement | judgement | None | No |
+| `confidenceMinimumFoodDays` | 10 usable days in the past 28 | engine coach_confidence.dart | The minimum Fair food-log boundary | Matches the estimator's minimum day count; product judgement | judgement | None | No |
+| `confidenceGoodWeighInDays` | 20 weigh-ins in the past 28 | engine coach_confidence.dart | The Good weigh-in boundary | Product judgement | judgement | None | No |
+| `confidenceMinimumWeighInDays` | 8 weigh-ins in the past 28 | engine coach_confidence.dart | The minimum Fair weigh-in boundary | Matches the estimator's minimum weigh-in count; product judgement | judgement | None | No |
+| `confidenceStabilityDays` | 14 days | engine coach_confidence.dart | How long a recent phase change or logging-style restart lowers stability | Product judgement aligned with a settling period; event handling awaits MM-136 | judgement | None | No |
 | `settlingDays` | 10 days | engine coach_constants.dart | How long after a change of intake the scale moves for reasons other than tissue | Glycogen and water shifts (MM-131); the length is product judgement | judgement | Not from a trial | No |
 | `phaseChangeFraction` | 10% of expenditure | engine coach_constants.dart | What counts as a change of intake level | Product judgement (MM-131) | judgement | None | No |
 | `settlingShiftFraction` | 0.4% of body weight a day | engine coach_constants.dart | How far the trend may shift inside a settling window | Product judgement tuned in simulation (MM-131) | judgement | None | No |
@@ -166,3 +193,8 @@ Rows: deurenbergBodyFat, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBou
 | `underweightBmi` | 18.5 | domain body_mass_index.dart | Below this no deficit is planned | The WHO and CDC boundary of underweight, a convention rather than a threshold of harm (MM-111) | strong | Adults; may differ by age and ancestry | No |
 | `lowWeightCautionBmi` | 20 | domain body_mass_index.dart | Below this deficits are allowed only at the gentlest pace | Product judgement: a margin above the boundary (MM-111) | judgement | None | No |
 | `lowWeightMaxLossFraction` | 0.5% of body weight a week | domain body_mass_index.dart | The gentlest pace of loss | Garthe 2011, Helms 2014 for slower loss in lean people; the use here is product judgement | judgement | Athletes | No |
+| `UserSetup.healthCheckIntervalDays` | 90 days | domain user_setup.dart | How often the health check is due | Product judgement balancing timely updates against repeated-question friction (MM-112) | judgement | All users | No |
+| `CoachingPolicy.seniorMaxWeeklyLossFraction` | 0.5% of body weight a week | domain coaching_policy.dart | The loss pace offered from age 65 | Product judgement informed by preserving lean mass in older adults (MM-112) | judgement | Adults aged 65 and older | No |
+| `CoachingPolicy.seniorMinimumProteinGPerKgReferenceWeight` | 1.2 g per kg of reference weight | domain coaching_policy.dart | Protein minimum from age 65 | PROT-AGE and ESPEN position papers, as cited in MM-112 (primary sources not yet confirmed) | moderate | Older adults | No |
+| `CoachingPolicy.insulinUnconfirmedMaxWeeklyLossFraction` | 0.5% of body weight a week | domain coaching_policy.dart | The loss pace until an insulin- or sulfonylurea-treated user confirms care-team discussion | Hypoglycemia risk is standard clinical guidance; this cap is product judgement (MM-112) | judgement | People treated with insulin or a sulfonylurea | No |
+| `CoachingPolicy.targetsAllowed` | False after bariatric surgery | domain coaching_policy.dart | Whether the app issues nutrition targets | Product judgement: post-surgical intake and protein rules are set by the surgical team (MM-112) | judgement | People who have had bariatric surgery | No |

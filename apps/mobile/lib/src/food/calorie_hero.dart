@@ -8,6 +8,7 @@ import '../ui/horizon_arc.dart';
 import '../ui/macro_bar.dart';
 import '../ui/macro_kind.dart';
 import '../ui/mm_hero_surface.dart';
+import '../ui/mm_status_chip.dart';
 import '../ui/status_row.dart';
 
 /// The hero of a day: calories as a horizon arc, what is left, the macros, and
@@ -18,6 +19,7 @@ class CalorieHero extends StatelessWidget {
     required this.targets,
     this.macros = MacroKind.values,
     this.status,
+    this.confidence,
     this.onStatusTap,
     this.onTap,
     super.key,
@@ -31,6 +33,7 @@ class CalorieHero extends StatelessWidget {
 
   /// One line about the coach (calibration, a recent change).
   final String? status;
+  final String? confidence;
   final VoidCallback? onStatusTap;
   final VoidCallback? onTap;
 
@@ -77,6 +80,7 @@ class CalorieHero extends StatelessWidget {
                 MacroKind.carbs => t?.carbsG,
                 MacroKind.fat => t?.fatG,
               },
+              minimum: macro == MacroKind.protein ? t?.proteinMinimumG : null,
               emphasized: macro == MacroKind.protein,
             ),
             if (macro != macros.last) const SizedBox(height: 12),
@@ -86,6 +90,14 @@ class CalorieHero extends StatelessWidget {
             Divider(color: context.mm.outline),
             StatusRow(text: status!, onTap: onStatusTap ?? () {}),
           ],
+          if (confidence != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: MmStatusChip(label: confidence!),
+              ),
+            ),
         ],
       ),
     );

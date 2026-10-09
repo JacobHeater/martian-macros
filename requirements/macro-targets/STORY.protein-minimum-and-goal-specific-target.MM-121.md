@@ -1,8 +1,8 @@
 ---
 id: MM-121
-status: proposed
+status: done
 component: macro-targets
-related: [MM-119, MM-24, MM-28, MM-29, MM-41, MM-92, MM-112, MM-120, MM-123, MM-132, MM-143]
+related: [MM-119, MM-24, MM-28, MM-29, MM-41, MM-92, MM-112, MM-120, MM-123, MM-132, MM-143, MM-149]
 ---
 
 # Story: A protein minimum to clear and a target chosen for my goal
@@ -33,8 +33,8 @@ Choices I made without asking (say if any is wrong):
 | maintenance or lean gain, lifting | 1.6 | 1.8 |
 | any goal, not lifting (0 training days and "not lifting yet") | 1.2 | 1.6 |
 | lean user in a deficit (unchanged, per kg fat-free mass) | 2.3 | 2.6 |
-| age 65 or over | never below 1.2, whatever else applies | as above |
-| chronic kidney disease (unchanged) | capped at 0.8 | 0.8 |
+| age 65 or over | never below 1.2, unless the kidney-disease cap applies | as above |
+| chronic kidney disease (unchanged) | both are 0.8 per kg of body weight, overriding the age floor | same |
 
 - **A day "met protein" at or above the minimum.** That is what streaks and summaries count (MM-92, MM-149). Reaching the target is shown,
   not scored separately.
@@ -53,12 +53,13 @@ Where the experts disagreed:
   lifting, and 1.6 costs little. Kept at 1.6 target, 1.2 minimum.
 
 ## Description
-`computeTargets` returns a protein minimum and target; the Food screen, dashboard and summaries show and judge both.
+`computeTargets` returns a protein minimum and target. Food, Dashboard and Coach show both; streaks and summaries judge against the
+minimum as specified by MM-92 and MM-149.
 
 ## Acceptance Criteria
 ```gherkin
 Scenario: A cut
-  Given an 80 kg man at BMI 24 who lifts, on fat loss
+  Given an 80 kg, 180 cm man who lifts, on fat loss
   Then his protein minimum is 128 g and his target 160 g
 
 Scenario: Maintenance asks for less
@@ -75,16 +76,30 @@ Scenario: Meeting protein
   Then the day counts as having met protein and the bar shows it between the two marks
 
 Scenario: Well over
-  When 230 g is logged
+  Given the Food screen shows a 128 g minimum and a 160 g target
+  When 230 g of protein is logged
   Then nothing is flagged, colored or warned
 
 Scenario: Kidney disease
   Given the kidney answer is ticked
-  Then minimum and target are both 0.8 g per kg and exceeding it is flagged with the care-team note
+  Then minimum and target are both 0.8 g per kg of body weight, even if the user is 65 or over
+  And exceeding it is flagged with the care-team note
+
+Scenario: Senior protein floor
+  Given a 67-year-old man weighs 80 kg and does not lift
+  Then his protein minimum is at least 96 g unless the kidney-disease cap applies
 
 Scenario: Approaching lean
-  Given a man on fat loss whose estimated body fat falls from 19% to 14% over a cut
-  Then his protein target never changes by more than 10 g between consecutive check-ins
+  Given an 80 kg, 180 cm man who lifts and is on fat loss
+  When his safety body-fat estimate moves from 18% to 17%, 16%, and 15%
+  Then his unrounded protein targets are approximately 160, 164.2, 169.8, and 176.8 g
+  And no consecutive target change exceeds 10 g
+
+Scenario: Historical target before the minimum existed
+  Given a target-history row predates schema v7 and records 160 g protein
+  When the row is loaded after migration
+  Then its recorded target remains 160 g and its minimum remains unknown
+  And target history shows no fabricated minimum
 ```
 
 ## Notes
@@ -93,3 +108,12 @@ Scenario: Approaching lean
   plant-based diet (**moderate**). Not modelled; a single line in the protein explanation for users who mark themselves vegan would be the
   cheapest honest treatment. Future phase.
 - Every figure in the table goes in the evidence register (MM-143) and to MM-29.
+
+## Implementation and verification
+- Added goal- and training-specific minimum/target calculations, the age-65 minimum floor, kidney-cap precedence, and a smooth lean-deficit
+  interpolation. The evidence-range helper remains documented separately from the selected app target.
+- Persisted the minimum in target history with schema v7; older history retains a null minimum rather than an invented value.
+- Surfaced the minimum and target in Food, Dashboard, Coach, target history, and target-change details. Protein progress shows separate
+  minimum and target marks; target-history rows from before the migration show only their recorded target.
+- Verified with focused engine calculation/body-fat uncertainty tests, migration tests, and Food/history/target-change UI tests. The full
+  `fvm dart run tool/bin/mm.dart check` passed.

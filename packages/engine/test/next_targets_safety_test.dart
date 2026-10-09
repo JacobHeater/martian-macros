@@ -9,13 +9,16 @@ import 'support/trend_points.dart';
 void main() {
   final start = CalendarDate(2026, 1, 1);
 
-  UserSetup setup({required CalendarDate onboardedOn}) => UserSetup(
+  UserSetup setup({
+    required CalendarDate onboardedOn,
+    ScreeningAnswers screening = const ScreeningAnswers(),
+  }) => UserSetup(
     profile: Profile(
       sex: BiologicalSex.male,
       birthDate: CalendarDate(1994, 3, 1),
       heightCm: 180,
     ),
-    screening: const ScreeningAnswers(),
+    screening: screening,
     trainingStatus: TrainingStatus.intermediate,
     trainingDaysPerWeek: 3,
     goalMode: GoalMode.fatLoss,
@@ -85,12 +88,59 @@ void main() {
       bodyFat: snapshot.bodyFat,
       bmrKcal: snapshot.bmrKcal,
       tdee: snapshot.tdee,
+      confidence: snapshot.confidence,
       recommendation: snapshot.recommendation,
     );
     expect(
       nextTargets(
         setup: s,
         snapshot: slow,
+        history: [deficitStartingOn(start)],
+        today: start.addDays(35),
+      ),
+      isNull,
+    );
+  });
+
+  test('an updated estimate still waits while confidence is Learning', () {
+    final s = setup(onboardedOn: start);
+    final base = snapshotAfter(35, s);
+    final snapshot = CoachSnapshot(
+      policy: base.policy,
+      trend: trendOf(
+        start: start.addDays(5),
+        days: 30,
+        levelKg: 85,
+        lossFractionPerWeek: 0,
+      ),
+      trendWeightKg: base.trendWeightKg,
+      bodyFat: base.bodyFat,
+      bmrKcal: base.bmrKcal,
+      tdee: TdeeEstimate(
+        kcal: base.tdee.kcal,
+        sigmaKcal: base.tdee.sigmaKcal,
+        status: TdeeStatus.updated,
+        usableIntakeDays: base.tdee.usableIntakeDays,
+        excludedPartialDays: base.tdee.excludedPartialDays,
+        weighIns: base.tdee.weighIns,
+      ),
+      confidence: const CoachConfidence(
+        level: ConfidenceLevel.learning,
+        estimate: ConfidenceLevel.learning,
+        foodLog: ConfidenceLevel.good,
+        weighIns: ConfidenceLevel.good,
+        stability: ConfidenceLevel.good,
+        nextStep: ConfidenceNextStep.keepLogging,
+        usableFoodDays: 24,
+        weighInDays: 24,
+      ),
+      recommendation: base.recommendation,
+    );
+
+    expect(
+      nextTargets(
+        setup: s,
+        snapshot: snapshot,
         history: [deficitStartingOn(start)],
         today: start.addDays(35),
       ),
@@ -108,6 +158,18 @@ void main() {
         history: [deficitStartingOn(start.addDays(32))],
         today: start.addDays(35),
       ),
+      isNull,
+    );
+  });
+
+  test('bariatric surgery prevents issuing targets', () {
+    final s = setup(
+      onboardedOn: start,
+      screening: const ScreeningAnswers(bariatricSurgery: true),
+    );
+    final snapshot = snapshotAfter(35, s);
+    expect(
+      nextTargets(setup: s, snapshot: snapshot, history: [], today: start),
       isNull,
     );
   });

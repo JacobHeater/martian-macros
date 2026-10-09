@@ -39,6 +39,17 @@ class Setups extends Table {
   BoolColumn get menopause => boolean().withDefault(const Constant(false))();
   BoolColumn get thyroidCondition =>
       boolean().withDefault(const Constant(false))();
+  BoolColumn get insulinOrSulfonylurea =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get insulinCareTeamConfirmed =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get bariatricSurgery =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get weightAffectingMedication =>
+      boolean().withDefault(const Constant(false))();
+  IntColumn get healthCheckConfirmedEpochDay => integer().nullable()();
+  IntColumn get healthCheckSkipCount =>
+      integer().withDefault(const Constant(0))();
 
   @override
   Set<Column<Object>> get primaryKey => {id};

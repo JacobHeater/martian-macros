@@ -138,9 +138,13 @@ void main() {
       await tester.tap(find.text('Coach'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
-        find.textContaining('daily activity and training days'),
+        find.text('Your metabolism estimate'),
         300,
       );
+      await tester.ensureVisible(find.text('Your metabolism estimate'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Your metabolism estimate'));
+      await tester.pumpAndSettle();
       expect(
         find.textContaining(
           'sex, age, height, weight, daily activity and training days',

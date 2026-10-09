@@ -30,5 +30,15 @@ extension CautionMessage on Caution {
     Caution.thyroidCondition =>
       'Thyroid conditions affect energy needs. The app adapts to your '
           'measured results; keep your treatment stable where you can.',
+    Caution.insulinOrSulfonylurea =>
+      'Insulin or sulfonylurea treatment can cause low blood sugar when you '
+          'eat less. Talk to your care team before a deficit; until then, '
+          'the app limits loss to the gentlest pace.',
+    Caution.bariatricSurgery =>
+      'After bariatric surgery, your surgical team should set your nutrition '
+          'targets. The app will not issue coaching targets.',
+    Caution.weightAffectingMedication =>
+      'Some medications can change weight or water retention. Your trend may '
+          'move for reasons other than food; keep your clinician informed.',
   };
 }

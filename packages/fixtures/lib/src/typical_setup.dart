@@ -7,6 +7,7 @@ UserSetup typicalSetup({
   ScreeningAnswers screening = const ScreeningAnswers(),
   DailyActivity dailyActivity = DailyActivity.light,
   CalendarDate? onboardedOn,
+  CalendarDate? healthCheckConfirmedOn,
 }) => UserSetup(
   profile: Profile(
     sex: sex,
@@ -19,4 +20,7 @@ UserSetup typicalSetup({
   dailyActivity: dailyActivity,
   goalMode: goalMode,
   onboardedOn: onboardedOn ?? CalendarDate(2026, 10, 1),
+  // Old onboarding dates in fixtures should not accidentally make the
+  // re-check due unless the test sets its confirmation date explicitly.
+  healthCheckConfirmedOn: healthCheckConfirmedOn ?? CalendarDate(2026, 10, 1),
 );

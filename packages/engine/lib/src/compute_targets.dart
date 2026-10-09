@@ -103,16 +103,19 @@ DailyTargets computeTargets(TargetInputs i) => computeTargetsTraced(i).targets;
     flags.add(TargetFlag.flooredAtSafetyMinimum);
   }
 
-  final protein = SafetyBounds.proteinRangeG(
+  final protein = SafetyBounds.proteinTargetsG(
     sex: i.sex,
     weightKg: i.trendWeightKg,
     heightCm: i.heightCm,
     bodyFatPercent: safetyBf,
     inDeficit: rate < 0,
-    capGPerKg: i.policy.proteinCapGPerKg,
+    lifting:
+        !(i.trainingStatus == TrainingStatus.untrained &&
+            i.trainingDaysPerWeek == 0),
+    policy: i.policy,
   );
   if (i.policy.proteinCapGPerKg != null) flags.add(TargetFlag.proteinCapped);
-  final proteinG = protein.midG;
+  final proteinG = protein.targetG;
 
   final minFat = SafetyBounds.minFatG(
     sex: i.sex,
@@ -131,6 +134,7 @@ DailyTargets computeTargets(TargetInputs i) => computeTargetsTraced(i).targets;
     targets: DailyTargets(
       kcal: kcal,
       proteinG: proteinG,
+      proteinMinimumG: protein.minimumG,
       fatG: fatG,
       carbsG: carbsG,
       weeklyRateFraction: rate,

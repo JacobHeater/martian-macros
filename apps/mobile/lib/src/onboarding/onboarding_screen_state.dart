@@ -134,6 +134,10 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       chronicKidneyDisease: s.chronicKidneyDisease,
       androgenUse: s.androgenUse,
       thyroidCondition: s.thyroidCondition,
+      insulinOrSulfonylurea: s.insulinOrSulfonylurea,
+      insulinCareTeamConfirmed: s.insulinCareTeamConfirmed,
+      bariatricSurgery: s.bariatricSurgery,
+      weightAffectingMedication: s.weightAffectingMedication,
     );
   }
 
@@ -172,6 +176,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ? chosen
                 : recommended,
             onboardedOn: _today,
+            healthCheckConfirmedOn: _today,
             unitSystem: _units,
             bodyFatPercent: _bodyFat,
           ),
