@@ -65,6 +65,11 @@ final completenessProvider =
       (ref, date) => ref.watch(dayMarkReaderProvider).watchCompleteness(date),
     );
 
+/// The user's own foods and recipes, by name (MM-45).
+final customFoodsProvider = StreamProvider<List<CustomFood>>(
+  (ref) => ref.watch(customFoodReaderProvider).watchCustomFoods(),
+);
+
 final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
   (ref) => ref.watch(recentFoodReaderProvider).watchRecentFoods(),
 );

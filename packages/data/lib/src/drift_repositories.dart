@@ -2,6 +2,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import 'app_database.dart';
+import 'drift_custom_food_repository.dart';
 import 'drift_data_eraser.dart';
 import 'drift_day_mark_repository.dart';
 import 'drift_food_repository.dart';
@@ -23,6 +24,7 @@ final class DriftRepositories {
       weightEvents = DriftWeightEventRepository(db),
       waist = DriftWaistRepository(db),
       food = DriftFoodRepository(db),
+      customFoods = DriftCustomFoodRepository(db),
       dayMarks = DriftDayMarkRepository(db),
       intake = DriftIntakeReader(db),
       targets = DriftTargetsHistoryRepository(db),
@@ -35,6 +37,7 @@ final class DriftRepositories {
   final WeightEventRepository weightEvents;
   final WaistRepository waist;
   final FoodRepository food;
+  final CustomFoodRepository customFoods;
   final DayMarkRepository dayMarks;
   final IntakeReader intake;
   final TargetsHistoryRepository targets;

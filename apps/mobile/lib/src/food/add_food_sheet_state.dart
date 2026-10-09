@@ -24,6 +24,8 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/notice.dart';
 import 'add_food_sheet.dart';
+import 'custom/custom_catalog_food.dart';
+import 'custom/my_foods_step.dart';
 import 'estimate/estimate_meal_step.dart';
 import 'food_amount_step.dart';
 import 'food_search_results.dart';
@@ -34,6 +36,8 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   CatalogFood? _picked;
   var _scanning = false;
   var _estimating = false;
+  var _myFoods = false;
+  CustomFood? _pickedCustom;
   final _name = TextEditingController();
   final _kcal = TextEditingController();
   final _protein = TextEditingController();
@@ -302,6 +306,24 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         ),
       );
     }
+    final pickedCustom = _pickedCustom;
+    if (pickedCustom != null) {
+      return _sheet(
+        FoodAmountStep(
+          food: customCatalogFood(pickedCustom),
+          custom: pickedCustom,
+          servings: const [],
+          day: widget.day,
+          meal: _meal,
+          onBack: () => setState(() => _pickedCustom = null),
+        ),
+      );
+    }
+    if (_myFoods) {
+      return _sheet(
+        MyFoodsStep(onBack: () => setState(() => _myFoods = false)),
+      );
+    }
     if (_estimating) {
       return _sheet(
         EstimateMealStep(
@@ -317,6 +339,10 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           onFound: (food) => setState(() {
             _scanning = false;
             _picked = food;
+          }),
+          onFoundCustom: (food) => setState(() {
+            _scanning = false;
+            _pickedCustom = food;
           }),
           onManual: () => setState(() => _scanning = false),
           onBack: () => setState(() => _scanning = false),
@@ -346,25 +372,38 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           if (!editing && query.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: MmButton(
-                key: const ValueKey('food-scan'),
-                label: 'Scan a barcode',
-                kind: MmButtonKind.secondary,
-                icon: Icons.qr_code_scanner,
-                expand: true,
-                onPressed: () => setState(() => _scanning = true),
-              ),
-            ),
-          if (!editing && query.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: MmButton(
-                key: const ValueKey('food-estimate'),
-                label: 'Estimate a meal',
-                kind: MmButtonKind.secondary,
-                icon: Icons.restaurant,
-                expand: true,
-                onPressed: () => setState(() => _estimating = true),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: MmButton(
+                      key: const ValueKey('food-scan'),
+                      label: 'Scan',
+                      kind: MmButtonKind.secondary,
+                      icon: Icons.qr_code_scanner,
+                      onPressed: () => setState(() => _scanning = true),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: MmButton(
+                      key: const ValueKey('food-my-foods'),
+                      label: 'Saved',
+                      kind: MmButtonKind.secondary,
+                      icon: Icons.bookmark_border,
+                      onPressed: () => setState(() => _myFoods = true),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: MmButton(
+                      key: const ValueKey('food-estimate'),
+                      label: 'Estimate',
+                      kind: MmButtonKind.secondary,
+                      icon: Icons.restaurant,
+                      onPressed: () => setState(() => _estimating = true),
+                    ),
+                  ),
+                ],
               ),
             ),
           if (editing)
@@ -377,6 +416,27 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
               onLabelTap: null,
             ),
           if (!editing && query.isNotEmpty) ...[
+            for (final f
+                in ref
+                    .watch(customFoodsProvider)
+                    .maybeWhen(
+                      data: (all) => all
+                          .where(
+                            (f) => f.name.toLowerCase().contains(
+                              query.toLowerCase(),
+                            ),
+                          )
+                          .toList(),
+                      orElse: () => const <CustomFood>[],
+                    ))
+              MmListRow(
+                key: ValueKey('custom-hit-${f.id}'),
+                title: f.name,
+                subtitle:
+                    '${f.kind == CustomFoodKind.recipe ? 'Your recipe' : 'Your food'} · '
+                    '${f.servingDescription} · ${Fmt.kcal(f.perServing.kcal)}',
+                onTap: () => setState(() => _pickedCustom = f),
+              ),
             for (final e in matchingRecents)
               MmListRow(
                 title: e.name,

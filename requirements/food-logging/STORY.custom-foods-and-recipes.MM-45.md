@@ -1,6 +1,6 @@
 ---
 id: MM-45
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-39, MM-42, MM-44, MM-47, MM-61, MM-167]
 ---
@@ -47,3 +47,19 @@ Scenario: The energy check
 
 ## Clarified by MM-167 (proposed)
 Logging a custom food or recipe "in any number of servings or grams" writes the same quantity, unit and basis fields as any other food.
+
+## Progress
+Built: schema version 12 with `custom_foods` and `recipe_ingredients` (migration 11 to 12), `CustomFoodRepository` (Drift and in-memory,
+with a shared contract test), and in the add-food sheet a "My foods and recipes" step. **A saved food** has a name, a serving
+description and weight, numbers per serving (with the same energy-against-macros warning as a typed entry) and an optional barcode.
+**A recipe** has ingredients (found by search and a weight, or typed as totals), a number of servings and an optional cooked weight of
+the whole pot; one serving is the summed ingredients divided by the servings, and a serving weighs the cooked weight over the
+servings (raw weights are never used, so a recipe with no cooked weight is logged by servings only). Saved foods and recipes appear in
+search above recents and database results, are found by scanning their barcode, can be edited, and are deleted after a confirmation
+that says logged entries stay. They are logged through the same amount step as any food (servings, grams, ounces), recording the
+quantity, unit and per-serving reference (MM-167). Editing never touches entries already logged: each entry stores its own totals.
+Tests: `custom_foods_test.dart`, `recipe_test.dart`, the repository contract in both stores, and the migration tests.
+
+Not built: inclusion in backup (MM-63 is unbuilt; its format must carry these tables); ingredient lines do not remember which
+database food they came from, only the totals at the time; a recipe's ingredients cannot yet be reordered; saved foods are not used by
+the "Fix this food" copy (MM-153); the raw-or-cooked prompt (MM-151) for ingredients. Not seen on the emulator.
