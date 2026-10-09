@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 
 import 'app_database.dart';
+import 'portion_columns.dart';
 
 /// A stored food row as the domain object the rest of the app sees.
 FoodEntry foodFromRow(FoodRow r) => FoodEntry(
@@ -13,4 +14,5 @@ FoodEntry foodFromRow(FoodRow r) => FoodEntry(
   carbsG: r.carbsG,
   fatG: r.fatG,
   source: r.quantitySource,
+  portion: portionFromRow(r),
 );

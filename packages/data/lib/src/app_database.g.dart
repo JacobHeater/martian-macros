@@ -2036,6 +2036,143 @@ class $FoodEntriesTable extends FoodEntries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   ).withConverter<QuantitySource>($FoodEntriesTable.$converterquantitySource);
+  static const VerificationMeta _portionQuantityMeta = const VerificationMeta(
+    'portionQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> portionQuantity = GeneratedColumn<double>(
+    'portion_quantity',
+    aliasedName,
+    true,
+    check: () => ComparableExpr(portionQuantity).isBiggerThanValue(0),
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<PortionUnit?, String>
+  portionUnit = GeneratedColumn<String>(
+    'portion_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<PortionUnit?>($FoodEntriesTable.$converterportionUnitn);
+  @override
+  late final GeneratedColumnWithTypeConverter<NutritionBasis?, String>
+  nutritionBasis = GeneratedColumn<String>(
+    'nutrition_basis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<NutritionBasis?>($FoodEntriesTable.$converternutritionBasisn);
+  @override
+  late final GeneratedColumnWithTypeConverter<ReferenceBasis?, String>
+  referenceBasis = GeneratedColumn<String>(
+    'reference_basis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<ReferenceBasis?>($FoodEntriesTable.$converterreferenceBasisn);
+  static const VerificationMeta _referenceKcalMeta = const VerificationMeta(
+    'referenceKcal',
+  );
+  @override
+  late final GeneratedColumn<double> referenceKcal = GeneratedColumn<double>(
+    'reference_kcal',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referenceProteinGMeta = const VerificationMeta(
+    'referenceProteinG',
+  );
+  @override
+  late final GeneratedColumn<double> referenceProteinG =
+      GeneratedColumn<double>(
+        'reference_protein_g',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referenceCarbsGMeta = const VerificationMeta(
+    'referenceCarbsG',
+  );
+  @override
+  late final GeneratedColumn<double> referenceCarbsG = GeneratedColumn<double>(
+    'reference_carbs_g',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referenceFatGMeta = const VerificationMeta(
+    'referenceFatG',
+  );
+  @override
+  late final GeneratedColumn<double> referenceFatG = GeneratedColumn<double>(
+    'reference_fat_g',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _servingDescriptionMeta =
+      const VerificationMeta('servingDescription');
+  @override
+  late final GeneratedColumn<String> servingDescription =
+      GeneratedColumn<String>(
+        'serving_description',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _servingGramsMeta = const VerificationMeta(
+    'servingGrams',
+  );
+  @override
+  late final GeneratedColumn<double> servingGrams = GeneratedColumn<double>(
+    'serving_grams',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _servingMillilitersMeta =
+      const VerificationMeta('servingMilliliters');
+  @override
+  late final GeneratedColumn<double> servingMilliliters =
+      GeneratedColumn<double>(
+        'serving_milliliters',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<PortionUnit?, String>
+  servingUnit = GeneratedColumn<String>(
+    'serving_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<PortionUnit?>($FoodEntriesTable.$converterservingUnitn);
+  static const VerificationMeta _densityGPerMlMeta = const VerificationMeta(
+    'densityGPerMl',
+  );
+  @override
+  late final GeneratedColumn<double> densityGPerMl = GeneratedColumn<double>(
+    'density_g_per_ml',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2059,6 +2196,19 @@ class $FoodEntriesTable extends FoodEntries
     carbsG,
     fatG,
     quantitySource,
+    portionQuantity,
+    portionUnit,
+    nutritionBasis,
+    referenceBasis,
+    referenceKcal,
+    referenceProteinG,
+    referenceCarbsG,
+    referenceFatG,
+    servingDescription,
+    servingGrams,
+    servingMilliliters,
+    servingUnit,
+    densityGPerMl,
     createdAt,
   ];
   @override
@@ -2124,6 +2274,87 @@ class $FoodEntriesTable extends FoodEntries
     } else if (isInserting) {
       context.missing(_fatGMeta);
     }
+    if (data.containsKey('portion_quantity')) {
+      context.handle(
+        _portionQuantityMeta,
+        portionQuantity.isAcceptableOrUnknown(
+          data['portion_quantity']!,
+          _portionQuantityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference_kcal')) {
+      context.handle(
+        _referenceKcalMeta,
+        referenceKcal.isAcceptableOrUnknown(
+          data['reference_kcal']!,
+          _referenceKcalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference_protein_g')) {
+      context.handle(
+        _referenceProteinGMeta,
+        referenceProteinG.isAcceptableOrUnknown(
+          data['reference_protein_g']!,
+          _referenceProteinGMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference_carbs_g')) {
+      context.handle(
+        _referenceCarbsGMeta,
+        referenceCarbsG.isAcceptableOrUnknown(
+          data['reference_carbs_g']!,
+          _referenceCarbsGMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference_fat_g')) {
+      context.handle(
+        _referenceFatGMeta,
+        referenceFatG.isAcceptableOrUnknown(
+          data['reference_fat_g']!,
+          _referenceFatGMeta,
+        ),
+      );
+    }
+    if (data.containsKey('serving_description')) {
+      context.handle(
+        _servingDescriptionMeta,
+        servingDescription.isAcceptableOrUnknown(
+          data['serving_description']!,
+          _servingDescriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('serving_grams')) {
+      context.handle(
+        _servingGramsMeta,
+        servingGrams.isAcceptableOrUnknown(
+          data['serving_grams']!,
+          _servingGramsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('serving_milliliters')) {
+      context.handle(
+        _servingMillilitersMeta,
+        servingMilliliters.isAcceptableOrUnknown(
+          data['serving_milliliters']!,
+          _servingMillilitersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('density_g_per_ml')) {
+      context.handle(
+        _densityGPerMlMeta,
+        densityGPerMl.isAcceptableOrUnknown(
+          data['density_g_per_ml']!,
+          _densityGPerMlMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -2179,6 +2410,66 @@ class $FoodEntriesTable extends FoodEntries
           data['${effectivePrefix}quantity_source'],
         )!,
       ),
+      portionQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}portion_quantity'],
+      ),
+      portionUnit: $FoodEntriesTable.$converterportionUnitn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}portion_unit'],
+        ),
+      ),
+      nutritionBasis: $FoodEntriesTable.$converternutritionBasisn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}nutrition_basis'],
+        ),
+      ),
+      referenceBasis: $FoodEntriesTable.$converterreferenceBasisn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}reference_basis'],
+        ),
+      ),
+      referenceKcal: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reference_kcal'],
+      ),
+      referenceProteinG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reference_protein_g'],
+      ),
+      referenceCarbsG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reference_carbs_g'],
+      ),
+      referenceFatG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reference_fat_g'],
+      ),
+      servingDescription: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}serving_description'],
+      ),
+      servingGrams: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}serving_grams'],
+      ),
+      servingMilliliters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}serving_milliliters'],
+      ),
+      servingUnit: $FoodEntriesTable.$converterservingUnitn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}serving_unit'],
+        ),
+      ),
+      densityGPerMl: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}density_g_per_ml'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -2197,6 +2488,30 @@ class $FoodEntriesTable extends FoodEntries
   $converterquantitySource = const EnumNameConverter<QuantitySource>(
     QuantitySource.values,
   );
+  static JsonTypeConverter2<PortionUnit, String, String> $converterportionUnit =
+      const EnumNameConverter<PortionUnit>(PortionUnit.values);
+  static JsonTypeConverter2<PortionUnit?, String?, String?>
+  $converterportionUnitn = JsonTypeConverter2.asNullable($converterportionUnit);
+  static JsonTypeConverter2<NutritionBasis, String, String>
+  $converternutritionBasis = const EnumNameConverter<NutritionBasis>(
+    NutritionBasis.values,
+  );
+  static JsonTypeConverter2<NutritionBasis?, String?, String?>
+  $converternutritionBasisn = JsonTypeConverter2.asNullable(
+    $converternutritionBasis,
+  );
+  static JsonTypeConverter2<ReferenceBasis, String, String>
+  $converterreferenceBasis = const EnumNameConverter<ReferenceBasis>(
+    ReferenceBasis.values,
+  );
+  static JsonTypeConverter2<ReferenceBasis?, String?, String?>
+  $converterreferenceBasisn = JsonTypeConverter2.asNullable(
+    $converterreferenceBasis,
+  );
+  static JsonTypeConverter2<PortionUnit, String, String> $converterservingUnit =
+      const EnumNameConverter<PortionUnit>(PortionUnit.values);
+  static JsonTypeConverter2<PortionUnit?, String?, String?>
+  $converterservingUnitn = JsonTypeConverter2.asNullable($converterservingUnit);
 }
 
 class FoodRow extends DataClass implements Insertable<FoodRow> {
@@ -2209,6 +2524,19 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
   final double carbsG;
   final double fatG;
   final QuantitySource quantitySource;
+  final double? portionQuantity;
+  final PortionUnit? portionUnit;
+  final NutritionBasis? nutritionBasis;
+  final ReferenceBasis? referenceBasis;
+  final double? referenceKcal;
+  final double? referenceProteinG;
+  final double? referenceCarbsG;
+  final double? referenceFatG;
+  final String? servingDescription;
+  final double? servingGrams;
+  final double? servingMilliliters;
+  final PortionUnit? servingUnit;
+  final double? densityGPerMl;
   final DateTime createdAt;
   const FoodRow({
     required this.id,
@@ -2220,6 +2548,19 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     required this.carbsG,
     required this.fatG,
     required this.quantitySource,
+    this.portionQuantity,
+    this.portionUnit,
+    this.nutritionBasis,
+    this.referenceBasis,
+    this.referenceKcal,
+    this.referenceProteinG,
+    this.referenceCarbsG,
+    this.referenceFatG,
+    this.servingDescription,
+    this.servingGrams,
+    this.servingMilliliters,
+    this.servingUnit,
+    this.densityGPerMl,
     required this.createdAt,
   });
   @override
@@ -2242,6 +2583,53 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
         $FoodEntriesTable.$converterquantitySource.toSql(quantitySource),
       );
     }
+    if (!nullToAbsent || portionQuantity != null) {
+      map['portion_quantity'] = Variable<double>(portionQuantity);
+    }
+    if (!nullToAbsent || portionUnit != null) {
+      map['portion_unit'] = Variable<String>(
+        $FoodEntriesTable.$converterportionUnitn.toSql(portionUnit),
+      );
+    }
+    if (!nullToAbsent || nutritionBasis != null) {
+      map['nutrition_basis'] = Variable<String>(
+        $FoodEntriesTable.$converternutritionBasisn.toSql(nutritionBasis),
+      );
+    }
+    if (!nullToAbsent || referenceBasis != null) {
+      map['reference_basis'] = Variable<String>(
+        $FoodEntriesTable.$converterreferenceBasisn.toSql(referenceBasis),
+      );
+    }
+    if (!nullToAbsent || referenceKcal != null) {
+      map['reference_kcal'] = Variable<double>(referenceKcal);
+    }
+    if (!nullToAbsent || referenceProteinG != null) {
+      map['reference_protein_g'] = Variable<double>(referenceProteinG);
+    }
+    if (!nullToAbsent || referenceCarbsG != null) {
+      map['reference_carbs_g'] = Variable<double>(referenceCarbsG);
+    }
+    if (!nullToAbsent || referenceFatG != null) {
+      map['reference_fat_g'] = Variable<double>(referenceFatG);
+    }
+    if (!nullToAbsent || servingDescription != null) {
+      map['serving_description'] = Variable<String>(servingDescription);
+    }
+    if (!nullToAbsent || servingGrams != null) {
+      map['serving_grams'] = Variable<double>(servingGrams);
+    }
+    if (!nullToAbsent || servingMilliliters != null) {
+      map['serving_milliliters'] = Variable<double>(servingMilliliters);
+    }
+    if (!nullToAbsent || servingUnit != null) {
+      map['serving_unit'] = Variable<String>(
+        $FoodEntriesTable.$converterservingUnitn.toSql(servingUnit),
+      );
+    }
+    if (!nullToAbsent || densityGPerMl != null) {
+      map['density_g_per_ml'] = Variable<double>(densityGPerMl);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2257,6 +2645,45 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       carbsG: Value(carbsG),
       fatG: Value(fatG),
       quantitySource: Value(quantitySource),
+      portionQuantity: portionQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(portionQuantity),
+      portionUnit: portionUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(portionUnit),
+      nutritionBasis: nutritionBasis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nutritionBasis),
+      referenceBasis: referenceBasis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceBasis),
+      referenceKcal: referenceKcal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceKcal),
+      referenceProteinG: referenceProteinG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceProteinG),
+      referenceCarbsG: referenceCarbsG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceCarbsG),
+      referenceFatG: referenceFatG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceFatG),
+      servingDescription: servingDescription == null && nullToAbsent
+          ? const Value.absent()
+          : Value(servingDescription),
+      servingGrams: servingGrams == null && nullToAbsent
+          ? const Value.absent()
+          : Value(servingGrams),
+      servingMilliliters: servingMilliliters == null && nullToAbsent
+          ? const Value.absent()
+          : Value(servingMilliliters),
+      servingUnit: servingUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(servingUnit),
+      densityGPerMl: densityGPerMl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(densityGPerMl),
       createdAt: Value(createdAt),
     );
   }
@@ -2280,6 +2707,33 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       quantitySource: $FoodEntriesTable.$converterquantitySource.fromJson(
         serializer.fromJson<String>(json['quantitySource']),
       ),
+      portionQuantity: serializer.fromJson<double?>(json['portionQuantity']),
+      portionUnit: $FoodEntriesTable.$converterportionUnitn.fromJson(
+        serializer.fromJson<String?>(json['portionUnit']),
+      ),
+      nutritionBasis: $FoodEntriesTable.$converternutritionBasisn.fromJson(
+        serializer.fromJson<String?>(json['nutritionBasis']),
+      ),
+      referenceBasis: $FoodEntriesTable.$converterreferenceBasisn.fromJson(
+        serializer.fromJson<String?>(json['referenceBasis']),
+      ),
+      referenceKcal: serializer.fromJson<double?>(json['referenceKcal']),
+      referenceProteinG: serializer.fromJson<double?>(
+        json['referenceProteinG'],
+      ),
+      referenceCarbsG: serializer.fromJson<double?>(json['referenceCarbsG']),
+      referenceFatG: serializer.fromJson<double?>(json['referenceFatG']),
+      servingDescription: serializer.fromJson<String?>(
+        json['servingDescription'],
+      ),
+      servingGrams: serializer.fromJson<double?>(json['servingGrams']),
+      servingMilliliters: serializer.fromJson<double?>(
+        json['servingMilliliters'],
+      ),
+      servingUnit: $FoodEntriesTable.$converterservingUnitn.fromJson(
+        serializer.fromJson<String?>(json['servingUnit']),
+      ),
+      densityGPerMl: serializer.fromJson<double?>(json['densityGPerMl']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2300,6 +2754,27 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       'quantitySource': serializer.toJson<String>(
         $FoodEntriesTable.$converterquantitySource.toJson(quantitySource),
       ),
+      'portionQuantity': serializer.toJson<double?>(portionQuantity),
+      'portionUnit': serializer.toJson<String?>(
+        $FoodEntriesTable.$converterportionUnitn.toJson(portionUnit),
+      ),
+      'nutritionBasis': serializer.toJson<String?>(
+        $FoodEntriesTable.$converternutritionBasisn.toJson(nutritionBasis),
+      ),
+      'referenceBasis': serializer.toJson<String?>(
+        $FoodEntriesTable.$converterreferenceBasisn.toJson(referenceBasis),
+      ),
+      'referenceKcal': serializer.toJson<double?>(referenceKcal),
+      'referenceProteinG': serializer.toJson<double?>(referenceProteinG),
+      'referenceCarbsG': serializer.toJson<double?>(referenceCarbsG),
+      'referenceFatG': serializer.toJson<double?>(referenceFatG),
+      'servingDescription': serializer.toJson<String?>(servingDescription),
+      'servingGrams': serializer.toJson<double?>(servingGrams),
+      'servingMilliliters': serializer.toJson<double?>(servingMilliliters),
+      'servingUnit': serializer.toJson<String?>(
+        $FoodEntriesTable.$converterservingUnitn.toJson(servingUnit),
+      ),
+      'densityGPerMl': serializer.toJson<double?>(densityGPerMl),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2314,6 +2789,19 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     double? carbsG,
     double? fatG,
     QuantitySource? quantitySource,
+    Value<double?> portionQuantity = const Value.absent(),
+    Value<PortionUnit?> portionUnit = const Value.absent(),
+    Value<NutritionBasis?> nutritionBasis = const Value.absent(),
+    Value<ReferenceBasis?> referenceBasis = const Value.absent(),
+    Value<double?> referenceKcal = const Value.absent(),
+    Value<double?> referenceProteinG = const Value.absent(),
+    Value<double?> referenceCarbsG = const Value.absent(),
+    Value<double?> referenceFatG = const Value.absent(),
+    Value<String?> servingDescription = const Value.absent(),
+    Value<double?> servingGrams = const Value.absent(),
+    Value<double?> servingMilliliters = const Value.absent(),
+    Value<PortionUnit?> servingUnit = const Value.absent(),
+    Value<double?> densityGPerMl = const Value.absent(),
     DateTime? createdAt,
   }) => FoodRow(
     id: id ?? this.id,
@@ -2325,6 +2813,39 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     carbsG: carbsG ?? this.carbsG,
     fatG: fatG ?? this.fatG,
     quantitySource: quantitySource ?? this.quantitySource,
+    portionQuantity: portionQuantity.present
+        ? portionQuantity.value
+        : this.portionQuantity,
+    portionUnit: portionUnit.present ? portionUnit.value : this.portionUnit,
+    nutritionBasis: nutritionBasis.present
+        ? nutritionBasis.value
+        : this.nutritionBasis,
+    referenceBasis: referenceBasis.present
+        ? referenceBasis.value
+        : this.referenceBasis,
+    referenceKcal: referenceKcal.present
+        ? referenceKcal.value
+        : this.referenceKcal,
+    referenceProteinG: referenceProteinG.present
+        ? referenceProteinG.value
+        : this.referenceProteinG,
+    referenceCarbsG: referenceCarbsG.present
+        ? referenceCarbsG.value
+        : this.referenceCarbsG,
+    referenceFatG: referenceFatG.present
+        ? referenceFatG.value
+        : this.referenceFatG,
+    servingDescription: servingDescription.present
+        ? servingDescription.value
+        : this.servingDescription,
+    servingGrams: servingGrams.present ? servingGrams.value : this.servingGrams,
+    servingMilliliters: servingMilliliters.present
+        ? servingMilliliters.value
+        : this.servingMilliliters,
+    servingUnit: servingUnit.present ? servingUnit.value : this.servingUnit,
+    densityGPerMl: densityGPerMl.present
+        ? densityGPerMl.value
+        : this.densityGPerMl,
     createdAt: createdAt ?? this.createdAt,
   );
   FoodRow copyWithCompanion(FoodEntriesCompanion data) {
@@ -2340,6 +2861,45 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       quantitySource: data.quantitySource.present
           ? data.quantitySource.value
           : this.quantitySource,
+      portionQuantity: data.portionQuantity.present
+          ? data.portionQuantity.value
+          : this.portionQuantity,
+      portionUnit: data.portionUnit.present
+          ? data.portionUnit.value
+          : this.portionUnit,
+      nutritionBasis: data.nutritionBasis.present
+          ? data.nutritionBasis.value
+          : this.nutritionBasis,
+      referenceBasis: data.referenceBasis.present
+          ? data.referenceBasis.value
+          : this.referenceBasis,
+      referenceKcal: data.referenceKcal.present
+          ? data.referenceKcal.value
+          : this.referenceKcal,
+      referenceProteinG: data.referenceProteinG.present
+          ? data.referenceProteinG.value
+          : this.referenceProteinG,
+      referenceCarbsG: data.referenceCarbsG.present
+          ? data.referenceCarbsG.value
+          : this.referenceCarbsG,
+      referenceFatG: data.referenceFatG.present
+          ? data.referenceFatG.value
+          : this.referenceFatG,
+      servingDescription: data.servingDescription.present
+          ? data.servingDescription.value
+          : this.servingDescription,
+      servingGrams: data.servingGrams.present
+          ? data.servingGrams.value
+          : this.servingGrams,
+      servingMilliliters: data.servingMilliliters.present
+          ? data.servingMilliliters.value
+          : this.servingMilliliters,
+      servingUnit: data.servingUnit.present
+          ? data.servingUnit.value
+          : this.servingUnit,
+      densityGPerMl: data.densityGPerMl.present
+          ? data.densityGPerMl.value
+          : this.densityGPerMl,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -2356,13 +2916,26 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           ..write('carbsG: $carbsG, ')
           ..write('fatG: $fatG, ')
           ..write('quantitySource: $quantitySource, ')
+          ..write('portionQuantity: $portionQuantity, ')
+          ..write('portionUnit: $portionUnit, ')
+          ..write('nutritionBasis: $nutritionBasis, ')
+          ..write('referenceBasis: $referenceBasis, ')
+          ..write('referenceKcal: $referenceKcal, ')
+          ..write('referenceProteinG: $referenceProteinG, ')
+          ..write('referenceCarbsG: $referenceCarbsG, ')
+          ..write('referenceFatG: $referenceFatG, ')
+          ..write('servingDescription: $servingDescription, ')
+          ..write('servingGrams: $servingGrams, ')
+          ..write('servingMilliliters: $servingMilliliters, ')
+          ..write('servingUnit: $servingUnit, ')
+          ..write('densityGPerMl: $densityGPerMl, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     epochDay,
     meal,
@@ -2372,8 +2945,21 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     carbsG,
     fatG,
     quantitySource,
+    portionQuantity,
+    portionUnit,
+    nutritionBasis,
+    referenceBasis,
+    referenceKcal,
+    referenceProteinG,
+    referenceCarbsG,
+    referenceFatG,
+    servingDescription,
+    servingGrams,
+    servingMilliliters,
+    servingUnit,
+    densityGPerMl,
     createdAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2387,6 +2973,19 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           other.carbsG == this.carbsG &&
           other.fatG == this.fatG &&
           other.quantitySource == this.quantitySource &&
+          other.portionQuantity == this.portionQuantity &&
+          other.portionUnit == this.portionUnit &&
+          other.nutritionBasis == this.nutritionBasis &&
+          other.referenceBasis == this.referenceBasis &&
+          other.referenceKcal == this.referenceKcal &&
+          other.referenceProteinG == this.referenceProteinG &&
+          other.referenceCarbsG == this.referenceCarbsG &&
+          other.referenceFatG == this.referenceFatG &&
+          other.servingDescription == this.servingDescription &&
+          other.servingGrams == this.servingGrams &&
+          other.servingMilliliters == this.servingMilliliters &&
+          other.servingUnit == this.servingUnit &&
+          other.densityGPerMl == this.densityGPerMl &&
           other.createdAt == this.createdAt);
 }
 
@@ -2400,6 +2999,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
   final Value<double> carbsG;
   final Value<double> fatG;
   final Value<QuantitySource> quantitySource;
+  final Value<double?> portionQuantity;
+  final Value<PortionUnit?> portionUnit;
+  final Value<NutritionBasis?> nutritionBasis;
+  final Value<ReferenceBasis?> referenceBasis;
+  final Value<double?> referenceKcal;
+  final Value<double?> referenceProteinG;
+  final Value<double?> referenceCarbsG;
+  final Value<double?> referenceFatG;
+  final Value<String?> servingDescription;
+  final Value<double?> servingGrams;
+  final Value<double?> servingMilliliters;
+  final Value<PortionUnit?> servingUnit;
+  final Value<double?> densityGPerMl;
   final Value<DateTime> createdAt;
   const FoodEntriesCompanion({
     this.id = const Value.absent(),
@@ -2411,6 +3023,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.carbsG = const Value.absent(),
     this.fatG = const Value.absent(),
     this.quantitySource = const Value.absent(),
+    this.portionQuantity = const Value.absent(),
+    this.portionUnit = const Value.absent(),
+    this.nutritionBasis = const Value.absent(),
+    this.referenceBasis = const Value.absent(),
+    this.referenceKcal = const Value.absent(),
+    this.referenceProteinG = const Value.absent(),
+    this.referenceCarbsG = const Value.absent(),
+    this.referenceFatG = const Value.absent(),
+    this.servingDescription = const Value.absent(),
+    this.servingGrams = const Value.absent(),
+    this.servingMilliliters = const Value.absent(),
+    this.servingUnit = const Value.absent(),
+    this.densityGPerMl = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   FoodEntriesCompanion.insert({
@@ -2423,6 +3048,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     required double carbsG,
     required double fatG,
     required QuantitySource quantitySource,
+    this.portionQuantity = const Value.absent(),
+    this.portionUnit = const Value.absent(),
+    this.nutritionBasis = const Value.absent(),
+    this.referenceBasis = const Value.absent(),
+    this.referenceKcal = const Value.absent(),
+    this.referenceProteinG = const Value.absent(),
+    this.referenceCarbsG = const Value.absent(),
+    this.referenceFatG = const Value.absent(),
+    this.servingDescription = const Value.absent(),
+    this.servingGrams = const Value.absent(),
+    this.servingMilliliters = const Value.absent(),
+    this.servingUnit = const Value.absent(),
+    this.densityGPerMl = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : epochDay = Value(epochDay),
        meal = Value(meal),
@@ -2442,6 +3080,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Expression<double>? carbsG,
     Expression<double>? fatG,
     Expression<String>? quantitySource,
+    Expression<double>? portionQuantity,
+    Expression<String>? portionUnit,
+    Expression<String>? nutritionBasis,
+    Expression<String>? referenceBasis,
+    Expression<double>? referenceKcal,
+    Expression<double>? referenceProteinG,
+    Expression<double>? referenceCarbsG,
+    Expression<double>? referenceFatG,
+    Expression<String>? servingDescription,
+    Expression<double>? servingGrams,
+    Expression<double>? servingMilliliters,
+    Expression<String>? servingUnit,
+    Expression<double>? densityGPerMl,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -2454,6 +3105,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       if (carbsG != null) 'carbs_g': carbsG,
       if (fatG != null) 'fat_g': fatG,
       if (quantitySource != null) 'quantity_source': quantitySource,
+      if (portionQuantity != null) 'portion_quantity': portionQuantity,
+      if (portionUnit != null) 'portion_unit': portionUnit,
+      if (nutritionBasis != null) 'nutrition_basis': nutritionBasis,
+      if (referenceBasis != null) 'reference_basis': referenceBasis,
+      if (referenceKcal != null) 'reference_kcal': referenceKcal,
+      if (referenceProteinG != null) 'reference_protein_g': referenceProteinG,
+      if (referenceCarbsG != null) 'reference_carbs_g': referenceCarbsG,
+      if (referenceFatG != null) 'reference_fat_g': referenceFatG,
+      if (servingDescription != null) 'serving_description': servingDescription,
+      if (servingGrams != null) 'serving_grams': servingGrams,
+      if (servingMilliliters != null) 'serving_milliliters': servingMilliliters,
+      if (servingUnit != null) 'serving_unit': servingUnit,
+      if (densityGPerMl != null) 'density_g_per_ml': densityGPerMl,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -2468,6 +3132,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Value<double>? carbsG,
     Value<double>? fatG,
     Value<QuantitySource>? quantitySource,
+    Value<double?>? portionQuantity,
+    Value<PortionUnit?>? portionUnit,
+    Value<NutritionBasis?>? nutritionBasis,
+    Value<ReferenceBasis?>? referenceBasis,
+    Value<double?>? referenceKcal,
+    Value<double?>? referenceProteinG,
+    Value<double?>? referenceCarbsG,
+    Value<double?>? referenceFatG,
+    Value<String?>? servingDescription,
+    Value<double?>? servingGrams,
+    Value<double?>? servingMilliliters,
+    Value<PortionUnit?>? servingUnit,
+    Value<double?>? densityGPerMl,
     Value<DateTime>? createdAt,
   }) {
     return FoodEntriesCompanion(
@@ -2480,6 +3157,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       carbsG: carbsG ?? this.carbsG,
       fatG: fatG ?? this.fatG,
       quantitySource: quantitySource ?? this.quantitySource,
+      portionQuantity: portionQuantity ?? this.portionQuantity,
+      portionUnit: portionUnit ?? this.portionUnit,
+      nutritionBasis: nutritionBasis ?? this.nutritionBasis,
+      referenceBasis: referenceBasis ?? this.referenceBasis,
+      referenceKcal: referenceKcal ?? this.referenceKcal,
+      referenceProteinG: referenceProteinG ?? this.referenceProteinG,
+      referenceCarbsG: referenceCarbsG ?? this.referenceCarbsG,
+      referenceFatG: referenceFatG ?? this.referenceFatG,
+      servingDescription: servingDescription ?? this.servingDescription,
+      servingGrams: servingGrams ?? this.servingGrams,
+      servingMilliliters: servingMilliliters ?? this.servingMilliliters,
+      servingUnit: servingUnit ?? this.servingUnit,
+      densityGPerMl: densityGPerMl ?? this.densityGPerMl,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -2518,6 +3208,53 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
         $FoodEntriesTable.$converterquantitySource.toSql(quantitySource.value),
       );
     }
+    if (portionQuantity.present) {
+      map['portion_quantity'] = Variable<double>(portionQuantity.value);
+    }
+    if (portionUnit.present) {
+      map['portion_unit'] = Variable<String>(
+        $FoodEntriesTable.$converterportionUnitn.toSql(portionUnit.value),
+      );
+    }
+    if (nutritionBasis.present) {
+      map['nutrition_basis'] = Variable<String>(
+        $FoodEntriesTable.$converternutritionBasisn.toSql(nutritionBasis.value),
+      );
+    }
+    if (referenceBasis.present) {
+      map['reference_basis'] = Variable<String>(
+        $FoodEntriesTable.$converterreferenceBasisn.toSql(referenceBasis.value),
+      );
+    }
+    if (referenceKcal.present) {
+      map['reference_kcal'] = Variable<double>(referenceKcal.value);
+    }
+    if (referenceProteinG.present) {
+      map['reference_protein_g'] = Variable<double>(referenceProteinG.value);
+    }
+    if (referenceCarbsG.present) {
+      map['reference_carbs_g'] = Variable<double>(referenceCarbsG.value);
+    }
+    if (referenceFatG.present) {
+      map['reference_fat_g'] = Variable<double>(referenceFatG.value);
+    }
+    if (servingDescription.present) {
+      map['serving_description'] = Variable<String>(servingDescription.value);
+    }
+    if (servingGrams.present) {
+      map['serving_grams'] = Variable<double>(servingGrams.value);
+    }
+    if (servingMilliliters.present) {
+      map['serving_milliliters'] = Variable<double>(servingMilliliters.value);
+    }
+    if (servingUnit.present) {
+      map['serving_unit'] = Variable<String>(
+        $FoodEntriesTable.$converterservingUnitn.toSql(servingUnit.value),
+      );
+    }
+    if (densityGPerMl.present) {
+      map['density_g_per_ml'] = Variable<double>(densityGPerMl.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2536,6 +3273,19 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
           ..write('carbsG: $carbsG, ')
           ..write('fatG: $fatG, ')
           ..write('quantitySource: $quantitySource, ')
+          ..write('portionQuantity: $portionQuantity, ')
+          ..write('portionUnit: $portionUnit, ')
+          ..write('nutritionBasis: $nutritionBasis, ')
+          ..write('referenceBasis: $referenceBasis, ')
+          ..write('referenceKcal: $referenceKcal, ')
+          ..write('referenceProteinG: $referenceProteinG, ')
+          ..write('referenceCarbsG: $referenceCarbsG, ')
+          ..write('referenceFatG: $referenceFatG, ')
+          ..write('servingDescription: $servingDescription, ')
+          ..write('servingGrams: $servingGrams, ')
+          ..write('servingMilliliters: $servingMilliliters, ')
+          ..write('servingUnit: $servingUnit, ')
+          ..write('densityGPerMl: $densityGPerMl, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -5295,6 +6045,19 @@ typedef $$FoodEntriesTableCreateCompanionBuilder =
       required double carbsG,
       required double fatG,
       required QuantitySource quantitySource,
+      Value<double?> portionQuantity,
+      Value<PortionUnit?> portionUnit,
+      Value<NutritionBasis?> nutritionBasis,
+      Value<ReferenceBasis?> referenceBasis,
+      Value<double?> referenceKcal,
+      Value<double?> referenceProteinG,
+      Value<double?> referenceCarbsG,
+      Value<double?> referenceFatG,
+      Value<String?> servingDescription,
+      Value<double?> servingGrams,
+      Value<double?> servingMilliliters,
+      Value<PortionUnit?> servingUnit,
+      Value<double?> densityGPerMl,
       Value<DateTime> createdAt,
     });
 typedef $$FoodEntriesTableUpdateCompanionBuilder =
@@ -5308,6 +6071,19 @@ typedef $$FoodEntriesTableUpdateCompanionBuilder =
       Value<double> carbsG,
       Value<double> fatG,
       Value<QuantitySource> quantitySource,
+      Value<double?> portionQuantity,
+      Value<PortionUnit?> portionUnit,
+      Value<NutritionBasis?> nutritionBasis,
+      Value<ReferenceBasis?> referenceBasis,
+      Value<double?> referenceKcal,
+      Value<double?> referenceProteinG,
+      Value<double?> referenceCarbsG,
+      Value<double?> referenceFatG,
+      Value<String?> servingDescription,
+      Value<double?> servingGrams,
+      Value<double?> servingMilliliters,
+      Value<PortionUnit?> servingUnit,
+      Value<double?> densityGPerMl,
       Value<DateTime> createdAt,
     });
 
@@ -5365,6 +6141,75 @@ class $$FoodEntriesTableFilterComposer
   get quantitySource => $composableBuilder(
     column: $table.quantitySource,
     builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<double> get portionQuantity => $composableBuilder(
+    column: $table.portionQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<PortionUnit?, PortionUnit, String>
+  get portionUnit => $composableBuilder(
+    column: $table.portionUnit,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<NutritionBasis?, NutritionBasis, String>
+  get nutritionBasis => $composableBuilder(
+    column: $table.nutritionBasis,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<ReferenceBasis?, ReferenceBasis, String>
+  get referenceBasis => $composableBuilder(
+    column: $table.referenceBasis,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<double> get referenceKcal => $composableBuilder(
+    column: $table.referenceKcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get referenceProteinG => $composableBuilder(
+    column: $table.referenceProteinG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get referenceCarbsG => $composableBuilder(
+    column: $table.referenceCarbsG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get referenceFatG => $composableBuilder(
+    column: $table.referenceFatG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get servingDescription => $composableBuilder(
+    column: $table.servingDescription,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get servingGrams => $composableBuilder(
+    column: $table.servingGrams,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get servingMilliliters => $composableBuilder(
+    column: $table.servingMilliliters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<PortionUnit?, PortionUnit, String>
+  get servingUnit => $composableBuilder(
+    column: $table.servingUnit,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<double> get densityGPerMl => $composableBuilder(
+    column: $table.densityGPerMl,
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -5427,6 +6272,71 @@ class $$FoodEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get portionQuantity => $composableBuilder(
+    column: $table.portionQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get portionUnit => $composableBuilder(
+    column: $table.portionUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nutritionBasis => $composableBuilder(
+    column: $table.nutritionBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referenceBasis => $composableBuilder(
+    column: $table.referenceBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get referenceKcal => $composableBuilder(
+    column: $table.referenceKcal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get referenceProteinG => $composableBuilder(
+    column: $table.referenceProteinG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get referenceCarbsG => $composableBuilder(
+    column: $table.referenceCarbsG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get referenceFatG => $composableBuilder(
+    column: $table.referenceFatG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get servingDescription => $composableBuilder(
+    column: $table.servingDescription,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get servingGrams => $composableBuilder(
+    column: $table.servingGrams,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get servingMilliliters => $composableBuilder(
+    column: $table.servingMilliliters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get servingUnit => $composableBuilder(
+    column: $table.servingUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get densityGPerMl => $composableBuilder(
+    column: $table.densityGPerMl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -5472,6 +6382,75 @@ class $$FoodEntriesTableAnnotationComposer
         builder: (column) => column,
       );
 
+  GeneratedColumn<double> get portionQuantity => $composableBuilder(
+    column: $table.portionQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<PortionUnit?, String> get portionUnit =>
+      $composableBuilder(
+        column: $table.portionUnit,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<NutritionBasis?, String>
+  get nutritionBasis => $composableBuilder(
+    column: $table.nutritionBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<ReferenceBasis?, String>
+  get referenceBasis => $composableBuilder(
+    column: $table.referenceBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get referenceKcal => $composableBuilder(
+    column: $table.referenceKcal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get referenceProteinG => $composableBuilder(
+    column: $table.referenceProteinG,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get referenceCarbsG => $composableBuilder(
+    column: $table.referenceCarbsG,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get referenceFatG => $composableBuilder(
+    column: $table.referenceFatG,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get servingDescription => $composableBuilder(
+    column: $table.servingDescription,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get servingGrams => $composableBuilder(
+    column: $table.servingGrams,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get servingMilliliters => $composableBuilder(
+    column: $table.servingMilliliters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<PortionUnit?, String> get servingUnit =>
+      $composableBuilder(
+        column: $table.servingUnit,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<double> get densityGPerMl => $composableBuilder(
+    column: $table.densityGPerMl,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
@@ -5513,6 +6492,19 @@ class $$FoodEntriesTableTableManager
                 Value<double> carbsG = const Value.absent(),
                 Value<double> fatG = const Value.absent(),
                 Value<QuantitySource> quantitySource = const Value.absent(),
+                Value<double?> portionQuantity = const Value.absent(),
+                Value<PortionUnit?> portionUnit = const Value.absent(),
+                Value<NutritionBasis?> nutritionBasis = const Value.absent(),
+                Value<ReferenceBasis?> referenceBasis = const Value.absent(),
+                Value<double?> referenceKcal = const Value.absent(),
+                Value<double?> referenceProteinG = const Value.absent(),
+                Value<double?> referenceCarbsG = const Value.absent(),
+                Value<double?> referenceFatG = const Value.absent(),
+                Value<String?> servingDescription = const Value.absent(),
+                Value<double?> servingGrams = const Value.absent(),
+                Value<double?> servingMilliliters = const Value.absent(),
+                Value<PortionUnit?> servingUnit = const Value.absent(),
+                Value<double?> densityGPerMl = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion(
                 id: id,
@@ -5524,6 +6516,19 @@ class $$FoodEntriesTableTableManager
                 carbsG: carbsG,
                 fatG: fatG,
                 quantitySource: quantitySource,
+                portionQuantity: portionQuantity,
+                portionUnit: portionUnit,
+                nutritionBasis: nutritionBasis,
+                referenceBasis: referenceBasis,
+                referenceKcal: referenceKcal,
+                referenceProteinG: referenceProteinG,
+                referenceCarbsG: referenceCarbsG,
+                referenceFatG: referenceFatG,
+                servingDescription: servingDescription,
+                servingGrams: servingGrams,
+                servingMilliliters: servingMilliliters,
+                servingUnit: servingUnit,
+                densityGPerMl: densityGPerMl,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -5537,6 +6542,19 @@ class $$FoodEntriesTableTableManager
                 required double carbsG,
                 required double fatG,
                 required QuantitySource quantitySource,
+                Value<double?> portionQuantity = const Value.absent(),
+                Value<PortionUnit?> portionUnit = const Value.absent(),
+                Value<NutritionBasis?> nutritionBasis = const Value.absent(),
+                Value<ReferenceBasis?> referenceBasis = const Value.absent(),
+                Value<double?> referenceKcal = const Value.absent(),
+                Value<double?> referenceProteinG = const Value.absent(),
+                Value<double?> referenceCarbsG = const Value.absent(),
+                Value<double?> referenceFatG = const Value.absent(),
+                Value<String?> servingDescription = const Value.absent(),
+                Value<double?> servingGrams = const Value.absent(),
+                Value<double?> servingMilliliters = const Value.absent(),
+                Value<PortionUnit?> servingUnit = const Value.absent(),
+                Value<double?> densityGPerMl = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FoodEntriesCompanion.insert(
                 id: id,
@@ -5548,6 +6566,19 @@ class $$FoodEntriesTableTableManager
                 carbsG: carbsG,
                 fatG: fatG,
                 quantitySource: quantitySource,
+                portionQuantity: portionQuantity,
+                portionUnit: portionUnit,
+                nutritionBasis: nutritionBasis,
+                referenceBasis: referenceBasis,
+                referenceKcal: referenceKcal,
+                referenceProteinG: referenceProteinG,
+                referenceCarbsG: referenceCarbsG,
+                referenceFatG: referenceFatG,
+                servingDescription: servingDescription,
+                servingGrams: servingGrams,
+                servingMilliliters: servingMilliliters,
+                servingUnit: servingUnit,
+                densityGPerMl: densityGPerMl,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

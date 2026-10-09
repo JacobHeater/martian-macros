@@ -1,4 +1,5 @@
 import 'calendar_date.dart';
+import 'food/portion/portion.dart';
 import 'meal.dart';
 import 'quantity_source.dart';
 
@@ -14,6 +15,7 @@ final class FoodEntry {
     required this.carbsG,
     required this.fatG,
     required this.source,
+    this.portion,
   });
 
   /// Database id; 0 for an entry not yet saved.
@@ -26,4 +28,9 @@ final class FoodEntry {
   final double carbsG;
   final double fatG;
   final QuantitySource source;
+
+  /// How much was eaten and what the totals are for (MM-167). Null for an
+  /// entry logged before portions were recorded, and nothing is invented for
+  /// it. When present, its method is [source].
+  final Portion? portion;
 }
