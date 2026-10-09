@@ -16,6 +16,10 @@ void main() {
     () => InMemoryRepositories().preferences,
   );
   foodRepositoryContract('In-memory', () => InMemoryRepositories().food);
+  customFoodRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().customFoods,
+  );
   dayMarkRepositoryContract('In-memory', () => InMemoryRepositories().dayMarks);
   targetsHistoryRepositoryContract(
     'In-memory',

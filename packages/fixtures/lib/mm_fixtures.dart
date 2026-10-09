@@ -5,6 +5,7 @@ library;
 
 export 'src/fixed_clock.dart';
 export 'src/in_memory_backup_storage.dart';
+export 'src/in_memory_custom_food_repository.dart';
 export 'src/in_memory_data_eraser.dart';
 export 'src/in_memory_day_mark_repository.dart';
 export 'src/in_memory_entitlement.dart';

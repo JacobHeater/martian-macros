@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import 'in_memory_custom_food_repository.dart';
 import 'in_memory_data_eraser.dart';
 import 'in_memory_day_mark_repository.dart';
 import 'in_memory_food_repository.dart';
@@ -22,6 +23,7 @@ final class InMemoryRepositories {
     final weightEvents = InMemoryWeightEventRepository();
     final waist = InMemoryWaistRepository();
     final food = InMemoryFoodRepository();
+    final customFoods = InMemoryCustomFoodRepository();
     final dayMarks = InMemoryDayMarkRepository();
     final targets = InMemoryTargetsHistoryRepository();
     final preferences = InMemoryPreferencesRepository();
@@ -31,6 +33,7 @@ final class InMemoryRepositories {
       weightEvents: weightEvents,
       waist: waist,
       food: food,
+      customFoods: customFoods,
       dayMarks: dayMarks,
       intake: InMemoryIntakeReader(food, dayMarks),
       targets: targets,
@@ -41,6 +44,7 @@ final class InMemoryRepositories {
         weightEvents.clear,
         waist.clear,
         food.clear,
+        customFoods.clear,
         dayMarks.clear,
         targets.clear,
         preferences.clear,
@@ -54,6 +58,7 @@ final class InMemoryRepositories {
     required this.weightEvents,
     required this.waist,
     required this.food,
+    required this.customFoods,
     required this.dayMarks,
     required this.intake,
     required this.targets,
@@ -66,6 +71,7 @@ final class InMemoryRepositories {
   final WeightEventRepository weightEvents;
   final WaistRepository waist;
   final FoodRepository food;
+  final CustomFoodRepository customFoods;
   final DayMarkRepository dayMarks;
   final IntakeReader intake;
   final TargetsHistoryRepository targets;

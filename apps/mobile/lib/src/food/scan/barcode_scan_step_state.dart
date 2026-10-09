@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
 import '../../food_packs/food_catalog_provider.dart';
+import '../../providers.dart';
 import '../../ui/mm_button.dart';
 import '../../ui/mm_button_kind.dart';
 import '../../ui/mm_text_field.dart';
@@ -37,6 +38,13 @@ class BarcodeScanStepState extends ConsumerState<BarcodeScanStep> {
       );
       return;
     }
+    final custom = (ref.read(customFoodsProvider).value ?? const <CustomFood>[])
+        .where((f) => f.barcode == gtin)
+        .firstOrNull;
+    if (custom != null) {
+      if (mounted) widget.onFoundCustom(custom);
+      return;
+    }
     final catalog = await ref.read(foodCatalogProvider.future);
     final food = catalog.byBarcode(gtin);
     if (!mounted) return;
@@ -53,6 +61,8 @@ class BarcodeScanStepState extends ConsumerState<BarcodeScanStep> {
 
   @override
   Widget build(BuildContext context) {
+    // Kept loaded so a scan can look the user's own foods up at once.
+    ref.watch(customFoodsProvider);
     final text = Theme.of(context).textTheme;
     return Column(
       mainAxisSize: MainAxisSize.min,

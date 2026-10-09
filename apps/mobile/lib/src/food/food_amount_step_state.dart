@@ -21,11 +21,33 @@ import 'food_trust_mark.dart';
 
 class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   final _quantity = TextEditingController();
-  late final List<AmountChoice> _choices = [
-    for (final s in widget.servings) AmountChoice(PortionUnit.serving, s),
-    const AmountChoice(PortionUnit.gram, null),
-    const AmountChoice(PortionUnit.ounce, null),
-  ];
+  late final List<AmountChoice> _choices = _initialChoices();
+
+  List<AmountChoice> _initialChoices() {
+    final custom = widget.custom;
+    if (custom == null) {
+      return [
+        for (final s in widget.servings) AmountChoice(PortionUnit.serving, s),
+        const AmountChoice(PortionUnit.gram, null),
+        const AmountChoice(PortionUnit.ounce, null),
+      ];
+    }
+    final grams = custom.servingGrams;
+    return [
+      AmountChoice(
+        PortionUnit.serving,
+        CatalogServing(
+          description: custom.servingDescription,
+          grams: grams ?? 0,
+        ),
+      ),
+      if (grams != null) ...const [
+        AmountChoice(PortionUnit.gram, null),
+        AmountChoice(PortionUnit.ounce, null),
+      ],
+    ];
+  }
+
   late AmountChoice _choice = _choices.first;
   late Meal _meal = widget.meal;
 
@@ -50,6 +72,16 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   /// The food's nutrition for 100 g, with the chosen serving's details so the
   /// entry can say what it was scaled from.
   ReferenceNutrition get _reference {
+    final custom = widget.custom;
+    if (custom != null) {
+      return ReferenceNutrition(
+        basis: ReferenceBasis.perServing,
+        nutrition: custom.perServing,
+        servingDescription: custom.servingDescription,
+        servingGrams: custom.servingGrams,
+        servingUnit: PortionUnit.serving,
+      );
+    }
     final food = widget.food;
     final serving = _choice.serving;
     return ReferenceNutrition(
@@ -84,7 +116,9 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   QuantitySource get _method {
     if (_choice.unit.isWeight) return QuantitySource.weighed;
     final packaged =
-        widget.food.source == 'usda_branded' || widget.food.source == 'off';
+        widget.custom != null ||
+        widget.food.source == 'usda_branded' ||
+        widget.food.source == 'off';
     return packaged
         ? QuantitySource.labelServing
         : QuantitySource.householdMeasure;
@@ -127,9 +161,11 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
     _quantity.text = _defaultQuantity(c);
   });
 
-  String _label(AmountChoice c) => c.serving != null
+  String _label(AmountChoice c) => c.serving == null
+      ? c.unit.chipLabel
+      : c.serving!.grams > 0
       ? '${c.serving!.description} (${_n(c.serving!.grams)} g)'
-      : c.unit.chipLabel;
+      : c.serving!.description;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +173,7 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
     final food = widget.food;
     final totals = _totals;
     final grams = _grams;
-    final note = grams == null
+    final note = grams == null || widget.custom != null
         ? null
         : roundedToZeroNote(
             food,

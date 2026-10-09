@@ -103,8 +103,12 @@ Everything. Its only contact with existing code is the validation function in
 
 ## Requirement sources
 - Built: MM-53 (nutrition checks), MM-54 (barcode normalization), MM-52 (the pipeline).
-- In progress: MM-51 (spike: hand check and pantry test open), MM-55 (format and reader: fixture is 30 foods).
-- Remaining: MM-153, MM-57, MM-56.
+- In progress: MM-51 (spike: the 50-product hand check and the pantry test need a person), MM-55 (format and reader built;
+  real packs published to the data repository), MM-56 (download, resume, checksum, status strip and cancel built and tried on the
+  emulator; the bundled generic pack, the onboarding offer, backup exclusion and slow-network testing are open), MM-153 (source and
+  tier wording, ranking and the rounded-to-zero note built; the amount-step display now lives with search; the pipeline's
+  near-tolerance, missing-field and age rules, and "Fix this food", are open).
+- Remaining: MM-57 (licensing review by a qualified person; the packs are already public).
   Epic: MM-50.
 
 ## Notes for whoever builds it
