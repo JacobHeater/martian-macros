@@ -31,6 +31,19 @@ void setupRepositoryContract(String name, SetupRepository Function() create) {
       expect(loaded.unitSystem, saved.unitSystem);
       expect(loaded.onboardedOn.epochDay, saved.onboardedOn.epochDay);
       expect(loaded.screening.pregnant, isFalse);
+      expect(loaded.creatineStartedOn, isNull);
+    });
+
+    test('keeps the creatine start date', () async {
+      final startedOn = CalendarDate(2026, 1, 1);
+      await repo.saveSetup(
+        typicalSetup().copyWith(creatineStartedOn: () => startedOn),
+      );
+      expect((await repo.loadSetup())!.creatineStartedOn, startedOn);
+      await repo.saveSetup(
+        typicalSetup().copyWith(creatineStartedOn: () => null),
+      );
+      expect((await repo.loadSetup())!.creatineStartedOn, isNull);
     });
 
     test('keeps daily activity, and a new setup defaults to light', () async {

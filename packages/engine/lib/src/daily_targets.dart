@@ -4,6 +4,7 @@ final class DailyTargets {
   const DailyTargets({
     required this.kcal,
     required this.proteinG,
+    this.proteinMinimumG,
     required this.fatG,
     required this.carbsG,
     required this.weeklyRateFraction,
@@ -12,6 +13,7 @@ final class DailyTargets {
 
   final double kcal;
   final double proteinG;
+  final double? proteinMinimumG;
   final double fatG;
   final double carbsG;
 
@@ -20,4 +22,9 @@ final class DailyTargets {
   final double weeklyRateFraction;
 
   final Set<TargetFlag> flags;
+
+  bool meetsProteinMinimum(double intakeProteinG) {
+    final minimum = proteinMinimumG;
+    return minimum != null && intakeProteinG >= minimum;
+  }
 }

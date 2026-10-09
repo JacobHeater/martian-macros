@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import '../format/training_status_label.dart';
 import '../ui/choice_card.dart';
 import '../ui/mm_slider.dart';
+import '../ui/mm_list_row.dart';
 import '../ui/mm_switch_row.dart';
 import '../ui/section_label.dart';
 
@@ -13,6 +14,9 @@ class TrainingStep extends StatelessWidget {
     required this.status,
     required this.trainingDays,
     required this.bodyFat,
+    required this.creatineStartedOn,
+    required this.onCreatine,
+    required this.onPickCreatineStartDate,
     required this.onStatus,
     required this.onTrainingDays,
     required this.onBodyFatKnown,
@@ -25,6 +29,9 @@ class TrainingStep extends StatelessWidget {
 
   /// The user's own estimate, or null if they do not know it.
   final double? bodyFat;
+  final CalendarDate? creatineStartedOn;
+  final ValueChanged<bool> onCreatine;
+  final VoidCallback onPickCreatineStartDate;
   final ValueChanged<TrainingStatus> onStatus;
   final ValueChanged<int> onTrainingDays;
   final ValueChanged<bool> onBodyFatKnown;
@@ -77,6 +84,21 @@ class TrainingStep extends StatelessWidget {
             divisions: 50,
             label: '${bodyFat!.round()}%',
             onChanged: (v) => onBodyFat(v.roundToDouble()),
+          ),
+        const SizedBox(height: 12),
+        const SectionLabel('Creatine'),
+        MmSwitchRow(
+          flush: true,
+          title: 'I currently take creatine',
+          value: creatineStartedOn != null,
+          onChanged: onCreatine,
+        ),
+        if (creatineStartedOn != null)
+          MmListRow(
+            title: 'When did you start?',
+            subtitle: creatineStartedOn.toString(),
+            trailing: const Icon(Icons.calendar_today_outlined),
+            onTap: onPickCreatineStartDate,
           ),
       ],
     );

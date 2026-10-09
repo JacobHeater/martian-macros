@@ -6,6 +6,10 @@ import 'package:mm_fixtures/mm_fixtures_contracts.dart';
 void main() {
   setupRepositoryContract('In-memory', () => InMemoryRepositories().setup);
   weightRepositoryContract('In-memory', () => InMemoryRepositories().weights);
+  weightEventRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().weightEvents,
+  );
   waistRepositoryContract('In-memory', () => InMemoryRepositories().waist);
   preferencesRepositoryContract(
     'In-memory',
@@ -27,6 +31,7 @@ void main() {
       eraser: r.eraser,
       setup: r.setup,
       weights: r.weights,
+      weightEvents: r.weightEvents,
       food: r.food,
       targets: r.targets,
       preferences: r.preferences,

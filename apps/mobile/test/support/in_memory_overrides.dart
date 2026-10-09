@@ -7,6 +7,7 @@ import 'package:mm_fixtures/mm_fixtures.dart';
 List<Override> inMemoryOverrides(InMemoryRepositories repos) => [
   setupRepositoryProvider.overrideWithValue(repos.setup),
   weightRepositoryProvider.overrideWithValue(repos.weights),
+  weightEventRepositoryProvider.overrideWithValue(repos.weightEvents),
   waistRepositoryProvider.overrideWithValue(repos.waist),
   foodRepositoryProvider.overrideWithValue(repos.food),
   dayMarkRepositoryProvider.overrideWithValue(repos.dayMarks),

@@ -10,6 +10,7 @@ import 'drift_preferences_repository.dart';
 import 'drift_setup_repository.dart';
 import 'drift_targets_history_repository.dart';
 import 'drift_waist_repository.dart';
+import 'drift_weight_event_repository.dart';
 import 'drift_weight_repository.dart';
 
 /// Every repository over one [AppDatabase]. The one place that knows which
@@ -19,6 +20,7 @@ final class DriftRepositories {
     : _db = db,
       setup = DriftSetupRepository(db),
       weights = DriftWeightRepository(db),
+      weightEvents = DriftWeightEventRepository(db),
       waist = DriftWaistRepository(db),
       food = DriftFoodRepository(db),
       dayMarks = DriftDayMarkRepository(db),
@@ -30,6 +32,7 @@ final class DriftRepositories {
   final AppDatabase _db;
   final SetupRepository setup;
   final WeightRepository weights;
+  final WeightEventRepository weightEvents;
   final WaistRepository waist;
   final FoodRepository food;
   final DayMarkRepository dayMarks;

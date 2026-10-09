@@ -154,6 +154,29 @@ void main() {
     expect(h.last.targets.flags, contains(TargetFlag.modeNotAllowed));
   });
 
+  testWidgets('new screening answers can be changed in Settings', (
+    tester,
+  ) async {
+    await seed();
+    await openSettings(tester);
+    await tester.tap(find.text('Health check'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('A medication I take can change my weight or water retention'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(
+      find.text('A medication I take can change my weight or water retention'),
+    );
+    await tester.pumpAndSettle();
+
+    final setup = (await readNow(tester, repos.setup.loadSetup))!;
+    expect(setup.screening.weightAffectingMedication, isTrue);
+    expect(setup.profileRevision, 1);
+    expect(setup.healthCheckConfirmedOn, today);
+  });
+
   testWidgets('no longer breastfeeding removes the 400 kcal and offers every '
       'goal again', (tester) async {
     await seed(
@@ -180,6 +203,13 @@ void main() {
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Coach'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Change'),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.ensureVisible(find.text('Change'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();

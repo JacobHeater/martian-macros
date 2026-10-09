@@ -79,6 +79,7 @@ void main() {
           explanation: i == 0
               ? null
               : reduction(2400.0 - (i - 1) * 25, 2400.0 - i * 25),
+          flags: i == 3 ? {TargetFlag.heldByUser} : const {},
         ),
     ]);
     await openCoach(tester);
@@ -88,6 +89,7 @@ void main() {
     expect(find.text('Target history'), findsOneWidget);
     expect(find.textContaining(' kcal · P 170'), findsNWidgets(6));
     expect(find.textContaining('2,275 kcal'), findsOneWidget, reason: 'newest');
+    expect(find.textContaining('Kept by you'), findsOneWidget);
 
     await tester.tap(find.textContaining('2,375 kcal'));
     await tester.pumpAndSettle();

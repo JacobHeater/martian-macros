@@ -83,7 +83,9 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
    expected within a few months, build the table generic by site now, so
    waist migrates once, not twice.
 2. **Weight events (MM-136).** M2. Engine mechanism shared with WS-02 step 2;
-   the simulator gains both kinds of event.
+   implemented with schema v10, event entry/chart marks, onboarding creatine
+   capture and deterministic lasting/transient-event simulations. Final
+   screenshot/CI validation is in progress.
 3. **Period days (MM-20).** M2. The engine already widens noise when given
    flow days; this supplies them. Female profiles only.
 4. **Explain a weight jump (MM-142).** M2. Works with typed macros; better

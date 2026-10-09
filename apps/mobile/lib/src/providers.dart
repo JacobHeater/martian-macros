@@ -38,6 +38,10 @@ final weightsProvider = StreamProvider<List<WeightObservation>>(
   (ref) => ref.watch(weightReaderProvider).watchWeights(),
 );
 
+final weightEventsProvider = StreamProvider<List<WeightEvent>>(
+  (ref) => ref.watch(weightEventReaderProvider).watchWeightEvents(),
+);
+
 final waistProvider = StreamProvider<List<WaistObservation>>(
   (ref) => ref.watch(waistReaderProvider).watchWaist(),
 );
@@ -70,9 +74,14 @@ final recentFoodsProvider = StreamProvider<List<FoodEntry>>(
 final coachProvider = Provider<CoachSnapshot?>((ref) {
   final setup = ref.watch(setupProvider).value;
   final weights = ref.watch(weightsProvider).value;
+  final weightEvents = ref.watch(weightEventsProvider).value;
   final intake = ref.watch(intakeDaysProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
-  if (setup == null || weights == null || intake == null || history == null) {
+  if (setup == null ||
+      weights == null ||
+      weightEvents == null ||
+      intake == null ||
+      history == null) {
     return null;
   }
   return analyze(
@@ -80,45 +89,24 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
     weights: weights,
     intake: intake,
     history: history,
+    weightEvents: weightEvents,
     today: ref.watch(todayProvider),
   );
 });
 
 /// The targets in force today, if any have been issued.
 final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  if (setup == null ||
+      !CoachingPolicy.derive(
+        profile: setup.profile,
+        screening: setup.screening,
+        today: ref.watch(todayProvider),
+      ).targetsAllowed) {
+    return null;
+  }
   final history = ref.watch(targetsHistoryProvider).value;
   return history == null || history.isEmpty ? null : history.last;
-});
-
-/// Runs the check-in: whenever the engine says targets should change,
-/// persists them. Watching this provider keeps it active. Saving is
-/// idempotent (one record per effective day), and once saved the engine
-/// stops asking.
-final checkInProvider = Provider<void>((ref) {
-  final setup = ref.watch(setupProvider).value;
-  final snapshot = ref.watch(coachProvider);
-  final history = ref.watch(targetsHistoryProvider).value;
-  if (setup == null || snapshot == null || history == null) return;
-  final next = nextTargets(
-    setup: setup,
-    snapshot: snapshot,
-    history: history,
-    today: ref.watch(todayProvider),
-  );
-  if (next == null) return;
-  // Targets first: the goal change below re-runs this provider.
-  final saved = ref.read(targetsHistoryWriterProvider).saveTargets(next);
-  if (next.mode == GoalMode.maintenance &&
-      setup.goalMode != GoalMode.maintenance) {
-    // Low body weight (MM-111) or a health check answer (MM-83) ruled the
-    // goal out: make maintenance the user's goal, so a deficit does not
-    // resume by itself when the reason goes away.
-    saved.then(
-      (_) => ref
-          .read(setupWriterProvider)
-          .saveSetup(setup.copyWith(goalMode: GoalMode.maintenance)),
-    );
-  }
 });
 
 /// The first day targets may next change.

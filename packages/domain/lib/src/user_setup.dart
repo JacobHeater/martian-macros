@@ -20,7 +20,12 @@ final class UserSetup {
     this.unitSystem = UnitSystem.imperial,
     this.bodyFatPercent,
     this.requestedLossFraction,
+    this.healthCheckConfirmedOn,
+    this.healthCheckSkipCount = 0,
+    this.creatineStartedOn,
   });
+
+  static const healthCheckIntervalDays = 90;
 
   final Profile profile;
   final ScreeningAnswers screening;
@@ -48,6 +53,21 @@ final class UserSetup {
   /// Chosen fat-loss pace (fraction of body weight per week), if any.
   final double? requestedLossFraction;
 
+  /// The last day the user confirmed their health answers.
+  final CalendarDate? healthCheckConfirmedOn;
+
+  /// Consecutive skipped re-checks; two pauses deficit coaching.
+  final int healthCheckSkipCount;
+
+  /// When the user started taking creatine, if they currently take it (MM-136).
+  final CalendarDate? creatineStartedOn;
+
+  bool healthCheckDueOn(CalendarDate today) {
+    final confirmed = healthCheckConfirmedOn;
+    return confirmed == null ||
+        confirmed.daysUntil(today) >= healthCheckIntervalDays;
+  }
+
   UserSetup copyWith({
     Profile? profile,
     ScreeningAnswers? screening,
@@ -58,6 +78,10 @@ final class UserSetup {
     int? trainingDaysPerWeek,
     DailyActivity? dailyActivity,
     double? Function()? bodyFatPercent,
+    double? Function()? requestedLossFraction,
+    CalendarDate? Function()? healthCheckConfirmedOn,
+    int? healthCheckSkipCount,
+    CalendarDate? Function()? creatineStartedOn,
   }) => UserSetup(
     profile: profile ?? this.profile,
     screening: screening ?? this.screening,
@@ -71,6 +95,15 @@ final class UserSetup {
     bodyFatPercent: bodyFatPercent == null
         ? this.bodyFatPercent
         : bodyFatPercent(),
-    requestedLossFraction: requestedLossFraction,
+    requestedLossFraction: requestedLossFraction == null
+        ? this.requestedLossFraction
+        : requestedLossFraction(),
+    healthCheckConfirmedOn: healthCheckConfirmedOn == null
+        ? this.healthCheckConfirmedOn
+        : healthCheckConfirmedOn(),
+    healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
+    creatineStartedOn: creatineStartedOn == null
+        ? this.creatineStartedOn
+        : creatineStartedOn(),
   );
 }

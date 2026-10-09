@@ -22,6 +22,7 @@ void main() {
     BiologicalSex sex = BiologicalSex.male,
     GoalMode mode = GoalMode.fatLoss,
     double weightKg = 90,
+    double heightCm = 178,
     double bodyFat = 25,
     double tdee = 2800,
     double bmr = 1850,
@@ -31,19 +32,23 @@ void main() {
     TrainingStatus status = TrainingStatus.intermediate,
     double? requestedLoss,
     double safetyRaise = 0,
+    double? safetyBodyFat,
+    int trainingDaysPerWeek = 3,
   }) => TargetInputs(
     sex: sex,
-    heightCm: 178,
+    heightCm: heightCm,
     trendWeightKg: weightKg,
     bodyFat: BodyFatEstimate(percent: bodyFat, sigmaPercent: 2),
     mode: mode,
     trainingStatus: status,
+    trainingDaysPerWeek: trainingDaysPerWeek,
     policy: policy ?? policyFor(sex),
     tdeeKcal: tdee,
     bmrKcal: bmr,
     previous: previous,
     consecutiveDeficitWeeks: deficitWeeks,
     requestedLossFraction: requestedLoss,
+    safetyBodyFatPercent: safetyBodyFat,
     safetyRaiseKcal: safetyRaise,
   );
 
@@ -137,6 +142,141 @@ void main() {
       );
       expect(range.minG, closeTo(1.6 * 77.8, 1e-9));
       expect(range.maxG, closeTo(2.2 * 77.8, 1e-9));
+    });
+
+    test('goal and training choose the protein minimum and target', () {
+      final cut = computeTargets(
+        inputs(weightKg: 80, heightCm: 180, bodyFat: 20),
+      );
+      expect(cut.proteinMinimumG, closeTo(128, 1e-9));
+      expect(cut.proteinG, closeTo(160, 1e-9));
+
+      final maintenance = computeTargets(
+        inputs(
+          weightKg: 80,
+          heightCm: 180,
+          bodyFat: 20,
+          mode: GoalMode.maintenance,
+        ),
+      );
+      expect(maintenance.proteinG, closeTo(144, 1e-9));
+
+      final leanGain = computeTargets(
+        inputs(
+          weightKg: 80,
+          heightCm: 180,
+          bodyFat: 20,
+          mode: GoalMode.leanGain,
+        ),
+      );
+      expect(leanGain.proteinMinimumG, closeTo(128, 1e-9));
+      expect(leanGain.proteinG, closeTo(144, 1e-9));
+
+      final notLifting = computeTargets(
+        inputs(
+          weightKg: 80,
+          heightCm: 180,
+          bodyFat: 20,
+          status: TrainingStatus.untrained,
+          trainingDaysPerWeek: 0,
+        ),
+      );
+      expect(notLifting.proteinMinimumG, closeTo(96, 1e-9));
+      expect(notLifting.proteinG, closeTo(128, 1e-9));
+    });
+
+    test('the senior protein floor reaches targets unless kidney-capped', () {
+      final policy = CoachingPolicy.derive(
+        profile: Profile(
+          sex: BiologicalSex.male,
+          birthDate: CalendarDate(1959, 1, 1),
+          heightCm: 180,
+        ),
+        screening: const ScreeningAnswers(),
+        today: today,
+        weightKg: 80,
+      );
+      final targets = computeTargets(
+        inputs(
+          weightKg: 80,
+          heightCm: 180,
+          bodyFat: 20,
+          mode: GoalMode.maintenance,
+          status: TrainingStatus.untrained,
+          trainingDaysPerWeek: 0,
+          policy: policy,
+        ),
+      );
+      expect(targets.proteinMinimumG, closeTo(96, 1e-9));
+      expect(targets.proteinG, closeTo(128, 1e-9));
+    });
+
+    test(
+      'protein minimum defines meeting the target without an upper limit',
+      () {
+        final targets = computeTargets(
+          inputs(weightKg: 80, heightCm: 180, bodyFat: 20),
+        );
+        expect(targets.meetsProteinMinimum(127), isFalse);
+        expect(targets.meetsProteinMinimum(135), isTrue);
+        expect(targets.meetsProteinMinimum(230), isTrue);
+        expect(targets.flags, isEmpty);
+      },
+    );
+
+    test('kidney cap overrides the age floor and sets both values', () {
+      final policy = CoachingPolicy.derive(
+        profile: Profile(
+          sex: BiologicalSex.male,
+          birthDate: CalendarDate(1959, 1, 1),
+          heightCm: 180,
+        ),
+        screening: const ScreeningAnswers(chronicKidneyDisease: true),
+        today: today,
+        weightKg: 80,
+      );
+      final targets = computeTargets(
+        inputs(
+          weightKg: 80,
+          heightCm: 180,
+          bodyFat: 20,
+          mode: GoalMode.maintenance,
+          policy: policy,
+        ),
+      );
+      expect(targets.proteinMinimumG, 64);
+      expect(targets.proteinG, 64);
+      expect(targets.flags, contains(TargetFlag.proteinCapped));
+    });
+
+    test('lean deficit interpolation avoids a target cliff', () {
+      var previous = 0.0;
+      for (var bodyFat = 19.0; bodyFat >= 14; bodyFat -= 1) {
+        final weight = 80 - (19 - bodyFat) * 0.5;
+        final targets = computeTargets(
+          inputs(weightKg: weight, bodyFat: bodyFat, safetyBodyFat: bodyFat),
+        );
+        if (previous > 0) {
+          expect((targets.proteinG - previous).abs(), lessThanOrEqualTo(10));
+        }
+        previous = targets.proteinG;
+      }
+    });
+
+    test('lean deficit interpolation uses the specified target points', () {
+      const expectedTargets = [160.0, 164.2133333333, 169.8133333333, 176.8];
+      for (var index = 0; index < 4; index++) {
+        final bodyFat = 18.0 - index;
+        final targets = computeTargets(
+          inputs(
+            weightKg: 80,
+            heightCm: 180,
+            bodyFat: bodyFat,
+            safetyBodyFat: bodyFat,
+          ),
+        );
+        expect(targets.proteinG, closeTo(expectedTargets[index], 1e-8));
+      }
     });
 
     test('protein does not step at BMI 30', () {

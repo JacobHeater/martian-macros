@@ -9,6 +9,7 @@ String coachLineText({
   required UserSetup setup,
   required List<TargetsRecord> history,
   required CalendarDate today,
+  ConfidenceLevel confidence = ConfidenceLevel.good,
 }) {
   final day = setup.onboardedOn.daysUntil(today) + 1;
   if (day <= calibrationDays) {
@@ -21,10 +22,17 @@ String coachLineText({
     final change =
         current.targets.kcal - history[history.length - 2].targets.kcal;
     if (change.round() != 0) {
-      return 'Targets went ${change < 0 ? 'down' : 'up'} '
+      final approximate = confidence != ConfidenceLevel.good;
+      return 'Targets went '
+          '${change < 0 ? 'down' : 'up'} '
+          '${approximate ? 'about ' : ''}'
           '${change.abs().round()} kcal on '
-          '${Fmt.day(current.effectiveFrom, today)}.';
+          '${Fmt.day(current.effectiveFrom, today)}'
+          '${approximate ? ', so far' : ''}.';
     }
+  }
+  if (confidence == ConfidenceLevel.learning) {
+    return 'Targets are held while the coach learns from more complete data.';
   }
   return 'Next check-in ${Fmt.day(nextCheckIn(setup, current), today)}.';
 }

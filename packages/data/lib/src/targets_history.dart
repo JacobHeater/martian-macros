@@ -10,6 +10,7 @@ class TargetsHistory extends Table {
   TextColumn get mode => textEnum<GoalMode>()();
   RealColumn get kcal => real()();
   RealColumn get proteinG => real()();
+  RealColumn get proteinMinimumG => real().nullable()();
   RealColumn get fatG => real()();
   RealColumn get carbsG => real()();
   RealColumn get weeklyRateFraction => real()();
@@ -23,6 +24,14 @@ class TargetsHistory extends Table {
   /// Why these targets were issued, as JSON (`TargetsExplanation.encode`).
   /// Added in schema version 5 (MM-138); null on older rows.
   TextColumn get explanation => text().nullable()();
+
+  /// Existing target history should not trigger new summary dialogs.
+  BoolColumn get summarySeen => boolean().withDefault(const Constant(true))();
+
+  /// Rules used to issue targets; bump [currentTargetRulesVersion] when target
+  /// calculation behavior changes.
+  IntColumn get targetRulesVersion =>
+      integer().withDefault(const Constant(currentTargetRulesVersion))();
 
   /// Added in schema version 4 (MM-83); older rows read as 0.
   IntColumn get profileRevision => integer().withDefault(const Constant(0))();

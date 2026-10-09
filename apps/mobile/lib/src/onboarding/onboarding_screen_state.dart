@@ -32,6 +32,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   var _trainingDays = 3;
   var _activity = DailyActivity.light;
   double? _bodyFat;
+  CalendarDate? _creatineStartedOn;
   var _screening = const ScreeningAnswers();
   GoalMode? _mode;
 
@@ -134,6 +135,10 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       chronicKidneyDisease: s.chronicKidneyDisease,
       androgenUse: s.androgenUse,
       thyroidCondition: s.thyroidCondition,
+      insulinOrSulfonylurea: s.insulinOrSulfonylurea,
+      insulinCareTeamConfirmed: s.insulinCareTeamConfirmed,
+      bariatricSurgery: s.bariatricSurgery,
+      weightAffectingMedication: s.weightAffectingMedication,
     );
   }
 
@@ -149,6 +154,26 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
     if (picked != null) {
       setState(() => _birthDate = CalendarDate.fromDateTime(picked));
+    }
+  }
+
+  Future<void> _pickCreatineStartDate() async {
+    final today = _today;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(
+        _creatineStartedOn?.year ?? today.year,
+        _creatineStartedOn?.month ?? today.month,
+        _creatineStartedOn?.day ?? today.day,
+      ),
+      firstDate: DateTime(today.year - 100, today.month, today.day),
+      lastDate: DateTime(today.year, today.month, today.day),
+      helpText: 'Creatine start date',
+    );
+    if (picked != null) {
+      if (mounted) {
+        setState(() => _creatineStartedOn = CalendarDate.fromDateTime(picked));
+      }
     }
   }
 
@@ -172,8 +197,10 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ? chosen
                 : recommended,
             onboardedOn: _today,
+            healthCheckConfirmedOn: _today,
             unitSystem: _units,
             bodyFatPercent: _bodyFat,
+            creatineStartedOn: _creatineStartedOn,
           ),
         );
   }
@@ -214,6 +241,11 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       status: _status,
       trainingDays: _trainingDays,
       bodyFat: _bodyFat,
+      creatineStartedOn: _creatineStartedOn,
+      onCreatine: (on) => setState(() {
+        _creatineStartedOn = on ? (_creatineStartedOn ?? _today) : null;
+      }),
+      onPickCreatineStartDate: _pickCreatineStartDate,
       onStatus: (status) => setState(() => _status = status),
       onTrainingDays: (days) => setState(() => _trainingDays = days),
       onBodyFatKnown: (on) => setState(

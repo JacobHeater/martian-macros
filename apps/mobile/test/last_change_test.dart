@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:martian_macros/src/format/explanation_line_text.dart';
+import 'package:martian_macros/src/format/fmt.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
@@ -82,7 +83,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('What changed'), findsOneWidget);
     expect(
-      find.textContaining('Calories 2,400 → 2,325. Protein unchanged'),
+      find.textContaining('Calories 2,400 → 2,325. Protein target unchanged'),
       findsOneWidget,
     );
     expect(find.textContaining('Carbohydrate 255 → 240 g'), findsOneWidget);
@@ -139,6 +140,71 @@ void main() {
     expect(find.text('Your first targets.'), findsOneWidget);
   });
 
+  testWidgets('a check-in with no material change says why', (tester) async {
+    await seed([
+      record(9, 2400),
+      record(
+        2,
+        2400,
+        explanation: const TargetsExplanation(
+          lines: [],
+          previousKcal: 2400,
+          newKcal: 2400,
+          estimateStatus: TdeeStatus.updated,
+          usableIntakeDays: 14,
+          weighIns: 12,
+        ),
+      ),
+    ]);
+    await openCoach(tester);
+    expect(
+      find.textContaining(
+        'Checked ${Fmt.day(today.addDays(-2), today)}. No change:',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('See why'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'No calculated contribution was large enough to move the '
+        'calorie target.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a rounded contribution remainder is shown in the account', (
+    tester,
+  ) async {
+    await seed([
+      record(9, 2400),
+      record(
+        2,
+        2398,
+        explanation: const TargetsExplanation(
+          lines: [
+            ExplanationLine(
+              ExplanationReason.expenditureEstimate,
+              -1,
+              from: 2900,
+              to: 2899,
+            ),
+          ],
+          previousKcal: 2400,
+          newKcal: 2398,
+          estimateStatus: TdeeStatus.updated,
+          usableIntakeDays: 14,
+          weighIns: 12,
+        ),
+      ),
+    ]);
+    await openCoach(tester);
+    await tester.tap(find.text('See why'));
+    await tester.pumpAndSettle();
+    expect(find.text('And −1 kcal from rounding and limits.'), findsOneWidget);
+  });
+
   testWidgets('three weeks with no food logged: targets are unchanged for '
       'lack of data, and what is needed', (tester) async {
     await seed([record(30, 2400)]);
@@ -153,6 +219,46 @@ void main() {
     expect(
       find.textContaining('Needs 10 more fully logged days'),
       findsWidgets,
+    );
+  });
+
+  testWidgets('a creatine change explains the reduction pause', (tester) async {
+    await seed([record(30, 2400)]);
+    await repos.weightEvents.saveWeightEvent(
+      WeightEvent(
+        date: today.addDays(-7),
+        type: WeightEventType.startedCreatine,
+      ),
+    );
+    await openCoach(tester);
+    expect(
+      find.textContaining(
+        'Calorie reductions are paused while your creatine change settles.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('an app rule update is named as the cause', (tester) async {
+    await seed([
+      record(9, 2400),
+      record(
+        2,
+        2325,
+        explanation: const TargetsExplanation(
+          lines: [ExplanationLine(ExplanationReason.appRuleUpdate, -75)],
+          previousKcal: 2400,
+          newKcal: 2325,
+          estimateStatus: TdeeStatus.updated,
+          usableIntakeDays: 14,
+          weighIns: 12,
+        ),
+      ),
+    ]);
+    await openCoach(tester);
+    expect(
+      find.textContaining('The target rules changed in an app update'),
+      findsOneWidget,
     );
   });
 

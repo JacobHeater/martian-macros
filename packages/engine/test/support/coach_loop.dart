@@ -127,6 +127,7 @@ List<WeekResult> runCoachLoop({
           bodyFat: startBodyFat,
           mode: currentMode,
           trainingStatus: trainingStatus,
+          trainingDaysPerWeek: trainingDaysPerWeek,
           policy: policy,
           tdeeKcal: tdee.kcal,
           bmrKcal: bmrFor(trendWeight),

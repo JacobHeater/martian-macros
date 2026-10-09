@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
@@ -61,6 +62,7 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today));
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
     expect(find.text('Goal: Fat loss'), findsOneWidget);
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
@@ -77,6 +79,7 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today));
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Maintenance'));
@@ -91,6 +94,12 @@ void main() {
       history.last.targets.kcal - history.first.targets.kcal,
       greaterThan(100),
     );
+    expect(find.text('Why your targets are what they are'), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await pumpApp(tester, repos, FixedClock(today));
+    expect(find.text('Why your targets are what they are'), findsOneWidget);
   });
 
   testWidgets('the first adaptive check-in runs through the app', (

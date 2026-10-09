@@ -3,6 +3,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'coach_constants.dart';
 import 'coach_snapshot.dart';
 import 'compute_targets.dart';
+import 'confidence_level.dart';
 import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
 import 'explain_targets.dart';
@@ -11,6 +12,7 @@ import 'loss_safety_raise.dart';
 import 'safety_body_fat.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
+import 'target_rules_version.dart';
 import 'targets_record.dart';
 import 'tdee_status.dart';
 
@@ -29,7 +31,7 @@ TargetsRecord? nextTargets({
   required List<TargetsRecord> history,
   required CalendarDate today,
 }) {
-  if (snapshot.policy.blocked) return null;
+  if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return null;
 
   final lastSafetyBf = history.isEmpty
       ? null
@@ -53,6 +55,7 @@ TargetsRecord? nextTargets({
         bodyFat: snapshot.bodyFat,
         mode: setup.goalMode,
         trainingStatus: setup.trainingStatus,
+        trainingDaysPerWeek: setup.trainingDaysPerWeek,
         policy: snapshot.policy,
         tdeeKcal: snapshot.tdee.kcal,
         bmrKcal: snapshot.bmrKcal,
@@ -80,6 +83,7 @@ TargetsRecord? nextTargets({
       tdeeStatus: snapshot.tdee.status,
       safetyBodyFatPercent: safetyBf,
       targets: targets,
+      summarySeen: false,
       explanation: explainTargets(
         trigger: targets.flags.contains(TargetFlag.underweightMaintenance)
             ? ExplanationTrigger.underweightRule
@@ -92,6 +96,7 @@ TargetsRecord? nextTargets({
         targets: targets,
         trace: traced.trace,
         tdee: snapshot.tdee,
+        confidence: snapshot.confidence,
       ),
     );
   }
@@ -133,6 +138,14 @@ TargetsRecord? nextTargets({
     );
   }
 
+  if (last.targetRulesVersion < currentTargetRulesVersion) {
+    return build(
+      previous: last.targets,
+      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      trigger: ExplanationTrigger.appRuleUpdate,
+    );
+  }
+
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return null;
   // Losing faster than the safe pace is not noise, so this runs through
   // calibration and while the estimate is held.
@@ -158,10 +171,18 @@ TargetsRecord? nextTargets({
   }
 
   if (setup.onboardedOn.daysUntil(today) < calibrationDays) return null;
-  if (snapshot.tdee.status == TdeeStatus.held) return null;
+  if (snapshot.tdee.status == TdeeStatus.held ||
+      snapshot.confidence.level == ConfidenceLevel.learning) {
+    return null;
+  }
 
-  return build(
+  final next = build(
     previous: last.targets,
     deficitWeeks: consecutiveDeficitWeeks(history, today),
   );
+  if (snapshot.creatineReductionPausedOn(today) &&
+      next.targets.kcal < last.targets.kcal) {
+    return null;
+  }
+  return next;
 }

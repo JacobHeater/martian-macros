@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'coach_confidence.dart';
 import 'explanation_line.dart';
 import 'tdee_status.dart';
 
@@ -14,6 +15,7 @@ final class TargetsExplanation {
     this.usableIntakeDays = 0,
     this.excludedPartialDays = 0,
     this.weighIns = 0,
+    this.confidence,
   });
 
   factory TargetsExplanation.decode(String source) {
@@ -31,6 +33,11 @@ final class TargetsExplanation {
       usableIntakeDays: (json['usableIntakeDays'] as num?)?.toInt() ?? 0,
       excludedPartialDays: (json['excludedPartialDays'] as num?)?.toInt() ?? 0,
       weighIns: (json['weighIns'] as num?)?.toInt() ?? 0,
+      confidence: (json['confidence'] as Map<String, Object?>?) == null
+          ? null
+          : CoachConfidence.fromJson(
+              json['confidence']! as Map<String, Object?>,
+            ),
     );
   }
 
@@ -49,6 +56,9 @@ final class TargetsExplanation {
   final int excludedPartialDays;
   final int weighIns;
 
+  /// The confidence assessment when these targets were issued, if available.
+  final CoachConfidence? confidence;
+
   /// The change in calories, or null for the first targets.
   double? get change => previousKcal == null ? null : newKcal - previousKcal!;
 
@@ -63,5 +73,6 @@ final class TargetsExplanation {
     'usableIntakeDays': usableIntakeDays,
     'excludedPartialDays': excludedPartialDays,
     'weighIns': weighIns,
+    if (confidence != null) 'confidence': confidence!.toJson(),
   });
 }

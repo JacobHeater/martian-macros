@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../providers.dart';
@@ -26,11 +27,16 @@ class TargetsHistoryScreen extends ConsumerWidget {
                 for (var i = history.length - 1; i >= 0; i--)
                   MmListRow(
                     title: Fmt.day(history[i].effectiveFrom, today),
-                    subtitle:
-                        '${Fmt.kcal(history[i].targets.kcal)} · '
-                        'P ${history[i].targets.proteinG.round()} · '
-                        'C ${history[i].targets.carbsG.round()} · '
-                        'F ${history[i].targets.fatG.round()}',
+                    subtitle: [
+                      '${Fmt.kcal(history[i].targets.kcal)} · '
+                          'P ${_proteinRange(history[i].targets)} · '
+                          'C ${history[i].targets.carbsG.round()} · '
+                          'F ${history[i].targets.fatG.round()}',
+                      if (history[i].targets.flags.contains(
+                        TargetFlag.heldByUser,
+                      ))
+                        'Kept by you',
+                    ].join('\n'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => showTargetChangeSheet(
                       context,
@@ -42,5 +48,12 @@ class TargetsHistoryScreen extends ConsumerWidget {
               ],
             ),
     );
+  }
+
+  String _proteinRange(DailyTargets targets) {
+    final minimum = targets.proteinMinimumG;
+    return minimum == null
+        ? '${targets.proteinG.round()}'
+        : '${minimum.round()}–${targets.proteinG.round()}';
   }
 }

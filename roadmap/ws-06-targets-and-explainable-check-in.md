@@ -1,6 +1,6 @@
 # WS-06: Targets and the explainable check-in
 
-**Order** 6 · **Group** B · **State** not started · **Risk** high
+**Order** 6 · **Group** B · **State** in progress · **Risk** high
 
 ## Summary
 Turn the weekly number into something an expert would sign and a user can
@@ -89,7 +89,12 @@ register, and the paywall gates features built here.
    change to the shape of the target record: add the minimum, the signed
    contributions with reason codes, the inputs used, and the confidence
    parts. One migration. Introduce the entitlement interface here, returning
-   "unlocked".
+   "unlocked". Current implementation includes stored confidence, the
+   confidence card, one-time next-open summary, versioned app-rule updates, a
+   no-change reason and held-entry history detail. MM-136 now supplies dated
+   weight events, with deterministic creatine/travel simulations. Broader
+   confidence next-step/data-boundary simulations and product-owner
+   confirmation of the hold behavior remain.
 4. **Rounding and bands (MM-123).** M2.
 5. **Fat-loss pace (MM-128).** M2. After WS-05 step 2.
 6. **Maintenance band and leaving a deficit (MM-130).** M2. After WS-02
@@ -100,9 +105,9 @@ register, and the paywall gates features built here.
    and its strength signal WS-10 step 3; the surplus cap needs neither.
 
 ## Done enough to unblock others
-MM-121, MM-123, MM-138 and MM-139 are done: a target record carries a protein
-minimum, a band, an explanation and a confidence, and one function answers
-"is this intake on target".
+MM-121 is done: target records carry a protein minimum and goal-specific
+target, the app displays both, and the engine can determine whether an intake
+meets the minimum.
 
 ## Do not start before this
 Anything in WS-09. The adherence summary judges against bands and the protein
@@ -116,7 +121,7 @@ beside anything.
 ## Requirement sources
 - Built (since this was written): MM-144 (non-goals).
 - Built (since this was written): MM-143 (evidence register).
-- Remaining: MM-121, MM-138, MM-139, MM-123, MM-128, MM-130,
+- Remaining: MM-138, MM-139, MM-123, MM-128, MM-130,
   MM-122, MM-124, MM-129. Epics: MM-119, MM-137.
 
 ## Notes for whoever builds it

@@ -11,6 +11,7 @@ import 'targets_history.dart';
 import 'user_preferences.dart';
 import 'waist_entries.dart';
 import 'weight_entries.dart';
+import 'weight_events.dart';
 
 part 'app_database.g.dart';
 
@@ -23,6 +24,7 @@ part 'app_database.g.dart';
     WaistEntries,
     TargetsHistory,
     UserPreferences,
+    WeightEvents,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -30,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 5;
+  static const currentSchemaVersion = 10;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -56,6 +58,32 @@ class AppDatabase extends _$AppDatabase {
     // 4 to 5: why each set of targets was issued (MM-138).
     4: (m) async {
       await m.addColumn(targetsHistory, targetsHistory.explanation);
+    },
+    // 5 to 6: expanded screening and repeat-check state (MM-112).
+    5: (m) async {
+      await m.addColumn(setups, setups.insulinOrSulfonylurea);
+      await m.addColumn(setups, setups.insulinCareTeamConfirmed);
+      await m.addColumn(setups, setups.bariatricSurgery);
+      await m.addColumn(setups, setups.weightAffectingMedication);
+      await m.addColumn(setups, setups.healthCheckConfirmedEpochDay);
+      await m.addColumn(setups, setups.healthCheckSkipCount);
+    },
+    // 6 to 7: the protein minimum stored with each target (MM-121).
+    6: (m) async {
+      await m.addColumn(targetsHistory, targetsHistory.proteinMinimumG);
+    },
+    // 7 to 8: show each newly issued target explanation once (MM-138).
+    7: (m) async {
+      await m.addColumn(targetsHistory, targetsHistory.summarySeen);
+    },
+    // 8 to 9: track which target-calculation rules issued each record.
+    8: (m) async {
+      await m.addColumn(targetsHistory, targetsHistory.targetRulesVersion);
+    },
+    // 9 to 10: persist weight events and the onboarding creatine start date.
+    9: (m) async {
+      await m.addColumn(setups, setups.creatineStartedEpochDay);
+      await m.createTable(weightEvents);
     },
   };
 
