@@ -10,17 +10,18 @@ import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/step_progress.dart';
-import 'about_you_step.dart';
 import 'activity_step.dart';
+import 'birth_date_step.dart';
 import 'goal_step.dart';
 import 'health_step.dart';
 import 'measurements_step.dart';
 import 'onboarding_screen.dart';
+import 'sex_step.dart';
 import 'training_step.dart';
 import 'welcome_step.dart';
 
 class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const _stepCount = 6;
+  static const _stepCount = 7;
   var _welcomed = false;
   var _step = 0;
   var _saving = false;
@@ -108,8 +109,9 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   bool get _canContinue => switch (_step) {
-    0 => _sex != null && _birthDate != null && !_isMinor,
-    1 =>
+    0 => _sex != null,
+    1 => _birthDate != null && !_isMinor,
+    2 =>
       _profile != null &&
           _weightKg != null &&
           _weightKg! >= 30 &&
@@ -208,17 +210,19 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Widget _stepBody() => switch (_step) {
-    0 => AboutYouStep(
+    0 => SexStep(
       sex: _sex,
-      birthDate: _birthDate,
-      isMinor: _isMinor,
       onSex: (sex) => setState(() {
         _sex = sex;
         if (sex == BiologicalSex.male) _clearFemaleOnlyAnswers();
       }),
+    ),
+    1 => BirthDateStep(
+      birthDate: _birthDate,
+      isMinor: _isMinor,
       onPickBirthDate: _pickBirthDate,
     ),
-    1 => MeasurementsStep(
+    2 => MeasurementsStep(
       units: _units,
       feet: _feet,
       inches: _inches,
@@ -235,11 +239,11 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       }),
       onChanged: () => setState(_readMeasurements),
     ),
-    2 => ActivityStep(
+    3 => ActivityStep(
       activity: _activity,
       onActivity: (activity) => setState(() => _activity = activity),
     ),
-    3 => TrainingStep(
+    4 => TrainingStep(
       status: _status,
       trainingDays: _trainingDays,
       bodyFat: _bodyFat,
@@ -255,7 +259,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
       onBodyFat: (value) => setState(() => _bodyFat = value),
     ),
-    4 => HealthStep(
+    5 => HealthStep(
       screening: _screening,
       female: _sex == BiologicalSex.female,
       onChanged: (answers) => setState(() => _screening = answers),
