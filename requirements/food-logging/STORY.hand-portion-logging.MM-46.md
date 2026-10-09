@@ -2,7 +2,7 @@
 id: MM-46
 status: proposed
 component: food-logging
-related: [MM-37, MM-27, MM-38, MM-42, MM-49]
+related: [MM-37, MM-27, MM-38, MM-42, MM-49, MM-167]
 ---
 
 # Story: Log with hand portions instead of a scale
@@ -55,3 +55,11 @@ Scenario: Switching to a scale
 - The hand-size model (volume from height and sex) needs a source and a sanity check against a few real hands.
 - The engine's style-switch rule currently only distinguishes weighed from not weighed (MM-27); it must learn to tell hand portions from
   label servings.
+
+## Clarified by MM-167 (proposed)
+A hand portion is stored as a count of palms, cupped hands or thumbs, the model and its version, and the grams it implies as an
+estimate. Until the hand model exists, hand methods are a count plus typed totals. Whether "fist" is a method is an open decision in
+MM-167.
+
+Decided with the product owner (MM-167): there is **no fist portion**; the hand methods are palm, cupped hand and thumb. Vegetables
+use a cupped hand or a cup. Until the hand model is built, these are logged as a count plus typed totals, labelled as an estimate.

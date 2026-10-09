@@ -93,8 +93,11 @@ and WS-09 steps 1 and 8.
    estimator's style rule about it in the same change. The "cooked with oil"
    control in the prompt ticket needs generic foods and waits for step 4.
 3. **Custom foods and recipes (MM-45).** M3. First schema change here.
-4. **Search; store every nutrient; detail level (MM-42, MM-49).** M2. Build
-   against the fixture pack. Storing nutrients is one migration; the display
+4. **Search; store every nutrient; detail level; quantity, unit and basis
+   (MM-42, MM-49, MM-167).** M2. Build
+   against the fixture pack. Storing nutrients is one migration, and the quantity, unit and nutrition-basis
+   columns of MM-167 (what was eaten, in what unit, and what the numbers are for;
+   proposed, not built) belong in the same one, before MM-46; the display
    setting changes what is shown, never what is stored. Show each food's
    source and trust tier here.
 5. **Barcode; raw or cooked (MM-43, MM-151).** M2.
@@ -119,8 +122,8 @@ workstream's.
 
 ## Requirement sources
 - Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day
-  completeness, daily summary).
-- Remaining: MM-48, MM-47, MM-150, MM-152, MM-45, MM-42, MM-49, MM-43,
+  completeness, daily summary), MM-48, MM-47 (edit, copy).
+- Remaining: MM-150, MM-152, MM-45, MM-42, MM-49, MM-167, MM-43,
   MM-151, MM-127, MM-126, MM-46, MM-44, MM-58. Epic: MM-37.
 
 ## Notes for whoever builds it
