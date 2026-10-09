@@ -121,7 +121,7 @@ class FoodDatabaseScreen extends ConsumerWidget {
                 )
               else
                 const SizedBox.shrink()
-          else ...[
+          else if (!download.isRunning) ...[
             if (manifest.message != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
