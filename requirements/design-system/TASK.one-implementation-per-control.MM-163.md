@@ -1,6 +1,6 @@
 ---
 id: MM-163
-status: in-progress
+status: done
 component: design-system
 related: [MM-159, MM-160, MM-101, MM-102, MM-103, MM-104, MM-105]
 ---
@@ -61,3 +61,8 @@ Scenario: A reusable part
 - `mm arch` fails any file outside `ui/` and `theme/` that uses one of 34 raw Material controls (`tool/src/arch/default_identifier_rules.dart`). There are no exceptions and no baseline entries.
 - **Not done**: the gallery (MM-105) does not exist yet, so components are not shown in every state and theme; the components still have the stock Material look (the `design/` redesign is a visual
   change to these files); nothing mechanical yet stops a component from accepting a styling argument (it holds by convention). Status stays in-progress until the gallery lands.
+
+## Progress (closed)
+- The gallery (MM-105) now exists: `apps/mobile/lib/src/gallery/` shows every component and color in light and dark and at larger text sizes, behind Settings in development builds only, with widget tests (`gallery_test.dart`) that open every section in both themes. The restyle (MM-103) replaced the stock Material look on these components.
+- **Still true, not enforced by a tool**: nothing mechanical stops a component from accepting a styling argument; that holds by convention and review. The gallery shows the main states of each component, not every state of every one.
+

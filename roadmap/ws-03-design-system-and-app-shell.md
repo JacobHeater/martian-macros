@@ -128,9 +128,9 @@ conflicts with this one.
 
 ## Requirement sources
 - Built: MM-90 (three tabs and day rollover; superseded in part by the
-  dashboard navigation); MM-165 (light, dark or system theme); MM-105 (gallery and screenshot tests).
+  dashboard navigation); MM-165 (light, dark or system theme); MM-105 (gallery and screenshot tests); MM-163 (one implementation per control).
 - Remaining: MM-102, MM-103, MM-104, MM-108, MM-99, MM-98, MM-100, MM-107,
-  MM-91, MM-106, MM-109, MM-163. Epics: MM-89, MM-97, MM-101.
+  MM-91, MM-106, MM-109. Epics: MM-89, MM-97, MM-101.
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.
