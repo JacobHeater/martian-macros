@@ -1,4 +1,5 @@
 import '../../quantity_source.dart';
+import 'food_origin.dart';
 import 'nutrition_basis.dart';
 import 'portion_unit.dart';
 import 'reference_nutrition.dart';
@@ -17,6 +18,7 @@ final class Portion {
     this.quantity,
     this.unit,
     this.reference,
+    this.origin,
   });
 
   final QuantitySource method;
@@ -29,4 +31,7 @@ final class Portion {
   /// The reference nutrition the totals were calculated from, for a
   /// calculated entry.
   final ReferenceNutrition? reference;
+
+  /// The food it was logged from, when it came from a pack or a saved food.
+  final FoodOrigin? origin;
 }

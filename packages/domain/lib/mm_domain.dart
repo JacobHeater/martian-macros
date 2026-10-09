@@ -32,6 +32,7 @@ export 'src/food/estimate/meal_size.dart';
 export 'src/food/normalize_barcode.dart';
 export 'src/food/nutrition_per100g.dart';
 export 'src/food/nutrition_problem.dart';
+export 'src/food/portion/food_origin.dart';
 export 'src/food/portion/grams_for.dart';
 export 'src/food/portion/nutrition_basis.dart';
 export 'src/food/portion/nutrition_totals.dart';

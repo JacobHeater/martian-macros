@@ -29,5 +29,11 @@ class FoodEntries extends Table {
   RealColumn get servingMilliliters => real().nullable()();
   TextColumn get servingUnit => textEnum<PortionUnit>().nullable()();
   RealColumn get densityGPerMl => real().nullable()();
+  // MM-167: the food an entry was logged from, when it came from a pack or
+  // a saved food.
+  TextColumn get originPackId => text().nullable()();
+  IntColumn get originFoodId => integer().nullable()();
+  TextColumn get originSource => text().nullable()();
+  TextColumn get originSourceId => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
