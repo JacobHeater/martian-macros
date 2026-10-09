@@ -100,6 +100,129 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
       },
     );
 
+    test(
+      'a portion is stored and read back; an entry without one has none',
+      () async {
+        const reference = ReferenceNutrition(
+          basis: ReferenceBasis.perServing,
+          nutrition: NutritionTotals(
+            kcal: 160,
+            proteinG: 10,
+            carbsG: 15,
+            fatG: 6,
+          ),
+          servingDescription: '1 bar',
+          servingGrams: 40,
+          servingMilliliters: 55,
+          servingUnit: PortionUnit.serving,
+          densityGPerMl: 0.73,
+        );
+        final calculated = await repo.addFood(
+          FoodEntry(
+            id: 0,
+            date: d1,
+            meal: Meal.snack,
+            name: 'Bar',
+            kcal: 240,
+            proteinG: 15,
+            carbsG: 22.5,
+            fatG: 9,
+            source: QuantitySource.labelServing,
+            portion: const Portion(
+              method: QuantitySource.labelServing,
+              basis: NutritionBasis.calculated,
+              quantity: 1.5,
+              unit: PortionUnit.serving,
+              reference: reference,
+            ),
+          ),
+        );
+        final typed = await repo.addFood(
+          FoodEntry(
+            id: 0,
+            date: d1,
+            meal: Meal.dinner,
+            name: 'Stew',
+            kcal: 400,
+            proteinG: 30,
+            carbsG: 40,
+            fatG: 10,
+            source: QuantitySource.householdMeasure,
+            portion: const Portion(
+              method: QuantitySource.householdMeasure,
+              basis: NutritionBasis.enteredTotals,
+              quantity: 2,
+              unit: PortionUnit.cup,
+            ),
+          ),
+        );
+        await repo.addFood(_entry(d1, 'Old style'));
+        final byId = {for (final e in await repo.watchFood(d1).first) e.id: e};
+
+        final c = byId[calculated]!.portion!;
+        expect(c.basis, NutritionBasis.calculated);
+        expect(c.quantity, 1.5);
+        expect(c.unit, PortionUnit.serving);
+        expect(c.method, QuantitySource.labelServing);
+        expect(c.reference!.basis, ReferenceBasis.perServing);
+        expect(c.reference!.nutrition.kcal, 160);
+        expect(c.reference!.servingDescription, '1 bar');
+        expect(c.reference!.servingGrams, 40);
+        expect(c.reference!.servingMilliliters, 55);
+        expect(c.reference!.servingUnit, PortionUnit.serving);
+        expect(c.reference!.densityGPerMl, 0.73);
+        expect(byId[calculated]!.kcal, 240, reason: 'totals stay as logged');
+
+        final t = byId[typed]!.portion!;
+        expect(t.basis, NutritionBasis.enteredTotals);
+        expect(t.quantity, 2);
+        expect(t.unit, PortionUnit.cup);
+        expect(t.reference, isNull);
+        expect(byId[typed]!.kcal, 400, reason: 'typed totals are not scaled');
+
+        expect(
+          byId.values.singleWhere((e) => e.name == 'Old style').portion,
+          isNull,
+        );
+      },
+    );
+
+    test('an update can change or clear the portion', () async {
+      final id = await repo.addFood(
+        FoodEntry(
+          id: 0,
+          date: d1,
+          meal: Meal.lunch,
+          name: 'Oats',
+          kcal: 300,
+          proteinG: 10,
+          carbsG: 50,
+          fatG: 5,
+          source: QuantitySource.weighed,
+          portion: const Portion(
+            method: QuantitySource.weighed,
+            basis: NutritionBasis.enteredTotals,
+            quantity: 80,
+            unit: PortionUnit.gram,
+          ),
+        ),
+      );
+      await repo.updateFood(
+        FoodEntry(
+          id: id,
+          date: d1,
+          meal: Meal.lunch,
+          name: 'Oats',
+          kcal: 300,
+          proteinG: 10,
+          carbsG: 50,
+          fatG: 5,
+          source: QuantitySource.quickAdd,
+        ),
+      );
+      expect((await repo.watchFood(d1).first).single.portion, isNull);
+    });
+
     test('ids are never reused after a delete', () async {
       final a = await repo.addFood(_entry(d1, 'Oats'));
       await repo.deleteFood(a);

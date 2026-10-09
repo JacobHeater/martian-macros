@@ -103,6 +103,28 @@ void main() {
     }
   });
 
+  group('portions (MM-167)', () {
+    test('a food logged at version 10 keeps its totals and has no portion', () async {
+      final schema = await verifier.schemaAt(10);
+      schema.rawDatabase.execute(
+        'INSERT INTO food_entries (epoch_day, meal, name, kcal, protein_g, '
+        'carbs_g, fat_g, quantity_source) VALUES '
+        "(${day.epochDay}, 'lunch', 'Rice bowl', 510, 32, 60, 14, 'labelServing')",
+      );
+      final db = AppDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, current);
+
+      final entry = (await DriftRepositories(
+        db,
+      ).food.watchFood(day).first).single;
+      expect(entry.name, 'Rice bowl');
+      expect(entry.kcal, 510);
+      expect(entry.source, QuantitySource.labelServing);
+      expect(entry.portion, isNull, reason: 'nothing is invented');
+    });
+  });
+
   group('from released version 1 (MM-164, MM-165, MM-132, MM-83)', () {
     test('a saved setup and targets survive every later step, with each new '
         'field at its default', () async {

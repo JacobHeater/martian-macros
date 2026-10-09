@@ -12,5 +12,22 @@ class FoodEntries extends Table {
   RealColumn get carbsG => real().check(carbsG.isBiggerOrEqualValue(0))();
   RealColumn get fatG => real().check(fatG.isBiggerOrEqualValue(0))();
   TextColumn get quantitySource => textEnum<QuantitySource>()();
+  // MM-167: how much was eaten and what the totals are for. All null for an
+  // entry logged before they were recorded; `nutritionBasis` null means no
+  // portion. The reference columns are set only for a calculated entry.
+  RealColumn get portionQuantity =>
+      real().nullable().check(portionQuantity.isBiggerThanValue(0))();
+  TextColumn get portionUnit => textEnum<PortionUnit>().nullable()();
+  TextColumn get nutritionBasis => textEnum<NutritionBasis>().nullable()();
+  TextColumn get referenceBasis => textEnum<ReferenceBasis>().nullable()();
+  RealColumn get referenceKcal => real().nullable()();
+  RealColumn get referenceProteinG => real().nullable()();
+  RealColumn get referenceCarbsG => real().nullable()();
+  RealColumn get referenceFatG => real().nullable()();
+  TextColumn get servingDescription => text().nullable()();
+  RealColumn get servingGrams => real().nullable()();
+  RealColumn get servingMilliliters => real().nullable()();
+  TextColumn get servingUnit => textEnum<PortionUnit>().nullable()();
+  RealColumn get densityGPerMl => real().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
