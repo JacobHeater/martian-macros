@@ -2,6 +2,8 @@
     <!-- Used only to download the optional food database the user asks for
          (MM-56). The app sends no analytics and uploads nothing. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <application
         android:label="martian_macros"
         android:name="${applicationName}"
