@@ -11,6 +11,7 @@ import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/group_header.dart';
 import '../ui/mm_app_bar.dart';
+import '../ui/mm_list_group.dart';
 import '../ui/mm_list_row.dart';
 import '../ui/mm_menu_button.dart';
 import '../ui/mm_menu_item.dart';
@@ -64,97 +65,121 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const GroupHeader('Activity and training'),
-          MmListRow(
-            title: 'Daily activity',
-            subtitle: setup.dailyActivity.label,
-            trailing: MmMenuButton<DailyActivity>(
-              icon: Icons.edit_outlined,
-              onSelected: (a) =>
-                  setupWriter.saveSetup(setup.copyWith(dailyActivity: a)),
-              items: [
-                for (final a in DailyActivity.values) MmMenuItem(a, a.label),
-              ],
-            ),
-          ),
-          MmListRow(
-            title: 'Experience',
-            subtitle: setup.trainingStatus.label,
-            trailing: MmMenuButton<TrainingStatus>(
-              icon: Icons.edit_outlined,
-              onSelected: (s) =>
-                  setupWriter.saveSetup(setup.copyWith(trainingStatus: s)),
-              items: [
-                for (final s in TrainingStatus.values) MmMenuItem(s, s.label),
-              ],
-            ),
-          ),
-          MmListRow(
-            title: 'Training days per week: ${setup.trainingDaysPerWeek}',
-            detail: MmSlider(
-              value: setup.trainingDaysPerWeek.toDouble(),
-              max: 7,
-              divisions: 7,
-              onChanged: (v) => setupWriter.saveSetup(
-                setup.copyWith(trainingDaysPerWeek: v.round()),
+          MmListGroup(
+            children: [
+              MmListRow(
+                title: 'Daily activity',
+                subtitle: setup.dailyActivity.label,
+                trailing: MmMenuButton<DailyActivity>(
+                  icon: Icons.edit_outlined,
+                  onSelected: (a) =>
+                      setupWriter.saveSetup(setup.copyWith(dailyActivity: a)),
+                  items: [
+                    for (final a in DailyActivity.values)
+                      MmMenuItem(a, a.label),
+                  ],
+                ),
               ),
-            ),
+              MmListRow(
+                title: 'Experience',
+                subtitle: setup.trainingStatus.label,
+                trailing: MmMenuButton<TrainingStatus>(
+                  icon: Icons.edit_outlined,
+                  onSelected: (s) =>
+                      setupWriter.saveSetup(setup.copyWith(trainingStatus: s)),
+                  items: [
+                    for (final s in TrainingStatus.values)
+                      MmMenuItem(s, s.label),
+                  ],
+                ),
+              ),
+              MmListRow(
+                title: 'Training days per week: ${setup.trainingDaysPerWeek}',
+                detail: MmSlider(
+                  value: setup.trainingDaysPerWeek.toDouble(),
+                  max: 7,
+                  divisions: 7,
+                  onChanged: (v) => setupWriter.saveSetup(
+                    setup.copyWith(trainingDaysPerWeek: v.round()),
+                  ),
+                ),
+              ),
+            ],
           ),
           const GroupHeader('Body fat estimate'),
-          MmSwitchRow(
-            title: setup.bodyFatPercent == null
-                ? 'Let the app estimate'
-                : 'About ${setup.bodyFatPercent!.round()}%',
-            subtitle: 'Enter one only if you have a recent measurement.',
-            value: setup.bodyFatPercent != null,
-            onChanged: (on) => setupWriter.saveSetup(
-              setup.copyWith(bodyFatPercent: () => on ? 25 : null),
-            ),
-          ),
-          if (setup.bodyFatPercent != null)
-            MmSlider(
-              value: setup.bodyFatPercent!.clamp(5, 55),
-              min: 5,
-              max: 55,
-              divisions: 50,
-              label: '${setup.bodyFatPercent!.round()}%',
-              onChanged: (v) => setupWriter.saveSetup(
-                setup.copyWith(bodyFatPercent: () => v.roundToDouble()),
+          MmListGroup(
+            children: [
+              MmSwitchRow(
+                title: setup.bodyFatPercent == null
+                    ? 'Let the app estimate'
+                    : 'About ${setup.bodyFatPercent!.round()}%',
+                subtitle: 'Enter one only if you have a recent measurement.',
+                value: setup.bodyFatPercent != null,
+                onChanged: (on) => setupWriter.saveSetup(
+                  setup.copyWith(bodyFatPercent: () => on ? 25 : null),
+                ),
               ),
-            ),
+              if (setup.bodyFatPercent != null)
+                MmSlider(
+                  value: setup.bodyFatPercent!.clamp(5, 55),
+                  min: 5,
+                  max: 55,
+                  divisions: 50,
+                  label: '${setup.bodyFatPercent!.round()}%',
+                  onChanged: (v) => setupWriter.saveSetup(
+                    setup.copyWith(bodyFatPercent: () => v.roundToDouble()),
+                  ),
+                ),
+            ],
+          ),
           const ProfileSection(),
           const GroupHeader('About'),
-          MmListRow(
-            leadingIcon: Icons.menu_book_outlined,
-            title: 'How this works',
-            subtitle: 'Where each number comes from, and how sure we are.',
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const HowThisWorksScreen(),
+          MmListGroup(
+            children: [
+              MmListRow(
+                leadingIcon: Icons.menu_book_outlined,
+                title: 'How this works',
+                subtitle: 'Where each number comes from, and how sure we are.',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const HowThisWorksScreen(),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
           const GroupHeader('Data'),
-          const MmListRow(
-            leadingIcon: Icons.lock_outline,
-            title: 'Stored only on this device',
-            subtitle: 'Nothing is uploaded. Encrypted backup is coming.',
-          ),
-          MmListRow(
-            leadingIcon: Icons.delete_forever_outlined,
-            danger: true,
-            title: 'Erase all data and start over',
-            onTap: () => _confirmErase(context, ref),
+          MmListGroup(
+            children: [
+              const MmListRow(
+                leadingIcon: Icons.lock_outline,
+                title: 'Stored only on this device',
+                subtitle: 'Nothing is uploaded. Encrypted backup is coming.',
+              ),
+              MmListRow(
+                leadingIcon: Icons.delete_forever_outlined,
+                danger: true,
+                title: 'Erase all data and start over',
+                onTap: () => _confirmErase(context, ref),
+              ),
+            ],
           ),
           if (env == 'dev') ...[
             const GroupHeader('Development'),
-            MmListRow(
-              leadingIcon: Icons.palette_outlined,
-              title: 'Component gallery',
-              subtitle: 'Every color and component, light and dark.',
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const GalleryScreen()),
-              ),
+            MmListGroup(
+              children: [
+                MmListRow(
+                  leadingIcon: Icons.palette_outlined,
+                  title: 'Component gallery',
+                  subtitle: 'Every color and component, light and dark.',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const GalleryScreen(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
           const SizedBox(height: 24),

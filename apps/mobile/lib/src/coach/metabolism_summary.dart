@@ -3,6 +3,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../theme/mm_colors_context.dart';
+import '../ui/mm_disclosure.dart';
 import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
@@ -26,15 +27,11 @@ class MetabolismSummary extends StatelessWidget {
     final needDays = estimator.minIntakeDays - tdee.usableIntakeDays;
     final needWeighIns = estimator.minWeighIns - tdee.weighIns;
 
-    return ExpansionTile(
-      tilePadding: EdgeInsets.zero,
-      childrenPadding: EdgeInsets.zero,
-      title: const Text('Your metabolism estimate'),
-      subtitle: Text(
-        measured
-            ? 'Measured from your logged food and weight trend.'
-            : 'Starting estimate; it improves as you log food and weight.',
-      ),
+    return MmDisclosure(
+      title: 'Your metabolism estimate',
+      subtitle: measured
+          ? 'Measured from your logged food and weight trend.'
+          : 'Starting estimate; it improves as you log food and weight.',
       children: [
         Text(
           'Probably between '

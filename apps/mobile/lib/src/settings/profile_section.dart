@@ -6,6 +6,7 @@ import '../format/fmt.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/group_header.dart';
+import '../ui/mm_list_group.dart';
 import '../ui/mm_list_row.dart';
 import '../ui/show_mm_confirm.dart';
 import 'edit_height_sheet.dart';
@@ -32,30 +33,38 @@ class ProfileSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const GroupHeader('Profile'),
-        MmListRow(
-          title: 'Biological sex',
-          trailing: Text(profile.sex == BiologicalSex.male ? 'Male' : 'Female'),
-          onTap: () => _changeSex(context, ref, setup),
-        ),
-        MmListRow(
-          title: 'Date of birth',
-          subtitle: 'Age ${profile.ageOn(ref.watch(todayProvider))}',
-          trailing: Text(Fmt.longDate(profile.birthDate)),
-          onTap: () => _changeBirthDate(context, ref, setup),
-        ),
-        MmListRow(
-          title: 'Height',
-          trailing: Text(height),
-          onTap: () => _changeHeight(context, ref, setup),
-        ),
-        MmListRow(
-          title: 'Health check',
-          subtitle: ticked == 0
-              ? 'Nothing ticked'
-              : '$ticked ${ticked == 1 ? 'answer' : 'answers'} ticked',
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const HealthCheckScreen()),
-          ),
+        MmListGroup(
+          children: [
+            MmListRow(
+              title: 'Biological sex',
+              trailing: Text(
+                profile.sex == BiologicalSex.male ? 'Male' : 'Female',
+              ),
+              onTap: () => _changeSex(context, ref, setup),
+            ),
+            MmListRow(
+              title: 'Date of birth',
+              subtitle: 'Age ${profile.ageOn(ref.watch(todayProvider))}',
+              trailing: Text(Fmt.longDate(profile.birthDate)),
+              onTap: () => _changeBirthDate(context, ref, setup),
+            ),
+            MmListRow(
+              title: 'Height',
+              trailing: Text(height),
+              onTap: () => _changeHeight(context, ref, setup),
+            ),
+            MmListRow(
+              title: 'Health check',
+              subtitle: ticked == 0
+                  ? 'Nothing ticked'
+                  : '$ticked ${ticked == 1 ? 'answer' : 'answers'} ticked',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const HealthCheckScreen(),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
