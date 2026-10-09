@@ -3,6 +3,7 @@ import 'dart:io';
 import 'arch/arch_command.dart';
 import 'command.dart';
 import 'requirements.dart';
+import 'roadmap/roadmap_report_command.dart';
 import 'toolchain.dart';
 
 /// Workspace packages. `flutter: true` packages are tested with
@@ -29,6 +30,10 @@ final _commands = <String, (String, Command)>{
   'check': ('CI gate: format, requirements, arch, analyze, test', _check),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
+  'roadmap': (
+    'Write roadmap/progress.html, the progress page: mm roadmap [--check]',
+    _roadmap,
+  ),
   'evidence': (
     'Copy docs/evidence.md into the app assets: mm evidence [--check]',
     _evidence,
@@ -433,6 +438,9 @@ bool _samePath(String a, String b) {
 
 Future<int> _req(Toolchain tc, List<String> args) =>
     runRequirements(tc.repoRoot, args);
+
+Future<int> _roadmap(Toolchain tc, List<String> args) =>
+    runRoadmapReport(tc.repoRoot, args);
 
 Future<int> _arch(Toolchain tc, List<String> args) =>
     runArch(tc.repoRoot, args);
