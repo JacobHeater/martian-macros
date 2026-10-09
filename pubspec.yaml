@@ -11,6 +11,7 @@ workspace:
   - packages/engine
   - packages/fixtures
   - packages/data
+  - packages/food_catalog
   - tool
 
 dev_dependencies:
