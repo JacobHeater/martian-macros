@@ -109,6 +109,30 @@ void targetsHistoryRepositoryContract(
       expect(list.single.targets.kcal, 1900);
     });
 
+    test(
+      'marks summaries through a day without removing their explanations',
+      () async {
+        final why = TargetsExplanation(
+          lines: const [ExplanationLine(ExplanationReason.stepLimit, -25)],
+          previousKcal: 2200,
+          newKcal: 2175,
+          estimateStatus: TdeeStatus.updated,
+        );
+        await repo.saveTargets(
+          _record(d1, 2175, explanation: why).copyWith(summarySeen: false),
+        );
+        await repo.saveTargets(
+          _record(d2, 2150, explanation: why).copyWith(summarySeen: false),
+        );
+        await repo.markSummariesSeenThrough(d1);
+
+        final history = await repo.watchTargetsHistory().first;
+        expect(history.first.summarySeen, isTrue);
+        expect(history.first.explanation?.lines, hasLength(1));
+        expect(history.last.summarySeen, isFalse);
+      },
+    );
+
     test('keeps the estimate and the flags', () async {
       await repo.saveTargets(
         _record(

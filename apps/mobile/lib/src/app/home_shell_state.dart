@@ -16,6 +16,7 @@ import '../ui/mm_navigation_bar.dart';
 import 'home_destination.dart';
 import 'home_shell.dart';
 import 'home_tab_provider.dart';
+import 'target_change_summary_host.dart';
 
 class HomeShellState extends ConsumerState<HomeShell>
     with WidgetsBindingObserver {
@@ -60,46 +61,48 @@ class HomeShellState extends ConsumerState<HomeShell>
   Widget build(BuildContext context) {
     final destination = ref.watch(homeTabProvider);
 
-    return Scaffold(
-      appBar: MmAppBar(
-        title: switch (destination) {
-          HomeDestination.food => null,
-          HomeDestination.dashboard => 'Today',
-          _ => destination.label,
-        },
-        titleWidget: destination == HomeDestination.food
-            ? const FoodDayHeader()
-            : null,
-        actions: [
-          MmIconButton(
-            tooltip: 'Settings',
-            icon: Icons.settings_outlined,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+    return TargetChangeSummaryHost(
+      child: Scaffold(
+        appBar: MmAppBar(
+          title: switch (destination) {
+            HomeDestination.food => null,
+            HomeDestination.dashboard => 'Today',
+            _ => destination.label,
+          },
+          titleWidget: destination == HomeDestination.food
+              ? const FoodDayHeader()
+              : null,
+          actions: [
+            MmIconButton(
+              tooltip: 'Settings',
+              icon: Icons.settings_outlined,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+              ),
             ),
-          ),
-        ],
-      ),
-      body: IndexedStack(
-        index: destination.index,
-        children: const [
-          DashboardScreen(),
-          FoodScreen(),
-          ProgressScreen(),
-          CoachScreen(),
-        ],
-      ),
-      floatingActionButton:
-          destination == HomeDestination.dashboard ||
-              destination == HomeDestination.food
-          ? const AddFoodButton()
-          : null,
-      bottomNavigationBar: MmNavigationBar(
-        destinations: _destinations,
-        selectedIndex: destination.index,
-        onSelected: (i) => ref
-            .read(homeTabProvider.notifier)
-            .select(HomeDestination.values[i]),
+          ],
+        ),
+        body: IndexedStack(
+          index: destination.index,
+          children: const [
+            DashboardScreen(),
+            FoodScreen(),
+            ProgressScreen(),
+            CoachScreen(),
+          ],
+        ),
+        floatingActionButton:
+            destination == HomeDestination.dashboard ||
+                destination == HomeDestination.food
+            ? const AddFoodButton()
+            : null,
+        bottomNavigationBar: MmNavigationBar(
+          destinations: _destinations,
+          selectedIndex: destination.index,
+          onSelected: (i) => ref
+              .read(homeTabProvider.notifier)
+              .select(HomeDestination.values[i]),
+        ),
       ),
     );
   }
