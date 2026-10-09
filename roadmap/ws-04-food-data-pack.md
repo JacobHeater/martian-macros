@@ -1,6 +1,6 @@
 # WS-04: Food data pack
 
-**Order** 4 · **Group** A (start now) · **State** not started · **Risk** high
+**Order** 4 · **Group** A (start now) · **State** partially built · **Risk** high
 
 ## Summary
 Build the offline United States food pack (Open Food Facts and USDA FoodData
@@ -102,7 +102,8 @@ Everything. Its only contact with existing code is the validation function in
 `packages/domain`, which WS-08 also calls; define it in step 2 and both use it.
 
 ## Requirement sources
-- Remaining: MM-51, MM-53, MM-54, MM-55, MM-52, MM-153, MM-57, MM-56.
+- Built: MM-53 (nutrition checks), MM-54 (barcode normalization).
+- Remaining: MM-51, MM-55, MM-52, MM-153, MM-57, MM-56.
   Epic: MM-50.
 
 ## Notes for whoever builds it
