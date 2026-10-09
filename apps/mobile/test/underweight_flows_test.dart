@@ -19,6 +19,9 @@ void main() {
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));
+    await tester.pump();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));

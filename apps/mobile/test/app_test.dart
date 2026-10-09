@@ -82,7 +82,11 @@ void main() {
 
     await tester.tap(find.text('Male'));
     await tester.pump();
-    expect(next().onPressed, isNull, reason: 'sex alone is not enough');
+    expect(next().onPressed, isNotNull);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Date of birth'), findsOneWidget);
+    expect(next().onPressed, isNull, reason: 'no date of birth yet');
 
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();
@@ -151,6 +155,9 @@ void main() {
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));
+    await tester.pump();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Choose date'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
