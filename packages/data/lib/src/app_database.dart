@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 14;
+  static const currentSchemaVersion = 15;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -147,6 +147,24 @@ class AppDatabase extends _$AppDatabase {
         ('origin_source_id', foodEntries.originSourceId),
       ]) {
         if (!existing.contains(name)) await m.addColumn(foodEntries, column);
+      }
+    },
+    // 14 to 15: nutrients beyond the macros and the detail setting (MM-49).
+    14: (m) async {
+      Future<Set<String>> columnsOf(String table) async => {
+        for (final row in await customSelect('PRAGMA table_info($table)').get())
+          row.read<String>('name'),
+      };
+      final food = await columnsOf('food_entries');
+      for (final (name, column) in [
+        ('fiber_g', foodEntries.fiberG),
+        ('sodium_mg', foodEntries.sodiumMg),
+        ('alcohol_g', foodEntries.alcoholG),
+      ]) {
+        if (!food.contains(name)) await m.addColumn(foodEntries, column);
+      }
+      if (!(await columnsOf('user_preferences')).contains('detail_level')) {
+        await m.addColumn(userPreferences, userPreferences.detailLevel);
       }
     },
   };

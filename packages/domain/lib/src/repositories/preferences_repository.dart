@@ -1,3 +1,5 @@
+import 'detail_level_reader.dart';
+import 'detail_level_writer.dart';
 import 'easy_to_miss_reader.dart';
 import 'easy_to_miss_writer.dart';
 import 'preferences_reader.dart';
@@ -10,4 +12,6 @@ abstract interface class PreferencesRepository
         PreferencesReader,
         PreferencesWriter,
         EasyToMissReader,
-        EasyToMissWriter {}
+        EasyToMissWriter,
+        DetailLevelReader,
+        DetailLevelWriter {}

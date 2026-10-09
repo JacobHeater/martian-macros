@@ -26,6 +26,16 @@ void preferencesRepositoryContract(
       expect(await repo.watchThemePreference().first, ThemePreference.light);
     });
 
+    test('detail is Standard until changed, and each level is kept', () async {
+      expect(await repo.watchDetailLevel().first, DetailLevel.standard);
+      for (final level in DetailLevel.values) {
+        await repo.saveDetailLevel(level);
+        expect(await repo.watchDetailLevel().first, level);
+      }
+      await repo.saveThemePreference(ThemePreference.dark);
+      expect(await repo.watchDetailLevel().first, DetailLevel.full);
+    });
+
     test('the easy-to-miss line is on and never shown until changed', () async {
       final p = await repo.watchEasyToMiss().first;
       expect(p.enabled, isTrue);
