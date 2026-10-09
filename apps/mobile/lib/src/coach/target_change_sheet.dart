@@ -34,6 +34,9 @@ class TargetChangeSheet extends StatelessWidget {
     final t = current.targets;
     final p = previous?.targets;
     final confidence = explanation?.confidence;
+    final remainder = explanation == null
+        ? null
+        : _roundingRemainder(explanation);
     final confidenceNote = confidence == null
         ? ''
         : ' Coach confidence: '
@@ -73,13 +76,18 @@ class TargetChangeSheet extends StatelessWidget {
               style: text.bodyMedium,
             )
           else if (explanation.lines.isEmpty)
-            Text('Nothing moved the calorie target.', style: text.bodyMedium)
+            Text(
+              'No calculated contribution was large enough to move the '
+              'calorie target.',
+              style: text.bodyMedium,
+            )
           else
             for (final line in explanation.lines)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(line.text, style: text.bodyMedium),
               ),
+          if (remainder != null) Text(remainder, style: text.bodyMedium),
           if (explanation != null) ...[
             const SizedBox(height: 8),
             const SectionLabel('What it was based on'),
@@ -118,5 +126,15 @@ class TargetChangeSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String? _roundingRemainder(TargetsExplanation explanation) {
+    final change = explanation.change;
+    if (change == null) return null;
+    final remainder = change - explanation.linesTotal;
+    if (remainder.abs() < 0.5) return null;
+    final sign = remainder < 0 ? '−' : '+';
+    return 'And $sign${Fmt.whole(remainder.abs())} kcal from rounding '
+        'and limits.';
   }
 }

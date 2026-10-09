@@ -12,6 +12,7 @@ import 'loss_safety_raise.dart';
 import 'safety_body_fat.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
+import 'target_rules_version.dart';
 import 'targets_record.dart';
 import 'tdee_status.dart';
 
@@ -134,6 +135,14 @@ TargetsRecord? nextTargets({
       previous: last.targets,
       deficitWeeks: consecutiveDeficitWeeks(history, today),
       trigger: ExplanationTrigger.bodyFatCorrection,
+    );
+  }
+
+  if (last.targetRulesVersion < currentTargetRulesVersion) {
+    return build(
+      previous: last.targets,
+      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      trigger: ExplanationTrigger.appRuleUpdate,
     );
   }
 

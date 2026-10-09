@@ -50,6 +50,8 @@ TargetsExplanation explainTargets({
               ExplanationTrigger.goalChange => ExplanationReason.goalChange,
               ExplanationTrigger.profileCorrection =>
                 ExplanationReason.profileCorrection,
+              ExplanationTrigger.appRuleUpdate =>
+                ExplanationReason.appRuleUpdate,
               ExplanationTrigger.healthRule => ExplanationReason.healthRule,
               ExplanationTrigger.underweightRule =>
                 ExplanationReason.underweightRule,

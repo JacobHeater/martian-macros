@@ -39,6 +39,7 @@ export 'src/settling_window.dart';
 export 'src/settling_windows.dart';
 export 'src/target_flag.dart';
 export 'src/target_inputs.dart';
+export 'src/target_rules_version.dart';
 export 'src/targets_explanation.dart';
 export 'src/targets_history_reader.dart';
 export 'src/targets_history_repository.dart';

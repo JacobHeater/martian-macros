@@ -14,6 +14,7 @@ void main() {
   TargetsRecord target({
     required CalendarDate effectiveFrom,
     required double kcal,
+    double protein = 150,
     TargetsExplanation? explanation,
     bool summarySeen = true,
   }) => TargetsRecord(
@@ -26,13 +27,47 @@ void main() {
     summarySeen: summarySeen,
     targets: DailyTargets(
       kcal: kcal,
-      proteinG: 150,
+      proteinG: protein,
       proteinMinimumG: 120,
       fatG: 65,
       carbsG: 180,
       weeklyRateFraction: -0.0075,
     ),
   );
+
+  testWidgets('a macro-only target change is shown on the next app opening', (
+    tester,
+  ) async {
+    final repos = InMemoryRepositories();
+    await repos.setup.saveSetup(
+      typicalSetup(
+        onboardedOn: today.addDays(-30),
+        healthCheckConfirmedOn: today.addDays(-30),
+      ),
+    );
+    await repos.weights.saveWeight(today, 82);
+    await repos.targets.saveTargets(
+      target(effectiveFrom: previousDay, kcal: 2200),
+    );
+    await repos.targets.saveTargets(
+      target(
+        effectiveFrom: changeDay,
+        kcal: 2200,
+        protein: 160,
+        summarySeen: false,
+        explanation: const TargetsExplanation(
+          lines: [],
+          previousKcal: 2200,
+          newKcal: 2200,
+          estimateStatus: TdeeStatus.updated,
+        ),
+      ),
+    );
+
+    await pumpApp(tester, repos, FixedClock(today));
+    expect(find.text('Why your targets are what they are'), findsOneWidget);
+    expect(find.textContaining('Protein target 150 → 160 g'), findsOneWidget);
+  });
 
   testWidgets('an unseen target change is shown once and remains in history', (
     tester,

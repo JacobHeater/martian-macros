@@ -17,6 +17,8 @@ extension ExplanationLineText on ExplanationLine {
       ExplanationReason.paceAndWeight =>
         'Your pace and body weight moved the target ($size).',
       ExplanationReason.goalChange => 'You changed your goal ($size).',
+      ExplanationReason.appRuleUpdate =>
+        'The target rules changed in an app update ($size).',
       ExplanationReason.profileCorrection =>
         'You corrected your profile or health check ($size).',
       ExplanationReason.healthRule =>

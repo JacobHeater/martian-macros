@@ -30,11 +30,16 @@ class TargetChangeSummaryHostState
     Set<int> generatedThisLaunch,
   ) {
     if (_showingSummary) return;
-    final index = history.indexWhere(
-      (record) =>
-          _hasUnseenChange(record) &&
-          !generatedThisLaunch.contains(record.effectiveFrom.epochDay),
-    );
+    var index = -1;
+    for (var i = 0; i < history.length; i++) {
+      final previous = i == 0 ? null : history[i - 1];
+      final record = history[i];
+      if (_hasUnseenChange(record, previous) &&
+          !generatedThisLaunch.contains(record.effectiveFrom.epochDay)) {
+        index = i;
+        break;
+      }
+    }
     if (index < 0) return;
 
     _showingSummary = true;
@@ -109,6 +114,20 @@ class TargetChangeSummaryHostState
     }
   }
 
-  bool _hasUnseenChange(TargetsRecord record) =>
-      !record.summarySeen && (record.explanation?.change?.round() ?? 0) != 0;
+  bool _hasUnseenChange(TargetsRecord record, TargetsRecord? previous) {
+    if (record.summarySeen ||
+        previous == null ||
+        record.explanation?.previousKcal == null) {
+      return false;
+    }
+    final current = record.targets;
+    final prior = previous.targets;
+    return record.mode != previous.mode ||
+        current.kcal.round() != prior.kcal.round() ||
+        current.proteinG.round() != prior.proteinG.round() ||
+        current.proteinMinimumG?.round() != prior.proteinMinimumG?.round() ||
+        current.carbsG.round() != prior.carbsG.round() ||
+        current.fatG.round() != prior.fatG.round() ||
+        current.weeklyRateFraction != prior.weeklyRateFraction;
+  }
 }

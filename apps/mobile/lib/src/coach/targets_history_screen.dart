@@ -27,11 +27,16 @@ class TargetsHistoryScreen extends ConsumerWidget {
                 for (var i = history.length - 1; i >= 0; i--)
                   MmListRow(
                     title: Fmt.day(history[i].effectiveFrom, today),
-                    subtitle:
-                        '${Fmt.kcal(history[i].targets.kcal)} · '
-                        'P ${_proteinRange(history[i].targets)} · '
-                        'C ${history[i].targets.carbsG.round()} · '
-                        'F ${history[i].targets.fatG.round()}',
+                    subtitle: [
+                      '${Fmt.kcal(history[i].targets.kcal)} · '
+                          'P ${_proteinRange(history[i].targets)} · '
+                          'C ${history[i].targets.carbsG.round()} · '
+                          'F ${history[i].targets.fatG.round()}',
+                      if (history[i].targets.flags.contains(
+                        TargetFlag.heldByUser,
+                      ))
+                        'Kept by you',
+                    ].join('\n'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => showTargetChangeSheet(
                       context,

@@ -28,6 +28,11 @@ class TargetsHistory extends Table {
   /// Existing target history should not trigger new summary dialogs.
   BoolColumn get summarySeen => boolean().withDefault(const Constant(true))();
 
+  /// Rules used to issue targets; bump [currentTargetRulesVersion] when target
+  /// calculation behavior changes.
+  IntColumn get targetRulesVersion =>
+      integer().withDefault(const Constant(currentTargetRulesVersion))();
+
   /// Added in schema version 4 (MM-83); older rows read as 0.
   IntColumn get profileRevision => integer().withDefault(const Constant(0))();
 
