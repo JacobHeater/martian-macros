@@ -24,6 +24,7 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/notice.dart';
 import 'add_food_sheet.dart';
+import 'estimate/estimate_meal_step.dart';
 import 'food_amount_step.dart';
 import 'food_search_results.dart';
 import 'scan/barcode_scan_step.dart';
@@ -32,6 +33,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _search = TextEditingController();
   CatalogFood? _picked;
   var _scanning = false;
+  var _estimating = false;
   final _name = TextEditingController();
   final _kcal = TextEditingController();
   final _protein = TextEditingController();
@@ -300,6 +302,15 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         ),
       );
     }
+    if (_estimating) {
+      return _sheet(
+        EstimateMealStep(
+          day: widget.day,
+          meal: _meal,
+          onBack: () => setState(() => _estimating = false),
+        ),
+      );
+    }
     if (_scanning) {
       return _sheet(
         BarcodeScanStep(
@@ -342,6 +353,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
                 icon: Icons.qr_code_scanner,
                 expand: true,
                 onPressed: () => setState(() => _scanning = true),
+              ),
+            ),
+          if (!editing && query.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: MmButton(
+                key: const ValueKey('food-estimate'),
+                label: 'Estimate a meal',
+                kind: MmButtonKind.secondary,
+                icon: Icons.restaurant,
+                expand: true,
+                onPressed: () => setState(() => _estimating = true),
               ),
             ),
           if (editing)
