@@ -40,3 +40,13 @@ ordered by barcode (or name). The same sources give byte-identical packs.
   `reference`, USDA branded data `label`, Open Food Facts data `checkThis`.
 - **The license text in the pack header** is provisional until MM-57 has been
   read by a qualified person. Do not publish a pack before then.
+
+## Publishing (MM-56)
+
+`./mm food package --base-url https://example.org/food/` compresses the packs
+in `.food_cache/packs/` and writes `.food_cache/publish/manifest.json`, which
+lists each pack with its size and SHA-256. Upload the contents of `publish/` to
+a static host that serves files over https and honours `Range` requests, then
+set `MM_FOOD_PACK_MANIFEST_URL` in `config/prod.json` to the manifest's URL.
+The command uploads nothing, and **no pack should be published before the
+licensing (MM-57) has been reviewed**.
