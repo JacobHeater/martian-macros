@@ -286,5 +286,7 @@ Steps 3 to 5, calculation and screens, are built (`apps/mobile`, tests in `food_
   regenerated on CI.
 
 Remaining: the source food, conversion record and raw/cooked state are not stored; hand portions are a count with typed totals until
-MM-46's model exists; "One serving" is offered only under Label serving; Estimate is still 20% in the engine (the decision to make it
-40% is not yet applied); the backup format (MM-63) is unbuilt. The ticket stays in progress for those.
+MM-46's model exists; "One serving" is offered only under Label serving; the backup format (MM-63) is unbuilt. The ticket stays in progress for those.
+
+Done since: `QuantitySource.quickAdd` (Estimate) is now 0.40, as decided; the domain and engine tests pass unchanged. The adaptive simulator
+was not given a new estimate-heavy user (MM-30, MM-150 own that).
