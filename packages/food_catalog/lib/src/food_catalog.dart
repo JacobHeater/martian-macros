@@ -18,8 +18,16 @@ final class FoodCatalog
   List<SearchHit> search(String query, {int limit = 25, int offset = 0}) {
     final hits = [
       for (final pack in packs) ...pack.search(query, limit: limit + offset),
-    ]..sort((a, b) => a.score.compareTo(b.score));
+    ]..sort(_byTrustThenMatch);
     return hits.skip(offset).take(limit).toList();
+  }
+
+  /// Reference foods before label foods before "check this" ones, then the
+  /// better text match (MM-42, MM-153). So a generic "Oats" lists above a
+  /// branded product that merely matches the word more tightly.
+  static int _byTrustThenMatch(SearchHit a, SearchHit b) {
+    final byTier = a.food.tier.code.compareTo(b.food.tier.code);
+    return byTier != 0 ? byTier : a.score.compareTo(b.score);
   }
 
   @override

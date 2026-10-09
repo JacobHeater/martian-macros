@@ -1,6 +1,6 @@
 ---
 id: MM-42
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-38, MM-45, MM-50, MM-55]
 ---
@@ -55,3 +55,15 @@ Scenario: Nothing found
 ## Notes
 - Ranking is the hard part. Start with: exact and prefix matches on the name, generic before branded, then how often other products share
   the name. Tune against a list of the hundred most commonly eaten US foods.
+
+## Progress
+Done: a search field on the add-food sheet searching the installed packs on the phone; results listed reference-first, then by
+match (across packs); the user's matching recent foods listed above database results; an amount step with the food's servings
+or grams, macros updating, logged as a cup-or-spoon (serving) or weighed (grams) measurement; "Nothing found" and "no food
+database yet" both offer "Enter manually"; tests with the fixture pack.
+
+Not done: offering "scan its label" when nothing is found (MM-44 unbuilt); the user's saved foods and recipes (MM-45) ranking
+first, only recents do; collapsing branded variants under a generic one (results are a flat list, tier first); tuning ranking
+against the hundred most common US foods; the 150 ms bound measured on a phone (the pack-level search is timed in the
+food_catalog tests, the UI is not); search results are not paged. Reference-first ordering holds across packs, not within one
+pack's top 20.
