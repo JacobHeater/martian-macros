@@ -1,4 +1,4 @@
 {
   "MM_ENV": "dev",
-  "MM_FOOD_PACK_MANIFEST_URL": ""
+  "MM_FOOD_PACK_MANIFEST_URL": "https://github.com/JacobHeater/martian-macros-food-data/releases/latest/download/manifest.json"
 }
