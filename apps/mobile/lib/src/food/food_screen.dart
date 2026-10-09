@@ -5,10 +5,14 @@ import 'package:mm_domain/mm_domain.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../theme/mm_colors_context.dart';
+import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
 import 'calorie_hero.dart';
+import 'copy_entries.dart';
+import 'entries_copied_to.dart';
 import 'meal_section.dart';
 import 'selected_day_provider.dart';
 import 'targets_on.dart';
@@ -21,6 +25,8 @@ class FoodScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final day = shownDay(ref);
     final entries = ref.watch(foodForDayProvider(day)).value ?? const [];
+    final yesterday =
+        ref.watch(foodForDayProvider(day.addDays(-1))).value ?? const [];
     final history = ref.watch(targetsHistoryProvider).value ?? const [];
     final setup = ref.watch(setupProvider).value;
     final targetsAllowed =
@@ -48,6 +54,18 @@ class FoodScreen extends ConsumerWidget {
             child: Text(
               'Nothing logged yet. Start with breakfast.',
               style: text.bodyMedium?.copyWith(color: context.mm.text2),
+            ),
+          ),
+        if (entries.isEmpty && yesterday.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: MmButton(
+              label: 'Copy yesterday',
+              kind: MmButtonKind.secondary,
+              icon: Icons.content_copy,
+              expand: true,
+              onPressed: () =>
+                  copyEntries(ref, entriesCopiedTo(day, yesterday)),
             ),
           ),
         MmSurface(
