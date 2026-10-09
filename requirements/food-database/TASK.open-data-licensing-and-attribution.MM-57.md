@@ -39,3 +39,7 @@ Scenario: Reviewed
 
 ## Notes
 - I am not a lawyer and neither is the pipeline. This ticket is not done until a qualified person has read the conclusion.
+
+## Progress (facts gathered by the MM-51 spike; nothing built; status stays proposed)
+Open Food Facts' terms of use (fetched 2026-10-09) state ODbL for the database, the Database Contents License for contents and CC BY-SA for images, require crediting Open Food Facts with a link, and require derivative works to be shared under the same conditions. The Hugging Face listing tags the dataset both agpl-3.0 and odbl and I could not establish which governs the data. USDA's public-domain status is not confirmed here. The spike found the barcode pack would be about 88% USDA data and 12% Open Food Facts data by barcode count, which matters to what must be published. None of this has been read by a qualified person.
+
