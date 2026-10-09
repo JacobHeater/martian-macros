@@ -57,6 +57,49 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
       expect(await repo.watchFood(d1).first, isEmpty);
     });
 
+    test(
+      'update changes an entry in place; a missing id does nothing',
+      () async {
+        final a = await repo.addFood(_entry(d1, 'Oats', kcal: 300));
+        final b = await repo.addFood(_entry(d1, 'Eggs'));
+        await repo.updateFood(
+          FoodEntry(
+            id: a,
+            date: d2,
+            meal: Meal.dinner,
+            name: 'Porridge',
+            kcal: 250,
+            proteinG: 9,
+            carbsG: 40,
+            fatG: 5,
+            source: QuantitySource.householdMeasure,
+          ),
+        );
+        await repo.updateFood(
+          FoodEntry(
+            id: b + 100,
+            date: d1,
+            meal: Meal.lunch,
+            name: 'Ghost',
+            kcal: 1,
+            proteinG: 0,
+            carbsG: 0,
+            fatG: 0,
+            source: QuantitySource.weighed,
+          ),
+        );
+        final moved = (await repo.watchFood(d2).first).single;
+        expect(moved.id, a);
+        expect(moved.name, 'Porridge');
+        expect(moved.meal, Meal.dinner);
+        expect(moved.kcal, 250);
+        expect(moved.proteinG, 9);
+        expect(moved.source, QuantitySource.householdMeasure);
+        final left = await repo.watchFood(d1).first;
+        expect([for (final e in left) e.name], ['Eggs']);
+      },
+    );
+
     test('ids are never reused after a delete', () async {
       final a = await repo.addFood(_entry(d1, 'Oats'));
       await repo.deleteFood(a);

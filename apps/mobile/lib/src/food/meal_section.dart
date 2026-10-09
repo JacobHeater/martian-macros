@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
@@ -7,6 +9,7 @@ import '../format/meal_label.dart';
 import '../repository_role_providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/mm_icon_button.dart';
+import '../ui/show_mm_snack_bar.dart';
 import 'food_entry_tile.dart';
 import 'show_add_food_sheet.dart';
 
@@ -24,6 +27,18 @@ class MealSection extends ConsumerWidget {
   final Meal meal;
   final CalendarDate day;
   final List<FoodEntry> entries;
+
+  /// Deletes [entry] and offers to put it back for a few seconds (MM-48).
+  void _remove(BuildContext context, WidgetRef ref, FoodEntry entry) {
+    final writer = ref.read(foodEntryWriterProvider);
+    unawaited(writer.deleteFood(entry.id));
+    showMmSnackBar(
+      ScaffoldMessenger.of(context),
+      'Removed ${entry.name}',
+      actionLabel: 'Undo',
+      onAction: () => unawaited(writer.addFood(entry)),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,11 +82,13 @@ class MealSection extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 16),
               child: Icon(Icons.delete_outline, color: context.mm.danger),
             ),
-            onDismissed: (_) =>
-                ref.read(foodEntryWriterProvider).deleteFood(e.id),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: FoodEntryTile(entry: e),
+            onDismissed: (_) => _remove(context, ref, e),
+            child: InkWell(
+              onTap: () => showAddFoodSheet(context, day, entry: e),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: FoodEntryTile(entry: e),
+              ),
             ),
           ),
         ],
