@@ -1,6 +1,6 @@
 ---
 id: MM-167
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-27, MM-63, MM-38, MM-42, MM-43, MM-44, MM-45, MM-46, MM-48, MM-49, MM-55, MM-61, MM-139, MM-150, MM-151]
 ---
@@ -237,3 +237,19 @@ Scenario: The same behavior from search, barcode and manual entry
   5. *Wire-through*: search, barcode and custom foods write the same portion; fix the label-serving method mapping.
   6. *Tests*: domain unit tests; repository contract tests; widget tests for each method, validation, method change, edit round trip and
      legacy display; goldens for the new controls; and an emulator pass.
+
+## Progress
+Step 1 of the plan, the domain, is built and tested (`packages/domain/lib/src/food/portion/`, `test/portion_test.dart`):
+`PortionUnit` with exact constants (weight ounce 28.349523125 g, legal cup 236.588236 mL, tablespoon, teaspoon, fluid ounce as a
+separate volume unit), `parseQuantity` (decimals and simple fractions; empty, zero, negative and non-numeric rejected),
+`ReferenceNutrition` (per 100 g, per 100 mL or per serving, with the serving's description, grams, millilitres, unit and a density
+that is never guessed), `gramsFor`, `scaleNutrition` (the one place a quantity scales nutrition; null where it would need a guess),
+`unitsOffered` (cup and spoon only where the food can convert them) and the `Portion` value.
+
+Where the source counts a serving in a unit, that unit scales by the count itself, so "1 cup (240 mL) = 200 kcal" gives 100 kcal for
+half a cup; any other volume unit goes through the serving's own millilitres. This is why the legal-cup decision applies only to
+density-based conversion.
+
+Not built: schema and migration, repository changes, the amount step and manual form, edit restore, legacy display, the portion
+summary, and the fix to the label-serving mapping. The totals-versus-descriptive rule (typed totals never scaled) is a UI and
+persistence rule and has no code yet. No behavior of the app has changed.
