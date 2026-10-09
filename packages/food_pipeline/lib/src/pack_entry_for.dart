@@ -14,6 +14,8 @@ PackEntry packEntryFor(
   required String packId,
   String? gtin14,
   String? disagreement,
+  PreparationState preparation = PreparationState.unspecified,
+  int? pairedFoodId,
 }) {
   final (tier, reason) = disagreement != null
       ? (TrustTier.checkThis, disagreement)
@@ -46,6 +48,8 @@ PackEntry packEntryFor(
       sodiumMg: food.sodiumMg,
       alcoholG: food.alcoholG,
       source: food.source,
+      preparation: preparation,
+      pairedFoodId: pairedFoodId,
       sourceId: food.sourceId,
       tier: tier,
       tierReason: reason,

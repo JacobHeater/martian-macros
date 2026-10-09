@@ -8,6 +8,7 @@ import 'drop_reason.dart';
 import 'food_kind.dart';
 import 'pack_build_result.dart';
 import 'pack_entry_for.dart';
+import 'preparation_link.dart';
 
 /// Turns candidates into pack entries (MM-52): applies the nutrition checks
 /// (MM-53) and barcode normalization (MM-54) from `mm_domain`, keeps the newest
@@ -97,6 +98,7 @@ final class PackBuilder {
           packId: barcodePackId,
           gtin14: gtin,
           disagreement: disagree ? _disagreement : null,
+          preparation: PreparationState.packaged,
         ),
       );
       report.countWritten(winner.source);
@@ -106,9 +108,19 @@ final class PackBuilder {
       final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
       return byName != 0 ? byName : a.sourceId.compareTo(b.sourceId);
     });
+    // Raw and cooked versions of one food are linked (MM-151).
+    final links = preparationLinks([for (final c in generic) c.name]);
     final genericEntries = [
       for (var i = 0; i < generic.length; i++)
-        packEntryFor(generic[i], id: i + 1, packId: genericPackId),
+        packEntryFor(
+          generic[i],
+          id: i + 1,
+          packId: genericPackId,
+          preparation: links[i].state,
+          pairedFoodId: links[i].pairIndex == null
+              ? null
+              : links[i].pairIndex! + 1,
+        ),
     ];
     for (final c in generic) {
       report.countWritten(c.source);

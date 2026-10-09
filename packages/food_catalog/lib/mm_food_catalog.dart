@@ -3,6 +3,7 @@ library;
 
 export 'src/catalog_barcode_lookup.dart';
 export 'src/catalog_food.dart';
+export 'src/catalog_pair_lookup.dart';
 export 'src/catalog_search.dart';
 export 'src/catalog_serving.dart';
 export 'src/catalog_serving_lookup.dart';
