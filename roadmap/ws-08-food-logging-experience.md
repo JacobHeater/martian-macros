@@ -121,10 +121,12 @@ summary card is theirs, the add-food flow and entry rows are this
 workstream's.
 
 ## Requirement sources
-- Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day
-  completeness, daily summary), MM-48, MM-47 (edit, copy).
-- Remaining: MM-150, MM-152, MM-45, MM-42, MM-49, MM-167, MM-43,
-  MM-151, MM-127, MM-126, MM-46, MM-44, MM-58. Epic: MM-37.
+- Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day completeness, daily summary), MM-48 (edit an entry, undo a
+  delete), MM-47 (copy yesterday, copy a meal).
+- In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
+  barcode), MM-45 (saved foods and recipes), MM-150 (estimate a meal; the estimator's style rule and adherence reporting are open),
+  MM-167 (quantity, unit and nutrition basis; the source food, conversion record and raw/cooked state are not stored yet). Epic: MM-37.
+- Remaining: MM-152, MM-49, MM-151, MM-127, MM-126, MM-46, MM-44, MM-58.
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
