@@ -32,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 10;
+  static const currentSchemaVersion = 11;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -84,6 +84,23 @@ class AppDatabase extends _$AppDatabase {
     9: (m) async {
       await m.addColumn(setups, setups.creatineStartedEpochDay);
       await m.createTable(weightEvents);
+    },
+    // 10 to 11: how much was eaten and what the totals are for (MM-167).
+    // Existing entries keep null portions; nothing is invented for them.
+    10: (m) async {
+      await m.addColumn(foodEntries, foodEntries.portionQuantity);
+      await m.addColumn(foodEntries, foodEntries.portionUnit);
+      await m.addColumn(foodEntries, foodEntries.nutritionBasis);
+      await m.addColumn(foodEntries, foodEntries.referenceBasis);
+      await m.addColumn(foodEntries, foodEntries.referenceKcal);
+      await m.addColumn(foodEntries, foodEntries.referenceProteinG);
+      await m.addColumn(foodEntries, foodEntries.referenceCarbsG);
+      await m.addColumn(foodEntries, foodEntries.referenceFatG);
+      await m.addColumn(foodEntries, foodEntries.servingDescription);
+      await m.addColumn(foodEntries, foodEntries.servingGrams);
+      await m.addColumn(foodEntries, foodEntries.servingMilliliters);
+      await m.addColumn(foodEntries, foodEntries.servingUnit);
+      await m.addColumn(foodEntries, foodEntries.densityGPerMl);
     },
   };
 

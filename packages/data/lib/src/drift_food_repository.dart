@@ -3,6 +3,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import 'app_database.dart';
 import 'food_from_row.dart';
+import 'portion_columns.dart';
 
 /// [FoodRepository] over the Drift database.
 final class DriftFoodRepository implements FoodRepository {
@@ -22,30 +23,36 @@ final class DriftFoodRepository implements FoodRepository {
   Future<int> addFood(FoodEntry entry) => _db
       .into(_db.foodEntries)
       .insert(
-        FoodEntriesCompanion.insert(
-          epochDay: entry.date.epochDay,
-          meal: entry.meal,
-          name: entry.name,
-          kcal: entry.kcal,
-          proteinG: entry.proteinG,
-          carbsG: entry.carbsG,
-          fatG: entry.fatG,
-          quantitySource: entry.source,
+        withPortion(
+          FoodEntriesCompanion.insert(
+            epochDay: entry.date.epochDay,
+            meal: entry.meal,
+            name: entry.name,
+            kcal: entry.kcal,
+            proteinG: entry.proteinG,
+            carbsG: entry.carbsG,
+            fatG: entry.fatG,
+            quantitySource: entry.source,
+          ),
+          entry.portion,
         ),
       );
 
   @override
   Future<void> updateFood(FoodEntry entry) =>
       (_db.update(_db.foodEntries)..where((t) => t.id.equals(entry.id))).write(
-        FoodEntriesCompanion(
-          epochDay: Value(entry.date.epochDay),
-          meal: Value(entry.meal),
-          name: Value(entry.name),
-          kcal: Value(entry.kcal),
-          proteinG: Value(entry.proteinG),
-          carbsG: Value(entry.carbsG),
-          fatG: Value(entry.fatG),
-          quantitySource: Value(entry.source),
+        withPortion(
+          FoodEntriesCompanion(
+            epochDay: Value(entry.date.epochDay),
+            meal: Value(entry.meal),
+            name: Value(entry.name),
+            kcal: Value(entry.kcal),
+            proteinG: Value(entry.proteinG),
+            carbsG: Value(entry.carbsG),
+            fatG: Value(entry.fatG),
+            quantitySource: Value(entry.source),
+          ),
+          entry.portion,
         ),
       );
 
