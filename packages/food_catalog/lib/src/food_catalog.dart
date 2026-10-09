@@ -1,5 +1,6 @@
 import 'catalog_barcode_lookup.dart';
 import 'catalog_food.dart';
+import 'catalog_pair_lookup.dart';
 import 'catalog_search.dart';
 import 'catalog_serving.dart';
 import 'catalog_serving_lookup.dart';
@@ -9,7 +10,11 @@ import 'search_hit.dart';
 /// Several installed packs presented as one: search returns one ranked list,
 /// and a barcode is looked up in each pack in turn.
 final class FoodCatalog
-    implements CatalogSearch, CatalogBarcodeLookup, CatalogServingLookup {
+    implements
+        CatalogSearch,
+        CatalogBarcodeLookup,
+        CatalogServingLookup,
+        CatalogPairLookup {
   const FoodCatalog(this.packs);
 
   final List<FoodPack> packs;
@@ -35,6 +40,14 @@ final class FoodCatalog
     for (final pack in packs) {
       final food = pack.byBarcode(gtin14);
       if (food != null) return food;
+    }
+    return null;
+  }
+
+  @override
+  CatalogFood? pairOf(CatalogFood food) {
+    for (final pack in packs) {
+      if (pack.packId == food.packId) return pack.pairOf(food);
     }
     return null;
   }

@@ -10,6 +10,8 @@ import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_choice_chip.dart';
+import '../ui/mm_segment.dart';
+import '../ui/mm_segmented.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
 import '../ui/notice.dart';
@@ -51,6 +53,9 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   late AmountChoice _choice = _choices.first;
   late Meal _meal = widget.meal;
 
+  /// The food being logged: the one chosen, or its raw or cooked counterpart.
+  late CatalogFood _food = widget.food;
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +87,7 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         servingUnit: PortionUnit.serving,
       );
     }
-    final food = widget.food;
+    final food = _food;
     final serving = _choice.serving;
     return ReferenceNutrition(
       basis: ReferenceBasis.per100g,
@@ -117,8 +122,8 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
     if (_choice.unit.isWeight) return QuantitySource.weighed;
     final packaged =
         widget.custom != null ||
-        widget.food.source == 'usda_branded' ||
-        widget.food.source == 'off';
+        _food.source == 'usda_branded' ||
+        _food.source == 'off';
     return packaged
         ? QuantitySource.labelServing
         : QuantitySource.householdMeasure;
@@ -126,8 +131,24 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
 
   String _n(double v) => v.round().toString();
 
+  /// What the food is when it is weighed: cooked, dry or raw.
+  static String _stateLabel(CatalogFood f) => switch (f.preparation) {
+    PreparationState.cooked => 'Cooked',
+    PreparationState.raw =>
+      f.name.toLowerCase().contains(', dry') ? 'Dry' : 'Raw',
+    _ => 'As listed',
+  };
+
+  /// The size of the difference, which is the education (MM-151).
+  String _consequence(double grams) {
+    String line(CatalogFood f) =>
+        '${_n(grams)} g ${_stateLabel(f).toLowerCase()} is about '
+        '${_n(f.kcal * grams / 100)} kcal';
+    return '${line(widget.food)}. ${line(widget.alternate!)}.';
+  }
+
   Future<void> _log() async {
-    final food = widget.food;
+    final food = _food;
     final totals = _totals!;
     await ref
         .read(foodEntryWriterProvider)
@@ -170,7 +191,7 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final food = widget.food;
+    final food = _food;
     final totals = _totals;
     final grams = _grams;
     final note = grams == null || widget.custom != null
@@ -200,6 +221,25 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
               ),
           ],
         ),
+        if (widget.alternate != null && _choice.unit.isWeight) ...[
+          const SizedBox(height: 12),
+          Text('Weighed as', style: text.labelLarge),
+          const SizedBox(height: 4),
+          MmSegmented<bool>(
+            segments: [
+              MmSegment(false, _stateLabel(widget.food)),
+              MmSegment(true, _stateLabel(widget.alternate!)),
+            ],
+            selected: {identical(_food, widget.alternate)},
+            onChanged: (s) => setState(
+              () => _food = s.first ? widget.alternate! : widget.food,
+            ),
+          ),
+          if (_amount != null && _grams != null) ...[
+            const SizedBox(height: 4),
+            Text(_consequence(_grams!), style: text.bodySmall),
+          ],
+        ],
         const SizedBox(height: 12),
         MmTextField(
           key: const ValueKey('amount-quantity'),
