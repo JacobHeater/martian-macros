@@ -10,6 +10,9 @@ import '../repository_role_providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/show_mm_snack_bar.dart';
+import '../providers.dart';
+import 'copy_entries.dart';
+import 'entries_copied_to.dart';
 import 'food_entry_tile.dart';
 import 'show_add_food_sheet.dart';
 
@@ -57,6 +60,15 @@ class MealSection extends ConsumerWidget {
                 if (entries.isNotEmpty)
                   Text(Fmt.kcal(total), style: text.bodySmall),
                 const Spacer(),
+                if (entries.isNotEmpty && day != ref.watch(todayProvider))
+                  MmIconButton(
+                    tooltip: 'Copy ${meal.label.toLowerCase()} to today',
+                    icon: Icons.content_copy,
+                    onPressed: () => copyEntries(
+                      ref,
+                      entriesCopiedTo(ref.read(todayProvider), entries),
+                    ),
+                  ),
                 MmIconButton(
                   tooltip: 'Add ${meal.label.toLowerCase()}',
                   icon: Icons.add,
