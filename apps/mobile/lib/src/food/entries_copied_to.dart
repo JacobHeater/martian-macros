@@ -20,5 +20,8 @@ List<FoodEntry> entriesCopiedTo(
       fatG: e.fatG,
       source: e.source,
       portion: e.portion,
+      fiberG: e.fiberG,
+      sodiumMg: e.sodiumMg,
+      alcoholG: e.alcoholG,
     ),
 ];

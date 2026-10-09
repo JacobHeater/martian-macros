@@ -48,6 +48,22 @@ final class DriftPreferencesRepository implements PreferencesRepository {
       );
 
   @override
+  Stream<DetailLevel> watchDetailLevel() => _db
+      .select(_db.userPreferences)
+      .watchSingleOrNull()
+      .map((row) => row?.detailLevel ?? DetailLevel.standard);
+
+  @override
+  Future<void> saveDetailLevel(DetailLevel level) => _db
+      .into(_db.userPreferences)
+      .insertOnConflictUpdate(
+        UserPreferencesCompanion.insert(
+          id: const Value(1),
+          detailLevel: Value(level),
+        ),
+      );
+
+  @override
   Future<void> saveThemePreference(ThemePreference preference) => _db
       .into(_db.userPreferences)
       .insertOnConflictUpdate(

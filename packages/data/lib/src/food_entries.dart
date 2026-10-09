@@ -35,5 +35,9 @@ class FoodEntries extends Table {
   IntColumn get originFoodId => integer().nullable()();
   TextColumn get originSource => text().nullable()();
   TextColumn get originSourceId => text().nullable()();
+  // MM-49: nutrients beyond the macros, null when the source did not say.
+  RealColumn get fiberG => real().nullable()();
+  RealColumn get sodiumMg => real().nullable()();
+  RealColumn get alcoholG => real().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

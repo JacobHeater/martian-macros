@@ -15,6 +15,10 @@ class UserPreferences extends Table {
       boolean().withDefault(const Constant(true))();
   IntColumn get easyToMissLastShownEpochDay => integer().nullable()();
 
+  /// How much nutrition to show (MM-49).
+  TextColumn get detailLevel =>
+      textEnum<DetailLevel>().withDefault(const Constant('standard'))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
