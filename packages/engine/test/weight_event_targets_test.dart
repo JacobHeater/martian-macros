@@ -54,6 +54,7 @@ void main() {
     trendWeightKg: 85,
     bodyFat: const BodyFatEstimate(percent: 25, sigmaPercent: 2),
     bmrKcal: 1800,
+    calorieFloorKcal: 1800,
     tdee: TdeeEstimate(
       kcal: tdeeKcal,
       sigmaKcal: 200,

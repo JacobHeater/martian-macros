@@ -1,6 +1,6 @@
 ---
 id: MM-149
-status: proposed
+status: in-progress
 component: adherence
 related: [MM-145, MM-27, MM-33, MM-40, MM-41, MM-92, MM-98, MM-108, MM-114, MM-121, MM-123, MM-124, MM-139, MM-140, MM-141, MM-150]
 ---
@@ -85,3 +85,17 @@ Scenario: Mostly estimated
 ## Notes
 - Priority: must-have before MM-140, which depends on it.
 - A free user has targets set by hand (MM-85); the summary works the same against them.
+
+## Progress
+Built: `summarizeAdherence` (engine) turns intake days, weigh-ins and the targets history into an `AdherenceSummary` for the seven
+days ending yesterday: days logged, how many are complete (marked, or unmarked and passing the same usable-day rule the expenditure
+estimate uses, now shared as `usableIntakeDays`), weigh-ins, average intake on complete days against the average of the targets in
+force, its standing, days at or above the protein minimum, and whether more than half the calories were estimated. Standing uses
+the band of MM-123 (`CalorieBand`, `intakeStandingOf`); an average below the calorie floor is "below the app's minimum" and never
+"on target" or "under". The floor is now part of the coach's snapshot (`calorieFloorKcal`). A card "Your last 7 days" on the Coach
+screen shows the facts; over and under are worded the same way; there is no score, percentage or grade, and a test forbids those
+words. Tests: `adherence_summary_test.dart` in the engine and in the app.
+
+Not built: workouts (no training log yet), the summary beside the check-in summary (MM-138) and in the monthly report (MM-33), the
+pointer to the under-eating notice (MM-114), and higher days judged against their own targets (MM-124). The week is the seven days to
+yesterday, not the seven days before each check-in. The stall diagnosis and confidence do not read it yet (MM-140, MM-139).
