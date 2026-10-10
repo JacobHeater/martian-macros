@@ -33,6 +33,9 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today));
     await tester.tap(find.text('Food'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Chicken and rice'), 200);
+    await tester.ensureVisible(find.text('Chicken and rice'));
+    await tester.pumpAndSettle();
   }
 
   Future<List<FoodEntry>> entriesOn(WidgetTester tester, CalendarDate d) =>

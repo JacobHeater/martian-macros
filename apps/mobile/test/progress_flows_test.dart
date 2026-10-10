@@ -22,7 +22,7 @@ void main() {
 
   Future<void> openProgress(WidgetTester tester) async {
     await pumpApp(tester, repos, clock);
-    await tester.tap(find.text('Progress'));
+    await tester.tap(find.text('Progress').last);
     await tester.pumpAndSettle();
   }
 

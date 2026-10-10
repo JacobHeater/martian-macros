@@ -1,8 +1,17 @@
+import java.util.Base64
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Use the same compile-time identity flag as Dart. Normal builds keep their
+// existing identity; a demo can never share the normal Android sandbox.
+val demoApp = (project.findProperty("dart-defines") as? String)
+    ?.split(",")
+    ?.map { String(Base64.getDecoder().decode(it), Charsets.UTF_8) }
+    ?.contains("MM_DEMO_APP=true") == true
 
 android {
     namespace = "com.martianmacros.martian_macros"
@@ -19,7 +28,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.martianmacros.martian_macros"
+        applicationId = if (demoApp) "com.martianmacros.martian_macros.demo"
+            else "com.martianmacros.martian_macros"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -30,6 +40,8 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["appLabel"] = if (demoApp) "Martian Macros DEMO"
+            else "Martian Macros"
     }
 
     buildTypes {

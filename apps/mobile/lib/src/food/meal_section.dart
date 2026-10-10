@@ -10,6 +10,8 @@ import '../format/meal_label.dart';
 import '../repository_role_providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/mm_icon_button.dart';
+import '../ui/mm_icon_button_kind.dart';
+import '../ui/mm_disclosure.dart';
 import '../ui/show_mm_snack_bar.dart';
 import '../providers.dart';
 import 'copy_entries.dart';
@@ -58,33 +60,36 @@ class MealSection extends ConsumerWidget {
         full &&
         weightKg != null &&
         mealHasSolidProtein(proteinG: protein, weightKg: weightKg);
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: SizedBox(
-            height: 48,
-            child: Row(
+    return MmDisclosure(
+      key: PageStorageKey('meal-${day.epochDay}-${meal.name}'),
+      title: meal.label,
+      initiallyExpanded: true,
+      maintainState: true,
+      header: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(meal.label, style: text.labelLarge),
-                const SizedBox(width: 8),
-                // The subtotal gives way before the buttons do, so a long
-                // one never pushes them off a narrow screen.
-                Expanded(
-                  child: Row(
+                Text(
+                  meal.label,
+                  style: text.titleSmall?.copyWith(color: context.mm.text),
+                ),
+                if (entries.isNotEmpty)
+                  Row(
                     children: [
-                      if (entries.isNotEmpty)
-                        Flexible(
-                          child: Text(
-                            full
-                                ? '${Fmt.kcal(total)} · '
-                                      '${Fmt.grams(protein)} protein'
-                                : Fmt.kcal(total),
-                            style: text.bodySmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      Flexible(
+                        child: Text(
+                          full
+                              ? '${Fmt.kcal(total)} · '
+                                    '${Fmt.grams(protein)} protein'
+                              : Fmt.kcal(total),
+                          style: text.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                      ),
                       if (solid)
                         Padding(
                           padding: const EdgeInsets.only(left: 6),
@@ -98,25 +103,27 @@ class MealSection extends ConsumerWidget {
                         ),
                     ],
                   ),
-                ),
-                if (entries.isNotEmpty && day != ref.watch(todayProvider))
-                  MmIconButton(
-                    tooltip: 'Copy ${meal.label.toLowerCase()} to today',
-                    icon: Icons.content_copy,
-                    onPressed: () => copyEntries(
-                      ref,
-                      entriesCopiedTo(ref.read(todayProvider), entries),
-                    ),
-                  ),
-                MmIconButton(
-                  tooltip: 'Add ${meal.label.toLowerCase()}',
-                  icon: Icons.add,
-                  onPressed: () => showAddFoodSheet(context, day, meal: meal),
-                ),
               ],
             ),
           ),
-        ),
+          if (entries.isNotEmpty && day != ref.watch(todayProvider))
+            MmIconButton(
+              tooltip: 'Copy ${meal.label.toLowerCase()} to today',
+              icon: Icons.content_copy,
+              onPressed: () => copyEntries(
+                ref,
+                entriesCopiedTo(ref.read(todayProvider), entries),
+              ),
+            ),
+          MmIconButton(
+            tooltip: 'Add food to ${meal.label.toLowerCase()}',
+            kind: MmIconButtonKind.add,
+            icon: Icons.add,
+            onPressed: () => showAddFoodSheet(context, day, meal: meal),
+          ),
+        ],
+      ),
+      children: [
         for (final e in entries) ...[
           Divider(
             height: 1,

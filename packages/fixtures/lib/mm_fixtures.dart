@@ -3,6 +3,7 @@
 /// builds and early feature work that must not wait on a real provider.
 library;
 
+export 'src/demo_seed.dart';
 export 'src/fixed_clock.dart';
 export 'src/in_memory_backup_storage.dart';
 export 'src/in_memory_custom_food_repository.dart';
