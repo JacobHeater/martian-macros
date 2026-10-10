@@ -7,6 +7,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/in_memory_overrides.dart';
+import 'support/reveal_on_food_screen.dart';
 import 'support/confirm_initial_theme.dart';
 
 void main() {
@@ -226,9 +227,11 @@ void main() {
     expect(find.textContaining('kcal left'), findsOneWidget);
     await tester.tap(find.text('Food'));
     await tester.pumpAndSettle();
-    expect(find.text('Chicken and rice'), findsOneWidget);
+    // The hero is at the top of the screen; the entry is below it.
     expect(find.text('510'), findsWidgets);
     expect(find.textContaining('kcal left'), findsOneWidget);
+    await revealOnFoodScreen(tester, find.text('Chicken and rice'));
+    expect(find.text('Chicken and rice'), findsOneWidget);
 
     await tester.scrollUntilVisible(find.text('Complete'), 250);
     await tester.ensureVisible(find.text('Complete'));

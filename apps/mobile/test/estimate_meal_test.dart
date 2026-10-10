@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/reveal_on_food_screen.dart';
 
 /// MM-150: estimate a meal by size and kind.
 void main() {
@@ -57,6 +58,7 @@ void main() {
       4 * entry.proteinG + 4 * entry.carbsG + 9 * entry.fatG,
       closeTo(entry.kcal, 1e-6),
     );
+    await revealOnFoodScreen(tester, find.text('Estimated totals'));
     expect(find.text('Estimated totals'), findsOneWidget);
   });
 
