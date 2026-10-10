@@ -215,6 +215,24 @@ final stallAssessmentProvider = Provider<StallAssessment?>((ref) {
   );
 });
 
+/// Protein by meal for each of the days insights look at (MM-125).
+final mealProteinProvider = Provider<Map<CalendarDate, Map<Meal, double>>>((
+  ref,
+) {
+  final today = ref.watch(todayProvider);
+  return {
+    for (var i = 1; i <= InsightRationing.patternDays; i++)
+      if (ref.watch(foodForDayProvider(today.addDays(-i))).value
+          case final entries?)
+        today.addDays(-i): {
+          for (final meal in Meal.values)
+            meal: entries
+                .where((e) => e.meal == meal)
+                .fold(0.0, (sum, e) => sum + e.proteinG),
+        },
+  };
+});
+
 /// Which insights have been shown and dismissed (MM-141).
 final insightLogProvider = StreamProvider<List<InsightLogEntry>>(
   (ref) => ref.watch(insightLogReaderProvider).watchInsightLog(),
@@ -245,6 +263,7 @@ final insightSelectionProvider = Provider<InsightSelection?>((ref) {
       weights: weights,
       history: history,
       stall: ref.watch(stallAssessmentProvider),
+      mealProtein: ref.watch(mealProteinProvider),
       limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
     ),
     log: log,
