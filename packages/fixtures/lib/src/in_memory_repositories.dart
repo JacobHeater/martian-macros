@@ -5,6 +5,7 @@ import 'in_memory_custom_food_repository.dart';
 import 'in_memory_data_eraser.dart';
 import 'in_memory_day_mark_repository.dart';
 import 'in_memory_food_repository.dart';
+import 'in_memory_insight_log_repository.dart';
 import 'in_memory_intake_reader.dart';
 import 'in_memory_preferences_repository.dart';
 import 'in_memory_setup_repository.dart';
@@ -27,6 +28,7 @@ final class InMemoryRepositories {
     final dayMarks = InMemoryDayMarkRepository();
     final targets = InMemoryTargetsHistoryRepository();
     final preferences = InMemoryPreferencesRepository();
+    final insightLog = InMemoryInsightLogRepository();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -38,6 +40,7 @@ final class InMemoryRepositories {
       intake: InMemoryIntakeReader(food, dayMarks),
       targets: targets,
       preferences: preferences,
+      insightLog: insightLog,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -48,6 +51,7 @@ final class InMemoryRepositories {
         dayMarks.clear,
         targets.clear,
         preferences.clear,
+        insightLog.clear,
       ]),
     );
   }
@@ -63,6 +67,7 @@ final class InMemoryRepositories {
     required this.intake,
     required this.targets,
     required this.preferences,
+    required this.insightLog,
     required this.eraser,
   });
 
@@ -76,6 +81,7 @@ final class InMemoryRepositories {
   final IntakeReader intake;
   final TargetsHistoryRepository targets;
   final PreferencesRepository preferences;
+  final InsightLogRepository insightLog;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.

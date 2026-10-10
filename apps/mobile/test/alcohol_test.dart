@@ -54,6 +54,14 @@ void main() {
     );
     await openFood(tester);
     expect(find.text('Alcohol: 98 kcal'), findsOneWidget);
+    // MM-171: room between the line and the meals card below it.
+    final line = tester.widget<Padding>(
+      find.byKey(const ValueKey('alcohol-line')),
+    );
+    expect(
+      line.padding.resolve(TextDirection.ltr).bottom,
+      greaterThanOrEqualTo(8),
+    );
   });
 
   testWidgets('a typed drink saves without a mismatch and keeps its alcohol', (

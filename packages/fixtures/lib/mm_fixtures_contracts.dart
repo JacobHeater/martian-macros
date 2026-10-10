@@ -12,6 +12,7 @@ export 'src/contracts/entitlement_reader_contract.dart';
 export 'src/contracts/food_barcode_lookup_contract.dart';
 export 'src/contracts/food_repository_contract.dart';
 export 'src/contracts/food_search_contract.dart';
+export 'src/contracts/insight_log_repository_contract.dart';
 export 'src/contracts/intake_reader_contract.dart';
 export 'src/contracts/preferences_repository_contract.dart';
 export 'src/contracts/setup_repository_contract.dart';

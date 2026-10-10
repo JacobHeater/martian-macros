@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../app/home_destination.dart';
 import '../app/home_tab_provider.dart';
+import '../coach/insight_card.dart';
 import '../coach/under_eating_notice.dart';
 import '../food/calorie_hero.dart';
 import '../food/selected_day_provider.dart';
@@ -76,6 +77,7 @@ class DashboardScreen extends ConsumerWidget {
               ref.read(weightWriterProvider).saveWeight(today, kg),
           onTap: () => open(HomeDestination.progress),
         ),
+        const InsightCard(),
       ],
     );
   }

@@ -81,6 +81,14 @@ void main() {
     await repos.preferences.saveDetailLevel(DetailLevel.full);
     await openFood(tester);
     expect(find.textContaining('Fiber: 16 g · guide'), findsOneWidget);
+    // MM-171: the line once sat against the meals card below it.
+    final line = tester.widget<Padding>(
+      find.byKey(const ValueKey('fiber-line')),
+    );
+    expect(
+      line.padding.resolve(TextDirection.ltr).bottom,
+      greaterThanOrEqualTo(8),
+    );
   });
 
   testWidgets('too little fiber data says so rather than a total', (

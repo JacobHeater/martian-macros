@@ -56,6 +56,14 @@ final returnScreenWriterProvider = Provider<ReturnScreenWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
 
+final insightLogReaderProvider = Provider<InsightLogReader>(
+  (ref) => ref.watch(insightLogRepositoryProvider),
+);
+
+final insightLogWriterProvider = Provider<InsightLogWriter>(
+  (ref) => ref.watch(insightLogRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
