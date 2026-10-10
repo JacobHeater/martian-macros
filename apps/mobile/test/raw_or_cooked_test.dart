@@ -80,6 +80,30 @@ void main() {
     expect(entry.portion!.reference!.nutrition.kcal, 365);
   });
 
+  testWidgets('the state last used is preselected next time', (tester) async {
+    await pick(tester, 'white rice', 'White rice, cooked');
+    await tester.tap(find.text('Grams'));
+    await tester.pump();
+    await tester.tap(find.text('Raw'));
+    await tester.pump();
+    await tester.ensureVisible(find.byKey(const ValueKey('amount-log')));
+    await tester.tap(find.byKey(const ValueKey('amount-log')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add food'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('food-search')),
+      'white rice',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('White rice, cooked').first);
+    await tester.pumpAndSettle();
+    // 100 g of the raw entry (365 kcal), not the cooked one (130).
+    expect(find.text('Weighed as'), findsOneWidget);
+    expect(find.textContaining('365 kcal ·'), findsOneWidget);
+  });
+
   testWidgets('no switch for a serving, or for a food with one state', (
     tester,
   ) async {
