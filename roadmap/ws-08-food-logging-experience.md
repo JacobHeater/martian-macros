@@ -124,10 +124,10 @@ workstream's.
 - Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day completeness, daily summary), MM-48 (edit an entry, undo a
   delete), MM-47 (copy yesterday, copy a meal).
 - In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
-  barcode), MM-45 (saved foods and recipes), MM-150 (estimate a meal; the estimator's style rule and adherence reporting are open),
+  barcode), MM-45 (saved foods and recipes), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
-  need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food, conversion record and raw/cooked state are not stored yet). Epic: MM-37.
-- Remaining: MM-49, MM-127, MM-126, MM-46, MM-44, MM-58.
+  need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food; not yet tried with the real camera). Epic: MM-37.
+- Remaining: MM-127, MM-126, MM-58.
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
