@@ -4,6 +4,7 @@ import 'arch/arch_command.dart';
 import 'command.dart';
 import 'demo_command.dart';
 import 'food/food_command.dart';
+import 'physical_android_device_id.dart';
 import 'requirements.dart';
 import 'roadmap/roadmap_report_command.dart';
 import 'toolchain.dart';
@@ -54,7 +55,7 @@ final _commands = <String, (String, Command)>{
     _schema,
   ),
   'run': (
-    'Run the app (starts an emulator if needed): mm run [--env ..]',
+    'Run the app: mm run [--env dev|prod|phone] (phone selects physical Android)',
     _run,
   ),
   'demo': (
@@ -377,8 +378,42 @@ Future<int> _emulator(Toolchain tc, List<String> args) async {
 }
 
 Future<int> _run(Toolchain tc, List<String> args) async {
-  final (env, rest) = _takeEnv(args);
+  final (env, rest) = _takeEnv(args, allowed: [..._envs, 'phone']);
   if (env == null) return 64;
+  if (env == 'phone') {
+    if (rest.any((a) => a == '-d' || a.startsWith('--device-id'))) {
+      stderr.writeln(
+        'Use mm run --env dev -d DEVICE_ID for an explicit device, '
+        'or mm run --env phone for automatic phone selection.',
+      );
+      return 64;
+    }
+    final output = await tc.captureFlutter(['devices', '--machine']);
+    if (output == null) {
+      stderr.writeln(
+        'Flutter device discovery failed. Run mm doctor and '
+        'check fvm flutter devices.',
+      );
+      return 69;
+    }
+    final String id;
+    try {
+      id = physicalAndroidDeviceId(output);
+    } on FormatException catch (error) {
+      stderr.writeln('Flutter device discovery failed: ${error.message}');
+      return 69;
+    } on StateError catch (error) {
+      stderr.writeln(error.message);
+      return 69;
+    }
+    return tc.flutter([
+      'run',
+      '--dart-define-from-file=../../config/dev.json',
+      ...rest,
+      '-d',
+      id,
+    ], inDir: _appDir);
+  }
   // An explicit device choice is the caller's business; otherwise make
   // sure there is something to run on.
   final choseDevice = rest.any((a) => a == '-d' || a.startsWith('--device-id'));
@@ -427,13 +462,16 @@ Future<int> _clean(Toolchain tc, List<String> args) async {
 }
 
 /// Extracts `--env <name>` (default `dev`). Returns a null env on error.
-(String?, List<String>) _takeEnv(List<String> args) {
+(String?, List<String>) _takeEnv(
+  List<String> args, {
+  List<String> allowed = _envs,
+}) {
   final rest = [...args];
   var env = 'dev';
   final i = rest.indexOf('--env');
   if (i != -1) {
-    if (i + 1 >= rest.length || !_envs.contains(rest[i + 1])) {
-      stderr.writeln('--env must be one of: ${_envs.join(', ')}');
+    if (i + 1 >= rest.length || !allowed.contains(rest[i + 1])) {
+      stderr.writeln('--env must be one of: ${allowed.join(', ')}');
       return (null, rest);
     }
     env = rest[i + 1];
