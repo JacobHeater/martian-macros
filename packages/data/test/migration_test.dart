@@ -103,6 +103,54 @@ void main() {
     }
   });
 
+  group('theme initialization (MM-184)', () {
+    for (var from = 1; from < current; from++) {
+      test(
+        'absent preferences at version $from retain System on upgrade',
+        () async {
+          final schema = await verifier.schemaAt(from);
+          final db = AppDatabase(schema.newConnection());
+          addTearDown(db.close);
+          await verifier.migrateAndValidate(db, current);
+          final preferences = DriftRepositories(db).preferences;
+          expect(
+            await preferences.watchThemePreference().first,
+            ThemePreference.system,
+          );
+          await preferences.saveDetailLevel(DetailLevel.full);
+          expect(
+            await preferences.watchThemePreference().first,
+            ThemePreference.system,
+          );
+        },
+      );
+    }
+    for (final theme in ['system', 'light', 'dark']) {
+      test('version 23 keeps $theme and every unrelated preference', () async {
+        final schema = await verifier.schemaAt(23);
+        schema.rawDatabase.execute(
+          'INSERT INTO user_preferences (id, theme_preference, easy_to_miss_enabled, '
+          'easy_to_miss_last_shown_epoch_day, detail_level, under_eating_dismissed_epoch_day, '
+          'return_screen_dismissed_epoch_day, recovery_check_in_skipped_epoch_day) '
+          "VALUES (1, '$theme', 0, ${day.epochDay}, 'full', ${day.epochDay}, "
+          '${day.epochDay}, ${day.epochDay})',
+        );
+        final db = AppDatabase(schema.newConnection());
+        addTearDown(db.close);
+        await verifier.migrateAndValidate(db, current);
+        final preferences = DriftRepositories(db).preferences;
+        expect((await preferences.watchThemePreference().first).name, theme);
+        expect(await preferences.watchDetailLevel().first, DetailLevel.full);
+        final easy = await preferences.watchEasyToMiss().first;
+        expect(easy.enabled, isFalse);
+        expect(easy.lastShown, day);
+        expect(await preferences.watchUnderEatingDismissedOn().first, day);
+        expect(await preferences.watchReturnScreenDismissedOn().first, day);
+        expect(await preferences.watchRecoveryCheckInSkippedOn().first, day);
+      });
+    }
+  });
+
   group('portions (MM-167)', () {
     test('a food logged at version 10 keeps its totals and has no portion', () async {
       final schema = await verifier.schemaAt(10);

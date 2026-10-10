@@ -7,6 +7,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/in_memory_overrides.dart';
+import 'support/confirm_initial_theme.dart';
 
 void main() {
   final today = CalendarDate(2026, 10, 5);
@@ -71,6 +72,7 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await confirmInitialTheme(tester);
     expect(find.text('Get started'), findsOneWidget);
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
@@ -152,6 +154,7 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await confirmInitialTheme(tester);
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));

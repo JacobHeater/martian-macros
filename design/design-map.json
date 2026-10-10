@@ -219,6 +219,34 @@
     "approach": "explicit ColorScheme per theme; no seed palette; same role names, different values",
     "light": "cool-gray canvas, white surfaces with hairline and soft shadow, deeper accent values",
     "dark": "ink-navy canvas, surfaces step lighter with elevation, no shadows, 1dp top highlight, brighter accent values",
+    "martian": "MM-184: new-install default; retro deep grape, cream text and acid-lime actions. Existing preferences preserved; first-launch preview saves only on Continue; Settings offers Martian, Light, Dark and System.",
+    "martianPalette": {
+      "canvas": "#120B29",
+      "surface": "#20143D",
+      "raised": "#2C1B4C",
+      "overlay": "#382558",
+      "sunken": "#180F30",
+      "track": "#40305E",
+      "selected": "#423261",
+      "outline": "#594576",
+      "outlineStrong": "#A18BBE",
+      "text": "#FFF8E9",
+      "text2": "#D8C7EF",
+      "text3": "#BAA4D3",
+      "ember": "#C4FF48",
+      "onEmber": "#172500",
+      "ion": "#43F5E0",
+      "onIon": "#120B29",
+      "energy": "#FFF8E9",
+      "protein": "#43F5E0",
+      "carbs": "#FF80BB",
+      "fat": "#9170ED",
+      "positive": "#C4FF48",
+      "caution": "#FFD166",
+      "info": "#85CFFF",
+      "danger": "#FF938E",
+      "onDanger": "#120B29"
+    },
     "surfaceLevels": [
       "canvas",
       "surface",
@@ -228,8 +256,7 @@
     "emberRule": "never tinted, washed or used as a background",
     "gradients": [
       "limb-glow",
-      "horizon-arc",
-      "ember-halo"
+      "horizon-arc"
     ],
     "elevationTint": "off (surfaceTint transparent)"
   },

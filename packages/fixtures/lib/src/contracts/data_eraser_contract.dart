@@ -69,7 +69,7 @@ void dataEraserContract(
       expect(await r.targets.watchTargetsHistory().first, isEmpty);
       expect(
         await r.preferences.watchThemePreference().first,
-        ThemePreference.system,
+        ThemePreference.unselected,
       );
     });
   });

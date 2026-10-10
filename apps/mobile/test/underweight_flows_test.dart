@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/confirm_initial_theme.dart';
 
 /// MM-111 through the app.
 void main() {
@@ -16,6 +17,7 @@ void main() {
   testWidgets('a 170 cm woman at 50 kg is offered maintenance and lean gain '
       'only, and told why', (tester) async {
     await pumpApp(tester, repos, FixedClock(today));
+    await confirmInitialTheme(tester);
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Female'));
