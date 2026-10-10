@@ -1,6 +1,6 @@
 ---
 id: MM-116
-status: proposed
+status: in-progress
 component: safeguards
 related: [MM-110, MM-20, MM-24, MM-33, MM-61, MM-68, MM-117, MM-140, MM-146]
 ---
@@ -79,3 +79,29 @@ Scenario: Never a cut
 - Step count from a health platform is the one objective signal worth showing beside these: average steps commonly fall during a deficit
   as spontaneous activity drops, which lowers expenditure without the user noticing. Display only, future phase; it does not enter the
   estimate (MM-23).
+
+## Progress
+Built:
+- **The five questions** (hunger, energy, sleep, training, mood), each answered 1 to 5 with a word at each end, 1 being the hard end,
+  and an optional typical hours of sleep. Reached from a card on the Coach screen, "How you are holding up".
+- **Offered weekly**: from a week after setup, when it has been neither answered nor skipped in the last 7 days, and not during a
+  pause (`recoveryCheckInDue`). It cannot be saved until all five are answered.
+- **Skippable**: "Skip this week" stores no answers, only the day it was skipped, and the offer returns a week later. Nothing counts
+  skips.
+- **Stored as observations** (`RecoveryCheckIn`, the `RecoveryCheckInRepository` interface with a Drift implementation and an
+  in-memory one under one contract; schema version 22). One per day; answering again the same day replaces it.
+- **Shown back as five lines** over the last eight check-ins, each with its latest answer. No screen combines them: a test forbids
+  "score", "grade", "overall", "total" and "average" on the card.
+- **Never a cut**: nothing that computes a target reads these answers. `analyze`, `nextTargets` and `computeTargets` take no
+  recovery input, so no answer can change a target in either direction. There is no test for this beyond that; a test would have
+  nothing to exercise.
+- Rules are in `RecoveryRule`. Tests: `recovery_check_in_test.dart` (engine), `recovery_check_in_test.dart` (app), the contract
+  against both implementations, the preferences contract and the migration test.
+
+Not built:
+- **The missed-period question**: cycle logging (MM-20) does not exist, so there is nothing to detect it from.
+- Shown "with the check-in": it is a card on the Coach screen, not part of the target-change summary.
+- Sleep hours pre-filled from a health platform (MM-68, not built), and step count beside the lines.
+- Its reminder (MM-146 lists one; that ticket's build left it out).
+- The offer of relief that the answers lead to is MM-117.
+- Checked on the Android emulator: the card, the five questions, saving, and the lines for one check-in. iOS untried.

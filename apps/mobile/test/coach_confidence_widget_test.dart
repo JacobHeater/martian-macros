@@ -26,6 +26,11 @@ void main() {
 
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
+    // The metabolism card sits above the confidence card; the list builds
+    // only what is near the screen, so each is checked where it is.
+    await tester.scrollUntilVisible(find.textContaining('so far'), 300);
+    expect(find.textContaining('About'), findsOneWidget);
+    expect(find.textContaining('so far'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Coach confidence · Learning'),
       300,
@@ -39,8 +44,6 @@ void main() {
       find.textContaining('Log food and mark days complete'),
       findsOneWidget,
     );
-    expect(find.textContaining('About'), findsOneWidget);
-    expect(find.textContaining('so far'), findsOneWidget);
     expect(find.textContaining('score'), findsNothing);
 
     final metabolismTitle = find.text('Your metabolism estimate');

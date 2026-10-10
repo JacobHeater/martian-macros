@@ -326,6 +326,32 @@ final underEatingNoticeProvider = Provider<UnderEatingFinding?>((ref) {
       : null;
 });
 
+/// Every weekly recovery check-in, oldest first (MM-116).
+final recoveryCheckInsProvider = StreamProvider<List<RecoveryCheckIn>>(
+  (ref) => ref.watch(recoveryCheckInReaderProvider).watchRecoveryCheckIns(),
+);
+
+/// When the recovery check-in was last skipped.
+final recoverySkippedProvider = StreamProvider<CalendarDate?>(
+  (ref) =>
+      ref.watch(recoverySkipReaderProvider).watchRecoveryCheckInSkippedOn(),
+);
+
+/// Whether to offer the weekly recovery check-in now (MM-116).
+final recoveryCheckInDueProvider = Provider<bool>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  final checkIns = ref.watch(recoveryCheckInsProvider).value;
+  final skipped = ref.watch(recoverySkippedProvider);
+  if (setup == null || checkIns == null || !skipped.hasValue) return false;
+  return recoveryCheckInDue(
+    today: ref.watch(todayProvider),
+    onboardedOn: setup.onboardedOn,
+    checkIns: checkIns,
+    skippedOn: skipped.value,
+    paused: ref.watch(activePauseProvider) != null,
+  );
+});
+
 /// The reminder settings the user has stored (MM-146).
 final remindersProvider = StreamProvider<List<ReminderSetting>>(
   (ref) => ref.watch(reminderReaderProvider).watchReminders(),

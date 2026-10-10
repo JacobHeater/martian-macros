@@ -14,6 +14,7 @@ List<Override> inMemoryOverrides(InMemoryRepositories repos) => [
   insightLogRepositoryProvider.overrideWithValue(repos.insightLog),
   pauseRepositoryProvider.overrideWithValue(repos.pauses),
   reminderRepositoryProvider.overrideWithValue(repos.reminders),
+  recoveryCheckInRepositoryProvider.overrideWithValue(repos.recovery),
   dayMarkRepositoryProvider.overrideWithValue(repos.dayMarks),
   intakeReaderProvider.overrideWithValue(repos.intake),
   targetsHistoryRepositoryProvider.overrideWithValue(repos.targets),

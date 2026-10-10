@@ -25,6 +25,9 @@ class UserPreferences extends Table {
   /// The day the welcome-back screen was last put off (MM-147).
   IntColumn get returnScreenDismissedEpochDay => integer().nullable()();
 
+  /// The day the weekly recovery check-in was last skipped (MM-116).
+  IntColumn get recoveryCheckInSkippedEpochDay => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
