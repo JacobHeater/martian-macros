@@ -45,6 +45,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _carbs = TextEditingController();
   final _fat = TextEditingController();
   final _alcohol = TextEditingController();
+  var _askAlcohol = false;
   late Meal _meal = widget.entry?.meal ?? widget.meal ?? _defaultMeal();
   late CalendarDate _day = widget.entry?.date ?? widget.day;
   final _quantity = TextEditingController(text: '1');
@@ -716,15 +717,23 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         ],
       ),
       const SizedBox(height: 12),
-      MmTextField(
-        key: const ValueKey('food-alcohol'),
-        controller: _alcohol,
-        label: 'Alcohol g (optional)',
-        kind: MmTextFieldKind.number,
-        helper: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
-        onChanged: (_) => setState(() {}),
-      ),
-      const SizedBox(height: 12),
+      if (_askAlcohol || _alcohol.text.isNotEmpty) ...[
+        MmTextField(
+          key: const ValueKey('food-alcohol'),
+          controller: _alcohol,
+          label: 'Alcohol g',
+          kind: MmTextFieldKind.number,
+          helper: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
+          onChanged: (_) => setState(() {}),
+        ),
+        const SizedBox(height: 12),
+      ] else
+        MmButton(
+          key: const ValueKey('food-add-alcohol'),
+          label: 'Includes alcohol?',
+          kind: MmButtonKind.text,
+          onPressed: () => setState(() => _askAlcohol = true),
+        ),
       MmTextField(
         key: const ValueKey('food-kcal'),
         controller: _kcal,
