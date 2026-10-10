@@ -68,14 +68,16 @@ The screens:
 - **The workout screen**: each exercise is a card with last time's sets, today's sets as lines, and "Add set". Adding a set records
   a copy of the previous one at once and opens its controls: reps and load, each typed or stepped with large buttons (5 lb or
   2.5 kg), and reps in reserve. Every change is saved as it is made.
-- "Finish workout" is available once a set is logged. An empty workout is deleted from the top bar.
+- A new set's fields start empty when there is nothing to copy. "Finish workout" is available once a set has reps. An empty workout is deleted from the top bar.
 
 Not built:
 - Changing a finished workout's date or times.
 - A workout imported from a health platform (MM-68) has no way in yet; health sync does not exist.
 - Reordering exercises.
 
-Checked by tests, and by the screenshots generated on Linux in all three themes. Not seen on the emulator.
+Checked by tests, by the screenshots generated on Linux in all three themes, and on the Android emulator (the isolated demo app,
+Martian theme): the Train tab, starting a workout, adding an exercise, adding a set and typing reps with the phone's keyboard.
+Not seen there: finishing, reopening, repeating a workout, the light and dark themes.
 
 Choices made while building (say if any is wrong):
 - The same exercise can appear twice in one workout, as two entries.

@@ -283,6 +283,20 @@ void main() {
 
     await choose(tester, 'back squat', 'back-squat');
     await tap(tester, 'add-set-0');
+    expect(finish().onPressed, isNull, reason: 'a set with no reps yet');
+    // A new set's fields are empty, not zero, so nothing has to be cleared.
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(
+              of: find.byKey(const ValueKey('set-0-0-reps')),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .controller
+          .text,
+      isEmpty,
+    );
     await type(tester, 'set-0-0-reps', '8');
     await tap(tester, 'workout-finish');
 

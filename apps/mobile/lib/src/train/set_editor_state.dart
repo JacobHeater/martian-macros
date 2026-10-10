@@ -25,8 +25,14 @@ class SetEditorState extends State<SetEditor> {
     widget.onChanged(set);
   }
 
-  late final _reps = TextEditingController(text: '${widget.set.reps}');
-  late final _load = TextEditingController(text: _loadText(widget.set));
+  // A new set with nothing in it yet starts with empty fields, so the first
+  // number is typed without clearing a zero.
+  late final _reps = TextEditingController(
+    text: widget.set.reps == 0 ? '' : '${widget.set.reps}',
+  );
+  late final _load = TextEditingController(
+    text: widget.set.loadKg == 0 ? '' : _loadText(widget.set),
+  );
 
   /// One plate change: 5 lb, or 2.5 kg.
   double get _loadStep => widget.fmt.imperial ? 5 : 2.5;
