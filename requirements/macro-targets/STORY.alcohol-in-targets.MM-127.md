@@ -74,3 +74,5 @@ carry their alcohol (MM-49). Tested in `alcohol_test.dart`.
 
 Not built: the field takes grams only (no "standard drinks" count), the line is on the Food screen only (not the Today dashboard),
 and the weight-jump explanation that may mention last night's alcohol belongs to MM-142.
+
+Changed after seeing it on the emulator: the alcohol field made every typed entry longer, so it now sits behind an "Includes alcohol?" text button and appears only when asked for (or when an entry already has alcohol).
