@@ -41,6 +41,16 @@ class DashboardScreen extends ConsumerWidget {
     }
     final setup = setupState.value;
     if (setup == null) return const SizedBox.shrink();
+    final pausesState = ref.watch(pausesProvider);
+    if (pausesState.hasError) {
+      return const Notice(
+        kind: NoticeKind.caution,
+        text: 'Pause history could not be loaded. Reopen the app to retry.',
+      );
+    }
+    if (pausesState.isLoading) {
+      return const Center(child: Text('Loading pause history…'));
+    }
     final today = ref.watch(todayProvider);
     final foodState = ref.watch(foodForDayProvider(today));
     final historyState = ref.watch(targetsHistoryProvider);

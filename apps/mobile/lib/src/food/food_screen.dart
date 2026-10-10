@@ -15,6 +15,8 @@ import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
 import '../ui/mm_surface_kind.dart';
 import '../ui/info_card.dart';
+import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
 import 'calorie_hero.dart';
 import 'ask_low_day_complete.dart';
 import 'copy_entries.dart';
@@ -31,6 +33,16 @@ class FoodScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final pausesState = ref.watch(pausesProvider);
+    if (pausesState.hasError) {
+      return const Notice(
+        kind: NoticeKind.caution,
+        text: 'Pause history could not be loaded. Reopen the app to retry.',
+      );
+    }
+    if (pausesState.isLoading) {
+      return const Center(child: Text('Loading pause history…'));
+    }
     final day = shownDay(ref);
     final entries = ref.watch(foodForDayProvider(day)).value ?? const [];
     final yesterday =
@@ -46,8 +58,7 @@ class FoodScreen extends ConsumerWidget {
         ).targetsAllowed;
     final targets = targetsOn(history, day, targetsAllowed: targetsAllowed);
     // On a paused day the targets are a maintenance guide (MM-148).
-    final paused =
-        pauseOn(ref.watch(pausesProvider).value ?? const [], day) != null;
+    final paused = pauseOn(pausesState.value!, day) != null;
     final guide = paused ? ref.watch(maintenanceGuideProvider) : null;
     final completeness =
         ref.watch(completenessProvider(day)).value ?? DayCompleteness.unmarked;
