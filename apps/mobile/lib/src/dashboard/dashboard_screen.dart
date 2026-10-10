@@ -23,6 +23,7 @@ import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/info_card.dart';
 import 'coach_line_text.dart';
+import 'report_ready_notice.dart';
 import 'weight_card.dart';
 import 'dashboard_metrics.dart';
 
@@ -86,6 +87,7 @@ class DashboardScreen extends ConsumerWidget {
         const UnderEatingNotice(),
         const ReminderPausedNotice(),
         const ReliefOfferCard(),
+        const ReportReadyNotice(),
         CalorieHero(
           compact: true,
           intake: intakeDayFrom(today, entries),
