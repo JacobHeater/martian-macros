@@ -120,7 +120,11 @@ TargetsRecord? nextTargets({
   // step limit (MM-83).
   if (setup.profileRevision != last.profileRevision) {
     return build(
-      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      deficitWeeks: consecutiveDeficitWeeks(
+        history,
+        today,
+        restartOn: snapshot.deficitRestartOn,
+      ),
       trigger: ExplanationTrigger.profileCorrection,
     );
   }
@@ -133,7 +137,11 @@ TargetsRecord? nextTargets({
           lastSafetyBf - safetyBodyFatDeadbandPercent) {
     return build(
       previous: last.targets,
-      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      deficitWeeks: consecutiveDeficitWeeks(
+        history,
+        today,
+        restartOn: snapshot.deficitRestartOn,
+      ),
       trigger: ExplanationTrigger.bodyFatCorrection,
     );
   }
@@ -141,7 +149,11 @@ TargetsRecord? nextTargets({
   if (last.targetRulesVersion < currentTargetRulesVersion) {
     return build(
       previous: last.targets,
-      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      deficitWeeks: consecutiveDeficitWeeks(
+        history,
+        today,
+        restartOn: snapshot.deficitRestartOn,
+      ),
       trigger: ExplanationTrigger.appRuleUpdate,
     );
   }
@@ -165,7 +177,11 @@ TargetsRecord? nextTargets({
   if (raise > 0 || deficitNoLongerAllowed) {
     return build(
       previous: last.targets,
-      deficitWeeks: consecutiveDeficitWeeks(history, today),
+      deficitWeeks: consecutiveDeficitWeeks(
+        history,
+        today,
+        restartOn: snapshot.deficitRestartOn,
+      ),
       safetyRaiseKcal: raise,
     );
   }
@@ -178,7 +194,11 @@ TargetsRecord? nextTargets({
 
   final next = build(
     previous: last.targets,
-    deficitWeeks: consecutiveDeficitWeeks(history, today),
+    deficitWeeks: consecutiveDeficitWeeks(
+      history,
+      today,
+      restartOn: snapshot.deficitRestartOn,
+    ),
   );
   if (snapshot.creatineReductionPausedOn(today) &&
       next.targets.kcal < last.targets.kcal) {

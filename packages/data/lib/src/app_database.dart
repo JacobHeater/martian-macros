@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 17;
+  static const currentSchemaVersion = 18;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -194,6 +194,21 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(
           userPreferences,
           userPreferences.underEatingDismissedEpochDay,
+        );
+      }
+    },
+    // 17 to 18: when the welcome-back screen was last put off (MM-147).
+    17: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(user_preferences)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('return_screen_dismissed_epoch_day')) {
+        await m.addColumn(
+          userPreferences,
+          userPreferences.returnScreenDismissedEpochDay,
         );
       }
     },

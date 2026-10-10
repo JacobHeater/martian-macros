@@ -1,5 +1,6 @@
 import 'package:mm_domain/mm_domain.dart';
 
+import 'activity_gap.dart';
 import 'body_fat_estimate.dart';
 import 'coach_confidence.dart';
 import 'mode_recommendation.dart';
@@ -20,6 +21,8 @@ final class CoachSnapshot {
     required this.confidence,
     required this.recommendation,
     this.lastCreatineEventOn,
+    this.deficitRestartOn,
+    this.gaps = const [],
   });
 
   final CoachingPolicy policy;
@@ -38,6 +41,13 @@ final class CoachSnapshot {
   final CoachConfidence confidence;
   final ModeRecommendation recommendation;
   final CalendarDate? lastCreatineEventOn;
+
+  /// The first day back after the latest gap long enough to count as a break
+  /// from the deficit (MM-147); null with none.
+  final CalendarDate? deficitRestartOn;
+
+  /// Runs of days with nothing recorded, oldest first (MM-147).
+  final List<ActivityGap> gaps;
 
   bool creatineReductionPausedOn(CalendarDate today) {
     final event = lastCreatineEventOn;

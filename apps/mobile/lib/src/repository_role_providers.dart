@@ -48,6 +48,14 @@ final underEatingNoticeWriterProvider = Provider<UnderEatingNoticeWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
 
+final returnScreenReaderProvider = Provider<ReturnScreenReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final returnScreenWriterProvider = Provider<ReturnScreenWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
