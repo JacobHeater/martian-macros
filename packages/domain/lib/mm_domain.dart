@@ -30,6 +30,8 @@ export 'src/food/easy_to_miss/easy_to_miss_visible.dart';
 export 'src/food/estimate/estimate_meal.dart';
 export 'src/food/estimate/meal_kind.dart';
 export 'src/food/estimate/meal_size.dart';
+export 'src/food/fiber/fiber_day.dart';
+export 'src/food/fiber/fiber_guide.dart';
 export 'src/food/hand/hand_model.dart';
 export 'src/food/hand/hand_size.dart';
 export 'src/food/label/label_reading.dart';
