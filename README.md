@@ -35,7 +35,7 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm check` | CI gate: format check, analyze, all tests |
 | `mm test [path ...]` | Tests every package, or only the given ones (e.g. `packages/engine`) |
 | `mm analyze` / `mm format` | Static analysis / formatting (`--check` to verify only) |
-| `mm run [--env dev\|prod]` | Runs the app with `config/<env>.json` defines; starts an emulator if no device is connected |
+| `mm run [--env dev\|prod\|phone]` | Runs with dev/prod defines; `phone` uses dev defines and selects one physical Android phone, never an emulator |
 | `mm demo --seed -d <Android device ID>` | Runs a separate DEMO app and resets only its synthetic database |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android\|ios` | Builds an app bundle or IPA (iOS requires macOS) |
@@ -43,6 +43,12 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm schema` | Exports the database schema snapshot after a `schemaVersion` bump (migration tests read it) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
 | `mm clean` | Removes build outputs |
+
+For a USB-connected Android phone, enable USB debugging and accept the phone's
+authorization prompt, then run `.\mm run --env phone` in PowerShell (or
+`./mm run --env phone` in Bash). With multiple phones, use
+`mm run --env dev -d DEVICE_ID` instead. Other Flutter run flags, such as
+`--release`, can still be passed to the shortcut.
 
 ## Isolated Android demo
 

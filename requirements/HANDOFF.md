@@ -19,7 +19,7 @@ Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-178 (`mm req next` is the authority).
+**Next ticket ID.** MM-181 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -84,6 +84,8 @@ private notes; they bind whoever picks up the work.
   app/database. It must never seed or reset the normal app's data.
 - Validation is in progress; populated/empty/loading/error/narrow-screen
   tests cover the Dashboard. Screenshots and emulator checks are still pending.
+- MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
+  MM-180 splits the food log into separate meal cards at the owner's request.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
