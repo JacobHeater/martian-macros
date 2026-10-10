@@ -233,6 +233,16 @@ final mealProteinProvider = Provider<Map<CalendarDate, Map<Meal, double>>>((
   };
 });
 
+/// How many whole days the user has logged in a row (MM-92).
+final loggingStreakProvider = Provider<LoggingStreak>((ref) {
+  final intake = ref.watch(intakeDaysProvider).value ?? const [];
+  return loggingStreakOf(
+    today: ref.watch(todayProvider),
+    intake: intake,
+    pauses: ref.watch(pausesProvider).value ?? const [],
+  );
+});
+
 /// Which insights have been shown and dismissed (MM-141).
 final insightLogProvider = StreamProvider<List<InsightLogEntry>>(
   (ref) => ref.watch(insightLogReaderProvider).watchInsightLog(),
