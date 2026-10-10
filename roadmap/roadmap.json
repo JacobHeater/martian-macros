@@ -1792,7 +1792,8 @@
           "MM-77",
           "MM-78",
           "MM-79",
-          "MM-189"
+          "MM-189",
+          "MM-191"
         ]
       },
       "sequence": [
@@ -1841,6 +1842,14 @@
           "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
           "tickets": [
             "MM-189"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 7,
+          "title": "Set times, entered by hand or with set and rest timers (after step 2; needed before any set is written to a platform as a segment)",
+          "tickets": [
+            "MM-191"
           ],
           "milestone": "M4"
         }

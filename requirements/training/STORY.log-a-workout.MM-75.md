@@ -2,7 +2,7 @@
 id: MM-75
 status: proposed
 component: training
-related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68, MM-189]
+related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68, MM-189, MM-191]
 ---
 
 # Story: Log a workout, set by set
@@ -53,4 +53,4 @@ Scenario: Interrupted
 
 ## Notes
 - New tables: needs migrations (MM-61).
-- A rest timer is a common want; leave it out of the first version.
+- When each set happened, and the set and rest timers, are MM-191 (the owner's decision). A set here is logged without times.
