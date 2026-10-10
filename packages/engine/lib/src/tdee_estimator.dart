@@ -6,6 +6,7 @@ import 'settling_window.dart';
 import 'tdee_estimate.dart';
 import 'tdee_prior.dart';
 import 'tdee_status.dart';
+import 'usable_intake_days.dart';
 import 'weight_trend_point.dart';
 
 /// Windowed energy-balance TDEE estimator.
@@ -234,21 +235,10 @@ final class TdeeEstimator {
 
   /// Splits days into usable intake and a count of excluded partial days.
   (List<IntakeDay>, int) _usableDays(List<IntakeDay> days) {
-    final candidates = days
-        .where((d) => d.completeness != DayCompleteness.partial)
-        .toList();
-    if (candidates.isEmpty) return (const [], days.length);
-
-    // The 75th percentile stays inside the fully logged days even when a
-    // third of days are partial, unlike the median.
-    final typical = _percentile([for (final d in candidates) d.kcal], 0.75);
-    final threshold = typical * partialDayFraction;
-    final usable = [
-      for (final d in candidates)
-        if (d.completeness == DayCompleteness.complete ||
-            (d.kcal > 0 && d.kcal >= threshold))
-          d,
-    ];
+    final usable = usableIntakeDays(
+      days,
+      partialDayFraction: partialDayFraction,
+    );
     return (usable, days.length - usable.length);
   }
 
@@ -274,12 +264,3 @@ final class TdeeEstimator {
 }
 
 double _sq(num x) => (x * x).toDouble();
-
-/// Linear-interpolated percentile, [p] in 0–1.
-double _percentile(List<double> values, double p) {
-  final sorted = [...values]..sort();
-  final rank = p * (sorted.length - 1);
-  final lo = rank.floor();
-  final hi = rank.ceil();
-  return sorted[lo] + (sorted[hi] - sorted[lo]) * (rank - lo);
-}

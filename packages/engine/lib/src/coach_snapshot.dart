@@ -15,6 +15,7 @@ final class CoachSnapshot {
     required this.trendWeightKg,
     required this.bodyFat,
     required this.bmrKcal,
+    required this.calorieFloorKcal,
     required this.tdee,
     required this.confidence,
     required this.recommendation,
@@ -28,6 +29,11 @@ final class CoachSnapshot {
   final double trendWeightKg;
   final BodyFatEstimate bodyFat;
   final double bmrKcal;
+
+  /// The lowest calorie target the app would ever suggest for this person
+  /// (`SafetyBounds.calorieFloorKcal`). Intake is described against it
+  /// (MM-114, MM-149).
+  final double calorieFloorKcal;
   final TdeeEstimate tdee;
   final CoachConfidence confidence;
   final ModeRecommendation recommendation;

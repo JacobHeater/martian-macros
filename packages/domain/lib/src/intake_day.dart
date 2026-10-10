@@ -12,6 +12,7 @@ final class IntakeDay {
     this.completeness = DayCompleteness.unmarked,
     this.relativeSigma = 0.10,
     this.weighedShare = 0,
+    this.estimatedShare = 0,
   });
 
   final CalendarDate date;
@@ -28,4 +29,8 @@ final class IntakeDay {
   /// Fraction of the day's energy logged as weighed entries (0–1). A sudden
   /// change signals a logging-style switch and so a shift in logging bias.
   final double weighedShare;
+
+  /// Fraction of the day's energy from estimated entries (0–1), which limits
+  /// what an average can be trusted for (MM-150).
+  final double estimatedShare;
 }
