@@ -124,6 +124,10 @@ void main() {
       '181.4',
     );
     await tester.pump();
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('save-dashboard-weigh-in')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('save-dashboard-weigh-in')));
     await tester.pumpAndSettle();
     final weights = (await tester.runAsync(
