@@ -132,6 +132,29 @@ void main() {
     expect(find.text('Cooked with oil?'), findsNothing);
   });
 
+  testWidgets('a serving logs the food as picked, not the raw one (MM-170)', (
+    tester,
+  ) async {
+    await pick(tester, 'white rice', 'White rice, cooked');
+    await tester.tap(find.text('Grams'));
+    await tester.pump();
+    await tester.tap(find.text('Raw'));
+    await tester.pump();
+    // Back to the cup: a cup of cooked rice, not a cup of raw rice.
+    await tester.tap(find.textContaining('1 cup'));
+    await tester.pump();
+    expect(find.text('Weighed as'), findsNothing);
+    await tester.ensureVisible(find.byKey(const ValueKey('amount-log')));
+    await tester.tap(find.byKey(const ValueKey('amount-log')));
+    await tester.pumpAndSettle();
+    final entry = (await readNow(
+      tester,
+      () => repos.food.watchFood(today).first,
+    )).single;
+    expect(entry.name, 'White rice, cooked');
+    expect(entry.kcal, closeTo(130 * 158 / 100, 0.01));
+  });
+
   testWidgets('no switch for a serving, or for a food with one state', (
     tester,
   ) async {

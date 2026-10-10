@@ -291,6 +291,31 @@ void main() {
     expect(entry.portion!.quantity, 200, reason: 'no double scaling');
   });
 
+  testWidgets('editing a pack food keeps which food it came from (MM-169)', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    await type(tester, 'food-search', 'banana');
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Banana').first);
+    await tester.pumpAndSettle();
+    await tapText(tester, 'Grams');
+    await type(tester, 'amount-quantity', '150');
+    await tester.ensureVisible(find.byKey(const ValueKey('amount-log')));
+    await tester.tap(find.byKey(const ValueKey('amount-log')));
+    await tester.pumpAndSettle();
+    final origin = (await logged(tester)).single.portion!.origin;
+    expect(origin, isNotNull);
+
+    await tester.tap(find.text('Banana'));
+    await tester.pumpAndSettle();
+    await type(tester, 'portion-quantity', '200');
+    await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+    await tester.tap(find.byKey(const ValueKey('food-save')));
+    await tester.pumpAndSettle();
+    expect((await logged(tester)).single.portion!.origin, origin);
+  });
+
   testWidgets('an entry logged by serving is restored as logged', (
     tester,
   ) async {
