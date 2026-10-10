@@ -20,6 +20,7 @@ export 'src/evidence/evidence_register.dart';
 export 'src/evidence/evidence_row.dart';
 export 'src/food/barcode_symbology.dart';
 export 'src/food/check_nutrition.dart';
+export 'src/food/cooking_fat.dart';
 export 'src/food/custom/custom_food.dart';
 export 'src/food/custom/custom_food_kind.dart';
 export 'src/food/custom/recipe_ingredient.dart';

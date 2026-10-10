@@ -58,6 +58,11 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
 
   late AmountChoice _choice = _choices.first;
   late Meal _meal = widget.meal;
+  var _oil = CookingFat.none;
+
+  /// A cooked generic food may have been cooked in oil (MM-152).
+  bool get _offersOil =>
+      widget.custom == null && _food.preparation == PreparationState.cooked;
 
   /// The food being logged: the one chosen, or its raw or cooked counterpart.
   late CatalogFood _food = widget.food;
@@ -239,6 +244,30 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
             ),
           ),
         );
+    final oil = _oil.totals;
+    if (oil != null && _offersOil) {
+      await ref
+          .read(foodEntryWriterProvider)
+          .addFood(
+            FoodEntry(
+              id: 0,
+              date: widget.day,
+              meal: _meal,
+              name: 'Cooking oil',
+              kcal: oil.kcal,
+              proteinG: oil.proteinG,
+              carbsG: oil.carbsG,
+              fatG: oil.fatG,
+              source: QuantitySource.householdMeasure,
+              portion: Portion(
+                method: QuantitySource.householdMeasure,
+                basis: NutritionBasis.enteredTotals,
+                quantity: 1,
+                unit: _oil.unit,
+              ),
+            ),
+          );
+    }
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -335,6 +364,21 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         if (note != null) ...[
           const SizedBox(height: 8),
           Notice(kind: NoticeKind.info, text: note),
+        ],
+        if (_offersOil) ...[
+          const SizedBox(height: 12),
+          Text('Cooked with oil?', style: text.labelLarge),
+          const SizedBox(height: 4),
+          MmSegmented<CookingFat>(
+            key: const ValueKey('amount-oil'),
+            segments: const [
+              MmSegment(CookingFat.none, 'No'),
+              MmSegment(CookingFat.teaspoon, '1 tsp'),
+              MmSegment(CookingFat.tablespoon, '1 tbsp'),
+            ],
+            selected: {_oil},
+            onChanged: (s) => setState(() => _oil = s.first),
+          ),
         ],
         const SizedBox(height: 16),
         Wrap(
