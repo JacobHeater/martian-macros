@@ -15,6 +15,7 @@ export 'src/in_memory_insight_log_repository.dart';
 export 'src/in_memory_intake_reader.dart';
 export 'src/in_memory_pause_repository.dart';
 export 'src/in_memory_preferences_repository.dart';
+export 'src/in_memory_recovery_check_in_repository.dart';
 export 'src/in_memory_reminder_repository.dart';
 export 'src/in_memory_reminder_scheduler.dart';
 export 'src/in_memory_repositories.dart';
