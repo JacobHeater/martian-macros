@@ -52,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 25;
+  static const currentSchemaVersion = 26;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -281,6 +281,26 @@ class AppDatabase extends _$AppDatabase {
       await m.createTable(workoutExercises);
       await m.createTable(workoutSets);
       await m.createTable(customExercises);
+    },
+    // 25 to 26: when each set happened, and the running set timer
+    // (MM-191). Existing sets keep no times; none are invented.
+    25: (m) async {
+      // The tables are created at their current shape when a database is
+      // old enough to lack them (step 24), so only add what is not there.
+      Future<Set<String>> columnsOf(String table) async => {
+        for (final row in await customSelect('PRAGMA table_info($table)').get())
+          row.read<String>('name'),
+      };
+      final sets = await columnsOf('workout_sets');
+      if (!sets.contains('started_at_ms')) {
+        await m.addColumn(workoutSets, workoutSets.startedAtMs);
+      }
+      if (!sets.contains('ended_at_ms')) {
+        await m.addColumn(workoutSets, workoutSets.endedAtMs);
+      }
+      if (!(await columnsOf('workouts')).contains('set_started_at_ms')) {
+        await m.addColumn(workouts, workouts.setStartedAtMs);
+      }
     },
   };
 

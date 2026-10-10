@@ -39,7 +39,15 @@ final class DriftWorkoutRepository implements WorkoutRepository {
     for (final row in setRows) {
       sets
           .putIfAbsent((row.workoutId, row.exercisePosition), () => [])
-          .add(WorkoutSet(reps: row.reps, loadKg: row.loadKg, rir: row.rir));
+          .add(
+            WorkoutSet(
+              reps: row.reps,
+              loadKg: row.loadKg,
+              rir: row.rir,
+              startedAt: _time(row.startedAtMs),
+              endedAt: _time(row.endedAtMs),
+            ),
+          );
     }
     final exercises = <int, List<WorkoutExercise>>{};
     for (final row in exerciseRows) {
@@ -58,9 +66,8 @@ final class DriftWorkoutRepository implements WorkoutRepository {
           id: row.id,
           date: CalendarDate.fromEpochDay(row.dateEpochDay),
           startedAt: DateTime.fromMillisecondsSinceEpoch(row.startedAtMs),
-          endedAt: row.endedAtMs == null
-              ? null
-              : DateTime.fromMillisecondsSinceEpoch(row.endedAtMs!),
+          endedAt: _time(row.endedAtMs),
+          setStartedAt: _time(row.setStartedAtMs),
           exercises: exercises[row.id] ?? const [],
         ),
     ];
@@ -72,6 +79,7 @@ final class DriftWorkoutRepository implements WorkoutRepository {
       dateEpochDay: Value(workout.date.epochDay),
       startedAtMs: Value(workout.startedAt.millisecondsSinceEpoch),
       endedAtMs: Value(workout.endedAt?.millisecondsSinceEpoch),
+      setStartedAtMs: Value(workout.setStartedAt?.millisecondsSinceEpoch),
     );
     final int id;
     if (workout.id == 0) {
@@ -106,6 +114,8 @@ final class DriftWorkoutRepository implements WorkoutRepository {
                 reps: set.reps,
                 loadKg: set.loadKg,
                 rir: Value(set.rir),
+                startedAtMs: Value(set.startedAt?.millisecondsSinceEpoch),
+                endedAtMs: Value(set.endedAt?.millisecondsSinceEpoch),
               ),
             );
       }
@@ -118,6 +128,9 @@ final class DriftWorkoutRepository implements WorkoutRepository {
     await _deleteChildren(id);
     await (_db.delete(_db.workouts)..where((t) => t.id.equals(id))).go();
   });
+
+  static DateTime? _time(int? ms) =>
+      ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
 
   Future<void> _deleteChildren(int workoutId) async {
     await (_db.delete(

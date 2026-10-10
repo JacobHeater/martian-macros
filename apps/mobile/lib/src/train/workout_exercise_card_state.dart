@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import '../format/elapsed_text.dart';
 import '../format/fmt.dart';
 import '../format/set_text.dart';
+import '../integration_providers.dart';
 import '../providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/info_card.dart';
@@ -80,6 +82,13 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 key: ValueKey('set-editor-$index-$s'),
                 set: entry.sets[s],
                 number: s + 1,
+                timeBase: workout.startedAt,
+                checkTimes: (start, end) => checkTimeSpan(
+                  start: start,
+                  end: end,
+                  notBefore: workout.startedAt,
+                  notAfter: workout.endedAt ?? ref.read(clockProvider).now(),
+                ),
                 load: load,
                 fmt: fmt,
                 keyPrefix: 'set-$index-$s',
@@ -95,7 +104,14 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 key: ValueKey('set-$index-$s'),
                 dense: true,
                 title: setText(entry.sets[s], fmt, load),
-                trailing: Text('Set ${s + 1}', style: text.bodySmall),
+                // How long the set took, when it was timed.
+                trailing: Text(
+                  entry.sets[s].duration == null
+                      ? 'Set ${s + 1}'
+                      : 'Set ${s + 1} \u00b7 '
+                            '${elapsedText(entry.sets[s].duration!)}',
+                  style: text.bodySmall,
+                ),
                 onTap: () => setState(() => _open = s),
               ),
           const SizedBox(height: 8),

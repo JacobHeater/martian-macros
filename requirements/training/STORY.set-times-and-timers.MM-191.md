@@ -1,11 +1,11 @@
 ---
 id: MM-191
-status: proposed
+status: in-progress
 component: training
 related: [MM-74, MM-75, MM-146, MM-188, MM-189]
 ---
 
-# Story: When each set happened, entered by hand or with a timer
+# Story: Workout and set times, entered by hand or with a timer
 
 ## Context
 A health platform records an exercise inside a workout only with a start and an end time (MM-188), and the workout log (MM-75) records
@@ -15,6 +15,8 @@ Timing also has its own use in the gym: knowing how long the rest was.
 ## Decisions (made with the product owner)
 - **A set's times can be entered by hand.**
 - **The app has timers**, since nothing else in it tracks time during a workout.
+- **A workout's own times can be set by hand** (its day, start and end), and time is something the user starts and stops and can
+  see running, for workouts and rests, not only an elapsed figure worked out in the background (2026-10-10).
 
 Choices I made without asking (say if any is wrong):
 - **Times are optional.** A set is still logged with one tap and no times (MM-75). Nobody is made to time anything.
@@ -70,7 +72,27 @@ Scenario: Only timed sets reach a platform as segments
   Then only the first can be written as a segment, and the workout is still written as a session
 ```
 
+## Progress
+Built (2026-10-10), schema 26:
+- **The workout clock**: a card at the top of the workout shows the time running while it is in progress, and the start, end and
+  length once finished. "Edit times" sets the day, start and end by hand; while in progress it can also start the clock again
+  from now.
+- **The set and rest timer**, a bar at the bottom of a workout in progress. "Start set" starts timing; "Add set" on an exercise
+  stops it and gives the set its start and end. From then the bar counts the rest, until the next set is started. "Cancel" stops
+  a set timer without logging.
+- A set logged without the timer gets an end and no start. A set added to a finished workout gets neither.
+- **A set's start and end can be typed**, in its controls. An end not after its start, or a time outside the workout, is refused
+  with the reason and the set keeps what it had.
+- A timed set shows how long it took. The timers are stored times read against the app's clock, so they survive the app closing.
+
+Not built:
+- A target rest per exercise and the countdown to it; the sound and vibration at its end.
+- Pausing a workout's clock: it runs from start to end. Changing the start or end by hand is the way to correct it.
+- Typed times are to the minute, not the second (the phone's own time picker). A timed set is to the second.
+- The check that sets of one workout do not overlap.
+- A workout that runs past midnight cannot have its end typed (it would be before its start).
+
 ## Notes
-- Builds on MM-75; adds two nullable columns to the set, so it needs a migration (MM-61) and takes the schema lane.
+- Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26.
 - Time comes from the app's `Clock`, never the device directly (MM-190), so every scenario above is testable with a fixed clock.
 - Not planned: automatic rep counting, heart rate, or timing from a watch.
