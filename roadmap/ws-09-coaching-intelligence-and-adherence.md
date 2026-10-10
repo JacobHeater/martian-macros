@@ -144,8 +144,9 @@ independent of step 3.
   re-confirmation and the chart are open), MM-140 (the stall diagnosis and its
   card on the Coach screen; its options are text because the things they offer
   are not built), MM-141 (the insight framework, rationing and five of the ten
-  rules, on the dashboard).
-- Remaining: MM-148, MM-146, MM-116, MM-117, MM-133, MM-32,
+  rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
+  the estimator, the deficit count and the resume screen; reminders and streaks do not exist to be silenced).
+- Remaining: MM-146, MM-116, MM-117, MM-133, MM-32,
   MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
 
 ## Notes for whoever builds it

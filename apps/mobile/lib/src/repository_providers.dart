@@ -51,6 +51,10 @@ final insightLogRepositoryProvider = Provider<InsightLogRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).insightLog,
 );
 
+final pauseRepositoryProvider = Provider<PauseRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).pauses,
+);
+
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );

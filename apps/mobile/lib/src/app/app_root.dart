@@ -38,6 +38,9 @@ class AppRoot extends ConsumerWidget {
           today: today,
         ).blocked;
         if (blocked) return const AdultsOnlyScreen();
+        if (ref.watch(resumeDueProvider)) {
+          return const WelcomeBackScreen(resuming: true);
+        }
         if (ref.watch(welcomeBackDueProvider)) return const WelcomeBackScreen();
         if (value.healthCheckDueOn(today) &&
             !ref.watch(healthRecheckDismissalProvider)) {

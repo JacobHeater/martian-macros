@@ -42,6 +42,43 @@ final weightEventsProvider = StreamProvider<List<WeightEvent>>(
   (ref) => ref.watch(weightEventReaderProvider).watchWeightEvents(),
 );
 
+/// Every pause the user has set (MM-148).
+final pausesProvider = StreamProvider<List<Pause>>(
+  (ref) => ref.watch(pauseReaderProvider).watchPauses(),
+);
+
+/// The pause covering today, if any.
+final activePauseProvider = Provider<Pause?>(
+  (ref) => pauseOn(
+    ref.watch(pausesProvider).value ?? const [],
+    ref.watch(todayProvider),
+  ),
+);
+
+/// Whether a pause touches the [days] days up to today. Summaries and
+/// insights over such a stretch say nothing: a paused day is not judged
+/// (MM-148).
+bool pauseWithin(Ref ref, int days) {
+  final today = ref.watch(todayProvider);
+  return pausedDaysBetween(
+        ref.watch(pausesProvider).value ?? const [],
+        today.addDays(-days),
+        today,
+      ) >
+      0;
+}
+
+/// Intake for anything that judges a day: paused days are left out.
+final judgedIntakeProvider = Provider<List<IntakeDay>?>((ref) {
+  final intake = ref.watch(intakeDaysProvider).value;
+  if (intake == null) return null;
+  return withoutPausedDays(
+    intake,
+    ref.watch(pausesProvider).value ?? const [],
+    keepComplete: false,
+  );
+});
+
 final waistProvider = StreamProvider<List<WaistObservation>>(
   (ref) => ref.watch(waistReaderProvider).watchWaist(),
 );
@@ -100,11 +137,13 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
   final weightEvents = ref.watch(weightEventsProvider).value;
   final intake = ref.watch(intakeDaysProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
+  final pauses = ref.watch(pausesProvider).value;
   if (setup == null ||
       weights == null ||
       weightEvents == null ||
       intake == null ||
-      history == null) {
+      history == null ||
+      pauses == null) {
     return null;
   }
   return analyze(
@@ -113,18 +152,31 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
     intake: intake,
     history: history,
     weightEvents: weightEvents,
+    pauses: pauses,
     today: ref.watch(todayProvider),
   );
+});
+
+/// The guide shown in place of targets on a paused day (MM-148):
+/// maintenance. Null when the app shows this person no targets.
+final maintenanceGuideProvider = Provider<DailyTargets?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  final snapshot = ref.watch(coachProvider);
+  if (setup == null || snapshot == null || !snapshot.policy.targetsAllowed) {
+    return null;
+  }
+  return pausedGuide(setup: setup, snapshot: snapshot);
 });
 
 /// What the user did over the seven days to yesterday (MM-149); null until
 /// the coach has a first weigh-in.
 final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
   final snapshot = ref.watch(coachProvider);
-  final intake = ref.watch(intakeDaysProvider).value;
+  final intake = ref.watch(judgedIntakeProvider);
   final weights = ref.watch(weightsProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
   if (snapshot == null || intake == null || weights == null) return null;
+  if (pauseWithin(ref, 7)) return null;
   return summarizeAdherence(
     through: ref.watch(todayProvider).addDays(-1),
     intake: intake,
@@ -139,7 +191,7 @@ final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
 final stallAssessmentProvider = Provider<StallAssessment?>((ref) {
   final setup = ref.watch(setupProvider).value;
   final snapshot = ref.watch(coachProvider);
-  final intake = ref.watch(intakeDaysProvider).value;
+  final intake = ref.watch(judgedIntakeProvider);
   final weights = ref.watch(weightsProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
   if (setup == null ||
@@ -147,7 +199,8 @@ final stallAssessmentProvider = Provider<StallAssessment?>((ref) {
       intake == null ||
       weights == null ||
       history == null ||
-      !snapshot.policy.targetsAllowed) {
+      !snapshot.policy.targetsAllowed ||
+      pauseWithin(ref, 14)) {
     return null;
   }
   return assessStall(
@@ -171,7 +224,7 @@ final insightLogProvider = StreamProvider<List<InsightLogEntry>>(
 /// over the data to yesterday, then rationed against what was already shown.
 final insightSelectionProvider = Provider<InsightSelection?>((ref) {
   final setup = ref.watch(setupProvider).value;
-  final intake = ref.watch(intakeDaysProvider).value;
+  final intake = ref.watch(judgedIntakeProvider);
   final weights = ref.watch(weightsProvider).value;
   final history = ref.watch(targetsHistoryProvider).value;
   final log = ref.watch(insightLogProvider).value;
@@ -180,7 +233,8 @@ final insightSelectionProvider = Provider<InsightSelection?>((ref) {
       weights == null ||
       history == null ||
       log == null ||
-      ref.watch(coachProvider) == null) {
+      ref.watch(coachProvider) == null ||
+      pauseWithin(ref, InsightRationing.patternDays)) {
     return null;
   }
   final today = ref.watch(todayProvider);
@@ -214,10 +268,29 @@ final welcomeBackDueProvider = Provider<bool>((ref) {
     weights: weights,
     intake: intake,
     today: ref.watch(todayProvider),
+    pauses: ref.watch(pausesProvider).value ?? const [],
   );
   if (gap == null) return false;
   final putOff = dismissed.value;
   return putOff == null || putOff.isBefore(gap.from);
+});
+
+/// Whether to show the resume screen: a pause has ended, no weigh-in has
+/// been saved since, and the screen has not been put off since it ended
+/// (MM-148).
+final resumeDueProvider = Provider<bool>((ref) {
+  final weights = ref.watch(weightsProvider).value;
+  final pauses = ref.watch(pausesProvider).value;
+  final dismissed = ref.watch(returnScreenDismissedProvider);
+  if (weights == null || pauses == null || !dismissed.hasValue) return false;
+  final pause = pauseToResume(
+    pauses: pauses,
+    weights: weights,
+    today: ref.watch(todayProvider),
+  );
+  if (pause == null) return false;
+  final putOff = dismissed.value;
+  return putOff == null || !putOff.isAfter(pause.to);
 });
 
 /// When the under-eating notice was last dismissed (MM-114).
@@ -230,7 +303,7 @@ final underEatingDismissedProvider = StreamProvider<CalendarDate?>(
 /// or not its notice is showing (MM-114).
 final underEatingFindingProvider = Provider<UnderEatingFinding?>((ref) {
   final snapshot = ref.watch(coachProvider);
-  final intake = ref.watch(intakeDaysProvider).value;
+  final intake = ref.watch(judgedIntakeProvider);
   if (snapshot == null || intake == null) return null;
   return findUnderEating(
     through: ref.watch(todayProvider).addDays(-1),
