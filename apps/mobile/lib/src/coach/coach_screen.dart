@@ -27,6 +27,7 @@ import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
 import 'recovery_card.dart';
+import 'relief_offer_card.dart';
 import 'stall_card.dart';
 import 'target_flag_message.dart';
 import 'under_eating_notice.dart';
@@ -66,6 +67,7 @@ class CoachScreen extends ConsumerWidget {
           ),
         const PauseBanner(),
         const UnderEatingNotice(),
+        const ReliefOfferCard(),
         if (current != null)
           MmHeroSurface(
             child: Column(

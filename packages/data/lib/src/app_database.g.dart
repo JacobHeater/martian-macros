@@ -330,6 +330,27 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         type: DriftSqlType.int,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _maintenanceWeekFromEpochDayMeta =
+      const VerificationMeta('maintenanceWeekFromEpochDay');
+  @override
+  late final GeneratedColumn<int> maintenanceWeekFromEpochDay =
+      GeneratedColumn<int>(
+        'maintenance_week_from_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _reliefAnsweredEpochDayMeta =
+      const VerificationMeta('reliefAnsweredEpochDay');
+  @override
+  late final GeneratedColumn<int> reliefAnsweredEpochDay = GeneratedColumn<int>(
+    'relief_answered_epoch_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _healthCheckSkipCountMeta =
       const VerificationMeta('healthCheckSkipCount');
   @override
@@ -380,6 +401,8 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
     bariatricSurgery,
     weightAffectingMedication,
     healthCheckConfirmedEpochDay,
+    maintenanceWeekFromEpochDay,
+    reliefAnsweredEpochDay,
     healthCheckSkipCount,
     creatineStartedEpochDay,
   ];
@@ -582,6 +605,24 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         ),
       );
     }
+    if (data.containsKey('maintenance_week_from_epoch_day')) {
+      context.handle(
+        _maintenanceWeekFromEpochDayMeta,
+        maintenanceWeekFromEpochDay.isAcceptableOrUnknown(
+          data['maintenance_week_from_epoch_day']!,
+          _maintenanceWeekFromEpochDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relief_answered_epoch_day')) {
+      context.handle(
+        _reliefAnsweredEpochDayMeta,
+        reliefAnsweredEpochDay.isAcceptableOrUnknown(
+          data['relief_answered_epoch_day']!,
+          _reliefAnsweredEpochDayMeta,
+        ),
+      );
+    }
     if (data.containsKey('health_check_skip_count')) {
       context.handle(
         _healthCheckSkipCountMeta,
@@ -721,6 +762,14 @@ class $SetupsTable extends Setups with TableInfo<$SetupsTable, SetupRow> {
         DriftSqlType.int,
         data['${effectivePrefix}health_check_confirmed_epoch_day'],
       ),
+      maintenanceWeekFromEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}maintenance_week_from_epoch_day'],
+      ),
+      reliefAnsweredEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}relief_answered_epoch_day'],
+      ),
       healthCheckSkipCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}health_check_skip_count'],
@@ -785,6 +834,11 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
   final bool bariatricSurgery;
   final bool weightAffectingMedication;
   final int? healthCheckConfirmedEpochDay;
+
+  /// The offer to ease a deficit (MM-117): the day a maintenance week was
+  /// last taken early, and the day the offer was last answered.
+  final int? maintenanceWeekFromEpochDay;
+  final int? reliefAnsweredEpochDay;
   final int healthCheckSkipCount;
   final int? creatineStartedEpochDay;
   const SetupRow({
@@ -814,6 +868,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     required this.bariatricSurgery,
     required this.weightAffectingMedication,
     this.healthCheckConfirmedEpochDay,
+    this.maintenanceWeekFromEpochDay,
+    this.reliefAnsweredEpochDay,
     required this.healthCheckSkipCount,
     this.creatineStartedEpochDay,
   });
@@ -874,6 +930,14 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
         healthCheckConfirmedEpochDay,
       );
     }
+    if (!nullToAbsent || maintenanceWeekFromEpochDay != null) {
+      map['maintenance_week_from_epoch_day'] = Variable<int>(
+        maintenanceWeekFromEpochDay,
+      );
+    }
+    if (!nullToAbsent || reliefAnsweredEpochDay != null) {
+      map['relief_answered_epoch_day'] = Variable<int>(reliefAnsweredEpochDay);
+    }
     map['health_check_skip_count'] = Variable<int>(healthCheckSkipCount);
     if (!nullToAbsent || creatineStartedEpochDay != null) {
       map['creatine_started_epoch_day'] = Variable<int>(
@@ -918,6 +982,13 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           healthCheckConfirmedEpochDay == null && nullToAbsent
           ? const Value.absent()
           : Value(healthCheckConfirmedEpochDay),
+      maintenanceWeekFromEpochDay:
+          maintenanceWeekFromEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maintenanceWeekFromEpochDay),
+      reliefAnsweredEpochDay: reliefAnsweredEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reliefAnsweredEpochDay),
       healthCheckSkipCount: Value(healthCheckSkipCount),
       creatineStartedEpochDay: creatineStartedEpochDay == null && nullToAbsent
           ? const Value.absent()
@@ -981,6 +1052,12 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       healthCheckConfirmedEpochDay: serializer.fromJson<int?>(
         json['healthCheckConfirmedEpochDay'],
       ),
+      maintenanceWeekFromEpochDay: serializer.fromJson<int?>(
+        json['maintenanceWeekFromEpochDay'],
+      ),
+      reliefAnsweredEpochDay: serializer.fromJson<int?>(
+        json['reliefAnsweredEpochDay'],
+      ),
       healthCheckSkipCount: serializer.fromJson<int>(
         json['healthCheckSkipCount'],
       ),
@@ -1035,6 +1112,10 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       'healthCheckConfirmedEpochDay': serializer.toJson<int?>(
         healthCheckConfirmedEpochDay,
       ),
+      'maintenanceWeekFromEpochDay': serializer.toJson<int?>(
+        maintenanceWeekFromEpochDay,
+      ),
+      'reliefAnsweredEpochDay': serializer.toJson<int?>(reliefAnsweredEpochDay),
       'healthCheckSkipCount': serializer.toJson<int>(healthCheckSkipCount),
       'creatineStartedEpochDay': serializer.toJson<int?>(
         creatineStartedEpochDay,
@@ -1069,6 +1150,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     bool? bariatricSurgery,
     bool? weightAffectingMedication,
     Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+    Value<int?> maintenanceWeekFromEpochDay = const Value.absent(),
+    Value<int?> reliefAnsweredEpochDay = const Value.absent(),
     int? healthCheckSkipCount,
     Value<int?> creatineStartedEpochDay = const Value.absent(),
   }) => SetupRow(
@@ -1106,6 +1189,12 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay.present
         ? healthCheckConfirmedEpochDay.value
         : this.healthCheckConfirmedEpochDay,
+    maintenanceWeekFromEpochDay: maintenanceWeekFromEpochDay.present
+        ? maintenanceWeekFromEpochDay.value
+        : this.maintenanceWeekFromEpochDay,
+    reliefAnsweredEpochDay: reliefAnsweredEpochDay.present
+        ? reliefAnsweredEpochDay.value
+        : this.reliefAnsweredEpochDay,
     healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
     creatineStartedEpochDay: creatineStartedEpochDay.present
         ? creatineStartedEpochDay.value
@@ -1177,6 +1266,12 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
       healthCheckConfirmedEpochDay: data.healthCheckConfirmedEpochDay.present
           ? data.healthCheckConfirmedEpochDay.value
           : this.healthCheckConfirmedEpochDay,
+      maintenanceWeekFromEpochDay: data.maintenanceWeekFromEpochDay.present
+          ? data.maintenanceWeekFromEpochDay.value
+          : this.maintenanceWeekFromEpochDay,
+      reliefAnsweredEpochDay: data.reliefAnsweredEpochDay.present
+          ? data.reliefAnsweredEpochDay.value
+          : this.reliefAnsweredEpochDay,
       healthCheckSkipCount: data.healthCheckSkipCount.present
           ? data.healthCheckSkipCount.value
           : this.healthCheckSkipCount,
@@ -1217,6 +1312,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           ..write(
             'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
           )
+          ..write('maintenanceWeekFromEpochDay: $maintenanceWeekFromEpochDay, ')
+          ..write('reliefAnsweredEpochDay: $reliefAnsweredEpochDay, ')
           ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
           ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
@@ -1251,6 +1348,8 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
     bariatricSurgery,
     weightAffectingMedication,
     healthCheckConfirmedEpochDay,
+    maintenanceWeekFromEpochDay,
+    reliefAnsweredEpochDay,
     healthCheckSkipCount,
     creatineStartedEpochDay,
   ]);
@@ -1285,6 +1384,9 @@ class SetupRow extends DataClass implements Insertable<SetupRow> {
           other.weightAffectingMedication == this.weightAffectingMedication &&
           other.healthCheckConfirmedEpochDay ==
               this.healthCheckConfirmedEpochDay &&
+          other.maintenanceWeekFromEpochDay ==
+              this.maintenanceWeekFromEpochDay &&
+          other.reliefAnsweredEpochDay == this.reliefAnsweredEpochDay &&
           other.healthCheckSkipCount == this.healthCheckSkipCount &&
           other.creatineStartedEpochDay == this.creatineStartedEpochDay);
 }
@@ -1316,6 +1418,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
   final Value<bool> bariatricSurgery;
   final Value<bool> weightAffectingMedication;
   final Value<int?> healthCheckConfirmedEpochDay;
+  final Value<int?> maintenanceWeekFromEpochDay;
+  final Value<int?> reliefAnsweredEpochDay;
   final Value<int> healthCheckSkipCount;
   final Value<int?> creatineStartedEpochDay;
   const SetupsCompanion({
@@ -1345,6 +1449,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.bariatricSurgery = const Value.absent(),
     this.weightAffectingMedication = const Value.absent(),
     this.healthCheckConfirmedEpochDay = const Value.absent(),
+    this.maintenanceWeekFromEpochDay = const Value.absent(),
+    this.reliefAnsweredEpochDay = const Value.absent(),
     this.healthCheckSkipCount = const Value.absent(),
     this.creatineStartedEpochDay = const Value.absent(),
   });
@@ -1375,6 +1481,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     this.bariatricSurgery = const Value.absent(),
     this.weightAffectingMedication = const Value.absent(),
     this.healthCheckConfirmedEpochDay = const Value.absent(),
+    this.maintenanceWeekFromEpochDay = const Value.absent(),
+    this.reliefAnsweredEpochDay = const Value.absent(),
     this.healthCheckSkipCount = const Value.absent(),
     this.creatineStartedEpochDay = const Value.absent(),
   }) : sex = Value(sex),
@@ -1412,6 +1520,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Expression<bool>? bariatricSurgery,
     Expression<bool>? weightAffectingMedication,
     Expression<int>? healthCheckConfirmedEpochDay,
+    Expression<int>? maintenanceWeekFromEpochDay,
+    Expression<int>? reliefAnsweredEpochDay,
     Expression<int>? healthCheckSkipCount,
     Expression<int>? creatineStartedEpochDay,
   }) {
@@ -1450,6 +1560,10 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
         'weight_affecting_medication': weightAffectingMedication,
       if (healthCheckConfirmedEpochDay != null)
         'health_check_confirmed_epoch_day': healthCheckConfirmedEpochDay,
+      if (maintenanceWeekFromEpochDay != null)
+        'maintenance_week_from_epoch_day': maintenanceWeekFromEpochDay,
+      if (reliefAnsweredEpochDay != null)
+        'relief_answered_epoch_day': reliefAnsweredEpochDay,
       if (healthCheckSkipCount != null)
         'health_check_skip_count': healthCheckSkipCount,
       if (creatineStartedEpochDay != null)
@@ -1484,6 +1598,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
     Value<bool>? bariatricSurgery,
     Value<bool>? weightAffectingMedication,
     Value<int?>? healthCheckConfirmedEpochDay,
+    Value<int?>? maintenanceWeekFromEpochDay,
+    Value<int?>? reliefAnsweredEpochDay,
     Value<int>? healthCheckSkipCount,
     Value<int?>? creatineStartedEpochDay,
   }) {
@@ -1520,6 +1636,10 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           weightAffectingMedication ?? this.weightAffectingMedication,
       healthCheckConfirmedEpochDay:
           healthCheckConfirmedEpochDay ?? this.healthCheckConfirmedEpochDay,
+      maintenanceWeekFromEpochDay:
+          maintenanceWeekFromEpochDay ?? this.maintenanceWeekFromEpochDay,
+      reliefAnsweredEpochDay:
+          reliefAnsweredEpochDay ?? this.reliefAnsweredEpochDay,
       healthCheckSkipCount: healthCheckSkipCount ?? this.healthCheckSkipCount,
       creatineStartedEpochDay:
           creatineStartedEpochDay ?? this.creatineStartedEpochDay,
@@ -1629,6 +1749,16 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
         healthCheckConfirmedEpochDay.value,
       );
     }
+    if (maintenanceWeekFromEpochDay.present) {
+      map['maintenance_week_from_epoch_day'] = Variable<int>(
+        maintenanceWeekFromEpochDay.value,
+      );
+    }
+    if (reliefAnsweredEpochDay.present) {
+      map['relief_answered_epoch_day'] = Variable<int>(
+        reliefAnsweredEpochDay.value,
+      );
+    }
     if (healthCheckSkipCount.present) {
       map['health_check_skip_count'] = Variable<int>(
         healthCheckSkipCount.value,
@@ -1673,6 +1803,8 @@ class SetupsCompanion extends UpdateCompanion<SetupRow> {
           ..write(
             'healthCheckConfirmedEpochDay: $healthCheckConfirmedEpochDay, ',
           )
+          ..write('maintenanceWeekFromEpochDay: $maintenanceWeekFromEpochDay, ')
+          ..write('reliefAnsweredEpochDay: $reliefAnsweredEpochDay, ')
           ..write('healthCheckSkipCount: $healthCheckSkipCount, ')
           ..write('creatineStartedEpochDay: $creatineStartedEpochDay')
           ..write(')'))
@@ -8824,6 +8956,8 @@ typedef $$SetupsTableCreateCompanionBuilder = SetupsCompanion Function({
   Value<bool> bariatricSurgery,
   Value<bool> weightAffectingMedication,
   Value<int?> healthCheckConfirmedEpochDay,
+  Value<int?> maintenanceWeekFromEpochDay,
+  Value<int?> reliefAnsweredEpochDay,
   Value<int> healthCheckSkipCount,
   Value<int?> creatineStartedEpochDay,
 });
@@ -8854,6 +8988,8 @@ typedef $$SetupsTableUpdateCompanionBuilder = SetupsCompanion Function({
   Value<bool> bariatricSurgery,
   Value<bool> weightAffectingMedication,
   Value<int?> healthCheckConfirmedEpochDay,
+  Value<int?> maintenanceWeekFromEpochDay,
+  Value<int?> reliefAnsweredEpochDay,
   Value<int> healthCheckSkipCount,
   Value<int?> creatineStartedEpochDay,
 });
@@ -8998,6 +9134,16 @@ class $$SetupsTableFilterComposer
 
   ColumnFilters<int> get healthCheckConfirmedEpochDay => $composableBuilder(
     column: $table.healthCheckConfirmedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maintenanceWeekFromEpochDay => $composableBuilder(
+    column: $table.maintenanceWeekFromEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reliefAnsweredEpochDay => $composableBuilder(
+    column: $table.reliefAnsweredEpochDay,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9151,6 +9297,16 @@ class $$SetupsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get maintenanceWeekFromEpochDay => $composableBuilder(
+    column: $table.maintenanceWeekFromEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reliefAnsweredEpochDay => $composableBuilder(
+    column: $table.reliefAnsweredEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get healthCheckSkipCount => $composableBuilder(
     column: $table.healthCheckSkipCount,
     builder: (column) => ColumnOrderings(column),
@@ -9290,6 +9446,16 @@ class $$SetupsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get maintenanceWeekFromEpochDay => $composableBuilder(
+    column: $table.maintenanceWeekFromEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reliefAnsweredEpochDay => $composableBuilder(
+    column: $table.reliefAnsweredEpochDay,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get healthCheckSkipCount => $composableBuilder(
     column: $table.healthCheckSkipCount,
     builder: (column) => column,
@@ -9355,6 +9521,8 @@ class $$SetupsTableTableManager
                 Value<bool> bariatricSurgery = const Value.absent(),
                 Value<bool> weightAffectingMedication = const Value.absent(),
                 Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+                Value<int?> maintenanceWeekFromEpochDay = const Value.absent(),
+                Value<int?> reliefAnsweredEpochDay = const Value.absent(),
                 Value<int> healthCheckSkipCount = const Value.absent(),
                 Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion(
@@ -9384,6 +9552,8 @@ class $$SetupsTableTableManager
                 bariatricSurgery: bariatricSurgery,
                 weightAffectingMedication: weightAffectingMedication,
                 healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
+                maintenanceWeekFromEpochDay: maintenanceWeekFromEpochDay,
+                reliefAnsweredEpochDay: reliefAnsweredEpochDay,
                 healthCheckSkipCount: healthCheckSkipCount,
                 creatineStartedEpochDay: creatineStartedEpochDay,
               ),
@@ -9415,6 +9585,8 @@ class $$SetupsTableTableManager
                 Value<bool> bariatricSurgery = const Value.absent(),
                 Value<bool> weightAffectingMedication = const Value.absent(),
                 Value<int?> healthCheckConfirmedEpochDay = const Value.absent(),
+                Value<int?> maintenanceWeekFromEpochDay = const Value.absent(),
+                Value<int?> reliefAnsweredEpochDay = const Value.absent(),
                 Value<int> healthCheckSkipCount = const Value.absent(),
                 Value<int?> creatineStartedEpochDay = const Value.absent(),
               }) => SetupsCompanion.insert(
@@ -9444,6 +9616,8 @@ class $$SetupsTableTableManager
                 bariatricSurgery: bariatricSurgery,
                 weightAffectingMedication: weightAffectingMedication,
                 healthCheckConfirmedEpochDay: healthCheckConfirmedEpochDay,
+                maintenanceWeekFromEpochDay: maintenanceWeekFromEpochDay,
+                reliefAnsweredEpochDay: reliefAnsweredEpochDay,
                 healthCheckSkipCount: healthCheckSkipCount,
                 creatineStartedEpochDay: creatineStartedEpochDay,
               ),

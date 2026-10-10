@@ -32,7 +32,10 @@ DailyTargets computeTargets(TargetInputs i) => computeTargetsTraced(i).targets;
   }
 
   var rate = _weeklyRate(mode, i, safetyBf);
-  if (rate < 0 &&
+  if (rate < 0 && i.breakRequested) {
+    rate = 0;
+    flags.add(TargetFlag.requestedBreak);
+  } else if (rate < 0 &&
       i.consecutiveDeficitWeeks >= SafetyBounds.maxContinuousDeficitWeeks) {
     rate = 0;
     flags.add(TargetFlag.dietBreak);
@@ -60,6 +63,7 @@ DailyTargets computeTargets(TargetInputs i) => computeTargetsTraced(i).targets;
     // ordinary changes keep the limit.
     final exemptRaise =
         (flags.contains(TargetFlag.dietBreak) ||
+            flags.contains(TargetFlag.requestedBreak) ||
             flags.contains(TargetFlag.underweightMaintenance) ||
             flags.contains(TargetFlag.modeNotAllowed)) &&
         kcal > previous.kcal;

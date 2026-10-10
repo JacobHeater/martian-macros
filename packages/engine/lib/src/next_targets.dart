@@ -27,6 +27,7 @@ import 'tdee_status.dart';
 /// - Otherwise at most every [checkInIntervalDays]. Adaptive changes wait
 ///   out the calibration period and a holding estimator; a raise for a
 ///   too-fast loss (MM-115) does not.
+/// - A maintenance week the user asked for: immediate (MM-117).
 /// - Never during a pause, and not at a weekly check-in until
 ///   [checkInIntervalDays] after one ends (MM-148).
 TargetsRecord? nextTargets({
@@ -50,6 +51,7 @@ TargetsRecord? nextTargets({
     DailyTargets? previous,
     int deficitWeeks = 0,
     double safetyRaiseKcal = 0,
+    bool breakRequested = false,
     ExplanationTrigger trigger = ExplanationTrigger.checkIn,
   }) {
     final traced = computeTargetsTraced(
@@ -69,6 +71,7 @@ TargetsRecord? nextTargets({
         requestedLossFraction: setup.requestedLossFraction,
         safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal: safetyRaiseKcal,
+        breakRequested: breakRequested,
       ),
     );
     final targets = traced.targets;
@@ -162,6 +165,17 @@ TargetsRecord? nextTargets({
       ),
       trigger: ExplanationTrigger.appRuleUpdate,
     );
+  }
+
+  // A maintenance week the user asked for starts at once (MM-117). It is a
+  // set of targets like any other, so the next check-in is a week later,
+  // and being at maintenance it ends the unbroken deficit.
+  final breakFrom = setup.maintenanceWeekFrom;
+  if (breakFrom != null &&
+      !today.isBefore(breakFrom) &&
+      breakFrom.daysUntil(today) < checkInIntervalDays &&
+      last.effectiveFrom.isBefore(breakFrom)) {
+    return build(previous: last.targets, breakRequested: true);
   }
 
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return null;

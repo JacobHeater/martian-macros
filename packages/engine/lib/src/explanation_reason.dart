@@ -48,4 +48,7 @@ enum ExplanationReason {
 
   /// Targets made before explanations were recorded.
   noExplanationRecorded,
+
+  /// A maintenance week the user chose to take (MM-117).
+  requestedBreak,
 }
