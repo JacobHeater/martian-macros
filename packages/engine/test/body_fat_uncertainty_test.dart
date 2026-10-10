@@ -169,6 +169,7 @@ void main() {
         trendWeightKg: base.trendWeightKg,
         bodyFat: estimate,
         bmrKcal: base.bmrKcal,
+        calorieFloorKcal: base.calorieFloorKcal,
         tdee: base.tdee,
         confidence: base.confidence,
         recommendation: base.recommendation,

@@ -1,6 +1,6 @@
 ---
 id: MM-123
-status: proposed
+status: in-progress
 component: macro-targets
 related: [MM-119, MM-41, MM-92, MM-98, MM-107, MM-108, MM-121, MM-124, MM-149, MM-153]
 ---
@@ -85,3 +85,11 @@ Scenario: Exact display
 - MM-41's acceptance criteria use exact figures ("0 of 2,473 kcal"). When this ships that ticket's display examples are superseded; its
   behavior is not.
 - The band must never make a day *below the floor* read as "on target" (MM-114, MM-149).
+
+## Progress
+Built: the band itself, in the engine: `CalorieBand` (the larger of 5% and 100 kcal either side of the target) and `intakeStandingOf`
+(below, on target, above, and below the floor, which is never on target). The adherence summary (MM-149) uses it. Tested in the
+engine's `adherence_summary_test.dart`.
+
+Not built: display rounding of targets, the band drawn on the calorie bar, "on target" wording on the day's card, the dismissible
+line about label accuracy, and the exact-targets setting. No screen's daily figures have changed.
