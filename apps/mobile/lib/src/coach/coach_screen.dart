@@ -26,6 +26,7 @@ import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
 import 'target_flag_message.dart';
+import 'under_eating_notice.dart';
 
 /// What the engine believes, why, and what it will do next.
 class CoachScreen extends ConsumerWidget {
@@ -60,6 +61,7 @@ class CoachScreen extends ConsumerWidget {
               text: caution.message,
             ),
           ),
+        const UnderEatingNotice(),
         if (current != null)
           MmHeroSurface(
             child: Column(

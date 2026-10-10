@@ -12,6 +12,7 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
 import 'calorie_hero.dart';
+import 'ask_low_day_complete.dart';
 import 'copy_entries.dart';
 import 'entries_copied_to.dart';
 import 'easy_to_miss_line.dart';
@@ -124,12 +125,24 @@ class FoodScreen extends ConsumerWidget {
             selected: {
               if (completeness != DayCompleteness.unmarked) completeness,
             },
-            onChanged: (s) => ref
-                .read(dayMarkWriterProvider)
-                .setCompleteness(
-                  day,
-                  s.isEmpty ? DayCompleteness.unmarked : s.first,
-                ),
+            onChanged: (s) async {
+              var mark = s.isEmpty ? DayCompleteness.unmarked : s.first;
+              // A day under half the floor is asked about once, as it is
+              // marked (MM-114).
+              final floor = ref.read(coachProvider)?.calorieFloorKcal;
+              final logged = entries.fold<double>(0, (t, e) => t + e.kcal);
+              if (mark == DayCompleteness.complete &&
+                  floor != null &&
+                  logged < floor / 2) {
+                final answer = await askLowDayComplete(
+                  context,
+                  loggedKcal: logged,
+                );
+                if (answer == null) return;
+                mark = answer;
+              }
+              await ref.read(dayMarkWriterProvider).setCompleteness(day, mark);
+            },
           ),
           const SizedBox(height: 8),
           if (completeness == DayCompleteness.complete)
