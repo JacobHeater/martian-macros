@@ -1,6 +1,6 @@
 ---
 id: MM-92
-status: proposed
+status: in-progress
 component: app-shell
 related: [MM-89, MM-11, MM-32, MM-33, MM-77]
 ---
@@ -54,3 +54,25 @@ Scenario: Never
 
 ## Notes
 - The last scenario is a rule for every future feature, not only this one. A reviewer should reject a pull request that breaks it.
+
+## Progress
+Built:
+- **The logging streak** (`loggingStreakOf`, pure): whole days in a row, counted by the same rule the adherence summary and the
+  expenditure estimate use (`usableIntakeDays`), so nothing is rewarded that is not counted elsewhere. How much was eaten does not
+  matter: a test logs the same run at 1,700 and 2,800 kcal and gets the same streak.
+- **One missed day in seven is forgiven**: a second miss within a week breaks the streak, keeping the days before it. Two misses a
+  full week apart are two different weeks. Two days missed running break it at once.
+- **A pause neither counts nor breaks it** (MM-148), and does not use up the forgiven day. Today is never a miss.
+- **A quiet line on the Dashboard**, "Your logging": "7 whole days logged in a row. A missed day is forgiven, once a week." Said from
+  three days. No confetti and no notification. A test forbids "lowest", "deficit", "under target", "lost", "weight", "record", "best",
+  "kcal" and "calories" in it.
+- **Eating-disorder history**: the line is about logging only and never about weight, so it is shown to everyone.
+- Thresholds are in `StreakRule`. Tests: `logging_streak_test.dart` (engine) and `process_rewards_test.dart` (app).
+
+Not built:
+- **Protein days and weigh-ins as rewards**: the adherence card on the Coach screen already shows both as plain counts; no
+  acknowledgement was added. A weigh-in count is left out of rewards altogether, as it can pull attention to the scale.
+- **Workouts and personal records**: they need the training log (MM-75, MM-77), so "the loudest moment in the app" does not exist yet.
+- **The weekly and monthly summaries** (MM-33) do not mention the streak yet.
+- A streak is computed from the last 60 days of food, so it cannot read past 60.
+- Not checked on a device.
