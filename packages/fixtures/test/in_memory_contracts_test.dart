@@ -34,6 +34,10 @@ void main() {
     'In-memory',
     () => InMemoryRepositories().reminders,
   );
+  recoveryCheckInRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().recovery,
+  );
   intakeReaderContract('In-memory', () {
     final r = InMemoryRepositories();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);

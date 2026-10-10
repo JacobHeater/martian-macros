@@ -54,6 +54,14 @@ void preferencesRepositoryContract(
       expect(await repo.watchUnderEatingDismissedOn().first, day.addDays(1));
     });
 
+    test('the recovery check-in is not skipped until it is', () async {
+      expect(await repo.watchRecoveryCheckInSkippedOn().first, isNull);
+      final day = CalendarDate(2026, 10, 5);
+      await repo.saveRecoveryCheckInSkippedOn(day);
+      await repo.saveThemePreference(ThemePreference.dark);
+      expect(await repo.watchRecoveryCheckInSkippedOn().first, day);
+    });
+
     test('the easy-to-miss line is on and never shown until changed', () async {
       final p = await repo.watchEasyToMiss().first;
       expect(p.enabled, isTrue);

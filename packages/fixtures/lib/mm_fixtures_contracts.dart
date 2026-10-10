@@ -16,6 +16,7 @@ export 'src/contracts/insight_log_repository_contract.dart';
 export 'src/contracts/intake_reader_contract.dart';
 export 'src/contracts/pause_repository_contract.dart';
 export 'src/contracts/preferences_repository_contract.dart';
+export 'src/contracts/recovery_check_in_repository_contract.dart';
 export 'src/contracts/reminder_repository_contract.dart';
 export 'src/contracts/setup_repository_contract.dart';
 export 'src/contracts/targets_history_repository_contract.dart';

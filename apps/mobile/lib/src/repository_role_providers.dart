@@ -80,6 +80,22 @@ final reminderWriterProvider = Provider<ReminderWriter>(
   (ref) => ref.watch(reminderRepositoryProvider),
 );
 
+final recoveryCheckInReaderProvider = Provider<RecoveryCheckInReader>(
+  (ref) => ref.watch(recoveryCheckInRepositoryProvider),
+);
+
+final recoveryCheckInWriterProvider = Provider<RecoveryCheckInWriter>(
+  (ref) => ref.watch(recoveryCheckInRepositoryProvider),
+);
+
+final recoverySkipReaderProvider = Provider<RecoverySkipReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final recoverySkipWriterProvider = Provider<RecoverySkipWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );

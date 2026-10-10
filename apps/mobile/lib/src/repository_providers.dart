@@ -59,6 +59,10 @@ final reminderRepositoryProvider = Provider<ReminderRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).reminders,
 );
 
+final recoveryCheckInRepositoryProvider = Provider<RecoveryCheckInRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).recovery,
+);
+
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );

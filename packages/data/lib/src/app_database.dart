@@ -9,6 +9,7 @@ import 'insight_log.dart';
 import 'migration_step.dart';
 import 'pauses.dart';
 import 'recipe_ingredients.dart';
+import 'recovery_check_ins.dart';
 import 'reminders.dart';
 import 'schema_migration_exception.dart';
 import 'setups.dart';
@@ -35,6 +36,7 @@ part 'app_database.g.dart';
     InsightLog,
     Pauses,
     Reminders,
+    RecoveryCheckIns,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -42,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 21;
+  static const currentSchemaVersion = 22;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -229,6 +231,23 @@ class AppDatabase extends _$AppDatabase {
     // 20 to 21: reminder settings (MM-146).
     20: (m) async {
       await m.createTable(reminders);
+    },
+    // 21 to 22: the weekly recovery check-in and when it was last skipped
+    // (MM-116).
+    21: (m) async {
+      await m.createTable(recoveryCheckIns);
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(user_preferences)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('recovery_check_in_skipped_epoch_day')) {
+        await m.addColumn(
+          userPreferences,
+          userPreferences.recoveryCheckInSkippedEpochDay,
+        );
+      }
     },
   };
 
