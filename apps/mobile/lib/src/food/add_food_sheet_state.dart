@@ -153,7 +153,12 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     if (calc != null) {
       return amount == null || _unit == null
           ? null
-          : scaleNutrition(amount, _unit!, calc);
+          : scaleNutrition(
+              amount,
+              _unit!,
+              calc,
+              hand: ref.read(handSizeProvider),
+            );
     }
     final energy = _energy;
     if (energy == null) return null;
@@ -236,6 +241,15 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   QuantitySource get _calcMethod {
     final unit = _unit!;
     if (unit.isWeight) return QuantitySource.weighed;
+    switch (unit) {
+      case PortionUnit.palm:
+        return QuantitySource.palm;
+      case PortionUnit.cuppedHand:
+        return QuantitySource.cuppedHand;
+      case PortionUnit.thumb:
+        return QuantitySource.thumb;
+      default:
+    }
     if (unit == PortionUnit.serving) {
       return _source == QuantitySource.householdMeasure
           ? QuantitySource.householdMeasure
@@ -255,6 +269,15 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         unit: _unit,
         reference: calc,
         origin: widget.entry?.portion?.origin,
+        impliedGrams: _unit?.isHand == true
+            ? gramsFor(
+                _amount ?? 0,
+                _unit!,
+                calc,
+                hand: ref.read(handSizeProvider),
+              )
+            : null,
+        handModelVersion: _unit?.isHand == true ? HandModel.version : null,
       );
     }
     if (_source == QuantitySource.quickAdd) {
@@ -687,15 +710,30 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   /// An entry calculated from a food's own numbers: change the amount and the
   /// totals follow, or type the totals yourself.
   List<Widget> _calculatedFields(TextTheme text, ReferenceNutrition calc) {
-    final candidates = [
-      PortionUnit.serving,
-      PortionUnit.gram,
-      PortionUnit.ounce,
-      PortionUnit.cup,
-      PortionUnit.tablespoon,
-      PortionUnit.teaspoon,
-      PortionUnit.milliliter,
-    ].where((u) => scaleNutrition(1, u, calc) != null).toList();
+    final candidates =
+        [
+              PortionUnit.serving,
+              PortionUnit.gram,
+              PortionUnit.ounce,
+              PortionUnit.cup,
+              PortionUnit.tablespoon,
+              PortionUnit.teaspoon,
+              PortionUnit.milliliter,
+              PortionUnit.palm,
+              PortionUnit.cuppedHand,
+              PortionUnit.thumb,
+            ]
+            .where(
+              (u) =>
+                  scaleNutrition(
+                    1,
+                    u,
+                    calc,
+                    hand: ref.read(handSizeProvider),
+                  ) !=
+                  null,
+            )
+            .toList();
     final unit = _unit;
     final amount = _amount;
     return [

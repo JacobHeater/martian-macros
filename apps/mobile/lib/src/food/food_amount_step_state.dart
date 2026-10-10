@@ -6,6 +6,7 @@ import 'package:mm_food_catalog/mm_food_catalog.dart';
 import '../format/meal_label.dart';
 import '../format/portion_unit_label.dart';
 import '../format/quantity_text.dart';
+import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
@@ -32,6 +33,11 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         for (final s in widget.servings) AmountChoice(PortionUnit.serving, s),
         const AmountChoice(PortionUnit.gram, null),
         const AmountChoice(PortionUnit.ounce, null),
+        if (ref.read(handSizeProvider) != null) ...const [
+          AmountChoice(PortionUnit.palm, null),
+          AmountChoice(PortionUnit.cuppedHand, null),
+          AmountChoice(PortionUnit.thumb, null),
+        ],
       ];
     }
     final grams = custom.servingGrams;
@@ -108,18 +114,34 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
 
   NutritionTotals? get _totals {
     final q = _amount;
-    return q == null ? null : scaleNutrition(q, _choice.unit, _reference);
+    return q == null
+        ? null
+        : scaleNutrition(
+            q,
+            _choice.unit,
+            _reference,
+            hand: ref.read(handSizeProvider),
+          );
   }
 
   double? get _grams {
     final q = _amount;
-    return q == null ? null : gramsFor(q, _choice.unit, _reference);
+    return q == null
+        ? null
+        : gramsFor(
+            q,
+            _choice.unit,
+            _reference,
+            hand: ref.read(handSizeProvider),
+          );
   }
 
   /// A label serving from a packaged product is recorded as one; a serving of
   /// a generic food is a household measure; a weight is a weighing.
   QuantitySource get _method {
     if (_choice.unit.isWeight) return QuantitySource.weighed;
+    final hand = _handMethod(_choice.unit);
+    if (hand != null) return hand;
     final packaged =
         widget.custom != null ||
         _food.source == 'usda_branded' ||
@@ -128,6 +150,13 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         ? QuantitySource.labelServing
         : QuantitySource.householdMeasure;
   }
+
+  static QuantitySource? _handMethod(PortionUnit unit) => switch (unit) {
+    PortionUnit.palm => QuantitySource.palm,
+    PortionUnit.cuppedHand => QuantitySource.cuppedHand,
+    PortionUnit.thumb => QuantitySource.thumb,
+    _ => null,
+  };
 
   String _n(double v) => v.round().toString();
 
@@ -180,6 +209,8 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
               quantity: _amount,
               unit: _choice.unit,
               reference: _reference,
+              impliedGrams: _choice.unit.isHand ? _grams : null,
+              handModelVersion: _choice.unit.isHand ? HandModel.version : null,
               origin: FoodOrigin(
                 packId: food.packId,
                 foodId: food.id,

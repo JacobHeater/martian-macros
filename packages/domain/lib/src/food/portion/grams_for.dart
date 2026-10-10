@@ -1,3 +1,5 @@
+import '../hand/hand_model.dart';
+import '../hand/hand_size.dart';
 import 'portion_unit.dart';
 import 'reference_nutrition.dart';
 
@@ -7,15 +9,26 @@ import 'reference_nutrition.dart';
 /// A weight is exact. A volume converts only through the food's own density,
 /// or through a serving the source defines in both volume and weight; there is
 /// no generic density. A serving converts only when it has a gram weight. A
-/// hand portion never converts here: it needs the hand model (MM-46).
+/// hand portion converts through the hand model, and only when [hand] is
+/// given (MM-46).
 double? gramsFor(
   double quantity,
   PortionUnit unit,
-  ReferenceNutrition reference,
-) {
+  ReferenceNutrition reference, {
+  HandSize? hand,
+}) {
   final servingGrams0 = reference.servingGrams;
   if (servingGrams0 != null && unit == reference.servingUnit) {
     return quantity * servingGrams0;
+  }
+  if (unit.isHand) {
+    if (hand == null) return null;
+    final each = HandModel.gramsOf(
+      unit,
+      hand,
+      densityGPerMl: reference.densityGPerMl,
+    );
+    return each == null ? null : quantity * each;
   }
   final weight = unit.grams;
   if (weight != null) return quantity * weight;

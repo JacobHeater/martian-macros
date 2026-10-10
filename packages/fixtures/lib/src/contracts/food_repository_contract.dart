@@ -143,6 +143,28 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
             ),
           ),
         );
+        final byPalm = await repo.addFood(
+          FoodEntry(
+            id: 0,
+            date: d1,
+            meal: Meal.dinner,
+            name: 'Chicken',
+            kcal: 250,
+            proteinG: 47,
+            carbsG: 0,
+            fatG: 5,
+            source: QuantitySource.palm,
+            portion: const Portion(
+              method: QuantitySource.palm,
+              basis: NutritionBasis.calculated,
+              quantity: 1.5,
+              unit: PortionUnit.palm,
+              reference: reference,
+              impliedGrams: 150,
+              handModelVersion: 1,
+            ),
+          ),
+        );
         final typed = await repo.addFood(
           FoodEntry(
             id: 0,
@@ -187,6 +209,9 @@ void foodRepositoryContract(String name, FoodRepository Function() create) {
           ),
         );
         expect(byId[typed]!.portion!.origin, isNull);
+        expect(byId[byPalm]!.portion!.impliedGrams, 150);
+        expect(byId[byPalm]!.portion!.handModelVersion, 1);
+        expect(c.impliedGrams, isNull);
         expect(byId[calculated]!.kcal, 240, reason: 'totals stay as logged');
 
         final t = byId[typed]!.portion!;
