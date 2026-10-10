@@ -15,11 +15,13 @@ Last updated: 2026-10-10, by Copilot, during the Dashboard pivot.
 
 **Branch state.** Handoff PR #61 and phone-shortcut PR #62 are merged.
 Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
-`feature/mm176-dashboard-metrics`. No unrelated roadmap work is being started.
+`feature/mm176-dashboard-metrics`, draft PR #63. The combined delivery includes
+the Food pie, meal-card/vector-control refinements and flat FAB. No unrelated
+roadmap work is being started.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-182 (`mm req next` is the authority).
+**Next ticket ID.** MM-183 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -87,6 +89,9 @@ private notes; they bind whoever picks up the work.
   Seeded Dashboard summary, nutrition, measurements and coaching plus Food
   cards and the flat FAB were inspected on the Android emulator in both themes.
   Linux screenshot regeneration and PR checks are still pending.
+- Draft PR #63 packages the complete original request and refinements.
+  Linux Update goldens run 38024455576 was dispatched; download/review/commit
+  its images before marking the PR ready.
 - MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
   MM-180 splits the food log into separate meal cards at the owner's request.
 - The owner refined MM-180: expanded-by-default independent accordions,
@@ -96,9 +101,11 @@ private notes; they bind whoever picks up the work.
 - MM-180 controls now use centered stroked vector paths, not icon-font glyphs.
   MM-181 removes the floating Add food button's glow/shadow in both themes,
   including hover/focus/pressed elevation, at the owner's explicit request.
-- Emulator inspection found a low-contrast demo notice in light mode; its
-  tightly coupled regression fix is delegated to the original demo implementer.
-  No unrelated roadmap work is in scope.
+- MM-182 fixes the demo notice's low contrast in light mode with an explicit
+  full-width themed background and contrasting foreground. Both regression
+  cases failed before the fix and now pass; identity/seeding are unchanged.
+  Its updated device appearance has not yet been rechecked. No unrelated
+  roadmap work is in scope.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
