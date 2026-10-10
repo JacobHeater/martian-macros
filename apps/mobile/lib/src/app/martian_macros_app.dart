@@ -25,7 +25,7 @@ class MartianMacrosApp extends ConsumerWidget {
     final preference =
         ref.watch(themePreviewProvider) ??
         ref.watch(themePreferenceProvider).value ??
-        ThemePreference.unselected;
+        ThemePreference.system;
     final martian =
         preference == ThemePreference.martian ||
         preference == ThemePreference.unselected;

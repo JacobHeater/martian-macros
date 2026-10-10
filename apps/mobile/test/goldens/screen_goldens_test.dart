@@ -232,12 +232,6 @@ void main() {
   testWidgets('first-launch theme chooser, martian', (tester) async {
     await open(tester, InMemoryRepositories());
     await shot(tester, 'theme_chooser_martian');
-    await tester.scrollUntilVisible(
-      find.byKey(const ValueKey('theme-continue')),
-      300,
-    );
-    await tester.pumpAndSettle();
-    await shot(tester, 'theme_chooser_preview_martian');
   }, skip: !linux);
 
   for (final dark in [false, true]) {

@@ -1,6 +1,6 @@
 ---
 id: MM-184
-status: in-progress
+status: done
 component: design-system
 related: [MM-102, MM-181]
 ---
@@ -55,3 +55,22 @@ Scenario: Storage failures
   Given theme preferences fail to load or save
   Then an explicit failure is shown without claiming the choice was saved
 ```
+
+## Progress
+Implemented Martian tokens and shared component styling, live first-launch
+preview/confirmation, persistent Settings choices and explicit storage
+failure/retry states. Schema 24 preserves every old theme and uses System
+for absent legacy rows; fresh installations and full data erasure await choice.
+
+Full `mm check` passes. Repository contracts run against Drift and fixtures.
+Migration tests cover all 23 released schemas and every legacy preference.
+Theme tests verify all existing contrast and macro grayscale thresholds.
+Startup tests cover preview without persistence, confirmation, reopening,
+legacy preferences, loading/errors and save retries. MM-185 and MM-186
+regressions failed before their fixes and pass afterward.
+
+Martian Dashboard, Food, Settings and chooser were inspected on the Android
+emulator using only the isolated synthetic demo. Live Light preview and
+continuing to onboarding were checked. Linux Update goldens run `38025912745`
+passed; reviewed screenshots are committed with the delivery. Physical phone
+and iOS behavior were not tested.
