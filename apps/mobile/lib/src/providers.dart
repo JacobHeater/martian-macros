@@ -233,6 +233,57 @@ final mealProteinProvider = Provider<Map<CalendarDate, Map<Meal, double>>>((
   };
 });
 
+/// The monthly reports that are ready (MM-33), oldest first.
+final reportPeriodsProvider = Provider<List<ReportPeriod>>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  if (setup == null) return const [];
+  return reportPeriods(
+    onboardedOn: setup.onboardedOn,
+    today: ref.watch(todayProvider),
+  );
+});
+
+/// Food for a whole report period, read from the log rather than the last
+/// 60 days the engine uses, so an old report can be reread (MM-33).
+final _reportIntakeProvider = StreamProvider.family<List<IntakeDay>, int>((
+  ref,
+  index,
+) {
+  final periods = ref.watch(reportPeriodsProvider);
+  if (index >= periods.length) return Stream.value(const []);
+  return ref
+      .watch(intakeReaderProvider)
+      .watchIntakeDays(since: periods[index].from);
+});
+
+/// One monthly report, built from stored history; null until it is ready
+/// or while its data loads (MM-33).
+final monthlyReportProvider = Provider.family<MonthlyReport?, int>((
+  ref,
+  index,
+) {
+  final periods = ref.watch(reportPeriodsProvider);
+  final intake = ref.watch(_reportIntakeProvider(index)).value;
+  final weights = ref.watch(weightsProvider).value;
+  final waist = ref.watch(waistProvider).value;
+  final history = ref.watch(targetsHistoryProvider).value;
+  if (index >= periods.length ||
+      intake == null ||
+      weights == null ||
+      waist == null ||
+      history == null) {
+    return null;
+  }
+  return buildMonthlyReport(
+    period: periods[index],
+    intake: intake,
+    weights: weights,
+    waist: waist,
+    history: history,
+    trend: ref.watch(coachProvider)?.trend ?? const [],
+  );
+});
+
 /// How many whole days the user has logged in a row (MM-92).
 final loggingStreakProvider = Provider<LoggingStreak>((ref) {
   final intake = ref.watch(intakeDaysProvider).value ?? const [];
