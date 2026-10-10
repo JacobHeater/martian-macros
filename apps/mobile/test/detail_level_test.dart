@@ -68,4 +68,39 @@ void main() {
     expect(stored.single.carbsG, 40);
     expect(stored.single.fatG, 1);
   });
+
+  testWidgets(
+    'the fiber line shows at Full, with its guide, never at Standard',
+    (tester) async {
+      await openFood(tester);
+      expect(find.byKey(const ValueKey('fiber-line')), findsNothing);
+    },
+  );
+
+  testWidgets('Full shows fiber against the guide', (tester) async {
+    await repos.preferences.saveDetailLevel(DetailLevel.full);
+    await openFood(tester);
+    expect(find.textContaining('Fiber: 16 g · guide'), findsOneWidget);
+  });
+
+  testWidgets('too little fiber data says so rather than a total', (
+    tester,
+  ) async {
+    await repos.food.addFood(
+      FoodEntry(
+        id: 0,
+        date: today,
+        meal: Meal.dinner,
+        name: 'Typed meal',
+        kcal: 800,
+        proteinG: 30,
+        carbsG: 80,
+        fatG: 30,
+        source: QuantitySource.quickAdd,
+      ),
+    );
+    await repos.preferences.saveDetailLevel(DetailLevel.full);
+    await openFood(tester);
+    expect(find.text('Fiber: not enough data'), findsOneWidget);
+  });
 }
