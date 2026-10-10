@@ -47,6 +47,29 @@ agent left in flight and what the product owner has ruled in conversation.
 - Report uncertainty and limitations plainly. Do not claim a check or behavior
   was verified unless you actually verified it.
 
+## Delivery workflow (standing rules from the product owner)
+
+- Work through the roadmap without waiting to be asked. Commit, push, open
+  pull requests with `gh`, and merge them yourself (`gh pr merge --merge`) once
+  CI is green. The owner does not want to be involved in that.
+- Check open pull requests at the start and at the end of each session or
+  turn: merge the green ones, and fix a failing one in a follow-up. Never sit
+  waiting on CI in the middle of a session.
+- Create the feature branch from a fresh `main` before editing anything. Stage
+  files by name, never `git add -A`. No stash juggling. Never switch branches
+  while a build is running. If work depends on an unmerged pull request, stack
+  on it deliberately and say "builds on #N" in the description.
+- `mm check` has passed only when its exit code is 0 and its last line is
+  "All checks passed." A tail reading "All tests passed!" can belong to one
+  package while another failed.
+- A change to how a screen looks is not done until you have looked at it on the
+  emulator (or say plainly that you did not). How the app looks matters as much
+  as what it does.
+- Check a new native plugin with a release build, not only a debug one.
+- Bugs found in passing still follow the rule above; the owner will walk
+  through bugs and regressions at acceptance testing at the end, and until then
+  the focus is roadmap items and features.
+
 ## Project map and conventions
 
 - `apps/mobile/` is the Flutter UI.
@@ -136,5 +159,5 @@ unverified.
 Before finishing, review the diff for unintended changes and ensure the
 requirements, implementation, and tests agree. Update
 [requirements/HANDOFF.md](requirements/HANDOFF.md). Summarize the changes and list
-the checks actually run, including any failures or omissions. Do not commit or
-push unless explicitly asked.
+the checks actually run, including any failures or omissions. Commit and push
+per the delivery workflow above.
