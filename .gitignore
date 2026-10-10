@@ -33,3 +33,6 @@ tools/food_pipeline/out/
 
 # Food pipeline: downloaded sources and built packs (MM-52)
 .food_cache/
+
+# Kotlin compiler session files
+.kotlin/

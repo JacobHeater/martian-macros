@@ -46,7 +46,10 @@ class CalorieHero extends ConsumerWidget {
     final level = ref.watch(detailLevelProvider).value ?? DetailLevel.standard;
     final macros = level.showsCarbsAndFat
         ? this.macros
-        : [for (final m in this.macros) if (m == MacroKind.protein) m];
+        : [
+            for (final m in this.macros)
+              if (m == MacroKind.protein) m,
+          ];
     final t = targets;
     final left = t == null ? null : t.kcal - intake.kcal;
     final over = left != null && left < 0;
