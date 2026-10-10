@@ -1,6 +1,6 @@
 # WS-09: Coaching intelligence and adherence
 
-**Order** 9 · **Group** C · **State** not started · **Risk** high
+**Order** 9 · **Group** C · **State** in progress · **Risk** high
 
 ## Summary
 Everything the coach says and does beyond the weekly number: adherence,
@@ -135,8 +135,15 @@ workstream, steps 2 and 3 can overlap once step 1 is done, and step 4 is
 independent of step 3.
 
 ## Requirement sources
-- Remaining: MM-149, MM-147, MM-114, MM-141, MM-140, MM-148, MM-146, MM-116,
-  MM-117, MM-133, MM-32, MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
+- In progress: MM-149 (the weekly summary as five facts on the Coach screen;
+  not yet beside the check-in summary or in a report), MM-114 (the
+  under-eating notice, its one-tap fix and its 14-day quiet; the support line
+  for an eating-disorder history awaits the wording review), MM-147 (gap
+  detection, the welcome-back screen, the deficit-count restart and the
+  starting estimate after a long gap; confidence after a short gap, the goal
+  re-confirmation and the chart are open).
+- Remaining: MM-141, MM-140, MM-148, MM-146, MM-116, MM-117, MM-133, MM-32,
+  MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `coach.dart`. Do not add branches
