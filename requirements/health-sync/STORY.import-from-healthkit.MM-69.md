@@ -2,7 +2,7 @@
 id: MM-69
 status: proposed
 component: health-sync
-related: [MM-66, MM-67, MM-14, MM-68, MM-71, MM-72]
+related: [MM-66, MM-67, MM-14, MM-68, MM-71, MM-72, MM-188, MM-189]
 ---
 
 # Story: Import from Apple Health
