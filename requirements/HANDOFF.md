@@ -15,14 +15,13 @@ Last updated: 2026-10-10, by Copilot, while previewing the Martian palette.
 
 **Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
 delivery is in PR #63, ready for review with its final CI still pending.
-The owner requested a preview-only retro '90s theme named Martian in
-`design/palette-preview.html`. It is on `design/martian-palette-preview`,
-branched independently from fresh main. No Flutter theme or data changes.
+The owner approved the retro '90s Martian palette as the new-install default,
+with a first-launch theme chooser for new installations only. Existing
+choices must be preserved. `design/martian-palette-preview` now builds on #63.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** Main currently reports MM-176; PR #63 reserves MM-176
-through MM-183. Avoid reusing those IDs while that PR is in flight.
+**Next ticket ID.** MM-184 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -45,6 +44,9 @@ ticket's "Progress" section says what was and was not checked.
 
 **Standing rules from the product owner that are not in `AGENTS.md`.** These were given in conversation and held in one agent's
 private notes; they bind whoever picks up the work.
+- Current priority is a metrics-heavy Dashboard with a full existing-data
+  overview. The owner chose a separate demo app/database for repeatable
+  synthetic seeding; never overwrite the normal app's data.
 - Work through the roadmap without waiting to be asked. Open pull requests with `gh`, and merge them yourself (`--merge`) once CI is
   green. The owner does not want to be involved in that.
 - Do not sit waiting on CI in the middle of a session. Check open pull requests at the start and the end of each turn, merge the
@@ -80,8 +82,9 @@ private notes; they bind whoever picks up the work.
 - Owner now wants to preview an extra theme, Martian, before implementing it.
   Added deep grape, acid lime, cyan, pink and violet to the static palette
   preview alongside unchanged Dark/Light palettes. Included notices, swatches,
-  grayscale and measured contrast checks. No app theme is implemented or
-  approved yet; buttons intentionally have no incandescent glow.
+  grayscale and measured contrast checks. The owner approved implementation
+  as the new-install default with a first-launch chooser. Buttons intentionally
+  have no incandescent glow.
 - Browser-verified the preview at desktop and 375 px phone widths with no
   horizontal overflow. All seven displayed contrast spot checks pass; no
   external resources are loaded. `mm req` and diff whitespace checks pass.
@@ -94,6 +97,41 @@ private notes; they bind whoever picks up the work.
   connected physical phone over a running emulator and exited successfully;
   the app itself was not installed or launched during this verification.
 - No app data, database schema, or product feature behavior changes.
+- MM-175 added `mm run --env phone`: dev configuration with automatic physical
+  Android selection, never emulator fallback. Full checks passed; discovery
+  was verified on connected hardware without launching the app. PR #62 merged.
+- Owner pivoted to the Dashboard, explicitly superseding the sparse one-screen
+  direction. MM-176 adds a compact summary and 7/30-day nutrition, weight,
+  waist, coverage and coaching histories, plus separate recovery trends.
+- MM-177 supplies a repeatable synthetic seed in a separately identified demo
+  app/database. It must never seed or reset the normal app's data.
+- Integrated `mm check` passed (exit 0, "All checks passed.").
+  Populated/empty/loading/error/narrow-screen tests cover the Dashboard.
+  Seeded Dashboard summary, nutrition, measurements and coaching plus Food
+  cards and the flat FAB were inspected on the Android emulator in both themes.
+  Linux screenshot regeneration passed; populated/scrolled Dashboard and
+  expanded/collapsed Food images were downloaded, inspected and committed.
+  PR checks remain the final delivery gate.
+- Draft PR #63 packages the complete original request and refinements.
+  Linux Update goldens run 38024455576 passed; its changed images are included.
+- MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
+  MM-180 splits the food log into separate meal cards at the owner's request.
+- The owner refined MM-180: expanded-by-default independent accordions,
+  compact 12 dp outlined cards, and a separate tinted rounded-square Add action
+  beside a muted chevron. Add must not toggle the disclosure; tests cover
+  both collapsed and expanded states. Validation of this refinement is underway.
+- MM-180 controls now use centered stroked vector paths, not icon-font glyphs.
+  MM-181 removes the floating Add food button's glow/shadow in both themes,
+  including hover/focus/pressed elevation, at the owner's explicit request.
+- MM-182 fixes the demo notice's low contrast in light mode with an explicit
+  full-width themed background and contrasting foreground. Both regression
+  cases failed before the fix and now pass; identity/seeding are unchanged.
+  Its updated device appearance has not yet been rechecked. No unrelated
+  roadmap work is in scope.
+- Final Dart review found MM-183: Dashboard/Food could show ordinary targets
+  while pause history loaded or failed. Four regression cases failed before
+  adding explicit pause loading/error gates. Integrated `mm check` passed
+  afterward. Both review-discovered defects have tickets and regressions.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 

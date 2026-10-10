@@ -43,6 +43,10 @@ void main() {
   testWidgets('at Full, a lunch with 30 g carries the marker', (tester) async {
     await repos.preferences.saveDetailLevel(DetailLevel.full);
     await openFood(tester);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('protein-marker-lunch')),
+      200,
+    );
     expect(find.byKey(const ValueKey('protein-marker-lunch')), findsOneWidget);
     expect(find.textContaining('30 g protein'), findsOneWidget);
   });

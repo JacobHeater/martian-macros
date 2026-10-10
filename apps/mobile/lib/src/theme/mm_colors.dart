@@ -71,6 +71,9 @@ class MmColors extends ThemeExtension<MmColors> {
   final Color ember;
   final Color onEmber;
 
+  /// Owner-approved secondary Add affordance (MM-180), never a surface wash.
+  Color get addActionTint => ember.withValues(alpha: 0.15);
+
   /// The trend line and anything the engine estimated.
   final Color ion;
   final Color onIon;

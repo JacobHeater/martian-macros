@@ -366,6 +366,8 @@ void main() {
     );
     await openFood(tester);
     expect(find.text('Weighed · amount not recorded'), findsOneWidget);
+    await tester.ensureVisible(find.text('Old rice'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Old rice'));
     await tester.pumpAndSettle();
     expect(find.textContaining('logged without an amount'), findsOneWidget);
