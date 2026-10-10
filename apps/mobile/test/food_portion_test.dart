@@ -6,6 +6,7 @@ import 'package:mm_fixtures/mm_fixtures.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import 'support/pump_app.dart';
+import 'support/reveal_on_food_screen.dart';
 
 /// MM-167: quantity, unit and what the typed numbers are for, in the add-food
 /// sheet, the amount step and the editor.
@@ -253,6 +254,10 @@ void main() {
     expect(p.unit, PortionUnit.gram);
     expect(p.reference!.basis, ReferenceBasis.per100g);
     expect(p.reference!.nutrition.kcal, 89);
+    await revealOnFoodScreen(
+      tester,
+      find.textContaining('150 g · calculated from 89 kcal per 100 g'),
+    );
     expect(
       find.textContaining('150 g · calculated from 89 kcal per 100 g'),
       findsOneWidget,
@@ -273,8 +278,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('amount-log')));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Banana'));
-    await tester.pumpAndSettle();
+    await revealOnFoodScreen(tester, find.text('Banana'));
     await tester.tap(find.text('Banana'));
     await tester.pumpAndSettle();
     final field = tester.widget<TextField>(
@@ -309,8 +313,7 @@ void main() {
     final origin = (await logged(tester)).single.portion!.origin;
     expect(origin, isNotNull);
 
-    await tester.ensureVisible(find.text('Banana'));
-    await tester.pumpAndSettle();
+    await revealOnFoodScreen(tester, find.text('Banana'));
     await tester.tap(find.text('Banana'));
     await tester.pumpAndSettle();
     await type(tester, 'portion-quantity', '200');
@@ -330,12 +333,19 @@ void main() {
     await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
     await tester.tap(find.byKey(const ValueKey('food-save')));
     await tester.pumpAndSettle();
+    await revealOnFoodScreen(
+      tester,
+      find.textContaining(
+        '1.5 servings · calculated from 160 kcal per serving',
+      ),
+    );
     expect(
       find.textContaining(
         '1.5 servings · calculated from 160 kcal per serving',
       ),
       findsOneWidget,
     );
+    await revealOnFoodScreen(tester, find.text('Bar'));
     await tester.tap(find.text('Bar'));
     await tester.pumpAndSettle();
     final field = tester.widget<TextField>(
@@ -369,9 +379,12 @@ void main() {
       ),
     );
     await openFood(tester);
+    await revealOnFoodScreen(
+      tester,
+      find.text('Weighed · amount not recorded'),
+    );
     expect(find.text('Weighed · amount not recorded'), findsOneWidget);
-    await tester.ensureVisible(find.text('Old rice'));
-    await tester.pumpAndSettle();
+    await revealOnFoodScreen(tester, find.text('Old rice'));
     await tester.tap(find.text('Old rice'));
     await tester.pumpAndSettle();
     expect(find.textContaining('logged without an amount'), findsOneWidget);

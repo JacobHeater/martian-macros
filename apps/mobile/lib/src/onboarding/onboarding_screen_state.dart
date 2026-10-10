@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../format/parse_number.dart';
+import '../integration_providers.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/mm_button.dart';
@@ -147,7 +148,7 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _pickBirthDate() async {
-    final now = DateTime.now();
+    final now = ref.read(clockProvider).now();
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime(now.year - 30),
