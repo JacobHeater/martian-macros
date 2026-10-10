@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../format/meal_label.dart';
@@ -47,6 +48,16 @@ class MealSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
     final total = entries.fold(0.0, (sum, e) => sum + e.kcal);
+    final protein = entries.fold(0.0, (sum, e) => sum + e.proteinG);
+    // Full detail shows the protein of the meal and a quiet marker when it
+    // is a solid serving (MM-125). There is no per-meal target.
+    final full = (ref.watch(detailLevelProvider).value ?? DetailLevel.standard)
+        .showsExtras;
+    final weightKg = ref.watch(coachProvider)?.trendWeightKg;
+    final solid =
+        full &&
+        weightKg != null &&
+        mealHasSolidProtein(proteinG: protein, weightKg: weightKg);
     return Column(
       children: [
         Padding(
@@ -57,9 +68,37 @@ class MealSection extends ConsumerWidget {
               children: [
                 Text(meal.label, style: text.labelLarge),
                 const SizedBox(width: 8),
-                if (entries.isNotEmpty)
-                  Text(Fmt.kcal(total), style: text.bodySmall),
-                const Spacer(),
+                // The subtotal gives way before the buttons do, so a long
+                // one never pushes them off a narrow screen.
+                Expanded(
+                  child: Row(
+                    children: [
+                      if (entries.isNotEmpty)
+                        Flexible(
+                          child: Text(
+                            full
+                                ? '${Fmt.kcal(total)} · '
+                                      '${Fmt.grams(protein)} protein'
+                                : Fmt.kcal(total),
+                            style: text.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      if (solid)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Icon(
+                            Icons.check_circle_outline,
+                            key: ValueKey('protein-marker-${meal.name}'),
+                            size: 16,
+                            color: context.mm.text3,
+                            semanticLabel: 'A solid serving of protein',
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
                 if (entries.isNotEmpty && day != ref.watch(todayProvider))
                   MmIconButton(
                     tooltip: 'Copy ${meal.label.toLowerCase()} to today',

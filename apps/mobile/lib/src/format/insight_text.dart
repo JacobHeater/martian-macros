@@ -1,6 +1,8 @@
+import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import 'fmt.dart';
+import 'meal_label.dart';
 import 'stall_text.dart';
 
 /// The fixed words of each insight rule (MM-141), filled from the insight's
@@ -58,6 +60,20 @@ import 'stall_text.dart';
           ('Fully logged days', '${n('wholeDays')}'),
           ('Days at or above the minimum', '${n('metDays')}'),
           ('Average shortfall', '${n('averageShortfallG')} g'),
+        ],
+      );
+    case InsightRule.proteinByMeal:
+      final meal = Meal.values[n('meal')].label.toLowerCase();
+      return (
+        'Where the protein goes missing',
+        'On days you miss protein, $meal has almost none. Adding some '
+            'there is usually the easiest way to reach it. Spreading '
+            'protein over the day may help slightly; your daily total '
+            'matters much more.',
+        [
+          period,
+          ('Days under the minimum', '${n('missedDays')}'),
+          ('Of those, with almost none at $meal', '${n('lowDays')}'),
         ],
       );
     case InsightRule.stall:
