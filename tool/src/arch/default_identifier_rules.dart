@@ -64,4 +64,23 @@ const defaultIdentifierRules = <ForbiddenIdentifierRule>[
       'apps/mobile/lib/src/onboarding/welcome_step.dart',
     ],
   ),
+  // One clock (MM-190): the time comes from the app's Clock, so a test can
+  // fix the day and the hour. Reading the device's time anywhere else makes
+  // behavior, and tests, depend on when they run.
+  ForbiddenIdentifierRule(
+    appliesTo: 'apps/mobile/lib/',
+    identifiers: [_deviceTime],
+    reason: _oneClock,
+  ),
+  ForbiddenIdentifierRule(
+    appliesTo: 'packages/',
+    identifiers: [_deviceTime],
+    reason: _oneClock,
+    allowedPrefixes: ['packages/domain/lib/src/integration/system_clock.dart'],
+  ),
 ];
+
+const _deviceTime = r'DateTime\.now';
+const _oneClock =
+    'ask the Clock for the time (clockProvider in the app), never the device '
+    '(MM-190)';
