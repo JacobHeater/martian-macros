@@ -117,8 +117,8 @@ Built:
   both implementations, and the migration test.
 
 Not built:
-- Reminders are silent during a pause, and streaks neither advance nor break: reminders (MM-146) and process rewards (MM-92) do not
-  exist yet. Each must read the pause when it is built.
+- Streaks neither advance nor break: process rewards (MM-92) do not exist yet and must read the pause when built. (Reminders are
+  silent during a pause as of MM-146.)
 - Notices about training lapses (MM-134): not built either.
 - The glycogen rule at both ends of a pause (MM-131): the scale is not yet treated as settling when a pause starts or ends, beyond
   the sentence on the resume screen. The wording is this ticket's, not MM-130's, which is not built.

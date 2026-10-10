@@ -14,6 +14,7 @@ import '../format/fmt.dart';
 import '../format/coach_confidence_text.dart';
 import '../pause/pause_screen.dart';
 import '../providers.dart';
+import '../reminders/reminder_paused_notice.dart';
 import '../repository_role_providers.dart';
 import '../ui/macro_kind.dart';
 import 'coach_line_text.dart';
@@ -48,6 +49,7 @@ class DashboardScreen extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 112),
       children: [
         const UnderEatingNotice(),
+        const ReminderPausedNotice(),
         CalorieHero(
           intake: intakeDayFrom(today, entries),
           targets: pause != null
