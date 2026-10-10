@@ -273,6 +273,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('amount-log')));
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.text('Banana'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Banana'));
     await tester.pumpAndSettle();
     final field = tester.widget<TextField>(
@@ -307,6 +309,8 @@ void main() {
     final origin = (await logged(tester)).single.portion!.origin;
     expect(origin, isNotNull);
 
+    await tester.ensureVisible(find.text('Banana'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Banana'));
     await tester.pumpAndSettle();
     await type(tester, 'portion-quantity', '200');
