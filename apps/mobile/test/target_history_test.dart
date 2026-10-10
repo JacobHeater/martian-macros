@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
@@ -120,6 +121,8 @@ void main() {
       record(0, 2325, explanation: reduction(2400, 2325)),
     ]);
     await openCoach(tester);
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Keep last week’s targets for now'));
@@ -132,6 +135,10 @@ void main() {
     expect(h.last.targets.kcal, 2400);
     expect(h.last.targets.flags, {TargetFlag.heldByUser});
     expect(find.textContaining('Calories unchanged'), findsNothing);
+    // Opening "See why" scrolled the Last change card into view; the flag
+    // message is in the targets card above it.
+    await tester.drag(find.byType(ListView).first, const Offset(0, 900));
+    await tester.pumpAndSettle();
     expect(find.textContaining('kept last week'), findsWidgets);
   });
 
@@ -141,6 +148,8 @@ void main() {
       record(0, 2400, explanation: reduction(2325, 2400)),
     ]);
     await openCoach(tester);
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     expect(find.text('What changed'), findsOneWidget);
@@ -169,6 +178,8 @@ void main() {
       record(0, 2325, explanation: reduction(2400, 2325)),
     ]);
     await openCoach(tester);
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     expect(find.text('What changed'), findsOneWidget);

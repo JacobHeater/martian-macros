@@ -272,7 +272,7 @@ void main() {
 
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
-    expect(find.text('Daily targets'), findsOneWidget);
+    expect(find.text('Your targets'), findsOneWidget);
     final metabolismTitle = find.text('Your metabolism estimate');
     await tester.scrollUntilVisible(metabolismTitle, 300);
     await tester.ensureVisible(metabolismTitle);
