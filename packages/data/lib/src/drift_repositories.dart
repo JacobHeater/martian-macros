@@ -2,6 +2,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import 'app_database.dart';
+import 'drift_custom_exercise_repository.dart';
 import 'drift_custom_food_repository.dart';
 import 'drift_data_eraser.dart';
 import 'drift_day_mark_repository.dart';
@@ -17,6 +18,7 @@ import 'drift_targets_history_repository.dart';
 import 'drift_waist_repository.dart';
 import 'drift_weight_event_repository.dart';
 import 'drift_weight_repository.dart';
+import 'drift_workout_repository.dart';
 
 /// Every repository over one [AppDatabase]. The one place that knows which
 /// Drift class implements which interface.
@@ -37,6 +39,8 @@ final class DriftRepositories {
       pauses = DriftPauseRepository(db),
       reminders = DriftReminderRepository(db),
       recovery = DriftRecoveryCheckInRepository(db),
+      workouts = DriftWorkoutRepository(db),
+      customExercises = DriftCustomExerciseRepository(db),
       eraser = DriftDataEraser(db);
 
   final AppDatabase _db;
@@ -54,6 +58,8 @@ final class DriftRepositories {
   final PauseRepository pauses;
   final ReminderRepository reminders;
   final RecoveryCheckInRepository recovery;
+  final WorkoutRepository workouts;
+  final CustomExerciseRepository customExercises;
   final DataEraser eraser;
 
   /// Closes the underlying database.

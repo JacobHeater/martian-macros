@@ -104,7 +104,9 @@ void main() {
   });
 
   group('theme initialization (MM-184)', () {
-    for (var from = 1; from < current; from++) {
+    // Up to the version that introduced the choice (24). From then on, no
+    // stored preference means a fresh install that has not chosen yet.
+    for (var from = 1; from < 24; from++) {
       test(
         'absent preferences at version $from retain System on upgrade',
         () async {

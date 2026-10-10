@@ -1,6 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import 'in_memory_custom_exercise_repository.dart';
 import 'in_memory_custom_food_repository.dart';
 import 'in_memory_data_eraser.dart';
 import 'in_memory_day_mark_repository.dart';
@@ -16,6 +17,7 @@ import 'in_memory_targets_history_repository.dart';
 import 'in_memory_waist_repository.dart';
 import 'in_memory_weight_event_repository.dart';
 import 'in_memory_weight_repository.dart';
+import 'in_memory_workout_repository.dart';
 
 /// Every repository, in memory, sharing state where the real ones do (the
 /// intake reader sees the food log and day marks; the eraser empties all).
@@ -35,6 +37,8 @@ final class InMemoryRepositories {
     final pauses = InMemoryPauseRepository();
     final reminders = InMemoryReminderRepository();
     final recovery = InMemoryRecoveryCheckInRepository();
+    final workouts = InMemoryWorkoutRepository();
+    final customExercises = InMemoryCustomExerciseRepository();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -50,6 +54,8 @@ final class InMemoryRepositories {
       pauses: pauses,
       reminders: reminders,
       recovery: recovery,
+      workouts: workouts,
+      customExercises: customExercises,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -64,6 +70,8 @@ final class InMemoryRepositories {
         pauses.clear,
         reminders.clear,
         recovery.clear,
+        workouts.clear,
+        customExercises.clear,
       ]),
     );
   }
@@ -83,6 +91,8 @@ final class InMemoryRepositories {
     required this.pauses,
     required this.reminders,
     required this.recovery,
+    required this.workouts,
+    required this.customExercises,
     required this.eraser,
   });
 
@@ -100,6 +110,8 @@ final class InMemoryRepositories {
   final PauseRepository pauses;
   final ReminderRepository reminders;
   final RecoveryCheckInRepository recovery;
+  final WorkoutRepository workouts;
+  final CustomExerciseRepository customExercises;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.
