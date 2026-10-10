@@ -68,6 +68,30 @@ void main() {
     expect(logged.single.source, QuantitySource.householdMeasure);
   });
 
+  testWidgets('a food can be logged by palm, recorded as a hand portion', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    await tester.enterText(find.byKey(const ValueKey('food-search')), 'banana');
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Banana').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Palms'));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('amount-log')));
+    await tester.pumpAndSettle();
+    final logged = await readNow(
+      tester,
+      () => repos.food.watchFood(today).first,
+    );
+    final entry = logged.single;
+    expect(entry.source, QuantitySource.palm);
+    expect(entry.portion!.unit, PortionUnit.palm);
+    expect(entry.portion!.impliedGrams, greaterThan(50));
+    expect(entry.portion!.handModelVersion, HandModel.version);
+    expect(entry.kcal, closeTo(89 * entry.portion!.impliedGrams! / 100, 0.01));
+  });
+
   testWidgets('with nothing found the sheet offers manual entry', (
     tester,
   ) async {

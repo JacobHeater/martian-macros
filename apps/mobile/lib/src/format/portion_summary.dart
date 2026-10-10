@@ -20,7 +20,11 @@ String portionSummary(FoodEntry entry) {
   } else {
     amount = '${quantityText(quantity)} ${unit.of(quantity)}';
   }
-  final grams = reference == null ? null : gramsFor(quantity, unit, reference);
+  final grams = unit.isHand
+      ? portion.impliedGrams
+      : reference == null
+      ? null
+      : gramsFor(quantity, unit, reference);
   final weight = grams == null || unit.isWeight
       ? ''
       : ' (${quantityText(double.parse(grams.toStringAsFixed(0)))} g)';

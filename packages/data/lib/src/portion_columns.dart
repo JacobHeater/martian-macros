@@ -43,6 +43,8 @@ Portion? portionFromRow(FoodRow r) {
     quantity: r.portionQuantity,
     unit: r.portionUnit,
     reference: reference,
+    impliedGrams: r.impliedGrams,
+    handModelVersion: r.handModelVersion,
     origin: originPackId == null || originFoodId == null || originSource == null
         ? null
         : FoodOrigin(
@@ -71,6 +73,8 @@ FoodEntriesCompanion withPortion(FoodEntriesCompanion row, Portion? portion) {
     servingMilliliters: Value(reference?.servingMilliliters),
     servingUnit: Value(reference?.servingUnit),
     densityGPerMl: Value(reference?.densityGPerMl),
+    impliedGrams: Value(portion?.impliedGrams),
+    handModelVersion: Value(portion?.handModelVersion),
     originPackId: Value(portion?.origin?.packId),
     originFoodId: Value(portion?.origin?.foodId),
     originSource: Value(portion?.origin?.source),

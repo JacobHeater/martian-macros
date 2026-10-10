@@ -2173,6 +2173,28 @@ class $FoodEntriesTable extends FoodEntries
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _impliedGramsMeta = const VerificationMeta(
+    'impliedGrams',
+  );
+  @override
+  late final GeneratedColumn<double> impliedGrams = GeneratedColumn<double>(
+    'implied_grams',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _handModelVersionMeta = const VerificationMeta(
+    'handModelVersion',
+  );
+  @override
+  late final GeneratedColumn<int> handModelVersion = GeneratedColumn<int>(
+    'hand_model_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _originPackIdMeta = const VerificationMeta(
     'originPackId',
   );
@@ -2284,6 +2306,8 @@ class $FoodEntriesTable extends FoodEntries
     servingMilliliters,
     servingUnit,
     densityGPerMl,
+    impliedGrams,
+    handModelVersion,
     originPackId,
     originFoodId,
     originSource,
@@ -2434,6 +2458,24 @@ class $FoodEntriesTable extends FoodEntries
         densityGPerMl.isAcceptableOrUnknown(
           data['density_g_per_ml']!,
           _densityGPerMlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('implied_grams')) {
+      context.handle(
+        _impliedGramsMeta,
+        impliedGrams.isAcceptableOrUnknown(
+          data['implied_grams']!,
+          _impliedGramsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hand_model_version')) {
+      context.handle(
+        _handModelVersionMeta,
+        handModelVersion.isAcceptableOrUnknown(
+          data['hand_model_version']!,
+          _handModelVersionMeta,
         ),
       );
     }
@@ -2606,6 +2648,14 @@ class $FoodEntriesTable extends FoodEntries
         DriftSqlType.double,
         data['${effectivePrefix}density_g_per_ml'],
       ),
+      impliedGrams: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}implied_grams'],
+      ),
+      handModelVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hand_model_version'],
+      ),
       originPackId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}origin_pack_id'],
@@ -2701,6 +2751,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
   final double? servingMilliliters;
   final PortionUnit? servingUnit;
   final double? densityGPerMl;
+  final double? impliedGrams;
+  final int? handModelVersion;
   final String? originPackId;
   final int? originFoodId;
   final String? originSource;
@@ -2732,6 +2784,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     this.servingMilliliters,
     this.servingUnit,
     this.densityGPerMl,
+    this.impliedGrams,
+    this.handModelVersion,
     this.originPackId,
     this.originFoodId,
     this.originSource,
@@ -2808,6 +2862,12 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     if (!nullToAbsent || densityGPerMl != null) {
       map['density_g_per_ml'] = Variable<double>(densityGPerMl);
     }
+    if (!nullToAbsent || impliedGrams != null) {
+      map['implied_grams'] = Variable<double>(impliedGrams);
+    }
+    if (!nullToAbsent || handModelVersion != null) {
+      map['hand_model_version'] = Variable<int>(handModelVersion);
+    }
     if (!nullToAbsent || originPackId != null) {
       map['origin_pack_id'] = Variable<String>(originPackId);
     }
@@ -2883,6 +2943,12 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       densityGPerMl: densityGPerMl == null && nullToAbsent
           ? const Value.absent()
           : Value(densityGPerMl),
+      impliedGrams: impliedGrams == null && nullToAbsent
+          ? const Value.absent()
+          : Value(impliedGrams),
+      handModelVersion: handModelVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(handModelVersion),
       originPackId: originPackId == null && nullToAbsent
           ? const Value.absent()
           : Value(originPackId),
@@ -2954,6 +3020,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
         serializer.fromJson<String?>(json['servingUnit']),
       ),
       densityGPerMl: serializer.fromJson<double?>(json['densityGPerMl']),
+      impliedGrams: serializer.fromJson<double?>(json['impliedGrams']),
+      handModelVersion: serializer.fromJson<int?>(json['handModelVersion']),
       originPackId: serializer.fromJson<String?>(json['originPackId']),
       originFoodId: serializer.fromJson<int?>(json['originFoodId']),
       originSource: serializer.fromJson<String?>(json['originSource']),
@@ -3002,6 +3070,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
         $FoodEntriesTable.$converterservingUnitn.toJson(servingUnit),
       ),
       'densityGPerMl': serializer.toJson<double?>(densityGPerMl),
+      'impliedGrams': serializer.toJson<double?>(impliedGrams),
+      'handModelVersion': serializer.toJson<int?>(handModelVersion),
       'originPackId': serializer.toJson<String?>(originPackId),
       'originFoodId': serializer.toJson<int?>(originFoodId),
       'originSource': serializer.toJson<String?>(originSource),
@@ -3036,6 +3106,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     Value<double?> servingMilliliters = const Value.absent(),
     Value<PortionUnit?> servingUnit = const Value.absent(),
     Value<double?> densityGPerMl = const Value.absent(),
+    Value<double?> impliedGrams = const Value.absent(),
+    Value<int?> handModelVersion = const Value.absent(),
     Value<String?> originPackId = const Value.absent(),
     Value<int?> originFoodId = const Value.absent(),
     Value<String?> originSource = const Value.absent(),
@@ -3087,6 +3159,10 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     densityGPerMl: densityGPerMl.present
         ? densityGPerMl.value
         : this.densityGPerMl,
+    impliedGrams: impliedGrams.present ? impliedGrams.value : this.impliedGrams,
+    handModelVersion: handModelVersion.present
+        ? handModelVersion.value
+        : this.handModelVersion,
     originPackId: originPackId.present ? originPackId.value : this.originPackId,
     originFoodId: originFoodId.present ? originFoodId.value : this.originFoodId,
     originSource: originSource.present ? originSource.value : this.originSource,
@@ -3150,6 +3226,12 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
       densityGPerMl: data.densityGPerMl.present
           ? data.densityGPerMl.value
           : this.densityGPerMl,
+      impliedGrams: data.impliedGrams.present
+          ? data.impliedGrams.value
+          : this.impliedGrams,
+      handModelVersion: data.handModelVersion.present
+          ? data.handModelVersion.value
+          : this.handModelVersion,
       originPackId: data.originPackId.present
           ? data.originPackId.value
           : this.originPackId,
@@ -3194,6 +3276,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           ..write('servingMilliliters: $servingMilliliters, ')
           ..write('servingUnit: $servingUnit, ')
           ..write('densityGPerMl: $densityGPerMl, ')
+          ..write('impliedGrams: $impliedGrams, ')
+          ..write('handModelVersion: $handModelVersion, ')
           ..write('originPackId: $originPackId, ')
           ..write('originFoodId: $originFoodId, ')
           ..write('originSource: $originSource, ')
@@ -3230,6 +3314,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
     servingMilliliters,
     servingUnit,
     densityGPerMl,
+    impliedGrams,
+    handModelVersion,
     originPackId,
     originFoodId,
     originSource,
@@ -3265,6 +3351,8 @@ class FoodRow extends DataClass implements Insertable<FoodRow> {
           other.servingMilliliters == this.servingMilliliters &&
           other.servingUnit == this.servingUnit &&
           other.densityGPerMl == this.densityGPerMl &&
+          other.impliedGrams == this.impliedGrams &&
+          other.handModelVersion == this.handModelVersion &&
           other.originPackId == this.originPackId &&
           other.originFoodId == this.originFoodId &&
           other.originSource == this.originSource &&
@@ -3298,6 +3386,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
   final Value<double?> servingMilliliters;
   final Value<PortionUnit?> servingUnit;
   final Value<double?> densityGPerMl;
+  final Value<double?> impliedGrams;
+  final Value<int?> handModelVersion;
   final Value<String?> originPackId;
   final Value<int?> originFoodId;
   final Value<String?> originSource;
@@ -3329,6 +3419,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.servingMilliliters = const Value.absent(),
     this.servingUnit = const Value.absent(),
     this.densityGPerMl = const Value.absent(),
+    this.impliedGrams = const Value.absent(),
+    this.handModelVersion = const Value.absent(),
     this.originPackId = const Value.absent(),
     this.originFoodId = const Value.absent(),
     this.originSource = const Value.absent(),
@@ -3361,6 +3453,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     this.servingMilliliters = const Value.absent(),
     this.servingUnit = const Value.absent(),
     this.densityGPerMl = const Value.absent(),
+    this.impliedGrams = const Value.absent(),
+    this.handModelVersion = const Value.absent(),
     this.originPackId = const Value.absent(),
     this.originFoodId = const Value.absent(),
     this.originSource = const Value.absent(),
@@ -3400,6 +3494,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Expression<double>? servingMilliliters,
     Expression<String>? servingUnit,
     Expression<double>? densityGPerMl,
+    Expression<double>? impliedGrams,
+    Expression<int>? handModelVersion,
     Expression<String>? originPackId,
     Expression<int>? originFoodId,
     Expression<String>? originSource,
@@ -3432,6 +3528,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       if (servingMilliliters != null) 'serving_milliliters': servingMilliliters,
       if (servingUnit != null) 'serving_unit': servingUnit,
       if (densityGPerMl != null) 'density_g_per_ml': densityGPerMl,
+      if (impliedGrams != null) 'implied_grams': impliedGrams,
+      if (handModelVersion != null) 'hand_model_version': handModelVersion,
       if (originPackId != null) 'origin_pack_id': originPackId,
       if (originFoodId != null) 'origin_food_id': originFoodId,
       if (originSource != null) 'origin_source': originSource,
@@ -3466,6 +3564,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     Value<double?>? servingMilliliters,
     Value<PortionUnit?>? servingUnit,
     Value<double?>? densityGPerMl,
+    Value<double?>? impliedGrams,
+    Value<int?>? handModelVersion,
     Value<String?>? originPackId,
     Value<int?>? originFoodId,
     Value<String?>? originSource,
@@ -3498,6 +3598,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
       servingMilliliters: servingMilliliters ?? this.servingMilliliters,
       servingUnit: servingUnit ?? this.servingUnit,
       densityGPerMl: densityGPerMl ?? this.densityGPerMl,
+      impliedGrams: impliedGrams ?? this.impliedGrams,
+      handModelVersion: handModelVersion ?? this.handModelVersion,
       originPackId: originPackId ?? this.originPackId,
       originFoodId: originFoodId ?? this.originFoodId,
       originSource: originSource ?? this.originSource,
@@ -3590,6 +3692,12 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
     if (densityGPerMl.present) {
       map['density_g_per_ml'] = Variable<double>(densityGPerMl.value);
     }
+    if (impliedGrams.present) {
+      map['implied_grams'] = Variable<double>(impliedGrams.value);
+    }
+    if (handModelVersion.present) {
+      map['hand_model_version'] = Variable<int>(handModelVersion.value);
+    }
     if (originPackId.present) {
       map['origin_pack_id'] = Variable<String>(originPackId.value);
     }
@@ -3642,6 +3750,8 @@ class FoodEntriesCompanion extends UpdateCompanion<FoodRow> {
           ..write('servingMilliliters: $servingMilliliters, ')
           ..write('servingUnit: $servingUnit, ')
           ..write('densityGPerMl: $densityGPerMl, ')
+          ..write('impliedGrams: $impliedGrams, ')
+          ..write('handModelVersion: $handModelVersion, ')
           ..write('originPackId: $originPackId, ')
           ..write('originFoodId: $originFoodId, ')
           ..write('originSource: $originSource, ')
@@ -7882,6 +7992,8 @@ typedef $$FoodEntriesTableCreateCompanionBuilder =
       Value<double?> servingMilliliters,
       Value<PortionUnit?> servingUnit,
       Value<double?> densityGPerMl,
+      Value<double?> impliedGrams,
+      Value<int?> handModelVersion,
       Value<String?> originPackId,
       Value<int?> originFoodId,
       Value<String?> originSource,
@@ -7915,6 +8027,8 @@ typedef $$FoodEntriesTableUpdateCompanionBuilder =
       Value<double?> servingMilliliters,
       Value<PortionUnit?> servingUnit,
       Value<double?> densityGPerMl,
+      Value<double?> impliedGrams,
+      Value<int?> handModelVersion,
       Value<String?> originPackId,
       Value<int?> originFoodId,
       Value<String?> originSource,
@@ -8047,6 +8161,16 @@ class $$FoodEntriesTableFilterComposer
 
   ColumnFilters<double> get densityGPerMl => $composableBuilder(
     column: $table.densityGPerMl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get impliedGrams => $composableBuilder(
+    column: $table.impliedGrams,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get handModelVersion => $composableBuilder(
+    column: $table.handModelVersion,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8210,6 +8334,16 @@ class $$FoodEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get impliedGrams => $composableBuilder(
+    column: $table.impliedGrams,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get handModelVersion => $composableBuilder(
+    column: $table.handModelVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get originPackId => $composableBuilder(
     column: $table.originPackId,
     builder: (column) => ColumnOrderings(column),
@@ -8359,6 +8493,16 @@ class $$FoodEntriesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<double> get impliedGrams => $composableBuilder(
+    column: $table.impliedGrams,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get handModelVersion => $composableBuilder(
+    column: $table.handModelVersion,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get originPackId => $composableBuilder(
     column: $table.originPackId,
     builder: (column) => column,
@@ -8442,6 +8586,8 @@ class $$FoodEntriesTableTableManager
                 Value<double?> servingMilliliters = const Value.absent(),
                 Value<PortionUnit?> servingUnit = const Value.absent(),
                 Value<double?> densityGPerMl = const Value.absent(),
+                Value<double?> impliedGrams = const Value.absent(),
+                Value<int?> handModelVersion = const Value.absent(),
                 Value<String?> originPackId = const Value.absent(),
                 Value<int?> originFoodId = const Value.absent(),
                 Value<String?> originSource = const Value.absent(),
@@ -8473,6 +8619,8 @@ class $$FoodEntriesTableTableManager
                 servingMilliliters: servingMilliliters,
                 servingUnit: servingUnit,
                 densityGPerMl: densityGPerMl,
+                impliedGrams: impliedGrams,
+                handModelVersion: handModelVersion,
                 originPackId: originPackId,
                 originFoodId: originFoodId,
                 originSource: originSource,
@@ -8506,6 +8654,8 @@ class $$FoodEntriesTableTableManager
                 Value<double?> servingMilliliters = const Value.absent(),
                 Value<PortionUnit?> servingUnit = const Value.absent(),
                 Value<double?> densityGPerMl = const Value.absent(),
+                Value<double?> impliedGrams = const Value.absent(),
+                Value<int?> handModelVersion = const Value.absent(),
                 Value<String?> originPackId = const Value.absent(),
                 Value<int?> originFoodId = const Value.absent(),
                 Value<String?> originSource = const Value.absent(),
@@ -8537,6 +8687,8 @@ class $$FoodEntriesTableTableManager
                 servingMilliliters: servingMilliliters,
                 servingUnit: servingUnit,
                 densityGPerMl: densityGPerMl,
+                impliedGrams: impliedGrams,
+                handModelVersion: handModelVersion,
                 originPackId: originPackId,
                 originFoodId: originFoodId,
                 originSource: originSource,
