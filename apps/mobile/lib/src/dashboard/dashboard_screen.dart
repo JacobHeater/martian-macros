@@ -23,6 +23,7 @@ import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/info_card.dart';
 import 'coach_line_text.dart';
+import 'process_card.dart';
 import 'weight_card.dart';
 import 'dashboard_metrics.dart';
 
@@ -133,6 +134,7 @@ class DashboardScreen extends ConsumerWidget {
           onTap: () => open(HomeDestination.progress),
         ),
         const InsightCard(),
+        const ProcessCard(),
         const DashboardMetrics(),
       ],
     );
