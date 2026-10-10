@@ -68,7 +68,8 @@ Not built:
 - "Counts toward shoulder volume" is true of the data (the exercise has its muscle groups) and is shown when weekly volume is built
   (MM-78).
 
-Checked by tests and by the screenshots generated on Linux (light, dark, Martian). Not seen on the emulator.
+Checked by tests, by the screenshots generated on Linux (light, dark), and on the Android emulator: searching "bench" and choosing
+an exercise. Creating an exercise was not seen there.
 
 ## Notes
 - Source for the library: write it, or find an openly licensed list (check the license as carefully as for food data, MM-57).

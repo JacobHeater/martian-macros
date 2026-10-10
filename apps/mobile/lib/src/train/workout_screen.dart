@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mm_domain/mm_domain.dart';
 
 import '../format/fmt.dart';
 import '../format/workout_summary_text.dart';
@@ -20,6 +21,10 @@ class WorkoutScreen extends ConsumerWidget {
   const WorkoutScreen({required this.workoutId, super.key});
 
   final int workoutId;
+
+  static bool _hasWork(Workout workout) => workout.exercises.any(
+    (exercise) => exercise.sets.any((set) => set.reps > 0),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,9 +108,9 @@ class WorkoutScreen extends ConsumerWidget {
               key: const ValueKey('workout-finish'),
               label: 'Finish workout',
               expand: true,
-              // Nothing to keep until a set is logged; an empty workout is
-              // deleted from the top bar.
-              onPressed: workout.setCount == 0
+              // Nothing to keep until a set with reps is logged; an empty
+              // workout is deleted from the top bar.
+              onPressed: !_hasWork(workout)
                   ? null
                   : () async {
                       await controller.finish(workout);
