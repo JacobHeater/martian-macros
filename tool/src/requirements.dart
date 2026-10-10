@@ -99,15 +99,42 @@ final _fileName = RegExp(
 );
 final _idPattern = RegExp(r'^MM-\d+$');
 
+/// The living handoff document every agent keeps (MM-174).
+const handoffFileName = 'HANDOFF.md';
+
+/// The most sessions the handoff document may hold.
+const handoffSessionLimit = 3;
+
+/// What is wrong with the handoff document's [lines]: it must sum up between
+/// one and [handoffSessionLimit] sessions, each under a `## Session` heading,
+/// newest first, so it stays short enough to read at the start of a session.
+List<String> handoffProblems(List<String> lines) {
+  final sessions = lines.where((l) => l.startsWith('## Session ')).length;
+  return [
+    if (sessions == 0)
+      '$handoffFileName: needs at least one "## Session ..." section.',
+    if (sessions > handoffSessionLimit)
+      '$handoffFileName: holds $sessions sessions; keep the latest '
+          '$handoffSessionLimit and drop the oldest.',
+  ];
+}
+
 RequirementsScan _scan(Directory root) {
   final tickets = <Ticket>[];
   final problems = <String>[];
+  if (!File('${root.path}/$handoffFileName').existsSync()) {
+    problems.add(
+      '$handoffFileName is missing: every agent keeps it up to date (MM-174).',
+    );
+  }
 
   for (final entity
       in root.listSync()..sort((a, b) => a.path.compareTo(b.path))) {
     final name = _baseName(entity.path);
     if (entity is File) {
-      if (name != 'README.md') {
+      if (name == handoffFileName) {
+        problems.addAll(handoffProblems(entity.readAsLinesSync()));
+      } else if (name != 'README.md') {
         problems.add('$name: tickets belong in a component folder.');
       }
       continue;
