@@ -1,6 +1,6 @@
 ---
 id: MM-147
-status: proposed
+status: in-progress
 component: adherence
 related: [MM-145, MM-16, MM-18, MM-23, MM-24, MM-31, MM-92, MM-98, MM-108, MM-112, MM-135, MM-139, MM-146, MM-148]
 ---
@@ -89,3 +89,26 @@ Scenario: Later
 - A connected scale (MM-68) may have kept recording through the gap. Then there was no gap in weigh-ins and this flow does not trigger,
   which is right; the food-log gap is handled by the estimator as missing days.
 - A simulator test should cover a user who lapses for four weeks mid-cut and returns (MM-30).
+
+## Progress
+Built:
+- **What a gap is** (engine): `activityGaps` and `openGap` find runs of 7 or more days with no weigh-in and no food logged; today is
+  never part of one. Thresholds are in `GapRule`.
+- **The welcome-back screen**: on opening the app when returning from a gap, one screen, "Welcome back. To pick up, the coach needs
+  one thing: a weigh-in.", with the weigh-in field and "Later". No count of days, no summary, no streak (a test forbids those words).
+  Saving a weigh-in closes the gap and opens the dashboard. "Later" is stored (schema version 18) so the screen is not shown again
+  for the same absence, and the dashboard's weight card asks as usual.
+- **The deficit count** restarts on the first day back after a gap of 14 days or more (`consecutiveDeficitWeeks`, from the snapshot's
+  `deficitRestartOn`).
+- **The starting estimate** (`gapPrior`, used by `analyze`): after a gap of 28 days or more that still falls in the estimation window,
+  the last measured expenditure is the starting estimate with its uncertainty widened to 10% (never narrowed); if weight changed by
+  more than 5% across a gap of any length, it is first moved by the change in resting energy. With too little data in the window the
+  estimator holds, so targets are unchanged while it re-measures.
+- **A long gap**: the health check is already asked again after 90 days without one, and is shown after the welcome-back screen.
+- Tests: `activity_gap_test.dart` (engine), `welcome_back_test.dart` (app), the preferences contract and the migration test.
+
+Not built: confidence set to Fair after a 7 to 27 day gap (confidence follows the data in the window as before); the fixed 7-day
+re-calibration (the estimator holds until it has its usual minimum of data, which is longer); re-confirming the goal after 90 days;
+the trend chart drawing the gap dashed; streaks and the monthly report (neither exists yet); pauses (MM-148), so a paused period
+would count as a gap; a simulator user who lapses for four weeks and returns (MM-30). Food logged more than 60 days ago is not
+loaded, so an old stretch with food but no weigh-ins can read as a gap for the deficit count.

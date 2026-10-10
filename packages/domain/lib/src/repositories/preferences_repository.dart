@@ -4,6 +4,8 @@ import 'easy_to_miss_reader.dart';
 import 'easy_to_miss_writer.dart';
 import 'preferences_reader.dart';
 import 'preferences_writer.dart';
+import 'return_screen_reader.dart';
+import 'return_screen_writer.dart';
 import 'under_eating_notice_reader.dart';
 import 'under_eating_notice_writer.dart';
 
@@ -18,4 +20,6 @@ abstract interface class PreferencesRepository
         DetailLevelReader,
         DetailLevelWriter,
         UnderEatingNoticeReader,
-        UnderEatingNoticeWriter {}
+        UnderEatingNoticeWriter,
+        ReturnScreenReader,
+        ReturnScreenWriter {}
