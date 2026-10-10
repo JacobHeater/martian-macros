@@ -39,6 +39,7 @@ void main() {
 
   testWidgets('Standard shows the macros and no extras', (tester) async {
     await openFood(tester);
+    expect(find.text('Carbs'), findsWidgets);
     expect(find.textContaining('P 18 · C 40 · F 1'), findsOneWidget);
     expect(find.byKey(const ValueKey('entry-extras')), findsNothing);
   });
@@ -57,6 +58,8 @@ void main() {
     await repos.preferences.saveDetailLevel(DetailLevel.simple);
     await openFood(tester);
     expect(find.text('P 18'), findsOneWidget);
+    expect(find.text('Carbs'), findsNothing);
+    expect(find.text('Fat'), findsNothing);
     expect(find.textContaining('C 40'), findsNothing);
     final stored = await readNow(
       tester,
