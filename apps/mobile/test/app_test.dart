@@ -227,11 +227,12 @@ void main() {
     expect(find.textContaining('kcal left'), findsOneWidget);
     await tester.tap(find.text('Food'));
     await tester.pumpAndSettle();
-    // The hero is at the top of the screen; the entry is below it.
-    expect(find.text('510'), findsWidgets);
+    // The hero is at the top of the screen; the entry and its calories are
+    // below it, and are built only once scrolled to.
     expect(find.textContaining('kcal left'), findsOneWidget);
     await revealOnFoodScreen(tester, find.text('Chicken and rice'));
     expect(find.text('Chicken and rice'), findsOneWidget);
+    expect(find.text('510'), findsWidgets);
 
     await tester.scrollUntilVisible(find.text('Complete'), 250);
     await tester.ensureVisible(find.text('Complete'));
