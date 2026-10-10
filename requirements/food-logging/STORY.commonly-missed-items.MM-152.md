@@ -97,3 +97,10 @@ Not built: "Cooked with oil?" on the amount step and the user's usual cooking fa
 no categories, so the buttons search a word, and the user's own recent items are not yet ranked first for it); suppression while the
 under-eating notice is active (that notice, MM-114, is not built); the fade is by calendar days since onboarding, not days with a log.
 Not seen on the emulator.
+
+Done since: "Cooked with oil?" on the amount step. A cooked generic food (not a packaged, saved or raw one) offers No, 1 tsp or 1 tbsp;
+choosing one logs a second entry, "Cooking oil" (4.5 g or 13.5 g of fat, about 40 or 120 kcal), in the same meal. Tested in
+`raw_or_cooked_test.dart`. Still not built: the user's own usual cooking fat (it is a generic oil), "off for this food once
+dismissed" (the control is optional and defaults to No each time, so there is nothing to dismiss), and "cooked" is judged from the
+pack's preparation state because the pack has no category for pan-fried or roasted foods, so rice, which is not usually cooked in
+oil, is offered it too.
