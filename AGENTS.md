@@ -18,6 +18,13 @@ requirements, and [docs/architecture.md](docs/architecture.md).
   Gherkin acceptance criteria. Run `mm req` to validate the requirements.
   A documentation-only change or internal refactor that does not change
   behavior does not need a ticket.
+- Every bug gets a ticket and a regression test, at once. The moment a defect
+  is found, however small and wherever it was found (your own new code, the
+  emulator, CI, a review), write a `BUG.*.MM-n.md` ticket and a test that fails
+  with the bug and passes with the fix, and say in the ticket which test
+  guards it. Changing an existing test so that it passes around the bug is not
+  a regression test. A bug that cannot be fixed yet still gets its ticket, and
+  its test is skipped with the ticket's ID until the fix lands.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
