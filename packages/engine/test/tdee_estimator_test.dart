@@ -95,6 +95,21 @@ void main() {
     expect(stats.coverage2Sigma, greaterThanOrEqualTo(0.85));
   });
 
+  // MM-150: someone who mostly estimates meals is unbiased but noisy. Each
+  // estimate is 40% uncertain, and a day of several of them is about 20%. The
+  // noise averages out over a window and must not bias the estimate. (At 30%
+  // a day the unmarked-partial-day rule starts dropping honest low days and the
+  // estimate drifts about 160 kcal high; see the MM-150 ticket.)
+  test('is unbiased for a logger whose estimates are noisy (MM-150)', () {
+    final stats = monteCarlo(
+      makeUser: (seed) =>
+          SyntheticUser(seed: seed, baseTdeeKcal: 2800, entrySigma: 0.20),
+      loggedKcal: 2200,
+    );
+    expect(stats.bias.abs(), lessThan(100));
+    expect(stats.coverage2Sigma, greaterThanOrEqualTo(0.85));
+  });
+
   test('expresses TDEE in logging units for a consistent under-reporter', () {
     final stats = monteCarlo(
       makeUser: (seed) => SyntheticUser(
