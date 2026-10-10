@@ -7880,6 +7880,348 @@ class PausesCompanion extends UpdateCompanion<PauseRow> {
   }
 }
 
+class $RemindersTable extends Reminders
+    with TableInfo<$RemindersTable, ReminderRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RemindersTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<ReminderKind, String> kind =
+      GeneratedColumn<String>(
+        'kind',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<ReminderKind>($RemindersTable.$converterkind);
+  static const VerificationMeta _enabledMeta = const VerificationMeta(
+    'enabled',
+  );
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+    'enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enabled" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _minuteOfDayMeta = const VerificationMeta(
+    'minuteOfDay',
+  );
+  @override
+  late final GeneratedColumn<int> minuteOfDay = GeneratedColumn<int>(
+    'minute_of_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countFromEpochDayMeta = const VerificationMeta(
+    'countFromEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> countFromEpochDay = GeneratedColumn<int>(
+    'count_from_epoch_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    kind,
+    enabled,
+    minuteOfDay,
+    countFromEpochDay,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reminders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReminderRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('enabled')) {
+      context.handle(
+        _enabledMeta,
+        enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_enabledMeta);
+    }
+    if (data.containsKey('minute_of_day')) {
+      context.handle(
+        _minuteOfDayMeta,
+        minuteOfDay.isAcceptableOrUnknown(
+          data['minute_of_day']!,
+          _minuteOfDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_minuteOfDayMeta);
+    }
+    if (data.containsKey('count_from_epoch_day')) {
+      context.handle(
+        _countFromEpochDayMeta,
+        countFromEpochDay.isAcceptableOrUnknown(
+          data['count_from_epoch_day']!,
+          _countFromEpochDayMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {kind};
+  @override
+  ReminderRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReminderRow(
+      kind: $RemindersTable.$converterkind.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}kind'],
+        )!,
+      ),
+      enabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enabled'],
+      )!,
+      minuteOfDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minute_of_day'],
+      )!,
+      countFromEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count_from_epoch_day'],
+      ),
+    );
+  }
+
+  @override
+  $RemindersTable createAlias(String alias) {
+    return $RemindersTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<ReminderKind, String, String> $converterkind =
+      const EnumNameConverter<ReminderKind>(ReminderKind.values);
+}
+
+class ReminderRow extends DataClass implements Insertable<ReminderRow> {
+  final ReminderKind kind;
+  final bool enabled;
+  final int minuteOfDay;
+  final int? countFromEpochDay;
+  const ReminderRow({
+    required this.kind,
+    required this.enabled,
+    required this.minuteOfDay,
+    this.countFromEpochDay,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['kind'] = Variable<String>(
+        $RemindersTable.$converterkind.toSql(kind),
+      );
+    }
+    map['enabled'] = Variable<bool>(enabled);
+    map['minute_of_day'] = Variable<int>(minuteOfDay);
+    if (!nullToAbsent || countFromEpochDay != null) {
+      map['count_from_epoch_day'] = Variable<int>(countFromEpochDay);
+    }
+    return map;
+  }
+
+  RemindersCompanion toCompanion(bool nullToAbsent) {
+    return RemindersCompanion(
+      kind: Value(kind),
+      enabled: Value(enabled),
+      minuteOfDay: Value(minuteOfDay),
+      countFromEpochDay: countFromEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(countFromEpochDay),
+    );
+  }
+
+  factory ReminderRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReminderRow(
+      kind: $RemindersTable.$converterkind.fromJson(
+        serializer.fromJson<String>(json['kind']),
+      ),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+      minuteOfDay: serializer.fromJson<int>(json['minuteOfDay']),
+      countFromEpochDay: serializer.fromJson<int?>(json['countFromEpochDay']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'kind': serializer.toJson<String>(
+        $RemindersTable.$converterkind.toJson(kind),
+      ),
+      'enabled': serializer.toJson<bool>(enabled),
+      'minuteOfDay': serializer.toJson<int>(minuteOfDay),
+      'countFromEpochDay': serializer.toJson<int?>(countFromEpochDay),
+    };
+  }
+
+  ReminderRow copyWith({
+    ReminderKind? kind,
+    bool? enabled,
+    int? minuteOfDay,
+    Value<int?> countFromEpochDay = const Value.absent(),
+  }) => ReminderRow(
+    kind: kind ?? this.kind,
+    enabled: enabled ?? this.enabled,
+    minuteOfDay: minuteOfDay ?? this.minuteOfDay,
+    countFromEpochDay: countFromEpochDay.present
+        ? countFromEpochDay.value
+        : this.countFromEpochDay,
+  );
+  ReminderRow copyWithCompanion(RemindersCompanion data) {
+    return ReminderRow(
+      kind: data.kind.present ? data.kind.value : this.kind,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+      minuteOfDay: data.minuteOfDay.present
+          ? data.minuteOfDay.value
+          : this.minuteOfDay,
+      countFromEpochDay: data.countFromEpochDay.present
+          ? data.countFromEpochDay.value
+          : this.countFromEpochDay,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReminderRow(')
+          ..write('kind: $kind, ')
+          ..write('enabled: $enabled, ')
+          ..write('minuteOfDay: $minuteOfDay, ')
+          ..write('countFromEpochDay: $countFromEpochDay')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(kind, enabled, minuteOfDay, countFromEpochDay);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReminderRow &&
+          other.kind == this.kind &&
+          other.enabled == this.enabled &&
+          other.minuteOfDay == this.minuteOfDay &&
+          other.countFromEpochDay == this.countFromEpochDay);
+}
+
+class RemindersCompanion extends UpdateCompanion<ReminderRow> {
+  final Value<ReminderKind> kind;
+  final Value<bool> enabled;
+  final Value<int> minuteOfDay;
+  final Value<int?> countFromEpochDay;
+  final Value<int> rowid;
+  const RemindersCompanion({
+    this.kind = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.minuteOfDay = const Value.absent(),
+    this.countFromEpochDay = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RemindersCompanion.insert({
+    required ReminderKind kind,
+    required bool enabled,
+    required int minuteOfDay,
+    this.countFromEpochDay = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : kind = Value(kind),
+       enabled = Value(enabled),
+       minuteOfDay = Value(minuteOfDay);
+  static Insertable<ReminderRow> custom({
+    Expression<String>? kind,
+    Expression<bool>? enabled,
+    Expression<int>? minuteOfDay,
+    Expression<int>? countFromEpochDay,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (kind != null) 'kind': kind,
+      if (enabled != null) 'enabled': enabled,
+      if (minuteOfDay != null) 'minute_of_day': minuteOfDay,
+      if (countFromEpochDay != null) 'count_from_epoch_day': countFromEpochDay,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RemindersCompanion copyWith({
+    Value<ReminderKind>? kind,
+    Value<bool>? enabled,
+    Value<int>? minuteOfDay,
+    Value<int?>? countFromEpochDay,
+    Value<int>? rowid,
+  }) {
+    return RemindersCompanion(
+      kind: kind ?? this.kind,
+      enabled: enabled ?? this.enabled,
+      minuteOfDay: minuteOfDay ?? this.minuteOfDay,
+      countFromEpochDay: countFromEpochDay ?? this.countFromEpochDay,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (kind.present) {
+      map['kind'] = Variable<String>(
+        $RemindersTable.$converterkind.toSql(kind.value),
+      );
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (minuteOfDay.present) {
+      map['minute_of_day'] = Variable<int>(minuteOfDay.value);
+    }
+    if (countFromEpochDay.present) {
+      map['count_from_epoch_day'] = Variable<int>(countFromEpochDay.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RemindersCompanion(')
+          ..write('kind: $kind, ')
+          ..write('enabled: $enabled, ')
+          ..write('minuteOfDay: $minuteOfDay, ')
+          ..write('countFromEpochDay: $countFromEpochDay, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7898,6 +8240,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RecipeIngredientsTable(this);
   late final $InsightLogTable insightLog = $InsightLogTable(this);
   late final $PausesTable pauses = $PausesTable(this);
+  late final $RemindersTable reminders = $RemindersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7915,6 +8258,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     recipeIngredients,
     insightLog,
     pauses,
+    reminders,
   ];
 }
 
@@ -11690,6 +12034,199 @@ typedef $$PausesTableProcessedTableManager =
       PauseRow,
       PrefetchHooks Function()
     >;
+typedef $$RemindersTableCreateCompanionBuilder = RemindersCompanion Function({
+  required ReminderKind kind,
+  required bool enabled,
+  required int minuteOfDay,
+  Value<int?> countFromEpochDay,
+  Value<int> rowid,
+});
+typedef $$RemindersTableUpdateCompanionBuilder = RemindersCompanion Function({
+  Value<ReminderKind> kind,
+  Value<bool> enabled,
+  Value<int> minuteOfDay,
+  Value<int?> countFromEpochDay,
+  Value<int> rowid,
+});
+
+class $$RemindersTableFilterComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<ReminderKind, ReminderKind, String> get kind =>
+      $composableBuilder(
+        column: $table.kind,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minuteOfDay => $composableBuilder(
+    column: $table.minuteOfDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get countFromEpochDay => $composableBuilder(
+    column: $table.countFromEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RemindersTableOrderingComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minuteOfDay => $composableBuilder(
+    column: $table.minuteOfDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get countFromEpochDay => $composableBuilder(
+    column: $table.countFromEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RemindersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<ReminderKind, String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+
+  GeneratedColumn<int> get minuteOfDay => $composableBuilder(
+    column: $table.minuteOfDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get countFromEpochDay => $composableBuilder(
+    column: $table.countFromEpochDay,
+    builder: (column) => column,
+  );
+}
+
+class $$RemindersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RemindersTable,
+          ReminderRow,
+          $$RemindersTableFilterComposer,
+          $$RemindersTableOrderingComposer,
+          $$RemindersTableAnnotationComposer,
+          $$RemindersTableCreateCompanionBuilder,
+          $$RemindersTableUpdateCompanionBuilder,
+          (
+            ReminderRow,
+            BaseReferences<_$AppDatabase, $RemindersTable, ReminderRow>,
+          ),
+          ReminderRow,
+          PrefetchHooks Function()
+        > {
+  $$RemindersTableTableManager(_$AppDatabase db, $RemindersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RemindersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RemindersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RemindersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<ReminderKind> kind = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+                Value<int> minuteOfDay = const Value.absent(),
+                Value<int?> countFromEpochDay = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RemindersCompanion(
+                kind: kind,
+                enabled: enabled,
+                minuteOfDay: minuteOfDay,
+                countFromEpochDay: countFromEpochDay,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required ReminderKind kind,
+                required bool enabled,
+                required int minuteOfDay,
+                Value<int?> countFromEpochDay = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RemindersCompanion.insert(
+                kind: kind,
+                enabled: enabled,
+                minuteOfDay: minuteOfDay,
+                countFromEpochDay: countFromEpochDay,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RemindersTable, ReminderRow>(table),
+                  BaseReferences<_$AppDatabase, $RemindersTable, ReminderRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RemindersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RemindersTable,
+      ReminderRow,
+      $$RemindersTableFilterComposer,
+      $$RemindersTableOrderingComposer,
+      $$RemindersTableAnnotationComposer,
+      $$RemindersTableCreateCompanionBuilder,
+      $$RemindersTableUpdateCompanionBuilder,
+      (
+        ReminderRow,
+        BaseReferences<_$AppDatabase, $RemindersTable, ReminderRow>,
+      ),
+      ReminderRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11718,4 +12255,6 @@ class $AppDatabaseManager {
       $$InsightLogTableTableManager(_db, _db.insightLog);
   $$PausesTableTableManager get pauses =>
       $$PausesTableTableManager(_db, _db.pauses);
+  $$RemindersTableTableManager get reminders =>
+      $$RemindersTableTableManager(_db, _db.reminders);
 }
