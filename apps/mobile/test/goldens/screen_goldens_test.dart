@@ -8,6 +8,8 @@ import 'package:martian_macros/src/food_packs/pack_download_state.dart';
 import 'package:martian_macros/src/food_packs/pack_download_status.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/progress/progress_screen.dart';
+import 'package:martian_macros/src/dashboard/dashboard_screen.dart';
+import 'package:martian_macros/src/food/food_screen.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
@@ -138,6 +140,24 @@ void main() {
     }
   }
 
+  Future<InMemoryRepositories> metricsFixture({required bool dark}) async {
+    final repos = InMemoryRepositories();
+    await DemoSeed(today).replace(
+      eraser: repos.eraser,
+      setup: repos.setup,
+      weights: repos.weights,
+      waist: repos.waist,
+      food: repos.food,
+      dayMarks: repos.dayMarks,
+      targets: repos.targets,
+      recovery: repos.recovery,
+    );
+    await repos.preferences.saveThemePreference(
+      dark ? ThemePreference.dark : ThemePreference.light,
+    );
+    return repos;
+  }
+
   /// Every test ends here, so the shadow flag is put back before the test
   /// framework checks that no debug flag was left changed.
   Future<void> shot(WidgetTester tester, String name) async {
@@ -155,13 +175,58 @@ void main() {
     final mode = dark ? 'dark' : 'light';
 
     testWidgets('dashboard, $mode', (tester) async {
-      await open(tester, await seeded(dark: dark));
+      await open(tester, await metricsFixture(dark: dark));
       await shot(tester, 'dashboard_$mode');
     }, skip: !linux);
 
     testWidgets('food, $mode', (tester) async {
       await open(tester, await seeded(dark: dark), tab: 'Food');
       await shot(tester, 'food_$mode');
+    }, skip: !linux);
+
+    for (final (section, title) in [
+      ('nutrition', 'Nutrition history'),
+      ('measurements', 'Weight trend & uncertainty'),
+      ('coach', 'Coach & expenditure'),
+    ]) {
+      testWidgets('dashboard $section, $mode', (tester) async {
+        await open(tester, await metricsFixture(dark: dark));
+        await tester.scrollUntilVisible(
+          find.text(title),
+          400,
+          scrollable: find
+              .descendant(
+                of: find.byType(DashboardScreen),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        await tester.ensureVisible(find.text(title));
+        await tester.pumpAndSettle();
+        await shot(tester, 'dashboard_${section}_$mode');
+      }, skip: !linux);
+    }
+
+    testWidgets('food meal cards, $mode', (tester) async {
+      await open(tester, await metricsFixture(dark: dark), tab: 'Food');
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('meal-card-breakfast')),
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byType(FoodScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('meal-card-breakfast')),
+      );
+      await tester.pumpAndSettle();
+      await shot(tester, 'food_meals_$mode');
+      await tester.tap(find.text('Breakfast'));
+      await tester.pumpAndSettle();
+      await shot(tester, 'food_meals_collapsed_$mode');
     }, skip: !linux);
 
     testWidgets('progress, $mode', (tester) async {

@@ -11,6 +11,9 @@ related: [MM-97, MM-99, MM-100, MM-17, MM-23, MM-24, MM-32, MM-41, MM-77, MM-92,
 See MM-97.
 
 ## Decisions (made with the product owner)
+MM-176 supersedes the sparse contents and one-screen density below at the
+owner's request; startup, drill-down and numerical consistency still apply.
+
 - **The dashboard is the page the app starts on.**
 
 Choices I made without asking (say if any is wrong):

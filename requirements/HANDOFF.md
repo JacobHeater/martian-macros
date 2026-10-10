@@ -11,15 +11,17 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, while adding the MM-175 phone shortcut.
+Last updated: 2026-10-10, by Copilot, during the Dashboard pivot.
 
-**Branch state.** The MM-174 handoff PR #61 is open. MM-175 is on
-`feature/mm175-phone-shortcut`, stacked on that handoff branch; its PR builds on #61.
-No product feature work is being started in this session.
+**Branch state.** Handoff PR #61 and phone-shortcut PR #62 are merged.
+Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
+`feature/mm176-dashboard-metrics`, draft PR #63. The combined delivery includes
+the Food pie, meal-card/vector-control refinements and flat FAB. No unrelated
+roadmap work is being started.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-176 (`mm req next` is the authority).
+**Next ticket ID.** MM-184 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -42,6 +44,9 @@ ticket's "Progress" section says what was and was not checked.
 
 **Standing rules from the product owner that are not in `AGENTS.md`.** These were given in conversation and held in one agent's
 private notes; they bind whoever picks up the work.
+- Current priority is a metrics-heavy Dashboard with a full existing-data
+  overview. The owner chose a separate demo app/database for repeatable
+  synthetic seeding; never overwrite the normal app's data.
 - Work through the roadmap without waiting to be asked. Open pull requests with `gh`, and merge them yourself (`--merge`) once CI is
   green. The owner does not want to be involved in that.
 - Do not sit waiting on CI in the middle of a session. Check open pull requests at the start and the end of each turn, merge the
@@ -71,14 +76,41 @@ private notes; they bind whoever picks up the work.
 
 ## Session 4: 2026-10-10, Copilot
 
-- Owner requested `mm run --env phone` as a shortcut for physical-device testing.
-- MM-175 uses dev defines, selects one physical Android device, ignores emulators,
-  and reports missing, ambiguous, or malformed discovery results explicitly.
-- Existing dev/prod run and build behavior stays unchanged. All 47 tooling
-  tests and full `mm check` passed. `mm run --env phone --help` selected the
-  connected physical phone over a running emulator and exited successfully;
-  the app itself was not installed or launched during this verification.
-- No app data, database schema, or product feature behavior changes.
+- MM-175 added `mm run --env phone`: dev configuration with automatic physical
+  Android selection, never emulator fallback. Full checks passed; discovery
+  was verified on connected hardware without launching the app. PR #62 merged.
+- Owner pivoted to the Dashboard, explicitly superseding the sparse one-screen
+  direction. MM-176 adds a compact summary and 7/30-day nutrition, weight,
+  waist, coverage and coaching histories, plus separate recovery trends.
+- MM-177 supplies a repeatable synthetic seed in a separately identified demo
+  app/database. It must never seed or reset the normal app's data.
+- Integrated `mm check` passed (exit 0, "All checks passed.").
+  Populated/empty/loading/error/narrow-screen tests cover the Dashboard.
+  Seeded Dashboard summary, nutrition, measurements and coaching plus Food
+  cards and the flat FAB were inspected on the Android emulator in both themes.
+  Linux screenshot regeneration passed; populated/scrolled Dashboard and
+  expanded/collapsed Food images were downloaded, inspected and committed.
+  PR checks remain the final delivery gate.
+- Draft PR #63 packages the complete original request and refinements.
+  Linux Update goldens run 38024455576 passed; its changed images are included.
+- MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
+  MM-180 splits the food log into separate meal cards at the owner's request.
+- The owner refined MM-180: expanded-by-default independent accordions,
+  compact 12 dp outlined cards, and a separate tinted rounded-square Add action
+  beside a muted chevron. Add must not toggle the disclosure; tests cover
+  both collapsed and expanded states. Validation of this refinement is underway.
+- MM-180 controls now use centered stroked vector paths, not icon-font glyphs.
+  MM-181 removes the floating Add food button's glow/shadow in both themes,
+  including hover/focus/pressed elevation, at the owner's explicit request.
+- MM-182 fixes the demo notice's low contrast in light mode with an explicit
+  full-width themed background and contrasting foreground. Both regression
+  cases failed before the fix and now pass; identity/seeding are unchanged.
+  Its updated device appearance has not yet been rechecked. No unrelated
+  roadmap work is in scope.
+- Final Dart review found MM-183: Dashboard/Food could show ordinary targets
+  while pause history loaded or failed. Four regression cases failed before
+  adding explicit pause loading/error gates. Integrated `mm check` passed
+  afterward. Both review-discovered defects have tickets and regressions.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 

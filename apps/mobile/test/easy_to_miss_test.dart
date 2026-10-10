@@ -99,6 +99,10 @@ void main() {
   ) async {
     await start();
     await openFood(tester);
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('easy-to-miss-bites and tastes')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(
       find.byKey(const ValueKey('easy-to-miss-bites and tastes')),
     );

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'arch/arch_command.dart';
 import 'command.dart';
+import 'demo_command.dart';
 import 'food/food_command.dart';
 import 'physical_android_device_id.dart';
 import 'requirements.dart';
@@ -56,6 +57,10 @@ final _commands = <String, (String, Command)>{
   'run': (
     'Run the app: mm run [--env dev|prod|phone] (phone selects physical Android)',
     _run,
+  ),
+  'demo': (
+    'Seed isolated Android demo: mm demo --seed -d <device ID>',
+    runDemo,
   ),
   'emulator': (
     'Start an emulator: mm emulator [id] [--cold] | list',

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import '../charts/macro_split_chart.dart';
 import '../format/fmt.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
@@ -12,6 +13,10 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
+import '../ui/mm_surface_kind.dart';
+import '../ui/info_card.dart';
+import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
 import 'calorie_hero.dart';
 import 'ask_low_day_complete.dart';
 import 'copy_entries.dart';
@@ -28,6 +33,16 @@ class FoodScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final pausesState = ref.watch(pausesProvider);
+    if (pausesState.hasError) {
+      return const Notice(
+        kind: NoticeKind.caution,
+        text: 'Pause history could not be loaded. Reopen the app to retry.',
+      );
+    }
+    if (pausesState.isLoading) {
+      return const Center(child: Text('Loading pause history…'));
+    }
     final day = shownDay(ref);
     final entries = ref.watch(foodForDayProvider(day)).value ?? const [];
     final yesterday =
@@ -43,8 +58,7 @@ class FoodScreen extends ConsumerWidget {
         ).targetsAllowed;
     final targets = targetsOn(history, day, targetsAllowed: targetsAllowed);
     // On a paused day the targets are a maintenance guide (MM-148).
-    final paused =
-        pauseOn(ref.watch(pausesProvider).value ?? const [], day) != null;
+    final paused = pauseOn(pausesState.value!, day) != null;
     final guide = paused ? ref.watch(maintenanceGuideProvider) : null;
     final completeness =
         ref.watch(completenessProvider(day)).value ?? DayCompleteness.unmarked;
@@ -57,6 +71,10 @@ class FoodScreen extends ConsumerWidget {
           intake: intakeDayFrom(day, entries),
           targets: paused ? guide : targets?.targets,
           paused: paused,
+        ),
+        InfoCard(
+          title: 'Macronutrient split',
+          child: MacroSplitChart(intake: intakeDayFrom(day, entries)),
         ),
         FiberLine(
           entries: entries,
@@ -94,26 +112,21 @@ class FoodScreen extends ConsumerWidget {
                   copyEntries(ref, entriesCopiedTo(day, yesterday)),
             ),
           ),
-        MmSurface(
-          padded: false,
-          clip: true,
-          child: Column(
-            children: [
-              for (final meal in Meal.values) ...[
-                if (meal != Meal.values.first)
-                  Divider(height: 1, color: context.mm.outline),
-                MealSection(
-                  meal: meal,
-                  day: day,
-                  entries: [
-                    for (final e in entries)
-                      if (e.meal == meal) e,
-                  ],
-                ),
+        for (final meal in Meal.values)
+          MmSurface(
+            key: ValueKey('meal-card-${meal.name}'),
+            kind: MmSurfaceKind.compact,
+            padded: false,
+            clip: true,
+            child: MealSection(
+              meal: meal,
+              day: day,
+              entries: [
+                for (final e in entries)
+                  if (e.meal == meal) e,
               ],
-            ],
+            ),
           ),
-        ),
         if (entries.isNotEmpty) ...[
           const SizedBox(height: 12),
           Text('Is this day fully logged?', style: text.titleMedium),

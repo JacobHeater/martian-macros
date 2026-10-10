@@ -39,9 +39,10 @@ Everything else is neutral and quiet so those three can work.
   at card scale, and the full-round bar ends are what make the arc and bars feel
   one family.
 - **Elevation.** Light: hairline outline `outline` plus a soft shadow
-  `0 1 2 rgba(12,18,32,0.06)` on cards; sheets and FAB get `0 8 24
+  `0 1 2 rgba(12,18,32,0.06)` on cards; sheets get `0 8 24
   rgba(12,18,32,0.12)`. Dark: no shadows on cards; separation by surface step
-  plus a 1 dp inner top highlight (`text` at 6%). The FAB adds the Ember halo.
+  plus a 1 dp inner top highlight (`text` at 6%). The FAB has no halo or shadow
+  in either theme (MM-181).
 - **Density.** Phone portrait. No hero block taller than the content it
   introduces (Today hero is about 232 dp including macros). No dead bands
   between groups larger than 24 dp.
