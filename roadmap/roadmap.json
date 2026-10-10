@@ -1784,11 +1784,12 @@
         "HS-strings"
       ],
       "sourceRequirements": {
-        "built": [],
+        "built": [
+          "MM-76",
+          "MM-75"
+        ],
         "remaining": [
           "MM-74",
-          "MM-75",
-          "MM-76",
           "MM-77",
           "MM-78",
           "MM-79",
