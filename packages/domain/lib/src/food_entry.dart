@@ -43,6 +43,9 @@ final class FoodEntry {
   final double? sodiumMg;
   final double? alcoholG;
 
+  /// Energy from alcohol at 7 kcal per gram, or 0 when none is known (MM-127).
+  double get alcoholKcal => 7 * (alcoholG ?? 0);
+
   /// Carbohydrate less fiber, or null when fiber is not known.
   double? get netCarbsG {
     final fiber = fiberG;

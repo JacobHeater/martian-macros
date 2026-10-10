@@ -44,6 +44,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _protein = TextEditingController();
   final _carbs = TextEditingController();
   final _fat = TextEditingController();
+  final _alcohol = TextEditingController();
   late Meal _meal = widget.entry?.meal ?? widget.meal ?? _defaultMeal();
   late CalendarDate _day = widget.entry?.date ?? widget.day;
   final _quantity = TextEditingController(text: '1');
@@ -98,6 +99,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       _protein,
       _carbs,
       _fat,
+      _alcohol,
       _quantity,
     ]) {
       c.dispose();
@@ -115,7 +117,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   double get _p => parseNumber(_protein.text) ?? 0;
   double get _c => parseNumber(_carbs.text) ?? 0;
   double get _f => parseNumber(_fat.text) ?? 0;
-  double get _fromMacros => atwaterKcal(proteinG: _p, carbsG: _c, fatG: _f);
+  double get _a => parseNumber(_alcohol.text) ?? 0;
+  double get _fromMacros =>
+      atwaterKcal(proteinG: _p, carbsG: _c, fatG: _f, alcoholG: _a);
 
   /// Calories as typed, or derived from macros when left blank.
   double? get _energy {
@@ -190,7 +194,13 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   bool get _mismatch {
     final typed = parseNumber(_kcal.text);
     if (typed == null || _fromMacros == 0) return false;
-    return !macrosMatchEnergy(kcal: typed, proteinG: _p, carbsG: _c, fatG: _f);
+    return !macrosMatchEnergy(
+      kcal: typed,
+      proteinG: _p,
+      carbsG: _c,
+      fatG: _f,
+      alcoholG: _a,
+    );
   }
 
   void _fill(FoodEntry e) => setState(() {
@@ -201,6 +211,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     _protein.text = n(e.proteinG);
     _carbs.text = n(e.carbsG);
     _fat.text = n(e.fatG);
+    _alcohol.text = e.alcoholG == null ? '' : n(e.alcoholG!);
     _source = e.source;
     _basis = NutritionBasis.enteredTotals;
     final portion = e.portion;
@@ -320,7 +331,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       portion: portion,
       fiberG: _scaledExtra(editing?.fiberG),
       sodiumMg: _scaledExtra(editing?.sodiumMg),
-      alcoholG: _scaledExtra(editing?.alcoholG),
+      alcoholG: _calcRef == null
+          ? (_a > 0 ? _a : null)
+          : _scaledExtra(editing?.alcoholG),
     );
     final writer = ref.read(foodEntryWriterProvider);
     await (editing == null ? writer.addFood(entry) : writer.updateFood(entry));
@@ -701,6 +714,15 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           const SizedBox(width: 8),
           _number(_fat, 'Fat g', 'fat'),
         ],
+      ),
+      const SizedBox(height: 12),
+      MmTextField(
+        key: const ValueKey('food-alcohol'),
+        controller: _alcohol,
+        label: 'Alcohol g (optional)',
+        kind: MmTextFieldKind.number,
+        helper: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
+        onChanged: (_) => setState(() {}),
       ),
       const SizedBox(height: 12),
       MmTextField(
