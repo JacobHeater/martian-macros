@@ -87,6 +87,7 @@ void main() {
       trendWeightKg: snapshot.trendWeightKg,
       bodyFat: snapshot.bodyFat,
       bmrKcal: snapshot.bmrKcal,
+      calorieFloorKcal: snapshot.calorieFloorKcal,
       tdee: snapshot.tdee,
       confidence: snapshot.confidence,
       recommendation: snapshot.recommendation,
@@ -116,6 +117,7 @@ void main() {
       trendWeightKg: base.trendWeightKg,
       bodyFat: base.bodyFat,
       bmrKcal: base.bmrKcal,
+      calorieFloorKcal: base.calorieFloorKcal,
       tdee: TdeeEstimate(
         kcal: base.tdee.kcal,
         sigmaKcal: base.tdee.sigmaKcal,

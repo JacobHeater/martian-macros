@@ -11,6 +11,8 @@ import 'initial_tdee_prior.dart';
 import 'partition.dart';
 import 'recommend_mode.dart';
 import 'resting_energy_equations.dart';
+import 'safety_body_fat.dart';
+import 'safety_bounds.dart';
 import 'settling_shift.dart';
 import 'settling_windows.dart';
 import 'targets_record.dart';
@@ -141,6 +143,16 @@ CoachSnapshot? analyze({
     trendWeightKg: trendWeight,
     bodyFat: bodyFat,
     bmrKcal: bmr,
+    calorieFloorKcal: SafetyBounds.calorieFloorKcal(
+      sex: profile.sex,
+      bmrKcal: bmr,
+      bodyFatPercent: safetyBodyFatPercent(
+        bodyFat,
+        previous: history.isEmpty ? null : history.last.safetyBodyFatPercent,
+      ),
+      fatFreeMassUpperKg: bodyFat.fatFreeMassUpperKg(trendWeight),
+      trainingKcalPerDay: 0,
+    ),
     tdee: tdee,
     confidence: assessCoachConfidence(
       estimate: tdee,

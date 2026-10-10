@@ -20,6 +20,7 @@ import '../ui/mm_button_kind.dart';
 import '../ui/notice.dart';
 import '../ui/notice_kind.dart';
 import '../ui/stat_row.dart';
+import 'adherence_card.dart';
 import 'caution_message.dart';
 import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
@@ -143,6 +144,7 @@ class CoachScreen extends ConsumerWidget {
           today: today,
           holdNote: _holdNote(setup, snapshot, today),
         ),
+        const AdherenceCard(),
         InfoCard(
           title: 'Your metabolism',
           child: MetabolismSummary(

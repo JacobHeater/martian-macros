@@ -117,6 +117,23 @@ final coachProvider = Provider<CoachSnapshot?>((ref) {
   );
 });
 
+/// What the user did over the seven days to yesterday (MM-149); null until
+/// the coach has a first weigh-in.
+final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
+  final snapshot = ref.watch(coachProvider);
+  final intake = ref.watch(intakeDaysProvider).value;
+  final weights = ref.watch(weightsProvider).value;
+  final history = ref.watch(targetsHistoryProvider).value;
+  if (snapshot == null || intake == null || weights == null) return null;
+  return summarizeAdherence(
+    through: ref.watch(todayProvider).addDays(-1),
+    intake: intake,
+    weights: weights,
+    history: snapshot.policy.targetsAllowed ? history ?? const [] : const [],
+    floorKcal: snapshot.calorieFloorKcal,
+  );
+});
+
 /// The targets in force today, if any have been issued.
 final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
   final setup = ref.watch(setupProvider).value;
