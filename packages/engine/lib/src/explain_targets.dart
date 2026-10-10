@@ -44,7 +44,9 @@ TargetsExplanation explainTargets({
     );
     final rest = trace.formulaKcal - base - expenditure;
     add(
-      targets.flags.contains(TargetFlag.dietBreak)
+      targets.flags.contains(TargetFlag.requestedBreak)
+          ? ExplanationReason.requestedBreak
+          : targets.flags.contains(TargetFlag.dietBreak)
           ? ExplanationReason.dietBreak
           : switch (trigger) {
               ExplanationTrigger.goalChange => ExplanationReason.goalChange,

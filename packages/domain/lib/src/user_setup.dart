@@ -23,6 +23,8 @@ final class UserSetup {
     this.healthCheckConfirmedOn,
     this.healthCheckSkipCount = 0,
     this.creatineStartedOn,
+    this.maintenanceWeekFrom,
+    this.reliefAnsweredOn,
   });
 
   static const healthCheckIntervalDays = 90;
@@ -62,6 +64,13 @@ final class UserSetup {
   /// When the user started taking creatine, if they currently take it (MM-136).
   final CalendarDate? creatineStartedOn;
 
+  /// The day the user last chose to take a maintenance week early (MM-117).
+  final CalendarDate? maintenanceWeekFrom;
+
+  /// The day the user last answered the offer to ease a deficit, whatever
+  /// they chose (MM-117). The offer is not repeated for three weeks.
+  final CalendarDate? reliefAnsweredOn;
+
   bool healthCheckDueOn(CalendarDate today) {
     final confirmed = healthCheckConfirmedOn;
     return confirmed == null ||
@@ -82,6 +91,8 @@ final class UserSetup {
     CalendarDate? Function()? healthCheckConfirmedOn,
     int? healthCheckSkipCount,
     CalendarDate? Function()? creatineStartedOn,
+    CalendarDate? maintenanceWeekFrom,
+    CalendarDate? reliefAnsweredOn,
   }) => UserSetup(
     profile: profile ?? this.profile,
     screening: screening ?? this.screening,
@@ -105,5 +116,7 @@ final class UserSetup {
     creatineStartedOn: creatineStartedOn == null
         ? this.creatineStartedOn
         : creatineStartedOn(),
+    maintenanceWeekFrom: maintenanceWeekFrom ?? this.maintenanceWeekFrom,
+    reliefAnsweredOn: reliefAnsweredOn ?? this.reliefAnsweredOn,
   );
 }

@@ -46,6 +46,8 @@ extension ExplanationLineText on ExplanationLine {
             'be ${Fmt.kcal(from!)}.',
       ExplanationReason.noExplanationRecorded =>
         'No explanation was recorded for these targets.',
+      ExplanationReason.requestedBreak =>
+        'A maintenance week you chose to take ($size).',
     };
   }
 

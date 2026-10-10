@@ -19,6 +19,7 @@ const _safetyFlags = {
   TargetFlag.underweightMaintenance,
   TargetFlag.modeNotAllowed,
   TargetFlag.dietBreak,
+  TargetFlag.requestedBreak,
   TargetFlag.heldByUser,
 };
 

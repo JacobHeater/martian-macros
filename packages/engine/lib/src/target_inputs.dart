@@ -21,6 +21,7 @@ final class TargetInputs {
     this.requestedLossFraction,
     this.safetyBodyFatPercent,
     this.safetyRaiseKcal = 0,
+    this.breakRequested = false,
   });
 
   final BiologicalSex sex;
@@ -56,4 +57,8 @@ final class TargetInputs {
   /// Added to last week's target even beyond the weekly step limit, because
   /// the user is losing faster than the safe pace (`lossSafetyRaiseKcal`).
   final double safetyRaiseKcal;
+
+  /// The user chose a maintenance week now (MM-117): a deficit is replaced
+  /// by maintenance for this set of targets.
+  final bool breakRequested;
 }

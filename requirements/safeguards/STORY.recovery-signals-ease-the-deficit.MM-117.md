@@ -1,6 +1,6 @@
 ---
 id: MM-117
-status: proposed
+status: in-progress
 component: safeguards
 related: [MM-110, MM-24, MM-31, MM-77, MM-79, MM-116, MM-128, MM-135, MM-138, MM-141]
 ---
@@ -75,3 +75,32 @@ Scenario: Never the other direction
 - Without the training log (MM-75) only the self-report trigger exists.
 - Deloads and program changes are out of scope (MM-79, MM-144); a strength drop from a deliberate deload will trigger this, which is why
   "carry on" must be one tap and free of comment.
+
+## Progress
+Built:
+- **The self-report trigger** (`findReliefOffer`): on a fat-loss or recomp goal whose current targets are a deficit, when each of the
+  last two weekly check-ins (MM-116) had at least three of its five answers in the bottom two points. The two must be 5 to 14 days
+  apart, so one week answered twice is one check-in, and the latest must be within 7 days. Not during a pause.
+- **An offer, never a change**: a notice on the dashboard and the Coach screen with three choices, and which the coach would pick and
+  why. Eight or more weeks into the deficit, or with no slower pace left, it suggests the maintenance week; earlier, the slower pace.
+  The suggested choice is the prominent button.
+- **A maintenance week now**: targets go to maintenance at once, beyond the weekly step limit, flagged as the week the user chose
+  (`TargetFlag.requestedBreak`, explained as such in the target-change summary). The next check-in is a week later. Being at
+  maintenance it ends the unbroken deficit, so the count restarts when the deficit resumes.
+- **A slower pace**: one step gentler of 1.0, 0.75 and 0.5% a week (`slowerPace`), stored as the chosen pace. It takes effect at the
+  next check-in. Not offered on recomp, or at 0.5% already.
+- **Carry on**: one tap, no comment, nothing changes.
+- **Quiet for three weeks** after any of the three answers.
+- **Short sleep adds a line** when the hours given with those check-ins average under six, worded "appears to". It is never a trigger.
+- **Never the other direction**: the three outcomes are a raise, a gentler pace or no change. A test checks the slower pace never
+  lowers the target and forbids "eat less", "cardio", "train more", "exercise" and "push through" in the offer.
+- Thresholds are in `ReliefRule`. Schema version 23 stores the day a maintenance week was taken and the day the offer was last
+  answered. Tests: `relief_offer_test.dart` (engine and app), the setup contract and the migration test.
+
+Not built:
+- **The strength trigger**: it needs the training log and the strength trend (MM-75, MM-77). So "unless both triggers hold at once"
+  does not apply yet: the three weeks of quiet are unconditional.
+- It is a notice, not an entry in the insight catalog (MM-141), so it is not rationed with insights. It is a safety offer and should
+  not be.
+- The pace names and what each costs (MM-128): the offer shows the percentage only.
+- Not checked on a device.
