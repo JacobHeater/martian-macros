@@ -11,14 +11,15 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-09, by Claude (Anthropic), at the end of session 3 below.
+Last updated: 2026-10-10, by Copilot, during the Dashboard pivot.
 
-**Branch state.** `main` is green and holds everything described here. No pull request is open except the one that adds this
-document. Nothing is half-built on a local branch.
+**Branch state.** Handoff PR #61 and phone-shortcut PR #62 are merged.
+Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
+`feature/mm176-dashboard-metrics`. No unrelated roadmap work is being started.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-175 (`mm req next` is the authority).
+**Next ticket ID.** MM-178 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -41,6 +42,9 @@ ticket's "Progress" section says what was and was not checked.
 
 **Standing rules from the product owner that are not in `AGENTS.md`.** These were given in conversation and held in one agent's
 private notes; they bind whoever picks up the work.
+- Current priority is a metrics-heavy Dashboard with a full existing-data
+  overview. The owner chose a separate demo app/database for repeatable
+  synthetic seeding; never overwrite the normal app's data.
 - Work through the roadmap without waiting to be asked. Open pull requests with `gh`, and merge them yourself (`--merge`) once CI is
   green. The owner does not want to be involved in that.
 - Do not sit waiting on CI in the middle of a session. Check open pull requests at the start and the end of each turn, merge the
@@ -67,6 +71,19 @@ private notes; they bind whoever picks up the work.
   app's package is `com.martianmacros.martian_macros`.
 - One declaration per file is enforced (`mm arch`), and a file is named for what it declares. A screen that needs state has its
   `State` class in a second file ending `_state.dart`.
+
+## Session 4: 2026-10-10, Copilot
+
+- MM-175 added `mm run --env phone`: dev configuration with automatic physical
+  Android selection, never emulator fallback. Full checks passed; discovery
+  was verified on connected hardware without launching the app. PR #62 merged.
+- Owner pivoted to the Dashboard, explicitly superseding the sparse one-screen
+  direction. MM-176 adds a compact summary and 7/30-day nutrition, weight,
+  waist, coverage and coaching histories, plus separate recovery trends.
+- MM-177 supplies a repeatable synthetic seed in a separately identified demo
+  app/database. It must never seed or reset the normal app's data.
+- Validation is in progress; populated/empty/loading/error/narrow-screen
+  tests cover the Dashboard. Screenshots and emulator checks are still pending.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
@@ -117,27 +134,3 @@ Things a successor should know:
 - **No composite scores**, for adherence, recovery or confidence. Each ticket says why.
 - The stall diagnosis offers options as text only, because the things it would offer (pace choice MM-128, weekly budget MM-124, diet
   break policy MM-135) are not built.
-
-## Session 1: 2026-10-09 (afternoon), Claude (Anthropic)
-
-Workstream WS-08, the food-logging experience. All merged. Written from the pull requests and the commit history.
-
-| Pull request | Ticket | What changed |
-|---|---|---|
-| #36, #47 | MM-152 | The easy-to-miss line under a completed day, and "Cooked with oil?". |
-| #37, #48 | MM-150 | Estimated meals: the logging-style rule and a simulated noisy logger. |
-| #38 | MM-167 | Each entry remembers the food it was logged from. Schema 14. |
-| #39 | MM-166 | `mm roadmap` opens the progress page. |
-| #40, #43 | MM-49 | Detail level (Simple, Standard, Full); fiber, sodium and alcohol stored. Schema 15. |
-| #41 | MM-46 | Hand-portion logging, sized to the person. Schema 16. |
-| #42 | MM-44 | Reading a nutrition label with the camera, on the device. |
-| #44 | MM-151 | Raw or cooked, remembered per food. |
-| #45, #49 | MM-127 | Alcohol counted and shown on its own line. |
-| #46, #50 | MM-126 | Fiber against a guide, at Full detail. |
-
-Things a successor should know:
-- The detail level changes what is shown, never what is stored.
-- The label reader uses on-device text recognition (`google_mlkit_text_recognition`); its release build needed shrinker rules for
-  recognisers the app does not ship (MM-172).
-- Hand-portion volumes are judgement, and a waist-measurement noise of 1.5 cm is a stand-in until the measurement protocol (MM-155)
-  is built.
