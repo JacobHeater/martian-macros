@@ -9,6 +9,7 @@ import 'insight_log.dart';
 import 'migration_step.dart';
 import 'pauses.dart';
 import 'recipe_ingredients.dart';
+import 'reminders.dart';
 import 'schema_migration_exception.dart';
 import 'setups.dart';
 import 'targets_history.dart';
@@ -33,6 +34,7 @@ part 'app_database.g.dart';
     RecipeIngredients,
     InsightLog,
     Pauses,
+    Reminders,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -40,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 20;
+  static const currentSchemaVersion = 21;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -223,6 +225,10 @@ class AppDatabase extends _$AppDatabase {
     // 19 to 20: pauses for travel, illness and injury (MM-148).
     19: (m) async {
       await m.createTable(pauses);
+    },
+    // 20 to 21: reminder settings (MM-146).
+    20: (m) async {
+      await m.createTable(reminders);
     },
   };
 

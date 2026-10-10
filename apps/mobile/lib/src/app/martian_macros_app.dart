@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
 import '../providers.dart';
+import '../reminders/reminder_host.dart';
 import '../theme/mm_theme.dart';
 import 'app_root.dart';
 import 'check_in_host.dart';
@@ -22,8 +23,9 @@ class MartianMacrosApp extends ConsumerWidget {
       ThemePreference.dark => ThemeMode.dark,
       _ => ThemeMode.system,
     },
-    builder: (context, child) =>
-        CheckInHost(child: DownloadStatusHost(child: child!)),
+    builder: (context, child) => CheckInHost(
+      child: ReminderHost(child: DownloadStatusHost(child: child!)),
+    ),
     home: const AppRoot(),
   );
 }

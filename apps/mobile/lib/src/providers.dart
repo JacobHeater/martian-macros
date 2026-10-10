@@ -326,6 +326,89 @@ final underEatingNoticeProvider = Provider<UnderEatingFinding?>((ref) {
       : null;
 });
 
+/// The reminder settings the user has stored (MM-146).
+final remindersProvider = StreamProvider<List<ReminderSetting>>(
+  (ref) => ref.watch(reminderReaderProvider).watchReminders(),
+);
+
+/// Every reminder's setting: what is stored, or off at its default time.
+final reminderSettingsProvider = Provider<List<ReminderSetting>>((ref) {
+  final stored = ref.watch(remindersProvider).value ?? const [];
+  return [
+    for (final kind in ReminderKind.values)
+      stored.where((s) => s.kind == kind).firstOrNull ??
+          ReminderSetting(
+            kind: kind,
+            minuteOfDay: ReminderRule.defaultMinuteOfDay(kind),
+          ),
+  ];
+});
+
+/// What the reminder rules need to know; null until the data has loaded.
+final reminderFactsProvider = Provider<ReminderFacts?>((ref) {
+  final weights = ref.watch(weightsProvider).value;
+  final intake = ref.watch(intakeDaysProvider).value;
+  final waist = ref.watch(waistProvider).value;
+  final pauses = ref.watch(pausesProvider).value;
+  if (weights == null || intake == null || waist == null || pauses == null) {
+    return null;
+  }
+  return ReminderFacts(
+    weighInDays: [for (final w in weights) w.date],
+    foodDays: [
+      for (final d in intake)
+        if (d.kcal > 0) d.date,
+    ],
+    waistDays: [for (final w in waist) w.date],
+    pauses: pauses,
+  );
+});
+
+/// The minutes after midnight now.
+int _minuteNow(Ref ref) => minuteOfDayNow(ref.watch(clockProvider));
+
+/// The minutes after midnight on [clock].
+int minuteOfDayNow(Clock clock) {
+  final now = clock.now();
+  return now.hour * 60 + now.minute;
+}
+
+/// The reminders the device should have scheduled (MM-146). Null until the
+/// data has loaded, and while no reminder has ever been set, so that the
+/// scheduler is not touched for a user who never turned one on.
+final reminderPlanProvider = Provider<List<PlannedReminder>?>((ref) {
+  final stored = ref.watch(remindersProvider).value;
+  final facts = ref.watch(reminderFactsProvider);
+  if (stored == null || stored.isEmpty || facts == null) return null;
+  return planReminders(
+    settings: stored,
+    facts: facts,
+    today: ref.watch(todayProvider),
+    minuteNow: _minuteNow(ref),
+  );
+});
+
+/// The reminders that have gone unanswered seven times and paused
+/// themselves.
+final selfPausedRemindersProvider = Provider<List<ReminderSetting>>((ref) {
+  final stored = ref.watch(remindersProvider).value;
+  final facts = ref.watch(reminderFactsProvider);
+  if (stored == null || facts == null) return const [];
+  final today = ref.watch(todayProvider);
+  final minuteNow = _minuteNow(ref);
+  return [
+    for (final setting in stored)
+      if (reminderIgnoredStreak(
+            setting: setting,
+            facts: facts,
+            today: today,
+            minuteNow: minuteNow,
+          ) >=
+          ReminderRule.ignoredLimit)
+        setting,
+  ];
+});
+
 /// The targets in force today, if any have been issued.
 final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
   final setup = ref.watch(setupProvider).value;

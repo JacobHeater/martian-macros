@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/integration_providers.dart';
+import 'package:martian_macros/src/reminders/reminder_scheduler_provider.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'in_memory_overrides.dart';
@@ -14,6 +15,7 @@ Future<void> pumpApp(
   InMemoryRepositories repos,
   FixedClock clock, {
   List<Override> overrides = const [],
+  InMemoryReminderScheduler? scheduler,
 }) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.5;
@@ -23,6 +25,10 @@ Future<void> pumpApp(
       overrides: [
         ...inMemoryOverrides(repos),
         clockProvider.overrideWithValue(clock),
+        // Never the device's notifications in a test.
+        reminderSchedulerProvider.overrideWithValue(
+          scheduler ?? InMemoryReminderScheduler(),
+        ),
         ...overrides,
       ],
       child: const MartianMacrosApp(),
