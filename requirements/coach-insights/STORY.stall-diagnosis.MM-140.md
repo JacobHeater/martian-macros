@@ -1,6 +1,6 @@
 ---
 id: MM-140
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-137, MM-17, MM-19, MM-21, MM-23, MM-24, MM-27, MM-28, MM-32, MM-108, MM-123, MM-131, MM-133, MM-135, MM-136, MM-138, MM-139, MM-149]
 ---
@@ -102,3 +102,29 @@ Scenario: Wording
 - Depends on MM-149 for the adherence figures and MM-155 for waist noise.
 - "More daily activity" is the only place the app suggests activity, and it suggests walking, not exercise sessions to burn calories
   (MM-144).
+
+## Progress
+Built: `assessStall` (engine) returns no stall, not assessed with its reason, or a stall with its diagnosis and figures. A stall is
+judged against the goal: over 21 days (28 for a female profile, since the app has no cycle data) the trend moved less than a third of
+the intended pace and the shortfall exceeds the slope's uncertainty. Not assessed in the first window of a phase (a phase also
+restarts on the first day back from a long gap, MM-147), while the coach is still learning, or within 14 days of starting or
+stopping creatine. The diagnosis is the first of: data (fewer than 12 whole food days or 10 weigh-ins), masked (waist down by more
+than 1.5 cm over at least 3 readings, or a passing weight event in the last 10 days), intake (the window's average is above the
+band on a cut, below it on a gain), and the estimate. The intake figures are the adherence summary's for the same period (one
+function, tested equal). Under the estimate diagnosis it gives the change expected at the next check-in (the estimate's fall, no
+more than the weekly limit, never below the floor), says when the target is already at the floor, and flags an estimate under 1.3
+times resting energy. Thresholds are in `StallRule`. On the Coach screen a card "Progress has slowed" states the diagnosis in the
+user's numbers, lists options as plain lines, and opens to what it rests on. Tests: `stall_diagnosis_test.dart` (engine) and
+`stall_card_test.dart` (wording, a list of words that may not appear, and one test through the real app).
+
+Not built, or approximate:
+- **Waist noise is a stand-in** (1.5 cm) until MM-155 models it.
+- **Cycle windows and the start of training** as masking causes: only passing weight events and the waist are used.
+- **Options are text, not actions**: a gentler pace (MM-128), shaping the week (MM-124) and a maintenance break (MM-135) are not
+  built, so nothing can be tapped.
+- **Not an insight yet** (MM-141) and not on the dashboard; not "updated at each check-in" as a stored record, it is recomputed live.
+- **Pauses** (MM-148) do not exist, so a paused period is not excluded.
+- The slope's uncertainty ignores the correlation between the window's two ends, which makes it a little larger than it is and so
+  slightly slower to call a stall.
+- The simulated "accurate logger whose expenditure is 300 kcal below the estimate" scenario is tested with a constructed snapshot,
+  not through the closed-loop simulator.
