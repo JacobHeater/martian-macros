@@ -19,6 +19,8 @@ final class Portion {
     this.unit,
     this.reference,
     this.origin,
+    this.impliedGrams,
+    this.handModelVersion,
   });
 
   final QuantitySource method;
@@ -34,4 +36,10 @@ final class Portion {
 
   /// The food it was logged from, when it came from a pack or a saved food.
   final FoodOrigin? origin;
+
+  /// For a hand portion, the grams the hand model implied when it was logged
+  /// and the model's version (MM-46). Kept so the entry stays explicable if
+  /// the person's height is corrected or the model changes.
+  final double? impliedGrams;
+  final int? handModelVersion;
 }

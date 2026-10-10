@@ -1,3 +1,4 @@
+import '../hand/hand_size.dart';
 import 'grams_for.dart';
 import 'nutrition_totals.dart';
 import 'portion_unit.dart';
@@ -13,8 +14,9 @@ import 'reference_nutrition.dart';
 NutritionTotals? scaleNutrition(
   double quantity,
   PortionUnit unit,
-  ReferenceNutrition reference,
-) {
+  ReferenceNutrition reference, {
+  HandSize? hand,
+}) {
   if (!(quantity > 0) || !quantity.isFinite) return null;
   switch (reference.basis) {
     case ReferenceBasis.perServing:
@@ -27,13 +29,13 @@ NutritionTotals? scaleNutrition(
       if (ml != null && servingMl != null && servingMl > 0) {
         return reference.nutrition.times(quantity * ml / servingMl);
       }
-      final grams = gramsFor(quantity, unit, reference);
+      final grams = gramsFor(quantity, unit, reference, hand: hand);
       if (grams != null && servingGrams != null && servingGrams > 0) {
         return reference.nutrition.times(grams / servingGrams);
       }
       return null;
     case ReferenceBasis.per100g:
-      final grams = gramsFor(quantity, unit, reference);
+      final grams = gramsFor(quantity, unit, reference, hand: hand);
       return grams == null ? null : reference.nutrition.times(grams / 100);
     case ReferenceBasis.per100ml:
       final ml = unit.milliliters;

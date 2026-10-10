@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 15;
+  static const currentSchemaVersion = 16;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -165,6 +165,21 @@ class AppDatabase extends _$AppDatabase {
       }
       if (!(await columnsOf('user_preferences')).contains('detail_level')) {
         await m.addColumn(userPreferences, userPreferences.detailLevel);
+      }
+    },
+    // 15 to 16: what a hand portion implied, and the model's version (MM-46).
+    15: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(food_entries)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('implied_grams')) {
+        await m.addColumn(foodEntries, foodEntries.impliedGrams);
+      }
+      if (!existing.contains('hand_model_version')) {
+        await m.addColumn(foodEntries, foodEntries.handModelVersion);
       }
     },
   };

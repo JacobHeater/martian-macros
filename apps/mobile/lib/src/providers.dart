@@ -75,6 +75,14 @@ final easyToMissProvider = StreamProvider<EasyToMissPreference>(
   (ref) => ref.watch(easyToMissReaderProvider).watchEasyToMiss(),
 );
 
+/// The size of the person's hand for hand portions (MM-46), once set up.
+final handSizeProvider = Provider<HandSize?>((ref) {
+  final profile = ref.watch(setupProvider).value?.profile;
+  return profile == null
+      ? null
+      : HandSize(heightCm: profile.heightCm, sex: profile.sex);
+});
+
 /// How much nutrition to show (MM-49).
 final detailLevelProvider = StreamProvider<DetailLevel>(
   (ref) => ref.watch(detailLevelReaderProvider).watchDetailLevel(),
