@@ -41,7 +41,7 @@ olive, any desaturated warm neutral, purple-to-blue "AI" gradients, pure black
 |---|---|---|---|
 | `canvas` | `#090D15` | `#F3F5FA` | Page background |
 | `surface` | `#101624` | `#FFFFFF` | Grouped content (cards, lists) |
-| `raised` | `#171F32` | `#FFFFFF` | Nav bar, sheets, FAB shadow context, menus |
+| `raised` | `#171F32` | `#FFFFFF` | Nav bar, sheets, menus |
 | `overlay` | `#1F2A42` | `#FFFFFF` | Dialogs, popovers (dark only gets a visible step) |
 | `sunken` | `#0D1220` | `#E8ECF5` | Wells, input fills, skeletons |
 | `track` | `#1F2940` | `#EBEFF7` | Empty part of progress bars and arcs |
@@ -185,7 +185,7 @@ Gradients are allowed in exactly three cases and nowhere else:
 |---|---|---|---|
 | **Limb glow** | Radial `ion` at 12% (dark) / 8% (light) fading to transparent, from the card's top-trailing corner, ~60% radius | One hero surface per screen: Today hero, Coach confidence, onboarding welcome | Max one per screen. Never behind body text |
 | **Horizon arc** | The calorie arc itself (a shallow orbital curve) in `energy` on `track` | Today hero only | One |
-| **Ember halo** | Soft `ember` shadow at 25% under the primary FAB | Dark mode only | One element |
+| **Primary action** | Solid `ember` with `onEmber` foreground; no halo or shadow (MM-181) | Both themes | One primary action |
 
 No gradient has two hues. There is no purple-to-blue, no sunrise gradient, no
 mesh gradient.

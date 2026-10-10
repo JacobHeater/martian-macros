@@ -64,6 +64,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
     expect(find.text('Goal: Fat loss'), findsOneWidget);
+    await tester.ensureVisible(find.text('Change'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
     expect(find.text('Choose a goal'), findsOneWidget);
@@ -80,6 +82,8 @@ void main() {
     await tester.tap(find.text('Coach'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Goal: Fat loss'), 300);
+    await tester.ensureVisible(find.text('Change'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Change'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Maintenance'));

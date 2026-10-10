@@ -227,6 +227,8 @@ void main() {
     expect(find.text('510'), findsWidgets);
     expect(find.textContaining('kcal left'), findsOneWidget);
 
+    await tester.scrollUntilVisible(find.text('Complete'), 250);
+    await tester.ensureVisible(find.text('Complete'));
     await tester.tap(find.text('Complete'));
     await tester.pumpAndSettle();
     // 510 kcal is under half the floor, so the app asks first (MM-114).

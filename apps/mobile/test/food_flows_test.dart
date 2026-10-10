@@ -98,6 +98,8 @@ void main() {
     );
     await openFood(tester);
     expect(find.text('Chicken and rice'), findsOneWidget);
+    await tester.ensureVisible(find.text('Chicken and rice'));
+    await tester.pumpAndSettle();
     await tester.drag(find.text('Chicken and rice'), const Offset(-800, 0));
     await tester.pumpAndSettle();
     expect(find.text('Chicken and rice'), findsNothing);

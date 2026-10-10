@@ -168,7 +168,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.ensureVisible(find.text('What this rests on'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('What this rests on'));
       await tester.pumpAndSettle();
@@ -216,7 +216,7 @@ void main() {
       await pumpApp(tester, repos, FixedClock(today));
       await tester.scrollUntilVisible(card, 300);
       final dismiss = find.byKey(const ValueKey('insight-dismiss'));
-      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.ensureVisible(dismiss);
       await tester.pumpAndSettle();
       await tester.tap(dismiss);
       await tester.pumpAndSettle();
