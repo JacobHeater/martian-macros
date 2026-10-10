@@ -134,6 +134,28 @@ final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
   );
 });
 
+/// When the welcome-back screen was last put off (MM-147).
+final returnScreenDismissedProvider = StreamProvider<CalendarDate?>(
+  (ref) => ref.watch(returnScreenReaderProvider).watchReturnScreenDismissedOn(),
+);
+
+/// Whether to show the welcome-back screen: the user is returning from a gap
+/// today and has not put the screen off since it began (MM-147).
+final welcomeBackDueProvider = Provider<bool>((ref) {
+  final weights = ref.watch(weightsProvider).value;
+  final intake = ref.watch(intakeDaysProvider).value;
+  final dismissed = ref.watch(returnScreenDismissedProvider);
+  if (weights == null || intake == null || !dismissed.hasValue) return false;
+  final gap = openGap(
+    weights: weights,
+    intake: intake,
+    today: ref.watch(todayProvider),
+  );
+  if (gap == null) return false;
+  final putOff = dismissed.value;
+  return putOff == null || putOff.isBefore(gap.from);
+});
+
 /// When the under-eating notice was last dismissed (MM-114).
 final underEatingDismissedProvider = StreamProvider<CalendarDate?>(
   (ref) =>

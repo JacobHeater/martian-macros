@@ -1602,7 +1602,7 @@
       "file": "ws-09-coaching-intelligence-and-adherence.md",
       "intent": "Everything the coach says and does beyond the weekly number: adherence, stalls, safety notices, gaps and pauses, recovery, recomp verdicts, rewards and reports.",
       "recommendedOrder": 10,
-      "status": "not-started",
+      "status": "partially-built",
       "riskLevel": "high",
       "parallelGroup": "PG-C",
       "dependsOn": [
