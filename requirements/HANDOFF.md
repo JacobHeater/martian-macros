@@ -11,14 +11,15 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-09, by Claude (Anthropic), at the end of session 3 below.
+Last updated: 2026-10-10, by Copilot, while adding the MM-175 phone shortcut.
 
-**Branch state.** `main` is green and holds everything described here. No pull request is open except the one that adds this
-document. Nothing is half-built on a local branch.
+**Branch state.** The MM-174 handoff PR #61 is open. MM-175 is on
+`feature/mm175-phone-shortcut`, stacked on that handoff branch; its PR builds on #61.
+No product feature work is being started in this session.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-175 (`mm req next` is the authority).
+**Next ticket ID.** MM-176 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -67,6 +68,17 @@ private notes; they bind whoever picks up the work.
   app's package is `com.martianmacros.martian_macros`.
 - One declaration per file is enforced (`mm arch`), and a file is named for what it declares. A screen that needs state has its
   `State` class in a second file ending `_state.dart`.
+
+## Session 4: 2026-10-10, Copilot
+
+- Owner requested `mm run --env phone` as a shortcut for physical-device testing.
+- MM-175 uses dev defines, selects one physical Android device, ignores emulators,
+  and reports missing, ambiguous, or malformed discovery results explicitly.
+- Existing dev/prod run and build behavior stays unchanged. All 47 tooling
+  tests and full `mm check` passed. `mm run --env phone --help` selected the
+  connected physical phone over a running emulator and exited successfully;
+  the app itself was not installed or launched during this verification.
+- No app data, database schema, or product feature behavior changes.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
@@ -117,27 +129,3 @@ Things a successor should know:
 - **No composite scores**, for adherence, recovery or confidence. Each ticket says why.
 - The stall diagnosis offers options as text only, because the things it would offer (pace choice MM-128, weekly budget MM-124, diet
   break policy MM-135) are not built.
-
-## Session 1: 2026-10-09 (afternoon), Claude (Anthropic)
-
-Workstream WS-08, the food-logging experience. All merged. Written from the pull requests and the commit history.
-
-| Pull request | Ticket | What changed |
-|---|---|---|
-| #36, #47 | MM-152 | The easy-to-miss line under a completed day, and "Cooked with oil?". |
-| #37, #48 | MM-150 | Estimated meals: the logging-style rule and a simulated noisy logger. |
-| #38 | MM-167 | Each entry remembers the food it was logged from. Schema 14. |
-| #39 | MM-166 | `mm roadmap` opens the progress page. |
-| #40, #43 | MM-49 | Detail level (Simple, Standard, Full); fiber, sodium and alcohol stored. Schema 15. |
-| #41 | MM-46 | Hand-portion logging, sized to the person. Schema 16. |
-| #42 | MM-44 | Reading a nutrition label with the camera, on the device. |
-| #44 | MM-151 | Raw or cooked, remembered per food. |
-| #45, #49 | MM-127 | Alcohol counted and shown on its own line. |
-| #46, #50 | MM-126 | Fiber against a guide, at Full detail. |
-
-Things a successor should know:
-- The detail level changes what is shown, never what is stored.
-- The label reader uses on-device text recognition (`google_mlkit_text_recognition`); its release build needed shrinker rules for
-  recognisers the app does not ship (MM-172).
-- Hand-portion volumes are judgement, and a waist-measurement noise of 1.5 cm is a stand-in until the measurement protocol (MM-155)
-  is built.
