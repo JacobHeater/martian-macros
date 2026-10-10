@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import '../food/calorie_hero.dart';
 import '../format/fmt.dart';
 import '../format/coach_confidence_text.dart';
 import '../format/goal_mode_label.dart';
@@ -12,10 +13,7 @@ import '../repository_role_providers.dart';
 import '../ui/choice_card.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/info_card.dart';
-import '../ui/macro_figure.dart';
-import '../ui/macro_kind.dart';
 import '../ui/mm_disclosure.dart';
-import '../ui/mm_hero_surface.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/notice.dart';
@@ -52,6 +50,7 @@ class CoachScreen extends ConsumerWidget {
     final today = ref.watch(todayProvider);
     final fmt = Fmt(setup.unitSystem);
     final text = Theme.of(context).textTheme;
+    final pause = ref.watch(activePauseProvider);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -68,50 +67,26 @@ class CoachScreen extends ConsumerWidget {
         const PauseBanner(),
         const UnderEatingNotice(),
         const ReliefOfferCard(),
-        if (current != null)
-          MmHeroSurface(
+        if (current != null) ...[
+          // The one calorie visual (MM-187): today against the targets in
+          // force, or against the maintenance guide during a pause.
+          CalorieHero(
+            intake: intakeDayFrom(
+              today,
+              ref.watch(foodForDayProvider(today)).value ?? const [],
+            ),
+            targets: pause != null
+                ? ref.watch(maintenanceGuideProvider)
+                : current.targets,
+            paused: pause != null,
+          ),
+          InfoCard(
+            title: 'Your targets',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Daily targets',
-                  style: text.labelMedium?.copyWith(color: context.mm.text2),
-                ),
-                const SizedBox(height: 4),
-                Text(Fmt.whole(current.targets.kcal), style: text.displayLarge),
-                Text(
-                  'kcal a day',
-                  style: text.bodyMedium?.copyWith(color: context.mm.text2),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: MacroFigure(
-                        macro: MacroKind.protein,
-                        value: Fmt.grams(current.targets.proteinG),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: MacroFigure(
-                        macro: MacroKind.carbs,
-                        value: Fmt.grams(current.targets.carbsG),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: MacroFigure(
-                        macro: MacroKind.fat,
-                        value: Fmt.grams(current.targets.fatG),
-                      ),
-                    ),
-                  ],
-                ),
                 if (current.targets.proteinMinimumG case final minimum?)
                   StatRow('Protein minimum', Fmt.grams(minimum)),
-                const SizedBox(height: 16),
-                Divider(color: context.mm.outline),
                 StatRow(
                   'Intended pace',
                   current.targets.weeklyRateFraction == 0
@@ -147,6 +122,7 @@ class CoachScreen extends ConsumerWidget {
               ],
             ),
           ),
+        ],
         LastChangeCard(
           history: ref.watch(targetsHistoryProvider).value ?? const [],
           today: today,
