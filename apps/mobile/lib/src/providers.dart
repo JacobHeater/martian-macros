@@ -42,6 +42,30 @@ final weightEventsProvider = StreamProvider<List<WeightEvent>>(
   (ref) => ref.watch(weightEventReaderProvider).watchWeightEvents(),
 );
 
+/// Every logged workout, most recently started first (MM-75).
+final workoutsProvider = StreamProvider<List<Workout>>(
+  (ref) => ref.watch(workoutReaderProvider).watchWorkouts(),
+);
+
+/// The exercises the user added (MM-76).
+final customExercisesProvider = StreamProvider<List<Exercise>>(
+  (ref) => ref.watch(customExerciseReaderProvider).watchCustomExercises(),
+);
+
+/// Every exercise that can be chosen: the built-in library and the user's
+/// own (MM-76).
+final exercisesProvider = Provider<List<Exercise>>(
+  (ref) => [
+    ...builtInExercises,
+    ...ref.watch(customExercisesProvider).value ?? const [],
+  ],
+);
+
+/// [exercisesProvider] by id, for showing what a logged set was of.
+final exercisesByIdProvider = Provider<Map<String, Exercise>>(
+  (ref) => {for (final e in ref.watch(exercisesProvider)) e.id: e},
+);
+
 /// Every pause the user has set (MM-148).
 final pausesProvider = StreamProvider<List<Pause>>(
   (ref) => ref.watch(pauseReaderProvider).watchPauses(),

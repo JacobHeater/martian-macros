@@ -1,6 +1,6 @@
 ---
 id: MM-76
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-75, MM-78, MM-188, MM-189]
 ---
@@ -59,13 +59,16 @@ Built (2026-10-10):
   client library's source.
 - Search (`searchExercises`), covering the "Finding an exercise" and "Recents first" rules as a pure function.
 
-Not built, and why:
-- **The screen for choosing an exercise** has nowhere to live until the Train destination exists (MM-75).
-- **Saving a user's own exercises** needs a table. It waits for MM-75, so the training tables arrive in one schema change and not
-  two. The model and the search already take a custom exercise.
-- **"Recents" from real workouts**: the search takes the recent ids; what supplies them is the workout log (MM-75).
+- The table for a user's own exercises (schema 25, with the training tables of MM-75) and its repository.
+- The screen for choosing an exercise: recently used first under their own heading, then the whole library; a search box; and
+  "Create your own exercise", which carries the typed name over and adds the new exercise to the workout.
 
-Checked by tests only. Nothing here is visible in the app yet.
+Not built:
+- Changing or deleting one of the user's own exercises. The storage allows both; no screen does yet.
+- "Counts toward shoulder volume" is true of the data (the exercise has its muscle groups) and is shown when weekly volume is built
+  (MM-78).
+
+Checked by tests and by the screenshots generated on Linux (light, dark, Martian). Not seen on the emulator.
 
 ## Notes
 - Source for the library: write it, or find an openly licensed list (check the license as carefully as for food data, MM-57).
