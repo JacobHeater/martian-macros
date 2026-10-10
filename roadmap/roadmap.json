@@ -1521,7 +1521,8 @@
           "title": "Edit a logged entry; copy a meal or a day",
           "tickets": [
             "MM-48",
-            "MM-47"],
+            "MM-47"
+          ],
           "milestone": "M2"
         },
         {
@@ -1547,7 +1548,7 @@
           "tickets": [
             "MM-42",
             "MM-49",
-          "MM-167"
+            "MM-167"
           ],
           "milestone": "M2"
         },
@@ -1790,7 +1791,8 @@
           "MM-76",
           "MM-77",
           "MM-78",
-          "MM-79"
+          "MM-79",
+          "MM-189"
         ]
       },
       "sequence": [
@@ -1831,6 +1833,14 @@
           "title": "Progression suggestions",
           "tickets": [
             "MM-79"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 6,
+          "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
+          "tickets": [
+            "MM-189"
           ],
           "milestone": "M4"
         }
@@ -1882,7 +1892,8 @@
           "MM-70",
           "MM-71",
           "MM-72",
-          "MM-73"
+          "MM-73",
+          "MM-188"
         ]
       },
       "sequence": [
@@ -1941,6 +1952,14 @@
             "MM-69"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 8,
+          "title": "Spike: which exercises the platforms can name (settles the exercise mappings before WS-10 fills them)",
+          "tickets": [
+            "MM-188"
+          ],
+          "milestone": "M3"
         }
       ],
       "gate": {
