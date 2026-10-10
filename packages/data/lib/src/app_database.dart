@@ -44,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 22;
+  static const currentSchemaVersion = 23;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -248,6 +248,12 @@ class AppDatabase extends _$AppDatabase {
           userPreferences.recoveryCheckInSkippedEpochDay,
         );
       }
+    },
+    // 22 to 23: a maintenance week taken early, and when the offer to ease
+    // a deficit was last answered (MM-117).
+    22: (m) async {
+      await m.addColumn(setups, setups.maintenanceWeekFromEpochDay);
+      await m.addColumn(setups, setups.reliefAnsweredEpochDay);
     },
   };
 

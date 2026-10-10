@@ -352,6 +352,29 @@ final recoveryCheckInDueProvider = Provider<bool>((ref) {
   );
 });
 
+/// The offer to ease a deficit, when one is due (MM-117).
+final reliefOfferProvider = Provider<ReliefOffer?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  final snapshot = ref.watch(coachProvider);
+  final checkIns = ref.watch(recoveryCheckInsProvider).value;
+  final history = ref.watch(targetsHistoryProvider).value;
+  if (setup == null ||
+      snapshot == null ||
+      checkIns == null ||
+      history == null ||
+      !snapshot.policy.targetsAllowed) {
+    return null;
+  }
+  return findReliefOffer(
+    setup: setup,
+    checkIns: checkIns,
+    history: history,
+    today: ref.watch(todayProvider),
+    deficitRestartOn: snapshot.deficitRestartOn,
+    pauses: ref.watch(pausesProvider).value ?? const [],
+  );
+});
+
 /// The reminder settings the user has stored (MM-146).
 final remindersProvider = StreamProvider<List<ReminderSetting>>(
   (ref) => ref.watch(reminderReaderProvider).watchReminders(),
