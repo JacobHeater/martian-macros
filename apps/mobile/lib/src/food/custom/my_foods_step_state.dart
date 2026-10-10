@@ -16,12 +16,16 @@ import 'my_foods_step.dart';
 import 'recipe_form.dart';
 
 class MyFoodsStepState extends ConsumerState<MyFoodsStep> {
-  var _page = MyFoodsPage.list;
+  late var _page = widget.initialBarcode == null
+      ? MyFoodsPage.list
+      : MyFoodsPage.foodForm;
   CustomFood? _editing;
+  late String? _barcode = widget.initialBarcode;
 
   void _show(MyFoodsPage page, [CustomFood? editing]) => setState(() {
     _page = page;
     _editing = editing;
+    _barcode = null;
   });
 
   Future<void> _delete(CustomFood food) async {
@@ -43,6 +47,7 @@ class MyFoodsStepState extends ConsumerState<MyFoodsStep> {
       case MyFoodsPage.foodForm:
         return CustomFoodForm(
           food: _editing,
+          initialBarcode: _barcode,
           onDone: () => _show(MyFoodsPage.list),
         );
       case MyFoodsPage.recipeForm:
