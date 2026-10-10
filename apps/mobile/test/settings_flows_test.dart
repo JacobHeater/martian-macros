@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/confirm_initial_theme.dart';
 
 /// MM-93: Settings flows that shipped without a test (MM-62, MM-81, MM-82).
 void main() {
@@ -78,7 +79,7 @@ void main() {
     expect(await readNow(tester, repos.setup.loadSetup), isNotNull);
   });
 
-  testWidgets('confirming erases everything and returns to onboarding', (
+  testWidgets('confirming erases everything and returns to initial setup', (
     tester,
   ) async {
     await openSettings(tester);
@@ -97,6 +98,8 @@ void main() {
       await readNow(tester, () => repos.weights.watchWeights().first),
       isEmpty,
     );
+    expect(find.text('Choose your theme'), findsOneWidget);
+    await confirmInitialTheme(tester);
     expect(find.text('Get started'), findsOneWidget);
   });
 }

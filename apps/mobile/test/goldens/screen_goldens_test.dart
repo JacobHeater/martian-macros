@@ -19,7 +19,7 @@ import '../support/fake_pack_download_controller.dart';
 import '../support/pump_app.dart';
 import 'load_golden_fonts.dart';
 
-/// Screenshot tests (MM-105): every main screen, light and dark, with fixed
+/// Screenshot tests (MM-105): main screens in all three palettes, with fixed
 /// data and a fixed clock. The images are generated on Linux only, because
 /// text renders differently on each operating system: `mm goldens --update`
 /// there, or the "Update goldens" workflow. A changed image is reviewed in the
@@ -170,6 +170,69 @@ void main() {
       debugDisableShadows = true;
     }
   }
+
+  for (final (name, tab) in [
+    ('dashboard', null),
+    ('food', 'Food'),
+    ('progress', 'Progress'),
+    ('coach', 'Coach'),
+    ('settings', null),
+  ]) {
+    testWidgets('$name, martian', (tester) async {
+      final repos = await metricsFixture(dark: false);
+      await repos.preferences.saveThemePreference(ThemePreference.martian);
+      await open(tester, repos, tab: tab);
+      if (name == 'settings') {
+        await tester.tap(find.byTooltip('Settings'));
+        await tester.pumpAndSettle();
+      }
+      await shot(tester, '${name}_martian');
+    }, skip: !linux);
+  }
+
+  for (final (section, title) in [
+    ('nutrition', 'Nutrition history'),
+    ('measurements', 'Weight trend & uncertainty'),
+    ('coach', 'Coach & expenditure'),
+  ]) {
+    testWidgets('dashboard $section, martian', (tester) async {
+      final repos = await metricsFixture(dark: false);
+      await repos.preferences.saveThemePreference(ThemePreference.martian);
+      await open(tester, repos);
+      await tester.scrollUntilVisible(
+        find.text(title),
+        400,
+        scrollable: find
+            .descendant(
+              of: find.byType(DashboardScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.ensureVisible(find.text(title));
+      await tester.pumpAndSettle();
+      await shot(tester, 'dashboard_${section}_martian');
+    }, skip: !linux);
+  }
+
+  testWidgets('food meal cards, martian', (tester) async {
+    final repos = await metricsFixture(dark: false);
+    await repos.preferences.saveThemePreference(ThemePreference.martian);
+    await open(tester, repos, tab: 'Food');
+    final breakfast = find.byKey(const ValueKey('meal-card-breakfast'));
+    await tester.scrollUntilVisible(breakfast, 300);
+    await tester.ensureVisible(breakfast);
+    await tester.pumpAndSettle();
+    await shot(tester, 'food_meals_martian');
+    await tester.tap(find.text('Breakfast'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'food_meals_collapsed_martian');
+  }, skip: !linux);
+
+  testWidgets('first-launch theme chooser, martian', (tester) async {
+    await open(tester, InMemoryRepositories());
+    await shot(tester, 'theme_chooser_martian');
+  }, skip: !linux);
 
   for (final dark in [false, true]) {
     final mode = dark ? 'dark' : 'light';

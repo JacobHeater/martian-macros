@@ -14,7 +14,7 @@ final class DriftPreferencesRepository implements PreferencesRepository {
   Stream<ThemePreference> watchThemePreference() => _db
       .select(_db.userPreferences)
       .watchSingleOrNull()
-      .map((row) => row?.themePreference ?? ThemePreference.system);
+      .map((row) => row?.themePreference ?? ThemePreference.unselected);
 
   @override
   Stream<EasyToMissPreference> watchEasyToMiss() =>

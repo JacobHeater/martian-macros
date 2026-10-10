@@ -11,19 +11,24 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, during the Dashboard pivot.
+Last updated: 2026-10-10, by Copilot, while finishing MM-184.
 
-**Branch state.** Handoff PR #61 and phone-shortcut PR #62 are merged.
-Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
-`feature/mm176-dashboard-metrics`, draft PR #63. The combined delivery includes
-the Food pie, meal-card/vector-control refinements and flat FAB. No unrelated
-roadmap work is being started.
+**Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
+delivery is merged in PR #63 after successful CI.
+The owner approved the retro '90s Martian palette as the new-install default,
+with a first-launch theme chooser for new installations only. Existing
+choices are preserved. `feature/mm184-martian-theme` is PR #64 on top of
+merged #63. Implementation, local full checks and reviewed Linux screenshots
+are complete; final PR CI is pending. Merge #64 with `--merge` when green.
 
-**Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 24 in PR #64 (MM-184). No other schema change
+should start until it merges (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-184 (`mm req next` is the authority).
+**Next ticket ID.** MM-187 (`mm req next` is the authority).
 
-**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
+**What to build next.** Finish PR #64, not another side quest. Then the work
+follows `roadmap/`. WS-09 (coaching intelligence) is where earlier sessions
+worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
   counts (MM-149), and must neither advance nor break during a pause (MM-148).
 - Blocked: the recomp review and signal (MM-133, MM-32) need the training log and strength trend (WS-10, MM-75 and MM-77) and the
@@ -76,6 +81,57 @@ private notes; they bind whoever picks up the work.
 
 ## Session 4: 2026-10-10, Copilot
 
+- MM-184 now implements Martian, first-launch preview/confirmation and four
+  wrapping Settings choices. Schema 24 changes only the fresh-install default;
+  migration retains existing preferences and inserts System for legacy
+  installations without a row. Migration paths from all 23 released schemas,
+  preference contracts, startup/error/retry and contrast tests pass.
+- Broader mobile checks exposed existing tests tapping controls before scroll
+  animations settled after the taller Appearance section. Those tests now
+  fully reveal controls before tapping; behavioral assertions are unchanged.
+  Final full checks, Linux goldens and emulator inspection are still in flight.
+- Full `mm check` passed, exit 0 and "All checks passed." PR #63 passed CI
+  and was merged. MM-185 then exposed a delayed preference-stream race with a
+  failing test: confirmation briefly restored Martian before the saved choice
+  emitted. Preview now clears on confirmed stream publication, not write
+  completion. Final checks are being rerun with that regression.
+- Dart review found the loading state treated unknown preferences as a fresh
+  install. MM-186 has two failing-before regressions and restores the System
+  fallback until preferences load. Martian activates only when the stored
+  value identifies a fresh install or the user explicitly chose Martian.
+- Emulator-inspected Martian Dashboard, Food, Settings and the first-launch
+  chooser; live Light preview and transition to onboarding worked. Only
+  synthetic demo storage was reset, never the physical phone or normal app.
+  Linux golden update run `38025912745` passed; images are downloaded for review.
+- Full `mm check` passed again after MM-186, exit 0 and "All checks passed."
+  Reviewed the Martian golden contact sheet and full-size chooser/Settings;
+  screenshots cover Dashboard sections, Food accordions, Progress and Coach.
+  Only the emulator's isolated demo was run. Physical phone and iOS are untested.
+- PR #64 is ready for review with 11 new Martian screenshots and refreshed
+  Light/Dark Settings screenshots. Final requirements/format/diff checks pass.
+  No remaining implementation work; final GitHub CI must pass before merge.
+
+- PR #63 combines the seeded isolated demo, Dashboard infographics, Food pies,
+  separate meal accordions and flat FAB. Full checks and Linux golden
+  regeneration passed; emulator views were inspected. Final CI is pending.
+- Owner now wants to preview an extra theme, Martian, before implementing it.
+  Added deep grape, acid lime, cyan, pink and violet to the static palette
+  preview alongside unchanged Dark/Light palettes. Included notices, swatches,
+  grayscale and measured contrast checks. The owner approved implementation
+  as the new-install default with a first-launch chooser. Buttons intentionally
+  have no incandescent glow.
+- Browser-verified the preview at desktop and 375 px phone widths with no
+  horizontal overflow. All seven displayed contrast spot checks pass; no
+  external resources are loaded. `mm req` and diff whitespace checks pass.
+
+- Owner requested `mm run --env phone` as a shortcut for physical-device testing.
+- MM-175 uses dev defines, selects one physical Android device, ignores emulators,
+  and reports missing, ambiguous, or malformed discovery results explicitly.
+- Existing dev/prod run and build behavior stays unchanged. All 47 tooling
+  tests and full `mm check` passed. `mm run --env phone --help` selected the
+  connected physical phone over a running emulator and exited successfully;
+  the app itself was not installed or launched during this verification.
+- No app data, database schema, or product feature behavior changes.
 - MM-175 added `mm run --env phone`: dev configuration with automatic physical
   Android selection, never emulator fallback. Full checks passed; discovery
   was verified on connected hardware without launching the app. PR #62 merged.

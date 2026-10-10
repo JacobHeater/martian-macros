@@ -18,6 +18,15 @@ reading the code, not from screenshots. The palette was checked numerically
 rendered on a device**. [palette-preview.html](palette-preview.html) is a
 static rendering for judging it before anyone builds it.
 
+**MM-184 update:** Light and Dark are implemented, and the owner approved
+the retro '90s **Martian** palette as the default for new installations.
+Its deep grape, cream, acid-lime, cyan and pink are intentional exceptions
+to the original palette restrictions below. Existing installations retain
+their settings; new users preview a theme before onboarding. See
+[color-and-theme-system.md](color-and-theme-system.md) for the approved
+tokens and rollout. All themes share semantic roles and contrast rules;
+primary actions remain flat without glow.
+
 ## The direction in one paragraph
 
 **Red planet, blue sunset.** A deep, cool ink-navy night canvas (not black, not

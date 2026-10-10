@@ -6,7 +6,6 @@ import '../about/how_this_works_screen.dart';
 import '../food_packs/food_database_screen.dart';
 import '../format/daily_activity_label.dart';
 import '../format/detail_level_label.dart';
-import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
 import '../gallery/gallery_screen.dart';
 import '../pause/pause_screen.dart';
@@ -25,6 +24,7 @@ import '../ui/mm_switch_row.dart';
 import '../ui/show_mm_confirm.dart';
 import 'profile_section.dart';
 import 'reminders_section.dart';
+import 'theme_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -40,21 +40,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           const GroupHeader('Appearance'),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: MmSegmented<ThemePreference>(
-              segments: [
-                for (final p in ThemePreference.values) MmSegment(p, p.label),
-              ],
-              selected: {
-                ref.watch(themePreferenceProvider).value ??
-                    ThemePreference.system,
-              },
-              onChanged: (s) => ref
-                  .read(preferencesWriterProvider)
-                  .saveThemePreference(s.first),
-            ),
-          ),
+          const ThemeSettings(),
           const GroupHeader('Units'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

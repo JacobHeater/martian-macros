@@ -12,8 +12,11 @@ void preferencesRepositoryContract(
     late PreferencesRepository repo;
     setUp(() => repo = create());
 
-    test('follows the system until the user chooses', () async {
-      expect(await repo.watchThemePreference().first, ThemePreference.system);
+    test('fresh installs await the first theme choice', () async {
+      expect(
+        await repo.watchThemePreference().first,
+        ThemePreference.unselected,
+      );
     });
 
     test('keeps each choice, and a later one replaces it', () async {
@@ -25,6 +28,29 @@ void preferencesRepositoryContract(
       await repo.saveThemePreference(ThemePreference.light);
       expect(await repo.watchThemePreference().first, ThemePreference.light);
     });
+
+    test(
+      'other preference writes neither confirm nor overwrite a theme',
+      () async {
+        await repo.saveDetailLevel(DetailLevel.full);
+        expect(
+          await repo.watchThemePreference().first,
+          ThemePreference.unselected,
+        );
+        await repo.saveThemePreference(ThemePreference.martian);
+        await repo.saveDetailLevel(DetailLevel.standard);
+        await repo.saveEasyToMissEnabled(false);
+        final day = CalendarDate(2026, 10, 10);
+        await repo.markEasyToMissShown(day);
+        await repo.saveUnderEatingDismissedOn(day);
+        await repo.saveReturnScreenDismissedOn(day);
+        await repo.saveRecoveryCheckInSkippedOn(day);
+        expect(
+          await repo.watchThemePreference().first,
+          ThemePreference.martian,
+        );
+      },
+    );
 
     test('detail is Standard until changed, and each level is kept', () async {
       expect(await repo.watchDetailLevel().first, DetailLevel.standard);
@@ -86,7 +112,7 @@ void preferencesRepositoryContract(
     test('emits the current choice first, then each change', () async {
       await expectChangeEmits(
         repo.watchThemePreference(),
-        before: ThemePreference.system,
+        before: ThemePreference.unselected,
         change: () => repo.saveThemePreference(ThemePreference.dark),
         after: ThemePreference.dark,
       );

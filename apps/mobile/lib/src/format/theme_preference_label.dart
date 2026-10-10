@@ -5,5 +5,7 @@ extension ThemePreferenceLabel on ThemePreference {
     ThemePreference.system => 'System',
     ThemePreference.light => 'Light',
     ThemePreference.dark => 'Dark',
+    ThemePreference.martian => 'Martian',
+    ThemePreference.unselected => 'Martian',
   };
 }

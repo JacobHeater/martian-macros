@@ -19,7 +19,11 @@ double contrast(Color a, Color b) {
 }
 
 void main() {
-  final themes = {'dark': MmColors.dark, 'light': MmColors.light};
+  final themes = {
+    'dark': MmColors.dark,
+    'light': MmColors.light,
+    'martian': MmColors.martian,
+  };
 
   group('contrast (design/color-and-theme-system.md)', () {
     for (final MapEntry(key: name, value: c) in themes.entries) {
@@ -103,6 +107,26 @@ void main() {
   });
 
   group('the theme', () {
+    test('Martian is explicit, dark, retro-shaped and has no action glow', () {
+      final theme = mmTheme(Brightness.dark, martian: true);
+      expect(theme.extension<MmColors>(), MmColors.martian);
+      expect(theme.colorScheme.brightness, Brightness.dark);
+      expect(theme.colorScheme.primary, MmColors.martian.ember);
+      expect(theme.colorScheme.surfaceTint, Colors.transparent);
+      expect(theme.floatingActionButtonTheme.elevation, 0);
+      expect(theme.floatingActionButtonTheme.hoverElevation, 0);
+      expect(theme.floatingActionButtonTheme.focusElevation, 0);
+      expect(theme.floatingActionButtonTheme.highlightElevation, 0);
+      expect(
+        (theme.cardTheme.shape! as RoundedRectangleBorder).borderRadius,
+        BorderRadius.circular(12),
+      );
+      expect(
+        (theme.navigationBarTheme.indicatorShape! as RoundedRectangleBorder)
+            .borderRadius,
+        BorderRadius.circular(8),
+      );
+    });
     test('both themes carry the same extension and a flat scheme', () {
       for (final b in Brightness.values) {
         final theme = mmTheme(b);

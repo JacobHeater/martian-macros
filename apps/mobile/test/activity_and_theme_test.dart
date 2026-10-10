@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/confirm_initial_theme.dart';
 
 /// MM-164 (daily activity in the starting estimate) and MM-165 (theme
 /// preference), through the app.
@@ -16,6 +17,7 @@ void main() {
   /// Walks onboarding up to (and showing) the daily-activity step.
   Future<void> reachActivityStep(WidgetTester tester) async {
     await pumpApp(tester, repos, FixedClock(today));
+    await confirmInitialTheme(tester);
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Male'));
@@ -171,7 +173,10 @@ void main() {
     ThemeMode mode(WidgetTester tester) =>
         tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode!;
 
-    testWidgets('follows the phone until the user chooses', (tester) async {
+    testWidgets('an existing System choice continues following the phone', (
+      tester,
+    ) async {
+      await repos.preferences.saveThemePreference(ThemePreference.system);
       await openSettings(tester);
       expect(mode(tester), ThemeMode.system);
     });
