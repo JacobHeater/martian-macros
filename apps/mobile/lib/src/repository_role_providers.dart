@@ -40,6 +40,14 @@ final detailLevelWriterProvider = Provider<DetailLevelWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
 
+final underEatingNoticeReaderProvider = Provider<UnderEatingNoticeReader>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
+final underEatingNoticeWriterProvider = Provider<UnderEatingNoticeWriter>(
+  (ref) => ref.watch(preferencesRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );

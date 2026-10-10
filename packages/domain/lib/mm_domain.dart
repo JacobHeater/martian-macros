@@ -95,6 +95,8 @@ export 'src/repositories/recent_food_reader.dart';
 export 'src/repositories/setup_reader.dart';
 export 'src/repositories/setup_repository.dart';
 export 'src/repositories/setup_writer.dart';
+export 'src/repositories/under_eating_notice_reader.dart';
+export 'src/repositories/under_eating_notice_writer.dart';
 export 'src/repositories/waist_reader.dart';
 export 'src/repositories/waist_repository.dart';
 export 'src/repositories/waist_writer.dart';

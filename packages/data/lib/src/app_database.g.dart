@@ -5254,6 +5254,17 @@ class $UserPreferencesTable extends UserPreferences
         requiredDuringInsert: false,
         defaultValue: const Constant('standard'),
       ).withConverter<DetailLevel>($UserPreferencesTable.$converterdetailLevel);
+  static const VerificationMeta _underEatingDismissedEpochDayMeta =
+      const VerificationMeta('underEatingDismissedEpochDay');
+  @override
+  late final GeneratedColumn<int> underEatingDismissedEpochDay =
+      GeneratedColumn<int>(
+        'under_eating_dismissed_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5261,6 +5272,7 @@ class $UserPreferencesTable extends UserPreferences
     easyToMissEnabled,
     easyToMissLastShownEpochDay,
     detailLevel,
+    underEatingDismissedEpochDay,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5292,6 +5304,15 @@ class $UserPreferencesTable extends UserPreferences
         easyToMissLastShownEpochDay.isAcceptableOrUnknown(
           data['easy_to_miss_last_shown_epoch_day']!,
           _easyToMissLastShownEpochDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('under_eating_dismissed_epoch_day')) {
+      context.handle(
+        _underEatingDismissedEpochDayMeta,
+        underEatingDismissedEpochDay.isAcceptableOrUnknown(
+          data['under_eating_dismissed_epoch_day']!,
+          _underEatingDismissedEpochDayMeta,
         ),
       );
     }
@@ -5328,6 +5349,10 @@ class $UserPreferencesTable extends UserPreferences
           data['${effectivePrefix}detail_level'],
         )!,
       ),
+      underEatingDismissedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}under_eating_dismissed_epoch_day'],
+      ),
     );
   }
 
@@ -5355,12 +5380,16 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
 
   /// How much nutrition to show (MM-49).
   final DetailLevel detailLevel;
+
+  /// The day the under-eating notice was last dismissed (MM-114).
+  final int? underEatingDismissedEpochDay;
   const PreferencesRow({
     required this.id,
     required this.themePreference,
     required this.easyToMissEnabled,
     this.easyToMissLastShownEpochDay,
     required this.detailLevel,
+    this.underEatingDismissedEpochDay,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5382,6 +5411,11 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
         $UserPreferencesTable.$converterdetailLevel.toSql(detailLevel),
       );
     }
+    if (!nullToAbsent || underEatingDismissedEpochDay != null) {
+      map['under_eating_dismissed_epoch_day'] = Variable<int>(
+        underEatingDismissedEpochDay,
+      );
+    }
     return map;
   }
 
@@ -5395,6 +5429,10 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           ? const Value.absent()
           : Value(easyToMissLastShownEpochDay),
       detailLevel: Value(detailLevel),
+      underEatingDismissedEpochDay:
+          underEatingDismissedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(underEatingDismissedEpochDay),
     );
   }
 
@@ -5415,6 +5453,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       detailLevel: $UserPreferencesTable.$converterdetailLevel.fromJson(
         serializer.fromJson<String>(json['detailLevel']),
       ),
+      underEatingDismissedEpochDay: serializer.fromJson<int?>(
+        json['underEatingDismissedEpochDay'],
+      ),
     );
   }
   @override
@@ -5432,6 +5473,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       'detailLevel': serializer.toJson<String>(
         $UserPreferencesTable.$converterdetailLevel.toJson(detailLevel),
       ),
+      'underEatingDismissedEpochDay': serializer.toJson<int?>(
+        underEatingDismissedEpochDay,
+      ),
     };
   }
 
@@ -5441,6 +5485,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     bool? easyToMissEnabled,
     Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
     DetailLevel? detailLevel,
+    Value<int?> underEatingDismissedEpochDay = const Value.absent(),
   }) => PreferencesRow(
     id: id ?? this.id,
     themePreference: themePreference ?? this.themePreference,
@@ -5449,6 +5494,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
         ? easyToMissLastShownEpochDay.value
         : this.easyToMissLastShownEpochDay,
     detailLevel: detailLevel ?? this.detailLevel,
+    underEatingDismissedEpochDay: underEatingDismissedEpochDay.present
+        ? underEatingDismissedEpochDay.value
+        : this.underEatingDismissedEpochDay,
   );
   PreferencesRow copyWithCompanion(UserPreferencesCompanion data) {
     return PreferencesRow(
@@ -5465,6 +5513,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       detailLevel: data.detailLevel.present
           ? data.detailLevel.value
           : this.detailLevel,
+      underEatingDismissedEpochDay: data.underEatingDismissedEpochDay.present
+          ? data.underEatingDismissedEpochDay.value
+          : this.underEatingDismissedEpochDay,
     );
   }
 
@@ -5475,7 +5526,8 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           ..write('themePreference: $themePreference, ')
           ..write('easyToMissEnabled: $easyToMissEnabled, ')
           ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay, ')
-          ..write('detailLevel: $detailLevel')
+          ..write('detailLevel: $detailLevel, ')
+          ..write('underEatingDismissedEpochDay: $underEatingDismissedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -5487,6 +5539,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     easyToMissEnabled,
     easyToMissLastShownEpochDay,
     detailLevel,
+    underEatingDismissedEpochDay,
   );
   @override
   bool operator ==(Object other) =>
@@ -5497,7 +5550,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           other.easyToMissEnabled == this.easyToMissEnabled &&
           other.easyToMissLastShownEpochDay ==
               this.easyToMissLastShownEpochDay &&
-          other.detailLevel == this.detailLevel);
+          other.detailLevel == this.detailLevel &&
+          other.underEatingDismissedEpochDay ==
+              this.underEatingDismissedEpochDay);
 }
 
 class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
@@ -5506,12 +5561,14 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   final Value<bool> easyToMissEnabled;
   final Value<int?> easyToMissLastShownEpochDay;
   final Value<DetailLevel> detailLevel;
+  final Value<int?> underEatingDismissedEpochDay;
   const UserPreferencesCompanion({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.easyToMissEnabled = const Value.absent(),
     this.easyToMissLastShownEpochDay = const Value.absent(),
     this.detailLevel = const Value.absent(),
+    this.underEatingDismissedEpochDay = const Value.absent(),
   });
   UserPreferencesCompanion.insert({
     this.id = const Value.absent(),
@@ -5519,6 +5576,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     this.easyToMissEnabled = const Value.absent(),
     this.easyToMissLastShownEpochDay = const Value.absent(),
     this.detailLevel = const Value.absent(),
+    this.underEatingDismissedEpochDay = const Value.absent(),
   });
   static Insertable<PreferencesRow> custom({
     Expression<int>? id,
@@ -5526,6 +5584,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     Expression<bool>? easyToMissEnabled,
     Expression<int>? easyToMissLastShownEpochDay,
     Expression<String>? detailLevel,
+    Expression<int>? underEatingDismissedEpochDay,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5534,6 +5593,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
       if (easyToMissLastShownEpochDay != null)
         'easy_to_miss_last_shown_epoch_day': easyToMissLastShownEpochDay,
       if (detailLevel != null) 'detail_level': detailLevel,
+      if (underEatingDismissedEpochDay != null)
+        'under_eating_dismissed_epoch_day': underEatingDismissedEpochDay,
     });
   }
 
@@ -5543,6 +5604,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     Value<bool>? easyToMissEnabled,
     Value<int?>? easyToMissLastShownEpochDay,
     Value<DetailLevel>? detailLevel,
+    Value<int?>? underEatingDismissedEpochDay,
   }) {
     return UserPreferencesCompanion(
       id: id ?? this.id,
@@ -5551,6 +5613,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
       easyToMissLastShownEpochDay:
           easyToMissLastShownEpochDay ?? this.easyToMissLastShownEpochDay,
       detailLevel: detailLevel ?? this.detailLevel,
+      underEatingDismissedEpochDay:
+          underEatingDismissedEpochDay ?? this.underEatingDismissedEpochDay,
     );
   }
 
@@ -5580,6 +5644,11 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
         $UserPreferencesTable.$converterdetailLevel.toSql(detailLevel.value),
       );
     }
+    if (underEatingDismissedEpochDay.present) {
+      map['under_eating_dismissed_epoch_day'] = Variable<int>(
+        underEatingDismissedEpochDay.value,
+      );
+    }
     return map;
   }
 
@@ -5590,7 +5659,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
           ..write('themePreference: $themePreference, ')
           ..write('easyToMissEnabled: $easyToMissEnabled, ')
           ..write('easyToMissLastShownEpochDay: $easyToMissLastShownEpochDay, ')
-          ..write('detailLevel: $detailLevel')
+          ..write('detailLevel: $detailLevel, ')
+          ..write('underEatingDismissedEpochDay: $underEatingDismissedEpochDay')
           ..write(')'))
         .toString();
   }
@@ -9476,6 +9546,7 @@ typedef $$UserPreferencesTableCreateCompanionBuilder =
       Value<bool> easyToMissEnabled,
       Value<int?> easyToMissLastShownEpochDay,
       Value<DetailLevel> detailLevel,
+      Value<int?> underEatingDismissedEpochDay,
     });
 typedef $$UserPreferencesTableUpdateCompanionBuilder =
     UserPreferencesCompanion Function({
@@ -9484,6 +9555,7 @@ typedef $$UserPreferencesTableUpdateCompanionBuilder =
       Value<bool> easyToMissEnabled,
       Value<int?> easyToMissLastShownEpochDay,
       Value<DetailLevel> detailLevel,
+      Value<int?> underEatingDismissedEpochDay,
     });
 
 class $$UserPreferencesTableFilterComposer
@@ -9521,6 +9593,11 @@ class $$UserPreferencesTableFilterComposer
     column: $table.detailLevel,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
+
+  ColumnFilters<int> get underEatingDismissedEpochDay => $composableBuilder(
+    column: $table.underEatingDismissedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$UserPreferencesTableOrderingComposer
@@ -9554,6 +9631,11 @@ class $$UserPreferencesTableOrderingComposer
 
   ColumnOrderings<String> get detailLevel => $composableBuilder(
     column: $table.detailLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get underEatingDismissedEpochDay => $composableBuilder(
+    column: $table.underEatingDismissedEpochDay,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -9591,6 +9673,11 @@ class $$UserPreferencesTableAnnotationComposer
         column: $table.detailLevel,
         builder: (column) => column,
       );
+
+  GeneratedColumn<int> get underEatingDismissedEpochDay => $composableBuilder(
+    column: $table.underEatingDismissedEpochDay,
+    builder: (column) => column,
+  );
 }
 
 class $$UserPreferencesTableTableManager
@@ -9635,12 +9722,14 @@ class $$UserPreferencesTableTableManager
                 Value<bool> easyToMissEnabled = const Value.absent(),
                 Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
                 Value<DetailLevel> detailLevel = const Value.absent(),
+                Value<int?> underEatingDismissedEpochDay = const Value.absent(),
               }) => UserPreferencesCompanion(
                 id: id,
                 themePreference: themePreference,
                 easyToMissEnabled: easyToMissEnabled,
                 easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
                 detailLevel: detailLevel,
+                underEatingDismissedEpochDay: underEatingDismissedEpochDay,
               ),
           createCompanionCallback:
               ({
@@ -9649,12 +9738,14 @@ class $$UserPreferencesTableTableManager
                 Value<bool> easyToMissEnabled = const Value.absent(),
                 Value<int?> easyToMissLastShownEpochDay = const Value.absent(),
                 Value<DetailLevel> detailLevel = const Value.absent(),
+                Value<int?> underEatingDismissedEpochDay = const Value.absent(),
               }) => UserPreferencesCompanion.insert(
                 id: id,
                 themePreference: themePreference,
                 easyToMissEnabled: easyToMissEnabled,
                 easyToMissLastShownEpochDay: easyToMissLastShownEpochDay,
                 detailLevel: detailLevel,
+                underEatingDismissedEpochDay: underEatingDismissedEpochDay,
               ),
           withReferenceMapper: (p0) => p0
               .map(

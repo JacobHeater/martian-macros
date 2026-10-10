@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../app/home_destination.dart';
 import '../app/home_tab_provider.dart';
+import '../coach/under_eating_notice.dart';
 import '../food/calorie_hero.dart';
 import '../food/selected_day_provider.dart';
 import '../food/targets_on.dart';
@@ -43,6 +44,7 @@ class DashboardScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 112),
       children: [
+        const UnderEatingNotice(),
         CalorieHero(
           intake: intakeDayFrom(today, entries),
           targets: targetsOn(
