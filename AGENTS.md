@@ -2,7 +2,9 @@
 
 This file is the canonical contributor guide for AI agents and other automated
 contributors. Read it before making changes, along with the relevant code,
-requirements, and [docs/architecture.md](docs/architecture.md).
+requirements, and [docs/architecture.md](docs/architecture.md). Then read
+[requirements/HANDOFF.md](requirements/HANDOFF.md): it says what the last
+agent left in flight and what the product owner has ruled in conversation.
 
 ## Working agreements
 
@@ -25,6 +27,16 @@ requirements, and [docs/architecture.md](docs/architecture.md).
   guards it. Changing an existing test so that it passes around the bug is not
   a regression test. A bug that cannot be fixed yet still gets its ticket, and
   its test is skipped with the ticket's ID until the fix lands.
+- Keep the handoff document current. Every agent, whatever its vendor,
+  maintains [requirements/HANDOFF.md](requirements/HANDOFF.md) so the work can
+  change hands between agents without the product owner repeating anything
+  (MM-174). It is a living document that sums up the latest changes in the
+  three most recent sessions, newest first: when you start a session, add it
+  at the top and delete the oldest. Keep its "Where things stand" section
+  true: what is in flight, what to build next, what waits on the owner, and
+  any standing rule the owner gave you that is not in this file. Update it in
+  the same pull request as the work, and again before you finish, since a
+  session can end without warning. Nothing private goes in it.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
@@ -122,6 +134,7 @@ unverified.
 ## Completion
 
 Before finishing, review the diff for unintended changes and ensure the
-requirements, implementation, and tests agree. Summarize the changes and list
+requirements, implementation, and tests agree. Update
+[requirements/HANDOFF.md](requirements/HANDOFF.md). Summarize the changes and list
 the checks actually run, including any failures or omissions. Do not commit or
 push unless explicitly asked.
