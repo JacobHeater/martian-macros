@@ -23,9 +23,10 @@ has a part that waits on the training log (personal records; strength in the rep
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
 body-fat estimate (MM-34). So the next work is WS-10, the training log:
-- The exercise library (MM-76) first, built to MM-189. Each exercise carries an optional Health Connect segment type, and the
-  mapping table in MM-188 is its data. Copy identifiers from that table; do not retype them from memory.
-- Then workout logging (MM-75), set times and timers (MM-191), the strength trend (MM-77) and weekly volume (MM-78).
+- The exercise library (MM-76) is part built: the model, 164 exercises with their Health Connect types, and the search, all pure
+  code in `mm_domain` and `mm_engine`. Its picker screen and the table for a user's own exercises come with MM-75.
+- Next is workout logging (MM-75): the Train destination, the workout, set and custom-exercise tables in one schema change (25),
+  and the exercise picker. Then set times and timers (MM-191), the strength trend (MM-77) and weekly volume (MM-78).
 - Health sync (WS-11) starts with the health-source interface and its fake (MM-67). Workouts sync as sessions first, through the
   `health` plugin; segments on Android are a later piece in the app's own Android code (MM-188 says why).
 
@@ -104,6 +105,8 @@ private notes; they bind whoever picks up the work.
   plugin reads and writes sessions only. The ticket holds the mapping table, every identifier checked by script against the
   source. Not answered, because they need a phone: whether other apps fill segments, and how a written workout looks in each
   platform's own app.
+- Exercise library (MM-76), first part: `Exercise` and its enums, `builtInExercises` (164), `HealthConnectSegment` (the 42
+  identifiers, held to MM-188's table by a test) and `searchExercises`. No screen and no storage yet.
 - The owner then accepted the judgement mappings for now, and decided set times: manual entry, plus timers (MM-191, a new ticket,
   not built).
 - MM-189 is the design that follows from the owner's direction: an optional platform mapping per exercise, the app as system of

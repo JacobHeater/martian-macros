@@ -103,8 +103,10 @@ creates is new.
   not.** Each library exercise carries an optional mapping to the platform's own exercise type, and no mapping is a normal state.
   The app is the system of record; a platform gets a summary session, and exercises it cannot name stay in the app. Health
   Connect can name some exercises inside a workout; HealthKit names only the kind of workout, so iOS is session-level. The
-  mappings come from the spike MM-188 (WS-11 step 8) and are never written from memory. Build the library with the mapping field
-  empty first; filling it is a data change.
+  mappings come from the spike MM-188 (WS-11 step 8) and are never written from memory. The library
+  (`builtInExercises` in `mm_domain`) carries them; a test holds its Health Connect identifiers to MM-188's table.
+- **MM-76 is part built**: the model, the 164-exercise library and the search exist as pure code. The picker screen and the table
+  for a user's own exercises come with MM-75, so the training tables are one schema change.
 - Load is entered in the user's weight unit and stored in kilograms, like
   every other quantity. Bodyweight exercises record added load, which may be
   zero or negative.
