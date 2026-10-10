@@ -27,7 +27,9 @@ class MacroSplitChart extends StatelessWidget {
     if (total == 0) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
-        child: Text('Log macro amounts to see your protein, carbs and fat split.'),
+        child: Text(
+          'Log macro amounts to see your protein, carbs and fat split.',
+        ),
       );
     }
     Color color(MacroKind kind) => switch (kind) {

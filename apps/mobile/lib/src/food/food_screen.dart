@@ -13,6 +13,7 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
+import '../ui/mm_surface_kind.dart';
 import '../ui/info_card.dart';
 import 'calorie_hero.dart';
 import 'ask_low_day_complete.dart';
@@ -101,19 +102,20 @@ class FoodScreen extends ConsumerWidget {
             ),
           ),
         for (final meal in Meal.values)
-        MmSurface(
-          key: ValueKey('meal-card-${meal.name}'),
-          padded: false,
-          clip: true,
-          child: MealSection(
-                  meal: meal,
-                  day: day,
-                  entries: [
-                    for (final e in entries)
-                      if (e.meal == meal) e,
-                  ],
-                ),
-        ),
+          MmSurface(
+            key: ValueKey('meal-card-${meal.name}'),
+            kind: MmSurfaceKind.compact,
+            padded: false,
+            clip: true,
+            child: MealSection(
+              meal: meal,
+              day: day,
+              entries: [
+                for (final e in entries)
+                  if (e.meal == meal) e,
+              ],
+            ),
+          ),
         if (entries.isNotEmpty) ...[
           const SizedBox(height: 12),
           Text('Is this day fully logged?', style: text.titleMedium),

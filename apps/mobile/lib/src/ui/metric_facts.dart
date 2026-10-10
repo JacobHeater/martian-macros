@@ -26,9 +26,8 @@ class MetricFacts extends StatelessWidget {
                 ),
                 Text(
                   entry.key,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: context.mm.text2,
-                  ),
+                  style: Theme.of(context).textTheme.labelMedium
+                      ?.copyWith(color: context.mm.text2),
                 ),
               ],
             ),

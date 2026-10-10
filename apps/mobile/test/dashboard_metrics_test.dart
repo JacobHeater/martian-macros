@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -126,7 +127,10 @@ void main() {
   ) async {
     await repos.setup.saveSetup(typicalSetup(onboardedOn: today));
     await pump(tester);
-    expect(find.text('Log food to populate your intake history.'), findsOneWidget);
+    expect(
+      find.text('Log food to populate your intake history.'),
+      findsOneWidget,
+    );
     expect(find.text('No records in this range yet.'), findsWidgets);
     expect(find.text('Not recorded'), findsWidgets);
     expect(find.text('No coaching estimate available.'), findsOneWidget);
@@ -173,7 +177,9 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(
-      find.text('Dashboard history could not be loaded. Reopen the app to retry.'),
+      find.text(
+        'Dashboard history could not be loaded. Reopen the app to retry.',
+      ),
       findsOneWidget,
     );
   });
@@ -200,19 +206,23 @@ void main() {
     );
     expect(tester.takeException(), isNull);
     expect(find.text('● Logged intake'), findsOneWidget);
-    final spots = tester.widget<LineChart>(find.byType(LineChart)).data
-        .lineBarsData.single.spots;
+    final spots = tester
+        .widget<LineChart>(find.byType(LineChart))
+        .data
+        .lineBarsData
+        .single
+        .spots;
     expect(spots.length, 7);
     expect(spots[4], const FlSpot(4, 2000));
     expect(spots[5], FlSpot.nullSpot);
     expect(spots[6], const FlSpot(6, 2200));
     final semantics = tester.getSemantics(
       find.byWidgetPredicate(
-        (w) => w is Semantics &&
+        (w) =>
+            w is Semantics &&
             (w.properties.label?.startsWith('kcal history') ?? false),
       ),
     );
     expect(semantics.label, contains('2 recorded points'));
   });
 }
-import 'package:fl_chart/fl_chart.dart';

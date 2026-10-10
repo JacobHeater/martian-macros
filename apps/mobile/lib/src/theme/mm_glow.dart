@@ -21,24 +21,6 @@ abstract final class MmGlow {
   static Color? body(BuildContext context) =>
       _dark(context) ? context.mm.ion.withValues(alpha: 0.5) : null;
 
-  /// The halo of the primary action: Ember light in dark, a soft shadow in
-  /// light. The Ember is never used as a fill.
-  static List<BoxShadow> fab(BuildContext context) => _dark(context)
-      ? [
-          BoxShadow(
-            color: context.mm.ember.withValues(alpha: 0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 4),
-          ),
-        ]
-      : [
-          BoxShadow(
-            color: context.mm.text.withValues(alpha: 0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ];
-
   /// The resting shadow of a card in light mode; none in dark.
   static List<BoxShadow> card(BuildContext context) => _dark(context)
       ? const []

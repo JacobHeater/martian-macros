@@ -58,7 +58,8 @@ action:** Log food. **Emphasis:** the horizon arc and "calories left".
    long-press/help sheet. It stops being a full card; it is a rare action.
 5. **Primary action:** extended FAB "Log food", 56 dp tall, 16 radius, `ember`
    fill, `onEmber` label, plus icon, 16 dp from the edge and above the nav bar. It
-   is the only Ember fill on the screen. In dark mode it carries the Ember halo.
+   is the only Ember fill on the screen. MM-181 removes its decorative glow
+   and shadow in both themes; all interaction elevations remain zero.
 
 Bottom scroll padding is 112 dp (FAB 56 + 16 + 16 + margin) instead of 96
 unexplained.
@@ -83,8 +84,18 @@ on Dashboard and Food. Named gram/percentage labels use the bars' semantic
 macro colors; the denominator is protein/carbs/fat energy, not total calories.
 No recorded macros means an explanatory empty state, never invented sectors.
 
+MM-180 meal cards have 12 dp corners and a subtle outline. Their disclosure
+headers use 16 dp horizontal and 12 dp vertical insets, with title/subtotal
+on the left and Add beside a muted 16 dp chevron on the right. Both are crisp
+16 dp vector paths, using round 2-unit strokes in a 24-unit coordinate system.
+Add has a 28 dp rounded-square Ember 15% wash, within a 48 dp touch target;
+hover/focus uses solid Ember and the contrast-tested `onEmber` foreground.
+This small secondary-action affordance is an explicit owner-approved exception
+to the usual no-Ember-wash rule; it is not a second primary fill. Add and Copy
+consume their own gestures and do not change disclosure state.
+
 - Dark: canvas `#090D15`, hero on `surface` with limb glow, arc in near-white,
-  FAB with halo. This is the signature look.
+  flat solid FAB without a halo. This is the signature look.
 - Light: cool-gray canvas, white hero with hairline and soft shadow, ink arc.
   Same layout, same hierarchy, no glow beyond 8%. Check it stays energetic: the
   Ember FAB and the heavy figure carry it.

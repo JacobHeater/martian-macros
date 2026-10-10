@@ -134,18 +134,27 @@ class HistoryChart extends StatelessWidget {
                       LineChartBarData(
                         spots: [
                           if (item.connectRecordedPoints)
-                            ...(
-                              item.values.entries
-                                  .where((e) => !e.key.isBefore(start) && !e.key.isAfter(today))
-                                  .toList()
-                                ..sort((a, b) => a.key.compareTo(b.key))
-                            ).map((e) => FlSpot(start.daysUntil(e.key).toDouble(), e.value))
+                            ...(item.values.entries
+                                    .where(
+                                      (e) =>
+                                          !e.key.isBefore(start) &&
+                                          !e.key.isAfter(today),
+                                    )
+                                    .toList()
+                                  ..sort((a, b) => a.key.compareTo(b.key)))
+                                .map(
+                                  (e) => FlSpot(
+                                    start.daysUntil(e.key).toDouble(),
+                                    e.value,
+                                  ),
+                                )
                           else
                             for (var i = 0; i < days; i++)
-                            if (item.values[start.addDays(i)] case final value?)
-                              FlSpot(i.toDouble(), value)
-                            else
-                              FlSpot.nullSpot,
+                              if (item.values[start.addDays(i)]
+                                  case final value?)
+                                FlSpot(i.toDouble(), value)
+                              else
+                                FlSpot.nullSpot,
                         ],
                         color: color(item.kind),
                         barWidth: item.dashed ? 1.5 : 2.5,

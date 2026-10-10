@@ -5,14 +5,17 @@ import 'package:mm_engine/mm_engine.dart';
 
 void main() {
   final today = CalendarDate(2026, 10, 10);
-  IntakeDay food(int daysAgo, double kcal, {bool complete = false}) => IntakeDay(
-    date: today.addDays(-daysAgo),
-    kcal: kcal,
-    proteinG: kcal / 15,
-    carbsG: 200,
-    fatG: 60,
-    completeness: complete ? DayCompleteness.complete : DayCompleteness.unmarked,
-  );
+  IntakeDay food(int daysAgo, double kcal, {bool complete = false}) =>
+      IntakeDay(
+        date: today.addDays(-daysAgo),
+        kcal: kcal,
+        proteinG: kcal / 15,
+        carbsG: 200,
+        fatG: 60,
+        completeness: complete
+            ? DayCompleteness.complete
+            : DayCompleteness.unmarked,
+      );
   TargetsRecord target(int daysAgo, double kcal) => TargetsRecord(
     effectiveFrom: today.addDays(-daysAgo),
     mode: GoalMode.fatLoss,
@@ -88,9 +91,7 @@ void main() {
     final result = facts(
       intake: [food(0, 2100, complete: true), food(1, 2000, complete: true)],
       history: [target(7, 2300)],
-      pauses: [
-        Pause(from: today, to: today, reason: PauseReason.travel),
-      ],
+      pauses: [Pause(from: today, to: today, reason: PauseReason.travel)],
       weights: [WeightObservation(date: today, weightKg: 80)],
     );
     expect(result.calories[today], 2100);

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/food/calorie_hero.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
@@ -16,7 +17,13 @@ void main() {
     await repos.weights.saveWeight(today, 82);
     await pumpApp(tester, repos, FixedClock(today));
 
-    expect(find.text('Learning'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(CalorieHero),
+        matching: find.text('Learning'),
+      ),
+      findsOneWidget,
+    );
     expect(
       find.text(
         'Calibration, day 1 of 14. Targets hold while the app learns your metabolism.',

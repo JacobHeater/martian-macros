@@ -60,7 +60,7 @@ light scheme with its tokens. Set `scaffoldBackgroundColor` to `canvas`.
 A `ThemeExtension<MmColors>` for everything Material has no slot for, with
 `lerp` implemented: `protein`, `carbs`, `fat`, `energy`, `trend`, `trendBand`,
 `reading`, `positive`, `caution`, `info`, `danger`, `track`, `selected`,
-`sunken`, `raised`, `overlay`, `emberHalo`, `limbGlow`. Access through one
+`sunken`, `raised`, `overlay`, `limbGlow`. Access through one
 extension: `context.mm.protein`. Screens never call `Theme.of(context).colorScheme`
 for meaning.
 
@@ -76,8 +76,8 @@ Set these once in `ThemeData` rather than per widget:
   indicator `selected` 56 × 32 full-round, selected icon/label `ember`, unselected
   `text2`, labels always shown, label `label` role.
 - `FloatingActionButtonThemeData`: `ember` background, `onEmber` foreground,
-  `extendedPadding` 20, 16 radius, elevation 3 (light) / 0 plus a `BoxShadow`
-  halo wrapper in dark.
+  `extendedPadding` 20, 16 radius, zero elevation in every interaction state
+  and no decorative shadow wrapper in either theme (MM-181).
 - `FilledButtonThemeData`: 48 dp min height, 12 radius, `ember`/`onEmber`.
   `OutlinedButton`: `outlineStrong` border, `text` label. `TextButton`: `ember`.
 - `InputDecorationTheme`: filled `sunken`, 12 radius, `outlineStrong` 1 dp border,
@@ -128,8 +128,7 @@ radii or padding. Prefer assembling from these over generic configurable widgets
 - `LimbGlow`: a `RadialGradient` `DecoratedBox` clipped to the card, alpha from the
   token. `OrbitHairlines`: a `CustomPainter` of three arcs; pass `isDark` from the
   theme.
-- The dark FAB halo: wrap with `DecoratedBox(boxShadow: [BoxShadow(color:
-  ember@25%, blurRadius: 24, offset: Offset(0, 8))])` in dark only.
+- The primary FAB is flat; do not add a glow or shadow wrapper (MM-181).
 
 ## Spacing, radii, durations
 

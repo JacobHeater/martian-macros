@@ -41,13 +41,22 @@ void main() {
       tester,
     ) async {
       await pump(tester, intake(100, 150, 50), dark: dark);
-      final sections = tester.widget<PieChart>(find.byType(PieChart)).data.sections;
+      final sections = tester
+          .widget<PieChart>(find.byType(PieChart))
+          .data
+          .sections;
       expect(sections.map((s) => s.value), [400, 600, 450]);
       expect(find.text('Protein\n100 g · 27.6%'), findsOneWidget);
       expect(find.text('Carbs\n150 g · 41.4%'), findsOneWidget);
       expect(find.text('Fat\n50 g · 31.0%'), findsOneWidget);
-      expect(find.textContaining('1,450 kcal from recorded macros'), findsOneWidget);
-      expect(find.textContaining('Alcohol and other calorie differences'), findsOneWidget);
+      expect(
+        find.textContaining('1,450 kcal from recorded macros'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Alcohol and other calorie differences'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   }
@@ -60,7 +69,10 @@ void main() {
 
   testWidgets('zero shares have labels but no fake sectors', (tester) async {
     await pump(tester, intake(50, 0, 0));
-    final sections = tester.widget<PieChart>(find.byType(PieChart)).data.sections;
+    final sections = tester
+        .widget<PieChart>(find.byType(PieChart))
+        .data
+        .sections;
     expect(sections.length, 1);
     expect(sections.single.value, 200);
     expect(find.text('Protein\n50 g · 100.0%'), findsOneWidget);

@@ -19,7 +19,7 @@ Dashboard MM-176 and isolated demo seeding MM-177 are in flight on
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-181 (`mm req next` is the authority).
+**Next ticket ID.** MM-182 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -82,10 +82,23 @@ private notes; they bind whoever picks up the work.
   waist, coverage and coaching histories, plus separate recovery trends.
 - MM-177 supplies a repeatable synthetic seed in a separately identified demo
   app/database. It must never seed or reset the normal app's data.
-- Validation is in progress; populated/empty/loading/error/narrow-screen
-  tests cover the Dashboard. Screenshots and emulator checks are still pending.
+- Integrated `mm check` passed (exit 0, "All checks passed.").
+  Populated/empty/loading/error/narrow-screen tests cover the Dashboard.
+  Seeded Dashboard summary, nutrition, measurements and coaching plus Food
+  cards and the flat FAB were inspected on the Android emulator in both themes.
+  Linux screenshot regeneration and PR checks are still pending.
 - MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
   MM-180 splits the food log into separate meal cards at the owner's request.
+- The owner refined MM-180: expanded-by-default independent accordions,
+  compact 12 dp outlined cards, and a separate tinted rounded-square Add action
+  beside a muted chevron. Add must not toggle the disclosure; tests cover
+  both collapsed and expanded states. Validation of this refinement is underway.
+- MM-180 controls now use centered stroked vector paths, not icon-font glyphs.
+  MM-181 removes the floating Add food button's glow/shadow in both themes,
+  including hover/focus/pressed elevation, at the owner's explicit request.
+- Emulator inspection found a low-contrast demo notice in light mode; its
+  tightly coupled regression fix is delegated to the original demo implementer.
+  No unrelated roadmap work is in scope.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
