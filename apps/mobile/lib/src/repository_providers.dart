@@ -47,6 +47,10 @@ final intakeReaderProvider = Provider<IntakeReader>(
   (ref) => ref.watch(_driftRepositoriesProvider).intake,
 );
 
+final insightLogRepositoryProvider = Provider<InsightLogRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).insightLog,
+);
+
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );

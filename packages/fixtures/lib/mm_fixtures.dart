@@ -11,6 +11,7 @@ export 'src/in_memory_day_mark_repository.dart';
 export 'src/in_memory_entitlement.dart';
 export 'src/in_memory_food_catalog.dart';
 export 'src/in_memory_food_repository.dart';
+export 'src/in_memory_insight_log_repository.dart';
 export 'src/in_memory_intake_reader.dart';
 export 'src/in_memory_preferences_repository.dart';
 export 'src/in_memory_repositories.dart';

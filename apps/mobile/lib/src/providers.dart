@@ -162,6 +162,42 @@ final stallAssessmentProvider = Provider<StallAssessment?>((ref) {
   );
 });
 
+/// Which insights have been shown and dismissed (MM-141).
+final insightLogProvider = StreamProvider<List<InsightLogEntry>>(
+  (ref) => ref.watch(insightLogReaderProvider).watchInsightLog(),
+);
+
+/// The one insight to show today, if any (MM-141): the catalog's rules run
+/// over the data to yesterday, then rationed against what was already shown.
+final insightSelectionProvider = Provider<InsightSelection?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  final intake = ref.watch(intakeDaysProvider).value;
+  final weights = ref.watch(weightsProvider).value;
+  final history = ref.watch(targetsHistoryProvider).value;
+  final log = ref.watch(insightLogProvider).value;
+  if (setup == null ||
+      intake == null ||
+      weights == null ||
+      history == null ||
+      log == null ||
+      ref.watch(coachProvider) == null) {
+    return null;
+  }
+  final today = ref.watch(todayProvider);
+  return selectInsight(
+    candidates: findInsights(
+      through: today.addDays(-1),
+      intake: intake,
+      weights: weights,
+      history: history,
+      stall: ref.watch(stallAssessmentProvider),
+      limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
+    ),
+    log: log,
+    today: today,
+  );
+});
+
 /// When the welcome-back screen was last put off (MM-147).
 final returnScreenDismissedProvider = StreamProvider<CalendarDate?>(
   (ref) => ref.watch(returnScreenReaderProvider).watchReturnScreenDismissedOn(),
