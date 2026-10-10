@@ -134,6 +134,34 @@ final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
   );
 });
 
+/// Whether progress has stalled against the goal, and which kind of stall it
+/// is (MM-140); null until the coach has what it needs to look.
+final stallAssessmentProvider = Provider<StallAssessment?>((ref) {
+  final setup = ref.watch(setupProvider).value;
+  final snapshot = ref.watch(coachProvider);
+  final intake = ref.watch(intakeDaysProvider).value;
+  final weights = ref.watch(weightsProvider).value;
+  final history = ref.watch(targetsHistoryProvider).value;
+  if (setup == null ||
+      snapshot == null ||
+      intake == null ||
+      weights == null ||
+      history == null ||
+      !snapshot.policy.targetsAllowed) {
+    return null;
+  }
+  return assessStall(
+    setup: setup,
+    snapshot: snapshot,
+    history: history,
+    intake: intake,
+    weights: weights,
+    waist: ref.watch(waistProvider).value ?? const [],
+    weightEvents: ref.watch(weightEventsProvider).value ?? const [],
+    today: ref.watch(todayProvider),
+  );
+});
+
 /// When the welcome-back screen was last put off (MM-147).
 final returnScreenDismissedProvider = StreamProvider<CalendarDate?>(
   (ref) => ref.watch(returnScreenReaderProvider).watchReturnScreenDismissedOn(),

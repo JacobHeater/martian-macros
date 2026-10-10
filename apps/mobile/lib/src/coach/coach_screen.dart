@@ -25,6 +25,7 @@ import 'caution_message.dart';
 import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
+import 'stall_card.dart';
 import 'target_flag_message.dart';
 import 'under_eating_notice.dart';
 
@@ -146,6 +147,7 @@ class CoachScreen extends ConsumerWidget {
           today: today,
           holdNote: _holdNote(setup, snapshot, today),
         ),
+        const StallCard(),
         const AdherenceCard(),
         InfoCard(
           title: 'Your metabolism',
