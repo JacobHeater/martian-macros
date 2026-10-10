@@ -8937,12 +8937,24 @@ class $WorkoutsTable extends Workouts
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _setStartedAtMsMeta = const VerificationMeta(
+    'setStartedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> setStartedAtMs = GeneratedColumn<int>(
+    'set_started_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     dateEpochDay,
     startedAtMs,
     endedAtMs,
+    setStartedAtMs,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -8987,6 +8999,15 @@ class $WorkoutsTable extends Workouts
         endedAtMs.isAcceptableOrUnknown(data['ended_at_ms']!, _endedAtMsMeta),
       );
     }
+    if (data.containsKey('set_started_at_ms')) {
+      context.handle(
+        _setStartedAtMsMeta,
+        setStartedAtMs.isAcceptableOrUnknown(
+          data['set_started_at_ms']!,
+          _setStartedAtMsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -9012,6 +9033,10 @@ class $WorkoutsTable extends Workouts
         DriftSqlType.int,
         data['${effectivePrefix}ended_at_ms'],
       ),
+      setStartedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}set_started_at_ms'],
+      ),
     );
   }
 
@@ -9030,11 +9055,15 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
 
   /// Null while the workout is in progress.
   final int? endedAtMs;
+
+  /// When the set timer was started, while a set is being timed (MM-191).
+  final int? setStartedAtMs;
   const WorkoutRow({
     required this.id,
     required this.dateEpochDay,
     required this.startedAtMs,
     this.endedAtMs,
+    this.setStartedAtMs,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -9044,6 +9073,9 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
     map['started_at_ms'] = Variable<int>(startedAtMs);
     if (!nullToAbsent || endedAtMs != null) {
       map['ended_at_ms'] = Variable<int>(endedAtMs);
+    }
+    if (!nullToAbsent || setStartedAtMs != null) {
+      map['set_started_at_ms'] = Variable<int>(setStartedAtMs);
     }
     return map;
   }
@@ -9056,6 +9088,9 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       endedAtMs: endedAtMs == null && nullToAbsent
           ? const Value.absent()
           : Value(endedAtMs),
+      setStartedAtMs: setStartedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(setStartedAtMs),
     );
   }
 
@@ -9069,6 +9104,7 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       dateEpochDay: serializer.fromJson<int>(json['dateEpochDay']),
       startedAtMs: serializer.fromJson<int>(json['startedAtMs']),
       endedAtMs: serializer.fromJson<int?>(json['endedAtMs']),
+      setStartedAtMs: serializer.fromJson<int?>(json['setStartedAtMs']),
     );
   }
   @override
@@ -9079,6 +9115,7 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       'dateEpochDay': serializer.toJson<int>(dateEpochDay),
       'startedAtMs': serializer.toJson<int>(startedAtMs),
       'endedAtMs': serializer.toJson<int?>(endedAtMs),
+      'setStartedAtMs': serializer.toJson<int?>(setStartedAtMs),
     };
   }
 
@@ -9087,11 +9124,15 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
     int? dateEpochDay,
     int? startedAtMs,
     Value<int?> endedAtMs = const Value.absent(),
+    Value<int?> setStartedAtMs = const Value.absent(),
   }) => WorkoutRow(
     id: id ?? this.id,
     dateEpochDay: dateEpochDay ?? this.dateEpochDay,
     startedAtMs: startedAtMs ?? this.startedAtMs,
     endedAtMs: endedAtMs.present ? endedAtMs.value : this.endedAtMs,
+    setStartedAtMs: setStartedAtMs.present
+        ? setStartedAtMs.value
+        : this.setStartedAtMs,
   );
   WorkoutRow copyWithCompanion(WorkoutsCompanion data) {
     return WorkoutRow(
@@ -9103,6 +9144,9 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           ? data.startedAtMs.value
           : this.startedAtMs,
       endedAtMs: data.endedAtMs.present ? data.endedAtMs.value : this.endedAtMs,
+      setStartedAtMs: data.setStartedAtMs.present
+          ? data.setStartedAtMs.value
+          : this.setStartedAtMs,
     );
   }
 
@@ -9112,13 +9156,15 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           ..write('id: $id, ')
           ..write('dateEpochDay: $dateEpochDay, ')
           ..write('startedAtMs: $startedAtMs, ')
-          ..write('endedAtMs: $endedAtMs')
+          ..write('endedAtMs: $endedAtMs, ')
+          ..write('setStartedAtMs: $setStartedAtMs')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, dateEpochDay, startedAtMs, endedAtMs);
+  int get hashCode =>
+      Object.hash(id, dateEpochDay, startedAtMs, endedAtMs, setStartedAtMs);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9126,7 +9172,8 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           other.id == this.id &&
           other.dateEpochDay == this.dateEpochDay &&
           other.startedAtMs == this.startedAtMs &&
-          other.endedAtMs == this.endedAtMs);
+          other.endedAtMs == this.endedAtMs &&
+          other.setStartedAtMs == this.setStartedAtMs);
 }
 
 class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
@@ -9134,17 +9181,20 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
   final Value<int> dateEpochDay;
   final Value<int> startedAtMs;
   final Value<int?> endedAtMs;
+  final Value<int?> setStartedAtMs;
   const WorkoutsCompanion({
     this.id = const Value.absent(),
     this.dateEpochDay = const Value.absent(),
     this.startedAtMs = const Value.absent(),
     this.endedAtMs = const Value.absent(),
+    this.setStartedAtMs = const Value.absent(),
   });
   WorkoutsCompanion.insert({
     this.id = const Value.absent(),
     required int dateEpochDay,
     required int startedAtMs,
     this.endedAtMs = const Value.absent(),
+    this.setStartedAtMs = const Value.absent(),
   }) : dateEpochDay = Value(dateEpochDay),
        startedAtMs = Value(startedAtMs);
   static Insertable<WorkoutRow> custom({
@@ -9152,12 +9202,14 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     Expression<int>? dateEpochDay,
     Expression<int>? startedAtMs,
     Expression<int>? endedAtMs,
+    Expression<int>? setStartedAtMs,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (dateEpochDay != null) 'date_epoch_day': dateEpochDay,
       if (startedAtMs != null) 'started_at_ms': startedAtMs,
       if (endedAtMs != null) 'ended_at_ms': endedAtMs,
+      if (setStartedAtMs != null) 'set_started_at_ms': setStartedAtMs,
     });
   }
 
@@ -9166,12 +9218,14 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     Value<int>? dateEpochDay,
     Value<int>? startedAtMs,
     Value<int?>? endedAtMs,
+    Value<int?>? setStartedAtMs,
   }) {
     return WorkoutsCompanion(
       id: id ?? this.id,
       dateEpochDay: dateEpochDay ?? this.dateEpochDay,
       startedAtMs: startedAtMs ?? this.startedAtMs,
       endedAtMs: endedAtMs ?? this.endedAtMs,
+      setStartedAtMs: setStartedAtMs ?? this.setStartedAtMs,
     );
   }
 
@@ -9190,6 +9244,9 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     if (endedAtMs.present) {
       map['ended_at_ms'] = Variable<int>(endedAtMs.value);
     }
+    if (setStartedAtMs.present) {
+      map['set_started_at_ms'] = Variable<int>(setStartedAtMs.value);
+    }
     return map;
   }
 
@@ -9199,7 +9256,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
           ..write('id: $id, ')
           ..write('dateEpochDay: $dateEpochDay, ')
           ..write('startedAtMs: $startedAtMs, ')
-          ..write('endedAtMs: $endedAtMs')
+          ..write('endedAtMs: $endedAtMs, ')
+          ..write('setStartedAtMs: $setStartedAtMs')
           ..write(')'))
         .toString();
   }
@@ -9591,6 +9649,28 @@ class $WorkoutSetsTable extends WorkoutSets
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _startedAtMsMeta = const VerificationMeta(
+    'startedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> startedAtMs = GeneratedColumn<int>(
+    'started_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endedAtMsMeta = const VerificationMeta(
+    'endedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> endedAtMs = GeneratedColumn<int>(
+    'ended_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -9600,6 +9680,8 @@ class $WorkoutSetsTable extends WorkoutSets
     reps,
     loadKg,
     rir,
+    startedAtMs,
+    endedAtMs,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -9665,6 +9747,21 @@ class $WorkoutSetsTable extends WorkoutSets
         rir.isAcceptableOrUnknown(data['rir']!, _rirMeta),
       );
     }
+    if (data.containsKey('started_at_ms')) {
+      context.handle(
+        _startedAtMsMeta,
+        startedAtMs.isAcceptableOrUnknown(
+          data['started_at_ms']!,
+          _startedAtMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ended_at_ms')) {
+      context.handle(
+        _endedAtMsMeta,
+        endedAtMs.isAcceptableOrUnknown(data['ended_at_ms']!, _endedAtMsMeta),
+      );
+    }
     return context;
   }
 
@@ -9702,6 +9799,14 @@ class $WorkoutSetsTable extends WorkoutSets
         DriftSqlType.int,
         data['${effectivePrefix}rir'],
       ),
+      startedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at_ms'],
+      ),
+      endedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at_ms'],
+      ),
     );
   }
 
@@ -9723,6 +9828,11 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
 
   /// Reps in reserve, 0 to 5; null when not recorded.
   final int? rir;
+
+  /// When the set began and ended, in milliseconds since the Unix epoch;
+  /// null when not known (MM-191).
+  final int? startedAtMs;
+  final int? endedAtMs;
   const WorkoutSetRow({
     required this.id,
     required this.workoutId,
@@ -9731,6 +9841,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     required this.reps,
     required this.loadKg,
     this.rir,
+    this.startedAtMs,
+    this.endedAtMs,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -9744,6 +9856,12 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     if (!nullToAbsent || rir != null) {
       map['rir'] = Variable<int>(rir);
     }
+    if (!nullToAbsent || startedAtMs != null) {
+      map['started_at_ms'] = Variable<int>(startedAtMs);
+    }
+    if (!nullToAbsent || endedAtMs != null) {
+      map['ended_at_ms'] = Variable<int>(endedAtMs);
+    }
     return map;
   }
 
@@ -9756,6 +9874,12 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       reps: Value(reps),
       loadKg: Value(loadKg),
       rir: rir == null && nullToAbsent ? const Value.absent() : Value(rir),
+      startedAtMs: startedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAtMs),
+      endedAtMs: endedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAtMs),
     );
   }
 
@@ -9772,6 +9896,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       reps: serializer.fromJson<int>(json['reps']),
       loadKg: serializer.fromJson<double>(json['loadKg']),
       rir: serializer.fromJson<int?>(json['rir']),
+      startedAtMs: serializer.fromJson<int?>(json['startedAtMs']),
+      endedAtMs: serializer.fromJson<int?>(json['endedAtMs']),
     );
   }
   @override
@@ -9785,6 +9911,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       'reps': serializer.toJson<int>(reps),
       'loadKg': serializer.toJson<double>(loadKg),
       'rir': serializer.toJson<int?>(rir),
+      'startedAtMs': serializer.toJson<int?>(startedAtMs),
+      'endedAtMs': serializer.toJson<int?>(endedAtMs),
     };
   }
 
@@ -9796,6 +9924,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     int? reps,
     double? loadKg,
     Value<int?> rir = const Value.absent(),
+    Value<int?> startedAtMs = const Value.absent(),
+    Value<int?> endedAtMs = const Value.absent(),
   }) => WorkoutSetRow(
     id: id ?? this.id,
     workoutId: workoutId ?? this.workoutId,
@@ -9804,6 +9934,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     reps: reps ?? this.reps,
     loadKg: loadKg ?? this.loadKg,
     rir: rir.present ? rir.value : this.rir,
+    startedAtMs: startedAtMs.present ? startedAtMs.value : this.startedAtMs,
+    endedAtMs: endedAtMs.present ? endedAtMs.value : this.endedAtMs,
   );
   WorkoutSetRow copyWithCompanion(WorkoutSetsCompanion data) {
     return WorkoutSetRow(
@@ -9816,6 +9948,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       reps: data.reps.present ? data.reps.value : this.reps,
       loadKg: data.loadKg.present ? data.loadKg.value : this.loadKg,
       rir: data.rir.present ? data.rir.value : this.rir,
+      startedAtMs: data.startedAtMs.present
+          ? data.startedAtMs.value
+          : this.startedAtMs,
+      endedAtMs: data.endedAtMs.present ? data.endedAtMs.value : this.endedAtMs,
     );
   }
 
@@ -9828,14 +9964,25 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           ..write('position: $position, ')
           ..write('reps: $reps, ')
           ..write('loadKg: $loadKg, ')
-          ..write('rir: $rir')
+          ..write('rir: $rir, ')
+          ..write('startedAtMs: $startedAtMs, ')
+          ..write('endedAtMs: $endedAtMs')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, workoutId, exercisePosition, position, reps, loadKg, rir);
+  int get hashCode => Object.hash(
+    id,
+    workoutId,
+    exercisePosition,
+    position,
+    reps,
+    loadKg,
+    rir,
+    startedAtMs,
+    endedAtMs,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9846,7 +9993,9 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           other.position == this.position &&
           other.reps == this.reps &&
           other.loadKg == this.loadKg &&
-          other.rir == this.rir);
+          other.rir == this.rir &&
+          other.startedAtMs == this.startedAtMs &&
+          other.endedAtMs == this.endedAtMs);
 }
 
 class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
@@ -9857,6 +10006,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
   final Value<int> reps;
   final Value<double> loadKg;
   final Value<int?> rir;
+  final Value<int?> startedAtMs;
+  final Value<int?> endedAtMs;
   const WorkoutSetsCompanion({
     this.id = const Value.absent(),
     this.workoutId = const Value.absent(),
@@ -9865,6 +10016,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     this.reps = const Value.absent(),
     this.loadKg = const Value.absent(),
     this.rir = const Value.absent(),
+    this.startedAtMs = const Value.absent(),
+    this.endedAtMs = const Value.absent(),
   });
   WorkoutSetsCompanion.insert({
     this.id = const Value.absent(),
@@ -9874,6 +10027,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     required int reps,
     required double loadKg,
     this.rir = const Value.absent(),
+    this.startedAtMs = const Value.absent(),
+    this.endedAtMs = const Value.absent(),
   }) : workoutId = Value(workoutId),
        exercisePosition = Value(exercisePosition),
        position = Value(position),
@@ -9887,6 +10042,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     Expression<int>? reps,
     Expression<double>? loadKg,
     Expression<int>? rir,
+    Expression<int>? startedAtMs,
+    Expression<int>? endedAtMs,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -9896,6 +10053,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       if (reps != null) 'reps': reps,
       if (loadKg != null) 'load_kg': loadKg,
       if (rir != null) 'rir': rir,
+      if (startedAtMs != null) 'started_at_ms': startedAtMs,
+      if (endedAtMs != null) 'ended_at_ms': endedAtMs,
     });
   }
 
@@ -9907,6 +10066,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     Value<int>? reps,
     Value<double>? loadKg,
     Value<int?>? rir,
+    Value<int?>? startedAtMs,
+    Value<int?>? endedAtMs,
   }) {
     return WorkoutSetsCompanion(
       id: id ?? this.id,
@@ -9916,6 +10077,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       reps: reps ?? this.reps,
       loadKg: loadKg ?? this.loadKg,
       rir: rir ?? this.rir,
+      startedAtMs: startedAtMs ?? this.startedAtMs,
+      endedAtMs: endedAtMs ?? this.endedAtMs,
     );
   }
 
@@ -9943,6 +10106,12 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     if (rir.present) {
       map['rir'] = Variable<int>(rir.value);
     }
+    if (startedAtMs.present) {
+      map['started_at_ms'] = Variable<int>(startedAtMs.value);
+    }
+    if (endedAtMs.present) {
+      map['ended_at_ms'] = Variable<int>(endedAtMs.value);
+    }
     return map;
   }
 
@@ -9955,7 +10124,9 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
           ..write('position: $position, ')
           ..write('reps: $reps, ')
           ..write('loadKg: $loadKg, ')
-          ..write('rir: $rir')
+          ..write('rir: $rir, ')
+          ..write('startedAtMs: $startedAtMs, ')
+          ..write('endedAtMs: $endedAtMs')
           ..write(')'))
         .toString();
   }
@@ -14741,12 +14912,14 @@ typedef $$WorkoutsTableCreateCompanionBuilder = WorkoutsCompanion Function({
   required int dateEpochDay,
   required int startedAtMs,
   Value<int?> endedAtMs,
+  Value<int?> setStartedAtMs,
 });
 typedef $$WorkoutsTableUpdateCompanionBuilder = WorkoutsCompanion Function({
   Value<int> id,
   Value<int> dateEpochDay,
   Value<int> startedAtMs,
   Value<int?> endedAtMs,
+  Value<int?> setStartedAtMs,
 });
 
 class $$WorkoutsTableFilterComposer
@@ -14775,6 +14948,11 @@ class $$WorkoutsTableFilterComposer
 
   ColumnFilters<int> get endedAtMs => $composableBuilder(
     column: $table.endedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get setStartedAtMs => $composableBuilder(
+    column: $table.setStartedAtMs,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -14807,6 +14985,11 @@ class $$WorkoutsTableOrderingComposer
     column: $table.endedAtMs,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get setStartedAtMs => $composableBuilder(
+    column: $table.setStartedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WorkoutsTableAnnotationComposer
@@ -14833,6 +15016,11 @@ class $$WorkoutsTableAnnotationComposer
 
   GeneratedColumn<int> get endedAtMs =>
       $composableBuilder(column: $table.endedAtMs, builder: (column) => column);
+
+  GeneratedColumn<int> get setStartedAtMs => $composableBuilder(
+    column: $table.setStartedAtMs,
+    builder: (column) => column,
+  );
 }
 
 class $$WorkoutsTableTableManager
@@ -14870,11 +15058,13 @@ class $$WorkoutsTableTableManager
                 Value<int> dateEpochDay = const Value.absent(),
                 Value<int> startedAtMs = const Value.absent(),
                 Value<int?> endedAtMs = const Value.absent(),
+                Value<int?> setStartedAtMs = const Value.absent(),
               }) => WorkoutsCompanion(
                 id: id,
                 dateEpochDay: dateEpochDay,
                 startedAtMs: startedAtMs,
                 endedAtMs: endedAtMs,
+                setStartedAtMs: setStartedAtMs,
               ),
           createCompanionCallback:
               ({
@@ -14882,11 +15072,13 @@ class $$WorkoutsTableTableManager
                 required int dateEpochDay,
                 required int startedAtMs,
                 Value<int?> endedAtMs = const Value.absent(),
+                Value<int?> setStartedAtMs = const Value.absent(),
               }) => WorkoutsCompanion.insert(
                 id: id,
                 dateEpochDay: dateEpochDay,
                 startedAtMs: startedAtMs,
                 endedAtMs: endedAtMs,
+                setStartedAtMs: setStartedAtMs,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -15126,6 +15318,8 @@ typedef $$WorkoutSetsTableCreateCompanionBuilder =
       required int reps,
       required double loadKg,
       Value<int?> rir,
+      Value<int?> startedAtMs,
+      Value<int?> endedAtMs,
     });
 typedef $$WorkoutSetsTableUpdateCompanionBuilder =
     WorkoutSetsCompanion Function({
@@ -15136,6 +15330,8 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder =
       Value<int> reps,
       Value<double> loadKg,
       Value<int?> rir,
+      Value<int?> startedAtMs,
+      Value<int?> endedAtMs,
     });
 
 class $$WorkoutSetsTableFilterComposer
@@ -15179,6 +15375,16 @@ class $$WorkoutSetsTableFilterComposer
 
   ColumnFilters<int> get rir => $composableBuilder(
     column: $table.rir,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAtMs => $composableBuilder(
+    column: $table.endedAtMs,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -15226,6 +15432,16 @@ class $$WorkoutSetsTableOrderingComposer
     column: $table.rir,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAtMs => $composableBuilder(
+    column: $table.endedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WorkoutSetsTableAnnotationComposer
@@ -15259,6 +15475,14 @@ class $$WorkoutSetsTableAnnotationComposer
 
   GeneratedColumn<int> get rir =>
       $composableBuilder(column: $table.rir, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endedAtMs =>
+      $composableBuilder(column: $table.endedAtMs, builder: (column) => column);
 }
 
 class $$WorkoutSetsTableTableManager
@@ -15299,6 +15523,8 @@ class $$WorkoutSetsTableTableManager
                 Value<int> reps = const Value.absent(),
                 Value<double> loadKg = const Value.absent(),
                 Value<int?> rir = const Value.absent(),
+                Value<int?> startedAtMs = const Value.absent(),
+                Value<int?> endedAtMs = const Value.absent(),
               }) => WorkoutSetsCompanion(
                 id: id,
                 workoutId: workoutId,
@@ -15307,6 +15533,8 @@ class $$WorkoutSetsTableTableManager
                 reps: reps,
                 loadKg: loadKg,
                 rir: rir,
+                startedAtMs: startedAtMs,
+                endedAtMs: endedAtMs,
               ),
           createCompanionCallback:
               ({
@@ -15317,6 +15545,8 @@ class $$WorkoutSetsTableTableManager
                 required int reps,
                 required double loadKg,
                 Value<int?> rir = const Value.absent(),
+                Value<int?> startedAtMs = const Value.absent(),
+                Value<int?> endedAtMs = const Value.absent(),
               }) => WorkoutSetsCompanion.insert(
                 id: id,
                 workoutId: workoutId,
@@ -15325,6 +15555,8 @@ class $$WorkoutSetsTableTableManager
                 reps: reps,
                 loadKg: loadKg,
                 rir: rir,
+                startedAtMs: startedAtMs,
+                endedAtMs: endedAtMs,
               ),
           withReferenceMapper: (p0) => p0
               .map(
