@@ -13,18 +13,15 @@ Nothing private goes here: no credentials, no personal or health data.
 
 Last updated: 2026-10-10, by Claude (Anthropic), after MM-190 and the spike MM-188.
 
-**Branch state.** `main` is green again (MM-190, PR #69). Three pull requests are open and brought up to date with `main`; merge
-each with `--merge` when its CI is green:
-- #66 process rewards (MM-92), `feature/mm-92-process-rewards`.
-- #67 monthly report (MM-33), `feature/mm-33-monthly-report`.
-- #68 requirements only: the health-platform spike and design (MM-188, MM-189), `feature/mm-76-exercise-health-alignment`.
+**Branch state.** `main` is green, and no feature work is in flight. PRs #66 (process rewards, MM-92), #67 (monthly report, MM-33),
+#68 (the health-platform spike and design, MM-188 and MM-189) and #69 (MM-190) are merged. MM-92 and MM-33 stay `in-progress`: each
+has a part that waits on the training log (personal records; strength in the report).
 
 **Database.** Schema version 24 (MM-184). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
 **Next ticket ID.** MM-191 (`mm req next` is the authority).
 
-**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left once #66 and #67
-merge: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
+**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
 body-fat estimate (MM-34). So the next work is WS-10, the training log:
 - The exercise library (MM-76) first, built to MM-189. Each exercise carries an optional Health Connect segment type, and the
   mapping table in MM-188 is its data. Copy identifiers from that table; do not retype them from memory.
