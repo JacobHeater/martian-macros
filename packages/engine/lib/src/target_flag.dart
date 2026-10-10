@@ -30,4 +30,8 @@ enum TargetFlag {
 
   /// Protein was capped by the coaching policy.
   proteinCapped,
+
+  /// The user took a maintenance week early, when recovery was failing
+  /// (MM-117).
+  requestedBreak,
 }

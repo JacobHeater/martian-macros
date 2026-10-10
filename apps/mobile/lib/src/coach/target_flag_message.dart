@@ -17,6 +17,9 @@ extension TargetFlagMessage on TargetFlag {
     TargetFlag.rateLimited =>
       'This week’s change was limited to a small step. Targets move '
           'gradually so one odd week can’t swing them.',
+    TargetFlag.requestedBreak =>
+      'This is the maintenance week you chose. The deficit can resume at '
+          'the next check-in.',
     TargetFlag.dietBreak =>
       'You’ve been in a deficit for 16 weeks. This is a maintenance '
           'break to recover before continuing.',

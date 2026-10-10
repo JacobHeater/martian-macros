@@ -34,6 +34,22 @@ void setupRepositoryContract(String name, SetupRepository Function() create) {
       expect(loaded.creatineStartedOn, isNull);
     });
 
+    test('keeps the maintenance week and the answered day', () async {
+      final day = CalendarDate(2026, 10, 5);
+      await repo.saveSetup(typicalSetup());
+      expect((await repo.loadSetup())!.maintenanceWeekFrom, isNull);
+      expect((await repo.loadSetup())!.reliefAnsweredOn, isNull);
+      await repo.saveSetup(
+        typicalSetup().copyWith(
+          maintenanceWeekFrom: day,
+          reliefAnsweredOn: day.addDays(1),
+        ),
+      );
+      final loaded = (await repo.loadSetup())!;
+      expect(loaded.maintenanceWeekFrom, day);
+      expect(loaded.reliefAnsweredOn, day.addDays(1));
+    });
+
     test('keeps the creatine start date', () async {
       final startedOn = CalendarDate(2026, 1, 1);
       await repo.saveSetup(

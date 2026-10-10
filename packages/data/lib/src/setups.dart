@@ -48,6 +48,11 @@ class Setups extends Table {
   BoolColumn get weightAffectingMedication =>
       boolean().withDefault(const Constant(false))();
   IntColumn get healthCheckConfirmedEpochDay => integer().nullable()();
+
+  /// The offer to ease a deficit (MM-117): the day a maintenance week was
+  /// last taken early, and the day the offer was last answered.
+  IntColumn get maintenanceWeekFromEpochDay => integer().nullable()();
+  IntColumn get reliefAnsweredEpochDay => integer().nullable()();
   IntColumn get healthCheckSkipCount =>
       integer().withDefault(const Constant(0))();
   IntColumn get creatineStartedEpochDay => integer().nullable()();
