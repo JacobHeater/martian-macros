@@ -13,7 +13,7 @@ void main() {
   Future<void> lastActive(int daysAgo) async {
     repos = InMemoryRepositories();
     await repos.setup.saveSetup(
-      typicalSetup(onboardedOn: today.addDays(-200))
+      typicalSetup(onboardedOn: today.addDays(-210))
           .copyWith(healthCheckConfirmedOn: () => today.addDays(-30)),
     );
     await repos.weights.saveWeight(today.addDays(-daysAgo), 82);

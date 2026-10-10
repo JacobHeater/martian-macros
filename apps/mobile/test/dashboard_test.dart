@@ -60,7 +60,7 @@ void main() {
   }
 
   Future<void> seed({
-    int onboardedDaysAgo = 30,
+    int onboardedDaysAgo = 45,
     bool weighedToday = true,
     List<TargetsRecord> history = const [],
     List<FoodEntry> foods = const [],
