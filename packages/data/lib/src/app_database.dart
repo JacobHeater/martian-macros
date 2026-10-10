@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import 'custom_exercises.dart';
 import 'custom_foods.dart';
 import 'day_marks.dart';
 import 'food_entries.dart';
@@ -18,6 +19,9 @@ import 'user_preferences.dart';
 import 'waist_entries.dart';
 import 'weight_entries.dart';
 import 'weight_events.dart';
+import 'workout_exercises.dart';
+import 'workout_sets.dart';
+import 'workouts.dart';
 
 part 'app_database.g.dart';
 
@@ -37,6 +41,10 @@ part 'app_database.g.dart';
     Pauses,
     Reminders,
     RecoveryCheckIns,
+    Workouts,
+    WorkoutExercises,
+    WorkoutSets,
+    CustomExercises,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -44,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 24;
+  static const currentSchemaVersion = 25;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -265,6 +273,14 @@ class AppDatabase extends _$AppDatabase {
         ),
         mode: InsertMode.insertOrIgnore,
       );
+    },
+    // 24 to 25: the training log (MM-75) and the user's own exercises
+    // (MM-76).
+    24: (m) async {
+      await m.createTable(workouts);
+      await m.createTable(workoutExercises);
+      await m.createTable(workoutSets);
+      await m.createTable(customExercises);
     },
   };
 

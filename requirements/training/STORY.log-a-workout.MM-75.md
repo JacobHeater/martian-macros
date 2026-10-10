@@ -1,6 +1,6 @@
 ---
 id: MM-75
-status: proposed
+status: in-progress
 component: training
 related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68, MM-189, MM-191]
 ---
@@ -50,6 +50,24 @@ Scenario: Interrupted
   When the app is closed and reopened
   Then the workout is still in progress with its sets intact
 ```
+
+## Progress
+Built (2026-10-10), storage only:
+- The model: a `Workout` has a day, a start, an end (none while in progress) and its exercises in order; a `WorkoutExercise` has
+  its sets; a `WorkoutSet` is reps, load in kilograms and optional RIR (0 to 5, where 5 means five or more).
+- Schema 25: workouts, their exercises, their sets, and the user's own exercises (MM-76), in one migration. Checked by the
+  migration tests from every earlier version.
+- `WorkoutRepository` and `CustomExerciseRepository`, over the database and in memory, held to the same contract tests. Erasing
+  all data empties them.
+- `previousSetsOf` ("last time") and `recentExerciseIds` as pure functions.
+
+Not built yet: the Train destination and every screen. Nothing is visible in the app.
+
+Choices made while building (say if any is wrong):
+- The same exercise can appear twice in one workout, as two entries.
+- "Last time" is the most recent earlier workout in which the exercise has at least one set.
+- A workout an exercise was deleted from keeps the sets of its other exercises; deleting one of the user's own exercises does not
+  delete sets logged against it.
 
 ## Notes
 - New tables: needs migrations (MM-61).

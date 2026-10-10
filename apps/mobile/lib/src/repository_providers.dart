@@ -91,6 +91,14 @@ final recoveryCheckInRepositoryProvider = Provider<RecoveryCheckInRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).recovery,
 );
 
+final workoutRepositoryProvider = Provider<WorkoutRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).workouts,
+);
+
+final customExerciseRepositoryProvider = Provider<CustomExerciseRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).customExercises,
+);
+
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );

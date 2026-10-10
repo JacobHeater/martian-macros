@@ -5,6 +5,7 @@ library;
 
 export 'src/contracts/backup_storage_contract.dart';
 export 'src/contracts/clock_contract.dart';
+export 'src/contracts/custom_exercise_repository_contract.dart';
 export 'src/contracts/custom_food_repository_contract.dart';
 export 'src/contracts/data_eraser_contract.dart';
 export 'src/contracts/day_mark_repository_contract.dart';
@@ -23,3 +24,4 @@ export 'src/contracts/targets_history_repository_contract.dart';
 export 'src/contracts/waist_repository_contract.dart';
 export 'src/contracts/weight_event_repository_contract.dart';
 export 'src/contracts/weight_repository_contract.dart';
+export 'src/contracts/workout_repository_contract.dart';

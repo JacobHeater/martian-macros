@@ -26,6 +26,8 @@ void main() {
   pauseRepositoryContract('Drift', () => open().pauses);
   reminderRepositoryContract('Drift', () => open().reminders);
   recoveryCheckInRepositoryContract('Drift', () => open().recovery);
+  workoutRepositoryContract('Drift', () => open().workouts);
+  customExerciseRepositoryContract('Drift', () => open().customExercises);
   intakeReaderContract('Drift', () {
     final r = open();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);
@@ -40,6 +42,8 @@ void main() {
       food: r.food,
       targets: r.targets,
       preferences: r.preferences,
+      workouts: r.workouts,
+      customExercises: r.customExercises,
     );
   });
 }

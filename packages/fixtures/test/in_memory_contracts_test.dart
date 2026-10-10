@@ -38,6 +38,11 @@ void main() {
     'In-memory',
     () => InMemoryRepositories().recovery,
   );
+  workoutRepositoryContract('In-memory', () => InMemoryRepositories().workouts);
+  customExerciseRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().customExercises,
+  );
   intakeReaderContract('In-memory', () {
     final r = InMemoryRepositories();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);
@@ -52,6 +57,8 @@ void main() {
       food: r.food,
       targets: r.targets,
       preferences: r.preferences,
+      workouts: r.workouts,
+      customExercises: r.customExercises,
     );
   });
 }
