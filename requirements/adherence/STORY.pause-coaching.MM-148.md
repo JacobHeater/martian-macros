@@ -126,4 +126,5 @@ Not built:
 - The guide for a past paused day is today's maintenance estimate, not that day's.
 - A pause cannot be edited (only ended, cancelled or extended a week), and its dates are set with sliders; there is no date picker
   component yet.
-- Not checked on a device.
+- Checked on the Android emulator: the form, a running pause, and the paused dashboard. The resume screen, the Food screen and the
+  Coach notice were not looked at there, and iOS is untried.
