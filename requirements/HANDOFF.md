@@ -11,15 +11,18 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, while adding the MM-175 phone shortcut.
+Last updated: 2026-10-10, by Copilot, while previewing the Martian palette.
 
-**Branch state.** The MM-174 handoff PR #61 is open. MM-175 is on
-`feature/mm175-phone-shortcut`, stacked on that handoff branch; its PR builds on #61.
-No product feature work is being started in this session.
+**Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
+delivery is in PR #63, ready for review with its final CI still pending.
+The owner requested a preview-only retro '90s theme named Martian in
+`design/palette-preview.html`. It is on `design/martian-palette-preview`,
+branched independently from fresh main. No Flutter theme or data changes.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-176 (`mm req next` is the authority).
+**Next ticket ID.** Main currently reports MM-176; PR #63 reserves MM-176
+through MM-183. Avoid reusing those IDs while that PR is in flight.
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -70,6 +73,18 @@ private notes; they bind whoever picks up the work.
   `State` class in a second file ending `_state.dart`.
 
 ## Session 4: 2026-10-10, Copilot
+
+- PR #63 combines the seeded isolated demo, Dashboard infographics, Food pies,
+  separate meal accordions and flat FAB. Full checks and Linux golden
+  regeneration passed; emulator views were inspected. Final CI is pending.
+- Owner now wants to preview an extra theme, Martian, before implementing it.
+  Added deep grape, acid lime, cyan, pink and violet to the static palette
+  preview alongside unchanged Dark/Light palettes. Included notices, swatches,
+  grayscale and measured contrast checks. No app theme is implemented or
+  approved yet; buttons intentionally have no incandescent glow.
+- Browser-verified the preview at desktop and 375 px phone widths with no
+  horizontal overflow. All seven displayed contrast spot checks pass; no
+  external resources are loaded. `mm req` and diff whitespace checks pass.
 
 - Owner requested `mm run --env phone` as a shortcut for physical-device testing.
 - MM-175 uses dev defines, selects one physical Android device, ignores emulators,
