@@ -11,19 +11,24 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, while implementing MM-184.
+Last updated: 2026-10-10, by Copilot, while finishing MM-184.
 
 **Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
 delivery is merged in PR #63 after successful CI.
 The owner approved the retro '90s Martian palette as the new-install default,
 with a first-launch theme chooser for new installations only. Existing
-choices must be preserved. `feature/mm184-martian-theme` builds on #63.
+choices are preserved. `feature/mm184-martian-theme` is PR #64 on top of
+merged #63. Implementation, local full checks and reviewed Linux screenshots
+are complete; final PR CI is pending. Merge #64 with `--merge` when green.
 
-**Database.** Schema version 24 is in flight for MM-184. Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 24 in PR #64 (MM-184). No other schema change
+should start until it merges (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-186 (`mm req next` is the authority).
+**Next ticket ID.** MM-187 (`mm req next` is the authority).
 
-**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
+**What to build next.** Finish PR #64, not another side quest. Then the work
+follows `roadmap/`. WS-09 (coaching intelligence) is where earlier sessions
+worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
   counts (MM-149), and must neither advance nor break during a pause (MM-148).
 - Blocked: the recomp review and signal (MM-133, MM-32) need the training log and strength trend (WS-10, MM-75 and MM-77) and the
@@ -90,6 +95,21 @@ private notes; they bind whoever picks up the work.
   failing test: confirmation briefly restored Martian before the saved choice
   emitted. Preview now clears on confirmed stream publication, not write
   completion. Final checks are being rerun with that regression.
+- Dart review found the loading state treated unknown preferences as a fresh
+  install. MM-186 has two failing-before regressions and restores the System
+  fallback until preferences load. Martian activates only when the stored
+  value identifies a fresh install or the user explicitly chose Martian.
+- Emulator-inspected Martian Dashboard, Food, Settings and the first-launch
+  chooser; live Light preview and transition to onboarding worked. Only
+  synthetic demo storage was reset, never the physical phone or normal app.
+  Linux golden update run `38025912745` passed; images are downloaded for review.
+- Full `mm check` passed again after MM-186, exit 0 and "All checks passed."
+  Reviewed the Martian golden contact sheet and full-size chooser/Settings;
+  screenshots cover Dashboard sections, Food accordions, Progress and Coach.
+  Only the emulator's isolated demo was run. Physical phone and iOS are untested.
+- PR #64 is ready for review with 11 new Martian screenshots and refreshed
+  Light/Dark Settings screenshots. Final requirements/format/diff checks pass.
+  No remaining implementation work; final GitHub CI must pass before merge.
 
 - PR #63 combines the seeded isolated demo, Dashboard infographics, Food pies,
   separate meal accordions and flat FAB. Full checks and Linux golden

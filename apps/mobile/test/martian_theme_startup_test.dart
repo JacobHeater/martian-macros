@@ -129,6 +129,43 @@ void main() {
     );
   }
 
+  for (final preference in [ThemePreference.dark, ThemePreference.system]) {
+    testWidgets(
+      'MM-186: loading an existing ${preference.name} preference does not preview Martian',
+      (tester) async {
+        final stream = StreamController<ThemePreference>();
+        addTearDown(stream.close);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...inMemoryOverrides(repos),
+              todayProvider.overrideWithValue(today),
+              themePreferenceProvider.overrideWith((ref) => stream.stream),
+            ],
+            child: const MartianMacrosApp(),
+          ),
+        );
+        await tester.pump();
+        final loadingApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+        expect(loadingApp.themeMode, ThemeMode.system);
+        expect(
+          loadingApp.theme!.extension<MmColors>()!.canvas,
+          MmColors.light.canvas,
+        );
+        expect(find.text('Choose your theme'), findsNothing);
+        stream.add(preference);
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          preference == ThemePreference.dark
+              ? ThemeMode.dark
+              : ThemeMode.system,
+        );
+        expect(find.text('Get started'), findsOneWidget);
+      },
+    );
+  }
+
   testWidgets(
     'theme loading blocks onboarding and a load failure offers retry',
     (tester) async {
