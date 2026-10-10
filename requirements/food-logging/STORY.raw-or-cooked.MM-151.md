@@ -96,3 +96,8 @@ the published packs predate this and have no preparation or pairs until the pipe
 is published (not run: the source downloads are large); the rule was tested on names written from USDA's style, not yet on the real
 files, so how many foods pair is unknown; "default to the state people weigh" for search ordering; branded foods say "as packaged" only
 in the data, not on screen.
+
+Done since: the choice is remembered. Because an entry now stores which food it came from (MM-167), choosing a food that has a raw or
+cooked pair starts on the state it was last logged in, weighed in grams, found among the recent foods (the last 20 distinct entries,
+so a state not logged recently is forgotten). The switch still applies to weighing only; choosing a serving logs the food as picked.
+Tested in `raw_or_cooked_test.dart`.

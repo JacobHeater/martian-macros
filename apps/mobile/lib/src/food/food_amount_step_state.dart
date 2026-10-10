@@ -65,7 +65,26 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
   @override
   void initState() {
     super.initState();
+    _rememberPreparation();
     _quantity.text = _defaultQuantity(_choice);
+  }
+
+  /// Starts on the state (raw, dry or cooked) this food was last logged in,
+  /// as far back as the recent foods go (MM-151).
+  void _rememberPreparation() {
+    final alt = widget.alternate;
+    if (alt == null) return;
+    final recents = ref.read(recentFoodsProvider).value ?? const [];
+    for (final e in recents) {
+      final origin = e.portion?.origin;
+      if (origin == null || origin.packId != alt.packId) continue;
+      if (origin.foodId == widget.food.id) return;
+      if (origin.foodId == alt.id) {
+        _food = alt;
+        _choice = _choices.firstWhere((c) => c.unit == PortionUnit.gram);
+        return;
+      }
+    }
   }
 
   @override
@@ -225,6 +244,8 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
 
   void _pick(AmountChoice c) => setState(() {
     _choice = c;
+    // The raw or cooked switch applies to weighing only.
+    if (!c.unit.isWeight) _food = widget.food;
     _quantity.text = _defaultQuantity(c);
   });
 
