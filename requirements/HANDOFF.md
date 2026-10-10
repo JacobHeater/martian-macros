@@ -11,28 +11,34 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Claude (Anthropic), after MM-187.
+Last updated: 2026-10-10, by Claude (Anthropic), after MM-190 and the spike MM-188.
 
-**Branch state.** PRs #61 to #64 are merged, including the Martian theme (MM-184). The one open pull request is MM-187 (the arc is
-the one calorie visual), on `feature/mm-187-single-calorie-visual`; merge it with `--merge` when its CI is green. Nothing else is in
-flight.
+**Branch state.** `main` is green again (MM-190, PR #69). Three pull requests are open and brought up to date with `main`; merge
+each with `--merge` when its CI is green:
+- #66 process rewards (MM-92), `feature/mm-92-process-rewards`.
+- #67 monthly report (MM-33), `feature/mm-33-monthly-report`.
+- #68 requirements only: the health-platform spike and design (MM-188, MM-189), `feature/mm-76-exercise-health-alignment`.
 
 **Database.** Schema version 24 (MM-184). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-188 (`mm req next` is the authority).
+**Next ticket ID.** MM-191 (`mm req next` is the authority).
 
-**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where earlier sessions
-worked. In it:
-- Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
-  counts (MM-149), and must neither advance nor break during a pause (MM-148).
-- Blocked: the recomp review and signal (MM-133, MM-32) need the training log and strength trend (WS-10, MM-75 and MM-77) and the
-  measurement protocol (MM-155). Phase planning (MM-36) needs the body-fat estimate from measurements (MM-34).
-- Good work to hand off, with no dependencies: the exercise library (MM-76) and the health-source interface with its fake (MM-67).
+**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left once #66 and #67
+merge: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
+body-fat estimate (MM-34). So the next work is WS-10, the training log:
+- The exercise library (MM-76) first, built to MM-189. Each exercise carries an optional Health Connect segment type, and the
+  mapping table in MM-188 is its data. Copy identifiers from that table; do not retype them from memory.
+- Then workout logging (MM-75), the strength trend (MM-77) and weekly volume (MM-78).
+- Health sync (WS-11) starts with the health-source interface and its fake (MM-67). Workouts sync as sessions first, through the
+  `health` plugin; segments on Android are a later piece in the app's own Android code (MM-188 says why).
 
 **Waiting on the product owner.**
 - MM-173: honest low days from a noisy logger are dropped as partial, so the expenditure estimate drifts about 160 kcal high. The
   ticket lists four options and recommends judging "far below typical" against the spread of the window. Its test is skipped.
 - Reminders are scheduled inexactly on Android, so one can be up to an hour late. Exact timing needs a permission. Not asked yet.
+- MM-188 marks some exercise-to-platform mappings as judgement (for example Romanian deadlift written as a deadlift). The owner
+  can strike any; a struck one uses the fallback. Two of its questions need a phone and are open: whether other apps fill Health
+  Connect segments, and how a written workout looks in each platform's own app.
 - The support line for a user with an eating-disorder history on the under-eating notice (MM-114) names no helpline and has not
   been through the wording review (MM-29, MM-96).
 
@@ -56,6 +62,10 @@ private notes; they bind whoever picks up the work.
   The rule in `AGENTS.md` still holds for any bug you do find: a `BUG` ticket and a regression test at once.
 - How the app looks matters as much as what it does. Look at new screens on the emulator before calling them done.
 - Say plainly what was and was not verified. Never report a check as passed that you did not run.
+- **Training syncs with the phone's health systems (MM-189, MM-188).** Workouts should line up with what Health Connect and
+  HealthKit offer, with a fallback for exercises they do not name. Each library exercise carries an optional platform mapping (none
+  is normal); the app is the system of record; iOS is session-level only. Mapping data must come from the spike MM-188, checked
+  against the platforms' own references, never from memory.
 - **The only calorie visual is the arc**, in `CalorieHero`, and it is the only one in the app (MM-187). No screen builds its own hero
   or draws the arc; `mm arch` enforces it. Trend charts over a range are a separate thing; the owner has not been asked whether
   the Dashboard's calorie history lines should be held to the same rule.
@@ -63,6 +73,12 @@ private notes; they bind whoever picks up the work.
   only at launch.
 
 **Things that will cost you time if you do not know them.**
+- **A test that passes for you and fails in CI is probably reading something from the machine**: the time, the timezone, the
+  locale. Reproduce it before changing anything. Six Food tests failed in CI only after 15:00 UTC, were first blamed on Linux
+  layout, and a wrong fix was shipped on that guess (MM-190). To run the tests at another hour, set `TZ` (for example
+  `TZ=Etc/GMT-10 flutter test` on Linux or macOS; WSL works on the development machine).
+- The time comes from `clockProvider`, never `DateTime.now()`; `mm arch` refuses it outside `SystemClock`. `FixedClock(day, hour:)`
+  fixes the hour in a test.
 - `mm check` has passed only when its exit code is 0 and its last line is "All checks passed." A tail that reads "All tests passed!"
   can belong to one package while another failed.
 - Screenshot ("golden") tests run only on Linux, so only in CI. When a screen changes, push the branch to
@@ -75,6 +91,27 @@ private notes; they bind whoever picks up the work.
   app's package is `com.martianmacros.martian_macros`.
 - One declaration per file is enforced (`mm arch`), and a file is named for what it declares. A screen that needs state has its
   `State` class in a second file ending `_state.dart`.
+
+## Session 6: 2026-10-10 (later), Claude (Anthropic)
+
+- **`main` was red in CI and is green again (MM-190, PR #69).** The add-food sheet chose a new entry's meal from the device's time
+  instead of the app's clock, so six Food tests passed in the morning and failed after 15:00 on the machine running them. It was
+  first written up as a Linux layout difference and "fixed" by scrolling in the tests; that was a guess and it did not hold. It was
+  then reproduced by shifting the timezone, and fixed in the app: the default meal, the birth-date picker and the demo seed ask the
+  `Clock`, and an architecture rule refuses `DateTime.now` anywhere else. Checked: `mm check` on Windows, the whole app suite on
+  Linux at 06:00, 13:00, 16:00 and 22:00, and CI.
+- **The health-platform spike is done (MM-188)**, read from the AndroidX client library's source (1.1.0 and the development
+  branch), Apple's reference data and the `health` plugin's source. Health Connect names 42 strength movements as segment types; a
+  segment carries repetitions, and weight, set index and exertion only in an alpha. HealthKit names no exercise. The `health`
+  plugin reads and writes sessions only. The ticket holds the mapping table, every identifier checked by script against the
+  source. Not answered, because they need a phone: whether other apps fill segments, and how a written workout looks in each
+  platform's own app.
+- MM-189 is the design that follows from the owner's direction: an optional platform mapping per exercise, the app as system of
+  record, a plain strength session as the fallback, iOS session-level only.
+- Process rewards (MM-92, PR #66): a "Your logging" card on the Dashboard with a streak of whole logged days, one miss in seven
+  forgiven, pauses neither counting nor breaking it. Monthly report (MM-33, PR #67): a 28-day report on the Coach screen with the
+  expenditure estimate, trend change and target changes, and a notice on the Dashboard for a week after one is ready. Neither was
+  seen on the emulator.
 
 ## Session 5: 2026-10-10, Claude (Anthropic)
 
@@ -175,33 +212,3 @@ private notes; they bind whoever picks up the work.
   while pause history loaded or failed. Four regression cases failed before
   adding explicit pause loading/error gates. Integrated `mm check` passed
   afterward. Both review-discovered defects have tickets and regressions.
-
-## Session 3: 2026-10-09 (late), Claude (Anthropic)
-
-Workstream WS-09, steps 3 to 5 and part of 8. All merged.
-
-| Pull request | Ticket | What changed |
-|---|---|---|
-| #55 | MM-141 | Insight framework: a fixed catalog of rules, rationed to one a day and three a week, on the dashboard. |
-| #56 | MM-148 | Pause for travel, illness or injury. Schema 20. |
-| #57 | MM-146 | Local reminders for weigh-in, food and the weekly measurement. Schema 21. |
-| #58 | MM-116 | Weekly recovery check-in: five questions, shown as five lines over eight weeks. Schema 22. |
-| #59 | MM-117 | Offer to ease a deficit after two hard check-ins: a maintenance week, a slower pace, or carry on. Schema 23. |
-| #60 | MM-125 | Protein per meal at Full detail, a quiet marker, and one insight. |
-
-Things a successor should know:
-- **A pause is read in many places.** The estimator, gap detection, the check-in, the adherence summary, the stall diagnosis,
-  insights, the under-eating rule and reminders all consult it. Anything new that judges a day, counts a streak or prompts the user
-  must too. The helpers are `pauseOn`, `withoutPausedDays` and `pausedDaysBetween` in the engine.
-- **Reminders record nothing when they fire.** The plan is a pure function (`planReminders`) remade whenever the app opens or data
-  changes; the device's schedule is replaced by it. "Ignored seven times" is derived from the days since the reminder was turned on
-  with the thing not done. Each reminder is only ever scheduled seven sends ahead, which is how an absent user is left alone.
-- **New dependencies**: `flutter_local_notifications` 22.3.1 and `timezone` 0.11.1, with core-library desugaring, two receivers in
-  the Android manifest, and Gson's shrinker rules. iOS needs its app delegate looked at before reminders can be trusted there.
-- **A maintenance week the user takes** is a new target flag, `requestedBreak`, issued at once by `nextTargets` when
-  `UserSetup.maintenanceWeekFrom` is set. It is separate from the automatic diet break after sixteen weeks.
-- **Left out on purpose**, each noted in its ticket: the check-in-ready and recovery reminders, the reminder offer in onboarding, the
-  missed-period question (needs cycle logging, MM-20), the strength trigger for the ease-the-deficit offer (needs the training log),
-  and a date picker (pause dates are set with sliders).
-- Two rules were added to the working agreements this session: every bug gets a ticket and a regression test at once, and this
-  handoff document (MM-174). Bugs MM-168 to MM-173 were filed in retrospect; all but MM-173 are fixed.

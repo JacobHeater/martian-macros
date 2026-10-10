@@ -96,9 +96,15 @@ workstream to hand to a separate contributor, because nearly every file it
 creates is new.
 
 ## Requirement sources
-- Remaining: MM-76, MM-75, MM-77, MM-78, MM-79. Epic: MM-74.
+- Remaining: MM-76, MM-75, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
 
 ## Notes for whoever builds it
+- **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do
+  not.** Each library exercise carries an optional mapping to the platform's own exercise type, and no mapping is a normal state.
+  The app is the system of record; a platform gets a summary session, and exercises it cannot name stay in the app. Health
+  Connect can name some exercises inside a workout; HealthKit names only the kind of workout, so iOS is session-level. The
+  mappings come from the spike MM-188 (WS-11 step 8) and are never written from memory. Build the library with the mapping field
+  empty first; filling it is a data change.
 - Load is entered in the user's weight unit and stored in kilograms, like
   every other quantity. Bodyweight exercises record added load, which may be
   zero or negative.

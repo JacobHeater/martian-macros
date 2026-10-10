@@ -2,7 +2,7 @@
 id: MM-68
 status: proposed
 component: health-sync
-related: [MM-66, MM-67, MM-16, MM-19, MM-20, MM-34, MM-71, MM-72, MM-73]
+related: [MM-66, MM-67, MM-16, MM-19, MM-20, MM-34, MM-71, MM-72, MM-73, MM-188, MM-189]
 ---
 
 # Story: Import weigh-ins and more from Health Connect
