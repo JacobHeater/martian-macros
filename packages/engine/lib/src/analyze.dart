@@ -12,6 +12,7 @@ import 'gap_prior.dart';
 import 'gap_rule.dart';
 import 'initial_tdee_prior.dart';
 import 'partition.dart';
+import 'pause_deficit_restart.dart';
 import 'recommend_mode.dart';
 import 'resting_energy_equations.dart';
 import 'safety_body_fat.dart';
@@ -24,6 +25,7 @@ import 'tdee_prior.dart';
 import 'tdee_status.dart';
 import 'weight_event_effects.dart';
 import 'weight_trend_model.dart';
+import 'without_paused_days.dart';
 
 /// Analyses stored history. Returns null until there is a weigh-in.
 ///
@@ -36,6 +38,7 @@ CoachSnapshot? analyze({
   List<MenstruationDay> flowDays = const [],
   List<WeightEvent> weightEvents = const [],
   List<TargetsRecord> history = const [],
+  List<Pause> pauses = const [],
   WeightTrendModel trendModel = const WeightTrendModel(),
   TdeeEstimator estimator = const TdeeEstimator(),
 }) {
@@ -110,8 +113,15 @@ CoachSnapshot? analyze({
     ageYears: age,
   );
   final asOf = today.addDays(-1);
-  final gaps = activityGaps(weights: weights, intake: intake, today: today);
+  final gaps = activityGaps(
+    weights: weights,
+    intake: intake,
+    today: today,
+    pauses: pauses,
+  );
   final breaks = gaps.where((g) => g.days >= GapRule.deficitBreakDays);
+  final gapRestart = breaks.isEmpty ? null : breaks.last.returnOn;
+  final pauseRestart = pauseDeficitRestartOn(pauses, today);
   final initialPrior = initialTdeePrior(
     bmrKcal: bmr,
     dailyActivity: setup.dailyActivity,
@@ -121,7 +131,8 @@ CoachSnapshot? analyze({
   // formula prior while its scale change is excluded from the slope.
   final tdee = estimator.estimate(
     asOf: asOf,
-    intake: intake,
+    // Paused days are left out unless they were marked complete (MM-148).
+    intake: withoutPausedDays(intake, pauses, keepComplete: true),
     trend: trend,
     prior:
         _weightEventPrior(
@@ -158,7 +169,11 @@ CoachSnapshot? analyze({
   return CoachSnapshot(
     lastCreatineEventOn: lastCreatineEventOn,
     gaps: gaps,
-    deficitRestartOn: breaks.isEmpty ? null : breaks.last.returnOn,
+    deficitRestartOn:
+        gapRestart == null ||
+            (pauseRestart != null && pauseRestart.isAfter(gapRestart))
+        ? pauseRestart
+        : gapRestart,
     policy: policy,
     trend: trend,
     trendWeightKg: trendWeight,

@@ -109,6 +109,5 @@ Built:
 
 Not built: confidence set to Fair after a 7 to 27 day gap (confidence follows the data in the window as before); the fixed 7-day
 re-calibration (the estimator holds until it has its usual minimum of data, which is longer); re-confirming the goal after 90 days;
-the trend chart drawing the gap dashed; streaks and the monthly report (neither exists yet); pauses (MM-148), so a paused period
-would count as a gap; a simulator user who lapses for four weeks and returns (MM-30). Food logged more than 60 days ago is not
+the trend chart drawing the gap dashed; streaks and the monthly report (neither exists yet); a simulator user who lapses for four weeks and returns (MM-30). Food logged more than 60 days ago is not
 loaded, so an old stretch with food but no weigh-ins can read as a gap for the deficit count.

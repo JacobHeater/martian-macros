@@ -1,6 +1,6 @@
 ---
 id: MM-148
-status: proposed
+status: in-progress
 component: adherence
 related: [MM-145, MM-23, MM-24, MM-31, MM-92, MM-117, MM-134, MM-135, MM-136, MM-146, MM-147]
 ---
@@ -88,3 +88,43 @@ Scenario: Resuming
 - A pause is a kind of phase change for the glycogen rule (MM-131) at both ends.
 - For pregnancy, surgery and anything longer than a few weeks, the right tool is a goal change through the health check (MM-112), not a
   pause.
+
+## Progress
+Built:
+- **A pause record**: dates, reason and whether it has been extended (`Pause`, `PauseReason`; the `PauseRepository` interface with a
+  Drift implementation and an in-memory one under one contract; schema version 20). One pause per start day.
+- **Setting one**: Settings, "Pause". A reason (travel, illness, injury, other), a start from today to 28 days ahead, and a length of 1
+  to 28 days. While one is running or set, the same screen shows it with "Resume now" (or "Cancel this pause") and "Extend by a week",
+  which works once.
+- **During a pause**: the dashboard and the Food screen show a maintenance guide in place of targets, labelled paused, with what was
+  logged and never "over" or "left" (`pausedGuide`; a test logs 3,400 kcal and forbids the word). The dashboard's status line and a
+  notice on the Coach screen say until when. No check-in runs and no target changes, including for a goal change (`nextTargets`). The
+  weekly summary, the stall diagnosis and insights say nothing while a paused day is inside the stretch they look at, and the
+  under-eating rule does not see paused days.
+- **The estimator** leaves paused days out unless they were logged and marked complete (`withoutPausedDays`, in `analyze`).
+- **Not a lapse**: a paused day is never part of a gap (MM-147), so the welcome-back flow does not fire for a pause.
+- **Illness and injury** record weight events for the pause's dates, one a week (the trend takes at most two in 14 days into
+  account): illness as "illness", injury as "other". Ending or cancelling a pause removes the ones it no longer covers.
+- **Counts as a break**: a pause of 7 days or more restarts the unbroken-deficit count on the day after it, or on its seventh day
+  while it is still running (`pauseDeficitRestartOn`).
+- **Resuming**: when a pause has ended, on its date or early, the single return screen reads "Ready to resume? A weigh-in gets the
+  coach going again." and says the targets are what they were, the next check-in is in a week, and the scale will move while water
+  settles. A test forbids "back", "away", "missed", "streak", "gap" and "lost" on it. The stored targets are untouched by a pause, so
+  they are what they were; the next weekly check-in waits until 7 days after the pause ends.
+- **Heavy use**: more than 56 paused days in the 120 ending with a new pause shows one neutral question about maintenance on the
+  form. It refuses nothing.
+- Thresholds are in `PauseRule`. Tests: `pause_test.dart` (engine), `pause_test.dart` (app), the pause repository contract against
+  both implementations, and the migration test.
+
+Not built:
+- Reminders are silent during a pause, and streaks neither advance nor break: reminders (MM-146) and process rewards (MM-92) do not
+  exist yet. Each must read the pause when it is built.
+- Notices about training lapses (MM-134): not built either.
+- The glycogen rule at both ends of a pause (MM-131): the scale is not yet treated as settling when a pause starts or ends, beyond
+  the sentence on the resume screen. The wording is this ticket's, not MM-130's, which is not built.
+- The Coach screen still shows the stored targets under the paused notice; only the dashboard and Food screen swap in the guide.
+- The guide for a past paused day is today's maintenance estimate, not that day's.
+- A pause cannot be edited (only ended, cancelled or extended a week), and its dates are set with sliders; there is no date picker
+  component yet.
+- Checked on the Android emulator: the form, a running pause, and the paused dashboard. The resume screen, the Food screen and the
+  Coach notice were not looked at there, and iOS is untried.

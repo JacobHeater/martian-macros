@@ -12,8 +12,13 @@ import '../ui/number_entry_card.dart';
 /// The one screen shown on the first opening after a gap (MM-147). It asks
 /// for the single thing the coach needs, a weigh-in, and says nothing about
 /// the days away: no count, no summary, no streak.
+///
+/// The end of a pause shows the same screen ([resuming]) without a word that
+/// implies absence (MM-148).
 class WelcomeBackScreen extends ConsumerWidget {
-  const WelcomeBackScreen({super.key});
+  const WelcomeBackScreen({this.resuming = false, super.key});
+
+  final bool resuming;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,10 +33,18 @@ class WelcomeBackScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(24),
           children: [
             const SizedBox(height: 48),
-            Text('Welcome back', style: text.headlineMedium),
+            Text(
+              resuming ? 'Ready to resume?' : 'Welcome back',
+              style: text.headlineMedium,
+            ),
             const SizedBox(height: 12),
             Text(
-              'To pick up, the coach needs one thing: a weigh-in.',
+              resuming
+                  ? 'A weigh-in gets the coach going again. Your targets are '
+                        'what they were, and the next check-in is in a week. '
+                        'Expect the scale to move for a few days while water '
+                        'settles; that is not fat.'
+                  : 'To pick up, the coach needs one thing: a weigh-in.',
               style: text.bodyLarge?.copyWith(color: context.mm.text2),
             ),
             const SizedBox(height: 24),

@@ -7,10 +7,14 @@ import 'gap_rule.dart';
 /// logged, oldest first, up to the day before [today] (MM-147). Today is not
 /// over, so it is never part of a gap; a gap is open while today also has
 /// nothing recorded.
+///
+/// A paused day is never part of a gap (MM-148): a planned break is not a
+/// lapse.
 List<ActivityGap> activityGaps({
   required Iterable<WeightObservation> weights,
   required Iterable<IntakeDay> intake,
   required CalendarDate today,
+  Iterable<Pause> pauses = const [],
   int minimumDays = GapRule.minimumDays,
 }) {
   final active = <int>{
@@ -18,6 +22,9 @@ List<ActivityGap> activityGaps({
       if (!w.date.isAfter(today)) w.date.epochDay,
     for (final d in intake)
       if (d.kcal > 0 && !d.date.isAfter(today)) d.date.epochDay,
+    for (final p in pauses)
+      for (var day = p.from.epochDay; day <= p.to.epochDay; day++)
+        if (day <= today.epochDay) day,
   }.toList()..sort();
   if (active.isEmpty) return const [];
   final gaps = <ActivityGap>[];

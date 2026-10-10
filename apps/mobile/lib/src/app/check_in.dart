@@ -25,6 +25,7 @@ class CheckIn extends Notifier<Set<int>> {
       snapshot: snapshot,
       history: history,
       today: ref.watch(todayProvider),
+      pauses: ref.watch(pausesProvider).value ?? const [],
     );
     if (next == null) return Set.unmodifiable(_generatedThisLaunch);
     if (next.explanation?.previousKcal != null) {
