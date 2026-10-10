@@ -10,6 +10,7 @@ import 'adults_only_screen.dart';
 import 'health_recheck_dismissal_provider.dart';
 import 'health_recheck_screen.dart';
 import 'home_shell.dart';
+import 'welcome_back_screen.dart';
 
 /// Routes to onboarding until setup exists, then to the main shell.
 class AppRoot extends ConsumerWidget {
@@ -37,6 +38,7 @@ class AppRoot extends ConsumerWidget {
           today: today,
         ).blocked;
         if (blocked) return const AdultsOnlyScreen();
+        if (ref.watch(welcomeBackDueProvider)) return const WelcomeBackScreen();
         if (value.healthCheckDueOn(today) &&
             !ref.watch(healthRecheckDismissalProvider)) {
           return HealthRecheckScreen(allowSkip: value.healthCheckSkipCount < 2);

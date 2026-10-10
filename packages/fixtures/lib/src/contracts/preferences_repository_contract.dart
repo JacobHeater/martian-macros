@@ -45,6 +45,15 @@ void preferencesRepositoryContract(
       expect(await repo.watchDetailLevel().first, DetailLevel.full);
     });
 
+    test('the welcome-back screen is not put off until it is', () async {
+      expect(await repo.watchReturnScreenDismissedOn().first, isNull);
+      final day = CalendarDate(2026, 10, 5);
+      await repo.saveReturnScreenDismissedOn(day);
+      await repo.saveUnderEatingDismissedOn(day.addDays(1));
+      expect(await repo.watchReturnScreenDismissedOn().first, day);
+      expect(await repo.watchUnderEatingDismissedOn().first, day.addDays(1));
+    });
+
     test('the easy-to-miss line is on and never shown until changed', () async {
       final p = await repo.watchEasyToMiss().first;
       expect(p.enabled, isTrue);

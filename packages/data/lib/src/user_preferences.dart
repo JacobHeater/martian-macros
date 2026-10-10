@@ -22,6 +22,9 @@ class UserPreferences extends Table {
   /// The day the under-eating notice was last dismissed (MM-114).
   IntColumn get underEatingDismissedEpochDay => integer().nullable()();
 
+  /// The day the welcome-back screen was last put off (MM-147).
+  IntColumn get returnScreenDismissedEpochDay => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

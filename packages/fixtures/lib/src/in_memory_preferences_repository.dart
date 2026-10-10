@@ -49,6 +49,16 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
   Future<void> saveUnderEatingDismissedOn(CalendarDate day) async =>
       _underEatingDismissed.value = day;
 
+  final _returnDismissed = ObservableValue<CalendarDate?>(null);
+
+  @override
+  Stream<CalendarDate?> watchReturnScreenDismissedOn() =>
+      _returnDismissed.watch();
+
+  @override
+  Future<void> saveReturnScreenDismissedOn(CalendarDate day) async =>
+      _returnDismissed.value = day;
+
   @override
   Future<void> saveThemePreference(ThemePreference preference) async =>
       _theme.value = preference;
@@ -59,5 +69,6 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
     _easyToMiss.value = const EasyToMissPreference();
     _detail.value = DetailLevel.standard;
     _underEatingDismissed.value = null;
+    _returnDismissed.value = null;
   }
 }

@@ -4,6 +4,8 @@
 library;
 
 export 'src/activity_factor.dart';
+export 'src/activity_gap.dart';
+export 'src/activity_gaps.dart';
 export 'src/adherence_summary.dart';
 export 'src/analyze.dart';
 export 'src/body_fat_estimate.dart';
@@ -23,6 +25,8 @@ export 'src/explanation_line.dart';
 export 'src/explanation_reason.dart';
 export 'src/explanation_trigger.dart';
 export 'src/find_under_eating.dart';
+export 'src/gap_prior.dart';
+export 'src/gap_rule.dart';
 export 'src/goal_body_fat_check.dart';
 export 'src/hold_reduction.dart';
 export 'src/initial_tdee_prior.dart';
@@ -32,6 +36,7 @@ export 'src/loss_safety_raise.dart';
 export 'src/mode_reason.dart';
 export 'src/mode_recommendation.dart';
 export 'src/next_targets.dart';
+export 'src/open_gap.dart';
 export 'src/partition.dart';
 export 'src/protein_range.dart';
 export 'src/protein_targets.dart';

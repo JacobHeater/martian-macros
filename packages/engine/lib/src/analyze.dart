@@ -2,11 +2,14 @@ import 'dart:math' as math;
 
 import 'package:mm_domain/mm_domain.dart';
 
+import 'activity_gaps.dart';
 import 'body_fat_estimate.dart';
 import 'coach_confidence.dart';
 import 'coach_snapshot.dart';
 import 'cycle_noise.dart';
 import 'deurenberg_body_fat.dart';
+import 'gap_prior.dart';
+import 'gap_rule.dart';
 import 'initial_tdee_prior.dart';
 import 'partition.dart';
 import 'recommend_mode.dart';
@@ -107,6 +110,8 @@ CoachSnapshot? analyze({
     ageYears: age,
   );
   final asOf = today.addDays(-1);
+  final gaps = activityGaps(weights: weights, intake: intake, today: today);
+  final breaks = gaps.where((g) => g.days >= GapRule.deficitBreakDays);
   final initialPrior = initialTdeePrior(
     bmrKcal: bmr,
     dailyActivity: setup.dailyActivity,
@@ -126,6 +131,20 @@ CoachSnapshot? analyze({
           windowDays: estimator.windowDays,
           profileRevision: setup.profileRevision,
         ) ??
+        gapPrior(
+          gaps: gaps,
+          history: history,
+          trend: trend,
+          asOf: asOf,
+          windowDays: estimator.windowDays,
+          profileRevision: setup.profileRevision,
+          restingEnergyAt: (weightKg) => mifflinStJeorKcal(
+            sex: profile.sex,
+            weightKg: weightKg,
+            heightCm: profile.heightCm,
+            ageYears: age,
+          ),
+        ) ??
         initialPrior,
     bmrKcal: bmr,
     energyDensityForSlope: (slope) => energyDensityForSlope(
@@ -138,6 +157,8 @@ CoachSnapshot? analyze({
 
   return CoachSnapshot(
     lastCreatineEventOn: lastCreatineEventOn,
+    gaps: gaps,
+    deficitRestartOn: breaks.isEmpty ? null : breaks.last.returnOn,
     policy: policy,
     trend: trend,
     trendWeightKg: trendWeight,
