@@ -25,6 +25,7 @@ void main() {
   insightLogRepositoryContract('Drift', () => open().insightLog);
   pauseRepositoryContract('Drift', () => open().pauses);
   reminderRepositoryContract('Drift', () => open().reminders);
+  recoveryCheckInRepositoryContract('Drift', () => open().recovery);
   intakeReaderContract('Drift', () {
     final r = open();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);

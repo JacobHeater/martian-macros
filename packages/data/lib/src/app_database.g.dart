@@ -5276,6 +5276,17 @@ class $UserPreferencesTable extends UserPreferences
         type: DriftSqlType.int,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _recoveryCheckInSkippedEpochDayMeta =
+      const VerificationMeta('recoveryCheckInSkippedEpochDay');
+  @override
+  late final GeneratedColumn<int> recoveryCheckInSkippedEpochDay =
+      GeneratedColumn<int>(
+        'recovery_check_in_skipped_epoch_day',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5285,6 +5296,7 @@ class $UserPreferencesTable extends UserPreferences
     detailLevel,
     underEatingDismissedEpochDay,
     returnScreenDismissedEpochDay,
+    recoveryCheckInSkippedEpochDay,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5337,6 +5349,15 @@ class $UserPreferencesTable extends UserPreferences
         ),
       );
     }
+    if (data.containsKey('recovery_check_in_skipped_epoch_day')) {
+      context.handle(
+        _recoveryCheckInSkippedEpochDayMeta,
+        recoveryCheckInSkippedEpochDay.isAcceptableOrUnknown(
+          data['recovery_check_in_skipped_epoch_day']!,
+          _recoveryCheckInSkippedEpochDayMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5378,6 +5399,10 @@ class $UserPreferencesTable extends UserPreferences
         DriftSqlType.int,
         data['${effectivePrefix}return_screen_dismissed_epoch_day'],
       ),
+      recoveryCheckInSkippedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}recovery_check_in_skipped_epoch_day'],
+      ),
     );
   }
 
@@ -5411,6 +5436,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
 
   /// The day the welcome-back screen was last put off (MM-147).
   final int? returnScreenDismissedEpochDay;
+
+  /// The day the weekly recovery check-in was last skipped (MM-116).
+  final int? recoveryCheckInSkippedEpochDay;
   const PreferencesRow({
     required this.id,
     required this.themePreference,
@@ -5419,6 +5447,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     required this.detailLevel,
     this.underEatingDismissedEpochDay,
     this.returnScreenDismissedEpochDay,
+    this.recoveryCheckInSkippedEpochDay,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5450,6 +5479,11 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
         returnScreenDismissedEpochDay,
       );
     }
+    if (!nullToAbsent || recoveryCheckInSkippedEpochDay != null) {
+      map['recovery_check_in_skipped_epoch_day'] = Variable<int>(
+        recoveryCheckInSkippedEpochDay,
+      );
+    }
     return map;
   }
 
@@ -5471,6 +5505,10 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           returnScreenDismissedEpochDay == null && nullToAbsent
           ? const Value.absent()
           : Value(returnScreenDismissedEpochDay),
+      recoveryCheckInSkippedEpochDay:
+          recoveryCheckInSkippedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recoveryCheckInSkippedEpochDay),
     );
   }
 
@@ -5497,6 +5535,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       returnScreenDismissedEpochDay: serializer.fromJson<int?>(
         json['returnScreenDismissedEpochDay'],
       ),
+      recoveryCheckInSkippedEpochDay: serializer.fromJson<int?>(
+        json['recoveryCheckInSkippedEpochDay'],
+      ),
     );
   }
   @override
@@ -5520,6 +5561,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       'returnScreenDismissedEpochDay': serializer.toJson<int?>(
         returnScreenDismissedEpochDay,
       ),
+      'recoveryCheckInSkippedEpochDay': serializer.toJson<int?>(
+        recoveryCheckInSkippedEpochDay,
+      ),
     };
   }
 
@@ -5531,6 +5575,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     DetailLevel? detailLevel,
     Value<int?> underEatingDismissedEpochDay = const Value.absent(),
     Value<int?> returnScreenDismissedEpochDay = const Value.absent(),
+    Value<int?> recoveryCheckInSkippedEpochDay = const Value.absent(),
   }) => PreferencesRow(
     id: id ?? this.id,
     themePreference: themePreference ?? this.themePreference,
@@ -5545,6 +5590,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     returnScreenDismissedEpochDay: returnScreenDismissedEpochDay.present
         ? returnScreenDismissedEpochDay.value
         : this.returnScreenDismissedEpochDay,
+    recoveryCheckInSkippedEpochDay: recoveryCheckInSkippedEpochDay.present
+        ? recoveryCheckInSkippedEpochDay.value
+        : this.recoveryCheckInSkippedEpochDay,
   );
   PreferencesRow copyWithCompanion(UserPreferencesCompanion data) {
     return PreferencesRow(
@@ -5567,6 +5615,10 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
       returnScreenDismissedEpochDay: data.returnScreenDismissedEpochDay.present
           ? data.returnScreenDismissedEpochDay.value
           : this.returnScreenDismissedEpochDay,
+      recoveryCheckInSkippedEpochDay:
+          data.recoveryCheckInSkippedEpochDay.present
+          ? data.recoveryCheckInSkippedEpochDay.value
+          : this.recoveryCheckInSkippedEpochDay,
     );
   }
 
@@ -5582,7 +5634,10 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
             'underEatingDismissedEpochDay: $underEatingDismissedEpochDay, ',
           )
           ..write(
-            'returnScreenDismissedEpochDay: $returnScreenDismissedEpochDay',
+            'returnScreenDismissedEpochDay: $returnScreenDismissedEpochDay, ',
+          )
+          ..write(
+            'recoveryCheckInSkippedEpochDay: $recoveryCheckInSkippedEpochDay',
           )
           ..write(')'))
         .toString();
@@ -5597,6 +5652,7 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
     detailLevel,
     underEatingDismissedEpochDay,
     returnScreenDismissedEpochDay,
+    recoveryCheckInSkippedEpochDay,
   );
   @override
   bool operator ==(Object other) =>
@@ -5611,7 +5667,9 @@ class PreferencesRow extends DataClass implements Insertable<PreferencesRow> {
           other.underEatingDismissedEpochDay ==
               this.underEatingDismissedEpochDay &&
           other.returnScreenDismissedEpochDay ==
-              this.returnScreenDismissedEpochDay);
+              this.returnScreenDismissedEpochDay &&
+          other.recoveryCheckInSkippedEpochDay ==
+              this.recoveryCheckInSkippedEpochDay);
 }
 
 class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
@@ -5622,6 +5680,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
   final Value<DetailLevel> detailLevel;
   final Value<int?> underEatingDismissedEpochDay;
   final Value<int?> returnScreenDismissedEpochDay;
+  final Value<int?> recoveryCheckInSkippedEpochDay;
   const UserPreferencesCompanion({
     this.id = const Value.absent(),
     this.themePreference = const Value.absent(),
@@ -5630,6 +5689,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     this.detailLevel = const Value.absent(),
     this.underEatingDismissedEpochDay = const Value.absent(),
     this.returnScreenDismissedEpochDay = const Value.absent(),
+    this.recoveryCheckInSkippedEpochDay = const Value.absent(),
   });
   UserPreferencesCompanion.insert({
     this.id = const Value.absent(),
@@ -5639,6 +5699,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     this.detailLevel = const Value.absent(),
     this.underEatingDismissedEpochDay = const Value.absent(),
     this.returnScreenDismissedEpochDay = const Value.absent(),
+    this.recoveryCheckInSkippedEpochDay = const Value.absent(),
   });
   static Insertable<PreferencesRow> custom({
     Expression<int>? id,
@@ -5648,6 +5709,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     Expression<String>? detailLevel,
     Expression<int>? underEatingDismissedEpochDay,
     Expression<int>? returnScreenDismissedEpochDay,
+    Expression<int>? recoveryCheckInSkippedEpochDay,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5660,6 +5722,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
         'under_eating_dismissed_epoch_day': underEatingDismissedEpochDay,
       if (returnScreenDismissedEpochDay != null)
         'return_screen_dismissed_epoch_day': returnScreenDismissedEpochDay,
+      if (recoveryCheckInSkippedEpochDay != null)
+        'recovery_check_in_skipped_epoch_day': recoveryCheckInSkippedEpochDay,
     });
   }
 
@@ -5671,6 +5735,7 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
     Value<DetailLevel>? detailLevel,
     Value<int?>? underEatingDismissedEpochDay,
     Value<int?>? returnScreenDismissedEpochDay,
+    Value<int?>? recoveryCheckInSkippedEpochDay,
   }) {
     return UserPreferencesCompanion(
       id: id ?? this.id,
@@ -5683,6 +5748,8 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
           underEatingDismissedEpochDay ?? this.underEatingDismissedEpochDay,
       returnScreenDismissedEpochDay:
           returnScreenDismissedEpochDay ?? this.returnScreenDismissedEpochDay,
+      recoveryCheckInSkippedEpochDay:
+          recoveryCheckInSkippedEpochDay ?? this.recoveryCheckInSkippedEpochDay,
     );
   }
 
@@ -5722,6 +5789,11 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
         returnScreenDismissedEpochDay.value,
       );
     }
+    if (recoveryCheckInSkippedEpochDay.present) {
+      map['recovery_check_in_skipped_epoch_day'] = Variable<int>(
+        recoveryCheckInSkippedEpochDay.value,
+      );
+    }
     return map;
   }
 
@@ -5737,7 +5809,10 @@ class UserPreferencesCompanion extends UpdateCompanion<PreferencesRow> {
             'underEatingDismissedEpochDay: $underEatingDismissedEpochDay, ',
           )
           ..write(
-            'returnScreenDismissedEpochDay: $returnScreenDismissedEpochDay',
+            'returnScreenDismissedEpochDay: $returnScreenDismissedEpochDay, ',
+          )
+          ..write(
+            'recoveryCheckInSkippedEpochDay: $recoveryCheckInSkippedEpochDay',
           )
           ..write(')'))
         .toString();
@@ -8222,6 +8297,462 @@ class RemindersCompanion extends UpdateCompanion<ReminderRow> {
   }
 }
 
+class $RecoveryCheckInsTable extends RecoveryCheckIns
+    with TableInfo<$RecoveryCheckInsTable, RecoveryCheckInRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RecoveryCheckInsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateEpochDayMeta = const VerificationMeta(
+    'dateEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> dateEpochDay = GeneratedColumn<int>(
+    'date_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hungerMeta = const VerificationMeta('hunger');
+  @override
+  late final GeneratedColumn<int> hunger = GeneratedColumn<int>(
+    'hunger',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _energyMeta = const VerificationMeta('energy');
+  @override
+  late final GeneratedColumn<int> energy = GeneratedColumn<int>(
+    'energy',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sleepMeta = const VerificationMeta('sleep');
+  @override
+  late final GeneratedColumn<int> sleep = GeneratedColumn<int>(
+    'sleep',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _trainingMeta = const VerificationMeta(
+    'training',
+  );
+  @override
+  late final GeneratedColumn<int> training = GeneratedColumn<int>(
+    'training',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _moodMeta = const VerificationMeta('mood');
+  @override
+  late final GeneratedColumn<int> mood = GeneratedColumn<int>(
+    'mood',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sleepHoursMeta = const VerificationMeta(
+    'sleepHours',
+  );
+  @override
+  late final GeneratedColumn<double> sleepHours = GeneratedColumn<double>(
+    'sleep_hours',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    dateEpochDay,
+    hunger,
+    energy,
+    sleep,
+    training,
+    mood,
+    sleepHours,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'recovery_check_ins';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RecoveryCheckInRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date_epoch_day')) {
+      context.handle(
+        _dateEpochDayMeta,
+        dateEpochDay.isAcceptableOrUnknown(
+          data['date_epoch_day']!,
+          _dateEpochDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hunger')) {
+      context.handle(
+        _hungerMeta,
+        hunger.isAcceptableOrUnknown(data['hunger']!, _hungerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hungerMeta);
+    }
+    if (data.containsKey('energy')) {
+      context.handle(
+        _energyMeta,
+        energy.isAcceptableOrUnknown(data['energy']!, _energyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_energyMeta);
+    }
+    if (data.containsKey('sleep')) {
+      context.handle(
+        _sleepMeta,
+        sleep.isAcceptableOrUnknown(data['sleep']!, _sleepMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sleepMeta);
+    }
+    if (data.containsKey('training')) {
+      context.handle(
+        _trainingMeta,
+        training.isAcceptableOrUnknown(data['training']!, _trainingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_trainingMeta);
+    }
+    if (data.containsKey('mood')) {
+      context.handle(
+        _moodMeta,
+        mood.isAcceptableOrUnknown(data['mood']!, _moodMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_moodMeta);
+    }
+    if (data.containsKey('sleep_hours')) {
+      context.handle(
+        _sleepHoursMeta,
+        sleepHours.isAcceptableOrUnknown(data['sleep_hours']!, _sleepHoursMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {dateEpochDay};
+  @override
+  RecoveryCheckInRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RecoveryCheckInRow(
+      dateEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}date_epoch_day'],
+      )!,
+      hunger: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hunger'],
+      )!,
+      energy: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}energy'],
+      )!,
+      sleep: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sleep'],
+      )!,
+      training: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}training'],
+      )!,
+      mood: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mood'],
+      )!,
+      sleepHours: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sleep_hours'],
+      ),
+    );
+  }
+
+  @override
+  $RecoveryCheckInsTable createAlias(String alias) {
+    return $RecoveryCheckInsTable(attachedDatabase, alias);
+  }
+}
+
+class RecoveryCheckInRow extends DataClass
+    implements Insertable<RecoveryCheckInRow> {
+  final int dateEpochDay;
+  final int hunger;
+  final int energy;
+  final int sleep;
+  final int training;
+  final int mood;
+  final double? sleepHours;
+  const RecoveryCheckInRow({
+    required this.dateEpochDay,
+    required this.hunger,
+    required this.energy,
+    required this.sleep,
+    required this.training,
+    required this.mood,
+    this.sleepHours,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date_epoch_day'] = Variable<int>(dateEpochDay);
+    map['hunger'] = Variable<int>(hunger);
+    map['energy'] = Variable<int>(energy);
+    map['sleep'] = Variable<int>(sleep);
+    map['training'] = Variable<int>(training);
+    map['mood'] = Variable<int>(mood);
+    if (!nullToAbsent || sleepHours != null) {
+      map['sleep_hours'] = Variable<double>(sleepHours);
+    }
+    return map;
+  }
+
+  RecoveryCheckInsCompanion toCompanion(bool nullToAbsent) {
+    return RecoveryCheckInsCompanion(
+      dateEpochDay: Value(dateEpochDay),
+      hunger: Value(hunger),
+      energy: Value(energy),
+      sleep: Value(sleep),
+      training: Value(training),
+      mood: Value(mood),
+      sleepHours: sleepHours == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sleepHours),
+    );
+  }
+
+  factory RecoveryCheckInRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RecoveryCheckInRow(
+      dateEpochDay: serializer.fromJson<int>(json['dateEpochDay']),
+      hunger: serializer.fromJson<int>(json['hunger']),
+      energy: serializer.fromJson<int>(json['energy']),
+      sleep: serializer.fromJson<int>(json['sleep']),
+      training: serializer.fromJson<int>(json['training']),
+      mood: serializer.fromJson<int>(json['mood']),
+      sleepHours: serializer.fromJson<double?>(json['sleepHours']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dateEpochDay': serializer.toJson<int>(dateEpochDay),
+      'hunger': serializer.toJson<int>(hunger),
+      'energy': serializer.toJson<int>(energy),
+      'sleep': serializer.toJson<int>(sleep),
+      'training': serializer.toJson<int>(training),
+      'mood': serializer.toJson<int>(mood),
+      'sleepHours': serializer.toJson<double?>(sleepHours),
+    };
+  }
+
+  RecoveryCheckInRow copyWith({
+    int? dateEpochDay,
+    int? hunger,
+    int? energy,
+    int? sleep,
+    int? training,
+    int? mood,
+    Value<double?> sleepHours = const Value.absent(),
+  }) => RecoveryCheckInRow(
+    dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+    hunger: hunger ?? this.hunger,
+    energy: energy ?? this.energy,
+    sleep: sleep ?? this.sleep,
+    training: training ?? this.training,
+    mood: mood ?? this.mood,
+    sleepHours: sleepHours.present ? sleepHours.value : this.sleepHours,
+  );
+  RecoveryCheckInRow copyWithCompanion(RecoveryCheckInsCompanion data) {
+    return RecoveryCheckInRow(
+      dateEpochDay: data.dateEpochDay.present
+          ? data.dateEpochDay.value
+          : this.dateEpochDay,
+      hunger: data.hunger.present ? data.hunger.value : this.hunger,
+      energy: data.energy.present ? data.energy.value : this.energy,
+      sleep: data.sleep.present ? data.sleep.value : this.sleep,
+      training: data.training.present ? data.training.value : this.training,
+      mood: data.mood.present ? data.mood.value : this.mood,
+      sleepHours: data.sleepHours.present
+          ? data.sleepHours.value
+          : this.sleepHours,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecoveryCheckInRow(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('hunger: $hunger, ')
+          ..write('energy: $energy, ')
+          ..write('sleep: $sleep, ')
+          ..write('training: $training, ')
+          ..write('mood: $mood, ')
+          ..write('sleepHours: $sleepHours')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    dateEpochDay,
+    hunger,
+    energy,
+    sleep,
+    training,
+    mood,
+    sleepHours,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RecoveryCheckInRow &&
+          other.dateEpochDay == this.dateEpochDay &&
+          other.hunger == this.hunger &&
+          other.energy == this.energy &&
+          other.sleep == this.sleep &&
+          other.training == this.training &&
+          other.mood == this.mood &&
+          other.sleepHours == this.sleepHours);
+}
+
+class RecoveryCheckInsCompanion extends UpdateCompanion<RecoveryCheckInRow> {
+  final Value<int> dateEpochDay;
+  final Value<int> hunger;
+  final Value<int> energy;
+  final Value<int> sleep;
+  final Value<int> training;
+  final Value<int> mood;
+  final Value<double?> sleepHours;
+  const RecoveryCheckInsCompanion({
+    this.dateEpochDay = const Value.absent(),
+    this.hunger = const Value.absent(),
+    this.energy = const Value.absent(),
+    this.sleep = const Value.absent(),
+    this.training = const Value.absent(),
+    this.mood = const Value.absent(),
+    this.sleepHours = const Value.absent(),
+  });
+  RecoveryCheckInsCompanion.insert({
+    this.dateEpochDay = const Value.absent(),
+    required int hunger,
+    required int energy,
+    required int sleep,
+    required int training,
+    required int mood,
+    this.sleepHours = const Value.absent(),
+  }) : hunger = Value(hunger),
+       energy = Value(energy),
+       sleep = Value(sleep),
+       training = Value(training),
+       mood = Value(mood);
+  static Insertable<RecoveryCheckInRow> custom({
+    Expression<int>? dateEpochDay,
+    Expression<int>? hunger,
+    Expression<int>? energy,
+    Expression<int>? sleep,
+    Expression<int>? training,
+    Expression<int>? mood,
+    Expression<double>? sleepHours,
+  }) {
+    return RawValuesInsertable({
+      if (dateEpochDay != null) 'date_epoch_day': dateEpochDay,
+      if (hunger != null) 'hunger': hunger,
+      if (energy != null) 'energy': energy,
+      if (sleep != null) 'sleep': sleep,
+      if (training != null) 'training': training,
+      if (mood != null) 'mood': mood,
+      if (sleepHours != null) 'sleep_hours': sleepHours,
+    });
+  }
+
+  RecoveryCheckInsCompanion copyWith({
+    Value<int>? dateEpochDay,
+    Value<int>? hunger,
+    Value<int>? energy,
+    Value<int>? sleep,
+    Value<int>? training,
+    Value<int>? mood,
+    Value<double?>? sleepHours,
+  }) {
+    return RecoveryCheckInsCompanion(
+      dateEpochDay: dateEpochDay ?? this.dateEpochDay,
+      hunger: hunger ?? this.hunger,
+      energy: energy ?? this.energy,
+      sleep: sleep ?? this.sleep,
+      training: training ?? this.training,
+      mood: mood ?? this.mood,
+      sleepHours: sleepHours ?? this.sleepHours,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (dateEpochDay.present) {
+      map['date_epoch_day'] = Variable<int>(dateEpochDay.value);
+    }
+    if (hunger.present) {
+      map['hunger'] = Variable<int>(hunger.value);
+    }
+    if (energy.present) {
+      map['energy'] = Variable<int>(energy.value);
+    }
+    if (sleep.present) {
+      map['sleep'] = Variable<int>(sleep.value);
+    }
+    if (training.present) {
+      map['training'] = Variable<int>(training.value);
+    }
+    if (mood.present) {
+      map['mood'] = Variable<int>(mood.value);
+    }
+    if (sleepHours.present) {
+      map['sleep_hours'] = Variable<double>(sleepHours.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecoveryCheckInsCompanion(')
+          ..write('dateEpochDay: $dateEpochDay, ')
+          ..write('hunger: $hunger, ')
+          ..write('energy: $energy, ')
+          ..write('sleep: $sleep, ')
+          ..write('training: $training, ')
+          ..write('mood: $mood, ')
+          ..write('sleepHours: $sleepHours')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -8241,6 +8772,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $InsightLogTable insightLog = $InsightLogTable(this);
   late final $PausesTable pauses = $PausesTable(this);
   late final $RemindersTable reminders = $RemindersTable(this);
+  late final $RecoveryCheckInsTable recoveryCheckIns = $RecoveryCheckInsTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8259,6 +8793,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     insightLog,
     pauses,
     reminders,
+    recoveryCheckIns,
   ];
 }
 
@@ -10618,6 +11153,7 @@ typedef $$UserPreferencesTableCreateCompanionBuilder =
       Value<DetailLevel> detailLevel,
       Value<int?> underEatingDismissedEpochDay,
       Value<int?> returnScreenDismissedEpochDay,
+      Value<int?> recoveryCheckInSkippedEpochDay,
     });
 typedef $$UserPreferencesTableUpdateCompanionBuilder =
     UserPreferencesCompanion Function({
@@ -10628,6 +11164,7 @@ typedef $$UserPreferencesTableUpdateCompanionBuilder =
       Value<DetailLevel> detailLevel,
       Value<int?> underEatingDismissedEpochDay,
       Value<int?> returnScreenDismissedEpochDay,
+      Value<int?> recoveryCheckInSkippedEpochDay,
     });
 
 class $$UserPreferencesTableFilterComposer
@@ -10675,6 +11212,11 @@ class $$UserPreferencesTableFilterComposer
     column: $table.returnScreenDismissedEpochDay,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<int> get recoveryCheckInSkippedEpochDay => $composableBuilder(
+    column: $table.recoveryCheckInSkippedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$UserPreferencesTableOrderingComposer
@@ -10720,6 +11262,11 @@ class $$UserPreferencesTableOrderingComposer
     column: $table.returnScreenDismissedEpochDay,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get recoveryCheckInSkippedEpochDay => $composableBuilder(
+    column: $table.recoveryCheckInSkippedEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserPreferencesTableAnnotationComposer
@@ -10763,6 +11310,11 @@ class $$UserPreferencesTableAnnotationComposer
 
   GeneratedColumn<int> get returnScreenDismissedEpochDay => $composableBuilder(
     column: $table.returnScreenDismissedEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get recoveryCheckInSkippedEpochDay => $composableBuilder(
+    column: $table.recoveryCheckInSkippedEpochDay,
     builder: (column) => column,
   );
 }
@@ -10812,6 +11364,8 @@ class $$UserPreferencesTableTableManager
                 Value<int?> underEatingDismissedEpochDay = const Value.absent(),
                 Value<int?> returnScreenDismissedEpochDay =
                     const Value.absent(),
+                Value<int?> recoveryCheckInSkippedEpochDay =
+                    const Value.absent(),
               }) => UserPreferencesCompanion(
                 id: id,
                 themePreference: themePreference,
@@ -10820,6 +11374,7 @@ class $$UserPreferencesTableTableManager
                 detailLevel: detailLevel,
                 underEatingDismissedEpochDay: underEatingDismissedEpochDay,
                 returnScreenDismissedEpochDay: returnScreenDismissedEpochDay,
+                recoveryCheckInSkippedEpochDay: recoveryCheckInSkippedEpochDay,
               ),
           createCompanionCallback:
               ({
@@ -10831,6 +11386,8 @@ class $$UserPreferencesTableTableManager
                 Value<int?> underEatingDismissedEpochDay = const Value.absent(),
                 Value<int?> returnScreenDismissedEpochDay =
                     const Value.absent(),
+                Value<int?> recoveryCheckInSkippedEpochDay =
+                    const Value.absent(),
               }) => UserPreferencesCompanion.insert(
                 id: id,
                 themePreference: themePreference,
@@ -10839,6 +11396,7 @@ class $$UserPreferencesTableTableManager
                 detailLevel: detailLevel,
                 underEatingDismissedEpochDay: underEatingDismissedEpochDay,
                 returnScreenDismissedEpochDay: returnScreenDismissedEpochDay,
+                recoveryCheckInSkippedEpochDay: recoveryCheckInSkippedEpochDay,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -12227,6 +12785,263 @@ typedef $$RemindersTableProcessedTableManager =
       ReminderRow,
       PrefetchHooks Function()
     >;
+typedef $$RecoveryCheckInsTableCreateCompanionBuilder =
+    RecoveryCheckInsCompanion Function({
+      Value<int> dateEpochDay,
+      required int hunger,
+      required int energy,
+      required int sleep,
+      required int training,
+      required int mood,
+      Value<double?> sleepHours,
+    });
+typedef $$RecoveryCheckInsTableUpdateCompanionBuilder =
+    RecoveryCheckInsCompanion Function({
+      Value<int> dateEpochDay,
+      Value<int> hunger,
+      Value<int> energy,
+      Value<int> sleep,
+      Value<int> training,
+      Value<int> mood,
+      Value<double?> sleepHours,
+    });
+
+class $$RecoveryCheckInsTableFilterComposer
+    extends Composer<_$AppDatabase, $RecoveryCheckInsTable> {
+  $$RecoveryCheckInsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hunger => $composableBuilder(
+    column: $table.hunger,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get energy => $composableBuilder(
+    column: $table.energy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sleep => $composableBuilder(
+    column: $table.sleep,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get training => $composableBuilder(
+    column: $table.training,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sleepHours => $composableBuilder(
+    column: $table.sleepHours,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RecoveryCheckInsTableOrderingComposer
+    extends Composer<_$AppDatabase, $RecoveryCheckInsTable> {
+  $$RecoveryCheckInsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hunger => $composableBuilder(
+    column: $table.hunger,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get energy => $composableBuilder(
+    column: $table.energy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sleep => $composableBuilder(
+    column: $table.sleep,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get training => $composableBuilder(
+    column: $table.training,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sleepHours => $composableBuilder(
+    column: $table.sleepHours,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RecoveryCheckInsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RecoveryCheckInsTable> {
+  $$RecoveryCheckInsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get dateEpochDay => $composableBuilder(
+    column: $table.dateEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hunger =>
+      $composableBuilder(column: $table.hunger, builder: (column) => column);
+
+  GeneratedColumn<int> get energy =>
+      $composableBuilder(column: $table.energy, builder: (column) => column);
+
+  GeneratedColumn<int> get sleep =>
+      $composableBuilder(column: $table.sleep, builder: (column) => column);
+
+  GeneratedColumn<int> get training =>
+      $composableBuilder(column: $table.training, builder: (column) => column);
+
+  GeneratedColumn<int> get mood =>
+      $composableBuilder(column: $table.mood, builder: (column) => column);
+
+  GeneratedColumn<double> get sleepHours => $composableBuilder(
+    column: $table.sleepHours,
+    builder: (column) => column,
+  );
+}
+
+class $$RecoveryCheckInsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RecoveryCheckInsTable,
+          RecoveryCheckInRow,
+          $$RecoveryCheckInsTableFilterComposer,
+          $$RecoveryCheckInsTableOrderingComposer,
+          $$RecoveryCheckInsTableAnnotationComposer,
+          $$RecoveryCheckInsTableCreateCompanionBuilder,
+          $$RecoveryCheckInsTableUpdateCompanionBuilder,
+          (
+            RecoveryCheckInRow,
+            BaseReferences<
+              _$AppDatabase,
+              $RecoveryCheckInsTable,
+              RecoveryCheckInRow
+            >,
+          ),
+          RecoveryCheckInRow,
+          PrefetchHooks Function()
+        > {
+  $$RecoveryCheckInsTableTableManager(
+    _$AppDatabase db,
+    $RecoveryCheckInsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RecoveryCheckInsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RecoveryCheckInsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RecoveryCheckInsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> dateEpochDay = const Value.absent(),
+                Value<int> hunger = const Value.absent(),
+                Value<int> energy = const Value.absent(),
+                Value<int> sleep = const Value.absent(),
+                Value<int> training = const Value.absent(),
+                Value<int> mood = const Value.absent(),
+                Value<double?> sleepHours = const Value.absent(),
+              }) => RecoveryCheckInsCompanion(
+                dateEpochDay: dateEpochDay,
+                hunger: hunger,
+                energy: energy,
+                sleep: sleep,
+                training: training,
+                mood: mood,
+                sleepHours: sleepHours,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> dateEpochDay = const Value.absent(),
+                required int hunger,
+                required int energy,
+                required int sleep,
+                required int training,
+                required int mood,
+                Value<double?> sleepHours = const Value.absent(),
+              }) => RecoveryCheckInsCompanion.insert(
+                dateEpochDay: dateEpochDay,
+                hunger: hunger,
+                energy: energy,
+                sleep: sleep,
+                training: training,
+                mood: mood,
+                sleepHours: sleepHours,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RecoveryCheckInsTable, RecoveryCheckInRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $RecoveryCheckInsTable,
+                    RecoveryCheckInRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RecoveryCheckInsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RecoveryCheckInsTable,
+      RecoveryCheckInRow,
+      $$RecoveryCheckInsTableFilterComposer,
+      $$RecoveryCheckInsTableOrderingComposer,
+      $$RecoveryCheckInsTableAnnotationComposer,
+      $$RecoveryCheckInsTableCreateCompanionBuilder,
+      $$RecoveryCheckInsTableUpdateCompanionBuilder,
+      (
+        RecoveryCheckInRow,
+        BaseReferences<
+          _$AppDatabase,
+          $RecoveryCheckInsTable,
+          RecoveryCheckInRow
+        >,
+      ),
+      RecoveryCheckInRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -12257,4 +13072,6 @@ class $AppDatabaseManager {
       $$PausesTableTableManager(_db, _db.pauses);
   $$RemindersTableTableManager get reminders =>
       $$RemindersTableTableManager(_db, _db.reminders);
+  $$RecoveryCheckInsTableTableManager get recoveryCheckIns =>
+      $$RecoveryCheckInsTableTableManager(_db, _db.recoveryCheckIns);
 }

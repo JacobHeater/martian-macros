@@ -9,6 +9,7 @@ import 'in_memory_insight_log_repository.dart';
 import 'in_memory_intake_reader.dart';
 import 'in_memory_pause_repository.dart';
 import 'in_memory_preferences_repository.dart';
+import 'in_memory_recovery_check_in_repository.dart';
 import 'in_memory_reminder_repository.dart';
 import 'in_memory_setup_repository.dart';
 import 'in_memory_targets_history_repository.dart';
@@ -33,6 +34,7 @@ final class InMemoryRepositories {
     final insightLog = InMemoryInsightLogRepository();
     final pauses = InMemoryPauseRepository();
     final reminders = InMemoryReminderRepository();
+    final recovery = InMemoryRecoveryCheckInRepository();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -47,6 +49,7 @@ final class InMemoryRepositories {
       insightLog: insightLog,
       pauses: pauses,
       reminders: reminders,
+      recovery: recovery,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -60,6 +63,7 @@ final class InMemoryRepositories {
         insightLog.clear,
         pauses.clear,
         reminders.clear,
+        recovery.clear,
       ]),
     );
   }
@@ -78,6 +82,7 @@ final class InMemoryRepositories {
     required this.insightLog,
     required this.pauses,
     required this.reminders,
+    required this.recovery,
     required this.eraser,
   });
 
@@ -94,6 +99,7 @@ final class InMemoryRepositories {
   final InsightLogRepository insightLog;
   final PauseRepository pauses;
   final ReminderRepository reminders;
+  final RecoveryCheckInRepository recovery;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.

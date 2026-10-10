@@ -4,6 +4,8 @@ import 'easy_to_miss_reader.dart';
 import 'easy_to_miss_writer.dart';
 import 'preferences_reader.dart';
 import 'preferences_writer.dart';
+import 'recovery_skip_reader.dart';
+import 'recovery_skip_writer.dart';
 import 'return_screen_reader.dart';
 import 'return_screen_writer.dart';
 import 'under_eating_notice_reader.dart';
@@ -22,4 +24,6 @@ abstract interface class PreferencesRepository
         UnderEatingNoticeReader,
         UnderEatingNoticeWriter,
         ReturnScreenReader,
-        ReturnScreenWriter {}
+        ReturnScreenWriter,
+        RecoverySkipReader,
+        RecoverySkipWriter {}

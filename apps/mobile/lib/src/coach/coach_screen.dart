@@ -6,6 +6,7 @@ import 'package:mm_engine/mm_engine.dart';
 import '../format/fmt.dart';
 import '../format/coach_confidence_text.dart';
 import '../format/goal_mode_label.dart';
+import '../pause/pause_banner.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/choice_card.dart';
@@ -25,9 +26,9 @@ import 'caution_message.dart';
 import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
+import 'recovery_card.dart';
 import 'stall_card.dart';
 import 'target_flag_message.dart';
-import '../pause/pause_banner.dart';
 import 'under_eating_notice.dart';
 
 /// What the engine believes, why, and what it will do next.
@@ -151,6 +152,7 @@ class CoachScreen extends ConsumerWidget {
         ),
         const StallCard(),
         const AdherenceCard(),
+        const RecoveryCard(),
         InfoCard(
           title: 'Your metabolism',
           child: MetabolismSummary(

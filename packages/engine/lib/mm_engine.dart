@@ -61,6 +61,8 @@ export 'src/plan_reminders.dart';
 export 'src/protein_range.dart';
 export 'src/protein_targets.dart';
 export 'src/recommend_mode.dart';
+export 'src/recovery_check_in_due.dart';
+export 'src/recovery_rule.dart';
 export 'src/reminder_count_from.dart';
 export 'src/reminder_facts.dart';
 export 'src/reminder_ignored_streak.dart';
