@@ -103,9 +103,12 @@ WS-10 and WS-12 freely. WS-07 with the weigh-in accessor rule above. Step 1
 can run during group A.
 
 ## Requirement sources
-- Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69. Epic: MM-66.
+- Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
 
 ## Notes for whoever builds it
+- **Workouts are read and written, aligned with the exercises each platform can name (MM-189, the owner's direction).** MM-188 is
+  the spike that finds out exactly what Health Connect segments and HealthKit workouts can carry; it needs no code and settles the
+  mapping data WS-10 ships. Until it is done, workouts import and export as plain sessions.
 - A backfilled history is many weigh-ins arriving at once. The trend filter
   handles gaps and outliers; check its outlier rule (reject beyond five
   standard deviations, accept after three rejections in a row) against a
