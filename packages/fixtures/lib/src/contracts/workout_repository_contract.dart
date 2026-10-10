@@ -114,10 +114,35 @@ void workoutRepositoryContract(
       expect(sets[2].endedAt, isNull);
     });
 
+    test('a pause, running or over, is kept', () async {
+      final pausedAt = six.add(const Duration(minutes: 20));
+      await repo.saveWorkout(
+        Workout(
+          id: 0,
+          date: day,
+          startedAt: six,
+          pausedAt: pausedAt,
+          pausedFor: const Duration(minutes: 4, seconds: 30),
+        ),
+      );
+      final read = (await repo.watchWorkouts().first).single;
+      expect(read.paused, isTrue);
+      expect(read.pausedAt!.isAtSameMomentAs(pausedAt), isTrue);
+      expect(read.pausedFor, const Duration(minutes: 4, seconds: 30));
+      // Twenty minutes on the wall, less the earlier pause; the clock is
+      // stopped, so the time now does not matter.
+      expect(
+        read.activeFor(six.add(const Duration(hours: 3))),
+        const Duration(minutes: 15, seconds: 30),
+      );
+    });
+
     test('a workout in progress has no end', () async {
       await repo.saveWorkout(workout());
       final read = (await repo.watchWorkouts().first).single;
       expect(read.endedAt, isNull);
+      expect(read.paused, isFalse);
+      expect(read.pausedFor, Duration.zero);
       expect(read.setStartedAt, isNull);
       expect(read.inProgress, isTrue);
     });

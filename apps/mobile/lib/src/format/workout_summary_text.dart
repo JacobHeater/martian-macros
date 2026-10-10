@@ -9,6 +9,6 @@ String workoutSummaryText(Workout workout) {
   return [
     exercises == 1 ? '1 exercise' : '$exercises exercises',
     sets == 1 ? '1 set' : '$sets sets',
-    if (ended != null) '${ended.difference(workout.startedAt).inMinutes} min',
+    if (ended != null) '${workout.activeFor(ended).inMinutes} min',
   ].join(' · ');
 }

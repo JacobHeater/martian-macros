@@ -22,9 +22,38 @@ final class WorkoutController {
     ),
   );
 
-  Future<void> finish(Workout workout) => workouts.saveWorkout(
-    workout.copyWith(endedAt: clock.now, setStartedAt: () => null),
-  );
+  /// Ends the workout now. A pause still running ends with it.
+  Future<void> finish(Workout workout) {
+    final now = clock.now();
+    return workouts.saveWorkout(
+      _resumed(
+        workout,
+        now,
+      ).copyWith(endedAt: () => now, setStartedAt: () => null),
+    );
+  }
+
+  /// Stops the workout's clock until it is resumed (MM-191). A set being
+  /// timed is dropped: a pause is not part of a set.
+  Future<void> pause(Workout workout) {
+    if (workout.paused || !workout.inProgress) return Future.value();
+    return workouts.saveWorkout(
+      workout.copyWith(pausedAt: clock.now, setStartedAt: () => null),
+    );
+  }
+
+  /// Starts the clock again; the time paused is left out of the workout.
+  Future<void> resume(Workout workout) =>
+      workouts.saveWorkout(_resumed(workout, clock.now()));
+
+  static Workout _resumed(Workout workout, DateTime now) {
+    final pausedAt = workout.pausedAt;
+    if (pausedAt == null) return workout;
+    return workout.copyWith(
+      pausedAt: () => null,
+      pausedFor: workout.pausedFor + now.difference(pausedAt),
+    );
+  }
 
   /// Starts timing a set (MM-191). The next set added takes this as its
   /// start.
@@ -42,14 +71,29 @@ final class WorkoutController {
     required CalendarDate date,
     required DateTime startedAt,
     required DateTime? endedAt,
-  }) => workouts.saveWorkout(
-    workout.copyWith(date: date, startedAt: startedAt, endedAt: () => endedAt),
-  );
+  }) {
+    // Typed times are the truth: pauses longer than the workout they now
+    // describe are dropped.
+    final span = (endedAt ?? clock.now()).difference(startedAt);
+    return workouts.saveWorkout(
+      workout.copyWith(
+        date: date,
+        startedAt: startedAt,
+        endedAt: () => endedAt,
+        pausedFor: workout.pausedFor > span ? Duration.zero : null,
+      ),
+    );
+  }
 
   /// Starts a workout in progress again from now, for one opened before
   /// the training began.
   Future<void> restartClock(Workout workout) => workouts.saveWorkout(
-    workout.copyWith(date: clock.today(), startedAt: clock.now()),
+    workout.copyWith(
+      date: clock.today(),
+      startedAt: clock.now(),
+      pausedAt: () => null,
+      pausedFor: Duration.zero,
+    ),
   );
 
   Future<void> delete(Workout workout) => workouts.deleteWorkout(workout.id);

@@ -283,6 +283,13 @@ void main() {
 
     await choose(tester, 'back squat', 'back-squat');
     await tap(tester, 'add-set-0');
+    // The open set's controls push the button below what is built.
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('workout-finish')),
+      find.byType(ListView).last,
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
     expect(finish().onPressed, isNull, reason: 'a set with no reps yet');
     // A new set's fields are empty, not zero, so nothing has to be cleared.
     expect(
