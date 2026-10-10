@@ -1,6 +1,6 @@
 ---
 id: MM-141
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-137, MM-11, MM-92, MM-98, MM-108, MM-114, MM-117, MM-118, MM-125, MM-126, MM-139, MM-140, MM-142, MM-143, MM-149]
 ---
@@ -91,3 +91,29 @@ Scenario: The evidence is viewable
 ## Notes
 - Priority: should-have. Build the framework with the first rule that needs it (MM-140), not before.
 - Part of the paid Coach unlock, except safety insights, which are never behind a paywall (MM-85).
+
+## Progress
+Built: the framework and the first five rules.
+- **An insight** (`Insight`, engine) is the rule that produced it, the period it rests on and the figures observed. The words are
+  fixed templates per rule in the app (`insightText`), filled from those figures; nothing is generated.
+- **The catalog** (`InsightRule`, `findInsights`): partial days (more than a third of logged days), estimates rising (more than half
+  of calories), weigh-in timing (fewer than four a week), the stall diagnosis (MM-140) and protein short (the minimum met on fewer
+  than half of whole days, with the average shortfall). Each is a pattern over 14 days resting on at least 7 days of data, so none
+  can concern one day or one weigh-in. They come back highest priority first: data quality, coaching, pattern.
+- **Rationing** (`selectInsight`, `InsightRationing`): one insight shows at a time and keeps showing while its rule holds; at most
+  one new insight a day and three a week; a dismissed rule does not return for 28 days. Shown and dismissed insights are stored in
+  a new table (schema version 19, `InsightLogRepository`, in memory and in Drift under one contract).
+- **Eating-disorder history**: rules about weight (the stall, weigh-in timing) are left out entirely.
+- **The card** on the dashboard: title, what was observed, "What this rests on" with the figures and the period, and Dismiss.
+- Tests: `insights_test.dart` (engine: each rule, single days, priority, rationing), the repository contract, the migration test,
+  and `insight_card_test.dart` (words for every rule, a list of forbidden subjects, shown once and logged, dismissed and not back
+  ten days later).
+
+Not built:
+- **Five of the ten rules**: weekday and weekend, strength holding on a cut, waist against weight, meals without protein, fiber
+  and hunger, and the consistent day. Safety notices (MM-114, MM-115) keep their own components and are not rationed here.
+- **Entries in the evidence register** (MM-143) for each rule.
+- **The Coach unlock**: insights are shown to everyone; no paywall exists yet (MM-85).
+- **Hiding weight** (MM-118) and an action attached to an insight.
+- "Forbidden subjects" is tested on the five rules' words with representative figures, not by running every rule against every
+  simulated user.

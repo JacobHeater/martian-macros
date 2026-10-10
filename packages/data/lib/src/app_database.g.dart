@@ -7236,6 +7236,329 @@ class RecipeIngredientsCompanion extends UpdateCompanion<RecipeIngredientRow> {
   }
 }
 
+class $InsightLogTable extends InsightLog
+    with TableInfo<$InsightLogTable, InsightLogRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InsightLogTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<InsightRule, String> rule =
+      GeneratedColumn<String>(
+        'rule',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<InsightRule>($InsightLogTable.$converterrule);
+  static const VerificationMeta _shownEpochDayMeta = const VerificationMeta(
+    'shownEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> shownEpochDay = GeneratedColumn<int>(
+    'shown_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dismissedEpochDayMeta = const VerificationMeta(
+    'dismissedEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> dismissedEpochDay = GeneratedColumn<int>(
+    'dismissed_epoch_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    rule,
+    shownEpochDay,
+    dismissedEpochDay,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'insight_log';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InsightLogRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('shown_epoch_day')) {
+      context.handle(
+        _shownEpochDayMeta,
+        shownEpochDay.isAcceptableOrUnknown(
+          data['shown_epoch_day']!,
+          _shownEpochDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_shownEpochDayMeta);
+    }
+    if (data.containsKey('dismissed_epoch_day')) {
+      context.handle(
+        _dismissedEpochDayMeta,
+        dismissedEpochDay.isAcceptableOrUnknown(
+          data['dismissed_epoch_day']!,
+          _dismissedEpochDayMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InsightLogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InsightLogRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      rule: $InsightLogTable.$converterrule.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rule'],
+        )!,
+      ),
+      shownEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}shown_epoch_day'],
+      )!,
+      dismissedEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dismissed_epoch_day'],
+      ),
+    );
+  }
+
+  @override
+  $InsightLogTable createAlias(String alias) {
+    return $InsightLogTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<InsightRule, String, String> $converterrule =
+      const EnumNameConverter<InsightRule>(InsightRule.values);
+}
+
+class InsightLogRow extends DataClass implements Insertable<InsightLogRow> {
+  final int id;
+  final InsightRule rule;
+  final int shownEpochDay;
+  final int? dismissedEpochDay;
+  const InsightLogRow({
+    required this.id,
+    required this.rule,
+    required this.shownEpochDay,
+    this.dismissedEpochDay,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['rule'] = Variable<String>(
+        $InsightLogTable.$converterrule.toSql(rule),
+      );
+    }
+    map['shown_epoch_day'] = Variable<int>(shownEpochDay);
+    if (!nullToAbsent || dismissedEpochDay != null) {
+      map['dismissed_epoch_day'] = Variable<int>(dismissedEpochDay);
+    }
+    return map;
+  }
+
+  InsightLogCompanion toCompanion(bool nullToAbsent) {
+    return InsightLogCompanion(
+      id: Value(id),
+      rule: Value(rule),
+      shownEpochDay: Value(shownEpochDay),
+      dismissedEpochDay: dismissedEpochDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dismissedEpochDay),
+    );
+  }
+
+  factory InsightLogRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InsightLogRow(
+      id: serializer.fromJson<int>(json['id']),
+      rule: $InsightLogTable.$converterrule.fromJson(
+        serializer.fromJson<String>(json['rule']),
+      ),
+      shownEpochDay: serializer.fromJson<int>(json['shownEpochDay']),
+      dismissedEpochDay: serializer.fromJson<int?>(json['dismissedEpochDay']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'rule': serializer.toJson<String>(
+        $InsightLogTable.$converterrule.toJson(rule),
+      ),
+      'shownEpochDay': serializer.toJson<int>(shownEpochDay),
+      'dismissedEpochDay': serializer.toJson<int?>(dismissedEpochDay),
+    };
+  }
+
+  InsightLogRow copyWith({
+    int? id,
+    InsightRule? rule,
+    int? shownEpochDay,
+    Value<int?> dismissedEpochDay = const Value.absent(),
+  }) => InsightLogRow(
+    id: id ?? this.id,
+    rule: rule ?? this.rule,
+    shownEpochDay: shownEpochDay ?? this.shownEpochDay,
+    dismissedEpochDay: dismissedEpochDay.present
+        ? dismissedEpochDay.value
+        : this.dismissedEpochDay,
+  );
+  InsightLogRow copyWithCompanion(InsightLogCompanion data) {
+    return InsightLogRow(
+      id: data.id.present ? data.id.value : this.id,
+      rule: data.rule.present ? data.rule.value : this.rule,
+      shownEpochDay: data.shownEpochDay.present
+          ? data.shownEpochDay.value
+          : this.shownEpochDay,
+      dismissedEpochDay: data.dismissedEpochDay.present
+          ? data.dismissedEpochDay.value
+          : this.dismissedEpochDay,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InsightLogRow(')
+          ..write('id: $id, ')
+          ..write('rule: $rule, ')
+          ..write('shownEpochDay: $shownEpochDay, ')
+          ..write('dismissedEpochDay: $dismissedEpochDay')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, rule, shownEpochDay, dismissedEpochDay);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InsightLogRow &&
+          other.id == this.id &&
+          other.rule == this.rule &&
+          other.shownEpochDay == this.shownEpochDay &&
+          other.dismissedEpochDay == this.dismissedEpochDay);
+}
+
+class InsightLogCompanion extends UpdateCompanion<InsightLogRow> {
+  final Value<int> id;
+  final Value<InsightRule> rule;
+  final Value<int> shownEpochDay;
+  final Value<int?> dismissedEpochDay;
+  const InsightLogCompanion({
+    this.id = const Value.absent(),
+    this.rule = const Value.absent(),
+    this.shownEpochDay = const Value.absent(),
+    this.dismissedEpochDay = const Value.absent(),
+  });
+  InsightLogCompanion.insert({
+    this.id = const Value.absent(),
+    required InsightRule rule,
+    required int shownEpochDay,
+    this.dismissedEpochDay = const Value.absent(),
+  }) : rule = Value(rule),
+       shownEpochDay = Value(shownEpochDay);
+  static Insertable<InsightLogRow> custom({
+    Expression<int>? id,
+    Expression<String>? rule,
+    Expression<int>? shownEpochDay,
+    Expression<int>? dismissedEpochDay,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (rule != null) 'rule': rule,
+      if (shownEpochDay != null) 'shown_epoch_day': shownEpochDay,
+      if (dismissedEpochDay != null) 'dismissed_epoch_day': dismissedEpochDay,
+    });
+  }
+
+  InsightLogCompanion copyWith({
+    Value<int>? id,
+    Value<InsightRule>? rule,
+    Value<int>? shownEpochDay,
+    Value<int?>? dismissedEpochDay,
+  }) {
+    return InsightLogCompanion(
+      id: id ?? this.id,
+      rule: rule ?? this.rule,
+      shownEpochDay: shownEpochDay ?? this.shownEpochDay,
+      dismissedEpochDay: dismissedEpochDay ?? this.dismissedEpochDay,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (rule.present) {
+      map['rule'] = Variable<String>(
+        $InsightLogTable.$converterrule.toSql(rule.value),
+      );
+    }
+    if (shownEpochDay.present) {
+      map['shown_epoch_day'] = Variable<int>(shownEpochDay.value);
+    }
+    if (dismissedEpochDay.present) {
+      map['dismissed_epoch_day'] = Variable<int>(dismissedEpochDay.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InsightLogCompanion(')
+          ..write('id: $id, ')
+          ..write('rule: $rule, ')
+          ..write('shownEpochDay: $shownEpochDay, ')
+          ..write('dismissedEpochDay: $dismissedEpochDay')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7252,6 +7575,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CustomFoodsTable customFoods = $CustomFoodsTable(this);
   late final $RecipeIngredientsTable recipeIngredients =
       $RecipeIngredientsTable(this);
+  late final $InsightLogTable insightLog = $InsightLogTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7267,6 +7591,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     weightEvents,
     customFoods,
     recipeIngredients,
+    insightLog,
   ];
 }
 
@@ -10674,6 +10999,193 @@ typedef $$RecipeIngredientsTableProcessedTableManager =
       RecipeIngredientRow,
       PrefetchHooks Function()
     >;
+typedef $$InsightLogTableCreateCompanionBuilder = InsightLogCompanion Function({
+  Value<int> id,
+  required InsightRule rule,
+  required int shownEpochDay,
+  Value<int?> dismissedEpochDay,
+});
+typedef $$InsightLogTableUpdateCompanionBuilder = InsightLogCompanion Function({
+  Value<int> id,
+  Value<InsightRule> rule,
+  Value<int> shownEpochDay,
+  Value<int?> dismissedEpochDay,
+});
+
+class $$InsightLogTableFilterComposer
+    extends Composer<_$AppDatabase, $InsightLogTable> {
+  $$InsightLogTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<InsightRule, InsightRule, String> get rule =>
+      $composableBuilder(
+        column: $table.rule,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get shownEpochDay => $composableBuilder(
+    column: $table.shownEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dismissedEpochDay => $composableBuilder(
+    column: $table.dismissedEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InsightLogTableOrderingComposer
+    extends Composer<_$AppDatabase, $InsightLogTable> {
+  $$InsightLogTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rule => $composableBuilder(
+    column: $table.rule,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get shownEpochDay => $composableBuilder(
+    column: $table.shownEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dismissedEpochDay => $composableBuilder(
+    column: $table.dismissedEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InsightLogTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InsightLogTable> {
+  $$InsightLogTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<InsightRule, String> get rule =>
+      $composableBuilder(column: $table.rule, builder: (column) => column);
+
+  GeneratedColumn<int> get shownEpochDay => $composableBuilder(
+    column: $table.shownEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dismissedEpochDay => $composableBuilder(
+    column: $table.dismissedEpochDay,
+    builder: (column) => column,
+  );
+}
+
+class $$InsightLogTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InsightLogTable,
+          InsightLogRow,
+          $$InsightLogTableFilterComposer,
+          $$InsightLogTableOrderingComposer,
+          $$InsightLogTableAnnotationComposer,
+          $$InsightLogTableCreateCompanionBuilder,
+          $$InsightLogTableUpdateCompanionBuilder,
+          (
+            InsightLogRow,
+            BaseReferences<_$AppDatabase, $InsightLogTable, InsightLogRow>,
+          ),
+          InsightLogRow,
+          PrefetchHooks Function()
+        > {
+  $$InsightLogTableTableManager(_$AppDatabase db, $InsightLogTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InsightLogTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InsightLogTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InsightLogTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<InsightRule> rule = const Value.absent(),
+                Value<int> shownEpochDay = const Value.absent(),
+                Value<int?> dismissedEpochDay = const Value.absent(),
+              }) => InsightLogCompanion(
+                id: id,
+                rule: rule,
+                shownEpochDay: shownEpochDay,
+                dismissedEpochDay: dismissedEpochDay,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required InsightRule rule,
+                required int shownEpochDay,
+                Value<int?> dismissedEpochDay = const Value.absent(),
+              }) => InsightLogCompanion.insert(
+                id: id,
+                rule: rule,
+                shownEpochDay: shownEpochDay,
+                dismissedEpochDay: dismissedEpochDay,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$InsightLogTable, InsightLogRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $InsightLogTable,
+                    InsightLogRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InsightLogTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InsightLogTable,
+      InsightLogRow,
+      $$InsightLogTableFilterComposer,
+      $$InsightLogTableOrderingComposer,
+      $$InsightLogTableAnnotationComposer,
+      $$InsightLogTableCreateCompanionBuilder,
+      $$InsightLogTableUpdateCompanionBuilder,
+      (
+        InsightLogRow,
+        BaseReferences<_$AppDatabase, $InsightLogTable, InsightLogRow>,
+      ),
+      InsightLogRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -10698,4 +11210,6 @@ class $AppDatabaseManager {
       $$CustomFoodsTableTableManager(_db, _db.customFoods);
   $$RecipeIngredientsTableTableManager get recipeIngredients =>
       $$RecipeIngredientsTableTableManager(_db, _db.recipeIngredients);
+  $$InsightLogTableTableManager get insightLog =>
+      $$InsightLogTableTableManager(_db, _db.insightLog);
 }
