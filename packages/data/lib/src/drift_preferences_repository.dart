@@ -64,6 +64,23 @@ final class DriftPreferencesRepository implements PreferencesRepository {
       );
 
   @override
+  Stream<CalendarDate?> watchUnderEatingDismissedOn() =>
+      _db.select(_db.userPreferences).watchSingleOrNull().map((row) {
+        final day = row?.underEatingDismissedEpochDay;
+        return day == null ? null : CalendarDate.fromEpochDay(day);
+      });
+
+  @override
+  Future<void> saveUnderEatingDismissedOn(CalendarDate day) => _db
+      .into(_db.userPreferences)
+      .insertOnConflictUpdate(
+        UserPreferencesCompanion.insert(
+          id: const Value(1),
+          underEatingDismissedEpochDay: Value(day.epochDay),
+        ),
+      );
+
+  @override
   Future<void> saveThemePreference(ThemePreference preference) => _db
       .into(_db.userPreferences)
       .insertOnConflictUpdate(

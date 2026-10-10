@@ -19,6 +19,9 @@ class UserPreferences extends Table {
   TextColumn get detailLevel =>
       textEnum<DetailLevel>().withDefault(const Constant('standard'))();
 
+  /// The day the under-eating notice was last dismissed (MM-114).
+  IntColumn get underEatingDismissedEpochDay => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

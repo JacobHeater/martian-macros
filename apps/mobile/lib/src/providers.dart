@@ -134,6 +134,39 @@ final adherenceSummaryProvider = Provider<AdherenceSummary?>((ref) {
   );
 });
 
+/// When the under-eating notice was last dismissed (MM-114).
+final underEatingDismissedProvider = StreamProvider<CalendarDate?>(
+  (ref) =>
+      ref.watch(underEatingNoticeReaderProvider).watchUnderEatingDismissedOn(),
+);
+
+/// What the under-eating rule found over the two weeks to yesterday, whether
+/// or not its notice is showing (MM-114).
+final underEatingFindingProvider = Provider<UnderEatingFinding?>((ref) {
+  final snapshot = ref.watch(coachProvider);
+  final intake = ref.watch(intakeDaysProvider).value;
+  if (snapshot == null || intake == null) return null;
+  return findUnderEating(
+    through: ref.watch(todayProvider).addDays(-1),
+    intake: intake,
+    floorKcal: snapshot.calorieFloorKcal,
+  );
+});
+
+/// The finding to show now: null when there is none, or it was dismissed in
+/// the last two weeks.
+final underEatingNoticeProvider = Provider<UnderEatingFinding?>((ref) {
+  final finding = ref.watch(underEatingFindingProvider);
+  final dismissed = ref.watch(underEatingDismissedProvider);
+  if (finding == null || !dismissed.hasValue) return null;
+  return underEatingNoticeDue(
+        today: ref.watch(todayProvider),
+        dismissedOn: dismissed.value,
+      )
+      ? finding
+      : null;
+});
+
 /// The targets in force today, if any have been issued.
 final currentTargetsProvider = Provider<TargetsRecord?>((ref) {
   final setup = ref.watch(setupProvider).value;

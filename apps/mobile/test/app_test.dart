@@ -229,6 +229,9 @@ void main() {
 
     await tester.tap(find.text('Complete'));
     await tester.pumpAndSettle();
+    // 510 kcal is under half the floor, so the app asks first (MM-114).
+    await tester.tap(find.byKey(const ValueKey('choice-primary')));
+    await tester.pumpAndSettle();
     expect(
       await io(tester, () => repos.dayMarks.watchCompleteness(today).first),
       DayCompleteness.complete,

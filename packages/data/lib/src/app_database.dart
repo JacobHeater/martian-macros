@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 16;
+  static const currentSchemaVersion = 17;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -180,6 +180,21 @@ class AppDatabase extends _$AppDatabase {
       }
       if (!existing.contains('hand_model_version')) {
         await m.addColumn(foodEntries, foodEntries.handModelVersion);
+      }
+    },
+    // 16 to 17: when the under-eating notice was last dismissed (MM-114).
+    16: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(user_preferences)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('under_eating_dismissed_epoch_day')) {
+        await m.addColumn(
+          userPreferences,
+          userPreferences.underEatingDismissedEpochDay,
+        );
       }
     },
   };

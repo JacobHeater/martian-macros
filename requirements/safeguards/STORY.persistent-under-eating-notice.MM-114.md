@@ -1,6 +1,6 @@
 ---
 id: MM-114
-status: proposed
+status: in-progress
 component: safeguards
 related: [MM-110, MM-11, MM-27, MM-28, MM-29, MM-40, MM-92, MM-108, MM-113, MM-149]
 ---
@@ -84,3 +84,24 @@ Scenario: Not nagging
   resource that exists at release; helplines have closed and changed in recent years, so check at the time.
 - The same pattern over the *weight* channel (loss faster than the limit) is MM-115. The two together catch restriction that is logged and
   restriction that is not.
+
+## Progress
+Built: `findUnderEating` (engine): over the 14 days to yesterday, at least 7 whole days (marked complete, or unmarked and passing the
+expenditure estimate's usable-day rule) averaging more than 10% below the calorie floor; days marked partial and empty days never
+count; constants in `UnderEatingRule`. One notice, "About your logged days", on the dashboard and the Coach screen with both figures,
+the innocent explanation first and its fix as one tap ("Mark those days partial"), then the other explanation; "They are complete"
+dismisses it, and it is not shown again for 14 days (`underEatingNoticeDue`; the dismissal day is stored, schema version 17); it
+clears by itself when the average rises. Marking a day complete with less than half the floor logged asks "Is this everything you
+ate today?" with Yes and Mark partial. The easy-to-miss line (MM-152) is not shown while the pattern holds. Tests:
+`under_eating_test.dart` (engine), `under_eating_notice_test.dart` (app), the preferences contract and the migration test.
+
+Open, and needing the owner or MM-29:
+- **The support line.** For a user with the eating-disorder-history answer the notice adds "If eating has become a source of
+  distress, a doctor or a registered dietitian is the right person to talk to." No helpline or organisation is named, because the
+  ticket says the resource must be checked at release. This wording has not been through MM-29.
+- **"Targets are untouched" is not proved by a test.** Days marked partial are never used by the estimator. Days the user confirms as
+  complete are used, as MM-27 decided, so a real, confirmed 1,050 kcal intake does inform the expenditure estimate; the target still
+  cannot go below the floor or move more than the weekly limit. Whether confirmed-low days should be withheld from the estimator is a
+  decision, not made here.
+- The question on marking a low day complete is asked each time such a day is marked, not once per day.
+- The adherence summary's pointer to this notice (MM-149) is not built.
