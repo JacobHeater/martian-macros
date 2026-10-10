@@ -98,6 +98,34 @@ class MmColors extends ThemeExtension<MmColors> {
   final Color danger;
   final Color onDanger;
 
+  static const martian = MmColors(
+    canvas: Color(0xFF120B29),
+    surface: Color(0xFF20143D),
+    raised: Color(0xFF2C1B4C),
+    overlay: Color(0xFF382558),
+    sunken: Color(0xFF180F30),
+    track: Color(0xFF40305E),
+    selected: Color(0xFF423261),
+    outline: Color(0xFF594576),
+    outlineStrong: Color(0xFFA18BBE),
+    text: Color(0xFFFFF8E9),
+    text2: Color(0xFFD8C7EF),
+    text3: Color(0xFFBAA4D3),
+    ember: Color(0xFFC4FF48),
+    onEmber: Color(0xFF172500),
+    ion: Color(0xFF43F5E0),
+    onIon: Color(0xFF120B29),
+    energy: Color(0xFFFFF8E9),
+    protein: Color(0xFF43F5E0),
+    carbs: Color(0xFFFF80BB),
+    fat: Color(0xFF9170ED),
+    positive: Color(0xFFC4FF48),
+    caution: Color(0xFFFFD166),
+    info: Color(0xFF85CFFF),
+    danger: Color(0xFFFF938E),
+    onDanger: Color(0xFF120B29),
+  );
+
   static const dark = MmColors(
     canvas: Color(0xFF090D15),
     surface: Color(0xFF101624),

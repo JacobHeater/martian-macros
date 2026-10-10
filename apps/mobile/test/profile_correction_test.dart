@@ -260,6 +260,8 @@ void main() {
   testWidgets('height can be corrected', (tester) async {
     await seed();
     await openSettings(tester);
+    await tester.ensureVisible(find.text('Height'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Height'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('height-feet')), '6');
@@ -275,6 +277,8 @@ void main() {
   testWidgets('an implausible height cannot be saved', (tester) async {
     await seed();
     await openSettings(tester);
+    await tester.ensureVisible(find.text('Height'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Height'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('height-feet')), '2');

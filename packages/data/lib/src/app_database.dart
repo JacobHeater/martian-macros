@@ -44,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 23;
+  static const currentSchemaVersion = 24;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -254,6 +254,17 @@ class AppDatabase extends _$AppDatabase {
     22: (m) async {
       await m.addColumn(setups, setups.maintenanceWeekFromEpochDay);
       await m.addColumn(setups, setups.reliefAnsweredEpochDay);
+    },
+    // 23 to 24: fresh installs choose a theme; upgrades retain old appearance.
+    23: (m) async {
+      await m.alterTable(TableMigration(userPreferences));
+      await into(userPreferences).insert(
+        UserPreferencesCompanion.insert(
+          id: const Value(1),
+          themePreference: const Value(ThemePreference.system),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
     },
   };
 

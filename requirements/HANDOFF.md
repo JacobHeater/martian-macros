@@ -11,17 +11,17 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, while previewing the Martian palette.
+Last updated: 2026-10-10, by Copilot, while implementing MM-184.
 
 **Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
-delivery is in PR #63, ready for review with its final CI still pending.
+delivery is merged in PR #63 after successful CI.
 The owner approved the retro '90s Martian palette as the new-install default,
 with a first-launch theme chooser for new installations only. Existing
-choices must be preserved. `design/martian-palette-preview` now builds on #63.
+choices must be preserved. `feature/mm184-martian-theme` builds on #63.
 
-**Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 24 is in flight for MM-184. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-184 (`mm req next` is the authority).
+**Next ticket ID.** MM-186 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -75,6 +75,21 @@ private notes; they bind whoever picks up the work.
   `State` class in a second file ending `_state.dart`.
 
 ## Session 4: 2026-10-10, Copilot
+
+- MM-184 now implements Martian, first-launch preview/confirmation and four
+  wrapping Settings choices. Schema 24 changes only the fresh-install default;
+  migration retains existing preferences and inserts System for legacy
+  installations without a row. Migration paths from all 23 released schemas,
+  preference contracts, startup/error/retry and contrast tests pass.
+- Broader mobile checks exposed existing tests tapping controls before scroll
+  animations settled after the taller Appearance section. Those tests now
+  fully reveal controls before tapping; behavioral assertions are unchanged.
+  Final full checks, Linux goldens and emulator inspection are still in flight.
+- Full `mm check` passed, exit 0 and "All checks passed." PR #63 passed CI
+  and was merged. MM-185 then exposed a delayed preference-stream race with a
+  failing test: confirmation briefly restored Martian before the saved choice
+  emitted. Preview now clears on confirmed stream publication, not write
+  completion. Final checks are being rerun with that regression.
 
 - PR #63 combines the seeded isolated demo, Dashboard infographics, Food pies,
   separate meal accordions and flat FAB. Full checks and Linux golden

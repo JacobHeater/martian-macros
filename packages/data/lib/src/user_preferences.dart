@@ -7,7 +7,7 @@ class UserPreferences extends Table {
   IntColumn get id => integer().check(id.equals(1))();
 
   TextColumn get themePreference =>
-      textEnum<ThemePreference>().withDefault(const Constant('system'))();
+      textEnum<ThemePreference>().withDefault(const Constant('unselected'))();
 
   /// The easy-to-miss line (MM-152): on unless turned off, and the last day
   /// it was shown.
