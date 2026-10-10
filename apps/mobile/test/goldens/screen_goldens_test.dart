@@ -170,11 +170,14 @@ void main() {
     final squat = imperial ? Units.lbToKg(225) : 100.0;
     final deadlift = imperial ? Units.lbToKg(185) : 80.0;
     Workout workout(int daysAgo, {bool finished = true}) {
+      // Before the fixed clock's noon, so the one in progress has been
+      // running a while.
       final startedAt = DateTime(
         today.year,
         today.month,
         today.day,
-        18,
+        11,
+        22,
       ).subtract(Duration(days: daysAgo));
       return Workout(
         id: 0,

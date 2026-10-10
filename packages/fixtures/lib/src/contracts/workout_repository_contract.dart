@@ -74,10 +74,51 @@ void workoutRepositoryContract(
       expect(pullUp.rir, 0);
     });
 
+    test('set times and the running set timer are kept', () async {
+      final start = six.add(const Duration(minutes: 3));
+      final end = start.add(const Duration(seconds: 42));
+      final timing = end.add(const Duration(minutes: 2));
+      await repo.saveWorkout(
+        Workout(
+          id: 0,
+          date: day,
+          startedAt: six,
+          setStartedAt: timing,
+          exercises: [
+            WorkoutExercise(
+              exerciseId: 'back-squat',
+              sets: [
+                WorkoutSet(
+                  reps: 8,
+                  loadKg: 100,
+                  startedAt: start,
+                  endedAt: end,
+                ),
+                WorkoutSet(reps: 8, loadKg: 100, endedAt: end),
+                const WorkoutSet(reps: 8, loadKg: 100),
+              ],
+            ),
+          ],
+        ),
+      );
+      final read = (await repo.watchWorkouts().first).single;
+      expect(read.setStartedAt!.isAtSameMomentAs(timing), isTrue);
+      final sets = read.exercises.single.sets;
+      expect(sets[0].startedAt!.isAtSameMomentAs(start), isTrue);
+      expect(sets[0].endedAt!.isAtSameMomentAs(end), isTrue);
+      expect(sets[0].duration, const Duration(seconds: 42));
+      expect(sets[1].startedAt, isNull);
+      expect(sets[1].endedAt!.isAtSameMomentAs(end), isTrue);
+      expect(sets[1].duration, isNull);
+      expect(sets[2].startedAt, isNull);
+      expect(sets[2].endedAt, isNull);
+    });
+
     test('a workout in progress has no end', () async {
       await repo.saveWorkout(workout());
       final read = (await repo.watchWorkouts().first).single;
       expect(read.endedAt, isNull);
+      expect(read.setStartedAt, isNull);
       expect(read.inProgress, isTrue);
     });
 

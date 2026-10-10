@@ -17,7 +17,7 @@ Last updated: 2026-10-10, by Claude (Anthropic), after MM-190 and the spike MM-1
 #68 (the health-platform spike and design, MM-188 and MM-189) and #69 (MM-190) are merged. MM-92 and MM-33 stay `in-progress`: each
 has a part that waits on the training log (personal records; strength in the report).
 
-**Database.** Schema version 25 (MM-75: the training tables). Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 26 (MM-191: set times and the set timer). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
 **Next ticket ID.** MM-192 (`mm req next` is the authority).
 
@@ -26,7 +26,7 @@ body-fat estimate (MM-34). So the next work is WS-10, the training log:
 - Built: the exercise library with its picker and the user's own exercises (MM-76), and workout logging on a new Train
   destination (MM-75).
 - Next, in this order: the strength trend (MM-77), which is the gate for the recomp work in WS-09; weekly volume per muscle group
-  (MM-78); set times and timers (MM-191); progression suggestions (MM-79).
+  (MM-78); the rest of set times and timers (MM-191: target rest and its signal); progression suggestions (MM-79).
 - Health sync (WS-11) starts with the health-source interface and its fake (MM-67). Workouts sync as sessions first, through the
   `health` plugin; segments on Android are a later piece in the app's own Android code (MM-188 says why).
 
@@ -108,6 +108,9 @@ private notes; they bind whoever picks up the work.
   plugin reads and writes sessions only. The ticket holds the mapping table, every identifier checked by script against the
   source. Not answered, because they need a phone: whether other apps fill segments, and how a written workout looks in each
   platform's own app.
+- Workout times and timers (MM-191, the owner asked for them after seeing workout logging): a running workout clock, editing a
+  workout's day, start and end, a set and rest timer bar with start and cancel, and typed set times. Schema 26. Not built: target
+  rest with a countdown and its signal, pausing the workout clock.
 - Workout logging (MM-75) and the rest of the library (MM-76): schema 25 with the training tables, `WorkoutRepository` and
   `CustomExerciseRepository`, the Train destination, the workout screen, the exercise picker and creating an exercise. The
   navigation bar gained a tab, so every screenshot that shows it was regenerated.

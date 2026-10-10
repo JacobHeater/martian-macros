@@ -5,6 +5,7 @@ final class FixedClock implements Clock {
   FixedClock(this._today, {this.hour = 12});
 
   CalendarDate _today;
+  Duration _elapsed = Duration.zero;
 
   /// The hour of the day [now] reports. Noon unless a test is about the time
   /// of day.
@@ -12,9 +13,13 @@ final class FixedClock implements Clock {
 
   void advanceTo(CalendarDate day) => _today = day;
 
+  /// Moves [now] later within the day, for a test about elapsed time.
+  void elapse(Duration time) => _elapsed += time;
+
   @override
   CalendarDate today() => _today;
 
   @override
-  DateTime now() => DateTime(_today.year, _today.month, _today.day, hour);
+  DateTime now() =>
+      DateTime(_today.year, _today.month, _today.day, hour).add(_elapsed);
 }
