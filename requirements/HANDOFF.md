@@ -19,13 +19,13 @@ has a part that waits on the training log (personal records; strength in the rep
 
 **Database.** Schema version 24 (MM-184). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-191 (`mm req next` is the authority).
+**Next ticket ID.** MM-192 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
 body-fat estimate (MM-34). So the next work is WS-10, the training log:
 - The exercise library (MM-76) first, built to MM-189. Each exercise carries an optional Health Connect segment type, and the
   mapping table in MM-188 is its data. Copy identifiers from that table; do not retype them from memory.
-- Then workout logging (MM-75), the strength trend (MM-77) and weekly volume (MM-78).
+- Then workout logging (MM-75), set times and timers (MM-191), the strength trend (MM-77) and weekly volume (MM-78).
 - Health sync (WS-11) starts with the health-source interface and its fake (MM-67). Workouts sync as sessions first, through the
   `health` plugin; segments on Android are a later piece in the app's own Android code (MM-188 says why).
 
@@ -33,9 +33,8 @@ body-fat estimate (MM-34). So the next work is WS-10, the training log:
 - MM-173: honest low days from a noisy logger are dropped as partial, so the expenditure estimate drifts about 160 kcal high. The
   ticket lists four options and recommends judging "far below typical" against the spread of the window. Its test is skipped.
 - Reminders are scheduled inexactly on Android, so one can be up to an hour late. Exact timing needs a permission. Not asked yet.
-- MM-188 marks some exercise-to-platform mappings as judgement (for example Romanian deadlift written as a deadlift). The owner
-  can strike any; a struck one uses the fallback. Two of its questions need a phone and are open: whether other apps fill Health
-  Connect segments, and how a written workout looks in each platform's own app.
+- Two of MM-188's questions need a phone and are open: whether other apps fill Health Connect segments, and how a written workout
+  looks in each platform's own app. (The owner accepted its judgement mappings for now.)
 - The support line for a user with an eating-disorder history on the under-eating notice (MM-114) names no helpline and has not
   been through the wording review (MM-29, MM-96).
 
@@ -63,6 +62,8 @@ private notes; they bind whoever picks up the work.
   HealthKit offer, with a fallback for exercises they do not name. Each library exercise carries an optional platform mapping (none
   is normal); the app is the system of record; iOS is session-level only. Mapping data must come from the spike MM-188, checked
   against the platforms' own references, never from memory.
+- **Set times (MM-191).** A set's start and end can be entered by hand, and the app has set and rest timers. Times are optional and
+  never invented; only a set with both can be written to a platform as a segment.
 - **The only calorie visual is the arc**, in `CalorieHero`, and it is the only one in the app (MM-187). No screen builds its own hero
   or draws the arc; `mm arch` enforces it. Trend charts over a range are a separate thing; the owner has not been asked whether
   the Dashboard's calorie history lines should be held to the same rule.
@@ -103,6 +104,8 @@ private notes; they bind whoever picks up the work.
   plugin reads and writes sessions only. The ticket holds the mapping table, every identifier checked by script against the
   source. Not answered, because they need a phone: whether other apps fill segments, and how a written workout looks in each
   platform's own app.
+- The owner then accepted the judgement mappings for now, and decided set times: manual entry, plus timers (MM-191, a new ticket,
+  not built).
 - MM-189 is the design that follows from the owner's direction: an optional platform mapping per exercise, the app as system of
   record, a plain strength session as the fallback, iOS session-level only.
 - Process rewards (MM-92, PR #66): a "Your logging" card on the Dashboard with a streak of whole logged days, one miss in seven

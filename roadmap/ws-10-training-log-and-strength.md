@@ -96,7 +96,7 @@ workstream to hand to a separate contributor, because nearly every file it
 creates is new.
 
 ## Requirement sources
-- Remaining: MM-76, MM-75, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
+- Remaining: MM-76, MM-75, MM-191, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do

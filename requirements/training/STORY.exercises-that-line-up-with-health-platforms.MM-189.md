@@ -2,7 +2,7 @@
 id: MM-189
 status: proposed
 component: training
-related: [MM-66, MM-68, MM-69, MM-70, MM-74, MM-75, MM-76, MM-77, MM-188]
+related: [MM-66, MM-68, MM-69, MM-70, MM-74, MM-75, MM-76, MM-77, MM-188, MM-191]
 ---
 
 # Story: Workouts that line up with the health platforms, with a fallback
@@ -44,8 +44,9 @@ What the spike (MM-188) settled:
 - **Segments on Android are a later, separate piece** in the app's own Android code, because the plugin does not expose them. A
   segment is one set with its repetitions. Weight, set index and perceived exertion exist only in an alpha of the client library and
   wait for a stable one. RIR is never written: the platform has no field for it.
-- **A segment needs a start and an end time**, which the workout log does not record per set. Writing segments needs that settled
-  first.
+- **A segment needs a start and an end time.** The owner's decision: a set's times can be entered by hand, and the app has set and
+  rest timers (MM-191). A set with both times can be written as a segment; one without is left out, and no time is invented.
+- **The mappings marked as judgement in MM-188 stand for now** (the owner's decision).
 - **The mapping table in MM-188 is the library's data** from its first version, so nothing has to be re-keyed when segments arrive.
 
 ## Description
