@@ -1,8 +1,8 @@
-/// The main destinations, in navigation-bar order. Train joins between Food
-/// and Progress when the training log exists.
+/// The main destinations, in navigation-bar order.
 enum HomeDestination {
   dashboard('Dashboard'),
   food('Food'),
+  train('Train'),
   progress('Progress'),
   coach('Coach');
 

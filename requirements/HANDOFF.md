@@ -23,10 +23,10 @@ has a part that waits on the training log (personal records; strength in the rep
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) has nothing buildable left: the recomp review and signal (MM-133, MM-32) need the training log and strength trend, and phase planning (MM-36) needs the
 body-fat estimate (MM-34). So the next work is WS-10, the training log:
-- The exercise library (MM-76) is part built: the model, 164 exercises with their Health Connect types, and the search, all pure
-  code in `mm_domain` and `mm_engine`. Its picker screen and the table for a user's own exercises come with MM-75.
-- Next is workout logging (MM-75): the Train destination, the workout, set and custom-exercise tables in one schema change (25),
-  and the exercise picker. Then set times and timers (MM-191), the strength trend (MM-77) and weekly volume (MM-78).
+- Built: the exercise library with its picker and the user's own exercises (MM-76), and workout logging on a new Train
+  destination (MM-75).
+- Next, in this order: the strength trend (MM-77), which is the gate for the recomp work in WS-09; weekly volume per muscle group
+  (MM-78); set times and timers (MM-191); progression suggestions (MM-79).
 - Health sync (WS-11) starts with the health-source interface and its fake (MM-67). Workouts sync as sessions first, through the
   `health` plugin; segments on Android are a later piece in the app's own Android code (MM-188 says why).
 
@@ -78,6 +78,9 @@ private notes; they bind whoever picks up the work.
   `TZ=Etc/GMT-10 flutter test` on Linux or macOS; WSL works on the development machine).
 - The time comes from `clockProvider`, never `DateTime.now()`; `mm arch` refuses it outside `SystemClock`. `FixedClock(day, hour:)`
   fixes the hour in a test.
+- **Screenshots can be regenerated on the development machine**, in WSL: Ubuntu there has the pinned Flutter. Clone the repo
+  onto the Linux filesystem (never run pub or tests on `/mnt/c`), run `flutter test test/goldens --update-goldens` in
+  `apps/mobile`, and copy the images back. The "Update goldens" workflow on GitHub still works too.
 - `mm check` has passed only when its exit code is 0 and its last line is "All checks passed." A tail that reads "All tests passed!"
   can belong to one package while another failed.
 - Screenshot ("golden") tests run only on Linux, so only in CI. When a screen changes, push the branch to
@@ -105,6 +108,9 @@ private notes; they bind whoever picks up the work.
   plugin reads and writes sessions only. The ticket holds the mapping table, every identifier checked by script against the
   source. Not answered, because they need a phone: whether other apps fill segments, and how a written workout looks in each
   platform's own app.
+- Workout logging (MM-75) and the rest of the library (MM-76): schema 25 with the training tables, `WorkoutRepository` and
+  `CustomExerciseRepository`, the Train destination, the workout screen, the exercise picker and creating an exercise. The
+  navigation bar gained a tab, so every screenshot that shows it was regenerated.
 - Exercise library (MM-76), first part: `Exercise` and its enums, `builtInExercises` (164), `HealthConnectSegment` (the 42
   identifiers, held to MM-188's table by a test) and `searchExercises`. No screen and no storage yet.
 - The owner then accepted the judgement mappings for now, and decided set times: manual entry, plus timers (MM-191, a new ticket,
