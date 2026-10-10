@@ -17,6 +17,7 @@ final class Exercise {
   });
 
   /// Permanent. Logged sets refer to it, so it outlives a change of name.
+  /// Empty for one of the user's own that is not yet saved.
   final String id;
   final String name;
   final Equipment equipment;
@@ -32,4 +33,21 @@ final class Exercise {
   /// a normal state: the exercise stays in the app and is left out of what a
   /// platform is told, never written as a different one.
   final HealthConnectSegment? healthConnect;
+
+  /// What the id of every exercise the user added starts with. No built-in
+  /// exercise's id does.
+  static const customIdPrefix = 'custom-';
+
+  /// Whether the user added this exercise.
+  bool get isCustom => id.isEmpty || id.startsWith(customIdPrefix);
+
+  Exercise withId(String id) => Exercise(
+    id: id,
+    name: name,
+    equipment: equipment,
+    primary: primary,
+    secondary: secondary,
+    load: load,
+    healthConnect: healthConnect,
+  );
 }

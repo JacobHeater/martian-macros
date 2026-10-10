@@ -17,7 +17,7 @@ Last updated: 2026-10-10, by Claude (Anthropic), after MM-190 and the spike MM-1
 #68 (the health-platform spike and design, MM-188 and MM-189) and #69 (MM-190) are merged. MM-92 and MM-33 stay `in-progress`: each
 has a part that waits on the training log (personal records; strength in the report).
 
-**Database.** Schema version 24 (MM-184). Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 25 (MM-75: the training tables). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
 **Next ticket ID.** MM-192 (`mm req next` is the authority).
 

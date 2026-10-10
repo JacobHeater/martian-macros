@@ -16,6 +16,8 @@ void dataEraserContract(
     FoodRepository food,
     TargetsHistoryRepository targets,
     PreferencesRepository preferences,
+    WorkoutRepository workouts,
+    CustomExerciseRepository customExercises,
   })
   Function()
   create,
@@ -60,6 +62,28 @@ void dataEraserContract(
         ),
       );
 
+      await r.workouts.saveWorkout(
+        Workout(
+          id: 0,
+          date: day,
+          startedAt: DateTime(2026, 1, 1, 18),
+          exercises: const [
+            WorkoutExercise(
+              exerciseId: 'back-squat',
+              sets: [WorkoutSet(reps: 8, loadKg: 100)],
+            ),
+          ],
+        ),
+      );
+      await r.customExercises.saveCustomExercise(
+        const Exercise(
+          id: '',
+          name: 'Landmine press',
+          equipment: Equipment.barbell,
+          primary: MuscleGroup.shoulders,
+        ),
+      );
+
       await r.eraser.eraseAll();
 
       expect(await r.setup.loadSetup(), isNull);
@@ -67,6 +91,8 @@ void dataEraserContract(
       expect(await r.weightEvents.watchWeightEvents().first, isEmpty);
       expect(await r.food.watchFood(day).first, isEmpty);
       expect(await r.targets.watchTargetsHistory().first, isEmpty);
+      expect(await r.workouts.watchWorkouts().first, isEmpty);
+      expect(await r.customExercises.watchCustomExercises().first, isEmpty);
       expect(
         await r.preferences.watchThemePreference().first,
         ThemePreference.unselected,
