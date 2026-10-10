@@ -45,6 +45,11 @@ void main() {
       'averageShortfallG': 28,
     }),
     insight(InsightRule.stall),
+    insight(InsightRule.proteinByMeal, {
+      'meal': 0,
+      'missedDays': 10,
+      'lowDays': 8,
+    }),
   ];
 
   test('every rule in the catalog has words', () {
@@ -62,6 +67,14 @@ void main() {
     expect(body, contains('5 of 14 fully logged days'));
     expect(body, contains('about 28 g short'));
     expect(evidence, contains(('Average shortfall', '28 g')));
+  });
+
+  test('the protein-by-meal insight names the meal and grades itself', () {
+    final (_, body, evidence) = insightText(every[5], fmt);
+    expect(body, contains('breakfast has almost none'));
+    expect(body, contains('may help slightly'));
+    expect(body, contains('your daily total matters much more'));
+    expect(evidence, contains(('Days under the minimum', '10')));
   });
 
   test('forbidden subjects never appear', () {

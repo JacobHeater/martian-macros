@@ -150,9 +150,9 @@ independent of step 3.
   check-in or recovery ones, nor the onboarding offer; iOS untried), MM-116 (the five weekly questions, skipping, and
   the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
   offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
-  the training log).
+  the training log), MM-125 (the per-meal protein marker at Full detail and the one insight).
 - Remaining: MM-133, MM-32,
-  MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
+  MM-92, MM-33, MM-36. Epic: MM-145.
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `coach.dart`. Do not add branches

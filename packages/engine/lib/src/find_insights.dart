@@ -3,6 +3,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'insight.dart';
 import 'insight_rationing.dart';
 import 'insight_rule.dart';
+import 'protein_spread_rule.dart';
 import 'stall_assessment.dart';
 import 'stall_status.dart';
 import 'targets_record.dart';
@@ -23,6 +24,7 @@ List<Insight> findInsights({
   required List<WeightObservation> weights,
   required List<TargetsRecord> history,
   StallAssessment? stall,
+  Map<CalendarDate, Map<Meal, double>> mealProtein = const {},
   bool limitToProteinAndLogging = false,
 }) {
   const days = InsightRationing.patternDays;
@@ -92,6 +94,7 @@ List<Insight> findInsights({
 
   var judged = 0, met = 0;
   var shortfall = 0.0;
+  final missedDays = <CalendarDate>[];
   for (final d in whole) {
     final min = minimumOn(d.date);
     if (min == null) continue;
@@ -100,6 +103,7 @@ List<Insight> findInsights({
       met++;
     } else {
       shortfall += min - d.proteinG;
+      missedDays.add(d.date);
     }
   }
   if (judged >= minimum && met * 2 < judged) {
@@ -108,6 +112,28 @@ List<Insight> findInsights({
       'metDays': met.toDouble(),
       'averageShortfallG': shortfall / (judged - met),
     });
+  }
+
+  // On most of the days the minimum was missed, one main meal had almost
+  // no protein (MM-125). The earliest such meal is named.
+  if (judged >= minimum && met * 2 < judged) {
+    for (final meal in const [Meal.breakfast, Meal.lunch, Meal.dinner]) {
+      final low = missedDays
+          .where(
+            (day) =>
+                mealProtein.containsKey(day) &&
+                (mealProtein[day]![meal] ?? 0) < ProteinSpreadRule.almostNoneG,
+          )
+          .length;
+      if (low * 2 > missedDays.length) {
+        add(InsightRule.proteinByMeal, {
+          'meal': meal.index.toDouble(),
+          'missedDays': missedDays.length.toDouble(),
+          'lowDays': low.toDouble(),
+        });
+        break;
+      }
+    }
   }
 
   final allowed = [

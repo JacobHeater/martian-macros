@@ -1,6 +1,6 @@
 ---
 id: MM-125
-status: proposed
+status: in-progress
 component: macro-targets
 related: [MM-119, MM-41, MM-121, MM-141, MM-143, MM-144]
 ---
@@ -67,3 +67,22 @@ Scenario: No per-meal targets
 - Priority: could-have. Low cost, low stakes; do it after MM-121.
 - Older adults may need a larger per-meal dose for the same response (**moderate**). Not acted on beyond the higher daily minimum in
   MM-112.
+
+## Progress
+Built:
+- **At Full detail each meal's header shows its protein** beside its calories, and a quiet check mark when the meal has at least
+  0.3 g per kg of trend weight (`mealHasSolidProtein`). A meal without it shows nothing in its place. At Standard and Simple neither
+  is shown. (The header showed calories only; the ticket's "it already does" was true of the entries, not the meal.)
+- **One insight** (`InsightRule.proteinByMeal`): when the protein minimum was missed on more than half of the fully logged days of
+  the last two weeks, and on more than half of those days one main meal had under 10 g. It names the earliest such meal of breakfast,
+  lunch and dinner, never snacks, in the ticket's words, and grades itself: "Spreading protein over the day may help slightly; your
+  daily total matters much more." It ranks below every other insight and, like all of them, is not repeated for 28 days.
+- **No per-meal target** anywhere: a test checks the meal headers for one.
+- Thresholds are in `ProteinSpreadRule`. Tests: `protein_across_meals_test.dart` (engine and app), `insight_card_test.dart`.
+
+Not built:
+- The insight reads meals from the last 14 days of the food log, so it needs those days logged by meal; a day with no entries is not
+  counted as a day with an empty breakfast unless it was a fully logged day under the minimum.
+- "Reference weight" is the trend weight; before the first weigh-in there is no marker.
+- Not seen on a device: the emulator had no food logged. The header's subtotal shortens with an ellipsis before it can push the
+  add button off a narrow screen, which a test found it would otherwise do.
