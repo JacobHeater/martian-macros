@@ -1,6 +1,6 @@
 ---
 id: MM-46
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-27, MM-38, MM-42, MM-49, MM-167]
 ---
@@ -63,3 +63,18 @@ MM-167.
 
 Decided with the product owner (MM-167): there is **no fist portion**; the hand methods are palm, cupped hand and thumb. Vegetables
 use a cupped hand or a cup. Until the hand model is built, these are logged as a count plus typed totals, labelled as an estimate.
+
+## Progress
+Built: the hand model (`HandModel`, version 1, `packages/domain/lib/src/food/hand/`). Volume of a palm, cupped hand or thumb for a
+reference man (178 cm) and woman (165 cm), scaled by height cubed, times the food's own density or, with none, a default for what
+the portion is for (palm 1.0, cupped hand 0.65, thumb 0.9 g/mL). `gramsFor` and `scaleNutrition` take an optional `HandSize` and
+convert hand units only with it. The amount step offers Palms, Cupped hands and Thumbs after the weights, logs them as measured by
+palm, cupped hand or thumb (25, 30 and 40% uncertainty already in `QuantitySource`), and records the implied grams and the model
+version on the entry (schema version 16). The edit sheet keeps them. Tests: `hand_model_test.dart` (a taller man logs more than a
+shorter woman; a food's own density wins; no hand size, no conversion), the repository contract, and a widget test that logs a food by palm.
+
+**Honest limits.** The reference volumes are judgement, rounded from common coaching guidance and not checked against measured
+hands; the code says so. The packs carry a density for few foods, so a palm of salmon and a palm of chicken weigh the same here and
+differ only in their nutrition per gram, not in weight as the first scenario asks. Foods are not yet matched to the fitting portion
+(palm for meat, cupped hand for grains): all three are offered. The nudge to weigh the main protein source for a week, the
+engine's separation of hand portions from label servings (MM-27), and a check against real hands are not built. Not seen on the emulator.

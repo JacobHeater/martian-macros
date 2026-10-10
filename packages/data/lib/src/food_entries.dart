@@ -31,6 +31,9 @@ class FoodEntries extends Table {
   RealColumn get densityGPerMl => real().nullable()();
   // MM-167: the food an entry was logged from, when it came from a pack or
   // a saved food.
+  // MM-46: grams a hand portion implied, and the hand model's version.
+  RealColumn get impliedGrams => real().nullable()();
+  IntColumn get handModelVersion => integer().nullable()();
   TextColumn get originPackId => text().nullable()();
   IntColumn get originFoodId => integer().nullable()();
   TextColumn get originSource => text().nullable()();
