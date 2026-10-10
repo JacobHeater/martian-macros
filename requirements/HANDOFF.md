@@ -17,7 +17,7 @@ Last updated: 2026-10-10, by Claude (Anthropic), after MM-190 and the spike MM-1
 #68 (the health-platform spike and design, MM-188 and MM-189) and #69 (MM-190) are merged. MM-92 and MM-33 stay `in-progress`: each
 has a part that waits on the training log (personal records; strength in the report).
 
-**Database.** Schema version 26 (MM-191: set times and the set timer). Only one schema change may be in flight at a time (see `roadmap/README.md`).
+**Database.** Schema version 27 (MM-191: pausing the workout clock). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
 **Next ticket ID.** MM-192 (`mm req next` is the authority).
 
@@ -110,7 +110,7 @@ private notes; they bind whoever picks up the work.
   platform's own app.
 - Workout times and timers (MM-191, the owner asked for them after seeing workout logging): a running workout clock, editing a
   workout's day, start and end, a set and rest timer bar with start and cancel, and typed set times. Schema 26. Not built: target
-  rest with a countdown and its signal, pausing the workout clock.
+  rest with a countdown and its signal. Pause and resume on the workout clock followed, as schema 27.
 - Workout logging (MM-75) and the rest of the library (MM-76): schema 25 with the training tables, `WorkoutRepository` and
   `CustomExerciseRepository`, the Train destination, the workout screen, the exercise picker and creating an exercise. The
   navigation bar gained a tab, so every screenshot that shows it was regenerated.

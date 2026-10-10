@@ -27,7 +27,9 @@ class SetTimerBar extends ConsumerWidget {
     final setStarted = workout.setStartedAt;
     final restStarted = restStartedAt(workout);
     final since = setStarted ?? restStarted;
-    final label = setStarted != null
+    final label = workout.paused
+        ? 'Paused'
+        : setStarted != null
         ? 'Set'
         : restStarted != null
         ? 'Rest'
@@ -53,7 +55,7 @@ class SetTimerBar extends ConsumerWidget {
                     ),
                     Ticking(
                       builder: (context, now) => Text(
-                        since == null
+                        since == null || workout.paused
                             ? elapsedText(Duration.zero)
                             : elapsedText(now.difference(since)),
                         key: const ValueKey('set-timer-time'),
@@ -74,9 +76,12 @@ class SetTimerBar extends ConsumerWidget {
                 kind: setStarted == null
                     ? MmButtonKind.primary
                     : MmButtonKind.secondary,
-                onPressed: () => setStarted == null
-                    ? controller.startSet(workout)
-                    : controller.cancelSet(workout),
+                // Nothing is timed while the workout is paused.
+                onPressed: workout.paused
+                    ? null
+                    : () => setStarted == null
+                          ? controller.startSet(workout)
+                          : controller.cancelSet(workout),
               ),
             ],
           ),
