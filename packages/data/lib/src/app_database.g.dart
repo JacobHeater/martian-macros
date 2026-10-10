@@ -5346,7 +5346,7 @@ class $UserPreferencesTable extends UserPreferences
         false,
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('system'),
+        defaultValue: const Constant('unselected'),
       ).withConverter<ThemePreference>(
         $UserPreferencesTable.$converterthemePreference,
       );

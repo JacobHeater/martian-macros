@@ -4,7 +4,7 @@ import 'observable_value.dart';
 
 /// [PreferencesRepository] held in memory.
 final class InMemoryPreferencesRepository implements PreferencesRepository {
-  final _theme = ObservableValue<ThemePreference>(ThemePreference.system);
+  final _theme = ObservableValue<ThemePreference>(ThemePreference.unselected);
 
   @override
   Stream<ThemePreference> watchThemePreference() => _theme.watch();
@@ -75,7 +75,7 @@ final class InMemoryPreferencesRepository implements PreferencesRepository {
 
   /// Back to the defaults (used by [InMemoryDataEraser]).
   void clear() {
-    _theme.value = ThemePreference.system;
+    _theme.value = ThemePreference.unselected;
     _easyToMiss.value = const EasyToMissPreference();
     _detail.value = DetailLevel.standard;
     _underEatingDismissed.value = null;

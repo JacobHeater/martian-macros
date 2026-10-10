@@ -54,6 +54,8 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-pause')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('settings-pause')));
     await tester.pumpAndSettle();
   }

@@ -7,6 +7,40 @@ simulation with the Machado 2009 matrices) rather than estimated.
 
 ## 1. Strategy
 
+### Approved Martian palette (MM-184)
+
+The owner approved the retro '90s concept in
+[palette-preview.html](palette-preview.html) as the **new-install default**.
+It is a deliberate alternative to the Light/Dark direction below, not a
+replacement for existing users' choices. New installations preview Martian,
+Light, Dark or System before onboarding, saving only on Continue. Settings
+offers the same four choices. Upgrades keep the old preference (System when
+none was saved); erasing all data restarts the initial choice.
+
+Martian keeps the same semantic roles and accessibility thresholds:
+
+| Roles | Martian values |
+|---|---|
+| canvas / surface / raised / overlay | `#120B29` / `#20143D` / `#2C1B4C` / `#382558` |
+| sunken / track / selected | `#180F30` / `#40305E` / `#423261` |
+| outline / outlineStrong | `#594576` / `#A18BBE` |
+| text / text2 / text3 | `#FFF8E9` / `#D8C7EF` / `#BAA4D3` |
+| action / on-action | `#C4FF48` / `#172500` |
+| measurement / on-measurement | `#43F5E0` / `#120B29` |
+| protein / carbs / fat | `#43F5E0` / `#FF80BB` / `#9170ED` |
+| positive / caution / info | `#C4FF48` / `#FFD166` / `#85CFFF` |
+| danger / on-danger | `#FF938E` / `#120B29` |
+
+Energy uses cream text. The existing `ember` semantic role now means an
+acid-lime action in Martian; it does not imply orange. Deep grape and cream
+are intentional exceptions to the old neutral restrictions, scoped to this
+palette. Cards and primary floating actions use 12 dp corners and navigation
+indicators use 8 dp corners. Primary actions remain flat: no glow, halo or
+interaction elevation. Macro labels remain present alongside colors.
+
+Automated tests cover text on all four surface levels, filled controls,
+graphic contrast, tracks, navigation, and at least 10 L* between macros.
+
 1. **Do not use a seed palette.** `ColorScheme.fromSeed` / `colorSchemeSeed`
    invents every surface, container and tertiary from one hue. With a rust seed
    this is what produces the pale salmon containers, tinted beige surfaces and

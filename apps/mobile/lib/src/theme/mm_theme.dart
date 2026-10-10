@@ -6,9 +6,11 @@ import 'mm_type.dart';
 
 /// The light or dark theme. Both are built from the same roles; there is no
 /// seed palette, so no Material-generated tint can reach a screen.
-ThemeData mmTheme(Brightness brightness) {
+ThemeData mmTheme(Brightness brightness, {bool martian = false}) {
   final dark = brightness == Brightness.dark;
-  final c = dark ? MmColors.dark : MmColors.light;
+  final c = martian
+      ? MmColors.martian
+      : (dark ? MmColors.dark : MmColors.light);
 
   final scheme = ColorScheme(
     brightness: brightness,
@@ -76,7 +78,10 @@ ThemeData mmTheme(Brightness brightness) {
       color: c.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      shape: rounded(MmRadius.group, BorderSide(color: c.outline)),
+      shape: rounded(
+        martian ? 12 : MmRadius.group,
+        BorderSide(color: c.outline),
+      ),
     ),
     dividerTheme: DividerThemeData(color: c.outline, thickness: 1, space: 1),
     navigationBarTheme: NavigationBarThemeData(
@@ -84,7 +89,7 @@ ThemeData mmTheme(Brightness brightness) {
       backgroundColor: c.raised,
       surfaceTintColor: Colors.transparent,
       indicatorColor: c.selected,
-      indicatorShape: const StadiumBorder(),
+      indicatorShape: martian ? rounded(8) : const StadiumBorder(),
       elevation: 0,
       iconTheme: WidgetStateProperty.resolveWith(
         (states) => IconThemeData(
@@ -106,12 +111,12 @@ ThemeData mmTheme(Brightness brightness) {
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: c.ember,
       foregroundColor: c.onEmber,
-      elevation: dark ? 0 : 3,
-      focusElevation: dark ? 0 : 4,
-      hoverElevation: dark ? 0 : 4,
-      highlightElevation: dark ? 0 : 3,
+      elevation: 0,
+      focusElevation: 0,
+      hoverElevation: 0,
+      highlightElevation: 0,
       extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
-      shape: rounded(MmRadius.group),
+      shape: rounded(martian ? 12 : MmRadius.group),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

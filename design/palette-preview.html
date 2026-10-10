@@ -19,7 +19,7 @@
     --protein:#5B9DFF; --carbs:#F6C453; --fat:#7F57FF;
     --positive:#4FDB8A; --caution:#FFB84D; --info:#7FB8FF; --danger:#FF7A7A;
     --glow: rgba(63,216,240,.12); --hair: rgba(236,240,248,.06); --card-shadow: none;
-    --highlight: inset 0 1px 0 rgba(236,240,248,.06); --fab-shadow: 0 8px 24px rgba(255,106,69,.25);
+    --highlight: inset 0 1px 0 rgba(236,240,248,.06); --fab-shadow: none;
   }
   .theme-light {
     --canvas:#F3F5FA; --surface:#FFFFFF; --raised:#FFFFFF; --overlay:#FFFFFF; --sunken:#E8ECF5;
@@ -29,8 +29,39 @@
     --protein:#1646A6; --carbs:#BF7A00; --fat:#7448E6;
     --positive:#117A3E; --caution:#8F5600; --info:#1C62C9; --danger:#B3261E;
     --glow: rgba(10,120,144,.08); --hair: rgba(12,18,32,.05); --card-shadow: 0 1px 2px rgba(12,18,32,.06);
-    --highlight: none; --fab-shadow: 0 8px 24px rgba(12,18,32,.14);
+    --highlight: none; --fab-shadow: none;
   }
+  .theme-martian {
+    --canvas:#120B29; --surface:#20143D; --raised:#2C1B4C; --overlay:#382558; --sunken:#180F30;
+    --track:#40305E; --selected:#423261; --outline:#594576; --outlineStrong:#A18BBE;
+    --text:#FFF8E9; --text2:#D8C7EF; --text3:#BAA4D3;
+    --ember:#C4FF48; --onEmber:#172500; --ion:#43F5E0; --energy:#FFF8E9;
+    --protein:#43F5E0; --carbs:#FF80BB; --fat:#9170ED;
+    --positive:#C4FF48; --caution:#FFD166; --info:#85CFFF; --danger:#FF938E;
+    --glow: rgba(67,245,224,.08); --hair: rgba(216,199,239,.10); --card-shadow: none;
+    --highlight: none; --fab-shadow: none;
+  }
+  .theme-martian.phone { border-radius: 20px; }
+  .theme-martian .card { border-radius: 12px; }
+  .theme-martian .title { letter-spacing: -.6px; }
+  .theme-martian .big .n { font-weight: 800; letter-spacing: -2px; }
+  .theme-martian .status { background: repeating-linear-gradient(90deg,
+    var(--ion) 0 12px, var(--carbs) 12px 24px, var(--ember) 24px 36px,
+    var(--fat) 36px 48px); height: 6px; margin: 12px 0 6px; border-radius: 2px; }
+  .theme-martian .fab { border-radius: 12px; }
+  .theme-martian .nav .pill { border-radius: 8px; }
+  .edition { max-width: 1160px; margin: 0 auto 24px; padding: 24px;
+    border-radius: 16px; background: #120B29; color: #FFF8E9; border: 1px solid #594576; }
+  .edition .eyebrow { font: 700 12px/1.5 ui-monospace, monospace; letter-spacing: 2px; color: #C4FF48; }
+  .edition h2 { text-align: left; font: 800 clamp(32px, 6vw, 56px)/1.05 system-ui, sans-serif;
+    letter-spacing: -2px; margin: 8px 0 12px; }
+  .edition p { max-width: 680px; color: #D8C7EF; font-size: 14px; line-height: 1.6; margin: 0; }
+  .palette-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .palette-strip span { padding: 8px 12px; border-radius: 6px; font: 700 12px ui-monospace, monospace; }
+  .theme-label { color: #0C1220; font-weight: 700; }
+  .contrast { margin-top: 12px; padding: 12px; color: var(--text2); background: var(--surface);
+    border: 1px solid var(--outline); border-radius: 12px; max-width: 536px; font-size: 12px; line-height: 1.6; }
+  .contrast strong { color: var(--text); }
   .phone { width: 360px; height: 760px; border-radius: 28px; overflow: hidden; position: relative;
     background: var(--canvas); color: var(--text); box-shadow: 0 12px 40px rgba(0,0,0,.25); }
   .scroll { padding: 0 16px; }
@@ -108,13 +139,39 @@
   .btn.p { background: var(--ember); color: var(--onEmber); }
   .btn.o { outline: 1px solid var(--outlineStrong); outline-offset: -1px; color: var(--text); }
   .gray { filter: grayscale(1); }
+  @media (max-width: 400px) {
+    .row > div { min-width: 0; max-width: 100%; }
+    .phone { width: calc(100vw - 32px); }
+    .sheet-demo { width: calc(100vw - 64px); }
+    .swatches { box-sizing: border-box; width: calc(100vw - 32px); }
+    .edition { padding: 20px; }
+  }
 </style>
 </head>
 <body>
 <h1>Martian Macros palette preview</h1>
 <p class="note">Static rendering of <code>design/color-and-theme-system.md</code> and the Today layout in <code>screen-direction.md</code>. It is a judgment aid for MM-102, not app code; fonts fall back to the system sans if Space Grotesk and Inter are not installed, so figure shapes will differ from the proposal. The grayscale phone at the bottom checks that the macros still separate without color.</p>
 
+<div class="edition">
+  <div class="eyebrow">PALETTE EXPERIMENT / 003 / PREVIEW ONLY</div>
+  <h2>Martian</h2>
+  <p>Off-world nutrition. On a very '90s wavelength. Acid-lime actions, poolside
+    cyan, bubblegum pink and arcade violet on deep grape. Loud color, readable
+    numbers, no incandescent button glow. This is a proposed extra theme, not
+    a replacement for Dark or Light, and is not wired into the app.</p>
+  <div class="palette-strip" aria-label="Martian signature colors">
+    <span style="background:#C4FF48;color:#172500">ACID LIME</span>
+    <span style="background:#43F5E0;color:#120B29">POOL CYAN</span>
+    <span style="background:#FF80BB;color:#120B29">BUBBLEGUM</span>
+    <span style="background:#9170ED;color:#120B29">ARCADE VIOLET</span>
+  </div>
+</div>
+
 <div class="row">
+  <div>
+    <div class="phone theme-martian" id="martian" aria-label="Martian theme phone preview"></div>
+    <div class="label-tag theme-label">Martian / retro '90s concept</div>
+  </div>
   <div>
     <div class="phone theme-dark" id="dark"></div>
     <div class="label-tag">Dark</div>
@@ -128,6 +185,7 @@
 <section>
   <h2>Notice family and buttons (no colored fills)</h2>
   <div class="row">
+    <div class="theme-martian"><div class="sheet-demo" id="n-martian"></div><div class="label-tag theme-label">Martian</div></div>
     <div class="theme-dark"><div class="sheet-demo" id="n-dark"></div></div>
     <div class="theme-light"><div class="sheet-demo" id="n-light"></div></div>
   </div>
@@ -136,6 +194,7 @@
 <section>
   <h2>Swatches</h2>
   <div class="row">
+    <div class="theme-martian"><div class="swatches" id="sw-martian"></div><div class="contrast" id="contrast-martian"></div></div>
     <div class="theme-dark"><div class="swatches" id="sw-dark"></div></div>
     <div class="theme-light"><div class="swatches" id="sw-light"></div></div>
   </div>
@@ -144,6 +203,7 @@
 <section>
   <h2>Grayscale check (macros must still separate)</h2>
   <div class="row">
+    <div class="theme-martian gray"><div class="sheet-demo" id="g-martian"></div><div class="label-tag theme-label">Martian / grayscale</div></div>
     <div class="theme-dark gray"><div class="sheet-demo" id="g-dark"></div></div>
     <div class="theme-light gray"><div class="sheet-demo" id="g-light"></div></div>
   </div>
@@ -211,13 +271,14 @@
   }
   document.getElementById('dark').innerHTML = phone();
   document.getElementById('light').innerHTML = phone();
+  document.getElementById('martian').innerHTML = phone();
 
   const notices = `
     <div class="notice info">${I.info}<div><b>Info</b>Waiting for early water changes to settle.</div></div>
     <div class="notice caution">${I.warn}<div><b>Heads up</b>Your calorie target was raised to the safe minimum.</div></div>
     <div class="notice required">${I.warn}<div><b>Safety</b>We can't set a fat-loss target at this body weight. Maintenance is available.</div></div>
     <div class="btn p">Continue</div><div class="btn o">Not now</div>`;
-  ['n-dark', 'n-light'].forEach(id => document.getElementById(id).innerHTML = notices);
+  ['n-dark', 'n-light', 'n-martian'].forEach(id => document.getElementById(id).innerHTML = notices);
 
   const tokens = {
     dark: ['canvas','surface','raised','overlay','selected','track','text','text2','ember','ion','protein','carbs','fat','positive','caution','info','danger'],
@@ -231,11 +292,40 @@
     }).join('');
   }
   swatches('sw-dark', 'theme-dark'); swatches('sw-light', 'theme-light');
+  swatches('sw-martian', 'theme-martian');
+
+  function luminance(hex) {
+    const channels = hex.replace('#', '').match(/../g).map(v => parseInt(v, 16) / 255)
+      .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+    return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722;
+  }
+  const martianStyle = getComputedStyle(document.getElementById('martian'));
+  const value = token => martianStyle.getPropertyValue('--' + token).trim();
+  const contrast = (a, b) => {
+    const x = luminance(value(a)), y = luminance(value(b));
+    return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+  };
+  const checks = [
+    ['Body text / card', 'text', 'surface', 4.5],
+    ['Secondary text / card', 'text2', 'surface', 4.5],
+    ['Muted text / raised', 'text3', 'raised', 4.5],
+    ['Action label / lime', 'onEmber', 'ember', 4.5],
+    ['Protein / track', 'protein', 'track', 3],
+    ['Carbs / track', 'carbs', 'track', 3],
+    ['Fat / track', 'fat', 'track', 3],
+  ];
+  document.getElementById('contrast-martian').innerHTML =
+    '<strong>Martian contrast spot checks</strong><br>' +
+    checks.map(([label, foreground, background, minimum]) => {
+      const ratio = contrast(foreground, background);
+      return `${label}: ${ratio.toFixed(2)}:1 / ${ratio >= minimum ? 'PASS' : 'REVISE'} (min ${minimum}:1)`;
+    }).join('<br>');
 
   const macrosOnly = `<div class="macros" style="background:var(--surface);padding:16px;border-radius:16px;">
     ${macro('protein','Protein',96,180,'var(--protein)')}${macro('carbs','Carbs',160,260,'var(--carbs)')}${macro('fat','Fat',38,78,'var(--fat)')}</div>`;
   document.getElementById('g-dark').innerHTML = macrosOnly;
   document.getElementById('g-light').innerHTML = macrosOnly;
+  document.getElementById('g-martian').innerHTML = macrosOnly;
 </script>
 </body>
 </html>
