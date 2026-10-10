@@ -88,7 +88,6 @@ class DashboardScreen extends ConsumerWidget {
         const ReminderPausedNotice(),
         const ReliefOfferCard(),
         CalorieHero(
-          compact: true,
           intake: intakeDayFrom(today, entries),
           targets: pause != null
               ? ref.watch(maintenanceGuideProvider)

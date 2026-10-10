@@ -11,23 +11,17 @@ Nothing private goes here: no credentials, no personal or health data.
 
 ## Where things stand
 
-Last updated: 2026-10-10, by Copilot, while finishing MM-184.
+Last updated: 2026-10-10, by Claude (Anthropic), after MM-187.
 
-**Branch state.** PRs #61 and #62 are merged. The Dashboard/isolated demo
-delivery is merged in PR #63 after successful CI.
-The owner approved the retro '90s Martian palette as the new-install default,
-with a first-launch theme chooser for new installations only. Existing
-choices are preserved. `feature/mm184-martian-theme` is PR #64 on top of
-merged #63. Implementation, local full checks and reviewed Linux screenshots
-are complete; final PR CI is pending. Merge #64 with `--merge` when green.
+**Branch state.** PRs #61 to #64 are merged, including the Martian theme (MM-184). The one open pull request is MM-187 (the arc is
+the one calorie visual), on `feature/mm-187-single-calorie-visual`; merge it with `--merge` when its CI is green. Nothing else is in
+flight.
 
-**Database.** Schema version 24 in PR #64 (MM-184). No other schema change
-should start until it merges (see `roadmap/README.md`).
+**Database.** Schema version 24 (MM-184). Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-187 (`mm req next` is the authority).
+**Next ticket ID.** MM-188 (`mm req next` is the authority).
 
-**What to build next.** Finish PR #64, not another side quest. Then the work
-follows `roadmap/`. WS-09 (coaching intelligence) is where earlier sessions
+**What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where earlier sessions
 worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
   counts (MM-149), and must neither advance nor break during a pause (MM-148).
@@ -62,6 +56,9 @@ private notes; they bind whoever picks up the work.
   The rule in `AGENTS.md` still holds for any bug you do find: a `BUG` ticket and a regression test at once.
 - How the app looks matters as much as what it does. Look at new screens on the emulator before calling them done.
 - Say plainly what was and was not verified. Never report a check as passed that you did not run.
+- **The only calorie visual is the arc**, in `CalorieHero`, and it is the only one in the app (MM-187). No screen builds its own hero
+  or draws the arc; `mm arch` enforces it. Trend charts over a range are a separate thing; the owner has not been asked whether
+  the Dashboard's calorie history lines should be held to the same rule.
 - Fixed product constraints, not to be reopened: offline only; biological sex is male or female for every formula; United States
   only at launch.
 
@@ -78,6 +75,17 @@ private notes; they bind whoever picks up the work.
   app's package is `com.martianmacros.martian_macros`.
 - One declaration per file is enforced (`mm arch`), and a file is named for what it declares. A screen that needs state has its
   `State` class in a second file ending `_state.dart`.
+
+## Session 5: 2026-10-10, Claude (Anthropic)
+
+- MM-187: the owner's rule is that the horizon arc is the only calorie visual in the app. The Dashboard had been drawing the
+  calorie hero without its arc (a `compact` mode) and the Coach screen drew a hero of its own. `CalorieHero` has no compact variant
+  now; the Dashboard, Food and Coach screens all use it, and the Coach screen's second card is "Your targets" (protein minimum, pace,
+  next check-in, confidence, flags). `mm arch` fails a screen that names `MmHeroSurface` or `HorizonArc` outside the design system,
+  the calorie hero and the welcome art.
+- The taller Coach and Dashboard heroes pushed controls off the first screen and broke six older widget tests until they scrolled to
+  what they tapped. Dashboard and Coach screenshots changed in all three themes and were reviewed.
+- Merged PR #64 (Martian theme) when its CI was green, then branched from fresh `main`.
 
 ## Session 4: 2026-10-10, Copilot
 
@@ -197,23 +205,3 @@ Things a successor should know:
   and a date picker (pause dates are set with sliders).
 - Two rules were added to the working agreements this session: every bug gets a ticket and a regression test at once, and this
   handoff document (MM-174). Bugs MM-168 to MM-173 were filed in retrospect; all but MM-173 are fixed.
-
-## Session 2: 2026-10-09 (evening), Claude (Anthropic)
-
-Workstream WS-09, steps 1 to 3. All merged. Written from the pull requests and the commit history, not from notes taken at the time.
-
-| Pull request | Ticket | What changed |
-|---|---|---|
-| #51 | MM-149, MM-123 | Weekly adherence summary on the Coach screen: five facts and no score. Tolerance bands for intake. |
-| #52 | MM-114 | Notice when logged days sit far below the calorie floor for two weeks, with a one-tap fix. Schema 17. |
-| #53 | MM-147 | Returning after a gap: the welcome-back screen, the deficit count restarting, the starting estimate. Schema 18. |
-| #54 | MM-140 | Stall diagnosis: says which of four kinds of stall it is. |
-
-Things a successor should know:
-- **One rule decides which days count.** `usableIntakeDays` is shared by the expenditure estimate, the adherence summary and the
-  under-eating notice, so they always agree. MM-173 is a defect in that rule and touches all three.
-- **Nothing here praises eating under target**, and no notice comes from a single day. Several of these rules are enforced by tests
-  that forbid particular words on a screen. Treat those tests as the specification.
-- **No composite scores**, for adherence, recovery or confidence. Each ticket says why.
-- The stall diagnosis offers options as text only, because the things it would offer (pace choice MM-128, weekly budget MM-124, diet
-  break policy MM-135) are not built.
