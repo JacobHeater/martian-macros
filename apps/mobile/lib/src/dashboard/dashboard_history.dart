@@ -16,7 +16,9 @@ final class DashboardHistory {
     final eligibleStart = onboardedOn.isAfter(start) ? onboardedOn : start;
     for (var i = 0; i < days; i++) {
       final date = start.addDays(i);
-      if (date.isBefore(eligibleStart) || pauseOn(pauses, date) != null) continue;
+      if (date.isBefore(eligibleStart) || pauseOn(pauses, date) != null) {
+        continue;
+      }
       activeDays++;
       if (!targetsAllowed) continue;
       final record = history
@@ -24,8 +26,8 @@ final class DashboardHistory {
           .lastOrNull;
       if (record == null) continue;
       calorieTargets[date] = record.targets.kcal;
-      proteinTargets[date] = record.targets.proteinMinimumG ??
-          record.targets.proteinG;
+      proteinTargets[date] =
+          record.targets.proteinMinimumG ?? record.targets.proteinG;
     }
     for (final day in intake) {
       if (day.date.isBefore(eligibleStart) || day.date.isAfter(today)) continue;
@@ -64,7 +66,6 @@ final class DashboardHistory {
   double? get meanCalories => _mean(calories.values);
   double? get meanProtein => _mean(protein.values);
 
-  double? _mean(Iterable<double> values) => values.isEmpty
-      ? null
-      : values.reduce((a, b) => a + b) / values.length;
+  double? _mean(Iterable<double> values) =>
+      values.isEmpty ? null : values.reduce((a, b) => a + b) / values.length;
 }

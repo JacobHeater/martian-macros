@@ -53,7 +53,8 @@ class DashboardMetrics extends ConsumerWidget {
       );
     }
     final snapshot = ref.watch(coachProvider);
-    final allowed = snapshot?.policy.targetsAllowed ??
+    final allowed =
+        snapshot?.policy.targetsAllowed ??
         CoachingPolicy.derive(
           profile: setup.profile,
           screening: setup.screening,
@@ -85,12 +86,8 @@ class DashboardMetrics extends ConsumerWidget {
       kind: MmButtonKind.text,
       onPressed: () => open(tab),
     );
-    Widget chart(List<HistorySeries> series, String unit) => HistoryChart(
-      series: series,
-      today: today,
-      days: days,
-      unit: unit,
-    );
+    Widget chart(List<HistorySeries> series, String unit) =>
+        HistoryChart(series: series, today: today, days: days, unit: unit);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -102,10 +99,7 @@ class DashboardMetrics extends ConsumerWidget {
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-                'Your metrics',
-                style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Your metrics', style: Theme.of(context).textTheme.titleLarge),
             MmSegmented<int>(
               compact: true,
               segments: const [
@@ -131,7 +125,8 @@ class DashboardMetrics extends ConsumerWidget {
                   'Average logged intake': facts.meanCalories == null
                       ? 'Not recorded'
                       : Fmt.kcal(facts.meanCalories!),
-                  'Days with intake records': '${facts.calories.length} / $days',
+                  'Days with intake records':
+                      '${facts.calories.length} / $days',
                 },
               ),
               const SizedBox(height: 16),
@@ -191,7 +186,9 @@ class DashboardMetrics extends ConsumerWidget {
                 ),
               ], 'g'),
               if (facts.protein.isEmpty)
-                const Text('Log protein-containing food to populate this history.'),
+                const Text(
+                  'Log protein-containing food to populate this history.',
+                ),
             ],
           ),
         ),
@@ -205,7 +202,8 @@ class DashboardMetrics extends ConsumerWidget {
                 height: 190,
                 child: Semantics(
                   image: true,
-                  label: 'Weight trend in ${fmt.weightUnit}, $days days, '
+                  label:
+                      'Weight trend in ${fmt.weightUnit}, $days days, '
                       'with observations and uncertainty band.',
                   child: TrendChart(
                     trend: snapshot?.trend ?? const [],
@@ -241,15 +239,16 @@ class DashboardMetrics extends ConsumerWidget {
                 HistorySeries(
                   label: 'Recorded waist',
                   values: {
-                    for (final w in waists)
-                      w.date: fmt.lengthFromCm(w.waistCm),
+                    for (final w in waists) w.date: fmt.lengthFromCm(w.waistCm),
                   },
                   kind: HistorySeriesKind.measurement,
                   connectRecordedPoints: true,
                 ),
               ], fmt.lengthUnit),
               if (waists.isEmpty)
-                const Text('Add waist measurements in Progress to see history.'),
+                const Text(
+                  'Add waist measurements in Progress to see history.',
+                ),
             ],
           ),
         ),
@@ -260,8 +259,10 @@ class DashboardMetrics extends ConsumerWidget {
             children: [
               MetricFacts(
                 facts: {
-                  'Food days recorded': '${facts.loggedDays} / ${facts.activeDays}',
-                  'Days marked complete': '${facts.completeDays} / ${facts.activeDays}',
+                  'Food days recorded':
+                      '${facts.loggedDays} / ${facts.activeDays}',
+                  'Days marked complete':
+                      '${facts.completeDays} / ${facts.activeDays}',
                   'Weigh-in days': '${facts.weighInDays} / ${facts.activeDays}',
                   'Window': '$days days',
                 },
@@ -285,14 +286,20 @@ class DashboardMetrics extends ConsumerWidget {
               else ...[
                 MetricFacts(
                   facts: {
-                    'Coach confidence': confidenceLabel(snapshot.confidence.level),
+                    'Coach confidence': confidenceLabel(
+                      snapshot.confidence.level,
+                    ),
                     snapshot.tdee.status == TdeeStatus.updated
-                        ? 'Measured expenditure range'
-                        : 'Starting / held estimate range':
+                            ? 'Measured expenditure range'
+                            : 'Starting / held estimate range':
                         '${Fmt.whole(snapshot.tdee.kcal - snapshot.tdee.sigmaKcal)}–'
                         '${Fmt.whole(snapshot.tdee.kcal + snapshot.tdee.sigmaKcal)} kcal',
-                    'Food log evidence': confidenceLabel(snapshot.confidence.foodLog),
-                    'Weight evidence': confidenceLabel(snapshot.confidence.weighIns),
+                    'Food log evidence': confidenceLabel(
+                      snapshot.confidence.foodLog,
+                    ),
+                    'Weight evidence': confidenceLabel(
+                      snapshot.confidence.weighIns,
+                    ),
                   },
                 ),
                 const SizedBox(height: 12),

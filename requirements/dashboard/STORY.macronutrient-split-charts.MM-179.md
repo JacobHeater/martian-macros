@@ -39,3 +39,10 @@ Scenario: Accessibility
   And zero-valued macros have a zero share without a fake pie sector
   And narrow phones and both themes have no overflowing chart labels
 ```
+
+## Progress
+Implemented one shared chart on Dashboard and Food, retaining the progress
+bars. Tests verify exact 400/600/450 kcal sector values and percentage labels,
+empty/zero-share behavior, both themes and Food's selected-day versus
+Dashboard's current-day data. Integrated `mm check` passed. Charts were
+inspected on the seeded Android emulator.

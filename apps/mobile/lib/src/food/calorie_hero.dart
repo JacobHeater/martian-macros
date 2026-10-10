@@ -75,14 +75,15 @@ class CalorieHero extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!compact) HorizonArc(
-            progress: t == null || t.kcal <= 0
-                ? 0
-                : paused
-                ? (intake.kcal / t.kcal).clamp(0.0, 1.0)
-                : intake.kcal / t.kcal,
-            semanticsLabel: '$figure $caption',
-          ),
+          if (!compact)
+            HorizonArc(
+              progress: t == null || t.kcal <= 0
+                  ? 0
+                  : paused
+                  ? (intake.kcal / t.kcal).clamp(0.0, 1.0)
+                  : intake.kcal / t.kcal,
+              semanticsLabel: '$figure $caption',
+            ),
           Text(
             figure,
             style: compact ? text.displaySmall : text.displayLarge,

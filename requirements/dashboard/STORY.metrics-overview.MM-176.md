@@ -52,3 +52,12 @@ Scenario: Readability
   Then both themes and narrow phone widths show readable chart labels without overflow
   And interactive controls have accessible names
 ```
+
+## Progress
+Implemented the existing-data overview and shared dated chart components.
+Dashboard model/widget tests cover 7/30-day boundaries, gaps, historical
+targets, pauses, screening, empty/loading/error states and narrow widths in
+both themes. The integrated workspace passed `mm check` with exit 0 and
+"All checks passed." Populated summary, nutrition, measurements and coaching
+sections were inspected on the Android emulator using MM-177 synthetic data.
+Linux screenshot regeneration and PR checks remain delivery gates.

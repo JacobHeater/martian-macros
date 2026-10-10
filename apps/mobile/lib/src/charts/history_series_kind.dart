@@ -1,1 +1,8 @@
-enum HistorySeriesKind { energy, target, protein, estimate, measurement, recovery }
+enum HistorySeriesKind {
+  energy,
+  target,
+  protein,
+  estimate,
+  measurement,
+  recovery,
+}
