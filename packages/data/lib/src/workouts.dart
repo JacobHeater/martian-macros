@@ -12,4 +12,7 @@ class Workouts extends Table {
 
   /// Null while the workout is in progress.
   IntColumn get endedAtMs => integer().nullable()();
+
+  /// When the set timer was started, while a set is being timed (MM-191).
+  IntColumn get setStartedAtMs => integer().nullable()();
 }

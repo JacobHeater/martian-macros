@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mm_domain/mm_domain.dart';
 
+import '../format/clock_time_text.dart';
 import '../format/load_number.dart';
 import '../format/parse_number.dart';
 import '../format/set_text.dart';
+import '../format/time_span_problem_text.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
+import '../ui/mm_list_row.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
+import '../ui/show_mm_snack_bar.dart';
+import '../ui/show_mm_time_picker.dart';
 import 'set_editor.dart';
 
 class SetEditorState extends State<SetEditor> {
@@ -71,6 +76,38 @@ class SetEditorState extends State<SetEditor> {
     if (widget.load == ExerciseLoad.addedWeight && value < 0) value = 0;
     _load.text = loadNumber(value);
     _change(_set.copyWith(loadKg: widget.fmt.weightToKg(value)));
+  }
+
+  static String _timeText(DateTime? time) =>
+      time == null ? 'Not timed' : clockTimeText(time);
+
+  /// Sets the start or the end by hand, to the minute. A time that cannot
+  /// be right is refused with the reason.
+  Future<void> _pickTime({required bool start}) async {
+    final current = start ? _set.startedAt : _set.endedAt;
+    final opensAt = current ?? _set.endedAt ?? widget.timeBase;
+    final messenger = ScaffoldMessenger.of(context);
+    final minutes = await showMmTimePicker(
+      context,
+      initialMinuteOfDay: opensAt.hour * 60 + opensAt.minute,
+      helpText: start ? 'Set started' : 'Set ended',
+    );
+    if (minutes == null || !mounted) return;
+    final base = widget.timeBase;
+    final picked = DateTime(
+      base.year,
+      base.month,
+      base.day,
+    ).add(Duration(minutes: minutes));
+    final changed = start
+        ? _set.copyWith(startedAt: () => picked)
+        : _set.copyWith(endedAt: () => picked);
+    final problem = widget.checkTimes(changed.startedAt, changed.endedAt);
+    if (problem != null) {
+      showMmSnackBar(messenger, problem.message);
+      return;
+    }
+    _change(changed);
   }
 
   @override
@@ -137,6 +174,23 @@ class SetEditorState extends State<SetEditor> {
             // Tapping the chosen one again clears it.
             onChanged: (chosen) =>
                 _change(_set.copyWith(rir: () => chosen.firstOrNull)),
+          ),
+          const SizedBox(height: 8),
+          MmListRow(
+            key: ValueKey('$prefix-start'),
+            dense: true,
+            title: 'Started',
+            subtitle: _timeText(_set.startedAt),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _pickTime(start: true),
+          ),
+          MmListRow(
+            key: ValueKey('$prefix-end'),
+            dense: true,
+            title: 'Ended',
+            subtitle: _timeText(_set.endedAt),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _pickTime(start: false),
           ),
           Align(
             alignment: Alignment.centerRight,

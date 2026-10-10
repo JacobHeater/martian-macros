@@ -12,6 +12,8 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/show_mm_confirm.dart';
 import 'exercise_picker_screen.dart';
+import 'set_timer_bar.dart';
+import 'workout_clock_card.dart';
 import 'workout_controller_provider.dart';
 import 'workout_exercise_card.dart';
 
@@ -62,6 +64,9 @@ class WorkoutScreen extends ConsumerWidget {
           ),
         ],
       ),
+      bottomNavigationBar: workout.inProgress
+          ? SetTimerBar(workout: workout)
+          : null,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
@@ -70,6 +75,8 @@ class WorkoutScreen extends ConsumerWidget {
             key: const ValueKey('workout-summary'),
             style: text.bodyMedium?.copyWith(color: context.mm.text2),
           ),
+          const SizedBox(height: 12),
+          WorkoutClockCard(workout: workout),
           const SizedBox(height: 12),
           if (workout.exercises.isEmpty)
             Padding(
