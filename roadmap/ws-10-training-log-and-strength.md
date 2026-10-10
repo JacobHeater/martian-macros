@@ -96,7 +96,9 @@ workstream to hand to a separate contributor, because nearly every file it
 creates is new.
 
 ## Requirement sources
-- Remaining: MM-76, MM-75, MM-191, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
+- Built: MM-76 (the library, its search, the picker and the user's own exercises), MM-75 (workouts set by set, the Train
+  destination, schema 25).
+- Remaining: MM-191, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do
@@ -105,8 +107,9 @@ creates is new.
   Connect can name some exercises inside a workout; HealthKit names only the kind of workout, so iOS is session-level. The
   mappings come from the spike MM-188 (WS-11 step 8) and are never written from memory. The library
   (`builtInExercises` in `mm_domain`) carries them; a test holds its Health Connect identifiers to MM-188's table.
-- **MM-76 is part built**: the model, the 164-exercise library and the search exist as pure code. The picker screen and the table
-  for a user's own exercises come with MM-75, so the training tables are one schema change.
+- **Where the training code is**: the model and library in `packages/domain/lib/src/training/`; `searchExercises`,
+  `previousSetsOf` and `recentExerciseIds` in the engine; the screens in `apps/mobile/lib/src/train/`. A set editor keeps its own
+  state while open, so two quick taps cannot lose the first to a save that has not come back.
 - Load is entered in the user's weight unit and stored in kilograms, like
   every other quantity. Bodyweight exercises record added load, which may be
   zero or negative.

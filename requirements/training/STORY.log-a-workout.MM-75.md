@@ -1,6 +1,6 @@
 ---
 id: MM-75
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68, MM-189, MM-191]
 ---
@@ -21,7 +21,7 @@ Choices I made without asking (say if any is wrong):
 - **Load is in the user's weight unit**, stored in kilograms. Bodyweight exercises record added load (which may be zero or negative for
   assisted work).
 - **A workout can be started empty or from a previous workout.** Saved routines come later.
-- **A fourth tab, "Train"**, joins Today, Progress and Coach.
+- **A "Train" destination** joins the others, between Food and Progress (five in all, since the Dashboard was added).
 - **A session imported from a health platform** (MM-68) appears as a workout with duration only; the user can add sets to it.
 
 ## Description
@@ -61,11 +61,31 @@ Built (2026-10-10), storage only:
   all data empties them.
 - `previousSetsOf` ("last time") and `recentExerciseIds` as pure functions.
 
-Not built yet: the Train destination and every screen. Nothing is visible in the app.
+The screens:
+- **Train** is the third of five destinations. It offers "Start workout" and, once there is one, "Repeat last workout" (the same
+  exercises, no sets); while a workout is in progress it offers only "Continue". Finished workouts are listed and reopen for
+  correction.
+- **The workout screen**: each exercise is a card with last time's sets, today's sets as lines, and "Add set". Adding a set records
+  a copy of the previous one at once and opens its controls: reps and load, each typed or stepped with large buttons (5 lb or
+  2.5 kg), and reps in reserve. Every change is saved as it is made.
+- A new set's fields start empty when there is nothing to copy. "Finish workout" is available once a set has reps. An empty workout is deleted from the top bar.
+
+Not built:
+- Changing a finished workout's date or times.
+- A workout imported from a health platform (MM-68) has no way in yet; health sync does not exist.
+- Reordering exercises.
+
+Checked by tests, by the screenshots generated on Linux in all three themes, and on the Android emulator (the isolated demo app,
+Martian theme): the Train tab, starting a workout, adding an exercise, adding a set and typing reps with the phone's keyboard.
+Not seen there: finishing, reopening, repeating a workout, the light and dark themes.
 
 Choices made while building (say if any is wrong):
 - The same exercise can appear twice in one workout, as two entries.
 - "Last time" is the most recent earlier workout in which the exercise has at least one set.
+- The first set of an exercise starts as a copy of last time's first set. Reps in reserve are never copied: they are a judgment
+  of one set.
+- For a bodyweight exercise the load is the weight added, stepped below zero for assisted work and shown as "assisted".
+- Only one workout is in progress at a time.
 - A workout an exercise was deleted from keeps the sets of its other exercises; deleting one of the user's own exercises does not
   delete sets logged against it.
 

@@ -158,6 +158,52 @@ void main() {
     return repos;
   }
 
+  /// Two finished workouts and one in progress, so the Train screens have
+  /// something to show (MM-75).
+  Future<void> addTraining(
+    InMemoryRepositories repos, {
+    bool inProgress = false,
+  }) async {
+    // Loads a lifter would use, in the fixture's own unit.
+    final imperial =
+        (await repos.setup.loadSetup())!.unitSystem == UnitSystem.imperial;
+    final squat = imperial ? Units.lbToKg(225) : 100.0;
+    final deadlift = imperial ? Units.lbToKg(185) : 80.0;
+    Workout workout(int daysAgo, {bool finished = true}) {
+      final startedAt = DateTime(
+        today.year,
+        today.month,
+        today.day,
+        18,
+      ).subtract(Duration(days: daysAgo));
+      return Workout(
+        id: 0,
+        date: today.addDays(-daysAgo),
+        startedAt: startedAt,
+        endedAt: finished ? startedAt.add(const Duration(minutes: 52)) : null,
+        exercises: [
+          WorkoutExercise(
+            exerciseId: 'back-squat',
+            sets: [
+              WorkoutSet(reps: 8, loadKg: squat, rir: 2),
+              if (finished) WorkoutSet(reps: 7, loadKg: squat, rir: 1),
+            ],
+          ),
+          WorkoutExercise(
+            exerciseId: 'romanian-deadlift',
+            sets: [if (finished) WorkoutSet(reps: 10, loadKg: deadlift)],
+          ),
+        ],
+      );
+    }
+
+    await repos.workouts.saveWorkout(workout(5));
+    await repos.workouts.saveWorkout(workout(2));
+    if (inProgress) {
+      await repos.workouts.saveWorkout(workout(0, finished: false));
+    }
+  }
+
   /// Every test ends here, so the shadow flag is put back before the test
   /// framework checks that no debug flag was left changed.
   Future<void> shot(WidgetTester tester, String name) async {
@@ -189,6 +235,26 @@ void main() {
       await shot(tester, '${name}_martian');
     }, skip: !linux);
   }
+
+  testWidgets('train, martian', (tester) async {
+    final repos = await metricsFixture(dark: false);
+    await repos.preferences.saveThemePreference(ThemePreference.martian);
+    await addTraining(repos);
+    await open(tester, repos, tab: 'Train');
+    await shot(tester, 'train_martian');
+  }, skip: !linux);
+
+  testWidgets('workout in progress, martian', (tester) async {
+    final repos = await metricsFixture(dark: false);
+    await repos.preferences.saveThemePreference(ThemePreference.martian);
+    await addTraining(repos, inProgress: true);
+    await open(tester, repos, tab: 'Train');
+    await tester.tap(find.byKey(const ValueKey('train-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('add-set-0')));
+    await tester.pumpAndSettle();
+    await shot(tester, 'workout_martian');
+  }, skip: !linux);
 
   for (final (section, title) in [
     ('nutrition', 'Nutrition history'),
@@ -312,6 +378,39 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
       await shot(tester, 'weight_event_entry_$mode');
+    }, skip: !linux);
+
+    testWidgets('train, $mode', (tester) async {
+      final repos = await seeded(dark: dark);
+      await addTraining(repos);
+      await open(tester, repos, tab: 'Train');
+      await shot(tester, 'train_$mode');
+    }, skip: !linux);
+
+    testWidgets('workout in progress, $mode', (tester) async {
+      final repos = await seeded(dark: dark);
+      await addTraining(repos, inProgress: true);
+      await open(tester, repos, tab: 'Train');
+      await tester.tap(find.byKey(const ValueKey('train-continue')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('add-set-0')));
+      await tester.pumpAndSettle();
+      await shot(tester, 'workout_$mode');
+    }, skip: !linux);
+
+    testWidgets('choosing an exercise, $mode', (tester) async {
+      final repos = await seeded(dark: dark);
+      await addTraining(repos, inProgress: true);
+      await open(tester, repos, tab: 'Train');
+      await tester.tap(find.byKey(const ValueKey('train-continue')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('workout-add-exercise')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('workout-add-exercise')));
+      await tester.pumpAndSettle();
+      await shot(tester, 'exercise_picker_$mode');
     }, skip: !linux);
 
     testWidgets('coach, $mode', (tester) async {

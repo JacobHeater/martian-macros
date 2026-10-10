@@ -5,6 +5,7 @@ import '../coach/coach_screen.dart';
 import '../progress/progress_screen.dart';
 import '../providers.dart';
 import '../settings/settings_screen.dart';
+import '../train/train_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../food/add_food_button.dart';
 import '../food/food_day_header.dart';
@@ -31,6 +32,7 @@ class HomeShellState extends ConsumerState<HomeShell>
       icon: Icons.restaurant_outlined,
       selectedIcon: Icons.restaurant,
     ),
+    MmNavDestination(label: 'Train', icon: Icons.fitness_center),
     MmNavDestination(label: 'Progress', icon: Icons.show_chart),
     MmNavDestination(
       label: 'Coach',
@@ -87,6 +89,7 @@ class HomeShellState extends ConsumerState<HomeShell>
           children: const [
             DashboardScreen(),
             FoodScreen(),
+            TrainScreen(),
             ProgressScreen(),
             CoachScreen(),
           ],
