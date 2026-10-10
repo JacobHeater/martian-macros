@@ -52,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 26;
+  static const currentSchemaVersion = 27;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -300,6 +300,21 @@ class AppDatabase extends _$AppDatabase {
       }
       if (!(await columnsOf('workouts')).contains('set_started_at_ms')) {
         await m.addColumn(workouts, workouts.setStartedAtMs);
+      }
+    },
+    // 26 to 27: pausing a workout's clock (MM-191).
+    26: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(workouts)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('paused_at_ms')) {
+        await m.addColumn(workouts, workouts.pausedAtMs);
+      }
+      if (!existing.contains('paused_for_ms')) {
+        await m.addColumn(workouts, workouts.pausedForMs);
       }
     },
   };
