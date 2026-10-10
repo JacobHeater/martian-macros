@@ -16,7 +16,11 @@ enum InsightRule {
   stall(InsightPriority.coaching, aboutWeight: true),
 
   /// The protein minimum is met on fewer than half of whole days (MM-121).
-  proteinShort(InsightPriority.pattern);
+  proteinShort(InsightPriority.pattern),
+
+  /// On days the protein minimum is missed, one meal has almost none
+  /// (MM-125). Advice about reaching the total, not about timing.
+  proteinByMeal(InsightPriority.education);
 
   const InsightRule(this.priority, {this.aboutWeight = false});
 
