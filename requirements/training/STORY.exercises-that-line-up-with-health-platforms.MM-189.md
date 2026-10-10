@@ -12,8 +12,8 @@ The user's phone already holds a health record (Health Connect on Android, Apple
 workouts into it. The product owner's direction: **training should sync with those systems, so workouts align mostly with what the
 platforms offer, with a fallback for the exercises they do not.**
 
-The platforms are uneven. Health Connect can name some exercises inside a workout. HealthKit names the kind of workout and not the
-exercises in it (MM-188 has the facts and what is still unconfirmed).
+The platforms are uneven. Health Connect can name 42 strength movements inside a workout. HealthKit names the kind of workout and not
+the exercises in it. MM-188 has the checked lists, the mapping, and what is still open.
 
 ## Decisions (made with the product owner)
 - **Align with the platforms where they have something**, and fall back where they do not.
@@ -38,6 +38,15 @@ Choices I made without asking (say if any is wrong):
 - **Writing workouts to a platform is a permission the user grants separately** from reading, and off until they do. Refusing it changes
   nothing in the app.
 - **Nothing here changes the expenditure estimate.** Platform workouts and their calories stay out of it (MM-66).
+
+What the spike (MM-188) settled:
+- **Sessions ship first, on both platforms**, through the `health` plugin, which reads and writes sessions and nothing finer.
+- **Segments on Android are a later, separate piece** in the app's own Android code, because the plugin does not expose them. A
+  segment is one set with its repetitions. Weight, set index and perceived exertion exist only in an alpha of the client library and
+  wait for a stable one. RIR is never written: the platform has no field for it.
+- **A segment needs a start and an end time**, which the workout log does not record per set. Writing segments needs that settled
+  first.
+- **The mapping table in MM-188 is the library's data** from its first version, so nothing has to be re-keyed when segments arrive.
 
 ## Description
 A mapping from each library exercise to a platform exercise type or none, and the import and export rules above. The mapping is data
@@ -78,7 +87,7 @@ Scenario: Writing is separate permission
 ```
 
 ## Notes
-- Depends on MM-188 for the platform lists, and on MM-67 for the health source seam, so the whole thing is built and tested against a
-  fake on Windows.
+- MM-188 (done) has the platform lists and the mapping. Depends on MM-67 for the health source seam, so the whole thing is built and
+  tested against a fake on Windows.
 - The training log's own list and muscle taxonomy (MM-76) are the app's; the mapping adds to them and never constrains them.
 - Not planned: reading a watch's heart-rate or calories for a workout.
