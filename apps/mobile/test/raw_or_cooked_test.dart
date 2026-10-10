@@ -104,6 +104,34 @@ void main() {
     expect(find.textContaining('365 kcal ·'), findsOneWidget);
   });
 
+  testWidgets('a cooked food can add its cooking oil as a second entry', (
+    tester,
+  ) async {
+    await pick(tester, 'white rice', 'White rice, cooked');
+    expect(find.text('Cooked with oil?'), findsOneWidget);
+    await tester.ensureVisible(find.text('1 tsp'));
+    await tester.tap(find.text('1 tsp'));
+    await tester.pump();
+    await tester.ensureVisible(find.byKey(const ValueKey('amount-log')));
+    await tester.tap(find.byKey(const ValueKey('amount-log')));
+    await tester.pumpAndSettle();
+    final entries = await readNow(
+      tester,
+      () => repos.food.watchFood(today).first,
+    );
+    expect(entries.map((e) => e.name), contains('Cooking oil'));
+    final oil = entries.singleWhere((e) => e.name == 'Cooking oil');
+    expect(oil.kcal, closeTo(40, 1));
+    expect(oil.fatG, 4.5);
+    expect(oil.meal, entries.first.meal);
+    expect(entries, hasLength(2));
+  });
+
+  testWidgets('no oil question for a raw or packaged food', (tester) async {
+    await pick(tester, 'banana', 'Banana');
+    expect(find.text('Cooked with oil?'), findsNothing);
+  });
+
   testWidgets('no switch for a serving, or for a food with one state', (
     tester,
   ) async {
