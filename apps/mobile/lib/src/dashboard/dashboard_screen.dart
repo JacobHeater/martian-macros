@@ -8,6 +8,7 @@ import '../app/home_tab_provider.dart';
 import '../coach/insight_card.dart';
 import '../coach/relief_offer_card.dart';
 import '../coach/under_eating_notice.dart';
+import '../charts/macro_split_chart.dart';
 import '../food/calorie_hero.dart';
 import '../food/selected_day_provider.dart';
 import '../food/targets_on.dart';
@@ -18,8 +19,12 @@ import '../providers.dart';
 import '../reminders/reminder_paused_notice.dart';
 import '../repository_role_providers.dart';
 import '../ui/macro_kind.dart';
+import '../ui/notice.dart';
+import '../ui/notice_kind.dart';
+import '../ui/info_card.dart';
 import 'coach_line_text.dart';
 import 'weight_card.dart';
+import 'dashboard_metrics.dart';
 
 /// How the user is doing today, with a way into each detail screen.
 class DashboardScreen extends ConsumerWidget {
@@ -27,12 +32,31 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final setup = ref.watch(setupProvider).value;
+    final setupState = ref.watch(setupProvider);
+    if (setupState.hasError) {
+      return const Notice(
+        kind: NoticeKind.caution,
+        text: 'Your profile could not be loaded. Reopen the app to retry.',
+      );
+    }
+    final setup = setupState.value;
     if (setup == null) return const SizedBox.shrink();
     final today = ref.watch(todayProvider);
-    final entries = ref.watch(foodForDayProvider(today)).value ?? const [];
-    final history = ref.watch(targetsHistoryProvider).value ?? const [];
-    final weights = ref.watch(weightsProvider).value ?? const [];
+    final foodState = ref.watch(foodForDayProvider(today));
+    final historyState = ref.watch(targetsHistoryProvider);
+    final weightsState = ref.watch(weightsProvider);
+    if ([foodState, historyState, weightsState].any((s) => s.hasError)) {
+      return const Notice(
+        kind: NoticeKind.caution,
+        text: 'Dashboard records could not be loaded. Reopen the app to retry.',
+      );
+    }
+    if ([foodState, historyState, weightsState].any((s) => s.isLoading)) {
+      return const Center(child: Text('Loading your Dashboard…'));
+    }
+    final entries = foodState.value!;
+    final history = historyState.value!;
+    final weights = weightsState.value!;
     final coach = ref.watch(coachProvider);
     final trend = coach?.trend ?? const [];
     final fmt = Fmt(setup.unitSystem);
@@ -53,6 +77,7 @@ class DashboardScreen extends ConsumerWidget {
         const ReminderPausedNotice(),
         const ReliefOfferCard(),
         CalorieHero(
+          compact: true,
           intake: intakeDayFrom(today, entries),
           targets: pause != null
               ? ref.watch(maintenanceGuideProvider)
@@ -62,7 +87,7 @@ class DashboardScreen extends ConsumerWidget {
                   targetsAllowed: targetsAllowed,
                 )?.targets,
           paused: pause != null,
-          macros: const [MacroKind.protein],
+          macros: MacroKind.values,
           status: pause != null
               ? 'Paused until ${Fmt.day(pause.to, today)}. Nothing is '
                     'counted against you.'
@@ -86,6 +111,10 @@ class DashboardScreen extends ConsumerWidget {
             open(HomeDestination.food);
           },
         ),
+        InfoCard(
+          title: 'Macronutrient split',
+          child: MacroSplitChart(intake: intakeDayFrom(today, entries)),
+        ),
         WeightCard(
           trend: trend,
           weighedInToday: weights.any((w) => w.date == today),
@@ -95,6 +124,7 @@ class DashboardScreen extends ConsumerWidget {
           onTap: () => open(HomeDestination.progress),
         ),
         const InsightCard(),
+        const DashboardMetrics(),
       ],
     );
   }

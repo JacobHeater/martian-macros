@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import '../charts/macro_split_chart.dart';
 import '../format/fmt.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
@@ -12,6 +13,7 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_surface.dart';
+import '../ui/info_card.dart';
 import 'calorie_hero.dart';
 import 'ask_low_day_complete.dart';
 import 'copy_entries.dart';
@@ -58,6 +60,10 @@ class FoodScreen extends ConsumerWidget {
           targets: paused ? guide : targets?.targets,
           paused: paused,
         ),
+        InfoCard(
+          title: 'Macronutrient split',
+          child: MacroSplitChart(intake: intakeDayFrom(day, entries)),
+        ),
         FiberLine(
           entries: entries,
           kcalTarget: targets?.targets.kcal,
@@ -94,15 +100,12 @@ class FoodScreen extends ConsumerWidget {
                   copyEntries(ref, entriesCopiedTo(day, yesterday)),
             ),
           ),
+        for (final meal in Meal.values)
         MmSurface(
+          key: ValueKey('meal-card-${meal.name}'),
           padded: false,
           clip: true,
-          child: Column(
-            children: [
-              for (final meal in Meal.values) ...[
-                if (meal != Meal.values.first)
-                  Divider(height: 1, color: context.mm.outline),
-                MealSection(
+          child: MealSection(
                   meal: meal,
                   day: day,
                   entries: [
@@ -110,9 +113,6 @@ class FoodScreen extends ConsumerWidget {
                       if (e.meal == meal) e,
                   ],
                 ),
-              ],
-            ],
-          ),
         ),
         if (entries.isNotEmpty) ...[
           const SizedBox(height: 12),

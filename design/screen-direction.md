@@ -43,8 +43,9 @@ action:** Log food. **Emphasis:** the horizon arc and "calories left".
      the app learns", chevron. It opens Coach. This replaces the standalone
      peach `Notice`: the state lives inside the surface it qualifies. When
      there is no status it simply is not there and the hero shortens.
-3. **Log surface** (one `surface`, 16 radius, 16 padding, rows hairline-divided):
-   four meal groups. Each group header is 48 dp: `label` meal name, `caption`
+3. **Meal surfaces** (MM-180 supersedes the single combined log): four
+   independently spaced `surface` cards, one for each meal, with entries
+   hairline-divided inside their meal. Each group header is 48 dp: `label` meal name, `caption`
    kcal subtotal in `text2`, and a 48 dp "+" icon button that opens the add sheet
    **preselected to that meal**. A meal with no entries shows only its header
    row, so the structure never jumps and every meal is an add target.
@@ -77,6 +78,11 @@ destinations at the same height.
 
 ### Both themes
 
+MM-179 adds a shared macronutrient-energy pie below the existing progress bars
+on Dashboard and Food. Named gram/percentage labels use the bars' semantic
+macro colors; the denominator is protein/carbs/fat energy, not total calories.
+No recorded macros means an explanatory empty state, never invented sectors.
+
 - Dark: canvas `#090D15`, hero on `surface` with limb glow, arc in near-white,
   FAB with halo. This is the signature look.
 - Light: cool-gray canvas, white hero with hairline and soft shadow, ink arc.
@@ -91,11 +97,18 @@ trophy near the hero, or let the status row grow into a stack of banners.
 
 ## Dashboard (when WS-03 lands it)
 
-Same hero grammar. Order per MM-98: intake with protein, then trend weight (one
+MM-176 supersedes the sparse, one-screen direction below: a compact intake
+summary (all macros except in Simple detail), weight snapshot, and scrollable
+7/30-day nutrition, measurement, coverage and coaching sections. Each chart
+has dates, units, series labels and explicit missing-data states. Recovery
+keeps five separate trends. The owner explicitly requests metrics-heavy
+density; equal-weight decoration and invented measurements remain prohibited.
+
+Previous direction per MM-98: intake with protein, then trend weight (one
 `figure`, a 30-day Ion line, the weigh-in action in place if none today), then a
 single coach line. First three groups fit without scrolling. Cards are stable
 when data is absent: the empty state keeps the layout. At most three direct
-actions. **Tone:** scannable, energetic only in the hero. **Never:** a KPI wall,
+actions. **Tone:** scannable, energetic only in the hero. **Never:** an unlabeled KPI wall,
 equal-weight cards, a second hero.
 
 ## Food logging flows
