@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
+import '../providers.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/horizon_arc.dart';
 import '../ui/macro_bar.dart';
@@ -13,7 +15,7 @@ import '../ui/status_row.dart';
 
 /// The hero of a day: calories as a horizon arc, what is left, the macros, and
 /// optionally one status line. Used by the dashboard and the Food screen.
-class CalorieHero extends StatelessWidget {
+class CalorieHero extends ConsumerWidget {
   const CalorieHero({
     required this.intake,
     required this.targets,
@@ -38,8 +40,13 @@ class CalorieHero extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
+    // Simple detail shows calories and protein only (MM-49).
+    final level = ref.watch(detailLevelProvider).value ?? DetailLevel.standard;
+    final macros = level.showsCarbsAndFat
+        ? this.macros
+        : [for (final m in this.macros) if (m == MacroKind.protein) m];
     final t = targets;
     final left = t == null ? null : t.kcal - intake.kcal;
     final over = left != null && left < 0;
