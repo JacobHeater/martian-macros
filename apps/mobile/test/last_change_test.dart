@@ -79,6 +79,8 @@ void main() {
     expect(find.textContaining('Calories 2,400 → 2,325'), findsOneWidget);
     expect(find.text('See why'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     expect(find.text('What changed'), findsOneWidget);
@@ -163,6 +165,8 @@ void main() {
       ),
       findsOneWidget,
     );
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     expect(
@@ -200,6 +204,8 @@ void main() {
       ),
     ]);
     await openCoach(tester);
+    await tester.ensureVisible(find.text('See why'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See why'));
     await tester.pumpAndSettle();
     expect(find.text('And −1 kcal from rounding and limits.'), findsOneWidget);

@@ -14,7 +14,9 @@ import '../ui/mm_status_chip.dart';
 import '../ui/status_row.dart';
 
 /// The hero of a day: calories as a horizon arc, what is left, the macros, and
-/// optionally one status line. Used by the dashboard and the Food screen.
+/// optionally one status line. The one calorie visual in the app (MM-187):
+/// the Dashboard, the Food screen and the Coach screen all use it, and the
+/// arc is always drawn.
 class CalorieHero extends ConsumerWidget {
   const CalorieHero({
     required this.intake,
@@ -25,7 +27,6 @@ class CalorieHero extends ConsumerWidget {
     this.confidence,
     this.onStatusTap,
     this.onTap,
-    this.compact = false,
     super.key,
   });
 
@@ -44,7 +45,6 @@ class CalorieHero extends ConsumerWidget {
   final String? confidence;
   final VoidCallback? onStatusTap;
   final VoidCallback? onTap;
-  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,32 +75,21 @@ class CalorieHero extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!compact)
-            HorizonArc(
-              progress: t == null || t.kcal <= 0
-                  ? 0
-                  : paused
-                  ? (intake.kcal / t.kcal).clamp(0.0, 1.0)
-                  : intake.kcal / t.kcal,
-              semanticsLabel: '$figure $caption',
-            ),
-          Text(
-            figure,
-            style: compact ? text.displaySmall : text.displayLarge,
-            textAlign: TextAlign.center,
+          HorizonArc(
+            progress: t == null || t.kcal <= 0
+                ? 0
+                : paused
+                ? (intake.kcal / t.kcal).clamp(0.0, 1.0)
+                : intake.kcal / t.kcal,
+            semanticsLabel: '$figure $caption',
           ),
+          Text(figure, style: text.displayLarge, textAlign: TextAlign.center),
           Text(
             caption,
             style: text.bodyMedium?.copyWith(color: context.mm.text2),
             textAlign: TextAlign.center,
           ),
-          if (compact && left != null)
-            Text(
-              '${Fmt.kcal(intake.kcal)} logged today',
-              style: text.labelMedium?.copyWith(color: context.mm.text2),
-              textAlign: TextAlign.center,
-            ),
-          SizedBox(height: compact ? 12 : 24),
+          const SizedBox(height: 24),
           for (final macro in macros) ...[
             MacroBar(
               macro: macro,
