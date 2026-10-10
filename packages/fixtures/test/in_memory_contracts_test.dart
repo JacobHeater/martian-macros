@@ -29,6 +29,7 @@ void main() {
     'In-memory',
     () => InMemoryRepositories().insightLog,
   );
+  pauseRepositoryContract('In-memory', () => InMemoryRepositories().pauses);
   intakeReaderContract('In-memory', () {
     final r = InMemoryRepositories();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);

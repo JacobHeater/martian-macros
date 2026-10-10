@@ -9,11 +9,18 @@ ActivityGap? openGap({
   required Iterable<WeightObservation> weights,
   required Iterable<IntakeDay> intake,
   required CalendarDate today,
+  Iterable<Pause> pauses = const [],
 }) {
-  final gaps = activityGaps(weights: weights, intake: intake, today: today);
+  final gaps = activityGaps(
+    weights: weights,
+    intake: intake,
+    today: today,
+    pauses: pauses,
+  );
   if (gaps.isEmpty) return null;
   final last = gaps.last;
   final activeToday =
+      pauses.any((p) => p.covers(today)) ||
       weights.any((w) => w.date == today) ||
       intake.any((d) => d.date == today && d.kcal > 0);
   return last.returnOn == today && !activeToday ? last : null;

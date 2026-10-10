@@ -64,6 +64,14 @@ final insightLogWriterProvider = Provider<InsightLogWriter>(
   (ref) => ref.watch(insightLogRepositoryProvider),
 );
 
+final pauseReaderProvider = Provider<PauseReader>(
+  (ref) => ref.watch(pauseRepositoryProvider),
+);
+
+final pauseWriterProvider = Provider<PauseWriter>(
+  (ref) => ref.watch(pauseRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );

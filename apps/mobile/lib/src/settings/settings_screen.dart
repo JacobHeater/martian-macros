@@ -9,6 +9,7 @@ import '../format/detail_level_label.dart';
 import '../format/theme_preference_label.dart';
 import '../format/training_status_label.dart';
 import '../gallery/gallery_screen.dart';
+import '../pause/pause_screen.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/group_header.dart';
@@ -174,6 +175,21 @@ class SettingsScreen extends ConsumerWidget {
                 onChanged: (on) => ref
                     .read(easyToMissWriterProvider)
                     .saveEasyToMissEnabled(on),
+              ),
+            ],
+          ),
+          const GroupHeader('Coaching'),
+          MmListGroup(
+            children: [
+              MmListRow(
+                key: const ValueKey('settings-pause'),
+                leadingIcon: Icons.pause_circle_outline,
+                title: 'Pause',
+                subtitle: 'For a holiday, an illness or an injury.',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const PauseScreen()),
+                ),
               ),
             ],
           ),

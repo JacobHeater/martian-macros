@@ -20,6 +20,7 @@ class CalorieHero extends ConsumerWidget {
     required this.intake,
     required this.targets,
     this.macros = MacroKind.values,
+    this.paused = false,
     this.status,
     this.confidence,
     this.onStatusTap,
@@ -29,6 +30,10 @@ class CalorieHero extends ConsumerWidget {
 
   final IntakeDay intake;
   final DailyTargets? targets;
+
+  /// During a pause [targets] are a guide (MM-148): the hero shows what was
+  /// logged beside it and never calls a day over.
+  final bool paused;
 
   /// Which macros to show; protein is always emphasized.
   final List<MacroKind> macros;
@@ -51,12 +56,14 @@ class CalorieHero extends ConsumerWidget {
               if (m == MacroKind.protein) m,
           ];
     final t = targets;
-    final left = t == null ? null : t.kcal - intake.kcal;
+    final left = t == null || paused ? null : t.kcal - intake.kcal;
     final over = left != null && left < 0;
     final figure = left == null
         ? Fmt.whole(intake.kcal)
         : Fmt.whole(over ? -left : left);
-    final caption = left == null
+    final caption = paused && t != null
+        ? 'kcal logged · paused, guide ${Fmt.whole(t.kcal)}'
+        : left == null
         ? 'kcal logged'
         : over
         ? 'kcal over ${Fmt.whole(t!.kcal)}'
@@ -67,7 +74,11 @@ class CalorieHero extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HorizonArc(
-            progress: t == null || t.kcal <= 0 ? 0 : intake.kcal / t.kcal,
+            progress: t == null || t.kcal <= 0
+                ? 0
+                : paused
+                ? (intake.kcal / t.kcal).clamp(0.0, 1.0)
+                : intake.kcal / t.kcal,
             semanticsLabel: '$figure $caption',
           ),
           Text(figure, style: text.displayLarge, textAlign: TextAlign.center),
