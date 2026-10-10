@@ -37,6 +37,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   var _scanning = false;
   var _estimating = false;
   var _myFoods = false;
+  String? _labelBarcode;
   CustomFood? _pickedCustom;
   final _name = TextEditingController();
   final _kcal = TextEditingController();
@@ -362,7 +363,13 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     }
     if (_myFoods) {
       return _sheet(
-        MyFoodsStep(onBack: () => setState(() => _myFoods = false)),
+        MyFoodsStep(
+          initialBarcode: _labelBarcode,
+          onBack: () => setState(() {
+            _myFoods = false;
+            _labelBarcode = null;
+          }),
+        ),
       );
     }
     if (_estimating) {
@@ -385,6 +392,11 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           onFoundCustom: (food) => setState(() {
             _scanning = false;
             _pickedCustom = food;
+          }),
+          onReadLabel: (gtin) => setState(() {
+            _scanning = false;
+            _myFoods = true;
+            _labelBarcode = gtin;
           }),
           onManual: () => setState(() => _scanning = false),
           onBack: () => setState(() => _scanning = false),

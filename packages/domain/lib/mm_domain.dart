@@ -32,6 +32,8 @@ export 'src/food/estimate/meal_kind.dart';
 export 'src/food/estimate/meal_size.dart';
 export 'src/food/hand/hand_model.dart';
 export 'src/food/hand/hand_size.dart';
+export 'src/food/label/label_reading.dart';
+export 'src/food/label/parse_nutrition_label.dart';
 export 'src/food/normalize_barcode.dart';
 export 'src/food/nutrition_per100g.dart';
 export 'src/food/nutrition_problem.dart';
