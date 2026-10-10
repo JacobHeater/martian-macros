@@ -130,6 +130,94 @@ void main() {
     });
   });
 
+  group('pausing the workout clock', () {
+    testWidgets('stops it, and resuming carries on from where it was', (
+      tester,
+    ) async {
+      await startSquats(tester);
+      await wait(tester, const Duration(minutes: 10));
+      await tap(tester, 'workout-pause');
+      expect(textOf(tester, 'workout-clock-state'), 'Paused');
+
+      await wait(tester, const Duration(minutes: 5));
+      expect(textOf(tester, 'workout-elapsed'), '10:00');
+
+      await tap(tester, 'workout-pause');
+      expect(textOf(tester, 'workout-clock-state'), 'Started 12:00 PM');
+      await wait(tester, const Duration(minutes: 2));
+      expect(textOf(tester, 'workout-elapsed'), '12:00');
+
+      final workout = (await stored(tester)).single;
+      expect(workout.paused, isFalse);
+      expect(workout.pausedFor, const Duration(minutes: 5));
+    });
+
+    testWidgets('holds the set timer, and drops a set being timed', (
+      tester,
+    ) async {
+      await startSquats(tester);
+      await tap(tester, 'set-timer-button');
+      await wait(tester, const Duration(seconds: 20));
+      await tap(tester, 'workout-pause');
+
+      expect(textOf(tester, 'set-timer-label'), 'Paused');
+      expect((await stored(tester)).single.setStartedAt, isNull);
+      final button = tester.widget<FilledButton>(
+        find.descendant(
+          of: find.byKey(const ValueKey('set-timer-button')),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(button.onPressed, isNull);
+    });
+
+    testWidgets('survives the app closing', (tester) async {
+      await startSquats(tester);
+      await wait(tester, const Duration(minutes: 10));
+      await tap(tester, 'workout-pause');
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+      clock.elapse(const Duration(hours: 1));
+      await openTrain(tester);
+      await tap(tester, 'train-continue');
+
+      expect(textOf(tester, 'workout-clock-state'), 'Paused');
+      expect(textOf(tester, 'workout-elapsed'), '10:00');
+    });
+
+    testWidgets('is left out of the length of a finished workout', (
+      tester,
+    ) async {
+      await startSquats(tester);
+      await tap(tester, 'add-set-0');
+      await tester.enterText(find.byKey(const ValueKey('set-0-0-reps')), '8');
+      await tester.pumpAndSettle();
+      await wait(tester, const Duration(minutes: 30));
+      await tap(tester, 'workout-pause');
+      await wait(tester, const Duration(minutes: 10));
+      // Finished while still paused: the pause ends with the workout.
+      await tester.dragUntilVisible(
+        find.byKey(const ValueKey('workout-finish')),
+        find.byType(ListView).last,
+        const Offset(0, -200),
+      );
+      await tester.pumpAndSettle();
+      await tap(tester, 'workout-finish');
+
+      final workout = (await stored(tester)).single;
+      expect(workout.paused, isFalse);
+      expect(workout.pausedFor, const Duration(minutes: 10));
+      expect(workout.endedAt, noon.add(const Duration(minutes: 40)));
+      expect(find.text('1 exercise · 1 set · 30 min'), findsOneWidget);
+
+      await tap(tester, 'workout-${workout.id}');
+      expect(textOf(tester, 'workout-elapsed'), '30:00');
+      expect(textOf(tester, 'workout-paused-for'), 'Paused for 10:00');
+      expect(find.byKey(const ValueKey('workout-pause')), findsNothing);
+    });
+  });
+
   group('a workout\'s times, by hand', () {
     testWidgets('the end can be changed', (tester) async {
       final id = await saveFinished(tester);

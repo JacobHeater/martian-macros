@@ -15,6 +15,7 @@ Timing also has its own use in the gym: knowing how long the rest was.
 ## Decisions (made with the product owner)
 - **A set's times can be entered by hand.**
 - **The app has timers**, since nothing else in it tracks time during a workout.
+- **The workout clock can be paused and resumed** (2026-10-10).
 - **A workout's own times can be set by hand** (its day, start and end), and time is something the user starts and stops and can
   see running, for workouts and rests, not only an elapsed figure worked out in the background (2026-10-10).
 
@@ -80,6 +81,9 @@ Built (2026-10-10), schema 26:
 - **The set and rest timer**, a bar at the bottom of a workout in progress. "Start set" starts timing; "Add set" on an exercise
   stops it and gives the set its start and end. From then the bar counts the rest, until the next set is started. "Cancel" stops
   a set timer without logging.
+- **Pause and resume** on the workout clock (schema 27). Time paused is left out of the workout's length; its start and end stay
+  what the wall clock said. Pausing holds the set timer and drops a set being timed. Finishing while paused ends the pause. A
+  finished workout says how long it was paused. Typed times that make the workout shorter than its pauses drop the pauses.
 - A set logged without the timer gets an end and no start. A set added to a finished workout gets neither.
 - **A set's start and end can be typed**, in its controls. An end not after its start, or a time outside the workout, is refused
   with the reason and the set keeps what it had.
@@ -87,12 +91,11 @@ Built (2026-10-10), schema 26:
 
 Not built:
 - A target rest per exercise and the countdown to it; the sound and vibration at its end.
-- Pausing a workout's clock: it runs from start to end. Changing the start or end by hand is the way to correct it.
 - Typed times are to the minute, not the second (the phone's own time picker). A timed set is to the second.
 - The check that sets of one workout do not overlap.
 - A workout that runs past midnight cannot have its end typed (it would be before its start).
 
 ## Notes
-- Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26.
+- Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27.
 - Time comes from the app's `Clock`, never the device directly (MM-190), so every scenario above is testable with a fixed clock.
 - Not planned: automatic rep counting, heart rate, or timing from a watch.

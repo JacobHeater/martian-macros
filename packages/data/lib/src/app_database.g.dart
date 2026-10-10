@@ -8937,6 +8937,29 @@ class $WorkoutsTable extends Workouts
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _pausedAtMsMeta = const VerificationMeta(
+    'pausedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> pausedAtMs = GeneratedColumn<int>(
+    'paused_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pausedForMsMeta = const VerificationMeta(
+    'pausedForMs',
+  );
+  @override
+  late final GeneratedColumn<int> pausedForMs = GeneratedColumn<int>(
+    'paused_for_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _setStartedAtMsMeta = const VerificationMeta(
     'setStartedAtMs',
   );
@@ -8954,6 +8977,8 @@ class $WorkoutsTable extends Workouts
     dateEpochDay,
     startedAtMs,
     endedAtMs,
+    pausedAtMs,
+    pausedForMs,
     setStartedAtMs,
   ];
   @override
@@ -8999,6 +9024,24 @@ class $WorkoutsTable extends Workouts
         endedAtMs.isAcceptableOrUnknown(data['ended_at_ms']!, _endedAtMsMeta),
       );
     }
+    if (data.containsKey('paused_at_ms')) {
+      context.handle(
+        _pausedAtMsMeta,
+        pausedAtMs.isAcceptableOrUnknown(
+          data['paused_at_ms']!,
+          _pausedAtMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('paused_for_ms')) {
+      context.handle(
+        _pausedForMsMeta,
+        pausedForMs.isAcceptableOrUnknown(
+          data['paused_for_ms']!,
+          _pausedForMsMeta,
+        ),
+      );
+    }
     if (data.containsKey('set_started_at_ms')) {
       context.handle(
         _setStartedAtMsMeta,
@@ -9033,6 +9076,14 @@ class $WorkoutsTable extends Workouts
         DriftSqlType.int,
         data['${effectivePrefix}ended_at_ms'],
       ),
+      pausedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}paused_at_ms'],
+      ),
+      pausedForMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}paused_for_ms'],
+      )!,
       setStartedAtMs: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}set_started_at_ms'],
@@ -9056,6 +9107,13 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
   /// Null while the workout is in progress.
   final int? endedAtMs;
 
+  /// When the clock was paused, while it is (MM-191).
+  final int? pausedAtMs;
+
+  /// How long the clock has been paused in all, in milliseconds, not
+  /// counting a pause still running.
+  final int pausedForMs;
+
   /// When the set timer was started, while a set is being timed (MM-191).
   final int? setStartedAtMs;
   const WorkoutRow({
@@ -9063,6 +9121,8 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
     required this.dateEpochDay,
     required this.startedAtMs,
     this.endedAtMs,
+    this.pausedAtMs,
+    required this.pausedForMs,
     this.setStartedAtMs,
   });
   @override
@@ -9074,6 +9134,10 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
     if (!nullToAbsent || endedAtMs != null) {
       map['ended_at_ms'] = Variable<int>(endedAtMs);
     }
+    if (!nullToAbsent || pausedAtMs != null) {
+      map['paused_at_ms'] = Variable<int>(pausedAtMs);
+    }
+    map['paused_for_ms'] = Variable<int>(pausedForMs);
     if (!nullToAbsent || setStartedAtMs != null) {
       map['set_started_at_ms'] = Variable<int>(setStartedAtMs);
     }
@@ -9088,6 +9152,10 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       endedAtMs: endedAtMs == null && nullToAbsent
           ? const Value.absent()
           : Value(endedAtMs),
+      pausedAtMs: pausedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pausedAtMs),
+      pausedForMs: Value(pausedForMs),
       setStartedAtMs: setStartedAtMs == null && nullToAbsent
           ? const Value.absent()
           : Value(setStartedAtMs),
@@ -9104,6 +9172,8 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       dateEpochDay: serializer.fromJson<int>(json['dateEpochDay']),
       startedAtMs: serializer.fromJson<int>(json['startedAtMs']),
       endedAtMs: serializer.fromJson<int?>(json['endedAtMs']),
+      pausedAtMs: serializer.fromJson<int?>(json['pausedAtMs']),
+      pausedForMs: serializer.fromJson<int>(json['pausedForMs']),
       setStartedAtMs: serializer.fromJson<int?>(json['setStartedAtMs']),
     );
   }
@@ -9115,6 +9185,8 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
       'dateEpochDay': serializer.toJson<int>(dateEpochDay),
       'startedAtMs': serializer.toJson<int>(startedAtMs),
       'endedAtMs': serializer.toJson<int?>(endedAtMs),
+      'pausedAtMs': serializer.toJson<int?>(pausedAtMs),
+      'pausedForMs': serializer.toJson<int>(pausedForMs),
       'setStartedAtMs': serializer.toJson<int?>(setStartedAtMs),
     };
   }
@@ -9124,12 +9196,16 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
     int? dateEpochDay,
     int? startedAtMs,
     Value<int?> endedAtMs = const Value.absent(),
+    Value<int?> pausedAtMs = const Value.absent(),
+    int? pausedForMs,
     Value<int?> setStartedAtMs = const Value.absent(),
   }) => WorkoutRow(
     id: id ?? this.id,
     dateEpochDay: dateEpochDay ?? this.dateEpochDay,
     startedAtMs: startedAtMs ?? this.startedAtMs,
     endedAtMs: endedAtMs.present ? endedAtMs.value : this.endedAtMs,
+    pausedAtMs: pausedAtMs.present ? pausedAtMs.value : this.pausedAtMs,
+    pausedForMs: pausedForMs ?? this.pausedForMs,
     setStartedAtMs: setStartedAtMs.present
         ? setStartedAtMs.value
         : this.setStartedAtMs,
@@ -9144,6 +9220,12 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           ? data.startedAtMs.value
           : this.startedAtMs,
       endedAtMs: data.endedAtMs.present ? data.endedAtMs.value : this.endedAtMs,
+      pausedAtMs: data.pausedAtMs.present
+          ? data.pausedAtMs.value
+          : this.pausedAtMs,
+      pausedForMs: data.pausedForMs.present
+          ? data.pausedForMs.value
+          : this.pausedForMs,
       setStartedAtMs: data.setStartedAtMs.present
           ? data.setStartedAtMs.value
           : this.setStartedAtMs,
@@ -9157,14 +9239,23 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           ..write('dateEpochDay: $dateEpochDay, ')
           ..write('startedAtMs: $startedAtMs, ')
           ..write('endedAtMs: $endedAtMs, ')
+          ..write('pausedAtMs: $pausedAtMs, ')
+          ..write('pausedForMs: $pausedForMs, ')
           ..write('setStartedAtMs: $setStartedAtMs')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, dateEpochDay, startedAtMs, endedAtMs, setStartedAtMs);
+  int get hashCode => Object.hash(
+    id,
+    dateEpochDay,
+    startedAtMs,
+    endedAtMs,
+    pausedAtMs,
+    pausedForMs,
+    setStartedAtMs,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9173,6 +9264,8 @@ class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
           other.dateEpochDay == this.dateEpochDay &&
           other.startedAtMs == this.startedAtMs &&
           other.endedAtMs == this.endedAtMs &&
+          other.pausedAtMs == this.pausedAtMs &&
+          other.pausedForMs == this.pausedForMs &&
           other.setStartedAtMs == this.setStartedAtMs);
 }
 
@@ -9181,12 +9274,16 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
   final Value<int> dateEpochDay;
   final Value<int> startedAtMs;
   final Value<int?> endedAtMs;
+  final Value<int?> pausedAtMs;
+  final Value<int> pausedForMs;
   final Value<int?> setStartedAtMs;
   const WorkoutsCompanion({
     this.id = const Value.absent(),
     this.dateEpochDay = const Value.absent(),
     this.startedAtMs = const Value.absent(),
     this.endedAtMs = const Value.absent(),
+    this.pausedAtMs = const Value.absent(),
+    this.pausedForMs = const Value.absent(),
     this.setStartedAtMs = const Value.absent(),
   });
   WorkoutsCompanion.insert({
@@ -9194,6 +9291,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     required int dateEpochDay,
     required int startedAtMs,
     this.endedAtMs = const Value.absent(),
+    this.pausedAtMs = const Value.absent(),
+    this.pausedForMs = const Value.absent(),
     this.setStartedAtMs = const Value.absent(),
   }) : dateEpochDay = Value(dateEpochDay),
        startedAtMs = Value(startedAtMs);
@@ -9202,6 +9301,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     Expression<int>? dateEpochDay,
     Expression<int>? startedAtMs,
     Expression<int>? endedAtMs,
+    Expression<int>? pausedAtMs,
+    Expression<int>? pausedForMs,
     Expression<int>? setStartedAtMs,
   }) {
     return RawValuesInsertable({
@@ -9209,6 +9310,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
       if (dateEpochDay != null) 'date_epoch_day': dateEpochDay,
       if (startedAtMs != null) 'started_at_ms': startedAtMs,
       if (endedAtMs != null) 'ended_at_ms': endedAtMs,
+      if (pausedAtMs != null) 'paused_at_ms': pausedAtMs,
+      if (pausedForMs != null) 'paused_for_ms': pausedForMs,
       if (setStartedAtMs != null) 'set_started_at_ms': setStartedAtMs,
     });
   }
@@ -9218,6 +9321,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     Value<int>? dateEpochDay,
     Value<int>? startedAtMs,
     Value<int?>? endedAtMs,
+    Value<int?>? pausedAtMs,
+    Value<int>? pausedForMs,
     Value<int?>? setStartedAtMs,
   }) {
     return WorkoutsCompanion(
@@ -9225,6 +9330,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
       dateEpochDay: dateEpochDay ?? this.dateEpochDay,
       startedAtMs: startedAtMs ?? this.startedAtMs,
       endedAtMs: endedAtMs ?? this.endedAtMs,
+      pausedAtMs: pausedAtMs ?? this.pausedAtMs,
+      pausedForMs: pausedForMs ?? this.pausedForMs,
       setStartedAtMs: setStartedAtMs ?? this.setStartedAtMs,
     );
   }
@@ -9244,6 +9351,12 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
     if (endedAtMs.present) {
       map['ended_at_ms'] = Variable<int>(endedAtMs.value);
     }
+    if (pausedAtMs.present) {
+      map['paused_at_ms'] = Variable<int>(pausedAtMs.value);
+    }
+    if (pausedForMs.present) {
+      map['paused_for_ms'] = Variable<int>(pausedForMs.value);
+    }
     if (setStartedAtMs.present) {
       map['set_started_at_ms'] = Variable<int>(setStartedAtMs.value);
     }
@@ -9257,6 +9370,8 @@ class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
           ..write('dateEpochDay: $dateEpochDay, ')
           ..write('startedAtMs: $startedAtMs, ')
           ..write('endedAtMs: $endedAtMs, ')
+          ..write('pausedAtMs: $pausedAtMs, ')
+          ..write('pausedForMs: $pausedForMs, ')
           ..write('setStartedAtMs: $setStartedAtMs')
           ..write(')'))
         .toString();
@@ -14912,6 +15027,8 @@ typedef $$WorkoutsTableCreateCompanionBuilder = WorkoutsCompanion Function({
   required int dateEpochDay,
   required int startedAtMs,
   Value<int?> endedAtMs,
+  Value<int?> pausedAtMs,
+  Value<int> pausedForMs,
   Value<int?> setStartedAtMs,
 });
 typedef $$WorkoutsTableUpdateCompanionBuilder = WorkoutsCompanion Function({
@@ -14919,6 +15036,8 @@ typedef $$WorkoutsTableUpdateCompanionBuilder = WorkoutsCompanion Function({
   Value<int> dateEpochDay,
   Value<int> startedAtMs,
   Value<int?> endedAtMs,
+  Value<int?> pausedAtMs,
+  Value<int> pausedForMs,
   Value<int?> setStartedAtMs,
 });
 
@@ -14948,6 +15067,16 @@ class $$WorkoutsTableFilterComposer
 
   ColumnFilters<int> get endedAtMs => $composableBuilder(
     column: $table.endedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pausedAtMs => $composableBuilder(
+    column: $table.pausedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pausedForMs => $composableBuilder(
+    column: $table.pausedForMs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14986,6 +15115,16 @@ class $$WorkoutsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get pausedAtMs => $composableBuilder(
+    column: $table.pausedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pausedForMs => $composableBuilder(
+    column: $table.pausedForMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get setStartedAtMs => $composableBuilder(
     column: $table.setStartedAtMs,
     builder: (column) => ColumnOrderings(column),
@@ -15016,6 +15155,16 @@ class $$WorkoutsTableAnnotationComposer
 
   GeneratedColumn<int> get endedAtMs =>
       $composableBuilder(column: $table.endedAtMs, builder: (column) => column);
+
+  GeneratedColumn<int> get pausedAtMs => $composableBuilder(
+    column: $table.pausedAtMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get pausedForMs => $composableBuilder(
+    column: $table.pausedForMs,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get setStartedAtMs => $composableBuilder(
     column: $table.setStartedAtMs,
@@ -15058,12 +15207,16 @@ class $$WorkoutsTableTableManager
                 Value<int> dateEpochDay = const Value.absent(),
                 Value<int> startedAtMs = const Value.absent(),
                 Value<int?> endedAtMs = const Value.absent(),
+                Value<int?> pausedAtMs = const Value.absent(),
+                Value<int> pausedForMs = const Value.absent(),
                 Value<int?> setStartedAtMs = const Value.absent(),
               }) => WorkoutsCompanion(
                 id: id,
                 dateEpochDay: dateEpochDay,
                 startedAtMs: startedAtMs,
                 endedAtMs: endedAtMs,
+                pausedAtMs: pausedAtMs,
+                pausedForMs: pausedForMs,
                 setStartedAtMs: setStartedAtMs,
               ),
           createCompanionCallback:
@@ -15072,12 +15225,16 @@ class $$WorkoutsTableTableManager
                 required int dateEpochDay,
                 required int startedAtMs,
                 Value<int?> endedAtMs = const Value.absent(),
+                Value<int?> pausedAtMs = const Value.absent(),
+                Value<int> pausedForMs = const Value.absent(),
                 Value<int?> setStartedAtMs = const Value.absent(),
               }) => WorkoutsCompanion.insert(
                 id: id,
                 dateEpochDay: dateEpochDay,
                 startedAtMs: startedAtMs,
                 endedAtMs: endedAtMs,
+                pausedAtMs: pausedAtMs,
+                pausedForMs: pausedForMs,
                 setStartedAtMs: setStartedAtMs,
               ),
           withReferenceMapper: (p0) => p0

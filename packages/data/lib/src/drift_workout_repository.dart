@@ -67,6 +67,8 @@ final class DriftWorkoutRepository implements WorkoutRepository {
           date: CalendarDate.fromEpochDay(row.dateEpochDay),
           startedAt: DateTime.fromMillisecondsSinceEpoch(row.startedAtMs),
           endedAt: _time(row.endedAtMs),
+          pausedAt: _time(row.pausedAtMs),
+          pausedFor: Duration(milliseconds: row.pausedForMs),
           setStartedAt: _time(row.setStartedAtMs),
           exercises: exercises[row.id] ?? const [],
         ),
@@ -79,6 +81,8 @@ final class DriftWorkoutRepository implements WorkoutRepository {
       dateEpochDay: Value(workout.date.epochDay),
       startedAtMs: Value(workout.startedAt.millisecondsSinceEpoch),
       endedAtMs: Value(workout.endedAt?.millisecondsSinceEpoch),
+      pausedAtMs: Value(workout.pausedAt?.millisecondsSinceEpoch),
+      pausedForMs: Value(workout.pausedFor.inMilliseconds),
       setStartedAtMs: Value(workout.setStartedAt?.millisecondsSinceEpoch),
     );
     final int id;
