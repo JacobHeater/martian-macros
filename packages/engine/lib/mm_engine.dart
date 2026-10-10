@@ -85,6 +85,7 @@ export 'src/report_target_change.dart';
 export 'src/resting_energy_equations.dart';
 export 'src/safety_body_fat.dart';
 export 'src/safety_bounds.dart';
+export 'src/search_exercises.dart';
 export 'src/select_insight.dart';
 export 'src/settling_shift.dart';
 export 'src/settling_window.dart';
