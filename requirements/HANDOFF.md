@@ -21,7 +21,7 @@ roadmap work is being started.
 
 **Database.** Schema version 23. Only one schema change may be in flight at a time (see `roadmap/README.md`).
 
-**Next ticket ID.** MM-183 (`mm req next` is the authority).
+**Next ticket ID.** MM-184 (`mm req next` is the authority).
 
 **What to build next.** The work follows `roadmap/`. WS-09 (coaching intelligence) is where the last two sessions worked. In it:
 - Buildable now: process rewards (MM-92) and the monthly report (MM-33). Rewards must count exactly what the adherence summary
@@ -88,10 +88,11 @@ private notes; they bind whoever picks up the work.
   Populated/empty/loading/error/narrow-screen tests cover the Dashboard.
   Seeded Dashboard summary, nutrition, measurements and coaching plus Food
   cards and the flat FAB were inspected on the Android emulator in both themes.
-  Linux screenshot regeneration and PR checks are still pending.
+  Linux screenshot regeneration passed; populated/scrolled Dashboard and
+  expanded/collapsed Food images were downloaded, inspected and committed.
+  PR checks remain the final delivery gate.
 - Draft PR #63 packages the complete original request and refinements.
-  Linux Update goldens run 38024455576 was dispatched; download/review/commit
-  its images before marking the PR ready.
+  Linux Update goldens run 38024455576 passed; its changed images are included.
 - MM-179 adds a shared macro-energy pie on Dashboard and Food alongside bars;
   MM-180 splits the food log into separate meal cards at the owner's request.
 - The owner refined MM-180: expanded-by-default independent accordions,
@@ -106,6 +107,10 @@ private notes; they bind whoever picks up the work.
   cases failed before the fix and now pass; identity/seeding are unchanged.
   Its updated device appearance has not yet been rechecked. No unrelated
   roadmap work is in scope.
+- Final Dart review found MM-183: Dashboard/Food could show ordinary targets
+  while pause history loaded or failed. Four regression cases failed before
+  adding explicit pause loading/error gates. Integrated `mm check` passed
+  afterward. Both review-discovered defects have tickets and regressions.
 
 ## Session 3: 2026-10-09 (late), Claude (Anthropic)
 
