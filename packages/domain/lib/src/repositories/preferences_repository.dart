@@ -4,6 +4,8 @@ import 'easy_to_miss_reader.dart';
 import 'easy_to_miss_writer.dart';
 import 'preferences_reader.dart';
 import 'preferences_writer.dart';
+import 'under_eating_notice_reader.dart';
+import 'under_eating_notice_writer.dart';
 
 /// Reads and writes display preferences. Not health data and not part of the
 /// profile: it exists before onboarding.
@@ -14,4 +16,6 @@ abstract interface class PreferencesRepository
         EasyToMissReader,
         EasyToMissWriter,
         DetailLevelReader,
-        DetailLevelWriter {}
+        DetailLevelWriter,
+        UnderEatingNoticeReader,
+        UnderEatingNoticeWriter {}

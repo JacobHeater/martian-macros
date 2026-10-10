@@ -21,7 +21,12 @@ class EasyToMissLineState extends ConsumerState<EasyToMissLine> {
       today: today,
       onboardedOn: setup.onboardedOn,
       preference: preference,
-      suppressed: setup.screening.eatingDisorderHistory,
+      // Not for someone with an eating-disorder history, or while their
+      // logged days sit far below the floor (MM-114): a prompt to find more
+      // calories to record is the wrong emphasis.
+      suppressed:
+          setup.screening.eatingDisorderHistory ||
+          ref.watch(underEatingFindingProvider) != null,
     );
     if (visible && !_recorded && preference.lastShown != today) {
       _recorded = true;

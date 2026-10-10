@@ -36,6 +36,15 @@ void preferencesRepositoryContract(
       expect(await repo.watchDetailLevel().first, DetailLevel.full);
     });
 
+    test('the under-eating notice is undismissed until dismissed', () async {
+      expect(await repo.watchUnderEatingDismissedOn().first, isNull);
+      final day = CalendarDate(2026, 10, 5);
+      await repo.saveUnderEatingDismissedOn(day);
+      await repo.saveDetailLevel(DetailLevel.full);
+      expect(await repo.watchUnderEatingDismissedOn().first, day);
+      expect(await repo.watchDetailLevel().first, DetailLevel.full);
+    });
+
     test('the easy-to-miss line is on and never shown until changed', () async {
       final p = await repo.watchEasyToMiss().first;
       expect(p.enabled, isTrue);
