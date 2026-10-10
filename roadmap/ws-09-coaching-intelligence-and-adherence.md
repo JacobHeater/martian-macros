@@ -141,8 +141,11 @@ independent of step 3.
   for an eating-disorder history awaits the wording review), MM-147 (gap
   detection, the welcome-back screen, the deficit-count restart and the
   starting estimate after a long gap; confidence after a short gap, the goal
-  re-confirmation and the chart are open).
-- Remaining: MM-141, MM-140, MM-148, MM-146, MM-116, MM-117, MM-133, MM-32,
+  re-confirmation and the chart are open), MM-140 (the stall diagnosis and its
+  card on the Coach screen; its options are text because the things they offer
+  are not built), MM-141 (the insight framework, rationing and five of the ten
+  rules, on the dashboard).
+- Remaining: MM-148, MM-146, MM-116, MM-117, MM-133, MM-32,
   MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
 
 ## Notes for whoever builds it
