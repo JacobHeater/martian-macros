@@ -168,6 +168,34 @@ void main() {
       expect(log.single.shownOn, today);
     });
 
+    testWidgets('Dismiss is never under the Add food button', (tester) async {
+      // Regression: right-aligned, Dismiss sat beneath the floating button
+      // and could not be tapped until the list was scrolled further.
+      await shortOnProtein();
+      await pumpApp(tester, repos, FixedClock(today));
+      final dismiss = find.byKey(const ValueKey('insight-dismiss'));
+      final addFood = find.text('Add food');
+      final list = find.byType(ListView).first;
+      // At every scroll position where Dismiss is on screen.
+      for (var step = 0; step < 12; step++) {
+        if (dismiss.evaluate().isNotEmpty) {
+          final button = tester.getRect(dismiss);
+          final fab = tester.getRect(addFood).inflate(8);
+          expect(
+            button.overlaps(fab),
+            isFalse,
+            reason: 'Dismiss at $button is under Add food at $fab',
+          );
+        }
+        await tester.drag(list, const Offset(0, -80));
+        await tester.pumpAndSettle();
+      }
+      expect(dismiss, findsOneWidget, reason: 'the card was reached');
+      await tester.tap(dismiss);
+      await tester.pumpAndSettle();
+      expect(card, findsNothing);
+    });
+
     testWidgets('dismissed, it does not come back ten days later', (
       tester,
     ) async {
