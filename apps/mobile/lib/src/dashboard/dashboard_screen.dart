@@ -24,6 +24,7 @@ import '../ui/notice_kind.dart';
 import '../ui/info_card.dart';
 import 'coach_line_text.dart';
 import 'process_card.dart';
+import 'report_ready_notice.dart';
 import 'weight_card.dart';
 import 'dashboard_metrics.dart';
 
@@ -87,6 +88,7 @@ class DashboardScreen extends ConsumerWidget {
         const UnderEatingNotice(),
         const ReminderPausedNotice(),
         const ReliefOfferCard(),
+        const ReportReadyNotice(),
         CalorieHero(
           intake: intakeDayFrom(today, entries),
           targets: pause != null
