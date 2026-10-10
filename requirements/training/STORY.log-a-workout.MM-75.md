@@ -2,7 +2,7 @@
 id: MM-75
 status: proposed
 component: training
-related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68]
+related: [MM-74, MM-76, MM-77, MM-28, MM-61, MM-68, MM-189]
 ---
 
 # Story: Log a workout, set by set

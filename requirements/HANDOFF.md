@@ -56,6 +56,10 @@ private notes; they bind whoever picks up the work.
   The rule in `AGENTS.md` still holds for any bug you do find: a `BUG` ticket and a regression test at once.
 - How the app looks matters as much as what it does. Look at new screens on the emulator before calling them done.
 - Say plainly what was and was not verified. Never report a check as passed that you did not run.
+- **Training syncs with the phone's health systems (MM-189, MM-188).** Workouts should line up with what Health Connect and
+  HealthKit offer, with a fallback for exercises they do not name. Each library exercise carries an optional platform mapping (none
+  is normal); the app is the system of record; iOS is session-level only. Mapping data must come from the spike MM-188, checked
+  against the platforms' own references, never from memory.
 - **The only calorie visual is the arc**, in `CalorieHero`, and it is the only one in the app (MM-187). No screen builds its own hero
   or draws the arc; `mm arch` enforces it. Trend charts over a range are a separate thing; the owner has not been asked whether
   the Dashboard's calorie history lines should be held to the same rule.
