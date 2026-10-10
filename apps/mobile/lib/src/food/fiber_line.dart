@@ -39,7 +39,7 @@ class FiberLine extends ConsumerWidget {
         : 'Fiber: ${Fmt.whole(day.totalG)} g · guide ${Fmt.whole(guide)} g';
     return Padding(
       key: const ValueKey('fiber-line'),
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
         line,
         style: Theme.of(context).textTheme.bodyMedium

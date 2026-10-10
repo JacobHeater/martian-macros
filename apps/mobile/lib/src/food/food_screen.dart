@@ -59,7 +59,7 @@ class FoodScreen extends ConsumerWidget {
         if (entries.any((e) => e.alcoholKcal > 0))
           Padding(
             key: const ValueKey('alcohol-line'),
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
               'Alcohol: '
               '${Fmt.whole(entries.fold<double>(0, (s, e) => s + e.alcoholKcal))}'
