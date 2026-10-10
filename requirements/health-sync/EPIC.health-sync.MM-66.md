@@ -2,7 +2,7 @@
 id: MM-66
 status: proposed
 component: health-sync
-related: [MM-67, MM-68, MM-69, MM-70, MM-71, MM-72, MM-73, MM-15, MM-14, MM-75]
+related: [MM-67, MM-68, MM-69, MM-70, MM-71, MM-72, MM-73, MM-15, MM-14, MM-75, MM-188, MM-189]
 ---
 
 # Epic: Health platform sync
@@ -14,7 +14,8 @@ important daily task (MM-16) happens by itself.
 Decisions made with the product owner:
 - **Read**: weight, body fat, lean mass, height, workouts (as sessions, for timing and duration), menstruation, and steps (for context
   only).
-- **Write**: nutrition, so the app is a good citizen of the user's health data.
+- **Write**: nutrition, so the app is a good citizen of the user's health data. Workouts too, aligned with what each platform can
+  name and falling back to a plain session where it cannot (MM-189; the owner's direction).
 - **Do not use wearable "active calories" in the expenditure estimate.** Their error is roughly 27% to over 90%, and the estimate does not
   need them.
 - **Development starts on Windows with Android**; HealthKit waits until work moves to the Mac.
