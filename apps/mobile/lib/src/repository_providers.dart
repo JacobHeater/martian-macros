@@ -55,6 +55,10 @@ final pauseRepositoryProvider = Provider<PauseRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).pauses,
 );
 
+final reminderRepositoryProvider = Provider<ReminderRepository>(
+  (ref) => ref.watch(_driftRepositoriesProvider).reminders,
+);
+
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).targets,
 );

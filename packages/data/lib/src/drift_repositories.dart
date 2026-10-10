@@ -10,6 +10,7 @@ import 'drift_insight_log_repository.dart';
 import 'drift_intake_reader.dart';
 import 'drift_pause_repository.dart';
 import 'drift_preferences_repository.dart';
+import 'drift_reminder_repository.dart';
 import 'drift_setup_repository.dart';
 import 'drift_targets_history_repository.dart';
 import 'drift_waist_repository.dart';
@@ -33,6 +34,7 @@ final class DriftRepositories {
       preferences = DriftPreferencesRepository(db),
       insightLog = DriftInsightLogRepository(db),
       pauses = DriftPauseRepository(db),
+      reminders = DriftReminderRepository(db),
       eraser = DriftDataEraser(db);
 
   final AppDatabase _db;
@@ -48,6 +50,7 @@ final class DriftRepositories {
   final PreferencesRepository preferences;
   final InsightLogRepository insightLog;
   final PauseRepository pauses;
+  final ReminderRepository reminders;
   final DataEraser eraser;
 
   /// Closes the underlying database.

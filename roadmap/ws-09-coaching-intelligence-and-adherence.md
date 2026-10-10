@@ -145,8 +145,10 @@ independent of step 3.
   card on the Coach screen; its options are text because the things they offer
   are not built), MM-141 (the insight framework, rationing and five of the ten
   rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
-  the estimator, the deficit count and the resume screen; reminders and streaks do not exist to be silenced).
-- Remaining: MM-146, MM-116, MM-117, MM-133, MM-32,
+  the estimator, the deficit count and the resume screen; streaks do not exist to be frozen), MM-146 (three local
+  reminders with their own times, the two-a-day cap, the quiet period and the stop after a week unanswered; not the
+  check-in or recovery ones, nor the onboarding offer; iOS untried).
+- Remaining: MM-116, MM-117, MM-133, MM-32,
   MM-92, MM-33, MM-125, MM-36. Epic: MM-145.
 
 ## Notes for whoever builds it

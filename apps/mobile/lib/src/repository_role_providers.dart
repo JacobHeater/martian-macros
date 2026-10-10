@@ -72,6 +72,14 @@ final pauseWriterProvider = Provider<PauseWriter>(
   (ref) => ref.watch(pauseRepositoryProvider),
 );
 
+final reminderReaderProvider = Provider<ReminderReader>(
+  (ref) => ref.watch(reminderRepositoryProvider),
+);
+
+final reminderWriterProvider = Provider<ReminderWriter>(
+  (ref) => ref.watch(reminderRepositoryProvider),
+);
+
 final preferencesWriterProvider = Provider<PreferencesWriter>(
   (ref) => ref.watch(preferencesRepositoryProvider),
 );
