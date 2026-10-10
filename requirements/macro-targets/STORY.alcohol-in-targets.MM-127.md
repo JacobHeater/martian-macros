@@ -1,6 +1,6 @@
 ---
 id: MM-127
-status: proposed
+status: in-progress
 component: macro-targets
 related: [MM-119, MM-38, MM-41, MM-49, MM-53, MM-92, MM-108, MM-124, MM-142]
 ---
@@ -64,3 +64,13 @@ Scenario: A day with none
 ## Notes
 - Priority: could-have; small, and it removes a daily irritation for a large share of users.
 - Drinks are among the items most often left out of a log (MM-152).
+
+## Progress
+Built: a day with any alcohol shows "Alcohol: N kcal" (7 kcal per gram) on the Food screen, at every detail level, and nothing when
+there is none; an optional "Alcohol g" field on typed entries (with "one standard drink is 14 g" beside it) is counted in the energy
+check, so 2 beers at 300 kcal, 26 g carbohydrate and 28 g alcohol no longer raise a mismatch warning; the alcohol is stored on the
+entry and is never turned into carbohydrate or fat; the targets are untouched and no text comments on drinking. Pack foods already
+carry their alcohol (MM-49). Tested in `alcohol_test.dart`.
+
+Not built: the field takes grams only (no "standard drinks" count), the line is on the Food screen only (not the Today dashboard),
+and the weight-jump explanation that may mention last night's alcohol belongs to MM-142.

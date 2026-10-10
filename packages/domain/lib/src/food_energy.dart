@@ -1,9 +1,10 @@
-/// Energy implied by macros (Atwater 4/4/9).
+/// Energy implied by macros (Atwater 4/4/9), plus alcohol at 7 kcal per gram.
 double atwaterKcal({
   required double proteinG,
   required double carbsG,
   required double fatG,
-}) => 4 * proteinG + 4 * carbsG + 9 * fatG;
+  double alcoholG = 0,
+}) => 4 * proteinG + 4 * carbsG + 9 * fatG + 7 * alcoholG;
 
 /// Whether stated energy is consistent with stated macros: within the
 /// larger of 15% or 20 kcal. Used to catch typos at entry time.
@@ -12,11 +13,13 @@ bool macrosMatchEnergy({
   required double proteinG,
   required double carbsG,
   required double fatG,
+  double alcoholG = 0,
 }) => energyAgreesWithMacros(
   kcal: kcal,
   proteinG: proteinG,
   carbsG: carbsG,
   fatG: fatG,
+  alcoholG: alcoholG,
 );
 
 /// The single energy rule (MM-53): energy within the larger of 15% or 20 kcal

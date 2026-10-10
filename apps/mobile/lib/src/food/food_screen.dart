@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
+import '../format/fmt.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../theme/mm_colors_context.dart';
@@ -49,6 +50,17 @@ class FoodScreen extends ConsumerWidget {
           intake: intakeDayFrom(day, entries),
           targets: targets?.targets,
         ),
+        if (entries.any((e) => e.alcoholKcal > 0))
+          Padding(
+            key: const ValueKey('alcohol-line'),
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'Alcohol: '
+              '${Fmt.whole(entries.fold<double>(0, (s, e) => s + e.alcoholKcal))}'
+              ' kcal',
+              style: text.bodyMedium?.copyWith(color: context.mm.text2),
+            ),
+          ),
         if (entries.isEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
