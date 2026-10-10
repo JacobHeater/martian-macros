@@ -110,6 +110,18 @@ void main() {
     expect(stats.coverage2Sigma, greaterThanOrEqualTo(0.85));
   });
 
+  // MM-173 (open): at 30% a day the unmarked-partial-day rule drops honest
+  // low days and the estimate drifts about 160 kcal high. Un-skip this with
+  // the change that fixes it.
+  test('stays unbiased when a noisy logger has days 30% apart (MM-173)', () {
+    final stats = monteCarlo(
+      makeUser: (seed) =>
+          SyntheticUser(seed: seed, baseTdeeKcal: 2800, entrySigma: 0.30),
+      loggedKcal: 2200,
+    );
+    expect(stats.bias.abs(), lessThan(100));
+  }, skip: 'MM-173: fails today, about 160 kcal high');
+
   test('expresses TDEE in logging units for a consistent under-reporter', () {
     final stats = monteCarlo(
       makeUser: (seed) => SyntheticUser(
