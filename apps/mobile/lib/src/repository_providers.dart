@@ -7,6 +7,7 @@ import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'demo/demo_configuration.dart';
+import 'integration_providers.dart';
 
 final demoConfiguration = DemoConfiguration(
   demoApp: const bool.fromEnvironment('MM_DEMO_APP'),
@@ -19,7 +20,7 @@ final demoConfiguration = DemoConfiguration(
 Future<void> prepareDemoRepositories(ProviderContainer container) async {
   if (!demoConfiguration.isDemo || !demoConfiguration.seed) return;
   final repositories = container.read(_driftRepositoriesProvider);
-  await DemoSeed(CalendarDate.fromDateTime(DateTime.now())).replace(
+  await DemoSeed(container.read(clockProvider).today()).replace(
     eraser: repositories.eraser,
     setup: repositories.setup,
     weights: repositories.weights,

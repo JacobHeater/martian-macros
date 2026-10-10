@@ -10,6 +10,7 @@ import '../format/portion_unit_label.dart';
 import '../format/quantity_source_label.dart';
 import '../format/quantity_text.dart';
 import '../food_packs/food_catalog_provider.dart';
+import '../integration_providers.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/day_stepper.dart';
@@ -108,7 +109,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     super.dispose();
   }
 
-  static Meal _defaultMeal() => switch (DateTime.now().hour) {
+  /// The meal a new entry starts in, by the time of day. It asks the app's
+  /// clock, never the device directly, so a test can fix the hour (MM-190).
+  Meal _defaultMeal() => switch (ref.read(clockProvider).now().hour) {
     < 11 => Meal.breakfast,
     < 15 => Meal.lunch,
     < 21 => Meal.dinner,
