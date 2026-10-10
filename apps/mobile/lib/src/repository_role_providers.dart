@@ -159,3 +159,19 @@ final targetsHistoryReaderProvider = Provider<TargetsHistoryReader>(
 final targetsHistoryWriterProvider = Provider<TargetsHistoryWriter>(
   (ref) => ref.watch(targetsHistoryRepositoryProvider),
 );
+
+final workoutReaderProvider = Provider<WorkoutReader>(
+  (ref) => ref.watch(workoutRepositoryProvider),
+);
+
+final workoutWriterProvider = Provider<WorkoutWriter>(
+  (ref) => ref.watch(workoutRepositoryProvider),
+);
+
+final customExerciseReaderProvider = Provider<CustomExerciseReader>(
+  (ref) => ref.watch(customExerciseRepositoryProvider),
+);
+
+final customExerciseWriterProvider = Provider<CustomExerciseWriter>(
+  (ref) => ref.watch(customExerciseRepositoryProvider),
+);
