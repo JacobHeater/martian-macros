@@ -69,6 +69,9 @@ void main() {
     await type(tester, 'food-kcal', '300');
     expect(find.textContaining('Double-check the label'), findsOneWidget);
     // 2 standard drinks: 28 g of alcohol is 196 kcal; 104 + 196 = 300.
+    await tester.ensureVisible(find.byKey(const ValueKey('food-add-alcohol')));
+    await tester.tap(find.byKey(const ValueKey('food-add-alcohol')));
+    await tester.pump();
     await type(tester, 'food-alcohol', '28');
     expect(find.textContaining('Double-check the label'), findsNothing);
     await type(tester, 'portion-quantity', '700');
