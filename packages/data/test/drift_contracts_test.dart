@@ -23,6 +23,7 @@ void main() {
   dayMarkRepositoryContract('Drift', () => open().dayMarks);
   targetsHistoryRepositoryContract('Drift', () => open().targets);
   insightLogRepositoryContract('Drift', () => open().insightLog);
+  pauseRepositoryContract('Drift', () => open().pauses);
   intakeReaderContract('Drift', () {
     final r = open();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);

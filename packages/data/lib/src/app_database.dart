@@ -7,6 +7,7 @@ import 'day_marks.dart';
 import 'food_entries.dart';
 import 'insight_log.dart';
 import 'migration_step.dart';
+import 'pauses.dart';
 import 'recipe_ingredients.dart';
 import 'schema_migration_exception.dart';
 import 'setups.dart';
@@ -31,6 +32,7 @@ part 'app_database.g.dart';
     CustomFoods,
     RecipeIngredients,
     InsightLog,
+    Pauses,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -38,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 19;
+  static const currentSchemaVersion = 20;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -217,6 +219,10 @@ class AppDatabase extends _$AppDatabase {
     // 18 to 19: the log of shown and dismissed insights (MM-141).
     18: (m) async {
       await m.createTable(insightLog);
+    },
+    // 19 to 20: pauses for travel, illness and injury (MM-148).
+    19: (m) async {
+      await m.createTable(pauses);
     },
   };
 

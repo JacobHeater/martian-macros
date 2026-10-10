@@ -12,6 +12,7 @@ import '../food/selected_day_provider.dart';
 import '../food/targets_on.dart';
 import '../format/fmt.dart';
 import '../format/coach_confidence_text.dart';
+import '../pause/pause_screen.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/macro_kind.dart';
@@ -33,6 +34,7 @@ class DashboardScreen extends ConsumerWidget {
     final coach = ref.watch(coachProvider);
     final trend = coach?.trend ?? const [];
     final fmt = Fmt(setup.unitSystem);
+    final pause = ref.watch(activePauseProvider);
     final targetsAllowed = CoachingPolicy.derive(
       profile: setup.profile,
       screening: setup.screening,
@@ -48,22 +50,33 @@ class DashboardScreen extends ConsumerWidget {
         const UnderEatingNotice(),
         CalorieHero(
           intake: intakeDayFrom(today, entries),
-          targets: targetsOn(
-            history,
-            today,
-            targetsAllowed: targetsAllowed,
-          )?.targets,
+          targets: pause != null
+              ? ref.watch(maintenanceGuideProvider)
+              : targetsOn(
+                  history,
+                  today,
+                  targetsAllowed: targetsAllowed,
+                )?.targets,
+          paused: pause != null,
           macros: const [MacroKind.protein],
-          status: coachLineText(
-            setup: setup,
-            history: history,
-            today: today,
-            confidence: coach?.confidence.level ?? ConfidenceLevel.learning,
-          ),
-          confidence: coach == null
+          status: pause != null
+              ? 'Paused until ${Fmt.day(pause.to, today)}. Nothing is '
+                    'counted against you.'
+              : coachLineText(
+                  setup: setup,
+                  history: history,
+                  today: today,
+                  confidence:
+                      coach?.confidence.level ?? ConfidenceLevel.learning,
+                ),
+          confidence: coach == null || pause != null
               ? null
               : confidenceLabel(coach.confidence.level),
-          onStatusTap: () => open(HomeDestination.coach),
+          onStatusTap: pause != null
+              ? () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const PauseScreen()),
+                )
+              : () => open(HomeDestination.coach),
           onTap: () {
             ref.read(selectedDayProvider.notifier).set(null);
             open(HomeDestination.food);

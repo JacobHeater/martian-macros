@@ -7,6 +7,7 @@ import 'in_memory_day_mark_repository.dart';
 import 'in_memory_food_repository.dart';
 import 'in_memory_insight_log_repository.dart';
 import 'in_memory_intake_reader.dart';
+import 'in_memory_pause_repository.dart';
 import 'in_memory_preferences_repository.dart';
 import 'in_memory_setup_repository.dart';
 import 'in_memory_targets_history_repository.dart';
@@ -29,6 +30,7 @@ final class InMemoryRepositories {
     final targets = InMemoryTargetsHistoryRepository();
     final preferences = InMemoryPreferencesRepository();
     final insightLog = InMemoryInsightLogRepository();
+    final pauses = InMemoryPauseRepository();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -41,6 +43,7 @@ final class InMemoryRepositories {
       targets: targets,
       preferences: preferences,
       insightLog: insightLog,
+      pauses: pauses,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -52,6 +55,7 @@ final class InMemoryRepositories {
         targets.clear,
         preferences.clear,
         insightLog.clear,
+        pauses.clear,
       ]),
     );
   }
@@ -68,6 +72,7 @@ final class InMemoryRepositories {
     required this.targets,
     required this.preferences,
     required this.insightLog,
+    required this.pauses,
     required this.eraser,
   });
 
@@ -82,6 +87,7 @@ final class InMemoryRepositories {
   final TargetsHistoryRepository targets;
   final PreferencesRepository preferences;
   final InsightLogRepository insightLog;
+  final PauseRepository pauses;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.

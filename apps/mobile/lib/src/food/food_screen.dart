@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../providers.dart';
@@ -41,6 +42,10 @@ class FoodScreen extends ConsumerWidget {
           today: ref.watch(todayProvider),
         ).targetsAllowed;
     final targets = targetsOn(history, day, targetsAllowed: targetsAllowed);
+    // On a paused day the targets are a maintenance guide (MM-148).
+    final paused =
+        pauseOn(ref.watch(pausesProvider).value ?? const [], day) != null;
+    final guide = paused ? ref.watch(maintenanceGuideProvider) : null;
     final completeness =
         ref.watch(completenessProvider(day)).value ?? DayCompleteness.unmarked;
     final text = Theme.of(context).textTheme;
@@ -50,7 +55,8 @@ class FoodScreen extends ConsumerWidget {
       children: [
         CalorieHero(
           intake: intakeDayFrom(day, entries),
-          targets: targets?.targets,
+          targets: paused ? guide : targets?.targets,
+          paused: paused,
         ),
         FiberLine(
           entries: entries,

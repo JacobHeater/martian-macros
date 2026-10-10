@@ -7559,6 +7559,327 @@ class InsightLogCompanion extends UpdateCompanion<InsightLogRow> {
   }
 }
 
+class $PausesTable extends Pauses with TableInfo<$PausesTable, PauseRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PausesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _fromEpochDayMeta = const VerificationMeta(
+    'fromEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> fromEpochDay = GeneratedColumn<int>(
+    'from_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _toEpochDayMeta = const VerificationMeta(
+    'toEpochDay',
+  );
+  @override
+  late final GeneratedColumn<int> toEpochDay = GeneratedColumn<int>(
+    'to_epoch_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<PauseReason, String> reason =
+      GeneratedColumn<String>(
+        'reason',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<PauseReason>($PausesTable.$converterreason);
+  static const VerificationMeta _extendedMeta = const VerificationMeta(
+    'extended',
+  );
+  @override
+  late final GeneratedColumn<bool> extended = GeneratedColumn<bool>(
+    'extended',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("extended" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    fromEpochDay,
+    toEpochDay,
+    reason,
+    extended,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pauses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PauseRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('from_epoch_day')) {
+      context.handle(
+        _fromEpochDayMeta,
+        fromEpochDay.isAcceptableOrUnknown(
+          data['from_epoch_day']!,
+          _fromEpochDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('to_epoch_day')) {
+      context.handle(
+        _toEpochDayMeta,
+        toEpochDay.isAcceptableOrUnknown(
+          data['to_epoch_day']!,
+          _toEpochDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_toEpochDayMeta);
+    }
+    if (data.containsKey('extended')) {
+      context.handle(
+        _extendedMeta,
+        extended.isAcceptableOrUnknown(data['extended']!, _extendedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {fromEpochDay};
+  @override
+  PauseRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PauseRow(
+      fromEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}from_epoch_day'],
+      )!,
+      toEpochDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}to_epoch_day'],
+      )!,
+      reason: $PausesTable.$converterreason.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}reason'],
+        )!,
+      ),
+      extended: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}extended'],
+      )!,
+    );
+  }
+
+  @override
+  $PausesTable createAlias(String alias) {
+    return $PausesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<PauseReason, String, String> $converterreason =
+      const EnumNameConverter<PauseReason>(PauseReason.values);
+}
+
+class PauseRow extends DataClass implements Insertable<PauseRow> {
+  final int fromEpochDay;
+  final int toEpochDay;
+  final PauseReason reason;
+  final bool extended;
+  const PauseRow({
+    required this.fromEpochDay,
+    required this.toEpochDay,
+    required this.reason,
+    required this.extended,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['from_epoch_day'] = Variable<int>(fromEpochDay);
+    map['to_epoch_day'] = Variable<int>(toEpochDay);
+    {
+      map['reason'] = Variable<String>(
+        $PausesTable.$converterreason.toSql(reason),
+      );
+    }
+    map['extended'] = Variable<bool>(extended);
+    return map;
+  }
+
+  PausesCompanion toCompanion(bool nullToAbsent) {
+    return PausesCompanion(
+      fromEpochDay: Value(fromEpochDay),
+      toEpochDay: Value(toEpochDay),
+      reason: Value(reason),
+      extended: Value(extended),
+    );
+  }
+
+  factory PauseRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PauseRow(
+      fromEpochDay: serializer.fromJson<int>(json['fromEpochDay']),
+      toEpochDay: serializer.fromJson<int>(json['toEpochDay']),
+      reason: $PausesTable.$converterreason.fromJson(
+        serializer.fromJson<String>(json['reason']),
+      ),
+      extended: serializer.fromJson<bool>(json['extended']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'fromEpochDay': serializer.toJson<int>(fromEpochDay),
+      'toEpochDay': serializer.toJson<int>(toEpochDay),
+      'reason': serializer.toJson<String>(
+        $PausesTable.$converterreason.toJson(reason),
+      ),
+      'extended': serializer.toJson<bool>(extended),
+    };
+  }
+
+  PauseRow copyWith({
+    int? fromEpochDay,
+    int? toEpochDay,
+    PauseReason? reason,
+    bool? extended,
+  }) => PauseRow(
+    fromEpochDay: fromEpochDay ?? this.fromEpochDay,
+    toEpochDay: toEpochDay ?? this.toEpochDay,
+    reason: reason ?? this.reason,
+    extended: extended ?? this.extended,
+  );
+  PauseRow copyWithCompanion(PausesCompanion data) {
+    return PauseRow(
+      fromEpochDay: data.fromEpochDay.present
+          ? data.fromEpochDay.value
+          : this.fromEpochDay,
+      toEpochDay: data.toEpochDay.present
+          ? data.toEpochDay.value
+          : this.toEpochDay,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      extended: data.extended.present ? data.extended.value : this.extended,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PauseRow(')
+          ..write('fromEpochDay: $fromEpochDay, ')
+          ..write('toEpochDay: $toEpochDay, ')
+          ..write('reason: $reason, ')
+          ..write('extended: $extended')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(fromEpochDay, toEpochDay, reason, extended);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PauseRow &&
+          other.fromEpochDay == this.fromEpochDay &&
+          other.toEpochDay == this.toEpochDay &&
+          other.reason == this.reason &&
+          other.extended == this.extended);
+}
+
+class PausesCompanion extends UpdateCompanion<PauseRow> {
+  final Value<int> fromEpochDay;
+  final Value<int> toEpochDay;
+  final Value<PauseReason> reason;
+  final Value<bool> extended;
+  const PausesCompanion({
+    this.fromEpochDay = const Value.absent(),
+    this.toEpochDay = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.extended = const Value.absent(),
+  });
+  PausesCompanion.insert({
+    this.fromEpochDay = const Value.absent(),
+    required int toEpochDay,
+    required PauseReason reason,
+    this.extended = const Value.absent(),
+  }) : toEpochDay = Value(toEpochDay),
+       reason = Value(reason);
+  static Insertable<PauseRow> custom({
+    Expression<int>? fromEpochDay,
+    Expression<int>? toEpochDay,
+    Expression<String>? reason,
+    Expression<bool>? extended,
+  }) {
+    return RawValuesInsertable({
+      if (fromEpochDay != null) 'from_epoch_day': fromEpochDay,
+      if (toEpochDay != null) 'to_epoch_day': toEpochDay,
+      if (reason != null) 'reason': reason,
+      if (extended != null) 'extended': extended,
+    });
+  }
+
+  PausesCompanion copyWith({
+    Value<int>? fromEpochDay,
+    Value<int>? toEpochDay,
+    Value<PauseReason>? reason,
+    Value<bool>? extended,
+  }) {
+    return PausesCompanion(
+      fromEpochDay: fromEpochDay ?? this.fromEpochDay,
+      toEpochDay: toEpochDay ?? this.toEpochDay,
+      reason: reason ?? this.reason,
+      extended: extended ?? this.extended,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (fromEpochDay.present) {
+      map['from_epoch_day'] = Variable<int>(fromEpochDay.value);
+    }
+    if (toEpochDay.present) {
+      map['to_epoch_day'] = Variable<int>(toEpochDay.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(
+        $PausesTable.$converterreason.toSql(reason.value),
+      );
+    }
+    if (extended.present) {
+      map['extended'] = Variable<bool>(extended.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PausesCompanion(')
+          ..write('fromEpochDay: $fromEpochDay, ')
+          ..write('toEpochDay: $toEpochDay, ')
+          ..write('reason: $reason, ')
+          ..write('extended: $extended')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7576,6 +7897,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RecipeIngredientsTable recipeIngredients =
       $RecipeIngredientsTable(this);
   late final $InsightLogTable insightLog = $InsightLogTable(this);
+  late final $PausesTable pauses = $PausesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7592,6 +7914,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     customFoods,
     recipeIngredients,
     insightLog,
+    pauses,
   ];
 }
 
@@ -11186,6 +11509,187 @@ typedef $$InsightLogTableProcessedTableManager =
       InsightLogRow,
       PrefetchHooks Function()
     >;
+typedef $$PausesTableCreateCompanionBuilder = PausesCompanion Function({
+  Value<int> fromEpochDay,
+  required int toEpochDay,
+  required PauseReason reason,
+  Value<bool> extended,
+});
+typedef $$PausesTableUpdateCompanionBuilder = PausesCompanion Function({
+  Value<int> fromEpochDay,
+  Value<int> toEpochDay,
+  Value<PauseReason> reason,
+  Value<bool> extended,
+});
+
+class $$PausesTableFilterComposer
+    extends Composer<_$AppDatabase, $PausesTable> {
+  $$PausesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get fromEpochDay => $composableBuilder(
+    column: $table.fromEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get toEpochDay => $composableBuilder(
+    column: $table.toEpochDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<PauseReason, PauseReason, String> get reason =>
+      $composableBuilder(
+        column: $table.reason,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<bool> get extended => $composableBuilder(
+    column: $table.extended,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PausesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PausesTable> {
+  $$PausesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get fromEpochDay => $composableBuilder(
+    column: $table.fromEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get toEpochDay => $composableBuilder(
+    column: $table.toEpochDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get extended => $composableBuilder(
+    column: $table.extended,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PausesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PausesTable> {
+  $$PausesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get fromEpochDay => $composableBuilder(
+    column: $table.fromEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get toEpochDay => $composableBuilder(
+    column: $table.toEpochDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<PauseReason, String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<bool> get extended =>
+      $composableBuilder(column: $table.extended, builder: (column) => column);
+}
+
+class $$PausesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PausesTable,
+          PauseRow,
+          $$PausesTableFilterComposer,
+          $$PausesTableOrderingComposer,
+          $$PausesTableAnnotationComposer,
+          $$PausesTableCreateCompanionBuilder,
+          $$PausesTableUpdateCompanionBuilder,
+          (PauseRow, BaseReferences<_$AppDatabase, $PausesTable, PauseRow>),
+          PauseRow,
+          PrefetchHooks Function()
+        > {
+  $$PausesTableTableManager(_$AppDatabase db, $PausesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PausesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PausesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PausesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> fromEpochDay = const Value.absent(),
+                Value<int> toEpochDay = const Value.absent(),
+                Value<PauseReason> reason = const Value.absent(),
+                Value<bool> extended = const Value.absent(),
+              }) => PausesCompanion(
+                fromEpochDay: fromEpochDay,
+                toEpochDay: toEpochDay,
+                reason: reason,
+                extended: extended,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> fromEpochDay = const Value.absent(),
+                required int toEpochDay,
+                required PauseReason reason,
+                Value<bool> extended = const Value.absent(),
+              }) => PausesCompanion.insert(
+                fromEpochDay: fromEpochDay,
+                toEpochDay: toEpochDay,
+                reason: reason,
+                extended: extended,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PausesTable, PauseRow>(table),
+                  BaseReferences<_$AppDatabase, $PausesTable, PauseRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PausesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PausesTable,
+      PauseRow,
+      $$PausesTableFilterComposer,
+      $$PausesTableOrderingComposer,
+      $$PausesTableAnnotationComposer,
+      $$PausesTableCreateCompanionBuilder,
+      $$PausesTableUpdateCompanionBuilder,
+      (PauseRow, BaseReferences<_$AppDatabase, $PausesTable, PauseRow>),
+      PauseRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11212,4 +11716,6 @@ class $AppDatabaseManager {
       $$RecipeIngredientsTableTableManager(_db, _db.recipeIngredients);
   $$InsightLogTableTableManager get insightLog =>
       $$InsightLogTableTableManager(_db, _db.insightLog);
+  $$PausesTableTableManager get pauses =>
+      $$PausesTableTableManager(_db, _db.pauses);
 }

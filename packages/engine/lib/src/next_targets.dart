@@ -8,7 +8,9 @@ import 'consecutive_deficit_weeks.dart';
 import 'daily_targets.dart';
 import 'explain_targets.dart';
 import 'explanation_trigger.dart';
+import 'latest_ended_pause.dart';
 import 'loss_safety_raise.dart';
+import 'pause_on.dart';
 import 'safety_body_fat.dart';
 import 'target_flag.dart';
 import 'target_inputs.dart';
@@ -25,11 +27,14 @@ import 'tdee_status.dart';
 /// - Otherwise at most every [checkInIntervalDays]. Adaptive changes wait
 ///   out the calibration period and a holding estimator; a raise for a
 ///   too-fast loss (MM-115) does not.
+/// - Never during a pause, and not at a weekly check-in until
+///   [checkInIntervalDays] after one ends (MM-148).
 TargetsRecord? nextTargets({
   required UserSetup setup,
   required CoachSnapshot snapshot,
   required List<TargetsRecord> history,
   required CalendarDate today,
+  List<Pause> pauses = const [],
 }) {
   if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return null;
 
@@ -102,6 +107,7 @@ TargetsRecord? nextTargets({
   }
 
   if (history.isEmpty) return build();
+  if (pauseOn(pauses, today) != null) return null;
   final last = history.last;
   // A goal change applies at once. Not when the last record already holds the
   // user at maintenance because their weight or health check rules out the
@@ -159,6 +165,10 @@ TargetsRecord? nextTargets({
   }
 
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return null;
+  final ended = latestEndedPause(pauses, today);
+  if (ended != null && ended.resumesOn.daysUntil(today) < checkInIntervalDays) {
+    return null;
+  }
   // Losing faster than the safe pace is not noise, so this runs through
   // calibration and while the estimate is held.
   final raise = lossSafetyRaiseKcal(
