@@ -2,7 +2,7 @@
 id: MM-74
 status: proposed
 component: training
-related: [MM-75, MM-76, MM-77, MM-78, MM-79, MM-22, MM-32, MM-28, MM-68]
+related: [MM-75, MM-76, MM-77, MM-78, MM-79, MM-22, MM-32, MM-28, MM-68, MM-189, MM-191]
 ---
 
 # Epic: Training log

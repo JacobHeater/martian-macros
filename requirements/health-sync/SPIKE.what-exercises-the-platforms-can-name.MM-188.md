@@ -2,7 +2,7 @@
 id: MM-188
 status: done
 component: health-sync
-related: [MM-66, MM-67, MM-68, MM-69, MM-75, MM-76, MM-189]
+related: [MM-66, MM-67, MM-68, MM-69, MM-75, MM-76, MM-189, MM-191]
 ---
 
 # Spike: Which exercises Health Connect and HealthKit can name, and what a workout can carry
@@ -88,8 +88,8 @@ existing segments when it attaches a route. On iOS it reads and writes `HKWorkou
   sync is done, and it is worth building only if question 3 comes back yes for import, or the owner wants export regardless.
 - **When segments are written: one segment per set, with its repetitions, and nothing else**, on library 1.1.0. Weight, set index and
   perceived exertion wait for a stable 1.2.0. RIR is never written; the platform has no field for it, and RPE is not the same thing.
-- **A segment needs a start and an end**, and the workout log (MM-75) does not time each set. So writing segments also needs either set
-  timestamps or an honest rule for spreading sets across the session. Open, and a reason on its own to ship sessions first.
+- **A segment needs a start and an end**, and the workout log (MM-75) does not time each set. Settled by the owner: a set's times can
+  be entered by hand, and the app has set and rest timers (MM-191). Times are never spread across the session or guessed.
 - **Session type**: the app writes `STRENGTH_TRAINING` on Android and `traditionalStrengthTraining` on iOS. It imports as a strength
   workout: `STRENGTH_TRAINING`, `WEIGHTLIFTING` and `CALISTHENICS` on Android; `traditionalStrengthTraining`,
   `functionalStrengthTraining` and `coreTraining` on iOS. Other types import as a workout with a duration and no exercises.
@@ -99,7 +99,7 @@ existing segments when it attaches a route. On iOS it reads and writes `HKWorkou
 ## The mapping
 Health Connect segment types a strength session accepts, with the identifier checked against connect-client 1.1.0, and the library
 movements that map to each. A variant maps to its movement's type (MM-189). Where the fit is a judgement and not a plain match, it says
-so, and the owner can strike it.
+so. The owner accepted the judgement rows for now (2026-10-10).
 
 | Segment type | Id | Library movements that map to it |
 |---|---|---|
@@ -164,7 +164,8 @@ Scenario: What is not available is said
 ## Notes
 - No code.
 - Still open, and needing a phone: questions 3 and 5. Neither blocks the exercise library (MM-76) or session sync.
-- The "judgement" rows are mine. Strike any that should use the fallback instead; the cost of a wrong one is a workout that reads
-  slightly off in another app, and the cost of striking one is that exercise missing from the platform's record.
+- The "judgement" rows are mine and the owner accepted them for now. If one is struck later it uses the fallback: the cost of a
+  wrong one is a workout that reads slightly off in another app, and of striking one, that exercise missing from the platform's
+  record.
 - The library version to pin when segment code is written: connect-client 1.1.0, unless 1.2.0 is stable by then. Re-check the three
   new fields against whatever is pinned.
