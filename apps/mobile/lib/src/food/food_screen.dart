@@ -17,6 +17,7 @@ import 'entries_copied_to.dart';
 import 'easy_to_miss_line.dart';
 import 'meal_section.dart';
 import 'selected_day_provider.dart';
+import 'fiber_line.dart';
 import 'targets_on.dart';
 
 /// The day's hero and its meals. The day header lives in the app bar.
@@ -49,6 +50,11 @@ class FoodScreen extends ConsumerWidget {
         CalorieHero(
           intake: intakeDayFrom(day, entries),
           targets: targets?.targets,
+        ),
+        FiberLine(
+          entries: entries,
+          kcalTarget: targets?.targets.kcal,
+          sex: setup?.profile.sex,
         ),
         if (entries.any((e) => e.alcoholKcal > 0))
           Padding(

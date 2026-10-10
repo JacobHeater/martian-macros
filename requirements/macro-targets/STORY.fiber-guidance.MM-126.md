@@ -1,6 +1,6 @@
 ---
 id: MM-126
-status: proposed
+status: in-progress
 component: macro-targets
 related: [MM-119, MM-49, MM-53, MM-55, MM-108, MM-141, MM-153]
 ---
@@ -72,3 +72,12 @@ Scenario: Standard detail
 ## Notes
 - Priority: could-have. Depends on the food database carrying fiber (MM-55) and the detail setting (MM-49).
 - Fiber counted at 2 kcal per gram in the energy check is already specified (MM-53).
+
+## Progress
+Built: `fiberGuideG` (14 g per 1,000 kcal of the calorie target, never below 25 g for men or 21 g for women) and `FiberDay`
+(the day's fiber from entries that carry a value, and the share of calories they cover) in the domain; a fiber line on the Food
+screen at Full detail only: "Fiber: 28 g · guide 34 g", or "Fiber: not enough data" when under 70% of the day's calories come
+from entries with fiber, never a total that treats missing as zero. Nothing else depends on fiber: no streak, no summary, no reward.
+Tested in `fiber_test.dart` and `detail_level_test.dart`.
+
+Not built: the insight rule (MM-141) and any fiber on the Today dashboard.
