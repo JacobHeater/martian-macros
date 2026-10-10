@@ -9,6 +9,8 @@ import '../../ui/mm_button.dart';
 import '../../ui/mm_button_kind.dart';
 import '../../ui/mm_text_field.dart';
 import '../../ui/mm_text_field_kind.dart';
+import '../../ui/notice.dart';
+import '../label/label_text_reader_provider.dart';
 import 'custom_food_form.dart';
 
 class CustomFoodFormState extends ConsumerState<CustomFoodForm> {
@@ -25,6 +27,7 @@ class CustomFoodFormState extends ConsumerState<CustomFoodForm> {
   void initState() {
     super.initState();
     final f = widget.food;
+    _barcode.text = widget.initialBarcode ?? '';
     if (f == null) return;
     _name.text = f.name;
     _serving.text = f.servingDescription;
@@ -59,6 +62,58 @@ class CustomFoodFormState extends ConsumerState<CustomFoodForm> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  /// What the last label read said, shown above the numbers.
+  String? _labelNote;
+  var _reading = false;
+
+  Future<void> _readLabel() async {
+    setState(() => _reading = true);
+    String? text;
+    try {
+      text = await ref.read(labelTextReaderProvider).readLabel();
+    } on Object {
+      text = null;
+      if (mounted) {
+        setState(
+          () => _labelNote =
+              'The camera could not be used. You can type the numbers instead.',
+        );
+      }
+    }
+    if (!mounted) return;
+    if (text == null) {
+      setState(() => _reading = false);
+      return;
+    }
+    final r = parseNutritionLabel(text);
+    setState(() {
+      _reading = false;
+      if (r.isEmpty) {
+        _labelNote =
+            'No Nutrition Facts panel was found. Try again with the label '
+            'flat and well lit, or type the numbers.';
+        return;
+      }
+      String n(double v) => quantityText(v);
+      if (r.servingText != null) _serving.text = r.servingText!;
+      if (r.servingGrams != null) _grams.text = n(r.servingGrams!);
+      if (r.kcal != null) _kcal.text = n(r.kcal!);
+      if (r.proteinG != null) _protein.text = n(r.proteinG!);
+      if (r.carbsG != null) _carbs.text = n(r.carbsG!);
+      if (r.fatG != null) _fat.text = n(r.fatG!);
+      final missing = [
+        if (r.kcal == null) 'calories',
+        if (r.proteinG == null) 'protein',
+        if (r.carbsG == null) 'carbohydrate',
+        if (r.fatG == null) 'fat',
+        if (r.servingGrams == null) 'serving weight',
+      ];
+      _labelNote =
+          'Read from the label. Check every number against the package'
+          '${missing.isEmpty ? '.' : ', and fill in ${missing.join(', ')}.'}';
+    });
   }
 
   double get _p => parseNumber(_protein.text) ?? 0;
@@ -147,6 +202,21 @@ class CustomFoodFormState extends ConsumerState<CustomFoodForm> {
           style: text.titleLarge,
         ),
         const SizedBox(height: 12),
+        if (widget.food == null) ...[
+          MmButton(
+            key: const ValueKey('custom-read-label'),
+            label: _reading ? 'Reading…' : 'Read the nutrition label',
+            kind: MmButtonKind.secondary,
+            icon: Icons.document_scanner_outlined,
+            expand: true,
+            onPressed: _reading ? null : _readLabel,
+          ),
+          if (_labelNote != null) ...[
+            const SizedBox(height: 8),
+            Notice(text: _labelNote!),
+          ],
+          const SizedBox(height: 12),
+        ],
         MmTextField(
           key: const ValueKey('custom-name'),
           controller: _name,

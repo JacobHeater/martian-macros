@@ -23,6 +23,8 @@ class BarcodeScanStepState extends ConsumerState<BarcodeScanStep> {
     super.dispose();
   }
 
+  String? _unknownGtin;
+
   Future<void> _lookup(ScannedBarcode scanned) async {
     final gtin = normalizeBarcode(
       scanned.digits,
@@ -49,11 +51,12 @@ class BarcodeScanStepState extends ConsumerState<BarcodeScanStep> {
     final food = catalog.byBarcode(gtin);
     if (!mounted) return;
     if (food == null) {
-      setState(
-        () => _message =
-            'This product is not in the food database on this phone. You can '
-            'enter it yourself.',
-      );
+      setState(() {
+        _unknownGtin = gtin;
+        _message =
+            'This product is not in the food database on this phone. You '
+            'can read its label or enter it yourself.';
+      });
       return;
     }
     widget.onFound(food);
@@ -111,6 +114,13 @@ class BarcodeScanStepState extends ConsumerState<BarcodeScanStep> {
           const SizedBox(height: 12),
           Notice(text: _message!),
           const SizedBox(height: 8),
+          if (_unknownGtin != null)
+            MmButton(
+              key: const ValueKey('barcode-read-label'),
+              label: 'Read the label',
+              expand: true,
+              onPressed: () => widget.onReadLabel(_unknownGtin!),
+            ),
           MmButton(
             label: 'Enter manually',
             kind: MmButtonKind.secondary,

@@ -8,10 +8,18 @@ import 'custom_food_form_state.dart';
 /// per serving (MM-45). Editing a saved food changes only the food, never
 /// entries already logged from it.
 class CustomFoodForm extends ConsumerStatefulWidget {
-  const CustomFoodForm({required this.onDone, this.food, super.key});
+  const CustomFoodForm({
+    required this.onDone,
+    this.food,
+    this.initialBarcode,
+    super.key,
+  });
 
   /// The food being edited, or null for a new one.
   final CustomFood? food;
+
+  /// A barcode to save the food against, from a scan that found nothing.
+  final String? initialBarcode;
 
   /// Called after saving or when the user backs out.
   final VoidCallback onDone;

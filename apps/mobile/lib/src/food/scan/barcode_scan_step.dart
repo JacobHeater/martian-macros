@@ -12,6 +12,7 @@ class BarcodeScanStep extends ConsumerStatefulWidget {
   const BarcodeScanStep({
     required this.onFound,
     required this.onFoundCustom,
+    required this.onReadLabel,
     required this.onManual,
     required this.onBack,
     super.key,
@@ -19,6 +20,10 @@ class BarcodeScanStep extends ConsumerStatefulWidget {
 
   final ValueChanged<CatalogFood> onFound;
   final ValueChanged<CustomFood> onFoundCustom;
+
+  /// A product the packs do not have: read its label, to be saved against
+  /// these digits (MM-44).
+  final ValueChanged<String> onReadLabel;
   final VoidCallback onManual;
   final VoidCallback onBack;
 

@@ -1,6 +1,6 @@
 ---
 id: MM-44
-status: proposed
+status: in-progress
 component: food-logging
 related: [MM-37, MM-38, MM-43, MM-45, MM-53]
 ---
@@ -46,3 +46,19 @@ Scenario: Remembered
 ## Notes
 - Open question: offering to contribute the food to Open Food Facts. Good citizenship, but it means a network call and an account or
   anonymous-contribution flow. Decide after the basic path works.
+
+## Progress
+Built: `parseNutritionLabel` (domain) reads the US Nutrition Facts layout from recognised text: serving size and its weight,
+calories (never "calories from fat"), total fat, total carbohydrate, protein, fiber and sodium; it tolerates line breaks between
+label and value and the letters o, l and | mistaken for digits, and leaves what it did not find empty. In the saved-food form,
+"Read the nutrition label" takes a photo (`image_picker`), reads it on the phone (`google_mlkit_text_recognition`, bundled model, no
+upload, the photo is not kept) and fills the form, then says to check every number and names what it did not find. The form's existing
+energy check flags calories that disagree with the macros (800 against 182 is flagged). When a scanned barcode is not in the packs,
+"Read the label" opens that form with the barcode already attached, so scanning it again finds the saved food (MM-45). Tests:
+`parse_nutrition_label_test.dart` and `label_read_test.dart` (clear label, misread digit, unreadable photo, cancelled camera, unknown
+barcode read and saved), with the camera and recogniser faked.
+
+Not built or not verified: the real camera and ML Kit have not been run on the emulator or a phone, so how well the parser copes with
+real photographs is unknown; panels whose labels and values sit in separate columns are not read; sugars and saturated fat are not
+read (a saved food has no place for them yet); unsure fields are not individually marked, only the calories-versus-macros check and
+the missing-fields note; the iOS build with ML Kit is untried; contributing to Open Food Facts is undecided.
