@@ -111,3 +111,10 @@ Not built: the adherence summary and insight about estimate-heavy weeks (MM-149,
 biased estimates (MM-30), reuse from recents with the estimate mark (the entry appears in recents like any other, as typed totals),
 and the Estimate-heavy day check. Before the coach has a maintenance estimate the sizes are not shown and the sheet says so. Not seen
 on the emulator.
+
+Simulator, checked: the adaptive loop absorbs both users the ticket asked for. The 25%-low logger was already covered (the estimate is
+exact in logging units). A logger whose estimates are unbiased but noisy is now tested in `tdee_estimator_test.dart` at 20% a day (a
+day of several estimated meals; each is 40% uncertain): no bias and honest uncertainty. **A finding:** at 30% a day the estimate drifts
+about 160 kcal high, because the unmarked-partial-day rule (MM-27: a day under 65% of the window's 75th-percentile intake is treated
+as partial) starts dropping honest low days. Days marked complete are always used, so marking days complete is the protection. Whether
+the rule should be softer for estimate-heavy logging is a decision for the owner; it is not changed here.
