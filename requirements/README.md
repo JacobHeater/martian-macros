@@ -6,6 +6,13 @@ and defines the stories, tasks, bugs, epics, etc., that
 are necessary to define the functionality of each of the
 components of Martian Macros (MM).
 
+## The handoff document
+
+[HANDOFF.md](HANDOFF.md) is not a ticket. It is the living summary every
+agent keeps of the three most recent sessions and the current state of the
+work (MM-174). It and this README are the only files allowed at the top of
+this folder.
+
 ## Folder Structure
 
 Each folder represents a component of Martian Macros. Inside each
