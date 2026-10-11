@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import '../format/fmt.dart';
+import '../format/imported_weigh_in_text.dart';
+import '../health/imported_weigh_ins_provider.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/info_card.dart';
@@ -51,6 +54,20 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
     for (final w in weights) {
       if (w.date == today) todays = w;
     }
+    // Today's weigh-in came from the health platform unless one was typed.
+    final typedToday = (ref.watch(typedWeightsProvider).value ?? const []).any(
+      (w) => w.date == today,
+    );
+    DayWeighIn? importedToday;
+    if (!typedToday) {
+      for (final weighIn
+          in ref.watch(importedWeighInsProvider).value ??
+              const <DayWeighIn>[]) {
+        if (CalendarDate.fromDateTime(weighIn.day) == today) {
+          importedToday = weighIn;
+        }
+      }
+    }
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -63,7 +80,10 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
           initial: todays == null
               ? null
               : fmt.weightFromKg(todays.weightKg).toStringAsFixed(1),
-          hint: 'First thing in the morning, after the bathroom.',
+          hint: importedToday == null
+              ? 'First thing in the morning, after the bathroom.'
+              : '${importedWeighInText(importedToday)} Type a value to use '
+                    'yours instead.',
           onSave: (value) => ref
               .read(weightWriterProvider)
               .saveWeight(today, fmt.weightToKg(value)),

@@ -5,7 +5,7 @@ import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import '../format/health_data_type_label.dart';
 import '../health/health_connection_provider.dart';
-import '../health/health_importer_provider.dart';
+import '../health/health_sync_provider.dart';
 import '../integration_providers.dart';
 import '../providers.dart';
 import '../ui/group_header.dart';
@@ -60,19 +60,12 @@ class HealthConnectSection extends ConsumerWidget {
 
     /// Reads every allowed kind. A platform that cannot be read just now
     /// leaves what is kept as it was, and says so.
-    Future<void> import(Set<HealthDataType> types) async {
-      final importer = ref.read(healthImporterProvider);
-      try {
-        for (final type in types) {
-          await importer.import(type);
-        }
-      } on HealthReadFailure {
+    Future<void> import() async {
+      if (!await ref.read(healthSyncProvider)()) {
         showMmSnackBar(
           messenger,
           'Health Connect could not be read just now. Nothing was changed.',
         );
-      } finally {
-        ref.invalidate(healthConnectionProvider);
       }
     }
 
@@ -82,7 +75,7 @@ class HealthConnectSection extends ConsumerWidget {
       });
       ref.invalidate(healthConnectionProvider);
       if (after.contains(type)) {
-        await import({type});
+        await import();
       } else {
         showMmSnackBar(
           messenger,
@@ -130,17 +123,18 @@ class HealthConnectSection extends ConsumerWidget {
               label: 'Read from Health Connect now',
               kind: MmButtonKind.secondary,
               expand: true,
-              onPressed: () => import(connection.permitted),
+              onPressed: import,
             ),
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Text(
             'The app only reads. Nothing is written to your health data, '
-            'and nothing read leaves this phone. Readings are kept here for '
-            'now; they are not yet used for your trend. To stop, take the '
-            'permission away in Health Connect: what was read is kept until '
-            'you erase your data.',
+            'and nothing read leaves this phone. One weigh-in counts for a '
+            'day: the first of the morning, or the middle of the day’s '
+            'readings. A value you type for a day is used instead. To stop, '
+            'take the permission away in Health Connect: what was read is '
+            'kept until you erase your data.',
             style: text.bodySmall,
           ),
         ),
