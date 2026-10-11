@@ -15,7 +15,8 @@ sound and are kept.
 implemented in `apps/mobile` yet. The diagnosis of the current UI was made from
 reading the code, not from screenshots. The palette was checked numerically
 (contrast, grayscale lightness, color-blind separation) but **has not been seen
-rendered on a device**. [palette-preview.html](palette-preview.html) is a
+rendered on a device**.
+[palette-preview.html](../requirements/ui-ux-assets/palette-preview.html) is a
 static rendering for judging it before anyone builds it.
 
 **MM-184 update:** Light and Dark are implemented, and the owner approved
@@ -70,7 +71,7 @@ without becoming a theme.
 | [anti-cruft-and-anti-slop.md](anti-cruft-and-anti-slop.md) | What is wrong today, hard limits, the review checklist |
 | [design-system-implementation.md](design-system-implementation.md) | Flutter: `ThemeData`, tokens, components, fonts, tests |
 | [design-map.json](design-map.json) | Machine-readable version of all of the above |
-| [palette-preview.html](palette-preview.html) | Rendered palette and Today mock in both themes (open in a browser) |
+| [palette-preview.html](../requirements/ui-ux-assets/palette-preview.html) | Rendered palette and Today mock in both themes (open in a browser). Kept with the requirements, like every HTML UI/UX asset (MM-210) |
 
 ## How agents should use it
 

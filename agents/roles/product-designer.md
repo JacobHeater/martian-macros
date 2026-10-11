@@ -9,6 +9,8 @@ actions. Review proposed Maurice placement, scale and expression without
 trivializing safety or crowding data. Existing design documents prohibit
 mascots: Maurice is a requested review concern, not an approved asset or change
 to that rule. Flag the conflict for the owner before any implementation.
+Maintain the HTML UI/UX assets and the design status each entry gives
+(`requirements/ui-ux-assets/README.md`, MM-210); never record approval the owner has not given.
 ## Existing implementation audit
 Audit implemented screens/components against the approved design system,
 visual hierarchy, interaction states, consistency and product identity, using
