@@ -71,10 +71,16 @@ On a Pixel 9 Pro XL (Android SDK 37), as the separate demo app, 2026-10-11:
 - **Health Connect on that phone held no readings of any kind**, so importing a real reading, its source name and its units has
   not been seen on a device. Nothing was written to find out.
 
+Built next (2026-10-11), on the rule of MM-71:
+- **Imported weight feeds everything that uses weigh-ins**: today's weigh-in, the trend, the coach. One weigh-in counts per day,
+  and a value the user types for a day is used instead, with the import kept.
+- **What is allowed is read when the app opens and whenever it comes back to the front**, and from Settings on request. If it
+  cannot be read, what was kept is still used. Screens reload only when an import changed something.
+- The weigh-in card says where today's weigh-in came from and that typing overrules it.
+
 Not built:
-- **Weight feeding the trend**, the typed value overruling it, and which reading counts for a day (MM-71). Readings are kept and
-  shown in Settings only; the group says so.
-- Importing when the app opens and keeping up to date (MM-72); reading back further than Health Connect's first month (MM-73).
+- Keeping up to date in the background (MM-72: Health Connect refuses reads off screen without a further permission); reading
+  back further than Health Connect's first month (MM-73).
 - The offer at the end of onboarding; the height suggestion; menstruation feeding the trend's noise; sessions in the training log.
 - The permission screen itself was not seen: permissions were granted over adb.
 - Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent

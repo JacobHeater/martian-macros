@@ -3,6 +3,8 @@
 /// platform, so it can be built and tested on any machine.
 library;
 
+export 'src/daily_weigh_ins.dart';
+export 'src/day_weigh_in.dart';
 export 'src/health_changes.dart';
 export 'src/health_data_type.dart';
 export 'src/health_import_result.dart';
@@ -13,3 +15,5 @@ export 'src/health_sample.dart';
 export 'src/health_sample_store.dart';
 export 'src/health_source.dart';
 export 'src/nutrition_record.dart';
+export 'src/primary_weight_source.dart';
+export 'src/weigh_in_basis.dart';
