@@ -108,7 +108,8 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   suite passed (519 passed, 56 skipped). `mm format --check`, `mm analyze`,
   `mm req`, `mm panel` and repository-wide `mm check` passed. No emulator or
   native screen-reader check was performed.
-- Changes remain uncommitted on `feature/mm205-expert-mobile-ux`.
+- Commit `2a04f86` is pushed on `feature/mm205-expert-mobile-ux`; draft PR #81
+  is open. Linux golden generation and GitHub CI are in progress.
 
 ## Session 12: 2026-10-11, Copilot (novice mobile-experience audit)
 
