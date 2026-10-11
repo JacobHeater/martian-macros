@@ -6,6 +6,10 @@ import 'nutrition_record.dart';
 /// A phone's health platform, as the app sees it (MM-67). Health Connect,
 /// HealthKit and the fake all sit behind this, and one test suite
 /// (`healthSourceContract`) holds each to the same behavior.
+///
+/// A source that cannot read the platform just now throws
+/// `HealthReadFailure` from [read] and [changesSince]. It never answers
+/// with nothing instead: nothing means there are no readings.
 abstract interface class HealthSource {
   /// The types this platform has on this device at all.
   Future<Set<HealthDataType>> available();
