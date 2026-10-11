@@ -17,6 +17,7 @@ List<Override> inMemoryOverrides(InMemoryRepositories repos) => [
   recoveryCheckInRepositoryProvider.overrideWithValue(repos.recovery),
   workoutRepositoryProvider.overrideWithValue(repos.workouts),
   customExerciseRepositoryProvider.overrideWithValue(repos.customExercises),
+  healthSampleStoreProvider.overrideWithValue(repos.healthSamples),
   dayMarkRepositoryProvider.overrideWithValue(repos.dayMarks),
   intakeReaderProvider.overrideWithValue(repos.intake),
   targetsHistoryRepositoryProvider.overrideWithValue(repos.targets),
