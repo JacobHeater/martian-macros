@@ -13,8 +13,9 @@ with this file. Any pull request of Session 13 still open: read
 `./mm ci check <pr>` and merge it when its check has passed on its head. The expert panel (#79) and `mm ci` (#82, MM-209,
 `agents/ci-monitoring.md`) are merged.
 
-**Database.** Schema 29 (imported health readings and import tokens,
-MM-67). Only one schema change in flight at a time.
+**Database.** Schema 30 (the readings a waist measurement was taken from,
+MM-155), on its pull request until merged; `main` is 29 until then. Only
+one schema change in flight at a time.
 
 **Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
 MM-209 is taken). `mm req next` is the authority.
@@ -22,10 +23,9 @@ MM-209 is taken). `mm req next` is the authority.
 **What to build next.**
 - Health Connect behind `HealthSource` (MM-68): MM-67 is done, so it has a
   store, an importer and a contract suite to pass on a device.
-- MM-155, the rest: three readings per waist entry with their middle value
-  stored, a quick single-reading entry, and a noise figure per user (schema
-  30); then the protocol drawing and the chart. The shared change function
-  (`waistChangeOf`) is built and used by MM-32, MM-133 and MM-140.
+- MM-155, the rest: the protocol drawing and the waist chart. The shared
+  change function, the three-reading entry and the per-user noise figure
+  are built.
 - Small leftovers: the recomp review in the monthly report (MM-33, MM-133);
   an editable rep range and load step (MM-79; needs a table); MM-191's
   sound, background signal and free-typed rest length.
@@ -103,6 +103,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   signal, recomp review and stall diagnosis use it; the waist card says
   down, up or no clear change since the start. Entries so far are taken as
   the middle of three readings, as the card has always asked.
+- MM-155, second part (schema 30): a waist entry of three readings, the
+  middle one stored and all three kept; one reading is a quick entry with
+  wider noise; from eight full entries the noise figure is the user's own
+  (`waistNoiseOf`). A new `WaistEntryCard` on Progress.
 
 ## Session 12: 2026-10-11, Claude (training and recomp)
 

@@ -6,8 +6,15 @@ abstract final class WaistRule {
   /// readings.
   static const medianOfThreeNoiseCm = 1.0;
 
-  /// The noise of an entry that is a single reading.
+  /// The noise of an entry that is a single reading, and what it is as a
+  /// multiple of the figure for the middle of three.
   static const singleReadingNoiseCm = 1.5;
+  static const singleReadingFactor = 1.5;
+
+  /// From this many entries with all three readings, the noise figure is
+  /// the user's own, and it is never taken to be under the floor.
+  static const personalAfter = 8;
+  static const personalFloorCm = 0.5;
 
   /// A difference between two measurements is noisier than either: it has
   /// to exceed the noise figure times this to be called a change.

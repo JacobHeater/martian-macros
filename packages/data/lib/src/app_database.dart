@@ -57,7 +57,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 29;
+  static const currentSchemaVersion = 30;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -339,6 +339,13 @@ class AppDatabase extends _$AppDatabase {
     28: (m) async {
       await m.createTable(importedSamples);
       await m.createTable(healthImportTokens);
+    },
+    // 29 to 30: the readings a waist measurement was taken from (MM-155).
+    // Measurements already stored keep none; none are invented.
+    29: (m) async {
+      await m.addColumn(waistEntries, waistEntries.reading1Cm);
+      await m.addColumn(waistEntries, waistEntries.reading2Cm);
+      await m.addColumn(waistEntries, waistEntries.reading3Cm);
     },
   };
 
