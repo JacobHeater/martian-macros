@@ -248,6 +248,17 @@ void main() {
     ThemePreference.dark,
     ThemePreference.martian,
   ]) {
+    testWidgets('weekly volume, ${palette.name}', (tester) async {
+      final repos = await metricsFixture(dark: false, strength: true);
+      await repos.preferences.saveThemePreference(palette);
+      await open(tester, repos, tab: 'Train');
+      await tester.ensureVisible(find.byKey(const ValueKey('train-volume')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('train-volume')));
+      await tester.pumpAndSettle();
+      await shot(tester, 'weekly_volume_${palette.name}');
+    }, skip: !linux);
+
     testWidgets('strength charts and history, ${palette.name}', (tester) async {
       final repos = await metricsFixture(dark: false, strength: true);
       await repos.preferences.saveThemePreference(palette);

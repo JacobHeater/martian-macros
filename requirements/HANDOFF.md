@@ -5,12 +5,11 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, finishing MM-77.
+Last updated: 2026-10-11, by Copilot, starting MM-78.
 
-**Branch state.** `feature/mm77-strength-trends`, PR #77, has completed
-MM-77 strength trends. Reviewed Linux goldens are being committed; merge once
-final CI is green. No other feature work is in flight. Martian #64 and
-training/timer work through #76 merged.
+**Branch state.** `feature/mm78-weekly-volume` deliberately builds on #77
+while its final CI runs. MM-78 implements rolling weekly muscle-group volume;
+no schema changes. Merge #77 when green, then target the volume PR at main.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
@@ -75,6 +74,17 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, UI design-system controls.
   Stateful screens have a separate `_state.dart` declaration.
 
+## Session 8: 2026-10-11, Copilot
+
+- Owner authorized pushing through the roadmap autonomously. Started MM-78
+  after MM-77 implementation, screenshots and full checks passed.
+- Weekly volume counts finished workouts in two adjacent rolling seven-day
+  windows; RIR 0–4/null, full primary and half secondary contributions.
+  Unknown/deleted exercise mappings are explicitly omitted, never guessed.
+  Train opens an eleven-group comparison with a broad 10–20 reference band.
+- Engine/mobile tests and full `mm check` pass. Linux golden generation and
+  headless emulator inspection are next; #77 Android CI build is running.
+
 ## Session 7: 2026-10-11, Copilot
 
 - Completed MM-77: per-session Epley e1RM, smoothed per-lift strength,
@@ -110,14 +120,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   seconds, cross-set overlap validation.
 - MM-92 process rewards and MM-33 monthly reports merged but wait on strength
   and personal records for remaining parts. Neither was emulator-inspected.
-
-## Session 5: 2026-10-10, Claude (Anthropic)
-
-- MM-187 made the horizon arc the only calorie visual. Dashboard, Food and
-  Coach share CalorieHero; no compact variant. Architecture blocks standalone
-  hero surfaces/arcs in screens. Updated tests/goldens after taller heroes.
-- Merged green Martian #64. MM-184 preserves legacy themes with schema 24,
-  new-install chooser and wrapping Settings. MM-185/186 cover delayed-save
-  preview and loading fallback races. Full checks and reviewed screenshots
-  passed; Dashboard/Food/Settings/chooser were seen on the isolated emulator
-  demo, never the normal app or physical phone.
