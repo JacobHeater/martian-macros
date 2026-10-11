@@ -307,6 +307,8 @@ final monthlyReportProvider = Provider.family<MonthlyReport?, int>((
     trend: ref.watch(coachProvider)?.trend ?? const [],
     workouts: ref.watch(workoutsProvider).value ?? const [],
     exercises: ref.watch(exercisesProvider),
+    // As the app would recommend today: body fat then is not kept.
+    recommendation: ref.watch(coachProvider)?.recommendation,
   );
 });
 

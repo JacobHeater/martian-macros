@@ -1,6 +1,6 @@
 ---
 id: MM-133
-status: in-progress
+status: done
 component: adaptive-coach
 related: [MM-12, MM-21, MM-22, MM-25, MM-26, MM-32, MM-36, MM-77, MM-132, MM-134, MM-140, MM-155]
 ---
@@ -96,8 +96,11 @@ set for the recomp signal (MM-32); say if any is wrong:
   still recomp, the review points at the training instead of another goal.
 - **A slow cut suggests fat loss only where a deficit is allowed.**
 
+- **In the monthly report** (2026-10-11): the report of the month a review fell due in shows it, as it stood on the last day of
+  that month it was on the Coach screen. A review carried over from the month before is not repeated. The next goal it names is
+  what the app would recommend today, since body fat on that day is not kept.
+
 Not built:
-- The review in the monthly report (MM-33).
 - A button that changes the goal from the card: the goal is changed in Settings, as now.
 - The shared "no clear change" with the stall diagnosis (MM-140) waits for MM-155.
 - Not seen on the emulator: the demo data is not twelve weeks on recomp.
