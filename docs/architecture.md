@@ -171,6 +171,10 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
   contributions from two adjacent rolling seven-day windows. Finished
   sessions only; missing exercise mappings are disclosed rather than guessed.
   Train exposes all muscle groups against a non-prescriptive reference band.
+  Typed set timing (MM-191, MM-196) is checked in the pure engine against
+  workout bounds and other logged sets across every exercise entry. Adjacent
+  sets are allowed; incomplete evidence never invents an interval. The editor
+  explains refused overlaps and leaves stored times unchanged.
 
 ## Code structure principles
 

@@ -14,6 +14,7 @@ export 'src/build_monthly_report.dart';
 export 'src/build_strength_trends.dart';
 export 'src/build_weekly_volume.dart';
 export 'src/calorie_band.dart';
+export 'src/check_set_times.dart';
 export 'src/check_time_span.dart';
 export 'src/coach_confidence.dart';
 export 'src/coach_constants.dart';
