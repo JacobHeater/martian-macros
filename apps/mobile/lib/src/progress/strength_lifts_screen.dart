@@ -30,7 +30,7 @@ class StrengthLiftsScreen extends ConsumerWidget {
                     const Text('No finished workouts yet.'),
                   for (final trend in state.requireValue)
                     MmListRow(
-                      title: trend.exercise.name,
+                      title: trend.name,
                       subtitle:
                           '${trend.loggedSessions} logged sessions · '
                           '${trend.points.length} qualifying',
@@ -38,7 +38,7 @@ class StrengthLiftsScreen extends ConsumerWidget {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => StrengthHistoryScreen(
-                            exerciseId: trend.exercise.id,
+                            exerciseId: trend.exerciseId,
                           ),
                         ),
                       ),

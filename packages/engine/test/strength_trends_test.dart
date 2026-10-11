@@ -40,6 +40,15 @@ void main() {
     today: today,
   );
 
+  test('MM-194 deleted exercise retains logged sessions without guessing resistance', () {
+    final result = build([
+      workout(1, 0, [set(100)], exerciseId: 'custom-deleted'),
+    ]);
+    expect(result, hasLength(1));
+    expect(result.single.loggedSessions, 1);
+    expect(result.single.points, isEmpty);
+  });
+
   group('Epley e1RM', () {
     test('5 at 100 with 2 RIR is 123.3 kg, missing RIR is conservative', () {
       expect(
@@ -235,7 +244,7 @@ void main() {
         ],
         weights: [WeightObservation(date: today.addDays(-1), weightKg: 80)],
       );
-      expect(result.map((r) => r.exercise.id), [bench.id, pullUp.id]);
+      expect(result.map((r) => r.exerciseId), [bench.id, pullUp.id]);
       expect(result.first.recentSessions, 2);
       expect(result.first.points.map((p) => p.workoutId), [5, 1, 3]);
       expect(result.first.points.last.date, result.first.points[1].date);

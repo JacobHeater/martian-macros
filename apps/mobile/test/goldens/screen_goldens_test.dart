@@ -252,7 +252,16 @@ void main() {
       final repos = await metricsFixture(dark: false, strength: true);
       await repos.preferences.saveThemePreference(palette);
       await open(tester, repos, tab: 'Progress');
-      await tester.scrollUntilVisible(find.text('Strength trends'), 400);
+      await tester.scrollUntilVisible(
+        find.text('Strength trends'),
+        400,
+        scrollable: find
+            .descendant(
+              of: find.byType(ProgressScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       await tester.ensureVisible(find.text('Strength trends'));
       await tester.pumpAndSettle();
       await shot(tester, 'strength_${palette.name}');

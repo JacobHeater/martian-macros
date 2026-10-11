@@ -26,17 +26,24 @@ List<StrengthTrend> buildStrengthTrends({
         });
   final readings = weights.toList()..sort((a, b) => a.date.compareTo(b.date));
   final result = <StrengthTrend>[];
-  for (final exercise in exercises) {
+  final byId = {for (final exercise in exercises) exercise.id: exercise};
+  final exerciseIds = {
+    for (final workout in finished)
+      for (final entry in workout.exercises) entry.exerciseId,
+  };
+  for (final exerciseId in exerciseIds) {
+    final exercise = byId[exerciseId];
     final points = <StrengthPoint>[];
     var loggedSessions = 0;
     var recentSessions = 0;
     for (final workout in finished) {
       final sets = [
         for (final entry in workout.exercises)
-          if (entry.exerciseId == exercise.id) ...entry.sets,
+          if (entry.exerciseId == exerciseId) ...entry.sets,
       ];
       if (sets.isEmpty) continue;
       loggedSessions++;
+      if (exercise == null) continue;
       double? bodyweightKg;
       for (final reading in readings) {
         if (!reading.date.isAfter(workout.date) &&
@@ -75,6 +82,7 @@ List<StrengthTrend> buildStrengthTrends({
       result.add(
         StrengthTrend(
           exercise: exercise,
+          exerciseId: exerciseId,
           points: List.unmodifiable(points),
           loggedSessions: loggedSessions,
           recentSessions: recentSessions,
@@ -91,7 +99,7 @@ List<StrengthTrend> buildStrengthTrends({
     } else if (a.points.isEmpty != b.points.isEmpty) {
       return a.points.isEmpty ? 1 : -1;
     }
-    return a.exercise.id.compareTo(b.exercise.id);
+    return a.exerciseId.compareTo(b.exerciseId);
   });
   return List.unmodifiable(result);
 }

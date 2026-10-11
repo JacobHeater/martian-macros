@@ -38,6 +38,8 @@ Choices I made without asking (say if any is wrong):
 - Rank the Progress cards by qualifying sessions in the last 90 days
   (ties: latest date, then exercise ID). A separate list opens any logged
   lift, including one that has no usable e1RM yet.
+- Deleting an exercise keeps its lift history by stable ID. Without its
+  original resistance type, estimates are unavailable rather than guessed.
 - The graph shows the latest session on each recorded date; the detail list
   retains every session, including multiple sessions on the same day.
   No PR celebrations, coaching integration or monthly report changes in this slice.

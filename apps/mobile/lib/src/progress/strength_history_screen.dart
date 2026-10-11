@@ -19,11 +19,11 @@ class StrengthHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(strengthTrendsProvider);
     final trend = state.value
-        ?.where((t) => t.exercise.id == exerciseId)
+        ?.where((t) => t.exerciseId == exerciseId)
         .firstOrNull;
     final fmt = Fmt(ref.watch(setupProvider).requireValue!.unitSystem);
     return Scaffold(
-      appBar: MmAppBar(title: trend?.exercise.name ?? 'Lift history'),
+      appBar: MmAppBar(title: trend?.name ?? 'Lift history'),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
