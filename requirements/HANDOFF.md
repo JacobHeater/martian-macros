@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, after importing Linux golden updates.
+Last updated: 2026-10-11, by Copilot, after checking PR #81 CI.
 
 **Panel and novice experience.** PR #79 merged to `main` at
 `44251604bac61bdc5dd9eb69bec045e13f7e2929`. MM-205's distinct UX/Product
@@ -112,9 +112,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   the 15 changed Dashboard and meal-row screenshots from its artifact; these
   include the app-bar Add food action and visible row menu. No Windows golden
   baseline was used.
-- Commits `2a04f86` and `a54fe81` are pushed on
+- Commits `2a04f86`, `a54fe81` and `a1868a2` are pushed on
   `feature/mm205-expert-mobile-ux`; draft PR #81 is open and mergeable. GitHub
-  CI is running on the handoff commit; it must rerun after this golden update.
+  CI on the golden-update commit is still in progress. Keep the PR in draft
+  until CI passes on the latest head.
 
 ## Session 12: 2026-10-11, Copilot (novice mobile-experience audit)
 
