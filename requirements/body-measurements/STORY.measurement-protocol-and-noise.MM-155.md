@@ -115,6 +115,9 @@ Built (2026-10-11), schema 30:
   measurement is due ("Weekly is enough: the next is due Oct 12").
 - A reading outside 30 to 300 cm is refused before it is stored, whatever stores it.
 
+- Seen on the Android emulator (2026-10-11): the card, the summary line, and saving 35.5, 36 and 35.25 in, which stored 35.5.
+  The demo database there was upgraded from schema 28 without error.
+
 More choices I made without asking:
 - **The user's own figure is the typical (middle) spread between the highest and lowest of three readings.** The ticket says "the
   spread of that user's own repeat readings"; a standard deviation would be smaller and reports more changes.
@@ -127,7 +130,6 @@ Not built:
 - **The chart** (entries as dots, a smoothed line, the noise band; 90 days and a year).
 - The monthly report still shows the month's first and last measurement (MM-33).
 - Widening the noise inside a cycle window (the ticket calls it optional).
-- Not seen on the emulator yet.
 
 ## Notes
 - Priority: must-have before MM-32, MM-133 and MM-140's "masked" branch.
