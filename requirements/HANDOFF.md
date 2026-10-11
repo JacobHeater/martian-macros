@@ -5,7 +5,14 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, finishing MM-77.
+Last updated: 2026-10-11, by Copilot, repository expert-panel tooling.
+
+**Tooling in flight.** PR #79 adds the tool-neutral panel under `agents/`,
+read-only Claude profiles, portable run state and `mm panel` validation.
+Copilot native profiles cannot be installed in this execution environment;
+native-surface guidance documents the gap and sequential fallback. No app
+behavior or schema changes. Dart/Flutter are absent and the pinned SDK download
+is blocked; checks remain unverified until a toolchain is available.
 
 **Branch state.** `feature/mm77-strength-trends`, PR #77, has completed
 MM-77 strength trends. Reviewed Linux goldens are being committed; merge once
@@ -75,6 +82,19 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, UI design-system controls.
   Stateful screens have a separate `_state.dart` declaration.
 
+## Session 8: 2026-10-11, Copilot
+
+- Added repository development-tooling panel: canonical roles/protocol/
+  contract, single-writer checkpoint/resume and sanitized portable artifacts.
+- Product designer is distinct from UX; proposed Maurice usage must resolve the
+  existing design prohibition on mascots, not silently replace it.
+- Official Copilot configuration and Anthropic reviewer examples inspected;
+  Claude canonical reference unreachable and native runtime behavior untested.
+- Existing app work/requirements preserved. `mm panel`, `mm test tool`, `mm req`,
+  `mm analyze`, `mm format --check` and `mm check` each exited 1 before running:
+  no Dart/Flutter SDK; pinned SDK download returned HTTP 403. JSON parsing and
+  `git diff --check` passed. Focused validator tests are added but unexecuted.
+
 ## Session 7: 2026-10-11, Copilot
 
 - Completed MM-77: per-session Epley e1RM, smoothed per-lift strength,
@@ -110,14 +130,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   seconds, cross-set overlap validation.
 - MM-92 process rewards and MM-33 monthly reports merged but wait on strength
   and personal records for remaining parts. Neither was emulator-inspected.
-
-## Session 5: 2026-10-10, Claude (Anthropic)
-
-- MM-187 made the horizon arc the only calorie visual. Dashboard, Food and
-  Coach share CalorieHero; no compact variant. Architecture blocks standalone
-  hero surfaces/arcs in screens. Updated tests/goldens after taller heroes.
-- Merged green Martian #64. MM-184 preserves legacy themes with schema 24,
-  new-install chooser and wrapping Settings. MM-185/186 cover delayed-save
-  preview and loading fallback races. Full checks and reviewed screenshots
-  passed; Dashboard/Food/Settings/chooser were seen on the isolated emulator
-  demo, never the normal app or physical phone.

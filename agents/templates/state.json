@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "task_id": "replace-task-id",
+  "baseline": {
+    "branch": "REPLACE_WITH_ACTUAL_BRANCH",
+    "commit": "0000000000000000000000000000000000000000"
+  },
+  "phase": "scope",
+  "owner": null,
+  "assignments": [],
+  "decisions": [],
+  "pending_work": ["Replace template placeholders and assign relevant roles."],
+  "tests": [],
+  "checkpoint": {"at": null, "writers_stopped": false}
+}
