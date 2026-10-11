@@ -9,10 +9,12 @@ const defaultImportRules = <ForbiddenImportRule>[
       'package:drift_flutter',
       'package:mm_data',
       'package:mm_fixtures',
+      'package:mm_health_ingest/mm_health_ingest_testing.dart',
     ],
     reason:
-        'the app depends on repository interfaces, never on a database; only '
-        'repository_providers.dart chooses an implementation',
+        'the app depends on repository interfaces, never on a database or a '
+        'test stand-in; only repository_providers.dart chooses an '
+        'implementation',
     allowedFiles: ['apps/mobile/lib/src/repository_providers.dart'],
   ),
   ForbiddenImportRule(

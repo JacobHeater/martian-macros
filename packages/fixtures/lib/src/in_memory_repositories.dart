@@ -1,5 +1,7 @@
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
+import 'package:mm_health_ingest/mm_health_ingest_testing.dart';
 
 import 'in_memory_custom_exercise_repository.dart';
 import 'in_memory_custom_food_repository.dart';
@@ -39,6 +41,7 @@ final class InMemoryRepositories {
     final recovery = InMemoryRecoveryCheckInRepository();
     final workouts = InMemoryWorkoutRepository();
     final customExercises = InMemoryCustomExerciseRepository();
+    final healthSamples = InMemoryHealthSampleStore();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -56,6 +59,7 @@ final class InMemoryRepositories {
       recovery: recovery,
       workouts: workouts,
       customExercises: customExercises,
+      healthSamples: healthSamples,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -72,6 +76,7 @@ final class InMemoryRepositories {
         recovery.clear,
         workouts.clear,
         customExercises.clear,
+        healthSamples.clear,
       ]),
     );
   }
@@ -93,6 +98,7 @@ final class InMemoryRepositories {
     required this.recovery,
     required this.workouts,
     required this.customExercises,
+    required this.healthSamples,
     required this.eraser,
   });
 
@@ -112,6 +118,7 @@ final class InMemoryRepositories {
   final RecoveryCheckInRepository recovery;
   final WorkoutRepository workouts;
   final CustomExerciseRepository customExercises;
+  final HealthSampleStore healthSamples;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.

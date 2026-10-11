@@ -10,6 +10,7 @@ dependencies:
   drift: ^2.35.1
   mm_domain: any
   mm_engine: any
+  mm_health_ingest: any
   sqlite3: ^3.7.0
 
 dev_dependencies:

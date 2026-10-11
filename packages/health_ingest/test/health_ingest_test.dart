@@ -31,6 +31,8 @@ void main() {
     () async => FakeHealthSource.fromJson(recordedHealthHistory),
   );
 
+  healthSampleStoreContract('In-memory', InMemoryHealthSampleStore.new);
+
   group('the fake', () {
     test(
       'serves the recorded history: sources, an edit and a deletion',
