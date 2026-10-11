@@ -8,4 +8,7 @@ enum TimeSpanProblem {
 
   /// A time is after the latest allowed (the workout's end, or now).
   tooLate,
+
+  /// A set conflicts with another logged set in the same workout.
+  overlappingSet,
 }

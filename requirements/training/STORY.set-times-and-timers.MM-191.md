@@ -68,6 +68,13 @@ Scenario: Times that cannot be
   When an end before the start is entered
   Then it is refused and the set keeps its previous times
 
+Scenario: Overlapping typed sets
+  Given another logged set in the same workout
+  When typed times overlap that set, even on a different exercise
+  Then the change is refused with an explanation
+  And the set keeps its previous times
+  And sets that only touch at their boundaries remain allowed
+
 Scenario: Only timed sets reach a platform as segments
   Given a workout with one set that has both times and one that has neither
   Then only the first can be written as a segment, and the workout is still written as a session
@@ -88,11 +95,13 @@ Built (2026-10-10), schema 26:
 - **A set's start and end can be typed**, in its controls. An end not after its start, or a time outside the workout, is refused
   with the reason and the set keeps what it had.
 - A timed set shows how long it took. The timers are stored times read against the app's clock, so they survive the app closing.
+- Typed sets are checked for overlap across all exercises (MM-196). Adjacent
+  intervals are allowed; missing times do not imply a range. A conflict is
+  explained and the original times are preserved.
 
 Not built:
 - A target rest per exercise and the countdown to it; the sound and vibration at its end.
 - Typed times are to the minute, not the second (the phone's own time picker). A timed set is to the second.
-- The check that sets of one workout do not overlap.
 - A workout that runs past midnight cannot have its end typed (it would be before its start).
 
 ## Notes
