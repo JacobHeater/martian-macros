@@ -61,4 +61,17 @@ const defaultImportRules = <ForbiddenImportRule>[
         'the food pipeline is a pure Dart developer tool: it builds packs and '
         "never touches the user's database or the app",
   ),
+  ForbiddenImportRule(
+    appliesTo: 'packages/health_ingest/lib/',
+    forbidden: [
+      'package:flutter',
+      'package:drift',
+      'package:health',
+      'package:mm_data',
+      'package:mm_fixtures',
+    ],
+    reason:
+        'the health seam is pure Dart: a platform plugin sits behind '
+        'HealthSource in the app, never in the interface',
+  ),
 ];
