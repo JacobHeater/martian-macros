@@ -270,4 +270,111 @@ void main() {
       expect(s.reps, 14);
     });
   });
+
+  group('a range and step of the user\'s own', () {
+    ProgressionSuggestion? withSettings(
+      List<Workout> workouts,
+      ExerciseProgression settings, {
+      Exercise? of,
+      UnitSystem units = UnitSystem.metric,
+    }) => suggestProgression(
+      exerciseId: (of ?? squat).id,
+      exercise: of ?? squat,
+      workouts: workouts,
+      before: now,
+      goal: GoalMode.leanGain,
+      units: units,
+      settings: settings,
+    );
+
+    test('the top of their range decides when load goes up', () {
+      const threeToFive = ExerciseProgression(
+        exerciseId: 'back-squat',
+        repsLow: 3,
+        repsHigh: 5,
+      );
+      final workouts = [
+        session(7, [(5, 100), (5, 100)]),
+      ];
+      // In the default 6 to 10 this is short of the top.
+      expect(suggest(workouts)!.kind, ProgressionKind.addReps);
+      final s = withSettings(workouts, threeToFive)!;
+      expect(s.kind, ProgressionKind.addLoad);
+      expect(s.loadKg, 102.5);
+      expect(s.reps, 3);
+      expect(s.rangeTop, 5);
+    });
+
+    test('reps are aimed within their range', () {
+      const twelveToFifteen = ExerciseProgression(
+        exerciseId: 'back-squat',
+        repsLow: 12,
+        repsHigh: 15,
+      );
+      final s = withSettings([
+        session(7, [(10, 60), (10, 60)]),
+      ], twelveToFifteen)!;
+      expect(s.kind, ProgressionKind.addReps);
+      expect(s.reps, 12);
+    });
+
+    test('their load step is used in place of the equipment\'s', () {
+      const small = ExerciseProgression(
+        exerciseId: 'back-squat',
+        repsLow: 6,
+        repsHigh: 10,
+        loadStepKg: 1.25,
+      );
+      final s = withSettings([
+        session(7, [(10, 60), (10, 60)]),
+      ], small)!;
+      expect(s.loadKg, 61.25);
+    });
+
+    test('their step applies to weight added to the body and to assisted '
+        'work, which still never goes past none', () {
+      const ten = ExerciseProgression(
+        exerciseId: 'pull-up',
+        repsLow: 8,
+        repsHigh: 12,
+        loadStepKg: 10,
+      );
+      expect(
+        withSettings(
+          [
+            session(7, [(12, 5), (12, 5)], of: pullUp),
+          ],
+          ten,
+          of: pullUp,
+        )!.loadKg,
+        15,
+      );
+      expect(
+        withSettings(
+          [
+            session(7, [(12, -6), (12, -6)], of: pullUp),
+          ],
+          ten,
+          of: pullUp,
+        )!.loadKg,
+        0,
+      );
+    });
+
+    test('the usual step is the one named for the equipment and unit', () {
+      expect(defaultLoadStepKg(exercise: squat, units: UnitSystem.metric), 2.5);
+      expect(defaultLoadStepKg(exercise: raise, units: UnitSystem.metric), 2);
+      expect(defaultLoadStepKg(exercise: machine, units: UnitSystem.metric), 5);
+      expect(
+        Units.kgToLb(
+          defaultLoadStepKg(exercise: machine, units: UnitSystem.imperial),
+        ),
+        closeTo(10, 1e-9),
+      );
+      expect(
+        defaultLoadStepKg(exercise: pullUp, units: UnitSystem.metric),
+        2.5,
+      );
+    });
+  });
 }

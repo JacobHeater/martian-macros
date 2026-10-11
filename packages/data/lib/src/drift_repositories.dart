@@ -7,6 +7,7 @@ import 'drift_custom_exercise_repository.dart';
 import 'drift_custom_food_repository.dart';
 import 'drift_data_eraser.dart';
 import 'drift_day_mark_repository.dart';
+import 'drift_exercise_progression_repository.dart';
 import 'drift_food_repository.dart';
 import 'drift_health_sample_store.dart';
 import 'drift_insight_log_repository.dart';
@@ -44,6 +45,7 @@ final class DriftRepositories {
       workouts = DriftWorkoutRepository(db),
       customExercises = DriftCustomExerciseRepository(db),
       healthSamples = DriftHealthSampleStore(db),
+      exerciseProgressions = DriftExerciseProgressionRepository(db),
       eraser = DriftDataEraser(db);
 
   final AppDatabase _db;
@@ -64,6 +66,7 @@ final class DriftRepositories {
   final WorkoutRepository workouts;
   final CustomExerciseRepository customExercises;
   final HealthSampleStore healthSamples;
+  final ExerciseProgressionRepository exerciseProgressions;
   final DataEraser eraser;
 
   /// Closes the underlying database.
