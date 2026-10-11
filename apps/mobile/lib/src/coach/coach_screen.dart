@@ -24,6 +24,7 @@ import 'caution_message.dart';
 import '../app/health_recheck_screen.dart';
 import 'last_change_card.dart';
 import 'metabolism_summary.dart';
+import 'recomp_review_card.dart';
 import 'recovery_card.dart';
 import 'relief_offer_card.dart';
 import 'reports_card.dart';
@@ -130,6 +131,7 @@ class CoachScreen extends ConsumerWidget {
           holdNote: _holdNote(setup, snapshot, today),
         ),
         const StallCard(),
+        const RecompReviewCard(),
         const AdherenceCard(),
         const ReportsCard(),
         const RecoveryCard(),
