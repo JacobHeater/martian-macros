@@ -6,6 +6,8 @@
 - Audit coverage, unreviewed areas, referrals and blocked verification: REPLACE
 - Decisions, blockers, pending owner questions and dependencies: REPLACE
 - Actual tests: commands, commit/dirty state, exit codes and limitations: REPLACE
+- Open CI watches (`mm ci list`): watch id, PR, head commit, owner, acknowledged
+  cursor, unread events, watcher health; same machine or not: REPLACE
 - Exact next action; reviews reusable after input comparison: REPLACE
 - Accessible branch containing sanitized artifacts AND code changes: REPLACE
 - Resume: inspect status/diff, verify old writers stopped, compare hashes,

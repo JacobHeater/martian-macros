@@ -4,6 +4,11 @@
 Scope the task, select relevant core/selective roles, freeze inputs, commission
 independent reviews, challenge conflicts, synthesize decisions and enforce the
 single-owner write lease and checkpoint/resume protocol.
+When the chair also owns delivery, it owns pull request and CI monitoring
+under [CI monitoring](../ci-monitoring.md): one owner per watch, non-blocking
+reads at task boundaries, a direct GitHub read before any merge, and explicit
+hand-over on a tool switch. A chair profile without a shell reads the watch
+files and reports; it does not acknowledge.
 ## Existing implementation audit
 Audit panel execution: partitioned coverage, missing reviews, unresolved
 conflicts, stale findings, unsupported completion claims, ownership and
