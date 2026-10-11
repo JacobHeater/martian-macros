@@ -8,6 +8,7 @@ import 'package:martian_macros/src/integration_providers.dart';
 import 'package:martian_macros/src/providers.dart';
 import 'package:martian_macros/src/theme/mm_theme.dart';
 import 'package:martian_macros/src/train/weekly_volume_screen.dart';
+import 'package:martian_macros/src/train/train_screen.dart';
 import 'package:martian_macros/src/ui/muscle_volume_row.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
@@ -45,6 +46,7 @@ void main() {
     InMemoryRepositories repos, {
     List<Override> overrides = const [],
     bool settle = true,
+    Widget home = const WeeklyVolumeScreen(),
   }) async {
     tester.view.physicalSize = const Size(320, 900);
     tester.view.devicePixelRatio = 1;
@@ -63,7 +65,7 @@ void main() {
                 .copyWith(textScaler: TextScaler.linear(1.5)),
             child: child!,
           ),
-          home: const WeeklyVolumeScreen(),
+          home: home,
         ),
       ),
     );
@@ -111,12 +113,66 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+  testWidgets('MM-195 volume accessible during workout', (tester) async {
+    final repos = InMemoryRepositories();
+    await repos.workouts.saveWorkout(workout().copyWith(endedAt: () => null));
+    await pump(tester, repos, home: const Scaffold(body: TrainScreen()));
+    expect(find.text('Continue'), findsOneWidget);
+    expect(find.byKey(const ValueKey('train-volume')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('train-volume')));
+    await tester.pumpAndSettle();
+    expect(find.text('Last seven days'), findsOneWidget);
+  });
+
   testWidgets('unknown mappings explicitly omitted', (tester) async {
     final repos = InMemoryRepositories();
     await repos.workouts.saveWorkout(workout(id: 'custom-deleted'));
     await pump(tester, repos);
     expect(
       find.textContaining('4 current and 0 previous hard sets omitted'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('custom mapping edits reassign volume reactively', (
+    tester,
+  ) async {
+    final repos = InMemoryRepositories();
+    final source = builtInExercises.first;
+    final id = await repos.customExercises.saveCustomExercise(
+      Exercise(
+        id: '',
+        name: 'Custom lift',
+        equipment: source.equipment,
+        primary: MuscleGroup.chest,
+        secondary: [MuscleGroup.triceps],
+      ),
+    );
+    await repos.workouts.saveWorkout(workout(id: id, count: 3));
+    await pump(tester, repos);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('volume-chest')),
+      300,
+    );
+    await tester.pumpAndSettle();
+    final chest = find.byKey(const ValueKey('volume-chest'));
+    expect(tester.widget<MuscleVolumeRow>(chest).volume.currentSets, 3);
+    await repos.customExercises.saveCustomExercise(
+      Exercise(
+        id: id,
+        name: 'Custom lift',
+        equipment: source.equipment,
+        primary: MuscleGroup.back,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<MuscleVolumeRow>(chest).volume.currentSets, 0);
+    await repos.customExercises.deleteCustomExercise(id);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Last seven days'), -300);
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('3 current and 0 previous hard sets omitted'),
       findsOneWidget,
     );
   });
