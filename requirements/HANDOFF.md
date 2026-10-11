@@ -5,18 +5,20 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, starting MM-78.
+Last updated: 2026-10-11, by Copilot, continuing MM-191.
 
 **Branch state.** `feature/mm78-weekly-volume` implements rolling weekly
 muscle-group volume, with no schema changes. Strength #77 is green and merged.
 Volume PR #78 implementation/full checks and reviewed screenshots pass;
-merge once final CI is green.
+merge once final CI is green. `feature/mm191-set-overlap` builds on #78
+deliberately, completing typed-set overlap validation (MM-196). Its final
+Windows checks pass; PR #80 is open, pending CI.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
 in flight at a time.
 
-**Next ticket ID.** MM-196 (`mm req next` is the authority).
+**Next ticket ID.** MM-197 (`mm req next` is the authority).
 
 **What to build next.** WS-10: remaining rest countdown/signals and timing
 gaps (MM-191), then progression (MM-79).
@@ -75,6 +77,23 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, UI design-system controls.
   Stateful screens have a separate `_state.dart` declaration.
 
+## Session 9: 2026-10-11, Copilot
+
+- Final MM-78 full Windows `mm check` passes; PR #78 description now records
+  reviewed Linux screenshots and seven focused widget tests. Final CI is
+  running; merge watcher waits for green checks, never bypasses them.
+- Stopped the headless volume emulator; physical phone untouched. Continuing
+  MM-191 with MM-196: refuse overlapping typed set times across exercises
+  without inventing missing timing evidence.
+- MM-196 is implemented with a failing-before/passing-after widget regression.
+  Same-exercise partial-time conflicts, cross-exercise intervals, adjacency and
+  self-excluding edits are tested. Six engine cases plus existing training
+  tests and the final full Windows `mm check` pass. No schema or normal layout
+  changes. The refusal message is widget-tested, not emulator-inspected.
+  Committed/pushed as `12b5976`; PR #80 is open and its Linux/Android CI runs.
+  Remaining MM-191 work: rest target/countdown/signals, typed seconds and
+  cross-midnight workout ends; MM-79 progression follows.
+
 ## Session 8: 2026-10-11, Copilot
 
 - Owner authorized pushing through the roadmap autonomously. Started MM-78
@@ -113,18 +132,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   Reviewed six new strength images in Light/Dark/Martian and two weight-event
   entry backgrounds changed by the longer scrollable Progress content.
   PR #77 is awaiting final CI. iOS was not run.
-
-## Session 6: 2026-10-10 (later), Claude (Anthropic)
-
-- MM-190 fixed main's time-dependent Food failures: meal defaults, date picker
-  and demo ask the Clock; architecture rejects other `DateTime.now` calls.
-  Validated Windows, Linux at four times of day, and CI.
-- MM-188 health-platform spike verified 42 Health Connect segment identifiers;
-  HealthKit/plugin are session-level. Phone interoperability questions remain.
-  MM-189 records optional mappings, app-owned sets, summary session fallback.
-- MM-76 library/picker/custom exercises and MM-75 Train/workout logging merged
-  in schema 25. MM-191 added manual workout/set times and timers (26), then
-  workout-clock pause/resume (27). Remaining: target rest and signals, typed
-  seconds, cross-set overlap validation.
-- MM-92 process rewards and MM-33 monthly reports merged but wait on strength
-  and personal records for remaining parts. Neither was emulator-inspected.
