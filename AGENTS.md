@@ -61,6 +61,12 @@ delegation and sequential fallback do not supersede the working agreements here.
 - Check open pull requests at the start and at the end of each session or
   turn: merge the green ones, and fix a failing one in a follow-up. Never sit
   waiting on CI in the middle of a session.
+- Between those two checks, `mm ci` can watch a pull request's checks in the
+  background and keep what it sees (`agents/ci-monitoring.md`). It adds to the
+  rules above and replaces none: the start and end checks stay mandatory,
+  nobody waits on CI, and merging stays your explicit action. Before merging,
+  read GitHub directly (`mm ci check <pr>`); a stored result, or one for an
+  older commit, is not enough.
 - Create the feature branch from a fresh `main` before editing anything. Stage
   files by name, never `git add -A`. No stash juggling. Never switch branches
   while a build is running. If work depends on an unmerged pull request, stack

@@ -36,3 +36,6 @@ tools/food_pipeline/out/
 
 # Kotlin compiler session files
 .kotlin/
+
+# CI watch runtime state (MM-209): local to one machine, never committed
+.mm/
