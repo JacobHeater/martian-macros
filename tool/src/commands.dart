@@ -4,6 +4,7 @@ import 'arch/arch_command.dart';
 import 'command.dart';
 import 'demo_command.dart';
 import 'food/food_command.dart';
+import 'panel/panel_command.dart';
 import 'physical_android_device_id.dart';
 import 'requirements.dart';
 import 'roadmap/roadmap_report_command.dart';
@@ -32,7 +33,14 @@ const _envs = ['dev', 'prod'];
 final _commands = <String, (String, Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
-  'check': ('CI gate: format, requirements, arch, analyze, test', _check),
+  'check': (
+    'CI gate: format, requirements, arch, panel, analyze, test',
+    _check,
+  ),
+  'panel': (
+    'Expert panel: validate roles, native adapters and templates [run-dir]',
+    (tc, args) => runPanel(tc.repoRoot, args),
+  ),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
   'food': (
@@ -156,6 +164,7 @@ Future<int> _check(Toolchain tc, List<String> args) async {
     () => _format(tc, const ['--check']),
     () => _req(tc, const []),
     () => _arch(tc, const []),
+    () => runPanel(tc.repoRoot, const []),
     () => _analyze(tc, const []),
     () => _test(tc, const []),
   ]) {

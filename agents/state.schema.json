@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "baseline", "audit_mode", "phase", "owner", "assignments", "research_capabilities", "unresolved_questions", "decisions", "pending_work", "tests", "checkpoint"],
+  "properties": {
+    "schema_version": {"type": "integer", "enum": [1]},
+    "task_id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+    "audit_mode": {"type": "string", "enum": ["change", "feature", "domain", "panel-baseline"]},
+    "baseline": {
+      "type": "object", "additionalProperties": false,
+      "required": ["branch", "commit"],
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"}
+      }
+    },
+    "phase": {"type": "string", "enum": ["scope", "reviews", "challenge", "synthesis", "edits", "verification", "checkpoint", "complete", "blocked"]},
+    "owner": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["identity", "paths"],
+      "properties": {
+        "identity": {"type": "string", "minLength": 1},
+        "paths": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "assignments": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["task", "role", "reviewer", "status", "inspected_commit", "input_hashes", "report", "coverage", "research"],
+        "properties": {
+          "task": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "enum": ["chair", "training", "nutrition", "micronutrients", "coaching", "measurement", "safety", "product", "product-designer", "ux-accessibility", "architecture", "flutter", "integrations", "privacy-security", "qa"]},
+          "reviewer": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["pending", "complete", "stale", "omitted"]},
+          "omission_reason": {"type": "string", "minLength": 1},
+          "inspected_commit": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"},
+          "input_hashes": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}},
+          "report": {"type": "string", "minLength": 1},
+          "coverage": {
+            "type": "object", "additionalProperties": false,
+            "required": ["inspected", "not_inspected", "referrals", "methods", "limitations"],
+            "properties": {
+              "inspected": {"type": "array", "items": {"type": "string", "minLength": 1}},
+              "not_inspected": {"type": "array", "items": {"type": "string", "minLength": 1}},
+              "referrals": {"type": "array", "items": {"type": "string", "minLength": 1}},
+              "methods": {"type": "array", "items": {"type": "string", "enum": ["source-inspection", "runtime-reproduction", "test-results"]}},
+              "limitations": {"type": "string", "minLength": 1}
+            }
+          },
+          "research": {
+            "type": "object", "additionalProperties": false,
+            "required": ["status", "question", "reason", "path", "sources", "summary", "limitations"],
+            "properties": {
+              "status": {"type": "string", "enum": ["not-started", "performed", "unnecessary", "blocked"]},
+              "question": {"type": "string"},
+              "reason": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "enum": ["direct", "chair", "unavailable", "not-needed"]},
+              "summary": {"type": "string", "minLength": 1},
+              "limitations": {"type": "string", "minLength": 1},
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["url", "title", "published_or_updated", "accessed", "claim"],
+                  "properties": {
+                    "url": {"type": "string", "pattern": "^https://[^\\s]+$"},
+                    "title": {"type": "string", "minLength": 1},
+                    "published_or_updated": {"type": ["string", "null"], "minLength": 1},
+                    "accessed": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+                    "claim": {"type": "string", "minLength": 1}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "research_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["surface", "discovery", "retrieval", "status", "checked_at", "limitations"],
+        "properties": {
+          "surface": {"type": "string", "minLength": 1},
+          "discovery": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "retrieval": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "status": {"type": "string", "enum": ["observed", "untested", "blocked"]},
+          "checked_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+          "limitations": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "unresolved_questions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "status", "summary", "authority"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["accepted", "rejected", "pending"]},
+          "summary": {"type": "string", "minLength": 1},
+          "authority": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "pending_work": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["command", "commit", "dirty", "exit_code", "result", "summary"],
+        "properties": {
+          "command": {"type": "string", "minLength": 1},
+          "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+          "dirty": {"type": "boolean"},
+          "exit_code": {"type": ["integer", "null"]},
+          "result": {"type": "string", "enum": ["not-run", "passed", "failed"]},
+          "summary": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["at", "writers_stopped"],
+      "properties": {
+        "at": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+        "writers_stopped": {"type": "boolean"}
+      }
+    }
+  }
+}

@@ -32,7 +32,7 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | --- | --- |
 | `mm doctor` | Checks the toolchain against the pinned version |
 | `mm bootstrap` | Resolves dependencies for the whole workspace |
-| `mm check` | CI gate: format check, analyze, all tests |
+| `mm check` | CI gate: format, requirements, architecture, panel, analyze, all tests |
 | `mm test [path ...]` | Tests every package, or only the given ones (e.g. `packages/engine`) |
 | `mm analyze` / `mm format` | Static analysis / formatting (`--check` to verify only) |
 | `mm run [--env dev\|prod\|phone]` | Runs with dev/prod defines; `phone` uses dev defines and selects one physical Android phone, never an emulator |
@@ -42,7 +42,16 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm gen` | Runs `build_runner` in packages that use it |
 | `mm schema` | Exports the database schema snapshot after a `schemaVersion` bump (migration tests read it) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
+| `mm panel [run-dir]` | Validates expert-panel roles, Claude/Copilot adapters, research templates and optionally saved run state |
 | `mm clean` | Removes build outputs |
+
+## Repository expert panel
+
+The [tool-neutral panel](agents/README.md) is development tooling, not part of
+the app. It provides independent domain reviews, targeted challenges and
+single-owner edits, with [portable checkpoint artifacts](agents/run-state.md).
+See [native invocation and Claude-to-Copilot handoff examples](agents/native-surfaces.md)
+for read-only adapters, sequential fallback and unverified surface limitations.
 
 For a USB-connected Android phone, enable USB debugging and accept the phone's
 authorization prompt, then run `.\mm run --env phone` in PowerShell (or
