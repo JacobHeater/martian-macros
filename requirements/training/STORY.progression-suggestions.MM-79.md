@@ -96,7 +96,8 @@ Built (2026-10-11), schema 31:
 Not built:
 - On fat loss with every set at the top of the range, offering the load step as well (the panel proposed it; undecided).
 - The settings are reached from a workout in progress only, not from the exercise library.
-- Seen on the Android emulator on a fat loss goal only (the suggestion line); the settings screen was not seen there.
+- Seen on the Android emulator on a fat loss goal only: the suggestion line, the "Suggestions use" row, and the settings screen as it opens.
+  Saving from it was not confirmed there; the widget tests cover it.
 
 ## Notes
 - This is deliberately simple. Periodization, deloads and programs are out of scope.
