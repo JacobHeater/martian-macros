@@ -22,6 +22,7 @@ final class MonthlyReportText {
     ('Days logged', '${report.daysLogged} of ${ReportPeriod.days}'),
     ('Whole days', '${report.completeDays}'),
     ('Weigh-ins', '${report.weighIns}'),
+    if (report.workouts > 0) ('Workouts', '${report.workouts}'),
     if (report.averageProteinG case final protein?)
       (
         'Average protein',
@@ -31,6 +32,24 @@ final class MonthlyReportText {
                   '${Fmt.grams(report.averageProteinTargetG!)}',
       ),
   ];
+
+  /// Each lift's estimated one-rep max across the month, most trained
+  /// first, or why none can be shown. Empty when no workout was logged.
+  /// An estimate from reps and load, not a tested max.
+  List<(String, String)> get lifts {
+    if (report.workouts == 0) return const [];
+    if (report.lifts.isEmpty) {
+      return const [('Estimated maxes', 'No lift had two sessions this month')];
+    }
+    return [
+      for (final lift in report.lifts.take(6))
+        (
+          lift.name,
+          '${fmt.weight(lift.fromKg)} to ${fmt.weight(lift.toKg)} '
+              '(${fmt.weightDelta(lift.toKg - lift.fromKg)})',
+        ),
+    ];
+  }
 
   /// What the body did, or why that cannot be said.
   List<(String, String)> get body {

@@ -60,8 +60,14 @@ Built:
 - Tests: `monthly_report_test.dart` (engine and app). The app tests include six logged days, two target changes listed with their
   estimate, a report reread from a later day, and no grading or praise.
 
+- **Strength** (2026-10-11): the number of finished workouts in "What you did", and a "Your lifts" card with each lift's smoothed
+  estimated one-rep max at its first and last session of the month, most trained first, six at most. A lift needs two sessions in
+  the month to be listed; with training logged and no such lift the card says so; with no training there is no card. Strength is
+  read as it stood at the end of the month, so a later session does not change an old report. The card says the figure is worked
+  out from reps and load, not tested.
+
 Not built:
-- **Estimated one-rep-max change** (needs the training log, MM-75 and MM-77).
+- **The recomp review** (MM-133) in the report: it is on the Coach screen only.
 - **The body-fat range if one has settled** (needs the body-fat estimate from measurements, MM-34).
 - **The short weekly version** at the weekly check-in: the existing target-change summary (MM-138) already says what changed and why.
 - **Photos** (MM-157): no room is left on the screen yet.

@@ -305,6 +305,8 @@ final monthlyReportProvider = Provider.family<MonthlyReport?, int>((
     waist: waist,
     history: history,
     trend: ref.watch(coachProvider)?.trend ?? const [],
+    workouts: ref.watch(workoutsProvider).value ?? const [],
+    exercises: ref.watch(exercisesProvider),
   );
 });
 
