@@ -5,29 +5,38 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, continuing MM-191.
+Last updated: 2026-10-11, by Copilot, local expert-panel takeover.
 
-**Branch state.** `feature/mm78-weekly-volume` implements rolling weekly
-muscle-group volume, with no schema changes. Strength #77 is green and merged.
-Volume PR #78 implementation/full checks and reviewed screenshots pass;
-merge once final CI is green. `feature/mm191-set-overlap` builds on #78
-deliberately, completing typed-set overlap validation (MM-196). Its final
-Windows checks pass; PR #80 is open, pending CI.
+**Tooling in flight.** Existing PR #79, `copilot/implement-expert-panel`,
+adds canonical roles, Claude/Copilot adapters, research evidence and portable
+state validation. Owner explicitly requests completing it **without merging**.
+Local SDK checks pass; no repeat download needed. Claude native research and
+fresh artifact resume passed on Windows; Copilot chair-delegated research passed.
+Copilot native picker/CLI/cloud profile enforcement remains untested.
+MM-201 existing-code audit acceptance is implemented and exercised with actual
+independent nutrition/QA food-feature reviews and targeted challenge. Final
+full Windows checks pass; inspect current PR CI/readiness before further work.
+Implementation/audit artifacts are committed and pushed to existing #79.
+Main conflict is resolved; inspect current PR CI/readiness there before merge
+(owner explicitly prohibits merging #79).
 
-**Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
-results from existing repositories and needs no migration. One schema change
-in flight at a time.
+**Branch state.** Strength #77, weekly volume #78 and typed-set overlap #80
+are green and merged. PR #79 merges that upstream work without changing app
+behavior. Its handoff conflict was resolved and the merge pushed.
 
-**Next ticket ID.** MM-197 (`mm req next` is the authority).
+**Database.** Schema 27 (pausing the workout clock, MM-191). No panel migration.
+Only one schema change in flight at a time.
 
-**What to build next.** WS-10: remaining rest countdown/signals and timing
-gaps (MM-191), then progression (MM-79).
-Strength unlocks the recomp review/signal (MM-133, MM-32) and the unfinished
-strength/PR parts of monthly reports and rewards (MM-33, MM-92). Phase
-planning (MM-36) needs body-fat estimates (MM-34).
-Health sync starts at the health-source interface/fixture (MM-67). The
-`health` plugin handles sessions; Android segments require app-owned native
-code later (MM-188, MM-189).
+**Next ticket ID.** MM-205 (`mm req next` is the authority). Cloud panel's
+provisional MM-195 collided with training MM-195. Allocated MM-197 for the
+panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
+
+**What to build next.** Finish #79 first. Then WS-10: remaining rest
+countdown/signals and timing gaps (MM-191), then progression (MM-79).
+Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
+monthly reports/rewards (MM-33, MM-92). Phase planning (MM-36) needs body-fat
+estimates (MM-34). Health sync starts at the interface/fixture (MM-67);
+Android segments require app-owned native code later (MM-188, MM-189).
 
 **Waiting on the product owner.**
 - MM-173: noisy honest low intake is dropped as partial, drifting expenditure
@@ -46,89 +55,105 @@ appearing, ease-deficit offer, per-meal protein marker, resume-after-pause
 screen, palm portions, real-camera label reading. Tickets record limitations.
 
 **Standing owner rules beyond AGENTS.md.**
-- Dashboard is metrics-heavy, with a full existing-data overview. Synthetic
-  seeding belongs to the separate demo app/database, never normal storage.
+- Dashboard is metrics-heavy; synthetic seeds belong only to the separate
+  demo app/database, never normal storage.
 - Horizon arc is the only calorie visual (MM-187). Dashboard, Food and Coach
   reuse CalorieHero; no compact hero or independent calorie display.
-- Martian is the default only for new installs. First launch offers live theme
-  preview, saving on Continue; upgrades preserve existing preferences.
+- Martian defaults only for new installs. First launch offers live theme
+  preview; Continue saves. Upgrades preserve existing preferences.
 - Do not let test/build terminals steal game focus. Use noninteractive
-  PowerShell execution, not foreground VS Code terminals.
-- Commit/push/open PRs and merge green ones with `--merge`; never idle waiting
-  for CI or require owner involvement. Branch from fresh main, stage named
-  files, never stash-juggle or switch branches during a build.
-- Bugs get tickets and failing-before regressions immediately. Acceptance
-  testing will walk through bugs; otherwise stay on the feature roadmap.
+  PowerShell, not foreground VS Code terminals.
+- Commit/push/open PRs and merge green ones with `--merge`, except #79 which
+  the owner explicitly says **do not merge**. Branch from fresh main unless
+  explicitly continuing an existing PR. Stage named files; never stash-juggle
+  or switch branches during a build.
+- Bugs get tickets and failing-before regressions immediately. Otherwise
+  focus on feature roadmap; acceptance testing will walk through bugs.
 - Offline-first; binary biological sex for formulas; US only at launch.
-- How it looks matters: inspect changed screens on the emulator and state
-  precisely what was/wasn't verified. Primary action buttons have no glow.
+- Inspect changed screens on the emulator and state verification precisely.
+  Primary action buttons have no glow.
 
 **Time-saving notes.**
-- `mm check` only passes with exit 0 and final `All checks passed.`.
-- Linux alone generates goldens: Update goldens workflow, download, inspect,
-  commit changed PNGs. Windows screenshots are not golden baselines.
-- Lazy screen controls need `scrollUntilVisible`, `ensureVisible`, then
-  `pumpAndSettle` before tapping.
-- All time comes from the app's Clock, never `DateTime.now` outside its adapter.
-- Windows/FVM: `.\mm.ps1`. Emulator `emulator-5554`; never choose a physical
-  phone implicitly. Normal Android package `com.martianmacros.martian_macros`;
+- `mm check` passes only with exit 0 and final `All checks passed.`.
+- Linux generates goldens; download, inspect and commit them. Windows
+  screenshots are not golden baselines.
+- Lazy controls need `scrollUntilVisible`, `ensureVisible`, `pumpAndSettle`.
+- All time comes from Clock, not `DateTime.now` outside its adapter.
+- Windows/FVM: `.\mm.ps1`. Emulator `emulator-5554`; never implicitly select
+  the phone. Normal Android package `com.martianmacros.martian_macros`;
   synthetic demo uses `.demo`.
-- New native plugins require release-build validation; iOS needs macOS.
-- One declaration/file, narrow repository roles, UI design-system controls.
-  Stateful screens have a separate `_state.dart` declaration.
+- Native plugins need release-build validation; iOS needs macOS.
+- One declaration/file, narrow repository roles, design-system controls;
+  stateful screens have a separate `_state.dart`.
+
+## Session 10: 2026-10-11, Copilot (local panel takeover)
+
+- Owner requests finishing existing #79: install Copilot adapters, audit all
+  roles, verify research capability, run local checks. No merge.
+- Initial tree clean; fetched and safely switched existing branch. Merged
+  main; handoff conflicts resolved retaining upstream product decisions.
+- `.github/agents/` omission was a cloud environment restriction, not a
+  repository policy. Allocated panel bug MM-197 using `mm req next`.
+- Current official VS Code, GitHub and Claude configuration docs retrieved.
+  Role audit is read-only; this session is the sole write owner.
+- Audited all 15 roles; installed 15 Copilot adapters and research tools on
+  15 Claude adapters. Chair has bounded delegation/artifact edits, not shell;
+  specialist tools exclude writes/execution. Product design remains distinct
+  from UX. Research gates, source evidence/capability state and invalid fixtures
+  added (MM-198). 22 focused cases/full Windows `mm check` pass.
+- Copilot research specialist performed actual GitHub source discovery and
+  page retrieval. Claude native specialist performed WebSearch/WebFetch, then
+  a fresh Claude session resumed repository artifacts without chat/research
+  repetition. Unmodified resume profile exposed exactly five allowed tools.
+  Real sources/results/hashes persist in `docs/agent-runs/pr79-research-smoke/`;
+  templates remain inert. Copilot picker/CLI/cloud runtime was not exercised.
+- Native Claude isolated missing-doc smoke returned PANEL_CONFIG_MISSING,
+  stopped without review or fallback. Scoped validator review found MM-199
+  malformed-schema crash and MM-200 unexplained omissions; both reproduced
+  before fix, regression-tested and fixed. Full check passes (82 tool tests,
+  25 panel cases). Earlier PowerShell stream-redirection aborted on expected
+  negative-fixture stderr; OS-level redirection ran the real gate successfully.
+- Owner added MM-201: every role audits existing code, requirements, tests and
+  docs before proposals. Added audit modes, classified findings and portable
+  coverage; independent native nutrition and QA food-feature audits in flight.
+  Historical research run is explicitly stale for new instructions, retaining
+  applicable sources and real prior smoke results.
+- Nutrition audit returned classified findings/coverage. Parent reproduced
+  unchanged fractional/legacy rounding (MM-202) and per-serving alcohol mismatch
+  (MM-203). Added guards and skipped them with ticket IDs until separate app
+  fixes; no app implementation changed. Other gaps/hypotheses remain distinct.
+  Existing food tests pass (13, three tracked skips); full gate still passes.
+- QA completed independently and challenged recents interpretation. Shared
+  precision/alcohol causes deduplicated; distinct convert-to-totals alcohol
+  loss reproduced (MM-204) and guarded/skipped. No application fixes.
+  Real audit reports/state record inspected/uninspected layers, classifications,
+  dissent and owner executions. All native review processes quiescent.
+  Cup terminology request remains unverified: eCFR blocked, GovInfo unparsed.
+- Final post-QA full Windows check passed, exit 0 and All checks passed:
+  82 tool tests/25 panel cases. Saved research/audit runs validate. Four
+  reproduced app-bug guards are explicitly skipped; not claimed fixed.
+- Delivered merge commit 41ca7ae to original #79 branch, no force push.
+  PR description preserves original task and records actual checks, runtime
+  limits and deferred defects. New trusted CI runs (old cloud runs required
+  action and were not test evidence); PR is now mergeable. Read final CI/
+  readiness from PR. No tooling owner decision remains; do not merge.
 
 ## Session 9: 2026-10-11, Copilot
 
-- Final MM-78 full Windows `mm check` passes; PR #78 description now records
-  reviewed Linux screenshots and seven focused widget tests. Final CI is
-  running; merge watcher waits for green checks, never bypasses them.
-- Stopped the headless volume emulator; physical phone untouched. Continuing
-  MM-191 with MM-196: refuse overlapping typed set times across exercises
-  without inventing missing timing evidence.
-- MM-196 is implemented with a failing-before/passing-after widget regression.
-  Same-exercise partial-time conflicts, cross-exercise intervals, adjacency and
-  self-excluding edits are tested. Six engine cases plus existing training
-  tests and the final full Windows `mm check` pass. No schema or normal layout
-  changes. The refusal message is widget-tested, not emulator-inspected.
-  Committed/pushed as `12b5976`; PR #80 is open and its Linux/Android CI runs.
-  Remaining MM-191 work: rest target/countdown/signals, typed seconds and
-  cross-midnight workout ends; MM-79 progression follows.
+- Weekly volume #78 and typed-set overlap #80 completed with full Windows
+  checks, Linux CI/Android builds; both merged. No phone changes.
+- MM-196 has failing-before/passing-after regressions. Adjacent sets are
+  allowed and missing timing evidence is never invented.
+- Remaining MM-191: rest targets/signals, typed seconds, midnight ends.
 
-## Session 8: 2026-10-11, Copilot
+## Session 8: 2026-10-11, Copilot (cloud panel implementation)
 
-- Owner authorized pushing through the roadmap autonomously. Started MM-78
-  after MM-77 implementation, screenshots and full checks passed.
-- Weekly volume counts finished workouts in two adjacent rolling seven-day
-  windows; RIR 0–4/null, full primary and half secondary contributions.
-  Unknown/deleted exercise mappings are explicitly omitted, never guessed.
-  Train opens an eleven-group comparison with a broad 10–20 reference band.
-- Engine/mobile tests and full `mm check` pass. Linux golden generation and
-  headless emulator inspection are next; #77 Android CI build is running.
-- Strength #77 passed full Linux checks/Android build and merged. Inspected
-  Martian volume on the isolated headless emulator; Light/Dark/Martian volume
-  goldens pass. MM-195 fixed volume navigation disappearing during an active
-  workout, with failing-before/passing-after regression. Final full checks pass;
-  Reviewed refreshed Train screenshots and volume images in all three palettes.
-  Seven focused volume widget tests include exact reference-band/bar geometry,
-  screen-reader semantics and values above 20. PR #78 awaits final CI.
-
-## Session 7: 2026-10-11, Copilot
-
-- Completed MM-77: per-session Epley e1RM, smoothed per-lift strength,
-  four/twelve-week changes in Progress, and every logged lift's history.
-- Owner chose total bodyweight plus added/assisted load for bodyweight lifts;
-  omit estimates with unknown historical bodyweight, never future readings.
-- No schema changes. Engine tests, mobile/seed tests, and full `mm check` pass.
-  MM-192/193 have failing-before regressions for error-state propagation and
-  duplicated demo workouts; both are fixed. Demo adds training only in its
-  isolated store.
-- Dart review found deleted custom exercises hid their preserved histories.
-  MM-194 now retains stable IDs without guessing a missing resistance type,
-  with engine/mobile regressions. Workout, weight and custom-exercise retries
-  are tested; final full checks pass.
-- Inspected Martian Progress charts, full detail, all-lift navigation and
-  unusable high-rep history on a headless Android emulator; phone untouched.
-  Linux regeneration passed after fixing its ambiguous scroll selector.
-  Reviewed six new strength images in Light/Dark/Martian and two weight-event
-  entry backgrounds changed by the longer scrollable Progress content.
-  PR #77 is awaiting final CI. iOS was not run.
+- Added canonical roles/protocol/contract, read-only Claude adapters,
+  single-writer checkpoint/resume artifacts and `mm panel`.
+- Product design distinct from UX; Maurice proposal cannot silently override
+  existing mascot prohibition.
+- Copilot adapter writes restricted in that cloud environment. SDK download
+  HTTP 403 prevented Dart/Flutter checks. Native behavior was not tested.
+- Review fixed non-object schema bypass and Windows path defects; provisional
+  panel MM-195 now allocated MM-197 locally. Tests awaited local execution.
+- Cloud CI 38105665416 was `action_required`, zero jobs/logs, not test evidence.

@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "task_id": "pr79-research-smoke",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "copilot/implement-expert-panel",
+    "commit": "999d32887778f656080e788a1c9aa556e354ec8c"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Synthesize bounded platform research, no product change.",
+      "role": "chair",
+      "reviewer": "local-copilot-parent",
+      "status": "omitted",
+      "omission_reason": "Chair synthesizes; no independent chair review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {"inspected": [], "not_inspected": ["Independent chair review"], "referrals": [], "methods": [], "limitations": "Chair synthesis, not a separate review."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Chair owns synthesis, not a separate self-review.", "path": "not-needed", "sources": [], "summary": "See decision.md.", "limitations": "No independent chair reviewer."}
+    },
+    {
+      "task": "Externally verify VS Code retrieval versus discovery and cloud web alias.",
+      "role": "integrations",
+      "reviewer": "copilot-research-a47a1fc3-and-claude-panel-integrations",
+      "status": "stale",
+      "inspected_commit": "999d32887778f656080e788a1c9aa556e354ec8c",
+      "input_hashes": {
+        "agents/roles/integrations.md": "a3d2bb359145bd8b74ebc319e56c8fa0073b4a2c2c8e81bb6b86c76d1b6f0ba1",
+        "agents/panel-protocol.md": "e2ef0dd512ca119a8fb6ce9fe4b059bed0d40e415176335269f00c0ecf4f9f29",
+        "agents/review-contract.md": "e08dc19d12c19528bc52f097e6752d39fe63c7b4d02550b7c204b8f142246a2c",
+        "AGENTS.md": "b3c4186e21b301485b1ece9179882a8e32d1597e38747ede492a68243b9b3de9",
+        ".claude/agents/panel-integrations.md": "f8c5dabfccd2a4912834a1717c6d33a5e7766c0bd2918b615ca7548d55f0f183",
+        ".github/agents/panel-integrations.agent.md": "55334714a13bb27d885d90469510dce4e5024aab2cf7c906333f381835be5caf",
+        "agents/native-surfaces.md": "4393f275247bc0e681f9272656ac1aec088eaf2ee9d16d9e063002a2cc86cd2c",
+        "agents/templates/findings/role.md": "9008e0e69ee17928d7419389cd3bcd2d5903e8ba7f78fe971cdeba44ed05ef34"
+      },
+      "report": "findings/integrations.md",
+      "coverage": {"inspected": ["Canonical integration role/protocol/contract and native adapters", "Official platform docs and actual Claude tools/resume"], "not_inspected": ["Copilot native picker/CLI/cloud runtime"], "referrals": [], "methods": ["source-inspection", "runtime-reproduction"], "limitations": "New MM-201 audit instructions postdate this platform research; source findings retained, not a current full audit."},
+      "research": {
+        "status": "performed",
+        "question": "Is VS Code web/fetch source discovery, and is cloud web mapped?",
+        "reason": "Explicit current platform capability verification.",
+        "path": "chair",
+        "sources": [
+          {"url": "https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/agents/reference/tools-reference.md", "title": "Tools and context reference", "published_or_updated": "2026-10-07", "accessed": "2026-10-11", "claim": "web/fetch retrieves pages; separate GitHub-scoped discovery tools."},
+          {"url": "https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/custom-agents-configuration.md", "title": "Custom agents configuration", "published_or_updated": null, "accessed": "2026-10-11", "claim": "Cloud web alias currently not applicable; unknown entries ignored."}
+        ],
+        "summary": "See report for source findings versus interpretation and independent Claude corroboration.",
+        "limitations": "Documentation distinctions; no cloud/VS Code picker runtime attestation."
+      }
+    },
+    {
+      "task": "Omitted: no exercise science rule.",
+      "role": "training", "reviewer": "chair", "status": "omitted", "omission_reason": "No product/health rule is proposed.", "inspected_commit": null, "input_hashes": {}, "report": "findings/training.md",
+      "coverage": {"inspected": [], "not_inspected": ["Training"], "referrals": [], "methods": [], "limitations": "Outside platform-only scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Platform tooling only.", "path": "not-needed", "sources": [], "summary": "No health rule.", "limitations": "No training review."}
+    },
+    {
+      "task": "Omitted: no nutrition rule.",
+      "role": "nutrition", "reviewer": "chair", "status": "omitted", "omission_reason": "No product/health rule is proposed.", "inspected_commit": null, "input_hashes": {}, "report": "findings/nutrition.md",
+      "coverage": {"inspected": [], "not_inspected": ["Nutrition"], "referrals": [], "methods": [], "limitations": "Outside platform-only scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Platform tooling only.", "path": "not-needed", "sources": [], "summary": "No health rule.", "limitations": "No nutrition review."}
+    },
+    {
+      "task": "Omitted: no coaching rule.",
+      "role": "coaching", "reviewer": "chair", "status": "omitted", "omission_reason": "No product/health rule is proposed.", "inspected_commit": null, "input_hashes": {}, "report": "findings/coaching.md",
+      "coverage": {"inspected": [], "not_inspected": ["Coaching"], "referrals": [], "methods": [], "limitations": "Outside platform-only scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Platform tooling only.", "path": "not-needed", "sources": [], "summary": "No behavior rule.", "limitations": "No coaching review."}
+    },
+    {
+      "task": "Omitted: no measurement rule.",
+      "role": "measurement", "reviewer": "chair", "status": "omitted", "omission_reason": "No product/health rule is proposed.", "inspected_commit": null, "input_hashes": {}, "report": "findings/measurement.md",
+      "coverage": {"inspected": [], "not_inspected": ["Measurement"], "referrals": [], "methods": [], "limitations": "Outside platform-only scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Platform tooling only.", "path": "not-needed", "sources": [], "summary": "No measurement rule.", "limitations": "No measurement review."}
+    },
+    {
+      "task": "Omitted: no clinical or health rule.",
+      "role": "safety", "reviewer": "chair", "status": "omitted", "omission_reason": "No product/health rule is proposed.", "inspected_commit": null, "input_hashes": {}, "report": "findings/safety.md",
+      "coverage": {"inspected": [], "not_inspected": ["Clinical behavior"], "referrals": [], "methods": [], "limitations": "Not clinical clearance."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Public platform documentation only.", "path": "not-needed", "sources": [], "summary": "No clinical claim.", "limitations": "Not clinical clearance."}
+    }
+  ],
+  "research_capabilities": [
+    {"surface": "Local Copilot chair-delegated research specialist", "discovery": ["github-mcp-server-search_code"], "retrieval": ["web_fetch"], "status": "observed", "checked_at": "2026-10-11", "limitations": "GitHub-scoped discovery, not native custom-profile discovery."},
+    {"surface": "Claude Code 2.1.296 on Windows, panel-integrations", "discovery": ["WebSearch"], "retrieval": ["WebFetch"], "status": "observed", "checked_at": "2026-10-11", "limitations": "Research executed; fresh resume without CLI tool overrides exposed exactly five allowlisted tools."},
+    {"surface": "VS Code Local picker / Copilot CLI / GitHub cloud runtime", "discovery": [], "retrieval": [], "status": "untested", "checked_at": "2026-10-11", "limitations": "Static official-doc verification only; no installed Copilot CLI."}
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {"id": "D2", "status": "accepted", "summary": "Separate discovery/retrieval; use actual tools or bounded research.", "authority": "Owner acceptance and consulted official sources"}
+  ],
+  "pending_work": ["MM-201 changed canonical audit instructions after research/resume. Retain tested source evidence; integrations assignment is stale for new protocol, not a new full audit."],
+  "tests": [
+    {"command": "fvm dart test test\\panel_checker_test.dart (initial cloud implementation)", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "Windows regression fixture did not write state.json; corrected setup without changing expected behavior."},
+    {"command": "fvm dart test test\\panel_checker_test.dart", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "21 focused cases passed, including invalid adapter/research fixtures and Windows path test."},
+    {"command": ".\\mm.ps1 check", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Full Windows format/requirements/architecture/panel/analyze/workspace tests; final All checks passed."},
+    {"command": "claude --agent panel-integrations --print (restricted research smoke)", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Actual Read/WebSearch/WebFetch, no shell/write/delegation tools; source-supported result is_error false."},
+    {"command": "claude --agent panel-integrations --print (fresh artifact resume, no tool overrides)", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Read five artifacts without chat; reused evidence, no redundant research. Effective tools exactly Read/Grep/Glob/WebSearch/WebFetch."},
+    {"command": ".\\mm.ps1 check (final capability-invariant code)", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Final All checks passed; 79 tool tests include 22 panel cases. Windows regression executed, not skipped."},
+    {"command": ".\\mm.ps1 panel docs\\agent-runs\\pr79-research-smoke", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Actual saved run validated, including sources, reports, ownership and capability metadata."}
+  ],
+  "checkpoint": {"at": "2026-10-11T03:04:43Z", "writers_stopped": true}
+}
