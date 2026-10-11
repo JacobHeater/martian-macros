@@ -1,5 +1,6 @@
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import 'app_database.dart';
 import 'drift_custom_exercise_repository.dart';
@@ -7,6 +8,7 @@ import 'drift_custom_food_repository.dart';
 import 'drift_data_eraser.dart';
 import 'drift_day_mark_repository.dart';
 import 'drift_food_repository.dart';
+import 'drift_health_sample_store.dart';
 import 'drift_insight_log_repository.dart';
 import 'drift_intake_reader.dart';
 import 'drift_pause_repository.dart';
@@ -41,6 +43,7 @@ final class DriftRepositories {
       recovery = DriftRecoveryCheckInRepository(db),
       workouts = DriftWorkoutRepository(db),
       customExercises = DriftCustomExerciseRepository(db),
+      healthSamples = DriftHealthSampleStore(db),
       eraser = DriftDataEraser(db);
 
   final AppDatabase _db;
@@ -60,6 +63,7 @@ final class DriftRepositories {
   final RecoveryCheckInRepository recovery;
   final WorkoutRepository workouts;
   final CustomExerciseRepository customExercises;
+  final HealthSampleStore healthSamples;
   final DataEraser eraser;
 
   /// Closes the underlying database.

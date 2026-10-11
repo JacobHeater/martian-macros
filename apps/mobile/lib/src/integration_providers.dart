@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 /// The one place the app chooses its integration providers (MM-162). Screens
 /// and other providers depend on the interfaces only.
@@ -26,4 +27,10 @@ final backupStorageProvider = Provider<BackupStorage>(
 
 final entitlementReaderProvider = Provider<EntitlementReader>(
   (ref) => throw UnimplementedError('No entitlement source is registered yet.'),
+);
+
+/// The phone's health platform (MM-67). Health Connect (MM-68) and
+/// HealthKit (MM-69) are registered here when they exist.
+final healthSourceProvider = Provider<HealthSource>(
+  (ref) => throw UnimplementedError('No health platform is registered yet.'),
 );
