@@ -21,10 +21,10 @@ time.
 MM-209 is taken). `mm req next` is the authority.
 
 **What to build next.**
-- MM-71 (which weigh-in counts for a day; the owner's rule is in the
-  ticket), then imported weight feeding the trend with a typed value
-  overruling it (MM-68). The Health Connect adapter and its Settings group
-  are built; readings are kept but not used yet.
+- Health sync, what is left: see an import of a real reading on a phone
+  whose Health Connect has data (not yet seen); choosing the primary scale
+  in Settings (MM-71); background updates (MM-72); history beyond the
+  first month (MM-73); the onboarding offer and the other kinds (MM-68).
 - MM-155, the rest: the protocol drawing and the waist chart. The shared
   change function, the three-reading entry and the per-user noise figure
   are built.
@@ -108,6 +108,11 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   readings, so a real reading has not been seen imported.
 - The phone's normal app was not touched. The demo test app was left
   installed with six read permissions granted over adb.
+- MM-71 and the rest of MM-68's weight path, stacked on the first part:
+  `dailyWeighIns`, `primaryWeightSource`, `mergeWeighIns`; `weightsProvider`
+  is now typed weigh-ins plus the imported one that counts for each other
+  day (`typedWeightsProvider` is what was typed); `healthSyncProvider` runs
+  when the home shell opens and on resume.
 
 ## Session 13: 2026-10-11, Claude (health table, waist change)
 
