@@ -167,7 +167,8 @@ Not built:
   sound file: a new dependency, left for the product owner to decide. Only the vibration is given.
 - A signal when the app is in the background (MM-146's scheduler), and a rest length typed freely.
 - A workout's own start and end are still typed to the minute (the phone's time picker).
-- Not seen with a screen reader, and the vibration was not felt on a phone.
+- Seen on the Android emulator (2026-10-11): choosing a target, the countdown, the bar at the target, and the time entry.
+  Not seen with a screen reader, and the vibration was not felt on a phone.
 
 ## Notes
 - Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
