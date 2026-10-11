@@ -6,12 +6,15 @@ import 'strength_point.dart';
 final class StrengthTrend {
   const StrengthTrend({
     required this.exercise,
+    required this.exerciseId,
     required this.points,
     required this.loggedSessions,
     required this.recentSessions,
   });
 
-  final Exercise exercise;
+  final String exerciseId;
+  final Exercise? exercise;
+  String get name => exercise?.name ?? 'Deleted exercise ($exerciseId)';
   final List<StrengthPoint> points;
   final int loggedSessions;
   final int recentSessions;

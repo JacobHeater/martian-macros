@@ -149,6 +149,82 @@ void main() {
     expect(find.text('12 weeks: Not enough history'), findsOneWidget);
   });
 
+  for (final exerciseRead in [false, true]) {
+    testWidgets(
+      '${exerciseRead ? 'exercise' : 'weight'} loading, failure and retry',
+      (tester) async {
+        final repos = InMemoryRepositories();
+        await repos.workouts.saveWorkout(workout());
+        final weightStream = StreamController<List<WeightObservation>>();
+        final exerciseStream = StreamController<List<Exercise>>();
+        addTearDown(exerciseRead ? exerciseStream.close : weightStream.close);
+        var attempts = 0;
+        await pump(
+          tester,
+          repos,
+          settle: false,
+          overrides: [
+            if (exerciseRead)
+              customExercisesProvider.overrideWith((ref) {
+                attempts++;
+                return attempts == 1 ? exerciseStream.stream : Stream.value([]);
+              })
+            else
+              weightsProvider.overrideWith((ref) {
+                attempts++;
+                return attempts == 1 ? weightStream.stream : Stream.value([]);
+              }),
+          ],
+        );
+        expect(find.byType(StrengthTrendCard), findsNothing);
+        if (exerciseRead) {
+          exerciseStream.addError(
+            StateError('exercise read failed'),
+            StackTrace.current,
+          );
+        } else {
+          weightStream.addError(
+            StateError('weight read failed'),
+            StackTrace.current,
+          );
+        }
+        await tester.pumpAndSettle();
+        expect(find.text('Retry strength history'), findsOneWidget);
+        await tester.tap(find.text('Retry strength history'));
+        await tester.pumpAndSettle();
+        expect(find.text('120.0 kg'), findsOneWidget);
+        expect(attempts, 2);
+      },
+    );
+  }
+
+  testWidgets('MM-194 deleting custom exercise retains its lift history', (
+    tester,
+  ) async {
+    final repos = InMemoryRepositories();
+    final id = await repos.customExercises.saveCustomExercise(
+      builtInExercises.first.withId(''),
+    );
+    await repos.workouts.saveWorkout(workout(exerciseId: id));
+    await pump(tester, repos);
+    expect(find.byType(StrengthTrendCard), findsOneWidget);
+    await repos.customExercises.deleteCustomExercise(id);
+    await tester.pumpAndSettle();
+    expect(find.byType(StrengthTrendCard), findsNothing);
+    await tester.tap(find.text('All lift histories'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Deleted exercise ($id)'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Exercise details were deleted'),
+      findsOneWidget,
+    );
+    final saved = await tester.runAsync(
+      () => repos.workouts.watchWorkouts().first,
+    );
+    expect(saved!.single.exercises.single.sets.single.loadKg, 100);
+  });
+
   testWidgets('detail chart includes older history', (tester) async {
     final repos = InMemoryRepositories();
     await repos.workouts.saveWorkout(workout(daysAgo: 200));

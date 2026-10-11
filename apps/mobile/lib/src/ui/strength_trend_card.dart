@@ -38,11 +38,16 @@ class StrengthTrendCard extends StatelessWidget {
     }
 
     return InfoCard(
-      title: trend.exercise.name,
+      title: trend.name,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (latest == null)
+          if (trend.exercise == null)
+            const Text(
+              'Exercise details were deleted. Logged sets are preserved, but '
+              'estimates need the original resistance type.',
+            )
+          else if (latest == null)
             const Text(
               'No usable estimate yet. Log a finished workout with positive '
               'resistance and at most 12 reps including reps in reserve. '
@@ -100,7 +105,7 @@ class StrengthTrendCard extends StatelessWidget {
               ),
             ],
           ],
-          if (trend.exercise.load == ExerciseLoad.bodyweight) ...[
+          if (trend.exercise?.load == ExerciseLoad.bodyweight) ...[
             const SizedBox(height: 8),
             const Text(
               'Uses total bodyweight plus added or assisted weight. A weigh-in '

@@ -77,14 +77,14 @@ class StrengthSection extends ConsumerWidget {
                   in trends.where((t) => t.recentSessions > 0).take(4)) ...[
                 const SizedBox(height: 12),
                 StrengthTrendCard(
-                  key: ValueKey('strength-${trend.exercise.id}'),
+                  key: ValueKey('strength-${trend.exerciseId}'),
                   trend: trend,
                   fmt: fmt,
                   today: today,
                   onHistory: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) =>
-                          StrengthHistoryScreen(exerciseId: trend.exercise.id),
+                          StrengthHistoryScreen(exerciseId: trend.exerciseId),
                     ),
                   ),
                 ),
