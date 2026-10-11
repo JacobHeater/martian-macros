@@ -5,21 +5,21 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, finishing MM-77.
+Last updated: 2026-10-11, by Copilot, starting MM-78.
 
-**Branch state.** `feature/mm77-strength-trends`, PR #77, has completed
-MM-77 strength trends. Reviewed Linux goldens are being committed; merge once
-final CI is green. No other feature work is in flight. Martian #64 and
-training/timer work through #76 merged.
+**Branch state.** `feature/mm78-weekly-volume` implements rolling weekly
+muscle-group volume, with no schema changes. Strength #77 is green and merged.
+Volume PR #78 implementation/full checks and reviewed screenshots pass;
+merge once final CI is green.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
 in flight at a time.
 
-**Next ticket ID.** MM-195 (`mm req next` is the authority).
+**Next ticket ID.** MM-196 (`mm req next` is the authority).
 
-**What to build next.** WS-10: weekly
-volume (MM-78), remaining rest countdown/signals (MM-191), progression (MM-79).
+**What to build next.** WS-10: remaining rest countdown/signals and timing
+gaps (MM-191), then progression (MM-79).
 Strength unlocks the recomp review/signal (MM-133, MM-32) and the unfinished
 strength/PR parts of monthly reports and rewards (MM-33, MM-92). Phase
 planning (MM-36) needs body-fat estimates (MM-34).
@@ -75,6 +75,24 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, UI design-system controls.
   Stateful screens have a separate `_state.dart` declaration.
 
+## Session 8: 2026-10-11, Copilot
+
+- Owner authorized pushing through the roadmap autonomously. Started MM-78
+  after MM-77 implementation, screenshots and full checks passed.
+- Weekly volume counts finished workouts in two adjacent rolling seven-day
+  windows; RIR 0–4/null, full primary and half secondary contributions.
+  Unknown/deleted exercise mappings are explicitly omitted, never guessed.
+  Train opens an eleven-group comparison with a broad 10–20 reference band.
+- Engine/mobile tests and full `mm check` pass. Linux golden generation and
+  headless emulator inspection are next; #77 Android CI build is running.
+- Strength #77 passed full Linux checks/Android build and merged. Inspected
+  Martian volume on the isolated headless emulator; Light/Dark/Martian volume
+  goldens pass. MM-195 fixed volume navigation disappearing during an active
+  workout, with failing-before/passing-after regression. Final full checks pass;
+  Reviewed refreshed Train screenshots and volume images in all three palettes.
+  Seven focused volume widget tests include exact reference-band/bar geometry,
+  screen-reader semantics and values above 20. PR #78 awaits final CI.
+
 ## Session 7: 2026-10-11, Copilot
 
 - Completed MM-77: per-session Epley e1RM, smoothed per-lift strength,
@@ -110,14 +128,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   seconds, cross-set overlap validation.
 - MM-92 process rewards and MM-33 monthly reports merged but wait on strength
   and personal records for remaining parts. Neither was emulator-inspected.
-
-## Session 5: 2026-10-10, Claude (Anthropic)
-
-- MM-187 made the horizon arc the only calorie visual. Dashboard, Food and
-  Coach share CalorieHero; no compact variant. Architecture blocks standalone
-  hero surfaces/arcs in screens. Updated tests/goldens after taller heroes.
-- Merged green Martian #64. MM-184 preserves legacy themes with schema 24,
-  new-install chooser and wrapping Settings. MM-185/186 cover delayed-save
-  preview and loading fallback races. Full checks and reviewed screenshots
-  passed; Dashboard/Food/Settings/chooser were seen on the isolated emulator
-  demo, never the normal app or physical phone.
