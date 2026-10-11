@@ -1,6 +1,7 @@
 import 'package:mm_engine/mm_engine.dart';
 
 import 'fmt.dart';
+import 'waist_amount.dart';
 
 /// What the recomp signal card says (MM-32), or null when there is nothing
 /// to say. With the signal present: the three things seen, and what they do
@@ -15,7 +16,7 @@ String? recompSignalText(RecompSignal signal, Fmt fmt) {
         ? lifts.join(' and ')
         : '${lifts.take(2).join(', ')} and ${lifts.length - 2} more';
     return 'Trend weight held near ${fmt.weight(signal.trendWeightKg!)}. '
-        'Waist down about ${_waist(signal.waistChangeCm!.abs(), fmt)}. '
+        'Waist down about ${waistAmount(signal.waistChangeCm!, fmt)}. '
         'Estimated maxes are up on $named. '
         'This pattern is consistent with losing fat while keeping or gaining '
         'muscle. It does not measure either.';
@@ -32,15 +33,4 @@ String? recompSignalText(RecompSignal signal, Fmt fmt) {
           'mornings to see whether your weight is holding.',
     null => null,
   };
-}
-
-/// A waist change to the half centimeter or quarter inch: finer would be
-/// false precision for a tape.
-String _waist(double cm, Fmt fmt) {
-  final step = fmt.imperial ? 0.25 : 0.5;
-  final value = (fmt.lengthFromCm(cm) / step).round() * step;
-  final text = value == value.roundToDouble()
-      ? value.round().toString()
-      : value.toString();
-  return '$text ${fmt.lengthUnit}';
 }
