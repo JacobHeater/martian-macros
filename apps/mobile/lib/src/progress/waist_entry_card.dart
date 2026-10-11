@@ -14,6 +14,7 @@ class WaistEntryCard extends StatefulWidget {
     super.key,
   });
 
+  /// The unit the readings are typed in, in words: "inches".
   final String unit;
 
   /// What is known so far, under the fields; null before any measurement.
