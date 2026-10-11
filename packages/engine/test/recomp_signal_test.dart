@@ -135,13 +135,13 @@ void main() {
       );
     });
 
-    test('one reading at either end needs 2 cm', () {
+    test('it is the shared answer: down by the noise of a difference', () {
       expect(
-        read(waist: waistOn({28: 92, 10: 90.2, 3: 90.2})).waist,
+        read(waist: waistOn({28: 92, 10: 90.7, 3: 90.7})).waist,
         RecompPart.doesNotHold,
       );
       expect(
-        read(waist: waistOn({28: 92, 10: 90, 3: 90})).waist,
+        read(waist: waistOn({28: 92, 10: 90.6, 3: 90.6})).waist,
         RecompPart.holds,
       );
     });
@@ -162,18 +162,20 @@ void main() {
       );
     });
 
-    test('the windows are the last 14 days and 21 to 35 days ago', () {
-      // 13 days ago is recent; 14 is in neither window.
+    test('it needs a measurement from the last two weeks, and one from '
+        'about four weeks ago', () {
       expect(
-        read(waist: waistOn({35: 92, 21: 92, 13: 90})).waist,
+        read(waist: waistOn({35: 92, 24: 92, 13: 90})).waist,
         RecompPart.holds,
       );
+      // Nothing for two weeks: now is not known.
       expect(
-        read(waist: waistOn({35: 92, 21: 92, 14: 90})).waist,
+        read(waist: waistOn({35: 92, 24: 92, 14: 90})).waist,
         RecompPart.unknown,
       );
+      // Nothing within ten days of four weeks ago.
       expect(
-        read(waist: waistOn({36: 92, 20: 92, 13: 90, 3: 90})).waist,
+        read(waist: waistOn({60: 92, 50: 92, 10: 90, 3: 90})).waist,
         RecompPart.unknown,
       );
     });
