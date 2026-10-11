@@ -30,7 +30,10 @@ final class PanelChecker {
       'agents/state.schema.json',
       errors,
     );
-    if (schema is! Map<String, dynamic>) return errors;
+    if (schema is! Map<String, dynamic>) {
+      errors.add('Schema must be a JSON object');
+      return errors;
+    }
     final properties = schema['properties'];
     final assignmentsSchema = properties is Map
         ? properties['assignments']
@@ -269,7 +272,11 @@ final class PanelChecker {
       '${root.resolveSymbolicLinksSync()}/docs/agent-runs/$id',
     );
     if (!run.existsSync() ||
-        run.resolveSymbolicLinksSync() != expected.absolute.path) {
+        !expected.existsSync() ||
+        run.resolveSymbolicLinksSync() != expected.resolveSymbolicLinksSync() ||
+        !run.resolveSymbolicLinksSync().startsWith(
+          '${root.resolveSymbolicLinksSync()}${Platform.pathSeparator}',
+        )) {
       errors.add('Run must live at docs/agent-runs/$id in this repository');
     }
     if ((state['baseline'] as Map)['commit'] ==

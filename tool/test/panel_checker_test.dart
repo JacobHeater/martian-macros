@@ -119,6 +119,22 @@ void main() {
     expect(checker.check(root).any((e) => e.contains('not valid JSON')), isTrue);
   });
 
+  test('MM-195 non-object schema cannot bypass panel validation', () async {
+    final file = File('${root.path}/agents/state.schema.json');
+    for (final content in ['null', '[]', 'true', '"schema"']) {
+      file.writeAsStringSync(content);
+      expect(checker.check(root), contains('Schema must be a JSON object'));
+      expect(await runPanel(root, const []), 1);
+    }
+  });
+
+  test('MM-195 native saved-run separators validate on Windows', () {
+    expect(
+      checker.check(root, run: Directory(run.path.replaceAll('/', r'\'))),
+      isEmpty,
+    );
+  }, skip: !Platform.isWindows ? 'Windows path semantics' : false);
+
   test('template schema rejects extra fields and invalid enums', () {
     final file = File('${root.path}/agents/templates/state.json');
     state['phase'] = 'invented';

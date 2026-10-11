@@ -23,7 +23,8 @@ training/timer work through #76 merged.
 results from existing repositories and needs no migration. One schema change
 in flight at a time.
 
-**Next ticket ID.** MM-195 (`mm req next` is the authority).
+**Next ticket ID.** MM-196 provisionally: panel bug ticket uses MM-195; allocation
+must be verified with `mm req next` when the SDK is available.
 
 **What to build next.** WS-10: weekly
 volume (MM-78), remaining rest countdown/signals (MM-191), progression (MM-79).
@@ -94,6 +95,13 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   `mm analyze`, `mm format --check` and `mm check` each exited 1 before running:
   no Dart/Flutter SDK; pinned SDK download returned HTTP 403. JSON parsing and
   `git diff --check` passed. Focused validator tests are added but unexecuted.
+- Independent review found non-object schema bypass and Windows path comparison
+  defects; MM-195 records fixes/regressions, pending SDK execution and ID
+  validation. Automated review failed to load its model; CodeQL skipped Dart
+  (no supported language changes). No native agent runtime was tested.
+- PR #79 CI run 38105665416 was `action_required` with zero jobs/logs, so it
+  provides no test evidence. Concurrent PR #80 references MM-196: reconcile
+  the provisional MM-195 allocation against fresh main before merging.
 
 ## Session 7: 2026-10-11, Copilot
 
