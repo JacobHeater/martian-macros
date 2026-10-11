@@ -2,6 +2,7 @@ import 'package:mm_domain/mm_domain.dart';
 
 import 'measured_change.dart';
 import 'waist_change.dart';
+import 'waist_noise_of.dart';
 import 'waist_rule.dart';
 
 /// Whether the waist changed over the [days] up to [asOf] (MM-155), or
@@ -11,7 +12,9 @@ import 'waist_rule.dart';
 /// middle value of the latest three entries against that of the three
 /// nearest the day [days] ago. The latest entry has to be from the last
 /// two weeks. A difference is a change only when it exceeds the noise of a
-/// difference, 1.4 times [noiseCm]; inside that it is no clear change.
+/// difference, 1.4 times the noise figure; inside that it is no clear
+/// change. The figure is [waistNoiseOf] the entries, half as much again
+/// when either end includes a single reading, unless [noiseCm] is given.
 ///
 /// With [sinceStart], the comparison is with the first three entries ever
 /// instead, so the starting point is not one noisy reading.
@@ -20,7 +23,7 @@ WaistChange? waistChangeOf({
   required CalendarDate asOf,
   int days = 28,
   bool sinceStart = false,
-  double noiseCm = WaistRule.medianOfThreeNoiseCm,
+  double? noiseCm,
 }) {
   final entries = [
     for (final entry in waist)
@@ -80,7 +83,13 @@ WaistChange? waistChangeOf({
 
   final from = middle(baseline);
   final to = middle(recent);
-  final threshold = WaistRule.differenceFactor * noiseCm;
+  // The user's own figure once there is one; half as much again when
+  // either end rests on a single reading.
+  final single = [...recent, ...baseline].any((e) => e.isSingleReading);
+  final noise =
+      noiseCm ??
+      waistNoiseOf(waist) * (single ? WaistRule.singleReadingFactor : 1);
+  final threshold = WaistRule.differenceFactor * noise;
   // A hair of tolerance, so a change of exactly the threshold counts
   // whatever the arithmetic did to its last digit.
   final change = to - from;
