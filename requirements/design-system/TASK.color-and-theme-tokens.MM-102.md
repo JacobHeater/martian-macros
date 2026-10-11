@@ -31,7 +31,7 @@ Choices I made without asking (say if any is wrong):
 - **Being over a calorie target is not `danger` and not red.** It is stated in the normal text color (MM-108).
 - **Macro colors are distinguishable without color vision**: they differ in lightness as well as hue, and are always labelled.
 - **The direction for the palette**: see `design/color-and-theme-system.md`. Values were checked for contrast and color-blind separation but
-  not yet seen rendered in the app; `design/palette-preview.html` is the review sheet. Still a proposal until the gallery (MM-105) shows it.
+  not yet seen rendered in the app; the palette preview (see UI/UX Assets) is the review sheet. Still a proposal until the gallery (MM-105) shows it.
 - **Screens use tokens, never literal colors.** A lint or a test flags a `Color(0x...)` outside the theme files.
 
 ## Description
@@ -73,6 +73,17 @@ Scenario: Without color vision
   `Notice` and `ChoiceCard` still use their old shapes (step 1b). Status stays in-progress until the gallery shows the palette.
 
 ## Notes (completed)
-- Both themes, the semantic tokens, the contrast test, the no-stray-colors test and the rendered review (`design/palette-preview.html`, and the in-app gallery's color swatches, MM-105) exist. The
+- Both themes, the semantic tokens, the contrast test, the no-stray-colors test and the rendered review (the palette preview, and the in-app gallery's color swatches, MM-105) exist. The
   product owner reviewed the rendered palette and approved it.
 - **Not verified**: grayscale and color-blind review was done numerically (L* separation and simulated ΔE in `design/color-and-theme-system.md`), not with a person who has color-vision deficiency.
+
+## UI/UX Assets
+
+- [Palette preview](../ui-ux-assets/palette-preview.html) — Accepted. The
+  review sheet for the palette: the Martian, Dark and Light colors on a mock
+  phone, the notice family and buttons, every swatch with contrast spot
+  checks, and the three macros in grayscale. The owner's approval of the
+  rendered palette is recorded in the notes above. It is a static sheet, not
+  app code: its fonts fall back to the system's, its Today mock is an
+  illustration and not the reference for that screen, and it has not been
+  compared with the built screens since.

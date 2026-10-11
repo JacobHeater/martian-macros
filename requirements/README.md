@@ -13,6 +13,26 @@ agent keeps of the three most recent sessions and the current state of the
 work (MM-174). It and this README are the only files allowed at the top of
 this folder.
 
+## UI/UX assets
+
+HTML that shows what a screen or a flow is meant to look like or do lives in
+[ui-ux-assets/](ui-ux-assets/README.md), the one folder here that is not a
+component and holds no tickets (MM-210). A ticket lists the assets that
+support it under the exact heading `## UI/UX Assets`, one entry each:
+
+```markdown
+- [Title](../ui-ux-assets/file.html) — Status. What it shows, for which
+  screen or flow, and what limits it.
+```
+
+The status is `Exploratory`, `Proposed`, `Accepted` or `Superseded`. Add an
+asset and its entries in the same pull request; when an asset changes
+materially, bring its entries up to date. An asset you cannot confidently
+give to a ticket goes on the unresolved list in that folder's README, never
+to a guessed ticket. The ticket stays the requirement: a linked asset
+approves nothing and proves nothing about the app. `mm req` checks the links
+and the bookkeeping, not the judgement.
+
 ## Folder Structure
 
 Each folder represents a component of Martian Macros. Inside each
@@ -134,6 +154,10 @@ Scenario: ...
   When ...
   Then ...
 \`\`\`
+
+## UI/UX Assets
+Optional. The HTML assets in `ui-ux-assets/` that support this ticket, one
+entry each (see "UI/UX assets" above).
 
 ## Notes
 Optional: implementation notes, explicitly out-of-scope items, open

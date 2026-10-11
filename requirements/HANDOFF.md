@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Claude, end of Session 12.
+Last updated: 2026-10-11, by Claude, end of Session 15.
 
 **Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
 MM-208) is not Claude's and was not touched; its handoff edits will conflict
@@ -17,8 +17,12 @@ with this file. Nothing else is open: Session 13's pull requests (#90 to
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
-MM-209 is taken). `mm req next` is the authority.
+**Next ticket ID.** MM-211 once #81 merges (it uses MM-205 to MM-208;
+MM-209 and MM-210 are taken). `mm req next` is the authority.
+
+**HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
+from their tickets under `## UI/UX Assets` (MM-210). `mm req` fails on an
+HTML file anywhere else that the folder's README does not account for.
 
 **What to build next.**
 - Health sync, what is left: see an import of a real reading on a phone
@@ -50,6 +54,8 @@ MM-209 is taken). `mm req next` is the authority.
 - MM-188 still needs phone checks: other apps' Health Connect segments, and
   how a written workout looks in each platform's own app. Owner accepted
   the exercise mappings for now.
+- MM-210: whether the palette preview's Today mock is the reference for
+  the dashboard. It is linked only from the two color tickets.
 - Eating-disorder support wording in MM-114 lacks a reviewed helpline
   (MM-29, MM-96).
 
@@ -89,6 +95,29 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Native plugins need release-build validation; iOS needs macOS.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
+
+## Session 15: 2026-10-11, Claude (UI/UX assets)
+
+- **MM-210, done.** HTML UI/UX assets (screen prototypes, interaction
+  demonstrations, explorations, visual specifications) live in
+  `requirements/ui-ux-assets/` and are linked from the tickets they support
+  under the exact heading `## UI/UX Assets`, each with a status
+  (Exploratory, Proposed, Accepted, Superseded) and what it shows. It is a
+  standing working agreement in `AGENTS.md`; the convention is that
+  folder's README; six panel roles each say their part.
+- `mm req` checks the bookkeeping (`tool/src/ui_ux_assets.dart`, 28 tests):
+  links, statuses, unlinked assets, missing local files, network loads,
+  copies, and any HTML elsewhere that the README does not account for. It
+  cannot judge whether an asset belongs with its ticket, looks right or was
+  approved.
+- The one existing asset, the palette preview, moved from `design/` with its
+  history and is linked from MM-102 and MM-184. Opened in headless Edge after
+  the move: it renders whole. Its banner still calls Martian a proposal not
+  wired into the app; the MM-184 entry says so, and the file was not redrawn.
+- Left open for the owner: the preview also mocks the Today screen, and no
+  dashboard ticket links it, because nothing records it as that screen's
+  reference.
+- Nothing about `mm ci` changed.
 
 ## Session 14: 2026-10-11, Claude (Health Connect)
 
@@ -145,36 +174,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   emulator: the "Suggestions use" row and the settings screen as it opens.
 - Done this session: MM-67, MM-133, MM-79. In progress: MM-155 (drawing
   and chart left).
-
-## Session 12: 2026-10-11, Claude (training and recomp)
-
-The owner was away and said to use the panel for open questions. Read-only
-panel roles were asked (`panel-training`, `panel-ux-accessibility`,
-`panel-measurement`); their answers are in the tickets. They inspected
-source and ran nothing.
-
-- Merged, each after `mm ci check` showed its check passed on its head: #82
-  (`mm ci`), #83 (MM-191), #84 (MM-79), #85 (MM-32), #86 (MM-133), #87
-  (MM-33), #88 (MM-92). No CI watch is left to act on.
-- MM-191: a target rest per exercise with a countdown, one vibration at the
-  target (`RestSignal`), a set's times to the second (`showMmClockTime`),
-  and workouts and sets that end after midnight. Schema 28.
-- MM-79: `suggestProgression` (double progression) and a suggestion line on
-  each exercise of a workout in progress; the first set starts from it.
-- MM-32: `recompSignalOf` and a card on Progress. MM-133: `recompReviewOf`
-  and a review card on Coach at weeks 8, 12 and every 8 after. Both share an
-  interim waist rule until MM-155.
-- MM-33: workouts and a "Your lifts" card in the monthly report. MM-92:
-  personal records (`personalRecordsOf`), on the workout that set one.
-- MM-67, first half: `packages/health_ingest` with the `HealthSource`
-  interface, `HealthImporter`, a `FakeHealthSource` that replays a recorded
-  history, an in-memory store and `healthSourceContract`. No table, no
-  plugin and no screen yet.
-- A screenshot test broke on the taller exercise card and failed CI on #83;
-  fixed by scrolling to the button. Lesson: read the whole Linux golden run,
-  not its last line.
-- Seen on the Android emulator: the rest target, countdown and time entry;
-  the progression line (fat loss goal only); personal records. Not seen
-  there: the recomp signal and review, the report's lifts (the demo data
-  does not produce them). Not checked anywhere: a screen reader, the
-  vibration on a phone, iOS.
