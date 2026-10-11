@@ -14,8 +14,7 @@ with this file. Any pull request of Session 13 still open: read
 `agents/ci-monitoring.md`) are merged.
 
 **Database.** Schema 30 (the readings a waist measurement was taken from,
-MM-155), on its pull request until merged; `main` is 29 until then. Only
-one schema change in flight at a time.
+MM-155), merged. Only one schema change in flight at a time.
 
 **Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
 MM-209 is taken). `mm req next` is the authority.
@@ -26,9 +25,9 @@ MM-209 is taken). `mm req next` is the authority.
 - MM-155, the rest: the protocol drawing and the waist chart. The shared
   change function, the three-reading entry and the per-user noise figure
   are built.
-- Small leftovers: the recomp review in the monthly report (MM-33, MM-133);
-  an editable rep range and load step (MM-79; needs a table); MM-191's
-  sound, background signal and free-typed rest length.
+- Small leftovers: an editable rep range and load step (MM-79; needs a
+  table, schema 31); MM-191's sound, background signal and free-typed rest
+  length.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34); Android
   exercise segments need app-owned native code (MM-188, MM-189).
 
@@ -107,6 +106,11 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   middle one stored and all three kept; one reading is a quick entry with
   wider noise; from eight full entries the noise figure is the user's own
   (`waistNoiseOf`). A new `WaistEntryCard` on Progress.
+- #91 and #92 (MM-155) merged after their checks passed on their heads.
+  The waist card was seen on the emulator, and the demo database there
+  upgraded from schema 28 to 30 without error.
+- MM-133 done: the recomp review is also in the monthly report of the
+  month it fell due in (`RecompReviewBody` serves both places).
 
 ## Session 12: 2026-10-11, Claude (training and recomp)
 
