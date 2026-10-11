@@ -6,6 +6,12 @@ requirements, and [docs/architecture.md](docs/architecture.md). Then read
 [requirements/HANDOFF.md](requirements/HANDOFF.md): it says what the last
 agent left in flight and what the product owner has ruled in conversation.
 
+For cross-domain development reviews, use the tool-neutral
+[repository expert panel](agents/README.md), its
+[protocol](agents/panel-protocol.md) and [review contract](agents/review-contract.md).
+Reviewers are read-only; one designated owner edits canonical files. Native
+delegation and sequential fallback do not supersede the working agreements here.
+
 ## Working agreements
 
 - Inspect the repository state before editing. Preserve unrelated and
@@ -139,6 +145,8 @@ Run commands from the repository root using the `mm` wrapper (`.\mm` in
 PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
 
 - `mm req` after creating or updating requirements.
+- `mm panel` validates panel roles, Claude adapters and portable templates;
+  `mm panel docs/agent-runs/<task-id>` also checks saved run state.
 - `mm test <relevant-path>` for focused tests, such as
   `mm test packages/engine`.
 - `mm analyze` for static analysis.
