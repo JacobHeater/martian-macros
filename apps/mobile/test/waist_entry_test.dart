@@ -68,7 +68,7 @@ void main() {
   testWidgets('three readings: the middle one is the measurement, and all '
       'three are kept', (tester) async {
     await openWaist(tester);
-    expect(note(tester), 'Take three readings. The middle one is kept.');
+    expect(note(tester), 'Take three readings in cm. The middle one is kept.');
     await type(tester, ['91.5', '92.5', '92.0']);
     await save(tester);
 

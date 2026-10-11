@@ -68,9 +68,10 @@ class WaistEntryCardState extends State<WaistEntryCard> {
                       i == 0 ? 'entry-waist' : 'entry-waist-${i + 1}',
                     ),
                     controller: _readings[i],
-                    label: 'Reading ${i + 1}',
+                    // Short enough to fit three across a phone; the unit
+                    // is said once, under the fields.
+                    label: const ['1st', '2nd', '3rd'][i],
                     kind: MmTextFieldKind.number,
-                    suffix: widget.unit,
                     dense: true,
                     onChanged: (_) => setState(() {}),
                   ),
@@ -89,7 +90,8 @@ class WaistEntryCardState extends State<WaistEntryCard> {
                       ? 'One reading is kept as it is. It is noisier than '
                             'the middle of three, so a change takes longer '
                             'to show.'
-                      : 'Take three readings. The middle one is kept.',
+                      : 'Take three readings in ${widget.unit}. The middle one '
+                            'is kept.',
                   key: const ValueKey('waist-entry-note'),
                   style: text.bodySmall?.copyWith(color: context.mm.text2),
                 ),
