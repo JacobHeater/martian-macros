@@ -1,5 +1,6 @@
 import 'report_estimate.dart';
 import 'report_estimate_gap.dart';
+import 'report_lift.dart';
 import 'report_period.dart';
 import 'report_target_change.dart';
 
@@ -20,6 +21,8 @@ final class MonthlyReport {
     this.waistToCm,
     this.estimate,
     this.estimateGap,
+    this.workouts = 0,
+    this.lifts = const [],
   });
 
   final ReportPeriod period;
@@ -50,6 +53,13 @@ final class MonthlyReport {
   /// saying why.
   final ReportEstimate? estimate;
   final ReportEstimateGap? estimateGap;
+
+  /// Finished workouts in the month.
+  final int workouts;
+
+  /// The lifts with at least two sessions in the month that gave an
+  /// estimate, most trained first. One session cannot show a change.
+  final List<ReportLift> lifts;
 
   /// Every change to the targets in the month, oldest first.
   final List<ReportTargetChange> targetChanges;
