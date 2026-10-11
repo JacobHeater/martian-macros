@@ -162,6 +162,11 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
 - **Training.** An exercise library, sets × reps × load × RIR, Epley e1RM
   with RIR, weekly hard sets per muscle group, and double-progression
   suggestions.
+  Strength histories (MM-77) are pure-engine derivations of finished workouts,
+  the exercise library and dated weigh-ins. Bodyweight lifts need a historical
+  weigh-in; missing resistance metadata never becomes a guessed estimate.
+  Progress shows session bests, a trailing three-session mean and dated
+  four/twelve-week comparisons. Edits and deletions recompute from repositories.
 
 ## Code structure principles
 
