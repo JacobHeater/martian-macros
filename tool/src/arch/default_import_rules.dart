@@ -18,6 +18,17 @@ const defaultImportRules = <ForbiddenImportRule>[
     allowedFiles: ['apps/mobile/lib/src/repository_providers.dart'],
   ),
   ForbiddenImportRule(
+    appliesTo: 'apps/mobile/lib/',
+    forbidden: ['package:health/'],
+    reason:
+        'the health plugin sits behind HealthSource; only the Health Connect '
+        'adapter knows it',
+    allowedFiles: [
+      'apps/mobile/lib/src/health/health_connect_sample.dart',
+      'apps/mobile/lib/src/health/health_connect_source.dart',
+    ],
+  ),
+  ForbiddenImportRule(
     appliesTo: 'packages/domain/lib/',
     forbidden: [
       'package:flutter',

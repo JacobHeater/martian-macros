@@ -21,8 +21,10 @@ time.
 MM-209 is taken). `mm req next` is the authority.
 
 **What to build next.**
-- Health Connect behind `HealthSource` (MM-68): MM-67 is done, so it has a
-  store, an importer and a contract suite to pass on a device.
+- MM-71 (which weigh-in counts for a day; the owner's rule is in the
+  ticket), then imported weight feeding the trend with a typed value
+  overruling it (MM-68). The Health Connect adapter and its Settings group
+  are built; readings are kept but not used yet.
 - MM-155, the rest: the protocol drawing and the waist chart. The shared
   change function, the three-reading entry and the per-user noise figure
   are built.
@@ -88,6 +90,25 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
+## Session 14: 2026-10-11, Claude (Health Connect)
+
+- MM-68, first part: `HealthConnectSource` over the `health` plugin
+  (13.3.2, new dependency; read permissions only), a Health Connect group
+  in Settings, and `HealthReadFailure`: a platform that cannot be read is
+  an error, never an empty answer.
+- **Found on a real phone:** Health Connect refuses reads while the app is
+  not on screen, and the plugin reports that as no readings. Any import
+  must run in the foreground; the adapter now checks every read.
+- Run on the owner's Pixel as the **demo app only**
+  (`com.martianmacros.martian_macros.demo`), read only:
+  `flutter run integration_test/health_connect_test.dart -d <id>
+  --dart-define=MM_DEMO_APP=true --dart-define-from-file=../../config/dev.json`
+  (`flutter test` uninstalls the app afterwards, which drops permissions).
+  The contract passes unlocked. The phone's Health Connect held no
+  readings, so a real reading has not been seen imported.
+- The phone's normal app was not touched. The demo test app was left
+  installed with six read permissions granted over adb.
+
 ## Session 13: 2026-10-11, Claude (health table, waist change)
 
 - MM-67, second half: `imported_samples` and `health_import_tokens` (schema
@@ -152,27 +173,3 @@ source and ran nothing.
   there: the recomp signal and review, the report's lifts (the demo data
   does not produce them). Not checked anywhere: a screen reader, the
   vibration on a phone, iOS.
-
-## Session 11: 2026-10-11, Claude (CI monitoring)
-
-- MM-209: `mm ci` watches a pull request's checks in the background and keeps
-  each change as a stored event, so the chair reads them at task boundaries
-  without waiting. Read-only on GitHub. It supplements the delivery workflow;
-  the start and end checks, and merging by the chair, are unchanged. Full
-  instructions, state format, recovery and the capability matrix are in
-  `agents/ci-monitoring.md`.
-- Verified: 54 tests against a simulated `gh`; a read-only run against the real
-  PR #81 with a detached watcher; on Claude Code in VS Code, a finished
-  background command (`mm ci next`) reached the model at the next tool boundary
-  with no user prompt. Its tests also pass on Linux (WSL). **Not tested: any Copilot surface,
-  macOS**, and
-  on a real pull request a failing check or a rerun (simulated only).
-- **One CI watch is open**, on this change's own PR #82 (`feature/ci-watch`):
-  watch `JacobHeater-martian-macros-pr82`, owner `claude-chair`, on the
-  machine this was built on. Next chair: `./mm ci own` it (or start it again
-  on another machine), read `./mm ci check 82`, merge when green. The watcher
-  stops by itself when the PR merges. The demonstration watch on #81 was
-  stopped and removed. PR #81 (`feature/mm205-expert-mobile-ux`, draft, not this session's)
-  was read only: checks passed on head `6a75f5c`; it was not merged.
-- MM-209 was taken because the open PR #81 uses MM-205 to MM-208, although
-  fresh `main` reported MM-205 as next. Next is MM-210 once both merge.

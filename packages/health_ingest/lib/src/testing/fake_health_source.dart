@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../health_changes.dart';
 import '../health_data_type.dart';
+import '../health_read_failure.dart';
 import '../health_sample.dart';
 import '../health_source.dart';
 import '../nutrition_record.dart';
@@ -44,6 +45,10 @@ final class FakeHealthSource implements HealthSource {
   /// What the user would allow if asked; everything by default.
   Set<HealthDataType>? willPermit;
 
+  /// While set, the platform cannot be read, as when the app is not in the
+  /// foreground: reading throws [HealthReadFailure].
+  bool unreadable = false;
+
   /// Whether the platform takes nutrition from the app.
   bool takesNutrition = true;
 
@@ -62,6 +67,10 @@ final class FakeHealthSource implements HealthSource {
   /// Permits [types], or everything available, without asking.
   Future<void> permit([Set<HealthDataType>? types]) async =>
       _permitted.addAll(types ?? await available());
+
+  /// Takes permission away again, as the user can in the phone's settings.
+  void revoke([Set<HealthDataType>? types]) =>
+      types == null ? _permitted.clear() : _permitted.removeAll(types);
 
   static HealthDataType _type(Map<String, Object?> event) =>
       HealthDataType.values.byName(event['type']! as String);
@@ -127,6 +136,7 @@ final class FakeHealthSource implements HealthSource {
     required DateTime to,
   }) async {
     if (!_permitted.contains(type)) return const [];
+    if (unreadable) throw HealthReadFailure('reading ${type.name}');
     return _sorted(
       _state(
         type,
@@ -139,6 +149,7 @@ final class FakeHealthSource implements HealthSource {
   Future<HealthChanges> changesSince(HealthDataType type, String? token) async {
     final next = '$_generation:$happened';
     if (!_permitted.contains(type)) return HealthChanges(nextToken: next);
+    if (unreadable) throw HealthReadFailure('changes in ${type.name}');
     if (token == null) {
       return HealthChanges(
         nextToken: next,

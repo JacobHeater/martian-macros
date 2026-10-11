@@ -271,6 +271,38 @@ void main() {
       expect(await storedWeights(), hasLength(5));
     });
 
+    test('when the platform cannot be read, what is stored is left as it '
+        'was', () async {
+      await setUpWith(happened: 9);
+      await importer.import(HealthDataType.weight);
+      final before = await store.samples(HealthDataType.weight);
+      final token = await store.token(HealthDataType.weight);
+
+      source
+        ..letAllHappen()
+        ..unreadable = true;
+      await expectLater(
+        importer.import(HealthDataType.weight),
+        throwsA(isA<HealthReadFailure>()),
+      );
+      expect(await store.samples(HealthDataType.weight), before);
+      expect(await store.token(HealthDataType.weight), token);
+
+      // The same with a token the platform has forgotten: the read that
+      // would replace everything fails first.
+      source.expireTokens();
+      await expectLater(
+        importer.import(HealthDataType.weight),
+        throwsA(isA<HealthReadFailure>()),
+      );
+      expect(await store.samples(HealthDataType.weight), before);
+
+      source.unreadable = false;
+      final result = await importer.import(HealthDataType.weight);
+      expect(result.status, HealthImportStatus.readAgain);
+      expect(await storedWeights(), ['w-1', 'w-3', 'w-4', 'w-5', 'w-6']);
+    });
+
     test('a type the user has not permitted is left alone', () async {
       source = FakeHealthSource.fromJson(recordedHealthHistory);
       await source.permit({HealthDataType.steps});

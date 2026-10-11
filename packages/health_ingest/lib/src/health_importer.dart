@@ -10,6 +10,9 @@ import 'health_source.dart';
 /// platform replaces the stored one; one deleted there is removed here;
 /// importing twice changes nothing. When the platform has forgotten the
 /// token, everything is read again and the store made to match.
+///
+/// When the source cannot be read it throws `HealthReadFailure`, and what
+/// is stored is left exactly as it was.
 final class HealthImporter {
   const HealthImporter({required this.source, required this.store});
 
