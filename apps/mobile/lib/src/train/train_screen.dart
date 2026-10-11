@@ -78,17 +78,6 @@ class TrainScreen extends ConsumerWidget {
             expand: true,
             onPressed: start,
           ),
-          const SizedBox(height: 16),
-          MmButton(
-            key: const ValueKey('train-volume'),
-            label: 'Weekly training volume',
-            kind: MmButtonKind.secondary,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const WeeklyVolumeScreen(),
-              ),
-            ),
-          ),
           if (finished.isNotEmpty) ...[
             const SizedBox(height: 8),
             MmButton(
@@ -100,6 +89,15 @@ class TrainScreen extends ConsumerWidget {
             ),
           ],
         ],
+        const SizedBox(height: 16),
+        MmButton(
+          key: const ValueKey('train-volume'),
+          label: 'Weekly training volume',
+          kind: MmButtonKind.secondary,
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const WeeklyVolumeScreen()),
+          ),
+        ),
         if (finished.isNotEmpty) ...[
           const SizedBox(height: 16),
           InfoCard(

@@ -7,15 +7,16 @@ private belongs here. Requirements are authoritative for behavior.
 
 Last updated: 2026-10-11, by Copilot, starting MM-78.
 
-**Branch state.** `feature/mm78-weekly-volume` deliberately builds on #77
-while its final CI runs. MM-78 implements rolling weekly muscle-group volume;
-no schema changes. Merge #77 when green, then target the volume PR at main.
+**Branch state.** `feature/mm78-weekly-volume` implements rolling weekly
+muscle-group volume, with no schema changes. Strength #77 is green and merged.
+Volume implementation/full checks pass; final Train screenshot regeneration
+and PR delivery are in flight.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
 in flight at a time.
 
-**Next ticket ID.** MM-195 (`mm req next` is the authority).
+**Next ticket ID.** MM-196 (`mm req next` is the authority).
 
 **What to build next.** WS-10: weekly
 volume (MM-78), remaining rest countdown/signals (MM-191), progression (MM-79).
@@ -84,6 +85,11 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   Train opens an eleven-group comparison with a broad 10–20 reference band.
 - Engine/mobile tests and full `mm check` pass. Linux golden generation and
   headless emulator inspection are next; #77 Android CI build is running.
+- Strength #77 passed full Linux checks/Android build and merged. Inspected
+  Martian volume on the isolated headless emulator; Light/Dark/Martian volume
+  goldens pass. MM-195 fixed volume navigation disappearing during an active
+  workout, with failing-before/passing-after regression. Final full checks pass;
+  Train screenshots are being regenerated after that layout fix.
 
 ## Session 7: 2026-10-11, Copilot
 
