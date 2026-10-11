@@ -34,7 +34,9 @@ Only one schema change in flight at a time.
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** WS-10: progression (MM-79). MM-191 has only a sound
+**What to build next.** MM-79 (progression) is built with default rep ranges
+and load steps; editing them per exercise needs storage, so it waits for
+schema 28 to merge. Then recomp (MM-133, MM-32). MM-191 has only a sound
 at the end of a rest left (needs an audio package: owner's decision), a
 background signal, and a free-typed rest length.
 Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
@@ -112,6 +114,12 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - **Not built:** a sound (Flutter has no system alert sound on Android or
   iOS; needs a dependency). **Not verified:** a screen reader, and the
   vibration on a phone.
+- MM-79: `suggestProgression` in the engine and a suggestion line on each
+  exercise of a workout in progress; the first set starts from it. The rules
+  were set by `panel-training` (in the ticket). PR stacked on the MM-191 one.
+- A screenshot test broke on the taller exercise card (it could not find
+  the Add exercise button) and failed CI on the MM-191 PR; fixed by scrolling
+  to it. Lesson: read the whole Linux golden run, not its last line.
 - Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
   edits will conflict with this file.
 
