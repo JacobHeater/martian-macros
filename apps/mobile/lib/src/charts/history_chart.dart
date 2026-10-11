@@ -55,6 +55,27 @@ class HistoryChart extends StatelessWidget {
     final high = maximum ?? math.max(low + 1, values.reduce(math.max) * 1.1);
     final interval = (high - low) / 3;
     final text = Theme.of(context).textTheme.labelSmall;
+    List<FlSpot> connectedSpots(HistorySeries item) {
+      final entries =
+          item.values.entries
+              .where(
+                (entry) =>
+                    !entry.key.isBefore(start) && !entry.key.isAfter(today),
+              )
+              .toList()
+            ..sort((a, b) => a.key.compareTo(b.key));
+      return [
+        for (var i = 0; i < entries.length; i++) ...[
+          if (i > 0 &&
+              item.maximumGapDays != null &&
+              entries[i - 1].key.daysUntil(entries[i].key) >
+                  item.maximumGapDays!)
+            FlSpot.nullSpot,
+          FlSpot(start.daysUntil(entries[i].key).toDouble(), entries[i].value),
+        ],
+      ];
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,20 +155,7 @@ class HistoryChart extends StatelessWidget {
                       LineChartBarData(
                         spots: [
                           if (item.connectRecordedPoints)
-                            ...(item.values.entries
-                                    .where(
-                                      (e) =>
-                                          !e.key.isBefore(start) &&
-                                          !e.key.isAfter(today),
-                                    )
-                                    .toList()
-                                  ..sort((a, b) => a.key.compareTo(b.key)))
-                                .map(
-                                  (e) => FlSpot(
-                                    start.daysUntil(e.key).toDouble(),
-                                    e.value,
-                                  ),
-                                )
+                            ...connectedSpots(item)
                           else
                             for (var i = 0; i < days; i++)
                               if (item.values[start.addDays(i)]

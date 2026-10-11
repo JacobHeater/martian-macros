@@ -14,6 +14,7 @@ import '../charts/trend_chart.dart';
 import '../charts/trend_stats.dart';
 import 'waist_summary.dart';
 import 'weight_events_card.dart';
+import 'strength_section.dart';
 
 class ProgressScreenState extends ConsumerState<ProgressScreen> {
   var _rangeDays = 30;
@@ -129,6 +130,8 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
               .read(waistWriterProvider)
               .saveWaist(today, fmt.lengthToCm(value)),
         ),
+        const SizedBox(height: 16),
+        const StrengthSection(),
       ],
     );
   }

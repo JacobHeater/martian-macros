@@ -18,6 +18,7 @@ void main() {
       intake: repositories.intake,
       targets: repositories.targets,
       recovery: repositories.recovery,
+      workouts: repositories.workouts,
     );
   });
 
@@ -40,6 +41,7 @@ void main() {
         intake: demo.intake,
         targets: demo.targets,
         recovery: demo.recovery,
+        workouts: demo.workouts,
       );
       expect((await normal.weights.watchWeights().first).single.weightKg, 99);
       expect(await normal.setup.loadSetup(), isNull);
@@ -57,6 +59,7 @@ Future<void> exerciseDemoSeed({
   required IntakeReader intake,
   required TargetsHistoryRepository targets,
   required RecoveryCheckInRepository recovery,
+  required WorkoutRepository workouts,
 }) async {
   final today = CalendarDate(2026, 10, 10);
   Future<void> seed(CalendarDate day) => DemoSeed(day).replace(
@@ -68,8 +71,21 @@ Future<void> exerciseDemoSeed({
     dayMarks: marks,
     targets: targets,
     recovery: recovery,
+    workouts: workouts,
   );
   await seed(today);
+  final initialWorkouts = await workouts.watchWorkouts().first;
+  expect(initialWorkouts, hasLength(15));
+  final strength = buildStrengthTrends(
+    workouts: initialWorkouts,
+    exercises: builtInExercises,
+    weights: await weights.watchWeights().first,
+    today: today,
+  );
+  expect(strength, hasLength(5));
+  expect(strength.where((t) => t.recentSessions > 0), hasLength(4));
+  expect(strength.first.changeOverDays(84), isNotNull);
+  expect(strength.last.points, isEmpty);
   final initialWeights = await weights.watchWeights().first;
   final initialDays = await intake
       .watchIntakeDays(since: today.addDays(-100))
@@ -110,6 +126,10 @@ Future<void> exerciseDemoSeed({
     ),
   );
   await seed(today);
+  expect(
+    (await workouts.watchWorkouts().first).map((w) => w.date),
+    initialWorkouts.map((w) => w.date),
+  );
   expect(await food.watchFood(today).first, hasLength(1));
   expect(
     (await weights.watchWeights().first).map((w) => w.weightKg).toList(),
