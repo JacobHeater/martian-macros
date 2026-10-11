@@ -12,7 +12,7 @@ muscle-group volume, with no schema changes. Strength #77 is green and merged.
 Volume PR #78 implementation/full checks and reviewed screenshots pass;
 merge once final CI is green. `feature/mm191-set-overlap` builds on #78
 deliberately, completing typed-set overlap validation (MM-196). Its final
-Windows checks pass; delivery is pending CI.
+Windows checks pass; PR #80 is open, pending CI.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
@@ -90,6 +90,7 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   self-excluding edits are tested. Six engine cases plus existing training
   tests and the final full Windows `mm check` pass. No schema or normal layout
   changes. The refusal message is widget-tested, not emulator-inspected.
+  Committed/pushed as `12b5976`; PR #80 is open and its Linux/Android CI runs.
   Remaining MM-191 work: rest target/countdown/signals, typed seconds and
   cross-midnight workout ends; MM-79 progression follows.
 
