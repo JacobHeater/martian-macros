@@ -52,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 27;
+  static const currentSchemaVersion = 28;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -315,6 +315,18 @@ class AppDatabase extends _$AppDatabase {
       }
       if (!existing.contains('paused_for_ms')) {
         await m.addColumn(workouts, workouts.pausedForMs);
+      }
+    },
+    // 27 to 28: the rest the user means to take per exercise (MM-191).
+    27: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(workout_exercises)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('rest_target_seconds')) {
+        await m.addColumn(workoutExercises, workoutExercises.restTargetSeconds);
       }
     },
   };

@@ -9,4 +9,7 @@ class WorkoutExercises extends Table {
 
   /// The id of a built-in exercise or one of the user's own (MM-76).
   TextColumn get exerciseId => text()();
+
+  /// The rest the user means to take after a set, if chosen (MM-191).
+  IntColumn get restTargetSeconds => integer().nullable()();
 }

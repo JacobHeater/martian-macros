@@ -5,8 +5,9 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, local expert-panel takeover.
-CI monitoring (`mm ci`, MM-209) added by Claude the same day; see Session 11.
+Last updated: 2026-10-11, by Claude, Session 12 (rest target, MM-191). The
+paragraphs below about #79 are Copilot's from Session 10; #79 has since merged.
+CI monitoring (`mm ci`, MM-209) is merged (#82); see Session 11.
 
 **Tooling in flight.** Existing PR #79, `copilot/implement-expert-panel`,
 adds canonical roles, Claude/Copilot adapters, research evidence and portable
@@ -25,21 +26,27 @@ Main conflict is resolved; inspect current PR CI/readiness there before merge
 are green and merged. PR #79 merges that upstream work without changing app
 behavior. Its handoff conflict was resolved and the merge pushed.
 
-**Database.** Schema 27 (pausing the workout clock, MM-191). No panel migration.
+**Database.** Schema 28 (a target rest per workout exercise, MM-191), on
+`feature/mm191-rest-target` until its PR merges; `main` is 27 until then.
 Only one schema change in flight at a time.
 
 **Next ticket ID.** MM-205 (`mm req next` is the authority). Cloud panel's
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** Finish #79 first. Then WS-10: remaining rest
-countdown/signals and timing gaps (MM-191), then progression (MM-79).
+**What to build next.** WS-10: progression (MM-79). MM-191 has only a sound
+at the end of a rest left (needs an audio package: owner's decision), a
+background signal, and a free-typed rest length.
 Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
 monthly reports/rewards (MM-33, MM-92). Phase planning (MM-36) needs body-fat
 estimates (MM-34). Health sync starts at the interface/fixture (MM-67);
 Android segments require app-owned native code later (MM-188, MM-189).
 
 **Waiting on the product owner.**
+- MM-191: whether to add an audio package and a sound file for the end of a
+  rest (only a vibration is given now), and the choices the panel made in the
+  owner's absence, listed in the ticket (rests on offer, "Target rest
+  reached", the twelve-hour rule for times after midnight).
 - MM-173: noisy honest low intake is dropped as partial, drifting expenditure
   about 160 kcal high. Ticket lists four options; regression is skipped.
 - Android reminders are inexact, possibly an hour late. Exact timing needs
@@ -86,6 +93,27 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Native plugins need release-build validation; iOS needs macOS.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
+
+## Session 12: 2026-10-11, Claude (rest target)
+
+- Merged #82 (`mm ci`, MM-209) after reading GitHub directly: check passed on
+  head `3994982`. Its watch stops by itself; no CI watch of that PR remains
+  to act on.
+- MM-191, the rest of it: a target rest per exercise (None, 1:00, 1:30, 2:00,
+  3:00, 5:00), remembered per exercise; the bar counts down to it, then says
+  "Target rest reached" and shows the whole rest; one vibration at the target
+  through a `RestSignal` interface; a set's times typed to the second in a new
+  design-system entry (`showMmClockTime`); a workout, and a set in it, can end
+  after midnight. Schema 28 adds `workout_exercises.rest_target_seconds`.
+- The product owner was away and said to use the panel. `panel-training` and
+  `panel-ux-accessibility` were asked; what they decided is in the ticket
+  under "Choices made with the expert panel". Their reports were read-only
+  source reviews; nothing was run by them.
+- **Not built:** a sound (Flutter has no system alert sound on Android or
+  iOS; needs a dependency). **Not verified:** a screen reader, and the
+  vibration on a phone.
+- Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
+  edits will conflict with this file.
 
 ## Session 11: 2026-10-11, Claude (CI monitoring)
 
@@ -162,11 +190,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   limits and deferred defects. New trusted CI runs (old cloud runs required
   action and were not test evidence); PR is now mergeable. Read final CI/
   readiness from PR. No tooling owner decision remains; do not merge.
-
-## Session 9: 2026-10-11, Copilot
-
-- Weekly volume #78 and typed-set overlap #80 completed with full Windows
-  checks, Linux CI/Android builds; both merged. No phone changes.
-- MM-196 has failing-before/passing-after regressions. Adjacent sets are
-  allowed and missing timing evidence is never invented.
-- Remaining MM-191: rest targets/signals, typed seconds, midnight ends.

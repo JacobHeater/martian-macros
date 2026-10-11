@@ -20,6 +20,7 @@ class SetEditor extends StatefulWidget {
     required this.keyPrefix,
     required this.onChanged,
     required this.timeBase,
+    required this.timeLimit,
     required this.checkTimes,
     required this.onRemove,
     super.key,
@@ -34,9 +35,13 @@ class SetEditor extends StatefulWidget {
   final String keyPrefix;
   final ValueChanged<WorkoutSet> onChanged;
 
-  /// The day a typed time of day is on, and where the picker opens when
-  /// the set has no time yet (MM-191).
+  /// When the workout began: a typed time of day is on that day, or the
+  /// next when the workout ran past midnight, and the entry opens there
+  /// when the set has no time yet (MM-191).
   final DateTime timeBase;
+
+  /// The latest a typed time can be: the workout's end, or now.
+  final DateTime timeLimit;
 
   /// What is wrong with a typed start and end, if anything. A time that
   /// fails is refused and the set keeps what it had.

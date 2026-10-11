@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/elapsed_text.dart';
 import '../format/fmt.dart';
+import '../format/rest_target_text.dart';
 import '../format/set_text.dart';
 import '../integration_providers.dart';
 import '../providers.dart';
@@ -14,7 +15,9 @@ import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/mm_list_row.dart';
+import '../ui/mm_menu_item.dart';
 import '../ui/show_mm_confirm.dart';
+import '../ui/show_mm_options.dart';
 import 'set_editor.dart';
 import 'workout_controller_provider.dart';
 import 'workout_exercise_card.dart';
@@ -22,6 +25,17 @@ import 'workout_exercise_card.dart';
 class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
   /// The set whose controls are showing, if any. A set just added is.
   int? _open;
+
+  /// The rests on offer (MM-191); zero stands for none, which is where an
+  /// exercise starts: the app suggests no length of rest.
+  static const _restTargets = <Duration>[
+    Duration.zero,
+    Duration(minutes: 1),
+    Duration(seconds: 90),
+    Duration(minutes: 2),
+    Duration(minutes: 3),
+    Duration(minutes: 5),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +97,7 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 set: entry.sets[s],
                 number: s + 1,
                 timeBase: workout.startedAt,
+                timeLimit: workout.endedAt ?? ref.read(clockProvider).now(),
                 checkTimes: (start, end) => checkSetTimes(
                   start: start,
                   end: end,
@@ -119,6 +134,34 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 ),
                 onTap: () => setState(() => _open = s),
               ),
+          if (workout.inProgress)
+            MmListRow(
+              key: ValueKey('rest-target-$index'),
+              dense: true,
+              title: 'Rest target',
+              subtitle: restTargetText(entry.restTarget),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                final chosen = await showMmOptions<Duration>(
+                  context,
+                  title: 'Rest target',
+                  options: [
+                    for (final target in _restTargets)
+                      MmMenuItem(
+                        target,
+                        restTargetText(target == Duration.zero ? null : target),
+                      ),
+                  ],
+                  selected: entry.restTarget ?? Duration.zero,
+                );
+                if (chosen == null) return;
+                await controller.setRestTarget(
+                  workout,
+                  index,
+                  chosen.value == Duration.zero ? null : chosen.value,
+                );
+              },
+            ),
           const SizedBox(height: 8),
           MmButton(
             key: ValueKey('add-set-$index'),
