@@ -121,7 +121,7 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
         const WeightEventsCard(),
         WaistEntryCard(
           key: ValueKey('waist-${fmt.units}'),
-          unit: fmt.lengthUnit,
+          unit: fmt.imperial ? 'inches' : 'centimeters',
           summary: waist.isEmpty ? null : waistSummary(waist, fmt, today),
           onSave: (readings) {
             final cm = [for (final value in readings) fmt.lengthToCm(value)];
