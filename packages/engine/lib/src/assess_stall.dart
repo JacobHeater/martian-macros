@@ -5,6 +5,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'coach_snapshot.dart';
 import 'confidence_level.dart';
 import 'intake_standing.dart';
+import 'measured_change.dart';
 import 'safety_bounds.dart';
 import 'stall_assessment.dart';
 import 'stall_diagnosis.dart';
@@ -14,6 +15,7 @@ import 'stall_status.dart';
 import 'summarize_adherence.dart';
 import 'target_flag.dart';
 import 'targets_record.dart';
+import 'waist_change_of.dart';
 import 'weight_event_effects.dart';
 
 /// Whether progress has stalled against the goal and, if so, which kind of
@@ -108,13 +110,13 @@ StallAssessment assessStall({
     );
   }
 
-  final inWindow = [
-    for (final w in waist)
-      if (w.date.isAfter(from) && !w.date.isAfter(through)) w,
-  ]..sort((a, b) => a.date.compareTo(b.date));
-  final waistChange = inWindow.length < StallRule.minimumWaistReadings
-      ? null
-      : inWindow.last.waistCm - inWindow.first.waistCm;
+  // The one answer every feature gets (MM-155).
+  final waistOverWindow = waistChangeOf(
+    waist: waist,
+    asOf: through,
+    days: window,
+  );
+  final waistChange = waistOverWindow?.changeCm;
   final maskedByEvent = effectiveWeightEvents(weightEvents).any(
     (e) =>
         !e.date.isAfter(today) &&
@@ -126,9 +128,7 @@ StallAssessment assessStall({
       summary.weighIns < StallRule.minimumWeighIns) {
     diagnosis = StallDiagnosis.data;
   } else if (maskedByEvent ||
-      (!gaining &&
-          waistChange != null &&
-          waistChange < -StallRule.waistNoiseCm)) {
+      (!gaining && waistOverWindow?.direction == MeasuredChange.down)) {
     diagnosis = StallDiagnosis.masked;
   } else if (summary.standing ==
       (gaining ? IntakeStanding.below : IntakeStanding.above)) {

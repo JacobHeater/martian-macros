@@ -126,7 +126,7 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
           hint: waist.isEmpty
               ? 'Measure at the navel, relaxed. Take three and enter the '
                     'middle one. Once a week is plenty.'
-              : waistSummary(waist, fmt),
+              : waistSummary(waist, fmt, today),
           onSave: (value) => ref
               .read(waistWriterProvider)
               .saveWaist(today, fmt.lengthToCm(value)),

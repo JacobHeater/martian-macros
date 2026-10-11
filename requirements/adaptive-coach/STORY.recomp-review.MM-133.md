@@ -88,7 +88,8 @@ set for the recomp signal (MM-32); say if any is wrong:
 - **A review stays up for two weeks** from each of week 8, week 12 and every 8 weeks after, and reads the stretch up to today, twelve
   weeks of it at most. The weeks count from the last change to recomp, and a review is not shown during a pause.
 - **Waist** is judged as in MM-32, between the entries of the last 14 days and those within a week of the start of the period:
-  1.5 cm, or 2 cm when either end is one entry. It stands in for MM-155's shared function until that is built.
+  1.5 cm, or 2 cm when either end is one entry. Since 2026-10-11 it is MM-155's shared function (`waistChangeOf`) over the
+  period: smoothed ends, and 1.4 cm as the threshold.
 - **A lift rose or fell** when its smoothed estimated max moved 2.5% over the period; up is two lifts up and more up than down.
 - **What the table leaves open is "not working"**: a waist that went up, or strength that fell with weight held.
 - **The next goal for "not working"** is the goal the app would recommend today from body fat and training (MM-12). Where that is

@@ -1,6 +1,6 @@
 ---
 id: MM-155
-status: proposed
+status: in-progress
 component: body-measurements
 related: [MM-154, MM-21, MM-32, MM-34, MM-93, MM-107, MM-129, MM-133, MM-140, MM-146, MM-156]
 ---
@@ -86,6 +86,31 @@ Scenario: Quick entry
 Scenario: Rounding
   Then waist is displayed to the nearest 0.5 cm or 0.25 in
 ```
+
+## Progress
+Built (2026-10-11), no schema change:
+- **The one function** (`waistChangeOf`, pure): down, up or no clear change over a period, with the figures. Each end is the middle
+  value of up to three entries: the latest three, and the three nearest the day compared with. A difference is a change only past
+  1.4 times the noise figure. "Since start" compares with the middle of the first three entries.
+- **Every feature that asks uses it**: the recomp signal (MM-32), the recomp review (MM-133) and the stall diagnosis's "masked"
+  branch (MM-140). Their own interim waist rules are gone.
+- **The waist card** says the latest measurement and "Down 2.5 cm since you started", "Up ...", or "No clear change since you
+  started", in place of latest minus the first reading ever. Shown to 0.5 cm or 0.25 in.
+
+Choices I made without asking (say if any is wrong):
+- **What counts as "now" and "then"**: the latest entry has to be from the last 14 days, and "now" uses no entry older than 21
+  days; "then" uses entries within 10 days of the day compared with. With neither, the answer is "not known", not "no change".
+- **No entry is at both ends.** With few entries each end gets fewer than three.
+- **Entries made so far count as the middle of three readings** (noise 1.0 cm, so 1.4 cm is a change), because that is what the
+  card has always asked for. Nothing records whether three were taken.
+
+Not built:
+- **Three readings in the entry**, stored with their middle value, and the quick single-reading entry with its wider noise: needs a
+  schema change, which waits for the one in flight (MM-67, schema 29).
+- **A noise figure per user** from the spread of their own triples: needs the three readings.
+- The protocol drawing, when the next measurement is due, and the note that weekly is enough.
+- The chart.
+- The monthly report still shows the month's first and last measurement (MM-33).
 
 ## Notes
 - Priority: must-have before MM-32, MM-133 and MM-140's "masked" branch.

@@ -1,8 +1,10 @@
 import 'package:mm_domain/mm_domain.dart';
 
+import 'measured_change.dart';
 import 'recomp_part.dart';
 import 'recomp_signal.dart';
 import 'strength_trend.dart';
+import 'waist_change_of.dart';
 import 'weight_trend_point.dart';
 
 /// Reads the last four weeks up to [today] for a recomp signal (MM-32).
@@ -14,11 +16,8 @@ import 'weight_trend_point.dart';
 /// - **Weight is flat** when the trend moved less than 0.5% in 28 days.
 ///   Needs weigh-ins on 8 of those days, 2 in the last 7, and 2 within 3
 ///   days of the day 28 days ago.
-/// - **Waist is down** when the middle value of the entries of the last 14
-///   days is at least 1.5 cm under that of the entries from 21 to 35 days
-///   ago: 2 cm when either is a single entry, since one reading of a tape
-///   is that noisy. Needs an entry in each and three in all. This stands
-///   in for the shared change function of MM-155 until that exists.
+/// - **Waist is down** when the shared change function says so over 28
+///   days ([waistChangeOf], MM-155), from at least three entries in all.
 /// - **Strength is up** when at least two lifts rose and more rose than
 ///   fell. A lift rose when its smoothed estimated max is up 2.5% or more
 ///   over 28 days, it was trained in the last 14, and it has four sessions
@@ -59,35 +58,16 @@ RecompSignal recompSignalOf({
     weightPart = moved < 0.005 ? RecompPart.holds : RecompPart.doesNotHold;
   }
 
-  // Waist.
+  // Waist: the one answer every feature gets (MM-155).
   var waistPart = RecompPart.unknown;
   double? waistChangeCm;
-  double? middle(List<double> values) {
-    if (values.isEmpty) return null;
-    final sorted = [...values]..sort();
-    final mid = sorted.length ~/ 2;
-    return sorted.length.isOdd
-        ? sorted[mid]
-        : (sorted[mid - 1] + sorted[mid]) / 2;
-  }
-
-  final recent = [
-    for (final w in waist)
-      if (ago(w.date) >= 0 && ago(w.date) <= 13) w.waistCm,
-  ];
-  final baseline = [
-    for (final w in waist)
-      if (ago(w.date) >= 21 && ago(w.date) <= 35) w.waistCm,
-  ];
-  final recentMiddle = middle(recent);
-  final baselineMiddle = middle(baseline);
-  if (recentMiddle != null &&
-      baselineMiddle != null &&
-      recent.length + baseline.length >= 3) {
-    final change = recentMiddle - baselineMiddle;
-    waistChangeCm = change;
-    final needed = recent.length == 1 || baseline.length == 1 ? 2.0 : 1.5;
-    waistPart = change <= -needed ? RecompPart.holds : RecompPart.doesNotHold;
+  final waistChange = waistChangeOf(waist: waist, asOf: today);
+  if (waistChange != null &&
+      waistChange.recentEntries + waistChange.baselineEntries >= 3) {
+    waistChangeCm = waistChange.changeCm;
+    waistPart = waistChange.direction == MeasuredChange.down
+        ? RecompPart.holds
+        : RecompPart.doesNotHold;
   }
 
   // Strength.
