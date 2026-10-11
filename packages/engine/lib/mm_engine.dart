@@ -73,6 +73,8 @@ export 'src/pause_to_resume.dart';
 export 'src/pause_weight_events.dart';
 export 'src/paused_days_between.dart';
 export 'src/paused_guide.dart';
+export 'src/personal_record.dart';
+export 'src/personal_records_of.dart';
 export 'src/place_time_of_day.dart';
 export 'src/plan_reminders.dart';
 export 'src/previous_sets_of.dart';

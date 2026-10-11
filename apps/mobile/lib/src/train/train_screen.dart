@@ -9,6 +9,7 @@ import '../ui/info_card.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_list_row.dart';
+import 'personal_records_provider.dart';
 import 'workout_controller_provider.dart';
 import 'workout_screen.dart';
 import 'weekly_volume_screen.dart';
@@ -28,6 +29,7 @@ class TrainScreen extends ConsumerWidget {
         if (!workout.inProgress) workout,
     ];
     final text = Theme.of(context).textTheme;
+    final records = ref.watch(personalRecordsProvider);
 
     void open(int workoutId) => Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -110,7 +112,10 @@ class TrainScreen extends ConsumerWidget {
                     key: ValueKey('workout-${workout.id}'),
                     dense: true,
                     title: Fmt.day(workout.date, today),
-                    subtitle: workoutSummaryText(workout),
+                    subtitle: workoutSummaryText(
+                      workout,
+                      records: records[workout.id]?.length ?? 0,
+                    ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => open(workout.id),
                   ),

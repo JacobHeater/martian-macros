@@ -4,15 +4,18 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
+import '../format/personal_record_text.dart';
 import '../format/workout_summary_text.dart';
 import '../providers.dart';
 import '../theme/mm_colors_context.dart';
+import '../ui/info_card.dart';
 import '../ui/mm_app_bar.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/show_mm_confirm.dart';
 import 'exercise_picker_screen.dart';
+import 'personal_records_provider.dart';
 import 'rest_alarm.dart';
 import 'set_timer_bar.dart';
 import 'workout_clock_card.dart';
@@ -41,6 +44,12 @@ class WorkoutScreen extends ConsumerWidget {
     final today = ref.watch(todayProvider);
     final controller = ref.read(workoutControllerProvider);
     final text = Theme.of(context).textTheme;
+    final records =
+        ref.watch(personalRecordsProvider)[workout.id] ??
+        const <PersonalRecord>[];
+    final fmt = Fmt(
+      ref.watch(setupProvider).value?.unitSystem ?? UnitSystem.imperial,
+    );
 
     return Scaffold(
       appBar: MmAppBar(
@@ -83,6 +92,33 @@ class WorkoutScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           WorkoutClockCard(workout: workout),
           const SizedBox(height: 12),
+          if (records.isNotEmpty) ...[
+            InfoCard(
+              key: const ValueKey('workout-records'),
+              title: records.length == 1
+                  ? 'Personal record'
+                  : 'Personal records',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final record in records)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        personalRecordText(record, fmt),
+                        style: text.bodyLarge,
+                      ),
+                    ),
+                  Text(
+                    'Your best estimated one-rep max on the lift so far, '
+                    'worked out from reps and load.',
+                    style: text.bodySmall?.copyWith(color: context.mm.text2),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (workout.exercises.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
