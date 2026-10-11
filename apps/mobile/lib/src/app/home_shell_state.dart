@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../health/health_sync_provider.dart';
 import '../coach/coach_screen.dart';
 import '../progress/progress_screen.dart';
 import '../providers.dart';
@@ -45,6 +46,11 @@ class HomeShellState extends ConsumerState<HomeShell>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // What the user allowed from the health platform is read while the app
+    // is on screen (MM-68): now, and whenever it comes back to the front.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(healthSyncProvider)();
+    });
   }
 
   @override
@@ -56,7 +62,10 @@ class HomeShellState extends ConsumerState<HomeShell>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Roll the calendar day over if the app was left open overnight.
-    if (state == AppLifecycleState.resumed) ref.invalidate(todayProvider);
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(todayProvider);
+      ref.read(healthSyncProvider)();
+    }
   }
 
   @override
