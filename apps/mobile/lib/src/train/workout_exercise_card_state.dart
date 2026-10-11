@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/elapsed_text.dart';
 import '../format/fmt.dart';
+import '../format/progression_text.dart';
 import '../format/rest_target_text.dart';
 import '../format/set_text.dart';
 import '../integration_providers.dart';
@@ -44,14 +45,27 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
     final entry = workout.exercises[index];
     final exercise = ref.watch(exercisesByIdProvider)[entry.exerciseId];
     final load = exercise?.load ?? ExerciseLoad.addedWeight;
-    final fmt = Fmt(
-      ref.watch(setupProvider).value?.unitSystem ?? UnitSystem.imperial,
-    );
+    final setup = ref.watch(setupProvider).value;
+    final units = setup?.unitSystem ?? UnitSystem.imperial;
+    final fmt = Fmt(units);
+    final workouts = ref.watch(workoutsProvider).value ?? const <Workout>[];
     final lastTime = previousSetsOf(
       exerciseId: entry.exerciseId,
-      workouts: ref.watch(workoutsProvider).value ?? const [],
+      workouts: workouts,
       before: workout.startedAt,
     );
+    // What to try today (MM-79): offered while training, not on a workout
+    // being looked back at.
+    final suggestion = !workout.inProgress
+        ? null
+        : suggestProgression(
+            exerciseId: entry.exerciseId,
+            exercise: exercise,
+            workouts: workouts,
+            before: workout.startedAt,
+            goal: setup?.goalMode ?? GoalMode.maintenance,
+            units: units,
+          );
     final controller = ref.read(workoutControllerProvider);
     final text = Theme.of(context).textTheme;
 
@@ -88,6 +102,15 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 '${[for (final s in lastTime) setText(s, fmt, load)].join(', ')}',
                 key: ValueKey('last-time-$index'),
                 style: text.bodySmall?.copyWith(color: context.mm.text2),
+              ),
+            ),
+          if (suggestion != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                progressionText(suggestion, fmt, load),
+                key: ValueKey('suggestion-$index'),
+                style: text.bodyMedium,
               ),
             ),
           for (var s = 0; s < entry.sets.length; s++)
@@ -172,7 +195,18 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
             onPressed: () {
               // The next set is ready to adjust: its controls are open.
               setState(() => _open = entry.sets.length);
-              controller.addSet(workout, index, lastTime: lastTime.firstOrNull);
+              controller.addSet(
+                workout,
+                index,
+                // The first set starts from the suggestion, to be changed
+                // freely; without one, from last time's first set.
+                lastTime: suggestion == null
+                    ? lastTime.firstOrNull
+                    : WorkoutSet(
+                        reps: suggestion.reps,
+                        loadKg: suggestion.loadKg,
+                      ),
+              );
             },
           ),
         ],
