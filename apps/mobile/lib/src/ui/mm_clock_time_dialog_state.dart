@@ -83,9 +83,9 @@ class MmClockTimeDialogState extends State<MmClockTimeDialog> {
               children: [
                 _field('clock-hour', 'Hour', _hour),
                 const SizedBox(width: 8),
-                _field('clock-minute', 'Minute', _minute),
+                _field('clock-minute', 'Min', _minute),
                 const SizedBox(width: 8),
-                _field('clock-second', 'Second', _second),
+                _field('clock-second', 'Sec', _second),
               ],
             ),
             const SizedBox(height: 12),
