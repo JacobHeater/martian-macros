@@ -21,7 +21,7 @@
         "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
         "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
         "requirements/developer-tooling/STORY.expert-mobile-experience-panel.MM-205.md": "7bbabd1fa570b933847a1e2649b88012bb9b4f174e1b46d3a16f7a262c082d64",
-        "requirements/HANDOFF.md": "d5d5799effeeaf38993f1284606b24b82a121c51e26f3676705833e83aa33388"
+        "requirements/HANDOFF.md": "3f5247696580a4b89b357cf5a87e6e0d465c9bbec64ccb95867a0dc25dcd02bb"
       },
       "report": "findings/chair.md",
       "coverage": {
@@ -763,7 +763,7 @@
     }
   ],
   "checkpoint": {
-    "at": "2026-10-11T04:44:24Z",
+    "at": "2026-10-11T04:46:30Z",
     "writers_stopped": true
   }
 }
