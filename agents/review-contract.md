@@ -17,6 +17,13 @@ role slug, including an explicit “none” rather than omitting a section.
   documentation, uninspected areas, absent implementation when applicable,
   cross-domain referrals, actual evidence methods and blocked verification.
   Planning includes a targeted existing-behavior audit before proposals.
+- **Novice mobile experience (when UX/product design is assigned):** bounded
+  user goal and journey/screens/states; what novices must notice, decide,
+  remember and interpret; competing actions/groups; routine versus safety/
+  uncertainty information; recovery and route to detail; what is source
+  inspection versus rendered/device/user observation. Explain which observed
+  burdens are evidenced and which are hypotheses. Card count alone is not a
+  usability finding. Record bounded cross-domain consultation and its effect.
 - **Findings:** stable local ID and responsible domain; one classification:
   confirmed requirement violation, reproducible implementation defect,
   evidence-supported domain concern, documentation or requirement gap,

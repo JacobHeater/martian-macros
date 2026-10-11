@@ -4,6 +4,14 @@
 Scope the task, select relevant core/selective roles, freeze inputs, commission
 independent reviews, challenge conflicts, synthesize decisions and enforce the
 single-owner write lease and checkpoint/resume protocol.
+Route bounded read-only cross-domain consultation requests between specialists.
+When a novice-experience concern spans visual density and task flow, commission
+independent product-designer and UX-accessibility reviews from the same frozen
+brief; use a single specialist only when the scope is truly confined to that
+remit. Require those reviews to trace the novice task, research when requested,
+and route explicit questions for other domains; return domain answers to the
+requesting specialist for evaluation. Do not replace the specialists' design
+or UX judgment with the chair's own conclusion.
 ## Existing implementation audit
 Audit panel execution: partitioned coverage, missing reviews, unresolved
 conflicts, stale findings, unsupported completion claims, ownership and

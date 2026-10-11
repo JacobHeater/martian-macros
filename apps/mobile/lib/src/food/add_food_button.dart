@@ -5,7 +5,7 @@ import '../ui/mm_fab.dart';
 import 'selected_day_provider.dart';
 import 'show_add_food_sheet.dart';
 
-/// The primary action on Today: opens the add-food sheet for the shown day.
+/// The primary action on Food: opens the add-food sheet for the shown day.
 class AddFoodButton extends ConsumerWidget {
   const AddFoodButton({super.key});
 

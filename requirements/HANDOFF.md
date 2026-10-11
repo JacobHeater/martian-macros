@@ -5,34 +5,43 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, local expert-panel takeover.
+Last updated: 2026-10-11, by Copilot, after implementing MM-205 audit fixes.
 
-**Tooling in flight.** Existing PR #79, `copilot/implement-expert-panel`,
-adds canonical roles, Claude/Copilot adapters, research evidence and portable
-state validation. Owner explicitly requests completing it **without merging**.
-Local SDK checks pass; no repeat download needed. Claude native research and
-fresh artifact resume passed on Windows; Copilot chair-delegated research passed.
-Copilot native picker/CLI/cloud profile enforcement remains untested.
-MM-201 existing-code audit acceptance is implemented and exercised with actual
-independent nutrition/QA food-feature reviews and targeted challenge. Final
-full Windows checks pass; inspect current PR CI/readiness before further work.
-Implementation/audit artifacts are committed and pushed to existing #79.
-Main conflict is resolved; inspect current PR CI/readiness there before merge
-(owner explicitly prohibits merging #79).
+**Panel and novice experience.** PR #79 merged to `main` at
+`44251604bac61bdc5dd9eb69bec045e13f7e2929`. MM-205's distinct UX/Product
+Designer guidance and bounded novice meal-logging audit are complete on
+`feature/mm205-expert-mobile-ux`. Copilot native picker/CLI/cloud enforcement
+remains untested; cup terminology research remains explicitly unverified.
+
+**MM-206/207/208.** Dashboard Add food now targets today regardless of Food's
+retained historical date; Food's own action still targets the selected date.
+Meal rows have a named visible delete menu with Undo while swipe remains.
+Dashboard Add food is a labeled app-bar action, no longer obscuring the macro
+chart. All three regression guards are enabled and pass. MM-205 audit,
+research, decisions, and limits remain persisted in
+`docs/agent-runs/mm205-novice-mobile-experience/`. No Simple-mode chart policy
+change was made; existing MM-176/MM-179 behavior remains.
+
+**Food audit follow-up.** MM-202, MM-203 and MM-204 record reproduced existing
+food-edit/alcohol defects; each has a skipped regression guard pending a
+separately scoped application fix. Other audit hypotheses and unreviewed
+areas are recorded in `docs/agent-runs/pr79-food-feature-audit/`.
 
 **Branch state.** Strength #77, weekly volume #78 and typed-set overlap #80
-are green and merged. PR #79 merges that upstream work without changing app
-behavior. Its handoff conflict was resolved and the merge pushed.
+are green and merged. PR #79 merged to main at
+`44251604bac61bdc5dd9eb69bec045e13f7e2929`; this branch carries the MM-205
+panel work and its separately ticketed follow-up fixes.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). No panel migration.
 Only one schema change in flight at a time.
 
-**Next ticket ID.** MM-205 (`mm req next` is the authority). Cloud panel's
+**Next ticket ID.** MM-209 (`mm req next` is the authority). Cloud panel's
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** Finish #79 first. Then WS-10: remaining rest
-countdown/signals and timing gaps (MM-191), then progression (MM-79).
+**What to build next.** Continue WS-10: remaining rest countdown/signals and
+timing gaps (MM-191), then progression (MM-79). Food-log fixes MM-202/203/204
+remain separately ticketed follow-ups.
 Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
 monthly reports/rewards (MM-33, MM-92). Phase planning (MM-36) needs body-fat
 estimates (MM-34). Health sync starts at the interface/fixture (MM-67);
@@ -63,10 +72,9 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   preview; Continue saves. Upgrades preserve existing preferences.
 - Do not let test/build terminals steal game focus. Use noninteractive
   PowerShell, not foreground VS Code terminals.
-- Commit/push/open PRs and merge green ones with `--merge`, except #79 which
-  the owner explicitly says **do not merge**. Branch from fresh main unless
-  explicitly continuing an existing PR. Stage named files; never stash-juggle
-  or switch branches during a build.
+- Commit/push/open PRs and merge green ones with `--merge`. Branch from fresh
+  main unless explicitly continuing an existing PR. Stage named files; never
+  stash-juggle or switch branches during a build.
 - Bugs get tickets and failing-before regressions immediately. Otherwise
   focus on feature roadmap; acceptance testing will walk through bugs.
 - Offline-first; binary biological sex for formulas; US only at launch.
@@ -86,23 +94,52 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
-## Session 10: 2026-10-11, Copilot (local panel takeover)
+## Session 13: 2026-10-11, Copilot (implementing novice-experience findings)
 
-- Owner requests finishing existing #79: install Copilot adapters, audit all
-  roles, verify research capability, run local checks. No merge.
-- Initial tree clean; fetched and safely switched existing branch. Merged
-  main; handoff conflicts resolved retaining upstream product decisions.
-- `.github/agents/` omission was a cloud environment restriction, not a
-  repository policy. Allocated panel bug MM-197 using `mm req next`.
-- Current official VS Code, GitHub and Claude configuration docs retrieved.
-  Role audit is read-only; this session is the sole write owner.
-- Audited all 15 roles; installed 15 Copilot adapters and research tools on
-  15 Claude adapters. Chair has bounded delegation/artifact edits, not shell;
-  specialist tools exclude writes/execution. Product design remains distinct
-  from UX. Research gates, source evidence/capability state and invalid fixtures
-  added (MM-198). 22 focused cases/full Windows `mm check` pass.
-- Copilot research specialist performed actual GitHub source discovery and
-  page retrieval. Claude native specialist performed WebSearch/WebFetch, then
+- Implemented MM-206: Dashboard Add food explicitly targets today; Food
+  retains selected-day logging. Enabled the end-to-end regression covering
+  both routes and persisted dates.
+- Implemented MM-207: added a named, 48-by-48 design-system row menu with
+  Delete; swipe and Undo remain. Enabled the delete/Undo regression.
+- Implemented MM-208: moved Dashboard Add food to the labeled app bar so it
+  cannot overlay the macro chart. Enabled geometry and 1.5x text reachability
+  checks for all chart labels. Simple-mode chart behavior is unchanged.
+- Focused Dashboard/Food/insight/app tests passed (24 tests); the full mobile
+  suite passed (519 passed, 56 skipped). `mm format --check`, `mm analyze`,
+  `mm req`, `mm panel` and repository-wide `mm check` passed. No emulator or
+  native screen-reader check was performed.
+- Changes remain uncommitted on `feature/mm205-expert-mobile-ux`.
+
+## Session 12: 2026-10-11, Copilot (novice mobile-experience audit)
+
+- Owner reports novice cognitive overload from card- and analysis-heavy
+  screens; this is a problem signal, not proof that cards or required metrics
+  are harmful. MM-205 keeps app redesign out of scope.
+- Product Designer and UX independently audited the existing novice
+  meal-log journey; they remained distinct. Chair-delegated source research
+  found indirect food-entry friction evidence but no direct novice
+  progressive-disclosure study or support for chart demotion.
+- Flutter corroborated Dashboard Add food using Food's retained historical
+  date; QA corroborated the visible deletion alternative rule and golden
+  overlap. Parent reproduced MM-206 wrong-day, MM-207 missing action and
+  MM-208 FAB overlap with targeted widget probes. Each is ticketed with a
+  skipped guard pending its own UI fix; no app behavior changed.
+- Persisted audit, source provenance, decisions, checkpoint and test results
+  in `docs/agent-runs/mm205-novice-mobile-experience/`. MM-49/MM-179 Simple
+  scope remains with the owner. Full `mm check` previously failed due Dart
+  VM/JIT crash; no claim that it passed.
+- Fixed guard syntax to `skip: true` with ticket IDs in comments; focused
+  Dashboard/Food tests passed with three tracked skips. Platform/device,
+  screen-reader and novice-user behavior remain unverified.
+
+## Session 11: 2026-10-10, Copilot (merge confirmation)
+
+- Owner confirmed switching to main and pulling. Verified clean `main` equals
+  `origin/main` at merge commit 44251604; GitHub reports #79 merged.
+- Updated this handoff: panel work is complete; no #79 blocker/merge exception
+  remains. MM-202/203/204 are separately deferred food behavior fixes.
+
+rformed WebSearch/WebFetch, then
   a fresh Claude session resumed repository artifacts without chat/research
   repetition. Unmodified resume profile exposed exactly five allowed tools.
   Real sources/results/hashes persist in `docs/agent-runs/pr79-research-smoke/`;
@@ -134,26 +171,4 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   reproduced app-bug guards are explicitly skipped; not claimed fixed.
 - Delivered merge commit 41ca7ae to original #79 branch, no force push.
   PR description preserves original task and records actual checks, runtime
-  limits and deferred defects. New trusted CI runs (old cloud runs required
-  action and were not test evidence); PR is now mergeable. Read final CI/
-  readiness from PR. No tooling owner decision remains; do not merge.
-
-## Session 9: 2026-10-11, Copilot
-
-- Weekly volume #78 and typed-set overlap #80 completed with full Windows
-  checks, Linux CI/Android builds; both merged. No phone changes.
-- MM-196 has failing-before/passing-after regressions. Adjacent sets are
-  allowed and missing timing evidence is never invented.
-- Remaining MM-191: rest targets/signals, typed seconds, midnight ends.
-
-## Session 8: 2026-10-11, Copilot (cloud panel implementation)
-
-- Added canonical roles/protocol/contract, read-only Claude adapters,
-  single-writer checkpoint/resume artifacts and `mm panel`.
-- Product design distinct from UX; Maurice proposal cannot silently override
-  existing mascot prohibition.
-- Copilot adapter writes restricted in that cloud environment. SDK download
-  HTTP 403 prevented Dart/Flutter checks. Native behavior was not tested.
-- Review fixed non-object schema bypass and Windows path defects; provisional
-  panel MM-195 now allocated MM-197 locally. Tests awaited local execution.
-- Cloud CI 38105665416 was `action_required`, zero jobs/logs, not test evidence.
+  limits and deferred defects. Trusted CI ran on the merged PR head.
