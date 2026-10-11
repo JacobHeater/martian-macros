@@ -622,7 +622,8 @@
   ],
   "pending_work": [
     "Verify Flutter Dismissible semantics, provider loading/error behavior, native accessibility/device behavior, and novice task performance where relevant.",
-    "Revalidate affected findings if relevant app source or requirements change."
+    "Revalidate affected findings if relevant app source or requirements change.",
+    "Confirm CI is green on the latest PR #81 head before marking it ready."
   ],
   "tests": [
     {
@@ -771,7 +772,7 @@
     }
   ],
   "checkpoint": {
-    "at": "2026-10-11T04:49:01Z",
+    "at": "2026-10-11T04:56:04Z",
     "writers_stopped": true
   }
 }
