@@ -210,14 +210,12 @@ void main() {
       expect(await storedWeights(), hasLength(5));
     });
 
-    test('importing again from no token does not duplicate either', () async {
+    test('importing again with a token the platform does not know does '
+        'not duplicate either', () async {
       await setUpWith();
       await importer.import(HealthDataType.weight);
-      final other = HealthImporter(
-        source: source,
-        store: store..saveToken(HealthDataType.weight, 'forgotten'),
-      );
-      final again = await other.import(HealthDataType.weight);
+      await store.saveToken(HealthDataType.weight, 'forgotten');
+      final again = await importer.import(HealthDataType.weight);
       expect(again.status, HealthImportStatus.readAgain);
       expect(await storedWeights(), hasLength(5));
     });
