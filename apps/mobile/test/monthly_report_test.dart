@@ -186,6 +186,75 @@ void main() {
     expect(find.text('28 of 28'), findsOneWidget);
   });
 
+  Future<void> trainedOn(int day, double squatKg) async {
+    final date = onboarded.addDays(day);
+    final began = DateTime(date.year, date.month, date.day, 18);
+    await repos.workouts.saveWorkout(
+      Workout(
+        id: 0,
+        date: date,
+        startedAt: began,
+        endedAt: began.add(const Duration(minutes: 50)),
+        exercises: [
+          WorkoutExercise(
+            exerciseId: 'back-squat',
+            sets: [WorkoutSet(reps: 1, loadKg: squatKg)],
+          ),
+        ],
+      ),
+    );
+  }
+
+  testWidgets('a month with training lists the workouts and each lift', (
+    tester,
+  ) async {
+    await seed(daysSinceOnboarding: 28);
+    await trainedOn(2, 220);
+    await trainedOn(23, 240);
+    await openFirstReport(tester, onboarded.addDays(28));
+
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('report-work')),
+        matching: find.text('Workouts'),
+      ),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('report-lifts')),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(MonthlyReportScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('Back squat'), findsOneWidget);
+    // 220 kg then 240 kg for one rep: the estimates are 227.3 and 248 kg,
+    // and the last is smoothed with the one before it.
+    expect(find.text('501.2 lb to 524.0 lb (+22.8 lb)'), findsOneWidget);
+    expect(shown(tester), contains('not tested'));
+  });
+
+  testWidgets('a month with one session of a lift says why none is shown', (
+    tester,
+  ) async {
+    await seed(daysSinceOnboarding: 28);
+    await trainedOn(2, 100);
+    await openFirstReport(tester, onboarded.addDays(28));
+
+    expect(shown(tester), contains('No lift had two sessions this month'));
+  });
+
+  testWidgets('a month with no training has no lifts card', (tester) async {
+    await seed(daysSinceOnboarding: 28);
+    await openFirstReport(tester, onboarded.addDays(28));
+
+    expect(shown(tester), isNot(contains('Your lifts')));
+    expect(shown(tester), isNot(contains('Workouts')));
+  });
+
   testWidgets('nothing in a report grades or praises', (tester) async {
     await seed(daysSinceOnboarding: 28);
     await openFirstReport(tester, onboarded.addDays(28));
