@@ -140,7 +140,10 @@ void main() {
     }
   }
 
-  Future<InMemoryRepositories> metricsFixture({required bool dark}) async {
+  Future<InMemoryRepositories> metricsFixture({
+    required bool dark,
+    bool strength = false,
+  }) async {
     final repos = InMemoryRepositories();
     await DemoSeed(today).replace(
       eraser: repos.eraser,
@@ -151,6 +154,7 @@ void main() {
       dayMarks: repos.dayMarks,
       targets: repos.targets,
       recovery: repos.recovery,
+      workouts: strength ? repos.workouts : null,
     );
     await repos.preferences.saveThemePreference(
       dark ? ThemePreference.dark : ThemePreference.light,
@@ -236,6 +240,36 @@ void main() {
         await tester.pumpAndSettle();
       }
       await shot(tester, '${name}_martian');
+    }, skip: !linux);
+  }
+
+  for (final palette in [
+    ThemePreference.light,
+    ThemePreference.dark,
+    ThemePreference.martian,
+  ]) {
+    testWidgets('strength charts and history, ${palette.name}', (tester) async {
+      final repos = await metricsFixture(dark: false, strength: true);
+      await repos.preferences.saveThemePreference(palette);
+      await open(tester, repos, tab: 'Progress');
+      await tester.scrollUntilVisible(
+        find.text('Strength trends'),
+        400,
+        scrollable: find
+            .descendant(
+              of: find.byType(ProgressScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.ensureVisible(find.text('Strength trends'));
+      await tester.pumpAndSettle();
+      await shot(tester, 'strength_${palette.name}');
+      await tester.ensureVisible(find.text('Session history').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Session history').first);
+      await tester.pumpAndSettle();
+      await shot(tester, 'strength_history_${palette.name}');
     }, skip: !linux);
   }
 

@@ -70,7 +70,9 @@ Every launch of this seeded build replaces only demo data with the same
 daily food and completeness, targets, weights, weekly waist and recovery,
 and today's breakfast marked partial. Edits in the demo are discarded on
 the next launch; repeat the command to reset it. There is no randomness,
-real profile data, health import, or upload involved in seeding.
+real profile data, health import, or upload involved in seeding. Finished
+workouts span fourteen weeks: four chartable lifts and one high-rep-only
+lift demonstrate Progress strength trends and honest missing estimates.
 
 The command requires an explicit Android ID and does not start emulators or
 choose a phone implicitly. It cannot pass through production config or
