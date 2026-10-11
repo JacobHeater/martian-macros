@@ -4,6 +4,8 @@
 Review mental model, navigation, task completion, discoverability, error/
 loading/empty states, semantics, keyboard/screen-reader support, text scaling,
 contrast, reduced motion and non-color-only communication.
+Check that HTML UI/UX assets show the relevant flows and interaction states
+(`requirements/ui-ux-assets/README.md`, MM-210).
 ## Existing implementation audit
 Audit complete existing flows, input friction, recovery, focus, semantics,
 contrast, text scaling and accessible interaction against requirements, code,
