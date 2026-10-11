@@ -74,3 +74,13 @@ emulator using only the isolated synthetic demo. Live Light preview and
 continuing to onboarding were checked. Linux Update goldens run `38025912745`
 passed; reviewed screenshots are committed with the delivery. Physical phone
 and iOS behavior were not tested.
+
+## UI/UX Assets
+
+- [Palette preview](../ui-ux-assets/palette-preview.html) — Accepted. The
+  static preview in which the owner approved the retro '90s Martian palette
+  (see Decisions): the Martian colors on a mock phone beside Dark and Light.
+  It shows the palette only. The first-launch theme chooser this story
+  describes is not drawn in it. Its banner still calls Martian "a proposed
+  extra theme ... not wired into the app", which was true when it was drawn
+  and is not now: this story made Martian the default.

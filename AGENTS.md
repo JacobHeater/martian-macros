@@ -43,6 +43,18 @@ delegation and sequential fallback do not supersede the working agreements here.
   any standing rule the owner gave you that is not in this file. Update it in
   the same pull request as the work, and again before you finish, since a
   session can end without warning. Nothing private goes in it.
+- Keep HTML UI/UX assets with the requirements (MM-210). A screen prototype,
+  interaction demonstration, design exploration or visual specification
+  written as HTML lives in `requirements/ui-ux-assets/` and nowhere else, and
+  every ticket it supports links it under the exact heading
+  `## UI/UX Assets`, with its status and what it shows. Add the asset and its
+  links in the same pull request; when you change an asset materially, bring
+  its entries up to date. An asset you cannot confidently give to a ticket
+  goes on that folder's unresolved list, never to a guessed ticket. The
+  ticket stays the requirement: a linked asset approves nothing and proves
+  nothing about the app. The convention is in
+  [requirements/ui-ux-assets/README.md](requirements/ui-ux-assets/README.md);
+  `mm req` checks the bookkeeping.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
