@@ -167,6 +167,10 @@ covers biased loggers, collapsing logging quality, and recomp at flat weight.
   weigh-in; missing resistance metadata never becomes a guessed estimate.
   Progress shows session bests, a trailing three-session mean and dated
   four/twelve-week comparisons. Edits and deletions recompute from repositories.
+  Weekly volume (MM-78) derives full primary and half secondary hard-set
+  contributions from two adjacent rolling seven-day windows. Finished
+  sessions only; missing exercise mappings are disclosed rather than guessed.
+  Train exposes all muscle groups against a non-prescriptive reference band.
 
 ## Code structure principles
 
