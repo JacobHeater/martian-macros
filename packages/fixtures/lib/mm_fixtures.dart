@@ -21,6 +21,7 @@ export 'src/in_memory_recovery_check_in_repository.dart';
 export 'src/in_memory_reminder_repository.dart';
 export 'src/in_memory_reminder_scheduler.dart';
 export 'src/in_memory_repositories.dart';
+export 'src/in_memory_rest_signal.dart';
 export 'src/in_memory_setup_repository.dart';
 export 'src/in_memory_targets_history_repository.dart';
 export 'src/in_memory_waist_repository.dart';

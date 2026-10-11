@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../format/workout_summary_text.dart';
@@ -12,6 +13,7 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/show_mm_confirm.dart';
 import 'exercise_picker_screen.dart';
+import 'rest_alarm.dart';
 import 'set_timer_bar.dart';
 import 'workout_clock_card.dart';
 import 'workout_controller_provider.dart';
@@ -65,7 +67,10 @@ class WorkoutScreen extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: workout.inProgress
-          ? SetTimerBar(workout: workout)
+          ? RestAlarm(
+              workout: workout,
+              child: SetTimerBar(workout: workout),
+            )
           : null,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -105,7 +110,15 @@ class WorkoutScreen extends ConsumerWidget {
                 ),
               );
               if (exerciseId != null) {
-                await controller.addExercise(workout, exerciseId);
+                await controller.addExercise(
+                  workout,
+                  exerciseId,
+                  // A rest target chosen before is there again.
+                  restTarget: lastRestTargetOf(
+                    exerciseId: exerciseId,
+                    workouts: workouts,
+                  ),
+                );
               }
             },
           ),

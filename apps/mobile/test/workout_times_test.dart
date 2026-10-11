@@ -81,6 +81,27 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Types a time into the clock time entry of a set and confirms it.
+  Future<void> enterClock(
+    WidgetTester tester,
+    int hour,
+    int minute, {
+    bool am = false,
+  }) async {
+    await tester.enterText(find.byKey(const ValueKey('clock-hour')), '$hour');
+    await tester.enterText(
+      find.byKey(const ValueKey('clock-minute')),
+      '$minute',
+    );
+    await tester.enterText(find.byKey(const ValueKey('clock-second')), '0');
+    if (am) {
+      await tester.tap(find.text('AM'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.byKey(const ValueKey('clock-ok')));
+    await tester.pumpAndSettle();
+  }
+
   Future<int> saveFinished(WidgetTester tester) => repos.workouts.saveWorkout(
     Workout(
       id: 0,
@@ -400,7 +421,7 @@ void main() {
         await tap(tester, 'workout-$id');
         await tap(tester, 'set-0-1');
         await tap(tester, 'set-0-1-end');
-        await enterTime(tester, 12, 3);
+        await enterClock(tester, 12, 3);
 
         expect(
           find.text('That overlaps another set in this workout.'),
@@ -412,7 +433,7 @@ void main() {
         expect(sets[1].endedAt, isNull);
 
         await tap(tester, 'set-0-1-end');
-        await enterTime(tester, 12, 4);
+        await enterClock(tester, 12, 4);
         sets = (await stored(tester)).single.exercises.single.sets;
         expect(sets[1].startedAt, isNull);
         expect(sets[1].endedAt, noon.add(const Duration(minutes: 4)));
@@ -450,7 +471,7 @@ void main() {
       await tap(tester, 'workout-$id');
       await tap(tester, 'set-1-0');
       await tap(tester, 'set-1-0-start');
-      await enterTime(tester, 12, 2);
+      await enterClock(tester, 12, 2);
 
       expect(
         find.text('That overlaps another set in this workout.'),
@@ -462,14 +483,14 @@ void main() {
 
       // A shared boundary is valid, and the edited set excludes itself.
       await tap(tester, 'set-1-0-start');
-      await enterTime(tester, 12, 3);
+      await enterClock(tester, 12, 3);
       workout = (await stored(tester)).single;
       expect(
         workout.exercises[1].sets.single.startedAt,
         noon.add(const Duration(minutes: 3)),
       );
       await tap(tester, 'set-1-0-end');
-      await enterTime(tester, 12, 5);
+      await enterClock(tester, 12, 5);
       workout = (await stored(tester)).single;
       expect(
         workout.exercises[1].sets.single.endedAt,
@@ -484,7 +505,7 @@ void main() {
       expect(find.text('Not timed'), findsOneWidget);
 
       await tap(tester, 'set-0-0-start');
-      await enterTime(tester, 12, 9);
+      await enterClock(tester, 12, 9);
 
       final set = (await stored(tester)).single.exercises.single.sets.single;
       expect(set.startedAt, noon.add(const Duration(minutes: 9)));
@@ -500,7 +521,7 @@ void main() {
       await wait(tester, const Duration(minutes: 10));
 
       await tap(tester, 'set-0-0-start');
-      await enterTime(tester, 12, 15);
+      await enterClock(tester, 12, 15);
 
       expect(find.text('The end has to be after the start.'), findsOneWidget);
       final set = (await stored(tester)).single.exercises.single.sets.single;
@@ -513,7 +534,7 @@ void main() {
       await tap(tester, 'add-set-0');
 
       await tap(tester, 'set-0-0-start');
-      await enterTime(tester, 11, 50, am: true);
+      await enterClock(tester, 11, 50, am: true);
 
       expect(find.text('That is before the workout started.'), findsOneWidget);
       final set = (await stored(tester)).single.exercises.single.sets.single;

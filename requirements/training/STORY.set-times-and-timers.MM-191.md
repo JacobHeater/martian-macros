@@ -35,6 +35,23 @@ Choices I made without asking (say if any is wrong):
 - **Times must make sense**: an end after its start, both inside the workout, and sets of one workout not overlapping. A typed time that
   breaks this is refused with the reason, not silently moved.
 
+Choices made with the expert panel while the product owner was away (2026-10-11; say if any is wrong):
+- **The rests on offer are None, 1:00, 1:30, 2:00, 3:00 and 5:00**, and an exercise starts at None. The app recommends no length of
+  rest: prescribing training is a non-goal. Nothing under a minute is offered; that is the one range the evidence leans against
+  (Singer et al. 2024, DOI 10.3389/fspor.2024.1429789). No length typed freely yet. (training)
+- **A target is remembered per exercise**: adding the exercise to a later workout, or repeating a workout, brings its last target.
+- **At the target the bar says "Target rest reached"**, not "Rest over", which reads as an order to lift. The timer then shows the
+  whole rest, still counting. (training)
+- **The signal is given once**, only while the workout is open, never late for a rest that ended while the app was closed, and never
+  while the workout is paused or a set is being timed. (training, ux-accessibility)
+- **A screen reader hears the label when it changes, not the figure every second.** (ux-accessibility)
+- **A set's time is typed as hour, minute, second and AM or PM**, four separate controls with number keys, not free text: nothing
+  about AM or PM is guessed. (ux-accessibility)
+- **A typed time of day before the workout's start is on the next day**, when that is within twelve hours of the start and not still
+  to come; otherwise it is refused as before. The twelve hours stop a slip (11:20 PM against an 11:30 PM start) from making a workout
+  of nearly a day. The same holds for a set's times. (ux-accessibility)
+- **Time paused counts as rest.** The rest is the gap between one set's end and the next one's start, whatever the workout clock did.
+
 ## Description
 Optional start and end times on a set, a way to type and correct them, a set timer and a rest timer in the workout screen. The times are
 what later lets a set be written to Health Connect as a segment.
@@ -75,6 +92,45 @@ Scenario: Overlapping typed sets
   And the set keeps its previous times
   And sets that only touch at their boundaries remain allowed
 
+Scenario: No target
+  Given an exercise with no target rest
+  Then the rest timer counts up, as before
+
+Scenario: The target is reached
+  Given a target rest of 1 minute
+  When a minute has passed since the set ended
+  Then the signal is given once
+  And the timer says the target rest is reached and goes on counting the rest
+
+Scenario: The target is changed mid-rest
+  Given 40 seconds of rest against a 5 minute target
+  When the target is changed to 1 minute
+  Then 20 seconds are left
+
+Scenario: The target passed while the app was closed
+  When the app is opened after the target was reached
+  Then the rest is shown and no signal is given
+
+Scenario: The target is remembered
+  Given the back squat had a target rest of 3 minutes last time
+  When the back squat is added to a new workout
+  Then its target rest is 3 minutes
+
+Scenario: Typing seconds
+  When a start of 12:02:10 PM is entered for a set
+  Then the set starts at that second
+
+Scenario: A workout that ends after midnight
+  Given a workout that started at 11:30 PM
+  When an end of 12:20 AM is entered
+  Then it ends at 12:20 AM on the next day
+  And changing the workout's day keeps the end on the day after
+
+Scenario: A slip is not a day-long workout
+  Given a workout that started at 11:30 PM
+  When an end of 11:20 PM is entered
+  Then it is refused
+
 Scenario: Only timed sets reach a platform as segments
   Given a workout with one set that has both times and one that has neither
   Then only the first can be written as a segment, and the workout is still written as a session
@@ -99,12 +155,22 @@ Built (2026-10-10), schema 26:
   intervals are allowed; missing times do not imply a range. A conflict is
   explained and the original times are preserved.
 
+Built (2026-10-11), schema 28:
+- **A target rest per exercise**, chosen on the exercise's card of a workout in progress and remembered for that exercise. The bar
+  counts down to it, says when it is reached, and then shows the whole rest.
+- **One vibration when the target is reached**, through a `RestSignal` interface so it can be replaced.
+- **A set's start and end are typed to the second**, in an entry of the app's own.
+- **A workout can end after midnight**, and so can a set in it; changing the workout's day keeps the end on the day after.
+
 Not built:
-- A target rest per exercise and the countdown to it; the sound and vibration at its end.
-- Typed times are to the minute, not the second (the phone's own time picker). A timed set is to the second.
-- A workout that runs past midnight cannot have its end typed (it would be before its start).
+- **A sound at the end of a rest.** Flutter has no system alert sound on Android or iOS, so a sound needs an audio package and a
+  sound file: a new dependency, left for the product owner to decide. Only the vibration is given.
+- A signal when the app is in the background (MM-146's scheduler), and a rest length typed freely.
+- A workout's own start and end are still typed to the minute (the phone's time picker).
+- Seen on the Android emulator (2026-10-11): choosing a target, the countdown, the bar at the target, and the time entry.
+  Not seen with a screen reader, and the vibration was not felt on a phone.
 
 ## Notes
-- Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27.
+- Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
 - Time comes from the app's `Clock`, never the device directly (MM-190), so every scenario above is testable with a fixed clock.
 - Not planned: automatic rep counting, heart rate, or timing from a watch.
