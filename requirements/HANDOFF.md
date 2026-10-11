@@ -98,10 +98,15 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Verified: 54 tests against a simulated `gh`; a read-only run against the real
   PR #81 with a detached watcher; on Claude Code in VS Code, a finished
   background command (`mm ci next`) reached the model at the next tool boundary
-  with no user prompt. **Not tested: any Copilot surface, macOS, Linux**, and
-  on a real pull request a failing check, a push or a rerun (simulated only).
-- **No CI watch is open.** The demonstration watch on #81 was stopped and
-  removed. PR #81 (`feature/mm205-expert-mobile-ux`, draft, not this session's)
+  with no user prompt. Its tests also pass on Linux (WSL). **Not tested: any Copilot surface,
+  macOS**, and
+  on a real pull request a failing check or a rerun (simulated only).
+- **One CI watch is open**, on this change's own PR #82 (`feature/ci-watch`):
+  watch `JacobHeater-martian-macros-pr82`, owner `claude-chair`, on the
+  machine this was built on. Next chair: `./mm ci own` it (or start it again
+  on another machine), read `./mm ci check 82`, merge when green. The watcher
+  stops by itself when the PR merges. The demonstration watch on #81 was
+  stopped and removed. PR #81 (`feature/mm205-expert-mobile-ux`, draft, not this session's)
   was read only: checks passed on head `6a75f5c`; it was not merged.
 - MM-209 was taken because the open PR #81 uses MM-205 to MM-208, although
   fresh `main` reported MM-205 as next. Next is MM-210 once both merge.
