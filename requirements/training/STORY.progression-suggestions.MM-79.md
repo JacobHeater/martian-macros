@@ -1,6 +1,6 @@
 ---
 id: MM-79
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-75, MM-77, MM-78]
 ---
@@ -86,12 +86,17 @@ Built (2026-10-11):
 - `suggestProgression` in the engine, a pure function of the finished workouts, with the rules above.
 - A line on each exercise of a workout in progress, with the reason, and the first set started from it.
 
+Built (2026-10-11), schema 31:
+- **A rep range and a load step per exercise, set by the user**: a row on each exercise of a workout in progress says what
+  suggestions use ("6 to 10 reps · 5 lb steps") and opens a screen to change them or go back to the defaults. Kept in their own
+  table (`exercise_progressions`), for built-in exercises and the user's own alike. An empty step keeps the usual one for the
+  equipment. A range has to run from at least 1 to at most 50 with the top above the bottom.
+- The user's step also applies to weight added to the body and to assisted work, which still never goes past none.
+
 Not built:
-- **Editing the rep range and the load step per exercise.** They need a place to be stored, and one schema change was already in
-  flight (MM-191, schema 28). The defaults apply to everything until then.
 - On fat loss with every set at the top of the range, offering the load step as well (the panel proposed it; undecided).
-- Seen on the Android emulator (2026-10-11) on a fat loss goal only. The line sits under "Last time", so it does not repeat the
-  sets.
+- The settings are reached from a workout in progress only, not from the exercise library.
+- Seen on the Android emulator on a fat loss goal only (the suggestion line); the settings screen was not seen there.
 
 ## Notes
 - This is deliberately simple. Periodization, deloads and programs are out of scope.

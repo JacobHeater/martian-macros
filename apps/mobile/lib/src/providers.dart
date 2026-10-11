@@ -310,6 +310,15 @@ final monthlyReportProvider = Provider.family<MonthlyReport?, int>((
   );
 });
 
+/// The rep range and load step the user set, by exercise id (MM-79).
+final exerciseProgressionsProvider =
+    StreamProvider<Map<String, ExerciseProgression>>(
+      (ref) => ref
+          .watch(exerciseProgressionReaderProvider)
+          .watchExerciseProgressions()
+          .map((all) => {for (final p in all) p.exerciseId: p}),
+    );
+
 /// How many whole days the user has logged in a row (MM-92).
 final loggingStreakProvider = Provider<LoggingStreak>((ref) {
   final intake = ref.watch(intakeDaysProvider).value ?? const [];

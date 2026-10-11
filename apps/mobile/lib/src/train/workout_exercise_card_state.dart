@@ -5,6 +5,7 @@ import 'package:mm_engine/mm_engine.dart';
 
 import '../format/elapsed_text.dart';
 import '../format/fmt.dart';
+import '../format/progression_settings_text.dart';
 import '../format/progression_text.dart';
 import '../format/rest_target_text.dart';
 import '../format/set_text.dart';
@@ -19,6 +20,7 @@ import '../ui/mm_list_row.dart';
 import '../ui/mm_menu_item.dart';
 import '../ui/show_mm_confirm.dart';
 import '../ui/show_mm_options.dart';
+import 'progression_settings_screen.dart';
 import 'set_editor.dart';
 import 'workout_controller_provider.dart';
 import 'workout_exercise_card.dart';
@@ -54,6 +56,11 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
       workouts: workouts,
       before: workout.startedAt,
     );
+    // The user's own rep range and load step for it, if they set them.
+    final settings = ref
+        .watch(exerciseProgressionsProvider)
+        .value?[entry.exerciseId];
+    final (defaultLow, defaultHigh) = defaultRepRange(exercise);
     // What to try today (MM-79): offered while training, not on a workout
     // being looked back at.
     final suggestion = !workout.inProgress
@@ -65,6 +72,7 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
             before: workout.startedAt,
             goal: setup?.goalMode ?? GoalMode.maintenance,
             units: units,
+            settings: settings,
           );
     final controller = ref.read(workoutControllerProvider);
     final text = Theme.of(context).textTheme;
@@ -157,6 +165,27 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 ),
                 onTap: () => setState(() => _open = s),
               ),
+          if (workout.inProgress)
+            MmListRow(
+              key: ValueKey('progression-$index'),
+              dense: true,
+              title: 'Suggestions use',
+              subtitle: progressionSettingsText(
+                repsLow: settings?.repsLow ?? defaultLow,
+                repsHigh: settings?.repsHigh ?? defaultHigh,
+                loadStepKg:
+                    settings?.loadStepKg ??
+                    defaultLoadStepKg(exercise: exercise, units: units),
+                fmt: fmt,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      ProgressionSettingsScreen(exerciseId: entry.exerciseId),
+                ),
+              ),
+            ),
           if (workout.inProgress)
             MmListRow(
               key: ValueKey('rest-target-$index'),

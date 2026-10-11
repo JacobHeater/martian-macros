@@ -227,4 +227,149 @@ void main() {
     expect(find.byKey(const ValueKey('exercise-0')), findsOneWidget);
     expect(find.byKey(const ValueKey('suggestion-0')), findsNothing);
   });
+
+  group('a range and step of the user\'s own', () {
+    Future<void> type(WidgetTester tester, String key, String value) async {
+      await tester.enterText(find.byKey(ValueKey(key)), value);
+      await tester.pumpAndSettle();
+    }
+
+    String settingsLine(WidgetTester tester) => tester
+        .widgetList<Text>(
+          find.descendant(
+            of: find.byKey(const ValueKey('progression-0')),
+            matching: find.byType(Text),
+          ),
+        )
+        .map((t) => t.data ?? '')
+        .join(' | ');
+
+    Future<List<ExerciseProgression>> saved(WidgetTester tester) => readNow(
+      tester,
+      () => repos.exerciseProgressions.watchExerciseProgressions().first,
+    );
+
+    testWidgets('the exercise says what suggestions use, the defaults to '
+        'begin with', (tester) async {
+      await did(7, [(8, 60), (8, 60)]);
+      await startWith(tester, 'back-squat');
+      expect(settingsLine(tester), contains('6 to 10 reps · 2.5 kg steps'));
+    });
+
+    testWidgets('a range and a step can be set, and the suggestion follows', (
+      tester,
+    ) async {
+      await did(7, [(5, 100), (5, 100)]);
+      await startWith(tester, 'back-squat');
+      expect(suggestion(tester), 'One more rep on any set would be a step up.');
+
+      await tap(tester, 'progression-0');
+      await type(tester, 'progression-low', '3');
+      await type(tester, 'progression-high', '5');
+      await type(tester, 'progression-step', '5');
+      await tap(tester, 'progression-save');
+
+      expect(await saved(tester), [
+        const ExerciseProgression(
+          exerciseId: 'back-squat',
+          repsLow: 3,
+          repsHigh: 5,
+          loadStepKg: 5,
+        ),
+      ]);
+      expect(settingsLine(tester), contains('3 to 5 reps · 5 kg steps'));
+      expect(
+        suggestion(tester),
+        'Every set reached 5 last time. A step up would be 105 kg × 3.',
+      );
+      final set = await firstSet(tester);
+      expect(set.reps, 3);
+      expect(set.loadKg, 105);
+    });
+
+    testWidgets('an empty step keeps the usual one, and the screen opens on '
+        'what is saved', (tester) async {
+      await did(7, [(8, 60)]);
+      await startWith(tester, 'back-squat');
+      await tap(tester, 'progression-0');
+      expect(
+        find.textContaining('Leave empty for the usual step: 2.5 kg.'),
+        findsOneWidget,
+      );
+      await type(tester, 'progression-low', '5');
+      await type(tester, 'progression-high', '8');
+      await tap(tester, 'progression-save');
+
+      expect((await saved(tester)).single.loadStepKg, isNull);
+      expect(settingsLine(tester), contains('5 to 8 reps · 2.5 kg steps'));
+
+      await tap(tester, 'progression-0');
+      final low = tester.widget<TextField>(
+        find.descendant(
+          of: find.byKey(const ValueKey('progression-low')),
+          matching: find.byType(TextField),
+        ),
+      );
+      expect(low.controller!.text, '5');
+    });
+
+    testWidgets('a range that is no range cannot be saved, and says why', (
+      tester,
+    ) async {
+      await did(7, [(8, 60)]);
+      await startWith(tester, 'back-squat');
+      await tap(tester, 'progression-0');
+      await type(tester, 'progression-low', '10');
+      await type(tester, 'progression-high', '8');
+
+      expect(
+        find.text('The most reps has to be more than the fewest.'),
+        findsOneWidget,
+      );
+      await tap(tester, 'progression-save');
+      expect(await saved(tester), isEmpty);
+
+      await type(tester, 'progression-high', '12');
+      await type(tester, 'progression-step', '0');
+      expect(
+        find.text('The load step is a number above zero, or left empty.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the defaults can be taken back', (tester) async {
+      await repos.exerciseProgressions.saveExerciseProgression(
+        const ExerciseProgression(
+          exerciseId: 'back-squat',
+          repsLow: 3,
+          repsHigh: 5,
+        ),
+      );
+      await did(7, [(8, 60)]);
+      await startWith(tester, 'back-squat');
+      expect(settingsLine(tester), contains('3 to 5 reps'));
+
+      await tap(tester, 'progression-0');
+      await tap(tester, 'progression-defaults');
+      expect(await saved(tester), isEmpty);
+      expect(settingsLine(tester), contains('6 to 10 reps'));
+    });
+
+    testWidgets('pounds are typed for the step, kilograms are stored', (
+      tester,
+    ) async {
+      await setUpUser(units: UnitSystem.imperial);
+      await did(7, [(8, 60)]);
+      await startWith(tester, 'back-squat');
+      await tap(tester, 'progression-0');
+      await type(tester, 'progression-step', '10');
+      await tap(tester, 'progression-save');
+
+      expect(
+        Units.kgToLb((await saved(tester)).single.loadStepKg!),
+        closeTo(10, 1e-9),
+      );
+      expect(settingsLine(tester), contains('10 lb steps'));
+    });
+  });
 }
