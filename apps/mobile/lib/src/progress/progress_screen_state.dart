@@ -10,6 +10,7 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/number_entry_card.dart';
 import 'progress_screen.dart';
+import 'recomp_signal_card.dart';
 import '../charts/trend_chart.dart';
 import '../charts/trend_stats.dart';
 import 'waist_summary.dart';
@@ -130,6 +131,7 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
               .read(waistWriterProvider)
               .saveWaist(today, fmt.lengthToCm(value)),
         ),
+        RecompSignalCard(fmt: fmt),
         const SizedBox(height: 16),
         const StrengthSection(),
       ],

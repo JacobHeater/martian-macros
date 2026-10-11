@@ -26,17 +26,17 @@ Main conflict is resolved; inspect current PR CI/readiness there before merge
 are green and merged. PR #79 merges that upstream work without changing app
 behavior. Its handoff conflict was resolved and the merge pushed.
 
-**Database.** Schema 28 (a target rest per workout exercise, MM-191), on
-`feature/mm191-rest-target` until its PR merges; `main` is 27 until then.
+**Database.** Schema 28 (a target rest per workout exercise, MM-191), merged.
 Only one schema change in flight at a time.
 
 **Next ticket ID.** MM-205 (`mm req next` is the authority). Cloud panel's
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** MM-79 (progression) is built with default rep ranges
-and load steps; editing them per exercise needs storage, so it waits for
-schema 28 to merge. Then recomp (MM-133, MM-32). MM-191 has only a sound
+**What to build next.** The recomp review (MM-133), which can reuse
+`recompSignalOf`'s parts; then the strength parts of the monthly report and
+rewards (MM-33, MM-92). MM-79 (progression) is merged with default rep ranges
+and load steps; editing them per exercise needs a table (schema 29). MM-191 has only a sound
 at the end of a rest left (needs an audio package: owner's decision), a
 background signal, and a free-typed rest length.
 Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
@@ -120,6 +120,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - A screenshot test broke on the taller exercise card (it could not find
   the Add exercise button) and failed CI on the MM-191 PR; fixed by scrolling
   to it. Lesson: read the whole Linux golden run, not its last line.
+- #83 (MM-191) and #84 (MM-79) merged after a direct read of GitHub showed
+  the check passed on each head. No CI watch is left to act on.
+- MM-32: `recompSignalOf` and a card on Progress. `panel-measurement` set the
+  thresholds (in the ticket); the waist rule is interim until MM-155.
 - Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
   edits will conflict with this file.
 
