@@ -118,7 +118,7 @@ user's numbers, lists options as plain lines, and opens to what it rests on. Tes
 `stall_card_test.dart` (wording, a list of words that may not appear, and one test through the real app).
 
 Not built, or approximate:
-- **Waist noise is a stand-in** (1.5 cm) until MM-155 models it.
+- Waist noise was a stand-in (1.5 cm) until 2026-10-11; the waist is now judged by MM-155's shared function (`waistChangeOf`).
 - **Cycle windows and the start of training** as masking causes: only passing weight events and the waist are used.
 - **Options are text, not actions**: a gentler pace (MM-128), shaping the week (MM-124) and a maintenance break (MM-135) are not
   built, so nothing can be tapped.
