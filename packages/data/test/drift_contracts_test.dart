@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:mm_data/mm_data.dart';
+import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures_contracts.dart';
 import 'package:mm_health_ingest/mm_health_ingest.dart';
 import 'package:mm_health_ingest/mm_health_ingest_testing.dart';
@@ -30,6 +31,26 @@ void main() {
   recoveryCheckInRepositoryContract('Drift', () => open().recovery);
   workoutRepositoryContract('Drift', () => open().workouts);
   customExerciseRepositoryContract('Drift', () => open().customExercises);
+  exerciseProgressionRepositoryContract(
+    'Drift',
+    () => open().exerciseProgressions,
+  );
+
+  test('erasing empties the rep ranges and load steps', () async {
+    final repos = open();
+    await repos.exerciseProgressions.saveExerciseProgression(
+      const ExerciseProgression(
+        exerciseId: 'back-squat',
+        repsLow: 3,
+        repsHigh: 6,
+      ),
+    );
+    await repos.eraser.eraseAll();
+    expect(
+      await repos.exerciseProgressions.watchExerciseProgressions().first,
+      isEmpty,
+    );
+  });
   healthSampleStoreContract('Drift', () => open().healthSamples);
 
   test('importing into the database twice does not duplicate, and erasing '

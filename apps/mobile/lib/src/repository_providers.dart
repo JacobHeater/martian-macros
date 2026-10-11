@@ -101,6 +101,11 @@ final customExerciseRepositoryProvider = Provider<CustomExerciseRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).customExercises,
 );
 
+final exerciseProgressionRepositoryProvider =
+    Provider<ExerciseProgressionRepository>(
+      (ref) => ref.watch(_driftRepositoriesProvider).exerciseProgressions,
+    );
+
 /// Where readings imported from a health platform are kept (MM-67).
 final healthSampleStoreProvider = Provider<HealthSampleStore>(
   (ref) => ref.watch(_driftRepositoriesProvider).healthSamples,
