@@ -9,6 +9,7 @@ final class HistorySeries {
     required this.kind,
     this.dashed = false,
     this.connectRecordedPoints = false,
+    this.maximumGapDays,
   });
 
   final String label;
@@ -16,4 +17,5 @@ final class HistorySeries {
   final HistorySeriesKind kind;
   final bool dashed;
   final bool connectRecordedPoints;
+  final int? maximumGapDays;
 }

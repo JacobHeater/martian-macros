@@ -29,6 +29,7 @@ Future<void> prepareDemoRepositories(ProviderContainer container) async {
     dayMarks: repositories.dayMarks,
     targets: repositories.targets,
     recovery: repositories.recovery,
+    workouts: repositories.workouts,
   );
 }
 

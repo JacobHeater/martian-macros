@@ -22,6 +22,7 @@ final class DemoSeed {
     required DayMarkWriter dayMarks,
     required TargetsHistoryWriter targets,
     required RecoveryCheckInWriter recovery,
+    WorkoutWriter? workouts,
   }) async {
     await eraser.eraseAll();
     final start = today.addDays(-historyDays);
@@ -92,6 +93,40 @@ final class DemoSeed {
             fiberG: fiber,
             sodiumMg: 350,
             source: QuantitySource.weighed,
+          ),
+        );
+      }
+    }
+    if (workouts != null) {
+      for (var daysAgo = 98; daysAgo >= 0; daysAgo -= 7) {
+        final date = today.addDays(-daysAgo);
+        final start = DateTime(date.year, date.month, date.day, 18);
+        final progress = (98 - daysAgo) / 7;
+        await workouts.saveWorkout(
+          Workout(
+            id: 0,
+            date: date,
+            startedAt: start,
+            endedAt: start.add(const Duration(minutes: 55)),
+            exercises: [
+              for (final (id, load) in [
+                ('barbell-bench-press', 70.0 + progress),
+                ('back-squat', 95.0 + progress * 1.5),
+                ('barbell-row', 55.0 + progress * 0.5),
+                ('pull-up', progress < 7 ? -10.0 : 0.0),
+              ])
+                WorkoutExercise(
+                  exerciseId: id,
+                  sets: [
+                    WorkoutSet(reps: 6, loadKg: load, rir: 2),
+                    WorkoutSet(reps: 5, loadKg: load, rir: 1),
+                  ],
+                ),
+              WorkoutExercise(
+                exerciseId: 'dumbbell-lateral-raise',
+                sets: [const WorkoutSet(reps: 20, loadKg: 8)],
+              ),
+            ],
           ),
         );
       }
