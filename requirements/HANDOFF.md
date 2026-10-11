@@ -9,13 +9,13 @@ Last updated: 2026-10-11, by Claude, end of Session 12.
 
 **Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
 MM-208) is not Claude's and was not touched; its handoff edits will conflict
-with this file. Any pull request of Session 13 still open: read
-`./mm ci check <pr>` and merge it when its check has passed on its head. The expert panel (#79) and `mm ci` (#82, MM-209,
+with this file. Nothing else is open: Session 13's pull requests (#90 to
+#94) are merged. The expert panel (#79) and `mm ci` (#82, MM-209,
 `agents/ci-monitoring.md`) are merged.
 
-**Database.** Schema 31 (a rep range and load step per exercise, MM-79), on
-its pull request until merged; `main` is 30 until then. Only one schema
-change in flight at a time.
+**Database.** Schema 31 (a rep range and load step per exercise, MM-79),
+merged. Nothing in flight changes the schema. Only one schema change at a
+time.
 
 **Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
 MM-209 is taken). `mm req next` is the authority.
@@ -115,6 +115,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - MM-79 done (schema 31): a rep range and load step per exercise, set from
   a row on the exercise of a workout in progress
   (`ProgressionSettingsScreen`, `ExerciseProgressionRepository`).
+- #94 (MM-79) merged after its check passed on its head. Seen on the
+  emulator: the "Suggestions use" row and the settings screen as it opens.
+- Done this session: MM-67, MM-133, MM-79. In progress: MM-155 (drawing
+  and chart left).
 
 ## Session 12: 2026-10-11, Claude (training and recomp)
 
