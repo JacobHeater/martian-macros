@@ -5,8 +5,9 @@ import 'fmt.dart';
 import 'load_number.dart';
 
 /// A suggestion for the next session and its reason, in one or two short
-/// sentences (MM-79): "Last time 60 kg × 8, 8, 7. One more rep on any set
-/// would be a step up." It offers; it does not tell the user what to do.
+/// sentences (MM-79): "One more rep on any set would be a step up." It is
+/// read under what was done last time, so it does not repeat it, and it
+/// offers; it does not tell the user what to do.
 String progressionText(
   ProgressionSuggestion suggestion,
   Fmt fmt,
@@ -25,19 +26,16 @@ String progressionText(
     return at == null ? '$reps reps' : '$at × $reps';
   }
 
-  final last =
-      'Last time ${work(suggestion.lastLoadKg, suggestion.lastReps.join(', '))}.';
   final next = work(suggestion.loadKg, '${suggestion.reps}');
   return switch (suggestion.kind) {
-    ProgressionKind.addReps =>
-      '$last One more rep on any set would be a step up.',
+    ProgressionKind.addReps => 'One more rep on any set would be a step up.',
     ProgressionKind.addLoad =>
       'Every set reached ${suggestion.rangeTop} last time. '
           'A step up would be $next.',
     ProgressionKind.hold =>
-      '$last No more reps at this load in three sessions. '
+      'No more reps at this load in three sessions. '
           'Holding $next is a fair aim.',
     ProgressionKind.match =>
-      '$last Matching it holds your strength while you lose fat.',
+      'Matching last time holds your strength while you lose fat.',
   };
 }

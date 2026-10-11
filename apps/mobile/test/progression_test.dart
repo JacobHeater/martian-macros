@@ -102,10 +102,7 @@ void main() {
     await did(7, [(8, 60), (8, 60), (7, 60)]);
     await startWith(tester, 'back-squat');
 
-    expect(
-      suggestion(tester),
-      'Last time 60 kg × 8, 8, 7. One more rep on any set would be a step up.',
-    );
+    expect(suggestion(tester), 'One more rep on any set would be a step up.');
     final set = await firstSet(tester);
     expect(set.reps, 8);
     expect(set.loadKg, 60);
@@ -160,7 +157,7 @@ void main() {
 
     expect(
       suggestion(tester),
-      'Last time 60 kg × 8, 7. No more reps at this load in three sessions. '
+      'No more reps at this load in three sessions. '
       'Holding 60 kg × 8 is a fair aim.',
     );
     final set = await firstSet(tester);
@@ -177,8 +174,7 @@ void main() {
 
     expect(
       suggestion(tester),
-      'Last time 60 kg × 10, 10. '
-      'Matching it holds your strength while you lose fat.',
+      'Matching last time holds your strength while you lose fat.',
     );
     final set = await firstSet(tester);
     expect(set.reps, 10);
@@ -205,10 +201,7 @@ void main() {
     await did(7, [(14, 0), (12, 0)], exerciseId: 'pull-up');
     await startWith(tester, 'pull-up');
 
-    expect(
-      suggestion(tester),
-      'Last time 14, 12 reps. One more rep on any set would be a step up.',
-    );
+    expect(suggestion(tester), 'One more rep on any set would be a step up.');
   });
 
   testWidgets('assisted work steps toward less help', (tester) async {
