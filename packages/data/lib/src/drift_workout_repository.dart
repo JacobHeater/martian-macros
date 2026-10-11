@@ -57,6 +57,9 @@ final class DriftWorkoutRepository implements WorkoutRepository {
             WorkoutExercise(
               exerciseId: row.exerciseId,
               sets: sets[(row.workoutId, row.position)] ?? const [],
+              restTarget: row.restTargetSeconds == null
+                  ? null
+                  : Duration(seconds: row.restTargetSeconds!),
             ),
           );
     }
@@ -104,6 +107,7 @@ final class DriftWorkoutRepository implements WorkoutRepository {
               workoutId: id,
               position: e,
               exerciseId: exercise.exerciseId,
+              restTargetSeconds: Value(exercise.restTarget?.inSeconds),
             ),
           );
       for (var s = 0; s < exercise.sets.length; s++) {

@@ -69,6 +69,7 @@ export 'src/integration/food_item.dart';
 export 'src/integration/food_search.dart';
 export 'src/integration/outcome.dart';
 export 'src/integration/reminder_scheduler.dart';
+export 'src/integration/rest_signal.dart';
 export 'src/integration/system_clock.dart';
 export 'src/meal.dart';
 export 'src/menstruation_day.dart';

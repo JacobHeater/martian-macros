@@ -452,8 +452,11 @@ void main() {
       await open(tester, repos, tab: 'Train');
       await tester.tap(find.byKey(const ValueKey('train-continue')));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(
+      // Below the fold, in a list that builds only what is near the screen.
+      await tester.dragUntilVisible(
         find.byKey(const ValueKey('workout-add-exercise')),
+        find.byType(ListView).last,
+        const Offset(0, -200),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('workout-add-exercise')));
