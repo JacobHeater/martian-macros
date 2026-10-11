@@ -104,13 +104,32 @@ Choices I made without asking (say if any is wrong):
 - **Entries made so far count as the middle of three readings** (noise 1.0 cm, so 1.4 cm is a change), because that is what the
   card has always asked for. Nothing records whether three were taken.
 
+Built (2026-10-11), schema 30:
+- **The entry takes three readings and stores their middle value**, with the three kept beside it (`reading1_cm` to `reading3_cm`
+  on the waist entry). One reading alone is a quick entry and is recorded as one. Two is neither and cannot be saved. Entries made
+  before this keep no readings; none are invented.
+- **The noise figure**: 1.0 cm for the middle of three; half as much again when either end of a comparison includes a single
+  reading (1.5 cm at the default); and from eight entries that carry their three readings, the user's own, the typical spread of
+  their readings in one sitting, never under 0.5 cm (`waistNoiseOf`).
+- **The card** says what a quick entry costs when one reading is typed, gives the protocol in words, and says when the next
+  measurement is due ("Weekly is enough: the next is due Oct 12").
+- A reading outside 30 to 300 cm is refused before it is stored, whatever stores it.
+
+- Seen on the Android emulator (2026-10-11): the card, the summary line, and saving 35.5, 36 and 35.25 in, which stored 35.5.
+  The demo database there was upgraded from schema 28 without error.
+
+More choices I made without asking:
+- **The user's own figure is the typical (middle) spread between the highest and lowest of three readings.** The ticket says "the
+  spread of that user's own repeat readings"; a standard deviation would be smaller and reports more changes.
+- **There is no "quick entry" switch**: typing one reading is the quick entry.
+- **A second entry on the same day replaces the first**, as before. The ticket's "a second entry within three days replaces
+  nothing and is stored" holds across days; the card says weekly is enough from the first entry.
+
 Not built:
-- **Three readings in the entry**, stored with their middle value, and the quick single-reading entry with its wider noise: needs a
-  schema change, which waits for the one in flight (MM-67, schema 29).
-- **A noise figure per user** from the spread of their own triples: needs the three readings.
-- The protocol drawing, when the next measurement is due, and the note that weekly is enough.
-- The chart.
+- **The protocol drawing**, shown the first three times.
+- **The chart** (entries as dots, a smoothed line, the noise band; 90 days and a year).
 - The monthly report still shows the month's first and last measurement (MM-33).
+- Widening the noise inside a cycle window (the ticket calls it optional).
 
 ## Notes
 - Priority: must-have before MM-32, MM-133 and MM-140's "masked" branch.
