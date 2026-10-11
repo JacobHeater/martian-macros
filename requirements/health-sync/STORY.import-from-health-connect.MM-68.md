@@ -1,6 +1,6 @@
 ---
 id: MM-68
-status: proposed
+status: in-progress
 component: health-sync
 related: [MM-66, MM-67, MM-16, MM-19, MM-20, MM-34, MM-71, MM-72, MM-73, MM-188, MM-189]
 ---
@@ -47,6 +47,38 @@ Scenario: Health Connect is absent
   Given a device without Health Connect
   Then the app says so and offers nothing that needs it
 ```
+
+## Progress
+Built (2026-10-11):
+- **`HealthConnectSource`**, Android's Health Connect behind `HealthSource` (MM-67), over the `health` plugin (13.3.2, the one new
+  dependency), using the platform's own change tokens. `mm arch` keeps the plugin out of every file but the adapter.
+- **Read only.** The manifest declares the seven read permissions and no write permission. Nothing is written to the user's health
+  data.
+- **A Health Connect group in Settings**: each kind of reading with what it is for, allowed one at a time; refusing one leaves the
+  others alone and says how to allow it later. Allowed kinds show how many readings were read and from which sources. "Read from
+  Health Connect now" reads again. A phone without Health Connect says so and offers nothing. Menstruation is offered to female
+  profiles only. A permission taken away in the phone's settings is noticed the next time the group is shown or read, and what was
+  read is kept.
+- **An unreadable platform is an error, never "nothing"** (`HealthReadFailure`). Found on the phone: Health Connect refuses to be
+  read while the app is not on screen, and the plugin reports a refused read as no readings. Left alone, an import in that state
+  would have emptied what was kept. Every read is now checked by asking for changes straight after it, and a refused read changes
+  nothing and says so.
+
+On a Pixel 9 Pro XL (Android SDK 37), as the separate demo app, 2026-10-11:
+- `healthSourceContract` (MM-67) passes against Health Connect with the screen unlocked and six kinds allowed (allowed over adb;
+  menstruation left unallowed): `apps/mobile/integration_test/health_connect_test.dart`.
+- With the screen locked the same run fails with `HealthReadFailure`, as it should.
+- **Health Connect on that phone held no readings of any kind**, so importing a real reading, its source name and its units has
+  not been seen on a device. Nothing was written to find out.
+
+Not built:
+- **Weight feeding the trend**, the typed value overruling it, and which reading counts for a day (MM-71). Readings are kept and
+  shown in Settings only; the group says so.
+- Importing when the app opens and keeping up to date (MM-72); reading back further than Health Connect's first month (MM-73).
+- The offer at the end of onboarding; the height suggestion; menstruation feeding the trend's noise; sessions in the training log.
+- The permission screen itself was not seen: permissions were granted over adb.
+- Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent
+  opens the app's main screen for now.
 
 ## Notes
 - Health Connect has no biological-sex record, so nothing here touches MM-14.

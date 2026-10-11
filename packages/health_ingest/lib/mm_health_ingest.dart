@@ -8,6 +8,7 @@ export 'src/health_data_type.dart';
 export 'src/health_import_result.dart';
 export 'src/health_import_status.dart';
 export 'src/health_importer.dart';
+export 'src/health_read_failure.dart';
 export 'src/health_sample.dart';
 export 'src/health_sample_store.dart';
 export 'src/health_source.dart';
