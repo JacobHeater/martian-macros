@@ -9,21 +9,19 @@ Last updated: 2026-10-11, by Claude, end of Session 12.
 
 **Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
 MM-208) is not Claude's and was not touched; its handoff edits will conflict
-with this file. The MM-67 pull request from Session 12, if still open: read
-`./mm ci check <pr>` and merge it when its check has passed on its head.
-Nothing else is in flight. The expert panel (#79) and `mm ci` (#82, MM-209,
+with this file. Any pull request of Session 13 still open: read
+`./mm ci check <pr>` and merge it when its check has passed on its head. The expert panel (#79) and `mm ci` (#82, MM-209,
 `agents/ci-monitoring.md`) are merged.
 
-**Database.** Schema 28 (a target rest per workout exercise, MM-191), merged.
-Nothing in flight changes the schema. Only one schema change at a time.
+**Database.** Schema 29 (imported health readings and import tokens,
+MM-67). Only one schema change in flight at a time.
 
 **Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
 MM-209 is taken). `mm req next` is the authority.
 
 **What to build next.**
-- MM-67, second half: a Drift table for imported readings behind
-  `HealthSampleStore` (schema 29), the eraser, and the app's providers. Then
-  Health Connect behind `HealthSource` (MM-68).
+- Health Connect behind `HealthSource` (MM-68): MM-67 is done, so it has a
+  store, an importer and a contract suite to pass on a device.
 - MM-155 (waist protocol and noise): replaces the interim waist rule that
   MM-32 and MM-133 share.
 - Small leftovers: the recomp review in the monthly report (MM-33, MM-133);
@@ -89,6 +87,14 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
+## Session 13: 2026-10-11, Claude (health table)
+
+- MM-67, second half: `imported_samples` and `health_import_tokens` (schema
+  29), a Drift `HealthSampleStore`, `healthSampleStoreContract` run against
+  it and the in-memory one, erasing, and the app's providers
+  (`healthSourceProvider` throws until a platform is registered). Ticket
+  done; the device run of `healthSourceContract` belongs to MM-68 and MM-69.
+
 ## Session 12: 2026-10-11, Claude (training and recomp)
 
 The owner was away and said to use the panel for open questions. Read-only
@@ -145,55 +151,3 @@ source and ran nothing.
   was read only: checks passed on head `6a75f5c`; it was not merged.
 - MM-209 was taken because the open PR #81 uses MM-205 to MM-208, although
   fresh `main` reported MM-205 as next. Next is MM-210 once both merge.
-
-## Session 10: 2026-10-11, Copilot (local panel takeover)
-
-- Owner requests finishing existing #79: install Copilot adapters, audit all
-  roles, verify research capability, run local checks. No merge.
-- Initial tree clean; fetched and safely switched existing branch. Merged
-  main; handoff conflicts resolved retaining upstream product decisions.
-- `.github/agents/` omission was a cloud environment restriction, not a
-  repository policy. Allocated panel bug MM-197 using `mm req next`.
-- Current official VS Code, GitHub and Claude configuration docs retrieved.
-  Role audit is read-only; this session is the sole write owner.
-- Audited all 15 roles; installed 15 Copilot adapters and research tools on
-  15 Claude adapters. Chair has bounded delegation/artifact edits, not shell;
-  specialist tools exclude writes/execution. Product design remains distinct
-  from UX. Research gates, source evidence/capability state and invalid fixtures
-  added (MM-198). 22 focused cases/full Windows `mm check` pass.
-- Copilot research specialist performed actual GitHub source discovery and
-  page retrieval. Claude native specialist performed WebSearch/WebFetch, then
-  a fresh Claude session resumed repository artifacts without chat/research
-  repetition. Unmodified resume profile exposed exactly five allowed tools.
-  Real sources/results/hashes persist in `docs/agent-runs/pr79-research-smoke/`;
-  templates remain inert. Copilot picker/CLI/cloud runtime was not exercised.
-- Native Claude isolated missing-doc smoke returned PANEL_CONFIG_MISSING,
-  stopped without review or fallback. Scoped validator review found MM-199
-  malformed-schema crash and MM-200 unexplained omissions; both reproduced
-  before fix, regression-tested and fixed. Full check passes (82 tool tests,
-  25 panel cases). Earlier PowerShell stream-redirection aborted on expected
-  negative-fixture stderr; OS-level redirection ran the real gate successfully.
-- Owner added MM-201: every role audits existing code, requirements, tests and
-  docs before proposals. Added audit modes, classified findings and portable
-  coverage; independent native nutrition and QA food-feature audits in flight.
-  Historical research run is explicitly stale for new instructions, retaining
-  applicable sources and real prior smoke results.
-- Nutrition audit returned classified findings/coverage. Parent reproduced
-  unchanged fractional/legacy rounding (MM-202) and per-serving alcohol mismatch
-  (MM-203). Added guards and skipped them with ticket IDs until separate app
-  fixes; no app implementation changed. Other gaps/hypotheses remain distinct.
-  Existing food tests pass (13, three tracked skips); full gate still passes.
-- QA completed independently and challenged recents interpretation. Shared
-  precision/alcohol causes deduplicated; distinct convert-to-totals alcohol
-  loss reproduced (MM-204) and guarded/skipped. No application fixes.
-  Real audit reports/state record inspected/uninspected layers, classifications,
-  dissent and owner executions. All native review processes quiescent.
-  Cup terminology request remains unverified: eCFR blocked, GovInfo unparsed.
-- Final post-QA full Windows check passed, exit 0 and All checks passed:
-  82 tool tests/25 panel cases. Saved research/audit runs validate. Four
-  reproduced app-bug guards are explicitly skipped; not claimed fixed.
-- Delivered merge commit 41ca7ae to original #79 branch, no force push.
-  PR description preserves original task and records actual checks, runtime
-  limits and deferred defects. New trusted CI runs (old cloud runs required
-  action and were not test evidence); PR is now mergeable. Read final CI/
-  readiness from PR. No tooling owner decision remains; do not merge.

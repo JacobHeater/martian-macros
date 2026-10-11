@@ -1,6 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:mm_data/mm_data.dart';
 import 'package:mm_fixtures/mm_fixtures_contracts.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
+import 'package:mm_health_ingest/mm_health_ingest_testing.dart';
 import 'package:test/test.dart';
 
 /// Runs every repository contract against the Drift implementations. The same
@@ -28,6 +30,36 @@ void main() {
   recoveryCheckInRepositoryContract('Drift', () => open().recovery);
   workoutRepositoryContract('Drift', () => open().workouts);
   customExerciseRepositoryContract('Drift', () => open().customExercises);
+  healthSampleStoreContract('Drift', () => open().healthSamples);
+
+  test('importing into the database twice does not duplicate, and erasing '
+      'empties it', () async {
+    final repos = open();
+    final source = FakeHealthSource.fromJson(
+      recordedHealthHistory,
+      happened: 9,
+    );
+    await source.permit();
+    final importer = HealthImporter(source: source, store: repos.healthSamples);
+    await importer.import(HealthDataType.weight);
+    source.letAllHappen();
+    await importer.import(HealthDataType.weight);
+    await importer.import(HealthDataType.weight);
+    expect(
+      [
+        for (final s in await repos.healthSamples.samples(
+          HealthDataType.weight,
+        ))
+          s.platformId,
+      ],
+      ['w-1', 'w-3', 'w-4', 'w-5', 'w-6'],
+    );
+
+    await repos.eraser.eraseAll();
+    expect(await repos.healthSamples.samples(HealthDataType.weight), isEmpty);
+    expect(await repos.healthSamples.token(HealthDataType.weight), isNull);
+  });
+
   intakeReaderContract('Drift', () {
     final r = open();
     return (food: r.food, marks: r.dayMarks, intake: r.intake);

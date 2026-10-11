@@ -9,6 +9,7 @@ environment:
 dependencies:
   mm_domain: any
   mm_engine: any
+  mm_health_ingest: any
   test: ^1.26.0
 
 dev_dependencies:

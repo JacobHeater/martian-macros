@@ -1,11 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import 'custom_exercises.dart';
 import 'custom_foods.dart';
 import 'day_marks.dart';
 import 'food_entries.dart';
+import 'health_import_tokens.dart';
+import 'imported_samples.dart';
 import 'insight_log.dart';
 import 'migration_step.dart';
 import 'pauses.dart';
@@ -45,6 +48,8 @@ part 'app_database.g.dart';
     WorkoutExercises,
     WorkoutSets,
     CustomExercises,
+    ImportedSamples,
+    HealthImportTokens,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -52,7 +57,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 28;
+  static const currentSchemaVersion = 29;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -328,6 +333,12 @@ class AppDatabase extends _$AppDatabase {
       if (!existing.contains('rest_target_seconds')) {
         await m.addColumn(workoutExercises, workoutExercises.restTargetSeconds);
       }
+    },
+    // 28 to 29: readings imported from a health platform, and where each
+    // import left off (MM-67).
+    28: (m) async {
+      await m.createTable(importedSamples);
+      await m.createTable(healthImportTokens);
     },
   };
 
