@@ -5,11 +5,12 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, starting MM-77.
+Last updated: 2026-10-11, by Copilot, finishing MM-77.
 
-**Branch state.** `feature/mm77-strength-trends` is implementing strength
-trends from fresh green `main`. No other feature work is in flight; no open
-PRs at session start. Martian #64 and training/timer work through #76 merged.
+**Branch state.** `feature/mm77-strength-trends`, PR #77, has completed
+MM-77 strength trends. Reviewed Linux goldens are being committed; merge once
+final CI is green. No other feature work is in flight. Martian #64 and
+training/timer work through #76 merged.
 
 **Database.** Schema 27 (pausing the workout clock, MM-191). MM-77 derives
 results from existing repositories and needs no migration. One schema change
@@ -17,7 +18,7 @@ in flight at a time.
 
 **Next ticket ID.** MM-195 (`mm req next` is the authority).
 
-**What to build next.** WS-10: finish strength trends (MM-77), then weekly
+**What to build next.** WS-10: weekly
 volume (MM-78), remaining rest countdown/signals (MM-191), progression (MM-79).
 Strength unlocks the recomp review/signal (MM-133, MM-32) and the unfinished
 strength/PR parts of monthly reports and rewards (MM-33, MM-92). Phase
@@ -76,21 +77,24 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 
 ## Session 7: 2026-10-11, Copilot
 
-- Implementing MM-77: per-session Epley e1RM, smoothed per-lift strength,
+- Completed MM-77: per-session Epley e1RM, smoothed per-lift strength,
   four/twelve-week changes in Progress, and every logged lift's history.
 - Owner chose total bodyweight plus added/assisted load for bodyweight lifts;
   omit estimates with unknown historical bodyweight, never future readings.
-- No schema changes. Engine/UI implementation and validation are in flight.
-- Engine tests, 11 focused mobile/seed tests, and full `mm check` pass.
+- No schema changes. Engine tests, mobile/seed tests, and full `mm check` pass.
   MM-192/193 have failing-before regressions for error-state propagation and
-  duplicated demo workouts; both are fixed. Linux screenshots and headless
-  emulator inspection are next. Demo adds training only in its isolated store.
+  duplicated demo workouts; both are fixed. Demo adds training only in its
+  isolated store.
 - Dart review found deleted custom exercises hid their preserved histories.
   MM-194 now retains stable IDs without guessing a missing resistance type,
   with engine/mobile regressions. Workout, weight and custom-exercise retries
-  are tested; final full checks pass. Emulator Progress charts are inspected.
-  First Linux golden attempt failed on an ambiguous test scrollable; its
-  selector now targets Progress explicitly and regeneration is being retried.
+  are tested; final full checks pass.
+- Inspected Martian Progress charts, full detail, all-lift navigation and
+  unusable high-rep history on a headless Android emulator; phone untouched.
+  Linux regeneration passed after fixing its ambiguous scroll selector.
+  Reviewed six new strength images in Light/Dark/Martian and two weight-event
+  entry backgrounds changed by the longer scrollable Progress content.
+  PR #77 is awaiting final CI. iOS was not run.
 
 ## Session 6: 2026-10-10 (later), Claude (Anthropic)
 

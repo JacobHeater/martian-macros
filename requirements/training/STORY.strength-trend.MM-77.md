@@ -1,6 +1,6 @@
 ---
 id: MM-77
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-75, MM-32, MM-33]
 ---
@@ -91,3 +91,9 @@ Scenario: Data cannot be read
 
 ## Notes
 - e1RM is a comparison tool, not a prediction of a real one-rep max. Say so where it is shown.
+- Engine and mobile tests cover formulas, historical bodyweight, smoothing,
+  baseline tolerance, gaps, ranking, same-day sessions, units, corrections,
+  deletions and all three input read/retry states. Full Windows checks pass.
+- Progress charts, full lift detail, all-lift navigation and an unusable
+  high-rep history were inspected in the isolated Martian Android emulator
+  demo. Linux screenshots cover Light, Dark and Martian. iOS was not run.
