@@ -7,6 +7,7 @@ import 'in_memory_custom_exercise_repository.dart';
 import 'in_memory_custom_food_repository.dart';
 import 'in_memory_data_eraser.dart';
 import 'in_memory_day_mark_repository.dart';
+import 'in_memory_exercise_progression_repository.dart';
 import 'in_memory_food_repository.dart';
 import 'in_memory_insight_log_repository.dart';
 import 'in_memory_intake_reader.dart';
@@ -42,6 +43,7 @@ final class InMemoryRepositories {
     final workouts = InMemoryWorkoutRepository();
     final customExercises = InMemoryCustomExerciseRepository();
     final healthSamples = InMemoryHealthSampleStore();
+    final exerciseProgressions = InMemoryExerciseProgressionRepository();
     return InMemoryRepositories._(
       setup: setup,
       weights: weights,
@@ -60,6 +62,7 @@ final class InMemoryRepositories {
       workouts: workouts,
       customExercises: customExercises,
       healthSamples: healthSamples,
+      exerciseProgressions: exerciseProgressions,
       eraser: InMemoryDataEraser([
         setup.clear,
         weights.clear,
@@ -77,6 +80,7 @@ final class InMemoryRepositories {
         workouts.clear,
         customExercises.clear,
         healthSamples.clear,
+        exerciseProgressions.clear,
       ]),
     );
   }
@@ -99,6 +103,7 @@ final class InMemoryRepositories {
     required this.workouts,
     required this.customExercises,
     required this.healthSamples,
+    required this.exerciseProgressions,
     required this.eraser,
   });
 
@@ -119,6 +124,7 @@ final class InMemoryRepositories {
   final WorkoutRepository workouts;
   final CustomExerciseRepository customExercises;
   final HealthSampleStore healthSamples;
+  final ExerciseProgressionRepository exerciseProgressions;
   final DataEraser eraser;
 
   /// Nothing to release; present so it can stand in for `DriftRepositories`.

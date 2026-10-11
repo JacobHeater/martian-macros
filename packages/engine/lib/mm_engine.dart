@@ -25,6 +25,7 @@ export 'src/confidence_next_step.dart';
 export 'src/consecutive_deficit_weeks.dart';
 export 'src/cycle_noise.dart';
 export 'src/daily_targets.dart';
+export 'src/default_load_step_kg.dart';
 export 'src/default_rep_range.dart';
 export 'src/deurenberg_body_fat.dart';
 export 'src/estimated_one_rep_max.dart';

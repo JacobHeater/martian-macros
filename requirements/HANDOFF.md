@@ -13,8 +13,9 @@ with this file. Any pull request of Session 13 still open: read
 `./mm ci check <pr>` and merge it when its check has passed on its head. The expert panel (#79) and `mm ci` (#82, MM-209,
 `agents/ci-monitoring.md`) are merged.
 
-**Database.** Schema 30 (the readings a waist measurement was taken from,
-MM-155), merged. Only one schema change in flight at a time.
+**Database.** Schema 31 (a rep range and load step per exercise, MM-79), on
+its pull request until merged; `main` is 30 until then. Only one schema
+change in flight at a time.
 
 **Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
 MM-209 is taken). `mm req next` is the authority.
@@ -25,9 +26,8 @@ MM-209 is taken). `mm req next` is the authority.
 - MM-155, the rest: the protocol drawing and the waist chart. The shared
   change function, the three-reading entry and the per-user noise figure
   are built.
-- Small leftovers: an editable rep range and load step (MM-79; needs a
-  table, schema 31); MM-191's sound, background signal and free-typed rest
-  length.
+- Small leftovers: MM-191's sound, background signal and free-typed rest
+  length; MM-155's protocol drawing and chart.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34); Android
   exercise segments need app-owned native code (MM-188, MM-189).
 
@@ -111,6 +111,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   upgraded from schema 28 to 30 without error.
 - MM-133 done: the recomp review is also in the monthly report of the
   month it fell due in (`RecompReviewBody` serves both places).
+- #93 merged after its check passed on its head.
+- MM-79 done (schema 31): a rep range and load step per exercise, set from
+  a row on the exercise of a workout in progress
+  (`ProgressionSettingsScreen`, `ExerciseProgressionRepository`).
 
 ## Session 12: 2026-10-11, Claude (training and recomp)
 

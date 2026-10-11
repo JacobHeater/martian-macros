@@ -29,6 +29,7 @@ ProgressionSuggestion? suggestProgression({
   required DateTime before,
   required GoalMode goal,
   required UnitSystem units,
+  ExerciseProgression? settings,
 }) {
   // Loads closer than this are the same load: a difference of rounding
   // between units, not of plates.
@@ -72,7 +73,10 @@ ProgressionSuggestion? suggestProgression({
   if (sessions.isEmpty) return null;
 
   final (_, load, reps) = sessions.first;
-  final (bottom, top) = defaultRepRange(exercise);
+  // The user's own range and step, where they set them.
+  final (bottom, top) = settings == null
+      ? defaultRepRange(exercise)
+      : (settings.repsLow, settings.repsHigh);
   ProgressionSuggestion suggest(ProgressionKind kind, double loadKg, int n) =>
       ProgressionSuggestion(
         kind: kind,
@@ -83,7 +87,12 @@ ProgressionSuggestion? suggestProgression({
         rangeTop: top,
       );
 
-  final more = nextLoadKg(exercise: exercise, units: units, loadKg: load);
+  final more = nextLoadKg(
+    exercise: exercise,
+    units: units,
+    loadKg: load,
+    stepKg: settings?.loadStepKg,
+  );
   if (goal == GoalMode.fatLoss) {
     return suggest(ProgressionKind.match, load, reps.first);
   }

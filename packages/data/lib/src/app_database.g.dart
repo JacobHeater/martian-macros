@@ -11605,6 +11605,339 @@ class HealthImportTokensCompanion
   }
 }
 
+class $ExerciseProgressionsTable extends ExerciseProgressions
+    with TableInfo<$ExerciseProgressionsTable, ExerciseProgressionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExerciseProgressionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _exerciseIdMeta = const VerificationMeta(
+    'exerciseId',
+  );
+  @override
+  late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
+    'exercise_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repsLowMeta = const VerificationMeta(
+    'repsLow',
+  );
+  @override
+  late final GeneratedColumn<int> repsLow = GeneratedColumn<int>(
+    'reps_low',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repsHighMeta = const VerificationMeta(
+    'repsHigh',
+  );
+  @override
+  late final GeneratedColumn<int> repsHigh = GeneratedColumn<int>(
+    'reps_high',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _loadStepKgMeta = const VerificationMeta(
+    'loadStepKg',
+  );
+  @override
+  late final GeneratedColumn<double> loadStepKg = GeneratedColumn<double>(
+    'load_step_kg',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    exerciseId,
+    repsLow,
+    repsHigh,
+    loadStepKg,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exercise_progressions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExerciseProgressionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('exercise_id')) {
+      context.handle(
+        _exerciseIdMeta,
+        exerciseId.isAcceptableOrUnknown(data['exercise_id']!, _exerciseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_exerciseIdMeta);
+    }
+    if (data.containsKey('reps_low')) {
+      context.handle(
+        _repsLowMeta,
+        repsLow.isAcceptableOrUnknown(data['reps_low']!, _repsLowMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_repsLowMeta);
+    }
+    if (data.containsKey('reps_high')) {
+      context.handle(
+        _repsHighMeta,
+        repsHigh.isAcceptableOrUnknown(data['reps_high']!, _repsHighMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_repsHighMeta);
+    }
+    if (data.containsKey('load_step_kg')) {
+      context.handle(
+        _loadStepKgMeta,
+        loadStepKg.isAcceptableOrUnknown(
+          data['load_step_kg']!,
+          _loadStepKgMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {exerciseId};
+  @override
+  ExerciseProgressionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExerciseProgressionRow(
+      exerciseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exercise_id'],
+      )!,
+      repsLow: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reps_low'],
+      )!,
+      repsHigh: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reps_high'],
+      )!,
+      loadStepKg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}load_step_kg'],
+      ),
+    );
+  }
+
+  @override
+  $ExerciseProgressionsTable createAlias(String alias) {
+    return $ExerciseProgressionsTable(attachedDatabase, alias);
+  }
+}
+
+class ExerciseProgressionRow extends DataClass
+    implements Insertable<ExerciseProgressionRow> {
+  /// The id of a built-in exercise or one of the user's own.
+  final String exerciseId;
+  final int repsLow;
+  final int repsHigh;
+
+  /// Null for the default step of the exercise's equipment.
+  final double? loadStepKg;
+  const ExerciseProgressionRow({
+    required this.exerciseId,
+    required this.repsLow,
+    required this.repsHigh,
+    this.loadStepKg,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['exercise_id'] = Variable<String>(exerciseId);
+    map['reps_low'] = Variable<int>(repsLow);
+    map['reps_high'] = Variable<int>(repsHigh);
+    if (!nullToAbsent || loadStepKg != null) {
+      map['load_step_kg'] = Variable<double>(loadStepKg);
+    }
+    return map;
+  }
+
+  ExerciseProgressionsCompanion toCompanion(bool nullToAbsent) {
+    return ExerciseProgressionsCompanion(
+      exerciseId: Value(exerciseId),
+      repsLow: Value(repsLow),
+      repsHigh: Value(repsHigh),
+      loadStepKg: loadStepKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(loadStepKg),
+    );
+  }
+
+  factory ExerciseProgressionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExerciseProgressionRow(
+      exerciseId: serializer.fromJson<String>(json['exerciseId']),
+      repsLow: serializer.fromJson<int>(json['repsLow']),
+      repsHigh: serializer.fromJson<int>(json['repsHigh']),
+      loadStepKg: serializer.fromJson<double?>(json['loadStepKg']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'exerciseId': serializer.toJson<String>(exerciseId),
+      'repsLow': serializer.toJson<int>(repsLow),
+      'repsHigh': serializer.toJson<int>(repsHigh),
+      'loadStepKg': serializer.toJson<double?>(loadStepKg),
+    };
+  }
+
+  ExerciseProgressionRow copyWith({
+    String? exerciseId,
+    int? repsLow,
+    int? repsHigh,
+    Value<double?> loadStepKg = const Value.absent(),
+  }) => ExerciseProgressionRow(
+    exerciseId: exerciseId ?? this.exerciseId,
+    repsLow: repsLow ?? this.repsLow,
+    repsHigh: repsHigh ?? this.repsHigh,
+    loadStepKg: loadStepKg.present ? loadStepKg.value : this.loadStepKg,
+  );
+  ExerciseProgressionRow copyWithCompanion(ExerciseProgressionsCompanion data) {
+    return ExerciseProgressionRow(
+      exerciseId: data.exerciseId.present
+          ? data.exerciseId.value
+          : this.exerciseId,
+      repsLow: data.repsLow.present ? data.repsLow.value : this.repsLow,
+      repsHigh: data.repsHigh.present ? data.repsHigh.value : this.repsHigh,
+      loadStepKg: data.loadStepKg.present
+          ? data.loadStepKg.value
+          : this.loadStepKg,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseProgressionRow(')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('repsLow: $repsLow, ')
+          ..write('repsHigh: $repsHigh, ')
+          ..write('loadStepKg: $loadStepKg')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(exerciseId, repsLow, repsHigh, loadStepKg);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExerciseProgressionRow &&
+          other.exerciseId == this.exerciseId &&
+          other.repsLow == this.repsLow &&
+          other.repsHigh == this.repsHigh &&
+          other.loadStepKg == this.loadStepKg);
+}
+
+class ExerciseProgressionsCompanion
+    extends UpdateCompanion<ExerciseProgressionRow> {
+  final Value<String> exerciseId;
+  final Value<int> repsLow;
+  final Value<int> repsHigh;
+  final Value<double?> loadStepKg;
+  final Value<int> rowid;
+  const ExerciseProgressionsCompanion({
+    this.exerciseId = const Value.absent(),
+    this.repsLow = const Value.absent(),
+    this.repsHigh = const Value.absent(),
+    this.loadStepKg = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExerciseProgressionsCompanion.insert({
+    required String exerciseId,
+    required int repsLow,
+    required int repsHigh,
+    this.loadStepKg = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : exerciseId = Value(exerciseId),
+       repsLow = Value(repsLow),
+       repsHigh = Value(repsHigh);
+  static Insertable<ExerciseProgressionRow> custom({
+    Expression<String>? exerciseId,
+    Expression<int>? repsLow,
+    Expression<int>? repsHigh,
+    Expression<double>? loadStepKg,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (exerciseId != null) 'exercise_id': exerciseId,
+      if (repsLow != null) 'reps_low': repsLow,
+      if (repsHigh != null) 'reps_high': repsHigh,
+      if (loadStepKg != null) 'load_step_kg': loadStepKg,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExerciseProgressionsCompanion copyWith({
+    Value<String>? exerciseId,
+    Value<int>? repsLow,
+    Value<int>? repsHigh,
+    Value<double?>? loadStepKg,
+    Value<int>? rowid,
+  }) {
+    return ExerciseProgressionsCompanion(
+      exerciseId: exerciseId ?? this.exerciseId,
+      repsLow: repsLow ?? this.repsLow,
+      repsHigh: repsHigh ?? this.repsHigh,
+      loadStepKg: loadStepKg ?? this.loadStepKg,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (exerciseId.present) {
+      map['exercise_id'] = Variable<String>(exerciseId.value);
+    }
+    if (repsLow.present) {
+      map['reps_low'] = Variable<int>(repsLow.value);
+    }
+    if (repsHigh.present) {
+      map['reps_high'] = Variable<int>(repsHigh.value);
+    }
+    if (loadStepKg.present) {
+      map['load_step_kg'] = Variable<double>(loadStepKg.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseProgressionsCompanion(')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('repsLow: $repsLow, ')
+          ..write('repsHigh: $repsHigh, ')
+          ..write('loadStepKg: $loadStepKg, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -11640,6 +11973,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $HealthImportTokensTable healthImportTokens =
       $HealthImportTokensTable(this);
+  late final $ExerciseProgressionsTable exerciseProgressions =
+      $ExerciseProgressionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -11665,6 +12000,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     customExercises,
     importedSamples,
     healthImportTokens,
+    exerciseProgressions,
   ];
 }
 
@@ -17432,6 +17768,219 @@ typedef $$HealthImportTokensTableProcessedTableManager =
       HealthImportTokenRow,
       PrefetchHooks Function()
     >;
+typedef $$ExerciseProgressionsTableCreateCompanionBuilder =
+    ExerciseProgressionsCompanion Function({
+      required String exerciseId,
+      required int repsLow,
+      required int repsHigh,
+      Value<double?> loadStepKg,
+      Value<int> rowid,
+    });
+typedef $$ExerciseProgressionsTableUpdateCompanionBuilder =
+    ExerciseProgressionsCompanion Function({
+      Value<String> exerciseId,
+      Value<int> repsLow,
+      Value<int> repsHigh,
+      Value<double?> loadStepKg,
+      Value<int> rowid,
+    });
+
+class $$ExerciseProgressionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repsLow => $composableBuilder(
+    column: $table.repsLow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repsHigh => $composableBuilder(
+    column: $table.repsHigh,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ExerciseProgressionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repsLow => $composableBuilder(
+    column: $table.repsLow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repsHigh => $composableBuilder(
+    column: $table.repsHigh,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ExerciseProgressionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repsLow =>
+      $composableBuilder(column: $table.repsLow, builder: (column) => column);
+
+  GeneratedColumn<int> get repsHigh =>
+      $composableBuilder(column: $table.repsHigh, builder: (column) => column);
+
+  GeneratedColumn<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => column,
+  );
+}
+
+class $$ExerciseProgressionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExerciseProgressionsTable,
+          ExerciseProgressionRow,
+          $$ExerciseProgressionsTableFilterComposer,
+          $$ExerciseProgressionsTableOrderingComposer,
+          $$ExerciseProgressionsTableAnnotationComposer,
+          $$ExerciseProgressionsTableCreateCompanionBuilder,
+          $$ExerciseProgressionsTableUpdateCompanionBuilder,
+          (
+            ExerciseProgressionRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ExerciseProgressionsTable,
+              ExerciseProgressionRow
+            >,
+          ),
+          ExerciseProgressionRow,
+          PrefetchHooks Function()
+        > {
+  $$ExerciseProgressionsTableTableManager(
+    _$AppDatabase db,
+    $ExerciseProgressionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExerciseProgressionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExerciseProgressionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ExerciseProgressionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> exerciseId = const Value.absent(),
+                Value<int> repsLow = const Value.absent(),
+                Value<int> repsHigh = const Value.absent(),
+                Value<double?> loadStepKg = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExerciseProgressionsCompanion(
+                exerciseId: exerciseId,
+                repsLow: repsLow,
+                repsHigh: repsHigh,
+                loadStepKg: loadStepKg,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String exerciseId,
+                required int repsLow,
+                required int repsHigh,
+                Value<double?> loadStepKg = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExerciseProgressionsCompanion.insert(
+                exerciseId: exerciseId,
+                repsLow: repsLow,
+                repsHigh: repsHigh,
+                loadStepKg: loadStepKg,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $ExerciseProgressionsTable,
+                    ExerciseProgressionRow
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ExerciseProgressionsTable,
+                    ExerciseProgressionRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ExerciseProgressionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExerciseProgressionsTable,
+      ExerciseProgressionRow,
+      $$ExerciseProgressionsTableFilterComposer,
+      $$ExerciseProgressionsTableOrderingComposer,
+      $$ExerciseProgressionsTableAnnotationComposer,
+      $$ExerciseProgressionsTableCreateCompanionBuilder,
+      $$ExerciseProgressionsTableUpdateCompanionBuilder,
+      (
+        ExerciseProgressionRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ExerciseProgressionsTable,
+          ExerciseProgressionRow
+        >,
+      ),
+      ExerciseProgressionRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -17476,4 +18025,6 @@ class $AppDatabaseManager {
       $$ImportedSamplesTableTableManager(_db, _db.importedSamples);
   $$HealthImportTokensTableTableManager get healthImportTokens =>
       $$HealthImportTokensTableTableManager(_db, _db.healthImportTokens);
+  $$ExerciseProgressionsTableTableManager get exerciseProgressions =>
+      $$ExerciseProgressionsTableTableManager(_db, _db.exerciseProgressions);
 }

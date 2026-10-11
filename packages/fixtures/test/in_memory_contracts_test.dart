@@ -39,6 +39,10 @@ void main() {
     () => InMemoryRepositories().recovery,
   );
   workoutRepositoryContract('In-memory', () => InMemoryRepositories().workouts);
+  exerciseProgressionRepositoryContract(
+    'In-memory',
+    () => InMemoryRepositories().exerciseProgressions,
+  );
   customExerciseRepositoryContract(
     'In-memory',
     () => InMemoryRepositories().customExercises,
