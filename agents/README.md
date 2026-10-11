@@ -17,6 +17,9 @@ advises, not overrides the product owner.
 - [Run state](run-state.md): minimal portable artifacts and schema.
 - [Native surfaces](native-surfaces.md): configuration sources, restrictions,
   research discovery versus retrieval, delegation differences and cross-tool examples.
+- [CI monitoring](ci-monitoring.md): `mm ci`, background pull request and
+  check monitoring that supplements the delivery workflow; what each
+  surface was and was not verified to do.
 - [Templates](templates/): copy into `docs/agent-runs/<task-id>/`; replace
   placeholders before running reviews. Never put health records or secrets here.
 

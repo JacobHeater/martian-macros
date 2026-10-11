@@ -6,6 +6,7 @@ private belongs here. Requirements are authoritative for behavior.
 ## Where things stand
 
 Last updated: 2026-10-11, by Copilot, local expert-panel takeover.
+CI monitoring (`mm ci`, MM-209) added by Claude the same day; see Session 11.
 
 **Tooling in flight.** Existing PR #79, `copilot/implement-expert-panel`,
 adds canonical roles, Claude/Copilot adapters, research evidence and portable
@@ -86,6 +87,30 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
+## Session 11: 2026-10-11, Claude (CI monitoring)
+
+- MM-209: `mm ci` watches a pull request's checks in the background and keeps
+  each change as a stored event, so the chair reads them at task boundaries
+  without waiting. Read-only on GitHub. It supplements the delivery workflow;
+  the start and end checks, and merging by the chair, are unchanged. Full
+  instructions, state format, recovery and the capability matrix are in
+  `agents/ci-monitoring.md`.
+- Verified: 54 tests against a simulated `gh`; a read-only run against the real
+  PR #81 with a detached watcher; on Claude Code in VS Code, a finished
+  background command (`mm ci next`) reached the model at the next tool boundary
+  with no user prompt. Its tests also pass on Linux (WSL). **Not tested: any Copilot surface,
+  macOS**, and
+  on a real pull request a failing check or a rerun (simulated only).
+- **One CI watch is open**, on this change's own PR #82 (`feature/ci-watch`):
+  watch `JacobHeater-martian-macros-pr82`, owner `claude-chair`, on the
+  machine this was built on. Next chair: `./mm ci own` it (or start it again
+  on another machine), read `./mm ci check 82`, merge when green. The watcher
+  stops by itself when the PR merges. The demonstration watch on #81 was
+  stopped and removed. PR #81 (`feature/mm205-expert-mobile-ux`, draft, not this session's)
+  was read only: checks passed on head `6a75f5c`; it was not merged.
+- MM-209 was taken because the open PR #81 uses MM-205 to MM-208, although
+  fresh `main` reported MM-205 as next. Next is MM-210 once both merge.
+
 ## Session 10: 2026-10-11, Copilot (local panel takeover)
 
 - Owner requests finishing existing #79: install Copilot adapters, audit all
@@ -145,15 +170,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - MM-196 has failing-before/passing-after regressions. Adjacent sets are
   allowed and missing timing evidence is never invented.
 - Remaining MM-191: rest targets/signals, typed seconds, midnight ends.
-
-## Session 8: 2026-10-11, Copilot (cloud panel implementation)
-
-- Added canonical roles/protocol/contract, read-only Claude adapters,
-  single-writer checkpoint/resume artifacts and `mm panel`.
-- Product design distinct from UX; Maurice proposal cannot silently override
-  existing mascot prohibition.
-- Copilot adapter writes restricted in that cloud environment. SDK download
-  HTTP 403 prevented Dart/Flutter checks. Native behavior was not tested.
-- Review fixed non-object schema bypass and Windows path defects; provisional
-  panel MM-195 now allocated MM-197 locally. Tests awaited local execution.
-- Cloud CI 38105665416 was `action_required`, zero jobs/logs, not test evidence.
