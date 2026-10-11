@@ -760,10 +760,18 @@
       "exit_code": 0,
       "result": "passed",
       "summary": "Final repository-wide CI check passed with exit code 0 and final line `All checks passed.`"
+    },
+    {
+      "command": "gh run view 38112620983; gh run download 38112620983; compare and inspect changed Dashboard/meal-row PNGs",
+      "commit": "2a04f86ecd20b75510e974442bdceccb5c7ea11c",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Linux Update goldens workflow succeeded. Fifteen changed Dashboard and food-meal screenshots were copied from the artifact after hash comparison and representative old/new visual inspection; the Add food relocation and row More actions control are visible. No Windows golden was generated."
     }
   ],
   "checkpoint": {
-    "at": "2026-10-11T04:46:30Z",
+    "at": "2026-10-11T04:49:01Z",
     "writers_stopped": true
   }
 }
