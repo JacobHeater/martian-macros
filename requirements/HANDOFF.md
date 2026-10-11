@@ -33,9 +33,11 @@ Only one schema change in flight at a time.
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** Personal records (MM-92), then the recomp review
-(MM-133, on the Coach screen) in the monthly report, whose lifts card is
-built (MM-33). MM-155 (waist protocol and noise) would replace
+**What to build next.** The health-source interface and its fake (MM-67),
+which unblocks health sync; or MM-155 (waist protocol and noise), which
+replaces the interim waist rule of MM-32 and MM-133. Small leftovers: the
+recomp review in the monthly report (MM-33), editable rep range and load
+step (MM-79, schema 29). MM-155 (waist protocol and noise) would replace
 the interim waist rule that MM-32 and MM-133 share. MM-79 (progression) is merged with default rep ranges
 and load steps; editing them per exercise needs a table (schema 29). MM-191 has only a sound
 at the end of a rest left (needs an audio package: owner's decision), a
@@ -129,6 +131,8 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   card on Coach at weeks 8, 12 and every 8 after; its own PR.
 - #86 (MM-133) merged the same way. MM-33: workouts and a "Your lifts" card
   in the monthly report; its own PR.
+- MM-92: personal records (`personalRecordsOf`), a card on the workout that
+  set one and a mark in the workout list; PR stacked on the MM-33 one.
 - Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
   edits will conflict with this file.
 
