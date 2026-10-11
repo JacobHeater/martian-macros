@@ -22,8 +22,10 @@ MM-209 is taken). `mm req next` is the authority.
 **What to build next.**
 - Health Connect behind `HealthSource` (MM-68): MM-67 is done, so it has a
   store, an importer and a contract suite to pass on a device.
-- MM-155 (waist protocol and noise): replaces the interim waist rule that
-  MM-32 and MM-133 share.
+- MM-155, the rest: three readings per waist entry with their middle value
+  stored, a quick single-reading entry, and a noise figure per user (schema
+  30); then the protocol drawing and the chart. The shared change function
+  (`waistChangeOf`) is built and used by MM-32, MM-133 and MM-140.
 - Small leftovers: the recomp review in the monthly report (MM-33, MM-133);
   an editable rep range and load step (MM-79; needs a table); MM-191's
   sound, background signal and free-typed rest length.
@@ -87,13 +89,20 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
-## Session 13: 2026-10-11, Claude (health table)
+## Session 13: 2026-10-11, Claude (health table, waist change)
 
 - MM-67, second half: `imported_samples` and `health_import_tokens` (schema
   29), a Drift `HealthSampleStore`, `healthSampleStoreContract` run against
   it and the in-memory one, erasing, and the app's providers
   (`healthSourceProvider` throws until a platform is registered). Ticket
   done; the device run of `healthSourceContract` belongs to MM-68 and MM-69.
+- #90 (MM-67 table) merged after its check passed on its head.
+- MM-155, first part: `waistChangeOf`, one answer to whether the waist
+  changed (smoothed ends; a change only past 1.4 times the noise figure;
+  "since start" from the middle of the first three entries). The recomp
+  signal, recomp review and stall diagnosis use it; the waist card says
+  down, up or no clear change since the start. Entries so far are taken as
+  the middle of three readings, as the card has always asked.
 
 ## Session 12: 2026-10-11, Claude (training and recomp)
 
