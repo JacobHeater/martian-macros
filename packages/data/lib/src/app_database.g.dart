@@ -10742,6 +10742,705 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExerciseRow> {
   }
 }
 
+class $ImportedSamplesTable extends ImportedSamples
+    with TableInfo<$ImportedSamplesTable, ImportedSampleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImportedSamplesTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<HealthDataType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<HealthDataType>($ImportedSamplesTable.$convertertype);
+  static const VerificationMeta _platformIdMeta = const VerificationMeta(
+    'platformId',
+  );
+  @override
+  late final GeneratedColumn<String> platformId = GeneratedColumn<String>(
+    'platform_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startMsMeta = const VerificationMeta(
+    'startMs',
+  );
+  @override
+  late final GeneratedColumn<int> startMs = GeneratedColumn<int>(
+    'start_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMsMeta = const VerificationMeta('endMs');
+  @override
+  late final GeneratedColumn<int> endMs = GeneratedColumn<int>(
+    'end_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<String> sourceId = GeneratedColumn<String>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceNameMeta = const VerificationMeta(
+    'sourceName',
+  );
+  @override
+  late final GeneratedColumn<String> sourceName = GeneratedColumn<String>(
+    'source_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    type,
+    platformId,
+    value,
+    startMs,
+    endMs,
+    sourceId,
+    sourceName,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'imported_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ImportedSampleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('platform_id')) {
+      context.handle(
+        _platformIdMeta,
+        platformId.isAcceptableOrUnknown(data['platform_id']!, _platformIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_platformIdMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('start_ms')) {
+      context.handle(
+        _startMsMeta,
+        startMs.isAcceptableOrUnknown(data['start_ms']!, _startMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startMsMeta);
+    }
+    if (data.containsKey('end_ms')) {
+      context.handle(
+        _endMsMeta,
+        endMs.isAcceptableOrUnknown(data['end_ms']!, _endMsMeta),
+      );
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    if (data.containsKey('source_name')) {
+      context.handle(
+        _sourceNameMeta,
+        sourceName.isAcceptableOrUnknown(data['source_name']!, _sourceNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceNameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {type, platformId};
+  @override
+  ImportedSampleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ImportedSampleRow(
+      type: $ImportedSamplesTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      platformId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}platform_id'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}value'],
+      )!,
+      startMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ms'],
+      )!,
+      endMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ms'],
+      ),
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_id'],
+      )!,
+      sourceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_name'],
+      )!,
+    );
+  }
+
+  @override
+  $ImportedSamplesTable createAlias(String alias) {
+    return $ImportedSamplesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<HealthDataType, String, String> $convertertype =
+      const EnumNameConverter<HealthDataType>(HealthDataType.values);
+}
+
+class ImportedSampleRow extends DataClass
+    implements Insertable<ImportedSampleRow> {
+  final HealthDataType type;
+
+  /// The platform's own id for the reading.
+  final String platformId;
+
+  /// In the unit of [type].
+  final double value;
+  final int startMs;
+  final int? endMs;
+
+  /// The app or device that wrote it, and its name as shown.
+  final String sourceId;
+  final String sourceName;
+  const ImportedSampleRow({
+    required this.type,
+    required this.platformId,
+    required this.value,
+    required this.startMs,
+    this.endMs,
+    required this.sourceId,
+    required this.sourceName,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['type'] = Variable<String>(
+        $ImportedSamplesTable.$convertertype.toSql(type),
+      );
+    }
+    map['platform_id'] = Variable<String>(platformId);
+    map['value'] = Variable<double>(value);
+    map['start_ms'] = Variable<int>(startMs);
+    if (!nullToAbsent || endMs != null) {
+      map['end_ms'] = Variable<int>(endMs);
+    }
+    map['source_id'] = Variable<String>(sourceId);
+    map['source_name'] = Variable<String>(sourceName);
+    return map;
+  }
+
+  ImportedSamplesCompanion toCompanion(bool nullToAbsent) {
+    return ImportedSamplesCompanion(
+      type: Value(type),
+      platformId: Value(platformId),
+      value: Value(value),
+      startMs: Value(startMs),
+      endMs: endMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endMs),
+      sourceId: Value(sourceId),
+      sourceName: Value(sourceName),
+    );
+  }
+
+  factory ImportedSampleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ImportedSampleRow(
+      type: $ImportedSamplesTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+      platformId: serializer.fromJson<String>(json['platformId']),
+      value: serializer.fromJson<double>(json['value']),
+      startMs: serializer.fromJson<int>(json['startMs']),
+      endMs: serializer.fromJson<int?>(json['endMs']),
+      sourceId: serializer.fromJson<String>(json['sourceId']),
+      sourceName: serializer.fromJson<String>(json['sourceName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'type': serializer.toJson<String>(
+        $ImportedSamplesTable.$convertertype.toJson(type),
+      ),
+      'platformId': serializer.toJson<String>(platformId),
+      'value': serializer.toJson<double>(value),
+      'startMs': serializer.toJson<int>(startMs),
+      'endMs': serializer.toJson<int?>(endMs),
+      'sourceId': serializer.toJson<String>(sourceId),
+      'sourceName': serializer.toJson<String>(sourceName),
+    };
+  }
+
+  ImportedSampleRow copyWith({
+    HealthDataType? type,
+    String? platformId,
+    double? value,
+    int? startMs,
+    Value<int?> endMs = const Value.absent(),
+    String? sourceId,
+    String? sourceName,
+  }) => ImportedSampleRow(
+    type: type ?? this.type,
+    platformId: platformId ?? this.platformId,
+    value: value ?? this.value,
+    startMs: startMs ?? this.startMs,
+    endMs: endMs.present ? endMs.value : this.endMs,
+    sourceId: sourceId ?? this.sourceId,
+    sourceName: sourceName ?? this.sourceName,
+  );
+  ImportedSampleRow copyWithCompanion(ImportedSamplesCompanion data) {
+    return ImportedSampleRow(
+      type: data.type.present ? data.type.value : this.type,
+      platformId: data.platformId.present
+          ? data.platformId.value
+          : this.platformId,
+      value: data.value.present ? data.value.value : this.value,
+      startMs: data.startMs.present ? data.startMs.value : this.startMs,
+      endMs: data.endMs.present ? data.endMs.value : this.endMs,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      sourceName: data.sourceName.present
+          ? data.sourceName.value
+          : this.sourceName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedSampleRow(')
+          ..write('type: $type, ')
+          ..write('platformId: $platformId, ')
+          ..write('value: $value, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('sourceName: $sourceName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    type,
+    platformId,
+    value,
+    startMs,
+    endMs,
+    sourceId,
+    sourceName,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ImportedSampleRow &&
+          other.type == this.type &&
+          other.platformId == this.platformId &&
+          other.value == this.value &&
+          other.startMs == this.startMs &&
+          other.endMs == this.endMs &&
+          other.sourceId == this.sourceId &&
+          other.sourceName == this.sourceName);
+}
+
+class ImportedSamplesCompanion extends UpdateCompanion<ImportedSampleRow> {
+  final Value<HealthDataType> type;
+  final Value<String> platformId;
+  final Value<double> value;
+  final Value<int> startMs;
+  final Value<int?> endMs;
+  final Value<String> sourceId;
+  final Value<String> sourceName;
+  final Value<int> rowid;
+  const ImportedSamplesCompanion({
+    this.type = const Value.absent(),
+    this.platformId = const Value.absent(),
+    this.value = const Value.absent(),
+    this.startMs = const Value.absent(),
+    this.endMs = const Value.absent(),
+    this.sourceId = const Value.absent(),
+    this.sourceName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ImportedSamplesCompanion.insert({
+    required HealthDataType type,
+    required String platformId,
+    required double value,
+    required int startMs,
+    this.endMs = const Value.absent(),
+    required String sourceId,
+    required String sourceName,
+    this.rowid = const Value.absent(),
+  }) : type = Value(type),
+       platformId = Value(platformId),
+       value = Value(value),
+       startMs = Value(startMs),
+       sourceId = Value(sourceId),
+       sourceName = Value(sourceName);
+  static Insertable<ImportedSampleRow> custom({
+    Expression<String>? type,
+    Expression<String>? platformId,
+    Expression<double>? value,
+    Expression<int>? startMs,
+    Expression<int>? endMs,
+    Expression<String>? sourceId,
+    Expression<String>? sourceName,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (type != null) 'type': type,
+      if (platformId != null) 'platform_id': platformId,
+      if (value != null) 'value': value,
+      if (startMs != null) 'start_ms': startMs,
+      if (endMs != null) 'end_ms': endMs,
+      if (sourceId != null) 'source_id': sourceId,
+      if (sourceName != null) 'source_name': sourceName,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ImportedSamplesCompanion copyWith({
+    Value<HealthDataType>? type,
+    Value<String>? platformId,
+    Value<double>? value,
+    Value<int>? startMs,
+    Value<int?>? endMs,
+    Value<String>? sourceId,
+    Value<String>? sourceName,
+    Value<int>? rowid,
+  }) {
+    return ImportedSamplesCompanion(
+      type: type ?? this.type,
+      platformId: platformId ?? this.platformId,
+      value: value ?? this.value,
+      startMs: startMs ?? this.startMs,
+      endMs: endMs ?? this.endMs,
+      sourceId: sourceId ?? this.sourceId,
+      sourceName: sourceName ?? this.sourceName,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $ImportedSamplesTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (platformId.present) {
+      map['platform_id'] = Variable<String>(platformId.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    if (startMs.present) {
+      map['start_ms'] = Variable<int>(startMs.value);
+    }
+    if (endMs.present) {
+      map['end_ms'] = Variable<int>(endMs.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<String>(sourceId.value);
+    }
+    if (sourceName.present) {
+      map['source_name'] = Variable<String>(sourceName.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedSamplesCompanion(')
+          ..write('type: $type, ')
+          ..write('platformId: $platformId, ')
+          ..write('value: $value, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('sourceName: $sourceName, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HealthImportTokensTable extends HealthImportTokens
+    with TableInfo<$HealthImportTokensTable, HealthImportTokenRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HealthImportTokensTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<HealthDataType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<HealthDataType>($HealthImportTokensTable.$convertertype);
+  static const VerificationMeta _tokenMeta = const VerificationMeta('token');
+  @override
+  late final GeneratedColumn<String> token = GeneratedColumn<String>(
+    'token',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [type, token];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'health_import_tokens';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HealthImportTokenRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('token')) {
+      context.handle(
+        _tokenMeta,
+        token.isAcceptableOrUnknown(data['token']!, _tokenMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tokenMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {type};
+  @override
+  HealthImportTokenRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HealthImportTokenRow(
+      type: $HealthImportTokensTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      token: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}token'],
+      )!,
+    );
+  }
+
+  @override
+  $HealthImportTokensTable createAlias(String alias) {
+    return $HealthImportTokensTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<HealthDataType, String, String> $convertertype =
+      const EnumNameConverter<HealthDataType>(HealthDataType.values);
+}
+
+class HealthImportTokenRow extends DataClass
+    implements Insertable<HealthImportTokenRow> {
+  final HealthDataType type;
+  final String token;
+  const HealthImportTokenRow({required this.type, required this.token});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['type'] = Variable<String>(
+        $HealthImportTokensTable.$convertertype.toSql(type),
+      );
+    }
+    map['token'] = Variable<String>(token);
+    return map;
+  }
+
+  HealthImportTokensCompanion toCompanion(bool nullToAbsent) {
+    return HealthImportTokensCompanion(type: Value(type), token: Value(token));
+  }
+
+  factory HealthImportTokenRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HealthImportTokenRow(
+      type: $HealthImportTokensTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+      token: serializer.fromJson<String>(json['token']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'type': serializer.toJson<String>(
+        $HealthImportTokensTable.$convertertype.toJson(type),
+      ),
+      'token': serializer.toJson<String>(token),
+    };
+  }
+
+  HealthImportTokenRow copyWith({HealthDataType? type, String? token}) =>
+      HealthImportTokenRow(type: type ?? this.type, token: token ?? this.token);
+  HealthImportTokenRow copyWithCompanion(HealthImportTokensCompanion data) {
+    return HealthImportTokenRow(
+      type: data.type.present ? data.type.value : this.type,
+      token: data.token.present ? data.token.value : this.token,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HealthImportTokenRow(')
+          ..write('type: $type, ')
+          ..write('token: $token')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(type, token);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HealthImportTokenRow &&
+          other.type == this.type &&
+          other.token == this.token);
+}
+
+class HealthImportTokensCompanion
+    extends UpdateCompanion<HealthImportTokenRow> {
+  final Value<HealthDataType> type;
+  final Value<String> token;
+  final Value<int> rowid;
+  const HealthImportTokensCompanion({
+    this.type = const Value.absent(),
+    this.token = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HealthImportTokensCompanion.insert({
+    required HealthDataType type,
+    required String token,
+    this.rowid = const Value.absent(),
+  }) : type = Value(type),
+       token = Value(token);
+  static Insertable<HealthImportTokenRow> custom({
+    Expression<String>? type,
+    Expression<String>? token,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (type != null) 'type': type,
+      if (token != null) 'token': token,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HealthImportTokensCompanion copyWith({
+    Value<HealthDataType>? type,
+    Value<String>? token,
+    Value<int>? rowid,
+  }) {
+    return HealthImportTokensCompanion(
+      type: type ?? this.type,
+      token: token ?? this.token,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $HealthImportTokensTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (token.present) {
+      map['token'] = Variable<String>(token.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HealthImportTokensCompanion(')
+          ..write('type: $type, ')
+          ..write('token: $token, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10772,6 +11471,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CustomExercisesTable customExercises = $CustomExercisesTable(
     this,
   );
+  late final $ImportedSamplesTable importedSamples = $ImportedSamplesTable(
+    this,
+  );
+  late final $HealthImportTokensTable healthImportTokens =
+      $HealthImportTokensTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10795,6 +11499,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     workoutExercises,
     workoutSets,
     customExercises,
+    importedSamples,
+    healthImportTokens,
   ];
 }
 
@@ -16069,6 +16775,432 @@ typedef $$CustomExercisesTableProcessedTableManager =
       CustomExerciseRow,
       PrefetchHooks Function()
     >;
+typedef $$ImportedSamplesTableCreateCompanionBuilder =
+    ImportedSamplesCompanion Function({
+      required HealthDataType type,
+      required String platformId,
+      required double value,
+      required int startMs,
+      Value<int?> endMs,
+      required String sourceId,
+      required String sourceName,
+      Value<int> rowid,
+    });
+typedef $$ImportedSamplesTableUpdateCompanionBuilder =
+    ImportedSamplesCompanion Function({
+      Value<HealthDataType> type,
+      Value<String> platformId,
+      Value<double> value,
+      Value<int> startMs,
+      Value<int?> endMs,
+      Value<String> sourceId,
+      Value<String> sourceName,
+      Value<int> rowid,
+    });
+
+class $$ImportedSamplesTableFilterComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<HealthDataType, HealthDataType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ImportedSamplesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ImportedSamplesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<HealthDataType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<int> get startMs =>
+      $composableBuilder(column: $table.startMs, builder: (column) => column);
+
+  GeneratedColumn<int> get endMs =>
+      $composableBuilder(column: $table.endMs, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => column,
+  );
+}
+
+class $$ImportedSamplesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImportedSamplesTable,
+          ImportedSampleRow,
+          $$ImportedSamplesTableFilterComposer,
+          $$ImportedSamplesTableOrderingComposer,
+          $$ImportedSamplesTableAnnotationComposer,
+          $$ImportedSamplesTableCreateCompanionBuilder,
+          $$ImportedSamplesTableUpdateCompanionBuilder,
+          (
+            ImportedSampleRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ImportedSamplesTable,
+              ImportedSampleRow
+            >,
+          ),
+          ImportedSampleRow,
+          PrefetchHooks Function()
+        > {
+  $$ImportedSamplesTableTableManager(
+    _$AppDatabase db,
+    $ImportedSamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ImportedSamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImportedSamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImportedSamplesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<HealthDataType> type = const Value.absent(),
+                Value<String> platformId = const Value.absent(),
+                Value<double> value = const Value.absent(),
+                Value<int> startMs = const Value.absent(),
+                Value<int?> endMs = const Value.absent(),
+                Value<String> sourceId = const Value.absent(),
+                Value<String> sourceName = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedSamplesCompanion(
+                type: type,
+                platformId: platformId,
+                value: value,
+                startMs: startMs,
+                endMs: endMs,
+                sourceId: sourceId,
+                sourceName: sourceName,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required HealthDataType type,
+                required String platformId,
+                required double value,
+                required int startMs,
+                Value<int?> endMs = const Value.absent(),
+                required String sourceId,
+                required String sourceName,
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedSamplesCompanion.insert(
+                type: type,
+                platformId: platformId,
+                value: value,
+                startMs: startMs,
+                endMs: endMs,
+                sourceId: sourceId,
+                sourceName: sourceName,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ImportedSamplesTable, ImportedSampleRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ImportedSamplesTable,
+                    ImportedSampleRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ImportedSamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImportedSamplesTable,
+      ImportedSampleRow,
+      $$ImportedSamplesTableFilterComposer,
+      $$ImportedSamplesTableOrderingComposer,
+      $$ImportedSamplesTableAnnotationComposer,
+      $$ImportedSamplesTableCreateCompanionBuilder,
+      $$ImportedSamplesTableUpdateCompanionBuilder,
+      (
+        ImportedSampleRow,
+        BaseReferences<_$AppDatabase, $ImportedSamplesTable, ImportedSampleRow>,
+      ),
+      ImportedSampleRow,
+      PrefetchHooks Function()
+    >;
+typedef $$HealthImportTokensTableCreateCompanionBuilder =
+    HealthImportTokensCompanion Function({
+      required HealthDataType type,
+      required String token,
+      Value<int> rowid,
+    });
+typedef $$HealthImportTokensTableUpdateCompanionBuilder =
+    HealthImportTokensCompanion Function({
+      Value<HealthDataType> type,
+      Value<String> token,
+      Value<int> rowid,
+    });
+
+class $$HealthImportTokensTableFilterComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<HealthDataType, HealthDataType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HealthImportTokensTableOrderingComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HealthImportTokensTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<HealthDataType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get token =>
+      $composableBuilder(column: $table.token, builder: (column) => column);
+}
+
+class $$HealthImportTokensTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HealthImportTokensTable,
+          HealthImportTokenRow,
+          $$HealthImportTokensTableFilterComposer,
+          $$HealthImportTokensTableOrderingComposer,
+          $$HealthImportTokensTableAnnotationComposer,
+          $$HealthImportTokensTableCreateCompanionBuilder,
+          $$HealthImportTokensTableUpdateCompanionBuilder,
+          (
+            HealthImportTokenRow,
+            BaseReferences<
+              _$AppDatabase,
+              $HealthImportTokensTable,
+              HealthImportTokenRow
+            >,
+          ),
+          HealthImportTokenRow,
+          PrefetchHooks Function()
+        > {
+  $$HealthImportTokensTableTableManager(
+    _$AppDatabase db,
+    $HealthImportTokensTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HealthImportTokensTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HealthImportTokensTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HealthImportTokensTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<HealthDataType> type = const Value.absent(),
+                Value<String> token = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HealthImportTokensCompanion(
+                type: type,
+                token: token,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required HealthDataType type,
+                required String token,
+                Value<int> rowid = const Value.absent(),
+              }) => HealthImportTokensCompanion.insert(
+                type: type,
+                token: token,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HealthImportTokensTable, HealthImportTokenRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $HealthImportTokensTable,
+                    HealthImportTokenRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HealthImportTokensTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HealthImportTokensTable,
+      HealthImportTokenRow,
+      $$HealthImportTokensTableFilterComposer,
+      $$HealthImportTokensTableOrderingComposer,
+      $$HealthImportTokensTableAnnotationComposer,
+      $$HealthImportTokensTableCreateCompanionBuilder,
+      $$HealthImportTokensTableUpdateCompanionBuilder,
+      (
+        HealthImportTokenRow,
+        BaseReferences<
+          _$AppDatabase,
+          $HealthImportTokensTable,
+          HealthImportTokenRow
+        >,
+      ),
+      HealthImportTokenRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -16109,4 +17241,8 @@ class $AppDatabaseManager {
       $$WorkoutSetsTableTableManager(_db, _db.workoutSets);
   $$CustomExercisesTableTableManager get customExercises =>
       $$CustomExercisesTableTableManager(_db, _db.customExercises);
+  $$ImportedSamplesTableTableManager get importedSamples =>
+      $$ImportedSamplesTableTableManager(_db, _db.importedSamples);
+  $$HealthImportTokensTableTableManager get healthImportTokens =>
+      $$HealthImportTokensTableTableManager(_db, _db.healthImportTokens);
 }
