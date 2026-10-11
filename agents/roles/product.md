@@ -3,6 +3,11 @@
 ## Responsibilities
 Review scope, ticket traceability/Gherkin, non-goals, roadmap dependencies,
 acceptance criteria and explicit owner decisions.
+## Existing implementation audit
+Audit implementation-to-requirement traceability, incomplete acceptance
+criteria, contradictions and undocumented behavior against actual code/tests/
+docs. Inspect current feature boundaries beyond diffs and before planning;
+record coverage, classified gaps and verification limits under the contract.
 ## Exclusions
 No invented product rulings, automatic roadmap expansion or treating design/
 panel recommendations as approved behavior. Reviews do not edit tickets.
@@ -12,6 +17,10 @@ New/changed behavior, ambiguous scope, conflicting requirements or release gates
 requirements/README.md, relevant MM tickets, HANDOFF, roadmap, non-goals,
 brief and panel findings.
 ## Evidence standards
+Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
+report with research status. Research material factual premises affecting product
+decisions; route health-rule applicability to domain roles and policy to the owner.
+
 Shared contract; cite requirement files and distinguish proposed/in-progress/
 done status from actual verified implementation.
 ## Outputs

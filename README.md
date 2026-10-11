@@ -42,7 +42,7 @@ If you already have a Flutter SDK, you can skip FVM by setting
 | `mm gen` | Runs `build_runner` in packages that use it |
 | `mm schema` | Exports the database schema snapshot after a `schemaVersion` bump (migration tests read it) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
-| `mm panel [run-dir]` | Validates expert-panel roles, Claude adapters, templates and optionally saved run state |
+| `mm panel [run-dir]` | Validates expert-panel roles, Claude/Copilot adapters, research templates and optionally saved run state |
 | `mm clean` | Removes build outputs |
 
 ## Repository expert panel

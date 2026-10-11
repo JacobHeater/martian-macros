@@ -372,6 +372,111 @@ void main() {
   });
 
   group('a set\'s times, by hand', () {
+    testWidgets(
+      'MM-196 checks partial times against other sets of the same exercise',
+      (tester) async {
+        final first = WorkoutSet(
+          reps: 8,
+          loadKg: 100,
+          startedAt: noon.add(const Duration(minutes: 2)),
+          endedAt: noon.add(const Duration(minutes: 4)),
+        );
+        final id = await repos.workouts.saveWorkout(
+          Workout(
+            id: 0,
+            date: today,
+            startedAt: noon,
+            endedAt: noon.add(const Duration(minutes: 10)),
+            exercises: [
+              WorkoutExercise(
+                exerciseId: 'back-squat',
+                sets: [first, const WorkoutSet(reps: 8, loadKg: 100)],
+              ),
+            ],
+          ),
+        );
+        clock.elapse(const Duration(minutes: 10));
+        await openTrain(tester);
+        await tap(tester, 'workout-$id');
+        await tap(tester, 'set-0-1');
+        await tap(tester, 'set-0-1-end');
+        await enterTime(tester, 12, 3);
+
+        expect(
+          find.text('That overlaps another set in this workout.'),
+          findsOneWidget,
+        );
+        var sets = (await stored(tester)).single.exercises.single.sets;
+        expect(sets[0], first);
+        expect(sets[1].startedAt, isNull);
+        expect(sets[1].endedAt, isNull);
+
+        await tap(tester, 'set-0-1-end');
+        await enterTime(tester, 12, 4);
+        sets = (await stored(tester)).single.exercises.single.sets;
+        expect(sets[1].startedAt, isNull);
+        expect(sets[1].endedAt, noon.add(const Duration(minutes: 4)));
+      },
+    );
+
+    testWidgets('MM-196 refuses overlapping typed times across exercises', (
+      tester,
+    ) async {
+      final first = WorkoutSet(
+        reps: 8,
+        loadKg: 100,
+        startedAt: noon.add(const Duration(minutes: 2)),
+        endedAt: noon.add(const Duration(minutes: 3)),
+      );
+      final second = WorkoutSet(
+        reps: 6,
+        loadKg: 0,
+        endedAt: noon.add(const Duration(minutes: 4)),
+      );
+      clock.elapse(const Duration(minutes: 10));
+      final id = await repos.workouts.saveWorkout(
+        Workout(
+          id: 0,
+          date: today,
+          startedAt: noon,
+          endedAt: noon.add(const Duration(minutes: 5)),
+          exercises: [
+            WorkoutExercise(exerciseId: 'back-squat', sets: [first]),
+            WorkoutExercise(exerciseId: 'pull-up', sets: [second]),
+          ],
+        ),
+      );
+      await openTrain(tester);
+      await tap(tester, 'workout-$id');
+      await tap(tester, 'set-1-0');
+      await tap(tester, 'set-1-0-start');
+      await enterTime(tester, 12, 2);
+
+      expect(
+        find.text('That overlaps another set in this workout.'),
+        findsOneWidget,
+      );
+      var workout = (await stored(tester)).single;
+      expect(workout.exercises[1].sets.single, second);
+      expect(workout.exercises[0].sets.single, first);
+
+      // A shared boundary is valid, and the edited set excludes itself.
+      await tap(tester, 'set-1-0-start');
+      await enterTime(tester, 12, 3);
+      workout = (await stored(tester)).single;
+      expect(
+        workout.exercises[1].sets.single.startedAt,
+        noon.add(const Duration(minutes: 3)),
+      );
+      await tap(tester, 'set-1-0-end');
+      await enterTime(tester, 12, 5);
+      workout = (await stored(tester)).single;
+      expect(
+        workout.exercises[1].sets.single.endedAt,
+        noon.add(const Duration(minutes: 5)),
+      );
+    });
+
     testWidgets('a start can be typed', (tester) async {
       await startSquats(tester);
       await wait(tester, const Duration(minutes: 10));

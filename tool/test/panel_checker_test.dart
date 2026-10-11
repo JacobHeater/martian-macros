@@ -7,7 +7,8 @@ import '../src/panel/panel_checker.dart';
 import '../src/panel/panel_command.dart';
 
 void main() {
-  final source = Directory.current.path.endsWith('${Platform.pathSeparator}tool')
+  final source =
+      Directory.current.path.endsWith('${Platform.pathSeparator}tool')
       ? Directory.current.parent
       : Directory.current;
   const checker = PanelChecker();
@@ -31,6 +32,7 @@ void main() {
   }
 
   Map<String, dynamic> assignment(String role, String status) => {
+    'task': 'Check the bounded synthetic test fixture.',
     'role': role,
     'reviewer': 'test-session',
     'status': status,
@@ -44,23 +46,37 @@ void main() {
         path: List.filled(64, 'b').join(),
     },
     'report': 'findings/$role.md',
+    'coverage': {
+      'inspected': ['Synthetic fixture only.'],
+      'not_inspected': ['Application behavior.'],
+      'referrals': <String>[],
+      'methods': ['source-inspection'],
+      'limitations': 'Synthetic validator fixture, no real audit.',
+    },
+    'research': {
+      'status': 'unnecessary',
+      'question': '',
+      'reason': 'Mechanical synthetic fixture test.',
+      'path': 'not-needed',
+      'sources': <Map<String, dynamic>>[],
+      'summary': 'No external factual claims in this test fixture.',
+      'limitations': 'Synthetic validator test, not a real review.',
+    },
   };
 
   setUp(() {
     root = Directory.systemTemp.createTempSync('mm_panel_test');
     copyDirectory('agents');
-    // Copy only permitted Claude profiles, never inspect Copilot agent files.
     copyDirectory('.claude/agents');
+    copyDirectory('.github/agents');
     run = Directory('${root.path}/docs/agent-runs/test-run')
       ..createSync(recursive: true);
     for (final name in ['brief.md', 'decision.md', 'handoff.md']) {
       File('${root.path}/agents/templates/$name').copySync('${run.path}/$name');
     }
-    state =
-        jsonDecode(
-              File('${root.path}/agents/templates/state.json').readAsStringSync(),
-            )
-            as Map<String, dynamic>;
+    state = jsonDecode(
+      File('${root.path}/agents/templates/state.json').readAsStringSync(),
+    ) as Map<String, dynamic>;
     state['task_id'] = 'test-run';
     state['baseline'] = {
       'branch': 'test-branch',
@@ -89,7 +105,10 @@ void main() {
       index.readAsStringSync().replaceAll('roles/training.md', 'other.md'),
     );
     final errors = checker.check(root);
-    expect(errors.any((e) => e.contains('missing section: Exclusions')), isTrue);
+    expect(
+      errors.any((e) => e.contains('missing section: Exclusions')),
+      isTrue,
+    );
     expect(errors.any((e) => e.contains('must link')), isTrue);
   });
 
@@ -106,20 +125,152 @@ void main() {
     expect(errors.any((e) => e.contains('review-contract.md')), isTrue);
   });
 
+  test(
+    'Copilot coverage, research tools and reviewer restrictions are required',
+    () {
+      final file = File('${root.path}/.github/agents/panel-training.agent.md');
+      file.writeAsStringSync(
+        file
+            .readAsStringSync()
+            .replaceAll('"web"', '"execute"')
+            .replaceAll('agents: []', 'agents: ["panel-chair"]'),
+      );
+      final errors = checker.check(root);
+      expect(errors.any((e) => e.contains('Copilot tool allowlist')), isTrue);
+      expect(
+        errors.any((e) => e.contains('restrict native delegation')),
+        isTrue,
+      );
+      file.deleteSync();
+      expect(
+        checker.check(root),
+        contains('Missing .github/agents/panel-training.agent.md'),
+      );
+    },
+  );
+
+  test('Copilot malformed frontmatter and broken shared references fail', () {
+    final file = File('${root.path}/.github/agents/panel-qa.agent.md');
+    file.writeAsStringSync(
+      file
+          .readAsStringSync()
+          .replaceAll('agents/review-contract.md', 'other.md')
+          .replaceAll('tools: [', 'tools: invalid ['),
+    );
+    final errors = checker.check(root);
+    expect(errors.any((e) => e.contains('not valid JSON')), isTrue);
+    expect(errors.any((e) => e.contains('review-contract.md')), isTrue);
+  });
+
+  test('performed research cannot be claimed without consulted sources', () {
+    final item = assignment('integrations', 'pending');
+    (item['research'] as Map)['status'] = 'performed';
+    state['assignments'] = [item];
+    expect(
+      checkRun().any((e) => e.contains('performed research needs')),
+      isTrue,
+    );
+  });
+
+  test('performed evidence requires observed discovery and retrieval, not YAML claims', () {
+    final item = assignment('integrations', 'pending');
+    final research = item['research'] as Map;
+    research['status'] = 'performed';
+    research['question'] = 'Synthetic platform question';
+    research['path'] = 'chair';
+    research['sources'] = [
+      {
+        'url': 'https://example.com/source',
+        'title': 'Synthetic source fixture',
+        'published_or_updated': null,
+        'accessed': '2026-10-11',
+        'claim': 'Test-only fixture, not consulted evidence.',
+      },
+    ];
+    state['assignments'] = [item];
+    expect(
+      checkRun().any((e) => e.contains('observed discovery/retrieval')),
+      isTrue,
+    );
+    state['research_capabilities'] = [
+      {
+        'surface': 'Synthetic fixture',
+        'discovery': ['fixture-search'],
+        'retrieval': ['fixture-fetch'],
+        'status': 'observed',
+        'checked_at': '2026-10-11',
+        'limitations': 'Synthetic validator test only.',
+      },
+    ];
+    expect(checkRun(), isEmpty);
+  });
+
+  test('source dates, URL and bounded assignment fields are validated', () {
+    final item = assignment('integrations', 'pending');
+    item['research'] = {
+      'status': 'performed',
+      'question': 'Current documented API?',
+      'reason': 'Potentially outdated capability.',
+      'path': 'chair',
+      'sources': [
+        {
+          'url': 'invented',
+          'title': '',
+          'published_or_updated': null,
+          'accessed': 'yesterday',
+          'claim': 'Test-only invalid source.',
+        },
+      ],
+      'summary': 'Test fixture.',
+      'limitations': 'Not actual evidence.',
+    };
+    item.remove('task');
+    state['assignments'] = [item];
+    final errors = checkRun();
+    expect(errors.any((e) => e.contains('missing task')), isTrue);
+    expect(errors.any((e) => e.contains('.url has invalid format')), isTrue);
+    expect(errors.any((e) => e.contains('.title must not be empty')), isTrue);
+    expect(
+      errors.any((e) => e.contains('.accessed has invalid format')),
+      isTrue,
+    );
+  });
+
+  test('completed research requires matching report and resolved evidence', () {
+    final item = assignment('integrations', 'complete');
+    (item['research'] as Map)['status'] = 'blocked';
+    (item['research'] as Map)['path'] = 'unavailable';
+    state['assignments'] = [item];
+    File('${run.path}/findings/integrations.md')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('Incomplete synthetic report');
+    final errors = checkRun();
+    expect(errors.any((e) => e.contains('report missing section')), isTrue);
+    expect(errors.any((e) => e.contains('unresolved research')), isTrue);
+  });
+
   test('schema role coverage and malformed schema fail clearly', () {
     final file = File('${root.path}/agents/state.schema.json');
     final schema = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-    final items = schema['properties']['assignments']['items'];
-    items['properties']['role']['enum'].remove('qa');
+    final properties = schema['properties'] as Map;
+    final items = (properties['assignments'] as Map)['items'] as Map;
+    final role = (items['properties'] as Map)['role'] as Map;
+    (role['enum'] as List).remove('qa');
     file.writeAsStringSync(jsonEncode(schema));
     expect(checker.check(root).any((e) => e.contains('15 canonical')), isTrue);
     file.writeAsStringSync('{}');
-    expect(checker.check(root), contains('Schema missing assignments role enum'));
+    expect(
+      checker.check(root),
+      contains('Schema missing assignments role enum'),
+    );
     file.writeAsStringSync('{');
-    expect(checker.check(root).any((e) => e.contains('not valid JSON')), isTrue);
+    expect(
+      checker.check(root).any((e) => e.contains('not valid JSON')),
+      isTrue,
+    );
   });
 
-  test('MM-195 non-object schema cannot bypass panel validation', () async {
+  test('MM-197 non-object schema cannot bypass panel validation', () async {
     final file = File('${root.path}/agents/state.schema.json');
     for (final content in ['null', '[]', 'true', '"schema"']) {
       file.writeAsStringSync(content);
@@ -128,12 +279,37 @@ void main() {
     }
   });
 
-  test('MM-195 native saved-run separators validate on Windows', () {
+  test('MM-197 native saved-run separators validate on Windows', () {
+    expect(checkRun(), isEmpty);
     expect(
       checker.check(root, run: Directory(run.path.replaceAll('/', r'\'))),
       isEmpty,
     );
   }, skip: !Platform.isWindows ? 'Windows path semantics' : false);
+
+  test('MM-199 malformed schema keywords fail without throwing', () async {
+    final file = File('${root.path}/agents/state.schema.json');
+    final original = file.readAsStringSync();
+    for (final entry in {
+      'required': 'not-a-list',
+      'properties': <Object?>[],
+      'minLength': 'one',
+      'pattern': '[',
+      'items': <Object?>[],
+      'additionalProperties': 'invalid',
+      'enum': 'invalid',
+      'type': ['object', 1],
+    }.entries) {
+      final schema = jsonDecode(original) as Map<String, dynamic>;
+      schema[entry.key] = entry.value;
+      file.writeAsStringSync(jsonEncode(schema));
+      expect(
+        checker.check(root).any((e) => e.contains('Schema keyword')),
+        isTrue,
+      );
+      expect(await runPanel(root, const []), 1);
+    }
+  });
 
   test('template schema rejects extra fields and invalid enums', () {
     final file = File('${root.path}/agents/templates/state.json');
@@ -145,9 +321,55 @@ void main() {
     expect(errors, contains('template has unknown field extra'));
   });
 
+  test(
+    'MM-201 audit mode, coverage and canonical audit invocation are required',
+    () {
+      state['audit_mode'] = 'planning-only';
+      final item = assignment('nutrition', 'complete');
+      (item['coverage'] as Map)['inspected'] = <String>[];
+      (item['coverage'] as Map)['methods'] = <String>[];
+      state['assignments'] = [item];
+      expect(checkRun(), contains('state.audit_mode has unsupported value'));
+      state['audit_mode'] = 'feature';
+      expect(
+        checkRun().any((e) => e.contains('completed audit needs')),
+        isTrue,
+      );
+      item.remove('coverage');
+      expect(checkRun(), contains('state.assignments[0] missing coverage'));
+      final role = File('${root.path}/agents/roles/nutrition.md');
+      role.writeAsStringSync(
+        role.readAsStringSync().replaceAll(
+          '## Existing implementation audit',
+          '## Other',
+        ),
+      );
+      final adapter = File(
+        '${root.path}/.github/agents/panel-nutrition.agent.md',
+      );
+      adapter.writeAsStringSync(
+        adapter.readAsStringSync().replaceAll(
+          'existing-implementation audit protocol',
+          'planning only',
+        ),
+      );
+      final errors = checker.check(root);
+      expect(
+        errors.any(
+          (e) => e.contains('missing section: Existing implementation audit'),
+        ),
+        isTrue,
+      );
+      expect(
+        errors.any((e) => e.contains('missing shared audit invocation')),
+        isTrue,
+      );
+    },
+  );
+
   test('run requires identity, real baseline and local artifacts', () {
     state['task_id'] = 'wrong-dir';
-    state['baseline']['commit'] = List.filled(40, '0').join();
+    (state['baseline'] as Map)['commit'] = List.filled(40, '0').join();
     File('${run.path}/brief.md').deleteSync();
     final errors = checkRun();
     expect(errors.any((e) => e.contains('Run must live')), isTrue);
@@ -186,7 +408,10 @@ void main() {
     state['assignments'] = [item, assignment('training', 'pending')];
     final errors = checkRun();
     expect(errors.any((e) => e.contains('Duplicate assignment')), isTrue);
-    expect(errors.any((e) => e.contains('must be findings/training.md')), isTrue);
+    expect(
+      errors.any((e) => e.contains('must be findings/training.md')),
+      isTrue,
+    );
     expect(errors.any((e) => e.contains('input paths')), isTrue);
   });
 
@@ -201,7 +426,10 @@ void main() {
         'summary': 'Inconsistent test fixture',
       },
     ];
-    expect(checkRun(), contains('Test result/exit code disagree: mm test tool'));
+    expect(
+      checkRun(),
+      contains('Test result/exit code disagree: mm test tool'),
+    );
   });
 
   test('complete phase cannot conceal pending work or stale reviews', () {
@@ -218,6 +446,10 @@ void main() {
       'at': '2026-10-11T02:00:00Z',
       'writers_stopped': true,
     };
+    final brief = File('${run.path}/brief.md');
+    brief.writeAsStringSync(
+      '${brief.readAsStringSync()}\nMechanical fixture; domain review unnecessary.\n',
+    );
     state['assignments'] = [
       assignment('chair', 'complete'),
       for (final role in [
@@ -227,11 +459,57 @@ void main() {
         'measurement',
         'safety',
       ])
-        assignment(role, 'omitted'),
+        {
+          ...assignment(role, 'omitted'),
+          'omission_reason': 'Mechanical fixture; domain review unnecessary.',
+        },
     ];
     File('${run.path}/findings/chair.md')
       ..createSync(recursive: true)
-      ..writeAsStringSync('Synthetic test report');
+      ..writeAsStringSync(
+        File('${root.path}/agents/templates/findings/role.md')
+            .readAsStringSync(),
+      );
+    expect(checkRun(), isEmpty);
+  });
+
+  test('MM-200 complete runs cannot omit reviews without recorded reasons', () {
+    state['phase'] = 'complete';
+    state['pending_work'] = <String>[];
+    state['checkpoint'] = {
+      'at': '2026-10-11T02:00:00Z',
+      'writers_stopped': true,
+    };
+    state['assignments'] = [
+      for (final role in [
+        'chair',
+        'training',
+        'nutrition',
+        'coaching',
+        'measurement',
+        'safety',
+      ])
+        assignment(role, 'omitted'),
+    ];
+    expect(
+      checkRun().any((e) => e.contains('omission needs a recorded reason')),
+      isTrue,
+    );
+    for (final item
+        in (state['assignments'] as List).cast<Map<String, dynamic>>()) {
+      item['omission_reason'] =
+          'Mechanical fixture; domain review unnecessary.';
+    }
+    expect(
+      checkRun().any(
+        (e) => e.contains('omission reason missing from brief/report'),
+      ),
+      isTrue,
+    );
+    final brief = File('${run.path}/brief.md');
+    brief.writeAsStringSync(
+      '${brief.readAsStringSync()}\nMechanical fixture; domain review unnecessary.\n',
+    );
     expect(checkRun(), isEmpty);
   });
 

@@ -145,7 +145,7 @@ Run commands from the repository root using the `mm` wrapper (`.\mm` in
 PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
 
 - `mm req` after creating or updating requirements.
-- `mm panel` validates panel roles, Claude adapters and portable templates;
+- `mm panel` validates panel roles, Claude/Copilot adapters and portable templates;
   `mm panel docs/agent-runs/<task-id>` also checks saved run state.
 - `mm test <relevant-path>` for focused tests, such as
   `mm test packages/engine`.

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "task_id": "pr79-food-feature-audit",
+  "audit_mode": "feature",
+  "baseline": {"branch": "copilot/implement-expert-panel", "commit": "999d32887778f656080e788a1c9aa556e354ec8c"},
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Audit current food reference/consumed quantity scaling and nutrition totals.",
+      "role": "nutrition",
+      "reviewer": "native-claude-panel-nutrition",
+      "status": "complete",
+      "inspected_commit": "999d32887778f656080e788a1c9aa556e354ec8c",
+      "input_hashes": {
+        "AGENTS.md": "b3c4186e21b301485b1ece9179882a8e32d1597e38747ede492a68243b9b3de9",
+        "agents/roles/nutrition.md": "08b3678f603fb30ba4dfa4a6f885ecbf227a4a00b312fd489a976055eb184b57",
+        "agents/panel-protocol.md": "06abcce0cbc39e5e73f08eee13e92adc8039ad9ac00d1b72654de60909ecba90",
+        "agents/review-contract.md": "a7431d6dd605a8d8ffe35b6abb0082f279133d291ed2dccebf618f591c29ac56",
+        "agents/templates/findings/role.md": "ceff5de882039d1586365dd84cb1a98cff29535d30d3ae7afa12ba2e7a4cd726",
+        "packages/domain/lib/src/food/portion/scale_nutrition.dart": "b04f49f0cf7e88f2433b28c8c0f3b614c1a7f272584e9b3208def995f411a675",
+        "packages/domain/lib/src/food/portion/grams_for.dart": "babd36e22039a337d4f06eb04d463833866da63f754d886247e4b353486cf1e3",
+        "packages/domain/lib/src/food/portion/portion_unit.dart": "cb9c3ce2640411ca90307040674d40bc9ae57e73606c3b2370f73327e20a0534",
+        "packages/domain/lib/src/food/portion/portion.dart": "6ddd6b5e14d7da3f5d2636d884ae2d62c89540dbb020316c558af45e9be739a1",
+        "packages/domain/lib/src/food/portion/reference_nutrition.dart": "45cde68d270610189af132ff9540a14ea296d111fa1a78e8cd30765efb348c91",
+        "packages/domain/lib/src/food/portion/units_offered.dart": "acb279aec36b22390c0c315c2b6c034cf087f3eed004ab39c3f6c928792929c7",
+        "requirements/food-logging/STORY.record-quantity-unit-and-nutrition-basis.MM-167.md": "541e761761a47c112b667d83938793552130c54379802e2c53b3b37d3de4a863",
+        "apps/mobile/lib/src/food/food_amount_step_state.dart": "70035b69bf9332b3c0d6a880b040867a140176d20d1c1c9e6b67d32d0ac94ec1",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "apps/mobile/lib/src/food/amount_choice.dart": "54296cffe0563c5386aba0231a91419083de6cddf27f37f7c6d6c6a1fec381cd",
+        "packages/domain/lib/src/food/portion/nutrition_totals.dart": "359864f525f5fcbcff360474372d46c4a9db3a12d1a4312db6d3174749efbb0e",
+        "packages/data/lib/src/portion_columns.dart": "219dc1e408e6c9610fbd89784166f5960c5abf1d9618c9654802665cb61cae5c",
+        "apps/mobile/lib/src/food/custom/custom_catalog_food.dart": "75f8bd7587d5cd8fb428971f0e55f5c5f35c8bea12d85ed458c6e35b853eb60b",
+        "apps/mobile/lib/src/format/quantity_text.dart": "5979838675c2f9f149e489252d9215914f94602a84c5eca7bb362dd0179eb647",
+        "packages/domain/lib/src/food/portion/parse_quantity.dart": "f672c6e6f09ead7eed0f078afee9c5d328fe6e57a5755d539351974c916af2a7",
+        "apps/mobile/lib/src/format/portion_summary.dart": "36f16cf80ae61f78a86885a17dce36f5797a7d63c7b4552d87605b9eebdca5f7",
+        "apps/mobile/lib/src/food/copy_entries.dart": "c9f001fb61a0847437bab62889f9e7e079f0b2f05ef37cd13709946ad6825601",
+        "packages/domain/lib/src/food/custom/recipe_per_serving.dart": "1b0b92f33417c1fd61a2334b463d56449ffc9ff828a21d2348808f20a9f723fc",
+        "packages/domain/lib/src/food/hand/hand_model.dart": "ddfc56bd7d1c14a3e9258ad9326c18ccfbd30d7eeaab3dc6e1db253b2a06205e",
+        "requirements/food-logging/STORY.recent-foods.MM-39.md": "be00e81ea357dd635ddb5710663c3cb7b494794536c548ef564e49909e6f3718",
+        "packages/domain/test/portion_test.dart": "6cafee633afd790f04c9eab992121cf8bdeb637d5b5b7f1084b90b548e28edf1"
+      },
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": ["Food portion/reference/scaling domain, quantity/add/edit UI and stored portion columns", "MM-167/MM-39; portion tests partial bodies and other names"],
+        "not_inspected": ["Full repository/migration/contracts, catalog pack contents, estimate/recipe/barcode/label forms, engine/clinical algorithms"],
+        "referrals": ["Micronutrients: extra-nutrient policy", "Measurement: precision impact", "UX/coaching: recents and zero-kcal semantics", "Data owner: serving and per100ml support"],
+        "methods": ["source-inspection", "test-results"],
+        "limitations": "Specialist source-only; parent synthetic widget assertions reproduced MM-202/MM-203. Test file changed only to add tracked guards after specialist inspection; no application implementation changed."
+      },
+      "research": {"status": "unnecessary", "question": "", "reason": "Internal consistency/arithmetic/requirement traceability, no new health rule.", "path": "not-needed", "sources": [], "summary": "Classified findings and owner verification in report.", "limitations": "No independent scientific/unit-standard verification."}
+    },
+    {
+      "task": "Audit current food entry/edit/save/read traceability and test validity.",
+      "role": "qa", "reviewer": "native-claude-panel-qa", "status": "complete",
+      "inspected_commit": "999d32887778f656080e788a1c9aa556e354ec8c",
+      "input_hashes": {
+        "agents/roles/qa.md": "4a3179cfd58dbfd46ac86b68a093856fd5c234bf95b408cf040529e21cff46ab",
+        "agents/panel-protocol.md": "06abcce0cbc39e5e73f08eee13e92adc8039ad9ac00d1b72654de60909ecba90",
+        "agents/review-contract.md": "a7431d6dd605a8d8ffe35b6abb0082f279133d291ed2dccebf618f591c29ac56",
+        "requirements/food-logging/STORY.record-quantity-unit-and-nutrition-basis.MM-167.md": "541e761761a47c112b667d83938793552130c54379802e2c53b3b37d3de4a863",
+        "requirements/food-logging/STORY.recent-foods.MM-39.md": "be00e81ea357dd635ddb5710663c3cb7b494794536c548ef564e49909e6f3718",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "apps/mobile/lib/src/food/food_amount_step_state.dart": "70035b69bf9332b3c0d6a880b040867a140176d20d1c1c9e6b67d32d0ac94ec1",
+        "apps/mobile/lib/src/format/quantity_text.dart": "5979838675c2f9f149e489252d9215914f94602a84c5eca7bb362dd0179eb647",
+        "packages/domain/lib/src/food/portion/scale_nutrition.dart": "b04f49f0cf7e88f2433b28c8c0f3b614c1a7f272584e9b3208def995f411a675",
+        "packages/domain/lib/src/food/portion/nutrition_basis.dart": "3cc5ead12ee4ed382406ea8c3980276721b5c8769c402e1dd9e5e34b1a6e6946",
+        "packages/data/lib/src/food_from_row.dart": "c605fdab92f9a673c076cfd0c70b24101e1ecf3e2e14146282ea59ab97ed4092",
+        "packages/data/lib/src/drift_food_repository.dart": "45a1d216caaf5ed5d633a1c7ee0cf0046668f661d3ade17ad763111494ab20af",
+        "packages/fixtures/lib/src/in_memory_food_repository.dart": "403d87dae4150e04e8c6cf04ebdd18c4e35e0d8b0c1d29c81b03ea58edd442cd",
+        "packages/fixtures/lib/src/contracts/food_repository_contract.dart": "fd3cb69fe1b1af68f4482993e4676e0db81ec7fcf5b386a4f78a93c7bec8321f",
+        "apps/mobile/test/food_portion_test.dart": "4191e7afa85b91fd0119923fcfda486e84854f8b4ac124f81e38fd3061562a1e"
+      },
+      "report": "findings/qa.md",
+      "coverage": {"inspected": ["Current domain scaling, app add/edit/save, Drift/fixture food repository and contract, bounded food tests", "Targeted MM-39 recents challenge"], "not_inspected": ["Migration/schema, hand model/MM-46, native/visual paths and engine consumers"], "referrals": ["UX/Flutter: recents and input semantics", "Architecture: contract coverage", "Nutrition: cup terminology evidence blocked"], "methods": ["source-inspection", "test-results"], "limitations": "Source-only specialist; owner ran guards and full gate. Hashes index key causal inputs and updated test guard file, not every ancillary inspected file; re-read unindexed inputs on resume."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Internal code/requirement findings need no new external claims.", "path": "not-needed", "sources": [], "summary": "Independent audit plus actual targeted recents challenge; separate cup question remains unverified.", "limitations": "No source-supported cup-definition conclusion; external retrieval attempts blocked/unparsed."}
+    },
+    {
+      "task": "Synthesize execution/coverage; no independent chair self-review.",
+      "role": "chair", "reviewer": "local-copilot-parent", "status": "omitted",
+      "omission_reason": "Chair synthesizes; no independent chair review.",
+      "inspected_commit": null, "input_hashes": {}, "report": "findings/chair.md",
+      "coverage": {"inspected": [], "not_inspected": ["Independent chair review"], "referrals": [], "methods": [], "limitations": "Synthesis recorded separately."},
+      "research": {"status": "unnecessary", "question": "", "reason": "No separate self-review.", "path": "not-needed", "sources": [], "summary": "See decision.", "limitations": "Not independent."}
+    },
+    {
+      "task": "Scope training relevance.",
+      "role": "training", "reviewer": "chair", "status": "omitted",
+      "omission_reason": "No training/coaching/adaptation/clinical rule is proposed.",
+      "inspected_commit": null, "input_hashes": {}, "report": "findings/training.md",
+      "coverage": {"inspected": [], "not_inspected": ["Training"], "referrals": [], "methods": [], "limitations": "Outside bounded scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Outside bounded scope.", "path": "not-needed", "sources": [], "summary": "No training rule.", "limitations": "Not reviewed."}
+    },
+    {
+      "task": "Scope coaching relevance.",
+      "role": "coaching", "reviewer": "chair", "status": "omitted",
+      "omission_reason": "No training/coaching/adaptation/clinical rule is proposed.",
+      "inspected_commit": null, "input_hashes": {}, "report": "findings/coaching.md",
+      "coverage": {"inspected": [], "not_inspected": ["Coaching"], "referrals": ["UX/coaching wording remains unreviewed"], "methods": [], "limitations": "Outside bounded scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Outside bounded scope.", "path": "not-needed", "sources": [], "summary": "No coaching rule.", "limitations": "Not reviewed."}
+    },
+    {
+      "task": "Scope measurement relevance.",
+      "role": "measurement", "reviewer": "chair", "status": "omitted",
+      "omission_reason": "No training/coaching/adaptation/clinical rule is proposed.",
+      "inspected_commit": null, "input_hashes": {}, "report": "findings/measurement.md",
+      "coverage": {"inspected": [], "not_inspected": ["Adaptive calculations"], "referrals": ["Precision impact remains unreviewed"], "methods": [], "limitations": "Outside bounded scope."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Outside bounded scope.", "path": "not-needed", "sources": [], "summary": "No adaptive rule.", "limitations": "Not reviewed."}
+    },
+    {
+      "task": "Scope clinical safety relevance.",
+      "role": "safety", "reviewer": "chair", "status": "omitted",
+      "omission_reason": "No training/coaching/adaptation/clinical rule is proposed.",
+      "inspected_commit": null, "input_hashes": {}, "report": "findings/safety.md",
+      "coverage": {"inspected": [], "not_inspected": ["Clinical safety"], "referrals": ["Alcohol display impact remains unreviewed"], "methods": [], "limitations": "Not clinical clearance."},
+      "research": {"status": "unnecessary", "question": "", "reason": "Outside bounded scope.", "path": "not-needed", "sources": [], "summary": "No clinical rule.", "limitations": "Not reviewed."}
+    }
+  ],
+  "research_capabilities": [],
+  "unresolved_questions": ["App recents/zero-kcal/unit/extras/hand-history semantics require broader requirements review; not silently decided by tooling audit.", "Cup terminology verification blocked: eCFR access denied; GovInfo PDF unparsed, HTML404. No remembered claim may authorize a change."],
+  "decisions": [
+    {"id": "AUD-D1", "status": "accepted", "summary": "Track confirmed precision and alcohol bugs without changing application behavior in PR #79.", "authority": "Owner's no-app-change scope and AGENTS bug tracking rule"}
+  ],
+  "pending_work": ["Application fixes MM-202/MM-203/MM-204 and unreviewed referrals remain separate from tooling PR #79; publish tooling and check CI."],
+  "tests": [
+    {"command": "fvm flutter test test\\food_portion_test.dart --plain-name MM-20", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "MM-202 assertions reproduced 100->99 and 100.123->100.1; alcohol setup initially missed toggle."},
+    {"command": "fvm flutter test test\\food_portion_test.dart --plain-name MM-203", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "After setup correction, 276 kcal logged but alcohol 14 rather than 28 g."},
+    {"command": "fvm flutter test test\\food_portion_test.dart", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "13 existing cases pass; three known-bug guards explicitly skipped MM-202/MM-203, not claimed fixed."},
+    {"command": ".\\mm.ps1 check", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Full pre-food-guard tooling gate: final All checks passed, 82 tool tests including 25 panel cases."},
+    {"command": "fvm flutter test test\\food_portion_test.dart --plain-name MM-204", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "Intended guard: 138 kcal unchanged but alcohol null rather than 14 g; then skipped with MM-204."},
+    {"command": ".\\mm.ps1 check (final post-QA delivery)", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Final All checks passed. 82 tool tests/25 panel cases; four known food-bug guards skipped with MM-202/203/204, not fixed."},
+    {"command": ".\\mm.ps1 panel docs\\agent-runs\\pr79-food-feature-audit", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 0, "result": "passed", "summary": "Saved audit validates with actual coverage, reasons, reports, pending app followups and quiescent checkpoint; recorded current hashes match."}
+  ],
+  "checkpoint": {"at": "2026-10-11T03:21:09Z", "writers_stopped": true}
+}

@@ -11,6 +11,7 @@ import '../ui/mm_button_kind.dart';
 import '../ui/mm_list_row.dart';
 import 'workout_controller_provider.dart';
 import 'workout_screen.dart';
+import 'weekly_volume_screen.dart';
 
 /// The Train destination (MM-75): start a workout or carry on with the one
 /// in progress, and reopen finished ones.
@@ -88,6 +89,15 @@ class TrainScreen extends ConsumerWidget {
             ),
           ],
         ],
+        const SizedBox(height: 16),
+        MmButton(
+          key: const ValueKey('train-volume'),
+          label: 'Weekly training volume',
+          kind: MmButtonKind.secondary,
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const WeeklyVolumeScreen()),
+          ),
+        ),
         if (finished.isNotEmpty) ...[
           const SizedBox(height: 16),
           InfoCard(

@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "task_id": "replace-task-id",
+  "audit_mode": "change",
   "baseline": {
     "branch": "REPLACE_WITH_ACTUAL_BRANCH",
     "commit": "0000000000000000000000000000000000000000"
@@ -8,6 +9,8 @@
   "phase": "scope",
   "owner": null,
   "assignments": [],
+  "research_capabilities": [],
+  "unresolved_questions": [],
   "decisions": [],
   "pending_work": ["Replace template placeholders and assign relevant roles."],
   "tests": [],

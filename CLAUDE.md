@@ -11,6 +11,6 @@ not treat a review as a substitute for running the applicable tests and
 checks.
 
 For cross-domain work, start with [agents/README.md](agents/README.md).
-The `panel-*` subagents are thin read-only adapters; the parent session handles
-native delegation, artifacts and the single edit owner. See
+The `panel-*` specialists are thin read-only research adapters; `panel-chair`
+coordinates artifacts and bounded reviews, with a single edit owner. See
 [native surfaces and handoff examples](agents/native-surfaces.md).

@@ -33,9 +33,12 @@ const _envs = ['dev', 'prod'];
 final _commands = <String, (String, Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
-  'check': ('CI gate: format, requirements, arch, panel, analyze, test', _check),
+  'check': (
+    'CI gate: format, requirements, arch, panel, analyze, test',
+    _check,
+  ),
   'panel': (
-    'Expert panel: validate roles, Claude adapters and templates [run-dir]',
+    'Expert panel: validate roles, native adapters and templates [run-dir]',
     (tc, args) => runPanel(tc.repoRoot, args),
   ),
   'test': ('Run tests: mm test [package-path ...]', _test),
