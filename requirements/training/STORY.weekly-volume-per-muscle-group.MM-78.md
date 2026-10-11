@@ -1,6 +1,6 @@
 ---
 id: MM-78
-status: proposed
+status: in-progress
 component: training
 related: [MM-74, MM-75, MM-76, MM-79]
 ---
@@ -18,6 +18,19 @@ Choices I made without asking (say if any is wrong):
 - **A set counts fully toward its exercise's primary muscle group and half toward each secondary one.**
 - **The week is the last seven days**, not a calendar week, so the figure does not reset on Monday.
 - **Shown against a broad reference range** of 10 to 20 hard sets a week per group, described as a typical range, not a rule.
+- Count finished workouts only, ending at today's local date: current window
+  today minus six days through today, previous window minus thirteen through
+  minus seven. Future and in-progress sessions are excluded.
+- RIR 5+ is the logger's representation of easy sets and is excluded.
+  Zero or assisted load still counts; bodyweight exercises need no weigh-in
+  to count logged hard sets. Positive reps are required.
+- All eleven muscle groups appear, including zero, with exact half-set values.
+  No prescriptions, warnings or rewards for reaching the reference band.
+- Train opens the volume view. Each row shows current and previous volume,
+  a signed change, and a graphic scaled to include values above 20.
+- Deleted/unknown exercise mappings are not guessed. Show the number of
+  otherwise-hard sets omitted in each window and explain missing mappings.
+  Failed workout/library reads show retry, not zero-volume results.
 
 ## Description
 A view of hard sets per muscle group over the last seven days, with the previous seven for comparison.
@@ -35,4 +48,19 @@ Scenario: Easy sets do not count
 Scenario: A neglected group
   Given no hamstring work in two weeks
   Then hamstrings show zero, visibly below the reference range
+
+Scenario: Rolling windows
+  Given finished workouts on today, six, seven, thirteen and fourteen days ago
+  Then today and six days ago contribute to the current period
+  And seven and thirteen days ago contribute to the previous period
+  And fourteen days ago, future and in-progress workouts do not contribute
+
+Scenario: Missing mapping
+  Given a finished workout refers to a deleted exercise
+  Then its hard sets are reported as omitted from muscle-group totals
+  And a failed library read is shown as a retry state instead
+
+Scenario: Recomputed volume
+  When a workout is edited or deleted or a custom muscle mapping changes
+  Then current and previous muscle-group totals update
 ```
