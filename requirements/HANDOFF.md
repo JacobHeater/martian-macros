@@ -33,9 +33,10 @@ Only one schema change in flight at a time.
 provisional MM-195 collided with training MM-195. Allocated MM-197 for the
 panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
 
-**What to build next.** The recomp review (MM-133), which can reuse
-`recompSignalOf`'s parts; then the strength parts of the monthly report and
-rewards (MM-33, MM-92). MM-79 (progression) is merged with default rep ranges
+**What to build next.** The strength parts of the monthly report and
+rewards (MM-33, MM-92), with the recomp review (MM-133, built for the Coach
+screen) added to the report. MM-155 (waist protocol and noise) would replace
+the interim waist rule that MM-32 and MM-133 share. MM-79 (progression) is merged with default rep ranges
 and load steps; editing them per exercise needs a table (schema 29). MM-191 has only a sound
 at the end of a rest left (needs an audio package: owner's decision), a
 background signal, and a free-typed rest length.
@@ -124,6 +125,8 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   the check passed on each head. No CI watch is left to act on.
 - MM-32: `recompSignalOf` and a card on Progress. `panel-measurement` set the
   thresholds (in the ticket); the waist rule is interim until MM-155.
+- #85 (MM-32) merged the same way. MM-133: `recompReviewOf` and a review
+  card on Coach at weeks 8, 12 and every 8 after; its own PR.
 - Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
   edits will conflict with this file.
 
