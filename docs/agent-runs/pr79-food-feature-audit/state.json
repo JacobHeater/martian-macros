@@ -121,7 +121,7 @@
   "decisions": [
     {"id": "AUD-D1", "status": "accepted", "summary": "Track confirmed precision and alcohol bugs without changing application behavior in PR #79.", "authority": "Owner's no-app-change scope and AGENTS bug tracking rule"}
   ],
-  "pending_work": ["Application fixes MM-202/MM-203/MM-204 and unreviewed referrals remain separate from tooling PR #79; publish tooling and check CI."],
+  "pending_work": ["Application fixes MM-202/MM-203/MM-204 and unreviewed referrals remain separate from tooling PR #79. Tooling published at 41ca7ae; inspect current PR CI/readiness."],
   "tests": [
     {"command": "fvm flutter test test\\food_portion_test.dart --plain-name MM-20", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "MM-202 assertions reproduced 100->99 and 100.123->100.1; alcohol setup initially missed toggle."},
     {"command": "fvm flutter test test\\food_portion_test.dart --plain-name MM-203", "commit": "999d32887778f656080e788a1c9aa556e354ec8c", "dirty": true, "exit_code": 1, "result": "failed", "summary": "After setup correction, 276 kcal logged but alcohol 14 rather than 28 g."},
