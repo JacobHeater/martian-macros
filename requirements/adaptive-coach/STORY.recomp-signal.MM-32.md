@@ -26,8 +26,8 @@ they differ from the choices above, these are what was built. Every figure is a 
 threshold:
 - **Waist down** compares the middle value of the entries of the last 14 days with that of the entries from 21 to 35 days ago, and
   needs a drop of 1.5 cm: 2 cm when either is a single entry. It needs an entry in each and three in all. The 1 cm first written is
-  inside the noise of one reading of a tape (MM-155), and the card would flicker. This rule stands in for MM-155's shared change
-  function and moves to it when that is built.
+  inside the noise of one reading of a tape (MM-155), and the card would flicker. Since 2026-10-11 the waist is judged by
+  MM-155's shared function (`waistChangeOf`): smoothed ends, and 1.4 cm as the threshold.
 - **Flat** stays at less than 0.5% over 28 days, and needs weigh-ins on 8 of those days, 2 in the last 7 and 2 near the day 28 days ago.
 - **A lift is up** when its smoothed estimated max rose 2.5% or more over 28 days, it was trained in the last 14 days and has four
   sessions in the last 42. One more rep is about 3% of a max. The signal needs two lifts up and more up than down.

@@ -207,7 +207,8 @@ void main() {
       expect(find.text('Recomp review, week 12'), findsOneWidget);
       expect(cardText(tester), startsWith('It is working.'));
       expect(find.text('Last 84 days'), findsOneWidget);
-      expect(find.text('Down 3 cm'), findsOneWidget);
+      // Smoothed at each end (MM-155), so a little under the 3 cm entered.
+      expect(find.text('Down 2.5 cm'), findsOneWidget);
       expect(find.textContaining('Up: '), findsOneWidget);
       expect(find.textContaining('not a measurement of it'), findsOneWidget);
       final setup = await readNow(tester, () => repos.setup.watchSetup().first);

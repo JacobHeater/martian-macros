@@ -162,7 +162,7 @@ void main() {
       expect(r.verdict, RecompVerdict.working);
       expect(r.missing, isEmpty);
       expect(r.waist, MeasuredChange.down);
-      expect(r.waistChangeCm, closeTo(-2.75, 1e-9));
+      expect(r.waistChangeCm, closeTo(-2.625, 1e-9));
       expect(r.strength, MeasuredChange.up);
       expect(r.liftsUp, ['Back squat', 'Barbell row']);
       expect(r.weightChangeFraction, closeTo(-0.4 / 82, 1e-9));

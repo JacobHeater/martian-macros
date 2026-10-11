@@ -8,6 +8,8 @@ import 'recomp_review.dart';
 import 'recomp_verdict.dart';
 import 'strength_trend.dart';
 import 'targets_record.dart';
+import 'waist_change_of.dart';
+import 'waist_rule.dart';
 import 'weight_trend_point.dart';
 
 /// The recomp review due on [today], or null when none is (MM-133).
@@ -17,10 +19,9 @@ import 'weight_trend_point.dart';
 /// up to today, 12 weeks of it at most, and each signal against its own
 /// noise. The figures are judgments, as in the recomp signal (MM-32):
 ///
-/// - **Waist**: the middle value of the last 14 days' entries against that
-///   of the entries within a week of the start of the period; 1.5 cm is a
-///   change, 2 cm when either is one entry. A verdict needs four entries
-///   in the period and one at each end.
+/// - **Waist**: the shared change function over the period
+///   ([waistChangeOf], MM-155). A verdict needs four entries in the period
+///   and a measurement at each end.
 /// - **Strength**: a lift rose or fell when its smoothed estimated max
 ///   moved 2.5% over the period. It counts when trained in the last 14
 ///   days and in six different weeks of the period; a verdict needs two.
@@ -66,42 +67,18 @@ RecompReview? recompReviewOf({
   if (week == null || days - week * 7 >= shownForDays) return null;
   final period = days > 84 ? 84 : days;
 
-  // Waist.
-  double? middle(List<double> values) {
-    if (values.isEmpty) return null;
-    final sorted = [...values]..sort();
-    final mid = sorted.length ~/ 2;
-    return sorted.length.isOdd
-        ? sorted[mid]
-        : (sorted[mid - 1] + sorted[mid]) / 2;
-  }
-
+  // Waist: the one answer every feature gets (MM-155).
   final inPeriod = [
     for (final w in waist)
-      if (ago(w.date) >= 0 && ago(w.date) <= period + 7) w,
+      if (ago(w.date) >= 0 &&
+          ago(w.date) <= period + WaistRule.baselineWithinDays)
+        w,
   ];
-  final recent = [
-    for (final w in inPeriod)
-      if (ago(w.date) <= 13) w.waistCm,
-  ];
-  final baseline = [
-    for (final w in inPeriod)
-      if (ago(w.date) >= period - 7) w.waistCm,
-  ];
-  MeasuredChange? waistChange;
-  double? waistChangeCm;
-  final recentMiddle = middle(recent);
-  final baselineMiddle = middle(baseline);
-  if (inPeriod.length >= 4 && recentMiddle != null && baselineMiddle != null) {
-    final change = recentMiddle - baselineMiddle;
-    final needed = recent.length == 1 || baseline.length == 1 ? 2.0 : 1.5;
-    waistChangeCm = change;
-    waistChange = change <= -needed
-        ? MeasuredChange.down
-        : change >= needed
-        ? MeasuredChange.up
-        : MeasuredChange.noClearChange;
-  }
+  final measured = inPeriod.length < 4
+      ? null
+      : waistChangeOf(waist: waist, asOf: today, days: period);
+  final waistChange = measured?.direction;
+  final waistChangeCm = measured?.changeCm;
 
   // Strength.
   final liftsUp = <String>[];
