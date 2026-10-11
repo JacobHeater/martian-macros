@@ -90,7 +90,8 @@ Not built:
 - **Editing the rep range and the load step per exercise.** They need a place to be stored, and one schema change was already in
   flight (MM-191, schema 28). The defaults apply to everything until then.
 - On fat loss with every set at the top of the range, offering the load step as well (the panel proposed it; undecided).
-- Not seen on the emulator yet.
+- Seen on the Android emulator (2026-10-11) on a fat loss goal only. The line sits under "Last time", so it does not repeat the
+  sets.
 
 ## Notes
 - This is deliberately simple. Periodization, deloads and programs are out of scope.
