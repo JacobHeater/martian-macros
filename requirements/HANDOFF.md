@@ -5,53 +5,43 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Claude, Session 12 (rest target, MM-191). The
-paragraphs below about #79 are Copilot's from Session 10; #79 has since merged.
-CI monitoring (`mm ci`, MM-209) is merged (#82); see Session 11.
+Last updated: 2026-10-11, by Claude, end of Session 12.
 
-**Tooling in flight.** Existing PR #79, `copilot/implement-expert-panel`,
-adds canonical roles, Claude/Copilot adapters, research evidence and portable
-state validation. Owner explicitly requests completing it **without merging**.
-Local SDK checks pass; no repeat download needed. Claude native research and
-fresh artifact resume passed on Windows; Copilot chair-delegated research passed.
-Copilot native picker/CLI/cloud profile enforcement remains untested.
-MM-201 existing-code audit acceptance is implemented and exercised with actual
-independent nutrition/QA food-feature reviews and targeted challenge. Final
-full Windows checks pass; inspect current PR CI/readiness before further work.
-Implementation/audit artifacts are committed and pushed to existing #79.
-Main conflict is resolved; inspect current PR CI/readiness there before merge
-(owner explicitly prohibits merging #79).
-
-**Branch state.** Strength #77, weekly volume #78 and typed-set overlap #80
-are green and merged. PR #79 merges that upstream work without changing app
-behavior. Its handoff conflict was resolved and the merge pushed.
+**Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
+MM-208) is not Claude's and was not touched; its handoff edits will conflict
+with this file. The MM-67 pull request from Session 12, if still open: read
+`./mm ci check <pr>` and merge it when its check has passed on its head.
+Nothing else is in flight. The expert panel (#79) and `mm ci` (#82, MM-209,
+`agents/ci-monitoring.md`) are merged.
 
 **Database.** Schema 28 (a target rest per workout exercise, MM-191), merged.
-Only one schema change in flight at a time.
+Nothing in flight changes the schema. Only one schema change at a time.
 
-**Next ticket ID.** MM-205 (`mm req next` is the authority). Cloud panel's
-provisional MM-195 collided with training MM-195. Allocated MM-197 for the
-panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
+**Next ticket ID.** MM-210 once #81 merges (it uses MM-205 to MM-208, and
+MM-209 is taken). `mm req next` is the authority.
 
-**What to build next.** The health-source interface and its fake (MM-67),
-which unblocks health sync; or MM-155 (waist protocol and noise), which
-replaces the interim waist rule of MM-32 and MM-133. Small leftovers: the
-recomp review in the monthly report (MM-33), editable rep range and load
-step (MM-79, schema 29). MM-155 (waist protocol and noise) would replace
-the interim waist rule that MM-32 and MM-133 share. MM-79 (progression) is merged with default rep ranges
-and load steps; editing them per exercise needs a table (schema 29). MM-191 has only a sound
-at the end of a rest left (needs an audio package: owner's decision), a
-background signal, and a free-typed rest length.
-Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
-monthly reports/rewards (MM-33, MM-92). Phase planning (MM-36) needs body-fat
-estimates (MM-34). Health sync starts at the interface/fixture (MM-67);
-Android segments require app-owned native code later (MM-188, MM-189).
+**What to build next.**
+- MM-67, second half: a Drift table for imported readings behind
+  `HealthSampleStore` (schema 29), the eraser, and the app's providers. Then
+  Health Connect behind `HealthSource` (MM-68).
+- MM-155 (waist protocol and noise): replaces the interim waist rule that
+  MM-32 and MM-133 share.
+- Small leftovers: the recomp review in the monthly report (MM-33, MM-133);
+  an editable rep range and load step (MM-79; needs a table); MM-191's
+  sound, background signal and free-typed rest length.
+- Blocked: phase planning (MM-36) needs body-fat estimates (MM-34); Android
+  exercise segments need app-owned native code (MM-188, MM-189).
 
 **Waiting on the product owner.**
+- Session 12 ran with the owner away, on the instruction to use the expert
+  panel. Every choice made that way is listed in its ticket under "Choices
+  made with the expert panel" or "Progress" (MM-191, MM-79, MM-32, MM-133,
+  MM-92, MM-67) and is the owner's to overturn.
 - MM-191: whether to add an audio package and a sound file for the end of a
-  rest (only a vibration is given now), and the choices the panel made in the
-  owner's absence, listed in the ticket (rests on offer, "Target rest
-  reached", the twelve-hour rule for times after midnight).
+  rest (only a vibration is given now).
+- MM-92: a personal record on a bodyweight lift can come partly from a change
+  in body weight; it is shown to everyone, including people with a history
+  of an eating disorder, because the wording never mentions weight.
 - MM-173: noisy honest low intake is dropped as partial, drifting expenditure
   about 160 kcal high. Ticket lists four options; regression is skipped.
 - Android reminders are inexact, possibly an hour late. Exact timing needs
@@ -99,42 +89,38 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
-## Session 12: 2026-10-11, Claude (rest target)
+## Session 12: 2026-10-11, Claude (training and recomp)
 
-- Merged #82 (`mm ci`, MM-209) after reading GitHub directly: check passed on
-  head `3994982`. Its watch stops by itself; no CI watch of that PR remains
-  to act on.
-- MM-191, the rest of it: a target rest per exercise (None, 1:00, 1:30, 2:00,
-  3:00, 5:00), remembered per exercise; the bar counts down to it, then says
-  "Target rest reached" and shows the whole rest; one vibration at the target
-  through a `RestSignal` interface; a set's times typed to the second in a new
-  design-system entry (`showMmClockTime`); a workout, and a set in it, can end
-  after midnight. Schema 28 adds `workout_exercises.rest_target_seconds`.
-- The product owner was away and said to use the panel. `panel-training` and
-  `panel-ux-accessibility` were asked; what they decided is in the ticket
-  under "Choices made with the expert panel". Their reports were read-only
-  source reviews; nothing was run by them.
-- **Not built:** a sound (Flutter has no system alert sound on Android or
-  iOS; needs a dependency). **Not verified:** a screen reader, and the
-  vibration on a phone.
-- MM-79: `suggestProgression` in the engine and a suggestion line on each
-  exercise of a workout in progress; the first set starts from it. The rules
-  were set by `panel-training` (in the ticket). PR stacked on the MM-191 one.
-- A screenshot test broke on the taller exercise card (it could not find
-  the Add exercise button) and failed CI on the MM-191 PR; fixed by scrolling
-  to it. Lesson: read the whole Linux golden run, not its last line.
-- #83 (MM-191) and #84 (MM-79) merged after a direct read of GitHub showed
-  the check passed on each head. No CI watch is left to act on.
-- MM-32: `recompSignalOf` and a card on Progress. `panel-measurement` set the
-  thresholds (in the ticket); the waist rule is interim until MM-155.
-- #85 (MM-32) merged the same way. MM-133: `recompReviewOf` and a review
-  card on Coach at weeks 8, 12 and every 8 after; its own PR.
-- #86 (MM-133) merged the same way. MM-33: workouts and a "Your lifts" card
-  in the monthly report; its own PR.
-- MM-92: personal records (`personalRecordsOf`), a card on the workout that
-  set one and a mark in the workout list; PR stacked on the MM-33 one.
-- Draft PR #81 (Copilot's, MM-205 to MM-208) was not touched. Its handoff
-  edits will conflict with this file.
+The owner was away and said to use the panel for open questions. Read-only
+panel roles were asked (`panel-training`, `panel-ux-accessibility`,
+`panel-measurement`); their answers are in the tickets. They inspected
+source and ran nothing.
+
+- Merged, each after `mm ci check` showed its check passed on its head: #82
+  (`mm ci`), #83 (MM-191), #84 (MM-79), #85 (MM-32), #86 (MM-133), #87
+  (MM-33), #88 (MM-92). No CI watch is left to act on.
+- MM-191: a target rest per exercise with a countdown, one vibration at the
+  target (`RestSignal`), a set's times to the second (`showMmClockTime`),
+  and workouts and sets that end after midnight. Schema 28.
+- MM-79: `suggestProgression` (double progression) and a suggestion line on
+  each exercise of a workout in progress; the first set starts from it.
+- MM-32: `recompSignalOf` and a card on Progress. MM-133: `recompReviewOf`
+  and a review card on Coach at weeks 8, 12 and every 8 after. Both share an
+  interim waist rule until MM-155.
+- MM-33: workouts and a "Your lifts" card in the monthly report. MM-92:
+  personal records (`personalRecordsOf`), on the workout that set one.
+- MM-67, first half: `packages/health_ingest` with the `HealthSource`
+  interface, `HealthImporter`, a `FakeHealthSource` that replays a recorded
+  history, an in-memory store and `healthSourceContract`. No table, no
+  plugin and no screen yet.
+- A screenshot test broke on the taller exercise card and failed CI on #83;
+  fixed by scrolling to the button. Lesson: read the whole Linux golden run,
+  not its last line.
+- Seen on the Android emulator: the rest target, countdown and time entry;
+  the progression line (fat loss goal only); personal records. Not seen
+  there: the recomp signal and review, the report's lifts (the demo data
+  does not produce them). Not checked anywhere: a screen reader, the
+  vibration on a phone, iOS.
 
 ## Session 11: 2026-10-11, Claude (CI monitoring)
 

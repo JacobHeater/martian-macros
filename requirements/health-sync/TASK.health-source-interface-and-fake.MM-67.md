@@ -1,6 +1,6 @@
 ---
 id: MM-67
-status: proposed
+status: in-progress
 component: health-sync
 related: [MM-66, MM-68, MM-69, MM-71]
 ---
@@ -37,6 +37,29 @@ Scenario: A reading deleted on the platform
 Scenario: The fake behaves like the real thing
   Then one shared test suite passes against the fake and, on a device, against each real source
 ```
+
+## Progress
+Built (2026-10-11), with the product owner away; the choices are mine, say if any is wrong:
+- **`packages/health_ingest`**, pure Dart, with no platform plugin in it (`mm arch` forbids one): `HealthSource` (what is available
+  and permitted, asking permission, reading a type over a range, changes since a token, writing nutrition), `HealthSample` (value,
+  times, the platform's id, the source app or device), and one unit per type whatever the platform.
+- **`HealthImporter`** brings a `HealthSampleStore` up to date from a source: only what changed since the saved token; an edited
+  reading replaces the stored one; a deleted one is removed; importing twice changes nothing; an expired token means everything is
+  read again and the store made to match. The token is saved last, so an import cut short is repeated harmlessly.
+- **`FakeHealthSource`** replays a recorded history given as JSON (a string or a file's contents): several sources, two readings
+  the same morning, a gap, an edit, a deletion. A test lets part of the history happen, imports, lets the rest happen, and imports
+  again. Tokens can be expired and permission refused. `recordedHealthHistory` is one such history; every reading in it is made up.
+- **`healthSourceContract`**, the shared suite: it assumes no particular readings, so the same suite can run against a real
+  platform on a device. It runs against the fake in four states.
+- A stored reading is keyed by type and platform id, apart from anything the user typed. `InMemoryHealthSampleStore` is the only
+  store so far.
+
+Not built:
+- **The table** for imported readings (a Drift `HealthSampleStore`, schema 29), erasing it with the rest of the user's data, and the
+  app's providers. Until then nothing imported is kept.
+- Any real platform: Health Connect is MM-68, HealthKit MM-69. The suite has not run against one.
+- Nothing above the seam yet: no screen shows an imported reading, and which reading counts when two sources disagree is MM-71.
+- The ticket named the `health` plugin as the start; no plugin was added here.
 
 ## Notes
 - Start on the `health` plugin behind this interface. Where it cannot do anchored or change-token queries, add typed platform channels
