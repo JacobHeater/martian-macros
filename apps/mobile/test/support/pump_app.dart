@@ -6,6 +6,8 @@ import 'package:martian_macros/src/app/martian_macros_app.dart';
 import 'package:martian_macros/src/integration_providers.dart';
 import 'package:martian_macros/src/reminders/reminder_scheduler_provider.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
+import 'package:mm_health_ingest/mm_health_ingest_testing.dart';
 
 import 'in_memory_overrides.dart';
 
@@ -16,6 +18,7 @@ Future<void> pumpApp(
   FixedClock clock, {
   List<Override> overrides = const [],
   InMemoryReminderScheduler? scheduler,
+  HealthSource? healthSource,
 }) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.5;
@@ -28,6 +31,12 @@ Future<void> pumpApp(
         // Never the device's notifications in a test.
         reminderSchedulerProvider.overrideWithValue(
           scheduler ?? InMemoryReminderScheduler(),
+        ),
+        // Never the device's health platform in a test: one with nothing
+        // in it, unless the test brings its own.
+        healthSourceProvider.overrideWithValue(
+          healthSource ??
+              FakeHealthSource.fromJson('{"sources": [], "events": []}'),
         ),
         ...overrides,
       ],

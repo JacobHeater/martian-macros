@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/health/health_connect_source.dart';
 import 'package:martian_macros/src/health/health_importer_provider.dart';
 import 'package:martian_macros/src/integration_providers.dart';
 import 'package:martian_macros/src/repository_providers.dart';
@@ -39,9 +41,18 @@ void main() {
     expect(await store.token(HealthDataType.weight), isNull);
   });
 
-  test('with no platform registered, the source says so', () {
+  test('on Android the source is Health Connect; elsewhere none is '
+      'registered yet', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
-    expect(() => container.read(healthSourceProvider), throwsA(anything));
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    expect(container.read(healthSourceProvider), isA<HealthConnectSource>());
+
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final other = ProviderContainer();
+    addTearDown(other.dispose);
+    expect(() => other.read(healthSourceProvider), throwsA(anything));
+    debugDefaultTargetPlatformOverride = null;
   });
 }

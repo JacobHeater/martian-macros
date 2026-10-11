@@ -1,5 +1,7 @@
 package com.martianmacros.martian_macros
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// A fragment activity, which Health Connect's permission screen needs
+// (MM-68).
+class MainActivity : FlutterFragmentActivity()
