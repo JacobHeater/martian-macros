@@ -11,6 +11,7 @@ import 'package:martian_macros/src/train/weekly_volume_screen.dart';
 import 'package:martian_macros/src/train/train_screen.dart';
 import 'package:martian_macros/src/ui/muscle_volume_row.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/in_memory_overrides.dart';
@@ -132,6 +133,48 @@ void main() {
       find.textContaining('4 current and 0 previous hard sets omitted'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('reference band and above-range volumes have exact geometry', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: mmTheme(Brightness.light),
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              child: MuscleVolumeRow(
+                volume: MuscleVolume(
+                  group: MuscleGroup.chest,
+                  currentSets: 30,
+                  previousSets: 15,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final layers = tester
+        .widgetList<Positioned>(
+          find.descendant(
+            of: find.byType(MuscleVolumeRow),
+            matching: find.byType(Positioned),
+          ),
+        )
+        .toList();
+    expect(layers[1].left, 100);
+    expect(layers[1].width, 100);
+    expect(layers[2].width, 300);
+    expect(layers[3].left, 150);
+    expect(
+      find.bySemanticsLabel(RegExp('Chest: 30 current hard sets; 15 previous')),
+      findsOneWidget,
+    );
+    semantics.dispose();
   });
 
   testWidgets('custom mapping edits reassign volume reactively', (

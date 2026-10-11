@@ -1,6 +1,6 @@
 ---
 id: MM-78
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-75, MM-76, MM-79]
 ---
@@ -64,3 +64,13 @@ Scenario: Recomputed volume
   When a workout is edited or deleted or a custom muscle mapping changes
   Then current and previous muscle-group totals update
 ```
+
+## Validation
+- Six engine cases cover exact counts, rolling boundaries, RIR/bodyweight,
+  missing mappings, duplicate secondary mappings and explicit malformed data.
+- Mobile tests cover updates/deletions, custom mapping changes, both source
+  loading/error/retry states, and active-workout navigation (MM-195).
+  Layout tested at 320px and 150% text. Full Windows `mm check` passes.
+- Martian volume screen and all eleven rows inspected in the isolated headless
+  Android emulator; no physical phone or normal storage used. Reviewed Linux
+  goldens cover Light/Dark/Martian. iOS was not run.
