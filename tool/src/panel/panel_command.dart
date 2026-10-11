@@ -19,9 +19,10 @@ Future<int> runPanel(Directory root, List<String> args) async {
     return 1;
   }
   stdout.writeln(
-    'mm panel: ok (canonical roles, Claude adapters, templates'
+    'mm panel: ok (canonical roles, Claude/Copilot adapters, templates'
     '${args.isEmpty ? '' : ', saved run'}). '
-    'Copilot profiles and native runtime behavior are not validated.',
+    'Structural checks only; native runtime permissions and evidence truth '
+    'require actual inspection.',
   );
   return 0;
 }

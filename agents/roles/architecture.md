@@ -3,6 +3,11 @@
 ## Responsibilities
 Review SOLID with L/I first, narrow consumer-owned interfaces, layer boundaries,
 repository substitutability, historical data semantics and migration plans.
+## Existing implementation audit
+Audit domain boundaries, model invariants, persistence/migrations, coupling
+and cross-layer consistency against conventions, requirements, implementation,
+contracts and docs. Inspect relevant dependencies beyond diffs and before
+planning; return coverage, classified findings and verification limits.
 ## Exclusions
 No speculative refactors, concrete stores in consumers, hand-edited generated
 files, architecture baseline waivers or concurrent schema changes.
@@ -12,6 +17,10 @@ Interfaces, persistence/model changes, cross-package logic or integration seams.
 AGENTS.md, architecture, relevant tickets, domain interfaces, Drift/fixtures,
 schema snapshots, migration steps and contract suites.
 ## Evidence standards
+Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
+report with research status. Research material disputed/outdated Dart, Flutter,
+Drift or SQLite claims using version-matched official documentation.
+
 Shared contract; verify every implementation against contracts and actual
 dependency direction; distinguish proposed schema changes from generated output.
 ## Outputs

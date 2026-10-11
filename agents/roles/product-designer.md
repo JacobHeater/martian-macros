@@ -9,6 +9,12 @@ actions. Review proposed Maurice placement, scale and expression without
 trivializing safety or crowding data. Existing design documents prohibit
 mascots: Maurice is a requested review concern, not an approved asset or change
 to that rule. Flag the conflict for the owner before any implementation.
+## Existing implementation audit
+Audit implemented screens/components against the approved design system,
+visual hierarchy, interaction states, consistency and product identity, using
+requirements, code, tests/docs and actual renders where available. Audit
+beyond diffs and before planning; classify preferences as improvements, not
+violations, and record code-only/rendered coverage and verification limits.
 ## Exclusions
 Distinct from UX: does not own navigation, task flows, accessibility compliance
 or behavior policy. No palette invention, assumed screenshot inspection or
@@ -20,6 +26,10 @@ design/README.md, visual-language, color-and-theme-system, screen-direction,
 anti-cruft-and-anti-slop, design-map, relevant tickets, tokens and actual rendered
 screens/goldens in Light/Dark/Martian.
 ## Evidence standards
+Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
+report with research status. Research material platform/design-system capabilities
+or explicit requests; visual preference is a design judgment, not scientific proof.
+
 Shared contract; identify code-only versus rendered review. Compare actual
 screens with approved tokens/hierarchy; record device/theme and visual limits.
 ## Outputs

@@ -362,6 +362,125 @@ void main() {
     expect(find.byKey(const ValueKey('food-kcal')), findsOneWidget);
   });
 
+  testWidgets(
+    'MM-202 unchanged fractional calculated edit preserves nutrition',
+    (tester) async {
+      await openSheet(tester);
+      await tapText(tester, 'One serving');
+      await manual(tester, name: 'Fractional bar', kcal: '300');
+      await type(tester, 'portion-quantity', '1/3');
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.tap(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      final before = (await logged(tester)).single;
+      expect(before.kcal, closeTo(100, 1e-9));
+      await revealOnFoodScreen(tester, find.text('Fractional bar'));
+      await tester.tap(find.text('Fractional bar'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.tap(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      final after = (await logged(tester)).single;
+      expect(after.kcal, before.kcal);
+      expect(after.portion!.quantity, before.portion!.quantity);
+    },
+    skip: true,
+  ); // MM-202: application fix deferred from tooling PR.
+
+  testWidgets('MM-202 unchanged legacy edit preserves recorded totals', (
+    tester,
+  ) async {
+    await repos.food.addFood(
+      FoodEntry(
+        id: 0,
+        date: today,
+        meal: Meal.lunch,
+        name: 'Precise legacy',
+        kcal: 100.123,
+        proteinG: 1.234,
+        carbsG: 20.123,
+        fatG: 1.234,
+        source: QuantitySource.quickAdd,
+      ),
+    );
+    await openFood(tester);
+    await revealOnFoodScreen(tester, find.text('Precise legacy'));
+    await tester.tap(find.text('Precise legacy'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+    await tester.tap(find.byKey(const ValueKey('food-save')));
+    await tester.pumpAndSettle();
+    final after = (await logged(tester)).single;
+    expect(after.kcal, 100.123);
+    expect(after.proteinG, 1.234);
+  }, skip: true); // MM-202: application fix deferred from tooling PR.
+
+  testWidgets('MM-203 per-serving alcohol scales with consumed calories', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    await tapText(tester, 'One serving');
+    await type(tester, 'food-name', 'Synthetic alcohol serving');
+    await type(tester, 'food-carbs', '10');
+    await tapText(tester, 'Includes alcohol?');
+    await type(tester, 'food-alcohol', '14');
+    await type(tester, 'portion-quantity', '2');
+    await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+    await tester.tap(find.byKey(const ValueKey('food-save')));
+    await tester.pumpAndSettle();
+    final entry = (await logged(tester)).single;
+    expect(entry.kcal, 276);
+    expect(entry.alcoholG, 28);
+  }, skip: true); // MM-203: application fix deferred from tooling PR.
+
+  testWidgets(
+    'MM-204 converting calculated entry to totals preserves alcohol',
+    (tester) async {
+      await repos.food.addFood(
+        FoodEntry(
+          id: 0,
+          date: today,
+          meal: Meal.lunch,
+          name: 'Calculated drink',
+          kcal: 138,
+          proteinG: 0,
+          carbsG: 10,
+          fatG: 0,
+          alcoholG: 14,
+          source: QuantitySource.labelServing,
+          portion: Portion(
+            method: QuantitySource.labelServing,
+            basis: NutritionBasis.calculated,
+            quantity: 1,
+            unit: PortionUnit.serving,
+            reference: ReferenceNutrition(
+              basis: ReferenceBasis.perServing,
+              nutrition: NutritionTotals(
+                kcal: 138,
+                proteinG: 0,
+                carbsG: 10,
+                fatG: 0,
+              ),
+              servingUnit: PortionUnit.serving,
+            ),
+          ),
+        ),
+      );
+      await openFood(tester);
+      await revealOnFoodScreen(tester, find.text('Calculated drink'));
+      await tester.tap(find.text('Calculated drink'));
+      await tester.pumpAndSettle();
+      await tapText(tester, 'Enter the totals myself');
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.tap(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      final entry = (await logged(tester)).single;
+      expect(entry.kcal, 138);
+      expect(entry.alcoholG, 14);
+    },
+    skip: true,
+  ); // MM-204: application fix deferred from tooling PR.
+
   testWidgets('an entry from before amounts were recorded invents none', (
     tester,
   ) async {

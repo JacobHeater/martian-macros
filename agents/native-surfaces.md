@@ -1,111 +1,112 @@
 # Native execution surfaces
 
-Configuration reviewed 2026-10-11. These profiles are instructions plus native
-tool allowlists, not a sandbox or a live cross-product session bridge.
+Configuration researched 2026-10-11. **Static configuration is not runtime
+verification.** See the actual [smoke run](../docs/agent-runs/pr79-research-smoke/)
+for observations and untested surfaces; do not infer tool access from YAML.
 
-## Official configuration references
+## Verified official configuration sources
 
 - [Claude Code subagents](https://code.claude.com/docs/en/sub-agents):
-  canonical page could not be fetched in this environment (DNS failure).
-  `name`, `description` and `tools: Read, Grep, Glob` were verified against
-  [Anthropic's official reviewer examples](https://github.com/anthropics/claude-code/blob/main/plugins/plugin-dev/skills/agent-development/examples/complete-agent-examples.md).
-  No claims here about unverified Claude nesting/resume features.
-- [Copilot configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-  and [cloud agent creation](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents):
-  `.agent.md` profiles, required description, optional name/target/tools.
-  Targets are `github-copilot` or `vscode`; omitted target supports both.
-- [Microsoft's VS Code custom-agent reference](https://github.com/microsoft/vscode-docs/blob/main/docs/agent-customization/custom-agents.md),
-  [subagents](https://github.com/microsoft/vscode-docs/blob/main/docs/agents/run/subagents.md)
-  and [tools](https://github.com/microsoft/vscode-docs/blob/main/docs/agents/reference/tools-reference.md).
-  These official source pages were accessible when the rendered site was not.
+  project `.claude/agents/*.md`, `name`, `description`, explicit `tools`
+  (comma-separated or YAML list). Without tools, all are inherited. Native
+  `Read`, `Grep`, `Glob`, `WebSearch`, `WebFetch` are not Copilot aliases.
+- [VS Code custom agents](https://code.visualstudio.com/docs/agent-customization/custom-agents)
+  and [subagents](https://code.visualstudio.com/docs/agents/run/subagents):
+  `.github/agents/*.agent.md`, `tools` and `agents`. Include `agent` for native
+  delegation; `agents: []` prevents specialist delegation on the Local harness.
+- [VS Code tools reference](https://code.visualstudio.com/docs/agents/reference/tools-reference):
+  `read`/`search` are repository tool sets; `web/fetch` retrieves a known URL.
+  `githubRepo`/`githubTextSearch` can discover public official repository material
+  when enabled. This reference does not document general public-web search.
+- [GitHub configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration):
+  `read`, `search`, `web`, `edit`, `agent` aliases; unknown entries are ignored.
+  `web` currently has no cloud mapping. `github/<tool>` selects configured
+  GitHub MCP tools. Cloud's default token is repository-scoped.
+- [Copilot CLI invocation](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/invoke-custom-agents):
+  repository `.github/agents`, `/agent` picker, `--agent=panel-chair`, and
+  native custom-agent inference/delegation. User-level profiles override repo
+  profiles of the same filename.
+- [Copilot SDK custom agents](https://docs.github.com/en/copilot/how-tos/copilot-sdk/features/custom-agents):
+  programmatic `customAgents` have prompts and scoped tools. An SDK host controls
+  discovery, registration and effective tools; its parent tools are not proof
+  of specialist capabilities. Do not copy VS Code identifiers into SDK configs.
 
-Recheck official references and the effective tool picker when upgrading.
-Native loading, routing, refusal on missing documents and permissions were
-**not runtime-tested** here.
+Sources were retrieved and inspected, not just search snippets. Publication/
+update dates were not supplied by these rendered pages; access date is above.
 
-## Claude Code
+## Adapters and capability matrix
 
-The new `.claude/agents/panel-*.md` profiles are thin read-only adapters: all
-use `Read, Grep, Glob`, explicitly load their canonical role, protocol and
-contract, and fail closed with `PANEL_CONFIG_MISSING`. Existing dart and
-requirements reviewers are preserved. Reviewers cannot run git/tests or fetch
-external sources with this allowlist; the parent supplies diff, baseline,
-source extracts and executed check results.
+All 15 Claude and 15 Copilot adapters explicitly read their role, protocol and
+review contract and stop with `PANEL_CONFIG_MISSING` if unreadable. Markdown links
+alone do not load instructions. Substantive domain instructions stay canonical.
+The prior `.github/agents/` omission was the cloud session's execution restriction,
+not a repository policy. Local adapters are now installed; no policy was bypassed.
 
-Ask the **parent Claude session**:
+| Surface | Repository reads | Source discovery | Known-URL retrieval | Delegation |
+| --- | --- | --- | --- | --- |
+| Claude Code | Read/Grep/Glob | WebSearch, subject to policy/network | WebFetch, subject to policy/network | Main chair Agent(type allowlist); nested availability depends on version/depth and is not used by this workflow |
+| VS Code Local | read/search | Enabled GitHub repository tools; general web-search provider not assumed | web/fetch | agent/runSubagent and bounded `agents` list |
+| VS Code Copilot / SDK host | Host-selected tools | Inspect actual registered tools; use chair research path if absent | Host-selected fetch tools | Host-specific custom-agent registration; no inferred hot discovery |
+| Copilot CLI | read/search aliases | Inspect effective GitHub MCP discovery; general public search not assumed | web alias where implemented | Native custom-agent tool; no VS Code worker-list enforcement assumed |
+| GitHub cloud | read/search; repo-scoped GitHub MCP | Configured `github/search_repositories` and `github/search_code`, scope permitting | No native web alias mapping; approved configured retrieval provider or chair needed | agent alias; VS Code `agents` list not an enforcement guarantee |
 
-> Use the repository panel protocol for MM-78. Delegate relevant independent
-> reviews to panel-training, panel-measurement, panel-safety, panel-architecture
-> and panel-qa. Explain omitted core roles. Give each the frozen brief and
-> relevant inputs without peer conclusions. Use panel-chair to critique the
-> scope/synthesis. You, the parent, persist reports and own all edits.
+Copilot profiles include `web`, VS Code GitHub discovery tools and narrowly
+named GitHub MCP discovery tools. Unsupported entries are ignored, **not**
+evidence that browsing works. The aliases here do not install any MCP service.
+No new provider, paid service, secret or public data sharing was configured.
+For health research or sources outside the reachable discovery index, use
+actual native search or a bounded chair request to an approved research service.
+If none exists, record `PANEL_RESEARCH_BLOCKED`. Fetching a URL supplied by the
+chair is retrieval, not discovery. Specialists must evaluate returned evidence.
 
-The chair adapter is intentionally read-only too. Delegation occurs in the
-parent using Claude's native subagent mechanism, not by granting reviewers
-shell/write tools or assuming Copilot's `agent` identifier works in Claude.
+Reviewers have no edit/execute/delegation permissions in their allowlists.
+Chairs have read/research, artifact-edit and native delegation tools, not shell
+tools; their prompt limits edits to the run directory unless explicitly named
+implementation owner. Native edit tools are not path sandboxes: enforce the
+write lease and inspect permissions. Never grant `*` tools to reviewers.
+Before invoking, inspect overrides, effective tools, hooks and organization
+policy; if write/execute tools leak into a specialist, do not invoke it.
 
-## Copilot cloud versus VS Code
+## Invocation and continuation
 
-**Delivery limitation:** this environment cannot access or modify
-`.github/agents/`. Copilot adapters have therefore **not been installed**.
-The following is the officially documented profile shape, not a claim of
-configured discovery or a replacement executable adapter:
+In Copilot Local, select **panel-chair** or ask the parent to use it. In CLI:
 
-```yaml
----
-name: panel-training
-description: Read-only training review using the repository panel contract.
-tools: ["read", "search"]
----
-Read AGENTS.md, agents/roles/training.md, agents/panel-protocol.md and
-agents/review-contract.md before reviewing. If any is missing/unreadable,
-stop with PANEL_CONFIG_MISSING and the exact path; do not invent a fallback.
-Return the shared review report. Do not edit, execute commands or delegate.
+```text
+copilot --agent=panel-chair --prompt "Read agents/README.md and scope this task.
+Assign only relevant reviewers, record omitted core roles, and use the research gate."
 ```
 
-Each role would need its own native profile referencing its canonical role;
-do not duplicate the role's responsibilities in the adapter. `read`/`search`
-are Copilot aliases; Claude's allowlist uses native `Read`/`Grep`/`Glob`.
-Omitting `tools` or using `*` grants all tools, so do neither for reviewers.
-Unknown Copilot tool names may be ignored rather than rejected.
+In Claude, start the chair as the main session (`claude --agent panel-chair`),
+or have the parent delegate to read-only specialists and use chair for synthesis.
+Current Claude docs permit depth-limited nesting, but `Agent(type)` restrictions
+are enforced only for a main-thread agent. This workflow prohibits nested chair
+delegation: when chair is a subagent it returns assignments to the parent.
+A restricted chair cannot run `mm`
+or git: the designated edit owner executes and supplies actual results.
 
-Copilot documents `agent` for custom-agent invocation. A coordinator can use
-`tools: ["read", "search", "agent"]`; reviewers omit `agent`, `edit`, `execute`,
-web and MCP wildcards. VS Code additionally supports `agents` as a coordinator
-worker allowlist and `agent/runSubagent` in its local tool picker; do not assume
-the cloud enforces the VS Code worker list. Use the parent as artifact/edit
-owner and delegate only read-only work. If delegation or profiles are
-unavailable, apply canonical roles sequentially in the current session.
+Native delegation is optional: independently scoped initial reports, targeted
+challenge, synthesis, one edit owner and verification also work sequentially.
+Record self-review limitations. VS Code **handoff buttons are manual UI
+transitions**, not automatic parallel delegation; GitHub cloud ignores handoffs.
 
-VS Code `handoffs` are user-facing transition buttons, **not** autonomous
-delegation, and GitHub.com ignores them (and `argument-hint`). This package
-does not configure handoffs. Neither those buttons nor native delegation
-transfer a live session from Claude to Copilot.
+For a bounded existing-feature audit, invoke `panel-nutrition` on food reference/
+consumed quantity scaling and `panel-qa` on entry/edit/save/read traceability and
+test validity, using `feature` mode and the same frozen brief. Both load the
+shared existing-implementation audit protocol; neither fixes code. Native
+delegation or separate sequential invocations return the same coverage and
+classified-finding contract. Parent/owner executes requested checks, persists
+results and routes confirmed defects before any separately authorized fix.
 
-Inspect effective tools, inherited permissions, hooks, MCP configuration and
-prompt-file overrides before sensitive work. Read-only frontmatter does not
-prove a hook or overridden profile cannot write. Do not run a reviewer if its
-effective surface exposes write/execute tools; use a restricted parent
-sequential review instead. Missing-document refusal is a prompt policy,
-not a native schema-enforced file dependency.
+Before switching tools, checkpoint the actual run: stop/acknowledge every agent
+and writer, persist source evidence/hashes/decisions/results, release ownership.
+Commit named sanitized artifacts **and relevant code** to an accessible branch
+for remote continuation. In the destination:
 
-## Practical Claude-to-Copilot handoff
+> Read AGENTS.md, agents/panel-protocol.md and
+> docs/agent-runs/pr79-research-smoke/{brief.md,state.json,decision.md,handoff.md}.
+> Inspect current branch/status/diff; validate with mm panel and verify previous
+> agents stopped. Compare relevant input hashes and research freshness. Reuse
+> unchanged completed findings; mark changed findings stale. Acquire the single
+> write lease before editing. Use sequential fallback if native tools are absent.
 
-1. In Claude, request: “Checkpoint `docs/agent-runs/mm78-review/` using the panel
-   protocol. Stop and acknowledge all writers; save initial/challenge reports,
-   input hashes, decisions, pending work and actual tests. Release ownership.”
-2. Review/redact artifacts, commit named files and publish them **with code
-   changes** to a branch the destination can access using allowed delivery
-   tools. A local path or copied conversation summary alone is insufficient.
-3. In Copilot on that branch:
-
-   > Resume `docs/agent-runs/mm78-review/` using `agents/panel-protocol.md`.
-   > Read its state, brief, decision and handoff. Inspect branch/status/diff;
-   > verify old writers stopped, compare input hashes and retain unchanged
-   > completed reviews. Mark changed findings stale and re-review only affected
-   > roles/dependencies. Acquire the single edit lease before writing. Native
-   > profiles are not installed here: use canonical sequential reviews unless
-   > this checkout has independently verified restricted native profiles.
-
-4. Record new session identity/phase and actual test results. Do not assume
-   hidden tools, credentials, private data or Claude's live context survived.
+No live chat, credentials, hidden tool grants or private profiles transfer.

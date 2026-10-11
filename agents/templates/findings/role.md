@@ -6,13 +6,31 @@ Reviewer identity, requirement IDs/files inspected, commit, input paths/hashes.
 ## Existing facts versus proposals
 Repository facts and approved requirements separately from new recommendations.
 
+## Audit coverage
+Mode: change | feature | domain | panel-baseline.
+Implementation, requirements, tests and documentation inspected; areas not
+inspected; absent implementation if applicable; cross-domain referrals.
+Actual evidence methods and blocked checks. Planning first audits existing
+behavior. No findings is limited to this scope and method.
+
 ## Findings
-Finding ID, severity, confirmed/risk/question, location, impact and action;
-or explicitly no findings.
+ID/domain, classification, impact-based severity/confidence, requirement/
+invariant/design rule/evidence, actual paths/symbols/lines, expected vs observed,
+reproduction/calculation/inspection, user impact, remediation/acceptance criteria,
+verification status/limitations; or explicitly no findings within scope/method.
+Classify using the shared contract; never invent a reproduced or passing result.
 
 ## Sources and evidence
-Verified sources, exact supported claims, populations and applicability;
-or evidence not verified with the available tools.
+Actually consulted URL/title, publication or update date (null if unknown),
+access date, supported claim, population/applicability and limitations.
+Separate source finding, interpretation and proposal; record conflicting
+evidence and revalidation conditions. Never fill with invented citations.
+
+## Research
+Status: performed | unnecessary | blocked (choose based on actual work).
+Question and trigger/reason. Execution surface, actual discovery and retrieval
+tools, direct/chair path; bounded request or capability gap if blocked.
+Persist matching research metadata in state.json for this assignment.
 
 ## Confidence and limitations
 Confidence with reasons, missing inputs, tool/platform limits and self-review.

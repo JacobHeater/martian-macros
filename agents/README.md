@@ -16,7 +16,7 @@ advises, not overrides the product owner.
 - [Review contract](review-contract.md): the common report and evidence rules.
 - [Run state](run-state.md): minimal portable artifacts and schema.
 - [Native surfaces](native-surfaces.md): configuration sources, restrictions,
-  delegation differences and cross-tool examples.
+  research discovery versus retrieval, delegation differences and cross-tool examples.
 - [Templates](templates/): copy into `docs/agent-runs/<task-id>/`; replace
   placeholders before running reviews. Never put health records or secrets here.
 
@@ -55,8 +55,38 @@ are invoked only when their criteria apply.
 > Do not edit canonical files until conflicts are challenged and one edit owner
 > is designated. Use native delegation only if this surface exposes it;
 > otherwise perform the same reviews sequentially.
+> Use `change` audit mode; inspect surrounding current behavior before proposals.
+
+## Existing-feature audit examples
+
+Every role audits existing implementation within its bounded remit, even during
+planning. The shared contract records inspected/uninspected areas, methods,
+classified findings and limitations; "no findings" is not whole-app certification.
+
+- **Feature:** Ask the chair for `feature` mode on current food-entry quantity/
+  unit and nutrition scaling. Assign nutrition to reference/consumed arithmetic
+  and QA to entry/edit/save/read paths, requirements and test validity. Withhold
+  peer conclusions for initial reports. Chair requests owner-run targeted checks,
+  deduplicates causes and records uncovered layers; audit does not authorize fixes.
+- **Domain:** Assign measurement `domain` mode on conversions/rounding and
+  missing-data handling across named packages, with an explicit file/time budget.
+- **Panel baseline:** Chair uses `panel-baseline` mode to partition specified
+  feature areas among relevant specialists, including product traceability,
+  product design and separate UX coverage. Record exclusions/unreviewed areas,
+  not a claim that every role scanned everything.
+
+Confirmed defects/violations enter the requirements/bug workflow with regression
+guards. Evidence-supported concerns, documentation gaps, improvements and
+unverified hypotheses stay distinctly classified. Reviewers never write fixes.
 
 This example is an invocation, not approval to change MM-78 or evidence that
 it was reviewed. `mm panel` validates the panel package; `mm panel <run-dir>`
 also validates a saved run. Structural validation is not scientific sign-off
 or proof of a native runtime's permission enforcement.
+
+Research is required by the protocol's evidence triggers, not only when a model
+admits uncertainty. Every role records performed/unnecessary/blocked research.
+Specialists use actual available research tools or a bounded chair request;
+missing capability never becomes fabricated citations. The
+[real smoke run](../docs/agent-runs/pr79-research-smoke/) is separate from inert
+templates and records actual observations and remaining platform limitations.

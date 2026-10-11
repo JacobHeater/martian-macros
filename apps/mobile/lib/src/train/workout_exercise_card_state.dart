@@ -83,11 +83,16 @@ class WorkoutExerciseCardState extends ConsumerState<WorkoutExerciseCard> {
                 set: entry.sets[s],
                 number: s + 1,
                 timeBase: workout.startedAt,
-                checkTimes: (start, end) => checkTimeSpan(
+                checkTimes: (start, end) => checkSetTimes(
                   start: start,
                   end: end,
                   notBefore: workout.startedAt,
                   notAfter: workout.endedAt ?? ref.read(clockProvider).now(),
+                  otherSets: [
+                    for (var e = 0; e < workout.exercises.length; e++)
+                      for (var t = 0; t < workout.exercises[e].sets.length; t++)
+                        if (e != index || t != s) workout.exercises[e].sets[t],
+                  ],
                 ),
                 load: load,
                 fmt: fmt,
