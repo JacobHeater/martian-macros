@@ -97,6 +97,7 @@ export 'src/reminder_ignored_streak.dart';
 export 'src/reminder_rule.dart';
 export 'src/report_estimate.dart';
 export 'src/report_estimate_gap.dart';
+export 'src/report_lift.dart';
 export 'src/report_period.dart';
 export 'src/report_periods.dart';
 export 'src/report_target_change.dart';

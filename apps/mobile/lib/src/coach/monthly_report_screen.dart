@@ -52,6 +52,24 @@ class MonthlyReportScreen extends ConsumerWidget {
               children: [for (final (a, b) in words.body) StatRow(a, b)],
             ),
           ),
+          if (words.lifts.isNotEmpty)
+            InfoCard(
+              key: const ValueKey('report-lifts'),
+              title: 'Your lifts',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final (a, b) in words.lifts) StatRow(a, b),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Estimated one-rep max, smoothed over recent sessions, '
+                    'at the first and the last session of the month. It is '
+                    'worked out from reps and load, not tested.',
+                    style: text.bodySmall?.copyWith(color: context.mm.text2),
+                  ),
+                ],
+              ),
+            ),
           InfoCard(
             key: const ValueKey('report-estimate'),
             title: 'What the coach measured',

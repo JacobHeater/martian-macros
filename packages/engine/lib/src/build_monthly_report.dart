@@ -1,9 +1,11 @@
 import 'package:mm_domain/mm_domain.dart';
 
+import 'build_strength_trends.dart';
 import 'coach_constants.dart';
 import 'monthly_report.dart';
 import 'report_estimate.dart';
 import 'report_estimate_gap.dart';
+import 'report_lift.dart';
 import 'report_period.dart';
 import 'report_target_change.dart';
 import 'targets_record.dart';
@@ -23,6 +25,8 @@ MonthlyReport buildMonthlyReport({
   required List<WaistObservation> waist,
   required List<TargetsRecord> history,
   required List<WeightTrendPoint> trend,
+  List<Workout> workouts = const [],
+  List<Exercise> exercises = const [],
 }) {
   bool inPeriod(CalendarDate d) =>
       !d.isBefore(period.from) && !d.isAfter(period.to);
@@ -110,8 +114,33 @@ MonthlyReport buildMonthlyReport({
     }
   }
 
+  // Strength as it stood at the end of the month, so a report reread later
+  // says what it said then.
+  final lifts =
+      <ReportLift>[
+        for (final lift in buildStrengthTrends(
+          workouts: workouts,
+          exercises: exercises,
+          weights: weights,
+          today: period.to,
+        ))
+          if (lift.points.where((p) => inPeriod(p.date)).toList()
+              case final month when month.length >= 2)
+            ReportLift(
+              name: lift.name,
+              sessions: month.length,
+              fromKg: month.first.trendKg,
+              toKg: month.last.trendKg,
+            ),
+      ]..sort((a, b) {
+        final sessions = b.sessions.compareTo(a.sessions);
+        return sessions != 0 ? sessions : a.name.compareTo(b.name);
+      });
+
   return MonthlyReport(
     period: period,
+    workouts: workouts.where((w) => !w.inProgress && inPeriod(w.date)).length,
+    lifts: lifts,
     daysLogged: logged.length,
     completeDays: whole.length,
     weighIns: weighIns,
