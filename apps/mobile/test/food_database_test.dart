@@ -59,6 +59,9 @@ void main() {
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Food database'), 300);
+    // Clear of the download strip that sits over the bottom of the list.
+    await tester.ensureVisible(find.text('Food database'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Food database'));
     await tester.pumpAndSettle();
     return fake;
