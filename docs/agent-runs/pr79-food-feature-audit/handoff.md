@@ -14,4 +14,5 @@ Ancillary inputs not indexed by hashes need re-reading on resume.
 
 Before tool switch, wait for every reviewer/process to finish, record real
 results and release write lease with current timestamp. Push only the existing
-PR branch, await real CI, mark ready if unblocked; do not merge.
+PR branch (delivered at 41ca7ae), await real CI and mark ready if unblocked;
+do not merge. Application bug fixes remain separate follow-up work.
