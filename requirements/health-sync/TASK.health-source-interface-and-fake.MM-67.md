@@ -1,6 +1,6 @@
 ---
 id: MM-67
-status: in-progress
+status: done
 component: health-sync
 related: [MM-66, MM-68, MM-69, MM-71]
 ---
@@ -54,11 +54,19 @@ Built (2026-10-11), with the product owner away; the choices are mine, say if an
 - A stored reading is keyed by type and platform id, apart from anything the user typed. `InMemoryHealthSampleStore` is the only
   store so far.
 
-Not built:
-- **The table** for imported readings (a Drift `HealthSampleStore`, schema 29), erasing it with the rest of the user's data, and the
-  app's providers. Until then nothing imported is kept.
-- Any real platform: Health Connect is MM-68, HealthKit MM-69. The suite has not run against one.
-- Nothing above the seam yet: no screen shows an imported reading, and which reading counts when two sources disagree is MM-71.
+Built (2026-10-11), schema 29:
+- **Two tables**: `imported_samples`, one row per platform reading keyed by type and platform id, and `health_import_tokens`,
+  where each type's import left off. A Drift `HealthSampleStore` over them, held to the same suite (`healthSampleStoreContract`)
+  as the in-memory one. Nothing imported is written to the weigh-ins the user typed.
+- **Erasing the user's data empties both**, in the database and in memory (tested in each).
+- **The app's providers**: `healthSampleStoreProvider`, `healthSourceProvider` (throws until a platform is registered) and
+  `healthImporterProvider`. The app may not import the fake (`mm arch`).
+
+Left to the tickets that own them:
+- Any real platform: Health Connect is MM-68, HealthKit MM-69. `healthSourceContract` has run only against the fake; running it
+  on a device is part of those.
+- Nothing above the seam: no screen shows an imported reading, and which reading counts when two sources disagree is MM-71. So
+  the first scenario above is met for the import and the store, not yet for a trend or a list on screen.
 - The ticket named the `health` plugin as the start; no plugin was added here.
 
 ## Notes
