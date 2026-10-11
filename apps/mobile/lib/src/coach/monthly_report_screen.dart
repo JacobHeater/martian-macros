@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'recomp_review_body.dart';
 import '../format/fmt.dart';
 import '../format/monthly_report_text.dart';
 import '../providers.dart';
@@ -52,6 +53,15 @@ class MonthlyReportScreen extends ConsumerWidget {
               children: [for (final (a, b) in words.body) StatRow(a, b)],
             ),
           ),
+          if (report.recompReview case final review?)
+            InfoCard(
+              key: const ValueKey('report-recomp-review'),
+              title: 'Recomp review, week ${review.week}',
+              child: RecompReviewBody(
+                review: review,
+                fmt: Fmt(setup.unitSystem),
+              ),
+            ),
           if (words.lifts.isNotEmpty)
             InfoCard(
               key: const ValueKey('report-lifts'),
