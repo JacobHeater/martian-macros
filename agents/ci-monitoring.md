@@ -40,7 +40,8 @@ Tested on 2026-10-11 on Windows 11, `gh` 2.87.3.
 | Copilot (VS Code Local, CLI, cloud) | **Untested** | No Copilot surface was available to the session that built this. The portable commands need only a shell; whether Copilot surfaces a background command's completion to the model is not known |
 | MCP notifications creating a model turn | Not used | Not assumed anywhere |
 | Interrupting a model mid-generation | Unsupported | No documented mechanism was found or used |
-| macOS, Linux | Untested | Pure Dart and `gh`; nothing platform-specific is known, and nothing was run there |
+| Linux | Tests only | The 54 tests pass on Ubuntu (WSL). The watcher was not run against GitHub there |
+| macOS | Untested | Pure Dart and `gh`; nothing platform-specific is known, and nothing was run there |
 
 ## State
 
@@ -251,6 +252,9 @@ test file. Against the real PR #81, read-only:
    events were still there.
 8. The demonstration watch was removed with `./mm ci stop --delete`.
 
-Not demonstrated on a real pull request, only simulated: a failing check, a
-push changing the head, a rerun, rate limiting and an expired login. Nothing
+The watch was then used on its own pull request, #82, as the chair
+workflow says: started after the push, work continued, and a later push to
+the branch was seen as a real `headChanged`.
+
+Not demonstrated on a real pull request, only simulated: a failing check, a rerun, rate limiting and an expired login. Nothing
 was pushed or changed on GitHub to manufacture them.
