@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/coach/monthly_report_screen.dart';
 import 'package:martian_macros/src/format/recomp_review_text.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
@@ -206,7 +207,7 @@ void main() {
 
       expect(find.text('Recomp review, week 12'), findsOneWidget);
       expect(cardText(tester), startsWith('It is working.'));
-      expect(find.text('Last 84 days'), findsOneWidget);
+      expect(find.text('84 days'), findsOneWidget);
       // Smoothed at each end (MM-155), so a little under the 3 cm entered.
       expect(find.text('Down 2.5 cm'), findsOneWidget);
       expect(find.textContaining('Up: '), findsOneWidget);
@@ -223,6 +224,44 @@ void main() {
 
       expect(cardText(tester), startsWith('No verdict yet.'));
       expect(cardText(tester), contains('(there are 0)'));
+    });
+
+    testWidgets('the monthly report of the month it fell due in holds it '
+        'too', (tester) async {
+      await setUpUser(GoalMode.recomp);
+      await measuredWeekly();
+      await trainedWeekly();
+      await pumpApp(tester, repos, FixedClock(today));
+      await tester.tap(find.text('Coach').last);
+      await tester.pumpAndSettle();
+      // Coaching began 100 days ago and recomp 84: the third report covers
+      // days 40 to 67 of it, and the week 8 review fell due on day 56.
+      final report = find.byKey(const ValueKey('report-2'));
+      await tester.scrollUntilVisible(
+        report,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(report);
+      await tester.pumpAndSettle();
+      await tester.tap(report);
+      await tester.pumpAndSettle();
+
+      final card = find.byKey(const ValueKey('report-recomp-review'));
+      await tester.scrollUntilVisible(
+        card,
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(MonthlyReportScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        find.descendant(of: card, matching: find.text('Recomp review, week 8')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('there is no review on another goal', (tester) async {

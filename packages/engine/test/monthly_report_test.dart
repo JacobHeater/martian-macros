@@ -329,4 +329,79 @@ void main() {
       expect(later.toKg, then.toKg);
     });
   });
+
+  group('the recomp review', () {
+    const eligible = ModeRecommendation(
+      GoalMode.recomp,
+      ModeReason.recompEligible,
+    );
+
+    TargetsRecord onRecomp(int day, [GoalMode mode = GoalMode.recomp]) =>
+        TargetsRecord(
+          effectiveFrom: start.addDays(day),
+          mode: mode,
+          tdeeKcal: 2500,
+          tdeeSigmaKcal: 150,
+          tdeeStatus: TdeeStatus.updated,
+          targets: const DailyTargets(
+            kcal: 2400,
+            proteinG: 160,
+            fatG: 70,
+            carbsG: 250,
+            weeklyRateFraction: -0.001,
+          ),
+        );
+
+    /// The report of the month that begins [monthStart] days after recomp
+    /// began on day 0, with waist measured weekly throughout.
+    MonthlyReport reportFrom(
+      int monthStart, {
+      ModeRecommendation? recommendation = eligible,
+      GoalMode mode = GoalMode.recomp,
+    }) => buildMonthlyReport(
+      period: ReportPeriod(index: 0, from: start.addDays(monthStart)),
+      intake: const [],
+      weights: const [],
+      waist: [
+        for (var d = 0; d <= 140; d += 7)
+          WaistObservation(date: start.addDays(d), waistCm: 92 - d * 0.04),
+      ],
+      history: [onRecomp(0, mode)],
+      trend: [for (var d = 0; d <= 140; d++) point(d, 82)],
+      recommendation: recommendation,
+    );
+
+    test('a month in which none falls due has none', () {
+      expect(reportFrom(0).recompReview, isNull);
+      expect(reportFrom(100).recompReview, isNull);
+    });
+
+    test('the week 8 review is in the month it fell due in', () {
+      // Days 42 to 69: the review is due on day 56.
+      final review = reportFrom(42).recompReview!;
+      expect(review.week, 8);
+      // Read on the last day it was shown in the month, day 69.
+      expect(review.periodDays, 69);
+      expect(review.waist, MeasuredChange.down);
+      expect(review.missing, [RecompMeasure.strength]);
+    });
+
+    test('a review due in the month before is not repeated, and the next '
+        'one due is shown', () {
+      // Days 60 to 87: week 8 was already showing; week 12 is due on day 84.
+      final review = reportFrom(60).recompReview!;
+      expect(review.week, 12);
+      // Days 57 to 84: week 8 fell due on day 56, the day before.
+      expect(reportFrom(57).recompReview!.week, 12);
+      // Days 56 to 83: week 8 falls due on the first day and week 12 the
+      // day after the last.
+      expect(reportFrom(56).recompReview!.week, 8);
+    });
+
+    test('there is none on another goal, or when no recommendation is '
+        'given', () {
+      expect(reportFrom(42, mode: GoalMode.fatLoss).recompReview, isNull);
+      expect(reportFrom(42, recommendation: null).recompReview, isNull);
+    });
+  });
 }
