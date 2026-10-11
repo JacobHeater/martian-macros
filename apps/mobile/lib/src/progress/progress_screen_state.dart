@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/fmt.dart';
 import '../providers.dart';
@@ -13,6 +14,7 @@ import 'progress_screen.dart';
 import 'recomp_signal_card.dart';
 import '../charts/trend_chart.dart';
 import '../charts/trend_stats.dart';
+import 'waist_entry_card.dart';
 import 'waist_summary.dart';
 import 'weight_events_card.dart';
 import 'strength_section.dart';
@@ -117,19 +119,24 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
                 ),
         ),
         const WeightEventsCard(),
-        NumberEntryCard(
-          key: ValueKey('waist-${waist.length}-${fmt.units}'),
-          title: 'Waist',
+        WaistEntryCard(
+          key: ValueKey('waist-${fmt.units}'),
           unit: fmt.lengthUnit,
-          fieldKey: 'waist',
-          initial: null,
-          hint: waist.isEmpty
-              ? 'Measure at the navel, relaxed. Take three and enter the '
-                    'middle one. Once a week is plenty.'
-              : waistSummary(waist, fmt, today),
-          onSave: (value) => ref
-              .read(waistWriterProvider)
-              .saveWaist(today, fmt.lengthToCm(value)),
+          summary: waist.isEmpty ? null : waistSummary(waist, fmt, today),
+          onSave: (readings) {
+            final cm = [for (final value in readings) fmt.lengthToCm(value)];
+            // Refused here, so it is refused whatever stores it.
+            if (cm.any(
+              (reading) =>
+                  reading < WaistObservation.minCm ||
+                  reading > WaistObservation.maxCm,
+            )) {
+              throw const FormatException('Not a waist measurement.');
+            }
+            return ref
+                .read(waistWriterProvider)
+                .saveWaist(today, middleReading(cm), readings: cm);
+          },
         ),
         RecompSignalCard(fmt: fmt),
         const SizedBox(height: 16),

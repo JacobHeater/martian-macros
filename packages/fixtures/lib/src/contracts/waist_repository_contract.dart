@@ -28,6 +28,29 @@ void waistRepositoryContract(String name, WaistRepository Function() create) {
       expect([for (final w in list) w.waistCm], [91.5, 90]);
     });
 
+    test(
+      'the readings a measurement was taken from are kept in order',
+      () async {
+        await repo.saveWaist(d1, 92, readings: [91.5, 92.5, 92]);
+        await repo.saveWaist(d2, 90.5, readings: [90.5]);
+        final list = await repo.watchWaist().first;
+        expect(list[0].waistCm, 92);
+        expect(list[0].readings, [91.5, 92.5, 92]);
+        expect(list[0].isSingleReading, isFalse);
+        expect(list[1].readings, [90.5]);
+        expect(list[1].isSingleReading, isTrue);
+      },
+    );
+
+    test('a measurement saved without readings has none, and saving the '
+        'day again replaces its readings', () async {
+      await repo.saveWaist(d1, 92, readings: [91.5, 92.5, 92]);
+      await repo.saveWaist(d1, 91);
+      final only = (await repo.watchWaist().first).single;
+      expect(only.waistCm, 91);
+      expect(only.readings, isEmpty);
+    });
+
     test('emits the current list first, then each change', () async {
       await expectChangeEmits(
         repo.watchWaist().map((l) => l.length),
