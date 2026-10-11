@@ -12,10 +12,18 @@ final class InMemoryWaistRepository implements WaistRepository {
   );
 
   @override
-  Future<void> saveWaist(CalendarDate date, double waistCm) async {
+  Future<void> saveWaist(
+    CalendarDate date,
+    double waistCm, {
+    List<double> readings = const [],
+  }) async {
     _byDay.value = {
       ..._byDay.value,
-      date.epochDay: WaistObservation(date: date, waistCm: waistCm),
+      date.epochDay: WaistObservation(
+        date: date,
+        waistCm: waistCm,
+        readings: List.unmodifiable(readings),
+      ),
     };
   }
 

@@ -118,6 +118,109 @@ void main() {
     });
   });
 
+  group('the noise figure', () {
+    WaistObservation triple(int daysAgo, double middle, double spread) =>
+        WaistObservation(
+          date: today.addDays(-daysAgo),
+          waistCm: middle,
+          readings: [middle - spread / 2, middle + spread / 2, middle],
+        );
+
+    test('is 1.0 cm until eight entries carry their three readings', () {
+      expect(waistNoiseOf(const []), 1.0);
+      expect(
+        waistNoiseOf([for (var i = 0; i < 7; i++) triple(i * 7, 92, 0.6)]),
+        1.0,
+      );
+      // Entries without readings, and single readings, say nothing about
+      // the spread of a sitting.
+      expect(
+        waistNoiseOf([
+          ...on({for (var i = 0; i < 20; i++) i * 7: 92}),
+          for (var i = 0; i < 10; i++)
+            WaistObservation(
+              date: today.addDays(-i),
+              waistCm: 92,
+              readings: const [92],
+            ),
+        ]),
+        1.0,
+      );
+    });
+
+    test('is then the user\'s own: readings that typically span 0.6 cm '
+        'give 0.6', () {
+      final ten = [for (var i = 0; i < 10; i++) triple(i * 7, 92, 0.6)];
+      expect(waistNoiseOf(ten), closeTo(0.6, 1e-9));
+    });
+
+    test('is never taken to be under half a centimeter', () {
+      final steady = [for (var i = 0; i < 10; i++) triple(i * 7, 92, 0.2)];
+      expect(waistNoiseOf(steady), 0.5);
+    });
+
+    test('is the typical spread, so one wild sitting does not set it', () {
+      final entries = [
+        for (var i = 0; i < 9; i++) triple(i * 7, 92, 0.8),
+        triple(70, 92, 6),
+      ];
+      expect(waistNoiseOf(entries), closeTo(0.8, 1e-9));
+    });
+
+    test('a careful measurer has smaller changes reported', () {
+      // Ten weekly sittings spanning 0.6 cm, the last three a centimeter
+      // down on the three of four weeks before.
+      final entries = [
+        for (var i = 0; i < 10; i++) triple(i * 7, i < 3 ? 91.0 : 92.0, 0.6),
+      ];
+      final change = waistChangeOf(waist: entries, asOf: today)!;
+      expect(change.thresholdCm, closeTo(1.4 * 0.6, 1e-9));
+      expect(change.changeCm, closeTo(-1, 1e-9));
+      expect(change.direction, MeasuredChange.down);
+
+      // The same figures with no readings kept: at the default, not a
+      // change.
+      final plain = on({
+        for (var i = 0; i < 10; i++) i * 7: i < 3 ? 91.0 : 92.0,
+      });
+      expect(
+        waistChangeOf(waist: plain, asOf: today)!.direction,
+        MeasuredChange.noClearChange,
+      );
+    });
+
+    test('a single reading at either end widens it by half', () {
+      final entries = [
+        WaistObservation(
+          date: today.addDays(-28),
+          waistCm: 92,
+          readings: const [91.5, 92.5, 92],
+        ),
+        WaistObservation(date: today, waistCm: 90.2, readings: const [90.2]),
+      ];
+      final change = waistChangeOf(waist: entries, asOf: today)!;
+      expect(change.thresholdCm, closeTo(2.1, 1e-9));
+      expect(change.direction, MeasuredChange.noClearChange);
+    });
+  });
+
+  group('the middle reading', () {
+    test('is the middle of three, whatever the order', () {
+      expect(middleReading([91.5, 92.5, 92.0]), 92.0);
+      expect(middleReading([94, 92, 92.5]), 92.5);
+      expect(middleReading([92, 92, 95]), 92);
+    });
+
+    test('of one reading is that reading', () {
+      expect(middleReading([92.4]), 92.4);
+    });
+
+    test('is not taken of two, or of none', () {
+      expect(() => middleReading([92, 93]), throwsArgumentError);
+      expect(() => middleReading(const []), throwsArgumentError);
+    });
+  });
+
   group('since the start', () {
     WaistChange? sinceStart(Map<int, double> byDaysAgo) =>
         waistChangeOf(waist: on(byDaysAgo), asOf: today, sinceStart: true);

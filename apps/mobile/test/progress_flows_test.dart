@@ -64,7 +64,10 @@ void main() {
     );
     // 90 cm to 88.5 cm is a fall of 0.6 in, shown to the quarter inch.
     expect(
-      find.text('Latest: 34.75 in on Oct 5. Down 0.5 in since you started.'),
+      find.text(
+        'Latest: 34.75 in on Oct 5. Down 0.5 in since you started. '
+        'Weekly is enough: the next is due Oct 12.',
+      ),
       findsOneWidget,
     );
   });

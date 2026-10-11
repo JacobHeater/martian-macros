@@ -4139,8 +4139,47 @@ class $WaistEntriesTable extends WaistEntries
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _reading1CmMeta = const VerificationMeta(
+    'reading1Cm',
+  );
   @override
-  List<GeneratedColumn> get $columns => [epochDay, waistCm];
+  late final GeneratedColumn<double> reading1Cm = GeneratedColumn<double>(
+    'reading1_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reading2CmMeta = const VerificationMeta(
+    'reading2Cm',
+  );
+  @override
+  late final GeneratedColumn<double> reading2Cm = GeneratedColumn<double>(
+    'reading2_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reading3CmMeta = const VerificationMeta(
+    'reading3Cm',
+  );
+  @override
+  late final GeneratedColumn<double> reading3Cm = GeneratedColumn<double>(
+    'reading3_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    epochDay,
+    waistCm,
+    reading1Cm,
+    reading2Cm,
+    reading3Cm,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4167,6 +4206,24 @@ class $WaistEntriesTable extends WaistEntries
     } else if (isInserting) {
       context.missing(_waistCmMeta);
     }
+    if (data.containsKey('reading1_cm')) {
+      context.handle(
+        _reading1CmMeta,
+        reading1Cm.isAcceptableOrUnknown(data['reading1_cm']!, _reading1CmMeta),
+      );
+    }
+    if (data.containsKey('reading2_cm')) {
+      context.handle(
+        _reading2CmMeta,
+        reading2Cm.isAcceptableOrUnknown(data['reading2_cm']!, _reading2CmMeta),
+      );
+    }
+    if (data.containsKey('reading3_cm')) {
+      context.handle(
+        _reading3CmMeta,
+        reading3Cm.isAcceptableOrUnknown(data['reading3_cm']!, _reading3CmMeta),
+      );
+    }
     return context;
   }
 
@@ -4184,6 +4241,18 @@ class $WaistEntriesTable extends WaistEntries
         DriftSqlType.double,
         data['${effectivePrefix}waist_cm'],
       )!,
+      reading1Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading1_cm'],
+      ),
+      reading2Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading2_cm'],
+      ),
+      reading3Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading3_cm'],
+      ),
     );
   }
 
@@ -4196,12 +4265,34 @@ class $WaistEntriesTable extends WaistEntries
 class WaistRow extends DataClass implements Insertable<WaistRow> {
   final int epochDay;
   final double waistCm;
-  const WaistRow({required this.epochDay, required this.waistCm});
+
+  /// The readings the measurement was taken from (MM-155): all three, the
+  /// first alone for a quick entry, or none for an entry made before
+  /// readings were kept.
+  final double? reading1Cm;
+  final double? reading2Cm;
+  final double? reading3Cm;
+  const WaistRow({
+    required this.epochDay,
+    required this.waistCm,
+    this.reading1Cm,
+    this.reading2Cm,
+    this.reading3Cm,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['epoch_day'] = Variable<int>(epochDay);
     map['waist_cm'] = Variable<double>(waistCm);
+    if (!nullToAbsent || reading1Cm != null) {
+      map['reading1_cm'] = Variable<double>(reading1Cm);
+    }
+    if (!nullToAbsent || reading2Cm != null) {
+      map['reading2_cm'] = Variable<double>(reading2Cm);
+    }
+    if (!nullToAbsent || reading3Cm != null) {
+      map['reading3_cm'] = Variable<double>(reading3Cm);
+    }
     return map;
   }
 
@@ -4209,6 +4300,15 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return WaistEntriesCompanion(
       epochDay: Value(epochDay),
       waistCm: Value(waistCm),
+      reading1Cm: reading1Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading1Cm),
+      reading2Cm: reading2Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading2Cm),
+      reading3Cm: reading3Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading3Cm),
     );
   }
 
@@ -4220,6 +4320,9 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return WaistRow(
       epochDay: serializer.fromJson<int>(json['epochDay']),
       waistCm: serializer.fromJson<double>(json['waistCm']),
+      reading1Cm: serializer.fromJson<double?>(json['reading1Cm']),
+      reading2Cm: serializer.fromJson<double?>(json['reading2Cm']),
+      reading3Cm: serializer.fromJson<double?>(json['reading3Cm']),
     );
   }
   @override
@@ -4228,17 +4331,38 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return <String, dynamic>{
       'epochDay': serializer.toJson<int>(epochDay),
       'waistCm': serializer.toJson<double>(waistCm),
+      'reading1Cm': serializer.toJson<double?>(reading1Cm),
+      'reading2Cm': serializer.toJson<double?>(reading2Cm),
+      'reading3Cm': serializer.toJson<double?>(reading3Cm),
     };
   }
 
-  WaistRow copyWith({int? epochDay, double? waistCm}) => WaistRow(
+  WaistRow copyWith({
+    int? epochDay,
+    double? waistCm,
+    Value<double?> reading1Cm = const Value.absent(),
+    Value<double?> reading2Cm = const Value.absent(),
+    Value<double?> reading3Cm = const Value.absent(),
+  }) => WaistRow(
     epochDay: epochDay ?? this.epochDay,
     waistCm: waistCm ?? this.waistCm,
+    reading1Cm: reading1Cm.present ? reading1Cm.value : this.reading1Cm,
+    reading2Cm: reading2Cm.present ? reading2Cm.value : this.reading2Cm,
+    reading3Cm: reading3Cm.present ? reading3Cm.value : this.reading3Cm,
   );
   WaistRow copyWithCompanion(WaistEntriesCompanion data) {
     return WaistRow(
       epochDay: data.epochDay.present ? data.epochDay.value : this.epochDay,
       waistCm: data.waistCm.present ? data.waistCm.value : this.waistCm,
+      reading1Cm: data.reading1Cm.present
+          ? data.reading1Cm.value
+          : this.reading1Cm,
+      reading2Cm: data.reading2Cm.present
+          ? data.reading2Cm.value
+          : this.reading2Cm,
+      reading3Cm: data.reading3Cm.present
+          ? data.reading3Cm.value
+          : this.reading3Cm,
     );
   }
 
@@ -4246,49 +4370,77 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
   String toString() {
     return (StringBuffer('WaistRow(')
           ..write('epochDay: $epochDay, ')
-          ..write('waistCm: $waistCm')
+          ..write('waistCm: $waistCm, ')
+          ..write('reading1Cm: $reading1Cm, ')
+          ..write('reading2Cm: $reading2Cm, ')
+          ..write('reading3Cm: $reading3Cm')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(epochDay, waistCm);
+  int get hashCode =>
+      Object.hash(epochDay, waistCm, reading1Cm, reading2Cm, reading3Cm);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WaistRow &&
           other.epochDay == this.epochDay &&
-          other.waistCm == this.waistCm);
+          other.waistCm == this.waistCm &&
+          other.reading1Cm == this.reading1Cm &&
+          other.reading2Cm == this.reading2Cm &&
+          other.reading3Cm == this.reading3Cm);
 }
 
 class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
   final Value<int> epochDay;
   final Value<double> waistCm;
+  final Value<double?> reading1Cm;
+  final Value<double?> reading2Cm;
+  final Value<double?> reading3Cm;
   const WaistEntriesCompanion({
     this.epochDay = const Value.absent(),
     this.waistCm = const Value.absent(),
+    this.reading1Cm = const Value.absent(),
+    this.reading2Cm = const Value.absent(),
+    this.reading3Cm = const Value.absent(),
   });
   WaistEntriesCompanion.insert({
     this.epochDay = const Value.absent(),
     required double waistCm,
+    this.reading1Cm = const Value.absent(),
+    this.reading2Cm = const Value.absent(),
+    this.reading3Cm = const Value.absent(),
   }) : waistCm = Value(waistCm);
   static Insertable<WaistRow> custom({
     Expression<int>? epochDay,
     Expression<double>? waistCm,
+    Expression<double>? reading1Cm,
+    Expression<double>? reading2Cm,
+    Expression<double>? reading3Cm,
   }) {
     return RawValuesInsertable({
       if (epochDay != null) 'epoch_day': epochDay,
       if (waistCm != null) 'waist_cm': waistCm,
+      if (reading1Cm != null) 'reading1_cm': reading1Cm,
+      if (reading2Cm != null) 'reading2_cm': reading2Cm,
+      if (reading3Cm != null) 'reading3_cm': reading3Cm,
     });
   }
 
   WaistEntriesCompanion copyWith({
     Value<int>? epochDay,
     Value<double>? waistCm,
+    Value<double?>? reading1Cm,
+    Value<double?>? reading2Cm,
+    Value<double?>? reading3Cm,
   }) {
     return WaistEntriesCompanion(
       epochDay: epochDay ?? this.epochDay,
       waistCm: waistCm ?? this.waistCm,
+      reading1Cm: reading1Cm ?? this.reading1Cm,
+      reading2Cm: reading2Cm ?? this.reading2Cm,
+      reading3Cm: reading3Cm ?? this.reading3Cm,
     );
   }
 
@@ -4301,6 +4453,15 @@ class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
     if (waistCm.present) {
       map['waist_cm'] = Variable<double>(waistCm.value);
     }
+    if (reading1Cm.present) {
+      map['reading1_cm'] = Variable<double>(reading1Cm.value);
+    }
+    if (reading2Cm.present) {
+      map['reading2_cm'] = Variable<double>(reading2Cm.value);
+    }
+    if (reading3Cm.present) {
+      map['reading3_cm'] = Variable<double>(reading3Cm.value);
+    }
     return map;
   }
 
@@ -4308,7 +4469,10 @@ class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
   String toString() {
     return (StringBuffer('WaistEntriesCompanion(')
           ..write('epochDay: $epochDay, ')
-          ..write('waistCm: $waistCm')
+          ..write('waistCm: $waistCm, ')
+          ..write('reading1Cm: $reading1Cm, ')
+          ..write('reading2Cm: $reading2Cm, ')
+          ..write('reading3Cm: $reading3Cm')
           ..write(')'))
         .toString();
   }
@@ -13302,11 +13466,17 @@ typedef $$WaistEntriesTableCreateCompanionBuilder =
     WaistEntriesCompanion Function({
       Value<int> epochDay,
       required double waistCm,
+      Value<double?> reading1Cm,
+      Value<double?> reading2Cm,
+      Value<double?> reading3Cm,
     });
 typedef $$WaistEntriesTableUpdateCompanionBuilder =
     WaistEntriesCompanion Function({
       Value<int> epochDay,
       Value<double> waistCm,
+      Value<double?> reading1Cm,
+      Value<double?> reading2Cm,
+      Value<double?> reading3Cm,
     });
 
 class $$WaistEntriesTableFilterComposer
@@ -13325,6 +13495,21 @@ class $$WaistEntriesTableFilterComposer
 
   ColumnFilters<double> get waistCm => $composableBuilder(
     column: $table.waistCm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -13347,6 +13532,21 @@ class $$WaistEntriesTableOrderingComposer
     column: $table.waistCm,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WaistEntriesTableAnnotationComposer
@@ -13363,6 +13563,21 @@ class $$WaistEntriesTableAnnotationComposer
 
   GeneratedColumn<double> get waistCm =>
       $composableBuilder(column: $table.waistCm, builder: (column) => column);
+
+  GeneratedColumn<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
+    builder: (column) => column,
+  );
 }
 
 class $$WaistEntriesTableTableManager
@@ -13394,17 +13609,33 @@ class $$WaistEntriesTableTableManager
               $$WaistEntriesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$WaistEntriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> epochDay = const Value.absent(),
-            Value<double> waistCm = const Value.absent(),
-          }) => WaistEntriesCompanion(epochDay: epochDay, waistCm: waistCm),
+          updateCompanionCallback:
+              ({
+                Value<int> epochDay = const Value.absent(),
+                Value<double> waistCm = const Value.absent(),
+                Value<double?> reading1Cm = const Value.absent(),
+                Value<double?> reading2Cm = const Value.absent(),
+                Value<double?> reading3Cm = const Value.absent(),
+              }) => WaistEntriesCompanion(
+                epochDay: epochDay,
+                waistCm: waistCm,
+                reading1Cm: reading1Cm,
+                reading2Cm: reading2Cm,
+                reading3Cm: reading3Cm,
+              ),
           createCompanionCallback:
               ({
                 Value<int> epochDay = const Value.absent(),
                 required double waistCm,
+                Value<double?> reading1Cm = const Value.absent(),
+                Value<double?> reading2Cm = const Value.absent(),
+                Value<double?> reading3Cm = const Value.absent(),
               }) => WaistEntriesCompanion.insert(
                 epochDay: epochDay,
                 waistCm: waistCm,
+                reading1Cm: reading1Cm,
+                reading2Cm: reading2Cm,
+                reading3Cm: reading3Cm,
               ),
           withReferenceMapper: (p0) => p0
               .map(
