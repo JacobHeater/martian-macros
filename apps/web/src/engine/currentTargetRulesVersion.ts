@@ -1,0 +1,5 @@
+/**
+ * Bump when a target-calculation rule changes and should be applied to
+ * existing users immediately with an explanation.
+ */
+export const currentTargetRulesVersion = 1;
