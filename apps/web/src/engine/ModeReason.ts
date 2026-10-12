@@ -1,0 +1,18 @@
+const values = [
+  /** Policy forbids deficits (screening). */
+  'deficitNotAllowed',
+  /** Body mass index is below 18.5 (MM-111). */
+  'underweight',
+  /** Body fat high enough that faster visible loss matters most. */
+  'highBodyFat',
+  /** Novice, returning, or high body fat: recomp is realistic (Barakat 2020). */
+  'recompEligible',
+  /** Lean and trained: building needs a surplus. */
+  'leanAndTrained',
+  /** Default: trained, moderate body fat, so cut first. */
+  'cutFirst',
+] as const;
+
+export type ModeReason = (typeof values)[number];
+
+export const ModeReason = { values } as const;
