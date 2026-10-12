@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 const allowed: Record<string, readonly string[]> = {
   lang: [],
   domain: ['lang'],
+  engine: ['lang', 'domain'],
 };
 
 const src = resolve('src');
