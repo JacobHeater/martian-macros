@@ -3,4 +3,4 @@
 # TypeScript run by Node itself (22.18+); no build step.
 set -e
 root="$(cd "$(dirname "$0")" && pwd)"
-exec node "$root/tool/mm.ts" "$@"
+exec node --disable-warning=ExperimentalWarning "$root/tool/mm.ts" "$@"

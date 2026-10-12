@@ -6,7 +6,26 @@ import { capture, run } from './proc.ts';
 const webApp = 'apps/mobile';
 const androidDir = `${webApp}/android`;
 
-const sdk = () => process.env['ANDROID_HOME'] ?? process.env['ANDROID_SDK_ROOT'];
+/**
+ * Where the Android SDK is (MM-235): the environment first, then the
+ * platform's default install location, so a plain shell works without
+ * setting anything. Undefined means "hope it is on PATH".
+ */
+export function androidSdkFrom(env: NodeJS.ProcessEnv, platform: string, exists: (path: string) => boolean): string | undefined {
+  for (const name of ['ANDROID_HOME', 'ANDROID_SDK_ROOT']) {
+    const set = env[name];
+    if (set !== undefined && set !== '') return set;
+  }
+  const candidates =
+    platform === 'win32'
+      ? [env['LOCALAPPDATA'] === undefined ? undefined : `${env['LOCALAPPDATA']}/Android/Sdk`]
+      : platform === 'darwin'
+        ? [env['HOME'] === undefined ? undefined : `${env['HOME']}/Library/Android/sdk`]
+        : [env['HOME'] === undefined ? undefined : `${env['HOME']}/Android/Sdk`];
+  return candidates.find((path) => path !== undefined && exists(path));
+}
+
+const sdk = () => androidSdkFrom(process.env, process.platform, existsSync);
 
 const adbPath = () => {
   const home = sdk();
@@ -18,13 +37,44 @@ const emulatorPath = () => {
   return home === undefined ? 'emulator' : `${home}/emulator/emulator`;
 };
 
+/** What a failure to run adb at all means for whoever asked. */
+const adbMissing = () =>
+  new Error(
+    'adb could not be run. Set ANDROID_HOME to the Android SDK (usually ' +
+      (process.platform === 'win32' ? '%LOCALAPPDATA%\Android\Sdk' : '~/Android/Sdk') +
+      '), or put platform-tools on PATH.',
+  );
+
+/**
+ * Gradle's environment: when `JAVA_HOME` is unset, Android Studio's bundled
+ * JDK is offered from its default place, so a plain shell builds (MM-235).
+ */
+function gradleEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  if (env['JAVA_HOME'] === undefined || env['JAVA_HOME'] === '') {
+    const studio = 'C:/Program Files/Android/Android Studio/jbr';
+    if (process.platform === 'win32' && existsSync(studio)) env['JAVA_HOME'] = studio;
+  }
+  // Gradle's Android plugin needs the SDK location too.
+  if (env['ANDROID_HOME'] === undefined || env['ANDROID_HOME'] === '') {
+    const home = sdk();
+    if (home !== undefined) env['ANDROID_HOME'] = home;
+  }
+  return env;
+}
+
 // An absolute path: Windows may not resolve a command from the working
 // directory at all (NoDefaultCurrentDirectoryInExePath).
 const gradle = (dir: string) => resolve(dir, process.platform === 'win32' ? 'gradlew.bat' : 'gradlew');
 
-/** Ids of connected devices and running emulators, from `adb devices`. */
+/**
+ * Ids of connected devices and running emulators, from `adb devices`. An
+ * `adb` that cannot be run is its own, named error, never an empty list
+ * (MM-235).
+ */
 export async function deviceIds(): Promise<string[]> {
   const result = await capture([adbPath(), 'devices']);
+  if (result.code === 127) throw adbMissing();
   if (result.code !== 0) return [];
   return result.stdout
     .split('\n')
@@ -119,7 +169,7 @@ export async function runBuild(repoRoot: string, args: readonly string[]): Promi
   if (synced !== 0) return synced;
   const task = args.includes('--release') ? 'assembleRelease' : 'assembleDebug';
   const androidRoot = `${repoRoot}/${androidDir}`;
-  return run([gradle(androidRoot), task], { cwd: androidRoot });
+  return run([gradle(androidRoot), task], { cwd: androidRoot, env: gradleEnv() });
 }
 
 const appId = 'com.martianmacros.martian_macros.demo';
@@ -134,9 +184,50 @@ async function installAndLaunch(repoRoot: string, device: string): Promise<numbe
   return run([adbPath(), '-s', device, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`]);
 }
 
-/** `mm run [-d DEVICE]`: build, install and launch on a device or emulator. */
+/**
+ * The one physical Android phone among `ids`, never an emulator (MM-234).
+ * It throws, with what to do, when there is none or more than one.
+ */
+export function physicalAndroidDeviceId(ids: readonly string[]): string {
+  const phones = ids.filter((id) => !id.startsWith('emulator-'));
+  if (phones.length === 0) {
+    throw new Error(
+      'No Android phone connected. Connect a data-capable USB cable, enable USB debugging, and accept the authorization prompt on your phone.',
+    );
+  }
+  if (phones.length > 1) {
+    throw new Error(`Multiple Android phones connected: ${phones.join(', ')}. Select one with mm run -d DEVICE_ID.`);
+  }
+  return phones[0]!;
+}
+
+/**
+ * `mm run [--env dev|prod|phone] [-d DEVICE]`: build, install and launch.
+ * `--env phone` selects the one physical phone, never an emulator; `dev`
+ * and `prod` are accepted and change nothing, since the build has no
+ * per-environment defines (one config).
+ */
 export async function runApp(repoRoot: string, args: readonly string[]): Promise<number> {
+  const env = args.includes('--env') ? args[args.indexOf('--env') + 1] : undefined;
+  if (env !== undefined && !['dev', 'prod', 'phone'].includes(env)) {
+    stderr.write('--env must be one of: dev, prod, phone\n');
+    return 64;
+  }
   let device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  if (env === 'phone') {
+    if (device !== undefined) {
+      stderr.write('Use mm run -d DEVICE_ID for an explicit device, or mm run --env phone for automatic phone selection.\n');
+      return 64;
+    }
+    try {
+      device = physicalAndroidDeviceId(await deviceIds());
+    } catch (error) {
+      stderr.write(`${error instanceof Error ? error.message : error}\n`);
+      return 69;
+    }
+  } else if (env !== undefined) {
+    stdout.write('The build has no per-environment defines; --env chooses nothing here (MM-232).\n');
+  }
   if (device === undefined) {
     const ready = await ensureDevice();
     if (ready !== 0) return ready;
