@@ -48,6 +48,7 @@ on Java 25.
 | `src/healthIngest/` | The seam to a phone's health platform, carried over from `packages/health_ingest`. Imports only `lang` |
 | `src/sql/` | `SqlDatabase`, the one thing the app knows about SQLite, and in `wasm/` its adapter for tests and the browser. Imports only `lang` |
 | `src/foodCatalog/` | Food packs read, searched and written through `SqlDatabase`, carried over from `packages/food_catalog`. Imports only `lang` and `sql` |
+| `src/foodPipeline/` | Builds food packs from the open data sources, carried over from `packages/food_pipeline`. A developer tool, never part of the app; its `node/` folder is the only place that touches files |
 | `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
 | `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |
@@ -77,6 +78,7 @@ came from, the conversion is written the same way everywhere.
 | `x ~/ y`, `x.toInt()` | `Math.trunc(x / y)`, `Math.trunc(x)` |
 | `x % y` with a possibly negative `x` | Dart's result is never negative; JavaScript's can be. Write `((x % y) + y) % y` |
 | `double.tryParse(text)` | `tryParseDouble(text)`. Never `Number(text)` or `parseFloat(text)` |
+| `int.tryParse(text)` | `tryParseInt(text)`. Never `parseInt(text)` |
 | `1.0.toString()` is `"1.0"` | JavaScript gives `"1"`. Format numbers for display explicitly |
 | `DateTime` | `Date` |
 | `Duration` | A number of milliseconds, with `Ms` in the name |
