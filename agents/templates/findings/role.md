@@ -13,6 +13,14 @@ inspected; absent implementation if applicable; cross-domain referrals.
 Actual evidence methods and blocked checks. Planning first audits existing
 behavior. No findings is limited to this scope and method.
 
+## Novice mobile experience (when UX/product design is assigned)
+Bounded novice goal and journey; screens/states, decisions and interpretations,
+competing groups/actions, routine versus safety/uncertainty information,
+recovery and path to detail. Separate source/code, rendered/device and
+user-observation evidence. Explain observed cognitive burden versus hypothesis;
+card count alone is not evidence. Include bounded cross-domain consultation
+and its effect.
+
 ## Findings
 ID/domain, classification, impact-based severity/confidence, requirement/
 invariant/design rule/evidence, actual paths/symbols/lines, expected vs observed,

@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 
 void main() {
   final today = CalendarDate(2026, 10, 5);
@@ -118,6 +119,7 @@ void main() {
     );
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.enterText(find.byKey(const ValueKey('food-name')), 'Lunch');
     await tester.enterText(find.byKey(const ValueKey('food-protein')), '30');
     await tester.enterText(find.byKey(const ValueKey('food-carbs')), '40');

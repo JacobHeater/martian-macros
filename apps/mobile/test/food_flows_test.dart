@@ -6,6 +6,7 @@ import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 
 /// MM-93: the Food screen's flows that shipped without a test (MM-38, MM-41).
 void main() {
@@ -83,6 +84,7 @@ void main() {
     await openFood(tester);
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.enterText(find.byKey(const ValueKey('food-protein')), '45');
     await tester.enterText(find.byKey(const ValueKey('food-carbs')), '60');
     await tester.enterText(find.byKey(const ValueKey('food-fat')), '10');
@@ -115,6 +117,7 @@ void main() {
     expect(find.text('Yesterday'), findsOneWidget);
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.enterText(find.byKey(const ValueKey('food-name')), 'Pasta');
     await tester.enterText(find.byKey(const ValueKey('food-kcal')), '600');
     await tester.pump();

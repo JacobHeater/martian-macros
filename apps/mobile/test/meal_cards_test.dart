@@ -179,7 +179,8 @@ void main() {
       await tester.tap(add);
       await tester.pumpAndSettle();
       expect(find.text('Add food'), findsWidgets);
-      expect(find.byKey(const ValueKey('food-name')), findsOneWidget);
+      expect(find.byKey(const ValueKey('food-search')), findsOneWidget);
+      expect(find.byKey(const ValueKey('food-name')), findsNothing);
       expect(
         tester.widget<AddFoodSheet>(find.byType(AddFoodSheet)).meal,
         Meal.breakfast,

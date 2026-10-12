@@ -11,7 +11,10 @@ import '../dashboard/dashboard_screen.dart';
 import '../food/add_food_button.dart';
 import '../food/food_day_header.dart';
 import '../food/food_screen.dart';
+import '../food/show_add_food_sheet.dart';
 import '../ui/mm_app_bar.dart';
+import '../ui/mm_button.dart';
+import '../ui/mm_button_kind.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/mm_nav_destination.dart';
 import '../ui/mm_navigation_bar.dart';
@@ -84,6 +87,14 @@ class HomeShellState extends ConsumerState<HomeShell>
               ? const FoodDayHeader()
               : null,
           actions: [
+            if (destination == HomeDestination.dashboard)
+              MmButton(
+                label: 'Add food',
+                icon: Icons.add,
+                kind: MmButtonKind.text,
+                onPressed: () =>
+                    showAddFoodSheet(context, ref.read(todayProvider)),
+              ),
             MmIconButton(
               tooltip: 'Settings',
               icon: Icons.settings_outlined,
@@ -103,9 +114,7 @@ class HomeShellState extends ConsumerState<HomeShell>
             CoachScreen(),
           ],
         ),
-        floatingActionButton:
-            destination == HomeDestination.dashboard ||
-                destination == HomeDestination.food
+        floatingActionButton: destination == HomeDestination.food
             ? const AddFoodButton()
             : null,
         bottomNavigationBar: MmNavigationBar(

@@ -1,0 +1,778 @@
+{
+  "schema_version": 1,
+  "task_id": "mm205-novice-mobile-experience",
+  "audit_mode": "feature",
+  "baseline": {
+    "branch": "feature/mm205-expert-mobile-ux",
+    "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Synthesize independent novice meal-logging audits, route bounded challenges, validate findings and persist the research/checkpoint record.",
+      "role": "chair",
+      "reviewer": "Copilot SDK parent chair",
+      "status": "complete",
+      "inspected_commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "input_hashes": {
+        "agents/roles/chair.md": "c490d2699b1174a4e0e663eb92903ffb58e13f07a6aaf38497a9e496b3cd9e85",
+        "agents/panel-protocol.md": "5fbea73b43c16179f1da57ff9e274c8fa4feae58fe0d09bc79ee92bdf87b5423",
+        "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "requirements/developer-tooling/STORY.expert-mobile-experience-panel.MM-205.md": "7bbabd1fa570b933847a1e2649b88012bb9b4f174e1b46d3a16f7a262c082d64",
+        "requirements/HANDOFF.md": "3f5247696580a4b89b357cf5a87e6e0d465c9bbec64ccb95867a0dc25dcd02bb"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [
+          "Independent UX and Product Designer reports and their research addenda",
+          "Bounded Flutter and QA challenge responses",
+          "Relevant requirements, design rules, source, tests and stored Dashboard golden",
+          "Requirement allocator, skip API, portable run schema and research capability"
+        ],
+        "not_inspected": [
+          "Whole application or all 15 domains",
+          "Production database, emulator/device, assistive technology or novice task performance"
+        ],
+        "referrals": [
+          "Product owner: Simple detail scope across MM-49/MM-179",
+          "Flutter/QA: fix and verify MM-206/MM-207/MM-208 separately",
+          "Flutter platform review: Dismissible semantics and native accessibility behavior"
+        ],
+        "methods": [
+          "source-inspection",
+          "runtime-reproduction",
+          "test-results"
+        ],
+        "limitations": "Synthesis is bounded to the novice food-logging journey. Current widget probes are not device, native platform, screen-reader or user-study verification."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What current accessibility and food-journaling evidence is relevant to novice meal logging and the prominence of target bars plus a macro-energy chart?",
+        "reason": "The owner explicitly requested externally grounded modern mobile fitness guidance and the potential comprehension effect was uncertain.",
+        "path": "chair",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html",
+            "title": "Understanding Success Criterion 2.5.1: Pointer Gestures",
+            "published_or_updated": "WCAG 2.2 Recommendation date reported as 2023-12-05, not independently reverified; page update not established",
+            "accessed": "2026-10-10",
+            "claim": "Normative pointer-gesture accessibility guidance; it does not establish chart prominence."
+          },
+          {
+            "url": "https://depstein.net/assets/pubs/fcordeiro_chi15.pdf",
+            "title": "Barriers and Negative Nudges: Exploring Challenges in Food Journaling",
+            "published_or_updated": "2015",
+            "accessed": "2026-10-10",
+            "claim": "Mixed-experience food journalers reported search/portion and choice friction; not a novice-only or progressive-disclosure experiment."
+          },
+          {
+            "url": "https://api.flutter.dev/flutter/widgets/Dismissible-class.html",
+            "title": "Dismissible class - widgets library - Dart API",
+            "published_or_updated": null,
+            "accessed": "2026-10-11",
+            "claim": "Current API describes drag dismissal but does not document semantic dismiss behavior."
+          }
+        ],
+        "summary": "Delegated browser-backed discovery and retrieval were actually performed. See findings/research.md for full source inventory, methods and limitations.",
+        "limitations": "Native UX/Product Designer surfaces lacked page retrieval. Exact research-agent tool identifiers were not retained. ACM pages were blocked and author/archive PDFs were used. No controlled novice progressive-disclosure evidence was found."
+      }
+    },
+    {
+      "task": "Audit visual hierarchy, density and novice-facing design from onboarding through the meal-log journey.",
+      "role": "product-designer",
+      "reviewer": "panel-product-designer",
+      "status": "complete",
+      "inspected_commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "input_hashes": {
+        "agents/roles/product-designer.md": "e7ec90144919633ba9533fca57e1a569b985d09bc9f42f82452638f4632cc09b",
+        "agents/panel-protocol.md": "5fbea73b43c16179f1da57ff9e274c8fa4feae58fe0d09bc79ee92bdf87b5423",
+        "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "requirements/dashboard/STORY.metrics-overview.MM-176.md": "41b76c34550cbda4f26ae3f8ecf45753479d52e349f25cd6dca4d56ce9ce2c65",
+        "requirements/dashboard/STORY.macronutrient-split-charts.MM-179.md": "c615b0147cadfd0471dfedf35ea8f5c1435f5b5c3b2bdfa8ec2c347278c582dc",
+        "requirements/food-logging/STORY.detail-level.MM-49.md": "6edac44011ede7d6163805b5c852f89e9ff6ba608aa34eb9c0ca83e087fdb416",
+        "apps/mobile/lib/src/dashboard/dashboard_screen.dart": "70c8678d1fc5c0aca41e24fbae3335b71381c8098b335a555b033b3b0f6eedc6",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "apps/mobile/test/goldens/images/dashboard_martian.png": "56f9cfef7dad92e2ca1708ca2e182708f0debf43aff3a4ada737452b390b7377"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [
+          "Onboarding, Dashboard, Food, Add-food sheet, and limited Coach/Progress entry views",
+          "Visual design requirements, relevant implementation/tests, and seven stored PNG goldens"
+        ],
+        "not_inspected": [
+          "Add-food sheet render, full onboarding, keyboard/focus, large text, physical devices and novice users",
+          "All Coach/Progress detail and every theme/state"
+        ],
+        "referrals": [
+          "UX & Accessibility: bounded chart comprehension and prominence question",
+          "QA/Flutter: verify FAB/chart geometry and approved visual changes"
+        ],
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "limitations": "Reviewer inspected but did not run tests; golden images are stored artifacts rather than a current device observation. Parent later ran a bundled-font geometry guard."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does placing all three macro-energy shares alongside target-progress bars before meal groups improve routine novice meal-log comprehension enough to justify the first-view prominence?",
+        "reason": "Explicit owner request for modern mobile fitness guidance; no direct evidence in the repository resolved comprehension.",
+        "path": "chair",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+            "title": "Understanding Success Criterion 1.4.4: Resize Text",
+            "published_or_updated": "WCAG 2.2 Recommendation date reported as 2023-12-05, not independently reverified; page update not established",
+            "accessed": "2026-10-10",
+            "claim": "Normative text-resizing criteria; not evidence for which nutrition content belongs above the fold."
+          },
+          {
+            "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
+            "title": "Accessibility - Human Interface Guidelines - Apple Developer",
+            "published_or_updated": "Latest changelog entry supplied as 2025-06-09",
+            "accessed": "2026-10-10",
+            "claim": "Platform accessibility guidance; not a controlled study of novice comprehension."
+          },
+          {
+            "url": "https://depstein.net/assets/pubs/fcordeiro_chi15.pdf",
+            "title": "Barriers and Negative Nudges: Exploring Challenges in Food Journaling",
+            "published_or_updated": "2015",
+            "accessed": "2026-10-10",
+            "claim": "Mixed-experience journalers described food-entry search/portion friction; not a chart-prominence experiment."
+          },
+          {
+            "url": "https://depstein.net/assets/pubs/lsilva_dis21.pdf",
+            "title": "Investigating Preferred Food Description Practices in Digital Food Journaling",
+            "published_or_updated": "2021",
+            "accessed": "2026-10-10",
+            "claim": "Small, mainly experienced-user logging study; informs description variability, not novice chart prominence."
+          }
+        ],
+        "summary": "Chair provided source summaries; designer concluded evidence does not establish benefit or harm from the current chart prominence.",
+        "limitations": "Designer did not independently retrieve the external pages or PDFs. No direct controlled novice progressive-disclosure study was found."
+      }
+    },
+    {
+      "task": "Independently audit task flow, comprehension, recovery and accessibility across the novice meal-log journey.",
+      "role": "ux-accessibility",
+      "reviewer": "panel-ux-accessibility",
+      "status": "complete",
+      "inspected_commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "input_hashes": {
+        "agents/roles/ux-accessibility.md": "3c9d35da38251033015338a96d0d12a0fb032c3a84209972d0c98d7e4d2ebc80",
+        "agents/panel-protocol.md": "5fbea73b43c16179f1da57ff9e274c8fa4feae58fe0d09bc79ee92bdf87b5423",
+        "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "requirements/dashboard/STORY.quick-actions-from-the-dashboard.MM-100.md": "f7ba353e7eaa06a65a64a07b19307ae8edd6bf4aebba8a3ec6ddee5d5bac7010",
+        "requirements/dashboard/STORY.metrics-overview.MM-176.md": "41b76c34550cbda4f26ae3f8ecf45753479d52e349f25cd6dca4d56ce9ce2c65",
+        "requirements/dashboard/STORY.macronutrient-split-charts.MM-179.md": "c615b0147cadfd0471dfedf35ea8f5c1435f5b5c3b2bdfa8ec2c347278c582dc",
+        "requirements/food-logging/STORY.detail-level.MM-49.md": "6edac44011ede7d6163805b5c852f89e9ff6ba608aa34eb9c0ca83e087fdb416",
+        "apps/mobile/lib/src/food/add_food_button.dart": "d1b3d5b9045e77c80e7658a97605efe015ca10d08a558ca045ac4980a4102f18",
+        "apps/mobile/lib/src/food/selected_day_provider.dart": "df7850c4672fcf6e5b4325a6f0eea7bff52c4477ab485689e95f0c810d5038b8",
+        "apps/mobile/lib/src/food/meal_section.dart": "e118914b5302a70e584d13250a691e4abc16620decfdb4a1be8d93baceb5faa5",
+        "apps/mobile/lib/src/food/food_screen.dart": "2fbe36a6c2cd69439681f6b416ddbfa85b5adf182f4222fe9941318165ad5d6c",
+        "apps/mobile/lib/src/food/food_search_results.dart": "cf28ca54683b34e1216de1f3189dc144deb0dac70d12bbf138d0d29b7692e8a9",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [
+          "Onboarding entry/welcome/goal, Dashboard, Food date/groups/search/manual/amount/estimate/barcode, Add-food sheet, and linked Coach/Progress entry views",
+          "Requirements, selected widget tests and stored Light/Martian renders"
+        ],
+        "not_inspected": [
+          "Complete OCR/custom recipe flows and persistence failure recovery",
+          "Full onboarding/safety variants, measured contrast, large text, focus, reduced motion, TalkBack, VoiceOver, devices and novice task performance"
+        ],
+        "referrals": [
+          "Flutter: verify date state through persistence",
+          "QA: challenge visible non-gesture deletion",
+          "Product Designer: assess visual/metric prominence"
+        ],
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "limitations": "Specialist tests were inspected, not run. Stored goldens are not current-device or novice-user observation; parent later reproduced three guards."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does current accessibility and food-journaling evidence support prominent macro target bars plus energy shares before meal groups for novice logging?",
+        "reason": "Explicit user request for externally researched modern mobile fitness UX; perceived cognitive burden was uncertain.",
+        "path": "chair",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html",
+            "title": "Understanding Success Criterion 2.5.1: Pointer Gestures",
+            "published_or_updated": "WCAG 2.2 Recommendation date reported as 2023-12-05, not independently reverified; page update not established",
+            "accessed": "2026-10-10",
+            "claim": "Normative alternative-to-complex-gesture guidance; not evidence of chart effectiveness."
+          },
+          {
+            "url": "https://developer.android.com/guide/topics/ui/accessibility/apps",
+            "title": "Make apps more accessible",
+            "published_or_updated": null,
+            "accessed": "2026-10-10",
+            "claim": "Official Android accessibility guidance; does not compare macro-chart prominence."
+          },
+          {
+            "url": "https://depstein.net/assets/pubs/fcordeiro_chi15.pdf",
+            "title": "Barriers and Negative Nudges: Exploring Challenges in Food Journaling",
+            "published_or_updated": "2015",
+            "accessed": "2026-10-10",
+            "claim": "Mixed-experience journalers reported food-entry friction; no novice-only or progressive-disclosure experiment."
+          }
+        ],
+        "summary": "Chair-delegated research was evaluated through source summaries; it supports investigating entry friction but cannot prove that this chart harms or improves novice comprehension.",
+        "limitations": "Direct specialist web retrieval was blocked. Full source and population limits are in findings/research.md."
+      }
+    },
+    {
+      "task": "Trace UX-01's Dashboard manual-entry date from Food selection through persistence and identify a narrow regression.",
+      "role": "flutter",
+      "reviewer": "panel-flutter-challenge",
+      "status": "complete",
+      "inspected_commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "input_hashes": {
+        "agents/roles/flutter.md": "8d7fe94db9b6936c9d82e323da1057924c522ff20e02cb7c4eaa439636b0ff22",
+        "agents/panel-protocol.md": "5fbea73b43c16179f1da57ff9e274c8fa4feae58fe0d09bc79ee92bdf87b5423",
+        "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "requirements/dashboard/STORY.quick-actions-from-the-dashboard.MM-100.md": "f7ba353e7eaa06a65a64a07b19307ae8edd6bf4aebba8a3ec6ddee5d5bac7010",
+        "apps/mobile/lib/src/dashboard/dashboard_screen.dart": "70c8678d1fc5c0aca41e24fbae3335b71381c8098b335a555b033b3b0f6eedc6",
+        "apps/mobile/lib/src/food/add_food_button.dart": "d1b3d5b9045e77c80e7658a97605efe015ca10d08a558ca045ac4980a4102f18",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "apps/mobile/test/dashboard_test.dart": "8194711d7710f5c3529124526ac7a312d57fff8b18add17dca3fb31fbd89c525"
+      },
+      "report": "findings/flutter.md",
+      "coverage": {
+        "inspected": [
+          "Food day selection/provider, tab navigation, Dashboard display, shared AddFoodButton, sheet initialization/save, Drift/fixture repositories, and relevant requirements/tests"
+        ],
+        "not_inspected": [
+          "Catalog/scan/estimate save implementations, production database execution, whole-app state, and other UX findings"
+        ],
+        "referrals": [
+          "Chair/implementation owner: MM-206 fix",
+          "QA: run integration regression",
+          "UX: assess user-facing impact"
+        ],
+        "methods": [
+          "source-inspection"
+        ],
+        "limitations": "Reviewer did not run tests or runtime checks; parent later reproduced the wrong-day integration failure."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "MM-100 and the local date/save source trace fully determine the required Dashboard date.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Internal requirement and persistence trace; no new health or platform claim.",
+        "limitations": "No production database/device test or external research."
+      }
+    },
+    {
+      "task": "Challenge UX-02 against repository deletion guidance and assess PD-01's stored golden/source overlap.",
+      "role": "qa",
+      "reviewer": "panel-qa-challenge",
+      "status": "complete",
+      "inspected_commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "input_hashes": {
+        "agents/roles/qa.md": "4a3179cfd58dbfd46ac86b68a093856fd5c234bf95b408cf040529e21cff46ab",
+        "agents/panel-protocol.md": "5fbea73b43c16179f1da57ff9e274c8fa4feae58fe0d09bc79ee92bdf87b5423",
+        "agents/review-contract.md": "acee20e0b7be9af15cdefc39de6d795be97bbb877d8b144384e13ee84d107531",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "apps/mobile/lib/src/food/meal_section.dart": "e118914b5302a70e584d13250a691e4abc16620decfdb4a1be8d93baceb5faa5",
+        "apps/mobile/test/food_edit_test.dart": "afca70253b215f0114bdbdf33be0d3d0b60fd650f99f7e7ac381608be215ddff",
+        "apps/mobile/test/goldens/images/dashboard_martian.png": "56f9cfef7dad92e2ca1708ca2e182708f0debf43aff3a4ada737452b390b7377"
+      },
+      "report": "findings/qa.md",
+      "coverage": {
+        "inspected": [
+          "Meal-row/edit deletion UI and tests",
+          "Dashboard stored golden and FAB/scroll layout"
+        ],
+        "not_inspected": [
+          "Whole app, current build runtime, device rendering, screen reader, keyboard or switch access"
+        ],
+        "referrals": [
+          "Flutter: verify pinned Dismissible semantic behavior",
+          "Implementation: visible action and FAB geometry fix",
+          "QA owner: rerun guards and accessible interaction checks"
+        ],
+        "methods": [
+          "source-inspection"
+        ],
+        "limitations": "Read-only reviewer ran no commands/tests. Parent later reproduced the deletion gap and font-calibrated overlap."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The visible-alternative criterion is explicit in local design rules; external semantics do not alter that finding.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Bounded local design/source challenge.",
+        "limitations": "Flutter semantic-dismiss behavior remains an open platform verification question."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "training",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No training behavior or evidence claim was in scope.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No training review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "nutrition",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No nutrition rule or calculation change was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No nutrition review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "micronutrients",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No micronutrient or supplement rule was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No micronutrient review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "coaching",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No coaching trigger or recommendation was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No coaching review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "measurement",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No measurement or adaptation calculation was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No measurement review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "safety",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No clinical/medical rule was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No safety review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "product",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "This was not a requirements-completeness audit.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No product-requirements review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "architecture",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No architecture or data-model decision was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No architecture review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "integrations",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No external integration behavior was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No integrations review performed."
+      }
+    },
+    {
+      "task": "Omitted from this bounded audit.",
+      "role": "privacy-security",
+      "reviewer": "not assigned",
+      "status": "omitted",
+      "omission_reason": "Out of this bounded novice meal-entry audit; no relevant domain rule or change was proposed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned; omitted scope and reason are recorded in brief.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No data handling, transmission or permission change was proposed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Role intentionally omitted.",
+        "limitations": "No privacy or security review performed."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Chair-delegated browser-backed research agent and chair known-URL retrieval",
+      "discovery": [
+        "Google Scholar search through integrated browser; general search engines were unreliable."
+      ],
+      "retrieval": [
+        "Rendered W3C/Apple/Android documentation pages",
+        "Retrieved author-hosted/archived PDFs and inspected extracted text",
+        "Chair fetched the known Flutter Dismissible API URL"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-11",
+      "limitations": "Exact research-agent tool identifiers were not retained. Native UX and Product Designer surfaces had GitHub discovery but no general page retrieval; reviewers used chair summaries. ACM retrieval was blocked."
+    }
+  ],
+  "unresolved_questions": [
+    "Does the pinned Flutter Dismissible expose a runtime semantic dismiss action, and how does it behave on TalkBack/VoiceOver?",
+    "Do injected loading/error provider states in Food and search currently appear indistinguishable from empty states?",
+    "What novice task evidence would show whether the macro split helps comprehension or should be lower prominence?"
+  ],
+  "decisions": [
+    {
+      "id": "mm49-mm179-simple-scope",
+      "status": "accepted",
+      "summary": "Preserve the existing full macro split; no chart-policy change was requested.",
+      "authority": "Product owner"
+    },
+    {
+      "id": "mm206-mm207-mm208-separate-fixes",
+      "status": "accepted",
+      "summary": "Implement each finding under its separate bug ticket, outside the MM-205 role-guidance scope.",
+      "authority": "Product owner"
+    }
+  ],
+  "pending_work": [
+    "Verify Flutter Dismissible semantics, provider loading/error behavior, native accessibility/device behavior, and novice task performance where relevant.",
+    "Revalidate affected findings if relevant app source or requirements change.",
+    "Confirm CI is green on the latest PR #81 head before marking it ready."
+  ],
+  "tests": [
+    {
+      "command": "Push-Location .\\apps\\mobile; fvm flutter test test/dashboard_test.dart --plain-name \"MM-206: Dashboard logging ignores Food historical-day selection\"; Pop-Location",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "Expected failing-before result: saved food was absent from today (empty WhereIterable, expected length 1)."
+    },
+    {
+      "command": "Push-Location .\\apps\\mobile; fvm flutter test test/food_edit_test.dart --plain-name \"MM-207: an entry can be deleted from its visible actions and restored\"; Pop-Location",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "Expected failing-before result: no visible More actions for Chicken and rice control was found."
+    },
+    {
+      "command": "Push-Location .\\apps\\mobile; fvm flutter test test/dashboard_test.dart --plain-name \"MM-208: Dashboard FAB does not cover macro chart labels\" --reporter expanded; Pop-Location",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "Expected failing-before result with bundled production fonts loaded in setUpAll: FAB rectangle overlaps the Fat label. Without bundled fonts, Windows fallback metrics passed, demonstrating a font-dependent false negative."
+    },
+    {
+      "command": "fvm dart test test/panel_checker_test.dart (working directory: tool)",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Focused panel checker tests passed (25 tests), recorded from the preceding validation session."
+    },
+    {
+      "command": ".\\mm.ps1 req",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Requirements validation reported 208 valid tickets; allocator next ID is MM-209."
+    },
+    {
+      "command": ".\\mm.ps1 check",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "Previous broad run ended with a Dart VM/JIT compiler crash compiling mm_engine TdeeEstimator.estimate; it is not evidence these UX changes failed and is not a passing full-suite check."
+    },
+    {
+      "command": ".\\mm.ps1 format",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Formatted apps/packages/tool; 967 files, 0 changed."
+    },
+    {
+      "command": "Push-Location .\\apps\\mobile; fvm flutter test test/dashboard_test.dart test/food_edit_test.dart; Pop-Location",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Focused Dashboard/Food-edit suites: 9 passed, 3 ticketed MM-206/207/208 regression guards skipped after their expected pre-fix failures."
+    },
+    {
+      "command": ".\\mm.ps1 analyze",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Dart static analysis with --fatal-infos: no issues found."
+    },
+    {
+      "command": ".\\mm.ps1 req",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All 208 requirements valid; next allocated ID is MM-209."
+    },
+    {
+      "command": ".\\mm.ps1 panel docs/agent-runs/mm205-novice-mobile-experience",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "Initial run-directory validation failed because wrapped omission-reason text did not match the exact state reason; brief wording was corrected."
+    },
+    {
+      "command": ".\\mm.ps1 panel docs/agent-runs/mm205-novice-mobile-experience",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Canonical roles, adapters, templates, state schema and saved run passed structural validation."
+    },
+    {
+      "command": "Push-Location .\\tool; fvm dart test test/panel_checker_test.dart; Pop-Location",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All 25 focused panel checker tests passed."
+    },
+    {
+      "command": "git diff --check",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "No whitespace errors or conflict markers in the tracked diff."
+    },
+    {
+      "command": "Push-Location apps\\mobile; fvm flutter test test\\dashboard_test.dart test\\food_edit_test.dart test\\insight_card_test.dart test\\app_test.dart; $result = $LASTEXITCODE; Pop-Location; exit $result",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All 24 focused Dashboard, food-entry, insight-layout, and app-flow tests passed after fixes. Dashboard tests cover both date routes, chart-label clearance at 360x800 and 1.5x text scale, and label reachability; food tests cover the named 48x48 delete control and Undo."
+    },
+    {
+      "command": ".\\mm.ps1 test apps/mobile",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Complete mobile Flutter test suite passed: 519 passed, 56 skipped."
+    },
+    {
+      "command": ".\\mm.ps1 check",
+      "commit": "44251604bac61bdc5dd9eb69bec045e13f7e2929",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Final repository-wide CI check passed with exit code 0 and final line `All checks passed.`"
+    },
+    {
+      "command": "gh run view 38112620983; gh run download 38112620983; compare and inspect changed Dashboard/meal-row PNGs",
+      "commit": "2a04f86ecd20b75510e974442bdceccb5c7ea11c",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Linux Update goldens workflow succeeded. Fifteen changed Dashboard and food-meal screenshots were copied from the artifact after hash comparison and representative old/new visual inspection; the Add food relocation and row More actions control are visible. No Windows golden was generated."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-11T04:56:04Z",
+    "writers_stopped": true
+  }
+}

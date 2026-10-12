@@ -12,6 +12,8 @@ import '../theme/mm_colors_context.dart';
 import '../ui/mm_icon_button.dart';
 import '../ui/mm_icon_button_kind.dart';
 import '../ui/mm_disclosure.dart';
+import '../ui/mm_menu_button.dart';
+import '../ui/mm_menu_item.dart';
 import '../ui/show_mm_snack_bar.dart';
 import '../providers.dart';
 import 'copy_entries.dart';
@@ -21,7 +23,7 @@ import 'show_add_food_sheet.dart';
 
 /// One meal: its header with subtotal and an add button, then its entries.
 /// A meal with no entries still shows its header, so every meal is an add
-/// target and the list never jumps. Swipe an entry to delete it.
+/// target and the list never jumps. Swipe is an accelerator for deletion.
 class MealSection extends ConsumerWidget {
   const MealSection({
     required this.meal,
@@ -141,11 +143,25 @@ class MealSection extends ConsumerWidget {
               child: Icon(Icons.delete_outline, color: context.mm.danger),
             ),
             onDismissed: (_) => _remove(context, ref, e),
-            child: InkWell(
-              onTap: () => showAddFoodSheet(context, day, entry: e),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: FoodEntryTile(entry: e),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => showAddFoodSheet(context, day, entry: e),
+                      child: FoodEntryTile(entry: e),
+                    ),
+                  ),
+                  MmMenuButton<String>(
+                    tooltip: 'More actions for ${e.name}',
+                    icon: Icons.more_vert,
+                    items: const [MmMenuItem('delete', 'Delete')],
+                    onSelected: (action) {
+                      if (action == 'delete') _remove(context, ref, e);
+                    },
+                  ),
+                ],
               ),
             ),
           ),
