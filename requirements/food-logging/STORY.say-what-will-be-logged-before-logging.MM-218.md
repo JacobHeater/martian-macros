@@ -77,6 +77,14 @@ Scenario: One wording
 ```
 
 ## Notes
+- **Delivery reconciliation, 2026-10-12:** the observations above describe the
+  earlier walkthrough, not the current app. MM-226 removed the basis switch:
+  manual servings now scale per-serving nutrition and show logged totals.
+  MM-225 adds live macro previews to manual, amount, and estimate steps,
+  including selected cooking oil. Still open here: consistent placement and
+  wording of complete calorie/macro totals across routes, and explicit handling
+  of a stored calorie figure after macros are edited. Do not reopen the
+  removed basis choice or claim the preview resolves every criterion.
 - Evidence: step records 1.5, 1.7, 2.6, 3.3 and 4.3a in the two reports;
   screenshot tests `add_food_opened_dark`, `add_food_form_end_dark`,
   `add_food_estimate_dark`.

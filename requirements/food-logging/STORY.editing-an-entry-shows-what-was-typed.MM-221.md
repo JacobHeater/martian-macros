@@ -59,6 +59,13 @@ Scenario: An entry without an amount
 ```
 
 ## Notes
+- **Delivery reconciliation, 2026-10-12:** MM-226 changes the serving edit
+  action to Edit nutrition per serving and preserves per-serving semantics;
+  it no longer irreversibly converts that entry to typed totals. MM-202 fixes
+  fractional quantity/nutrition edit precision. Still open: showing the typed
+  per-serving fields immediately on opening, labeling/confirming day movement,
+  and resolving the legacy-entry notice. The historical action name and
+  conversion description above are superseded, not current evidence.
 - Evidence: step records 4.2, 4.3b and 4.3d; screenshot tests
   `add_food_edit_per_serving_dark` (added at the reviewers' request) and
   `add_food_edit_dark`.
