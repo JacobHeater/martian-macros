@@ -1,0 +1,154 @@
+/* The charts (MM-232): drawn here, with no chart library. Every color is a token. */
+.chart-plot {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-12);
+  margin-bottom: var(--space-12);
+  font: var(--type-caption);
+}
+.chart-energy {
+  color: var(--energy);
+}
+.chart-target {
+  color: var(--text2);
+}
+.chart-protein {
+  color: var(--protein);
+}
+.chart-estimate {
+  color: var(--ion);
+}
+.chart-measurement {
+  color: var(--carbs);
+}
+.chart-recovery {
+  color: var(--fat);
+}
+.chart-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.chart-dot {
+  fill: currentColor;
+}
+.chart-grid {
+  stroke: var(--outline);
+  stroke-width: 1;
+}
+.chart-axis {
+  fill: var(--text2);
+  font: var(--type-caption);
+  font-size: 10px;
+}
+.chart-band {
+  fill: color-mix(in srgb, var(--ion) 14%, transparent);
+}
+.chart-weigh-in {
+  fill: var(--text2);
+}
+.chart-event {
+  stroke: var(--caution);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.chart-spark {
+  height: 56px;
+}
+.chart-empty {
+  display: grid;
+  place-items: center;
+  height: 100px;
+  margin: 0;
+}
+.chart-empty-tall {
+  height: 190px;
+}
+.chart-caption,
+.chart-note {
+  margin: var(--space-8) 0 0;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.chart-note {
+  padding: var(--space-8) 0;
+  color: var(--text);
+  font: var(--type-body);
+}
+.chart-stats {
+  display: flex;
+  gap: var(--space-8);
+  margin: 0;
+}
+.chart-stat {
+  flex: 1;
+  min-width: 0;
+}
+.chart-stat-label {
+  color: var(--text2);
+  font: var(--type-label);
+}
+.chart-stat-value {
+  margin: 0;
+  font: var(--type-title);
+}
+.chart-split-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+}
+.chart-split-ring {
+  flex: none;
+}
+.chart-sector-protein {
+  fill: var(--protein);
+}
+.chart-sector-carbs {
+  fill: var(--carbs);
+}
+.chart-sector-fat {
+  fill: var(--fat);
+}
+.chart-split-list {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chart-split-item {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) 0;
+  font: var(--type-label);
+}
+.chart-text-protein {
+  color: var(--protein);
+}
+.chart-text-carbs {
+  color: var(--carbs);
+}
+.chart-text-fat {
+  color: var(--fat);
+}
+.chart-mini {
+  flex: none;
+}
+.chart-mini-base {
+  stroke: var(--outline);
+  stroke-width: 1;
+}
+.chart-mini-line {
+  fill: none;
+  stroke: var(--info);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.chart-mini-dot {
+  fill: var(--info);
+}
