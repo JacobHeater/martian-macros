@@ -19,6 +19,8 @@ import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { PackHttp } from '../foodCatalog/download/PackHttp';
+import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
@@ -56,6 +58,18 @@ export interface AppServices {
 
   /** The installed food packs read as one catalog (MM-42); given again when a pack is installed or removed. */
   readonly catalog: Watched<FoodCatalog>;
+
+  /** Where downloaded food packs are kept, apart from the user's own data (MM-56). */
+  readonly packStore: PackStore;
+
+  /** The network, as far as packs are concerned: the only thing the app ever fetches. */
+  readonly packHttp: PackHttp;
+
+  /**
+   * Where to read the list of downloadable packs, set for each build.
+   * Empty means this build offers no downloads and makes no request.
+   */
+  readonly packManifestUrl: string;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
 

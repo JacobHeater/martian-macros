@@ -1,5 +1,7 @@
 import { SqlRepositories } from '../data/SqlRepositories';
 import { SystemClock } from '../domain/integration/SystemClock';
+import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
+import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
@@ -42,6 +44,11 @@ export async function openAppServices(): Promise<AppServices> {
     eraser: repositories.eraser,
     // No pack can be installed yet, and no camera plugin is in the shell (MM-232, step 5).
     catalog: constant(new FoodCatalog([])),
+    // No pack can be downloaded until the phone's own file storage is wired in
+    // (MM-232, step 5): no address to read a list from, so no request is made.
+    packStore: new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes })),
+    packHttp: new InMemoryPackHttp(),
+    packManifestUrl: '',
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),

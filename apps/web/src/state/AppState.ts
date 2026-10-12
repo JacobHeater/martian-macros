@@ -68,6 +68,7 @@ import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
 import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
+import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
@@ -86,6 +87,8 @@ import { Loadable } from './Loadable';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
+import { PackDownloadController } from './PackDownloadController';
+import { PackManifestCheck } from './PackManifestCheck';
 import { StreamCell } from './StreamCell';
 import { ValueCell } from './ValueCell';
 
@@ -292,6 +295,18 @@ export class AppState {
   /** The installed packs read as one catalog (MM-42). Empty until a pack is installed. */
   readonly foodCatalog: StreamCell<FoodCatalog>;
 
+  /** Packs on this phone, read again whenever one is installed or removed. */
+  readonly installedPacks: Cell<Loadable<InstalledPack[]>>;
+
+  /** Counts installs and removals of packs; what is installed is read again when it changes. */
+  private readonly packChanges = new ValueCell(0);
+
+  /** The one food-pack download (MM-56). Nothing starts by itself. */
+  readonly packDownload: PackDownloadController;
+
+  /** The list of packs the host offers, read once when the user asks. */
+  readonly packManifest: PackManifestCheck;
+
   /** Each lift's estimated strength over time. Failed when a logged set cannot be worked out. */
   readonly strengthTrends: Cell<Loadable<readonly StrengthTrend[]>>;
 
@@ -338,7 +353,21 @@ export class AppState {
 
     this.setup = stream(() => s.setup.watchSetup());
     this.themePreference = stream(() => s.preferences.watchThemePreference());
-    this.foodCatalog = stream(() => s.catalog);
+    this.foodCatalog = stream(() => {
+      // Read here so that an install or a removal makes this ask again.
+      void this.packChanges.value;
+      return s.catalog;
+    });
+    this.installedPacks = stream(() => {
+      void this.packChanges.value;
+      return once(() => s.packStore.installed());
+    });
+    this.packDownload = new PackDownloadController({
+      http: s.packHttp,
+      store: s.packStore,
+      onInstalled: () => this.packsChanged(),
+    });
+    this.packManifest = new PackManifestCheck({ http: s.packHttp, url: s.packManifestUrl });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
@@ -773,6 +802,11 @@ export class AppState {
     });
 
     this.checkIn = this.makeCheckIn();
+  }
+
+  /** Reads again which packs are installed, and the catalog made of them. */
+  packsChanged(): void {
+    this.packChanges.put(this.packChanges.peek() + 1);
   }
 
   /** Looks at the health platform again: what it has, what is allowed, what has been imported. */
