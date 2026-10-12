@@ -1,3 +1,4 @@
+import type { CalendarDate } from '../domain/CalendarDate';
 import type { MmMenuItem } from './MmMenuItem';
 
 /**
@@ -27,6 +28,14 @@ export interface Overlays {
    * in words and with a check, not by color alone.
    */
   options<T>(question: { title: string; options: readonly MmMenuItem<T>[]; selected: T }): Promise<MmMenuItem<T> | undefined>;
+
+  /** Asks for a calendar day from `first` to `last`. */
+  date(question: {
+    helpText: string;
+    initial: CalendarDate;
+    first: CalendarDate;
+    last: CalendarDate;
+  }): Promise<CalendarDate | undefined>;
 
   /** Asks for a time of day. Gives minutes after midnight. */
   timeOfDay(question: { initialMinuteOfDay: number; helpText?: string }): Promise<number | undefined>;

@@ -6,6 +6,7 @@ describe('the palette a theme choice means', () => {
     expect(paletteFor('martian', false)).toBe('martian');
     expect(paletteFor('light', true)).toBe('light');
     expect(paletteFor('dark', false)).toBe('dark');
+    expect(paletteFor('unselected', false)).toBe('martian');
   });
 
   it('follows the phone for System', () => {

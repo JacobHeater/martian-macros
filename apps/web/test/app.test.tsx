@@ -1,52 +1,98 @@
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { App } from '../src/app/App';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { CalendarDate } from '../src/domain/CalendarDate';
+import { InMemoryRepositories } from '../src/fixtures/InMemoryRepositories';
+import { typicalSetup } from '../src/fixtures/typicalSetup';
 import type { SystemBars } from '../src/platform/SystemBars';
+import { renderApp } from './support/renderApp';
 
-/** MM-229: the shell of the app. */
+/** MM-229, MM-232: the shell of the app, for someone who is set up. */
+const today = CalendarDate.of(2026, 10, 10);
+let repos: InMemoryRepositories;
+
+beforeEach(async () => {
+  repos = new InMemoryRepositories();
+  await repos.preferences.saveThemePreference('martian');
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today }));
+  await repos.weights.saveWeight(today, 82);
+});
+
+const bar = () => screen.findByRole('navigation', { name: 'Destinations' });
+
 describe('the five destinations', () => {
-  it('are in a bottom bar, Dashboard first and current', () => {
-    render(<App />);
-    const bar = screen.getByRole('navigation', { name: 'Destinations' });
-    const places = within(bar).getAllByRole('button');
+  it('are in a bottom bar, Dashboard first and current', async () => {
+    renderApp(repos, today);
+    const places = within(await bar()).getAllByRole('button');
     expect(places.map((place) => place.textContent)).toEqual(['Dashboard', 'Food', 'Train', 'Progress', 'Coach']);
     expect(places[0]).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Today');
   });
 
   it('show the chosen one and mark it current in words', async () => {
-    render(<App />);
-    const bar = screen.getByRole('navigation', { name: 'Destinations' });
-    await userEvent.click(within(bar).getByRole('button', { name: 'Progress' }));
-
-    expect(within(bar).getByRole('button', { name: 'Progress' })).toHaveAttribute('aria-current', 'page');
-    expect(within(bar).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
+    renderApp(repos, today);
+    const destinations = await bar();
+    await userEvent.click(within(destinations).getByRole('button', { name: 'Progress' }));
+    expect(within(destinations).getByRole('button', { name: 'Progress' })).toHaveAttribute('aria-current', 'page');
+    expect(within(destinations).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Progress');
   });
 });
 
 describe('the theme', () => {
-  it('is Martian for a new installation', () => {
-    render(<App />);
+  it('is the one that was chosen', async () => {
+    renderApp(repos, today);
+    await bar();
     expect(document.documentElement).toHaveClass('theme-martian');
   });
 
-  it('changes at once when another is chosen in Settings', async () => {
-    render(<App />);
-    await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Settings');
+  it('changes at once when another is chosen in Settings, and is kept', async () => {
+    renderApp(repos, today);
+    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
+    const choices = within(screen.getByRole('group', { name: 'Appearance' })).getAllByRole('button');
+    expect(choices.map((choice) => choice.textContent)).toEqual(['Martian', 'Light', 'Dark', 'System']);
 
     await userEvent.click(screen.getByRole('button', { name: 'Light' }));
+    await screen.findByRole('button', { name: 'Light', pressed: true });
     expect(document.documentElement).toHaveClass('theme-light');
-    expect(screen.getByRole('button', { name: 'Light (chosen)' })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+    expect(await bar()).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Settings' })).not.toBeInTheDocument();
   });
 
-  it('follows the phone when System is chosen', () => {
-    render(<App initialTheme="system" />);
+  // From martian_theme_startup_test.dart: "Settings ... reports failed saves".
+  it('says so when a choice cannot be saved, and keeps the one in force', async () => {
+    await repos.preferences.saveThemePreference('light');
+    let fail = true;
+    renderApp(repos, today, {
+      change: (services) => ({
+        ...services,
+        preferences: Object.assign(Object.create(services.preferences) as typeof services.preferences, {
+          saveThemePreference: async (preference: Parameters<typeof services.preferences.saveThemePreference>[0]) => {
+            if (fail) throw new Error('theme write unavailable');
+            await services.preferences.saveThemePreference(preference);
+          },
+        }),
+      }),
+    });
+    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Martian' }));
+    expect(await screen.findByText('Could not save your theme. Please try again.')).toBeInTheDocument();
+    expect(document.documentElement).toHaveClass('theme-light');
+
+    fail = false;
+    await userEvent.click(screen.getByRole('button', { name: 'Martian' }));
+    await screen.findByRole('button', { name: 'Martian', pressed: true });
+    expect(document.documentElement).toHaveClass('theme-martian');
+    expect(screen.queryByText('Could not save your theme. Please try again.')).not.toBeInTheDocument();
+  });
+
+  it('follows the phone when System is chosen', async () => {
+    await repos.preferences.saveThemePreference('system');
+    renderApp(repos, today);
+    await bar();
     // The test phone is set to a light appearance (test/setup.ts).
     expect(document.documentElement).toHaveClass('theme-light');
   });
@@ -56,11 +102,13 @@ describe("the phone's bars", () => {
   it('are told the background is dark in Martian and light in Light', async () => {
     const told: boolean[] = [];
     const bars: SystemBars = { setBackgroundIsDark: (dark) => told.push(dark) };
-    render(<App systemBars={bars} />);
+    renderApp(repos, today, { systemBars: bars });
+    await bar();
     expect(told.at(-1)).toBe(true);
 
     await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
     await userEvent.click(screen.getByRole('button', { name: 'Light' }));
+    await screen.findByRole('button', { name: 'Light', pressed: true });
     expect(told.at(-1)).toBe(false);
   });
 });

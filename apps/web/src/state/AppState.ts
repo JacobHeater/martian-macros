@@ -63,7 +63,9 @@ import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
+import { CheckIn } from './CheckIn';
 import { DerivedCell } from './DerivedCell';
+import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
@@ -96,10 +98,22 @@ export class AppState {
   /** Counts imports from the health platform; what was imported is read again when it changes. */
   private readonly imports = new ValueCell(0);
 
-  readonly setup: Cell<Loadable<UserSetup | undefined>>;
+  readonly setup: StreamCell<UserSetup | undefined>;
 
   /** Light, dark or follow the phone (MM-165). */
-  readonly themePreference: Cell<Loadable<ThemePreference>>;
+  readonly themePreference: StreamCell<ThemePreference>;
+
+  /** A look being tried on the theme chooser before it is kept (MM-184). */
+  readonly themePreview = new ValueCell<ThemePreference | undefined>(undefined);
+
+  /** Which destination is showing. The app starts on the dashboard. */
+  readonly homeTab = new ValueCell<HomeDestination>('dashboard');
+
+  /** Whether the repeat health check was put off for this launch (MM-112). */
+  readonly healthRecheckDismissed = new ValueCell(false);
+
+  /** Saves new targets when they are due, for as long as it is started. */
+  readonly checkIn: CheckIn;
 
   /** The weigh-ins the user typed, and nothing imported. */
   readonly typedWeights: Cell<Loadable<WeightObservation[]>>;
@@ -615,6 +629,21 @@ export class AppState {
         return undefined;
       }
       return history === undefined ? undefined : history[history.length - 1];
+    });
+
+    this.checkIn = this.makeCheckIn();
+  }
+
+  /** What the check-in needs; made last, once everything it reads exists. */
+  private makeCheckIn(): CheckIn {
+    return new CheckIn({
+      setup: () => of(this.setup),
+      coach: this.coach,
+      history: () => of(this.targetsHistory),
+      pauses: () => of(this.pauses) ?? [],
+      today: this.today,
+      targets: this.services.targets,
+      setups: this.services.setup,
     });
   }
 
