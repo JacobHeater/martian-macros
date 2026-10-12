@@ -29,8 +29,8 @@
   ]);
   var logging = m.info('Your logging', [m.p('9 whole days logged in a row. A missed day is forgiven, once a week.')]);
   function facts(a, al, b, bl) {
-    return m.rowx(['<div class="grow"><div class="fig" style="font-size:26px">' + a + '</div><div class="label t2">' + al + '</div></div>',
-      '<div class="grow"><div class="fig" style="font-size:26px">' + b + '</div><div class="label t2">' + bl + '</div></div>'], 'top');
+    return m.rowx(['<div class="grow"><div class="fig" style="font-size:calc(26px * var(--ts, 1))">' + a + '</div><div class="label t2">' + al + '</div></div>',
+      '<div class="grow"><div class="fig" style="font-size:calc(26px * var(--ts, 1))">' + b + '</div><div class="label t2">' + bl + '</div></div>'], 'top');
   }
   var metricsHead = m.col([m.heading('Your metrics'), m.seg(['7 days', '30 days'], 1)]);
   var nutrition = m.info('Nutrition history', [

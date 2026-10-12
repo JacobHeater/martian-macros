@@ -23,7 +23,7 @@
     intro: 'Every reusable component in <code>apps/mobile/lib/src/ui/</code> and <code>apps/mobile/lib/src/charts/</code>, with its states. Each specimen has a stable address: <code>components/index.html#&lt;id&gt;</code>. Screens use these and never a raw Material control (MM-163).',
     sources: ['apps/mobile/lib/src/ui/', 'apps/mobile/lib/src/charts/', 'apps/mobile/lib/src/theme/', 'apps/mobile/lib/src/gallery/'],
     tickets: ['MM-102', 'MM-103', 'MM-104', 'MM-105', 'MM-107', 'MM-163', 'MM-181', 'MM-187'],
-    limits: 'Focus and hover are the browser’s, not Flutter’s: the app shows Material ink and focus rings that are not reproduced. Charts are schematic. The text-size switch scales the whole specimen; in the app only text grows.',
+    limits: 'Focus and hover are the browser’s, not Flutter’s: the app shows Material ink and focus rings that are not reproduced. Charts are schematic.',
     sections: [
       { h: 'Tokens', id: 'tokens', frames: [
         spec('colors', 'Colors, by meaning', 'theme/mm_colors.dart', 'Switch the theme above to see each of the three sets.', [swatches], true),
@@ -88,13 +88,13 @@
         spec('macro-bar', 'MacroBar', 'ui/macro_bar.dart', 'Amount against target, with the protein minimum marked. Colors differ in lightness as well as hue.', [m.macros()]),
         spec('macro-figure', 'MacroFigure', 'ui/macro_figure.dart', 'A macro’s color rule, name and amount.', [m.rowx(['protein|Protein|177 g', 'carbs|Carbs|205 g', 'fat|Fat|54 g'].map(function (s) { var p = s.split('|');
           return '<div class="grow"><div style="height:4px;border-radius:2px;background:var(--' + p[0] + ')"></div><div class="label t2" style="margin-top:8px">' + p[1] + '</div><div class="heading">' + p[2] + '</div></div>'; }))]),
-        spec('metric-facts', 'MetricFacts', 'ui/metric_facts.dart', 'Two or more figures with their names.', [m.rowx(['<div class="grow"><div class="fig" style="font-size:26px">2,298 kcal</div><div class="label t2">Average logged intake</div></div>', '<div class="grow"><div class="fig" style="font-size:26px">30 / 30</div><div class="label t2">Days with intake records</div></div>'], 'top')]),
+        spec('metric-facts', 'MetricFacts', 'ui/metric_facts.dart', 'Two or more figures with their names.', [m.rowx(['<div class="grow"><div class="fig" style="font-size:calc(26px * var(--ts, 1))">2,298 kcal</div><div class="label t2">Average logged intake</div></div>', '<div class="grow"><div class="fig" style="font-size:calc(26px * var(--ts, 1))">30 / 30</div><div class="label t2">Days with intake records</div></div>'], 'top')]),
         spec('mm-progress-bar', 'MmProgressBar', 'ui/mm_progress_bar.dart', '', [m.progress(42)]),
         spec('step-progress', 'StepProgress', 'ui/step_progress.dart', 'Where one is in onboarding.', [m.steps(7, 3)]),
         spec('mm-spinner', 'MmSpinner', 'ui/mm_spinner.dart', 'Still here; it turns in the app.', [m.spinner()]),
         spec('mini-trend', 'MiniTrend', 'ui/mini_trend.dart, ui/mini_trend_painter.dart', 'A small line for a recovery answer over the last check-ins, with the series spoken.', [m.rowx(['<span class="grow">Hunger</span><span class="t2">3 of 5</span>', m.spark()])]),
         spec('muscle-volume-row', 'MuscleVolumeRow', 'ui/muscle_volume_row.dart', 'Hard sets this week against the shaded 10–20 reference, with last week’s marker.', [m.col(['<div><b>Back</b> &nbsp; <b>4 hard sets</b></div>', m.cap('Previous: 4 · change: 0'), m.vol(20, 20)], 'gap4')]),
-        spec('strength-trend-card', 'StrengthTrendCard', 'ui/strength_trend_card.dart', 'A lift’s estimated one-rep max over time. Its other states are on the Progress sheet.', [m.info('Back squat', ['<div><div class="fig" style="font-size:26px">319.7 lb</div><div class="cap">Smoothed e1RM · October 5, 2026</div></div>', m.lineChart()])])
+        spec('strength-trend-card', 'StrengthTrendCard', 'ui/strength_trend_card.dart', 'A lift’s estimated one-rep max over time. Its other states are on the Progress sheet.', [m.info('Back squat', ['<div><div class="fig" style="font-size:calc(26px * var(--ts, 1))">319.7 lb</div><div class="cap">Smoothed e1RM · October 5, 2026</div></div>', m.lineChart()])])
       ] },
       { h: 'Charts', id: 'charts', frames: [
         spec('trend-chart', 'TrendChart and TrendStats', 'charts/trend_chart.dart, charts/trend_stats.dart', 'Weigh-ins as dots, the trend as a line, its uncertainty as a band, weight events as dashed markers (MM-17, MM-107).', [

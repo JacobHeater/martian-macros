@@ -14,7 +14,7 @@
   var wbar = { title: 'Workout', back: true, acts: ['trash'] };
   function clock(o) {
     o = o || {};
-    return m.card([m.rowx(['<div class="grow"><div class="fig" style="font-size:22px;line-height:28px">' + (o.time || '38:00') + '</div><div class="t2">' + (o.sub || 'Started 11:22 AM') + '</div></div>',
+    return m.card([m.rowx(['<div class="grow"><div class="fig" style="font-size:calc(22px * var(--ts, 1));line-height:calc(28px * var(--ts, 1))">' + (o.time || '38:00') + '</div><div class="t2">' + (o.sub || 'Started 11:22 AM') + '</div></div>',
       o.done ? '' : m.btn(o.paused ? 'Resume' : 'Pause', 'secondary', { icon: o.paused ? 'play' : 'pause' })]), m.btn('Edit times', 'text', { sm: true }).replace('class="btn', 'style="align-self:flex-start" class="btn')]);
   }
   function setRow(text, n, time) { return m.row(text, '', '<span class="cap">Set ' + n + (time ? ' · ' + time : '') + '</span>', { cls: 'bare' }); }
@@ -34,7 +34,7 @@
     m.row('Suggestions use', '6 to 10 reps · 5 lb steps', m.i('right', 's'), { cls: 'bare' }), m.row('Rest target', '2:00', m.i('right', 's'), { cls: 'bare', show: 'rest' }),
     m.btn('Add set', 'secondary', { block: true })]);
   function timer(labelText, time, action, kind, note) {
-    return '<div class="bottom"><div class="grow"><div class="cap">' + labelText + '</div><div class="fig" style="font-size:22px;line-height:28px">' + time + '</div>' + (note ? '<div class="cap">' + note + '</div>' : '') + '</div>' + m.btn(action, kind) + '</div>';
+    return '<div class="bottom"><div class="grow"><div class="cap">' + labelText + '</div><div class="fig" style="font-size:calc(22px * var(--ts, 1));line-height:calc(28px * var(--ts, 1))">' + time + '</div>' + (note ? '<div class="cap">' + note + '</div>' : '') + '</div>' + m.btn(action, kind) + '</div>';
   }
   var clockDialog = function (hidden, err) {
     return '<div class="scrim mid" data-layer="clock"' + (hidden ? ' hidden' : '') + '><div class="dialog"><div class="heading">Set started</div>' +
@@ -75,7 +75,7 @@
       ] },
       { h: 'Workout: clock, timers and suggestions', frames: [
         m.frame('workout-paused', 'Paused', '', m.phone({ cls: 'short', bar: wbar, body: [clock({ paused: true, time: '38:00', sub: 'Paused<br>Paused for 4:10' })], bottom: timer('Paused', '0:00', 'Start set', 'off') })),
-        m.frame('workout-set-running', 'A set being timed', '', m.phone({ cls: 'short', bar: wbar, body: [m.p('Tap Add set when the set is done.', 't2')], bottom: timer('Set', '0:23', 'Cancel', 'secondary') })),
+        m.frame('workout-set-running', 'A set being timed', 'As the screenshot test shows it: the instruction is in the bar, under the figure, and with a set open the Add set button it names is below the fold (MM-222).', m.phone({ cls: 'short', bar: wbar, body: ['<div style="height:40px"></div>'], bottom: timer('Set', '0:23', 'Cancel', 'secondary', 'Tap Add set when the set is done.') })),
         m.frame('workout-rest-counting', 'Rest counting down to a target', '', m.phone({ cls: 'short', bar: wbar, body: ['<div style="height:40px"></div>'], bottom: timer('Rest left · 2:00 target', '1:12', 'Start set', 'primary') })),
         m.frame('workout-rest-reached', 'Target rest reached', 'The phone vibrates once.', m.phone({ cls: 'short', bar: wbar, body: ['<div style="height:40px"></div>'], bottom: timer('Target rest reached · 2:00 target', '2:07', 'Start set', 'primary') })),
         m.frame('workout-suggestions', 'The four suggestions', 'MM-79. A suggestion is a sentence, never a prefilled number.', m.phone({ cls: 'short', bar: wbar, body: [

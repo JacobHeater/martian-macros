@@ -16,12 +16,12 @@
     m.rowx([m.donut(), m.col(['<div class="c-protein"><b>Protein</b><br>40 g · 28.3%</div>', '<div class="c-carbs"><b>Carbs</b><br>61 g · 43.1%</div>', '<div class="c-fat"><b>Fat</b><br>18 g · 28.6%</div>'])]),
     m.cap('566 kcal from recorded macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol and other calorie differences are not part of this split.')]);
   function meal(name, kcal, entries, open) {
-    var head = '<div class="rowx" data-disc-host><div class="grow"><div class="heading" style="font-size:15px">' + name + '</div>' + (kcal ? '<div class="t2" style="font-size:13px">' + kcal + '</div>' : '') + '</div>' +
+    var head = '<div class="rowx" data-disc-host><div class="grow"><div class="heading" style="font-size:calc(15px * var(--ts, 1))">' + name + '</div>' + (kcal ? '<div class="t2" style="font-size:calc(13px * var(--ts, 1))">' + kcal + '</div>' : '') + '</div>' +
       m.icobtn('plus', 'Add food to ' + name.toLowerCase(), { cls: 'add', s: true }) + m.icobtn(open ? 'up' : 'down', 'Show or hide ' + name, { disc: true, s: true }) + '</div>';
     return '<div class="card">' + head + '<div class="col" ' + (open ? '' : 'hidden') + '>' + (entries || '') + '</div></div>';
   }
   function entry(name, macros, src, kcal) {
-    return m.hr() + m.rowx(['<div class="grow"><div>' + name + '</div><div class="t2" style="font-size:13px">' + macros + '</div><div class="t3" style="font-size:13px">' + src + '</div></div><div class="heading">' + kcal + '</div>']);
+    return m.hr() + m.rowx(['<div class="grow"><div>' + name + '</div><div class="t2" style="font-size:calc(13px * var(--ts, 1))">' + macros + '</div><div class="t3" style="font-size:calc(13px * var(--ts, 1))">' + src + '</div></div><div class="heading">' + kcal + '</div>']);
   }
   var meals = [
     meal('Breakfast', '566 kcal · 40 g protein', entry('Demo oats and yogurt', 'P 40 · C 61 · F 18', 'Weighed · amount not recorded', '566'), true),
@@ -46,7 +46,7 @@
           m.hero({ pct: 0, fig: '2,100', cap: 'kcal left of 2,100', parts: [m.macros({ protein: '0 g · min 131 · target 163', carbs: '0 / 230 g', fat: '0 / 58 g', pcts: [0, 0, 0] })] }),
           m.p('Nothing logged yet. Start with breakfast.', 't2'), m.btn('Copy yesterday', 'secondary', { icon: 'copy' })] })),
         m.frame('food-past-day', 'A past day', 'The day stepper moves back and forward; forward stops at today. A past meal can be copied to today.', m.phone({ cls: 'short', bar: { title: 'Yesterday', day: true, acts: ['gear'] }, nav: 'food', body: [
-          '<div class="card"><div class="rowx"><div class="grow"><div class="heading" style="font-size:15px">Dinner</div><div class="t2" style="font-size:13px">720 kcal · 48 g protein</div></div>' +
+          '<div class="card"><div class="rowx"><div class="grow"><div class="heading" style="font-size:calc(15px * var(--ts, 1))">Dinner</div><div class="t2" style="font-size:calc(13px * var(--ts, 1))">720 kcal · 48 g protein</div></div>' +
           m.icobtn('copy', 'Copy dinner to today', { s: true }) + m.icobtn('plus', 'Add food to dinner', { cls: 'add', s: true }) + m.icobtn('up', 'Hide dinner', { s: true }) + '</div>' +
           entry('Chicken thigh, roasted', 'P 48 · C 0 · F 22', 'USDA, lab-analyzed · 220 g weighed', '390') + entry('Rice, cooked', 'P 6 · C 72 · F 1', 'Cup / spoon · 1.5 cups', '330') + '</div>'] })),
         m.frame('food-detail-full', 'Full detail level', 'Fiber and alcohol lines appear under the split when the detail level is Full (MM-49).', m.phone({ cls: 'short', bar: bar, body: [split, m.p('Fiber: 18 g · guide 30 g', 't2'), m.p('Alcohol: 98 kcal', 't2')] })),

@@ -75,7 +75,7 @@
       o = o || {};
       return '<div class="field ' + (o.err ? 'err ' : '') + (o.cls || '') + '">' +
         (labelText && value !== '' && value != null ? '<span class="fl">' + labelText + '</span>' : '') +
-        (value !== '' && value != null ? '<span class="v">' + value + '</span>' : '<span class="ph">' + (labelText || '') + '</span>') +
+        '<span class="v" contenteditable="true" role="textbox" aria-label="' + (labelText || 'Value') + '" data-ph="' + (labelText || '') + '">' + (value == null ? '' : value) + '</span>' +
         (o.sfx ? '<span class="sfx">' + o.sfx + '</span>' : '') + '</div>' +
         (o.help ? '<div class="helper ' + (o.err ? 'err' : '') + '">' + o.help + '</div>' : '');
     },
@@ -129,7 +129,7 @@
     choice: function (titleText, sub, o) {
       o = o || {};
       return '<div class="choice ' + (o.on ? 'on' : '') + '" role="button" tabindex="0"><div class="grow"><div class="heading">' + titleText +
-        (o.tag ? '<span class="tag">' + o.tag + '</span>' : '') + '</div>' + (sub ? '<div class="t2" style="font-size:14px">' + sub + '</div>' : '') + '</div>' +
+        (o.tag ? '<span class="tag">' + o.tag + '</span>' : '') + '</div>' + (sub ? '<div class="t2" style="font-size:calc(14px * var(--ts, 1))">' + sub + '</div>' : '') + '</div>' +
         '<span class="tick" ' + (o.on ? '' : 'hidden') + '>' + i('check') + '</span></div>';
     },
     choices: function (parts) { return '<div class="col choices">' + j(parts) + '</div>'; },
@@ -277,9 +277,11 @@
       }).join('');
       document.body.className = 'sheet t-martian';
       document.body.insertAdjacentHTML('beforeend', head + tools + '<main>' + body + '</main>');
-      // "?theme=dark" or "?theme=light" opens the sheet in that theme.
+      // "?theme=dark" or "?theme=light" opens the sheet in that theme; "?text=2" at that text size.
       var asked = /[?&]theme=(martian|dark|light)\b/.exec(location.search);
       if (asked) act(document.querySelector('[data-theme="' + asked[1] + '"]'));
+      var size = /[?&]text=(1\.3|2)/.exec(location.search);
+      if (size) act(document.querySelector('[data-zoom="' + size[1] + '"]'));
       if (location.hash) {
         var target = document.getElementById(location.hash.slice(1));
         if (target) target.scrollIntoView();
@@ -294,9 +296,8 @@
       document.body.className = 'sheet t-' + t.dataset.theme;
       document.querySelectorAll('[data-theme]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === t)); });
     } else if ((t = el.closest('[data-zoom]'))) {
-      // Approximate: the whole frame scales. In the app only text does.
-      document.querySelectorAll('.phone, .specimen').forEach(function (p) { p.style.zoom = t.dataset.zoom; });
-      document.querySelectorAll('.frame').forEach(function (f) { f.style.width = f.classList.contains('wide') ? '' : 360 * t.dataset.zoom + 'px'; });
+      // Text alone grows, as in the app; the frame keeps its width and reflows.
+      document.querySelectorAll('.phone, .specimen').forEach(function (p) { p.style.setProperty('--ts', t.dataset.zoom); });
       document.querySelectorAll('[data-zoom]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === t)); });
     } else if ((t = el.closest('[data-hide]'))) {
       var layer = t.closest('[data-layer]');
