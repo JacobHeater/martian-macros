@@ -1,0 +1,68 @@
+import { describe, expect, it } from 'vitest';
+import { healthConnectSample } from '../../src/platform/healthConnectSample';
+import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
+
+/** MM-68: a Health Connect reading as the app keeps it. */
+const at = new Date(2026, 8, 1, 7, 2).getTime();
+
+const record = (type: string, value: number | undefined, over: Partial<MmHealthRecord> = {}): MmHealthRecord => ({
+  id: 'abc-123',
+  type,
+  ...(value === undefined ? {} : { value }),
+  startMs: at,
+  endMs: at,
+  sourceId: 'com.example.scale',
+  sourceName: 'Bathroom scale',
+  ...over,
+});
+
+describe('healthConnectSample', () => {
+  it('a weight keeps its value, time, id and source', () => {
+    const sample = healthConnectSample(record('weight', 82.4));
+    expect(sample?.type).toBe('weight');
+    expect(sample?.value).toBe(82.4);
+    expect(sample?.platformId).toBe('abc-123');
+    expect(sample?.start).toEqual(new Date(2026, 8, 1, 7, 2));
+    expect(sample?.end).toBeUndefined();
+    expect(sample?.sourceId).toBe('com.example.scale');
+    expect(sample?.sourceName).toBe('Bathroom scale');
+  });
+
+  it('a source with no name is shown by its id', () => {
+    expect(healthConnectSample(record('weight', 82.4, { sourceName: '' }))?.sourceName).toBe('com.example.scale');
+  });
+
+  it('a height in meters is kept in centimeters', () => {
+    expect(healthConnectSample(record('height', 1.78))?.value).toBeCloseTo(178);
+  });
+
+  it('body fat, lean mass and steps keep the number as it is', () => {
+    expect(healthConnectSample(record('bodyFat', 21.5))?.value).toBe(21.5);
+    expect(healthConnectSample(record('leanMass', 61.2))?.value).toBe(61.2);
+    expect(healthConnectSample(record('steps', 8042))?.value).toBe(8042);
+  });
+
+  it('a workout is kept as its length in minutes, with its span', () => {
+    const sample = healthConnectSample(record('workout', undefined, { endMs: at + 45 * 60000 }));
+    expect(sample?.value).toBe(45);
+    expect(sample?.start).toEqual(new Date(at));
+    expect(sample?.end).toEqual(new Date(at + 45 * 60000));
+  });
+
+  it('a day of menstrual flow is kept as 1, whatever the platform says', () => {
+    expect(healthConnectSample(record('menstruation', 3))?.value).toBe(1);
+  });
+
+  it('a reading that spans no time has no end', () => {
+    expect(healthConnectSample(record('steps', 100))?.end).toBeUndefined();
+  });
+
+  it('a numeric type with no number is not imported', () => {
+    expect(healthConnectSample(record('weight', undefined))).toBeUndefined();
+    expect(healthConnectSample(record('height', undefined))).toBeUndefined();
+  });
+
+  it('a kind of reading the app does not import gives nothing', () => {
+    expect(healthConnectSample(record('BLOOD_GLUCOSE', 5.5))).toBeUndefined();
+  });
+});
