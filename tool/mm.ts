@@ -10,7 +10,7 @@ import { runRequirements } from './src/requirements.ts';
 import { runRoadmapReport } from './src/roadmap.ts';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const webApp = `${repoRoot}/apps/web`;
+const webApp = `${repoRoot}/apps/mobile`;
 
 type Command = (args: readonly string[]) => Promise<number> | number;
 
