@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Martian Macros DEMO</string>
+    <string name="title_activity_main">Martian Macros DEMO</string>
+    <string name="package_name">com.martianmacros.martian_macros.demo</string>
+    <string name="custom_url_scheme">com.martianmacros.martian_macros.demo</string>
+</resources>

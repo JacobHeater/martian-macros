@@ -103,12 +103,26 @@ Scenario: Screenshots anywhere
   CI sets up Node 22.
 - The built app is 225 kB of script (71 kB compressed) plus the two fonts.
 
+**Built and verified (the Android shell):**
+- `apps/web/android/`: a Capacitor 8.5.3 project with the demo app ID and
+  the name "Martian Macros DEMO". Cloud backup is off. `npm run android`
+  builds the app and copies it in.
+- Built with Gradle and installed on the Android emulator (a Pixel 10 Pro XL
+  image) with Wi-Fi and mobile data turned off: it opens to Dashboard in the
+  Martian palette with the bundled fonts, the destinations and the gear
+  respond to touch, and choosing Light in Settings changes the app at once.
+- The app draws behind the phone's bars and keeps clear of them. The bars'
+  icons follow the palette through `src/platform/SystemBars.ts` (ours) and
+  its Capacitor adapter; before that they were dark on the dark background.
+- The emulator's normal app was not touched. The owner's phone was connected
+  throughout and nothing was installed on it.
+
 **Not built yet:**
-- The Android shell under the demo app ID, and seeing it on a phone.
 - Screenshot tests.
+- CI does not build the Android shell.
 - Rules that enforce the engineering principles in TypeScript (one
   declaration per file is followed by hand so far; no vendor import outside
   its adapter and no raw control in a screen have nothing to check yet).
 
-**Not verified:** the app has only been seen in desktop Edge. Nothing has
-run in a phone's web view.
+**Not verified:** a physical phone. The shell has run on the emulator only.
+Typing, the keyboard and sheets have nothing to be judged on yet.
