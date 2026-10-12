@@ -91,18 +91,18 @@ body.sheet {
 .phone {
   width: 360px; min-height: 640px; display: flex; flex-direction: column; position: relative;
   background: var(--canvas); color: var(--text); border-radius: 20px; overflow: hidden;
-  font: 400 15px/22px "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 400 calc(15px * var(--ts, 1))/calc(22px * var(--ts, 1)) "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-variant-numeric: tabular-nums; box-shadow: 0 6px 24px rgba(12, 18, 32, .22);
 }
 .phone.short { min-height: 0; }
 .specimen {
   background: var(--canvas); color: var(--text); border-radius: 16px; padding: 16px;
-  font: 400 15px/22px "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font: 400 calc(15px * var(--ts, 1))/calc(22px * var(--ts, 1)) "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums;
   display: flex; flex-direction: column; gap: 12px;
 }
 .phone p, .specimen p { margin: 0; }
 .appbar { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; min-height: 56px; }
-.appbar .title { font: 600 22px/28px "SpaceGrotesk", "Inter", sans-serif; flex: 1; }
+.appbar .title { font: 600 calc(22px * var(--ts, 1))/calc(28px * var(--ts, 1)) "SpaceGrotesk", "Inter", sans-serif; flex: 1; }
 .appbar .ico { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text); flex: none; }
 .appbar .ico.dim { color: var(--text3); opacity: .6; }
 .body { flex: 1; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -112,12 +112,12 @@ body.sheet {
 svg.i { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 svg.i.s { width: 20px; height: 20px; }
 
-.title { font: 600 22px/28px "SpaceGrotesk", "Inter", sans-serif; }
-.heading { font: 600 17px/24px "Inter", sans-serif; }
-.label { font: 600 13px/16px "Inter", sans-serif; letter-spacing: .2px; }
-.cap { font: 400 12px/16px "Inter", sans-serif; color: var(--text2); }
-.fig-xl { font: 600 48px/52px "SpaceGrotesk", "Inter", sans-serif; }
-.fig { font: 600 32px/36px "SpaceGrotesk", "Inter", sans-serif; }
+.title { font: 600 calc(22px * var(--ts, 1))/calc(28px * var(--ts, 1)) "SpaceGrotesk", "Inter", sans-serif; }
+.heading { font: 600 calc(17px * var(--ts, 1))/calc(24px * var(--ts, 1)) "Inter", sans-serif; }
+.label { font: 600 calc(13px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; letter-spacing: .2px; }
+.cap { font: 400 calc(12px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
+.fig-xl { font: 600 calc(48px * var(--ts, 1))/calc(52px * var(--ts, 1)) "SpaceGrotesk", "Inter", sans-serif; }
+.fig { font: 600 calc(32px * var(--ts, 1))/calc(36px * var(--ts, 1)) "SpaceGrotesk", "Inter", sans-serif; }
 .t2 { color: var(--text2); } .t3 { color: var(--text3); }
 .c-ember { color: var(--ember); } .c-ion { color: var(--ion); } .c-info { color: var(--info); }
 .c-caution { color: var(--caution); } .c-danger { color: var(--danger); } .c-positive { color: var(--positive); }
@@ -140,7 +140,7 @@ svg.i.s { width: 20px; height: 20px; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px;
-  border-radius: 12px; font: 600 15px/24px "Inter", sans-serif; border: 1px solid transparent; white-space: nowrap;
+  border-radius: 12px; font: 600 calc(15px * var(--ts, 1))/calc(24px * var(--ts, 1)) "Inter", sans-serif; border: 1px solid transparent; white-space: nowrap;
 }
 .btn.primary { background: var(--ember); color: var(--on-ember); }
 .btn.secondary { border-color: var(--outline-strong); color: var(--text); }
@@ -150,31 +150,31 @@ svg.i.s { width: 20px; height: 20px; }
 .btn.sm { min-height: 40px; padding: 0 14px; }
 .icobtn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text2); flex: none; }
 .icobtn.add { background: color-mix(in srgb, var(--ember) 15%, transparent); color: var(--ember); width: 28px; height: 28px; border-radius: 8px; }
-.fab { position: absolute; right: 16px; bottom: 16px; background: var(--ember); color: var(--on-ember); border-radius: var(--r-group); height: 56px; padding: 0 20px; display: flex; align-items: center; gap: 10px; font: 600 15px/24px "Inter", sans-serif; }
+.fab { position: absolute; right: 16px; bottom: 16px; background: var(--ember); color: var(--on-ember); border-radius: var(--r-group); height: 56px; padding: 0 20px; display: flex; align-items: center; gap: 10px; font: 600 calc(15px * var(--ts, 1))/calc(24px * var(--ts, 1)) "Inter", sans-serif; }
 .fab.static { position: static; align-self: flex-end; }
 
 .field { position: relative; border: 1px solid var(--outline-strong); background: var(--sunken); border-radius: 12px; min-height: 48px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
 .field .v { flex: 1; } .field .ph { flex: 1; color: var(--text2); } .field .sfx { color: var(--text2); }
-.field .fl { position: absolute; top: -8px; left: 12px; padding: 0 4px; background: var(--surface); font: 400 12px/16px "Inter", sans-serif; color: var(--text2); }
+.field .fl { position: absolute; top: -8px; left: 12px; padding: 0 4px; background: var(--surface); font: 400 calc(12px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
 .field.oncanvas .fl { background: var(--canvas); }
 .field.err { border-color: var(--danger); }
-.helper { font: 400 12px/16px "Inter", sans-serif; color: var(--text2); margin-top: -4px; }
+.helper { font: 400 calc(12px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); margin-top: -4px; }
 .helper.err { color: var(--danger); }
-.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--outline-strong); font: 600 13px/16px "Inter", sans-serif; color: var(--text2); }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--outline-strong); font: 600 calc(13px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
 .chip.on { background: var(--selected); color: var(--text); }
 .chip.status { border-color: var(--outline-strong); min-height: 32px; }
 .seg { display: flex; border: 1px solid var(--outline-strong); border-radius: 999px; overflow: hidden; }
-.seg > span { flex: 1; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font: 600 13px/16px "Inter", sans-serif; color: var(--text2); border-left: 1px solid var(--outline-strong); text-align: center; }
+.seg > span { flex: 1; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font: 600 calc(13px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); border-left: 1px solid var(--outline-strong); text-align: center; }
 .seg > span:first-child { border-left: 0; }
 .seg > span.on { background: var(--selected); color: var(--ember); }
 .seg.fit { align-self: flex-start; }
 
-.gh { font: 600 15px/22px "Inter", sans-serif; color: var(--text2); margin-top: 12px; }
+.gh { font: 600 calc(15px * var(--ts, 1))/calc(22px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); margin-top: 12px; }
 .group { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-group); overflow: hidden; }
 .group > * + * { border-top: 1px solid var(--outline); }
 .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 56px; }
 .row .main { flex: 1; min-width: 0; }
-.row .sub { font: 400 13px/18px "Inter", sans-serif; color: var(--text2); }
+.row .sub { font: 400 calc(13px * var(--ts, 1))/calc(18px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
 .row .trail { color: var(--text2); display: flex; align-items: center; gap: 8px; }
 .row.bare { padding-left: 0; padding-right: 0; }
 .row .lead-danger { color: var(--danger); display: flex; }
@@ -187,7 +187,7 @@ svg.i.s { width: 20px; height: 20px; }
 .notice.caution { border-color: var(--caution); } .notice.caution > svg { color: var(--caution); }
 .notice.safety { border-color: var(--caution); border-width: 2px; } .notice.safety > svg { color: var(--caution); }
 .notice.plain { border-color: var(--outline); }
-.notice .nt { font: 600 13px/18px "Inter", sans-serif; }
+.notice .nt { font: 600 calc(13px * var(--ts, 1))/calc(18px * var(--ts, 1)) "Inter", sans-serif; }
 .notice .nb { display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .notice .acts { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -212,15 +212,15 @@ svg.i.s { width: 20px; height: 20px; }
 .check svg { width: 16px; height: 16px; stroke-width: 3; }
 .choice { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-group); padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
 .choice.on { background: var(--selected); border: 2px solid var(--ember); }
-.choice .tag { font: 600 12px/16px "Inter", sans-serif; background: var(--sunken); border-radius: 6px; padding: 2px 8px; margin-left: 8px; }
+.choice .tag { font: 600 calc(12px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; background: var(--sunken); border-radius: 6px; padding: 2px 8px; margin-left: 8px; }
 .choice .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--ember); color: var(--on-ember); display: grid; place-items: center; flex: none; }
 .choice .tick svg { width: 16px; height: 16px; stroke-width: 3; }
 .spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--track); border-top-color: var(--ion); align-self: center; }
 .daystep { display: flex; align-items: center; gap: 4px; }
-.disc { display: flex; align-items: center; gap: 8px; color: var(--text2); font: 600 13px/16px "Inter", sans-serif; }
+.disc { display: flex; align-items: center; gap: 8px; color: var(--text2); font: 600 calc(13px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; }
 
 .nav { display: flex; background: var(--raised); height: 72px; padding: 8px 4px; }
-.nav > span { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 12px/16px "Inter", sans-serif; color: var(--text2); }
+.nav > span { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 calc(12px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
 .nav > span > i { width: 56px; height: 30px; border-radius: var(--r-nav); display: grid; place-items: center; }
 .nav > span.on { color: var(--ember); font-weight: 700; } .nav > span.on > i { background: var(--selected); }
 
@@ -233,10 +233,10 @@ svg.i.s { width: 20px; height: 20px; }
 .dialog .acts { display: flex; justify-content: flex-end; gap: 8px; }
 .menu { background: var(--overlay); border-radius: 12px; padding: 6px 0; align-self: flex-end; min-width: 200px; box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
 .menu > span { display: flex; align-items: center; gap: 8px; padding: 10px 16px; }
-.snack { position: absolute; left: 16px; right: 16px; bottom: 16px; background: var(--text); color: var(--canvas); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.snack { position: absolute; left: 16px; right: 16px; bottom: 16px; background: var(--text); color: var(--canvas); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; font-size: calc(14px * var(--ts, 1)); }
 .snack b { font-weight: 700; }
-.demo { background: var(--caution); color: #1A1200; font: 700 11px/16px "Inter", sans-serif; letter-spacing: .08em; text-align: center; padding: 2px; }
-.strip { background: var(--raised); padding: 8px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.demo { background: var(--caution); color: #1A1200; font: 700 calc(11px * var(--ts, 1))/calc(16px * var(--ts, 1)) "Inter", sans-serif; letter-spacing: .08em; text-align: center; padding: 2px; }
+.strip { background: var(--raised); padding: 8px 16px; display: flex; flex-direction: column; gap: 6px; font-size: calc(13px * var(--ts, 1)); }
 
 .chart text { font: 400 11px "Inter", sans-serif; fill: var(--text2); }
 .chart .grid { stroke: var(--outline); stroke-width: 1; }
@@ -248,9 +248,9 @@ svg.i.s { width: 20px; height: 20px; }
 .vol > i { position: absolute; left: 0; top: 4px; height: 8px; background: var(--ion); }
 .vol > b { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text2); }
 .sw { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.sw > span { font: 400 10px/14px "Inter", sans-serif; color: var(--text2); }
+.sw > span { font: 400 calc(10px * var(--ts, 1))/calc(14px * var(--ts, 1)) "Inter", sans-serif; color: var(--text2); }
 .sw > span > i { display: block; height: 28px; border-radius: 6px; border: 1px solid var(--outline); margin-bottom: 4px; }
-.viewfinder { height: 180px; border-radius: 12px; background: #000; border: 1px solid var(--outline); position: relative; display: grid; place-items: center; color: #9aa; font-size: 12px; }
+.viewfinder { height: 180px; border-radius: 12px; background: #000; border: 1px solid var(--outline); position: relative; display: grid; place-items: center; color: #9aa; font-size: calc(12px * var(--ts, 1)); }
 .viewfinder::after { content: ""; position: absolute; left: 12%; right: 12%; top: 50%; height: 2px; background: var(--ember); }
 
 .phone:has(> .nav) .fab, .phone:has(> .nav) .snack { bottom: 88px; }
@@ -263,3 +263,14 @@ svg.i.s { width: 20px; height: 20px; }
   .sheet-tools { position: static; }
   .frames { gap: 20px 0; }
 }
+
+/* Fields take typing, so a sheet can be tried and not only looked at. */
+.field .v { outline: none; min-width: 1ch; }
+.field .v:empty::before { content: attr(data-ph); color: var(--text2); }
+.field:focus-within { border-color: var(--text); border-width: 2px; padding: 11px 15px; }
+
+/* Larger text needs taller controls; the label must not sit on the value. */
+.field { padding-top: calc(12px * var(--ts, 1)); padding-bottom: calc(12px * var(--ts, 1)); }
+.field .fl { top: calc(-8px * var(--ts, 1)); }
+.chip { min-height: calc(34px * var(--ts, 1)); }
+.btn { min-height: calc(48px * var(--ts, 1)); }

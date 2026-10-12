@@ -17,10 +17,14 @@ role slug, including an explicit “none” rather than omitting a section.
   documentation, uninspected areas, absent implementation when applicable,
   cross-domain referrals, actual evidence methods and blocked verification.
   Planning includes a targeted existing-behavior audit before proposals.
+  In a UI review, label each area **walked** (a step record exists, see
+  below) or **surveyed** (read, no step record). No findings in a surveyed
+  area says nothing about its usability.
 - **Findings:** stable local ID and responsible domain; one classification:
   confirmed requirement violation, reproducible implementation defect,
   evidence-supported domain concern, documentation or requirement gap,
-  design/usability improvement, or unverified hypothesis requiring investigation.
+  usability problem found by inspection, design/usability improvement, or
+  unverified hypothesis requiring investigation.
   Record impact-based severity (blocker/high/medium/low), confidence with reason,
   applicable requirement/invariant/design rule/external evidence, actual file
   paths/symbols/line references, expected versus observed behavior, reproduction
@@ -29,6 +33,23 @@ role slug, including an explicit “none” rather than omitting a section.
   requirement IDs, line references, reproduction results or test outcomes.
   Preference alone is not a violation; code inspection alone is not runtime
   reproduction. A no-findings report still records scope and method.
+- **Task walkthrough (UI reviews):** for each interaction the brief marks for
+  depth, name the person and the task, then go step by step through what the
+  built screen presents, from its source and a render (say which you had).
+  For each step record what the person sees, what they must decide or already
+  know, the action, and what tells them it worked. A step fails when a person
+  new to it would not know what to do next, would not find the control, could
+  not tell what a value means or which value will be kept, or gets no sign of
+  the result. Each failing step is a finding classed **usability problem
+  found by inspection**, evidenced by the step record with its file and line
+  or its frame. Severity says how often the step is met, how hard it is to
+  get past, and whether it recurs each time. This is analytical evidence. It
+  needs no observed users, and it measures nothing about how many would
+  fail: do not call it an unverified hypothesis because nobody was observed,
+  and do not report it as observed behavior. A requirement that asks for the
+  thing does not make the step pass; say that the requirement is where a
+  change would have to be made. A walkthrough is done on the built screen,
+  never on a drawing of it alone.
 - **Research:** status `performed`, `unnecessary` or `blocked`; question and
   trigger/reason (confidence alone is never evidence); actual execution surface,
   source-discovery and retrieval tools used, direct or chair-delegated path.
