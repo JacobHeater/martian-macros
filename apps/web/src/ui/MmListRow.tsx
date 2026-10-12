@@ -1,0 +1,52 @@
+import type { ReactNode } from 'react';
+import { MmIcon } from './MmIcon';
+import type { MmIconName } from './MmIconName';
+import './ui.css';
+
+interface MmListRowProps {
+  title: string;
+  subtitle?: string | undefined;
+  /** Shown under the title in place of `subtitle` (a slider, say). */
+  detail?: ReactNode;
+  leadingIcon?: MmIconName | undefined;
+  /** Marks a destructive row (erase): its icon uses the danger color. */
+  danger?: boolean;
+  trailing?: ReactNode;
+  onPress?: (() => void) | undefined;
+  dense?: boolean;
+}
+
+/** One row of a list: a title with optional detail, icon and trailing content. */
+export function MmListRow({
+  title,
+  subtitle,
+  detail,
+  leadingIcon,
+  danger = false,
+  trailing,
+  onPress,
+  dense = false,
+}: MmListRowProps) {
+  const body = (
+    <>
+      {leadingIcon === undefined ? null : (
+        <span className={`mm-list-row-leading${danger ? ' mm-danger' : ''}`}>
+          <MmIcon name={leadingIcon} />
+        </span>
+      )}
+      <span className="mm-list-row-text">
+        <span className="mm-list-row-title">{title}</span>
+        {detail ?? (subtitle === undefined ? null : <span className="mm-list-row-subtitle">{subtitle}</span>)}
+      </span>
+      {trailing === undefined ? null : <span className="mm-list-row-trailing">{trailing}</span>}
+    </>
+  );
+  const className = `mm-list-row${dense ? ' mm-list-row-dense' : ''}`;
+  return onPress === undefined ? (
+    <div className={className}>{body}</div>
+  ) : (
+    <button type="button" className={`${className} mm-list-row-button`} onClick={onPress}>
+      {body}
+    </button>
+  );
+}
