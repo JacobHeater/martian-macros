@@ -147,6 +147,34 @@ measured whether "Add food" covers something (MM-208, the insight's
 Dismiss) have no equivalent in a test without layout; they belong to the
 screenshot tests of MM-229.
 
+**6. Food (2026-10-12).** `apps/web/src/food/`: the Food screen (the day in
+the top bar, the hero, the macronutrient split, fiber and alcohol lines, a
+card for each meal with its entries, copying a meal or yesterday, marking
+the day and the easy-to-miss line), and the add-food sheet with every way
+in: search of the installed packs, the amount step (servings, weight, hand
+portions, raw or cooked, cooking oil), typing a food by its macros, editing
+an entry, saved foods and recipes, estimating a meal, scanning a barcode and
+reading a label. The services gained the food catalog, a barcode scanner and
+a label reader, each behind an interface in `apps/web/src/platform/`; the
+app is given an empty catalog and "no camera" until step 5. Overlays now
+stack, so a confirmation sits over the sheet. 118 tests: the Flutter tests
+of `food_flows`, `food_edit`, `food_copy`, `food_portion`, `food_search`,
+`food_trust`, `hand_portion_summary`, `add_food_discovery`,
+`add_food_macro_split`, `add_food_method_change`,
+`default_meal_follows_clock`, `alcohol`, `barcode_scan`, `custom_foods`,
+`label_read`, `detail_level`, `easy_to_miss`, `estimate_meal`, `meal_cards`,
+`protein_across_meals` and `raw_or_cooked`, and the cases left over from
+step 5 above that go through this screen. **Differences from Flutter:** the
+barcode step has a "Scan with the camera" button that opens the camera,
+where Flutter embedded a live view in the sheet (the scanner is asked for
+one barcode, which is what a native scanner plugin gives); and a
+destination's own state (which meals are closed) is not kept while another
+destination is showing, where Flutter kept all five alive. One Flutter case
+is not carried over because it measures layout (`add_food_route_labels`,
+MM-213: three labels on one line at 360 wide); it belongs to the screenshot
+tests of MM-229. The food database screen (`food_database_test`) comes with
+Settings.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with

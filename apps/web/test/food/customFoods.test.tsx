@@ -1,0 +1,228 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CustomFood } from '../../src/domain/food/custom/CustomFood';
+import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
+import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
+import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { openAddFood, press, typeIn } from '../support/addFood';
+import { expectClose } from '../support/expectClose';
+import { first } from '../support/first';
+import { openTab } from '../support/openTab';
+import { renderApp } from '../support/renderApp';
+
+/** MM-45: foods and recipes the user saves once and logs in any amount. Carried over from custom_foods_test.dart. */
+const today = CalendarDate.of(2026, 10, 5);
+let repos: InMemoryRepositories;
+
+beforeEach(async () => {
+  repos = new InMemoryRepositories();
+  await repos.preferences.saveThemePreference('martian');
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-40), healthCheckConfirmedOn: today }));
+  await repos.weights.saveWeight(today, 82);
+});
+
+async function open(): Promise<HTMLElement> {
+  renderApp(repos, today);
+  await openTab('Food');
+  return openAddFood();
+}
+
+const logged = () => first(repos.food.watchFood(today));
+const saved = () => first(repos.customFoods.watchCustomFoods());
+
+async function createBar(sheet: HTMLElement): Promise<void> {
+  await press(sheet, 'Saved');
+  await press(sheet, 'New food');
+  await typeIn(sheet, 'Name', 'Protein bar');
+  await typeIn(sheet, 'One serving is', '1 bar');
+  await typeIn(sheet, 'Weighs g', '30');
+  await typeIn(sheet, 'Protein g', '10');
+  await typeIn(sheet, 'Carbs g', '12');
+  await typeIn(sheet, 'Fat g', '4');
+  await typeIn(sheet, 'Calories', '120');
+  await press(sheet, 'Save food');
+  await within(sheet).findByRole('heading', { name: 'My foods' });
+}
+
+/** Leaves "My foods", searches for `query` and picks the saved food called `name`. */
+async function pickSaved(sheet: HTMLElement, query: string, name: string): Promise<void> {
+  await typeIn(sheet, 'Search foods', query);
+  await userEvent.click(await within(sheet).findByRole('button', { name: new RegExp(`^${name}`) }));
+  await within(sheet).findByRole('button', { name: 'Log it' });
+}
+
+const food = (init: {
+  name: string;
+  kind?: 'food' | 'recipe';
+  servingDescription: string;
+  servingGrams: number;
+  kcal: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  barcode?: string;
+  servings?: number;
+  cookedWeightGrams?: number;
+}) =>
+  new CustomFood({
+    id: 0,
+    name: init.name,
+    kind: init.kind ?? 'food',
+    servingDescription: init.servingDescription,
+    servingGrams: init.servingGrams,
+    perServing: new NutritionTotals({ kcal: init.kcal, proteinG: init.proteinG, carbsG: init.carbsG, fatG: init.fatG }),
+    barcode: init.barcode,
+    servings: init.servings,
+    cookedWeightGrams: init.cookedWeightGrams,
+  });
+
+it('a saved food is logged in any amount', async () => {
+  const sheet = await open();
+  await createBar(sheet);
+  expect(within(sheet).getByRole('button', { name: /^Protein bar/ })).toBeInTheDocument();
+  await press(sheet, 'Back');
+  await typeIn(sheet, 'Search foods', 'protein');
+  expect(await within(sheet).findByText('Your food · 1 bar · 120 kcal')).toBeInTheDocument();
+  await press(sheet, /^Protein bar/);
+  await press(sheet, 'Grams');
+  await typeIn(sheet, /^Amount/, '45');
+  expect(within(sheet).getByText(/180 kcal/)).toBeInTheDocument();
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await logged()).length).toBe(1);
+  const entry = (await logged())[0];
+  expect(entry?.name).toBe('Protein bar');
+  expectClose(entry?.kcal ?? 0, 180, 1e-9);
+  expectClose(entry?.proteinG ?? 0, 15, 1e-9);
+  expect(entry?.portion?.quantity).toBe(45);
+  expect(entry?.portion?.unit).toBe('gram');
+  expect(entry?.portion?.reference?.basis).toBe('perServing');
+});
+
+it('editing a saved food does not rewrite what was logged', async () => {
+  let sheet = await open();
+  await createBar(sheet);
+  await press(sheet, 'Back');
+  await pickSaved(sheet, 'protein', 'Protein bar');
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await logged()).length).toBe(1);
+  expect((await logged())[0]?.kcal).toBe(120);
+
+  // Change the food's calories afterwards.
+  await expect.poll(() => screen.queryByRole('dialog')).toBeNull();
+  sheet = await openAddFood();
+  await press(sheet, 'Saved');
+  await press(sheet, /^Protein bar/);
+  await typeIn(sheet, 'Calories', '150');
+  await press(sheet, 'Save food');
+  await expect.poll(async () => (await saved())[0]?.perServing.kcal).toBe(150);
+  expect(await saved()).toHaveLength(1);
+  expect((await logged())[0]?.kcal).toBe(120);
+});
+
+it('calories that disagree with the macros warn', async () => {
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  await press(sheet, 'New food');
+  await typeIn(sheet, 'Protein g', '10');
+  await typeIn(sheet, 'Carbs g', '10');
+  await typeIn(sheet, 'Fat g', '5');
+  await typeIn(sheet, 'Calories', '400');
+  expect(within(sheet).getByText(/Macros add up to 125 kcal/)).toBeInTheDocument();
+});
+
+it('a recipe divides its ingredients into servings', async () => {
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  await press(sheet, 'New recipe');
+  await typeIn(sheet, 'Name', 'Chili');
+  await typeIn(sheet, 'Makes servings', '4');
+  await press(sheet, 'Enter numbers instead');
+  for (const [name, kcal, protein] of [
+    ['Beef', '1000', '100'],
+    ['Beans', '600', '40'],
+  ] as const) {
+    await typeIn(sheet, 'Ingredient', name);
+    await typeIn(sheet, 'kcal', kcal);
+    await typeIn(sheet, 'Protein g', protein);
+    await press(sheet, 'Add');
+  }
+  expect(within(sheet).getByText(/One serving: 400 kcal/)).toBeInTheDocument();
+  expect(within(sheet).getByText(/35 g protein/)).toBeInTheDocument();
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved()).length).toBe(1);
+  const chili = (await saved())[0];
+  expect(chili?.kind).toBe('recipe');
+  expect(chili?.servings).toBe(4);
+  expect(chili?.perServing.kcal).toBe(400);
+  expect(chili?.servingGrams, 'no cooked weight given').toBeUndefined();
+  expect(chili?.ingredients).toHaveLength(2);
+
+  await press(sheet, 'Back');
+  await pickSaved(sheet, 'chili', 'Chili');
+  expect(within(sheet).queryByRole('button', { name: 'Grams' }), 'servings only').not.toBeInTheDocument();
+  await typeIn(sheet, 'How many servings', '1.5');
+  expect(within(sheet).getByText(/600 kcal/)).toBeInTheDocument();
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await logged()).length).toBe(1);
+  const entry = (await logged())[0];
+  expect(entry?.kcal).toBe(600);
+  expect(entry?.portion?.quantity).toBe(1.5);
+  expect(entry?.portion?.unit).toBe('serving');
+});
+
+it('a cooked weight lets a recipe be logged by weight', async () => {
+  await repos.customFoods.saveCustomFood(
+    food({
+      name: 'Stew',
+      kind: 'recipe',
+      servingDescription: '1 serving',
+      servingGrams: 300,
+      kcal: 450,
+      proteinG: 30,
+      carbsG: 40,
+      fatG: 15,
+      servings: 4,
+      cookedWeightGrams: 1200,
+    }),
+  );
+  const sheet = await open();
+  await pickSaved(sheet, 'stew', 'Stew');
+  await press(sheet, 'Grams');
+  await typeIn(sheet, /^Amount/, '150');
+  expect(within(sheet).getByText(/225 kcal/)).toBeInTheDocument();
+});
+
+it('scanning a barcode that is a saved food finds it', async () => {
+  await repos.customFoods.saveCustomFood(
+    food({
+      name: 'Granola from the shop',
+      servingDescription: '1 cup',
+      servingGrams: 60,
+      kcal: 250,
+      proteinG: 6,
+      carbsG: 40,
+      fatG: 8,
+      barcode: '00036000291452',
+    }),
+  );
+  const sheet = await open();
+  await press(sheet, 'Scan');
+  await typeIn(sheet, 'Or type the digits', '036000291452');
+  await press(sheet, 'Look up');
+  expect(await within(sheet).findByRole('heading', { name: 'Granola from the shop' })).toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: 'Log it' })).toBeInTheDocument();
+});
+
+it('deleting a saved food asks first and keeps the sheet open', async () => {
+  await repos.customFoods.saveCustomFood(
+    food({ name: 'Old bar', servingDescription: '1 bar', servingGrams: 40, kcal: 200, proteinG: 5, carbsG: 30, fatG: 7 }),
+  );
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  await press(sheet, 'Delete Old bar');
+  const question = await screen.findByRole('dialog', { name: 'Delete Old bar?' });
+  await userEvent.click(within(question).getByRole('button', { name: 'Delete' }));
+  expect(await within(sheet).findByText('Nothing saved yet.')).toBeInTheDocument();
+});
