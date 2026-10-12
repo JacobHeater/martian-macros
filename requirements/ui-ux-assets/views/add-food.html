@@ -35,34 +35,34 @@
     title: 'Add food sheet',
     intro: 'A bottom sheet over Food or Dashboard. It searches, scans, estimates, or takes numbers typed by hand, and it is also how a logged entry is edited. Each frame below is one step of the same sheet.',
     sources: ['apps/mobile/lib/src/food/add_food_sheet.dart', 'apps/mobile/lib/src/food/add_food_sheet_state.dart', 'apps/mobile/lib/src/food/show_add_food_sheet.dart', 'apps/mobile/lib/src/food/add_food_button.dart', 'apps/mobile/lib/src/food/food_search_results.dart', 'apps/mobile/lib/src/food/food_amount_step.dart', 'apps/mobile/lib/src/food/food_trust_mark.dart', 'apps/mobile/lib/src/food/scan/', 'apps/mobile/lib/src/food/estimate/', 'apps/mobile/lib/src/food/custom/'],
-    tickets: ['MM-38', 'MM-39', 'MM-42', 'MM-43', 'MM-44', 'MM-45', 'MM-46', 'MM-48', 'MM-150', 'MM-151', 'MM-153', 'MM-167', 'MM-127', 'MM-213', 'MM-216', 'MM-217', 'MM-223', 'MM-225'],
+    tickets: ['MM-38', 'MM-39', 'MM-42', 'MM-43', 'MM-44', 'MM-45', 'MM-46', 'MM-48', 'MM-150', 'MM-151', 'MM-153', 'MM-167', 'MM-127', 'MM-213', 'MM-216', 'MM-217', 'MM-223', 'MM-225', 'MM-226'],
     limits: 'Screenshot tests cover the opened discovery screen, manual-entry form, search, amount, estimate, and edit states. The discovery screen offers routes and recents without also showing the manual form. Route buttons keep whole labels and wrap as needed. Hand portions label both the weight and totals as estimates. The camera view is a placeholder. Fields take typing and chips answer taps; nothing is calculated, so totals do not follow what is typed.',
     sections: [
       { h: 'Typing a food in', frames: [
         m.frame('add-food-macro-preview', 'Food macro preview', 'The existing shared macro-energy pie is inline, not another card. This frame shows the lower manual form after entering nutrition; the chart updates in the app, while this drawing is static.', sheet([
-          macros('40', '61', '18'), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories', '', { help: 'Leave blank to calculate from macros.' }),
-          macroPreview(40, 61, 18), meals, m.btn('Log it', 'primary', { block: true })])),
+          m.label('Nutrition per serving'), macros('40', '61', '18'), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories per serving', '', { help: 'Leave blank to calculate from macros.' }),
+          macroPreview(40, 61, 18), meals, total('Logs 566 kcal · 40 g protein · 61 g carbs · 18 g fat'), m.btn('Log it', 'primary', { block: true })])),
         m.frame('add-food-default', 'Food discovery', 'Search, choose another route, or select a recent food. Manual entry is a separate step, so the search field is not competing with a second name field.', sheet([
           m.title('Add food'), m.field('Search foods', ''), tools, m.label('Recent foods'), m.achips(['Greek yogurt', 'Chicken and rice', 'Oats with milk']),
           m.btn('Enter manually', 'secondary', { block: true })])),
         m.frame('add-food-manual', 'Manual entry', 'The name and nutrition form appear after choosing Enter manually; Back returns to food choices.', sheet([
-          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', ''), how(1), m.field('Servings eaten', '1'), m.label('The numbers below are for'), m.seg(['Everything I ate', 'One serving'], 0, { check: true }),
-          macros('', '', ''), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories', '', { help: 'Leave blank to calculate from macros.' }), meals, m.btn('Log it', 'off', { block: true })])),
+          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', ''), how(1), m.field('Servings eaten', '1'), m.label('Nutrition per serving'),
+          macros('', '', ''), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories per serving', '', { help: 'Leave blank to calculate from macros.' }), meals, m.btn('Log it', 'off', { block: true })])),
         m.frame('add-food-manual-from-search', 'Manual entry from search', 'Choosing Enter manually from results for “tuna” carries that query into the Food name field; the search field is no longer shown.', sheet([
-          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'tuna'), how(1), m.field('Servings eaten', '1'), m.label('The numbers below are for'), m.seg(['Everything I ate', 'One serving'], 0, { check: true }),
-          macros('', '', ''), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories', '', { help: 'Leave blank to calculate from macros.' }), meals, m.btn('Log it', 'off', { block: true })])),
+          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'tuna'), how(1), m.field('Servings eaten', '1'), m.label('Nutrition per serving'),
+          macros('', '', ''), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories per serving', '', { help: 'Leave blank to calculate from macros.' }), meals, m.btn('Log it', 'off', { block: true })])),
         m.frame('add-food-filled', 'Filled in', 'Calories typed that disagree with the macros get a caution, not a block.', sheet([
-          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Chicken and rice'), measured, m.field('Amount', '350', { sfx: 'g' }), m.label('The numbers below are for'), m.p('Everything you ate'),
+          m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Chicken and rice'), measured, m.field('Amount', '350', { sfx: 'g' }), m.label('Nutrition for this amount'),
           macros('42', '55', '9'), m.field('Calories', '600', { sfx: '469 from macros', help: 'Macros add up to 469 kcal. Double-check the label.' }), macroPreview(42, 55, 9), meals, m.btn('Log it', 'primary', { block: true })])),
-        m.frame('add-food-serving', 'From a label serving', 'Numbers can be for one serving; the sheet shows what will be logged.', sheet([
+        m.frame('add-food-serving', 'From a label serving', 'Enter nutrition per serving and servings eaten. There is no nutrition-basis switch; the sheet shows the calculated amount to log.', sheet([
           m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Protein bar'), m.col([m.label('How was it measured?'), m.chips(['Weighed', 'Label serving', 'Cup / spoon', 'Palm', 'Cupped hand', 'Thumb', 'Estimate'], 1)]),
-          m.field('Servings eaten', '1.5'), m.label('The numbers below are for'), m.seg(['Everything I ate', 'One serving'], 1),
+          m.field('Servings eaten', '1.5'), m.label('Nutrition per serving'),
           macros('20', '22', '8'), m.field('Calories per serving', '', { help: 'Leave blank to calculate from macros.' }), macroPreview(30, 33, 12), meals, total('Logs 360 kcal · 30 g protein · 33 g carbs · 12 g fat'), m.btn('Log it', 'primary', { block: true })])),
         m.frame('add-food-alcohol', 'With alcohol', '', sheet([m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Beer'), macros('2', '13', '0'), m.field('Alcohol g', '14', { help: 'One standard drink is 14 g. Counted at 7 kcal per gram.' }), m.field('Calories', '', { help: 'Leave blank to calculate from macros.' }), macroPreview(2, 13, 0)])),
         m.frame('add-food-invalid', 'Amount missing', 'Validation is shown under the field; Log it stays off. Entered totals can still be previewed because they are not scaled by this amount.', sheet([m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Rice'), measured, m.field('Amount', '0', { sfx: 'g', err: true, help: 'An amount above zero is needed.' }), macros('4', '45', '0'), macroPreview(4, 45, 0), meals, m.btn('Log it', 'off', { block: true })])),
         m.frame('add-food-method-changed', 'Method changed', 'When a previously entered amount is cleared because the method changed, the field explains that it must be entered again.', sheet([m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Rice'), how(0), m.field('Amount (g)', '', { err: true, help: 'Enter how much again for this method.' }), macros('4', '45', '0'), macroPreview(4, 45, 0), meals, m.btn('Log it', 'off', { block: true })])),
         m.frame('add-food-estimate-source', 'Measured as Estimate', 'An Estimate has no amount.', sheet([m.title('Add food'), m.btn('Back to food choices', 'text', { block: true }), m.field('Food name', 'Lunch out'), m.col([m.label('How was it measured?'), m.chips(['Weighed', 'Label serving', 'Cup / spoon', 'Palm', 'Cupped hand', 'Thumb', 'Estimate'], 6)]),
-          m.p('Enter calories and macros for everything you ate.', 't2'), macros('35', '80', '30'), macroPreview(35, 80, 30), meals, m.btn('Log it', 'primary', { block: true })]))
+          m.p('Enter calories and macros for this food.', 't2'), m.label('Nutrition for this amount'), macros('35', '80', '30'), macroPreview(35, 80, 30), meals, m.btn('Log it', 'primary', { block: true })]))
       ] },
       { h: 'Searching', frames: [
         m.frame('add-food-search', 'Results', 'Your own foods first, then recent ones, then the food database with where each number comes from. A saved food shows calories for a serving, a recent one for what was eaten that time, a database food per 100 g.', sheet([
@@ -128,14 +128,14 @@
       { h: 'Editing a logged entry', frames: [
         m.frame('add-food-edit', 'Edit food', 'Opened by tapping an entry. The day can be changed; search is not shown. How it was measured and what the numbers are for are shown as when adding.', sheet([
           m.title('Edit food'), m.rowx([m.icobtn('left', 'Previous day'), '<span class="title">Today</span>', m.icobtn('right', 'Next day', { cls: 't3' })]),
-          m.field('Food name', 'Chicken and rice'), measured, m.field('Amount', '350', { sfx: 'g' }), m.label('The numbers below are for'), m.p('Everything you ate'),
+          m.field('Food name', 'Chicken and rice'), measured, m.field('Amount', '350', { sfx: 'g' }), m.label('Nutrition for this amount'),
           macros('48', '70', '12'), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories', '610', { help: 'Leave blank to calculate from macros.' }), macroPreview(48, 70, 12), meals, m.btn('Save changes', 'primary', { block: true })])),
         m.frame('add-food-edit-per-serving', 'An entry typed for one serving, reopened', 'As the screenshot test shows it: the numbers that were typed are not on the sheet (MM-221).', sheet([m.title('Edit food'),
           m.rowx([m.icobtn('left', 'Previous day'), '<span class="title">Today</span>', m.icobtn('right', 'Next day', { cls: 't3' })]), m.field('Food name', 'Protein bar'), m.chips(['Servings'], 0), m.field('How many', '1'),
-          m.btn('Enter the totals myself', 'text', { sm: true }), macroPreview(12, 22, 7), meals, total('Logs 199 kcal · 12 g protein · 22 g carbs · 7 g fat'), m.btn('Save changes', 'primary', { block: true })])),
+          m.btn('Edit nutrition per serving', 'text', { sm: true }), macroPreview(12, 22, 7), meals, total('Logs 199 kcal · 12 g protein · 22 g carbs · 7 g fat'), m.btn('Save changes', 'primary', { block: true })])),
         m.frame('add-food-edit-legacy', 'An entry logged without an amount', 'As the screenshot test shows it. The notice sits under the measuring chips, with one already selected.', sheet([m.title('Edit food'),
           m.rowx([m.icobtn('left', 'Previous day'), '<span class="title">Today</span>', m.icobtn('right', 'Next day', { cls: 't3' })]), m.field('Food name', 'Chicken and rice'), measured,
-          m.notice('plain', 'This entry was logged without an amount. Choose how it was measured to add one.'), m.label('The numbers below are for'), m.p('Everything you ate'),
+          m.notice('plain', 'This entry was logged without an amount. Choose how it was measured to add one.'), m.label('Nutrition for this amount'),
           macros('48', '70', '12'), m.btn('Includes alcohol?', 'text', { sm: true }), m.field('Calories', '610', { help: 'Leave blank to calculate from macros.' }), macroPreview(48, 70, 12), meals, m.btn('Save changes', 'primary', { block: true })]))
       ] }
     ]

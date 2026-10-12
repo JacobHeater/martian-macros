@@ -104,7 +104,6 @@ void main() {
     await open(tester);
     await enterManualFood(tester);
     await type(tester, 'food-protein', '20');
-    await tap(tester, 'One serving');
     await type(tester, 'portion-quantity', '2');
     await tester.ensureVisible(preview);
     await tester.pumpAndSettle();

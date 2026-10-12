@@ -7,11 +7,17 @@ private belongs here. Requirements are authoritative for behavior.
 
 Last updated: 2026-10-11, by Copilot, Session 19.
 
-**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) remains a
-draft; #100 is already merged to `main`. Session 19's Add food,
+**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) is ready for
+review; #100 is already merged to `main`. Session 19's Add food,
 cross-app-usability work and MM-225 macro preview continue on
 `feature/mm205-expert-mobile-ux`. MM-223 and MM-225 are implemented and tested;
 Linux screenshot baselines are imported. Updated PR CI remains pending.
+The owner then identified ambiguous "Everything I ate / One serving" labels;
+MM-226 is implemented on the same PR before merging. The owner rejected
+renaming that switch: remove it; serving entries use nutrition per serving
+and servings eaten. Other measured amounts retain total-entry behavior.
+Coupled per-serving alcohol defects MM-203/MM-204 are fixed with enabled
+regressions. Full local `mm check` passed; new Linux screenshots remain pending.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -19,7 +25,7 @@ Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-226 (`mm req next` is the authority; MM-209 to MM-225
+**Next ticket ID.** MM-227 (`mm req next` is the authority; MM-209 to MM-226
 are taken).
 
 **HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
@@ -96,6 +102,9 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   again whether this class of usability work is warranted, and do not park an
   obvious inspection finding just because no user study was run. Ask only
   about a consequential product choice that evidence cannot settle.
+- **Simple servings (MM-226).** Remove the manual "Everything I ate / One
+  serving" switch; do not rename or restore it. Enter nutrition per serving,
+  specify servings eaten, and show calculated totals.
 - Material screen reviews and redesigns use current, credible external
   research and cite it. Distinguish built-screen evidence from a reference
   drawing, and give every finding an explicit disposition.
