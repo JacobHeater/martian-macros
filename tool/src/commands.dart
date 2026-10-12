@@ -36,9 +36,10 @@ final _commands = <String, (String, Command)>{
   'doctor': ('Check the toolchain and pinned Flutter version', _doctor),
   'bootstrap': ('Resolve dependencies for the whole workspace', _bootstrap),
   'check': (
-    'CI gate: format, requirements, arch, panel, analyze, test',
+    'CI gate: format, requirements, arch, panel, analyze, test, web',
     _check,
   ),
+  'web': ('Check the React app: type check, tests, build, offline', _web),
   'panel': (
     'Expert panel: validate roles, native adapters and templates [run-dir]',
     (tc, args) => runPanel(tc.repoRoot, args),
@@ -162,8 +163,19 @@ Future<int> _doctor(Toolchain tc, List<String> args) async {
   return 0;
 }
 
-Future<int> _bootstrap(Toolchain tc, List<String> args) =>
-    tc.flutter(['pub', 'get']);
+Future<int> _bootstrap(Toolchain tc, List<String> args) async {
+  final code = await tc.flutter(['pub', 'get']);
+  if (code != 0) return code;
+  // The React app (MM-228) installs the exact versions in its lock file.
+  return tc.run(const ['npm', 'ci'], inDir: _webApp);
+}
+
+/// The React app that is replacing the Flutter one (MM-228).
+const _webApp = 'apps/web';
+
+/// Type check, tests, build and the offline check of the React app.
+Future<int> _web(Toolchain tc, List<String> args) =>
+    tc.run(const ['npm', 'run', 'check'], inDir: _webApp);
 
 Future<int> _check(Toolchain tc, List<String> args) async {
   for (final step in <Future<int> Function()>[
@@ -173,6 +185,7 @@ Future<int> _check(Toolchain tc, List<String> args) async {
     () => runPanel(tc.repoRoot, const []),
     () => _analyze(tc, const []),
     () => _test(tc, const []),
+    () => _web(tc, const []),
   ]) {
     final code = await step();
     if (code != 0) return code;

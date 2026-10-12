@@ -1,0 +1,126 @@
+/* The design tokens (MM-102, MM-103). Copied from
+   apps/mobile/lib/src/theme/; test/tokens.test.ts holds the two together
+   until the Flutter app is removed. Components read these and never a
+   literal color, radius or size. */
+
+:root,
+.theme-martian {
+  --canvas: #120b29;
+  --surface: #20143d;
+  --raised: #2c1b4c;
+  --overlay: #382558;
+  --sunken: #180f30;
+  --track: #40305e;
+  --selected: #423261;
+  --outline: #594576;
+  --outline-strong: #a18bbe;
+  --text: #fff8e9;
+  --text2: #d8c7ef;
+  --text3: #baa4d3;
+  --ember: #c4ff48;
+  --on-ember: #172500;
+  --ion: #43f5e0;
+  --on-ion: #120b29;
+  --energy: #fff8e9;
+  --protein: #43f5e0;
+  --carbs: #ff80bb;
+  --fat: #9170ed;
+  --positive: #c4ff48;
+  --caution: #ffd166;
+  --info: #85cfff;
+  --danger: #ff938e;
+  --on-danger: #120b29;
+  --radius-group: 12px;
+  --radius-nav-indicator: 8px;
+  color-scheme: dark;
+}
+
+.theme-dark {
+  --canvas: #090d15;
+  --surface: #101624;
+  --raised: #171f32;
+  --overlay: #1f2a42;
+  --sunken: #0d1220;
+  --track: #1f2940;
+  --selected: #1c2842;
+  --outline: #2b3853;
+  --outline-strong: #5a6a8c;
+  --text: #ecf0f8;
+  --text2: #a9b4ca;
+  --text3: #8f9bb5;
+  --ember: #ff6a45;
+  --on-ember: #1a0802;
+  --ion: #3fd8f0;
+  --on-ion: #031a20;
+  --energy: #ecf0f8;
+  --protein: #5b9dff;
+  --carbs: #f6c453;
+  --fat: #7f57ff;
+  --positive: #4fdb8a;
+  --caution: #ffb84d;
+  --info: #7fb8ff;
+  --danger: #ff7a7a;
+  --on-danger: #2a0606;
+  --radius-group: 16px;
+  --radius-nav-indicator: 999px;
+  color-scheme: dark;
+}
+
+.theme-light {
+  --canvas: #f3f5fa;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --overlay: #ffffff;
+  --sunken: #e8ecf5;
+  --track: #ebeff7;
+  --selected: #e3e8f5;
+  --outline: #cbd3e3;
+  --outline-strong: #7c88a3;
+  --text: #0c1220;
+  --text2: #46526b;
+  --text3: #5a6680;
+  --ember: #cc3210;
+  --on-ember: #ffffff;
+  --ion: #0a7890;
+  --on-ion: #ffffff;
+  --energy: #0c1220;
+  --protein: #1646a6;
+  --carbs: #bf7a00;
+  --fat: #7448e6;
+  --positive: #117a3e;
+  --caution: #8f5600;
+  --info: #1c62c9;
+  --danger: #b3261e;
+  --on-danger: #ffffff;
+  --radius-group: 16px;
+  --radius-nav-indicator: 999px;
+  color-scheme: light;
+}
+
+:root {
+  /* Radii (MmRadius). The group radius is per theme, above. */
+  --radius-control: 12px;
+  --radius-chip: 8px;
+  --radius-sheet-top: 24px;
+
+  /* Spacing (MmSpace). */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+
+  /* Type roles (MmType), in rem so text follows the phone's text size:
+     size / line height, at 16px to the rem. */
+  --font-figures: 'SpaceGrotesk', 'Inter', system-ui, sans-serif;
+  --font-text: 'Inter', system-ui, sans-serif;
+  --type-figure-xl: 600 3rem/3.25rem var(--font-figures);
+  --type-figure: 600 2rem/2.25rem var(--font-figures);
+  --type-title: 600 1.375rem/1.75rem var(--font-figures);
+  --type-heading: 600 1.0625rem/1.5rem var(--font-text);
+  --type-body: 400 0.9375rem/1.375rem var(--font-text);
+  --type-label: 600 0.8125rem/1rem var(--font-text);
+  --type-caption: 400 0.75rem/1rem var(--font-text);
+  --type-nav: 500 0.75rem/1rem var(--font-text);
+}

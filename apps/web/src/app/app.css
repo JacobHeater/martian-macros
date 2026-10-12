@@ -1,0 +1,29 @@
+.app-frame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.app-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-height: 0;
+  padding: var(--space-8) var(--space-16) var(--space-24);
+  overflow-y: auto;
+}
+.app-empty {
+  margin: 0;
+  color: var(--text2);
+}
+.app-group-header {
+  margin: var(--space-12) 0 0;
+  color: var(--text2);
+  font: var(--type-heading);
+  font-size: 0.9375rem;
+}
+.app-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
