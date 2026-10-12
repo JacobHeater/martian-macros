@@ -10,6 +10,7 @@ const allowed: Record<string, readonly string[]> = {
   lang: [],
   domain: ['lang'],
   engine: ['lang', 'domain'],
+  healthIngest: ['lang'],
 };
 
 const src = resolve('src');
