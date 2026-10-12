@@ -12,6 +12,14 @@ For cross-domain development reviews, use the tool-neutral
 Reviewers are read-only; one designated owner edits canonical files. Native
 delegation and sequential fallback do not supersede the working agreements here.
 
+> **The app is moving from Flutter to a React HTML5 app in a native shell
+> (MM-228, decided by the product owner on 2026-10-12).** Read that epic
+> before any work on screens. Until the switch: new app work goes in
+> `apps/web/`; the Flutter app in `apps/mobile/` is frozen except for a defect
+> whose fix carries over; the requirements apply to the new app as written;
+> and the sections below that name Flutter, Dart or Drift describe the app
+> being replaced.
+
 ## Working agreements
 
 - Inspect the repository state before editing. Preserve unrelated and
