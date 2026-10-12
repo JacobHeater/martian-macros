@@ -204,13 +204,16 @@ Binding rules from the product owner (MM-159); the short form is in
   run against every implementation.
 - **Repositories for all persistence** (MM-161), designed as small role
   interfaces (`WeightReader`, `WeightWriter`, ...), not one store.
-- **One declaration per file** (MM-160), checked by `mm arch`.
+- **One declaration per file** (MM-160). The Dart checker (`mm arch`) was
+  removed with the toolchain; a TypeScript counterpart is on the list, and
+  the layers test guards the imports meanwhile.
 - **One implementation per control** (MM-163): reusable view parts are
   design-system components; screens never use raw Material controls.
 
 State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
-`mm arch` enforces one declaration per file, layering and design-system use with an empty
-baseline; repositories and integration seams have fixtures and contract suites. Workstream WS-14.
+The layers test (`apps/web/test/layers.test.ts`) enforces the layering and
+the adapter folders; the one-declaration and design-system checks await a
+TypeScript `mm arch` (see the handoff).
 
 ## Developer experience
 
