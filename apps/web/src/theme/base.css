@@ -1,0 +1,46 @@
+@font-face {
+  font-family: 'Inter';
+  src: url('../assets/fonts/Inter.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'SpaceGrotesk';
+  src: url('../assets/fonts/SpaceGrotesk.ttf') format('truetype');
+  font-weight: 300 700;
+  font-display: block;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--text);
+  font: var(--type-body);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}

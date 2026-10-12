@@ -24,16 +24,18 @@ Choices I made without asking (say if any is wrong):
 - **Components are ours, one per file**, taking meaning and never a color or
   a size, as MM-104 and MM-163 require. A screen uses components and no raw
   form control.
-- **Tests:** Vitest for logic and components; Playwright for screenshots of
-  real screens at 360 by 800 in the three themes, runnable on any operating
-  system.
+- **Tests:** Vitest for logic and components. Screenshots of real screens at
+  360 by 800 in the three themes come next, taken in one pinned environment
+  so that every machine gets the same images (browsers draw text slightly
+  differently on each operating system, as Flutter did).
 - **`mm check` runs the new app's checks** beside the existing ones until the
   switch, so one command still answers "is the repository sound".
 - **The Android shell is Capacitor, installed under the demo app ID only**
   (`com.martianmacros.martian_macros.demo`) until the switch. The owner's
   normal app and its data are not touched.
 - **Nothing is fetched at run time.** The build output is self-contained;
-  a test fails if a built file refers to a network address.
+  a check fails if the built page or a stylesheet loads anything from a
+  network address.
 
 ## Description
 - The app opens on five destinations in a bottom bar, Dashboard first, with
@@ -51,8 +53,8 @@ Choices I made without asking (say if any is wrong):
 ```gherkin
 Scenario: It builds and runs offline
   When the app is built
-  Then the output contains no reference to a network address
-  And it opens in a browser from the built files with the network off
+  Then the built page and stylesheets load nothing from a network address
+  And every path in them is relative, so it runs from files inside a shell
 
 Scenario: The five destinations
   Given the app is open
@@ -75,11 +77,38 @@ Scenario: On a phone
   And the normal app and its data are unchanged
 
 Scenario: Screenshots anywhere
-  When the screenshot tests run on Windows, macOS or Linux
-  Then they produce the same images
+  When the screenshot tests are run from Windows, macOS or Linux
+  Then they produce the same images, because they are taken in one pinned environment
 ```
 
-## Notes
-- How each engineering principle is enforced in TypeScript (one declaration
-  per file, no vendor import outside its adapter, no raw control in a screen)
-  is recorded here as it is built.
+## Progress
+**Built and verified (the web half):**
+- `apps/web/`: Vite 8, React 19, TypeScript 7 in strict mode, every version
+  exact in `package.json` and locked. `npm run check` runs the type check, 13
+  tests, the build and the offline check.
+- Tokens in `src/theme/tokens.css`. `test/tokens.test.ts` reads the Flutter
+  theme files and fails if any of the 75 colors, the radii, the six spacing
+  steps or the seven type roles differ. Type sizes are in rem, so text
+  follows the phone's text size.
+- Components, one per file in `src/ui/`: `MmAppBar`, `MmNavigationBar`,
+  `MmButton`, `MmIconButton`, `MmSurface`, `MmIcon`.
+- The shell: five destinations, Dashboard first, the current one given as
+  `aria-current` and shown by weight and an indicator; Settings behind the
+  gear with the four theme choices; Martian by default; System follows the
+  phone. The theme choice is held in memory: nothing is written to browser
+  storage, and it is not kept between launches until the data layer exists.
+- `?gallery` shows every token and component as built, in the three
+  palettes. Opened in headless Edge and looked at: correct in all three.
+- `mm check` runs it (`mm web` alone does too); `mm bootstrap` installs it;
+  CI sets up Node 22.
+- The built app is 225 kB of script (71 kB compressed) plus the two fonts.
+
+**Not built yet:**
+- The Android shell under the demo app ID, and seeing it on a phone.
+- Screenshot tests.
+- Rules that enforce the engineering principles in TypeScript (one
+  declaration per file is followed by hand so far; no vendor import outside
+  its adapter and no raw control in a screen have nothing to check yet).
+
+**Not verified:** the app has only been seen in desktop Edge. Nothing has
+run in a phone's web view.
