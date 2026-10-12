@@ -1,0 +1,372 @@
+import { describe, expect, it } from 'vitest';
+import { CalendarDate, FoodEntry, NutritionTotals, type Portion, Workout, WorkoutExercise, WorkoutSet } from '../../src/domain';
+import { CoachConfidence, ExplanationLine, type ProgressionSuggestion, TargetsExplanation } from '../../src/engine';
+import { CatalogFood } from '../../src/foodCatalog';
+import { confidenceNextStepText } from '../../src/format/confidenceNextStepText';
+import { explanationLineText } from '../../src/format/explanationLineText';
+import { extraNutrientsLine } from '../../src/format/extraNutrientsLine';
+import { Fmt } from '../../src/format/Fmt';
+import { foodSourceLabel } from '../../src/format/foodSourceLabel';
+import { importedWeighInText } from '../../src/format/importedWeighInText';
+import { loggingStreakText } from '../../src/format/loggingStreakText';
+import { personalRecordText } from '../../src/format/personalRecordText';
+import { portionSummary } from '../../src/format/portionSummary';
+import { progressionSettingsText } from '../../src/format/progressionSettingsText';
+import { progressionText } from '../../src/format/progressionText';
+import { reliefOfferText } from '../../src/format/reliefOfferText';
+import { restTargetText } from '../../src/format/restTargetText';
+import { roundedToZeroNote } from '../../src/format/roundedToZeroNote';
+import { setText } from '../../src/format/setText';
+import { underEatingText } from '../../src/format/underEatingText';
+import { whatWouldChangeIt } from '../../src/format/whatWouldChangeIt';
+import { workoutSummaryText } from '../../src/format/workoutSummaryText';
+
+/**
+ * Added in the move. The Flutter app tested these sentences through its
+ * screens; here each is tested where it is made. The expected text is the
+ * Dart function's own documented example where it has one, and otherwise
+ * what the Dart source says for that branch.
+ */
+const metric = new Fmt('metric');
+const imperial = new Fmt('imperial');
+const day = CalendarDate.of(2026, 10, 5);
+
+describe('a set', () => {
+  const set = (reps: number, lb: number, rir?: number) => new WorkoutSet({ reps, loadKg: imperial.weightToKg(lb), rir });
+
+  it('with added weight: "8 × 225 lb", and reps in reserve when recorded', () => {
+    expect(setText(set(8, 225), imperial, 'addedWeight')).toBe('8 × 225 lb');
+    expect(setText(set(8, 225, 2), imperial, 'addedWeight')).toBe('8 × 225 lb · 2 RIR');
+    expect(setText(set(8, 225, 5), imperial, 'addedWeight')).toBe('8 × 225 lb · 5+ RIR');
+    expect(setText(new WorkoutSet({ reps: 5, loadKg: 102.5 }), metric, 'addedWeight')).toBe('5 × 102.5 kg');
+  });
+
+  it('with bodyweight: reps alone, added weight with a plus, or assisted', () => {
+    expect(setText(set(8, 0), imperial, 'bodyweight')).toBe('8 reps');
+    expect(setText(set(1, 0), imperial, 'bodyweight')).toBe('1 rep');
+    expect(setText(set(8, 25), imperial, 'bodyweight')).toBe('8 × +25 lb');
+    expect(setText(set(8, -20), imperial, 'bodyweight')).toBe('8 × 20 lb assisted');
+  });
+});
+
+describe('a suggestion for next time', () => {
+  const suggestion = (kind: ProgressionSuggestion['kind'], loadKg: number): ProgressionSuggestion => ({
+    kind,
+    loadKg,
+    reps: 6,
+    lastLoadKg: loadKg,
+    lastReps: [10, 10],
+    rangeTop: 10,
+  });
+
+  it('says what a step up would be, in the user’s units', () => {
+    expect(progressionText(suggestion('addReps', 100), metric, 'addedWeight')).toBe(
+      'One more rep on any set would be a step up.',
+    );
+    expect(progressionText(suggestion('addLoad', 102.5), metric, 'addedWeight')).toBe(
+      'Every set reached 10 last time. A step up would be 102.5 kg × 6.',
+    );
+    expect(progressionText(suggestion('hold', 100), metric, 'addedWeight')).toBe(
+      'No more reps at this load in three sessions. Holding 100 kg × 6 is a fair aim.',
+    );
+    expect(progressionText(suggestion('match', 100), metric, 'addedWeight')).toBe(
+      'Matching last time holds your strength while you lose fat.',
+    );
+  });
+
+  it('for bodyweight: reps alone, a plus for added weight, or assisted', () => {
+    expect(progressionText(suggestion('addLoad', 0), metric, 'bodyweight')).toBe(
+      'Every set reached 10 last time. A step up would be 6 reps.',
+    );
+    expect(progressionText(suggestion('addLoad', 5), metric, 'bodyweight')).toBe(
+      'Every set reached 10 last time. A step up would be +5 kg × 6.',
+    );
+    expect(progressionText(suggestion('hold', -10), metric, 'bodyweight')).toBe(
+      'No more reps at this load in three sessions. Holding 10 kg assisted × 6 is a fair aim.',
+    );
+  });
+
+  it('the range and step it works with: "6 to 10 reps · 5 lb steps"', () => {
+    expect(
+      progressionSettingsText({ repsLow: 6, repsHigh: 10, loadStepKg: imperial.weightToKg(5), fmt: imperial }),
+    ).toBe('6 to 10 reps · 5 lb steps');
+    expect(progressionSettingsText({ repsLow: 3, repsHigh: 6, loadStepKg: 2.5, fmt: metric })).toBe(
+      '3 to 6 reps · 2.5 kg steps',
+    );
+  });
+});
+
+describe('a workout in a line', () => {
+  const six = new Date(2026, 9, 5, 18);
+  const squats = (sets: number) =>
+    new WorkoutExercise({
+      exerciseId: 'back-squat',
+      sets: Array.from({ length: sets }, () => new WorkoutSet({ reps: 8, loadKg: 100 })),
+    });
+
+  it('"3 exercises · 9 sets · 55 min", without the time while in progress', () => {
+    const exercises = [squats(3), squats(3), squats(3)];
+    const done = new Workout({ id: 1, date: day, startedAt: six, endedAt: new Date(six.getTime() + 55 * 60000), exercises });
+    expect(workoutSummaryText(done)).toBe('3 exercises · 9 sets · 55 min');
+    expect(workoutSummaryText(new Workout({ id: 1, date: day, startedAt: six, exercises }))).toBe('3 exercises · 9 sets');
+  });
+
+  it('counts one of each in the singular, leaves out a pause, and adds records', () => {
+    const one = new Workout({
+      id: 1,
+      date: day,
+      startedAt: six,
+      endedAt: new Date(six.getTime() + 30 * 60000 + 59000),
+      pausedForMs: 10 * 60000,
+      exercises: [squats(1)],
+    });
+    expect(workoutSummaryText(one)).toBe('1 exercise · 1 set · 20 min');
+    expect(workoutSummaryText(one, { records: 1 })).toBe('1 exercise · 1 set · 20 min · 1 personal record');
+    expect(workoutSummaryText(one, { records: 2 })).toBe('1 exercise · 1 set · 20 min · 2 personal records');
+  });
+});
+
+describe('what was eaten', () => {
+  const entry = (portion?: Portion, extras: { fiberG?: number; sodiumMg?: number; alcoholG?: number } = {}) =>
+    new FoodEntry({
+      id: 1,
+      date: day,
+      meal: 'lunch',
+      name: 'Food',
+      kcal: 240,
+      proteinG: 15,
+      carbsG: 22.5,
+      fatG: 9,
+      source: portion?.method ?? 'weighed',
+      portion,
+      ...extras,
+    });
+  const perServing = {
+    basis: 'perServing',
+    nutrition: new NutritionTotals({ kcal: 160.4, proteinG: 10, carbsG: 15, fatG: 6 }),
+    servingDescription: '1 bar',
+    servingGrams: 40,
+  } as const;
+  const per100g = {
+    basis: 'per100g',
+    nutrition: new NutritionTotals({ kcal: 389, proteinG: 17, carbsG: 66, fatG: 7 }),
+  } as const;
+
+  it('an entry from before portions were recorded says so', () => {
+    expect(portionSummary(entry())).toBe('Weighed · amount not recorded');
+  });
+
+  it('a portion with no amount is an estimate of the totals', () => {
+    expect(portionSummary(entry({ method: 'quickAdd', basis: 'enteredTotals' }))).toBe('Estimated totals');
+  });
+
+  it('servings name the serving, with its weight and what it was calculated from', () => {
+    expect(
+      portionSummary(
+        entry({ method: 'labelServing', basis: 'calculated', quantity: 1.5, unit: 'serving', reference: perServing }),
+      ),
+    ).toBe('1.5 × 1 bar (60 g) · calculated from 160 kcal per serving');
+  });
+
+  it('a weight is not given its weight again', () => {
+    expect(
+      portionSummary(entry({ method: 'weighed', basis: 'calculated', quantity: 80, unit: 'gram', reference: per100g })),
+    ).toBe('80 g · calculated from 389 kcal per 100 g');
+  });
+
+  it('typed totals say they were typed, and a hand portion says it is estimated', () => {
+    expect(
+      portionSummary(entry({ method: 'householdMeasure', basis: 'enteredTotals', quantity: 2, unit: 'cup' })),
+    ).toBe('2 cups · totals entered by you');
+    expect(
+      portionSummary(
+        entry({ method: 'palm', basis: 'calculated', quantity: 1, unit: 'palm', reference: per100g, impliedGrams: 99.6 }),
+      ),
+    ).toBe('1 palm (100 g) · estimated');
+  });
+
+  it('the extra nutrients are only the ones the source stated', () => {
+    expect(extraNutrientsLine(entry())).toBeUndefined();
+    expect(extraNutrientsLine(entry(undefined, { fiberG: 4.5, sodiumMg: 349.5, alcoholG: 0 }))).toBe(
+      'Fiber 5 g · Net carbs 18 g · Sodium 350 mg',
+    );
+    expect(extraNutrientsLine(entry(undefined, { alcoholG: 10.6 }))).toBe('Alcohol 11 g');
+  });
+});
+
+describe('a food from a pack', () => {
+  const food = (source: string, kcal = 100) =>
+    new CatalogFood({ id: 1, packId: 'p', name: 'Food', kcal, proteinG: 1, carbsG: 1, fatG: 1, source, tier: 'label', tierReason: '' });
+
+  it('says where its numbers came from, and never "verified"', () => {
+    expect(foodSourceLabel(food('usda_foundation'))).toBe('USDA, lab-analyzed');
+    expect(foodSourceLabel(food('usda_sr_legacy'))).toBe('USDA, lab-analyzed');
+    expect(foodSourceLabel(food('usda_branded'))).toBe('Manufacturer label (USDA)');
+    expect(foodSourceLabel(food('off'))).toBe('Community label (Open Food Facts)');
+    expect(foodSourceLabel(food('user_scan'))).toBe('Your label scan');
+    expect(foodSourceLabel(food('user'))).toBe('Your food');
+    expect(foodSourceLabel(food('estimate'))).toBe('Estimate');
+    expect(foodSourceLabel(food('something else'))).toBe('Food database');
+  });
+
+  it('a tiny serving that rounds to zero energy gets a note; others do not', () => {
+    const note = 'Labels may round small servings to zero. Many servings add up.';
+    expect(roundedToZeroNote(food('off', 8), { description: '1 spray', grams: 0.25 })).toBe(note);
+    expect(roundedToZeroNote(food('off', 8), { description: '1 tsp', grams: 5 })).toBeUndefined();
+    expect(roundedToZeroNote(food('off', 884), { description: '1 spray', grams: 0.25 })).toBeUndefined();
+  });
+});
+
+describe('why targets changed', () => {
+  it('names each cause and its size', () => {
+    expect(explanationLineText(new ExplanationLine('firstTargets', 0))).toBe(
+      'Your first targets, from your starting estimate of expenditure.',
+    );
+    expect(explanationLineText(new ExplanationLine('expenditureEstimate', -90, { from: 2950, to: 2860 }))).toBe(
+      'Your expenditure is 2,860 kcal a day, down from 2,950 (−90).',
+    );
+    expect(explanationLineText(new ExplanationLine('expenditureEstimate', 40, { from: 2400, to: 2440 }))).toBe(
+      'Your expenditure is 2,440 kcal a day, up from 2,400 (+40).',
+    );
+    expect(explanationLineText(new ExplanationLine('goalChange', 0))).toBe('You changed your goal (0).');
+    expect(explanationLineText(new ExplanationLine('stepLimit', 15))).toBe(
+      'Weekly changes are limited, so 15 kcal of the decrease is held for next week.',
+    );
+    expect(explanationLineText(new ExplanationLine('stepLimit', -1250.4))).toBe(
+      'Weekly changes are limited, so 1,250 kcal of the increase is held for next week.',
+    );
+    expect(explanationLineText(new ExplanationLine('calorieFloor', 120, { from: 1380, to: 1500 }))).toBe(
+      'Your calorie floor is 1,500 kcal; the target would otherwise be 1,380 kcal.',
+    );
+    expect(explanationLineText(new ExplanationLine('userHold', 0))).toBe('You kept last week’s targets for now (0).');
+  });
+
+  it('what would change them next, in order of what matters most', () => {
+    const explanation = (
+      lines: readonly ExplanationLine[],
+      { held = false, excludedPartialDays = 0 }: { held?: boolean; excludedPartialDays?: number } = {},
+    ) => new TargetsExplanation({ lines, newKcal: 2300, estimateStatus: held ? 'held' : 'updated', excludedPartialDays });
+
+    expect(whatWouldChangeIt(explanation([new ExplanationLine('calorieFloor', 1)], { held: true }))).toBe(
+      'More fully logged days and regular weigh-ins would let the app measure your expenditure.',
+    );
+    expect(
+      whatWouldChangeIt(explanation([new ExplanationLine('stepLimit', 1), new ExplanationLine('calorieFloor', 1)])),
+    ).toBe('The floor stays until your resting energy or body-fat estimate changes.');
+    expect(whatWouldChangeIt(explanation([new ExplanationLine('stepLimit', 1)], { excludedPartialDays: 2 }))).toBe(
+      'The rest of the change arrives over the next weeks, in weekly steps.',
+    );
+    expect(whatWouldChangeIt(explanation([], { excludedPartialDays: 2 }))).toBe(
+      'More complete days would make this estimate firmer.',
+    );
+    expect(whatWouldChangeIt(explanation([]))).toBe(
+      'If your weight trend changes at this intake, expect targets to follow.',
+    );
+  });
+});
+
+describe('how sure the coach is', () => {
+  const confidence = (nextStep: CoachConfidence['nextStep'], usableFoodDays: number, weighInDays: number) =>
+    new CoachConfidence({
+      level: 'learning',
+      estimate: 'learning',
+      foodLog: 'learning',
+      weighIns: 'learning',
+      stability: 'good',
+      nextStep,
+      usableFoodDays,
+      weighInDays,
+    });
+
+  it('counts the days still needed, in the singular for one', () => {
+    expect(confidenceNextStepText(confidence('completeFoodLog', 7, 0))).toBe(
+      'Log food and mark days complete when they are. You need 3 more usable days to reach the minimum.',
+    );
+    expect(confidenceNextStepText(confidence('completeFoodLog', 9, 0))).toBe(
+      'Log food and mark days complete when they are. You need 1 more usable day to reach the minimum.',
+    );
+    expect(confidenceNextStepText(confidence('completeFoodLog', 14, 0))).toBe(
+      'Mark days complete when they are. 6 more usable days would make the estimate firmer.',
+    );
+    expect(confidenceNextStepText(confidence('recordWeight', 20, 5))).toBe(
+      'Weigh in on 3 more mornings to make the estimate clearer.',
+    );
+    expect(confidenceNextStepText(confidence('recordWeight', 20, 12))).toBe(
+      'Weigh in on 8 more mornings to make the estimate clearer.',
+    );
+  });
+
+  it('says so when there is nothing to do', () => {
+    expect(confidenceNextStepText(confidence('waitForStability', 20, 20))).toBe(
+      'Nothing to do: the estimate is settling after a recent change.',
+    );
+  });
+});
+
+describe('quiet lines', () => {
+  it('a logging streak is mentioned from three days, with the forgiven day when there was one', () => {
+    expect(loggingStreakText({ days: 2 })).toBeUndefined();
+    expect(loggingStreakText({ days: 3 })).toBe('3 whole days logged in a row.');
+    expect(loggingStreakText({ days: 12, forgivenOn: day })).toBe(
+      '12 whole days logged in a row. A missed day is forgiven, once a week.',
+    );
+  });
+
+  it('a personal record: "Back squat: estimated max 110.0 kg, up from 107.5 kg."', () => {
+    expect(
+      personalRecordText({ exerciseId: 'back-squat', name: 'Back squat', estimateKg: 110, previousBestKg: 107.5 }, metric),
+    ).toBe('Back squat: estimated max 110.0 kg, up from 107.5 kg.');
+  });
+
+  it('a rest target: "2:00", or "None"', () => {
+    expect(restTargetText(120000)).toBe('2:00');
+    expect(restTargetText(undefined)).toBe('None');
+  });
+
+  it('an imported weigh-in says where it came from and why it counts', () => {
+    const at = new Date(2026, 9, 5, 6, 42);
+    const weighIn = { day: at, kg: 80, sourceName: 'Bathroom scale' };
+    expect(importedWeighInText({ ...weighIn, basis: 'firstMorning', readings: 2, at })).toBe(
+      'From Bathroom scale at 6:42 AM.',
+    );
+    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 3 })).toBe(
+      'The middle of 3 readings from Bathroom scale.',
+    );
+    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 1 })).toBe('From Bathroom scale.');
+  });
+});
+
+describe('notices', () => {
+  it('under-eating: what was seen, the innocent explanation first, support only when asked for', () => {
+    const finding = { averageKcal: 1149.6, floorKcal: 1500, days: 7, lowDays: [] };
+    const base =
+      'Your logged days average 1,150 kcal. The lowest the app would ever suggest for you is 1,500. ' +
+      'If those days are missing food, mark them partial. ' +
+      'If they are complete, that is less than the app considers enough. Eating at your target will not slow ' +
+      'your progress the way it feels like it will.';
+    expect(underEatingText(finding, { supportLine: false })).toBe(base);
+    expect(underEatingText(finding, { supportLine: true })).toBe(
+      `${base} If eating has become a source of distress, a doctor or a registered dietitian is the right person to talk to.`,
+    );
+  });
+
+  it('easing a deficit: a maintenance week or a slower pace, and sleep only when it has been short', () => {
+    const early = reliefOfferText({ suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3, shortSleep: false });
+    expect(early.title).toBe('Two hard weeks in a row');
+    expect(early.suggestion).toBe(
+      'The coach would slow the pace: you are early in this deficit, and a gentler pace is easier to hold than a break.',
+    );
+    expect(early.sleep).toBeUndefined();
+
+    const late = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true });
+    expect(late.suggestion).toBe(
+      'The coach would take a maintenance week: you are 9 weeks into this deficit, and a week at maintenance is a diet break taken early.',
+    );
+    expect(late.sleep).toContain('under six hours');
+
+    const noSlower = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: undefined, deficitWeeks: 2, shortSleep: false });
+    expect(noSlower.suggestion).toBe(
+      'The coach would take a maintenance week: a week at maintenance is a diet break taken early, and the deficit can resume after it.',
+    );
+  });
+});

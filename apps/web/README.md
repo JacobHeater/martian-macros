@@ -51,6 +51,7 @@ on Java 25.
 | `src/foodPipeline/` | Builds food packs from the open data sources, carried over from `packages/food_pipeline`. A developer tool, never part of the app; its `node/` folder is the only place that touches files |
 | `src/fixtures/` | Every repository and seam held in memory, the demo seed, and a typical user, carried over from `packages/fixtures`. Their contract suites are in `test/contracts/` |
 | `src/data/` | The user's database and every repository over it, through `SqlDatabase`, carried over from `packages/data`. Passes the same contract suites as the fixtures |
+| `src/format/` | What the user reads: numbers, dates, units and the fixed wording of every label and sentence, carried over from the Flutter app. The only place imperial units exist |
 | `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
 | `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |
@@ -77,6 +78,8 @@ came from, the conversion is written the same way everywhere.
 | `CalendarDate(2026, 3, 8)` | `CalendarDate.of(2026, 3, 8)`. There is one object per day, so `===`, `Map` keys and `Set` members behave as Dart's value equality did |
 | `==` overridden on a class | An `equals(other)` method, or a `sameX(a, b)` function for an interface. `===` on two objects is never value equality |
 | `x.round()` | `roundHalfAwayFromZero(x)`. Never `Math.round`, which sends -2.5 to -2 |
+| `x.toStringAsFixed(n)` | `toStringAsFixed(x, n)`. `toFixed` drops the sign of negative zero |
+| `NumberFormat`, `DateFormat` | Written out in `format/` (`groupThousands`, `Fmt.day`). Not `Intl`, whose output depends on the device |
 | `x ~/ y`, `x.toInt()` | `Math.trunc(x / y)`, `Math.trunc(x)` |
 | `x % y` with a possibly negative `x` | Dart's result is never negative; JavaScript's can be. Write `((x % y) + y) % y` |
 | `double.tryParse(text)` | `tryParseDouble(text)`. Never `Number(text)` or `parseFloat(text)` |

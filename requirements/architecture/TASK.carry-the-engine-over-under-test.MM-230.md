@@ -82,6 +82,8 @@ Scenario: No Dart is left
 | fixtures | 3,541 lines, 54 files | 141 | done (it never touched SQLite; the first count here was wrong to say it waited) | 144: all 141 carried over and 3 added |
 | data | 20,359 lines, 48 files (18,030 of them generated) | the contract suites and 22 of its own | done on the SQLite seam, with the schema at version 1 (MM-231); the 31 released upgrade steps and their 10 tests are not carried over, by that decision | 147: every contract suite (125 tests), 12 of its own carried over and 10 added |
 | food_pipeline | 922 lines, 22 files | 30 | done, except its two command-line entry points, which move with the task runner | 36: all 30 carried over (one changed, below) and 6 added |
+| the Flutter app's wording (`apps/mobile/lib/src/format`) | 1,293 lines, 50 files | none of its own: tested through the screens | done | 70, all new: 45 compare with what Dart printed, 25 test the sentences |
+| the rest of the Flutter app (`apps/mobile`) | about 19,400 lines of screens and their state, 81 test files | | not started: rebuilt as screens (MM-228 part 4) | |
 | `mm` task runner | 8,361 lines | 191 | not started | |
 
 **Domain (2026-10-12):** `apps/web/src/domain/` and `apps/web/src/lang/`.
@@ -143,6 +145,26 @@ The type check is clean.
   (`test/data/demoSeed.test.ts`) and passes against both the in-memory
   repositories and the database. I first wrote that Dart had no test of the
   seed; that was wrong, and the pull request that said so is corrected.
+- **What the user reads is what the Flutter app showed**
+  (`apps/web/src/format/`): numbers, dates, units and the fixed wording of
+  every label and sentence. Three checks, of different strength:
+  - Compared with what Dart printed, from a file the Dart formatters wrote:
+    weights, lengths and waist changes in both unit systems over 46 awkward
+    numbers, energy, paces, loads, file sizes, timers, times of day, days,
+    typed numbers, and every label of 29 kinds. All equal.
+  - Compared word for word with the Dart source: 295 pieces of wording
+    from the 50 Dart files are all present in the TypeScript. A word was
+    changed on purpose and the comparison reported it. This is a script run
+    once (it reads the Dart source, which will be deleted), not a test.
+  - Tested here, with the expected text taken from the Dart source: sets,
+    suggestions, a workout in a line, what was eaten, where a food came
+    from, why targets changed, how sure the coach is, and four notices.
+  - **Not tested beyond the wording comparison:** the sentences for a
+    stall, an insight, the week's adherence, the recomp signal and review,
+    and the monthly report. Their branches were tested in Flutter through
+    the screens that show them, and those tests come over with the screens.
+  Dates and thousands separators are written out in the code and not asked
+  of the device, so they read the same on every phone.
 - `mm food build` and `mm food publish` still run the Dart pipeline. They
   switch when the task runner is converted.
 - Files that read and write disk live in a folder called `node`, and a test
