@@ -175,8 +175,12 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   destinations, Settings with the theme choice, and a `?gallery` page of
   every token and component. `mm bootstrap` now runs `npm ci` there and
   `mm check` ends with `mm web` (type check, tests, build, offline check),
-  so Node 22 is needed locally. Not built: the Android shell, screenshot
-  tests. Seen only in desktop Edge, never in a phone's web view.
+  so Node 22 is needed locally. Not built: screenshot tests.
+- **The Android shell exists** in `apps/web/android/` (Capacitor, demo app
+  ID only). It was built and run on the emulator with the network off; it
+  has not been on a physical phone. `apps/web/README.md` says how to build
+  it. Always name the device with `adb -s`: the owner's phone is usually
+  connected and only the demo app may go on it.
 - #102 (Copilot's, green) was merged at the start of this session under the
   standing rule.
 
