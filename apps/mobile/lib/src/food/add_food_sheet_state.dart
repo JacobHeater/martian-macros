@@ -10,7 +10,6 @@ import '../format/meal_label.dart';
 import '../format/parse_number.dart';
 import '../format/portion_unit_label.dart';
 import '../format/quantity_source_label.dart';
-import '../format/quantity_text.dart';
 import '../food_packs/food_catalog_provider.dart';
 import '../integration_providers.dart';
 import '../providers.dart';
@@ -92,7 +91,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           ? entry.alcoholG! / entry.kcal
           : null;
       _unit = portion.unit;
-      _quantity.text = quantityText(portion.quantity ?? 1);
+      _quantity.text = _editableNumber(portion.quantity ?? 1);
       _quantityWasEntered = portion.quantity != null;
     } else {
       _fill(entry);
@@ -215,16 +214,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     );
   }
 
+  String _editableNumber(double value) => value == value.roundToDouble()
+      ? value.round().toString()
+      : value.toString();
+
   void _fill(FoodEntry e) => setState(() {
     _manualEntry = true;
-    String n(double v) =>
-        v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(1);
     _name.text = e.name;
-    _kcal.text = n(e.kcal);
-    _protein.text = n(e.proteinG);
-    _carbs.text = n(e.carbsG);
-    _fat.text = n(e.fatG);
-    _alcohol.text = e.alcoholG == null ? '' : n(e.alcoholG!);
+    _kcal.text = _editableNumber(e.kcal);
+    _protein.text = _editableNumber(e.proteinG);
+    _carbs.text = _editableNumber(e.carbsG);
+    _fat.text = _editableNumber(e.fatG);
+    _alcohol.text = e.alcoholG == null ? '' : _editableNumber(e.alcoholG!);
     _source = e.source;
     _basis = NutritionBasis.enteredTotals;
     _calcRef = null;
@@ -233,7 +234,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     _legacy = false;
     if (portion != null && portion.quantity != null && portion.unit != null) {
       _unit = portion.unit;
-      _quantity.text = quantityText(portion.quantity!);
+      _quantity.text = _editableNumber(portion.quantity!);
       _quantityWasEntered = true;
       if (e.source == QuantitySource.labelServing &&
           portion.unit == PortionUnit.serving &&
@@ -285,7 +286,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         : t.kcal * _calcAlcoholPerKcal!;
     _source = _calcMethod;
     final servings = _source == QuantitySource.labelServing ? _amount : 1.0;
-    String n(double v) => (v / (servings ?? 1)).toString();
+    String n(double v) => _editableNumber(v / (servings ?? 1));
     if (t != null) {
       _kcal.text = n(t.kcal);
       _protein.text = n(t.proteinG);

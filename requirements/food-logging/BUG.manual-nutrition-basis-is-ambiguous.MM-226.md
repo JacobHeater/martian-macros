@@ -1,6 +1,6 @@
 ---
 id: MM-226
-status: in-progress
+status: done
 component: food-logging
 related: [MM-167, MM-223, MM-224, MM-225]
 ---
@@ -59,4 +59,7 @@ coverage. Per-serving alcohol must also scale correctly (existing MM-203/MM-204)
 
 Both new regressions were executed before the implementation and failed at
 the intended missing heading/remaining-switch assertions. Full local `mm check`
-then passed after the fix. Linux screenshot regeneration is pending.
+then passed after the fix. The final precision follow-up passes full `mm check`
+(mobile 633 passed, 65 skipped). Linux run 38200742381 succeeded for `85f5542`;
+five changed images were visually inspected and imported in the follow-up to
+merged #81. No emulator/device verification was performed.
