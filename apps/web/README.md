@@ -52,6 +52,7 @@ on Java 25.
 | `src/fixtures/` | Every repository and seam held in memory, the demo seed, and a typical user, carried over from `packages/fixtures`. Their contract suites are in `test/contracts/` |
 | `src/data/` | The user's database and every repository over it, through `SqlDatabase`, carried over from `packages/data`. Passes the same contract suites as the fixtures |
 | `src/format/` | What the user reads: numbers, dates, units and the fixed wording of every label and sentence, carried over from the Flutter app. The only place imperial units exist |
+| `src/state/` | `AppState`: everything the screens show that is worked out from what is stored, as cells that follow the repositories. No React and no browser in it. From the Flutter app's providers |
 | `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
 | `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |
