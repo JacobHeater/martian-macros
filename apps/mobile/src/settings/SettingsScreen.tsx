@@ -22,6 +22,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
+import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { HealthConnectSection } from './HealthConnectSection';
@@ -123,7 +124,7 @@ export function SettingsScreen() {
           onChange={(on) => void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: on ? 25 : undefined }))}
         />
         {bodyFat === undefined ? null : (
-          <MmSlider
+          <MmSliderRow
             name="Body fat percent"
             value={clamp(bodyFat, 5, 55)}
             min={5}

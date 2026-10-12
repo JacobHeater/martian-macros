@@ -65,3 +65,9 @@
   font: var(--type-caption);
   color: var(--text2);
 }
+.gallery-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 420px;
+}
