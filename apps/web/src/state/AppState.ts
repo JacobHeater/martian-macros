@@ -26,6 +26,7 @@ import type { AdherenceSummary } from '../engine/AdherenceSummary';
 import { analyze } from '../engine/analyze';
 import { assessStall } from '../engine/assessStall';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
+import { buildStrengthTrends } from '../engine/buildStrengthTrends';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
@@ -43,6 +44,8 @@ import { pausedGuide } from '../engine/pausedGuide';
 import { pauseOn } from '../engine/pauseOn';
 import { pauseToResume } from '../engine/pauseToResume';
 import { planReminders } from '../engine/planReminders';
+import type { RecompReview } from '../engine/RecompReview';
+import { recompReviewOf } from '../engine/recompReviewOf';
 import { recoveryCheckInDue } from '../engine/recoveryCheckInDue';
 import type { ReliefOffer } from '../engine/ReliefOffer';
 import { ReminderFacts } from '../engine/ReminderFacts';
@@ -52,6 +55,7 @@ import type { ReportPeriod } from '../engine/ReportPeriod';
 import { reportPeriods } from '../engine/reportPeriods';
 import { selectInsight } from '../engine/selectInsight';
 import type { StallAssessment } from '../engine/StallAssessment';
+import type { StrengthTrend } from '../engine/StrengthTrend';
 import { summarizeAdherence } from '../engine/summarizeAdherence';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
@@ -271,6 +275,18 @@ export class AppState {
 
   /** The targets in force today, if any have been issued. */
   readonly currentTargets: Cell<TargetsRecord | undefined>;
+
+  /** Each lift's estimated strength over time. Failed when a logged set cannot be worked out. */
+  readonly strengthTrends: Cell<Loadable<readonly StrengthTrend[]>>;
+
+  /** The recomp review due today, if one is (MM-133). Not during a pause, which is not time on recomp. */
+  readonly recompReview: Cell<RecompReview | undefined>;
+
+  /** How many days of history the Dashboard shows. */
+  readonly dashboardRange = new ValueCell(30);
+
+  /** The day shown on the Food tab; undefined follows the real current day. */
+  readonly selectedDay = new ValueCell<CalendarDate | undefined>(undefined);
 
   private readonly foodByDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
@@ -629,6 +645,44 @@ export class AppState {
         return undefined;
       }
       return history === undefined ? undefined : history[history.length - 1];
+    });
+
+    this.strengthTrends = derived<Loadable<readonly StrengthTrend[]>>(() => {
+      const sources: Loadable<unknown>[] = [this.workouts.value, this.weights.value, this.customExercises.value];
+      for (const source of sources) if (!source.ready && 'error' in source) return Loadable.failed(source.error);
+      const workouts = of(this.workouts);
+      const weights = of(this.weights);
+      if (workouts === undefined || weights === undefined || of(this.customExercises) === undefined) {
+        return Loadable.loading;
+      }
+      try {
+        return Loadable.of(
+          buildStrengthTrends({ workouts, weights, exercises: this.exercises.value, today: this.today.value }),
+        );
+      } catch (error) {
+        return Loadable.failed(error);
+      }
+    });
+
+    this.recompReview = derived(() => {
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (
+        snapshot === undefined ||
+        history === undefined ||
+        !snapshot.policy.targetsAllowed ||
+        this.activePause.value !== undefined
+      ) {
+        return undefined;
+      }
+      return recompReviewOf({
+        history,
+        trend: snapshot.trend,
+        waist: of(this.waist) ?? [],
+        strengthTrends: of(this.strengthTrends) ?? [],
+        recommendation: snapshot.recommendation,
+        today: this.today.value,
+      });
     });
 
     this.checkIn = this.makeCheckIn();

@@ -8,6 +8,9 @@ export interface Navigator {
    */
   push<T = void>(screen: (close: (result?: T) => void) => ReactNode): Promise<T | undefined>;
 
-  /** Whether a pushed screen is showing. */
+  /** Closes every pushed screen, back to what is underneath them all. Each answers as simply left. */
+  closeAll(): void;
+
+  /** How many pushed screens there are. */
   readonly depth: number;
 }
