@@ -2,12 +2,14 @@
 
 Status: founding decisions, October 2026. This is the overview.
 
-> **Decided 2026-10-12 (MM-228): the app is being rebuilt as a React HTML5
-> app in a native shell.** It stays offline, the web is never a product, and
-> the product decisions below stand. Everything in this file about Flutter,
-> Dart packages and Drift describes the app being replaced, which remains the
-> reference for behavior until the new one takes over. This file is rewritten
-> at the switch.
+> **Decided 2026-10-12 (MM-228): the app is a React HTML5 app in a native
+> shell.** It stays offline, the web is never a product, and the product
+> decisions below stand. The rebuild (MM-232) is done: the app lives in
+> `apps/web/`, and the Flutter app this file was first written about was
+> removed with it (it remains in git history). A Dart file named below has
+> its counterpart under `apps/web/src`, named in camelCase — `mode_advisor.dart`
+> is `modeAdvisor.ts` — with the same behavior, held by the carried-over
+> tests.
 
 **The requirements live in [`requirements/`](../requirements/README.md)**, one
 ticket per decision or piece of work, each with a short id (`MM-n`). Where
@@ -15,7 +17,8 @@ this file and a ticket disagree, the ticket is right; fix this file.
 
 **Product design guidance lives in [`design/`](../design/README.md)** and
 translates requirements and roadmap decisions into shared visual, interaction,
-accessibility, and Flutter implementation rules.
+accessibility, and implementation rules (written for the Flutter app; the
+conventions carried over).
 
 ## Product
 
@@ -201,23 +204,28 @@ Binding rules from the product owner (MM-159); the short form is in
   run against every implementation.
 - **Repositories for all persistence** (MM-161), designed as small role
   interfaces (`WeightReader`, `WeightWriter`, ...), not one store.
-- **One declaration per file** (MM-160), checked by `mm arch`.
+- **One declaration per file** (MM-160). The Dart checker (`mm arch`) was
+  removed with the toolchain; a TypeScript counterpart is on the list, and
+  the layers test guards the imports meanwhile.
 - **One implementation per control** (MM-163): reusable view parts are
   design-system components; screens never use raw Material controls.
 
 State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
-`mm arch` enforces one declaration per file, layering and design-system use with an empty
-baseline; repositories and integration seams have fixtures and contract suites. Workstream WS-14.
+The layers test (`apps/web/test/layers.test.ts`) enforces the layering and
+the adapter folders; the one-declaration and design-system checks await a
+TypeScript `mm arch` (see the handoff).
 
 ## Developer experience
 
-- `mm` is a zero-dependency Dart CLI (`tool/`), launched by `mm.ps1`,
-  `mm.cmd`, and `mm`, so there is one implementation for every OS.
-- Flutter is pinned through FVM (`.fvmrc`).
-- Environments use `--dart-define-from-file=config/<env>.json`. Native
-  flavors come later, when the dev and prod app IDs need to install side by
-  side.
-- iOS tasks fail fast with a clear message on non-macOS hosts.
+- `mm` is a zero-dependency TypeScript CLI (`tool/`) run by Node itself,
+  launched by `mm.ps1`, `mm.cmd`, and `mm`, so there is one implementation
+  for every OS.
+- Node 22.18+ is the one toolchain; Android builds also need a JDK and the
+  Android SDK.
+- Per-environment build values live in `config/<env>.json` (the food-pack
+  manifest address); the web build reads them at build time. Native flavors
+  come later, when the dev and prod app IDs need to install side by side
+  (MM-228).
 
 ## Roadmap
 

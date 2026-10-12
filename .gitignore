@@ -8,28 +8,12 @@ Thumbs.db
 *.iws
 .history/
 
-# Dart / Flutter (any package in the workspace)
-.dart_tool/
-.pub-cache/
-.pub/
+# Build outputs and coverage
 build/
 coverage/
-.flutter-plugins
-.flutter-plugins-dependencies
-**/doc/api/
-migrate_working_dir/
-.widget_preview/
-
-# FVM: keep .fvmrc, ignore the local SDK symlink
-.fvm/flutter_sdk
-.fvm/versions
 
 # Local environment overrides (config/*.json is committed; *.local.json is not)
 config/*.local.json
-
-# Food pipeline inputs and outputs (large; rebuilt by `mm food`)
-tools/food_pipeline/.cache/
-tools/food_pipeline/out/
 
 # Food pipeline: downloaded sources and built packs (MM-52)
 .food_cache/

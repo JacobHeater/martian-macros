@@ -1,6 +1,6 @@
 ---
 id: MM-231
-status: in-progress
+status: done
 component: persistence
 related: [MM-228, MM-230, MM-59, MM-160, MM-41, MM-42]
 ---
@@ -170,3 +170,5 @@ Scenario: The system of record is on the phone
 ## Notes
 - The food catalog is the first thing built on it, because it reads and
   never writes.
+
+**Done (2026-10-12).** `SqlDatabase` has the WebAssembly adapter (tests and the browser) and the native one over the `MmDb` plugin (bundled SQLite with FTS5), both held to `sqlDatabaseContract`; the app opens the phone's own database in `openAppServices`, and a food pack downloads, unpacks and answers a search on the device (MM-232 steps 5 and 6 record the verification).

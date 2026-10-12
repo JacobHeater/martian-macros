@@ -1,6 +1,7 @@
 # Martian Macros: the React app
 
-The app being built to replace the Flutter one in `apps/mobile/` (MM-228).
+The app (MM-228). It replaced the Flutter app with MM-232; the layers the
+Dart packages kept apart stay apart below.
 It runs offline inside a native shell on a phone. The browser is where it is
 developed, tested and reviewed; the web is not a product.
 

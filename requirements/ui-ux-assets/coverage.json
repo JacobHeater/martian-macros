@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "about": "Every UI surface in apps/mobile/lib/src and the HTML that draws it (MM-211). Kept by hand: add or change an entry in the same pull request as the widget. mm req checks it against the source.",
-  "updated": "2026-10-11",
+  "about": "Every UI surface in apps/web/src and the HTML that draws it (MM-211). Kept by hand: add or change an entry in the same pull request as the component. mm req checks it against the source.",
+  "updated": "2026-10-12",
   "surfaces": [
     {
-      "source": "apps/mobile/lib/src/about/evidence_question_screen.dart",
+      "source": "apps/web/src/about/EvidenceQuestionScreen.tsx",
       "symbol": "EvidenceQuestionScreen",
       "kind": "view",
       "requirements": [
@@ -18,7 +18,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/about/evidence_row_card.dart",
+      "source": "apps/web/src/about/EvidenceRowCard.tsx",
       "symbol": "EvidenceRowCard",
       "kind": "part",
       "requirements": [
@@ -33,7 +33,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/about/how_this_works_screen.dart",
+      "source": "apps/web/src/about/HowThisWorksScreen.tsx",
       "symbol": "HowThisWorksScreen",
       "kind": "view",
       "requirements": [
@@ -48,7 +48,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/app/adults_only_screen.dart",
+      "source": "apps/web/src/app/AdultsOnlyScreen.tsx",
       "symbol": "AdultsOnlyScreen",
       "kind": "view",
       "requirements": [
@@ -62,7 +62,25 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/app/app_root.dart",
+      "source": "apps/web/src/app/App.tsx",
+      "symbol": "App",
+      "kind": "host",
+      "requirements": [
+        "MM-165",
+        "MM-184",
+        "MM-177"
+      ],
+      "asset": "views/onboarding.html#app-demo",
+      "states": [
+        "themes",
+        "demo title"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Applies the theme and hosts the overlays, the download strip and the navigator; the themes are the switch on every sheet."
+    },
+    {
+      "source": "apps/web/src/app/AppRoot.tsx",
       "symbol": "AppRoot",
       "kind": "view",
       "requirements": [
@@ -79,39 +97,7 @@
       "limits": "Which gate is shown first is described on the flows sheet, not drawn as one frame."
     },
     {
-      "source": "apps/mobile/lib/src/app/check_in_host.dart",
-      "symbol": "CheckInHost",
-      "kind": "host",
-      "requirements": [
-        "MM-24"
-      ],
-      "asset": "flows/index.html#weekly-check-in",
-      "states": [
-        "none of its own"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "Runs the weekly check-in when the app opens; it draws nothing itself."
-    },
-    {
-      "source": "apps/mobile/lib/src/app/download_status_host.dart",
-      "symbol": "DownloadStatusHost",
-      "kind": "part",
-      "requirements": [
-        "MM-56"
-      ],
-      "asset": "views/settings.html#food-database-downloading",
-      "states": [
-        "checking",
-        "downloading",
-        "installing"
-      ],
-      "verification": "source-only",
-      "status": "covered",
-      "limits": "Only the downloading wording is drawn."
-    },
-    {
-      "source": "apps/mobile/lib/src/app/health_recheck_screen.dart",
+      "source": "apps/web/src/app/HealthRecheckScreen.tsx",
       "symbol": "HealthRecheckScreen",
       "kind": "view",
       "requirements": [
@@ -126,7 +112,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/app/home_shell.dart",
+      "source": "apps/web/src/app/HomeShell.tsx",
       "symbol": "HomeShell",
       "kind": "navigation",
       "requirements": [
@@ -142,41 +128,56 @@
       "limits": "Drawn as the bottom bar on every destination sheet."
     },
     {
-      "source": "apps/mobile/lib/src/app/martian_macros_app.dart",
-      "symbol": "MartianMacrosApp",
+      "source": "apps/web/src/app/NavigatorHost.tsx",
+      "symbol": "NavigatorHost",
       "kind": "host",
       "requirements": [
-        "MM-165",
-        "MM-184",
-        "MM-177"
+        "MM-232"
       ],
       "asset": "views/onboarding.html#app-demo",
       "states": [
-        "themes",
-        "demo title"
+        "base",
+        "pushed"
       ],
       "verification": "source-only",
       "status": "covered",
-      "limits": "Applies the theme and the app title; the themes are the switch on every sheet."
+      "limits": "The stack of pushed screens; what it shows is each screen's own drawing."
     },
     {
-      "source": "apps/mobile/lib/src/app/target_change_summary_host.dart",
-      "symbol": "TargetChangeSummaryHost",
+      "source": "apps/web/src/app/Screen.tsx",
+      "symbol": "Screen",
       "kind": "host",
       "requirements": [
-        "MM-138"
+        "MM-232"
       ],
-      "asset": "views/coach.html#target-change-sheet",
+      "asset": "components/index.html#mm-app-bar",
       "states": [
-        "shown once",
-        "could not finish"
+        "title",
+        "actions",
+        "footer"
       ],
       "verification": "source-only",
       "status": "covered",
-      "limits": "Shows the explanation sheet after a check-in; its failure message is views/onboarding.html#target-summary-error."
+      "limits": "The page scaffold around every pushed screen; drawn through its app bar."
     },
     {
-      "source": "apps/mobile/lib/src/app/welcome_back_screen.dart",
+      "source": "apps/web/src/app/ThemeChooserScreen.tsx",
+      "symbol": "ThemeChooserScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-184"
+      ],
+      "asset": "views/onboarding.html#theme-chooser",
+      "states": [
+        "Martian preselected",
+        "saving",
+        "save failed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/app/WelcomeBackScreen.tsx",
       "symbol": "WelcomeBackScreen",
       "kind": "view",
       "requirements": [
@@ -191,7 +192,98 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/adherence_card.dart",
+      "source": "apps/web/src/charts/HistoryChart.tsx",
+      "symbol": "HistoryChart",
+      "kind": "component",
+      "requirements": [
+        "MM-107",
+        "MM-176"
+      ],
+      "asset": "components/index.html#history-chart",
+      "states": [
+        "a series with a gap"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Drawn as bars; the app draws points joined by a line."
+    },
+    {
+      "source": "apps/web/src/charts/MacroSplitChart.tsx",
+      "symbol": "MacroSplitChart",
+      "kind": "component",
+      "requirements": [
+        "MM-107",
+        "MM-179",
+        "MM-225"
+      ],
+      "asset": "components/index.html#macro-split-chart",
+      "states": [
+        "three macros",
+        "food preview",
+        "empty food preview"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/charts/MiniTrend.tsx",
+      "symbol": "MiniTrend",
+      "kind": "component",
+      "requirements": [
+        "MM-116"
+      ],
+      "asset": "components/index.html#mini-trend",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/charts/TrendChart.tsx",
+      "symbol": "TrendChart",
+      "kind": "component",
+      "requirements": [
+        "MM-17",
+        "MM-107"
+      ],
+      "asset": "components/index.html#trend-chart",
+      "states": [
+        "with band and event"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/charts/TrendSparkline.tsx",
+      "symbol": "TrendSparkline",
+      "kind": "component",
+      "requirements": [
+        "MM-107"
+      ],
+      "asset": "components/index.html#trend-sparkline",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/charts/TrendStats.tsx",
+      "symbol": "TrendStats",
+      "kind": "component",
+      "requirements": [
+        "MM-17"
+      ],
+      "asset": "components/index.html#trend-chart",
+      "states": [
+        "three figures"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/coach/AdherenceCard.tsx",
       "symbol": "AdherenceCard",
       "kind": "part",
       "requirements": [
@@ -205,7 +297,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/coach_screen.dart",
+      "source": "apps/web/src/coach/CoachScreen.tsx",
       "symbol": "CoachScreen",
       "kind": "view",
       "requirements": [
@@ -224,7 +316,7 @@
       "limits": "Compared with the screenshot test for the top of the page only."
     },
     {
-      "source": "apps/mobile/lib/src/coach/insight_card.dart",
+      "source": "apps/web/src/coach/InsightCard.tsx",
       "symbol": "InsightCard",
       "kind": "part",
       "requirements": [
@@ -240,7 +332,7 @@
       "limits": "Two of the five rules are drawn."
     },
     {
-      "source": "apps/mobile/lib/src/coach/last_change_card.dart",
+      "source": "apps/web/src/coach/LastChangeCard.tsx",
       "symbol": "LastChangeCard",
       "kind": "part",
       "requirements": [
@@ -256,7 +348,7 @@
       "limits": "The no-change wording is not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/coach/metabolism_summary.dart",
+      "source": "apps/web/src/coach/MetabolismSummary.tsx",
       "symbol": "MetabolismSummary",
       "kind": "part",
       "requirements": [
@@ -273,7 +365,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/monthly_report_screen.dart",
+      "source": "apps/web/src/coach/MonthlyReportScreen.tsx",
       "symbol": "MonthlyReportScreen",
       "kind": "view",
       "requirements": [
@@ -289,7 +381,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/recomp_review_body.dart",
+      "source": "apps/web/src/coach/RecompReviewBody.tsx",
       "symbol": "RecompReviewBody",
       "kind": "part",
       "requirements": [
@@ -304,7 +396,7 @@
       "limits": "One of the verdicts is drawn."
     },
     {
-      "source": "apps/mobile/lib/src/coach/recomp_review_card.dart",
+      "source": "apps/web/src/coach/RecompReviewCard.tsx",
       "symbol": "RecompReviewCard",
       "kind": "part",
       "requirements": [
@@ -318,7 +410,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/recovery_card.dart",
+      "source": "apps/web/src/coach/RecoveryCard.tsx",
       "symbol": "RecoveryCard",
       "kind": "part",
       "requirements": [
@@ -334,7 +426,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/recovery_check_in_screen.dart",
+      "source": "apps/web/src/coach/RecoveryCheckInScreen.tsx",
       "symbol": "RecoveryCheckInScreen",
       "kind": "view",
       "requirements": [
@@ -349,7 +441,7 @@
       "limits": "Where the end labels of each scale sit is approximate."
     },
     {
-      "source": "apps/mobile/lib/src/coach/relief_offer_card.dart",
+      "source": "apps/web/src/coach/ReliefOfferCard.tsx",
       "symbol": "ReliefOfferCard",
       "kind": "part",
       "requirements": [
@@ -364,7 +456,7 @@
       "limits": "The slower-pace and short-sleep wordings are not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/coach/reports_card.dart",
+      "source": "apps/web/src/coach/ReportsCard.tsx",
       "symbol": "ReportsCard",
       "kind": "part",
       "requirements": [
@@ -378,21 +470,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/show_target_change_sheet.dart",
-      "symbol": "showTargetChangeSheet",
-      "kind": "sheet",
-      "requirements": [
-        "MM-138"
-      ],
-      "asset": "views/coach.html#target-change-sheet",
-      "states": [
-        "open"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/coach/stall_card.dart",
+      "source": "apps/web/src/coach/StallCard.tsx",
       "symbol": "StallCard",
       "kind": "part",
       "requirements": [
@@ -407,7 +485,7 @@
       "limits": "One of the causes is drawn."
     },
     {
-      "source": "apps/mobile/lib/src/coach/target_change_sheet.dart",
+      "source": "apps/web/src/coach/TargetChangeSheet.tsx",
       "symbol": "TargetChangeSheet",
       "kind": "sheet",
       "requirements": [
@@ -422,7 +500,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/targets_history_screen.dart",
+      "source": "apps/web/src/coach/TargetsHistoryScreen.tsx",
       "symbol": "TargetsHistoryScreen",
       "kind": "view",
       "requirements": [
@@ -437,7 +515,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/coach/under_eating_notice.dart",
+      "source": "apps/web/src/coach/UnderEatingNotice.tsx",
       "symbol": "UnderEatingNotice",
       "kind": "part",
       "requirements": [
@@ -451,7 +529,21 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/dashboard/dashboard_metrics.dart",
+      "source": "apps/web/src/coach/showTargetChangeSheet.tsx",
+      "symbol": "showTargetChangeSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#target-change-sheet",
+      "states": [
+        "open"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/dashboard/DashboardMetrics.tsx",
       "symbol": "DashboardMetrics",
       "kind": "part",
       "requirements": [
@@ -467,7 +559,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/dashboard/dashboard_screen.dart",
+      "source": "apps/web/src/dashboard/DashboardScreen.tsx",
       "symbol": "DashboardScreen",
       "kind": "view",
       "requirements": [
@@ -489,7 +581,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/dashboard/process_card.dart",
+      "source": "apps/web/src/dashboard/ProcessCard.tsx",
       "symbol": "ProcessCard",
       "kind": "part",
       "requirements": [
@@ -504,7 +596,7 @@
       "limits": "Hidden when there is no streak."
     },
     {
-      "source": "apps/mobile/lib/src/dashboard/report_ready_notice.dart",
+      "source": "apps/web/src/dashboard/ReportReadyNotice.tsx",
       "symbol": "ReportReadyNotice",
       "kind": "part",
       "requirements": [
@@ -518,7 +610,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/dashboard/weight_card.dart",
+      "source": "apps/web/src/dashboard/WeightCard.tsx",
       "symbol": "WeightCard",
       "kind": "part",
       "requirements": [
@@ -534,21 +626,7 @@
       "limits": "Its second form, the Weight card shown once today is saved, is not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/food/add_food_button.dart",
-      "symbol": "AddFoodButton",
-      "kind": "component",
-      "requirements": [
-        "MM-100"
-      ],
-      "asset": "views/food.html#food-default",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/food/add_food_sheet.dart",
+      "source": "apps/web/src/food/AddFoodSheet.tsx",
       "symbol": "AddFoodSheet",
       "kind": "sheet",
       "requirements": [
@@ -585,7 +663,7 @@
       "limits": "Discovery, manual form, macro preview and edit screenshots were inspected from Linux run 38199739648. Search-to-manual query carry is widget-tested and drawn. Validation and method-change states are drawn from source."
     },
     {
-      "source": "apps/mobile/lib/src/food/calorie_hero.dart",
+      "source": "apps/web/src/food/CalorieHero.tsx",
       "symbol": "CalorieHero",
       "kind": "part",
       "requirements": [
@@ -604,69 +682,7 @@
       "limits": "The separate discovery/manual-entry states have widget coverage; the refreshed Linux screenshots are pending."
     },
     {
-      "source": "apps/mobile/lib/src/food/custom/custom_food_form.dart",
-      "symbol": "CustomFoodForm",
-      "kind": "sheet",
-      "requirements": [
-        "MM-44",
-        "MM-45"
-      ],
-      "asset": "views/add-food.html#add-food-custom-food",
-      "states": [
-        "filled from a label",
-        "label not read",
-        "bad barcode"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/food/custom/my_foods_step.dart",
-      "symbol": "MyFoodsStep",
-      "kind": "sheet",
-      "requirements": [
-        "MM-45"
-      ],
-      "asset": "views/add-food.html#add-food-my-foods",
-      "states": [
-        "populated",
-        "empty",
-        "delete confirm"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/food/custom/recipe_form.dart",
-      "symbol": "RecipeForm",
-      "kind": "sheet",
-      "requirements": [
-        "MM-45"
-      ],
-      "asset": "views/add-food.html#add-food-recipe",
-      "states": [
-        "with ingredients"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/food/custom/recipe_ingredient_adder.dart",
-      "symbol": "RecipeIngredientAdder",
-      "kind": "part",
-      "requirements": [
-        "MM-45"
-      ],
-      "asset": "views/add-food.html#add-food-recipe-ingredient",
-      "states": [
-        "by numbers"
-      ],
-      "verification": "source-only",
-      "status": "covered",
-      "limits": "Picking an ingredient from search is described, not drawn."
-    },
-    {
-      "source": "apps/mobile/lib/src/food/easy_to_miss_line.dart",
+      "source": "apps/web/src/food/EasyToMissLine.tsx",
       "symbol": "EasyToMissLine",
       "kind": "part",
       "requirements": [
@@ -680,25 +696,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/estimate/estimate_meal_step.dart",
-      "symbol": "EstimateMealStep",
-      "kind": "sheet",
-      "requirements": [
-        "MM-150",
-        "MM-225"
-      ],
-      "asset": "views/add-food.html#add-food-estimate",
-      "states": [
-        "default",
-        "estimated macro preview",
-        "before first weigh-in"
-      ],
-      "verification": "screenshot-compared",
-      "limits": "The estimated macro preview was compared with Linux run 38199739648. The drawing is static and illustrative; actual totals depend on maintenance.",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/food/fiber_line.dart",
+      "source": "apps/web/src/food/FiberLine.tsx",
       "symbol": "FiberLine",
       "kind": "part",
       "requirements": [
@@ -713,7 +711,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/food_amount_step.dart",
+      "source": "apps/web/src/food/FoodAmountStep.tsx",
       "symbol": "FoodAmountStep",
       "kind": "sheet",
       "requirements": [
@@ -736,7 +734,7 @@
       "limits": "Serving macro preview compared with Linux run 38199739648. Cooking-oil, hand-portion estimates and raw-or-cooked frames remain drawn from source and widget-tested, not device-reviewed."
     },
     {
-      "source": "apps/mobile/lib/src/food/food_day_header.dart",
+      "source": "apps/web/src/food/FoodDayHeader.tsx",
       "symbol": "FoodDayHeader",
       "kind": "part",
       "requirements": [
@@ -751,7 +749,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/food_entry_tile.dart",
+      "source": "apps/web/src/food/FoodEntryTile.tsx",
       "symbol": "FoodEntryTile",
       "kind": "part",
       "requirements": [
@@ -766,7 +764,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/food_screen.dart",
+      "source": "apps/web/src/food/FoodScreen.tsx",
       "symbol": "FoodScreen",
       "kind": "view",
       "requirements": [
@@ -789,7 +787,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/food_search_results.dart",
+      "source": "apps/web/src/food/FoodSearchResults.tsx",
       "symbol": "FoodSearchResults",
       "kind": "part",
       "requirements": [
@@ -806,7 +804,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/food_trust_mark.dart",
+      "source": "apps/web/src/food/FoodTrustMark.tsx",
       "symbol": "FoodTrustMark",
       "kind": "part",
       "requirements": [
@@ -822,7 +820,22 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/meal_section.dart",
+      "source": "apps/web/src/food/MealChips.tsx",
+      "symbol": "MealChips",
+      "kind": "part",
+      "requirements": [
+        "MM-47"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "chosen"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The meal choice chips, drawn as part of the food day sheet."
+    },
+    {
+      "source": "apps/web/src/food/MealSection.tsx",
       "symbol": "MealSection",
       "kind": "part",
       "requirements": [
@@ -842,7 +855,87 @@
       "limits": "The per-meal protein marker is not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/food/scan/barcode_scan_step.dart",
+      "source": "apps/web/src/food/custom/CustomFoodForm.tsx",
+      "symbol": "CustomFoodForm",
+      "kind": "sheet",
+      "requirements": [
+        "MM-44",
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-custom-food",
+      "states": [
+        "filled from a label",
+        "label not read",
+        "bad barcode"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/food/custom/MyFoodsStep.tsx",
+      "symbol": "MyFoodsStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-my-foods",
+      "states": [
+        "populated",
+        "empty",
+        "delete confirm"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/food/custom/RecipeForm.tsx",
+      "symbol": "RecipeForm",
+      "kind": "sheet",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-recipe",
+      "states": [
+        "with ingredients"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/food/custom/RecipeIngredientAdder.tsx",
+      "symbol": "RecipeIngredientAdder",
+      "kind": "part",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-recipe-ingredient",
+      "states": [
+        "by numbers"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Picking an ingredient from search is described, not drawn."
+    },
+    {
+      "source": "apps/web/src/food/estimate/EstimateMealStep.tsx",
+      "symbol": "EstimateMealStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-150",
+        "MM-225"
+      ],
+      "asset": "views/add-food.html#add-food-estimate",
+      "states": [
+        "default",
+        "estimated macro preview",
+        "before first weigh-in"
+      ],
+      "verification": "screenshot-compared",
+      "limits": "The estimated macro preview was compared with Linux run 38199739648. The drawing is static and illustrative; actual totals depend on maintenance.",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/food/scan/BarcodeScanStep.tsx",
       "symbol": "BarcodeScanStep",
       "kind": "sheet",
       "requirements": [
@@ -858,22 +951,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food/scan/mobile_scanner_view.dart",
-      "symbol": "MobileScannerView",
-      "kind": "part",
-      "requirements": [
-        "MM-43"
-      ],
-      "asset": "views/add-food.html#add-food-scan",
-      "states": [
-        "placeholder"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "A live camera view; a black placeholder stands in for it. Its light switch is not drawn."
-    },
-    {
-      "source": "apps/mobile/lib/src/food/show_add_food_sheet.dart",
+      "source": "apps/web/src/food/showAddFoodSheet.tsx",
       "symbol": "showAddFoodSheet",
       "kind": "sheet",
       "requirements": [
@@ -887,7 +965,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food_packs/available_pack_card.dart",
+      "source": "apps/web/src/foodPacks/AvailablePackCard.tsx",
       "symbol": "AvailablePackCard",
       "kind": "part",
       "requirements": [
@@ -903,7 +981,24 @@
       "limits": "The Update wording is not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/food_packs/food_database_screen.dart",
+      "source": "apps/web/src/foodPacks/DownloadStatusHost.tsx",
+      "symbol": "DownloadStatusHost",
+      "kind": "part",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "views/settings.html#food-database-downloading",
+      "states": [
+        "checking",
+        "downloading",
+        "installing"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Only the downloading wording is drawn."
+    },
+    {
+      "source": "apps/web/src/foodPacks/FoodDatabaseScreen.tsx",
       "symbol": "FoodDatabaseScreen",
       "kind": "view",
       "requirements": [
@@ -921,7 +1016,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/food_packs/pack_download_card.dart",
+      "source": "apps/web/src/foodPacks/PackDownloadCard.tsx",
       "symbol": "PackDownloadCard",
       "kind": "part",
       "requirements": [
@@ -938,50 +1033,8 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/gallery/button_specimens.dart",
-      "symbol": "ButtonSpecimens",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#mm-button",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/color_swatches.dart",
-      "symbol": "ColorSwatches",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#colors",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/data_specimens.dart",
-      "symbol": "DataSpecimens",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#macro-bar",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/gallery_screen.dart",
-      "symbol": "GalleryScreen",
+      "source": "apps/web/src/gallery/Gallery.tsx",
+      "symbol": "Gallery",
       "kind": "view",
       "requirements": [
         "MM-105"
@@ -995,63 +1048,7 @@
       "limits": "Drawn as its switches and section titles; its contents are the component catalog."
     },
     {
-      "source": "apps/mobile/lib/src/gallery/gallery_section.dart",
-      "symbol": "GallerySection",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "views/settings.html#gallery",
-      "states": [
-        "a section title"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/input_specimens.dart",
-      "symbol": "InputSpecimens",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#mm-text-field",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/surface_specimens.dart",
-      "symbol": "SurfaceSpecimens",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#notice",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/gallery/type_specimens.dart",
-      "symbol": "TypeSpecimens",
-      "kind": "part",
-      "requirements": [
-        "MM-105"
-      ],
-      "asset": "components/index.html#type",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/onboarding/activity_step.dart",
+      "source": "apps/web/src/onboarding/ActivityStep.tsx",
       "symbol": "ActivityStep",
       "kind": "view",
       "requirements": [
@@ -1065,7 +1062,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/birth_date_step.dart",
+      "source": "apps/web/src/onboarding/BirthDateStep.tsx",
       "symbol": "BirthDateStep",
       "kind": "view",
       "requirements": [
@@ -1081,7 +1078,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/goal_step.dart",
+      "source": "apps/web/src/onboarding/GoalStep.tsx",
       "symbol": "GoalStep",
       "kind": "view",
       "requirements": [
@@ -1096,7 +1093,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/health_step.dart",
+      "source": "apps/web/src/onboarding/HealthStep.tsx",
       "symbol": "HealthStep",
       "kind": "view",
       "requirements": [
@@ -1113,7 +1110,7 @@
       "limits": "The female list is views/settings.html#health-check-female."
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/measurements_step.dart",
+      "source": "apps/web/src/onboarding/MeasurementsStep.tsx",
       "symbol": "MeasurementsStep",
       "kind": "view",
       "requirements": [
@@ -1128,7 +1125,7 @@
       "limits": "Metric is described, not drawn."
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/onboarding_screen.dart",
+      "source": "apps/web/src/onboarding/OnboardingScreen.tsx",
       "symbol": "OnboardingScreen",
       "kind": "view",
       "requirements": [
@@ -1145,7 +1142,7 @@
       "limits": "Compared with the screenshot test for the first step."
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/sex_step.dart",
+      "source": "apps/web/src/onboarding/SexStep.tsx",
       "symbol": "SexStep",
       "kind": "view",
       "requirements": [
@@ -1159,7 +1156,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/training_step.dart",
+      "source": "apps/web/src/onboarding/TrainingStep.tsx",
       "symbol": "TrainingStep",
       "kind": "view",
       "requirements": [
@@ -1173,7 +1170,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/onboarding/welcome_step.dart",
+      "source": "apps/web/src/onboarding/WelcomeStep.tsx",
       "symbol": "WelcomeStep",
       "kind": "view",
       "requirements": [
@@ -1187,7 +1184,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/pause/pause_banner.dart",
+      "source": "apps/web/src/pause/PauseBanner.tsx",
       "symbol": "PauseBanner",
       "kind": "part",
       "requirements": [
@@ -1201,7 +1198,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/pause/pause_screen.dart",
+      "source": "apps/web/src/pause/PauseScreen.tsx",
       "symbol": "PauseScreen",
       "kind": "view",
       "requirements": [
@@ -1218,7 +1215,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/progress_screen.dart",
+      "source": "apps/web/src/progress/ProgressScreen.tsx",
       "symbol": "ProgressScreen",
       "kind": "view",
       "requirements": [
@@ -1238,7 +1235,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/recomp_signal_card.dart",
+      "source": "apps/web/src/progress/RecompSignalCard.tsx",
       "symbol": "RecompSignalCard",
       "kind": "part",
       "requirements": [
@@ -1253,7 +1250,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/strength_history_screen.dart",
+      "source": "apps/web/src/progress/StrengthHistoryScreen.tsx",
       "symbol": "StrengthHistoryScreen",
       "kind": "view",
       "requirements": [
@@ -1268,7 +1265,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/strength_lifts_screen.dart",
+      "source": "apps/web/src/progress/StrengthLiftsScreen.tsx",
       "symbol": "StrengthLiftsScreen",
       "kind": "view",
       "requirements": [
@@ -1283,7 +1280,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/strength_section.dart",
+      "source": "apps/web/src/progress/StrengthSection.tsx",
       "symbol": "StrengthSection",
       "kind": "part",
       "requirements": [
@@ -1300,7 +1297,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/waist_entry_card.dart",
+      "source": "apps/web/src/progress/WaistEntryCard.tsx",
       "symbol": "WaistEntryCard",
       "kind": "part",
       "requirements": [
@@ -1318,7 +1315,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/weight_event_entry_sheet.dart",
+      "source": "apps/web/src/progress/WeightEventEntrySheet.tsx",
       "symbol": "WeightEventEntrySheet",
       "kind": "sheet",
       "requirements": [
@@ -1332,7 +1329,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/progress/weight_events_card.dart",
+      "source": "apps/web/src/progress/WeightEventsCard.tsx",
       "symbol": "WeightEventsCard",
       "kind": "part",
       "requirements": [
@@ -1348,22 +1345,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/reminders/reminder_host.dart",
-      "symbol": "ReminderHost",
-      "kind": "host",
-      "requirements": [
-        "MM-146"
-      ],
-      "asset": "views/settings.html#settings-default",
-      "states": [
-        "none of its own"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "Schedules the phone's notifications; it draws nothing in the app. The notifications themselves belong to Android and are not drawn."
-    },
-    {
-      "source": "apps/mobile/lib/src/reminders/reminder_paused_notice.dart",
+      "source": "apps/web/src/reminders/ReminderPausedNotice.tsx",
       "symbol": "ReminderPausedNotice",
       "kind": "part",
       "requirements": [
@@ -1377,7 +1359,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/settings/edit_height_sheet.dart",
+      "source": "apps/web/src/settings/EditHeightSheet.tsx",
       "symbol": "EditHeightSheet",
       "kind": "sheet",
       "requirements": [
@@ -1391,7 +1373,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/settings/health_check_screen.dart",
+      "source": "apps/web/src/settings/HealthCheckScreen.tsx",
       "symbol": "HealthCheckScreen",
       "kind": "view",
       "requirements": [
@@ -1406,7 +1388,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/settings/health_connect_section.dart",
+      "source": "apps/web/src/settings/HealthConnectSection.tsx",
       "symbol": "HealthConnectSection",
       "kind": "part",
       "requirements": [
@@ -1426,7 +1408,7 @@
       "limits": "Never seen on a real phone."
     },
     {
-      "source": "apps/mobile/lib/src/settings/profile_section.dart",
+      "source": "apps/web/src/settings/ProfileSection.tsx",
       "symbol": "ProfileSection",
       "kind": "part",
       "requirements": [
@@ -1441,7 +1423,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/settings/reminders_section.dart",
+      "source": "apps/web/src/settings/RemindersSection.tsx",
       "symbol": "RemindersSection",
       "kind": "part",
       "requirements": [
@@ -1457,7 +1439,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/settings/settings_screen.dart",
+      "source": "apps/web/src/settings/SettingsScreen.tsx",
       "symbol": "SettingsScreen",
       "kind": "view",
       "requirements": [
@@ -1477,7 +1459,7 @@
       "limits": "Compared with the screenshot test for the top of the page only."
     },
     {
-      "source": "apps/mobile/lib/src/settings/theme_settings.dart",
+      "source": "apps/web/src/settings/ThemeSettings.tsx",
       "symbol": "ThemeSettings",
       "kind": "part",
       "requirements": [
@@ -1493,23 +1475,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/theme/theme_chooser_screen.dart",
-      "symbol": "ThemeChooserScreen",
-      "kind": "view",
-      "requirements": [
-        "MM-184"
-      ],
-      "asset": "views/onboarding.html#theme-chooser",
-      "states": [
-        "Martian preselected",
-        "saving",
-        "save failed"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/train/custom_exercise_screen.dart",
+      "source": "apps/web/src/train/CustomExerciseScreen.tsx",
       "symbol": "CustomExerciseScreen",
       "kind": "view",
       "requirements": [
@@ -1523,7 +1489,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/exercise_picker_screen.dart",
+      "source": "apps/web/src/train/ExercisePickerScreen.tsx",
       "symbol": "ExercisePickerScreen",
       "kind": "view",
       "requirements": [
@@ -1538,7 +1504,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/progression_settings_screen.dart",
+      "source": "apps/web/src/train/ProgressionSettingsScreen.tsx",
       "symbol": "ProgressionSettingsScreen",
       "kind": "view",
       "requirements": [
@@ -1553,22 +1519,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/rest_alarm.dart",
-      "symbol": "RestAlarm",
-      "kind": "host",
-      "requirements": [
-        "MM-191"
-      ],
-      "asset": "views/train.html#workout-rest-reached",
-      "states": [
-        "none of its own"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "Vibrates the phone when the rest target is reached; it draws nothing."
-    },
-    {
-      "source": "apps/mobile/lib/src/train/set_editor.dart",
+      "source": "apps/web/src/train/SetEditor.tsx",
       "symbol": "SetEditor",
       "kind": "part",
       "requirements": [
@@ -1585,7 +1536,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/set_timer_bar.dart",
+      "source": "apps/web/src/train/SetTimerBar.tsx",
       "symbol": "SetTimerBar",
       "kind": "part",
       "requirements": [
@@ -1603,22 +1554,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/ticking.dart",
-      "symbol": "Ticking",
-      "kind": "host",
-      "requirements": [
-        "MM-191"
-      ],
-      "asset": "views/train.html#workout-set-running",
-      "states": [
-        "none of its own"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "Rebuilds its child every second; it draws nothing itself."
-    },
-    {
-      "source": "apps/mobile/lib/src/train/train_screen.dart",
+      "source": "apps/web/src/train/TrainScreen.tsx",
       "symbol": "TrainScreen",
       "kind": "view",
       "requirements": [
@@ -1634,7 +1570,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/weekly_volume_screen.dart",
+      "source": "apps/web/src/train/WeeklyVolumeScreen.tsx",
       "symbol": "WeeklyVolumeScreen",
       "kind": "view",
       "requirements": [
@@ -1651,7 +1587,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/workout_clock_card.dart",
+      "source": "apps/web/src/train/WorkoutClockCard.tsx",
       "symbol": "WorkoutClockCard",
       "kind": "part",
       "requirements": [
@@ -1667,7 +1603,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/workout_exercise_card.dart",
+      "source": "apps/web/src/train/WorkoutExerciseCard.tsx",
       "symbol": "WorkoutExerciseCard",
       "kind": "part",
       "requirements": [
@@ -1686,7 +1622,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/workout_screen.dart",
+      "source": "apps/web/src/train/WorkoutScreen.tsx",
       "symbol": "WorkoutScreen",
       "kind": "view",
       "requirements": [
@@ -1704,7 +1640,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/train/workout_times_screen.dart",
+      "source": "apps/web/src/train/WorkoutTimesScreen.tsx",
       "symbol": "WorkoutTimesScreen",
       "kind": "view",
       "requirements": [
@@ -1720,84 +1656,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/charts/history_chart.dart",
-      "symbol": "HistoryChart",
-      "kind": "component",
-      "requirements": [
-        "MM-107",
-        "MM-176"
-      ],
-      "asset": "components/index.html#history-chart",
-      "states": [
-        "a series with a gap"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered",
-      "limits": "Drawn as bars; the app draws points joined by a line."
-    },
-    {
-      "source": "apps/mobile/lib/src/charts/macro_split_chart.dart",
-      "symbol": "MacroSplitChart",
-      "kind": "component",
-      "requirements": [
-        "MM-107",
-        "MM-179",
-        "MM-225"
-      ],
-      "asset": "components/index.html#macro-split-chart",
-      "states": [
-        "three macros",
-        "food preview",
-        "empty food preview"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/charts/trend_chart.dart",
-      "symbol": "TrendChart",
-      "kind": "component",
-      "requirements": [
-        "MM-17",
-        "MM-107"
-      ],
-      "asset": "components/index.html#trend-chart",
-      "states": [
-        "with band and event"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/charts/trend_sparkline.dart",
-      "symbol": "TrendSparkline",
-      "kind": "component",
-      "requirements": [
-        "MM-107"
-      ],
-      "asset": "components/index.html#trend-sparkline",
-      "states": [
-        "shown"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/charts/trend_stats.dart",
-      "symbol": "TrendStats",
-      "kind": "component",
-      "requirements": [
-        "MM-17"
-      ],
-      "asset": "components/index.html#trend-chart",
-      "states": [
-        "three figures"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/choice_card.dart",
+      "source": "apps/web/src/ui/ChoiceCard.tsx",
       "symbol": "ChoiceCard",
       "kind": "component",
       "requirements": [
@@ -1813,7 +1672,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/day_stepper.dart",
+      "source": "apps/web/src/ui/DayStepper.tsx",
       "symbol": "DayStepper",
       "kind": "component",
       "requirements": [
@@ -1828,7 +1687,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/demo_notice.dart",
+      "source": "apps/web/src/ui/DemoNotice.tsx",
       "symbol": "DemoNotice",
       "kind": "component",
       "requirements": [
@@ -1842,7 +1701,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/download_status_strip.dart",
+      "source": "apps/web/src/ui/DownloadStatusStrip.tsx",
       "symbol": "DownloadStatusStrip",
       "kind": "component",
       "requirements": [
@@ -1856,7 +1715,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/group_header.dart",
+      "source": "apps/web/src/ui/GroupHeader.tsx",
       "symbol": "GroupHeader",
       "kind": "component",
       "requirements": [
@@ -1870,22 +1729,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/hero_backdrop_painter.dart",
-      "symbol": "HeroBackdropPainter",
-      "kind": "painter",
-      "requirements": [
-        "MM-187"
-      ],
-      "asset": "components/index.html#mm-hero-surface",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered",
-      "limits": "The drawn rings of the backdrop are replaced by a plain gradient."
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/horizon_arc.dart",
+      "source": "apps/web/src/ui/HorizonArc.tsx",
       "symbol": "HorizonArc",
       "kind": "component",
       "requirements": [
@@ -1901,22 +1745,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/horizon_arc_painter.dart",
-      "symbol": "HorizonArcPainter",
-      "kind": "painter",
-      "requirements": [
-        "MM-187"
-      ],
-      "asset": "components/index.html#horizon-arc",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered",
-      "limits": "The glow on the marker is not drawn."
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/info_card.dart",
+      "source": "apps/web/src/ui/InfoCard.tsx",
       "symbol": "InfoCard",
       "kind": "component",
       "requirements": [
@@ -1931,7 +1760,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/macro_bar.dart",
+      "source": "apps/web/src/ui/MacroBar.tsx",
       "symbol": "MacroBar",
       "kind": "component",
       "requirements": [
@@ -1947,7 +1776,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/macro_figure.dart",
+      "source": "apps/web/src/ui/MacroFigure.tsx",
       "symbol": "MacroFigure",
       "kind": "component",
       "requirements": [
@@ -1961,7 +1790,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/metric_facts.dart",
+      "source": "apps/web/src/ui/MetricFacts.tsx",
       "symbol": "MetricFacts",
       "kind": "component",
       "requirements": [
@@ -1975,35 +1804,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mini_trend.dart",
-      "symbol": "MiniTrend",
-      "kind": "component",
-      "requirements": [
-        "MM-116"
-      ],
-      "asset": "components/index.html#mini-trend",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/mini_trend_painter.dart",
-      "symbol": "MiniTrendPainter",
-      "kind": "painter",
-      "requirements": [
-        "MM-116"
-      ],
-      "asset": "components/index.html#mini-trend",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/mm_action_chip.dart",
+      "source": "apps/web/src/ui/MmActionChip.tsx",
       "symbol": "MmActionChip",
       "kind": "component",
       "requirements": [
@@ -2017,7 +1818,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_app_bar.dart",
+      "source": "apps/web/src/ui/MmAppBar.tsx",
       "symbol": "MmAppBar",
       "kind": "component",
       "requirements": [
@@ -2033,7 +1834,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_button.dart",
+      "source": "apps/web/src/ui/MmButton.tsx",
       "symbol": "MmButton",
       "kind": "component",
       "requirements": [
@@ -2053,7 +1854,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_check_row.dart",
+      "source": "apps/web/src/ui/MmCheckRow.tsx",
       "symbol": "MmCheckRow",
       "kind": "component",
       "requirements": [
@@ -2068,7 +1869,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_choice_chip.dart",
+      "source": "apps/web/src/ui/MmChoiceChip.tsx",
       "symbol": "MmChoiceChip",
       "kind": "component",
       "requirements": [
@@ -2084,7 +1885,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_clock_time_dialog.dart",
+      "source": "apps/web/src/ui/MmClockTimeDialog.tsx",
       "symbol": "MmClockTimeDialog",
       "kind": "dialog",
       "requirements": [
@@ -2099,7 +1900,38 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_disclosure.dart",
+      "source": "apps/web/src/ui/MmDateDialog.tsx",
+      "symbol": "MmDateDialog",
+      "kind": "dialog",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#show-mm-time-picker",
+      "states": [
+        "open",
+        "refused"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The app draws its own date dialog where Flutter opened the platform's; the sheet shows its opener."
+    },
+    {
+      "source": "apps/web/src/ui/MmDialog.tsx",
+      "symbol": "MmDialog",
+      "kind": "dialog",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#show-mm-confirm",
+      "states": [
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The dialog shell confirm, choice and options are drawn with."
+    },
+    {
+      "source": "apps/web/src/ui/MmDisclosure.tsx",
       "symbol": "MmDisclosure",
       "kind": "component",
       "requirements": [
@@ -2114,7 +1946,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_dropdown.dart",
+      "source": "apps/web/src/ui/MmDropdown.tsx",
       "symbol": "MmDropdown",
       "kind": "component",
       "requirements": [
@@ -2129,7 +1961,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_fab.dart",
+      "source": "apps/web/src/ui/MmFab.tsx",
       "symbol": "MmFab",
       "kind": "component",
       "requirements": [
@@ -2143,7 +1975,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_hero_surface.dart",
+      "source": "apps/web/src/ui/MmHeroSurface.tsx",
       "symbol": "MmHeroSurface",
       "kind": "component",
       "requirements": [
@@ -2157,7 +1989,22 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_icon_button.dart",
+      "source": "apps/web/src/ui/MmIcon.tsx",
+      "symbol": "MmIcon",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-stroke-icon",
+      "states": [
+        "plus",
+        "chevron"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/web/src/ui/MmIconButton.tsx",
       "symbol": "MmIconButton",
       "kind": "component",
       "requirements": [
@@ -2172,7 +2019,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_list_group.dart",
+      "source": "apps/web/src/ui/MmListGroup.tsx",
       "symbol": "MmListGroup",
       "kind": "component",
       "requirements": [
@@ -2186,7 +2033,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_list_row.dart",
+      "source": "apps/web/src/ui/MmListRow.tsx",
       "symbol": "MmListRow",
       "kind": "component",
       "requirements": [
@@ -2204,7 +2051,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_menu_button.dart",
+      "source": "apps/web/src/ui/MmMenuButton.tsx",
       "symbol": "MmMenuButton",
       "kind": "component",
       "requirements": [
@@ -2219,7 +2066,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_navigation_bar.dart",
+      "source": "apps/web/src/ui/MmNavigationBar.tsx",
       "symbol": "MmNavigationBar",
       "kind": "navigation",
       "requirements": [
@@ -2234,7 +2081,23 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_progress_bar.dart",
+      "source": "apps/web/src/ui/MmOverlays.tsx",
+      "symbol": "MmOverlays",
+      "kind": "host",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#show-mm-snack-bar",
+      "states": [
+        "dialogs",
+        "snack"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The host that draws the open questions and the snack bar."
+    },
+    {
+      "source": "apps/web/src/ui/MmProgressBar.tsx",
       "symbol": "MmProgressBar",
       "kind": "component",
       "requirements": [
@@ -2248,7 +2111,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_segmented.dart",
+      "source": "apps/web/src/ui/MmSegmented.tsx",
       "symbol": "MmSegmented",
       "kind": "component",
       "requirements": [
@@ -2264,7 +2127,23 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_slider.dart",
+      "source": "apps/web/src/ui/MmSheet.tsx",
+      "symbol": "MmSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "views/add-food.html#add-food-default",
+      "states": [
+        "open",
+        "dismissed"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The sheet shell every bottom sheet is drawn with; the drawing is of its fullest use."
+    },
+    {
+      "source": "apps/web/src/ui/MmSlider.tsx",
       "symbol": "MmSlider",
       "kind": "component",
       "requirements": [
@@ -2278,7 +2157,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_spinner.dart",
+      "source": "apps/web/src/ui/MmSpinner.tsx",
       "symbol": "MmSpinner",
       "kind": "component",
       "requirements": [
@@ -2293,7 +2172,7 @@
       "limits": "It turns in the app and is still here."
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_status_chip.dart",
+      "source": "apps/web/src/ui/MmStatusChip.tsx",
       "symbol": "MmStatusChip",
       "kind": "component",
       "requirements": [
@@ -2308,36 +2187,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_stroke_icon.dart",
-      "symbol": "MmStrokeIcon",
-      "kind": "component",
-      "requirements": [
-        "MM-104"
-      ],
-      "asset": "components/index.html#mm-stroke-icon",
-      "states": [
-        "plus",
-        "chevron"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/mm_stroke_icon_painter.dart",
-      "symbol": "MmStrokeIconPainter",
-      "kind": "painter",
-      "requirements": [
-        "MM-104"
-      ],
-      "asset": "components/index.html#mm-stroke-icon",
-      "states": [
-        "shown"
-      ],
-      "verification": "screenshot-compared",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/mm_surface.dart",
+      "source": "apps/web/src/ui/MmSurface.tsx",
       "symbol": "MmSurface",
       "kind": "component",
       "requirements": [
@@ -2352,7 +2202,22 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_switch_row.dart",
+      "source": "apps/web/src/ui/MmSwipeToRemove.tsx",
+      "symbol": "MmSwipeToRemove",
+      "kind": "component",
+      "requirements": [
+        "MM-125"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "swiped"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The swipe-to-remove gesture shell, drawn as the removed-entry state of the food day."
+    },
+    {
+      "source": "apps/web/src/ui/MmSwitchRow.tsx",
       "symbol": "MmSwitchRow",
       "kind": "component",
       "requirements": [
@@ -2367,7 +2232,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/mm_text_field.dart",
+      "source": "apps/web/src/ui/MmTextField.tsx",
       "symbol": "MmTextField",
       "kind": "component",
       "requirements": [
@@ -2385,7 +2250,23 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/muscle_volume_row.dart",
+      "source": "apps/web/src/ui/MmTimeOfDayDialog.tsx",
+      "symbol": "MmTimeOfDayDialog",
+      "kind": "dialog",
+      "requirements": [
+        "MM-146"
+      ],
+      "asset": "components/index.html#show-mm-time-picker",
+      "states": [
+        "open",
+        "refused"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The app draws its own time-of-day dialog where Flutter opened the platform's."
+    },
+    {
+      "source": "apps/web/src/ui/MuscleVolumeRow.tsx",
       "symbol": "MuscleVolumeRow",
       "kind": "component",
       "requirements": [
@@ -2399,7 +2280,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/notice.dart",
+      "source": "apps/web/src/ui/Notice.tsx",
       "symbol": "Notice",
       "kind": "component",
       "requirements": [
@@ -2417,7 +2298,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/number_entry_card.dart",
+      "source": "apps/web/src/ui/NumberEntryCard.tsx",
       "symbol": "NumberEntryCard",
       "kind": "component",
       "requirements": [
@@ -2433,7 +2314,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/section_label.dart",
+      "source": "apps/web/src/ui/SectionLabel.tsx",
       "symbol": "SectionLabel",
       "kind": "component",
       "requirements": [
@@ -2447,94 +2328,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/show_mm_choice.dart",
-      "symbol": "showMmChoice",
-      "kind": "dialog",
-      "requirements": [
-        "MM-104"
-      ],
-      "asset": "components/index.html#show-mm-choice",
-      "states": [
-        "open"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/show_mm_clock_time.dart",
-      "symbol": "showMmClockTime",
-      "kind": "dialog",
-      "requirements": [
-        "MM-191"
-      ],
-      "asset": "components/index.html#mm-clock-time-dialog",
-      "states": [
-        "open"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/show_mm_confirm.dart",
-      "symbol": "showMmConfirm",
-      "kind": "dialog",
-      "requirements": [
-        "MM-104",
-        "MM-62"
-      ],
-      "asset": "components/index.html#show-mm-confirm",
-      "states": [
-        "open"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/show_mm_options.dart",
-      "symbol": "showMmOptions",
-      "kind": "dialog",
-      "requirements": [
-        "MM-191"
-      ],
-      "asset": "components/index.html#show-mm-options",
-      "states": [
-        "open, one chosen"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/show_mm_snack_bar.dart",
-      "symbol": "showMmSnackBar",
-      "kind": "component",
-      "requirements": [
-        "MM-104"
-      ],
-      "asset": "components/index.html#show-mm-snack-bar",
-      "states": [
-        "with action",
-        "plain"
-      ],
-      "verification": "source-only",
-      "status": "covered"
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/show_mm_time_picker.dart",
-      "symbol": "showMmTimePicker",
-      "kind": "dialog",
-      "requirements": [
-        "MM-146"
-      ],
-      "asset": "components/index.html#show-mm-time-picker",
-      "states": [
-        "its opener"
-      ],
-      "verification": "not-drawn",
-      "status": "not-drawn",
-      "limits": "Opens the phone's own time picker, which belongs to the platform."
-    },
-    {
-      "source": "apps/mobile/lib/src/ui/stat_row.dart",
+      "source": "apps/web/src/ui/StatRow.tsx",
       "symbol": "StatRow",
       "kind": "component",
       "requirements": [
@@ -2548,7 +2342,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/status_row.dart",
+      "source": "apps/web/src/ui/StatusRow.tsx",
       "symbol": "StatusRow",
       "kind": "component",
       "requirements": [
@@ -2562,7 +2356,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/step_progress.dart",
+      "source": "apps/web/src/ui/StepProgress.tsx",
       "symbol": "StepProgress",
       "kind": "component",
       "requirements": [
@@ -2576,7 +2370,7 @@
       "status": "covered"
     },
     {
-      "source": "apps/mobile/lib/src/ui/strength_trend_card.dart",
+      "source": "apps/web/src/ui/StrengthTrendCard.tsx",
       "symbol": "StrengthTrendCard",
       "kind": "component",
       "requirements": [
