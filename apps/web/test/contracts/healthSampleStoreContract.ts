@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { HealthDataType, type HealthSample, type HealthSampleStore } from '../../src/healthIngest';
 
 /** What every `HealthSampleStore` must do (MM-67). */
-export function healthSampleStoreContract(name: string, create: () => HealthSampleStore): void {
+export function healthSampleStoreContract(
+  name: string,
+  create: () => HealthSampleStore | Promise<HealthSampleStore>,
+): void {
   describe(`${name} as a HealthSampleStore`, () => {
     let store: HealthSampleStore;
 
@@ -28,8 +31,8 @@ export function healthSampleStoreContract(name: string, create: () => HealthSamp
       sourceName: 'Bathroom scale',
     };
 
-    beforeEach(() => {
-      store = create();
+    beforeEach(async () => {
+      store = await create();
     });
 
     it('starts empty, with no token', async () => {
