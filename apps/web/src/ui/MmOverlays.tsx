@@ -4,6 +4,7 @@ import { MmClockTimeDialog } from './MmClockTimeDialog';
 import { MmDateDialog } from './MmDateDialog';
 import { MmDialog } from './MmDialog';
 import { MmIcon } from './MmIcon';
+import { MmSheet } from './MmSheet';
 import { MmTimeOfDayDialog } from './MmTimeOfDayDialog';
 import type { Overlays } from './Overlays';
 import { OverlaysContext } from './OverlaysContext';
@@ -127,6 +128,14 @@ export function MmOverlays({ children }: { children: ReactNode }) {
 
       clockTime({ title, initialMs }) {
         return ask((finish) => <MmClockTimeDialog title={title} initialMs={initialMs} onDone={finish} />);
+      },
+
+      sheet(label, content) {
+        return ask((finish) => (
+          <MmSheet label={label} onDismiss={() => finish(undefined)}>
+            {content(finish)}
+          </MmSheet>
+        ));
       },
 
       snack(message, action) {

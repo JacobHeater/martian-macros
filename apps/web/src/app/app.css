@@ -40,6 +40,10 @@
 .app-body {
   gap: 0;
 }
+/* The body scrolls; nothing in it is squeezed to fit. */
+.app-body > * {
+  flex-shrink: 0;
+}
 .app-body-roomy {
   padding: var(--space-24);
 }

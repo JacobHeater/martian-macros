@@ -33,7 +33,16 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const navigator = useMemo<Navigator>(() => ({ push, depth: stack.length }), [push, stack.length]);
+  const pushed = useRef(stack);
+  pushed.current = stack;
+  const closeAll = useCallback(() => {
+    for (const screen of [...pushed.current].reverse()) screen.close();
+  }, []);
+
+  const navigator = useMemo<Navigator>(
+    () => ({ push, closeAll, depth: stack.length }),
+    [push, closeAll, stack.length],
+  );
 
   return (
     <NavigatorContext.Provider value={navigator}>
