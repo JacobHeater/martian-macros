@@ -11,7 +11,7 @@
 <script>
 (function (m) {
   function sheet(parts) { return m.phone({ cls: 'short', body: ['<div style="height:40px"></div>'], over: '<div class="sheet-b" style="margin-top:-12px">' + parts.join('') + '</div>' }).replace('<div class="body ">', '<div class="body " style="background:rgba(0,0,0,.5);flex:none;padding:0">'); }
-  var tools = m.rowx([m.btn('Scan', 'secondary', { icon: 'scan', grow: true, sm: true }), m.btn('Saved', 'secondary', { icon: 'saved', grow: true, sm: true }), m.btn('Estimate', 'secondary', { icon: 'tune', grow: true, sm: true })]);
+  var tools = m.rowx([m.btn('Scan', 'secondary', { icon: 'scan', sm: true }), m.btn('Saved', 'secondary', { icon: 'saved', sm: true }), m.btn('Estimate', 'secondary', { icon: 'tune', sm: true })], 'wrap');
   var meals = m.chips(['Breakfast', 'Lunch', 'Dinner', 'Snacks'], 1);
   function how(on) { return m.col([m.label('How was it measured?'), m.chips(['Weighed', 'Label serving', 'Cup / spoon', 'Palm', 'Cupped hand', 'Thumb', 'Estimate'], on)]); }
   var measured = how(0);
@@ -23,8 +23,8 @@
     title: 'Add food sheet',
     intro: 'A bottom sheet over Food or Dashboard. It searches, scans, estimates, or takes numbers typed by hand, and it is also how a logged entry is edited. Each frame below is one step of the same sheet.',
     sources: ['apps/mobile/lib/src/food/add_food_sheet.dart', 'apps/mobile/lib/src/food/add_food_sheet_state.dart', 'apps/mobile/lib/src/food/show_add_food_sheet.dart', 'apps/mobile/lib/src/food/add_food_button.dart', 'apps/mobile/lib/src/food/food_search_results.dart', 'apps/mobile/lib/src/food/food_amount_step.dart', 'apps/mobile/lib/src/food/food_trust_mark.dart', 'apps/mobile/lib/src/food/scan/', 'apps/mobile/lib/src/food/estimate/', 'apps/mobile/lib/src/food/custom/'],
-    tickets: ['MM-38', 'MM-39', 'MM-42', 'MM-43', 'MM-44', 'MM-45', 'MM-46', 'MM-48', 'MM-150', 'MM-151', 'MM-153', 'MM-167', 'MM-127'],
-    limits: 'Six screenshot tests cover this sheet (opened, the rest of the form, search, amount, estimate, edit) and the frames for those were corrected against them; the rest is drawn from source alone. On the built sheet at this width the Saved and Estimate labels break mid-word (MM-213), which this drawing does not reproduce. The camera view is a placeholder. Fields take typing and chips answer taps; nothing is calculated, so totals do not follow what is typed.',
+    tickets: ['MM-38', 'MM-39', 'MM-42', 'MM-43', 'MM-44', 'MM-45', 'MM-46', 'MM-48', 'MM-150', 'MM-151', 'MM-153', 'MM-167', 'MM-127', 'MM-213', 'MM-216', 'MM-217'],
+    limits: 'Seven screenshot tests cover this sheet (opened, form, search, amount, estimate, and edit states) and the frames for those were corrected against them; the rest is drawn from source alone. Route buttons keep whole labels and wrap as needed. Hand portions label both the weight and totals as estimates. The camera view is a placeholder. Fields take typing and chips answer taps; nothing is calculated, so totals do not follow what is typed.',
     sections: [
       { h: 'Typing a food in', frames: [
         m.frame('add-food-default', 'Opened', 'Search, the three other ways in, recent foods as chips, then the form, which opens on Label serving with one serving. On a phone the sheet fills the screen and everything from the macro fields down is below the fold.', sheet([
@@ -40,6 +40,7 @@
           macros('20', '22', '8'), m.field('Calories per serving', '', { help: 'Leave blank to calculate from macros.' }), meals, total('Logs 360 kcal · 30 g protein · 33 g carbs · 12 g fat'), m.btn('Log it', 'primary', { block: true })])),
         m.frame('add-food-alcohol', 'With alcohol', '', sheet([m.title('Add food'), m.field('Food', 'Beer'), macros('2', '13', '0'), m.field('Alcohol g', '14', { help: 'One standard drink is 14 g. Counted at 7 kcal per gram.' }), m.field('Calories', '', { help: 'Leave blank to calculate from macros.' })])),
         m.frame('add-food-invalid', 'Amount missing', 'Validation is shown under the field; Log it stays off.', sheet([m.title('Add food'), m.field('Food', 'Rice'), measured, m.field('Amount', '0', { sfx: 'g', err: true, help: 'An amount above zero is needed.' }), macros('4', '45', '0'), meals, m.btn('Log it', 'off', { block: true })])),
+        m.frame('add-food-method-changed', 'Method changed', 'When a previously entered amount is cleared because the method changed, the field explains that it must be entered again.', sheet([m.title('Add food'), m.field('Food', 'Rice'), how(0), m.field('Amount (g)', '', { err: true, help: 'Enter how much again for this method.' }), macros('4', '45', '0'), meals, m.btn('Log it', 'off', { block: true })])),
         m.frame('add-food-estimate-source', 'Measured as Estimate', 'An Estimate has no amount.', sheet([m.title('Add food'), m.field('Food', 'Lunch out'), m.col([m.label('How was it measured?'), m.chips(['Weighed', 'Label serving', 'Cup / spoon', 'Palm', 'Cupped hand', 'Thumb', 'Estimate'], 6)]),
           m.p('Enter calories and macros for everything you ate.', 't2'), macros('35', '80', '30'), meals, m.btn('Log it', 'primary', { block: true })]))
       ] },
@@ -54,6 +55,9 @@
         m.frame('add-food-amount', 'How much of a found food', 'As the screenshot test shows it: the food’s own serving first, then weights and hand portions; the field is named for the unit chosen.', sheet([
           m.title('Banana'), m.cap('Food database · Reference'), m.chips(['1 medium (118 g)', 'Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs'], 0), m.field('How many servings', '2'), m.cap('236 g'),
           total('210 kcal · 3 g protein · 54 g carbs · 1 g fat'), meals, m.btn('Log it', 'primary', { block: true }), m.btn('Back to search', 'text', { block: true })])),
+        m.frame('add-food-amount-hand', 'Hand portion estimated', 'Both the grams and nutrient totals are explicitly estimates for hand portions.', sheet([
+          m.title('Banana'), m.cap('Food database · Reference'), m.chips(['1 medium (118 g)', 'Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs'], 3), m.field('Amount (palms)', '1', { help: 'About 114 g (estimated)' }),
+          total('Estimated: 102 kcal · 1 g protein · 26 g carbs · 0 g fat'), meals, m.btn('Log it', 'primary', { block: true }), m.btn('Back to search', 'text', { block: true })])),
         m.frame('add-food-amount-cooked', 'A food that is weighed raw or cooked', 'Drawn from source only: raw or cooked, a unit, an amount, and oil.', sheet([
           m.title('Rice, white, long-grain'), m.cap('USDA, lab-analyzed · Reference'), m.label('Weighed as'), m.seg(['Cooked', 'Dry'], 0),
           m.chips(['Grams', 'Ounces', 'Cups', '1 cup (158 g)'], 0), m.field('Amount (g)', '180'), m.cap('180 g'),

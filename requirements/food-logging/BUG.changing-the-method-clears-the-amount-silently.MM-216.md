@@ -1,6 +1,6 @@
 ---
 id: MM-216
-status: proposed
+status: done
 component: food-logging
 related: [MM-167, MM-212]
 ---
@@ -31,7 +31,15 @@ Scenario: Changing the method
   And the form says to enter how much again
 ```
 
+## Resolution
+When a method change clears an amount that was entered or restored from an
+existing entry, the amount field says to enter it again. Choosing the already
+selected method does not clear the amount.
+
+## UI/UX Assets
+- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows the
+  amount-field instruction after changing the measurement method.
+
 ## Notes
-- Guarded by `apps/mobile/test/add_food_method_change_test.dart`. Run enabled
-  once: failed as it should (no such line). Skipped with this ticket's ID
-  until the fix.
+- Regression: `apps/mobile/test/add_food_method_change_test.dart`, enabled for
+  a user-entered amount that is cleared by a method change.

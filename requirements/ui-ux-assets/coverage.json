@@ -555,7 +555,9 @@
         "MM-38",
         "MM-39",
         "MM-48",
-        "MM-167"
+        "MM-167",
+        "MM-213",
+        "MM-216"
       ],
       "asset": "views/add-food.html#add-food-default",
       "states": [
@@ -564,6 +566,7 @@
         "label serving",
         "alcohol",
         "invalid",
+        "method changed",
         "estimate source",
         "search",
         "edit",
@@ -571,7 +574,7 @@
       ],
       "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "On the built sheet at 360 wide the Saved and Estimate labels break mid-word (MM-213); the drawing does not reproduce that."
+      "limits": "The route buttons wrap at larger text sizes. Validation and method-change states are drawn from source."
     },
     {
       "source": "apps/mobile/lib/src/food/calorie_hero.dart",
@@ -704,17 +707,19 @@
       "requirements": [
         "MM-42",
         "MM-151",
-        "MM-167"
+        "MM-167",
+        "MM-217"
       ],
       "asset": "views/add-food.html#add-food-amount",
       "states": [
         "a serving",
+        "hand portion estimate",
         "raw or cooked with oil",
         "no amount"
       ],
       "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "The raw-or-cooked frame is drawn from source alone."
+      "limits": "The hand-portion estimate and raw-or-cooked frames are drawn from source alone."
     },
     {
       "source": "apps/mobile/lib/src/food/food_day_header.dart",

@@ -1,6 +1,6 @@
 ---
 id: MM-213
-status: proposed
+status: done
 component: food-logging
 related: [MM-38, MM-45, MM-150, MM-212]
 ---
@@ -39,10 +39,17 @@ Scenario: Large text
   Then no label is broken inside a word
 ```
 
+## Resolution
+Replaced the equal-width route row with intrinsic-width buttons in a wrapping
+layout. The regression test checks the three labels at 360 dp at the default
+and 2.0x text scales.
+
+## UI/UX Assets
+- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows the
+  route buttons wrapping without splitting their labels.
+
 ## Notes
-- Guarded by `apps/mobile/test/add_food_route_labels_test.dart`. It was run
-  enabled once and failed as it should (the Saved label is 42 high where one
-  line is 21), and is skipped with this ticket's ID until the fix.
-- The screenshot `add_food_opened_dark.png` shows the defect as it is today
-  and will change with the fix.
+- Regression: `apps/mobile/test/add_food_route_labels_test.dart`, enabled for
+  the fixed layout at default and 2.0x text scaling.
+- The `add_food_opened_dark.png` golden changes with the route layout.
 - Not fixed here: MM-212 changes how reviews are done, and this is the app.

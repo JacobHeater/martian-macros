@@ -52,6 +52,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _quantity = TextEditingController(text: '1');
   var _source = QuantitySource.labelServing;
   PortionUnit? _unit = PortionUnit.serving;
+  var _quantityWasEntered = false;
 
   /// What the typed numbers are for. Only a label serving offers "one
   /// serving"; everything else is for everything eaten (MM-167).
@@ -60,6 +61,8 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   /// An entry logged before amounts were recorded: no amount is asked for it
   /// and none is invented.
   var _legacy = false;
+
+  var _amountNeedsReentry = false;
 
   /// For an entry calculated from a food's reference nutrition: its amount can
   /// be changed and the totals follow; its totals are not typed.
@@ -86,6 +89,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       _calcRef = portion.reference;
       _unit = portion.unit;
       _quantity.text = quantityText(portion.quantity ?? 1);
+      _quantityWasEntered = portion.quantity != null;
     } else {
       _fill(entry);
     }
@@ -223,20 +227,28 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     if (portion != null && portion.quantity != null && portion.unit != null) {
       _unit = portion.unit;
       _quantity.text = quantityText(portion.quantity!);
+      _quantityWasEntered = true;
     } else {
       _unit = unitsOffered(e.source).firstOrNull;
       _quantity.clear();
+      _quantityWasEntered = false;
     }
     _search.clear();
   });
 
-  void _selectMethod(QuantitySource method) => setState(() {
-    _source = method;
-    _unit = unitsOffered(method).firstOrNull;
-    _quantity.clear();
-    _basis = NutritionBasis.enteredTotals;
-    _legacy = false;
-  });
+  void _selectMethod(QuantitySource method) {
+    if (method == _source) return;
+    setState(() {
+      _amountNeedsReentry =
+          _quantityWasEntered && _quantity.text.trim().isNotEmpty;
+      _quantityWasEntered = false;
+      _source = method;
+      _unit = unitsOffered(method).firstOrNull;
+      _quantity.clear();
+      _basis = NutritionBasis.enteredTotals;
+      _legacy = false;
+    });
+  }
 
   /// Stops calculating from the food and lets the totals be typed.
   void _enterTotalsMyself() => setState(() {
@@ -443,36 +455,30 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
           if (!editing && query.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Row(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: MmButton(
-                      key: const ValueKey('food-scan'),
-                      label: 'Scan',
-                      kind: MmButtonKind.secondary,
-                      icon: Icons.qr_code_scanner,
-                      onPressed: () => setState(() => _scanning = true),
-                    ),
+                  MmButton(
+                    key: const ValueKey('food-scan'),
+                    label: 'Scan',
+                    kind: MmButtonKind.secondary,
+                    icon: Icons.qr_code_scanner,
+                    onPressed: () => setState(() => _scanning = true),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: MmButton(
-                      key: const ValueKey('food-my-foods'),
-                      label: 'Saved',
-                      kind: MmButtonKind.secondary,
-                      icon: Icons.bookmark_border,
-                      onPressed: () => setState(() => _myFoods = true),
-                    ),
+                  MmButton(
+                    key: const ValueKey('food-my-foods'),
+                    label: 'Saved',
+                    kind: MmButtonKind.secondary,
+                    icon: Icons.bookmark_border,
+                    onPressed: () => setState(() => _myFoods = true),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: MmButton(
-                      key: const ValueKey('food-estimate'),
-                      label: 'Estimate',
-                      kind: MmButtonKind.secondary,
-                      icon: Icons.restaurant,
-                      onPressed: () => setState(() => _estimating = true),
-                    ),
+                  MmButton(
+                    key: const ValueKey('food-estimate'),
+                    label: 'Estimate',
+                    kind: MmButtonKind.secondary,
+                    icon: Icons.restaurant,
+                    onPressed: () => setState(() => _estimating = true),
                   ),
                 ],
               ),
@@ -664,13 +670,18 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
             ? null
             : unit.of(amount ?? 2),
         kind: MmTextFieldKind.quantity,
-        helper: amount == null
+        helper: _amountNeedsReentry
+            ? 'Enter how much again for this method.'
+            : amount == null
             ? (empty
                   ? 'How much did you eat?'
                   : 'An amount above zero is needed.')
             : null,
         helperIsWarning: amount == null && !empty,
-        onChanged: (_) => setState(() {}),
+        onChanged: (_) => setState(() {
+          _quantityWasEntered = _quantity.text.trim().isNotEmpty;
+          if (_amount != null) _amountNeedsReentry = false;
+        }),
       ),
     ];
   }

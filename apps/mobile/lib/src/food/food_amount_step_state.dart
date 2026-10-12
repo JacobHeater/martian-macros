@@ -346,6 +346,9 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
           kind: MmTextFieldKind.quantity,
           helper: invalid || _amount == null
               ? 'An amount above zero is needed.'
+              : _choice.unit.isHand && grams != null
+              ? 'About ${quantityText(double.parse(grams.toStringAsFixed(0)))} '
+                    'g (estimated)'
               : _choice.unit == PortionUnit.serving && grams != null
               ? '${quantityText(double.parse(grams.toStringAsFixed(0)))} g'
               : null,
@@ -356,7 +359,9 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
         Text(
           totals == null
               ? 'Enter an amount to see the totals.'
-              : '${_n(totals.kcal)} kcal · ${_n(totals.proteinG)} g protein · '
+              : '${_choice.unit.isHand ? 'Estimated: ' : ''}'
+                    '${_n(totals.kcal)} kcal · '
+                    '${_n(totals.proteinG)} g protein · '
                     '${_n(totals.carbsG)} g carbs · ${_n(totals.fatG)} g fat',
           key: const ValueKey('amount-macros'),
           style: text.titleMedium,
