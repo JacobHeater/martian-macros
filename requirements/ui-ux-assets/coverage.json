@@ -579,9 +579,9 @@
         "edit",
         "legacy entry"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "The route buttons wrap at larger text sizes. The search-to-manual query carry is covered by a widget test and drawn, but its updated Linux screenshot baseline is pending. Validation and method-change states are drawn from source."
+      "limits": "Discovery, manual form, macro preview and edit screenshots were inspected from Linux run 38199739648. Search-to-manual query carry is widget-tested and drawn. Validation and method-change states are drawn from source."
     },
     {
       "source": "apps/mobile/lib/src/food/calorie_hero.dart",
@@ -692,8 +692,8 @@
         "estimated macro preview",
         "before first weigh-in"
       ],
-      "verification": "source-only",
-      "limits": "The estimated macro preview is drawn from source; updated Linux goldens are pending.",
+      "verification": "screenshot-compared",
+      "limits": "The estimated macro preview was compared with Linux run 38199739648. The drawing is static and illustrative; actual totals depend on maintenance.",
       "status": "covered"
     },
     {
@@ -730,9 +730,9 @@
         "macro preview with cooking oil",
         "no amount"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "Macro previews, hand-portion estimates and raw-or-cooked frames are drawn from source. Updated Linux goldens are pending."
+      "limits": "Serving macro preview compared with Linux run 38199739648. Cooking-oil, hand-portion estimates and raw-or-cooked frames remain drawn from source and widget-tested, not device-reviewed."
     },
     {
       "source": "apps/mobile/lib/src/food/food_day_header.dart",

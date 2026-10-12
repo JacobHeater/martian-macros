@@ -1,6 +1,6 @@
 ---
 id: MM-225
-status: in-progress
+status: done
 component: food-logging
 related: [MM-179, MM-223, MM-224, MM-42, MM-150, MM-167]
 ---
@@ -79,5 +79,10 @@ Scenario: Accessible preview
 ## Notes
 - Tests: `apps/mobile/test/add_food_macro_split_test.dart` and
   `apps/mobile/test/macro_split_chart_test.dart`.
-- Linux screenshot baselines and emulator verification are recorded separately
-  in the handoff; Windows tests do not validate Linux goldens.
+- `mm check` passed with mobile 627 passed, 69 skipped. The shared component's
+  existing logged-intake tests continue to pass.
+- Linux Update goldens run 38199739648 succeeded for commit d632d64. The new
+  food preview and affected entry-state images were visually inspected and
+  imported with matching SHA-256 hashes. The HTML reference was inspected in
+  the browser. No emulator was connected; no device or native screen-reader
+  verification is claimed.

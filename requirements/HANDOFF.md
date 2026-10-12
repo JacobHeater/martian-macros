@@ -10,8 +10,8 @@ Last updated: 2026-10-11, by Copilot, Session 19.
 **Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) remains a
 draft; #100 is already merged to `main`. Session 19's Add food,
 cross-app-usability work and MM-225 macro preview continue on
-`feature/mm205-expert-mobile-ux`. Linux screenshot baselines and updated PR CI
-are still pending.
+`feature/mm205-expert-mobile-ux`. MM-223 and MM-225 are implemented and tested;
+Linux screenshot baselines are imported. Updated PR CI remains pending.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -27,12 +27,13 @@ from their tickets under `## UI/UX Assets` (MM-210). Every view and
 component has a drawing there, listed in `coverage.json` (MM-211); a UI
 change is not done until its drawing and manifest entry are changed with
 it. #81's Dashboard/Food entry-point changes and MM-223's Add food
-discovery/manual-entry states are reflected in the drawings and manifest;
-Linux golden images remain pending.
+discovery/manual-entry states and MM-225's macro previews are reflected in the
+drawings and manifest. Linux golden images were inspected and imported.
 
 **What to build next.**
-- Finish MM-223 verification after importing Linux goldens; review the
-  cross-app findings for MM-224 and give each a concrete disposition.
+- MM-223 and MM-225 are verified with tests and Linux screenshots; device
+  verification remains unavailable. Review the cross-app findings for MM-224
+  and give each a concrete disposition.
 - Continue cross-app hierarchy work under MM-224. The owner has approved this
   as a standing mandate; do not ask whether to do it.
 - MM-214 and MM-215 remain ready to fix, each with a skipped test waiting.
@@ -152,14 +153,15 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   formatting, analysis, architecture and all workspace checks passed.
   No emulator was connected (only a physical phone, which was not used).
 - Requirements, implementation, tests, and the Add food drawing/manifest are
-  updated in the local worktree. Linux golden images have not been
-  generated/imported. `mm analyze` and `mm check` passed (`All checks
-  passed.`). The bounded cross-app panel survey is complete; its limits,
+  published to #81 in d632d64. Linux run 38199739648 passed; nine new/changed
+  entry images were inspected and imported with matching hashes. `mm analyze`
+  and `mm check` passed (`All checks passed.`). The bounded cross-app panel
+  survey is complete; its limits,
   recommendations, and research caveats are recorded in MM-224. ACM pages
   were not freshly retrievable, so DOI metadata and the prior research record
   were used.
-- Continue on `feature/mm205-expert-mobile-ux`; Linux baseline generation and
-  PR CI are the remaining delivery checks. The broader MM-224 effort remains
+- Continue on `feature/mm205-expert-mobile-ux`; updated PR CI is the remaining
+  delivery check. The broader MM-224 effort remains
   open; the pie chart does not claim to resolve cross-app hierarchy.
 
 ## Session 18: 2026-10-11, Copilot (joining the meal-logging PRs)
