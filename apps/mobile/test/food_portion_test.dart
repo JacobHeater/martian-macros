@@ -442,8 +442,7 @@ void main() {
       expect(after.kcal, before.kcal);
       expect(after.portion!.quantity, before.portion!.quantity);
     },
-    skip: true,
-  ); // MM-202: application fix deferred from tooling PR.
+  );
 
   testWidgets('MM-202 unchanged legacy edit preserves recorded totals', (
     tester,
@@ -471,7 +470,7 @@ void main() {
     final after = (await logged(tester)).single;
     expect(after.kcal, 100.123);
     expect(after.proteinG, 1.234);
-  }, skip: true); // MM-202: application fix deferred from tooling PR.
+  });
 
   testWidgets('MM-203 per-serving alcohol scales with consumed calories', (
     tester,
