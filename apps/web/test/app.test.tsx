@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
+import type { SystemBars } from '../src/platform/SystemBars';
 
 /** MM-229: the shell of the app. */
 describe('the five destinations', () => {
@@ -48,5 +49,18 @@ describe('the theme', () => {
     render(<App initialTheme="system" />);
     // The test phone is set to a light appearance (test/setup.ts).
     expect(document.documentElement).toHaveClass('theme-light');
+  });
+});
+
+describe("the phone's bars", () => {
+  it('are told the background is dark in Martian and light in Light', async () => {
+    const told: boolean[] = [];
+    const bars: SystemBars = { setBackgroundIsDark: (dark) => told.push(dark) };
+    render(<App systemBars={bars} />);
+    expect(told.at(-1)).toBe(true);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Light' }));
+    expect(told.at(-1)).toBe(false);
   });
 });
