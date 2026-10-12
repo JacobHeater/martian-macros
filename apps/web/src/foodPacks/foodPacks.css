@@ -1,0 +1,13 @@
+.food-packs-checking {
+  align-items: center;
+}
+.food-packs-host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.food-packs-host-screens {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
