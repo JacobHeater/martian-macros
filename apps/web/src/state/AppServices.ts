@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
 import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
@@ -20,6 +21,7 @@ import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
+import type { HealthSource } from '../healthIngest/HealthSource';
 import type { Watched } from '../lang/Watched';
 import type { BarcodeScanner } from '../platform/BarcodeScanner';
 import type { LabelTextReader } from '../platform/LabelTextReader';
@@ -56,6 +58,18 @@ export interface AppServices {
   readonly catalog: Watched<FoodCatalog>;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
+
+  /** The phone's own scheduled notifications (MM-146). Nothing here uses the network. */
+  readonly reminderScheduler: ReminderScheduler;
+
+  /** The phone's health platform (MM-68). The app only reads from it. */
+  readonly healthSource: HealthSource;
+
+  /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
+  readonly evidence: () => Promise<string>;
+
+  /** Which build this is: "dev" or "prod". The development group of Settings shows only in "dev". */
+  readonly environment: string;
 
   /** How the end of a rest is signalled (MM-191). */
   readonly restSignal: RestSignal;

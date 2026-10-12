@@ -1,8 +1,8 @@
 import type { Unsubscribe } from '../lang/Unsubscribe';
 import type { Watched } from '../lang/Watched';
 
-/** The cells read by whatever is being worked out right now. */
-const reading: Set<Cell<unknown>>[] = [];
+/** The cells read by whatever is being worked out right now, each with the version it was read at. */
+const reading: Map<Cell<unknown>, number>[] = [];
 
 /**
  * A value that can be read now and watched. A cell does its work only
@@ -12,6 +12,7 @@ const reading: Set<Cell<unknown>>[] = [];
  */
 export class Cell<T> implements Watched<T> {
   private current: T;
+  private changes = 0;
   private readonly listeners = new Set<(value: T) => void>();
 
   constructor(initial: T) {
@@ -20,10 +21,10 @@ export class Cell<T> implements Watched<T> {
 
   /**
    * Runs `work` and gives what it returned with every cell whose value it
-   * read.
+   * read, and the version of the cell it read.
    */
-  static tracking<R>(work: () => R): readonly [result: R, read: ReadonlySet<Cell<unknown>>] {
-    const read = new Set<Cell<unknown>>();
+  static tracking<R>(work: () => R): readonly [result: R, read: ReadonlyMap<Cell<unknown>, number>] {
+    const read = new Map<Cell<unknown>, number>();
     reading.push(read);
     try {
       return [work(), read];
@@ -34,13 +35,22 @@ export class Cell<T> implements Watched<T> {
 
   /** The value now. While nothing watches the cell it may be out of date. */
   get value(): T {
-    reading[reading.length - 1]?.add(this as Cell<unknown>);
+    this.refresh();
+    const read = reading[reading.length - 1];
+    if (read !== undefined && !read.has(this as Cell<unknown>)) read.set(this as Cell<unknown>, this.changes);
     return this.current;
   }
 
   /** The value now, without counting as having read it. */
   peek(): T {
+    this.refresh();
     return this.current;
+  }
+
+  /** How many times the value has changed. Two reads with the same count read the same value. */
+  get version(): number {
+    this.refresh();
+    return this.changes;
   }
 
   get watched(): boolean {
@@ -68,8 +78,12 @@ export class Cell<T> implements Watched<T> {
   protected set(next: T): void {
     if (Object.is(next, this.current)) return;
     this.current = next;
+    this.changes += 1;
     for (const listener of [...this.listeners]) listener(next);
   }
+
+  /** Brings the value up to date before it is read, for a cell that works its value out. */
+  protected refresh(): void {}
 
   protected wake(): void {}
 
