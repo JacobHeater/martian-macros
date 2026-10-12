@@ -38,6 +38,11 @@ No ticket requires a quantity or unit per method; none defines the nutrition bas
 interpret a portion; none covers legacy entries with a method and no quantity; and "Estimate" has two incompatible meanings.
 
 ## Decisions
+**Owner revision (MM-226):** the manual label-serving basis switch is removed.
+Servings eaten scales nutrition per serving by default. Other measured manual
+amounts retain entered totals. Earlier notes about a totals/per-serving choice
+below are historical, superseded by this explicit owner instruction.
+
 **Proposed additions** (made without asking; say if any is wrong). None of this is built.
 
 ### 1. Three separate things, never mixed
@@ -79,14 +84,14 @@ later change to a food pack does not change history.
   "1 1/2") are accepted too.
 
 ### 3. What the nutrition fields mean
-- **Typed protein, carbohydrate, fat and calories** are labelled with their basis in words next to the fields: "For everything you ate"
-  (entered totals; today's behavior, now stated), "Per serving (from the label)" or "Per 100 g". The basis defaults to "For everything you
-  ate".
+- **Typed protein, carbohydrate, fat and calories** use "Nutrition per serving"
+  for label servings and "Nutrition for this amount" for other manually measured
+  amounts. There is no manual nutrition-basis switch (MM-226).
 - When the basis is per-serving or per-100 g, the amount consumed is required and the totals are calculated and shown before logging.
 - **Calories from macros** keeps its behavior. It computes from the macros in whichever basis is on screen, and the result is shown in
   that basis; it is never computed from totals and then scaled again. The mismatch check (MM-38, MM-53) applies to the reference values
   and equally to entered totals, because it is a ratio.
-- A food from the pack or a barcode always has a reference basis (per 100 g plus its servings); a manual entry has the one the user chose.
+- A food from the pack or a barcode always has a reference basis (per 100 g plus its servings); a manual entry derives its basis from the measurement method.
 
 ### 4. What is persisted
 Beyond the totals and the method, an entry stores what is needed to read the portion back:
@@ -155,10 +160,10 @@ Scenario: 2 cupped handfuls as an estimated portion
   And the amount is never presented as exact
 
 Scenario: Totals that are not multiplied again
-  Given the user chooses "For everything you ate" and types 400 kcal
-  And enters a quantity of 2 servings
+  Given the user chooses Weighed and types 400 kcal for the measured amount
+  And enters a quantity of 200 grams
   Then the entry's totals are 400 kcal
-  And the 2 servings are descriptive only
+  And the 200 grams are descriptive only
 
 Scenario: No double scaling when editing
   Given a calculated entry of 2 servings at 150 kcal per serving, totalling 300 kcal

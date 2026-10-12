@@ -23,8 +23,6 @@ import '../ui/mm_choice_chip.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
 import '../ui/mm_list_row.dart';
-import '../ui/mm_segment.dart';
-import '../ui/mm_segmented.dart';
 import '../ui/notice.dart';
 import 'add_food_sheet.dart';
 import 'custom/custom_catalog_food.dart';
@@ -57,9 +55,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   PortionUnit? _unit = PortionUnit.serving;
   var _quantityWasEntered = false;
 
-  /// What the typed numbers are for. Only a label serving offers "one
-  /// serving"; everything else is for everything eaten (MM-167).
-  var _basis = NutritionBasis.enteredTotals;
+  var _basis = NutritionBasis.calculated;
 
   /// An entry logged before amounts were recorded: no amount is asked for it
   /// and none is invented.
@@ -70,6 +66,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   /// For an entry calculated from a food's reference nutrition: its amount can
   /// be changed and the totals follow; its totals are not typed.
   ReferenceNutrition? _calcRef;
+  double? _calcAlcoholPerKcal;
 
   @override
   void initState() {
@@ -91,6 +88,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     } else if (portion.basis == NutritionBasis.calculated &&
         portion.reference != null) {
       _calcRef = portion.reference;
+      _calcAlcoholPerKcal = entry.alcoholG != null && entry.kcal > 0
+          ? entry.alcoholG! / entry.kcal
+          : null;
       _unit = portion.unit;
       _quantity.text = quantityText(portion.quantity ?? 1);
       _quantityWasEntered = portion.quantity != null;
@@ -227,12 +227,32 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     _alcohol.text = e.alcoholG == null ? '' : n(e.alcoholG!);
     _source = e.source;
     _basis = NutritionBasis.enteredTotals;
+    _calcRef = null;
+    _calcAlcoholPerKcal = null;
     final portion = e.portion;
     _legacy = false;
     if (portion != null && portion.quantity != null && portion.unit != null) {
       _unit = portion.unit;
       _quantity.text = quantityText(portion.quantity!);
       _quantityWasEntered = true;
+      if (e.source == QuantitySource.labelServing &&
+          portion.unit == PortionUnit.serving &&
+          portion.quantity! > 0) {
+        final servings = portion.quantity!;
+        _calcRef = ReferenceNutrition(
+          basis: ReferenceBasis.perServing,
+          servingUnit: PortionUnit.serving,
+          nutrition: NutritionTotals(
+            kcal: e.kcal / servings,
+            proteinG: e.proteinG / servings,
+            carbsG: e.carbsG / servings,
+            fatG: e.fatG / servings,
+          ),
+        );
+        _calcAlcoholPerKcal = e.alcoholG != null && e.kcal > 0
+            ? e.alcoholG! / e.kcal
+            : null;
+      }
     } else {
       _unit = unitsOffered(e.source).firstOrNull;
       _quantity.clear();
@@ -250,24 +270,34 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       _source = method;
       _unit = unitsOffered(method).firstOrNull;
       _quantity.clear();
-      _basis = NutritionBasis.enteredTotals;
+      _basis = method == QuantitySource.labelServing
+          ? NutritionBasis.calculated
+          : NutritionBasis.enteredTotals;
       _legacy = false;
     });
   }
 
-  /// Stops calculating from the food and lets the totals be typed.
+  /// Edits nutrition per serving for servings, or totals for other amounts.
   void _enterTotalsMyself() => setState(() {
     final t = _totals;
-    String n(double v) =>
-        v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(1);
+    final alcohol = t == null || _calcAlcoholPerKcal == null
+        ? null
+        : t.kcal * _calcAlcoholPerKcal!;
+    _source = _calcMethod;
+    final servings = _source == QuantitySource.labelServing ? _amount : 1.0;
+    String n(double v) => (v / (servings ?? 1)).toString();
     if (t != null) {
       _kcal.text = n(t.kcal);
       _protein.text = n(t.proteinG);
       _carbs.text = n(t.carbsG);
       _fat.text = n(t.fatG);
+      _alcohol.text = alcohol == null ? '' : n(alcohol);
     }
     _calcRef = null;
-    _basis = NutritionBasis.enteredTotals;
+    _calcAlcoholPerKcal = null;
+    _basis = _source == QuantitySource.labelServing
+        ? NutritionBasis.calculated
+        : NutritionBasis.enteredTotals;
   });
 
   /// The method an edited calculated entry is now measured by.
@@ -353,8 +383,12 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       fiberG: _scaledExtra(editing?.fiberG),
       sodiumMg: _scaledExtra(editing?.sodiumMg),
       alcoholG: _calcRef == null
-          ? (_a > 0 ? _a : null)
-          : _scaledExtra(editing?.alcoholG),
+          ? (_a > 0
+                ? _a * (_basis == NutritionBasis.calculated ? _amount! : 1)
+                : null)
+          : (_calcAlcoholPerKcal == null
+                ? _scaledExtra(editing?.alcoholG)
+                : totals.kcal * _calcAlcoholPerKcal!),
     );
     final writer = ref.read(foodEntryWriterProvider);
     await (editing == null ? writer.addFood(entry) : writer.updateFood(entry));
@@ -675,10 +709,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     if (_source == QuantitySource.quickAdd) {
       return [
         const SizedBox(height: 8),
-        Text(
-          'Enter calories and macros for everything you ate.',
-          style: text.bodySmall,
-        ),
+        Text('Enter calories and macros for this food.', style: text.bodySmall),
       ];
     }
     final units = unitsOffered(_source);
@@ -752,19 +783,10 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       ),
       ..._amountFields(text),
       const SizedBox(height: 16),
-      Text('The numbers below are for', style: text.labelLarge),
-      const SizedBox(height: 4),
-      if (_source == QuantitySource.labelServing && !_legacy)
-        MmSegmented<NutritionBasis>(
-          segments: const [
-            MmSegment(NutritionBasis.enteredTotals, 'Everything I ate'),
-            MmSegment(NutritionBasis.calculated, 'One serving'),
-          ],
-          selected: {_basis},
-          onChanged: (s) => setState(() => _basis = s.first),
-        )
-      else
-        Text('Everything you ate', style: text.bodyMedium),
+      Text(
+        perServing ? 'Nutrition per serving' : 'Nutrition for this amount',
+        style: text.labelLarge,
+      ),
       const SizedBox(height: 12),
       Row(
         children: [
@@ -870,7 +892,9 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         onChanged: (_) => setState(() {}),
       ),
       MmButton(
-        label: 'Enter the totals myself',
+        label: _unit == PortionUnit.serving
+            ? 'Edit nutrition per serving'
+            : 'Enter the totals myself',
         kind: MmButtonKind.text,
         onPressed: _enterTotalsMyself,
       ),

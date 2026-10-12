@@ -560,7 +560,8 @@
         "MM-213",
         "MM-216",
         "MM-223",
-        "MM-225"
+        "MM-225",
+        "MM-226"
       ],
       "asset": "views/add-food.html#add-food-default",
       "states": [

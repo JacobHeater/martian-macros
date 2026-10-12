@@ -14,7 +14,8 @@ to establish this internal arithmetic mismatch.
 
 ## Description
 Scale alcohol consistently with consumed servings and retain reference
-semantics on subsequent edits. Application fix is deferred from tooling PR #79.
+semantics on subsequent edits. Fixed alongside the simple-serving entry
+change MM-226, which makes serving scaling the default.
 
 ## Acceptance Criteria
 ```gherkin
@@ -27,7 +28,7 @@ Scenario: Alcohol and energy share the consumed quantity
 
 ## Notes
 Guard: `MM-203 per-serving alcohol scales with consumed calories` in
-food_portion_test. Skipped with this ID pending a separate application fix.
+food_portion_test. Now enabled alongside MM-226.
 The guard ran and failed at the intended assertion: energy was 276 kcal,
 but consumed alcohol was 14 rather than 28 g. Initial test setup forgot the
 optional alcohol toggle; corrected setup then reproduced the real defect.

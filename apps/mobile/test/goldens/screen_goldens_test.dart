@@ -696,9 +696,6 @@ void main() {
         'Protein bar',
       );
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('One serving'));
-      await tester.tap(find.text('One serving'));
-      await tester.pumpAndSettle();
       for (final (key, value) in [
         ('food-protein', '12'),
         ('food-carbs', '22'),
