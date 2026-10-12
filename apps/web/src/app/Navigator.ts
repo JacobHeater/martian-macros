@@ -11,6 +11,9 @@ export interface Navigator {
   /** Closes every pushed screen, back to what is underneath them all. Each answers as simply left. */
   closeAll(): void;
 
+  /** Closes the screen on top, as simply left. False when nothing is pushed. */
+  closeTop(): boolean;
+
   /** How many pushed screens there are. */
   readonly depth: number;
 }

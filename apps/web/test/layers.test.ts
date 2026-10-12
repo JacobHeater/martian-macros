@@ -29,6 +29,7 @@ const allowed: Record<string, readonly string[]> = {
 const adapters: Record<string, readonly string[]> = {
   '@sqlite.org/sqlite-wasm': ['sql/wasm/'],
   '@capacitor/core': ['platform/', 'sql/native/', 'foodCatalog/download/native/'],
+  '@capacitor/app': ['platform/'],
 };
 
 /**
