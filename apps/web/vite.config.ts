@@ -1,10 +1,22 @@
+import { readFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 // The app is served from files inside a native shell, never from a site, so
 // every built path is relative.
+// Where to read the list of downloadable packs (MM-56): the address the
+// Flutter builds were given, from the repository's build config. Only the
+// native shell uses it; a browser build offers no downloads.
+const manifestUrl =
+  process.env['MM_FOOD_PACK_MANIFEST_URL'] ??
+  (JSON.parse(readFileSync(new URL('../../config/prod.json', import.meta.url), 'utf8')) as Record<string, string>)[
+    'MM_FOOD_PACK_MANIFEST_URL'
+  ] ??
+  '';
+
 export default defineConfig({
   base: './',
+  define: { __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl) },
   plugins: [react()],
   build: { target: 'es2022', sourcemap: true },
   // The evidence register is one file, docs/evidence.md at the top of the
