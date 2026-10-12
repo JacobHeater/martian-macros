@@ -8,9 +8,27 @@ export default defineConfig({
   plugins: [react()],
   build: { target: 'es2022', sourcemap: true },
   test: {
-    environment: 'jsdom',
-    include: ['src/**/*.test.{ts,tsx}', 'test/**/*.test.{ts,tsx}'],
-    setupFiles: ['test/setup.ts'],
-    css: true,
+    // Only tests of what is drawn need a browser's document. Making one for
+    // each file of rules and arithmetic took most of the run.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'rules',
+          environment: 'node',
+          include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'screens',
+          environment: 'jsdom',
+          include: ['src/**/*.test.tsx', 'test/**/*.test.tsx'],
+          setupFiles: ['test/setup.ts'],
+          css: true,
+        },
+      },
+    ],
   },
 });
