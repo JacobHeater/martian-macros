@@ -84,7 +84,7 @@ Never write `Accepted` without something written down to point to.
 
 ```json
 {
-  "source": "apps/mobile/lib/src/ui/mm_button.dart",
+  "source": "apps/web/src/ui/MmButton.tsx",
   "symbol": "MmButton",
   "kind": "component",
   "requirements": ["MM-104"],
@@ -103,7 +103,7 @@ Never write `Accepted` without something written down to point to.
   `not-drawn`.
 - `status`: `covered`, `incomplete`, `not-drawn`. Anything but `covered`
   must say why under `limits`.
-- A `_state.dart` file belongs to its widget's entry and has none of its own.
+- A component's hooks and helpers belong to its entry and have none of their own.
 
 ## What `mm req` checks, and what it cannot
 

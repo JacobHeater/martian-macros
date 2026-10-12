@@ -152,8 +152,8 @@ starting it, why it is safe, and the specific collisions to manage.
 
 ### The schema lane
 
-`packages/data/lib/src/app_database.dart` is at `schemaVersion` 1 with no
-migrations. Nine workstreams need to change it. Rules, once MM-61 lands:
+`apps/web/src/data/schema.ts` carries `currentSchemaVersion` and the
+migration steps. Nine workstreams need to change it. Rules, once MM-61 lands:
 
 - **One schema change in flight at a time.** The branch that takes the next
   version number merges before the next one starts.
@@ -161,7 +161,6 @@ migrations. Nine workstreams need to change it. Rules, once MM-61 lands:
   and columns.
 - **Every migration has a test** that upgrades a database created at the
   previous version, with data in it.
-- **Run `mm gen`; never hand-edit `app_database.g.dart`.**
 - **Additive by default.** New columns are nullable or have defaults. A
   destructive change needs its own ticket.
 
@@ -173,11 +172,11 @@ most if ignored:
 
 | Hotspot | Why |
 | --- | --- |
-| `targets.dart`, `coach.dart`, `safety_bounds.dart` | Four workstreams want to change the target calculation. WS-02 finishes first; then WS-06 owns it; WS-09 adds beside it. |
-| `tdee_estimator.dart` | Phase changes, week shapes and new logging styles each change what the estimator must tolerate. One at a time, each with a full simulator run. |
-| `synthetic_user.dart` | Five workstreams extend the simulator. Additions are optional and default off, so seeded results never change. |
+| `targets.ts`, `coach.ts`, `SafetyBounds.ts` | Four workstreams want to change the target calculation. WS-02 finishes first; then WS-06 owns it; WS-09 adds beside it. |
+| `TdeeEstimator.ts` | Phase changes, week shapes and new logging styles each change what the estimator must tolerate. One at a time, each with a full simulator run. |
+| `SyntheticUser.ts` | Five workstreams extend the simulator. Additions are optional and default off, so seeded results never change. |
 | All user-facing text | MM-108 moves every string into localization files in one pass. Do it while four screens exist. |
-| `onboarding_screen.dart` | 531 lines in one file, and five workstreams add to onboarding. Split it by step during the WS-03 migration. |
+| `OnboardingScreen.tsx` | Five workstreams add to onboarding; it is already split by step. Keep it that way. |
 
 ## Choosing what to build next
 

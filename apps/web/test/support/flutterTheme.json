@@ -1,0 +1,145 @@
+{
+  "about": "The Flutter theme as it stood when the Flutter app was removed (MM-232 step 6). MM-229: the CSS tokens equal these values; a deliberate visual change updates this record knowingly.",
+  "colors": {
+    "martian": {
+      "canvas": "#120b29",
+      "surface": "#20143d",
+      "raised": "#2c1b4c",
+      "overlay": "#382558",
+      "sunken": "#180f30",
+      "track": "#40305e",
+      "selected": "#423261",
+      "outline": "#594576",
+      "outlineStrong": "#a18bbe",
+      "text": "#fff8e9",
+      "text2": "#d8c7ef",
+      "text3": "#baa4d3",
+      "ember": "#c4ff48",
+      "onEmber": "#172500",
+      "ion": "#43f5e0",
+      "onIon": "#120b29",
+      "energy": "#fff8e9",
+      "protein": "#43f5e0",
+      "carbs": "#ff80bb",
+      "fat": "#9170ed",
+      "positive": "#c4ff48",
+      "caution": "#ffd166",
+      "info": "#85cfff",
+      "danger": "#ff938e",
+      "onDanger": "#120b29"
+    },
+    "dark": {
+      "canvas": "#090d15",
+      "surface": "#101624",
+      "raised": "#171f32",
+      "overlay": "#1f2a42",
+      "sunken": "#0d1220",
+      "track": "#1f2940",
+      "selected": "#1c2842",
+      "outline": "#2b3853",
+      "outlineStrong": "#5a6a8c",
+      "text": "#ecf0f8",
+      "text2": "#a9b4ca",
+      "text3": "#8f9bb5",
+      "ember": "#ff6a45",
+      "onEmber": "#1a0802",
+      "ion": "#3fd8f0",
+      "onIon": "#031a20",
+      "energy": "#ecf0f8",
+      "protein": "#5b9dff",
+      "carbs": "#f6c453",
+      "fat": "#7f57ff",
+      "positive": "#4fdb8a",
+      "caution": "#ffb84d",
+      "info": "#7fb8ff",
+      "danger": "#ff7a7a",
+      "onDanger": "#2a0606"
+    },
+    "light": {
+      "canvas": "#f3f5fa",
+      "surface": "#ffffff",
+      "raised": "#ffffff",
+      "overlay": "#ffffff",
+      "sunken": "#e8ecf5",
+      "track": "#ebeff7",
+      "selected": "#e3e8f5",
+      "outline": "#cbd3e3",
+      "outlineStrong": "#7c88a3",
+      "text": "#0c1220",
+      "text2": "#46526b",
+      "text3": "#5a6680",
+      "ember": "#cc3210",
+      "onEmber": "#ffffff",
+      "ion": "#0a7890",
+      "onIon": "#ffffff",
+      "energy": "#0c1220",
+      "protein": "#1646a6",
+      "carbs": "#bf7a00",
+      "fat": "#7448e6",
+      "positive": "#117a3e",
+      "caution": "#8f5600",
+      "info": "#1c62c9",
+      "danger": "#b3261e",
+      "onDanger": "#ffffff"
+    }
+  },
+  "radius": {
+    "control": 12,
+    "chip": 8,
+    "sheetTop": 24,
+    "group": 16
+  },
+  "martianRadiusGroup": 12,
+  "space": {
+    "s4": 4,
+    "s8": 8,
+    "s12": 12,
+    "s16": 16,
+    "s24": 24,
+    "s32": 32
+  },
+  "type": {
+    "figure-xl": [
+      48,
+      52,
+      600,
+      "figures"
+    ],
+    "figure": [
+      32,
+      36,
+      600,
+      "figures"
+    ],
+    "title": [
+      22,
+      28,
+      600,
+      "figures"
+    ],
+    "heading": [
+      17,
+      24,
+      600,
+      "text"
+    ],
+    "body": [
+      15,
+      22,
+      400,
+      "text"
+    ],
+    "label": [
+      13,
+      16,
+      600,
+      "text"
+    ],
+    "caption": [
+      12,
+      16,
+      400,
+      "text"
+    ]
+  }
+}

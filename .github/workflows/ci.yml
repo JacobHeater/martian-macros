@@ -1,9 +1,8 @@
 name: CI
 
-# Runs the same commands as a developer: `mm bootstrap` and `mm check`, then an
-# Android build. CI calls `mm`, never `flutter` directly, so local and CI
-# behavior cannot drift (MM-7). The screenshot tests (MM-105) run here, on Linux,
-# as part of `mm check`; the "Update goldens" workflow regenerates their images.
+# Runs the same commands as a developer: `mm bootstrap` and `mm check`, then
+# the Android build of the shell. CI calls `mm`, never npm or gradle
+# directly, so local and CI behavior cannot drift (MM-7).
 
 on:
   pull_request:
@@ -17,22 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Read the pinned Flutter version
-        id: flutter
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ steps.flutter.outputs.version }}
-          channel: stable
-          cache: true
-
-      # The React app that is replacing the Flutter one (MM-228).
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -41,23 +24,15 @@ jobs:
 
       - name: Bootstrap
         run: ./mm bootstrap
-        env:
-          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
 
-      - name: Check (format, requirements, architecture, analyze, test)
+      - name: Check (requirements, panel, tool tests, web)
         run: ./mm check
-        env:
-          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
 
-      - name: Keep the screenshots that differ
-        if: failure()
-        uses: actions/upload-artifact@v4
+      # The Android shell (MM-232): the web app synced in and assembled.
+      - uses: actions/setup-java@v5
         with:
-          name: golden-failures
-          path: apps/mobile/test/goldens/failures
-          if-no-files-found: ignore
+          distribution: temurin
+          java-version: '21'
 
-      - name: Build Android (dev)
-        run: ./mm build android --env dev
-        env:
-          MM_FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+      - name: Build Android (debug)
+        run: ./mm build android

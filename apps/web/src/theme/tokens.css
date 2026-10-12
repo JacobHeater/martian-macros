@@ -1,5 +1,5 @@
 /* The design tokens (MM-102, MM-103). Copied from
-   apps/mobile/lib/src/theme/; test/tokens.test.ts holds the two together
+   the Flutter theme it was carried over from; test/tokens.test.ts holds it steady
    until the Flutter app is removed. Components read these and never a
    literal color, radius or size. */
 
