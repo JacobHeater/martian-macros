@@ -79,7 +79,7 @@ Scenario: No Dart is left
 | engine | 6,819 lines, 158 files | 567 | done | 573: all 567 (566 pass, 1 skipped for MM-173 as in Dart), and 6 added |
 | health_ingest | 976 lines, 21 files | 71 | done | 71: all of them |
 | food_catalog | 1,550 lines, 36 files | 17 + the download's | reading, searching and writing packs done; downloading a pack is not (see MM-231) | 25: 17 carried over, the manifest's 2, and 6 added |
-| fixtures | 3,541 lines, 54 files | | waits on MM-231 | |
+| fixtures | 3,541 lines, 54 files | 141 | done (it never touched SQLite; the first count here was wrong to say it waited) | 144: all 141 carried over and 3 added |
 | data | 20,359 lines, 48 files (18,030 of them generated) | | waits on MM-231 | |
 | food_pipeline | 922 lines, 22 files | 30 | done, except its two command-line entry points, which move with the task runner | 36: all 30 carried over (one changed, below) and 6 added |
 | `mm` task runner | 8,361 lines | 191 | not started | |
@@ -130,6 +130,15 @@ The type check is clean.
 - One pipeline test changed: Dart installed a published pack through the
   app's download code, which is not carried over yet (MM-231). The test now
   unpacks the published file and reads it as a pack.
+- **The fixtures are carried over**: an in-memory implementation of every
+  repository and seam (`apps/web/src/fixtures/`) and the 23 contract suites
+  any implementation must pass (`apps/web/test/contracts/`). The suites take
+  a repository that may arrive later, so the database's repositories can run
+  them unchanged. One Dart test became a compile-time check: scripting a
+  backup to fail with something that is not a failure is now refused by the
+  type checker, and the test fails the typecheck if it ever stops being
+  refused. A broken repository was tried on purpose (weigh-ins listed newest
+  first): the contract failed, as it should.
 - `mm food build` and `mm food publish` still run the Dart pipeline. They
   switch when the task runner is converted.
 - Files that read and write disk live in a folder called `node`, and a test
