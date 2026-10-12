@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component catalog · Martian Macros UI reference</title>
+<link rel="stylesheet" href="../shared/mm.css">
+<script src="../shared/mm.js"></script>
+</head>
+<body>
+<script>
+(function (m) {
+  // One specimen: the component's states side by side on the app's canvas.
+  function spec(id, name, src, note, parts, wide) {
+    return m.frame(id, name, (note ? note + ' ' : '') + '<code>' + src + '</code>', '<div class="specimen">' + [].concat(parts).join('') + '</div>', { wide: wide });
+  }
+  var cols = ['canvas', 'surface', 'raised', 'overlay', 'sunken', 'track', 'selected', 'outline', 'outline-strong', 'text', 'text2', 'text3', 'ember', 'on-ember', 'ion', 'on-ion', 'energy', 'protein', 'carbs', 'fat', 'positive', 'caution', 'info', 'danger', 'on-danger'];
+  var swatches = '<div class="sw">' + cols.map(function (c) { return '<span><i style="background:var(--' + c + ')"></i>' + c.replace(/-([a-z])/g, function (x, l) { return l.toUpperCase(); }) + '</span>'; }).join('') + '</div>';
+  var go = m.i('right', 's');
+
+  m.page({
+    title: 'Component catalog',
+    intro: 'Every reusable component in <code>apps/mobile/lib/src/ui/</code> and <code>apps/mobile/lib/src/charts/</code>, with its states. Each specimen has a stable address: <code>components/index.html#&lt;id&gt;</code>. Screens use these and never a raw Material control (MM-163).',
+    sources: ['apps/mobile/lib/src/ui/', 'apps/mobile/lib/src/charts/', 'apps/mobile/lib/src/theme/', 'apps/mobile/lib/src/gallery/'],
+    tickets: ['MM-102', 'MM-103', 'MM-104', 'MM-105', 'MM-107', 'MM-163', 'MM-181', 'MM-187'],
+    limits: 'Focus and hover are the browser’s, not Flutter’s: the app shows Material ink and focus rings that are not reproduced. Charts are schematic. The text-size switch scales the whole specimen; in the app only text grows.',
+    sections: [
+      { h: 'Tokens', id: 'tokens', frames: [
+        spec('colors', 'Colors, by meaning', 'theme/mm_colors.dart', 'Switch the theme above to see each of the three sets.', [swatches], true),
+        spec('type', 'Type roles', 'theme/mm_type.dart', 'Space Grotesk for figures and titles, Inter for the rest; figures are tabular.', [
+          '<div class="fig-xl">1,534</div><div class="cap">figureXL · 48/52 · displayLarge</div>', '<div class="fig">184.1 lb</div><div class="cap">figure · 32/36 · displayMedium, displaySmall</div>',
+          '<div class="title">Weight trend</div><div class="cap">title · 22/28 · headline*, titleLarge</div>', '<div class="heading">Your targets</div><div class="cap">heading · 17/24 · titleMedium</div>',
+          '<div>Body text 1,234 kcal 172 g −0.8 lb</div><div class="cap">body · 15/22 · bodyLarge, bodyMedium</div>', '<div class="label">Label</div><div class="cap">label · 13/16 · titleSmall, labelLarge, labelMedium</div>', '<div class="cap">caption · 12/16 · bodySmall, labelSmall</div>']),
+        spec('radius-space', 'Radii and spacing', 'theme/mm_radius.dart, theme/mm_space.dart', 'Radii: group 16 (12 in Martian), control 12, chip 8, sheet top 24. Spacing: 4, 8, 12, 16, 24, 32.', [
+          m.rowx([4, 8, 12, 16, 24, 32].map(function (s) { return '<div class="center"><div style="width:' + s + 'px;height:32px;background:var(--ion)"></div><div class="cap">' + s + '</div></div>'; })),
+          m.rowx(['<div class="card" style="width:90px">group</div>', '<span class="btn secondary">control</span>', '<span class="chip">chip</span>'])])
+      ] },
+      { h: 'Buttons', id: 'buttons', frames: [
+        spec('mm-button', 'MmButton', 'ui/mm_button.dart', 'Kinds: primary, secondary, text. Off when it has no action. The primary action is flat, with no glow (MM-181).', [
+          m.rowx([m.btn('Primary'), m.btn('Primary off', 'off')], 'wrap'), m.rowx([m.btn('Secondary', 'secondary'), m.btn('With icon', 'secondary', { icon: 'plus' }), m.btn('Text', 'text')], 'wrap'), m.btn('Expanded', 'primary', { block: true })]),
+        spec('mm-icon-button', 'MmIconButton', 'ui/mm_icon_button.dart', 'Kinds: standard and add (the tinted add affordance, MM-180). Always has a spoken label.', [m.rowx([m.icobtn('gear', 'Settings'), m.icobtn('trash', 'Delete'), m.icobtn('plus', 'Add food to breakfast', { cls: 'add', s: true })])]),
+        spec('mm-fab', 'MmFab', 'ui/mm_fab.dart', 'The one floating action: Add food.', ['<div class="fab static">' + m.i('plus') + 'Add food</div>']),
+        spec('mm-stroke-icon', 'MmStrokeIcon', 'ui/mm_stroke_icon.dart, ui/mm_stroke_icon_painter.dart', 'Two drawn icons that stay crisp at any size: plus and chevron.', [m.rowx([m.i('plus'), m.i('up'), m.i('down')])])
+      ] },
+      { h: 'Inputs', id: 'inputs', frames: [
+        spec('mm-text-field', 'MmTextField', 'ui/mm_text_field.dart', 'Kinds: text, number, quantity (decimals and simple fractions). Empty, filled, with a unit, with a helper, and in error.', [
+          m.field('Food', ''), m.field('Food', 'Chicken and rice'), m.field('Weight', '172.4', { sfx: 'lb' }), m.field('Calories', '600', { help: 'Macros add up to 410 kcal. Double-check the label.' }), m.field('Amount', '0', { err: true, help: 'An amount above zero is needed.' })]),
+        spec('mm-dropdown', 'MmDropdown', 'ui/mm_dropdown.dart', 'Closed and open.', [m.field('Equipment', 'Barbell', { sfx: m.i('down', 's') }),
+          '<div class="menu" style="align-self:stretch">' + ['Barbell', 'Dumbbell', 'Machine', 'Cable', 'Bodyweight', 'Other'].map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>']),
+        spec('mm-segmented', 'MmSegmented and MmSegment', 'ui/mm_segmented.dart, ui/mm_segment.dart', 'One of a few. Tap to select. With and without a check mark; with nothing selected.', [m.seg(['30d', '90d'], 0, { fit: true }), m.seg(['Complete', 'Partial'], 1, { check: true }), m.seg(['0', '1', '2', '3', '4', '5+'], -1)]),
+        spec('mm-choice-chip', 'MmChoiceChip', 'ui/mm_choice_chip.dart', 'One or several of a set. Tap to select.', [m.chips(['Breakfast', 'Lunch', 'Dinner', 'Snacks'], 1), m.chips(['Glutes', 'Hamstrings', 'Calves'], [0, 1], { multi: true })]),
+        spec('mm-action-chip', 'MmActionChip', 'ui/mm_action_chip.dart', 'A shortcut that does something at once.', [m.achips(['Greek yogurt', 'Oats'])]),
+        spec('mm-switch-row', 'MmSwitchRow', 'ui/mm_switch_row.dart', 'On and off. Tap the switch.', [m.group([m.row('Let the app estimate', 'Enter one only if you have a recent measurement.', m.sw(true)), m.row('Log food', 'On days with nothing logged yet.', m.sw(false))])]),
+        spec('mm-check-row', 'MmCheckRow', 'ui/mm_check_row.dart', 'Ticked and not. Tap the box.', [m.row('Thyroid condition', '', '', { lead: m.check(true), cls: 'bare' }), m.row('Chronic kidney disease', '', '', { lead: m.check(false), cls: 'bare' })]),
+        spec('mm-slider', 'MmSlider', 'ui/mm_slider.dart', 'Whole steps, with the value spoken.', [m.label('Training days per week: 3'), m.slider(43)]),
+        spec('number-entry-card', 'NumberEntryCard', 'ui/number_entry_card.dart', 'One number and Save: empty, unchanged, changed.', [
+          m.info('Today’s weigh-in', [m.rowx(['<div class="grow">' + m.field('', '', { sfx: 'lb' }) + '</div>', m.btn('Save', 'off')]), m.cap('First thing in the morning, after the bathroom.')]),
+          m.info('Today’s weigh-in', [m.rowx(['<div class="grow">' + m.field('', '172.4', { sfx: 'lb' }) + '</div>', m.btn('Save', 'primary')]), m.cap('First thing in the morning, after the bathroom.')])]),
+        spec('day-stepper', 'DayStepper', 'ui/day_stepper.dart', 'Previous day, the day, next day. Next is off on today.', [
+          m.rowx([m.icobtn('left', 'Previous day'), '<span class="title">Yesterday</span>', m.icobtn('right', 'Next day')]), m.rowx([m.icobtn('left', 'Previous day'), '<span class="title">Today</span>', '<span class="icobtn t3" style="opacity:.5">' + m.i('right') + '</span>'])]),
+        spec('mm-menu-button', 'MmMenuButton and MmMenuItem', 'ui/mm_menu_button.dart, ui/mm_menu_item.dart', 'A row’s edit icon opens a menu of choices; the current one is marked.', [m.rowx(['<span class="grow">Daily activity</span>', m.icobtn('edit', 'Change daily activity', { s: true })]),
+          '<div class="menu">' + ['Mostly seated', 'Light movement', 'On my feet most of the day', 'Physical job'].map(function (t, n) { return '<span>' + (n === 1 ? m.i('check', 's') : '<svg class="i s"></svg>') + t + '</span>'; }).join('') + '</div>'])
+      ] },
+      { h: 'Surfaces, rows and notices', id: 'surfaces', frames: [
+        spec('mm-surface', 'MmSurface', 'ui/mm_surface.dart', 'The plain grouped surface. Kinds: standard and compact.', [m.card([m.p('Standard')]), '<div class="card" style="padding:10px 12px">Compact</div>']),
+        spec('info-card', 'InfoCard', 'ui/info_card.dart', 'A titled surface, with an optional action beside the title.', [m.info('Daily targets', [m.stat('Protein', '159 g'), m.stat('Carbs', '205 g'), m.stat('Fat', '54 g')]), m.info('Weight events', [m.cap('With an action.')], m.btn('Add', 'secondary', { icon: 'plus', sm: true }))]),
+        spec('mm-hero-surface', 'MmHeroSurface', 'ui/mm_hero_surface.dart, ui/hero_backdrop_painter.dart', 'The one hero surface, with its drawn backdrop. Used for the calorie arc (MM-187).', [m.hero({ pct: 27, fig: '1,534', cap: 'kcal left of 2,100', parts: [] })]),
+        spec('notice', 'Notice', 'ui/notice.dart', 'Kinds: info, caution, safeguard. An outline and an icon, never a colored fill. Optional title and actions.', [
+          m.notice('info', 'Waiting for early water changes to settle. Your measurement will use the days after October 18.'), m.notice('caution', 'Your calories are at the lowest level the app will set.', { title: 'Heads up' }),
+          m.notice('safety', 'Please speak with a clinician before changing your intake.', { title: 'Targets are paused.', acts: [m.btn('Review answers', 'secondary', { sm: true })] })]),
+        spec('choice-card', 'ChoiceCard', 'ui/choice_card.dart', 'A choice with a description: unselected, selected, with a badge. Tap to select.', [m.choices([m.choice('Fat loss', 'Lose fat at a steady pace.', { on: true, tag: 'Recommended' }), m.choice('Maintenance', 'Hold where you are.')])]),
+        spec('mm-list-group', 'MmListGroup, MmListRow and GroupHeader', 'ui/mm_list_group.dart, ui/mm_list_row.dart, ui/group_header.dart', 'Rows: a value, a subtitle, a way in, a leading icon, and a destructive row (its icon takes the danger color).', [m.gh('A group of rows'),
+          m.group([m.row('Biological sex', '', 'Female'), m.row('Stored only on this device', 'Nothing is uploaded.', '', { lead: m.i('lock') }), m.row('How this works', '', go), m.row('Erase all data and start over', '', '', { lead: '<span class="lead-danger">' + m.i('trash') + '</span>' })])]),
+        spec('section-label', 'SectionLabel', 'ui/section_label.dart', 'A label over a control inside a form.', [m.label('Resistance training experience')]),
+        spec('stat-row', 'StatRow', 'ui/stat_row.dart', 'A name and its value.', [m.stat('Protein minimum', '131 g'), m.stat('Next check-in', 'Mon, Oct 12')]),
+        spec('status-row', 'StatusRow', 'ui/status_row.dart', 'A one-line state under a surface, with a way into the detail.', [m.rowx(['<span class="c-info">' + m.i('info', 's') + '</span>', '<span class="grow cap">Calibration, day 4 of 14.</span>', '<span class="t3">' + go + '</span>'])]),
+        spec('mm-status-chip', 'MmStatusChip', 'ui/mm_status_chip.dart', 'A short standing: the coach’s confidence, a food’s trust tier.', [m.rowx(['<span class="chip status">Good</span>', '<span class="chip status">Learning</span>', '<span class="chip status">Check this</span>'])]),
+        spec('mm-disclosure', 'MmDisclosure', 'ui/mm_disclosure.dart', 'Closed and open. Tap the title.', [m.disc('What this rests on', [m.stat('Estimate', 'Good'), m.stat('Food log', 'Good')], false), m.disc('What this rests on', [m.stat('Estimate', 'Good'), m.stat('Food log', 'Good')], true)]),
+        spec('demo-notice', 'DemoNotice', 'ui/demo_notice.dart', 'Marks a build running on seeded data.', ['<div class="demo">DEMO · Synthetic data</div>']),
+        spec('download-status-strip', 'DownloadStatusStrip', 'ui/download_status_strip.dart', 'Follows a food database download on every screen.', ['<div class="strip"><div class="rowx"><span class="grow">Downloading food database</span>' + m.btn('Cancel', 'text', { sm: true }) + '</div>' + m.progress(42) + '</div>'])
+      ] },
+      { h: 'Navigation', id: 'navigation', frames: [
+        spec('mm-app-bar', 'MmAppBar', 'ui/mm_app_bar.dart', 'A destination’s bar, a pushed screen’s bar, and the Food bar with its day stepper.', [m.appbar({ title: 'Progress', acts: ['gear'] }), m.appbar({ title: 'Settings', back: true }), m.appbar({ title: 'Today', day: true, dayEnd: true, acts: ['gear'] })]),
+        spec('mm-navigation-bar', 'MmNavigationBar and MmNavDestination', 'ui/mm_navigation_bar.dart, ui/mm_nav_destination.dart', 'Five destinations, Dashboard first (MM-99). The current one is Ember on a neutral indicator, never an Ember tint.', [m.nav('dashboard'), m.nav('progress')])
+      ] },
+      { h: 'Data and progress', id: 'data', frames: [
+        spec('horizon-arc', 'HorizonArc', 'ui/horizon_arc.dart, ui/horizon_arc_painter.dart', 'The one calorie visual (MM-187): empty, part way, full.', ['<div class="hero" style="padding:8px;border:0">' + m.arc(0) + m.arc(27) + m.arc(100) + '</div>']),
+        spec('macro-bar', 'MacroBar', 'ui/macro_bar.dart', 'Amount against target, with the protein minimum marked. Colors differ in lightness as well as hue.', [m.macros()]),
+        spec('macro-figure', 'MacroFigure', 'ui/macro_figure.dart', 'A macro’s color rule, name and amount.', [m.rowx(['protein|Protein|177 g', 'carbs|Carbs|205 g', 'fat|Fat|54 g'].map(function (s) { var p = s.split('|');
+          return '<div class="grow"><div style="height:4px;border-radius:2px;background:var(--' + p[0] + ')"></div><div class="label t2" style="margin-top:8px">' + p[1] + '</div><div class="heading">' + p[2] + '</div></div>'; }))]),
+        spec('metric-facts', 'MetricFacts', 'ui/metric_facts.dart', 'Two or more figures with their names.', [m.rowx(['<div class="grow"><div class="fig" style="font-size:26px">2,298 kcal</div><div class="label t2">Average logged intake</div></div>', '<div class="grow"><div class="fig" style="font-size:26px">30 / 30</div><div class="label t2">Days with intake records</div></div>'], 'top')]),
+        spec('mm-progress-bar', 'MmProgressBar', 'ui/mm_progress_bar.dart', '', [m.progress(42)]),
+        spec('step-progress', 'StepProgress', 'ui/step_progress.dart', 'Where one is in onboarding.', [m.steps(7, 3)]),
+        spec('mm-spinner', 'MmSpinner', 'ui/mm_spinner.dart', 'Still here; it turns in the app.', [m.spinner()]),
+        spec('mini-trend', 'MiniTrend', 'ui/mini_trend.dart, ui/mini_trend_painter.dart', 'A small line for a recovery answer over the last check-ins, with the series spoken.', [m.rowx(['<span class="grow">Hunger</span><span class="t2">3 of 5</span>', m.spark()])]),
+        spec('muscle-volume-row', 'MuscleVolumeRow', 'ui/muscle_volume_row.dart', 'Hard sets this week against the shaded 10–20 reference, with last week’s marker.', [m.col(['<div><b>Back</b> &nbsp; <b>4 hard sets</b></div>', m.cap('Previous: 4 · change: 0'), m.vol(20, 20)], 'gap4')]),
+        spec('strength-trend-card', 'StrengthTrendCard', 'ui/strength_trend_card.dart', 'A lift’s estimated one-rep max over time. Its other states are on the Progress sheet.', [m.info('Back squat', ['<div><div class="fig" style="font-size:26px">319.7 lb</div><div class="cap">Smoothed e1RM · October 5, 2026</div></div>', m.lineChart()])])
+      ] },
+      { h: 'Charts', id: 'charts', frames: [
+        spec('trend-chart', 'TrendChart and TrendStats', 'charts/trend_chart.dart, charts/trend_stats.dart', 'Weigh-ins as dots, the trend as a line, its uncertainty as a band, weight events as dashed markers (MM-17, MM-107).', [
+          m.rowx(['Trend weight|184.1 lb', 'Last 7 days|−0.6 lb', 'Since start|−5.5 lb'].map(function (s) { var p = s.split('|'); return '<div class="grow"><div class="label t2">' + p[0] + '</div><div class="heading">' + p[1] + '</div></div>'; })), m.trend({ event: true })]),
+        spec('history-chart', 'HistoryChart', 'charts/history_chart.dart', 'A recorded series against a dashed reference. A missing day is a gap, never a zero.', [m.bars({ color: 'energy' })]),
+        spec('macro-split-chart', 'MacroSplitChart', 'charts/macro_split_chart.dart', 'The share of recorded macro energy, always with its legend in words.', [m.rowx([m.donut(), m.col(['<div class="c-protein"><b>Protein</b><br>40 g · 28.3%</div>', '<div class="c-carbs"><b>Carbs</b><br>61 g · 43.1%</div>', '<div class="c-fat"><b>Fat</b><br>18 g · 28.6%</div>'])])]),
+        spec('trend-sparkline', 'TrendSparkline', 'charts/trend_sparkline.dart', 'The trend in one small line.', [m.spark()])
+      ] },
+      { h: 'Dialogs and transient messages', id: 'dialogs', frames: [
+        spec('show-mm-confirm', 'showMmConfirm', 'ui/show_mm_confirm.dart', 'Before something destructive. The quiet Cancel is on the left.', ['<div class="dialog"><div class="heading">Erase everything?</div><p class="t2">This permanently deletes your profile, food log, weigh-ins, and targets from this device. It cannot be undone.</p><div class="acts">' + m.btn('Cancel', 'text') + m.btn('Erase', 'primary', { sm: true }) + '</div></div>']),
+        spec('show-mm-choice', 'showMmChoice', 'ui/show_mm_choice.dart', 'A question with two answers.', ['<div class="dialog"><div class="heading">Is this everything you ate today?</div><p class="t2">640 kcal is logged. If food is missing, mark the day partial so the coach does not read it as a full day.</p><div class="acts">' + m.btn('Mark partial', 'text') + m.btn('Yes', 'primary', { sm: true }) + '</div></div>']),
+        spec('show-mm-options', 'showMmOptions', 'ui/show_mm_options.dart', 'One of a short list; the current one is marked Chosen.', ['<div class="dialog"><div class="heading">Rest target</div>' + ['None', '1:30', '2:00'].map(function (t) { return '<div class="row bare"><div class="main">' + t + '</div>' + (t === '2:00' ? '<div class="trail">' + m.i('check', 's') + '</div>' : '') + '</div>'; }).join('') + '</div>']),
+        spec('mm-clock-time-dialog', 'MmClockTimeDialog and showMmClockTime', 'ui/mm_clock_time_dialog.dart, ui/show_mm_clock_time.dart', 'A time to the second, typed. Valid and refused.', ['<div class="dialog"><div class="heading">Set started</div>' +
+          m.rowx(['<div class="grow">' + m.field('Hour', '11') + '</div>', '<div class="grow">' + m.field('Min', '75', { err: true }) + '</div>', '<div class="grow">' + m.field('Sec', '05') + '</div>']) + '<div class="helper err">The minute is from 0 to 59.</div>' + m.seg(['AM', 'PM'], 0) + '<div class="acts">' + m.btn('Cancel', 'text') + m.btn('OK', 'primary', { sm: true }) + '</div></div>']),
+        spec('show-mm-time-picker', 'showMmTimePicker', 'ui/show_mm_time_picker.dart', 'Opens the phone’s own time picker in the app’s theme. The picker belongs to the platform and is not drawn.', [m.row('At 7:30 AM', '', m.i('edit', 's'), { cls: 'bare' })]),
+        spec('show-mm-snack-bar', 'showMmSnackBar', 'ui/show_mm_snack_bar.dart', 'A short message at the bottom, with an optional action. A new one replaces the last.', ['<div class="snack" style="position:static"><span>Removed Demo oats and yogurt</span><b>Undo</b></div>', '<div class="snack" style="position:static"><span>That value looks off. Check it.</span></div>'])
+      ] }
+    ]
+  });
+})(mm);
+</script>
+</body>
+</html>

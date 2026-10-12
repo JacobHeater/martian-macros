@@ -110,3 +110,11 @@ Not built:
 - Until the training log exists (MM-75) the strength signal is absent and the table reduces to waist and weight. The review must say that
   strength is the missing piece.
 - Shares its definition of "no clear change" with the stall diagnosis (MM-140), which covers fat loss.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-recomp-review) — Current.
+  Draws RecompReviewBody and RecompReviewCard as built on 2026-10-11: one
+  verdict, shown. Drawn from the source alone; not compared with the running
+  app. One of the verdicts is drawn. It shows what exists and approves
+  nothing.

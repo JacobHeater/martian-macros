@@ -74,3 +74,15 @@ Not built:
 - Adherence is shown as counts and protein; the report does not repeat the adherence summary's intake-against-target line, because
   that wording is for a week and the report restates nothing it can avoid.
 - Not checked on a device.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html) — Current. Draws
+  MonthlyReportScreen and ReportsCard as built on 2026-10-11: populated, thin
+  month, not ready, one report. Frames: `#monthly-report`, `#coach-default`.
+  Drawn from the source alone; not compared with the running app. It shows
+  what exists and approves nothing.
+- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-report-ready) —
+  Current. Draws ReportReadyNotice as built on 2026-10-11: shown. Drawn from
+  the source alone; not compared with the running app. It shows what exists
+  and approves nothing.

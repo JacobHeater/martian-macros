@@ -124,3 +124,15 @@ Scenario: Reporting a later creatine change
   rise also moves the trend less when declared than when unmarked.
 - Validation currently covers deterministic scenarios, not population-level event calibration. MM-139's synthetic population checks
   for confidence/next-step boundaries remain separate.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html) — Current. Draws
+  WeightEventEntrySheet and WeightEventsCard as built on 2026-10-11: open,
+  populated, empty, third event. Frames: `#progress-event-sheet`,
+  `#progress-default`. Compared with a screenshot test of the built screen. It
+  shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#weigh-in-and-trend) — Current.
+  Draws the "a weigh-in, a weight event and a waist measurement" path as built
+  on 2026-10-11. Drawn from the source alone; not compared with the running
+  app. It shows what exists and approves nothing.

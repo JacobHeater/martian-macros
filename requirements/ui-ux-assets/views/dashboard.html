@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Martian Macros UI reference</title>
+<link rel="stylesheet" href="../shared/mm.css">
+<script src="../shared/mm.js"></script>
+</head>
+<body>
+<script>
+(function (m) {
+  var bar = { title: 'Today', acts: ['gear'] };
+  var hero = m.hero({ pct: 27, fig: '1,534', cap: 'kcal left of 2,100', parts: [
+    m.macros(), m.hr(),
+    m.rowx([m.i('info') .replace('class="i ', 'class="i c-info '), '<span class="grow t2">Targets went down 100 kcal on Today.</span>', m.i('right')]),
+    '<span class="chip status" style="align-self:flex-start">Good</span>'
+  ] });
+  var split = m.info('Macronutrient split', [
+    m.rowx([m.donut(), m.col([
+      '<div class="c-protein"><b>Protein</b><br>40 g · 28.3%</div>',
+      '<div class="c-carbs"><b>Carbs</b><br>61 g · 43.1%</div>',
+      '<div class="c-fat"><b>Fat</b><br>18 g · 28.6%</div>'])]),
+    m.cap('566 kcal from recorded macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol and other calorie differences are not part of this split.')
+  ]);
+  var weigh = m.info('Today’s weigh-in', [
+    m.rowx(['<div class="grow">' + m.field('', '183.9', { sfx: 'lb' }) + '</div>', m.btn('Save', 'off')]),
+    m.cap('First thing in the morning, after the bathroom.')
+  ]);
+  var logging = m.info('Your logging', [m.p('9 whole days logged in a row. A missed day is forgiven, once a week.')]);
+  function facts(a, al, b, bl) {
+    return m.rowx(['<div class="grow"><div class="fig" style="font-size:26px">' + a + '</div><div class="label t2">' + al + '</div></div>',
+      '<div class="grow"><div class="fig" style="font-size:26px">' + b + '</div><div class="label t2">' + bl + '</div></div>'], 'top');
+  }
+  var metricsHead = m.col([m.heading('Your metrics'), m.seg(['7 days', '30 days'], 1)]);
+  var nutrition = m.info('Nutrition history', [
+    facts('2,298 kcal', 'Average logged intake', '30 / 30', 'Days with intake records'),
+    m.cap('● Logged intake &nbsp; – – Target in force'), m.bars({ color: 'energy' }),
+    m.p('Missing logs are gaps, not zero intake. Averages use recorded days, including today’s unfinished log.')
+  ], m.btn('Food details', 'text', { sm: true }));
+  var protein = m.info('Protein history', [
+    facts('156 g', 'Average logged protein', '30', 'Recorded days used'),
+    '<p class="cap"><span class="c-protein">● Logged protein</span> &nbsp; – – Minimum / target</p>', m.bars({ color: 'protein', top: '189' })
+  ]);
+  var weight = m.info('Weight trend &amp; uncertainty', [m.trend(),
+    m.p('lb · Dots are measurements; the line is the estimated trend. The band shows uncertainty.')], m.btn('Progress', 'text', { sm: true }));
+  var waist = m.info('Waist history', [facts('35.8 in', 'Latest in range', '5', 'Measurements'),
+    '<p class="cap c-carbs">● Recorded waist</p>', m.lineChart({ label: 'Recorded waist over the range' })]);
+  var coverage = m.info('Logging coverage', [
+    facts('30 / 30', 'Food days recorded', '26 / 30', 'Days marked complete'), facts('28 / 30', 'Weigh-in days', '30 days', 'Window'),
+    m.cap('Counts describe available records, not a score. Paused days and days before onboarding are excluded.')
+  ]);
+  var coach = m.info('Coach &amp; expenditure', [
+    facts('Good', 'Coach confidence', '2,542–2,733 kcal', 'Measured expenditure range'),
+    facts('Good', 'Food log evidence', 'Good', 'Weight evidence'),
+    m.p('Keep logging food and weight consistently; that will make the estimate firmer.'),
+    '<p class="cap c-ion">● Measured estimates at check-ins</p>', m.lineChart({ label: 'Measured expenditure at each check-in' }),
+    m.p('Check-in estimates are not daily expenditure measurements.')
+  ], m.btn('Coach details', 'text', { sm: true }));
+  var holding = m.info('How you are holding up', ['Hunger', 'Energy', 'Sleep', 'Training', 'Mood'].map(function (q, n) {
+    return m.rowx(['<span class="grow">' + q + '</span><span class="t2">' + [3, 4, 3, 4, 4][n] + ' of 5</span>', m.spark()]);
+  }).concat([m.cap('Recovery observations: Aug 10–Oct 5. Each line is a separate answer, not a combined score.')]));
+
+  m.page({
+    title: 'Dashboard',
+    intro: 'The first destination. It sums up today and the recent record, and links out to Food, Progress and Coach.',
+    sources: ['apps/mobile/lib/src/dashboard/', 'apps/mobile/lib/src/app/home_shell_state.dart', 'apps/mobile/lib/src/food/calorie_hero.dart'],
+    tickets: ['MM-98', 'MM-99', 'MM-100', 'MM-176', 'MM-41', 'MM-92'],
+    limits: 'Chart shapes are schematic, not plotted from data. The order of cards follows the source; the screenshot tests show only parts of this long page.',
+    sections: [
+      { h: 'Default', frames: [
+        m.frame('dashboard-default', 'Today, with targets', 'Top of the page: calorie hero, coach line, confidence chip, macro split, weigh-in, and the logging streak (shown only once there is one).',
+          m.phone({ bar: bar, nav: 'dashboard', fab: 'Add food', body: [hero, split, weigh, logging] })),
+        m.frame('dashboard-metrics', 'Your metrics', 'Below the fold. The 7 / 30 day switch applies to every card under it.',
+          m.phone({ bar: bar, nav: 'dashboard', fab: 'Add food', body: [metricsHead, nutrition, protein, weight, waist, coverage, coach, holding] }))
+      ] },
+      { h: 'Other states', frames: [
+        m.frame('dashboard-first-day', 'Before the first weigh-in', 'No targets yet; the hero has nothing to count against.',
+          m.phone({ bar: bar, nav: 'dashboard', fab: 'Add food', body: [
+            m.hero({ pct: 0, fig: '0', cap: 'kcal logged', parts: [m.hr(), m.rowx([m.i('info'), '<span class="grow t2">Targets arrive with your first weigh-in.</span>'])] }),
+            m.info('Today’s weigh-in', [m.rowx(['<div class="grow">' + m.field('', '', { sfx: 'lb' }) + '</div>', m.btn('Save', 'off')]), m.cap('First thing in the morning, after the bathroom.')]),
+            m.info('Your history', [m.p('Log food to populate your intake history.'), m.btn('Add food', 'secondary')])] })),
+        m.frame('dashboard-calibration', 'Calibration', 'The coach line during the first two weeks.',
+          m.phone({ cls: 'short', bar: bar, body: [m.hero({ pct: 40, fig: '1,260', cap: 'kcal left of 2,100', parts: [m.macros(), m.hr(),
+            m.rowx([m.i('tune'), '<span class="grow t2">Calibration, day 4 of 14. Targets hold while the app learns your metabolism.</span>', m.i('right')])] })] })),
+        m.frame('dashboard-over', 'Over the target', 'Stated in the normal text color, never red (MM-102, MM-108).',
+          m.phone({ cls: 'short', bar: bar, body: [m.hero({ pct: 100, fig: '180', cap: 'kcal over 2,100', parts: [m.macros({ protein: '170 g · min 131 · target 163', carbs: '250 / 230 g', fat: '70 / 58 g', pcts: [100, 100, 100] })] })] })),
+        m.frame('dashboard-paused', 'Paused', 'Targets become a guide and nothing is judged.',
+          m.phone({ cls: 'short', bar: bar, body: [
+            m.notice('info', 'Targets are on hold and no check-in runs. A maintenance guide is 2,600 kcal a day. Log or weigh in if you like; nothing is counted against you.', { id: 'pause-banner', title: 'Paused until Oct 12', acts: [m.btn('Manage pause', 'text', { sm: true })] }),
+            m.hero({ pct: 22, fig: '566', cap: 'kcal logged · paused, guide 2,600', parts: [m.macros({ noMark: true })] }),
+            m.cap('Paused until Monday, Oct 12. Nothing is counted against you.')] })),
+        m.frame('dashboard-report-ready', 'A monthly report is ready', 'Shown once per report, above the hero.',
+          m.phone({ cls: 'short', bar: bar, body: [m.notice('info', 'See what you did, what your body did and what the coach measured.', { title: 'A new monthly report is ready', acts: [m.btn('Open the report', 'text', { sm: true })] })] })),
+        m.frame('dashboard-loading', 'Loading', '',
+          m.phone({ cls: 'short', bar: bar, body: [m.spinner(), m.p('Loading your Dashboard…', 't2 center')] })),
+        m.frame('dashboard-error', 'Records could not be loaded', 'Each failed read has its own caution notice.',
+          m.phone({ cls: 'short', bar: bar, body: [
+            m.notice('caution', 'Dashboard records could not be loaded. Reopen the app to retry.'),
+            m.notice('caution', 'Your profile could not be loaded. Reopen the app to retry.'),
+            m.notice('caution', 'Dashboard history could not be loaded. Reopen the app to retry.')] }))
+      ] }
+    ]
+  });
+})(mm);
+</script>
+</body>
+</html>

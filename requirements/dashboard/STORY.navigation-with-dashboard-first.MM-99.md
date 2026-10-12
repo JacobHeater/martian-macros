@@ -61,3 +61,19 @@ Scenario: Keeping place
 - Navigation is Dashboard, Food, Progress, Coach (`MmNavigationBar`), opening on Dashboard; selection lives in `homeTabProvider`. Today was renamed Food (`apps/mobile/lib/src/food/`). Each destination keeps
   its state (`IndexedStack`). Settings stays behind the gear. Train is not added (no training log yet).
 - Tests: `dashboard_test.dart` (opens on the dashboard, four labelled destinations, drill-in) and the updated `app_test.dart`.
+
+## UI/UX Assets
+
+- [Flows](../ui-ux-assets/flows/index.html#navigation-map) — Current. Draws
+  HomeShell and the "how the five destinations and Settings connect" path as
+  built on 2026-10-11: five destinations. Partly compared with screenshot
+  tests, the rest drawn from the source alone. Drawn as the bottom bar on
+  every destination sheet. It shows what exists and approves nothing.
+- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-default) —
+  Current. Draws DashboardScreen as built on 2026-10-11: populated, first day,
+  calibration, over target, paused, loading, error. Compared with a screenshot
+  test of the built screen. It shows what exists and approves nothing.
+- [Component catalog](../ui-ux-assets/components/index.html#mm-navigation-bar)
+  — Current. Draws MmNavigationBar as built on 2026-10-11: each destination
+  current. Compared with a screenshot test of the built screen. It shows what
+  exists and approves nothing.

@@ -82,3 +82,10 @@ Scenario: Too few weigh-ins
   trend still moves as weigh-ins arrive, so near 0.5% the card can come and go; waist also moves with the menstrual cycle.
 - Depends on the training log for strength (MM-77). A first version on weight and waist alone is possible and weaker.
 - The thresholds need checking against the measurement noise of a tape (about 0.5 to 1 cm), or the card will flicker.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-recomp-close) —
+  Current. Draws RecompSignalCard as built on 2026-10-11: signal, close to
+  one. Drawn from the source alone; not compared with the running app. It
+  shows what exists and approves nothing.

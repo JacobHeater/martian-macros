@@ -55,6 +55,17 @@ delegation and sequential fallback do not supersede the working agreements here.
   nothing about the app. The convention is in
   [requirements/ui-ux-assets/README.md](requirements/ui-ux-assets/README.md);
   `mm req` checks the bookkeeping.
+- Every view and reusable component has an HTML drawing (MM-211). The
+  library at `requirements/ui-ux-assets/index.html` draws the app as built,
+  and `coverage.json` beside it lists every widget file with the frame that
+  draws it. When you add a view, a component, a sheet or a dialog, draw it
+  with its states, add its manifest entry and link the sheet from its
+  tickets, in the same pull request; when you change how one looks or
+  behaves, change its drawing with it; when you remove one, remove its
+  frames and its entry. `mm req` fails on a widget file the manifest does
+  not list. A `Current` sheet shows what is built and nothing else: a
+  redesign goes on its own sheet, marked as a proposal, and a broken screen
+  is drawn broken and given a bug ticket.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
@@ -88,7 +99,7 @@ delegation and sequential fallback do not supersede the working agreements here.
   package while another failed.
 - A change to how a screen looks is not done until you have looked at it on the
   emulator (or say plainly that you did not). How the app looks matters as much
-  as what it does.
+  as what it does. Its HTML drawing is looked at in a browser too (MM-211).
 - Check a new native plugin with a release build, not only a debug one.
 - Bugs found in passing still follow the rule above; the owner will walk
   through bugs and regressions at acceptance testing at the end, and until then

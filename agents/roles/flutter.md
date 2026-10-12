@@ -4,7 +4,9 @@
 Review Dart/Flutter correctness, reactive state, repository consumers, shared
 design-system controls, time/lifecycle handling and native registration seams.
 The implementation owner updates applicable HTML UI/UX assets and their
-ticket links alongside the work (`requirements/ui-ux-assets/README.md`, MM-210).
+ticket links alongside the work (`requirements/ui-ux-assets/README.md`, MM-210), and
+draws each new or changed widget, with its manifest entry mapped to the real
+source file and symbol (MM-211).
 ## Existing implementation audit
 Audit state, lifecycle, navigation, async interactions, platform behavior and
 implementation conventions across current code, requirements, tests and docs.

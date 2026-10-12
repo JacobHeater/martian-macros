@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Martian Macros UI/UX reference library</title>
+<link rel="stylesheet" href="shared/mm.css">
+<style>
+  main { max-width: 980px; margin: 0 auto; }
+  main h2 { font: 600 18px/1.3 "SpaceGrotesk", "Inter", system-ui, sans-serif; margin: 28px 0 8px; }
+  main a { color: #1C3FAA; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .grid > a { display: block; background: #fff; border: 1px solid #CBD3E3; border-radius: 12px; padding: 14px 16px; text-decoration: none; color: #141824; }
+  .grid > a b { display: block; font-size: 16px; color: #1C3FAA; margin-bottom: 4px; }
+  .grid > a span { color: #3C465C; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; background: #fff; }
+  th, td { border: 1px solid #CBD3E3; padding: 6px 10px; text-align: left; vertical-align: top; font-size: 13px; }
+</style>
+</head>
+<body class="sheet">
+<header class="sheet-head">
+  <h1>Martian Macros UI/UX reference library</h1>
+  <p><span class="sheet-status">Current</span>Every view and reusable component of the app as built, drawn as HTML with its states (MM-211). Drawn on 2026-10-11 from the source and the screenshot tests.</p>
+  <p>These sheets show what exists. They approve nothing, they are not the app, and where a sheet and a requirement disagree the requirement stands. Each sheet says what limits it.</p>
+</header>
+<main>
+  <h2>Views</h2>
+  <div class="grid">
+    <a href="views/dashboard.html"><b>Dashboard</b><span>Today, your metrics, and its states: first day, calibration, over target, paused, loading, error.</span></a>
+    <a href="views/food.html"><b>Food</b><span>The day’s log: hero, macro split, meals, completeness, past days.</span></a>
+    <a href="views/add-food.html"><b>Add food sheet</b><span>Typing, searching, amounts, scanning, estimating, saved foods, recipes, editing an entry.</span></a>
+    <a href="views/train.html"><b>Train</b><span>Train, a workout with its clock and timers, the exercise picker, your own exercise, suggestions, weekly volume, workout times.</span></a>
+    <a href="views/progress.html"><b>Progress</b><span>Weigh-in, trend, weight events, waist, recomp signal, strength trends, lift histories.</span></a>
+    <a href="views/coach.html"><b>Coach</b><span>Targets, the explanation sheet, the cards that appear when they apply, target history, monthly report, recovery check-in.</span></a>
+    <a href="views/settings.html"><b>Settings</b><span>Settings and what opens from it: health check, pause, how this works, food database, component gallery.</span></a>
+    <a href="views/onboarding.html"><b>First launch and gates</b><span>Theme chooser, onboarding, adults only, the repeated health check, welcome back, loading and failure.</span></a>
+  </div>
+
+  <h2>Components</h2>
+  <div class="grid">
+    <a href="components/index.html"><b>Component catalog</b><span>Every component in the design system and every chart, each with its states and a stable address.</span></a>
+    <a href="components/index.html#tokens"><b>Tokens</b><span>Colors by meaning in all three themes, type roles, radii and spacing.</span></a>
+    <a href="components/index.html#dialogs"><b>Dialogs and messages</b><span>Confirm, choice, options, the time dialog, snack bars.</span></a>
+  </div>
+
+  <h2>Flows</h2>
+  <div class="grid">
+    <a href="flows/index.html"><b>Flows and navigation map</b><span>First launch, opening the app later, logging a food, weighing in, logging a workout, the weekly check-in, pause and return.</span></a>
+  </div>
+
+  <h2>Earlier design sheets</h2>
+  <div class="grid">
+    <a href="palette-preview.html"><b>Palette preview</b><span>Accepted. The sheet in which the owner approved the palette (MM-102, MM-184). A proposal sheet, not a drawing of the built app.</span></a>
+  </div>
+
+  <h2>Coverage</h2>
+  <p><a href="coverage.json">coverage.json</a> lists every widget file in <code>apps/mobile/lib/src</code> with the frame that draws it, the states drawn, its requirements, how it was checked and what limits it. <code>mm req</code> fails when a widget file is missing from it, when an entry names a file or a frame that does not exist, or when an entry is incomplete.</p>
+  <table>
+    <tr><th>Checked how</th><th>Means</th></tr>
+    <tr><td><code>screenshot-compared</code></td><td>Drawn from the source and compared by eye with a screenshot test of the built screen.</td></tr>
+    <tr><td><code>source-only</code></td><td>Drawn from the source. No screenshot test covers it, or it was not compared. Layout is approximate.</td></tr>
+    <tr><td><code>not-drawn</code></td><td>Has no surface of its own, or belongs to the phone. The entry says which.</td></tr>
+  </table>
+
+  <h2>Reading the sheets</h2>
+  <p>Open this file in a browser; nothing is fetched and no build is needed. The app’s two fonts are read from <code>apps/mobile/assets/fonts/</code>, so keep the library inside the repository; without them the system font is used. If your browser refuses local fonts or scripts from a file, serve the repository instead: <code>python -m http.server</code> in the repository root, then open <code>/requirements/ui-ux-assets/</code>.</p>
+  <p>On every sheet the Theme switch redraws it in Martian, Dark or Light, and the Text switch enlarges it (approximately: the whole frame scales, where the app scales only text). Segments, chips, switches, check boxes, choice cards and folded sections answer a tap; some frames open a sheet or a dialog. Numbers are made-up fixture data, and nothing is calculated.</p>
+  <p>The convention, and what to do when a view or component is added or changed, is in <a href="README.md">README.md</a>.</p>
+</main>
+</body>
+</html>

@@ -117,3 +117,10 @@ Not built:
 - **Hiding weight** (MM-118) and an action attached to an insight.
 - "Forbidden subjects" is tested on the five rules' words with representative figures, not by running every rule against every
   simulated user.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-insight) — Current. Draws
+  InsightCard as built on 2026-10-11: collapsed, dismissible. Drawn from the
+  source alone; not compared with the running app. Two of the five rules are
+  drawn. It shows what exists and approves nothing.

@@ -87,3 +87,14 @@ Not built:
 - **The weekly and monthly summaries** (MM-33) do not mention the streak yet.
 - A streak is computed from the last 60 days of food, so it cannot read past 60.
 - Not checked on a device.
+
+## UI/UX Assets
+
+- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-default) —
+  Current. Draws ProcessCard as built on 2026-10-11: a streak. Drawn from the
+  source alone; not compared with the running app. Hidden when there is no
+  streak. It shows what exists and approves nothing.
+- [Train](../ui-ux-assets/views/train.html#workout-default) — Current. Draws
+  WorkoutScreen as built on 2026-10-11: in progress, new, finished with a
+  record, delete confirm. Compared with a screenshot test of the built screen.
+  It shows what exists and approves nothing.
