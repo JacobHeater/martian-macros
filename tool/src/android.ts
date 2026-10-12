@@ -261,6 +261,51 @@ export async function runDemo(repoRoot: string, args: readonly string[]): Promis
   return installAndLaunch(repoRoot, device);
 }
 
+/**
+ * `mm screenshot [-d DEVICE] [path]`: a device's screen as a PNG (MM-238).
+ * Captured on the device and pulled, never redirected through the shell,
+ * which corrupts binary output in PowerShell 5.1. With no `-d` the one
+ * physical phone wins over an emulator.
+ */
+export async function runScreenshot(args: readonly string[]): Promise<number> {
+  let device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  const out = args.filter((arg, at) => !arg.startsWith('-') && args[at - 1] !== '-d');
+  try {
+    if (device === undefined) {
+      const ids = await deviceIds();
+      device = ids.some((id) => !id.startsWith('emulator-')) ? physicalAndroidDeviceId(ids) : ids.length === 1 ? ids[0] : undefined;
+      if (device === undefined) {
+        stderr.write(
+          ids.length === 0
+            ? 'No device is connected.\n'
+            : `More than one device is connected: ${ids.join(', ')}. Choose one with -d DEVICE.\n`,
+        );
+        return 69;
+      }
+    }
+    const stamp = new Date().toISOString().slice(0, 19).replaceAll(/[-:]/g, '').replace('T', '-');
+    const path = out[0] ?? `mm-screenshot-${stamp}.png`;
+    const onDevice = `/sdcard/mm-screenshot-${stamp}.png`;
+    for (const step of [
+      [adbPath(), '-s', device, 'shell', 'screencap', '-p', onDevice],
+      [adbPath(), '-s', device, 'pull', onDevice, path],
+      [adbPath(), '-s', device, 'shell', 'rm', onDevice],
+    ]) {
+      const result = await capture(step);
+      if (result.code === 127) throw adbMissing();
+      if (result.code !== 0) {
+        stderr.write(`${result.stderr.trim() || result.stdout.trim() || 'adb failed'}\n`);
+        return 1;
+      }
+    }
+    stdout.write(`${device} -> ${path}\n`);
+    return 0;
+  } catch (error) {
+    stderr.write(`${error instanceof Error ? error.message : error}\n`);
+    return 69;
+  }
+}
+
 /** Removes build outputs and caches. */
 export function runClean(repoRoot: string): number {
   for (const path of [`${webApp}/dist`, `${androidDir}/app/build`, `${androidDir}/build`, `${androidDir}/.gradle`]) {

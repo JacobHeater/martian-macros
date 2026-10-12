@@ -36,6 +36,7 @@ Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
 | `mm run [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator |
 | `mm demo -d <Android device ID>` | The isolated DEMO app on an exact device |
+| `mm screenshot [-d DEVICE] [path]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's) |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android [--release]` | Builds the web app, syncs the shell and assembles the APK |
 | `mm food fetch\|build\|package` | Builds the food packs (MM-52); `build` needs DuckDB on PATH |
