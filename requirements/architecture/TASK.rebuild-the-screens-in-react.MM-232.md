@@ -113,6 +113,15 @@ Chrome: the database opens and the theme chooser draws as it should.
 are placeholders; and the app keeps its data in memory, so **nothing
 survives closing it** until the native adapter exists (MM-231).
 
+**4. The charts (2026-10-12).** `apps/web/src/charts/`: the history chart,
+the weight trend with its band and event marks, the sparkline, the trend
+figures, the macronutrient split and the small trend line, drawn as SVG
+here with no chart library. `DashboardHistory` (the facts the dashboard
+charts) is carried over with its 8 tests. 23 tests in all; the Flutter
+macro-split tests are carried over. Looked at in the gallery in three
+palettes. One difference from Flutter: the trend line joins its points with
+straight segments, where Flutter's chart library curved them.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
