@@ -3,6 +3,7 @@ import { SystemClock } from '../domain/integration/SystemClock';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
+import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../state/AppServices';
 
@@ -41,5 +42,6 @@ export async function openAppServices(): Promise<AppServices> {
     catalog: constant(new FoodCatalog([])),
     barcodeScanner: camera,
     labelReader: camera,
+    restSignal: new VibratingRestSignal(),
   };
 }

@@ -27,6 +27,7 @@ import { analyze } from '../engine/analyze';
 import { assessStall } from '../engine/assessStall';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
 import { buildStrengthTrends } from '../engine/buildStrengthTrends';
+import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
@@ -41,6 +42,8 @@ import type { MonthlyReport } from '../engine/MonthlyReport';
 import { openGap } from '../engine/openGap';
 import { pausedDaysBetween } from '../engine/pausedDaysBetween';
 import { pausedGuide } from '../engine/pausedGuide';
+import type { PersonalRecord } from '../engine/PersonalRecord';
+import { personalRecordsOf } from '../engine/personalRecordsOf';
 import { pauseOn } from '../engine/pauseOn';
 import { pauseToResume } from '../engine/pauseToResume';
 import { planReminders } from '../engine/planReminders';
@@ -62,6 +65,7 @@ import { summarizeAdherence } from '../engine/summarizeAdherence';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
 import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
+import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
@@ -290,6 +294,12 @@ export class AppState {
 
   /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
   readonly recompSignal: Cell<RecompSignal | undefined>;
+
+  /** Personal records by the id of the workout that set them (MM-92). Empty while the strength history loads. */
+  readonly personalRecords: Cell<ReadonlyMap<number, readonly PersonalRecord[]>>;
+
+  /** Hard sets for each muscle group, this week and last. Failed when a logged set cannot be worked out. */
+  readonly weeklyVolume: Cell<Loadable<WeeklyVolume>>;
 
   /** How many days of history the Dashboard shows. */
   readonly dashboardRange = new ValueCell(30);
@@ -708,7 +718,30 @@ export class AppState {
       });
     });
 
+    this.personalRecords = derived<ReadonlyMap<number, readonly PersonalRecord[]>>(() =>
+      personalRecordsOf(of(this.strengthTrends) ?? []),
+    );
+
+    this.weeklyVolume = derived<Loadable<WeeklyVolume>>(() => {
+      const sources: Loadable<unknown>[] = [this.workouts.value, this.customExercises.value];
+      for (const source of sources) if (!source.ready && 'error' in source) return Loadable.failed(source.error);
+      const workouts = of(this.workouts);
+      if (workouts === undefined || of(this.customExercises) === undefined) return Loadable.loading;
+      try {
+        return Loadable.of(buildWeeklyVolume({ workouts, exercises: this.exercises.value, today: this.today.value }));
+      } catch (error) {
+        return Loadable.failed(error);
+      }
+    });
+
     this.checkIn = this.makeCheckIn();
+  }
+
+  /** Reads again what the weekly volume is worked out from, after a read went wrong. */
+  retryWeeklyVolume(): void {
+    for (const cell of [this.workouts, this.customExercises]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
   }
 
   /** Reads again what the strength trends are worked out from, after a read went wrong. */

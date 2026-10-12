@@ -2,13 +2,13 @@ import { HomeDestination } from '../state/HomeDestination';
 import { MmAppBar } from '../ui/MmAppBar';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmNavigationBar } from '../ui/MmNavigationBar';
-import { MmSurface } from '../ui/MmSurface';
 import { CoachScreen } from '../coach/CoachScreen';
 import { useTargetChangeSummaries } from '../coach/useTargetChangeSummaries';
 import { DashboardScreen } from '../dashboard/DashboardScreen';
 import { FoodDayHeader } from '../food/FoodDayHeader';
 import { FoodScreen } from '../food/FoodScreen';
 import { ProgressScreen } from '../progress/ProgressScreen';
+import { TrainScreen } from '../train/TrainScreen';
 import { showAddFoodSheet } from '../food/showAddFoodSheet';
 import { useShownDay } from '../food/useShownDay';
 import { MmButton } from '../ui/MmButton';
@@ -23,8 +23,7 @@ import './app.css';
 
 /**
  * The frame every destination sits in (MM-90, MM-99): its name and the way
- * to Settings above, the five destinations below. A destination that is
- * not rebuilt yet says so.
+ * to Settings above, the five destinations below.
  */
 export function HomeShell() {
   const { state } = useApp();
@@ -63,12 +62,10 @@ export function HomeShell() {
           <FoodScreen />
         ) : current === 'progress' ? (
           <ProgressScreen />
-        ) : current === 'coach' ? (
-          <CoachScreen />
+        ) : current === 'train' ? (
+          <TrainScreen />
         ) : (
-          <MmSurface>
-            <p className="app-empty">{HomeDestination.label(current)} is not rebuilt yet.</p>
-          </MmSurface>
+          <CoachScreen />
         )}
       </main>
       {current === 'food' ? (

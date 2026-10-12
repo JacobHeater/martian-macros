@@ -1,0 +1,433 @@
+import { screen, within } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
+import { Workout } from '../../src/domain/training/Workout';
+import { WorkoutExercise } from '../../src/domain/training/WorkoutExercise';
+import { WorkoutSet } from '../../src/domain/training/WorkoutSet';
+import { FixedClock } from '../../src/fixtures/FixedClock';
+import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
+import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { renderApp } from '../support/renderApp';
+import { enterClock, enterDate, enterTime, minutes, pass, seconds, settle, user, withTimersInHand } from '../support/time';
+import {
+  addSet,
+  choose,
+  layer,
+  openTrain,
+  pressInSet,
+  setEditor,
+  startWorkout,
+  storedWorkouts,
+  typeInSet,
+  workoutRows,
+} from '../support/train';
+
+/**
+ * MM-191: a workout's times set by hand, its running clock, and the set
+ * and rest timers. Carried over from workout_times_test.dart.
+ */
+const today = CalendarDate.of(2026, 10, 5);
+const noon = new Date(2026, 9, 5, 12);
+const after = (ms: number) => new Date(noon.getTime() + ms);
+let repos: InMemoryRepositories;
+let clock: FixedClock;
+
+withTimersInHand();
+
+beforeEach(async () => {
+  repos = new InMemoryRepositories();
+  await repos.preferences.saveThemePreference('martian');
+  await repos.setup.saveSetup(
+    typicalSetup({ onboardedOn: today.addDays(-40), healthCheckConfirmedOn: today }).copyWith({ unitSystem: 'metric' }),
+  );
+  await repos.weights.saveWeight(today, 82);
+});
+
+const stored = () => storedWorkouts(repos);
+const only = async () => {
+  const workouts = await stored();
+  expect(workouts).toHaveLength(1);
+  return workouts[0] as Workout;
+};
+const onlySet = async () => (await only()).exercises[0]?.sets[0];
+
+/** Lets time pass on the app's clock and the displays tick once. */
+const wait = (ms: number) => pass(clock, ms, 1000);
+
+async function open() {
+  const view = renderApp(repos, today);
+  clock = view.clock;
+  await openTrain();
+  return view;
+}
+
+/** A workout in progress with a back squat in it. */
+async function startSquats(): Promise<void> {
+  await open();
+  await startWorkout(user);
+  await choose('Back squat', undefined, user);
+}
+
+async function press(name: string | RegExp): Promise<void> {
+  await user.click(layer().getByRole('button', { name }));
+  await settle();
+}
+
+async function add(): Promise<void> {
+  await addSet(0, user);
+  await settle();
+}
+
+const elapsed = () => layer().getByText(/^\d+:\d\d(:\d\d)?$/, { selector: '.train-clock-time' }).textContent;
+const clockLines = () => [...document.querySelectorAll('.app-layer:not([hidden]) .train-clock-line')].map((line) => line.textContent);
+const timerLabel = () => document.querySelector('.train-timer-label')?.textContent;
+const timerTime = () => document.querySelector('.train-timer-time')?.textContent;
+const timerButton = () => document.querySelector<HTMLButtonElement>('.train-timer button') as HTMLButtonElement;
+
+async function pressTimer(): Promise<void> {
+  await user.click(timerButton());
+  await settle();
+}
+
+const saveFinished = () =>
+  repos.workouts.saveWorkout(
+    new Workout({
+      id: 0,
+      date: today.addDays(-1),
+      startedAt: new Date(2026, 9, 4, 18),
+      endedAt: new Date(2026, 9, 4, 18, 50),
+      exercises: [new WorkoutExercise({ exerciseId: 'back-squat', sets: [new WorkoutSet({ reps: 8, loadKg: 100 })] })],
+    }),
+  );
+
+async function openFinished(): Promise<void> {
+  await open();
+  await user.click(workoutRows()[0] as HTMLElement);
+  await layer().findByRole('heading', { name: 'Back squat' });
+}
+
+describe('the workout clock', () => {
+  it('runs while a workout is in progress', async () => {
+    await startSquats();
+    expect(elapsed()).toBe('0:00');
+    await wait(minutes(12) + seconds(5));
+    expect(elapsed()).toBe('12:05');
+    expect(clockLines()).toEqual(['Started 12:00 PM']);
+  });
+
+  it('can be started again from now', async () => {
+    await startSquats();
+    await wait(minutes(20));
+    await press('Edit times');
+    await press('Start the clock again from now');
+    const workout = await only();
+    expect(workout.startedAt).toEqual(after(minutes(20)));
+    expect(workout.inProgress).toBe(true);
+  });
+
+  it('a finished workout shows when it was and how long', async () => {
+    await saveFinished();
+    await openFinished();
+    expect(elapsed()).toBe('50:00');
+    expect(clockLines()).toEqual(['6:00 PM to 6:50 PM']);
+    // Nothing to time in a finished workout.
+    expect(document.querySelector('.train-timer')).toBeNull();
+  });
+});
+
+describe('pausing the workout clock', () => {
+  it('stops it, and resuming carries on from where it was', async () => {
+    await startSquats();
+    await wait(minutes(10));
+    await press('Pause');
+    expect(clockLines()).toEqual(['Paused']);
+    await wait(minutes(5));
+    expect(elapsed()).toBe('10:00');
+    await press('Resume');
+    expect(clockLines()).toEqual(['Started 12:00 PM']);
+    await wait(minutes(2));
+    expect(elapsed()).toBe('12:00');
+    const workout = await only();
+    expect(workout.paused).toBe(false);
+    expect(workout.pausedForMs).toBe(minutes(5));
+  });
+
+  it('holds the set timer, and drops a set being timed', async () => {
+    await startSquats();
+    await pressTimer();
+    await wait(seconds(20));
+    await press('Pause');
+    expect(timerLabel()).toBe('Paused');
+    expect((await only()).setStartedAt).toBeUndefined();
+    expect(timerButton()).toBeDisabled();
+  });
+
+  it('survives the app closing', async () => {
+    const view = await open();
+    await startWorkout(user);
+    await choose('Back squat', undefined, user);
+    await wait(minutes(10));
+    await press('Pause');
+    view.unmount();
+    const later = clock;
+    later.elapseMs(minutes(60));
+    renderApp(repos, today, { clock: later });
+    await openTrain();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await layer().findByRole('heading', { name: 'Back squat' });
+    expect(clockLines()).toEqual(['Paused']);
+    expect(elapsed()).toBe('10:00');
+  });
+
+  it('is left out of the length of a finished workout', async () => {
+    await startSquats();
+    await add();
+    await typeInSet('Reps', '8', 1, user);
+    await settle();
+    await wait(minutes(30));
+    await press('Pause');
+    await wait(minutes(10));
+    // Finished while still paused: the pause ends with the workout.
+    await press('Finish workout');
+    const workout = await only();
+    expect(workout.paused).toBe(false);
+    expect(workout.pausedForMs).toBe(minutes(10));
+    expect(workout.endedAt).toEqual(after(minutes(40)));
+    expect(await screen.findByText('1 exercise · 1 set · 30 min')).toBeInTheDocument();
+    await user.click(workoutRows()[0] as HTMLElement);
+    await layer().findByRole('heading', { name: 'Back squat' });
+    expect(elapsed()).toBe('30:00');
+    expect(clockLines()).toContain('Paused for 10:00');
+    expect(layer().queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument();
+  });
+});
+
+describe('a workout’s times, by hand', () => {
+  async function openTimes(): Promise<void> {
+    await saveFinished();
+    await openFinished();
+    await press('Edit times');
+    await layer().findByRole('heading', { name: 'Workout times' });
+  }
+
+  it('the end can be changed', async () => {
+    await openTimes();
+    await press(/^Ended/);
+    await enterTime('Ended', '19:15');
+    const workout = await only();
+    expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 19, 15));
+    expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 18));
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15 PM');
+  });
+
+  it('the start can be changed', async () => {
+    await openTimes();
+    await press(/^Started/);
+    await enterTime('Started', '17:30');
+    const workout = await only();
+    expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 17, 30));
+    expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 18, 50));
+  });
+
+  it('an end before the start is refused, with the reason', async () => {
+    await openTimes();
+    await press(/^Ended/);
+    await enterTime('Ended', '17:00');
+    expect(screen.getByText('The end has to be after the start.')).toBeInTheDocument();
+    expect((await only()).endedAt).toEqual(new Date(2026, 9, 4, 18, 50));
+  });
+
+  it('the day moves both times with it', async () => {
+    await openTimes();
+    await press(/^Day/);
+    await enterDate('2026-10-02');
+    const workout = await only();
+    expect(workout.date).toBe(CalendarDate.of(2026, 10, 2));
+    expect(workout.startedAt).toEqual(new Date(2026, 9, 2, 18));
+    expect(workout.endedAt).toEqual(new Date(2026, 9, 2, 18, 50));
+  });
+});
+
+describe('the set timer', () => {
+  it('times a set from Start set to Add set', async () => {
+    await startSquats();
+    expect(timerLabel()).toBe('Set timer');
+    await wait(minutes(3));
+    await pressTimer();
+    expect(timerLabel()).toBe('Set');
+    await wait(seconds(40));
+    expect(timerTime()).toBe('0:40');
+    await add();
+    const workout = await only();
+    const set = workout.exercises[0]?.sets[0];
+    expect(set?.startedAt).toEqual(after(minutes(3)));
+    expect(set?.durationMs).toBe(seconds(40));
+    expect(workout.setStartedAt).toBeUndefined();
+  });
+
+  it('then counts the rest until the next set starts', async () => {
+    await startSquats();
+    await pressTimer();
+    await wait(seconds(30));
+    await add();
+    expect(timerLabel()).toBe('Rest');
+    await wait(seconds(90));
+    expect(timerTime()).toBe('1:30');
+    await pressTimer();
+    expect(timerLabel()).toBe('Set');
+    expect(timerTime()).toBe('0:00');
+  });
+
+  it('a set logged without it has an end and no start', async () => {
+    await startSquats();
+    await wait(minutes(4));
+    await add();
+    const set = await onlySet();
+    expect(set?.startedAt).toBeUndefined();
+    expect(set?.endedAt).toEqual(after(minutes(4)));
+    // The rest still counts from it.
+    expect(timerLabel()).toBe('Rest');
+  });
+
+  it('can be cancelled without logging a set', async () => {
+    await startSquats();
+    await pressTimer();
+    await pressTimer();
+    const workout = await only();
+    expect(workout.setStartedAt).toBeUndefined();
+    expect(workout.setCount).toBe(0);
+    expect(timerLabel()).toBe('Set timer');
+  });
+
+  it('and the rest both survive the app closing', async () => {
+    const view = await open();
+    await startWorkout(user);
+    await choose('Back squat', undefined, user);
+    await add();
+    await wait(seconds(20));
+    await pressTimer();
+    view.unmount();
+    clock.elapseMs(minutes(1));
+    renderApp(repos, today, { clock });
+    await openTrain();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await layer().findByRole('heading', { name: 'Back squat' });
+    expect(timerLabel()).toBe('Set');
+    expect(timerTime()).toBe('1:00');
+  });
+
+  it('a set added to a finished workout gets no times', async () => {
+    await saveFinished();
+    await openFinished();
+    await add();
+    const sets = (await only()).exercises[0]?.sets ?? [];
+    expect(sets).toHaveLength(2);
+    expect(sets[1]?.startedAt).toBeUndefined();
+    expect(sets[1]?.endedAt).toBeUndefined();
+  });
+});
+
+describe('a set’s times, by hand', () => {
+  const overlaps = 'That overlaps another set in this workout.';
+
+  it('MM-196 checks partial times against other sets of the same exercise', async () => {
+    const first = new WorkoutSet({ reps: 8, loadKg: 100, startedAt: after(minutes(2)), endedAt: after(minutes(4)) });
+    await repos.workouts.saveWorkout(
+      new Workout({
+        id: 0,
+        date: today,
+        startedAt: noon,
+        endedAt: after(minutes(10)),
+        exercises: [
+          new WorkoutExercise({ exerciseId: 'back-squat', sets: [first, new WorkoutSet({ reps: 8, loadKg: 100 })] }),
+        ],
+      }),
+    );
+    await openFinished();
+    clock.elapseMs(minutes(10));
+    await press(/Set 2$/);
+    await pressInSet(/^Ended/, 2, user);
+    await enterClock(12, 3);
+    expect(screen.getByText(overlaps)).toBeInTheDocument();
+    let sets = (await only()).exercises[0]?.sets ?? [];
+    expect(sets[0]).toEqual(first);
+    expect(sets[1]?.startedAt).toBeUndefined();
+    expect(sets[1]?.endedAt).toBeUndefined();
+
+    await pressInSet(/^Ended/, 2, user);
+    await enterClock(12, 4);
+    sets = (await only()).exercises[0]?.sets ?? [];
+    expect(sets[1]?.startedAt).toBeUndefined();
+    expect(sets[1]?.endedAt).toEqual(after(minutes(4)));
+  });
+
+  it('MM-196 refuses overlapping typed times across exercises', async () => {
+    const first = new WorkoutSet({ reps: 8, loadKg: 100, startedAt: after(minutes(2)), endedAt: after(minutes(3)) });
+    const second = new WorkoutSet({ reps: 6, loadKg: 0, endedAt: after(minutes(4)) });
+    await repos.workouts.saveWorkout(
+      new Workout({
+        id: 0,
+        date: today,
+        startedAt: noon,
+        endedAt: after(minutes(5)),
+        exercises: [
+          new WorkoutExercise({ exerciseId: 'back-squat', sets: [first] }),
+          new WorkoutExercise({ exerciseId: 'pull-up', sets: [second] }),
+        ],
+      }),
+    );
+    await openFinished();
+    clock.elapseMs(minutes(10));
+    const pullUps = layer().getByRole('heading', { name: 'Pull-up' }).closest('.mm-surface') as HTMLElement;
+    await user.click(within(pullUps).getByRole('button', { name: /Set 1/ }));
+    await pressInSet(/^Started/, 1, user);
+    await enterClock(12, 2);
+    expect(screen.getByText(overlaps)).toBeInTheDocument();
+    let workout = await only();
+    expect(workout.exercises[1]?.sets[0]).toEqual(second);
+    expect(workout.exercises[0]?.sets[0]).toEqual(first);
+
+    // A shared boundary is valid, and the edited set excludes itself.
+    await pressInSet(/^Started/, 1, user);
+    await enterClock(12, 3);
+    workout = await only();
+    expect(workout.exercises[1]?.sets[0]?.startedAt).toEqual(after(minutes(3)));
+    await pressInSet(/^Ended/, 1, user);
+    await enterClock(12, 5);
+    workout = await only();
+    expect(workout.exercises[1]?.sets[0]?.endedAt).toEqual(after(minutes(5)));
+  });
+
+  it('a start can be typed', async () => {
+    await startSquats();
+    await wait(minutes(10));
+    await add();
+    expect(within(setEditor()).getByText('Not timed')).toBeInTheDocument();
+    await pressInSet(/^Started/, 1, user);
+    await enterClock(12, 9);
+    const set = await onlySet();
+    expect(set?.startedAt).toEqual(after(minutes(9)));
+    expect(set?.endedAt).toEqual(after(minutes(10)));
+  });
+
+  it('a start after the end is refused, with the reason', async () => {
+    await startSquats();
+    await wait(minutes(10));
+    await add();
+    await wait(minutes(10));
+    await pressInSet(/^Started/, 1, user);
+    await enterClock(12, 15);
+    expect(screen.getByText('The end has to be after the start.')).toBeInTheDocument();
+    expect((await onlySet())?.startedAt).toBeUndefined();
+  });
+
+  it('a time before the workout began is refused', async () => {
+    await startSquats();
+    await wait(minutes(10));
+    await add();
+    await pressInSet(/^Started/, 1, user);
+    await enterClock(11, 50, 0, { period: 'AM' });
+    expect(screen.getByText('That is before the workout started.')).toBeInTheDocument();
+    expect((await onlySet())?.startedAt).toBeUndefined();
+  });
+});
