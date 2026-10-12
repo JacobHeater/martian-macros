@@ -45,6 +45,8 @@ import { pauseOn } from '../engine/pauseOn';
 import { pauseToResume } from '../engine/pauseToResume';
 import { planReminders } from '../engine/planReminders';
 import type { RecompReview } from '../engine/RecompReview';
+import type { RecompSignal } from '../engine/RecompSignal';
+import { recompSignalOf } from '../engine/recompSignalOf';
 import { recompReviewOf } from '../engine/recompReviewOf';
 import { recoveryCheckInDue } from '../engine/recoveryCheckInDue';
 import type { ReliefOffer } from '../engine/ReliefOffer';
@@ -286,6 +288,9 @@ export class AppState {
   /** The recomp review due today, if one is (MM-133). Not during a pause, which is not time on recomp. */
   readonly recompReview: Cell<RecompReview | undefined>;
 
+  /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
+  readonly recompSignal: Cell<RecompSignal | undefined>;
+
   /** How many days of history the Dashboard shows. */
   readonly dashboardRange = new ValueCell(30);
 
@@ -331,7 +336,8 @@ export class AppState {
       const typed = this.typedWeights.value;
       const imported = of(this.importedWeighIns) ?? [];
       const today = this.today.value;
-      if (!typed.ready) return Loadable.loading;
+      // A read that went wrong stays wrong here, so whoever shows the weights can say so.
+      if (!typed.ready) return typed;
       return Loadable.of(mergeWeighIns({ typed: typed.value, imported, today }));
     });
     this.weightEvents = stream(() => s.weightEvents.watchWeightEvents());
@@ -690,7 +696,26 @@ export class AppState {
       });
     });
 
+    this.recompSignal = derived(() => {
+      const trend = this.coach.value?.trend;
+      if (trend === undefined) return undefined;
+      return recompSignalOf({
+        trend,
+        weights: of(this.weights) ?? [],
+        waist: of(this.waist) ?? [],
+        strengthTrends: of(this.strengthTrends) ?? [],
+        today: this.today.value,
+      });
+    });
+
     this.checkIn = this.makeCheckIn();
+  }
+
+  /** Reads again what the strength trends are worked out from, after a read went wrong. */
+  retryStrengthHistory(): void {
+    for (const cell of [this.typedWeights, this.workouts, this.customExercises]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
   }
 
   /** What the check-in needs; made last, once everything it reads exists. */

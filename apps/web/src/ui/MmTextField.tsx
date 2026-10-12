@@ -7,7 +7,7 @@ interface MmTextFieldProps {
   onChange: (value: string) => void;
   /** Shown above the field, and what a person hears. */
   label?: string | undefined;
-  /** What a person hears when there is no visible label. */
+  /** What a person hears, when there is no visible label or the label alone is too short to say what the field is. */
   name?: string | undefined;
   hint?: string | undefined;
   helper?: string | undefined;
@@ -49,7 +49,7 @@ export function MmTextField({
           inputMode={kind === 'number' ? 'decimal' : 'text'}
           autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
           autoComplete="off"
-          aria-label={label === undefined ? name : undefined}
+          aria-label={name}
           aria-describedby={helper === undefined ? undefined : helperId}
           placeholder={hint}
           value={value}
