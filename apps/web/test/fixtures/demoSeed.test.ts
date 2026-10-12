@@ -4,7 +4,8 @@ import { DemoSeed } from '../../src/fixtures/DemoSeed';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { first } from '../support/first';
 
-// Added in the move: in Dart the seed was only exercised through the app's demo build.
+// Added in the move. The Flutter app's own test of the seed is carried over in test/data/demoSeed.test.ts,
+// where it also runs against the database; these pin the seeded values themselves.
 const today = CalendarDate.of(2026, 10, 12);
 
 async function seeded(): Promise<InMemoryRepositories> {
