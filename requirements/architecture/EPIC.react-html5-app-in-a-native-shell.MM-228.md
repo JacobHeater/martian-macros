@@ -52,10 +52,9 @@ Choices I made without asking (say if any is wrong):
   the system can evict nothing. The schema starts again at version 1: the app
   has not been released, so there is no installed data to migrate.
 - **The coaching engine is carried over under test, not rewritten on trust.**
-  Its Dart tests are the reference. Whether it is compiled from Dart to
-  JavaScript or ported to TypeScript is decided by measuring both on the
-  weekly check-in (MM-230); either way the same cases must give the same
-  numbers before any screen depends on it.
+  Its Dart tests are the reference. The owner decided on 2026-10-12 that all
+  of the Dart is converted to TypeScript (MM-230); the same cases must give
+  the same numbers before any screen depends on it.
 - **The UI coverage manifest is the migration checklist.** The 165 surfaces
   in `requirements/ui-ux-assets/coverage.json` each get a status in the new
   app; the Flutter screenshot tests are the picture each is compared with.

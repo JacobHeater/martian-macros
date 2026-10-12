@@ -181,11 +181,14 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   has not been on a physical phone. `apps/web/README.md` says how to build
   it. Always name the device with `adb -s`: the owner's phone is usually
   connected and only the demo app may go on it.
-- **The engine measurement has started** (MM-230, read its Progress). The
-  engine, domain and health import tests pass compiled to JavaScript with no
-  source change, apart from two tests that read files; the weight trend
-  gives digit-for-digit the same output both ways. The food catalog does not
-  compile to JavaScript because it uses `dart:ffi`. No route is chosen yet.
+- **The owner decided all of the Dart is converted to TypeScript** (MM-230,
+  read it: the table under Progress says which package is done). Nothing is
+  compiled from Dart. The domain is done in `apps/web/src/domain/`, with
+  every Dart test carried over and passing. The engine is next. Read
+  "Carrying Dart over" in `apps/web/README.md` before converting anything:
+  it says how enums, nulls, dates, rounding and streams are written.
+- **The Dart stays until the switch** and is the reference. A fix made in
+  one language is made in the other.
 - #102 (Copilot's, green) was merged at the start of this session under the
   standing rule.
 
