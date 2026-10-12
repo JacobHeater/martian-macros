@@ -80,7 +80,7 @@ Scenario: No Dart is left
 | health_ingest | 976 lines, 21 files | 71 | done | 71: all of them |
 | food_catalog | 1,550 lines, 36 files | 17 + the download's | reading, searching and writing packs done; downloading a pack is not (see MM-231) | 25: 17 carried over, the manifest's 2, and 6 added |
 | fixtures | 3,541 lines, 54 files | 141 | done (it never touched SQLite; the first count here was wrong to say it waited) | 144: all 141 carried over and 3 added |
-| data | 20,359 lines, 48 files (18,030 of them generated) | | waits on MM-231 | |
+| data | 20,359 lines, 48 files (18,030 of them generated) | the contract suites and 22 of its own | done on the SQLite seam, with the schema at version 1 (MM-231); the 31 released upgrade steps and their 10 tests are not carried over, by that decision | 147: every contract suite (125 tests), 12 of its own carried over and 10 added |
 | food_pipeline | 922 lines, 22 files | 30 | done, except its two command-line entry points, which move with the task runner | 36: all 30 carried over (one changed, below) and 6 added |
 | `mm` task runner | 8,361 lines | 191 | not started | |
 
@@ -139,6 +139,10 @@ The type check is clean.
   type checker, and the test fails the typecheck if it ever stops being
   refused. A broken repository was tried on purpose (weigh-ins listed newest
   first): the contract failed, as it should.
+- The Flutter app's test of the demo seed is carried over
+  (`test/data/demoSeed.test.ts`) and passes against both the in-memory
+  repositories and the database. I first wrote that Dart had no test of the
+  seed; that was wrong, and the pull request that said so is corrected.
 - `mm food build` and `mm food publish` still run the Dart pipeline. They
   switch when the task runner is converted.
 - Files that read and write disk live in a folder called `node`, and a test

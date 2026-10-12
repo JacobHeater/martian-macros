@@ -15,6 +15,7 @@ const allowed: Record<string, readonly string[]> = {
   foodCatalog: ['lang', 'sql'],
   foodPipeline: ['lang', 'domain', 'foodCatalog', 'sql'],
   fixtures: ['lang', 'domain', 'engine', 'healthIngest'],
+  data: ['lang', 'domain', 'engine', 'healthIngest', 'sql'],
 };
 
 /**
