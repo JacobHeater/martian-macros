@@ -28,12 +28,13 @@ String portionSummary(FoodEntry entry) {
   final weight = grams == null || unit.isWeight
       ? ''
       : ' (${quantityText(double.parse(grams.toStringAsFixed(0)))} g)';
-  final how = switch (portion.basis) {
-    NutritionBasis.enteredTotals =>
-      unit.isHand ? 'estimated' : 'totals entered by you',
-    NutritionBasis.calculated =>
-      reference == null ? 'calculated' : _calculatedFrom(reference),
-  };
+  final how = unit.isHand
+      ? 'estimated'
+      : switch (portion.basis) {
+          NutritionBasis.enteredTotals => 'totals entered by you',
+          NutritionBasis.calculated =>
+            reference == null ? 'calculated' : _calculatedFrom(reference),
+        };
   return '$amount$weight · $how';
 }
 

@@ -38,12 +38,19 @@ void main() {
           )
           .height;
 
-      // Scan fits on one line; the other two are as tall only if they do too.
-      final oneLine = heightOf('food-scan');
-      expect(heightOf('food-my-foods'), oneLine, reason: 'Saved');
-      expect(heightOf('food-estimate'), oneLine, reason: 'Estimate');
+      void expectSingleLineLabels() {
+        final oneLine = heightOf('food-scan');
+        expect(heightOf('food-my-foods'), oneLine, reason: 'Saved');
+        expect(heightOf('food-estimate'), oneLine, reason: 'Estimate');
+      }
+
+      expectSingleLineLabels();
+      tester.binding.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(
+        tester.binding.platformDispatcher.clearTextScaleFactorTestValue,
+      );
+      await tester.pumpAndSettle();
+      expectSingleLineLabels();
     },
-    // Fails today: both labels wrap. Enable with the fix (MM-213).
-    skip: true,
   );
 }
