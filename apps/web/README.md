@@ -49,6 +49,7 @@ on Java 25.
 | `src/sql/` | `SqlDatabase`, the one thing the app knows about SQLite, and in `wasm/` its adapter for tests and the browser. Imports only `lang` |
 | `src/foodCatalog/` | Food packs read, searched and written through `SqlDatabase`, carried over from `packages/food_catalog`. Imports only `lang` and `sql` |
 | `src/foodPipeline/` | Builds food packs from the open data sources, carried over from `packages/food_pipeline`. A developer tool, never part of the app; its `node/` folder is the only place that touches files |
+| `src/fixtures/` | Every repository and seam held in memory, the demo seed, and a typical user, carried over from `packages/fixtures`. Their contract suites are in `test/contracts/` |
 | `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
 | `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |

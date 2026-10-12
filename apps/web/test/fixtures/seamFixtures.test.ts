@@ -1,0 +1,85 @@
+import { describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
+import { Denied } from '../../src/domain/integration/Denied';
+import { Entitlement } from '../../src/domain/integration/Entitlement';
+import { NotFound } from '../../src/domain/integration/NotFound';
+import { Succeeded } from '../../src/domain/integration/Succeeded';
+import { SystemClock } from '../../src/domain/integration/SystemClock';
+import { Unavailable } from '../../src/domain/integration/Unavailable';
+import { FixedClock } from '../../src/fixtures/FixedClock';
+import { InMemoryBackupStorage } from '../../src/fixtures/InMemoryBackupStorage';
+import { InMemoryEntitlement } from '../../src/fixtures/InMemoryEntitlement';
+import { InMemoryFoodCatalog } from '../../src/fixtures/InMemoryFoodCatalog';
+import { backupStorageContract } from '../contracts/backupStorageContract';
+import { clockContract } from '../contracts/clockContract';
+import { entitlementReaderContract } from '../contracts/entitlementReaderContract';
+import { foodBarcodeLookupContract } from '../contracts/foodBarcodeLookupContract';
+import { foodSearchContract } from '../contracts/foodSearchContract';
+import { first } from '../support/first';
+
+/**
+ * The integration-seam fixtures: they satisfy the same contracts a real
+ * provider will, and can be scripted to fail so offline and denied paths
+ * are tested without a device.
+ */
+foodSearchContract('In-memory', (items) => new InMemoryFoodCatalog(items));
+foodBarcodeLookupContract('In-memory', (items) => new InMemoryFoodCatalog(items));
+backupStorageContract('In-memory', () => new InMemoryBackupStorage());
+entitlementReaderContract('In-memory', () => new InMemoryEntitlement());
+clockContract('System', () => new SystemClock());
+clockContract('Fixed', () => new FixedClock(CalendarDate.of(2026, 10, 8)));
+
+describe('scripted failures', () => {
+  it('a catalog that is offline answers Unavailable to every call', async () => {
+    const catalog = new InMemoryFoodCatalog([]);
+    catalog.failWith(new Unavailable('offline'));
+    expect(await catalog.search('oats')).toBeInstanceOf(Unavailable);
+    expect(await catalog.lookup('1')).toBeInstanceOf(Unavailable);
+    catalog.recover();
+    expect(await catalog.search('oats')).toBeInstanceOf(Succeeded);
+  });
+
+  it('a denied backup answers Denied with the message', async () => {
+    const storage = new InMemoryBackupStorage();
+    storage.failWith(new Denied('signed out'));
+    const result = await storage.put('a', new Uint8Array(1));
+    expect(result).toBeInstanceOf(Denied);
+    expect((result as Denied).message).toBe('signed out');
+  });
+
+  // In Dart this was a failure when the test ran. Here the compiler refuses
+  // it, and the typecheck fails if it ever stops refusing.
+  it('failWith rejects a non-failure', async () => {
+    const storage = new InMemoryBackupStorage();
+    // @ts-expect-error A NotFound is not a failure to script.
+    storage.failWith(new NotFound());
+    storage.recover();
+    expect(await storage.list()).toBeInstanceOf(Succeeded);
+  });
+});
+
+describe('FixedClock', () => {
+  it('can be moved to another day', () => {
+    const clock = new FixedClock(CalendarDate.of(2026, 10, 8));
+    clock.advanceTo(CalendarDate.of(2026, 10, 9));
+    expect(clock.today().epochDay).toBe(CalendarDate.of(2026, 10, 9).epochDay);
+  });
+
+  // Added in the move: the two things the class does that had no test of their own.
+  it('reports the hour it was given, and time elapsed within the day', () => {
+    const clock = new FixedClock(CalendarDate.of(2026, 10, 8), { hour: 7 });
+    expect(clock.now().getHours()).toBe(7);
+    clock.elapseMs(90 * 60 * 1000);
+    expect([clock.now().getHours(), clock.now().getMinutes()]).toEqual([8, 30]);
+    expect(new FixedClock(CalendarDate.of(2026, 10, 8)).now().getHours()).toBe(12);
+  });
+});
+
+describe('InMemoryEntitlement', () => {
+  it('starts free and follows changes', async () => {
+    const entitlement = new InMemoryEntitlement();
+    expect((await first(entitlement.watchEntitlement())).status).toBe('free');
+    entitlement.set(new Entitlement('unlocked'));
+    expect((await first(entitlement.watchEntitlement())).coachAvailable).toBe(true);
+  });
+});

@@ -199,9 +199,12 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   (`apps/web/src/foodCatalog/`): it reads a pack the Dart writer wrote and
   gives the same searches with the same scores. The food pipeline
   (`apps/web/src/foodPipeline/`) builds the same packs as the Dart one from
-  a recorded extract; `mm food build` still runs the Dart one. Not built: the native
+  a recorded extract; `mm food build` still runs the Dart one. The in-memory
+  repositories and their 23 contract suites are in `apps/web/src/fixtures/`
+  and `apps/web/test/contracts/`. Not built: the native
   adapter, downloading a pack (it needs an interface to the phone's files
-  first), the data layer, the fixtures. Whether a native
+  first), the data layer (the repositories on SQLite, which must pass those
+  same contract suites). Whether a native
   plugin has FTS5 on Android is not verified.
   The task runner (`tool/`) is the last Dart and waits for nothing. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
