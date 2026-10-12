@@ -26,9 +26,9 @@ const allowed: Record<string, readonly string[]> = {
  * that may import it: its adapter (MM-159, MM-231). Everything else goes
  * through the interface the adapter implements.
  */
-const adapters: Record<string, string> = {
-  '@sqlite.org/sqlite-wasm': 'sql/wasm/',
-  '@capacitor/core': 'platform/',
+const adapters: Record<string, readonly string[]> = {
+  '@sqlite.org/sqlite-wasm': ['sql/wasm/'],
+  '@capacitor/core': ['platform/', 'sql/native/', 'foodCatalog/download/native/'],
 };
 
 /**
@@ -69,8 +69,8 @@ describe('layers', () => {
       for (const file of files) {
         for (const specifier of importsOf(file)) {
           const target = specifier.startsWith('.') ? layerOf(resolve(dirname(file), specifier)) : specifier;
-          const adapterFolder = adapters[specifier];
-          if (adapterFolder !== undefined && inFolder(file, adapterFolder)) continue;
+          const adapterFolders = adapters[specifier];
+          if (adapterFolders !== undefined && adapterFolders.some((folder) => inFolder(file, folder))) continue;
           if (specifier.startsWith('node:') && isNodeOnly(file)) continue;
           if (target !== layer && !mayImport.includes(target)) {
             broken.push(`${relative(src, file)} imports ${specifier}`);
@@ -93,10 +93,10 @@ describe('layers', () => {
     expect(broken).toEqual([]);
   });
 
-  for (const [library, folder] of Object.entries(adapters)) {
-    it(`only ${folder} imports ${library}`, () => {
+  for (const [library, folders] of Object.entries(adapters)) {
+    it(`only ${folders.join(', ')} imports ${library}`, () => {
       const outside = filesIn(src)
-        .filter((file) => !inFolder(file, folder) && importsOf(file).includes(library))
+        .filter((file) => !folders.some((folder) => inFolder(file, folder)) && importsOf(file).includes(library))
         .map((file) => relative(src, file));
       expect(outside).toEqual([]);
     });
