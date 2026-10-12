@@ -26,7 +26,7 @@ interface Snack {
  * the one over it is answered.
  */
 export function MmOverlays({ children }: { children: ReactNode }) {
-  const [dialogs, setDialogs] = useState<readonly { id: number; node: ReactNode }[]>([]);
+  const [dialogs, setDialogs] = useState<readonly { id: number; node: ReactNode; dismiss: () => boolean }[]>([]);
   const dialogCount = useRef(0);
   const [snack, setSnack] = useState<Snack>();
   const snackCount = useRef(0);
@@ -43,9 +43,17 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         setDialogs((current) => current.filter((dialog) => dialog.id !== id));
         resolve(answer);
       };
-      setDialogs((current) => [...current, { id, node: render(finish) }]);
+      const dismiss = () => {
+        if (answered) return false;
+        finish(undefined);
+        return true;
+      };
+      setDialogs((current) => [...current, { id, node: render(finish), dismiss }]);
     });
   }, []);
+
+  const showing = useRef(dialogs);
+  showing.current = dialogs;
 
   const overlays = useMemo<Overlays>(
     () => ({
@@ -141,6 +149,14 @@ export function MmOverlays({ children }: { children: ReactNode }) {
       snack(message, action) {
         snackCount.current += 1;
         setSnack({ id: snackCount.current, message, action });
+      },
+
+      closeTop() {
+        // From the top down, past any already answered just now.
+        for (let at = showing.current.length - 1; at >= 0; at -= 1) {
+          if (showing.current[at]?.dismiss() === true) return true;
+        }
+        return false;
       },
     }),
     [ask],

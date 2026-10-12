@@ -50,6 +50,12 @@ export interface Overlays {
    */
   sheet<T>(label: string, content: (close: (answer?: T) => void) => ReactNode): Promise<T | undefined>;
 
+  /**
+   * Closes the question on top as simply dismissed, as the phone's back
+   * button does. False when no question is showing.
+   */
+  closeTop(): boolean;
+
   /** Shows a short message at the bottom of the screen, optionally with one action (an "Undo", say). */
   snack(message: string, action?: { label: string; onAction: () => void }): void;
 }

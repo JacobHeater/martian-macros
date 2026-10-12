@@ -1,3 +1,4 @@
+import { HardwareBack } from './HardwareBack';
 import { DownloadStatusHost } from '../foodPacks/DownloadStatusHost';
 import { useEffect, useMemo } from 'react';
 import type { SystemBars } from '../platform/SystemBars';
@@ -73,6 +74,7 @@ export function App({ services, systemBars, demo = false }: AppProps) {
     <MmOverlays>
       <DownloadStatusHost>
         <NavigatorHost>
+          <HardwareBack />
           <AppRoot />
         </NavigatorHost>
       </DownloadStatusHost>

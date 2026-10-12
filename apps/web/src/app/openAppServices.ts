@@ -8,6 +8,12 @@ import { NativePackStore } from '../foodCatalog/download/native/NativePackStore'
 import { openInstalledCatalog } from '../foodCatalog/download/openInstalledCatalog';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { constant } from '../lang/constant';
+import { mmHealth } from '../platform/mmHealth';
+import { mmReminders } from '../platform/mmReminders';
+import { mmScanner } from '../platform/mmScanner';
+import { NativeCamera } from '../platform/NativeCamera';
+import { NativeHealthSource } from '../platform/NativeHealthSource';
+import { NativeReminderScheduler } from '../platform/NativeReminderScheduler';
 import { NoCamera } from '../platform/NoCamera';
 import { runningNatively } from '../platform/runningNatively';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
@@ -16,6 +22,7 @@ import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { mmDb } from '../sql/native/mmDb';
 import { NativeSqlDatabase } from '../sql/native/NativeSqlDatabase';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
+import { reminderPrompt } from '../format/reminderPrompt';
 import type { AppServices } from '../state/AppServices';
 import { once } from '../state/once';
 
@@ -37,7 +44,7 @@ export async function openAppServices(): Promise<AppServices> {
   const packStore = native
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
-  const camera = new NoCamera();
+  const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
@@ -72,9 +79,10 @@ export async function openAppServices(): Promise<AppServices> {
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),
-    // Neither plugin is in the shell yet (MM-232, step 5).
-    reminderScheduler: new NoNotifications(),
-    healthSource: new NoHealthPlatform(),
+    reminderScheduler: native
+      ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
+      : new NoNotifications(),
+    healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
   };
