@@ -152,7 +152,7 @@ starting it, why it is safe, and the specific collisions to manage.
 
 ### The schema lane
 
-`apps/web/src/data/schema.ts` carries `currentSchemaVersion` and the
+`apps/mobile/src/data/schema.ts` carries `currentSchemaVersion` and the
 migration steps. Nine workstreams need to change it. Rules, once MM-61 lands:
 
 - **One schema change in flight at a time.** The branch that takes the next

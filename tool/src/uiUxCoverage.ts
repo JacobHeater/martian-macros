@@ -5,7 +5,7 @@ import { uiUxAssetHasAnchor, uiUxAssetsFolder } from './uiUxAssets.ts';
 export const uiUxCoverageFile = `${uiUxAssetsFolder}/coverage.json`;
 
 /** Where the app's components are. */
-export const uiSourceFolder = 'apps/web/src';
+export const uiSourceFolder = 'apps/mobile/src';
 
 export const uiUxSurfaceKinds = ['view', 'part', 'component', 'sheet', 'dialog', 'navigation', 'painter', 'host'];
 export const uiUxVerifications = ['screenshot-compared', 'source-only', 'not-drawn'];
