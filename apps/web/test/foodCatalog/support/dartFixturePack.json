@@ -1,0 +1,776 @@
+{
+ "searches": {
+  "chick bre": [
+   {
+    "id": 1,
+    "score": -8.667341151247014
+   },
+   {
+    "id": 2,
+    "score": -8.667341151247014
+   }
+  ],
+  "ba": [
+   {
+    "id": 6,
+    "score": -4.250411344332411
+   },
+   {
+    "id": 17,
+    "score": -3.974841392844898
+   },
+   {
+    "id": 24,
+    "score": -3.732828273875877
+   }
+  ],
+  "test": [
+   {
+    "id": 25,
+    "score": -1.8821179056853417
+   },
+   {
+    "id": 24,
+    "score": -1.4400371448893063
+   },
+   {
+    "id": 26,
+    "score": -1.4400371448893063
+   }
+  ],
+  "rice": [
+   {
+    "id": 3,
+    "score": -4.692499758402116
+   },
+   {
+    "id": 4,
+    "score": -4.692499758402116
+   }
+  ],
+  "c": [
+   {
+    "id": 19,
+    "score": -0.8198705553334124
+   },
+   {
+    "id": 2,
+    "score": -0.8057068180539946
+   },
+   {
+    "id": 13,
+    "score": -0.7812626789530885
+   },
+   {
+    "id": 16,
+    "score": -0.7812626789530885
+   },
+   {
+    "id": 28,
+    "score": -0.7812626789530885
+   },
+   {
+    "id": 26,
+    "score": -0.7787984327642946
+   },
+   {
+    "id": 1,
+    "score": -0.7559365985932214
+   },
+   {
+    "id": 4,
+    "score": -0.7559365985932214
+   },
+   {
+    "id": 21,
+    "score": -0.7559365985932214
+   },
+   {
+    "id": 25,
+    "score": -0.7559365985932214
+   },
+   {
+    "id": 20,
+    "score": -0.7322009454219026
+   },
+   {
+    "id": 24,
+    "score": -0.7099104667587034
+   }
+  ],
+  "pasta cooked": [
+   {
+    "id": 28,
+    "score": -7.125687398125484
+   }
+  ],
+  "oats": [
+   {
+    "id": 8,
+    "score": -5.936411216418416
+   }
+  ],
+  "co": [
+   {
+    "id": 13,
+    "score": -1.627644106294277
+   },
+   {
+    "id": 16,
+    "score": -1.627644106294277
+   },
+   {
+    "id": 28,
+    "score": -1.627644106294277
+   },
+   {
+    "id": 2,
+    "score": -1.5748810004352958
+   },
+   {
+    "id": 4,
+    "score": -1.5748810004352958
+   },
+   {
+    "id": 21,
+    "score": -1.5748810004352958
+   },
+   {
+    "id": 25,
+    "score": -1.5748810004352958
+   },
+   {
+    "id": 20,
+    "score": -1.525431312085775
+   },
+   {
+    "id": 26,
+    "score": -1.4789924289802208
+   }
+  ],
+  "br": [
+   {
+    "id": 12,
+    "score": -2.2759752145132213
+   },
+   {
+    "id": 14,
+    "score": -2.2759752145132213
+   },
+   {
+    "id": 1,
+    "score": -2.202195251982477
+   },
+   {
+    "id": 2,
+    "score": -2.202195251982477
+   },
+   {
+    "id": 25,
+    "score": -1.0427563532553752
+   },
+   {
+    "id": 24,
+    "score": -0.7978288061662483
+   },
+   {
+    "id": 26,
+    "score": -0.7978288061662483
+   }
+  ],
+  "zzzz": []
+ },
+ "foods": [
+  {
+   "id": 1,
+   "name": "Chicken breast, raw",
+   "brand": null,
+   "kcal": 120.0,
+   "proteinG": 22.5,
+   "carbsG": 0.0,
+   "fatG": 2.6,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "raw",
+   "pairedFoodId": 2,
+   "tier": "reference",
+   "sourceId": "fixture-1",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 2,
+   "name": "Chicken breast, cooked",
+   "brand": null,
+   "kcal": 165.0,
+   "proteinG": 31.0,
+   "carbsG": 0.0,
+   "fatG": 3.6,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": 1,
+   "tier": "reference",
+   "sourceId": "fixture-2",
+   "servings": [
+    {
+     "description": "1 breast",
+     "grams": 172.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 3,
+   "name": "White rice, raw",
+   "brand": null,
+   "kcal": 365.0,
+   "proteinG": 7.0,
+   "carbsG": 80.0,
+   "fatG": 0.7,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "raw",
+   "pairedFoodId": 4,
+   "tier": "reference",
+   "sourceId": "fixture-3",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 4,
+   "name": "White rice, cooked",
+   "brand": null,
+   "kcal": 130.0,
+   "proteinG": 2.7,
+   "carbsG": 28.0,
+   "fatG": 0.3,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": 3,
+   "tier": "reference",
+   "sourceId": "fixture-4",
+   "servings": [
+    {
+     "description": "1 cup",
+     "grams": 158.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 5,
+   "name": "Egg, whole",
+   "brand": null,
+   "kcal": 143.0,
+   "proteinG": 12.6,
+   "carbsG": 0.7,
+   "fatG": 9.5,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-5",
+   "servings": [
+    {
+     "description": "1 large egg",
+     "grams": 50.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 6,
+   "name": "Banana",
+   "brand": null,
+   "kcal": 89.0,
+   "proteinG": 1.1,
+   "carbsG": 23.0,
+   "fatG": 0.3,
+   "fiberG": 2.6,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-6",
+   "servings": [
+    {
+     "description": "1 medium",
+     "grams": 118.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 7,
+   "name": "Apple",
+   "brand": null,
+   "kcal": 52.0,
+   "proteinG": 0.3,
+   "carbsG": 14.0,
+   "fatG": 0.2,
+   "fiberG": 2.4,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-7",
+   "servings": [
+    {
+     "description": "1 medium",
+     "grams": 182.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 8,
+   "name": "Oats, dry",
+   "brand": null,
+   "kcal": 389.0,
+   "proteinG": 16.9,
+   "carbsG": 66.0,
+   "fatG": 6.9,
+   "fiberG": 10.6,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-8",
+   "servings": [
+    {
+     "description": "1/2 cup",
+     "grams": 40.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 9,
+   "name": "Milk, whole",
+   "brand": null,
+   "kcal": 61.0,
+   "proteinG": 3.2,
+   "carbsG": 4.8,
+   "fatG": 3.3,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": 1.03,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-9",
+   "servings": [
+    {
+     "description": "1 cup",
+     "grams": 244.0
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 10,
+   "name": "Olive oil",
+   "brand": null,
+   "kcal": 884.0,
+   "proteinG": 0.0,
+   "carbsG": 0.0,
+   "fatG": 100.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": 0.91,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-10",
+   "servings": [
+    {
+     "description": "1 tbsp",
+     "grams": 13.5
+    }
+   ],
+   "barcodes": []
+  },
+  {
+   "id": 11,
+   "name": "Almonds",
+   "brand": null,
+   "kcal": 579.0,
+   "proteinG": 21.0,
+   "carbsG": 22.0,
+   "fatG": 50.0,
+   "fiberG": 12.5,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-11",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 12,
+   "name": "Broccoli, raw",
+   "brand": null,
+   "kcal": 34.0,
+   "proteinG": 2.8,
+   "carbsG": 7.0,
+   "fatG": 0.4,
+   "fiberG": 2.6,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "raw",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-12",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 13,
+   "name": "Salmon, cooked",
+   "brand": null,
+   "kcal": 206.0,
+   "proteinG": 22.0,
+   "carbsG": 0.0,
+   "fatG": 12.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-13",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 14,
+   "name": "Bread, white",
+   "brand": null,
+   "kcal": 265.0,
+   "proteinG": 9.0,
+   "carbsG": 49.0,
+   "fatG": 3.2,
+   "fiberG": 2.7,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-14",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 15,
+   "name": "Greek yogurt, plain nonfat",
+   "brand": null,
+   "kcal": 59.0,
+   "proteinG": 10.2,
+   "carbsG": 3.6,
+   "fatG": 0.4,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-15",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 16,
+   "name": "Lentils, cooked",
+   "brand": null,
+   "kcal": 116.0,
+   "proteinG": 9.0,
+   "carbsG": 20.0,
+   "fatG": 0.4,
+   "fiberG": 7.9,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-16",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 17,
+   "name": "Sweet potato, baked",
+   "brand": null,
+   "kcal": 90.0,
+   "proteinG": 2.0,
+   "carbsG": 21.0,
+   "fatG": 0.2,
+   "fiberG": 3.3,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-17",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 18,
+   "name": "Peanut butter",
+   "brand": null,
+   "kcal": 588.0,
+   "proteinG": 25.0,
+   "carbsG": 20.0,
+   "fatG": 50.0,
+   "fiberG": 6.0,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-18",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 19,
+   "name": "Cheddar cheese",
+   "brand": null,
+   "kcal": 403.0,
+   "proteinG": 25.0,
+   "carbsG": 1.3,
+   "fatG": 33.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-19",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 20,
+   "name": "Ground beef, lean, cooked",
+   "brand": null,
+   "kcal": 250.0,
+   "proteinG": 26.0,
+   "carbsG": 0.0,
+   "fatG": 15.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-20",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 21,
+   "name": "Black beans, cooked",
+   "brand": null,
+   "kcal": 132.0,
+   "proteinG": 8.9,
+   "carbsG": 24.0,
+   "fatG": 0.5,
+   "fiberG": 8.7,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-21",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 22,
+   "name": "Orange juice",
+   "brand": null,
+   "kcal": 45.0,
+   "proteinG": 0.7,
+   "carbsG": 10.4,
+   "fatG": 0.2,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": 1.04,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-22",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 23,
+   "name": "Red wine",
+   "brand": null,
+   "kcal": 85.0,
+   "proteinG": 0.1,
+   "carbsG": 2.6,
+   "fatG": 0.0,
+   "fiberG": null,
+   "alcoholG": 10.6,
+   "densityGPerMl": 0.99,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-23",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 24,
+   "name": "Protein bar, chocolate",
+   "brand": "Test Brand",
+   "kcal": 380.0,
+   "proteinG": 33.0,
+   "carbsG": 35.0,
+   "fatG": 12.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "packaged",
+   "pairedFoodId": null,
+   "tier": "label",
+   "sourceId": "fixture-24",
+   "servings": [
+    {
+     "description": "1 bar",
+     "grams": 60.0
+    }
+   ],
+   "barcodes": [
+    "00001000000113"
+   ]
+  },
+  {
+   "id": 25,
+   "name": "Cola",
+   "brand": "Test Brand",
+   "kcal": 42.0,
+   "proteinG": 0.0,
+   "carbsG": 10.6,
+   "fatG": 0.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": 1.04,
+   "preparation": "packaged",
+   "pairedFoodId": null,
+   "tier": "label",
+   "sourceId": "fixture-25",
+   "servings": [],
+   "barcodes": [
+    "00001000000281"
+   ]
+  },
+  {
+   "id": 26,
+   "name": "Corn flakes cereal",
+   "brand": "Test Brand",
+   "kcal": 375.0,
+   "proteinG": 8.0,
+   "carbsG": 80.0,
+   "fatG": 2.5,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "packaged",
+   "pairedFoodId": null,
+   "tier": "label",
+   "sourceId": "fixture-26",
+   "servings": [],
+   "barcodes": [
+    "00001000000359"
+   ]
+  },
+  {
+   "id": 27,
+   "name": "Pasta, dry",
+   "brand": null,
+   "kcal": 371.0,
+   "proteinG": 13.0,
+   "carbsG": 75.0,
+   "fatG": 1.5,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "raw",
+   "pairedFoodId": 28,
+   "tier": "reference",
+   "sourceId": "fixture-27",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 28,
+   "name": "Pasta, cooked",
+   "brand": null,
+   "kcal": 158.0,
+   "proteinG": 5.8,
+   "carbsG": 31.0,
+   "fatG": 0.9,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "cooked",
+   "pairedFoodId": 27,
+   "tier": "reference",
+   "sourceId": "fixture-28",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 29,
+   "name": "Avocado",
+   "brand": null,
+   "kcal": 160.0,
+   "proteinG": 2.0,
+   "carbsG": 8.5,
+   "fatG": 14.7,
+   "fiberG": 6.7,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-29",
+   "servings": [],
+   "barcodes": []
+  },
+  {
+   "id": 30,
+   "name": "Tofu, firm",
+   "brand": null,
+   "kcal": 144.0,
+   "proteinG": 17.0,
+   "carbsG": 3.0,
+   "fatG": 9.0,
+   "fiberG": null,
+   "alcoholG": null,
+   "densityGPerMl": null,
+   "preparation": "unspecified",
+   "pairedFoodId": null,
+   "tier": "reference",
+   "sourceId": "fixture-30",
+   "servings": [],
+   "barcodes": []
+  }
+ ]
+}

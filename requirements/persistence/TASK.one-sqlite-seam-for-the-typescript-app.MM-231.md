@@ -108,7 +108,34 @@ Scenario: The system of record is on the phone
   file and open one from bytes, which is how a pack is built and read
   off the phone.
 
-**Not built:** the native adapter; anything on top of the seam.
+**The food catalog on the seam (2026-10-12):**
+- `apps/web/src/foodCatalog/`: the pack reader (`SqliteFoodPack`), several
+  packs as one ranked list (`FoodCatalog`), the writer (`writeFoodPack`),
+  the invented fixture pack, and the manifest that lists packs to download.
+  It imports only `lang` and `sql`; every lookup returns a promise.
+- All 17 Dart catalog tests are carried over and pass, and the 2 manifest
+  tests. One changed: Dart proved a pack file was opened read-only; opening
+  a file is now the platform's, so that proof belongs to the phone's adapter
+  and is **not made anywhere yet**.
+- **The pack format is unchanged, measured.** The Dart writer wrote the
+  fixture pack to a file and the Dart reader recorded every food and ten
+  searches. The TypeScript reader gives the same foods and, for all ten
+  searches, the same ids in the same order with the same scores to the last
+  digit, both from the Dart-written file and from a pack this writer wrote.
+  The recorded file is small and invented; no pack of real food data built
+  by the pipeline has been opened this way.
+- Search in a 50,000-food pack: under the test's 150 ms on a laptop, through
+  the WebAssembly build. Not a phone figure.
+
+**Not built:**
+- The native adapter.
+- **Downloading a pack** (`PackStore`, `PackDownload`, the HTTP adapters and
+  their 10 tests). In Dart it streams a file to disk, resumes a partial
+  one, hashes it as it arrives, unpacks gzip and swaps it into place. Each
+  of those is a file operation on the phone, so it needs its own interface
+  to the platform and evidence from a device before it is written. Its
+  plain types (the listing, progress, the problems) are carried over.
+- The data layer, the pipeline and the demo fixtures.
 
 ## Notes
 - The food catalog is the first thing built on it, because it reads and

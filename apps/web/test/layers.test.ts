@@ -12,6 +12,7 @@ const allowed: Record<string, readonly string[]> = {
   engine: ['lang', 'domain'],
   healthIngest: ['lang'],
   sql: ['lang'],
+  foodCatalog: ['lang', 'sql'],
 };
 
 /**
