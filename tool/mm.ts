@@ -69,7 +69,7 @@ const commands: Record<string, [string, Command]> = {
   run: ['Build, install and launch on a device: mm run [-d DEVICE]', (a) => runApp(repoRoot, a)],
   demo: ['The isolated demo app on an exact device: mm demo -d <device ID>', (a) => runDemo(repoRoot, a)],
   emulator: ['Start an emulator: mm emulator [id] [--cold] | list', (a) => runEmulator(repoRoot, a)],
-  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] (MM-238)', (a) => runScreenshot(a)],
+  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238)', (a) => runScreenshot(a)],
   build: ['Build the Android app: mm build android [--release]', (a) => runBuild(repoRoot, a)],
   clean: ['Remove build outputs and caches', () => runClean(repoRoot)],
 };

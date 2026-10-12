@@ -1,5 +1,6 @@
 import { existsSync, rmSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
 import { capture, run } from './proc.ts';
 
@@ -262,12 +263,37 @@ export async function runDemo(repoRoot: string, args: readonly string[]): Promis
 }
 
 /**
- * `mm screenshot [-d DEVICE] [path]`: a device's screen as a PNG (MM-238).
- * Captured on the device and pulled, never redirected through the shell,
- * which corrupts binary output in PowerShell 5.1. With no `-d` the one
- * physical phone wins over an emulator.
+ * The command that puts the PNG at `path` on the clipboard as an image, for
+ * `platform`; undefined where there is no way this runner knows (MM-238).
+ */
+export function clipboardImageCommand(platform: string, path: string): string[] | undefined {
+  if (platform === 'win32') {
+    // A quote in a PowerShell single-quoted string is written twice.
+    const quoted = path.replaceAll("'", "''");
+    const script =
+      'Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; ' +
+      `$image = [System.Drawing.Image]::FromFile('${quoted}'); ` +
+      '[System.Windows.Forms.Clipboard]::SetImage($image); $image.Dispose()';
+    // The clipboard needs a single-threaded apartment.
+    return ['powershell', '-NoProfile', '-STA', '-Command', script];
+  }
+  if (platform === 'darwin') {
+    return ['osascript', '-e', `set the clipboard to (read (POSIX file "${path}") as «class PNGf»)`];
+  }
+  if (platform === 'linux') return ['xclip', '-selection', 'clipboard', '-t', 'image/png', '-i', path];
+  return undefined;
+}
+
+/**
+ * `mm screenshot [-d DEVICE] [path] [--clipboard]`: a device's screen as a
+ * PNG (MM-238). Captured on the device and pulled, never redirected through
+ * the shell, which corrupts binary output in PowerShell 5.1. With no `-d`
+ * the one physical phone wins over an emulator. `--clipboard` puts the
+ * image on the clipboard: with a path as well as the file, with none
+ * instead of one.
  */
 export async function runScreenshot(args: readonly string[]): Promise<number> {
+  const clipboard = args.includes('--clipboard');
   let device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
   const out = args.filter((arg, at) => !arg.startsWith('-') && args[at - 1] !== '-d');
   try {
@@ -284,7 +310,9 @@ export async function runScreenshot(args: readonly string[]): Promise<number> {
       }
     }
     const stamp = new Date().toISOString().slice(0, 19).replaceAll(/[-:]/g, '').replace('T', '-');
-    const path = out[0] ?? `mm-screenshot-${stamp}.png`;
+    // Asked for the clipboard alone, the file is only a way to get there.
+    const keepFile = out[0] !== undefined || !clipboard;
+    const path = resolve(out[0] ?? (keepFile ? `mm-screenshot-${stamp}.png` : join(tmpdir(), `mm-screenshot-${stamp}.png`)));
     const onDevice = `/sdcard/mm-screenshot-${stamp}.png`;
     for (const step of [
       [adbPath(), '-s', device, 'shell', 'screencap', '-p', onDevice],
@@ -298,7 +326,19 @@ export async function runScreenshot(args: readonly string[]): Promise<number> {
         return 1;
       }
     }
-    stdout.write(`${device} -> ${path}\n`);
+    if (!clipboard) {
+      stdout.write(`${device} -> ${path}\n`);
+      return 0;
+    }
+    const command = clipboardImageCommand(process.platform, path);
+    const copied = command !== undefined && (await capture(command)).code === 0;
+    if (!copied) {
+      // The capture is not thrown away because the clipboard refused it.
+      stderr.write(`The image could not be put on the clipboard. It is kept at ${path}\n`);
+      return 1;
+    }
+    if (!keepFile) rmSync(path, { force: true });
+    stdout.write(`${device} -> ${keepFile ? `${path} and the clipboard` : 'the clipboard'}\n`);
     return 0;
   } catch (error) {
     stderr.write(`${error instanceof Error ? error.message : error}\n`);
