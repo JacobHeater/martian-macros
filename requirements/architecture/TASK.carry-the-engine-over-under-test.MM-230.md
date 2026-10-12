@@ -78,7 +78,7 @@ Scenario: No Dart is left
 | domain | 4,574 lines, 158 files | 102 | done | 105 (the 102, and 3 for what differs from Dart) |
 | engine | 6,819 lines, 158 files | 567 | done | 573: all 567 (566 pass, 1 skipped for MM-173 as in Dart), and 6 added |
 | health_ingest | 976 lines, 21 files | 71 | done | 71: all of them |
-| food_catalog | 1,550 lines, 36 files | 2 files | waits on MM-231 | |
+| food_catalog | 1,550 lines, 36 files | 17 + the download's | reading, searching and writing packs done; downloading a pack is not (see MM-231) | 25: 17 carried over, the manifest's 2, and 6 added |
 | fixtures | 3,541 lines, 54 files | | waits on MM-231 | |
 | data | 20,359 lines, 48 files (18,030 of them generated) | | waits on MM-231 | |
 | food_pipeline | 922 lines, 22 files | | waits on MM-231 | |

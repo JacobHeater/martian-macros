@@ -195,7 +195,12 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   on the phone. Read its Progress first: Node's own SQLite has no FTS5 and
   cannot read a food pack; the official SQLite WebAssembly build can. The
   seam, that adapter and a 14-test contract suite are built
-  (`apps/web/src/sql/`); the native adapter and everything on top are not. Whether a native plugin has FTS5 on Android is not verified.
+  (`apps/web/src/sql/`), and on it the food catalog
+  (`apps/web/src/foodCatalog/`): it reads a pack the Dart writer wrote and
+  gives the same searches with the same scores. Not built: the native
+  adapter, downloading a pack (it needs an interface to the phone's files
+  first), the data layer, the pipeline, the fixtures. Whether a native
+  plugin has FTS5 on Android is not verified.
   The task runner (`tool/`) is the last Dart and waits for nothing. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
   it says how enums, nulls, dates, rounding and streams are written.
