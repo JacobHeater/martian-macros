@@ -4,7 +4,9 @@
  * `format` folder of the Flutter app.
  */
 export * from './adherenceLines';
+export * from './cautionMessage';
 export * from './clockTimeText';
+export * from './coachLineText';
 export * from './confidenceLabel';
 export * from './confidenceNextStepText';
 export * from './dailyActivityDetail';
@@ -25,8 +27,12 @@ export * from './importedWeighInText';
 export * from './insightText';
 export * from './loadNumber';
 export * from './loggingStreakText';
+export * from './mealKindLabel';
+export * from './mealKindShortLabel';
 export * from './mealLabel';
+export * from './mealSizeLabel';
 export * from './megabytes';
+export * from './modeReasonExplanation';
 export * from './MonthlyReportText';
 export * from './muscleGroupLabel';
 export * from './paceLabel';
@@ -58,11 +64,14 @@ export * from './roundedToZeroNote';
 export * from './setText';
 export * from './spokenDuration';
 export * from './stallText';
+export * from './targetFlagMessage';
 export * from './themePreferenceLabel';
 export * from './timeSpanProblemMessage';
 export * from './trainingStatusLabel';
 export * from './trustTierLabel';
 export * from './underEatingText';
 export * from './waistAmount';
+export * from './waistSummary';
+export * from './weightEventLabel';
 export * from './whatWouldChangeIt';
 export * from './workoutSummaryText';

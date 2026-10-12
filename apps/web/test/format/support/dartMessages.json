@@ -1,0 +1,180 @@
+{
+ "labels": {
+  "caution": {
+   "pregnancy": "Pregnancy: the app holds you at maintenance and will not prescribe a deficit. Follow your clinician’s guidance on intake.",
+   "breastfeeding": "Breastfeeding: targets include extra energy for milk production and the app will not prescribe a deficit.",
+   "eatingDisorderHistory": "Deficit modes are switched off. If food or weight tracking starts to feel distressing, stop and talk to your care team.",
+   "chronicKidneyDisease": "Kidney disease: protein is capped low. Confirm your protein and energy targets with your nephrologist or dietitian.",
+   "pcos": "PCOS can change how your body responds. The app adapts to your measured results; keep your clinician in the loop.",
+   "menopause": "Hormonal changes can shift energy needs and water retention. The app adapts to your measured results.",
+   "thyroidCondition": "Thyroid conditions affect energy needs. The app adapts to your measured results; keep your treatment stable where you can.",
+   "insulinOrSulfonylurea": "Insulin or sulfonylurea treatment can cause low blood sugar when you eat less. Talk to your care team before a deficit; until then, the app limits loss to the gentlest pace.",
+   "bariatricSurgery": "After bariatric surgery, your surgical team should set your nutrition targets. The app will not issue coaching targets.",
+   "weightAffectingMedication": "Some medications can change weight or water retention. Your trend may move for reasons other than food; keep your clinician informed.",
+   "underweight": "Your weight is below the range where the app will plan a calorie deficit, so it holds you at maintenance. If you are not eating enough, or you are losing weight without trying, talk to a clinician.",
+   "lowBodyWeight": "Your weight is close to the low end of the healthy range, so the app only plans the gentlest pace of loss."
+  },
+  "targetFlag": {
+   "flooredAtSafetyMinimum": "Your calories are at the lowest level the app will set. Going lower risks your health and your muscle.",
+   "raisedForSafePace": "You were losing weight faster than the app aims for at your body fat, because faster loss costs more muscle. Targets went up.",
+   "heldAfterSafetyRaise": "Your targets went up last week because you were losing faster than the app aims for. They hold at that level this week.",
+   "heldByUser": "You kept last week’s targets. They may come down at the next check-in.",
+   "rateLimited": "This week’s change was limited to a small step. Targets move gradually so one odd week can’t swing them.",
+   "dietBreak": "You’ve been in a deficit for 16 weeks. This is a maintenance break to recover before continuing.",
+   "underweightMaintenance": "Your weight is below the range where the app will plan a calorie deficit, so targets are at maintenance. If you are not eating enough, talk to a clinician.",
+   "modeNotAllowed": "Your chosen goal isn’t available with your health check, so the app is holding you at maintenance.",
+   "proteinCapped": "Protein is capped because of your health check.",
+   "requestedBreak": "This is the maintenance week you chose. The deficit can resume at the next check-in."
+  },
+  "modeReason": {
+   "deficitNotAllowed": "Based on your health check, the app will not prescribe a calorie deficit.",
+   "underweight": "Your weight is below the range where the app will plan a calorie deficit, so it starts you at maintenance. If you are not eating enough, talk to a clinician.",
+   "highBodyFat": "At your estimated body fat, steady fat loss gives the fastest visible progress while training protects your muscle. Body fat here is an estimate that can be off by a few points either way.",
+   "recompEligible": "With your training background and estimated body fat, you can realistically lose fat and gain muscle at the same time. Body fat here is an estimate that can be off by a few points either way.",
+   "leanAndTrained": "You are already lean and trained, so building muscle needs a small surplus. Body fat here is an estimate that can be off by a few points either way.",
+   "cutFirst": "For trained lifters at moderate body fat, a focused cut works better than trying to do both at once. Body fat here is an estimate that can be off by a few points either way."
+  },
+  "weightEvent": {
+   "startedCreatine": "Started creatine",
+   "stoppedCreatine": "Stopped creatine",
+   "illness": "Illness",
+   "travel": "Travel",
+   "newTraining": "New or harder training",
+   "largeOrSaltyMeal": "Unusually large or salty meal",
+   "other": "Other"
+  },
+  "mealSize": {
+   "light": "Light",
+   "regular": "Regular",
+   "large": "Large",
+   "veryLarge": "Very large"
+  },
+  "mealKind": {
+   "balanced": "Balanced",
+   "mostlyCarbohydrate": "Mostly carbs (pasta, rice, pizza)",
+   "mostlyProtein": "Mostly protein (meat or fish)",
+   "rich": "Rich (fried, creamy, dessert)"
+  },
+  "mealKindShort": {
+   "balanced": "Balanced",
+   "mostlyCarbohydrate": "Mostly carbs",
+   "mostlyProtein": "Mostly protein",
+   "rich": "Rich"
+  }
+ },
+ "today": 20738,
+ "waist": {
+  "one today": {
+   "entries": [
+    [
+     20738,
+     91.0
+    ]
+   ],
+   "metric": "Latest: 91 cm on Oct 12. Weekly is enough: the next is due Oct 19.",
+   "imperial": "Latest: 35.75 in on Oct 12. Weekly is enough: the next is due Oct 19."
+  },
+  "one, a week old": {
+   "entries": [
+    [
+     20731,
+     91.0
+    ]
+   ],
+   "metric": "Latest: 91 cm on Oct 5.",
+   "imperial": "Latest: 35.75 in on Oct 5."
+  },
+  "two": {
+   "entries": [
+    [
+     20731,
+     93.0
+    ],
+    [
+     20738,
+     91.0
+    ]
+   ],
+   "metric": "Latest: 91 cm on Oct 12. Down 2 cm since you started. Weekly is enough: the next is due Oct 19.",
+   "imperial": "Latest: 35.75 in on Oct 12. Down 0.75 in since you started. Weekly is enough: the next is due Oct 19."
+  },
+  "down": {
+   "entries": [
+    [
+     20696,
+     94.0
+    ],
+    [
+     20703,
+     93.5
+    ],
+    [
+     20710,
+     94.5
+    ],
+    [
+     20724,
+     92.0
+    ],
+    [
+     20735,
+     91.5
+    ]
+   ],
+   "metric": "Latest: 91.5 cm on Oct 9. Down 2 cm since you started. Weekly is enough: the next is due Oct 16.",
+   "imperial": "Latest: 36 in on Oct 9. Down 0.75 in since you started. Weekly is enough: the next is due Oct 16."
+  },
+  "up": {
+   "entries": [
+    [
+     20696,
+     90.0
+    ],
+    [
+     20703,
+     90.5
+    ],
+    [
+     20710,
+     90.0
+    ],
+    [
+     20724,
+     92.0
+    ],
+    [
+     20729,
+     93.0
+    ]
+   ],
+   "metric": "Latest: 93 cm on Oct 3. Up 2 cm since you started.",
+   "imperial": "Latest: 36.5 in on Oct 3. Up 0.75 in since you started."
+  },
+  "no clear change": {
+   "entries": [
+    [
+     20696,
+     91.0
+    ],
+    [
+     20703,
+     91.5
+    ],
+    [
+     20710,
+     91.0
+    ],
+    [
+     20724,
+     91.0
+    ],
+    [
+     20737,
+     91.4
+    ]
+   ],
+   "metric": "Latest: 91.5 cm on Oct 11. No clear change since you started: a difference under 1.5 cm is within what a tape can tell. Weekly is enough: the next is due Oct 18.",
+   "imperial": "Latest: 36 in on Oct 11. No clear change since you started: a difference under 0.5 in is within what a tape can tell. Weekly is enough: the next is due Oct 18."
+  }
+ }
+}
