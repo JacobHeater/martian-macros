@@ -22,9 +22,9 @@
     var shares = { protein: 400 * p / energy, carbs: 400 * c / energy, fat: 900 * f / energy };
     return m.label(estimated ? 'Estimated macro split' : 'Macro split') + m.rowx([
       m.donut(shares), m.col([
-        '<div class="c-protein"><b>Protein</b><br>' + p + ' g · ' + shares.protein.toFixed(1) + '%</div>',
-        '<div class="c-carbs"><b>Carbs</b><br>' + c + ' g · ' + shares.carbs.toFixed(1) + '%</div>',
-        '<div class="c-fat"><b>Fat</b><br>' + f + ' g · ' + shares.fat.toFixed(1) + '%</div>'
+        '<div class="c-protein"><b>Protein</b><br>' + Math.round(p) + ' g · ' + shares.protein.toFixed(1) + '%</div>',
+        '<div class="c-carbs"><b>Carbs</b><br>' + Math.round(c) + ' g · ' + shares.carbs.toFixed(1) + '%</div>',
+        '<div class="c-fat"><b>Fat</b><br>' + Math.round(f) + ' g · ' + shares.fat.toFixed(1) + '%</div>'
       ])
     ]) + m.p(Math.round(energy).toLocaleString('en-US') + ' kcal from food macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol and other calorie differences are not part of this split.', 't2');
   }
@@ -74,7 +74,7 @@
         m.frame('add-food-search-no-pack', 'No food database on the phone', '', sheet([m.title('Add food'), m.field('Search foods', 'yog'), m.p('No food database is on this phone yet. You can download one in Settings, or enter the food yourself.', 't2'), m.btn('Enter manually', 'text', { sm: true })])),
         m.frame('add-food-amount', 'How much of a found food', 'As the screenshot test shows it: the food’s own serving first, then weights and hand portions; the field is named for the unit chosen.', sheet([
           m.title('Banana'), m.cap('Food database · Reference'), m.chips(['1 medium (118 g)', 'Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs'], 0), m.field('How many servings', '2'), m.cap('236 g'),
-          total('210 kcal · 3 g protein · 54 g carbs · 1 g fat'), macroPreview(2.6, 54, 0.6), meals, m.btn('Log it', 'primary', { block: true }), m.btn('Back to search', 'text', { block: true })])),
+          total('210 kcal · 3 g protein · 54 g carbs · 1 g fat'), macroPreview(2.596, 54.28, 0.708), meals, m.btn('Log it', 'primary', { block: true }), m.btn('Back to search', 'text', { block: true })])),
         m.frame('add-food-amount-hand', 'Hand portion estimated', 'Both the grams and nutrient totals are explicitly estimates for hand portions.', sheet([
           m.title('Banana'), m.cap('Food database · Reference'), m.chips(['1 medium (118 g)', 'Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs'], 3), m.field('Amount (palms)', '1', { help: 'About 114 g (estimated)' }),
           total('Estimated: 102 kcal · 1 g protein · 26 g carbs · 0 g fat'), macroPreview(1.3, 26, 0.3, true), meals, m.btn('Log it', 'primary', { block: true }), m.btn('Back to search', 'text', { block: true })])),
@@ -98,7 +98,7 @@
           m.title('Estimate a meal'), m.p('For a restaurant, a friend’s cooking or a buffet. Restaurant meals usually have more than they look. A rough entry beats a missing one.', 't2'),
           m.label('How big was it?'), m.chips(['Light · about 500 kcal', 'Regular · about 800 kcal', 'Large · about 1,200 kcal', 'Very large · about 1,800 kcal'], 1),
           m.label('What kind of meal?'), m.chips(['Balanced', 'Mostly carbs (pasta, rice, pizza)', 'Mostly protein (meat or fish)', 'Rich (fried, creamy, dessert)'], 0),
-          macroPreview(50, 90, 27, true), m.field('Name (optional)', '', {}), m.cap('Thai place, usual'), meals, m.btn('Log the estimate', 'primary', { block: true }), m.btn('Back', 'text', { block: true })])),
+          macroPreview(40, 100, 240 / 9, true), m.field('Name (optional)', '', {}), m.cap('Thai place, usual'), meals, m.btn('Log the estimate', 'primary', { block: true }), m.btn('Back', 'text', { block: true })])),
         m.frame('add-food-estimate-early', 'Before the first weigh-in', '', sheet([m.title('Estimate a meal'), m.notice('info', 'Sizes are scaled to your own energy needs, which the app works out after your first weigh-in. Until then, enter the food by hand.'), m.btn('Back', 'text', { block: true })]))
       ] },
       { h: 'Saved foods and recipes', frames: [

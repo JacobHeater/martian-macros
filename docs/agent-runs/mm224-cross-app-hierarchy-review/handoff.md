@@ -31,3 +31,11 @@
 
 No canonical product files or implementation were edited. Stop after this
 written recommendation, as requested.
+# Delivery reconciliation
+
+The editing owner restored the known baseline branch/commit after the survey.
+This run remains scoping evidence, not a completed protocol panel review:
+reviewed-input hashes were not recorded, fresh research was blocked, and
+Add food implementation/screenshots have since changed under MM-223/MM-225.
+The report's earlier source references are historical, not fresh consultation.
+MM-224 remains open; this metadata does not certify cross-app usability.

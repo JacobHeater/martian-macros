@@ -1,6 +1,6 @@
 ---
 id: MM-223
-status: in-progress
+status: done
 component: food-logging
 related: [MM-38, MM-39, MM-42, MM-212, MM-219, MM-224]
 ---
@@ -51,9 +51,11 @@ Scenario: Selecting a recent food
 ```
 
 ## UI/UX Assets
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) — Current. Shows discovery, a blank manual form, and manual entry from a search query; the regression widget test verifies the transition and query carry, and the updated Linux screenshot baseline is pending. It does not decide the open behavior of found or recent foods in MM-219.
+- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) — Current. Shows discovery, a blank manual form, and manual entry from a search query; the regression widget test verifies the transition and query carry. Linux discovery and manual-form screenshots were inspected and imported from run 38199739648. It does not decide the open behavior of found or recent foods in MM-219.
 
 ## Notes
 - Regression coverage: `apps/mobile/test/add_food_discovery_test.dart`.
+- `mm check` and Linux Update goldens run 38199739648 passed. No emulator
+  was available; screenshots and widget tests are not a live-device review.
 - This fixes only the search/name collision and first-screen hierarchy.
   The other proposed MM-219 behaviors remain open.

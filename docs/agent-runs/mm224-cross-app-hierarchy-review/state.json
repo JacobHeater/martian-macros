@@ -3,17 +3,17 @@
   "task_id": "mm224-cross-app-hierarchy-review",
   "audit_mode": "feature",
   "baseline": {
-    "branch": "unavailable: no Git/status tool exposed",
-    "commit": null
+    "branch": "feature/mm205-expert-mobile-ux",
+    "commit": "86888453e0b8e213bff6609eeafae01d3ec0aaa7"
   },
-  "phase": "checkpoint",
+  "phase": "scope",
   "owner": null,
   "assignments": [
     {
       "task": "Direct bounded existing-UI/documentation audit, source/render coverage, prior-review process trace and recommendation; no specialist panel.",
       "role": "chair",
       "reviewer": "current API session; identity not otherwise exposed",
-      "status": "complete",
+      "status": "stale",
       "inspected_commit": null,
       "input_hashes": {},
       "report": "findings/chair.md",
@@ -41,45 +41,16 @@
           "source-inspection",
           "render-inspection"
         ],
-        "limitations": "All current destination areas were surveyed, not newly walked. Prior Add-food walkthrough applies to its recorded commit. Stored PNGs are not device sessions; the Add-food opening PNG conflicts with current source. No commands/tests ran."
+        "limitations": "All current destination areas were surveyed, not newly walked. Prior Add-food walkthrough applies to its recorded commit. Stored PNGs are not device sessions; the Add-food opening PNG conflicts with current source. No commands/tests ran. The editing owner restored the baseline branch/commit after the review from its known worktree HEAD; source inspection included uncommitted MM-223 work and no reviewed-input hash set was reconstructed."
       },
       "research": {
         "status": "blocked",
         "question": "What current empirical evidence directly supports a cross-app primary-information hierarchy or progressive disclosure for novice wellness logging?",
         "reason": "Explicit request for current external research and protocol research gate; fresh general web discovery/retrieval was unavailable.",
         "path": "unavailable",
-        "sources": [
-          {
-            "url": "https://depstein.net/assets/pubs/fcordeiro_chi15.pdf",
-            "title": "Barriers and Negative Nudges: Exploring Challenges in Food Journaling",
-            "published_or_updated": "2015",
-            "accessed": "2026-10-10",
-            "claim": "Prior research record reports a survey of 141 mixed-experience journalers and 5,526 forum posts identifying food-journaling/search/portion friction; indirect to this UI and not a disclosure experiment."
-          },
-          {
-            "url": "https://depstein.net/assets/pubs/lsilva_dis21.pdf",
-            "title": "Investigating Preferred Food Description Practices in Digital Food Journaling",
-            "published_or_updated": "2021",
-            "accessed": "2026-10-10",
-            "claim": "Prior research record reports a two-week study with 15 participants and 1,008 logs, mainly prior journalers; not novice hierarchy evidence."
-          },
-          {
-            "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
-            "title": "Understanding Success Criterion 1.4.4: Resize Text",
-            "published_or_updated": "WCAG 2.2 Recommendation date reported as 2023-12-05; not independently reverified",
-            "accessed": "2026-10-10",
-            "claim": "Prior retrieval describes normative web accessibility text-resize guidance; informs verification, not hierarchy effectiveness or native Flutter conformance."
-          },
-          {
-            "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
-            "title": "Accessibility - Human Interface Guidelines",
-            "published_or_updated": "Latest changelog entry reported as 2025-06-09; page-level date not established",
-            "accessed": "2026-10-10",
-            "claim": "Prior retrieval describes official platform accessibility guidance, not a comparative usability study or nutrition-hierarchy policy."
-          }
-        ],
+        "sources": [],
         "summary": "Reused source details from the verified prior chair retrieval in docs/agent-runs/mm205-novice-mobile-experience/findings/research.md. Current general web search/retrieval was not observed; a bounded research delegation returned a maximum-depth error. No fresh research result is claimed.",
-        "limitations": "Evidence is indirect and does not establish that card count causes user difficulty, that progressive disclosure improves this app's task success, or which required data should be prominent. Current research capability blocked."
+        "limitations": "Evidence is indirect and does not establish that card count causes user difficulty, that progressive disclosure improves this app's task success, or which required data should be prominent. Current research capability blocked. Prior-source citations remain in the prose report, not as freshly consulted sources in this run. The survey is retained as scoping evidence, not a completed protocol review; the Add food implementation and baselines have since changed."
       }
     }
   ],
