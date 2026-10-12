@@ -86,6 +86,18 @@ repositories: the 7 Dart tests of merging weigh-ins and of the demo
 configuration carried over, and 22 new ones. Not done: no screen reads it
 yet, and the evidence register (a text asset) is not loaded here.
 
+**2. The component library (2026-10-12).** `apps/web/src/ui/`: the 45
+components of the Flutter `ui/` folder that are not charts, with the sizes
+and colors of the Flutter theme, and `MmOverlays`, which gives a screen its
+questions (confirm, a choice of two, a list of options, a time of day, a
+time to the second) and its short messages. 26 tests by what a person sees,
+hears and does; the two Flutter component tests are carried over. Every
+component is in the gallery (`?gallery`), and a screenshot of it in the
+three palettes was looked at. Not done: the four drawn components (the mini
+trend, the horizon arc, the muscle volume row, the strength trend card),
+which come with the charts; and nothing has been checked on a phone or with
+a screen reader.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
