@@ -175,6 +175,21 @@ MM-213: three labels on one line at 360 wide); it belongs to the screenshot
 tests of MM-229. The food database screen (`food_database_test`) comes with
 Settings.
 
+**7. Progress (2026-10-12).** `apps/web/src/progress/`: today's weigh-in
+(with where an imported one came from), the weight trend over 30 or 90 days
+with its events marked, the weight events card and the sheet that adds one,
+the waist card (three readings or one), the recomp signal, and strength:
+the four most-trained lifts, every lift's history and its sessions.
+`StrengthTrendCard` joins the component library; the app's state gained the
+recomp signal and a retry for the strength history. 38 tests: the Flutter
+tests of `progress_flows`, `waist_entry`, `recomp_signal` and
+`strength_progress`, the Progress half of the bariatric case, and what the
+screens do with weigh-ins already imported (`imported_weigh_ins`). **Still
+to come with the health import:** the cases of `imported_weigh_ins` that
+read the health platform as the app opens. The Flutter case that drew the
+strength cards at a narrow width and a large text size measured layout and
+belongs to the screenshot tests of MM-229; the count of cards is tested.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
