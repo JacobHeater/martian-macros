@@ -2,6 +2,13 @@
 
 Status: founding decisions, October 2026. This is the overview.
 
+> **Decided 2026-10-12 (MM-228): the app is being rebuilt as a React HTML5
+> app in a native shell.** It stays offline, the web is never a product, and
+> the product decisions below stand. Everything in this file about Flutter,
+> Dart packages and Drift describes the app being replaced, which remains the
+> reference for behavior until the new one takes over. This file is rewritten
+> at the switch.
+
 **The requirements live in [`requirements/`](../requirements/README.md)**, one
 ticket per decision or piece of work, each with a short id (`MM-n`). Where
 this file and a ticket disagree, the ticket is right; fix this file.
