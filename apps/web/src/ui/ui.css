@@ -958,3 +958,35 @@
   color: var(--text2);
   font: var(--type-caption);
 }
+
+.mm-horizon {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.mm-horizon-track,
+.mm-horizon-fill,
+.mm-horizon-ring {
+  fill: none;
+  stroke-linecap: round;
+}
+.mm-horizon-track {
+  stroke: var(--track);
+}
+.mm-horizon-fill,
+.mm-horizon-ring {
+  stroke: var(--energy);
+}
+.mm-horizon-dot {
+  fill: var(--energy);
+}
+.mm-horizon-hollow {
+  fill: var(--surface);
+}
+.mm-horizon-glow {
+  fill: color-mix(in srgb, var(--ion) 50%, transparent);
+  filter: blur(4px);
+}
+.theme-light .mm-horizon-glow {
+  display: none;
+}

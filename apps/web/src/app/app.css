@@ -27,3 +27,87 @@
   flex-wrap: wrap;
   gap: var(--space-8);
 }
+
+/* Screens (MM-232). */
+#root,
+.app-layer {
+  position: relative;
+  height: 100%;
+}
+.app-layer[hidden] {
+  display: none;
+}
+.app-body {
+  gap: 0;
+}
+.app-body-roomy {
+  padding: var(--space-24);
+}
+.app-body-barless {
+  padding-top: calc(var(--space-24) + env(safe-area-inset-top));
+}
+.app-headline {
+  margin: 0 0 var(--space-8);
+  font: var(--type-title);
+}
+.app-figure {
+  margin: 0 0 var(--space-12);
+  font: var(--type-figure);
+}
+.app-subhead {
+  margin: var(--space-16) 0 var(--space-12);
+  font: var(--type-heading);
+}
+.app-text {
+  margin: 0 0 var(--space-8);
+}
+.app-lead {
+  margin: 0;
+  color: var(--text2);
+}
+.app-muted {
+  color: var(--text2);
+}
+.app-caption {
+  margin: var(--space-8) 0 0;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.app-gap-small {
+  flex: none;
+  height: var(--space-12);
+}
+.app-gap {
+  flex: none;
+  height: var(--space-24);
+}
+.app-gap-large {
+  flex: none;
+  height: 48px;
+}
+.app-stack-item {
+  margin-bottom: var(--space-12);
+}
+.app-row-end {
+  justify-content: flex-end;
+}
+.app-row-even {
+  flex-wrap: nowrap;
+  gap: var(--space-12);
+}
+.app-row-even > * {
+  flex: 1;
+}
+.app-centered {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+.app-centered-page {
+  height: 100%;
+  padding: var(--space-24);
+}
+.app-centered-middle {
+  align-items: center;
+}

@@ -98,6 +98,21 @@ trend, the horizon arc, the muscle volume row, the strength trend card),
 which come with the charts; and nothing has been checked on a phone or with
 a screen reader.
 
+**3. The shell and onboarding (2026-10-12).** The app is drawn from
+`AppState` now. Rebuilt: the root that decides which screen is due, the
+theme chooser, onboarding (welcome and its seven steps), the adults-only
+screen, welcome back and resume, the repeat health check, and the check-in
+that saves new targets while the app is open. Screens are pushed and
+closed by a small navigator of our own; there is no router library. 32
+tests: the Flutter tests of theme start-up (9 of its 10; the tenth is the
+Settings one, carried into the shell's tests), onboarding (2), welcome back
+(6) and the health check on opening (4 of 6; the other two go through
+Settings and Coach), and 6 added. The built app was opened in headless
+Chrome: the database opens and the theme chooser draws as it should.
+**Known limits:** the five destinations and all of Settings but the theme
+are placeholders; and the app keeps its data in memory, so **nothing
+survives closing it** until the native adapter exists (MM-231).
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with

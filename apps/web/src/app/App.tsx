@@ -1,36 +1,68 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { SystemBars } from '../platform/SystemBars';
+import type { AppServices } from '../state/AppServices';
+import { AppState } from '../state/AppState';
+import { Loadable } from '../state/Loadable';
 import { isDarkPalette } from '../theme/isDarkPalette';
 import { paletteFor } from '../theme/paletteFor';
-import type { ThemePreference } from '../theme/ThemePreference';
-import { HomeShell } from './HomeShell';
-import { SettingsScreen } from './SettingsScreen';
+import { DemoNotice } from '../ui/DemoNotice';
+import { MmOverlays } from '../ui/MmOverlays';
+import { AppContext } from './AppContext';
+import { AppRoot } from './AppRoot';
+import { NavigatorHost } from './NavigatorHost';
+import { useCell } from './useCell';
 import { usePrefersDark } from './usePrefersDark';
+import './app.css';
 
 interface AppProps {
-  /** Martian for a new installation (MM-184). */
-  initialTheme?: ThemePreference;
+  /** Where everything is stored. The one place that chooses hands them in. */
+  services: AppServices;
   /** The phone's bars, told when the background changes. Absent in a browser. */
-  systemBars?: SystemBars;
+  systemBars?: SystemBars | undefined;
+  /** Marks every screen as showing synthetic data. */
+  demo?: boolean;
 }
 
-/**
- * The app. The theme choice lives in memory until the data layer exists
- * (MM-228 part 3); nothing here is written to browser storage.
- */
-export function App({ initialTheme = 'martian', systemBars }: AppProps) {
-  const [theme, setTheme] = useState<ThemePreference>(initialTheme);
-  const [inSettings, setInSettings] = useState(false);
-  const palette = paletteFor(theme, usePrefersDark());
+/** The app: its state over the stores it is given, its theme, and the screen that is due. */
+export function App({ services, systemBars, demo = false }: AppProps) {
+  const state = useMemo(() => new AppState(services), [services]);
+  const scope = useMemo(() => ({ services, state }), [services, state]);
+
+  const preview = useCell(state.themePreview);
+  const stored = useCell(state.themePreference);
+  // Until the stored choice has been read the app follows the phone, so an
+  // installation that chose Dark is never shown Martian first (MM-186).
+  const preference = preview ?? Loadable.valueOf(stored) ?? 'system';
+  const palette = paletteFor(preference, usePrefersDark());
 
   useEffect(() => {
     document.documentElement.className = `theme-${palette}`;
     systemBars?.setBackgroundIsDark(isDarkPalette(palette));
   }, [palette, systemBars]);
 
-  return inSettings ? (
-    <SettingsScreen theme={theme} onTheme={setTheme} onBack={() => setInSettings(false)} />
-  ) : (
-    <HomeShell onOpenSettings={() => setInSettings(true)} />
+  // Once the store holds a real choice, what was being tried is the choice (MM-185).
+  useEffect(() => {
+    if (stored.ready && stored.value !== 'unselected') state.themePreview.put(undefined);
+  }, [stored, state]);
+
+  // The check-in runs for as long as the app is open, whatever screen is showing.
+  useEffect(() => state.checkIn.start(), [state]);
+
+  // Roll the calendar day over if the app was left open overnight.
+  useEffect(() => {
+    const resumed = () => {
+      if (document.visibilityState === 'visible') state.refreshToday();
+    };
+    document.addEventListener('visibilitychange', resumed);
+    return () => document.removeEventListener('visibilitychange', resumed);
+  }, [state]);
+
+  const content = (
+    <MmOverlays>
+      <NavigatorHost>
+        <AppRoot />
+      </NavigatorHost>
+    </MmOverlays>
   );
+  return <AppContext.Provider value={scope}>{demo ? <DemoNotice>{content}</DemoNotice> : content}</AppContext.Provider>;
 }
