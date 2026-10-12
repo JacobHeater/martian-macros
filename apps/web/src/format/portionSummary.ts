@@ -1,0 +1,44 @@
+import { type FoodEntry, gramsFor, PortionUnit, type ReferenceNutrition } from '../domain';
+import { toStringAsFixed } from '../lang/toStringAsFixed';
+import { portionUnitOf } from './portionUnitOf';
+import { quantitySourceLabel } from './quantitySourceLabel';
+import { quantityText } from './quantityText';
+
+const whole = (value: number) => quantityText(Number(toStringAsFixed(value, 0)));
+
+function calculatedFrom(reference: ReferenceNutrition): string {
+  const kcal = whole(reference.nutrition.kcal);
+  switch (reference.basis) {
+    case 'per100g':
+      return `calculated from ${kcal} kcal per 100 g`;
+    case 'per100ml':
+      return `calculated from ${kcal} kcal per 100 mL`;
+    case 'perServing':
+      return `calculated from ${kcal} kcal per serving`;
+  }
+}
+
+/**
+ * A readable line for what was eaten and how the totals came about
+ * (MM-167). An entry logged before portions were recorded says so and
+ * invents nothing.
+ */
+export function portionSummary(entry: FoodEntry): string {
+  const portion = entry.portion;
+  if (portion === undefined) return `${quantitySourceLabel(entry.source)} · amount not recorded`;
+  const { quantity, unit, reference } = portion;
+  if (quantity === undefined || unit === undefined) return 'Estimated totals';
+  const servingDescription = reference?.servingDescription;
+  const amount =
+    unit === 'serving' && servingDescription !== undefined
+      ? `${quantityText(quantity)} × ${servingDescription}`
+      : `${quantityText(quantity)} ${portionUnitOf(unit, quantity)}`;
+  const hand = PortionUnit.isHand(unit);
+  const grams = hand ? portion.impliedGrams : reference === undefined ? undefined : gramsFor(quantity, unit, reference);
+  const weight = grams === undefined || PortionUnit.isWeight(unit) ? '' : ` (${whole(grams)} g)`;
+  let how: string;
+  if (hand) how = 'estimated';
+  else if (portion.basis === 'enteredTotals') how = 'totals entered by you';
+  else how = reference === undefined ? 'calculated' : calculatedFrom(reference);
+  return `${amount}${weight} · ${how}`;
+}

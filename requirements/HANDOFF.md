@@ -206,7 +206,8 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   first). The data layer is built (`apps/web/src/data/`): every repository
   on SQLite, passing those same suites, with the schema at version 1 in
   the shape the Dart database had; it has run only against the WebAssembly
-  build, never on a phone. Whether a native
+  build, never on a phone. The Flutter app's wording is carried over too
+  (`apps/web/src/format/`), checked against what Dart printed. Whether a native
   plugin has FTS5 on Android is not verified.
   The task runner (`tool/`) is the last Dart and waits for nothing. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
