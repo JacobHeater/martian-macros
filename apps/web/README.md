@@ -65,7 +65,7 @@ came from, the conversion is written the same way everywhere.
 | An enum with fields or getters | Functions on that object: `QuantitySource.relativeSigma(source)`, `PortionUnit.grams(unit)` |
 | A class with only fields | An `interface`, built as an object literal |
 | A class with defaults, getters, methods or checks | A `class` whose constructor takes one object: `new Pause({ from, to, reason })` |
-| Named parameters | One object parameter, destructured, with the same defaults |
+| Named parameters | One object parameter, destructured, with the same defaults. A default also replaces a key given as `undefined`, which Dart's does not do for an explicit `null`; where that matters, test for the key with `in` |
 | `null` | `undefined`, everywhere. A nullable field is `name?: T \| undefined` |
 | `CalendarDate(2026, 3, 8)` | `CalendarDate.of(2026, 3, 8)`. There is one object per day, so `===`, `Map` keys and `Set` members behave as Dart's value equality did |
 | `==` overridden on a class | An `equals(other)` method, or a `sameX(a, b)` function for an interface. `===` on two objects is never value equality |
