@@ -289,6 +289,37 @@ holds no data) — both belong to MM-229's run on a phone. Still open in
 step 5: the hardware back button inside the app's own navigation, and the
 demo seed wiring (MM-228).
 
+**14. The switch (2026-10-12).** Step 6, and with it the last of the
+Flutter ecosystem. The hardware back button first (merged with #130):
+Android's back answers the question on top as its scrim would, then closes
+the screen on top, and from the home screen puts the app in the background;
+`Navigator` and `Overlays` gained `closeTop`. Then the switch itself: the
+Dart task runner is rewritten in TypeScript (`tool/`), run by Node itself
+(22.18+) with no build step and no dependencies — `req` (with the MM-210
+asset and MM-211 coverage checks), `panel`, `ci` (the full MM-209 watch),
+`roadmap`, `food` (fetch in the tool; build and package drive the TS
+pipeline in `apps/web` through vite, DuckDB still does the extract),
+`run`/`demo`/`emulator`/`build`/`clean` over adb and Gradle, and `check` =
+req, panel, the tool's own type check and tests, then the web check. The
+Dart tool tests are ported to `node:test` (140 pass), the `ci` suite and
+the panel checker's among them, fidelity kept. `apps/mobile`, the seven
+Dart `packages/`, `.fvmrc`, the root pubspec and the goldens workflow are
+deleted (1,324 files; git history keeps them). `coverage.json` is
+re-pointed at `apps/web/src` — 138 of 150 surfaces mapped mechanically from
+their Flutter counterparts, 12 React-only hosts written by hand — and the
+coverage checker now reads `.tsx` files that return JSX. The tokens test's
+reference, the Flutter theme, is recorded in
+`apps/web/test/support/flutterTheme.json` as it stood at removal. The
+evidence register, README, AGENTS.md, the architecture overview and the
+roadmap name the TypeScript files now. CI runs on Node alone and assembles
+the debug APK. Not carried over, deliberately: `mm arch` (the Dart
+declaration checker; the layers test covers imports, and a TypeScript
+checker for the rest is listed in the handoff as next), `mm gen`/`mm
+schema` (no generated code; the schema is `src/data/schema.ts`),
+`mm format`/`mm analyze` (the web check's type check stands in; no
+repository Prettier config), `mm goldens` and the evidence copy (the app
+builds with `docs/evidence.md` directly). The demo seed flag is MM-228's.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with

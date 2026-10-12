@@ -12,13 +12,12 @@ For cross-domain development reviews, use the tool-neutral
 Reviewers are read-only; one designated owner edits canonical files. Native
 delegation and sequential fallback do not supersede the working agreements here.
 
-> **The app is moving from Flutter to a React HTML5 app in a native shell
-> (MM-228, decided by the product owner on 2026-10-12).** Read that epic
-> before any work on screens. Until the switch: new app work goes in
-> `apps/web/`; the Flutter app in `apps/mobile/` is frozen except for a defect
-> whose fix carries over; the requirements apply to the new app as written;
-> and the sections below that name Flutter, Dart or Drift describe the app
-> being replaced.
+> **The app is a React HTML5 app in a thin native Android shell (MM-228,
+> decided by the product owner on 2026-10-12).** The Flutter app it replaced
+> was removed with MM-232's final step; the old Dart sources remain in git
+> history, and the requirements describe the product as built in
+> `apps/web/`. The web is never a product: the app runs from files inside
+> the shell, offline.
 
 ## Working agreements
 
@@ -65,12 +64,12 @@ delegation and sequential fallback do not supersede the working agreements here.
   `mm req` checks the bookkeeping.
 - Every view and reusable component has an HTML drawing (MM-211). The
   library at `requirements/ui-ux-assets/index.html` draws the app as built,
-  and `coverage.json` beside it lists every widget file with the frame that
-  draws it. When you add a view, a component, a sheet or a dialog, draw it
-  with its states, add its manifest entry and link the sheet from its
+  and `coverage.json` beside it lists every component file with the frame
+  that draws it. When you add a view, a component, a sheet or a dialog, draw
+  it with its states, add its manifest entry and link the sheet from its
   tickets, in the same pull request; when you change how one looks or
   behaves, change its drawing with it; when you remove one, remove its
-  frames and its entry. `mm req` fails on a widget file the manifest does
+  frames and its entry. `mm req` fails on a component file the manifest does
   not list. A `Current` sheet shows what is built and nothing else: a
   redesign goes on its own sheet, marked as a proposal, and a broken screen
   is drawn broken and given a bug ticket.
@@ -104,7 +103,7 @@ delegation and sequential fallback do not supersede the working agreements here.
   on it deliberately and say "builds on #N" in the description.
 - `mm check` has passed only when its exit code is 0 and its last line is
   "All checks passed." A tail reading "All tests passed!" can belong to one
-  package while another failed.
+  suite while another failed.
 - A change to how a screen looks is not done until you have looked at it on the
   emulator (or say plainly that you did not). How the app looks matters as much
   as what it does. Its HTML drawing is looked at in a browser too (MM-211).
@@ -115,16 +114,32 @@ delegation and sequential fallback do not supersede the working agreements here.
 
 ## Project map and conventions
 
-- `apps/mobile/` is the Flutter UI.
-- `packages/domain/` contains pure-Dart domain types and rules.
-- `packages/engine/` contains pure-Dart calculations and coaching logic.
-- `packages/data/` contains Drift/SQLite persistence: the Drift implementations of the
-  repository interfaces (`DriftRepositories`).
-- `packages/fixtures/` holds in-memory implementations of every interface and the
-  contract test suites, for tests, demos and early work.
-- `apps/mobile/lib/src/ui/` is the design-system component library; screens use it and never
-  raw Material controls.
-- `tool/` contains the dependency-light `mm` task runner.
+- `apps/web/src/` is the app. Its first-level folders are layers, kept apart
+  exactly as the Dart packages were, and `apps/web/test/layers.test.ts`
+  enforces who may import whom:
+  - `lang/` small language helpers (no imports);
+  - `domain/` entities, units, repositories' interfaces, screening;
+  - `engine/` weight trend, adaptive TDEE, partition, safety bounds, targets, coach;
+  - `healthIngest/` what is read from a health platform;
+  - `sql/` the `SqlDatabase` interface, with the WebAssembly adapter in
+    `sql/wasm/` and the phone's in `sql/native/`;
+  - `foodCatalog/` food packs, search and the pack download, with the native
+    adapters in `foodCatalog/download/native/`;
+  - `foodPipeline/` the pack build (its file steps under `node/`);
+  - `fixtures/` in-memory implementations of every interface;
+  - `data/` SQL repositories over `SqlDatabase`;
+  - `format/` labels and text;
+  - `platform/` the shell's plugins behind interfaces (camera, reminders,
+    Health Connect, system bars, back button);
+  - `state/` the app's cells and controllers; then the screen folders.
+- `apps/web/src/ui/` is the design-system component library; screens use it
+  and never raw HTML controls.
+- `apps/web/android/` is the native shell: a Capacitor host and the app's own
+  Kotlin plugins (`MmDb`, `MmPacks`, `MmReminders`, `MmScanner`, `MmHealth`).
+- `apps/web/test/contracts/` holds the contract suites; every implementation
+  of an interface runs its suite, fixtures included.
+- `tool/` contains the dependency-free `mm` task runner: TypeScript run by
+  Node itself, with its own tests in `tool/test/`.
 - `requirements/` is the source of truth for planned and shipped product
   behavior; `docs/architecture.md` records cross-cutting design; `docs/non-goals.md` lists what the
   app will not do, and a change that proposes one needs its reopen condition met.
@@ -132,13 +147,10 @@ delegation and sequential fallback do not supersede the working agreements here.
   `roadmap/roadmap.json` to choose what to build next and to see what is
   blocked. It adds no requirements of its own.
 - Keep dependencies flowing with the existing layers. In particular, keep
-  domain and engine logic independent of Flutter and persistence details.
-- After changing a database schema or other generated source, use `mm gen` and
-  include the resulting generated changes when appropriate; do not hand-edit
-  generated output.
-- A change to any table bumps `AppDatabase.currentSchemaVersion` by one, adds
-  the step to `migrationSteps`, and runs `mm schema` to export the snapshot.
-  Only one schema change is in flight at a time (see `roadmap/README.md`).
+  domain and engine logic independent of React and persistence details.
+- A change to any table bumps `currentSchemaVersion` in
+  `apps/web/src/data/schema.ts` by one and adds the migration step; the
+  migration tests hold every released version's upgrade path.
 
 ## Engineering principles (binding)
 
@@ -149,32 +161,29 @@ interface segregation (I) win.
 1. Follow SOLID, and design for **L** and **I** first.
 2. Every integration point is an interface that any subtype can replace
    (food source, barcode scanner, health source, backup provider, entitlement,
-   clock). Never import a vendor or platform package outside the one
-   registration file.
+   clock). Never import a vendor or platform package outside its adapter
+   folder; `apps/web/test/layers.test.ts` names the folders each may live in,
+   and `apps/web/src/app/openAppServices.ts` is the one place implementations
+   are chosen.
 3. Consumers depend on the **narrowest** interface they need
-   (`WeightReader`, not a store). Interfaces are `abstract interface class`;
-   they live with the consumer's layer (`packages/domain`).
+   (`WeightReader`, not a store). Interfaces live with the consumer's layer.
 4. If a product or vendor decision is open, build against the interface and an
-   in-memory fixture (`packages/fixtures`) and carry on. Do not wait for the
+   in-memory fixture (`src/fixtures/`) and carry on. Do not wait for the
    decision.
-5. **One declaration per file.** Every model, interface, class, enum,
-   extension and typedef has its own file, named for it in snake_case. No file
-   defines more than one. Barrel files only `export`. Generated files are
-   exempt. `mm arch` enforces it.
-6. All database access goes through a repository interface with a Drift
-   implementation and an in-memory fixture. Screens and providers never use
-   Drift or a concrete store.
+5. **One declaration per file.** Every model, interface, class, union and
+   function module has its own file, named for it. Barrel files only
+   `export`.
+6. All database access goes through a repository interface with a SQL
+   implementation and an in-memory fixture. Screens and state never use SQL
+   or a concrete store.
 7. Every interface has a contract test suite run against **every**
    implementation, fixtures included. That is how substitutability is proved.
 8. A reusable part of a view is a design-system component, written once. A
-   screen never uses a raw Material control (`FilledButton`, `TextField`,
-   `DropdownButton`, `Card`, …); it uses the component. Components take
-   meaning (`MmButtonKind.primary`), never a color, radius or padding.
-9. Prefer composition to inheritance, and stateless or `ConsumerWidget`
-   widgets, so the one-declaration rule does not force public `State` classes.
-
-`mm arch` (part of `mm check`) enforces rules 2 (no vendor outside the registration
-file), 5, 6 and 8. Its baseline, `tool/arch_baseline.txt`, is empty; do not add to it.
+   screen never uses a raw HTML control (`<button>`, `<input>`, `<select>`,
+   …); it uses the component. Components take meaning
+   (`kind="primary"`), never a color, radius or padding.
+9. Prefer composition to inheritance and plain function components, so state
+   lives in `state/` cells and controllers, not in component classes.
 
 ## Validation
 
@@ -184,16 +193,9 @@ PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
 - `mm req` after creating or updating requirements.
 - `mm panel` validates panel roles, Claude/Copilot adapters and portable templates;
   `mm panel docs/agent-runs/<task-id>` also checks saved run state.
-- `mm test <relevant-path>` for focused tests, such as
-  `mm test packages/engine`.
-- `mm analyze` for static analysis.
-- `mm format --check` to verify formatting.
-- `mm goldens` runs the screenshot tests (Linux only; CI runs them in `mm check`).
-  When a change alters how a screen looks, run the **Update goldens** workflow
-  (or push a branch named `update-goldens/<name>`), commit the images it
-  produces, and let the pull request show them.
-- `mm check` before considering a change complete; it runs the CI checks
-  across the workspace.
+- `npx vitest run <relevant-path>` inside `apps/web` for focused tests;
+  `mm test` for the tool's tests and the whole web suite.
+- `mm check` before considering a change complete; it runs the CI checks.
 
 Choose the smallest relevant checks while iterating, then run the broader
 check when practical. If a check cannot run, state why and what remains

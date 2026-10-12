@@ -7,7 +7,7 @@ has been met. The detail is in the tickets named on each line;
 list itself.
 
 Some of it is enforced, not just written down: the banned-word test
-(`apps/mobile/test/voice_test.dart`, MM-108) fails on language this document
+(`apps/web/test/voice.test.ts`, MM-108) fails on language this document
 rules out, and the forbidden insight subjects are tested with MM-141.
 
 The fixed product constraint that the app models biological sex as male or

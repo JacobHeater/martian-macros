@@ -31,7 +31,7 @@ Tested on 2026-10-11 on Windows 11, `gh` 2.87.3.
 
 | Capability | Status | How it was established |
 | --- | --- | --- |
-| Watch, events, snapshot, cursors, restart, handoff | Verified | 54 tests against a simulated `gh` (`tool/test/ci_watch_test.dart`) |
+| Watch, events, snapshot, cursors, restart, handoff | Verified | 54 tests against a simulated `gh` (`tool/test/ciWatch.test.ts`) |
 | Reading a real pull request through `gh`, read-only | Verified | `mm ci start`, `events`, `check` against PR #81 of this repository |
 | Background watcher continuing while other work proceeds | Verified | Detached watcher polled PR #81 every 15 s while files were edited in the same session |
 | Claude Code (VS Code extension): finished background command reaches the model with no new user prompt | Verified, with limits | A background command's completion arrived as a task notification at the next tool boundary of the active turn. It names the output file; the content needs a read. Not tested: delivery while the session is idle between turns |
@@ -41,7 +41,7 @@ Tested on 2026-10-11 on Windows 11, `gh` 2.87.3.
 | MCP notifications creating a model turn | Not used | Not assumed anywhere |
 | Interrupting a model mid-generation | Unsupported | No documented mechanism was found or used |
 | Linux | Tests only | The 54 tests pass on Ubuntu (WSL). The watcher was not run against GitHub there |
-| macOS | Untested | Pure Dart and `gh`; nothing platform-specific is known, and nothing was run there |
+| macOS | Untested | Node and `gh`; nothing platform-specific is known, and nothing was run there |
 
 ## State
 

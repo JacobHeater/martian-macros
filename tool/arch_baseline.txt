@@ -1,4 +1,0 @@
-# Files that do not yet follow the engineering rules (MM-160).
-# This list can only shrink: do not add to it. `mm arch` fails if a
-# listed file is fixed and left here.
-# (Empty: the codebase follows the rules.)
