@@ -139,6 +139,10 @@ The type check is clean.
   type checker, and the test fails the typecheck if it ever stops being
   refused. A broken repository was tried on purpose (weigh-ins listed newest
   first): the contract failed, as it should.
+- The Flutter app's test of the demo seed is carried over
+  (`test/data/demoSeed.test.ts`) and passes against both the in-memory
+  repositories and the database. I first wrote that Dart had no test of the
+  seed; that was wrong, and the pull request that said so is corrected.
 - `mm food build` and `mm food publish` still run the Dart pipeline. They
   switch when the task runner is converted.
 - Files that read and write disk live in a folder called `node`, and a test
