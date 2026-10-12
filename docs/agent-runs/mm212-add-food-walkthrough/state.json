@@ -1,0 +1,581 @@
+{
+  "schema_version": 1,
+  "task_id": "mm212-add-food-walkthrough",
+  "audit_mode": "feature",
+  "baseline": {
+    "branch": "feature/mm212-usability-by-inspection",
+    "commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, supply renders, verify reviewer claims, synthesize and dispose of every finding.",
+      "role": "chair",
+      "reviewer": "claude-code-session-9c9d02ab",
+      "status": "omitted",
+      "omission_reason": "The chair synthesizes; it did not write an independent review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "An independent chair review"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Synthesis, not a separate review."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "See decision.md; the method's sources are in MM-212.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "See MM-212.",
+        "limitations": "None beyond MM-212's."
+      }
+    },
+    {
+      "task": "Walk four tasks through the built Add food sheet and report failing steps.",
+      "role": "ux-accessibility",
+      "reviewer": "claude-code-subagent-panel-ux-accessibility",
+      "status": "complete",
+      "inspected_commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb",
+      "input_hashes": {
+        "AGENTS.md": "0872b8c61b7e6d653d5a0a88597f485a03792ffb3d7b09883b62bafc0f341d4d",
+        "agents/panel-protocol.md": "75107ef685da23d3a2b8f09a7717a48f6426b51c00ae0de6fb5f381489d7fe73",
+        "agents/review-contract.md": "866e576d25986c694e4438ed1ad9fd3d50ea627c77d2554d605cfd53739d04be",
+        "agents/templates/findings/role.md": "ceff5de882039d1586365dd84cb1a98cff29535d30d3ae7afa12ba2e7a4cd726",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/ux-architecture.md": "a7a23cabfab5b46a24c248d76f915123c97e82040d76b958d79d54e28840d0c0",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/voice-and-wording.md": "f7f30ec19ddd963b2b535909780959b6750acec82a2c2012951bc5c575b21ca9",
+        "agents/roles/ux-accessibility.md": "3aa7028843a35504f186eccd006b9e7efa3c07a4b88ee0b0b77e9272f0125885",
+        ".claude/agents/panel-ux-accessibility.md": "068f1a6d246cf95c32f735bcfe071eef4831b76d0054e1c76902567858cddab1",
+        "docs/agent-runs/mm212-add-food-walkthrough/brief.md": "d1963ab620ebf806eb52d9c6f548d178db98237b525ad71632da5d2ad43f514b",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "apps/mobile/lib/src/food/food_amount_step_state.dart": "70035b69bf9332b3c0d6a880b040867a140176d20d1c1c9e6b67d32d0ac94ec1",
+        "apps/mobile/lib/src/food/food_search_results.dart": "cf28ca54683b34e1216de1f3189dc144deb0dac70d12bbf138d0d29b7692e8a9",
+        "apps/mobile/lib/src/food/estimate/estimate_meal_step_state.dart": "8b12057f6511888f80da557362c56d73736a2af69c4924bf8670f4630de26062",
+        "apps/mobile/lib/src/food/custom/custom_food_form_state.dart": "7e4a25641f2f8c9dc3133146490f68f6756b01b64db5938945dfed6d9c2c5433",
+        "apps/mobile/lib/src/format/portion_summary.dart": "36f16cf80ae61f78a86885a17dce36f5797a7d63c7b4552d87605b9eebdca5f7",
+        "apps/mobile/test/goldens/images/add_food_opened_dark.png": "b037a4a2bab3d618083ab334ce22825b98ec6d13ed134478f327fdc533c2434a",
+        "apps/mobile/test/goldens/images/add_food_form_end_dark.png": "fe76e43a24ce7b85b4495dddd7cc20fb432df04db946756ecd04991b796f934f",
+        "apps/mobile/test/goldens/images/add_food_search_dark.png": "d7b73d956368d8040c0a20268f729f4a3c30781121642ded5ec83588116940d0",
+        "apps/mobile/test/goldens/images/add_food_amount_dark.png": "5a9299bcbfc1ae5b178a4157a3eb030e4eea240eb0e66669468fe371a9583b78",
+        "apps/mobile/test/goldens/images/add_food_estimate_dark.png": "27f2fd624735e8ef62efc38e6450464877ef8c17589c24782b13e387960adc5c",
+        "apps/mobile/test/goldens/images/add_food_edit_dark.png": "3888664ff6422f5c6f5aaf7564838ef7df13cda3ec4a43d2b21627a5e41c0c12"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [
+          "Typed form, search and amount step, estimate, editing: walked on source and six screenshot tests",
+          "Saved-food form, raw or cooked, cooking oil: walked from source only"
+        ],
+        "not_inspected": [
+          "Barcode scanning, recipes, label reader (surveyed)",
+          "Light and Martian palettes, larger text, keyboard open, any device or screen reader"
+        ],
+        "referrals": [
+          "product-designer: hierarchy and position of the action",
+          "flutter: semantics, focus, keyboard",
+          "product and measurement: MM-167 decisions"
+        ],
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "limitations": "Nothing was run. One palette and one size. The edit screenshot shows only an entry without an amount."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No claim rests on an external standard or platform convention; every finding rests on the built screen and the repository's own rules.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None consulted.",
+        "limitations": "No external source was read."
+      }
+    },
+    {
+      "task": "Walk four tasks through the built Add food sheet from the visual side and report failing steps.",
+      "role": "product-designer",
+      "reviewer": "claude-code-subagent-panel-product-designer",
+      "status": "complete",
+      "inspected_commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb",
+      "input_hashes": {
+        "AGENTS.md": "0872b8c61b7e6d653d5a0a88597f485a03792ffb3d7b09883b62bafc0f341d4d",
+        "agents/panel-protocol.md": "75107ef685da23d3a2b8f09a7717a48f6426b51c00ae0de6fb5f381489d7fe73",
+        "agents/review-contract.md": "866e576d25986c694e4438ed1ad9fd3d50ea627c77d2554d605cfd53739d04be",
+        "agents/templates/findings/role.md": "ceff5de882039d1586365dd84cb1a98cff29535d30d3ae7afa12ba2e7a4cd726",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/ux-architecture.md": "a7a23cabfab5b46a24c248d76f915123c97e82040d76b958d79d54e28840d0c0",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/voice-and-wording.md": "f7f30ec19ddd963b2b535909780959b6750acec82a2c2012951bc5c575b21ca9",
+        "agents/roles/product-designer.md": "094d476357e38f47cc58d320f064d5cabbf5f2c185ad6c741f59b79628eac456",
+        ".claude/agents/panel-product-designer.md": "188148eb85ee6398eeee43e1d4cde3a2455c56cbe75ac1549ebfe7f000b06c08",
+        "docs/agent-runs/mm212-add-food-walkthrough/brief.md": "d1963ab620ebf806eb52d9c6f548d178db98237b525ad71632da5d2ad43f514b",
+        "apps/mobile/lib/src/food/add_food_sheet_state.dart": "f484474070eae409af61a037f40e35eb5cee96285bf01aba9d52c19348f3fe45",
+        "apps/mobile/lib/src/food/food_amount_step_state.dart": "70035b69bf9332b3c0d6a880b040867a140176d20d1c1c9e6b67d32d0ac94ec1",
+        "apps/mobile/lib/src/food/food_search_results.dart": "cf28ca54683b34e1216de1f3189dc144deb0dac70d12bbf138d0d29b7692e8a9",
+        "apps/mobile/lib/src/food/estimate/estimate_meal_step_state.dart": "8b12057f6511888f80da557362c56d73736a2af69c4924bf8670f4630de26062",
+        "apps/mobile/lib/src/food/custom/custom_food_form_state.dart": "7e4a25641f2f8c9dc3133146490f68f6756b01b64db5938945dfed6d9c2c5433",
+        "apps/mobile/lib/src/format/portion_summary.dart": "36f16cf80ae61f78a86885a17dce36f5797a7d63c7b4552d87605b9eebdca5f7",
+        "apps/mobile/test/goldens/images/add_food_opened_dark.png": "b037a4a2bab3d618083ab334ce22825b98ec6d13ed134478f327fdc533c2434a",
+        "apps/mobile/test/goldens/images/add_food_form_end_dark.png": "fe76e43a24ce7b85b4495dddd7cc20fb432df04db946756ecd04991b796f934f",
+        "apps/mobile/test/goldens/images/add_food_search_dark.png": "d7b73d956368d8040c0a20268f729f4a3c30781121642ded5ec83588116940d0",
+        "apps/mobile/test/goldens/images/add_food_amount_dark.png": "5a9299bcbfc1ae5b178a4157a3eb030e4eea240eb0e66669468fe371a9583b78",
+        "apps/mobile/test/goldens/images/add_food_estimate_dark.png": "27f2fd624735e8ef62efc38e6450464877ef8c17589c24782b13e387960adc5c",
+        "apps/mobile/test/goldens/images/add_food_edit_dark.png": "3888664ff6422f5c6f5aaf7564838ef7df13cda3ec4a43d2b21627a5e41c0c12"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [
+          "Opened sheet, typed form, search, amount step, estimate, edit of an entry without an amount: walked on source and six screenshot tests",
+          "Other edit states and estimate before a maintenance figure: walked from source only"
+        ],
+        "not_inspected": [
+          "Barcode scan, saved foods, recipes, label reader (surveyed)",
+          "Light and Martian palettes, larger text, keyboard open",
+          "requirements/ui-ux-assets/views/add-food.html"
+        ],
+        "referrals": [
+          "ux-accessibility: close action, the unexplained Reference mark, contrast, text scaling",
+          "product: MM-167 decision 3",
+          "qa: renders requested"
+        ],
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "limitations": "Nothing was run. Sizes read from screenshots by eye. One palette and one size."
+      },
+      "research": {
+        "status": "performed",
+        "question": "In what order does a US Nutrition Facts label print calories, fat, carbohydrate and protein?",
+        "reason": "A factual claim used in one step record (the form's field order against the label's).",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+            "title": "How to Understand and Use the Nutrition Facts Label",
+            "published_or_updated": "2024-03-05",
+            "accessed": "2026-10-11",
+            "claim": "The sample label runs serving information, calories, then Total Fat, Total Carbohydrate, Protein."
+          }
+        ],
+        "summary": "Supports an ordering observation only (PD-10); see the report.",
+        "limitations": "Read through a summarizing fetch, not line by line; no claim about error rates."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "training",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "training"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "nutrition",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "nutrition"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "micronutrients",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "micronutrients"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "coaching",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "coaching"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "measurement",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "measurement"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "safety",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "safety"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "product",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "product"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "architecture",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "architecture"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "flutter",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/flutter.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "flutter"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "integrations",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "integrations"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "privacy-security",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "privacy-security"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "qa",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/qa.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "qa"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagent (panel-product-designer, panel-ux-accessibility)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-11",
+      "limitations": "Observed in use by the product designer in the Add food run (one FDA page). Retrieval returns a summary made by a small model, not the page itself. Reviewers have no shell and cannot run the app or a browser."
+    }
+  ],
+  "unresolved_questions": [
+    "MM-167 decision 3: should typed numbers under Label serving default to \"Everything I ate\"? (MM-218)",
+    "Should a recent food open the amount step? (MM-219)",
+    "Is design/screen-direction.md still the target for the Add sheet? (MM-220)",
+    "Is the per-serving edit a defect against MM-167 and MM-48, or a change to them? (MM-221)"
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "Confirmed defects are bug tickets with guards; usability problems found by inspection are proposed stories for the owner; nothing in the app is changed by this run.",
+      "authority": "AGENTS.md bug rule; MM-212; the owner decides each proposed story."
+    }
+  ],
+  "pending_work": [
+    "Owner decisions on MM-218 to MM-221. Fixes for MM-213, MM-216, MM-217. Not supplied: screenshots with the keyboard open, at the largest text size, in Light and Martian; an emulator check of how the sheet is dismissed; a screen-reader pass."
+  ],
+  "tests": [
+    {
+      "command": "fvm flutter test test/add_food_route_labels_test.dart (enabled once)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "MM-213 reproduced: the Saved label is 42 high where one line is 21. Skipped again."
+    },
+    {
+      "command": "fvm flutter test test/add_food_method_change_test.dart (enabled once)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "MM-216 reproduced: no \"Enter how much again\" line. Skipped again."
+    },
+    {
+      "command": "fvm flutter test test/hand_portion_summary_test.dart (enabled once)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "MM-217 reproduced: \"1 palm (114 g) · calculated from 89 kcal per 100 g\". Skipped again."
+    },
+    {
+      "command": "flutter test test/goldens --update-goldens (Linux, WSL)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "60 screenshot tests passed; seven new Add food images written, including the per-serving edit both reviewers asked for."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-11T23:30:00Z",
+    "writers_stopped": true
+  }
+}

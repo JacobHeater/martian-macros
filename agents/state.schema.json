@@ -45,7 +45,7 @@
               "inspected": {"type": "array", "items": {"type": "string", "minLength": 1}},
               "not_inspected": {"type": "array", "items": {"type": "string", "minLength": 1}},
               "referrals": {"type": "array", "items": {"type": "string", "minLength": 1}},
-              "methods": {"type": "array", "items": {"type": "string", "enum": ["source-inspection", "runtime-reproduction", "test-results"]}},
+              "methods": {"type": "array", "items": {"type": "string", "enum": ["source-inspection", "runtime-reproduction", "test-results", "render-inspection", "task-walkthrough"]}},
               "limitations": {"type": "string", "minLength": 1}
             }
           },

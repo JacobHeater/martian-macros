@@ -569,8 +569,9 @@
         "edit",
         "legacy entry"
       ],
-      "verification": "source-only",
-      "status": "covered"
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "On the built sheet at 360 wide the Saved and Estimate labels break mid-word (MM-213); the drawing does not reproduce that."
     },
     {
       "source": "apps/mobile/lib/src/food/calorie_hero.dart",
@@ -678,7 +679,7 @@
         "default",
         "before first weigh-in"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered"
     },
     {
@@ -707,11 +708,13 @@
       ],
       "asset": "views/add-food.html#add-food-amount",
       "states": [
-        "filled",
+        "a serving",
+        "raw or cooked with oil",
         "no amount"
       ],
-      "verification": "source-only",
-      "status": "covered"
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The raw-or-cooked frame is drawn from source alone."
     },
     {
       "source": "apps/mobile/lib/src/food/food_day_header.dart",
@@ -779,7 +782,7 @@
         "none",
         "no database"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered"
     },
     {
@@ -795,7 +798,7 @@
         "label",
         "check this"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered"
     },
     {
@@ -860,7 +863,7 @@
       "states": [
         "open"
       ],
-      "verification": "source-only",
+      "verification": "screenshot-compared",
       "status": "covered"
     },
     {

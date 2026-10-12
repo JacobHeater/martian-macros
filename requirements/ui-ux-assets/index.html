@@ -64,7 +64,7 @@
 
   <h2>Reading the sheets</h2>
   <p>Open this file in a browser; nothing is fetched and no build is needed. The app’s two fonts are read from <code>apps/mobile/assets/fonts/</code>, so keep the library inside the repository; without them the system font is used. If your browser refuses local fonts or scripts from a file, serve the repository instead: <code>python -m http.server</code> in the repository root, then open <code>/requirements/ui-ux-assets/</code>.</p>
-  <p>On every sheet the Theme switch redraws it in Martian, Dark or Light, and the Text switch enlarges it (approximately: the whole frame scales, where the app scales only text). Segments, chips, switches, check boxes, choice cards and folded sections answer a tap; some frames open a sheet or a dialog. Numbers are made-up fixture data, and nothing is calculated.</p>
+  <p>On every sheet the Theme switch redraws it in Martian, Dark or Light, and the Text switch enlarges the text alone, at a fixed width, as the phone’s text-size setting does. What then wraps or crowds is how this drawing reflows, which is not how Flutter lays the screen out: large text is judged on the app. Fields take typing; segments, chips, switches, check boxes, choice cards and folded sections answer a tap; some frames open a sheet or a dialog. Numbers are made-up fixture data and nothing is calculated, so a total does not follow what is typed. A sheet is an aid to reading the app, never a substitute for looking at it: a usability review is done on the built screen (MM-212).</p>
   <p>The convention, and what to do when a view or component is added or changed, is in <a href="README.md">README.md</a>.</p>
 </main>
 </body>
