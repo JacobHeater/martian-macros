@@ -78,6 +78,7 @@ export * from './ModeReason';
 export * from './ModeRecommendation';
 export * from './MonthlyReport';
 export * from './MuscleVolume';
+export * from './nextCheckIn';
 export * from './nextLoadKg';
 export * from './nextTargets';
 export * from './openGap';
