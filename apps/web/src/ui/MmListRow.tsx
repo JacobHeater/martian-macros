@@ -12,6 +12,12 @@ interface MmListRowProps {
   /** Marks a destructive row (erase): its icon uses the danger color. */
   danger?: boolean;
   trailing?: ReactNode;
+  /**
+   * An action of the row's own (delete, say), shown at its end. It sits
+   * beside the part that is pressed, not inside it, so a row that opens
+   * something can still carry one.
+   */
+  trailingAction?: ReactNode;
   onPress?: (() => void) | undefined;
   dense?: boolean;
 }
@@ -24,6 +30,7 @@ export function MmListRow({
   leadingIcon,
   danger = false,
   trailing,
+  trailingAction,
   onPress,
   dense = false,
 }: MmListRowProps) {
@@ -42,6 +49,20 @@ export function MmListRow({
     </>
   );
   const className = `mm-list-row${dense ? ' mm-list-row-dense' : ''}`;
+  if (trailingAction !== undefined) {
+    return (
+      <div className={`${className} mm-list-row-with-action`}>
+        {onPress === undefined ? (
+          <div className="mm-list-row-main">{body}</div>
+        ) : (
+          <button type="button" className="mm-list-row-main mm-list-row-button" onClick={onPress}>
+            {body}
+          </button>
+        )}
+        {trailingAction}
+      </div>
+    );
+  }
   return onPress === undefined ? (
     <div className={className}>{body}</div>
   ) : (

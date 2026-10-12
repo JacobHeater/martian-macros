@@ -1017,3 +1017,43 @@
   background: var(--text2);
   opacity: 0.4;
 }
+
+/* A row with an action of its own beside the part that is pressed. */
+.mm-list-row-with-action {
+  padding: 0;
+}
+.mm-list-row-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  min-height: inherit;
+  padding: var(--space-8) var(--space-16);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+/* A row removed by dragging it left. */
+.mm-swipe {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.mm-swipe-behind {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--space-16);
+  background: var(--sunken);
+  color: var(--danger);
+}
+.mm-swipe-row {
+  position: relative;
+  background: var(--surface);
+}
