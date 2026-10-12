@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:martian_macros/src/food_packs/food_catalog_provider.dart';
 import 'package:martian_macros/src/food_packs/food_pack_providers.dart';
 import 'package:martian_macros/src/food_packs/pack_download_state.dart';
 import 'package:martian_macros/src/food_packs/pack_download_status.dart';
@@ -568,4 +569,86 @@ void main() {
       await shot(tester, 'food_database_downloading_$mode');
     }, skip: !linux);
   }
+
+  // The Add food sheet (MM-212): the densest interaction in the app had no
+  // render, so a review of it could only read its source. One palette is
+  // enough to show layout; the sheet uses the same components as the rest.
+  group('add food sheet, dark', () {
+    Future<void> openSheet(WidgetTester tester) async {
+      await open(
+        tester,
+        await seeded(dark: true),
+        tab: 'Food',
+        overrides: [
+          foodCatalogProvider.overrideWith(
+            (ref) async => FoodCatalog([
+              SqliteFoodPack.fromDatabase(
+                const FoodPackWriter().writeInMemory(
+                  FixturePack.header,
+                  FixturePack.entries,
+                ),
+              ),
+            ]),
+          ),
+        ],
+      );
+      await tester.tap(find.text('Add food'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('as it opens', (tester) async {
+      await openSheet(tester);
+      await shot(tester, 'add_food_opened_dark');
+    }, skip: !linux);
+
+    testWidgets('the rest of the form', (tester) async {
+      await openSheet(tester);
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_form_end_dark');
+    }, skip: !linux);
+
+    testWidgets('search results', (tester) async {
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const ValueKey('food-search')),
+        'chicken',
+      );
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_search_dark');
+    }, skip: !linux);
+
+    testWidgets('how much of a found food', (tester) async {
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const ValueKey('food-search')),
+        'banana',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Banana').first);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('amount-quantity')),
+        '2',
+      );
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_amount_dark');
+    }, skip: !linux);
+
+    testWidgets('estimating a meal', (tester) async {
+      await openSheet(tester);
+      await tester.tap(find.byKey(const ValueKey('food-estimate')));
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_estimate_dark');
+    }, skip: !linux);
+
+    testWidgets('editing a logged entry', (tester) async {
+      await open(tester, await seeded(dark: true), tab: 'Food');
+      await tester.ensureVisible(find.text('Chicken and rice'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Chicken and rice'));
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_edit_dark');
+    }, skip: !linux);
+  });
 }
