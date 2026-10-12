@@ -1,6 +1,6 @@
 ---
 id: MM-217
-status: proposed
+status: done
 component: food-logging
 related: [MM-46, MM-167, MM-212]
 ---
@@ -39,8 +39,15 @@ Scenario: Choosing the amount
   Then the grams it will record are shown, marked as an estimate
 ```
 
+## Resolution
+Hand portions now label the amount-step grams and nutrient totals as estimates,
+and the saved food-log line uses the same estimate wording. The regression
+test covers both the pre-log display and the saved portion summary.
+
+## UI/UX Assets
+- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows
+  hand-portion grams and nutrient totals marked as estimates.
+
 ## Notes
-- Guarded by `apps/mobile/test/hand_portion_summary_test.dart`. Run enabled
-  once: failed as it should (the line read "1 palm (114 g) · calculated from
-  89 kcal per 100 g"). Skipped with this ticket's ID until the fix.
-- The amount-step half has no test yet; add it with the fix.
+- Regression: `apps/mobile/test/hand_portion_summary_test.dart`, enabled for
+  both the amount-step estimate and the saved log line.

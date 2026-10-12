@@ -89,4 +89,37 @@ void main() {
     expect(back.proteinG, 51);
     expect(back.meal, Meal.lunch);
   });
+
+  testWidgets(
+    'MM-207: an entry can be deleted from its visible actions and restored',
+    (tester) async {
+      await openFood(tester);
+
+      final actions = find.byTooltip('More actions for Chicken and rice');
+      expect(actions, findsOneWidget);
+      await tester.ensureVisible(actions);
+      expect(tester.getSize(actions).width, greaterThanOrEqualTo(48));
+      expect(tester.getSize(actions).height, greaterThanOrEqualTo(48));
+
+      await tester.tap(actions);
+      await tester.pumpAndSettle();
+
+      final delete = find.text('Delete');
+      expect(delete, findsOneWidget);
+      expect(find.bySemanticsLabel('Delete'), findsOneWidget);
+      await tester.tap(delete);
+      await tester.pumpAndSettle();
+
+      expect(await entriesOn(tester, today), isEmpty);
+      expect(find.text('Removed Chicken and rice'), findsOneWidget);
+
+      await tester.tap(find.text('Undo'));
+      await tester.pumpAndSettle();
+
+      final restored = (await entriesOn(tester, today)).single;
+      expect(restored.name, 'Chicken and rice');
+      expect(restored.proteinG, 51);
+      expect(restored.meal, Meal.lunch);
+    },
+  );
 }

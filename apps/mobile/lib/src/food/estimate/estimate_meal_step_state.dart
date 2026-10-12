@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 
+import '../../charts/macro_split_chart.dart';
 import '../../format/fmt.dart';
 import '../../format/meal_label.dart';
 import '../../providers.dart';
@@ -59,6 +60,9 @@ class EstimateMealStepState extends ConsumerState<EstimateMealStep> {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final maintenance = ref.watch(coachProvider)?.tdee.kcal;
+    final totals = maintenance == null
+        ? null
+        : estimateMeal(_size, _kind, maintenanceKcal: maintenance);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,6 +113,22 @@ class EstimateMealStepState extends ConsumerState<EstimateMealStep> {
               ),
           ],
         ),
+        if (totals != null) ...[
+          const SizedBox(height: 16),
+          Text('Estimated macro split', style: text.labelLarge),
+          const SizedBox(height: 8),
+          MacroSplitChart(
+            key: const ValueKey('food-macro-preview'),
+            isPreview: true,
+            intake: IntakeDay(
+              date: widget.day,
+              kcal: totals.kcal,
+              proteinG: totals.proteinG,
+              carbsG: totals.carbsG,
+              fatG: totals.fatG,
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         MmTextField(
           key: const ValueKey('estimate-name'),

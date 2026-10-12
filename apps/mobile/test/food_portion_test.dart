@@ -6,6 +6,7 @@ import 'package:mm_fixtures/mm_fixtures.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 import 'support/reveal_on_food_screen.dart';
 
 /// MM-167: quantity, unit and what the typed numbers are for, in the add-food
@@ -42,10 +43,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> openSheet(WidgetTester tester) async {
+  Future<void> openSheet(WidgetTester tester, {bool manual = true}) async {
     await openFood(tester);
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    if (manual) await enterManualFood(tester);
   }
 
   Future<void> type(WidgetTester tester, String key, String value) async {
@@ -83,6 +85,66 @@ void main() {
     await type(tester, 'food-name', name);
     await type(tester, 'food-kcal', kcal);
   }
+
+  testWidgets(
+    'manual servings have no basis switch and scale nutrition (MM-226)',
+    (tester) async {
+      await openSheet(tester);
+      expect(find.text('Nutrition per serving'), findsOneWidget);
+      expect(find.text('Everything I ate'), findsNothing);
+      expect(find.text('One serving'), findsNothing);
+      await manual(tester, name: 'Bar', kcal: '160');
+      await type(tester, 'food-protein', '10');
+      await type(tester, 'portion-quantity', '2');
+      expect(find.textContaining('Logs 320 kcal'), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.tap(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      final entry = (await logged(tester)).last;
+      expect(entry.kcal, 320);
+      expect(entry.proteinG, 20);
+      expect(entry.portion!.quantity, 2);
+      expect(entry.portion!.basis, NutritionBasis.calculated);
+    },
+  );
+
+  testWidgets('older serving totals reopen without double scaling (MM-226)', (
+    tester,
+  ) async {
+    await repos.food.addFood(
+      FoodEntry(
+        id: 0,
+        date: today,
+        meal: Meal.lunch,
+        name: 'Older bar',
+        kcal: 400,
+        proteinG: 20,
+        carbsG: 50,
+        fatG: 10,
+        source: QuantitySource.labelServing,
+        portion: Portion(
+          method: QuantitySource.labelServing,
+          basis: NutritionBasis.enteredTotals,
+          quantity: 2,
+          unit: PortionUnit.serving,
+        ),
+      ),
+    );
+    await openFood(tester);
+    await revealOnFoodScreen(tester, find.text('Older bar'));
+    await tester.tap(find.text('Older bar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Everything I ate'), findsNothing);
+    expect(find.textContaining('Logs 400 kcal'), findsOneWidget);
+    await type(tester, 'portion-quantity', '3');
+    expect(find.textContaining('Logs 600 kcal'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+    await tester.tap(find.byKey(const ValueKey('food-save')));
+    await tester.pumpAndSettle();
+    final entry = (await logged(tester)).single;
+    expect(entry.kcal, 600);
+    expect(entry.proteinG, 30);
+  });
 
   testWidgets('Weighed asks for an amount and a weight unit', (tester) async {
     await openSheet(tester);
@@ -125,8 +187,7 @@ void main() {
     tester,
   ) async {
     await openSheet(tester);
-    expect(find.text('Everything you ate'), findsNothing);
-    expect(find.text('Everything I ate'), findsOneWidget);
+    await tapText(tester, 'Weighed');
     await manual(tester);
     await type(tester, 'portion-quantity', '2');
     await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
@@ -135,7 +196,7 @@ void main() {
     final entry = (await logged(tester)).single;
     expect(entry.kcal, 400);
     expect(entry.portion!.quantity, 2);
-    expect(entry.portion!.unit, PortionUnit.serving);
+    expect(entry.portion!.unit, PortionUnit.gram);
     expect(entry.portion!.basis, NutritionBasis.enteredTotals);
   });
 
@@ -143,7 +204,6 @@ void main() {
     tester,
   ) async {
     await openSheet(tester);
-    await tapText(tester, 'One serving');
     await manual(tester, name: 'Bar', kcal: '160');
     await type(tester, 'food-protein', '10');
     await type(tester, 'portion-quantity', '1.5');
@@ -201,7 +261,7 @@ void main() {
     await tapText(tester, 'Estimate');
     expect(find.byKey(const ValueKey('portion-quantity')), findsNothing);
     expect(
-      find.text('Enter calories and macros for everything you ate.'),
+      find.text('Enter calories and macros for this food.'),
       findsOneWidget,
     );
     await manual(tester);
@@ -234,7 +294,7 @@ void main() {
   testWidgets('a searched food is logged by weight and calculated', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);
@@ -267,7 +327,7 @@ void main() {
   testWidgets('editing a calculated entry restores it and recalculates', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);
@@ -300,7 +360,7 @@ void main() {
   testWidgets('editing a pack food keeps which food it came from (MM-169)', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);
@@ -327,7 +387,6 @@ void main() {
     tester,
   ) async {
     await openSheet(tester);
-    await tapText(tester, 'One serving');
     await manual(tester, name: 'Bar', kcal: '160');
     await type(tester, 'portion-quantity', '1.5');
     await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
@@ -356,8 +415,8 @@ void main() {
     );
     expect(field.controller!.text, '1.5');
     expect(find.textContaining('Logs 240 kcal'), findsOneWidget);
-    await tester.ensureVisible(find.text('Enter the totals myself'));
-    await tester.tap(find.text('Enter the totals myself'));
+    await tester.ensureVisible(find.text('Edit nutrition per serving'));
+    await tester.tap(find.text('Edit nutrition per serving'));
     await tester.pump();
     expect(find.byKey(const ValueKey('food-kcal')), findsOneWidget);
   });
@@ -366,7 +425,6 @@ void main() {
     'MM-202 unchanged fractional calculated edit preserves nutrition',
     (tester) async {
       await openSheet(tester);
-      await tapText(tester, 'One serving');
       await manual(tester, name: 'Fractional bar', kcal: '300');
       await type(tester, 'portion-quantity', '1/3');
       await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
@@ -419,7 +477,6 @@ void main() {
     tester,
   ) async {
     await openSheet(tester);
-    await tapText(tester, 'One serving');
     await type(tester, 'food-name', 'Synthetic alcohol serving');
     await type(tester, 'food-carbs', '10');
     await tapText(tester, 'Includes alcohol?');
@@ -431,7 +488,7 @@ void main() {
     final entry = (await logged(tester)).single;
     expect(entry.kcal, 276);
     expect(entry.alcoholG, 28);
-  }, skip: true); // MM-203: application fix deferred from tooling PR.
+  });
 
   testWidgets(
     'MM-204 converting calculated entry to totals preserves alcohol',
@@ -470,7 +527,7 @@ void main() {
       await revealOnFoodScreen(tester, find.text('Calculated drink'));
       await tester.tap(find.text('Calculated drink'));
       await tester.pumpAndSettle();
-      await tapText(tester, 'Enter the totals myself');
+      await tapText(tester, 'Edit nutrition per serving');
       await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
       await tester.tap(find.byKey(const ValueKey('food-save')));
       await tester.pumpAndSettle();
@@ -478,8 +535,7 @@ void main() {
       expect(entry.kcal, 138);
       expect(entry.alcoholG, 14);
     },
-    skip: true,
-  ); // MM-204: application fix deferred from tooling PR.
+  );
 
   testWidgets('an entry from before amounts were recorded invents none', (
     tester,

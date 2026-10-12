@@ -19,6 +19,8 @@ void main() {
     WidgetTester tester,
     IntakeDay intake, {
     bool dark = false,
+    bool isPreview = false,
+    double textScale = 1,
   }) async {
     tester.view.physicalSize = const Size(640, 1200);
     tester.view.devicePixelRatio = 2;
@@ -27,9 +29,14 @@ void main() {
       MaterialApp(
         theme: mmTheme(dark ? Brightness.dark : Brightness.light),
         home: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(32),
-            child: MacroSplitChart(intake: intake),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: MediaQuery(
+                data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+                child: MacroSplitChart(intake: intake, isPreview: isPreview),
+              ),
+            ),
           ),
         ),
       ),
@@ -79,5 +86,39 @@ void main() {
     expect(find.text('Carbs\n0 g · 0.0%'), findsOneWidget);
     expect(find.text('Fat\n0 g · 0.0%'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('food preview semantics and labels do not imply logged intake', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await pump(tester, intake(100, 150, 50), isPreview: true, textScale: 2);
+      expect(
+        find.bySemanticsLabel(
+          RegExp('Food preview macronutrient energy split'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('1,450 kcal from food macros'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('from recorded macros'), findsNothing);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('empty preview asks for entry rather than logging', (
+    tester,
+  ) async {
+    await pump(tester, intake(0, 0, 0), isPreview: true);
+    expect(find.byType(PieChart), findsNothing);
+    expect(
+      find.textContaining('Enter macro amounts to preview'),
+      findsOneWidget,
+    );
   });
 }

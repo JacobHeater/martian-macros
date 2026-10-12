@@ -207,7 +207,17 @@
         '<path class="grid" d="M40 20H312M40 65H312M40 110H312"/><path class="dash" d="M40 31H312"/>' + out +
         '<text x="44" y="130">Sep 29</text><text x="258" y="130">Oct 5</text><text x="0" y="24">' + (o.top || '2,400') + '</text><text x="0" y="114">0</text></svg>';
     },
-    donut: function () {
+    donut: function (shares) {
+      if (shares) {
+        var offset = 0;
+        var slices = ['protein', 'carbs', 'fat'].map(function (kind) {
+          var share = shares[kind] || 0;
+          var slice = '<circle cx="60" cy="60" r="40" pathLength="100" fill="none" stroke="var(--' + kind + ')" stroke-width="26" stroke-dasharray="' + share + ' 100" stroke-dashoffset="-' + offset + '" transform="rotate(-90 60 60)"/>';
+          offset += share;
+          return share > 0 ? slice : '';
+        }).join('');
+        return '<svg viewBox="0 0 120 120" width="110" height="110" role="img" aria-label="Food preview macronutrient energy split: protein ' + shares.protein.toFixed(1) + '%, carbs ' + shares.carbs.toFixed(1) + '%, fat ' + shares.fat.toFixed(1) + '%">' + slices + '</svg>';
+      }
       return '<svg viewBox="0 0 120 120" width="110" height="110" role="img" aria-label="Macronutrient split: protein 28.3%, carbs 43.1%, fat 28.6%">' +
         '<circle cx="60" cy="60" r="40" fill="none" stroke="var(--protein)" stroke-width="26" stroke-dasharray="71.1 251.3" transform="rotate(-90 60 60)"/>' +
         '<circle cx="60" cy="60" r="40" fill="none" stroke="var(--carbs)" stroke-width="26" stroke-dasharray="108.3 251.3" stroke-dashoffset="-71.1" transform="rotate(-90 60 60)"/>' +

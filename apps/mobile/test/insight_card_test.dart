@@ -182,8 +182,8 @@ void main() {
     });
 
     testWidgets('Dismiss is never under the Add food button', (tester) async {
-      // Regression: right-aligned, Dismiss sat beneath the floating button
-      // and could not be tapped until the list was scrolled further.
+      // The app-bar Add food action stays outside the scrolling Dashboard
+      // content, so it cannot cover Dismiss.
       await shortOnProtein();
       await pumpApp(tester, repos, FixedClock(today));
       final dismiss = find.byKey(const ValueKey('insight-dismiss'));

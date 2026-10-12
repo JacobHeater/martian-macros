@@ -555,15 +555,26 @@
         "MM-38",
         "MM-39",
         "MM-48",
-        "MM-167"
+        "MM-167",
+        "MM-219",
+        "MM-213",
+        "MM-216",
+        "MM-223",
+        "MM-225",
+        "MM-226"
       ],
       "asset": "views/add-food.html#add-food-default",
       "states": [
+        "discovery",
+        "manual entry",
+        "manual entry from search",
+        "macro preview",
         "empty",
         "filled",
         "label serving",
         "alcohol",
         "invalid",
+        "method changed",
         "estimate source",
         "search",
         "edit",
@@ -571,7 +582,7 @@
       ],
       "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "On the built sheet at 360 wide the Saved and Estimate labels break mid-word (MM-213); the drawing does not reproduce that."
+      "limits": "Discovery, manual form, macro preview and edit screenshots were inspected from Linux run 38199739648. Search-to-manual query carry is widget-tested and drawn. Validation and method-change states are drawn from source."
     },
     {
       "source": "apps/mobile/lib/src/food/calorie_hero.dart",
@@ -588,8 +599,9 @@
         "logged only",
         "paused"
       ],
-      "verification": "screenshot-compared",
-      "status": "covered"
+      "verification": "source-only",
+      "status": "incomplete",
+      "limits": "The separate discovery/manual-entry states have widget coverage; the refreshed Linux screenshots are pending."
     },
     {
       "source": "apps/mobile/lib/src/food/custom/custom_food_form.dart",
@@ -672,14 +684,17 @@
       "symbol": "EstimateMealStep",
       "kind": "sheet",
       "requirements": [
-        "MM-150"
+        "MM-150",
+        "MM-225"
       ],
       "asset": "views/add-food.html#add-food-estimate",
       "states": [
         "default",
+        "estimated macro preview",
         "before first weigh-in"
       ],
       "verification": "screenshot-compared",
+      "limits": "The estimated macro preview was compared with Linux run 38199739648. The drawing is static and illustrative; actual totals depend on maintenance.",
       "status": "covered"
     },
     {
@@ -704,17 +719,21 @@
       "requirements": [
         "MM-42",
         "MM-151",
-        "MM-167"
+        "MM-167",
+        "MM-217",
+        "MM-225"
       ],
       "asset": "views/add-food.html#add-food-amount",
       "states": [
         "a serving",
+        "hand portion estimate",
         "raw or cooked with oil",
+        "macro preview with cooking oil",
         "no amount"
       ],
       "verification": "screenshot-compared",
       "status": "covered",
-      "limits": "The raw-or-cooked frame is drawn from source alone."
+      "limits": "Serving macro preview compared with Linux run 38199739648. Cooking-oil, hand-portion estimates and raw-or-cooked frames remain drawn from source and widget-tested, not device-reviewed."
     },
     {
       "source": "apps/mobile/lib/src/food/food_day_header.dart",
@@ -774,7 +793,8 @@
       "symbol": "FoodSearchResults",
       "kind": "part",
       "requirements": [
-        "MM-42"
+        "MM-42",
+        "MM-223"
       ],
       "asset": "views/add-food.html#add-food-search",
       "states": [
@@ -1720,11 +1740,15 @@
       "symbol": "MacroSplitChart",
       "kind": "component",
       "requirements": [
-        "MM-107"
+        "MM-107",
+        "MM-179",
+        "MM-225"
       ],
       "asset": "components/index.html#macro-split-chart",
       "states": [
-        "three macros"
+        "three macros",
+        "food preview",
+        "empty food preview"
       ],
       "verification": "screenshot-compared",
       "status": "covered"

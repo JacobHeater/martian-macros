@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 
 /// MM-190: the meal a new entry starts in follows the app's clock, not the
 /// device's. When it read the device, the same tests passed in the morning and
@@ -22,6 +23,7 @@ void main() {
     await pumpApp(tester, repos, FixedClock(today, hour: hour));
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.enterText(find.byKey(const ValueKey('food-name')), 'Eggs');
     await tester.enterText(find.byKey(const ValueKey('food-protein')), '12');
     await tester.pump();

@@ -2,7 +2,7 @@
 id: MM-37
 status: in-progress
 component: food-logging
-related: [MM-38, MM-39, MM-40, MM-41, MM-42, MM-43, MM-44, MM-45, MM-46, MM-47, MM-48, MM-49, MM-50, MM-22, MM-85, MM-167]
+related: [MM-38, MM-39, MM-40, MM-41, MM-42, MM-43, MM-44, MM-45, MM-46, MM-47, MM-48, MM-49, MM-50, MM-22, MM-85, MM-167, MM-224]
 ---
 
 # Epic: Food logging
@@ -23,6 +23,12 @@ What turns it into a product is finding foods without typing numbers: search (MM
 barcode is unknown (MM-44), all resting on the food database (MM-50). Then the things that make repetition fast: saved foods and recipes
 (MM-45), copying a meal or a day (MM-47), and editing an entry (MM-48). Then the two ends of the audience: hand portions for people who will
 not weigh (MM-46), and a detail setting for people who want fiber, net carbs and more (MM-49).
+
+This capability is part of a usable product only when people can distinguish
+finding a food, choosing a recent food, and entering one by hand, and can tell
+what each screen is asking them to do. Cross-screen hierarchy is tracked in
+MM-224; this epic does not prescribe a single flow for unresolved MM-219
+choices.
 
 Food logging is free forever (MM-85).
 

@@ -87,6 +87,26 @@ it was reviewed. `mm panel` validates the panel package; `mm panel <run-dir>`
 also validates a saved run. Structural validation is not scientific sign-off
 or proof of a native runtime's permission enforcement.
 
+### Novice mobile fitness experience
+
+For a critique of cognitive load or card-heavy views, use `feature` or
+`panel-baseline` mode across a named novice task, not an unbounded aesthetic
+pass. Assign product-designer and UX-accessibility independently. The designer
+owns visual hierarchy, density, and what earns prominence; UX owns novice task
+flow, choices, comprehension, recovery, and accessibility. Both inspect current
+screens, requirements, tests and actual renders where available, and both
+research externally when the request asks for current mobile practice. They
+record sources actually consulted and distinguish heuristic/source review from
+rendered or user-tested observations.
+
+Each specialist may ask the chair for a narrowly scoped consultation from the
+role that owns an out-of-domain fact. The chair returns a read-only, bounded
+answer; the requesting specialist explains whether it changes the
+recommendation. Do not let either specialist speculate across domain boundaries
+or launch unrestricted nested agents. Do not count cards as a proxy for
+cognitive burden. Favor a clear novice path and progressive disclosure while
+preserving safety, uncertainty, consent and agency.
+
 Research is required by the protocol's evidence triggers, not only when a model
 admits uncertainty. Every role records performed/unnecessary/blocked research.
 Specialists use actual available research tools or a bounded chair request;
