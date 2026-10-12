@@ -1,5 +1,6 @@
 ext {
-    minSdkVersion = 24
+    // Health Connect (MM-68) needs Android 8, as the Flutter app did.
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'

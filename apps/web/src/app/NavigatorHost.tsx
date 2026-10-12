@@ -6,7 +6,8 @@ import { NavigatorContext } from './NavigatorContext';
 interface Pushed {
   readonly id: number;
   readonly node: ReactNode;
-  readonly close: () => void;
+  /** Closes as simply left. False when it had already closed. */
+  readonly close: () => boolean;
 }
 
 /**
@@ -29,7 +30,12 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
         setStack((current) => current.filter((pushed) => pushed.id !== id));
         resolve(result);
       };
-      setStack((current) => [...current, { id, node: screen(close), close: () => close() }]);
+      const tryClose = () => {
+        if (closed) return false;
+        close();
+        return true;
+      };
+      setStack((current) => [...current, { id, node: screen(close), close: tryClose }]);
     });
   }, []);
 
@@ -39,9 +45,17 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
     for (const screen of [...pushed.current].reverse()) screen.close();
   }, []);
 
+  const closeTop = useCallback(() => {
+    // From the top down, past any already closed just now.
+    for (let at = pushed.current.length - 1; at >= 0; at -= 1) {
+      if (pushed.current[at]?.close() === true) return true;
+    }
+    return false;
+  }, []);
+
   const navigator = useMemo<Navigator>(
-    () => ({ push, closeAll, depth: stack.length }),
-    [push, closeAll, stack.length],
+    () => ({ push, closeAll, closeTop, depth: stack.length }),
+    [push, closeAll, closeTop, stack.length],
   );
 
   return (
