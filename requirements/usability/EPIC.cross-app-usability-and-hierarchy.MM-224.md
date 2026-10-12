@@ -58,6 +58,25 @@ The epic is done when:
   agree before the epic is closed.
 
 ## Notes
+- **Delivery reconciliation, 2026-10-12:** #81 and #101 are merged. Add food
+  discovery separation (MM-223), live macro previews (MM-225), simple serving
+  entry (MM-226), and edit precision/alcohol fixes (MM-202 to MM-204) shipped.
+  MM-227 corrects the confirmed HTML Back to search parity defect in #102.
+  MM-218 to MM-221 now distinguish historical observations, shipped partial
+  resolutions, and remaining criteria. Those stories stay proposed because
+  their remaining scope has not been implemented or verified.
+- **Current priority/disposition:** Coach and Dashboard hierarchy remain
+  implementation work under this epic, not cleared by the survey. Progress
+  grouping remains a proposed refinement; Train's Start/Continue priority is
+  retained, with deeper task evidence still missing. Add food's remaining
+  action visibility/dismissal and pre-log clarity work is tracked by MM-220
+  and MM-218; route vocabulary/access by MM-219; edit presentation by MM-221.
+  No destination is certified usable by this inventory.
+- **Evidence boundary:** the owner confirmed a phone/reference discrepancy.
+  MM-227 was verified against source and browser assertions, not an installed
+  phone walkthrough. Establish the installed build and compare equivalent
+  state/theme/viewport before claiming phone parity. Do not attribute a
+  discrepancy to an older installation without evidence.
 - The Add food search/manual-entry collision is tracked separately in MM-223
   and is being fixed without deciding the remaining MM-219 questions.
 - Session 19's bounded cross-app survey is recorded at
