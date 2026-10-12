@@ -77,7 +77,7 @@ Scenario: No Dart is left
 | --- | --- | --- | --- | --- |
 | domain | 4,574 lines, 158 files | 102 | done | 105 (the 102, and 3 for what differs from Dart) |
 | engine | 6,819 lines, 158 files | 567 | done | 573: all 567 (566 pass, 1 skipped for MM-173 as in Dart), and 6 added |
-| health_ingest | 976 lines, 21 files | 71 | not started | |
+| health_ingest | 976 lines, 21 files | 71 | done | 71: all of them |
 | food_catalog | 1,550 lines, 36 files | 2 files | not started | |
 | fixtures | 3,541 lines, 54 files | | not started | |
 | data | 20,359 lines, 48 files (most of it generated) | | not started | |
@@ -128,6 +128,16 @@ The type check is clean.
   `timeOfDayMs`); a Dart file with several declarations is one file each
   (`weight_event_effects.dart` became six); `assert` in `holdReduction` is a
   thrown error.
+
+**Health import (2026-10-12):** `apps/web/src/healthIngest/`. All 71 tests
+pass unchanged, most of them the two contract suites every health source
+and every store must pass. The suites are in `apps/web/test/contracts/`,
+not in `src/`, so the app's source never imports the test framework; the
+real Health Connect plugin and the SQLite store will be run through the
+same two. The fake source and the in-memory store stay in `src/`, under
+`testing/`, because the demo uses them. A day is keyed by the time of its
+local midnight, since two JavaScript dates for the same moment are not the
+same map key.
 
 **Measured on 2026-10-12 (compiling the Dart to JavaScript):**
 - The packages' own Dart tests were run compiled to JavaScript on Node

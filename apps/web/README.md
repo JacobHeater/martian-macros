@@ -44,9 +44,11 @@ on Java 25.
 | `src/app/` | The shell: the five destinations and what is shown in each |
 | `src/lang/` | The few things Dart had and JavaScript lacks or does differently: rounding, reading a number, its errors, a watched value |
 | `src/domain/` | The domain model, carried over from `packages/domain`. Imports only `src/lang/` |
+| `src/engine/` | The coaching engine, carried over from `packages/engine`. Imports only `lang` and `domain` |
+| `src/healthIngest/` | The seam to a phone's health platform, carried over from `packages/health_ingest`. Imports only `lang` |
 | `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
-| `test/` | Tests that are about the whole app or the build |
+| `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |
 
 The tokens are copied from the Flutter theme, and a test compares the two
 until the Flutter app is removed.
