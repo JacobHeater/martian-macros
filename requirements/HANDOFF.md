@@ -26,12 +26,15 @@ task runner, re-points `coverage.json` at `apps/mobile/src` (150 surfaces),
 records the Flutter theme in `apps/mobile/test/support/flutterTheme.json` for
 the tokens test, and rewrites CI to Node + a debug Android build.
 
-**Standing rule (owner, 2026-10-12).** Screen and design verification is
-done in a browser; `requirements/ui-ux-assets/` is where design decisions
-are tracked and where the owner opines without running the app. Device and
-emulator screenshots verify native behavior only, never the design.
-The app folder is `apps/mobile` (renamed from `apps/web` the same day): a
-mobile application built on web technologies.
+**Standing rules (owner, 2026-10-12).** Screen and design verification is
+done in a browser; **Storybook is the design register** (MM-237,
+`mm storybook`), where design decisions are tracked on tickets (`## UI/UX`
+story links) and where the owner opines without running the app. The old
+HTML register (`requirements/ui-ux-assets/`) is retired, read-only history.
+Icons are Material's Outlined set behind `MmIcon` (MM-236); no hand-drawn
+glyphs. Device and emulator screenshots verify native behavior only, never
+the design. The app folder is `apps/mobile` (renamed from `apps/web` the
+same day): a mobile application built on web technologies.
 
 **Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
 with its migration steps and tests. Only one schema change at a time.
@@ -91,6 +94,11 @@ limitations.
   `packages/`, `.fvmrc` and the goldens workflow are deleted; CI runs on
   Node and assembles the debug APK; `coverage.json` lists the React
   sources; the evidence register and docs now name the TypeScript files.
+- Late in the session the owner rejected the hand-drawn nav icons
+  ("hammers fucking each other") and ruled: standard Material icons
+  (MM-236) and Storybook as the design register, replacing the HTML
+  register entirely (MM-237). Both shipped the same day; screen stories
+  remain MM-237's open step.
 - The pack build keeps DuckDB extract + the TS pipeline
   (`mm food build` drives `apps/mobile/scripts/food-build.mjs` through vite).
 

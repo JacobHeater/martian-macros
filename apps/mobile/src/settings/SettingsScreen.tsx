@@ -8,7 +8,6 @@ import { dailyActivityLabel } from '../format/dailyActivityLabel';
 import { detailLevelDescription } from '../format/detailLevelDescription';
 import { detailLevelLabel } from '../format/detailLevelLabel';
 import { trainingStatusLabel } from '../format/trainingStatusLabel';
-import { Gallery } from '../gallery/Gallery';
 import { clamp } from '../lang/clamp';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { PauseScreen } from '../pause/PauseScreen';
@@ -202,19 +201,6 @@ export function SettingsScreen() {
           onPress={() => void erase()}
         />
       </MmListGroup>
-      {services.environment === 'dev' ? (
-        <>
-          <GroupHeader text="Development" />
-          <MmListGroup>
-            <MmListRow
-              leadingIcon="edit"
-              title="Component gallery"
-              subtitle="Every color and component, light and dark."
-              onPress={() => void navigator.push(() => <Gallery />)}
-            />
-          </MmListGroup>
-        </>
-      ) : null}
       <p className="app-caption settings-about">Martian Macros · {services.environment}</p>
     </Screen>
   );
