@@ -250,6 +250,22 @@ the Health Connect plugin's readings and comes with that plugin in step 5.
 The golden images of `apps/mobile/test/goldens` are MM-229's screenshot
 tests.
 
+**12. The phone's own storage (2026-10-12).** Step 5's first slice: two
+plugins written for this app in the Android shell, in Kotlin. `MmDb` is
+SQLite (`androidx.sqlite:sqlite-bundled`, with FTS5) behind the same
+`SqlDatabase` contract suite as the WebAssembly build; the suite runs
+against the adapter with the bridge stood in for by the WebAssembly build.
+`MmPacks` is the pack files, named as the Flutter store named them, and the
+one HTTP fetch the app makes, streamed back as events with Range resume.
+`openAppServices` branches once on the shell: the database
+`martian_macros_demo` on the phone, packs as the catalog, the manifest
+address set per build from `config/prod.json` (overridden by
+`MM_FOOD_PACK_MANIFEST_URL` at build). Verified on the emulator end to end:
+onboarding's answers and first weigh-in survive `am force-stop`; the real
+manifest lists two packs; Common foods downloads, checks, unpacks, commits
+and then answers a search ("banana" finds USDA rows through FTS5). The
+camera, notifications and Health Connect plugins are step 5's second slice.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
