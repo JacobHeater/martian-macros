@@ -10,6 +10,9 @@ public class MainActivity extends BridgeActivity {
         // The app's own plugins (MM-232): the phone's storage and network.
         registerPlugin(MmDbPlugin.class);
         registerPlugin(MmPacksPlugin.class);
+        registerPlugin(MmRemindersPlugin.class);
+        registerPlugin(MmScannerPlugin.class);
+        registerPlugin(MmHealthPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

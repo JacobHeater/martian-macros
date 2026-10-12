@@ -266,6 +266,29 @@ manifest lists two packs; Common foods downloads, checks, unpacks, commits
 and then answers a search ("banana" finds USDA rows through FTS5). The
 camera, notifications and Health Connect plugins are step 5's second slice.
 
+**13. The camera, reminders and Health Connect (2026-10-12).** Step 5's
+second slice, three more plugins in the shell. `MmReminders`: inexact
+alarms with only the prompt as the notification, what is scheduled kept so
+the boot receiver can set it again, `POST_NOTIFICATIONS` asked only when a
+reminder is turned on. `MmScanner`: a CameraX live view reading the retail
+barcode kinds with ML Kit on the device, and a label photographed and read
+as text, the photo deleted. `MmHealth`: Health Connect read-only over
+`connect-client`, thin calls (status, permitted, request, read, token,
+changes) with the Dart source's flow ported to `NativeHealthSource`; the
+`healthSourceContract` runs against it over a fake plugin, and the Dart
+`health_connect_sample_test` is ported against the unit mapping.
+`minSdkVersion` 24→26, as the Flutter app's (Health Connect needs
+Android 8). Verified on the emulator: the weigh-in reminder asks, is
+granted and puts seven 7:00 alarms in `dumpsys alarm`; the scan view opens
+on the camera and cancelling comes back empty-handed; Health Connect's own
+permission sheet grants weight and the first sync reads and stores a token
+("Allowed. Nothing to read yet."). Not yet verified by hand: the label
+photo path (unit-tested; the emulator's camera app makes it slow to
+drive), and reading real weigh-ins back (the emulator's Health Connect
+holds no data) — both belong to MM-229's run on a phone. Still open in
+step 5: the hardware back button inside the app's own navigation, and the
+demo seed wiring (MM-228).
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
