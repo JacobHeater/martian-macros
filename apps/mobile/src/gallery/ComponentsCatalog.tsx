@@ -1,15 +1,3 @@
-import { useState } from 'react';
-import { HistoryChart } from '../charts/HistoryChart';
-import { MacroSplitChart } from '../charts/MacroSplitChart';
-import { MiniTrend } from '../charts/MiniTrend';
-import { TrendChart } from '../charts/TrendChart';
-import { TrendSparkline } from '../charts/TrendSparkline';
-import { TrendStats } from '../charts/TrendStats';
-import { CalendarDate } from '../domain/CalendarDate';
-import { IntakeDay } from '../domain/IntakeDay';
-import type { WeightTrendPoint } from '../engine/WeightTrendPoint';
-import { Fmt } from '../format/Fmt';
-import { HorizonArc } from '../ui/HorizonArc';
 import { ChoiceCard } from '../ui/ChoiceCard';
 import { DayStepper } from '../ui/DayStepper';
 import { DownloadStatusStrip } from '../ui/DownloadStatusStrip';
@@ -19,11 +7,13 @@ import { MacroBar } from '../ui/MacroBar';
 import { MacroFigure } from '../ui/MacroFigure';
 import { MetricFacts } from '../ui/MetricFacts';
 import { MmActionChip } from '../ui/MmActionChip';
+import { MmButton } from '../ui/MmButton';
 import { MmCheckRow } from '../ui/MmCheckRow';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmDropdown } from '../ui/MmDropdown';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
+import { MmIconButton } from '../ui/MmIconButton';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmOverlays } from '../ui/MmOverlays';
@@ -32,6 +22,7 @@ import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
 import { MmSpinner } from '../ui/MmSpinner';
 import { MmStatusChip } from '../ui/MmStatusChip';
+import { MmSurface } from '../ui/MmSurface';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
@@ -40,66 +31,10 @@ import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
 import { StatusRow } from '../ui/StatusRow';
 import { StepProgress } from '../ui/StepProgress';
-import { MmAppBar } from '../ui/MmAppBar';
-import { MmButton } from '../ui/MmButton';
-import { MmIconButton } from '../ui/MmIconButton';
-import { MmNavigationBar } from '../ui/MmNavigationBar';
-import { MmSurface } from '../ui/MmSurface';
-import { destinations } from '../app/destinations';
+import { useState } from 'react';
 import './gallery.css';
 
-const COLORS = [
-  'canvas', 'surface', 'raised', 'overlay', 'sunken', 'track', 'selected', 'outline', 'outline-strong',
-  'text', 'text2', 'text3', 'ember', 'on-ember', 'ion', 'on-ion', 'energy', 'protein', 'carbs', 'fat',
-  'positive', 'caution', 'info', 'danger', 'on-danger',
-] as const;
-
-const TYPE = ['figure-xl', 'figure', 'title', 'heading', 'body', 'label', 'caption'] as const;
-const PALETTES = ['martian', 'dark', 'light'] as const;
-
-/**
- * Every token and component as built, in each palette (MM-105). This is the
- * real thing, not a drawing of it: what is shown here is what a screen gets.
- */
-export function Gallery() {
-  return (
-    <div className="gallery">
-      {PALETTES.map((palette) => (
-        <section key={palette} className={`gallery-palette theme-${palette}`} aria-label={`${palette} palette`}>
-          <h2 className="gallery-title">{palette}</h2>
-          <div className="gallery-swatches">
-            {COLORS.map((color) => (
-              <div key={color} className="gallery-swatch">
-                <span style={{ background: `var(--${color})` }} />
-                {color}
-              </div>
-            ))}
-          </div>
-          {TYPE.map((role) => (
-            <p key={role} className="gallery-type" style={{ font: `var(--type-${role})` }}>
-              {role} 1,534 kcal 184.1 lb
-            </p>
-          ))}
-          <div className="gallery-row">
-            <MmButton label="Primary" onPress={() => undefined} />
-            <MmButton label="Primary off" />
-            <MmButton label="Secondary" kind="secondary" onPress={() => undefined} />
-            <MmButton label="Text" kind="text" onPress={() => undefined} />
-            <MmIconButton icon="settings" label="Settings" onPress={() => undefined} />
-          </div>
-          <MmSurface>A surface</MmSurface>
-          <Components />
-          <Charts />
-          <MmAppBar title="An app bar" />
-          <MmNavigationBar destinations={destinations} current="progress" onSelect={() => undefined} />
-        </section>
-      ))}
-    </div>
-  );
-}
-
-/** One of each component, live, so a change to one is seen in all three palettes at once. */
-function Components() {
+export function ComponentsCatalog() {
   const [text, setText] = useState('Oats');
   const [on, setOn] = useState(true);
   const [unit, setUnit] = useState<string | undefined>('lb');
@@ -107,6 +42,14 @@ function Components() {
   const nothing = () => undefined;
   return (
     <MmOverlays>
+      <div className="gallery-row">
+        <MmButton label="Primary" onPress={() => undefined} />
+        <MmButton label="Primary off" />
+        <MmButton label="Secondary" kind="secondary" onPress={() => undefined} />
+        <MmButton label="Text" kind="text" onPress={() => undefined} />
+        <MmIconButton icon="settings" label="Settings" onPress={() => undefined} />
+      </div>
+      <MmSurface>A surface</MmSurface>
       <MmHeroSurface>
         <p style={{ margin: 0, font: 'var(--type-figure-xl)' }}>1,534</p>
         <p style={{ margin: 0, color: 'var(--text2)' }}>kcal left today</p>
@@ -186,61 +129,5 @@ function Components() {
       <DayStepper label="Yesterday" onPrevious={nothing} onNext={nothing} onLabelPress={nothing} />
       <DownloadStatusStrip label="Downloading foods" fraction={0.4} onCancel={nothing} />
     </MmOverlays>
-  );
-}
-
-const chartDay = CalendarDate.of(2026, 10, 10);
-const chartTrend = Array.from({ length: 30 }, (_, i) => ({
-  date: chartDay.addDays(i - 29),
-  levelKg: 84 - i * 0.05 + Math.sin(i / 4) * 0.2,
-  levelSigmaKg: 0.25 + (i % 7) * 0.02,
-})) as unknown as WeightTrendPoint[];
-
-/** The charts, drawn from invented figures. */
-function Charts() {
-  const fmt = new Fmt('metric');
-  const valuesOf = (value: (daysAgo: number) => number | undefined) =>
-    new Map(
-      Array.from({ length: 30 }, (_, daysAgo) => [chartDay.addDays(-daysAgo), value(daysAgo)] as const).filter(
-        (entry): entry is readonly [CalendarDate, number] => entry[1] !== undefined,
-      ),
-    );
-  return (
-    <>
-      <MmSurface>
-        <HorizonArc progress={0.62} label="1,300 of 2,100 kcal" />
-        <HorizonArc progress={1.2} label="Over target" />
-      </MmSurface>
-      <InfoCard title="Nutrition history">
-        <HistoryChart
-          today={chartDay}
-          days={30}
-          unit="kcal"
-          series={[
-            { label: 'Logged intake', kind: 'energy', values: valuesOf((d) => (d % 6 === 2 ? undefined : 2000 + ((d * 37) % 300))) },
-            { label: 'Target in force', kind: 'target', dashed: true, values: valuesOf((d) => (d > 14 ? 2300 : 2250)) },
-          ]}
-        />
-      </InfoCard>
-      <InfoCard title="Weight">
-        <TrendStats trend={chartTrend} fmt={fmt} />
-        <TrendSparkline trend={chartTrend} />
-        <TrendChart
-          label="Weight trend"
-          trend={chartTrend}
-          weights={chartTrend.filter((_, i) => i % 2 === 0).map((p, i) => ({ date: p.date, weightKg: p.levelKg + ((i % 3) - 1) * 0.4 }))}
-          weightEvents={[{ date: chartDay.addDays(-9), type: 'travel' }]}
-          today={chartDay}
-          rangeDays={30}
-          fmt={fmt}
-        />
-      </InfoCard>
-      <InfoCard title="Macronutrient split">
-        <MacroSplitChart intake={new IntakeDay({ date: chartDay, kcal: 1450, proteinG: 100, carbsG: 150, fatG: 50 })} />
-      </InfoCard>
-      <MmSurface kind="compact">
-        <MiniTrend values={[3, 4, 2, 4, 5]} min={1} max={5} slots={8} label="Hunger" />
-      </MmSurface>
-    </>
   );
 }

@@ -113,10 +113,10 @@ it('confirming erases everything and returns to initial setup', async () => {
   expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
 });
 
-it('the development group and the build are shown in a development build', async () => {
+it('the build is named, and the gallery is gone to Storybook (MM-237)', async () => {
   const settings = await open();
   expect(settings.getByText('Martian Macros · dev')).toBeInTheDocument();
-  expect(settings.getByRole('button', { name: /^Component gallery/ })).toBeInTheDocument();
+  expect(settings.queryByRole('button', { name: /gallery/i })).not.toBeInTheDocument();
 });
 
 describe('theme preference (MM-165)', () => {

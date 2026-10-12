@@ -1,4 +1,11 @@
-# UI/UX assets
+# UI/UX assets (retired)
+
+> **Retired on 2026-10-12 (MM-237).** The design register is Storybook now
+> (`mm storybook`), rendering the real components. This folder is kept as
+> the historical record of the Flutter-era screens; tickets that link into
+> it keep their record, and nothing new is added here. `coverage.json` and
+> the `mm req` checks over this folder are gone with it.
+
 
 This folder is the HTML reference for how the app looks and behaves: a
 drawing of every view and reusable component as built, with its states

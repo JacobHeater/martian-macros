@@ -2,11 +2,8 @@
 
 .mm-icon {
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  /* Material's outlined icons are filled paths, not strokes (MM-236). */
+  fill: currentColor;
 }
 
 .mm-button {

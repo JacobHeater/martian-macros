@@ -1,9 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { stderr, stdout } from 'node:process';
-import { capture } from './proc.ts';
 import type { Ticket } from './ticket.ts';
-import { uiUxAssetProblems, uiUxAssetsFolder } from './uiUxAssets.ts';
-import { uiUxCoverageProblems } from './uiUxCoverage.ts';
 
 interface RequirementsScan {
   readonly tickets: Ticket[];
@@ -82,8 +79,9 @@ function scan(root: string): RequirementsScan {
       }
       continue;
     }
-    // The one folder that is not a component: the HTML assets (MM-210).
-    if (`requirements/${name}` === uiUxAssetsFolder) continue;
+    // The one folder that is not a component: the retired HTML register,
+    // kept as the historical record (MM-210, superseded by MM-237).
+    if (name === 'ui-ux-assets') continue;
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
       problems.push(`${name}/: component folders are kebab-case.`);
     }
@@ -158,22 +156,6 @@ function scan(root: string): RequirementsScan {
   return { tickets, problems, highestNumber: tickets.at(-1)?.number ?? 0 };
 }
 
-/**
- * Every HTML file in the repository that git does not ignore, tracked or
- * not, as paths from the root; undefined when git cannot say.
- */
-async function htmlFiles(repoRoot: string): Promise<string[] | undefined> {
-  const result = await capture(
-    ['git', 'ls-files', '--cached', '--others', '--exclude-standard', '--', '*.html', '*.htm'],
-    { cwd: repoRoot },
-  );
-  if (result.code !== 0) return undefined;
-  return result.stdout
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '' && existsSync(`${repoRoot}/${line}`));
-}
-
 const option = (args: readonly string[], name: string): string | undefined => {
   const at = args.indexOf(name);
   return at === -1 || at + 1 >= args.length ? undefined : args[at + 1];
@@ -195,12 +177,6 @@ export async function runRequirements(repoRoot: string, args: readonly string[])
     return 66;
   }
   const found = scan(root);
-  const html = await htmlFiles(repoRoot);
-  if (html === undefined) {
-    stderr.write(`git could not list the HTML files, so HTML outside ${uiUxAssetsFolder}/ was not checked (MM-210).\n`);
-  }
-  found.problems.push(...uiUxAssetProblems(repoRoot, html));
-  found.problems.push(...uiUxCoverageProblems(repoRoot, new Set(found.tickets.map((ticket) => ticket.id))));
 
   switch (args[0]) {
     case 'next':

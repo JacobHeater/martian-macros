@@ -39,6 +39,7 @@ Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android [--release]` | Builds the web app, syncs the shell and assembles the APK |
 | `mm food fetch\|build\|package` | Builds the food packs (MM-52); `build` needs DuckDB on PATH |
+| `mm storybook [build]` | The design register: every token, icon and component as built (MM-237) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
 | `mm roadmap [--check]` | Writes `roadmap/progress.html`, the progress page |
 | `mm ci` | Watches pull request checks without waiting (`mm ci help`) |

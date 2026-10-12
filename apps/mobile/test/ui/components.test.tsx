@@ -1,3 +1,4 @@
+import AddOutlined from '@mui/icons-material/AddOutlined';
 import { readFileSync } from 'node:fs';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -50,8 +51,11 @@ describe('the add button', () => {
     render(<MmIconButton icon="plus" kind="add" label="Add food to lunch" onPress={() => undefined} />);
     const button = screen.getByRole('button', { name: 'Add food to lunch' });
     const drawing = button.querySelector('svg');
-    expect(drawing).toHaveAttribute('width', '16');
-    expect(drawing?.querySelector('path')).toHaveAttribute('d', 'M12 5v14M5 12h14');
+    expect(drawing?.getAttribute('style')).toContain('width: 16px');
+    // Material's Add, through MmIcon (MM-236).
+    const plus = render(<AddOutlined />);
+    expect(drawing?.innerHTML).toBe(plus.container.querySelector('svg')?.innerHTML);
+    plus.unmount();
 
     expect(rule('.mm-icon-button')).toMatch(/width: 48px;[\s\S]*height: 48px;/);
     const plate = rule('.mm-icon-button-plate');
