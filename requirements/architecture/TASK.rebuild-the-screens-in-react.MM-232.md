@@ -1,6 +1,6 @@
 ---
 id: MM-232
-status: in-progress
+status: done
 component: architecture
 related: [MM-228, MM-229, MM-230, MM-231]
 ---
@@ -324,3 +324,5 @@ builds with `docs/evidence.md` directly). The demo seed flag is MM-228's.
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
   step 5.
+
+**Done (2026-10-12).** All six steps are complete; the sections above record each. The repository holds no Dart or Flutter. What remains around the rebuild is tracked in MM-229 (screenshot tests, a run on the physical phone) and MM-228 (demo seed, the identity switch).
