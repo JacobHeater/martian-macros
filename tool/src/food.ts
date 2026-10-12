@@ -71,7 +71,7 @@ async function unzip(zip: string, into: string): Promise<number> {
   return 0;
 }
 
-const webApp = 'apps/web';
+const webApp = 'apps/mobile';
 
 /**
  * `mm food fetch | build | package` (MM-52).

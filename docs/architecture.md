@@ -5,9 +5,9 @@ Status: founding decisions, October 2026. This is the overview.
 > **Decided 2026-10-12 (MM-228): the app is a React HTML5 app in a native
 > shell.** It stays offline, the web is never a product, and the product
 > decisions below stand. The rebuild (MM-232) is done: the app lives in
-> `apps/web/`, and the Flutter app this file was first written about was
+> `apps/mobile/`, and the Flutter app this file was first written about was
 > removed with it (it remains in git history). A Dart file named below has
-> its counterpart under `apps/web/src`, named in camelCase — `mode_advisor.dart`
+> its counterpart under `apps/mobile/src`, named in camelCase — `mode_advisor.dart`
 > is `modeAdvisor.ts` — with the same behavior, held by the carried-over
 > tests.
 
@@ -211,7 +211,7 @@ Binding rules from the product owner (MM-159); the short form is in
   design-system components; screens never use raw Material controls.
 
 State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
-The layers test (`apps/web/test/layers.test.ts`) enforces the layering and
+The layers test (`apps/mobile/test/layers.test.ts`) enforces the layering and
 the adapter folders; the one-declaration and design-system checks await a
 TypeScript `mm arch` (see the handoff).
 

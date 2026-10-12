@@ -16,7 +16,7 @@ delegation and sequential fallback do not supersede the working agreements here.
 > decided by the product owner on 2026-10-12).** The Flutter app it replaced
 > was removed with MM-232's final step; the old Dart sources remain in git
 > history, and the requirements describe the product as built in
-> `apps/web/`. The web is never a product: the app runs from files inside
+> `apps/mobile/`. The web is never a product: the app runs from files inside
 > the shell, offline.
 
 ## Working agreements
@@ -104,9 +104,16 @@ delegation and sequential fallback do not supersede the working agreements here.
 - `mm check` has passed only when its exit code is 0 and its last line is
   "All checks passed." A tail reading "All tests passed!" can belong to one
   suite while another failed.
-- A change to how a screen looks is not done until you have looked at it on the
-  emulator (or say plainly that you did not). How the app looks matters as much
-  as what it does. Its HTML drawing is looked at in a browser too (MM-211).
+- Screen and design verification happens in a browser (owner's standing
+  rule, 2026-10-12). A change to how a screen looks is not done until you
+  have looked at it in a browser — the dev server or the built page — and
+  its HTML drawing in `requirements/ui-ux-assets/` is updated with it
+  (MM-211). The assets are where the owner opines on design, on the
+  tickets, without running the app; that is a reason the app moved to web
+  technologies. How the app looks matters as much as what it does.
+- Device and emulator screenshots are only for verifying native behavior:
+  plugins, permissions, persistence, notifications, the back button and the
+  like. They are never the design check.
 - Check a new native plugin with a release build, not only a debug one.
 - Bugs found in passing still follow the rule above; the owner will walk
   through bugs and regressions at acceptance testing at the end, and until then
@@ -114,8 +121,8 @@ delegation and sequential fallback do not supersede the working agreements here.
 
 ## Project map and conventions
 
-- `apps/web/src/` is the app. Its first-level folders are layers, kept apart
-  exactly as the Dart packages were, and `apps/web/test/layers.test.ts`
+- `apps/mobile/src/` is the app. Its first-level folders are layers, kept apart
+  exactly as the Dart packages were, and `apps/mobile/test/layers.test.ts`
   enforces who may import whom:
   - `lang/` small language helpers (no imports);
   - `domain/` entities, units, repositories' interfaces, screening;
@@ -132,11 +139,11 @@ delegation and sequential fallback do not supersede the working agreements here.
   - `platform/` the shell's plugins behind interfaces (camera, reminders,
     Health Connect, system bars, back button);
   - `state/` the app's cells and controllers; then the screen folders.
-- `apps/web/src/ui/` is the design-system component library; screens use it
+- `apps/mobile/src/ui/` is the design-system component library; screens use it
   and never raw HTML controls.
-- `apps/web/android/` is the native shell: a Capacitor host and the app's own
+- `apps/mobile/android/` is the native shell: a Capacitor host and the app's own
   Kotlin plugins (`MmDb`, `MmPacks`, `MmReminders`, `MmScanner`, `MmHealth`).
-- `apps/web/test/contracts/` holds the contract suites; every implementation
+- `apps/mobile/test/contracts/` holds the contract suites; every implementation
   of an interface runs its suite, fixtures included.
 - `tool/` contains the dependency-free `mm` task runner: TypeScript run by
   Node itself, with its own tests in `tool/test/`.
@@ -149,7 +156,7 @@ delegation and sequential fallback do not supersede the working agreements here.
 - Keep dependencies flowing with the existing layers. In particular, keep
   domain and engine logic independent of React and persistence details.
 - A change to any table bumps `currentSchemaVersion` in
-  `apps/web/src/data/schema.ts` by one and adds the migration step; the
+  `apps/mobile/src/data/schema.ts` by one and adds the migration step; the
   migration tests hold every released version's upgrade path.
 
 ## Engineering principles (binding)
@@ -162,8 +169,8 @@ interface segregation (I) win.
 2. Every integration point is an interface that any subtype can replace
    (food source, barcode scanner, health source, backup provider, entitlement,
    clock). Never import a vendor or platform package outside its adapter
-   folder; `apps/web/test/layers.test.ts` names the folders each may live in,
-   and `apps/web/src/app/openAppServices.ts` is the one place implementations
+   folder; `apps/mobile/test/layers.test.ts` names the folders each may live in,
+   and `apps/mobile/src/app/openAppServices.ts` is the one place implementations
    are chosen.
 3. Consumers depend on the **narrowest** interface they need
    (`WeightReader`, not a store). Interfaces live with the consumer's layer.
@@ -193,7 +200,7 @@ PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
 - `mm req` after creating or updating requirements.
 - `mm panel` validates panel roles, Claude/Copilot adapters and portable templates;
   `mm panel docs/agent-runs/<task-id>` also checks saved run state.
-- `npx vitest run <relevant-path>` inside `apps/web` for focused tests;
+- `npx vitest run <relevant-path>` inside `apps/mobile` for focused tests;
   `mm test` for the tool's tests and the whole web suite.
 - `mm check` before considering a change complete; it runs the CI checks.
 

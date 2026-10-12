@@ -2,7 +2,7 @@
 
 Every constant and rule that decides something about a user's body or safety,
 with where it comes from and how good that evidence is. A test
-(`apps/web/test/engine/evidenceRegister.test.ts`) fails `mm check` when a
+(`apps/mobile/test/engine/evidenceRegister.test.ts`) fails `mm check` when a
 constant or rule has no row here, or a row names something that no longer
 exists. The app's **How this works** screen is generated from this file.
 
