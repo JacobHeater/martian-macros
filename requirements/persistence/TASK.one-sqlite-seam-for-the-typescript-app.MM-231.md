@@ -127,6 +127,35 @@ Scenario: The system of record is on the phone
 - Search in a 50,000-food pack: under the test's 150 ms on a laptop, through
   the WebAssembly build. Not a phone figure.
 
+**The data layer on the seam (2026-10-12):**
+- `apps/web/src/data/`: the user's database and a repository over it for
+  each of the 19 the Dart app had, plus the set that opens them all
+  (`SqlRepositories`). It imports no SQLite library.
+- **Every contract suite passes against it**, the same 23 suites the
+  in-memory repositories pass, so one can stand in for the other. A query
+  was broken on purpose (weigh-ins newest first) and its contract failed.
+- **The schema is version 1 and has the shape the Dart database had at its
+  version 31.** The Dart database wrote out every column of its 21 tables;
+  a test compares name, order, type, nullability, default and key of each
+  with what this schema creates. All equal. The check constraints are not
+  in that comparison; the ones the Dart tests exercised (sex, one setup
+  row, weight, waist) are tested directly.
+- **Upgrades are proven before one is needed**, with versions that do not
+  exist yet, as the Dart tests did: each step runs in turn, every row is
+  kept, a step that throws leaves the database exactly as it was including
+  the steps before it, a missing step is refused, and data saved by a newer
+  app is refused and left alone.
+- **Watching**: a repository's `watch...` reads again after any write to a
+  table it reads, and only then; a write that fails changes nothing and
+  tells nothing. Reads that span several tables (a workout with its sets)
+  are not one snapshot: a write landing between two of their queries is
+  followed at once by a second read that is consistent. The Dart app had
+  the same property.
+- Not carried over: the 31 upgrade steps of the Dart schema and the 10
+  tests of upgrades between its released versions (the decision above).
+- **Not verified:** any of this through the native plugin, which does not
+  exist yet. Every test above ran against the WebAssembly build in memory.
+
 **Not built:**
 - The native adapter.
 - **Downloading a pack** (`PackStore`, `PackDownload`, the HTTP adapters and
@@ -135,7 +164,8 @@ Scenario: The system of record is on the phone
   of those is a file operation on the phone, so it needs its own interface
   to the platform and evidence from a device before it is written. Its
   plain types (the listing, progress, the problems) are carried over.
-- The data layer, the pipeline and the demo fixtures.
+- The app does not open this database yet: nothing on a screen reads or
+  writes it.
 
 ## Notes
 - The food catalog is the first thing built on it, because it reads and

@@ -1,0 +1,1476 @@
+{
+ "custom_exercises": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "name",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "equipment",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "primary_muscle",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "secondary_muscles",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "load_kind",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "custom_foods": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "name",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "kind",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "serving_description",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "serving_grams",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "protein_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "carbs_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "fat_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 9,
+   "name": "barcode",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 10,
+   "name": "servings",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 11,
+   "name": "cooked_weight_grams",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "day_marks": [
+  {
+   "cid": 0,
+   "name": "epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "completeness",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "exercise_progressions": [
+  {
+   "cid": 0,
+   "name": "exercise_id",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "reps_low",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "reps_high",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "load_step_kg",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "food_entries": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "meal",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "name",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "protein_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "carbs_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "fat_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "quantity_source",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 9,
+   "name": "portion_quantity",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 10,
+   "name": "portion_unit",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 11,
+   "name": "nutrition_basis",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 12,
+   "name": "reference_basis",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 13,
+   "name": "reference_kcal",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 14,
+   "name": "reference_protein_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 15,
+   "name": "reference_carbs_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 16,
+   "name": "reference_fat_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 17,
+   "name": "serving_description",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 18,
+   "name": "serving_grams",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 19,
+   "name": "serving_milliliters",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 20,
+   "name": "serving_unit",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 21,
+   "name": "density_g_per_ml",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 22,
+   "name": "implied_grams",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 23,
+   "name": "hand_model_version",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 24,
+   "name": "origin_pack_id",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 25,
+   "name": "origin_food_id",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 26,
+   "name": "origin_source",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 27,
+   "name": "origin_source_id",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 28,
+   "name": "fiber_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 29,
+   "name": "sodium_mg",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 30,
+   "name": "alcohol_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 31,
+   "name": "created_at",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)",
+   "pk": 0
+  }
+ ],
+ "health_import_tokens": [
+  {
+   "cid": 0,
+   "name": "type",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "token",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "imported_samples": [
+  {
+   "cid": 0,
+   "name": "type",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "platform_id",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 2
+  },
+  {
+   "cid": 2,
+   "name": "value",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "start_ms",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "end_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "source_id",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "source_name",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "insight_log": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "rule",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "shown_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "dismissed_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "pauses": [
+  {
+   "cid": 0,
+   "name": "from_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "to_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "reason",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "extended",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  }
+ ],
+ "recipe_ingredients": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "recipe_id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "position",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "name",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "grams",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "protein_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "carbs_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "fat_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "recovery_check_ins": [
+  {
+   "cid": 0,
+   "name": "date_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "hunger",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "energy",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "sleep",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "training",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "mood",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "sleep_hours",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "reminders": [
+  {
+   "cid": 0,
+   "name": "kind",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "enabled",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "minute_of_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "count_from_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "setups": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "sex",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "birth_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "height_cm",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "training_status",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "training_days_per_week",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "profile_revision",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "daily_activity",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": "'light'",
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "goal_mode",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 9,
+   "name": "unit_system",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 10,
+   "name": "onboarded_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 11,
+   "name": "body_fat_percent",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 12,
+   "name": "requested_loss_fraction",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 13,
+   "name": "pregnant",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 14,
+   "name": "breastfeeding",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 15,
+   "name": "eating_disorder_history",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 16,
+   "name": "chronic_kidney_disease",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 17,
+   "name": "androgen_use",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 18,
+   "name": "pcos",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 19,
+   "name": "menopause",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 20,
+   "name": "thyroid_condition",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 21,
+   "name": "insulin_or_sulfonylurea",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 22,
+   "name": "insulin_care_team_confirmed",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 23,
+   "name": "bariatric_surgery",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 24,
+   "name": "weight_affecting_medication",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 25,
+   "name": "health_check_confirmed_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 26,
+   "name": "maintenance_week_from_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 27,
+   "name": "relief_answered_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 28,
+   "name": "health_check_skip_count",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 29,
+   "name": "creatine_started_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "targets_history": [
+  {
+   "cid": 0,
+   "name": "effective_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "mode",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "protein_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "protein_minimum_g",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "fat_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "carbs_g",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "weekly_rate_fraction",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "flags",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": "''",
+   "pk": 0
+  },
+  {
+   "cid": 9,
+   "name": "tdee_kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 10,
+   "name": "tdee_sigma_kcal",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 11,
+   "name": "explanation",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 12,
+   "name": "summary_seen",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "1",
+   "pk": 0
+  },
+  {
+   "cid": 13,
+   "name": "target_rules_version",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "1",
+   "pk": 0
+  },
+  {
+   "cid": 14,
+   "name": "profile_revision",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 15,
+   "name": "safety_body_fat_percent",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 16,
+   "name": "tdee_status",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "user_preferences": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "theme_preference",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": "'unselected'",
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "easy_to_miss_enabled",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "1",
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "easy_to_miss_last_shown_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "detail_level",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": "'standard'",
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "under_eating_dismissed_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "return_screen_dismissed_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "recovery_check_in_skipped_epoch_day",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "waist_entries": [
+  {
+   "cid": 0,
+   "name": "epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "waist_cm",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "reading1_cm",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "reading2_cm",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "reading3_cm",
+   "type": "REAL",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "weight_entries": [
+  {
+   "cid": 0,
+   "name": "epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "weight_kg",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "device_id",
+   "type": "TEXT",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "weight_events": [
+  {
+   "cid": 0,
+   "name": "date_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "type",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 2
+  }
+ ],
+ "workout_exercises": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "workout_id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "position",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "exercise_id",
+   "type": "TEXT",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "rest_target_seconds",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "workout_sets": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "workout_id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "exercise_position",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "position",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "reps",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "load_kg",
+   "type": "REAL",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "rir",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 7,
+   "name": "started_at_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 8,
+   "name": "ended_at_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ],
+ "workouts": [
+  {
+   "cid": 0,
+   "name": "id",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 1
+  },
+  {
+   "cid": 1,
+   "name": "date_epoch_day",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 2,
+   "name": "started_at_ms",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 3,
+   "name": "ended_at_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 4,
+   "name": "paused_at_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  },
+  {
+   "cid": 5,
+   "name": "paused_for_ms",
+   "type": "INTEGER",
+   "notnull": 1,
+   "dflt_value": "0",
+   "pk": 0
+  },
+  {
+   "cid": 6,
+   "name": "set_started_at_ms",
+   "type": "INTEGER",
+   "notnull": 0,
+   "dflt_value": null,
+   "pk": 0
+  }
+ ]
+}

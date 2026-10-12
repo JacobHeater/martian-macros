@@ -203,8 +203,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   repositories and their 23 contract suites are in `apps/web/src/fixtures/`
   and `apps/web/test/contracts/`. Not built: the native
   adapter, downloading a pack (it needs an interface to the phone's files
-  first), the data layer (the repositories on SQLite, which must pass those
-  same contract suites). Whether a native
+  first). The data layer is built (`apps/web/src/data/`): every repository
+  on SQLite, passing those same suites, with the schema at version 1 in
+  the shape the Dart database had; it has run only against the WebAssembly
+  build, never on a phone. Whether a native
   plugin has FTS5 on Android is not verified.
   The task runner (`tool/`) is the last Dart and waits for nothing. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
