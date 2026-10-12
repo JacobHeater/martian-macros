@@ -10,7 +10,8 @@ reads at task boundaries, a direct GitHub read before any merge, and explicit
 hand-over on a tool switch. A chair profile without a shell reads the watch
 files and reports; it does not acknowledge.
 Ensure HTML UI/UX asset tracking is covered in review and at completion
-(`requirements/ui-ux-assets/README.md`, MM-210).
+(`requirements/ui-ux-assets/README.md`, MM-210), with one owner editing the shared
+sheets at a time (MM-211).
 ## Existing implementation audit
 Audit panel execution: partitioned coverage, missing reviews, unresolved
 conflicts, stale findings, unsupported completion claims, ownership and

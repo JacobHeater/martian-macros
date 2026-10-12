@@ -37,3 +37,15 @@ Scenario: The engine refuses as well
 - `Profile.isAdultOn` and the `blocked` policy in `mm_domain`; `nextTargets` returns nothing for a blocked policy (engine test "blocked
   users get no targets").
 - The age shown is self-declared. There is no age verification, and none is planned.
+
+## UI/UX Assets
+
+- [First launch and gates](../ui-ux-assets/views/onboarding.html) — Current.
+  Draws AdultsOnlyScreen and BirthDateStep as built on 2026-10-11: default,
+  empty, under 18. Frames: `#adults-only`, `#onboarding-birth-date`. Drawn
+  from the source alone; not compared with the running app. It shows what
+  exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#opening-the-app-later) — Current.
+  Draws the "the gates that can stand in front of the app" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.

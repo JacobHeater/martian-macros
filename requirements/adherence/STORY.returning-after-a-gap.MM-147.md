@@ -111,3 +111,15 @@ Not built: confidence set to Fair after a 7 to 27 day gap (confidence follows th
 re-calibration (the estimator holds until it has its usual minimum of data, which is longer); re-confirming the goal after 90 days;
 the trend chart drawing the gap dashed; streaks and the monthly report (neither exists yet); a simulator user who lapses for four weeks and returns (MM-30). Food logged more than 60 days ago is not
 loaded, so an old stretch with food but no weigh-ins can read as a gap for the deficit count.
+
+## UI/UX Assets
+
+- [First launch and gates](../ui-ux-assets/views/onboarding.html#welcome-back)
+  — Current. Draws WelcomeBackScreen as built on 2026-10-11: after a gap,
+  after a pause. Drawn from the source alone; not compared with the running
+  app. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html) — Current. Draws the "the gates
+  that can stand in front of the app" path and the "pausing and coming back"
+  path as built on 2026-10-11. Frames: `#opening-the-app-later`,
+  `#pause-and-return`. Drawn from the source alone; not compared with the
+  running app. It shows what exists and approves nothing.

@@ -1,0 +1,2672 @@
+{
+  "schema": 1,
+  "about": "Every UI surface in apps/mobile/lib/src and the HTML that draws it (MM-211). Kept by hand: add or change an entry in the same pull request as the widget. mm req checks it against the source.",
+  "updated": "2026-10-11",
+  "surfaces": [
+    {
+      "source": "apps/mobile/lib/src/about/evidence_question_screen.dart",
+      "symbol": "EvidenceQuestionScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-143"
+      ],
+      "asset": "views/settings.html#evidence-question",
+      "states": [
+        "populated"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/about/evidence_row_card.dart",
+      "symbol": "EvidenceRowCard",
+      "kind": "part",
+      "requirements": [
+        "MM-143"
+      ],
+      "asset": "views/settings.html#evidence-question",
+      "states": [
+        "closed",
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/about/how_this_works_screen.dart",
+      "symbol": "HowThisWorksScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-143"
+      ],
+      "asset": "views/settings.html#how-this-works",
+      "states": [
+        "populated",
+        "error"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/app/adults_only_screen.dart",
+      "symbol": "AdultsOnlyScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-13"
+      ],
+      "asset": "views/onboarding.html#adults-only",
+      "states": [
+        "default"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/app/app_root.dart",
+      "symbol": "AppRoot",
+      "kind": "view",
+      "requirements": [
+        "MM-89"
+      ],
+      "asset": "views/onboarding.html#app-loading",
+      "states": [
+        "loading",
+        "data error",
+        "theme error"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Which gate is shown first is described on the flows sheet, not drawn as one frame."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/check_in_host.dart",
+      "symbol": "CheckInHost",
+      "kind": "host",
+      "requirements": [
+        "MM-24"
+      ],
+      "asset": "flows/index.html#weekly-check-in",
+      "states": [
+        "none of its own"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "Runs the weekly check-in when the app opens; it draws nothing itself."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/download_status_host.dart",
+      "symbol": "DownloadStatusHost",
+      "kind": "part",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "views/settings.html#food-database-downloading",
+      "states": [
+        "checking",
+        "downloading",
+        "installing"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Only the downloading wording is drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/health_recheck_screen.dart",
+      "symbol": "HealthRecheckScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-112"
+      ],
+      "asset": "views/onboarding.html#health-recheck",
+      "states": [
+        "first ask",
+        "second skip"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/app/home_shell.dart",
+      "symbol": "HomeShell",
+      "kind": "navigation",
+      "requirements": [
+        "MM-90",
+        "MM-99"
+      ],
+      "asset": "flows/index.html#navigation-map",
+      "states": [
+        "five destinations"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Drawn as the bottom bar on every destination sheet."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/martian_macros_app.dart",
+      "symbol": "MartianMacrosApp",
+      "kind": "host",
+      "requirements": [
+        "MM-165",
+        "MM-184",
+        "MM-177"
+      ],
+      "asset": "views/onboarding.html#app-demo",
+      "states": [
+        "themes",
+        "demo title"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Applies the theme and the app title; the themes are the switch on every sheet."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/target_change_summary_host.dart",
+      "symbol": "TargetChangeSummaryHost",
+      "kind": "host",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#target-change-sheet",
+      "states": [
+        "shown once",
+        "could not finish"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Shows the explanation sheet after a check-in; its failure message is views/onboarding.html#target-summary-error."
+    },
+    {
+      "source": "apps/mobile/lib/src/app/welcome_back_screen.dart",
+      "symbol": "WelcomeBackScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-147"
+      ],
+      "asset": "views/onboarding.html#welcome-back",
+      "states": [
+        "after a gap",
+        "after a pause"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/adherence_card.dart",
+      "symbol": "AdherenceCard",
+      "kind": "part",
+      "requirements": [
+        "MM-149"
+      ],
+      "asset": "views/coach.html#coach-default",
+      "states": [
+        "populated"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/coach_screen.dart",
+      "symbol": "CoachScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-24",
+        "MM-25",
+        "MM-139"
+      ],
+      "asset": "views/coach.html#coach-default",
+      "states": [
+        "populated",
+        "first day",
+        "learning"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Compared with the screenshot test for the top of the page only."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/insight_card.dart",
+      "symbol": "InsightCard",
+      "kind": "part",
+      "requirements": [
+        "MM-141"
+      ],
+      "asset": "views/coach.html#coach-insight",
+      "states": [
+        "collapsed",
+        "dismissible"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Two of the five rules are drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/last_change_card.dart",
+      "symbol": "LastChangeCard",
+      "kind": "part",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#coach-default",
+      "states": [
+        "a change",
+        "first targets"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The no-change wording is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/metabolism_summary.dart",
+      "symbol": "MetabolismSummary",
+      "kind": "part",
+      "requirements": [
+        "MM-23"
+      ],
+      "asset": "views/coach.html#coach-metabolism-states",
+      "states": [
+        "measured",
+        "starting",
+        "settling",
+        "implausible"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/monthly_report_screen.dart",
+      "symbol": "MonthlyReportScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-33"
+      ],
+      "asset": "views/coach.html#monthly-report",
+      "states": [
+        "populated",
+        "thin month",
+        "not ready"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/recomp_review_body.dart",
+      "symbol": "RecompReviewBody",
+      "kind": "part",
+      "requirements": [
+        "MM-133"
+      ],
+      "asset": "views/coach.html#coach-recomp-review",
+      "states": [
+        "one verdict"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "One of the verdicts is drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/recomp_review_card.dart",
+      "symbol": "RecompReviewCard",
+      "kind": "part",
+      "requirements": [
+        "MM-133"
+      ],
+      "asset": "views/coach.html#coach-recomp-review",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/recovery_card.dart",
+      "symbol": "RecoveryCard",
+      "kind": "part",
+      "requirements": [
+        "MM-116"
+      ],
+      "asset": "views/coach.html#coach-recovery-states",
+      "states": [
+        "first time",
+        "history",
+        "answered"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/recovery_check_in_screen.dart",
+      "symbol": "RecoveryCheckInScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-116"
+      ],
+      "asset": "views/coach.html#recovery-check-in",
+      "states": [
+        "part answered"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Where the end labels of each scale sit is approximate."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/relief_offer_card.dart",
+      "symbol": "ReliefOfferCard",
+      "kind": "part",
+      "requirements": [
+        "MM-117"
+      ],
+      "asset": "views/coach.html#coach-relief",
+      "states": [
+        "maintenance week offer"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The slower-pace and short-sleep wordings are not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/reports_card.dart",
+      "symbol": "ReportsCard",
+      "kind": "part",
+      "requirements": [
+        "MM-33"
+      ],
+      "asset": "views/coach.html#coach-default",
+      "states": [
+        "one report"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/show_target_change_sheet.dart",
+      "symbol": "showTargetChangeSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#target-change-sheet",
+      "states": [
+        "open"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/stall_card.dart",
+      "symbol": "StallCard",
+      "kind": "part",
+      "requirements": [
+        "MM-140"
+      ],
+      "asset": "views/coach.html#coach-stall",
+      "states": [
+        "one cause, evidence open"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "One of the causes is drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/target_change_sheet.dart",
+      "symbol": "TargetChangeSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#target-change-sheet",
+      "states": [
+        "a change",
+        "no change"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/targets_history_screen.dart",
+      "symbol": "TargetsHistoryScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-138"
+      ],
+      "asset": "views/coach.html#targets-history",
+      "states": [
+        "populated",
+        "empty"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/coach/under_eating_notice.dart",
+      "symbol": "UnderEatingNotice",
+      "kind": "part",
+      "requirements": [
+        "MM-114"
+      ],
+      "asset": "views/coach.html#coach-under-eating",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/dashboard/dashboard_metrics.dart",
+      "symbol": "DashboardMetrics",
+      "kind": "part",
+      "requirements": [
+        "MM-176"
+      ],
+      "asset": "views/dashboard.html#dashboard-metrics",
+      "states": [
+        "30 days",
+        "empty history",
+        "error"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/dashboard/dashboard_screen.dart",
+      "symbol": "DashboardScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-98",
+        "MM-99",
+        "MM-100"
+      ],
+      "asset": "views/dashboard.html#dashboard-default",
+      "states": [
+        "populated",
+        "first day",
+        "calibration",
+        "over target",
+        "paused",
+        "loading",
+        "error"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/dashboard/process_card.dart",
+      "symbol": "ProcessCard",
+      "kind": "part",
+      "requirements": [
+        "MM-92"
+      ],
+      "asset": "views/dashboard.html#dashboard-default",
+      "states": [
+        "a streak"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Hidden when there is no streak."
+    },
+    {
+      "source": "apps/mobile/lib/src/dashboard/report_ready_notice.dart",
+      "symbol": "ReportReadyNotice",
+      "kind": "part",
+      "requirements": [
+        "MM-33"
+      ],
+      "asset": "views/dashboard.html#dashboard-report-ready",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/dashboard/weight_card.dart",
+      "symbol": "WeightCard",
+      "kind": "part",
+      "requirements": [
+        "MM-16",
+        "MM-100"
+      ],
+      "asset": "views/dashboard.html#dashboard-default",
+      "states": [
+        "today's weigh-in"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Its second form, the Weight card shown once today is saved, is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/food/add_food_button.dart",
+      "symbol": "AddFoodButton",
+      "kind": "component",
+      "requirements": [
+        "MM-100"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/add_food_sheet.dart",
+      "symbol": "AddFoodSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-38",
+        "MM-39",
+        "MM-48",
+        "MM-167"
+      ],
+      "asset": "views/add-food.html#add-food-default",
+      "states": [
+        "empty",
+        "filled",
+        "label serving",
+        "alcohol",
+        "invalid",
+        "estimate source",
+        "search",
+        "edit",
+        "legacy entry"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/calorie_hero.dart",
+      "symbol": "CalorieHero",
+      "kind": "part",
+      "requirements": [
+        "MM-41",
+        "MM-187"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "left",
+        "over",
+        "logged only",
+        "paused"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/custom/custom_food_form.dart",
+      "symbol": "CustomFoodForm",
+      "kind": "sheet",
+      "requirements": [
+        "MM-44",
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-custom-food",
+      "states": [
+        "filled from a label",
+        "label not read",
+        "bad barcode"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/custom/my_foods_step.dart",
+      "symbol": "MyFoodsStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-my-foods",
+      "states": [
+        "populated",
+        "empty",
+        "delete confirm"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/custom/recipe_form.dart",
+      "symbol": "RecipeForm",
+      "kind": "sheet",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-recipe",
+      "states": [
+        "with ingredients"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/custom/recipe_ingredient_adder.dart",
+      "symbol": "RecipeIngredientAdder",
+      "kind": "part",
+      "requirements": [
+        "MM-45"
+      ],
+      "asset": "views/add-food.html#add-food-recipe-ingredient",
+      "states": [
+        "by numbers"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Picking an ingredient from search is described, not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/food/easy_to_miss_line.dart",
+      "symbol": "EasyToMissLine",
+      "kind": "part",
+      "requirements": [
+        "MM-152"
+      ],
+      "asset": "views/food.html#food-complete",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/estimate/estimate_meal_step.dart",
+      "symbol": "EstimateMealStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-150"
+      ],
+      "asset": "views/add-food.html#add-food-estimate",
+      "states": [
+        "default",
+        "before first weigh-in"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/fiber_line.dart",
+      "symbol": "FiberLine",
+      "kind": "part",
+      "requirements": [
+        "MM-126",
+        "MM-49"
+      ],
+      "asset": "views/food.html#food-detail-full",
+      "states": [
+        "with a guide"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_amount_step.dart",
+      "symbol": "FoodAmountStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-42",
+        "MM-151",
+        "MM-167"
+      ],
+      "asset": "views/add-food.html#add-food-amount",
+      "states": [
+        "filled",
+        "no amount"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_day_header.dart",
+      "symbol": "FoodDayHeader",
+      "kind": "part",
+      "requirements": [
+        "MM-90"
+      ],
+      "asset": "views/food.html#food-past-day",
+      "states": [
+        "today",
+        "a past day"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_entry_tile.dart",
+      "symbol": "FoodEntryTile",
+      "kind": "part",
+      "requirements": [
+        "MM-38",
+        "MM-48"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "an entry"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_screen.dart",
+      "symbol": "FoodScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-38",
+        "MM-40",
+        "MM-41",
+        "MM-47"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "populated",
+        "collapsed",
+        "empty",
+        "past day",
+        "complete",
+        "paused",
+        "error"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_search_results.dart",
+      "symbol": "FoodSearchResults",
+      "kind": "part",
+      "requirements": [
+        "MM-42"
+      ],
+      "asset": "views/add-food.html#add-food-search",
+      "states": [
+        "results",
+        "none",
+        "no database"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/food_trust_mark.dart",
+      "symbol": "FoodTrustMark",
+      "kind": "part",
+      "requirements": [
+        "MM-153"
+      ],
+      "asset": "views/add-food.html#add-food-search",
+      "states": [
+        "reference",
+        "label",
+        "check this"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/meal_section.dart",
+      "symbol": "MealSection",
+      "kind": "part",
+      "requirements": [
+        "MM-38",
+        "MM-47",
+        "MM-125"
+      ],
+      "asset": "views/food.html#food-default",
+      "states": [
+        "expanded",
+        "collapsed",
+        "copy to today",
+        "entry removed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The per-meal protein marker is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/food/scan/barcode_scan_step.dart",
+      "symbol": "BarcodeScanStep",
+      "kind": "sheet",
+      "requirements": [
+        "MM-43"
+      ],
+      "asset": "views/add-food.html#add-food-scan",
+      "states": [
+        "scanning",
+        "no camera",
+        "unknown product"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food/scan/mobile_scanner_view.dart",
+      "symbol": "MobileScannerView",
+      "kind": "part",
+      "requirements": [
+        "MM-43"
+      ],
+      "asset": "views/add-food.html#add-food-scan",
+      "states": [
+        "placeholder"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "A live camera view; a black placeholder stands in for it. Its light switch is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/food/show_add_food_sheet.dart",
+      "symbol": "showAddFoodSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-38"
+      ],
+      "asset": "views/add-food.html#add-food-default",
+      "states": [
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food_packs/available_pack_card.dart",
+      "symbol": "AvailablePackCard",
+      "kind": "part",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "views/settings.html#food-database-offer",
+      "states": [
+        "download",
+        "up to date"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The Update wording is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/food_packs/food_database_screen.dart",
+      "symbol": "FoodDatabaseScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "views/settings.html#food-database-offer",
+      "states": [
+        "nothing downloaded",
+        "before asking",
+        "installed",
+        "checking",
+        "not set up"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/food_packs/pack_download_card.dart",
+      "symbol": "PackDownloadCard",
+      "kind": "part",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "views/settings.html#food-database-downloading",
+      "states": [
+        "downloading",
+        "paused",
+        "failed",
+        "done"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/button_specimens.dart",
+      "symbol": "ButtonSpecimens",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#mm-button",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/color_swatches.dart",
+      "symbol": "ColorSwatches",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#colors",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/data_specimens.dart",
+      "symbol": "DataSpecimens",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#macro-bar",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/gallery_screen.dart",
+      "symbol": "GalleryScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "views/settings.html#gallery",
+      "states": [
+        "its sections"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Drawn as its switches and section titles; its contents are the component catalog."
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/gallery_section.dart",
+      "symbol": "GallerySection",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "views/settings.html#gallery",
+      "states": [
+        "a section title"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/input_specimens.dart",
+      "symbol": "InputSpecimens",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#mm-text-field",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/surface_specimens.dart",
+      "symbol": "SurfaceSpecimens",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#notice",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/gallery/type_specimens.dart",
+      "symbol": "TypeSpecimens",
+      "kind": "part",
+      "requirements": [
+        "MM-105"
+      ],
+      "asset": "components/index.html#type",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/activity_step.dart",
+      "symbol": "ActivityStep",
+      "kind": "view",
+      "requirements": [
+        "MM-164"
+      ],
+      "asset": "views/onboarding.html#onboarding-activity",
+      "states": [
+        "one chosen"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/birth_date_step.dart",
+      "symbol": "BirthDateStep",
+      "kind": "view",
+      "requirements": [
+        "MM-10",
+        "MM-13"
+      ],
+      "asset": "views/onboarding.html#onboarding-birth-date",
+      "states": [
+        "empty",
+        "under 18"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/goal_step.dart",
+      "symbol": "GoalStep",
+      "kind": "view",
+      "requirements": [
+        "MM-12"
+      ],
+      "asset": "views/onboarding.html#onboarding-goal",
+      "states": [
+        "recommended",
+        "restricted"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/health_step.dart",
+      "symbol": "HealthStep",
+      "kind": "view",
+      "requirements": [
+        "MM-11",
+        "MM-112"
+      ],
+      "asset": "views/onboarding.html#onboarding-health",
+      "states": [
+        "male list",
+        "one ticked"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "The female list is views/settings.html#health-check-female."
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/measurements_step.dart",
+      "symbol": "MeasurementsStep",
+      "kind": "view",
+      "requirements": [
+        "MM-10"
+      ],
+      "asset": "views/onboarding.html#onboarding-measurements",
+      "states": [
+        "US units filled"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Metric is described, not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/onboarding_screen.dart",
+      "symbol": "OnboardingScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-9"
+      ],
+      "asset": "views/onboarding.html#onboarding-sex",
+      "states": [
+        "seven steps",
+        "Next off",
+        "Back"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Compared with the screenshot test for the first step."
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/sex_step.dart",
+      "symbol": "SexStep",
+      "kind": "view",
+      "requirements": [
+        "MM-14"
+      ],
+      "asset": "views/onboarding.html#onboarding-sex",
+      "states": [
+        "none chosen"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/training_step.dart",
+      "symbol": "TrainingStep",
+      "kind": "view",
+      "requirements": [
+        "MM-10"
+      ],
+      "asset": "views/onboarding.html#onboarding-training",
+      "states": [
+        "filled"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/onboarding/welcome_step.dart",
+      "symbol": "WelcomeStep",
+      "kind": "view",
+      "requirements": [
+        "MM-9"
+      ],
+      "asset": "views/onboarding.html#onboarding-welcome",
+      "states": [
+        "default"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/pause/pause_banner.dart",
+      "symbol": "PauseBanner",
+      "kind": "part",
+      "requirements": [
+        "MM-148"
+      ],
+      "asset": "views/dashboard.html#pause-banner",
+      "states": [
+        "paused"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/pause/pause_screen.dart",
+      "symbol": "PauseScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-148"
+      ],
+      "asset": "views/settings.html#pause-new",
+      "states": [
+        "new",
+        "heavy use",
+        "current",
+        "scheduled"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/progress_screen.dart",
+      "symbol": "ProgressScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-16",
+        "MM-17",
+        "MM-71"
+      ],
+      "asset": "views/progress.html#progress-default",
+      "states": [
+        "populated",
+        "empty",
+        "typed",
+        "imported",
+        "few weigh-ins"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/recomp_signal_card.dart",
+      "symbol": "RecompSignalCard",
+      "kind": "part",
+      "requirements": [
+        "MM-32"
+      ],
+      "asset": "views/progress.html#progress-recomp-close",
+      "states": [
+        "signal",
+        "close to one"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/strength_history_screen.dart",
+      "symbol": "StrengthHistoryScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-77"
+      ],
+      "asset": "views/progress.html#strength-history",
+      "states": [
+        "populated",
+        "empty"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/strength_lifts_screen.dart",
+      "symbol": "StrengthLiftsScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-77"
+      ],
+      "asset": "views/progress.html#strength-lifts",
+      "states": [
+        "populated",
+        "empty"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/strength_section.dart",
+      "symbol": "StrengthSection",
+      "kind": "part",
+      "requirements": [
+        "MM-77"
+      ],
+      "asset": "views/progress.html#progress-strength-states",
+      "states": [
+        "populated",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/waist_entry_card.dart",
+      "symbol": "WaistEntryCard",
+      "kind": "part",
+      "requirements": [
+        "MM-21",
+        "MM-155"
+      ],
+      "asset": "views/progress.html#progress-waist-entry",
+      "states": [
+        "empty",
+        "three readings",
+        "one reading",
+        "refused value"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/weight_event_entry_sheet.dart",
+      "symbol": "WeightEventEntrySheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-136"
+      ],
+      "asset": "views/progress.html#progress-event-sheet",
+      "states": [
+        "open"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/progress/weight_events_card.dart",
+      "symbol": "WeightEventsCard",
+      "kind": "part",
+      "requirements": [
+        "MM-136"
+      ],
+      "asset": "views/progress.html#progress-default",
+      "states": [
+        "populated",
+        "empty",
+        "third event"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/reminders/reminder_host.dart",
+      "symbol": "ReminderHost",
+      "kind": "host",
+      "requirements": [
+        "MM-146"
+      ],
+      "asset": "views/settings.html#settings-default",
+      "states": [
+        "none of its own"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "Schedules the phone's notifications; it draws nothing in the app. The notifications themselves belong to Android and are not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/reminders/reminder_paused_notice.dart",
+      "symbol": "ReminderPausedNotice",
+      "kind": "part",
+      "requirements": [
+        "MM-146"
+      ],
+      "asset": "views/onboarding.html#reminder-paused",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/edit_height_sheet.dart",
+      "symbol": "EditHeightSheet",
+      "kind": "sheet",
+      "requirements": [
+        "MM-83"
+      ],
+      "asset": "views/settings.html#settings-edit-height",
+      "states": [
+        "US units"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/health_check_screen.dart",
+      "symbol": "HealthCheckScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-112"
+      ],
+      "asset": "views/settings.html#health-check",
+      "states": [
+        "male",
+        "female"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/health_connect_section.dart",
+      "symbol": "HealthConnectSection",
+      "kind": "part",
+      "requirements": [
+        "MM-68",
+        "MM-71"
+      ],
+      "asset": "views/settings.html#settings-health-none",
+      "states": [
+        "some allowed",
+        "none allowed",
+        "absent",
+        "refused",
+        "read failed"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "Never seen on a real phone."
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/profile_section.dart",
+      "symbol": "ProfileSection",
+      "kind": "part",
+      "requirements": [
+        "MM-83"
+      ],
+      "asset": "views/settings.html#settings-default",
+      "states": [
+        "shown",
+        "change sex confirm"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/reminders_section.dart",
+      "symbol": "RemindersSection",
+      "kind": "part",
+      "requirements": [
+        "MM-146"
+      ],
+      "asset": "views/settings.html#settings-reminders-refused",
+      "states": [
+        "one on",
+        "notifications off",
+        "night time"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/settings_screen.dart",
+      "symbol": "SettingsScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-80",
+        "MM-81",
+        "MM-82",
+        "MM-62"
+      ],
+      "asset": "views/settings.html#settings-default",
+      "states": [
+        "populated",
+        "own body fat",
+        "erase confirm"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Compared with the screenshot test for the top of the page only."
+    },
+    {
+      "source": "apps/mobile/lib/src/settings/theme_settings.dart",
+      "symbol": "ThemeSettings",
+      "kind": "part",
+      "requirements": [
+        "MM-165",
+        "MM-184"
+      ],
+      "asset": "views/settings.html#settings-theme-error",
+      "states": [
+        "chosen",
+        "save failed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/theme/theme_chooser_screen.dart",
+      "symbol": "ThemeChooserScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-184"
+      ],
+      "asset": "views/onboarding.html#theme-chooser",
+      "states": [
+        "Martian preselected",
+        "saving",
+        "save failed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/custom_exercise_screen.dart",
+      "symbol": "CustomExerciseScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-76"
+      ],
+      "asset": "views/train.html#custom-exercise",
+      "states": [
+        "filled"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/exercise_picker_screen.dart",
+      "symbol": "ExercisePickerScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-76"
+      ],
+      "asset": "views/train.html#exercise-picker",
+      "states": [
+        "recent and all",
+        "no match"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/progression_settings_screen.dart",
+      "symbol": "ProgressionSettingsScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-79"
+      ],
+      "asset": "views/train.html#progression-settings",
+      "states": [
+        "defaults",
+        "invalid range"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/rest_alarm.dart",
+      "symbol": "RestAlarm",
+      "kind": "host",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-rest-reached",
+      "states": [
+        "none of its own"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "Vibrates the phone when the rest target is reached; it draws nothing."
+    },
+    {
+      "source": "apps/mobile/lib/src/train/set_editor.dart",
+      "symbol": "SetEditor",
+      "kind": "part",
+      "requirements": [
+        "MM-75",
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-default",
+      "states": [
+        "new set",
+        "bodyweight",
+        "timed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/set_timer_bar.dart",
+      "symbol": "SetTimerBar",
+      "kind": "part",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-rest-counting",
+      "states": [
+        "rest",
+        "set running",
+        "counting down",
+        "target reached",
+        "paused"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/ticking.dart",
+      "symbol": "Ticking",
+      "kind": "host",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-set-running",
+      "states": [
+        "none of its own"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "Rebuilds its child every second; it draws nothing itself."
+    },
+    {
+      "source": "apps/mobile/lib/src/train/train_screen.dart",
+      "symbol": "TrainScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-75"
+      ],
+      "asset": "views/train.html#train-default",
+      "states": [
+        "populated",
+        "empty",
+        "in progress"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/weekly_volume_screen.dart",
+      "symbol": "WeeklyVolumeScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-78"
+      ],
+      "asset": "views/train.html#weekly-volume",
+      "states": [
+        "populated",
+        "loading",
+        "error",
+        "unmapped sets"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/workout_clock_card.dart",
+      "symbol": "WorkoutClockCard",
+      "kind": "part",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-paused",
+      "states": [
+        "running",
+        "paused",
+        "finished"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/workout_exercise_card.dart",
+      "symbol": "WorkoutExerciseCard",
+      "kind": "part",
+      "requirements": [
+        "MM-75",
+        "MM-79",
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-default",
+      "states": [
+        "with sets",
+        "suggestion",
+        "rest target options",
+        "remove confirm"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/workout_screen.dart",
+      "symbol": "WorkoutScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-75",
+        "MM-92"
+      ],
+      "asset": "views/train.html#workout-default",
+      "states": [
+        "in progress",
+        "new",
+        "finished with a record",
+        "delete confirm"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/train/workout_times_screen.dart",
+      "symbol": "WorkoutTimesScreen",
+      "kind": "view",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "views/train.html#workout-times",
+      "states": [
+        "same day",
+        "past midnight",
+        "future refused"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/charts/history_chart.dart",
+      "symbol": "HistoryChart",
+      "kind": "component",
+      "requirements": [
+        "MM-107",
+        "MM-176"
+      ],
+      "asset": "components/index.html#history-chart",
+      "states": [
+        "a series with a gap"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "Drawn as bars; the app draws points joined by a line."
+    },
+    {
+      "source": "apps/mobile/lib/src/charts/macro_split_chart.dart",
+      "symbol": "MacroSplitChart",
+      "kind": "component",
+      "requirements": [
+        "MM-107"
+      ],
+      "asset": "components/index.html#macro-split-chart",
+      "states": [
+        "three macros"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/charts/trend_chart.dart",
+      "symbol": "TrendChart",
+      "kind": "component",
+      "requirements": [
+        "MM-17",
+        "MM-107"
+      ],
+      "asset": "components/index.html#trend-chart",
+      "states": [
+        "with band and event"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/charts/trend_sparkline.dart",
+      "symbol": "TrendSparkline",
+      "kind": "component",
+      "requirements": [
+        "MM-107"
+      ],
+      "asset": "components/index.html#trend-sparkline",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/charts/trend_stats.dart",
+      "symbol": "TrendStats",
+      "kind": "component",
+      "requirements": [
+        "MM-17"
+      ],
+      "asset": "components/index.html#trend-chart",
+      "states": [
+        "three figures"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/choice_card.dart",
+      "symbol": "ChoiceCard",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#choice-card",
+      "states": [
+        "unselected",
+        "selected",
+        "badge"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/day_stepper.dart",
+      "symbol": "DayStepper",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#day-stepper",
+      "states": [
+        "a past day",
+        "today"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/demo_notice.dart",
+      "symbol": "DemoNotice",
+      "kind": "component",
+      "requirements": [
+        "MM-177"
+      ],
+      "asset": "components/index.html#demo-notice",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/download_status_strip.dart",
+      "symbol": "DownloadStatusStrip",
+      "kind": "component",
+      "requirements": [
+        "MM-56"
+      ],
+      "asset": "components/index.html#download-status-strip",
+      "states": [
+        "downloading"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/group_header.dart",
+      "symbol": "GroupHeader",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-list-group",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/hero_backdrop_painter.dart",
+      "symbol": "HeroBackdropPainter",
+      "kind": "painter",
+      "requirements": [
+        "MM-187"
+      ],
+      "asset": "components/index.html#mm-hero-surface",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The drawn rings of the backdrop are replaced by a plain gradient."
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/horizon_arc.dart",
+      "symbol": "HorizonArc",
+      "kind": "component",
+      "requirements": [
+        "MM-187"
+      ],
+      "asset": "components/index.html#horizon-arc",
+      "states": [
+        "empty",
+        "part",
+        "full"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/horizon_arc_painter.dart",
+      "symbol": "HorizonArcPainter",
+      "kind": "painter",
+      "requirements": [
+        "MM-187"
+      ],
+      "asset": "components/index.html#horizon-arc",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The glow on the marker is not drawn."
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/info_card.dart",
+      "symbol": "InfoCard",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#info-card",
+      "states": [
+        "plain",
+        "with action"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/macro_bar.dart",
+      "symbol": "MacroBar",
+      "kind": "component",
+      "requirements": [
+        "MM-104",
+        "MM-121"
+      ],
+      "asset": "components/index.html#macro-bar",
+      "states": [
+        "three macros",
+        "protein minimum mark"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/macro_figure.dart",
+      "symbol": "MacroFigure",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#macro-figure",
+      "states": [
+        "three macros"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/metric_facts.dart",
+      "symbol": "MetricFacts",
+      "kind": "component",
+      "requirements": [
+        "MM-176"
+      ],
+      "asset": "components/index.html#metric-facts",
+      "states": [
+        "two figures"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mini_trend.dart",
+      "symbol": "MiniTrend",
+      "kind": "component",
+      "requirements": [
+        "MM-116"
+      ],
+      "asset": "components/index.html#mini-trend",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mini_trend_painter.dart",
+      "symbol": "MiniTrendPainter",
+      "kind": "painter",
+      "requirements": [
+        "MM-116"
+      ],
+      "asset": "components/index.html#mini-trend",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_action_chip.dart",
+      "symbol": "MmActionChip",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-action-chip",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_app_bar.dart",
+      "symbol": "MmAppBar",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-app-bar",
+      "states": [
+        "destination",
+        "pushed",
+        "with day stepper"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_button.dart",
+      "symbol": "MmButton",
+      "kind": "component",
+      "requirements": [
+        "MM-104",
+        "MM-181"
+      ],
+      "asset": "components/index.html#mm-button",
+      "states": [
+        "primary",
+        "off",
+        "secondary",
+        "with icon",
+        "text",
+        "expanded"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_check_row.dart",
+      "symbol": "MmCheckRow",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-check-row",
+      "states": [
+        "ticked",
+        "unticked"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_choice_chip.dart",
+      "symbol": "MmChoiceChip",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-choice-chip",
+      "states": [
+        "selected",
+        "unselected",
+        "several"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_clock_time_dialog.dart",
+      "symbol": "MmClockTimeDialog",
+      "kind": "dialog",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "components/index.html#mm-clock-time-dialog",
+      "states": [
+        "valid",
+        "refused"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_disclosure.dart",
+      "symbol": "MmDisclosure",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-disclosure",
+      "states": [
+        "closed",
+        "open"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_dropdown.dart",
+      "symbol": "MmDropdown",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-dropdown",
+      "states": [
+        "closed",
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_fab.dart",
+      "symbol": "MmFab",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-fab",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_hero_surface.dart",
+      "symbol": "MmHeroSurface",
+      "kind": "component",
+      "requirements": [
+        "MM-187"
+      ],
+      "asset": "components/index.html#mm-hero-surface",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_icon_button.dart",
+      "symbol": "MmIconButton",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-icon-button",
+      "states": [
+        "standard",
+        "add"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_list_group.dart",
+      "symbol": "MmListGroup",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-list-group",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_list_row.dart",
+      "symbol": "MmListRow",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-list-group",
+      "states": [
+        "value",
+        "subtitle",
+        "way in",
+        "leading icon",
+        "destructive"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_menu_button.dart",
+      "symbol": "MmMenuButton",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-menu-button",
+      "states": [
+        "closed",
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_navigation_bar.dart",
+      "symbol": "MmNavigationBar",
+      "kind": "navigation",
+      "requirements": [
+        "MM-99",
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-navigation-bar",
+      "states": [
+        "each destination current"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_progress_bar.dart",
+      "symbol": "MmProgressBar",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-progress-bar",
+      "states": [
+        "part way"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_segmented.dart",
+      "symbol": "MmSegmented",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-segmented",
+      "states": [
+        "selected",
+        "none selected",
+        "with check"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_slider.dart",
+      "symbol": "MmSlider",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-slider",
+      "states": [
+        "part way"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_spinner.dart",
+      "symbol": "MmSpinner",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-spinner",
+      "states": [
+        "still"
+      ],
+      "verification": "source-only",
+      "status": "covered",
+      "limits": "It turns in the app and is still here."
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_status_chip.dart",
+      "symbol": "MmStatusChip",
+      "kind": "component",
+      "requirements": [
+        "MM-104",
+        "MM-139"
+      ],
+      "asset": "components/index.html#mm-status-chip",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_stroke_icon.dart",
+      "symbol": "MmStrokeIcon",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-stroke-icon",
+      "states": [
+        "plus",
+        "chevron"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_stroke_icon_painter.dart",
+      "symbol": "MmStrokeIconPainter",
+      "kind": "painter",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-stroke-icon",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_surface.dart",
+      "symbol": "MmSurface",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-surface",
+      "states": [
+        "standard",
+        "compact"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_switch_row.dart",
+      "symbol": "MmSwitchRow",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-switch-row",
+      "states": [
+        "on",
+        "off"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/mm_text_field.dart",
+      "symbol": "MmTextField",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#mm-text-field",
+      "states": [
+        "empty",
+        "filled",
+        "unit",
+        "helper",
+        "error"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/muscle_volume_row.dart",
+      "symbol": "MuscleVolumeRow",
+      "kind": "component",
+      "requirements": [
+        "MM-78"
+      ],
+      "asset": "components/index.html#muscle-volume-row",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/notice.dart",
+      "symbol": "Notice",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#notice",
+      "states": [
+        "info",
+        "caution",
+        "safeguard",
+        "with title",
+        "with actions"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/number_entry_card.dart",
+      "symbol": "NumberEntryCard",
+      "kind": "component",
+      "requirements": [
+        "MM-104",
+        "MM-16"
+      ],
+      "asset": "components/index.html#number-entry-card",
+      "states": [
+        "empty",
+        "changed"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/section_label.dart",
+      "symbol": "SectionLabel",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#section-label",
+      "states": [
+        "shown"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_choice.dart",
+      "symbol": "showMmChoice",
+      "kind": "dialog",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#show-mm-choice",
+      "states": [
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_clock_time.dart",
+      "symbol": "showMmClockTime",
+      "kind": "dialog",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "components/index.html#mm-clock-time-dialog",
+      "states": [
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_confirm.dart",
+      "symbol": "showMmConfirm",
+      "kind": "dialog",
+      "requirements": [
+        "MM-104",
+        "MM-62"
+      ],
+      "asset": "components/index.html#show-mm-confirm",
+      "states": [
+        "open"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_options.dart",
+      "symbol": "showMmOptions",
+      "kind": "dialog",
+      "requirements": [
+        "MM-191"
+      ],
+      "asset": "components/index.html#show-mm-options",
+      "states": [
+        "open, one chosen"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_snack_bar.dart",
+      "symbol": "showMmSnackBar",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#show-mm-snack-bar",
+      "states": [
+        "with action",
+        "plain"
+      ],
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/show_mm_time_picker.dart",
+      "symbol": "showMmTimePicker",
+      "kind": "dialog",
+      "requirements": [
+        "MM-146"
+      ],
+      "asset": "components/index.html#show-mm-time-picker",
+      "states": [
+        "its opener"
+      ],
+      "verification": "not-drawn",
+      "status": "not-drawn",
+      "limits": "Opens the phone's own time picker, which belongs to the platform."
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/stat_row.dart",
+      "symbol": "StatRow",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#stat-row",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/status_row.dart",
+      "symbol": "StatusRow",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#status-row",
+      "states": [
+        "shown"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/step_progress.dart",
+      "symbol": "StepProgress",
+      "kind": "component",
+      "requirements": [
+        "MM-104"
+      ],
+      "asset": "components/index.html#step-progress",
+      "states": [
+        "part way"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered"
+    },
+    {
+      "source": "apps/mobile/lib/src/ui/strength_trend_card.dart",
+      "symbol": "StrengthTrendCard",
+      "kind": "component",
+      "requirements": [
+        "MM-77"
+      ],
+      "asset": "components/index.html#strength-trend-card",
+      "states": [
+        "populated",
+        "no estimate",
+        "deleted exercise"
+      ],
+      "verification": "screenshot-compared",
+      "status": "covered",
+      "limits": "The no-estimate and deleted states are on views/progress.html#progress-strength-states."
+    }
+  ],
+  "flows": [
+    {
+      "id": "navigation-map",
+      "covers": "How the five destinations and Settings connect",
+      "requirements": [
+        "MM-90",
+        "MM-99"
+      ],
+      "asset": "flows/index.html#navigation-map",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "first-launch",
+      "covers": "Theme chooser, then onboarding, to the Dashboard",
+      "requirements": [
+        "MM-184",
+        "MM-9"
+      ],
+      "asset": "flows/index.html#first-launch",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "opening-the-app-later",
+      "covers": "The gates that can stand in front of the app",
+      "requirements": [
+        "MM-13",
+        "MM-112",
+        "MM-147",
+        "MM-24"
+      ],
+      "asset": "flows/index.html#opening-the-app-later",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "log-a-food",
+      "covers": "Adding, editing and removing a food, and closing the day",
+      "requirements": [
+        "MM-38",
+        "MM-42",
+        "MM-43",
+        "MM-150",
+        "MM-45",
+        "MM-48",
+        "MM-40"
+      ],
+      "asset": "flows/index.html#log-a-food",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "weigh-in-and-trend",
+      "covers": "A weigh-in, a weight event and a waist measurement",
+      "requirements": [
+        "MM-16",
+        "MM-136",
+        "MM-21"
+      ],
+      "asset": "flows/index.html#weigh-in-and-trend",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "log-a-workout",
+      "covers": "A workout from start to finish",
+      "requirements": [
+        "MM-75",
+        "MM-76",
+        "MM-79",
+        "MM-191"
+      ],
+      "asset": "flows/index.html#log-a-workout",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "weekly-check-in",
+      "covers": "The check-in, its explanation and the recovery questions",
+      "requirements": [
+        "MM-24",
+        "MM-138",
+        "MM-116",
+        "MM-117"
+      ],
+      "asset": "flows/index.html#weekly-check-in",
+      "verification": "source-only",
+      "status": "covered"
+    },
+    {
+      "id": "pause-and-return",
+      "covers": "Pausing and coming back",
+      "requirements": [
+        "MM-148",
+        "MM-147"
+      ],
+      "asset": "flows/index.html#pause-and-return",
+      "verification": "source-only",
+      "status": "covered"
+    }
+  ],
+  "unresolved": []
+}

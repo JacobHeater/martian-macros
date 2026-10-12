@@ -68,3 +68,16 @@ shown behind it).
 ## Clarified by MM-167 (proposed, not built)
 A scanned product's default of one label serving is recorded as the label-serving method with a quantity of servings and the serving's
 weight (MM-167); today it is recorded by the amount step's cup-or-spoon mapping.
+
+## UI/UX Assets
+
+- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-scan) —
+  Current. Draws BarcodeScanStep and MobileScannerView as built on 2026-10-11:
+  scanning, no camera, unknown product, placeholder. Drawn from the source
+  alone; not compared with the running app. A live camera view; a black
+  placeholder stands in for it. Its light switch is not drawn. It shows what
+  exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
+  "adding, editing and removing a food, and closing the day" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.

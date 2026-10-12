@@ -3,6 +3,7 @@ import 'dart:io';
 import 'requirements_scan.dart';
 import 'ticket.dart';
 import 'ui_ux_assets.dart';
+import 'ui_ux_coverage.dart';
 
 /// The requirements tracker: validates `requirements/` against the rules in
 /// its README and answers questions about tickets.
@@ -26,6 +27,12 @@ Future<int> runRequirements(Directory repoRoot, List<String> args) async {
     );
   }
   scan.problems.addAll(uiUxAssetProblems(repoRoot, htmlFiles: htmlFiles));
+  scan.problems.addAll(
+    uiUxCoverageProblems(
+      repoRoot,
+      ticketIds: {for (final ticket in scan.tickets) ticket.id},
+    ),
+  );
 
   switch (args.firstOrNull) {
     case 'next':

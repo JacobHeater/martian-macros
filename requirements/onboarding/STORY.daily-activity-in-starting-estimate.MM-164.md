@@ -80,3 +80,11 @@ Scenario: A measurement replaces it
 - Device: upgraded the emulator's existing version-1 database in place; the setup, targets and check-in date were intact and the starting estimate moved from 3,137 to 3,029 kcal (the new factor for light movement with 4 training days is 1.40, below the old 1.45).
 - Existing users' targets do not change until their next check-in.
 - **Not verified**: the factors have not been reviewed by a professional (MM-29); they are a documented heuristic. The simulation tests assumed the old starting factor (1.45) was exactly right for their simulated user; `phase_change_test.dart` now derives the user's true expenditure from `initialTdeePrior`, so the premise holds and its original thresholds are unchanged (a first version of this change loosened one, which hid the broken premise).
+
+## UI/UX Assets
+
+- [First launch and
+  gates](../ui-ux-assets/views/onboarding.html#onboarding-activity) — Current.
+  Draws ActivityStep as built on 2026-10-11: one chosen. Drawn from the source
+  alone; not compared with the running app. It shows what exists and approves
+  nothing.

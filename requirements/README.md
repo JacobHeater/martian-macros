@@ -25,7 +25,11 @@ support it under the exact heading `## UI/UX Assets`, one entry each:
   screen or flow, and what limits it.
 ```
 
-The status is `Exploratory`, `Proposed`, `Accepted` or `Superseded`. Add an
+That folder also holds a drawing of every view and component as built, with
+a manifest of what draws what (MM-211); open `ui-ux-assets/index.html`.
+
+The status is `Current` (a drawing of what is built), `Exploratory`,
+`Proposed`, `Accepted` or `Superseded`. Add an
 asset and its entries in the same pull request; when an asset changes
 materially, bring its entries up to date. An asset you cannot confidently
 give to a ticket goes on the unresolved list in that folder's README, never

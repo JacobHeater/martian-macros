@@ -35,3 +35,15 @@ Scenario: Cancelling
 - **The settings screen has no widget test** and the dialog was not exercised on a device (MM-93).
 - Rows are deleted; the database file is not removed or overwritten, so deleted data may remain in free pages until SQLite reuses them.
   When backup files exist (MM-63), erasing should also say that backups elsewhere are not touched.
+
+## UI/UX Assets
+
+- [Settings](../ui-ux-assets/views/settings.html#settings-default) — Current.
+  Draws SettingsScreen as built on 2026-10-11: populated, own body fat, erase
+  confirm. Compared with a screenshot test of the built screen. Compared with
+  the screenshot test for the top of the page only. It shows what exists and
+  approves nothing.
+- [Component catalog](../ui-ux-assets/components/index.html#show-mm-confirm) —
+  Current. Draws showMmConfirm as built on 2026-10-11: open. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

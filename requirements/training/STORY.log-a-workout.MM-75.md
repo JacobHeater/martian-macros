@@ -92,3 +92,16 @@ Choices made while building (say if any is wrong):
 ## Notes
 - New tables: needs migrations (MM-61).
 - When each set happened, and the set and rest timers, are MM-191 (the owner's decision). A set here is logged without times.
+
+## UI/UX Assets
+
+- [Train](../ui-ux-assets/views/train.html) — Current. Draws SetEditor,
+  TrainScreen, WorkoutExerciseCard and WorkoutScreen as built on 2026-10-11:
+  new set, bodyweight, timed, populated, empty, in progress, with sets,
+  suggestion, and more. Frames: `#workout-default`, `#train-default`. Compared
+  with a screenshot test of the built screen. It shows what exists and
+  approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-workout) — Current. Draws the
+  "a workout from start to finish" path as built on 2026-10-11. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

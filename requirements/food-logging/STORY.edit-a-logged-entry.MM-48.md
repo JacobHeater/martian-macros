@@ -46,3 +46,18 @@ framework default, not tuned. Not seen on the emulator yet.
 ## Clarified by MM-167 (proposed, not built)
 Editing restores name, macros, method, meal and day only. MM-167 requires it to restore the quantity, unit, serving and basis too, to
 show legacy entries as "Amount not recorded", and to avoid scaling totals twice.
+
+## UI/UX Assets
+
+- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) —
+  Current. Draws AddFoodSheet as built on 2026-10-11: empty, filled, label
+  serving, alcohol, invalid, estimate source, search, edit, and more. Drawn
+  from the source alone; not compared with the running app. It shows what
+  exists and approves nothing.
+- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
+  FoodEntryTile as built on 2026-10-11: an entry. Compared with a screenshot
+  test of the built screen. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
+  "adding, editing and removing a food, and closing the day" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.

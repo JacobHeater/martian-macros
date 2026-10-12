@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings · Martian Macros UI reference</title>
+<link rel="stylesheet" href="../shared/mm.css">
+<script src="../shared/mm.js"></script>
+</head>
+<body>
+<script>
+(function (m) {
+  var bar = { title: 'Settings', back: true };
+  function sw(titleText, sub, on) { return m.row(titleText, sub, m.sw(on)); }
+  var edit = m.i('edit', 's'), go = m.i('right', 's');
+  var appearance = [m.gh('Appearance'), m.chips(['Martian', 'Light', 'Dark', 'System'], 0)];
+  var units = [m.gh('Units'), m.seg(['lb / in', 'kg / cm'], 0, { check: true })];
+  var activity = [m.gh('Activity and training'), m.group([m.row('Daily activity', 'Light movement', edit, { show: 'activity' }), m.row('Experience', 'Under 1 year', edit, { show: 'experience' }),
+    '<div class="row" style="display:block"><div>Training days per week: 3</div>' + m.slider(43) + '</div>'])];
+  var bodyFat = function (on) { return [m.gh('Body fat estimate'), m.group([sw('Let the app estimate', on ? 'Enter one only if you have a recent measurement.' : 'About 22%', on)].concat(on ? [] : ['<div class="row" style="display:block">' + m.slider(40) + '<div class="cap right">22%</div></div>']))]; };
+  var profile = [m.gh('Profile'), m.group([m.row('Biological sex', '', 'Male', { show: 'sex' }), m.row('Date of birth', 'Age 34', edit), m.row('Height', '', '5′ 10″ ' + edit, { show: 'height' }), m.row('Health check', 'Nothing ticked', go)])];
+  var detail = [m.gh('Nutrition detail'), m.seg(['Simple', 'Standard', 'Full'], 1), m.cap('Calories, protein, carbohydrate and fat. Changes what is shown, never what is stored.')];
+  var logging = [m.gh('Food logging'), m.group([sw('Easy-to-miss reminder', 'A line under a completed day that names things people often forget to log.', true)])];
+  var reminders = [m.gh('Reminders'), m.group([sw('Weigh-in', 'On days with no weigh-in yet.', true), m.row('At 7:30 AM', '', edit), sw('Log food', 'On days with nothing logged yet.', false), sw('Weekly measurement', 'On Sundays, when your waist has not been measured that week.', false)]),
+    m.cap('At most two a day, never at night, and never during a pause. A reminder that goes unanswered for a week stops by itself. Nothing about your weight or food ever appears in one.')];
+  function health(rows, extra) {
+    return [m.gh('Health Connect'), m.group(rows)].concat(extra || []).concat([m.cap('The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in counts for a day: the first of the morning, or the middle of the day’s readings. A value you type for a day is used instead. To stop, take the permission away in Health Connect: what was read is kept until you erase your data.')]);
+  }
+  var ok = '<span class="c-positive">' + m.i('check', 's') + '</span>';
+  var healthSome = health([m.row('Weight', 'Allowed. 31 readings from Bathroom scale.', ok), m.row('Body fat', 'Not allowed. For the body-fat estimate.', go), m.row('Lean mass', 'Not allowed. For the body-fat estimate.', go),
+    m.row('Height', 'Not allowed. To suggest a correction if it differs from your profile.', go), m.row('Exercise sessions', 'Allowed. Nothing to read yet.', ok), m.row('Steps', 'Not allowed. For context only. Never used to work out your calories.', go)],
+    [m.btn('Read from Health Connect now', 'secondary', { block: true })]);
+  var coaching = [m.gh('Coaching'), m.group([m.row('Pause', 'For a holiday, an illness or an injury.', go, { lead: m.i('pause') })])];
+  var about = [m.gh('About'), m.group([m.row('How this works', 'Where each number comes from, and how sure we are.', go, { lead: m.i('book') })])];
+  var data = [m.gh('Data'), m.group([m.row('Food database', 'Optional download for barcode scanning. The only thing this app ever fetches.', go, { lead: m.i('download') }), m.row('Stored only on this device', 'Nothing is uploaded. Encrypted backup is coming.', '', { lead: m.i('lock') }),
+    m.row('Erase all data and start over', '', '', { lead: '<span class="lead-danger">' + m.i('trash') + '</span>', show: 'erase' })])];
+  var dev = [m.gh('Development'), m.group([m.row('Component gallery', 'Every color and component, light and dark.', go)]), m.cap('Martian Macros · dev')];
+  var menu = function (id, items, on) {
+    return '<div class="scrim mid" data-layer="' + id + '" hidden><div class="menu" style="align-self:center">' + items.map(function (t, n) { return '<span data-hide>' + (n === on ? m.i('check', 's') : '<svg class="i s"></svg>') + t + '</span>'; }).join('') + '</div></div>';
+  };
+  var heightSheet = function (hidden) { return m.sheet([m.title('Height'), m.rowx(['<div class="grow">' + m.field('Feet', '5') + '</div>', '<div class="grow">' + m.field('Inches', '10') + '</div>']), m.btn('Save', 'primary', { block: true, hide: true })], { id: 'height', hidden: hidden }); };
+  var healthRows = ['Pregnant|0', 'Breastfeeding|0', 'PCOS|0', 'Perimenopause or menopause|0', 'History of an eating disorder|0', 'Chronic kidney disease|0', 'Thyroid condition|1', 'Testosterone therapy or anabolic steroids|0',
+    'Diabetes treated with insulin or a sulfonylurea|0', 'I have had bariatric surgery|0', 'A medication I take can change my weight or water retention|0'];
+  function healthList(female) {
+    return healthRows.filter(function (r, n) { return female || n > 3; }).map(function (r) { var p = r.split('|'); return m.row(p[0], '', '', { lead: m.check(p[1] === '1'), cls: 'bare' }); }).join('');
+  }
+  var pauseForm = [m.p('A holiday, an illness, an injury: some weeks are not going to be tracked. Say so and the coach waits for you.', 't2'), m.label('Reason'), m.seg(['Travel', 'Illness', 'Injury', 'Other'], 0),
+    m.label('Starts: Today'), m.slider(0), m.label('Lasts: 7 days, through Sunday, Oct 11'), m.slider(40)];
+  var pauseNote = m.cap('While paused, your targets become a maintenance guide and nothing is judged against them. No check-in runs and no target changes. Logging and weigh-ins still work and are welcome, never asked for. A pause of a week or more counts as a break from the deficit.');
+
+  m.page({
+    title: 'Settings',
+    intro: 'Settings and the screens that open from it: the health check, pause, how this works, the food database and the component gallery.',
+    sources: ['apps/mobile/lib/src/settings/', 'apps/mobile/lib/src/pause/', 'apps/mobile/lib/src/about/', 'apps/mobile/lib/src/food_packs/', 'apps/mobile/lib/src/gallery/', 'apps/mobile/lib/src/onboarding/health_step.dart', 'apps/mobile/lib/src/ui/download_status_strip.dart'],
+    tickets: ['MM-80', 'MM-81', 'MM-82', 'MM-83', 'MM-165', 'MM-184', 'MM-146', 'MM-68', 'MM-71', 'MM-62', 'MM-49', 'MM-152', 'MM-148', 'MM-112', 'MM-143', 'MM-56', 'MM-105'],
+    limits: 'The order of groups follows the source; the screenshot test shows only the top of the page. The phone’s date and time pickers and the Health Connect permission screen belong to Android and are not drawn. The Health Connect group has never been seen on a real phone.',
+    sections: [
+      { h: 'Settings', frames: [
+        m.frame('settings-default', 'Settings, top to bottom', 'Tap Daily activity, Experience, Biological sex, Height or Erase to see what opens.', m.phone({ bar: bar, body: [].concat(appearance, units, activity, bodyFat(true), profile, detail, logging, coaching, reminders, healthSome, about, data, dev),
+          over: [menu('activity', ['Mostly seated', 'Light movement', 'On my feet most of the day', 'Physical job'], 1), menu('experience', ['Not lifting yet', 'Under 1 year', 'Returning after 6+ months off', '1–3 years', '3+ years'], 1), heightSheet(true),
+            m.confirm('Change biological sex?', 'Your energy needs, body-fat estimate and safety limits are recalculated for a female profile, and new targets start now. Your food log and weigh-ins are kept.', 'Change', { id: 'sex', hidden: true }),
+            m.confirm('Erase everything?', 'This permanently deletes your profile, food log, weigh-ins, and targets from this device. It cannot be undone.', 'Erase', { id: 'erase', hidden: true })] }))
+      ] },
+      { h: 'States of its groups', frames: [
+        m.frame('settings-body-fat-own', 'Body fat entered by the user', '', m.phone({ cls: 'short', bar: bar, body: bodyFat(false) })),
+        m.frame('settings-theme-error', 'Theme could not be saved', '', m.phone({ cls: 'short', bar: bar, body: appearance.concat([m.notice('caution', 'Could not save your theme. Please try again.')]) })),
+        m.frame('settings-reminders-refused', 'Reminders refused', 'Two messages the Reminders group can show.', m.phone({ cls: 'short', bar: bar, body: reminders.concat(['<div style="height:60px"></div>']), over: m.snack('Notifications are off for this app in your phone’s settings.') })),
+        m.frame('settings-reminders-night', 'A reminder time at night', '', m.phone({ cls: 'short', bar: bar, body: ['<div style="height:100px"></div>'], over: m.snack('Reminders are not sent between 9 pm and 7 am.') })),
+        m.frame('settings-health-none', 'Health Connect: nothing allowed', 'A female profile is also offered Menstruation.', m.phone({ cls: 'short', bar: bar, body: health([m.row('Weight', 'Not allowed. Weigh-ins from your scale, so you need not type them.', go), m.row('Body fat', 'Not allowed. For the body-fat estimate.', go),
+          m.row('Menstruation', 'Not allowed. To allow for water weight around your period.', go)]) })),
+        m.frame('settings-health-absent', 'Health Connect not on the phone', '', m.phone({ cls: 'short', bar: bar, body: [m.gh('Health Connect'), m.p('Health Connect is not on this phone, so there is nothing to connect. Everything in the app works without it.', 't2')] })),
+        m.frame('settings-health-refused', 'A kind refused, and a read that failed', '', m.phone({ cls: 'short', bar: bar, body: ['<div style="height:150px"></div>'],
+          over: ['<div class="snack" style="bottom:96px"><span>Health Connect could not be read just now. Nothing was changed.</span></div>', '<div class="snack" style="bottom:16px"><span>Body fat was not allowed. You can allow it here, or in Health Connect, whenever you like.</span></div>'] })),
+        m.frame('settings-edit-height', 'Edit height', 'Metric shows one field: Centimetres.', m.phone({ cls: 'short', bar: bar, body: ['<div style="height:220px"></div>'], over: heightSheet(false) })),
+        m.frame('settings-erase', 'Erase everything', '', m.phone({ cls: 'short', bar: bar, body: ['<div style="height:260px"></div>'], over: m.confirm('Erase everything?', 'This permanently deletes your profile, food log, weigh-ins, and targets from this device. It cannot be undone.', 'Erase') }))
+      ] },
+      { h: 'Health check', id: 'health-check', frames: [
+        m.frame('health-check', 'Health check (male profile)', 'The same list as onboarding. A change is saved as it is ticked.', m.phone({ cls: 'short', bar: { title: 'Health check', back: true }, body: [m.title('Health check'), m.p('Tick anything that applies. These change what the app will recommend, and some switch off calorie deficits entirely.', 't2'), healthList(false),
+          m.row('I have discussed a calorie deficit with my care team', '', '', { lead: m.check(false), cls: 'bare' }), m.cap('This app is not medical advice. Talk to your clinician before changing your diet if you have a medical condition.')] })),
+        m.frame('health-check-female', 'Health check (female profile)', 'Four more rows apply.', m.phone({ cls: 'short', bar: { title: 'Health check', back: true }, body: [healthList(true)] }))
+      ] },
+      { h: 'Pause', id: 'pause', frames: [
+        m.frame('pause-new', 'Setting a pause', 'MM-148.', m.phone({ cls: 'short', bar: { title: 'Pause', back: true }, body: pauseForm.concat([m.btn('Pause from today', 'primary', { block: true }), pauseNote]) })),
+        m.frame('pause-heavy', 'Many paused days lately', '', m.phone({ cls: 'short', bar: { title: 'Pause', back: true }, body: [m.notice('info', 'That makes a lot of paused days lately. Would maintenance suit better as the goal for now? You can change it on the Coach screen. Pausing is fine too.'), m.btn('Set this pause', 'primary', { block: true })] })),
+        m.frame('pause-current', 'Paused', '', m.phone({ cls: 'short', bar: { title: 'Pause', back: true }, body: [m.title('Paused until Monday, Oct 12'), m.p('Travel · 7 days', 't2'), m.btn('Resume now', 'primary', { block: true }), m.btn('Extend by a week', 'secondary', { block: true }),
+          m.cap('A pause can be extended once. For anything longer, changing the goal to maintenance on the Coach screen is the better tool.'), pauseNote] })),
+        m.frame('pause-scheduled', 'A pause set for later', '', m.phone({ cls: 'short', bar: { title: 'Pause', back: true }, body: [m.title('Pause set for Oct 9 to Oct 15'), m.p('Travel · 7 days', 't2'), m.btn('Cancel this pause', 'secondary', { block: true })] }))
+      ] },
+      { h: 'How this works', id: 'how-this-works', frames: [
+        m.frame('how-this-works', 'How this works', 'MM-143. Generated from the evidence register.', m.phone({ cls: 'short', bar: { title: 'How this works', back: true }, body: [m.p('Every number here comes from a rule. Each answer says how well supported the rule is, in words, and where it comes from.', 't2'), m.group(
+          ['How are my calories set?', 'How is my protein target chosen?', 'How does the app know how much energy I use?', 'How is my trend weight worked out?', 'Why do my targets change slowly?', 'How sure is my coach?', 'When does the app slow or stop a deficit?', 'How sure is the app about my body fat?', 'When does the app ask about my health?'].map(function (q) { return m.row(q, '', go); }))] })),
+        m.frame('evidence-question', 'One question', 'The answer, then each rule behind it with its grade in words. Tapping a rule opens its value, source and population (first card open, second closed).', m.phone({ cls: 'short', bar: { title: 'How are my calories set?', back: true }, body: [
+          m.p('Your target is your estimated daily energy use, adjusted for the pace of weight change you chose. The pace is limited by your body fat, because faster loss costs more muscle in lean people. The target never goes below a floor set by your resting energy and, for lean people, by the energy needed to support the body.'),
+          m.heading('The rules behind this'),
+          m.card([m.p('The lowest target ever issued'), m.label('Reasonably supported'), m.p('Value: 1,500 men, 1,200 women'), m.p('Source: NIH minimum-intake guidance, as cited in the code'), m.p('Based on: Adults with obesity under supervised and unsupervised programs')]),
+          m.card([m.p('The calorie floor'), m.label('Our judgement')]),
+          m.cap('These sources are as recorded when the rules were written. None has been reviewed by a professional yet.')] })),
+        m.frame('how-this-works-error', 'Could not be loaded', '', m.phone({ cls: 'short', bar: { title: 'How this works', back: true }, body: [m.p('This could not be loaded.', 't2 center')] }))
+      ] },
+      { h: 'Food database', id: 'food-database', frames: [
+        m.frame('food-database-offer', 'Nothing downloaded; one offered', 'MM-56.', m.phone({ cls: 'short', bar: { title: 'Food database', back: true }, body: [m.p('Barcode scanning needs a database of foods. It is a separate download, and nothing is downloaded unless you choose to.', 't2'),
+          m.gh('On this phone'), m.group([m.row('Nothing downloaded yet', '', '')]), m.gh('Download'),
+          m.info('Barcode foods, United States', [m.p('47 MB to download · version 2026-10-09'), m.p('It is stored on this phone and used without a connection.', 't2'),
+            m.p('Downloading contacts github.com. That tells the host your IP address and which file you asked for, and nothing else about you. It can use a lot of mobile data, so Wi-Fi is better. You can cancel at any time.', 't2'), m.btn('Download', 'primary')]),
+          m.gh('Where the foods come from'), m.cap('Food data from Open Food Facts (openfoodfacts.org), available under the Open Database License, and USDA FoodData Central. The files are published at github.com/JacobHeater/martian-macros-food-data.')] })),
+        m.frame('food-database-before', 'Before asking what is available', '', m.phone({ cls: 'short', bar: { title: 'Food database', back: true }, body: [m.gh('Download'), m.btn('See what is available', 'secondary'), m.cap('This contacts github.com once to read a small list. It reveals your IP address and nothing else.')] })),
+        m.frame('food-database-downloading', 'Downloading', 'A strip at the bottom of the screen follows the download on every screen.', m.phone({ cls: 'short', bar: { title: 'Food database', back: true },
+          body: [m.gh('On this phone'), m.group([m.row('Nothing downloaded yet', '', '')]), m.gh('Download'), m.info('Downloading', [m.p('Barcode foods, United States'), m.progress(37), m.p('17 MB of 46 MB', 't2'), m.btn('Cancel', 'secondary')])],
+          bottom: '<div class="strip" id="download-status-strip"><div class="rowx"><b class="grow">Downloading Barcode foods, United States</b>' + m.btn('Cancel', 'text', { sm: true }) + '</div>' + m.progress(37) + '</div>' })),
+        m.frame('food-database-paused', 'Paused, failed, done', '', m.phone({ cls: 'short', bar: { title: 'Food database', back: true }, body: [
+          m.info('Paused', [m.p('17 MB of 46 MB is kept on your phone. Resume to get the rest, or discard it.', 't2'), m.rowx([m.btn('Resume', 'primary'), m.btn('Discard', 'text')])]),
+          m.notice('caution', 'The host could not be reached. Nothing was changed.', { acts: [m.btn('Try again', 'secondary', { sm: true })] }), m.notice('info', 'Barcode foods, United States is on your phone.')] })),
+        m.frame('food-database-installed', 'Installed', 'Remove asks first.', m.phone({ cls: 'short', bar: { title: 'Food database', back: true }, body: [m.gh('On this phone'), m.group([m.row('Barcode foods, United States', 'Version 2026-10-09 · 140 MB', m.btn('Remove', 'text', { sm: true, show: 'rm' }))]),
+          m.gh('Download'), m.info('Barcode foods, United States', [m.p('47 MB to download · version 2026-10-09'), m.btn('Up to date', 'off')]), '<div style="height:120px"></div>'],
+          over: m.confirm('Remove this food database?', 'It frees 140 MB. Foods you have already logged keep their numbers. You can download it again later.', 'Remove', { id: 'rm', hidden: true }) })),
+        m.frame('food-database-unavailable', 'Checking, and downloads not set up', '', m.phone({ cls: 'short', bar: { title: 'Food database', back: true }, body: [m.spinner(), m.p('Checking what is available…', 't2 center'), m.notice('info', 'Food downloads are not set up in this version of the app, so nothing can be fetched.')] }))
+      ] },
+      { h: 'Component gallery (development builds)', id: 'gallery', frames: [
+        m.frame('gallery', 'Component gallery', 'MM-105. The in-app sheet of every color and component; the screenshot tests are taken from it. Its contents are drawn in the component catalog.', m.phone({ cls: 'short', bar: { title: 'Component gallery', back: true }, body: [m.seg(['Light', 'Dark'], 1), m.seg(['100%', '200%'], 0),
+          m.heading('Colors'), m.heading('Type'), m.heading('Buttons'), m.heading('Inputs'), m.heading('Surfaces and rows'), m.heading('Data and progress'), '<p class="cap">See <a style="color:var(--info)" href="../components/index.html">components/index.html</a>.</p>'] }))
+      ] }
+    ]
+  });
+})(mm);
+</script>
+</body>
+</html>

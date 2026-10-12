@@ -5,6 +5,8 @@ Trace requirements to tests, review regression and contract coverage, choose
 focused then broader mm checks, and audit actual device/build/golden evidence.
 Check that UI/UX asset links and local dependencies resolve and that a
 relevant asset behaves as its entry says (`requirements/ui-ux-assets/README.md`, MM-210).
+Audit the coverage manifest's verification claims against what was actually
+opened and compared (MM-211).
 ## Existing implementation audit
 Audit coverage, test validity and expectations, edge cases, regression guards
 and failure reproducibility against implemented behavior, requirements and

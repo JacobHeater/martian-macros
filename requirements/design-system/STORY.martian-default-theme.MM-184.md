@@ -84,3 +84,18 @@ and iOS behavior were not tested.
   describes is not drawn in it. Its banner still calls Martian "a proposed
   extra theme ... not wired into the app", which was true when it was drawn
   and is not now: this story made Martian the default.
+- [First launch and gates](../ui-ux-assets/views/onboarding.html) — Current.
+  Draws MartianMacrosApp and ThemeChooserScreen as built on 2026-10-11:
+  themes, demo title, Martian preselected, saving, save failed. Frames:
+  `#app-demo`, `#theme-chooser`. Partly compared with screenshot tests, the
+  rest drawn from the source alone. Applies the theme and the app title; the
+  themes are the switch on every sheet. It shows what exists and approves
+  nothing.
+- [Settings](../ui-ux-assets/views/settings.html#settings-theme-error) —
+  Current. Draws ThemeSettings as built on 2026-10-11: chosen, save failed.
+  Compared with a screenshot test of the built screen. It shows what exists
+  and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#first-launch) — Current. Draws the
+  "theme chooser, then onboarding, to the Dashboard" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.
