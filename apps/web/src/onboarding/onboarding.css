@@ -1,0 +1,24 @@
+.onboarding-welcome {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: calc(var(--space-24) + env(safe-area-inset-top)) var(--space-24)
+    calc(var(--space-24) + env(safe-area-inset-bottom));
+}
+.onboarding-welcome-top {
+  flex: 2;
+}
+.onboarding-welcome-bottom {
+  flex: 3;
+}
+.onboarding-progress {
+  padding: calc(var(--space-16) + env(safe-area-inset-top)) var(--space-24) 0;
+}
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-24) calc(var(--space-16) + env(safe-area-inset-bottom));
+}
+.onboarding-spacer {
+  flex: 1;
+}

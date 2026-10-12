@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MmButton } from './MmButton';
 import { MmClockTimeDialog } from './MmClockTimeDialog';
+import { MmDateDialog } from './MmDateDialog';
 import { MmDialog } from './MmDialog';
 import { MmIcon } from './MmIcon';
 import { MmTimeOfDayDialog } from './MmTimeOfDayDialog';
@@ -109,6 +110,12 @@ export function MmOverlays({ children }: { children: ReactNode }) {
               })}
             </div>
           </MmDialog>
+        ));
+      },
+
+      date({ helpText, initial, first, last }) {
+        return ask((finish) => (
+          <MmDateDialog helpText={helpText} initial={initial} first={first} last={last} onDone={finish} />
         ));
       },
 

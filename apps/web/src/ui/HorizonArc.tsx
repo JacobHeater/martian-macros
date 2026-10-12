@@ -1,0 +1,57 @@
+import { clamp } from '../lang/clamp';
+import './ui.css';
+
+const width = 320;
+const stroke = 8;
+const dotRadius = 6;
+const inset = dotRadius + 2;
+const height = width * 0.18 + inset * 2;
+
+interface HorizonArcProps {
+  /** Eaten over target; past 1 the dot hollows. */
+  progress: number;
+  /** What the arc says, for a screen reader (the arc itself is drawn). */
+  label: string;
+}
+
+/**
+ * The app's signature graphic: calories eaten as a body travelling along a
+ * shallow arc. A shallow orbital curve, a filled part, and a body dot at
+ * the progress point. Past the end the dot hollows and the arc stays full.
+ */
+export function HorizonArc({ progress, label }: HorizonArcProps) {
+  const chord = width - inset * 2;
+  const sagitta = height - inset * 2;
+  const radius = (chord * chord) / 4 / (2 * sagitta) + sagitta / 2;
+  const centerX = width / 2;
+  const centerY = inset + radius;
+  const half = Math.asin(chord / 2 / radius);
+  const start = -Math.PI / 2 - half;
+  const sweep = 2 * half;
+  const at = (fraction: number) => {
+    const angle = start + sweep * fraction;
+    return [centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius] as const;
+  };
+  const arcTo = (fraction: number) => {
+    const [fromX, fromY] = at(0);
+    const [toX, toY] = at(fraction);
+    return `M${fromX} ${fromY}A${radius} ${radius} 0 0 1 ${toX} ${toY}`;
+  };
+  const shown = clamp(progress, 0, 1);
+  const [dotX, dotY] = at(shown);
+  return (
+    <svg className="mm-horizon" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
+      <path className="mm-horizon-track" d={arcTo(1)} strokeWidth={stroke} />
+      {shown > 0 ? <path className="mm-horizon-fill" d={arcTo(shown)} strokeWidth={stroke} /> : null}
+      <circle className="mm-horizon-glow" cx={dotX} cy={dotY} r={dotRadius + 4} />
+      {progress > 1 ? (
+        <>
+          <circle className="mm-horizon-hollow" cx={dotX} cy={dotY} r={dotRadius} />
+          <circle className="mm-horizon-ring" cx={dotX} cy={dotY} r={dotRadius - 1} strokeWidth={2} />
+        </>
+      ) : (
+        <circle className="mm-horizon-dot" cx={dotX} cy={dotY} r={dotRadius} />
+      )}
+    </svg>
+  );
+}
