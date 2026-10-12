@@ -15,32 +15,47 @@ calorie targets, safety floors and the weight trend. A silent difference
 after the move would be the worst defect this app can have, and nobody would
 see it on a screen.
 
-## Decisions
+## Decisions (made by the product owner, 2026-10-12)
+- **All of the Dart is converted to TypeScript.** Nothing is compiled from
+  Dart to JavaScript and no Dart remains at the switch. The measurement
+  under Progress showed compiling works; the owner chose one language.
+
 Choices I made without asking (say if any is wrong):
-- **The Dart tests are the reference.** Before anything is moved, the cases
-  the Dart tests assert are written out as data: inputs and expected results.
-  The new engine must reproduce every one, to a stated tolerance for
-  floating-point results.
-- **Two routes are measured before one is chosen**, on the weekly check-in
-  and the weight trend: compiling the Dart packages to JavaScript and calling
-  them from TypeScript, and porting them to TypeScript. The measures are the
-  work involved, how the result is debugged and tested from the new app, and
-  the size of what ships.
-- **The simulator (MM-30) is run through whichever route is chosen**, and its
-  outcomes compared with the Dart ones.
+- **"All" includes the `mm` task runner** as well as the packages. The
+  Flutter app itself is converted by rebuilding its screens (MM-228 part 4).
+- **Order:** domain, engine, health import, food catalog, fixtures, data,
+  food pipeline, then the task runner. Each lands when its own tests pass.
+- **The Dart tests are the reference.** Every Dart test is carried over with
+  its source and must pass with the same expected values. A test is added
+  only where TypeScript behaves differently from Dart and the difference
+  could change a result.
+- **One TypeScript file for each Dart declaration**, in the same folders, in
+  `apps/web/src/`, so any file can be compared with the one it came from.
+- **The Dart stays until the switch.** It is the behavior reference and the
+  Flutter app still builds from it. A fix made in one is made in the other.
+- **How Dart is written in TypeScript** is in `apps/web/README.md`
+  ("Carrying Dart over"). The rules that guard results: rounding goes
+  through one function that rounds a half away from zero as Dart does;
+  typed numbers are read by one function that accepts what Dart accepts; a
+  calendar day is one object per day, so days compare and key as they did.
+- **Layers are enforced by a test**: `lang` imports nothing of ours and
+  `domain` imports only `lang`. Each package gets its rule as it arrives.
+- **The simulator (MM-30) is carried over with the engine** and its outcomes
+  compared with the Dart ones.
 - **The evidence register keeps guarding it**: the test that every constant
   has a row, and no row names something gone, moves with the engine.
 
 ## Description
-The domain types, the engine, health import and the food catalog, usable from
-the React app, giving the same answers as the Dart they replace.
+The domain types, the engine, health import, the food catalog, the fixtures,
+the data layer, the food pipeline and the task runner, in TypeScript, giving
+the same answers as the Dart they replace.
 
 ## Acceptance Criteria
 ```gherkin
 Scenario: The same answers
-  Given the reference cases written out from the Dart tests
-  When the new engine is run on each
-  Then every result matches, within the stated tolerance for non-integer results
+  Given every test of a Dart package
+  When it is carried over and run against the TypeScript
+  Then it passes with the same expected values
 
 Scenario: The simulator agrees
   When the synthetic-user simulator is run through the new engine
@@ -49,11 +64,37 @@ Scenario: The simulator agrees
 Scenario: Nothing unexplained
   Then every constant that decides something about a body or about safety still has its row in the evidence register
 
-Scenario: The route is chosen on evidence
-  Then this ticket records what compiling and porting each cost on the check-in and the trend, and why one was chosen
+Scenario: Layers hold
+  Then a test fails if the domain imports the engine, the data layer or a screen
+
+Scenario: No Dart is left
+  Given the switch of MM-228
+  Then the repository has no Dart source
 ```
 
 ## Progress
+| Package | Dart source | Dart tests | TypeScript | Tests passing |
+| --- | --- | --- | --- | --- |
+| domain | 4,574 lines, 158 files | 102 | done | 105 (the 102, and 3 for what differs from Dart) |
+| engine | 6,819 lines, 158 files | 566 | not started | |
+| health_ingest | 976 lines, 21 files | 71 | not started | |
+| food_catalog | 1,550 lines, 36 files | 2 files | not started | |
+| fixtures | 3,541 lines, 54 files | | not started | |
+| data | 20,359 lines, 48 files (most of it generated) | | not started | |
+| food_pipeline | 922 lines, 22 files | | not started | |
+| `mm` task runner | 8,361 lines | 191 | not started | |
+
+**Domain (2026-10-12):** `apps/web/src/domain/` and `apps/web/src/lang/`.
+The type check is clean and all 105 tests pass. Three things are written
+differently from the Dart, on purpose:
+- Lengths of time are numbers of milliseconds with `Ms` in the name
+  (`pausedForMs`, `restTargetMs`, `durationMs`); JavaScript has no duration
+  type.
+- A repository's `watch...` returns a `Watched<T>` (subscribe, get the
+  current value and each change, unsubscribe) in place of a Dart stream.
+- A field Dart cleared by passing a function returning null is cleared in
+  `copyWith` by giving its key as `undefined`; an absent key keeps it.
+
 **Measured on 2026-10-12 (compiling the Dart to JavaScript):**
 - The packages' own Dart tests were run compiled to JavaScript on Node
   (`dart test -p node`), with no change to any source file:
