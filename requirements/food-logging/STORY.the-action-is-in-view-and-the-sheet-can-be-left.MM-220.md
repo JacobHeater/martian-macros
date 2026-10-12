@@ -65,6 +65,12 @@ Scenario: Nothing to estimate from yet
 ```
 
 ## Notes
+- **Delivery reconciliation, 2026-10-12:** discovery/manual separation reduces
+  the opening screen, but does not close this story. Visible dismissal,
+  disabled-action explanations, small-screen/keyboard/large-text action
+  visibility, and the pre-maintenance estimate path remain open. MM-227 fixes
+  the HTML amount-step Back to search alignment only; it does not move the
+  app button or establish that its bottom placement is usable.
 - Evidence: step records 1.9, 1B.3, 3.2a, 3.5, 4.4 and 4.5; screenshot tests
   `add_food_estimate_dark`, `add_food_form_end_dark`, `add_food_edit_dark`.
 - Not checked: the keyboard open, larger text, other screen heights, system
