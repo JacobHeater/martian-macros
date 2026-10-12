@@ -27,6 +27,9 @@ export default defineConfig({
           include: ['src/**/*.test.tsx', 'test/**/*.test.tsx'],
           setupFiles: ['test/setup.ts'],
           css: true,
+          // These draw the whole app and walk through it; several screens' worth
+          // takes longer than the default on a busy machine.
+          testTimeout: 20000,
         },
       },
     ],

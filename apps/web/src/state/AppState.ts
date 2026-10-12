@@ -61,6 +61,7 @@ import type { TargetsRecord } from '../engine/TargetsRecord';
 import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
 import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
+import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
@@ -276,6 +277,9 @@ export class AppState {
   /** The targets in force today, if any have been issued. */
   readonly currentTargets: Cell<TargetsRecord | undefined>;
 
+  /** The installed packs read as one catalog (MM-42). Empty until a pack is installed. */
+  readonly foodCatalog: StreamCell<FoodCatalog>;
+
   /** Each lift's estimated strength over time. Failed when a logged set cannot be worked out. */
   readonly strengthTrends: Cell<Loadable<readonly StrengthTrend[]>>;
 
@@ -300,6 +304,7 @@ export class AppState {
 
     this.setup = stream(() => s.setup.watchSetup());
     this.themePreference = stream(() => s.preferences.watchThemePreference());
+    this.foodCatalog = stream(() => s.catalog);
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.

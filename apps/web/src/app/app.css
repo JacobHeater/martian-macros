@@ -115,3 +115,8 @@
 .app-centered-middle {
   align-items: center;
 }
+/* Where a floating action hangs: over the bottom of the body, above the navigation bar. */
+.app-fab-anchor {
+  position: relative;
+  height: 0;
+}

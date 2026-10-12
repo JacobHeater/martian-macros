@@ -1,5 +1,8 @@
 import { SqlRepositories } from '../data/SqlRepositories';
 import { SystemClock } from '../domain/integration/SystemClock';
+import { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import { constant } from '../lang/constant';
+import { NoCamera } from '../platform/NoCamera';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../state/AppServices';
 
@@ -12,6 +15,7 @@ import type { AppServices } from '../state/AppServices';
  */
 export async function openAppServices(): Promise<AppServices> {
   const repositories = await SqlRepositories.open(await WasmSqlDatabase.open());
+  const camera = new NoCamera();
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
@@ -33,5 +37,9 @@ export async function openAppServices(): Promise<AppServices> {
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
     eraser: repositories.eraser,
+    // No pack can be installed yet, and no camera plugin is in the shell (MM-232, step 5).
+    catalog: constant(new FoodCatalog([])),
+    barcodeScanner: camera,
+    labelReader: camera,
   };
 }

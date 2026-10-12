@@ -1,3 +1,4 @@
+import { servicesOf } from '../support/servicesOf';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { FoodEntry } from '../../src/domain/FoodEntry';
@@ -25,31 +26,7 @@ const today = CalendarDate.of(2026, 10, 10);
 function fresh(day: CalendarDate = today) {
   const repos = new InMemoryRepositories();
   const clock = new FixedClock(day);
-  return { repos, clock, state: new AppState({ ...asServices(repos), clock }) };
-}
-
-function asServices(repos: InMemoryRepositories) {
-  return {
-    setup: repos.setup,
-    weights: repos.weights,
-    weightEvents: repos.weightEvents,
-    waist: repos.waist,
-    food: repos.food,
-    customFoods: repos.customFoods,
-    dayMarks: repos.dayMarks,
-    intake: repos.intake,
-    targets: repos.targets,
-    preferences: repos.preferences,
-    insightLog: repos.insightLog,
-    pauses: repos.pauses,
-    reminders: repos.reminders,
-    recovery: repos.recovery,
-    workouts: repos.workouts,
-    customExercises: repos.customExercises,
-    healthSamples: repos.healthSamples,
-    exerciseProgressions: repos.exerciseProgressions,
-    eraser: repos.eraser,
-  };
+  return { repos, clock, state: new AppState(servicesOf(repos, clock)) };
 }
 
 async function seeded(day: CalendarDate = today) {

@@ -17,7 +17,11 @@ import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
+import type { Watched } from '../lang/Watched';
+import type { BarcodeScanner } from '../platform/BarcodeScanner';
+import type { LabelTextReader } from '../platform/LabelTextReader';
 
 /**
  * Everything the app reads and writes, by interface. One place chooses the
@@ -46,4 +50,9 @@ export interface AppServices {
   readonly healthSamples: HealthSampleStore;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
+
+  /** The installed food packs read as one catalog (MM-42); given again when a pack is installed or removed. */
+  readonly catalog: Watched<FoodCatalog>;
+  readonly barcodeScanner: BarcodeScanner;
+  readonly labelReader: LabelTextReader;
 }
