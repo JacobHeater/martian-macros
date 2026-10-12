@@ -1,6 +1,6 @@
 ---
 id: MM-231
-status: proposed
+status: in-progress
 component: persistence
 related: [MM-228, MM-230, MM-59, MM-160, MM-41, MM-42]
 ---
@@ -90,6 +90,26 @@ Scenario: The system of record is on the phone
   the Flutter app makes while the user types.
 - Anything on iOS.
 
+**Built (2026-10-12):**
+- `apps/web/src/sql/`: `SqlDatabase` (select, execute, a script of
+  statements, a transaction, close), `SqlFailure`, and the WebAssembly
+  adapter in `sql/wasm/`, the only folder that may import the SQLite
+  library. A test fails if any other file does.
+- `apps/web/test/contracts/sqlDatabaseContract.ts`: 14 tests any adapter
+  must pass. Among them: values of every kind come back as stored;
+  parameters are never read as SQL; a transaction that throws is undone and
+  rethrows what was thrown; a call made while a transaction is open waits
+  for it; calls run in the order made; full-text search with the pack's
+  tokenizer settings; and nothing works after close.
+- The contract found a defect in the adapter as first written: an error
+  thrown by a transaction's own work came back wrapped as a SQLite failure.
+  Fixed before it was committed.
+- The WebAssembly adapter can also write a database out as the bytes of a
+  file and open one from bytes, which is how a pack is built and read
+  off the phone.
+
+**Not built:** the native adapter; anything on top of the seam.
+
 ## Notes
-- Not started. The food catalog is the first thing built on it, because it
-  reads and never writes.
+- The food catalog is the first thing built on it, because it reads and
+  never writes.
