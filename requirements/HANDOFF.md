@@ -209,9 +209,26 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   build, never on a phone. The Flutter app's wording is carried over too
   (`apps/web/src/format/`), checked against what Dart printed. Whether a native
   plugin has FTS5 on Android is not verified.
-  The task runner (`tool/`) is the last Dart and waits for nothing. Read
-  "Carrying Dart over" in `apps/web/README.md` before converting anything:
-  it says how enums, nulls, dates, rounding and streams are written.
+  Read "Carrying Dart over" in `apps/web/README.md` before converting
+  anything: it says how enums, nulls, dates, rounding and streams are
+  written.
+- **What Dart is left, and in what order.** (1) The Flutter app's screens
+  and their state, about 19,200 lines and 81 test files: rebuilt as React
+  screens (MM-228 part 4), not started. (2) Downloading a pack and the
+  native SQLite adapter, which need the phone. (3) The task runner
+  (`tool/`), last, at the switch: most of what it does is check and build
+  the Dart, and that part goes when the Dart goes. MM-230's table has the
+  state of every package.
+- **To prove TypeScript matches Dart**, have the Dart write a file and
+  compare against it in a test: `test/engine/dartParity.test.ts`,
+  `test/foodCatalog/dartParity.test.ts`, `test/foodPipeline/`,
+  `test/data/schema.test.ts` and `test/format/` all do. Record the file
+  with a throwaway script run by `fvm dart run` and do not commit the
+  script.
+- **Open when the session ended:** #115 (data layer), #116 (wording) and
+  #117 (messages), stacked in that order, each passing `mm check` locally
+  with CI still running. Merge in order when green; retarget the next to
+  `main` after each.
 - **The Dart stays until the switch** and is the reference. A fix made in
   one language is made in the other.
 - #102 (Copilot's, green) was merged at the start of this session under the
