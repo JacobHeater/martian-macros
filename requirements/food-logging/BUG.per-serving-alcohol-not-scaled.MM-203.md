@@ -1,6 +1,6 @@
 ---
 id: MM-203
-status: in-progress
+status: done
 component: food-logging
 related: [MM-167, MM-201]
 ---
@@ -32,3 +32,6 @@ food_portion_test. Now enabled alongside MM-226.
 The guard ran and failed at the intended assertion: energy was 276 kcal,
 but consumed alcohol was 14 rather than 28 g. Initial test setup forgot the
 optional alcohol toggle; corrected setup then reproduced the real defect.
+
+The enabled guard now passes in full `mm check` (mobile 633 passed, 65
+skipped), including consumed alcohol and energy at two servings.

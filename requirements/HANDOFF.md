@@ -5,19 +5,20 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, Session 19.
+Last updated: 2026-10-12, by Copilot, Session 19.
 
-**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) is ready for
-review; #100 is already merged to `main`. Session 19's Add food,
-cross-app-usability work and MM-225 macro preview continue on
-`feature/mm205-expert-mobile-ux`. MM-223 and MM-225 are implemented and tested;
-Linux screenshot baselines are imported. Updated PR CI remains pending.
-The owner then identified ambiguous "Everything I ate / One serving" labels;
-MM-226 is implemented on the same PR before merging. The owner rejected
-renaming that switch: remove it; serving entries use nutrition per serving
-and servings eaten. Other measured amounts retain total-entry behavior.
-Coupled per-serving alcohol defects MM-203/MM-204 are fixed with enabled
-regressions. Full local `mm check` passed; new Linux screenshots remain pending.
+**Delivery.** #81 is merged at `c226eb6`; #100 was already merged to `main`.
+The final verification was still in flight when the owner merged #81.
+It includes discovery separation, macro previews, and MM-226's removal of
+the "Everything I ate / One serving" switch. Serving entries use nutrition
+per serving and servings eaten; other measured amounts retain typed totals.
+The precision fix MM-202 and five refreshed Linux screenshots continue on
+`fix/mm226-serving-verification`, branched from the merged main. Alcohol
+defects MM-203/MM-204 are fixed too; all four existing regression guards are
+enabled. Full local `mm check` passes (mobile 633 passed, 65 skipped).
+Linux run 38200742381 succeeded for #81's final source head `85f5542`;
+the five changed screenshots were visually inspected and imported. The
+follow-up still needs exact-head CI and merge. No emulator/device check.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -40,6 +41,7 @@ drawings and manifest. Linux golden images were inspected and imported.
 - MM-223 and MM-225 are verified with tests and Linux screenshots; device
   verification remains unavailable. Review the cross-app findings for MM-224
   and give each a concrete disposition.
+- Finish the serving-verification follow-up with green exact-head CI and merge.
 - Continue cross-app hierarchy work under MM-224. The owner has approved this
   as a standing mandate; do not ask whether to do it.
 - MM-214 and MM-215 remain ready to fix, each with a skipped test waiting.
@@ -119,6 +121,8 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Commit/push/open PRs and merge green ones with `--merge`. Branch from fresh
   main unless explicitly continuing an existing PR. Stage named files; never
   stash-juggle or switch branches during a build.
+- Never block the session waiting on PR checks. Check GitHub at the start/end
+  and use background CI monitoring between them; merge only a green current head.
 - Bugs get tickets and failing-before regressions immediately. Otherwise
   focus on feature roadmap; acceptance testing will walk through bugs.
 - Offline-first; binary biological sex for formulas; US only at launch.
