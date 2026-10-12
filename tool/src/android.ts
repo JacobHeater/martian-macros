@@ -134,9 +134,50 @@ async function installAndLaunch(repoRoot: string, device: string): Promise<numbe
   return run([adbPath(), '-s', device, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`]);
 }
 
-/** `mm run [-d DEVICE]`: build, install and launch on a device or emulator. */
+/**
+ * The one physical Android phone among `ids`, never an emulator (MM-234).
+ * It throws, with what to do, when there is none or more than one.
+ */
+export function physicalAndroidDeviceId(ids: readonly string[]): string {
+  const phones = ids.filter((id) => !id.startsWith('emulator-'));
+  if (phones.length === 0) {
+    throw new Error(
+      'No Android phone connected. Connect a data-capable USB cable, enable USB debugging, and accept the authorization prompt on your phone.',
+    );
+  }
+  if (phones.length > 1) {
+    throw new Error(`Multiple Android phones connected: ${phones.join(', ')}. Select one with mm run -d DEVICE_ID.`);
+  }
+  return phones[0]!;
+}
+
+/**
+ * `mm run [--env dev|prod|phone] [-d DEVICE]`: build, install and launch.
+ * `--env phone` selects the one physical phone, never an emulator; `dev`
+ * and `prod` are accepted and change nothing, since the build has no
+ * per-environment defines (one config).
+ */
 export async function runApp(repoRoot: string, args: readonly string[]): Promise<number> {
+  const env = args.includes('--env') ? args[args.indexOf('--env') + 1] : undefined;
+  if (env !== undefined && !['dev', 'prod', 'phone'].includes(env)) {
+    stderr.write('--env must be one of: dev, prod, phone\n');
+    return 64;
+  }
   let device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  if (env === 'phone') {
+    if (device !== undefined) {
+      stderr.write('Use mm run -d DEVICE_ID for an explicit device, or mm run --env phone for automatic phone selection.\n');
+      return 64;
+    }
+    try {
+      device = physicalAndroidDeviceId(await deviceIds());
+    } catch (error) {
+      stderr.write(`${error instanceof Error ? error.message : error}\n`);
+      return 69;
+    }
+  } else if (env !== undefined) {
+    stdout.write('The build has no per-environment defines; --env chooses nothing here (MM-232).\n');
+  }
   if (device === undefined) {
     const ready = await ensureDevice();
     if (ready !== 0) return ready;
