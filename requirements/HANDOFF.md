@@ -21,6 +21,11 @@ the five changed screenshots were visually inspected and imported. The follow-up
 last checked, not claimed green. No emulator/device check.
 MM-227 now corrects a confirmed HTML parity defect: amount-step Back to search
 was drawn full-width/centered despite the app's content-width left placement.
+The correction is published in #102 with failing-before/passing-after browser
+assertions for three amount frames. MM-218 to MM-221 and MM-224 are reconciled
+with the shipped changes; historical observations are not current defects
+unless their remaining criteria say so. Full phone/reference parity remains
+unverified.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 

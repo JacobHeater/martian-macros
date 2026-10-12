@@ -79,6 +79,15 @@ Scenario: A recent food beside a found one
 ```
 
 ## Notes
+- **Delivery reconciliation, 2026-10-12:** MM-223 shipped separate discovery
+  and manual-entry states, including manual entry from results and carried
+  query text. MM-226 removed the ambiguous nutrition-basis vocabulary.
+  Serving recents now restore a calculated serving reference rather than
+  multiplying prior totals again; other recent methods retain their existing
+  total-entry behavior. Still open: visible Estimate access from results,
+  distinct estimate-method wording, source vocabulary, and explicit next-step
+  cues. The older description of all recents as unscaled typed totals is no
+  longer true. A full result-row/route walkthrough remains unverified.
 - Evidence: step records 1.2, 2.2, 2.3 and 3.1; screenshot tests
   `add_food_opened_dark`, `add_food_search_dark`.
 - `design/screen-direction.md` (Food logging flows) describes a different
