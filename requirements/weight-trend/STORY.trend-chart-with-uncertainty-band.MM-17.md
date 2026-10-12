@@ -48,3 +48,14 @@ Scenario: Units
 - `_TrendChart` and `_TrendStats` in `progress_screen.dart`, using `fl_chart`.
 - **Only the single-reading case was seen on a device** (one dot, no line). A widget test renders the screen with eleven days of weigh-ins
   and checks the figures appear, but nothing asserts what the chart draws. Checking the line and band against real history is MM-93.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-default) — Current.
+  Draws ProgressScreen as built on 2026-10-11: populated, empty, typed,
+  imported, few weigh-ins. Compared with a screenshot test of the built
+  screen. It shows what exists and approves nothing.
+- [Component catalog](../ui-ux-assets/components/index.html#trend-chart) —
+  Current. Draws TrendChart and TrendStats as built on 2026-10-11: with band
+  and event, three figures. Compared with a screenshot test of the built
+  screen. It shows what exists and approves nothing.

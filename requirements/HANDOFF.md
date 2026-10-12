@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Claude, end of Session 15.
+Last updated: 2026-10-11, by Claude, end of Session 16.
 
 **Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
 MM-208) is not Claude's and was not touched; its handoff edits will conflict
@@ -17,12 +17,15 @@ with this file. Nothing else is open: Session 13's pull requests (#90 to
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-211 once #81 merges (it uses MM-205 to MM-208;
-MM-209 and MM-210 are taken). `mm req next` is the authority.
+**Next ticket ID.** MM-212 once #81 merges (it uses MM-205 to MM-208;
+MM-209 to MM-211 are taken). `mm req next` is the authority.
 
 **HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
-from their tickets under `## UI/UX Assets` (MM-210). `mm req` fails on an
-HTML file anywhere else that the folder's README does not account for.
+from their tickets under `## UI/UX Assets` (MM-210). Every view and
+component has a drawing there, listed in `coverage.json` (MM-211); a UI
+change is not done until its drawing and manifest entry are changed with
+it. #81 adds or changes screens and will need its drawings brought up to
+date when it merges: `mm req` will say which files.
 
 **What to build next.**
 - Health sync, what is left: see an import of a real reading on a phone
@@ -96,6 +99,35 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
+## Session 16: 2026-10-11, Claude (HTML reference library)
+
+- **MM-211, done.** `requirements/ui-ux-assets/index.html` opens an HTML
+  drawing of every view and component as built: eight view sheets, a
+  component catalog, a flows sheet. `coverage.json` lists all 165 widget
+  files with the frame that draws each, the states drawn, its tickets, how
+  it was checked and what limits it. 83 tickets link their drawings under
+  `## UI/UX Assets`, status `Current`.
+- **Standing rule (AGENTS.md):** a new view, component, sheet or dialog is
+  drawn, listed in the manifest and linked from its tickets in the same pull
+  request; a changed one is redrawn; a removed one loses its frames and its
+  entry. `mm req` fails on a widget file the manifest does not list, on an
+  entry pointing at a file, symbol, frame or ticket that does not exist,
+  and on a link to a frame that does not exist.
+- **How to add a frame:** sheets are built by `shared/mm.js` from helper
+  calls (`m.phone`, `m.info`, `m.row`, `m.frame('id', ...)`); copy a
+  neighboring frame. Styles and tokens are in `shared/mm.css`, copied from
+  `apps/mobile/lib/src/theme/`.
+- **Checked how:** 76 entries compared by eye with a screenshot test, 83
+  drawn from the source alone, 6 not drawn (hosts, the camera, the phone's
+  pickers) with the reason. Every sheet was opened in headless Edge. Nothing
+  was compared with the app on an emulator or phone.
+- **Corrections the comparison forced**, worth knowing when reading the
+  source for a drawing: confirm dialogs use the primary button, not a red
+  one; `showMmOptions` is a dialog, not a sheet; the download strip is at
+  the bottom of the screen; a lift's history is titled with the lift.
+- The session began by misreading the request as "track the HTML that
+  exists" (that is MM-210, Session 15). The owner meant "draw everything".
+
 ## Session 15: 2026-10-11, Claude (UI/UX assets)
 
 - **MM-210, done.** HTML UI/UX assets (screen prototypes, interaction
@@ -142,35 +174,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   is now typed weigh-ins plus the imported one that counts for each other
   day (`typedWeightsProvider` is what was typed); `healthSyncProvider` runs
   when the home shell opens and on resume.
-
-## Session 13: 2026-10-11, Claude (health table, waist change)
-
-- MM-67, second half: `imported_samples` and `health_import_tokens` (schema
-  29), a Drift `HealthSampleStore`, `healthSampleStoreContract` run against
-  it and the in-memory one, erasing, and the app's providers
-  (`healthSourceProvider` throws until a platform is registered). Ticket
-  done; the device run of `healthSourceContract` belongs to MM-68 and MM-69.
-- #90 (MM-67 table) merged after its check passed on its head.
-- MM-155, first part: `waistChangeOf`, one answer to whether the waist
-  changed (smoothed ends; a change only past 1.4 times the noise figure;
-  "since start" from the middle of the first three entries). The recomp
-  signal, recomp review and stall diagnosis use it; the waist card says
-  down, up or no clear change since the start. Entries so far are taken as
-  the middle of three readings, as the card has always asked.
-- MM-155, second part (schema 30): a waist entry of three readings, the
-  middle one stored and all three kept; one reading is a quick entry with
-  wider noise; from eight full entries the noise figure is the user's own
-  (`waistNoiseOf`). A new `WaistEntryCard` on Progress.
-- #91 and #92 (MM-155) merged after their checks passed on their heads.
-  The waist card was seen on the emulator, and the demo database there
-  upgraded from schema 28 to 30 without error.
-- MM-133 done: the recomp review is also in the monthly report of the
-  month it fell due in (`RecompReviewBody` serves both places).
-- #93 merged after its check passed on its head.
-- MM-79 done (schema 31): a rep range and load step per exercise, set from
-  a row on the exercise of a workout in progress
-  (`ProgressionSettingsScreen`, `ExerciseProgressionRepository`).
-- #94 (MM-79) merged after its check passed on its head. Seen on the
-  emulator: the "Suggestions use" row and the settings screen as it opens.
-- Done this session: MM-67, MM-133, MM-79. In progress: MM-155 (drawing
-  and chart left).

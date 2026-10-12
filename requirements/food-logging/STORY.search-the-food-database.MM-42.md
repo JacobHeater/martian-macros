@@ -72,3 +72,15 @@ pack's top 20.
 The amount step collects a quantity and unit and then stores only totals and a method, and it records every serving as a cup-or-spoon
 measurement. MM-167 requires the quantity, unit, serving and reference basis to be stored and a label serving to be recorded as a label
 serving. Those are implementation gaps, not met by this ticket's progress.
+
+## UI/UX Assets
+
+- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Draws
+  FoodAmountStep and FoodSearchResults as built on 2026-10-11: filled, no
+  amount, results, none, no database. Frames: `#add-food-amount`,
+  `#add-food-search`. Drawn from the source alone; not compared with the
+  running app. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
+  "adding, editing and removing a food, and closing the day" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.

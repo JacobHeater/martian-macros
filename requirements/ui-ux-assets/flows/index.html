@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flows · Martian Macros UI reference</title>
+<link rel="stylesheet" href="../shared/mm.css">
+<style>
+  main { max-width: 980px; margin: 0 auto; }
+  main h2 { font: 600 18px/1.3 "SpaceGrotesk", "Inter", system-ui, sans-serif; margin: 32px 0 4px; }
+  main ol { padding-left: 22px; } main li { margin: 6px 0; }
+  main a { color: #1C3FAA; }
+  .map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+  .map > div { background: #fff; border: 1px solid #CBD3E3; border-radius: 10px; padding: 10px; }
+  .map b { display: block; margin-bottom: 4px; }
+  .map small { display: block; color: #3C465C; }
+</style>
+</head>
+<body class="sheet">
+<header class="sheet-head">
+  <h1>Flows</h1>
+  <p><span class="sheet-status">Current</span>How the screens connect, as built on 2026-10-11. Each step links to the frame that draws it. It shows what exists; it approves nothing.</p>
+  <p><b>Source:</b> <code>apps/mobile/lib/src/app/</code> (root, shell and hosts) and the screens named in each step.</p>
+  <p><b>Limits:</b> These are the paths read from the source. They were not walked on a phone for this sheet, and transitions are not animated.</p>
+  <p><a href="../index.html">Library index</a></p>
+</header>
+<main>
+  <h2 id="navigation-map">Navigation map</h2>
+  <p>Five destinations in a bottom bar, Dashboard first (MM-99). Settings opens from the gear on every destination. Everything else is pushed on top or shown as a sheet or dialog.</p>
+  <div class="map">
+    <div><b><a href="../views/dashboard.html#dashboard-default">Dashboard</a></b><small>Add food sheet</small><small>Coach line → explanation sheet</small><small>Links to Food, Progress, Coach</small><small>Monthly report (when ready)</small></div>
+    <div><b><a href="../views/food.html#food-default">Food</a></b><small>Add food sheet: search, scan, estimate, saved foods, recipes</small><small>Edit an entry</small><small>Day stepper</small></div>
+    <div><b><a href="../views/train.html#train-default">Train</a></b><small>Workout → exercise picker → your own exercise</small><small>Suggestions, workout times</small><small>Weekly training volume</small></div>
+    <div><b><a href="../views/progress.html#progress-default">Progress</a></b><small>Weight event sheet</small><small>Lift histories → lift history</small></div>
+    <div><b><a href="../views/coach.html#coach-default">Coach</a></b><small>Explanation sheet, target history</small><small>Goal chooser</small><small>Monthly report</small><small>Recovery check-in</small></div>
+  </div>
+  <p><a href="../views/settings.html#settings-default">Settings</a> leads to the <a href="../views/settings.html#health-check">health check</a>, <a href="../views/settings.html#pause-new">pause</a>, <a href="../views/settings.html#how-this-works">how this works</a>, the <a href="../views/settings.html#food-database-offer">food database</a> and, in development builds, the <a href="../views/settings.html#gallery">component gallery</a>.</p>
+
+  <h2 id="first-launch">First launch</h2>
+  <ol>
+    <li><a href="../views/onboarding.html#app-loading">The app opens</a> and reads what is stored.</li>
+    <li>A new installation sees the <a href="../views/onboarding.html#theme-chooser">theme chooser</a> (MM-184). An existing one never does.</li>
+    <li><a href="../views/onboarding.html#onboarding-welcome">Welcome</a>, then seven steps: <a href="../views/onboarding.html#onboarding-sex">biological sex</a>, <a href="../views/onboarding.html#onboarding-birth-date">date of birth</a>, <a href="../views/onboarding.html#onboarding-measurements">measurements</a>, <a href="../views/onboarding.html#onboarding-activity">your day</a>, <a href="../views/onboarding.html#onboarding-training">training</a>, <a href="../views/onboarding.html#onboarding-health">health check</a>, <a href="../views/onboarding.html#onboarding-goal">your plan</a>.</li>
+    <li>A date of birth under 18 <a href="../views/onboarding.html#onboarding-under-18">stops the flow</a> (MM-13).</li>
+    <li>Start lands on the <a href="../views/dashboard.html#dashboard-calibration">Dashboard in calibration</a>.</li>
+  </ol>
+
+  <h2 id="opening-the-app-later">Opening the app later</h2>
+  <ol>
+    <li>Under 18 by the stored date of birth: <a href="../views/onboarding.html#adults-only">adults only</a>.</li>
+    <li>A health check due again: <a href="../views/onboarding.html#health-recheck">the repeated health check</a> (MM-112).</li>
+    <li>Back after a gap or a pause: <a href="../views/onboarding.html#welcome-back">welcome back</a> (MM-147).</li>
+    <li>A weekly check-in that changed targets: <a href="../views/coach.html#target-change-sheet">the explanation sheet</a>, once (MM-24, MM-138).</li>
+    <li>Otherwise the <a href="../views/dashboard.html#dashboard-default">Dashboard</a>. What Health Connect allows is read now and whenever the app returns to the front (MM-68).</li>
+  </ol>
+
+  <h2 id="log-a-food">Log a food</h2>
+  <ol>
+    <li>Add food, from the button on <a href="../views/dashboard.html#dashboard-default">Dashboard</a> or <a href="../views/food.html#food-default">Food</a>, or the plus on a meal.</li>
+    <li>The <a href="../views/add-food.html#add-food-default">sheet opens</a>. Then one of:
+      <ul>
+        <li>type the numbers (<a href="../views/add-food.html#add-food-filled">filled in</a>);</li>
+        <li>search (<a href="../views/add-food.html#add-food-search">results</a>), then <a href="../views/add-food.html#add-food-amount">how much</a>;</li>
+        <li><a href="../views/add-food.html#add-food-scan">scan a barcode</a>; an unknown product offers <a href="../views/add-food.html#add-food-scan-unknown">reading its label</a>;</li>
+        <li><a href="../views/add-food.html#add-food-estimate">estimate a meal</a>;</li>
+        <li>pick from <a href="../views/add-food.html#add-food-my-foods">saved foods and recipes</a>.</li>
+      </ul>
+    </li>
+    <li>Log it. The entry appears under its meal on <a href="../views/food.html#food-default">Food</a>, and the hero counts it.</li>
+    <li>Tapping the entry <a href="../views/add-food.html#add-food-edit">edits it</a>; swiping it away <a href="../views/food.html#food-removed">removes it, with Undo</a>.</li>
+    <li>At the end of the day, <a href="../views/food.html#food-complete">mark it complete or partial</a>. A very low complete day <a href="../views/food.html#food-low-day">is asked about</a>.</li>
+  </ol>
+
+  <h2 id="weigh-in-and-trend">Weigh in</h2>
+  <ol>
+    <li>Type today’s weight on <a href="../views/dashboard.html#dashboard-default">Dashboard</a> or <a href="../views/progress.html#progress-weigh-in-typed">Progress</a>, and Save. Or let it come from <a href="../views/progress.html#progress-weigh-in-imported">Health Connect</a>.</li>
+    <li>The <a href="../views/progress.html#progress-default">trend</a> redraws. Note anything that moves water as a <a href="../views/progress.html#progress-event-sheet">weight event</a>.</li>
+    <li>Once a week, <a href="../views/progress.html#progress-waist-entry">measure the waist</a>.</li>
+  </ol>
+
+  <h2 id="log-a-workout">Log a workout</h2>
+  <ol>
+    <li><a href="../views/train.html#train-default">Start workout</a>, or repeat the last one.</li>
+    <li><a href="../views/train.html#workout-empty">Add the first exercise</a> from the <a href="../views/train.html#exercise-picker">picker</a>, or <a href="../views/train.html#custom-exercise">create your own</a>.</li>
+    <li>Per set: Start set (<a href="../views/train.html#workout-set-running">timed</a>), Add set, then <a href="../views/train.html#workout-rest-counting">rest counts down</a> to its target.</li>
+    <li>The card says what <a href="../views/train.html#workout-suggestions">a step up would be</a>; the range it uses is <a href="../views/train.html#progression-settings">yours to set</a>.</li>
+    <li>Finish workout. A best estimated max is <a href="../views/train.html#workout-finished">named as a personal record</a>. Times can be <a href="../views/train.html#workout-times">corrected by hand</a>.</li>
+  </ol>
+
+  <h2 id="weekly-check-in">The weekly check-in</h2>
+  <ol>
+    <li>The check-in runs by itself when the app opens on or after its day (MM-24). Nothing is asked.</li>
+    <li>If targets changed, <a href="../views/coach.html#target-change-sheet">why</a> is shown once, with the choice to keep last week’s.</li>
+    <li>The <a href="../views/dashboard.html#dashboard-default">Dashboard’s coach line</a> and <a href="../views/coach.html#coach-default">Coach</a> carry it afterwards; every past change is in <a href="../views/coach.html#targets-history">target history</a>.</li>
+    <li>Once a week Coach offers the <a href="../views/coach.html#recovery-check-in">recovery questions</a>; two hard weeks lead to <a href="../views/coach.html#coach-relief">an offer to ease</a>, never to a lower target.</li>
+  </ol>
+
+  <h2 id="pause-and-return">Pause and return</h2>
+  <ol>
+    <li>Settings → <a href="../views/settings.html#pause-new">Pause</a>: a reason, a start and a length.</li>
+    <li>While paused, <a href="../views/dashboard.html#dashboard-paused">a banner</a> says so and the hero counts against a guide.</li>
+    <li>Resume from <a href="../views/settings.html#pause-current">the pause screen</a>; then <a href="../views/onboarding.html#welcome-back-after-pause">one weigh-in</a> restarts the coach.</li>
+  </ol>
+</main>
+</body>
+</html>

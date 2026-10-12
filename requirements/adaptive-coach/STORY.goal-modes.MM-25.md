@@ -57,3 +57,11 @@ Scenario: Only allowed goals are offered
 - `_weeklyRate` and `computeTargets` in `targets.dart` (tests in `targets_test.dart`); `_changeGoal` in `coach_screen.dart`.
 - **The change-goal sheet has no test and was not exercised on a device** (MM-93). The engine's handling of a goal change is tested.
 - Not built: choosing a fat-loss pace.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-default) — Current. Draws
+  CoachScreen as built on 2026-10-11: populated, first day, learning. Compared
+  with a screenshot test of the built screen. Compared with the screenshot
+  test for the top of the page only. It shows what exists and approves
+  nothing.

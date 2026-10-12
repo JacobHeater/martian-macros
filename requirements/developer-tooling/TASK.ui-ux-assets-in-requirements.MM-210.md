@@ -25,7 +25,8 @@ step with the ticket it illustrates.
 - **This is a standing agreement for every agent, not a one-time cleanup.**
 - **An asset that cannot be confidently given to a ticket is recorded as
   unresolved, not guessed at.**
-- **Statuses are exploratory, proposed, accepted and superseded.**
+- **Statuses are exploratory, proposed, accepted and superseded.** MM-211
+  added `current`, for a drawing of what is built.
 
 Choices I made without asking (say if any is wrong):
 - **The folder is `requirements/ui-ux-assets/`.** It is the one folder under

@@ -54,3 +54,10 @@ preference and food repository contracts (memory and Drift), the migration test,
 
 Not built: sugars and saturated fat (the packs do not carry them), the Today summary and the add-food form following the level
 (only entry rows do), and the energy check already counts alcohol and fiber (MM-53) so needed no change. Not seen on the emulator.
+
+## UI/UX Assets
+
+- [Food](../ui-ux-assets/views/food.html#food-detail-full) — Current. Draws
+  FiberLine as built on 2026-10-11: with a guide. Drawn from the source alone;
+  not compared with the running app. It shows what exists and approves
+  nothing.

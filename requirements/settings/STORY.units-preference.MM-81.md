@@ -43,3 +43,11 @@ Scenario: Round trip
 - The widget test for the Progress tab runs in metric and saves a metric weigh-in. **Switching units in Settings has no test** (MM-93).
 - Height is shown in feet and inches in imperial; the rounding of inches can show "5 ft 12 in" for a height just under 6 ft. Fix when
   editing height is built (MM-83).
+
+## UI/UX Assets
+
+- [Settings](../ui-ux-assets/views/settings.html#settings-default) — Current.
+  Draws SettingsScreen as built on 2026-10-11: populated, own body fat, erase
+  confirm. Compared with a screenshot test of the built screen. Compared with
+  the screenshot test for the top of the page only. It shows what exists and
+  approves nothing.

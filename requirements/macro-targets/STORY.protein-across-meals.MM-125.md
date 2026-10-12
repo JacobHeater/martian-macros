@@ -86,3 +86,11 @@ Not built:
 - "Reference weight" is the trend weight; before the first weigh-in there is no marker.
 - Not seen on a device: the emulator had no food logged. The header's subtotal shortens with an ellipsis before it can push the
   add button off a narrow screen, which a test found it would otherwise do.
+
+## UI/UX Assets
+
+- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
+  MealSection as built on 2026-10-11: expanded, collapsed, copy to today,
+  entry removed. Compared with a screenshot test of the built screen. The
+  per-meal protein marker is not drawn. It shows what exists and approves
+  nothing.
