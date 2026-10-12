@@ -205,6 +205,24 @@ times a second instead of setting one timer for the whole rest, because a
 phone holds timers while its screen is off and the clock is right whenever
 it is next asked.
 
+**9. Settings, reminders, the health import and About (2026-10-12).**
+`apps/web/src/settings/` (appearance, units, activity and training, body
+fat, the profile and its corrections, the health check, nutrition detail,
+the easy-to-miss line, pause, reminders, Health Connect, erase),
+`apps/web/src/about/` (How this works, read from `docs/evidence.md`, which
+the app is now built with directly, so there is no copy to keep in step).
+The services gained the reminder scheduler, the health source, the evidence
+text and the build's environment; the app's state gained the health
+connection, the health sync (run when the app opens and comes forward) and
+keeping the phone's reminders equal to the plan. Until step 5 the app is
+given "no notifications" and "no health platform", which the screens say in
+words. 48 tests: the Flutter tests of `settings_flows`, `profile_correction`,
+`reminders`, `health_connect_section`, `health_import`, `how_this_works`,
+the Settings and Coach cases of `activity_and_theme`, and the cases of
+`imported_weigh_ins` that read the platform as the app opens. Carrying
+`profile_correction` over found MM-233, a fault in the React app's state
+that the Flutter app does not have; it is fixed with its own tests.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with

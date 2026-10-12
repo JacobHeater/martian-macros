@@ -50,7 +50,7 @@ export class StreamCell<T> extends Cell<Loadable<T>> {
       stop();
       this.sources.delete(source);
     }
-    for (const source of read) {
+    for (const source of read.keys()) {
       if (this.sources.has(source)) continue;
       let subscribed = false;
       const stop = source.subscribe(() => {

@@ -15,7 +15,7 @@ import { MmButton } from '../ui/MmButton';
 import { MmFab } from '../ui/MmFab';
 import { useOverlays } from '../ui/useOverlays';
 import { destinations } from './destinations';
-import { SettingsScreen } from './SettingsScreen';
+import { SettingsScreen } from '../settings/SettingsScreen';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
 import { useNavigator } from './useNavigator';

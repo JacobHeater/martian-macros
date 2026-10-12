@@ -3,6 +3,8 @@ import { SystemClock } from '../domain/integration/SystemClock';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
+import { NoHealthPlatform } from '../platform/NoHealthPlatform';
+import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../state/AppServices';
@@ -43,5 +45,10 @@ export async function openAppServices(): Promise<AppServices> {
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),
+    // Neither plugin is in the shell yet (MM-232, step 5).
+    reminderScheduler: new NoNotifications(),
+    healthSource: new NoHealthPlatform(),
+    evidence: () => import('./evidenceText').then((module) => module.evidenceText),
+    environment: import.meta.env.DEV ? 'dev' : 'prod',
   };
 }

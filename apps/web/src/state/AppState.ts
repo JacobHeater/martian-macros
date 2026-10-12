@@ -67,19 +67,25 @@ import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
 import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
 import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
+import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
+import type { HealthDataType } from '../healthIngest/HealthDataType';
+import { HealthImporter } from '../healthIngest/HealthImporter';
+import type { HealthSample } from '../healthIngest/HealthSample';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
 import { DerivedCell } from './DerivedCell';
+import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
+import { once } from './once';
 import { StreamCell } from './StreamCell';
 import { ValueCell } from './ValueCell';
 
@@ -294,6 +300,19 @@ export class AppState {
 
   /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
   readonly recompSignal: Cell<RecompSignal | undefined>;
+
+  /**
+   * The health platform as it stands (MM-68), read afresh whenever it is
+   * asked to be, so a permission taken away in the phone's settings is
+   * noticed. Undefined where there is no platform or it cannot be asked.
+   */
+  readonly healthConnection: Cell<Loadable<HealthConnection | undefined>>;
+
+  /** Counts the times the health platform has to be looked at again. */
+  private readonly healthLooks = new ValueCell(0);
+
+  /** The evidence register (MM-143), read from the Markdown it is written in. */
+  readonly evidenceRegister: Cell<Loadable<EvidenceRegister>>;
 
   /** Personal records by the id of the workout that set them (MM-92). Empty while the strength history loads. */
   readonly personalRecords: Cell<ReadonlyMap<number, readonly PersonalRecord[]>>;
@@ -718,6 +737,25 @@ export class AppState {
       });
     });
 
+    this.healthConnection = stream(() => {
+      // Read here so that asking for another look makes this ask again.
+      void this.healthLooks.value;
+      return once(async (): Promise<HealthConnection | undefined> => {
+        try {
+          const available = await s.healthSource.available();
+          const permitted = available.size === 0 ? new Set<HealthDataType>() : await s.healthSource.permitted();
+          const imported = new Map<HealthDataType, readonly HealthSample[]>();
+          for (const type of permitted) imported.set(type, await s.healthSamples.samples(type));
+          return { available, permitted, imported };
+        } catch {
+          // No platform on this kind of device, or its plugin is not there.
+          return undefined;
+        }
+      });
+    });
+
+    this.evidenceRegister = stream(() => once(async () => EvidenceRegister.parse(await s.evidence())));
+
     this.personalRecords = derived<ReadonlyMap<number, readonly PersonalRecord[]>>(() =>
       personalRecordsOf(of(this.strengthTrends) ?? []),
     );
@@ -735,6 +773,54 @@ export class AppState {
     });
 
     this.checkIn = this.makeCheckIn();
+  }
+
+  /** Looks at the health platform again: what it has, what is allowed, what has been imported. */
+  refreshHealthConnection(): void {
+    this.healthLooks.put(this.healthLooks.peek() + 1);
+  }
+
+  /**
+   * Reads what the user has allowed from the health platform (MM-68) and
+   * brings what is kept up to date. False when the platform could not be
+   * read, in which case nothing kept was changed.
+   *
+   * It is run while the app is on screen: when it opens, when it comes
+   * back to the front, and when asked for in Settings. The platform
+   * refuses to be read at any other time.
+   */
+  async syncHealth(): Promise<boolean> {
+    const { healthSource: source, healthSamples: store } = this.services;
+    let changed = false;
+    try {
+      const importer = new HealthImporter({ source, store });
+      for (const type of await source.permitted()) {
+        const result = await importer.import(type);
+        changed = changed || result.status === 'readAgain' || result.upserted > 0 || result.deleted > 0;
+      }
+      return true;
+    } catch {
+      // The platform could not be read, or there is none on this kind of device.
+      return false;
+    } finally {
+      // Only when something was read, so the screens that work from the
+      // weigh-ins are not made to reload every time the app comes forward.
+      if (changed) this.healthImported();
+      this.refreshHealthConnection();
+    }
+  }
+
+  /**
+   * Keeps what the phone has scheduled equal to the reminder plan for as
+   * long as the app is open (MM-146). The plan is remade whenever a
+   * setting or the data behind it changes, so a weigh-in cancels today's
+   * prompt. Until a reminder has been set there is no plan and the
+   * scheduler is never touched. Gives the way to stop.
+   */
+  keepRemindersScheduled(): () => void {
+    return this.reminderPlan.subscribe((plan) => {
+      if (plan !== undefined) void this.services.reminderScheduler.replaceAll(plan);
+    });
   }
 
   /** Reads again what the weekly volume is worked out from, after a read went wrong. */

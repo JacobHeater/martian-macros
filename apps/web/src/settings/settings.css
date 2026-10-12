@@ -1,0 +1,18 @@
+.settings-note {
+  margin: var(--space-8) 0 0;
+}
+.settings-about {
+  margin: var(--space-24) 0;
+  text-align: center;
+}
+.settings-sheet {
+  padding: var(--space-4) var(--space-16) var(--space-16);
+}
+.settings-fields {
+  display: flex;
+  gap: var(--space-12);
+}
+.settings-fields > * {
+  flex: 1;
+  min-width: 0;
+}

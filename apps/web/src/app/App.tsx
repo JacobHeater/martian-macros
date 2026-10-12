@@ -48,10 +48,21 @@ export function App({ services, systemBars, demo = false }: AppProps) {
   // The check-in runs for as long as the app is open, whatever screen is showing.
   useEffect(() => state.checkIn.start(), [state]);
 
-  // Roll the calendar day over if the app was left open overnight.
+  // Reminders follow the plan for as long as the app is open (MM-146).
+  useEffect(() => state.keepRemindersScheduled(), [state]);
+
+  // The health platform is read when the app opens (MM-68).
+  useEffect(() => {
+    void state.syncHealth();
+  }, [state]);
+
+  // Roll the calendar day over if the app was left open overnight, and
+  // read the health platform again when the app comes back to the front.
   useEffect(() => {
     const resumed = () => {
-      if (document.visibilityState === 'visible') state.refreshToday();
+      if (document.visibilityState !== 'visible') return;
+      state.refreshToday();
+      void state.syncHealth();
     };
     document.addEventListener('visibilitychange', resumed);
     return () => document.removeEventListener('visibilitychange', resumed);
