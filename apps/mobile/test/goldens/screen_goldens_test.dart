@@ -305,6 +305,21 @@ void main() {
     await shot(tester, 'workout_martian');
   }, skip: !linux);
 
+  // Asked for by both reviewers of workout logging (MM-212): a set being
+  // timed while the previous set's controls are open.
+  testWidgets('workout with a set being timed, dark', (tester) async {
+    final repos = await metricsFixture(dark: true);
+    await addTraining(repos, inProgress: true);
+    await open(tester, repos, tab: 'Train');
+    await tester.tap(find.byKey(const ValueKey('train-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('add-set-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start set'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'workout_set_running_dark');
+  }, skip: !linux);
+
   for (final (section, title) in [
     ('nutrition', 'Nutrition history'),
     ('measurements', 'Weight trend & uncertainty'),
@@ -640,6 +655,38 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('food-estimate')));
       await tester.pumpAndSettle();
       await shot(tester, 'add_food_estimate_dark');
+    }, skip: !linux);
+
+    // Asked for by both reviewers of the Add food sheet (MM-212): an entry
+    // typed with its numbers for one serving, opened again.
+    testWidgets('editing an entry typed per serving', (tester) async {
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const ValueKey('food-name')),
+        'Protein bar',
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('One serving'));
+      await tester.tap(find.text('One serving'));
+      await tester.pumpAndSettle();
+      for (final (key, value) in [
+        ('food-protein', '12'),
+        ('food-carbs', '22'),
+        ('food-fat', '7'),
+      ]) {
+        await tester.ensureVisible(find.byKey(ValueKey(key)));
+        await tester.enterText(find.byKey(ValueKey(key)), value);
+        await tester.pumpAndSettle();
+      }
+      await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
+      await tester.tap(find.byKey(const ValueKey('food-save')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Protein bar'), 200);
+      await tester.ensureVisible(find.text('Protein bar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Protein bar'));
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_edit_per_serving_dark');
     }, skip: !linux);
 
     testWidgets('editing a logged entry', (tester) async {
