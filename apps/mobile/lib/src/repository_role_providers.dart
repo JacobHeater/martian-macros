@@ -175,3 +175,11 @@ final customExerciseReaderProvider = Provider<CustomExerciseReader>(
 final customExerciseWriterProvider = Provider<CustomExerciseWriter>(
   (ref) => ref.watch(customExerciseRepositoryProvider),
 );
+
+final exerciseProgressionReaderProvider = Provider<ExerciseProgressionReader>(
+  (ref) => ref.watch(exerciseProgressionRepositoryProvider),
+);
+
+final exerciseProgressionWriterProvider = Provider<ExerciseProgressionWriter>(
+  (ref) => ref.watch(exerciseProgressionRepositoryProvider),
+);

@@ -31,3 +31,16 @@ choosing a sex, cannot proceed if under 18, and is never offered a goal their he
 ## Outcome
 Built and run on an Android emulator end to end: a 200 lb, 5 ft 11 in novice was recommended recomp and landed on Today with 2,473 kcal and
 172 g protein. Widget tests cover the male and female paths.
+
+## UI/UX Assets
+
+- [First launch and gates](../ui-ux-assets/views/onboarding.html) — Current.
+  Draws OnboardingScreen and WelcomeStep as built on 2026-10-11: seven steps,
+  Next off, Back, default. Frames: `#onboarding-sex`, `#onboarding-welcome`.
+  Compared with a screenshot test of the built screen. Compared with the
+  screenshot test for the first step. It shows what exists and approves
+  nothing.
+- [Flows](../ui-ux-assets/flows/index.html#first-launch) — Current. Draws the
+  "theme chooser, then onboarding, to the Dashboard" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.

@@ -182,7 +182,9 @@ void main() {
       ],
     );
     expect(a.diagnosis, StallDiagnosis.masked);
-    expect(a.waistChangeCm, closeTo(-2, 1e-9));
+    // Smoothed (MM-155): the middle of the last three, 90.6, against the
+    // entry three weeks back, 92.
+    expect(a.waistChangeCm, closeTo(-1.4, 1e-9));
     expect(a.expectedChangeKcal, isNull, reason: 'nothing to change');
   });
 

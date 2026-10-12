@@ -69,10 +69,32 @@ Built:
 - **Eating-disorder history**: the line is about logging only and never about weight, so it is shown to everyone.
 - Thresholds are in `StreakRule`. Tests: `logging_streak_test.dart` (engine) and `process_rewards_test.dart` (app).
 
+- **Personal records** (2026-10-11, `personalRecordsOf`, pure): a finished workout sets one when a lift's best estimated one-rep
+  max in it is higher than in every earlier session of that lift. A lift's first session sets none, matching the best is not one,
+  and a record stays one after a later session beats it. Shown as a "Personal record" card at the top of the workout that set it
+  ("Back squat: estimated max 122.5 kg, up from 116.7 kg.") and as "1 personal record" on its line in the workout list. No
+  confetti, no notification. Tests: `personal_records_test.dart` (engine and app).
+
 Not built:
 - **Protein days and weigh-ins as rewards**: the adherence card on the Coach screen already shows both as plain counts; no
   acknowledgement was added. A weigh-in count is left out of rewards altogether, as it can pull attention to the scale.
-- **Workouts and personal records**: they need the training log (MM-75, MM-77), so "the loudest moment in the app" does not exist yet.
+- A reward for workouts as such: the monthly report counts them (MM-33) and nothing more is said.
+- A personal record is not announced at the moment the workout is finished, beyond its mark in the list the user lands on, and
+  is not in the weekly or monthly summary.
+- For a bodyweight lift the estimate includes body weight, so a record there can come partly from a change on the scale. Nothing in
+  the wording refers to weight, so it is shown to everyone, including people with a history of an eating disorder; say if it
+  should not be.
 - **The weekly and monthly summaries** (MM-33) do not mention the streak yet.
 - A streak is computed from the last 60 days of food, so it cannot read past 60.
 - Not checked on a device.
+
+## UI/UX Assets
+
+- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-default) —
+  Current. Draws ProcessCard as built on 2026-10-11: a streak. Drawn from the
+  source alone; not compared with the running app. Hidden when there is no
+  streak. It shows what exists and approves nothing.
+- [Train](../ui-ux-assets/views/train.html#workout-default) — Current. Draws
+  WorkoutScreen as built on 2026-10-11: in progress, new, finished with a
+  record, delete confirm. Compared with a screenshot test of the built screen.
+  It shows what exists and approves nothing.

@@ -43,6 +43,29 @@ delegation and sequential fallback do not supersede the working agreements here.
   any standing rule the owner gave you that is not in this file. Update it in
   the same pull request as the work, and again before you finish, since a
   session can end without warning. Nothing private goes in it.
+- Keep HTML UI/UX assets with the requirements (MM-210). A screen prototype,
+  interaction demonstration, design exploration or visual specification
+  written as HTML lives in `requirements/ui-ux-assets/` and nowhere else, and
+  every ticket it supports links it under the exact heading
+  `## UI/UX Assets`, with its status and what it shows. Add the asset and its
+  links in the same pull request; when you change an asset materially, bring
+  its entries up to date. An asset you cannot confidently give to a ticket
+  goes on that folder's unresolved list, never to a guessed ticket. The
+  ticket stays the requirement: a linked asset approves nothing and proves
+  nothing about the app. The convention is in
+  [requirements/ui-ux-assets/README.md](requirements/ui-ux-assets/README.md);
+  `mm req` checks the bookkeeping.
+- Every view and reusable component has an HTML drawing (MM-211). The
+  library at `requirements/ui-ux-assets/index.html` draws the app as built,
+  and `coverage.json` beside it lists every widget file with the frame that
+  draws it. When you add a view, a component, a sheet or a dialog, draw it
+  with its states, add its manifest entry and link the sheet from its
+  tickets, in the same pull request; when you change how one looks or
+  behaves, change its drawing with it; when you remove one, remove its
+  frames and its entry. `mm req` fails on a widget file the manifest does
+  not list. A `Current` sheet shows what is built and nothing else: a
+  redesign goes on its own sheet, marked as a proposal, and a broken screen
+  is drawn broken and given a bug ticket.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
@@ -61,6 +84,12 @@ delegation and sequential fallback do not supersede the working agreements here.
 - Check open pull requests at the start and at the end of each session or
   turn: merge the green ones, and fix a failing one in a follow-up. Never sit
   waiting on CI in the middle of a session.
+- Between those two checks, `mm ci` can watch a pull request's checks in the
+  background and keep what it sees (`agents/ci-monitoring.md`). It adds to the
+  rules above and replaces none: the start and end checks stay mandatory,
+  nobody waits on CI, and merging stays your explicit action. Before merging,
+  read GitHub directly (`mm ci check <pr>`); a stored result, or one for an
+  older commit, is not enough.
 - Create the feature branch from a fresh `main` before editing anything. Stage
   files by name, never `git add -A`. No stash juggling. Never switch branches
   while a build is running. If work depends on an unmerged pull request, stack
@@ -70,7 +99,7 @@ delegation and sequential fallback do not supersede the working agreements here.
   package while another failed.
 - A change to how a screen looks is not done until you have looked at it on the
   emulator (or say plainly that you did not). How the app looks matters as much
-  as what it does.
+  as what it does. Its HTML drawing is looked at in a browser too (MM-211).
 - Check a new native plugin with a release build, not only a debug one.
 - Bugs found in passing still follow the rule above; the owner will walk
   through bugs and regressions at acceptance testing at the end, and until then

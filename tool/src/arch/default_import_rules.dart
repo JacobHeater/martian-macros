@@ -9,11 +9,24 @@ const defaultImportRules = <ForbiddenImportRule>[
       'package:drift_flutter',
       'package:mm_data',
       'package:mm_fixtures',
+      'package:mm_health_ingest/mm_health_ingest_testing.dart',
     ],
     reason:
-        'the app depends on repository interfaces, never on a database; only '
-        'repository_providers.dart chooses an implementation',
+        'the app depends on repository interfaces, never on a database or a '
+        'test stand-in; only repository_providers.dart chooses an '
+        'implementation',
     allowedFiles: ['apps/mobile/lib/src/repository_providers.dart'],
+  ),
+  ForbiddenImportRule(
+    appliesTo: 'apps/mobile/lib/',
+    forbidden: ['package:health/'],
+    reason:
+        'the health plugin sits behind HealthSource; only the Health Connect '
+        'adapter knows it',
+    allowedFiles: [
+      'apps/mobile/lib/src/health/health_connect_sample.dart',
+      'apps/mobile/lib/src/health/health_connect_source.dart',
+    ],
   ),
   ForbiddenImportRule(
     appliesTo: 'packages/domain/lib/',
@@ -60,5 +73,18 @@ const defaultImportRules = <ForbiddenImportRule>[
     reason:
         'the food pipeline is a pure Dart developer tool: it builds packs and '
         "never touches the user's database or the app",
+  ),
+  ForbiddenImportRule(
+    appliesTo: 'packages/health_ingest/lib/',
+    forbidden: [
+      'package:flutter',
+      'package:drift',
+      'package:health',
+      'package:mm_data',
+      'package:mm_fixtures',
+    ],
+    reason:
+        'the health seam is pure Dart: a platform plugin sits behind '
+        'HealthSource in the app, never in the interface',
   ),
 ];

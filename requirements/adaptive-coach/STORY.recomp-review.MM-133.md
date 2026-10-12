@@ -1,6 +1,6 @@
 ---
 id: MM-133
-status: proposed
+status: done
 component: adaptive-coach
 related: [MM-12, MM-21, MM-22, MM-25, MM-26, MM-32, MM-36, MM-77, MM-132, MM-134, MM-140, MM-155]
 ---
@@ -80,8 +80,41 @@ Scenario: No automatic change
   Then the goal and targets are unchanged until the user chooses
 ```
 
+## Progress
+Built (2026-10-11), while the product owner was away. The choices below are mine, made to match the thresholds `panel-measurement`
+set for the recomp signal (MM-32); say if any is wrong:
+- `recompReviewOf` in the engine and a card on the Coach screen, with the verdict, the period, and what was seen of weight, waist
+  and strength.
+- **A review stays up for two weeks** from each of week 8, week 12 and every 8 weeks after, and reads the stretch up to today, twelve
+  weeks of it at most. The weeks count from the last change to recomp, and a review is not shown during a pause.
+- **Waist** is judged as in MM-32, between the entries of the last 14 days and those within a week of the start of the period:
+  1.5 cm, or 2 cm when either end is one entry. Since 2026-10-11 it is MM-155's shared function (`waistChangeOf`) over the
+  period: smoothed ends, and 1.4 cm as the threshold.
+- **A lift rose or fell** when its smoothed estimated max moved 2.5% over the period; up is two lifts up and more up than down.
+- **What the table leaves open is "not working"**: a waist that went up, or strength that fell with weight held.
+- **The next goal for "not working"** is the goal the app would recommend today from body fat and training (MM-12). Where that is
+  still recomp, the review points at the training instead of another goal.
+- **A slow cut suggests fat loss only where a deficit is allowed.**
+
+- **In the monthly report** (2026-10-11): the report of the month a review fell due in shows it, as it stood on the last day of
+  that month it was on the Coach screen. A review carried over from the month before is not repeated. The next goal it names is
+  what the app would recommend today, since body fat on that day is not kept.
+
+Not built:
+- A button that changes the goal from the card: the goal is changed in Settings, as now.
+- The shared "no clear change" with the stall diagnosis (MM-140) waits for MM-155.
+- Not seen on the emulator: the demo data is not twelve weeks on recomp.
+
 ## Notes
 - Priority: should-have; needed by about week eight after launch for the users the product is aimed at.
 - Until the training log exists (MM-75) the strength signal is absent and the table reduces to waist and weight. The review must say that
   strength is the missing piece.
 - Shares its definition of "no clear change" with the stall diagnosis (MM-140), which covers fat loss.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-recomp-review) — Current.
+  Draws RecompReviewBody and RecompReviewCard as built on 2026-10-11: one
+  verdict, shown. Drawn from the source alone; not compared with the running
+  app. One of the verdicts is drawn. It shows what exists and approves
+  nothing.

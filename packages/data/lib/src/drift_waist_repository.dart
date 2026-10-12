@@ -19,17 +19,25 @@ final class DriftWaistRepository implements WaistRepository {
             WaistObservation(
               date: CalendarDate.fromEpochDay(r.epochDay),
               waistCm: r.waistCm,
+              readings: [?r.reading1Cm, ?r.reading2Cm, ?r.reading3Cm],
             ),
         ],
       );
 
   @override
-  Future<void> saveWaist(CalendarDate date, double waistCm) => _db
+  Future<void> saveWaist(
+    CalendarDate date,
+    double waistCm, {
+    List<double> readings = const [],
+  }) => _db
       .into(_db.waistEntries)
       .insertOnConflictUpdate(
         WaistEntriesCompanion.insert(
           epochDay: Value(date.epochDay),
           waistCm: waistCm,
+          reading1Cm: Value(readings.elementAtOrNull(0)),
+          reading2Cm: Value(readings.elementAtOrNull(1)),
+          reading3Cm: Value(readings.elementAtOrNull(2)),
         ),
       );
 }

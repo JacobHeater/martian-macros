@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
+import 'health/imported_weigh_ins_provider.dart';
+import 'health/merge_weigh_ins.dart';
 import 'integration_providers.dart';
 import 'repository_role_providers.dart';
 
@@ -34,9 +36,24 @@ final evidenceRegisterProvider = FutureProvider<EvidenceRegister>(
       EvidenceRegister.parse(await rootBundle.loadString('assets/evidence.md')),
 );
 
-final weightsProvider = StreamProvider<List<WeightObservation>>(
+/// The weigh-ins the user typed, and nothing imported.
+final typedWeightsProvider = StreamProvider<List<WeightObservation>>(
   (ref) => ref.watch(weightReaderProvider).watchWeights(),
 );
+
+/// The weigh-ins everything works from: what the user typed and, for any
+/// other day, the imported weigh-in that counts (MM-68, MM-71).
+final weightsProvider = StreamProvider<List<WeightObservation>>((ref) {
+  final imported = ref.watch(importedWeighInsProvider).value ?? const [];
+  final today = ref.watch(todayProvider);
+  return ref
+      .watch(weightReaderProvider)
+      .watchWeights()
+      .map(
+        (typed) =>
+            mergeWeighIns(typed: typed, imported: imported, today: today),
+      );
+});
 
 final weightEventsProvider = StreamProvider<List<WeightEvent>>(
   (ref) => ref.watch(weightEventReaderProvider).watchWeightEvents(),
@@ -305,8 +322,21 @@ final monthlyReportProvider = Provider.family<MonthlyReport?, int>((
     waist: waist,
     history: history,
     trend: ref.watch(coachProvider)?.trend ?? const [],
+    workouts: ref.watch(workoutsProvider).value ?? const [],
+    exercises: ref.watch(exercisesProvider),
+    // As the app would recommend today: body fat then is not kept.
+    recommendation: ref.watch(coachProvider)?.recommendation,
   );
 });
+
+/// The rep range and load step the user set, by exercise id (MM-79).
+final exerciseProgressionsProvider =
+    StreamProvider<Map<String, ExerciseProgression>>(
+      (ref) => ref
+          .watch(exerciseProgressionReaderProvider)
+          .watchExerciseProgressions()
+          .map((all) => {for (final p in all) p.exerciseId: p}),
+    );
 
 /// How many whole days the user has logged in a row (MM-92).
 final loggingStreakProvider = Provider<LoggingStreak>((ref) {

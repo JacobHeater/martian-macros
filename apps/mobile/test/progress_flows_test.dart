@@ -62,10 +62,66 @@ void main() {
           )
           .first,
     );
-    expect(find.textContaining('Latest:'), findsOneWidget);
-    expect(find.textContaining('since'), findsWidgets);
-    // 90 cm to 88.5 cm is a fall of 0.6 in.
-    expect(find.textContaining('−0.6 in'), findsOneWidget);
+    // 90 cm to 88.5 cm is a fall of 0.6 in, shown to the quarter inch.
+    expect(
+      find.text(
+        'Latest: 34.75 in on Oct 5. Down 0.5 in since you started. '
+        'Weekly is enough: the next is due Oct 12.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a waist difference inside the noise is no clear change', (
+    tester,
+  ) async {
+    await repos.weights.saveWeight(today, 82);
+    await repos.waist.saveWaist(today.addDays(-14), 90);
+    await repos.waist.saveWaist(today, 89.2);
+    await openProgress(tester);
+    await tester.scrollUntilVisible(
+      find.textContaining('Latest:'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ProgressScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(
+      find.textContaining('No clear change since you started'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('the waist start is the middle of the first three entries', (
+    tester,
+  ) async {
+    await repos.weights.saveWeight(today, 82);
+    for (final (ago, cm) in [
+      (70, 94.0),
+      (63, 92.0),
+      (56, 92.5),
+      (14, 90.0),
+      (7, 90.0),
+      (0, 90.0),
+    ]) {
+      await repos.waist.saveWaist(today.addDays(-ago), cm);
+    }
+    await openProgress(tester);
+    await tester.scrollUntilVisible(
+      find.textContaining('Latest:'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ProgressScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    // 92.5 cm to 90 cm is 2.5 cm, an inch.
+    expect(find.textContaining('Down 1 in since you started.'), findsOneWidget);
   });
 
   testWidgets('a waist measurement can be saved from its card', (tester) async {

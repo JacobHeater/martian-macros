@@ -1,7 +1,8 @@
 # Color and theme system
 
 Status: proposed values, checked numerically, **not yet reviewed rendered on a
-device**. Judge them in [palette-preview.html](palette-preview.html) before
+device**. Judge them in
+[palette-preview.html](../requirements/ui-ux-assets/palette-preview.html) before
 building. Every number below was computed (WCAG 2.x contrast; CIE L*; CVD
 simulation with the Machado 2009 matrices) rather than estimated.
 
@@ -10,7 +11,8 @@ simulation with the Machado 2009 matrices) rather than estimated.
 ### Approved Martian palette (MM-184)
 
 The owner approved the retro '90s concept in
-[palette-preview.html](palette-preview.html) as the **new-install default**.
+[palette-preview.html](../requirements/ui-ux-assets/palette-preview.html) as the
+**new-install default**.
 It is a deliberate alternative to the Light/Dark direction below, not a
 replacement for existing users' choices. New installations preview Martian,
 Light, Dark or System before onboarding, saving only on Continue. Settings

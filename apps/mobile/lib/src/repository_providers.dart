@@ -5,6 +5,7 @@ import 'package:mm_data/mm_data.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import 'demo/demo_configuration.dart';
 import 'integration_providers.dart';
@@ -98,6 +99,16 @@ final workoutRepositoryProvider = Provider<WorkoutRepository>(
 
 final customExerciseRepositoryProvider = Provider<CustomExerciseRepository>(
   (ref) => ref.watch(_driftRepositoriesProvider).customExercises,
+);
+
+final exerciseProgressionRepositoryProvider =
+    Provider<ExerciseProgressionRepository>(
+      (ref) => ref.watch(_driftRepositoriesProvider).exerciseProgressions,
+    );
+
+/// Where readings imported from a health platform are kept (MM-67).
+final healthSampleStoreProvider = Provider<HealthSampleStore>(
+  (ref) => ref.watch(_driftRepositoriesProvider).healthSamples,
 );
 
 final targetsHistoryRepositoryProvider = Provider<TargetsHistoryRepository>(

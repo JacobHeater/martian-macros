@@ -23,6 +23,7 @@ import '../ui/mm_slider.dart';
 import '../ui/mm_switch_row.dart';
 import '../ui/show_mm_confirm.dart';
 import 'profile_section.dart';
+import 'health_connect_section.dart';
 import 'reminders_section.dart';
 import 'theme_settings.dart';
 
@@ -181,6 +182,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const RemindersSection(),
+          const HealthConnectSection(),
           const GroupHeader('About'),
           MmListGroup(
             children: [

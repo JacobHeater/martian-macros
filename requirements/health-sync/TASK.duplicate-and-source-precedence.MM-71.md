@@ -1,6 +1,6 @@
 ---
 id: MM-71
-status: proposed
+status: in-progress
 component: health-sync
 related: [MM-66, MM-67, MM-16, MM-18, MM-34, MM-68, MM-69]
 ---
@@ -51,8 +51,39 @@ Scenario: Deterministic
   Then the same samples in any order give the same result
 ```
 
+## Progress
+Built (2026-10-11):
+- **`dailyWeighIns`** (pure, in `packages/health_ingest`): one imported weigh-in per day. The primary scale's readings count
+  before any other source's; among those, the first between 04:00 and 12:00 local time, otherwise the middle value. The same
+  readings in any order give the same answer.
+- **`primaryWeightSource`**: the source with the most weigh-ins in the last thirty days; a tie goes to the id that sorts first.
+- **A typed value wins**: `mergeWeighIns` in the app puts what the user typed over the import for that day; the import is kept.
+- **The weigh-in card says the reason**: "From Bathroom scale at 6:42 AM." or "The middle of 3 readings from Bathroom scale."
+
+Choices I made without asking (say if any is wrong):
+- **The middle of an even number of readings is half way between the middle two.**
+- **A middle value taken across two sources is said to be from "several sources".**
+- **The morning is 04:00 up to, not including, 12:00.**
+
+Not built:
+- **Changing the primary scale in Settings**: it is chosen automatically only.
+- Steps through the platform's own aggregation, and body fat tracked per source (MM-34): only weight is used so far.
+- A weigh-in window for people whose morning is not 04:00 to 12:00.
+
 ## Notes
 - "First morning reading" assumes a usual sleep schedule. A night-shift worker's morning is not 04:00 to 12:00; a setting for the weigh-in
   window is a small later addition.
 - When the primary scale changes, the trend filter will see a step if the scales disagree. The outlier rule (MM-18) absorbs a small one;
   a large one needs a per-source offset, which MM-34's design should cover for weight as well as body fat.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-default) — Current.
+  Draws ProgressScreen as built on 2026-10-11: populated, empty, typed,
+  imported, few weigh-ins. Compared with a screenshot test of the built
+  screen. It shows what exists and approves nothing.
+- [Settings](../ui-ux-assets/views/settings.html#settings-health-none) —
+  Current. Draws HealthConnectSection as built on 2026-10-11: some allowed,
+  none allowed, absent, refused, read failed. Drawn from the source alone; not
+  compared with the running app. Never seen on a real phone. It shows what
+  exists and approves nothing.

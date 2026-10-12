@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import '../format/fmt.dart';
+import '../format/imported_weigh_in_text.dart';
+import '../health/imported_weigh_ins_provider.dart';
 import '../providers.dart';
 import '../repository_role_providers.dart';
 import '../ui/info_card.dart';
@@ -10,8 +14,10 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/number_entry_card.dart';
 import 'progress_screen.dart';
+import 'recomp_signal_card.dart';
 import '../charts/trend_chart.dart';
 import '../charts/trend_stats.dart';
+import 'waist_entry_card.dart';
 import 'waist_summary.dart';
 import 'weight_events_card.dart';
 import 'strength_section.dart';
@@ -48,6 +54,20 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
     for (final w in weights) {
       if (w.date == today) todays = w;
     }
+    // Today's weigh-in came from the health platform unless one was typed.
+    final typedToday = (ref.watch(typedWeightsProvider).value ?? const []).any(
+      (w) => w.date == today,
+    );
+    DayWeighIn? importedToday;
+    if (!typedToday) {
+      for (final weighIn
+          in ref.watch(importedWeighInsProvider).value ??
+              const <DayWeighIn>[]) {
+        if (CalendarDate.fromDateTime(weighIn.day) == today) {
+          importedToday = weighIn;
+        }
+      }
+    }
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -60,7 +80,10 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
           initial: todays == null
               ? null
               : fmt.weightFromKg(todays.weightKg).toStringAsFixed(1),
-          hint: 'First thing in the morning, after the bathroom.',
+          hint: importedToday == null
+              ? 'First thing in the morning, after the bathroom.'
+              : '${importedWeighInText(importedToday)} Type a value to use '
+                    'yours instead.',
           onSave: (value) => ref
               .read(weightWriterProvider)
               .saveWeight(today, fmt.weightToKg(value)),
@@ -116,20 +139,26 @@ class ProgressScreenState extends ConsumerState<ProgressScreen> {
                 ),
         ),
         const WeightEventsCard(),
-        NumberEntryCard(
-          key: ValueKey('waist-${waist.length}-${fmt.units}'),
-          title: 'Waist',
-          unit: fmt.lengthUnit,
-          fieldKey: 'waist',
-          initial: null,
-          hint: waist.isEmpty
-              ? 'Measure at the navel, relaxed. Take three and enter the '
-                    'middle one. Once a week is plenty.'
-              : waistSummary(waist, fmt),
-          onSave: (value) => ref
-              .read(waistWriterProvider)
-              .saveWaist(today, fmt.lengthToCm(value)),
+        WaistEntryCard(
+          key: ValueKey('waist-${fmt.units}'),
+          unit: fmt.imperial ? 'inches' : 'centimeters',
+          summary: waist.isEmpty ? null : waistSummary(waist, fmt, today),
+          onSave: (readings) {
+            final cm = [for (final value in readings) fmt.lengthToCm(value)];
+            // Refused here, so it is refused whatever stores it.
+            if (cm.any(
+              (reading) =>
+                  reading < WaistObservation.minCm ||
+                  reading > WaistObservation.maxCm,
+            )) {
+              throw const FormatException('Not a waist measurement.');
+            }
+            return ref
+                .read(waistWriterProvider)
+                .saveWaist(today, middleReading(cm), readings: cm);
+          },
         ),
+        RecompSignalCard(fmt: fmt),
         const SizedBox(height: 16),
         const StrengthSection(),
       ],

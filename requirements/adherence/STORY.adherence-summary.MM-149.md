@@ -99,3 +99,10 @@ words. Tests: `adherence_summary_test.dart` in the engine and in the app.
 Not built: workouts (no training log yet), the summary beside the check-in summary (MM-138) and in the monthly report (MM-33), the
 pointer to the under-eating notice (MM-114), and higher days judged against their own targets (MM-124). The week is the seven days to
 yesterday, not the seven days before each check-in. The stall diagnosis and confidence do not read it yet (MM-140, MM-139).
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-default) — Current. Draws
+  AdherenceCard as built on 2026-10-11: populated. Drawn from the source
+  alone; not compared with the running app. It shows what exists and approves
+  nothing.

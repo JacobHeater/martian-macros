@@ -1,6 +1,6 @@
 ---
 id: MM-155
-status: proposed
+status: in-progress
 component: body-measurements
 related: [MM-154, MM-21, MM-32, MM-34, MM-93, MM-107, MM-129, MM-133, MM-140, MM-146, MM-156]
 ---
@@ -87,6 +87,50 @@ Scenario: Rounding
   Then waist is displayed to the nearest 0.5 cm or 0.25 in
 ```
 
+## Progress
+Built (2026-10-11), no schema change:
+- **The one function** (`waistChangeOf`, pure): down, up or no clear change over a period, with the figures. Each end is the middle
+  value of up to three entries: the latest three, and the three nearest the day compared with. A difference is a change only past
+  1.4 times the noise figure. "Since start" compares with the middle of the first three entries.
+- **Every feature that asks uses it**: the recomp signal (MM-32), the recomp review (MM-133) and the stall diagnosis's "masked"
+  branch (MM-140). Their own interim waist rules are gone.
+- **The waist card** says the latest measurement and "Down 2.5 cm since you started", "Up ...", or "No clear change since you
+  started", in place of latest minus the first reading ever. Shown to 0.5 cm or 0.25 in.
+
+Choices I made without asking (say if any is wrong):
+- **What counts as "now" and "then"**: the latest entry has to be from the last 14 days, and "now" uses no entry older than 21
+  days; "then" uses entries within 10 days of the day compared with. With neither, the answer is "not known", not "no change".
+- **No entry is at both ends.** With few entries each end gets fewer than three.
+- **Entries made so far count as the middle of three readings** (noise 1.0 cm, so 1.4 cm is a change), because that is what the
+  card has always asked for. Nothing records whether three were taken.
+
+Built (2026-10-11), schema 30:
+- **The entry takes three readings and stores their middle value**, with the three kept beside it (`reading1_cm` to `reading3_cm`
+  on the waist entry). One reading alone is a quick entry and is recorded as one. Two is neither and cannot be saved. Entries made
+  before this keep no readings; none are invented.
+- **The noise figure**: 1.0 cm for the middle of three; half as much again when either end of a comparison includes a single
+  reading (1.5 cm at the default); and from eight entries that carry their three readings, the user's own, the typical spread of
+  their readings in one sitting, never under 0.5 cm (`waistNoiseOf`).
+- **The card** says what a quick entry costs when one reading is typed, gives the protocol in words, and says when the next
+  measurement is due ("Weekly is enough: the next is due Oct 12").
+- A reading outside 30 to 300 cm is refused before it is stored, whatever stores it.
+
+- Seen on the Android emulator (2026-10-11): the card, the summary line, and saving 35.5, 36 and 35.25 in, which stored 35.5.
+  The demo database there was upgraded from schema 28 without error.
+
+More choices I made without asking:
+- **The user's own figure is the typical (middle) spread between the highest and lowest of three readings.** The ticket says "the
+  spread of that user's own repeat readings"; a standard deviation would be smaller and reports more changes.
+- **There is no "quick entry" switch**: typing one reading is the quick entry.
+- **A second entry on the same day replaces the first**, as before. The ticket's "a second entry within three days replaces
+  nothing and is stored" holds across days; the card says weekly is enough from the first entry.
+
+Not built:
+- **The protocol drawing**, shown the first three times.
+- **The chart** (entries as dots, a smoothed line, the noise band; 90 days and a year).
+- The monthly report still shows the month's first and last measurement (MM-33).
+- Widening the noise inside a cycle window (the ticket calls it optional).
+
 ## Notes
 - Priority: must-have before MM-32, MM-133 and MM-140's "masked" branch.
 - MM-21 records that waist has no test at all (MM-93). This ticket's tests cover that gap for the new behavior; the old card's are still
@@ -94,3 +138,10 @@ Scenario: Rounding
 - A measurement reminder is in MM-146.
 - For female profiles, waist also swings with the cycle (bloating). The cycle window (MM-19) could widen the noise for entries inside it,
   as it does for weight. Worth doing if cycle data exists; not required here.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-waist-entry) —
+  Current. Draws WaistEntryCard as built on 2026-10-11: empty, three readings,
+  one reading, refused value. Drawn from the source alone; not compared with
+  the running app. It shows what exists and approves nothing.

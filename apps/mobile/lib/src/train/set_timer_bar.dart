@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
 
 import '../format/elapsed_text.dart';
+import '../format/spoken_duration.dart';
 import '../theme/mm_colors_context.dart';
 import '../ui/mm_button.dart';
 import '../ui/mm_button_kind.dart';
@@ -13,7 +14,8 @@ import 'workout_controller_provider.dart';
 /// The set and rest timer of a workout in progress (MM-191), always in reach
 /// at the bottom of the screen. "Start set" starts timing a set; adding the
 /// set stops it and gives the set its start and end. From then the rest is
-/// counted, until the next set is started.
+/// counted, until the next set is started: up, or down to the target rest
+/// of the exercise just done, and up again once that is reached.
 class SetTimerBar extends ConsumerWidget {
   const SetTimerBar({required this.workout, super.key});
 
@@ -27,13 +29,7 @@ class SetTimerBar extends ConsumerWidget {
     final setStarted = workout.setStartedAt;
     final restStarted = restStartedAt(workout);
     final since = setStarted ?? restStarted;
-    final label = workout.paused
-        ? 'Paused'
-        : setStarted != null
-        ? 'Set'
-        : restStarted != null
-        ? 'Rest'
-        : 'Set timer';
+    final target = setStarted == null ? restTargetOf(workout) : null;
 
     return Material(
       color: colors.raised,
@@ -48,19 +44,59 @@ class SetTimerBar extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      label,
-                      key: const ValueKey('set-timer-label'),
-                      style: text.bodySmall?.copyWith(color: colors.text2),
-                    ),
                     Ticking(
-                      builder: (context, now) => Text(
-                        since == null || workout.paused
-                            ? elapsedText(Duration.zero)
-                            : elapsedText(now.difference(since)),
-                        key: const ValueKey('set-timer-time'),
-                        style: text.headlineSmall,
-                      ),
+                      builder: (context, now) {
+                        final counting = since != null && !workout.paused;
+                        final elapsed = counting
+                            ? now.difference(since)
+                            : Duration.zero;
+                        final left = counting && target != null
+                            ? target - elapsed
+                            : null;
+                        final down = left != null && left > Duration.zero;
+                        final shown = down ? left : elapsed;
+                        final aim = target == null
+                            ? ''
+                            : ' · ${elapsedText(target)} target';
+                        final label = workout.paused
+                            ? 'Paused'
+                            : setStarted != null
+                            ? 'Set'
+                            : restStarted == null
+                            ? 'Set timer'
+                            : left == null
+                            ? 'Rest'
+                            : down
+                            ? 'Rest left$aim'
+                            : 'Target rest reached$aim';
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Said once when it changes; the figure under
+                            // it changes every second and is read only
+                            // when asked for.
+                            Semantics(
+                              liveRegion: true,
+                              child: Text(
+                                label,
+                                key: const ValueKey('set-timer-label'),
+                                style: text.bodySmall?.copyWith(
+                                  color: colors.text2,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              elapsedText(shown),
+                              key: const ValueKey('set-timer-time'),
+                              semanticsLabel: down
+                                  ? '${spokenDuration(shown)} left'
+                                  : spokenDuration(shown),
+                              style: text.headlineSmall,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     if (setStarted != null)
                       Text(
