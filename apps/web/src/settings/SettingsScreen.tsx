@@ -1,4 +1,5 @@
 import { HowThisWorksScreen } from '../about/HowThisWorksScreen';
+import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
 import { DailyActivity } from '../domain/DailyActivity';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { TrainingStatus } from '../domain/TrainingStatus';
@@ -182,6 +183,13 @@ export function SettingsScreen() {
       </MmListGroup>
       <GroupHeader text="Data" />
       <MmListGroup>
+        <MmListRow
+          leadingIcon="download"
+          title="Food database"
+          subtitle="Optional download for barcode scanning. The only thing this app ever fetches."
+          trailing={chevron}
+          onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
+        />
         <MmListRow
           leadingIcon="shield"
           title="Stored only on this device"
