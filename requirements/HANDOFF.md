@@ -9,7 +9,7 @@ Last updated: 2026-10-11, by Copilot, Session 18.
 
 **Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) is being
 updated with the food-review work from #100, which is already merged to
-`main`. #81 remains a draft while the updated screenshots and CI are pending.
+`main`. #81 remains a draft while CI runs on the updated head.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -127,10 +127,12 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   marking hand-portion grams, totals, and saved summaries as estimates.
 - Enabled the three regression tests. `mm test apps/mobile` passed: 617 passed,
   67 skipped. `mm req`, `mm analyze`, and `mm format --check` passed.
-- The Add food opening screenshot golden still needs regeneration through the
-  Linux Update goldens workflow. `mm check`, updated PR CI, and an emulator
-  review remain outstanding. MM-218 to MM-221 remain proposed; no open product
-  decisions were silently made.
+- Linux Update goldens run 38197178829 passed; hash comparison found two
+  changed images, which were copied from its artifact after visual review.
+- `mm check` passed, exit 0 with `All checks passed.` Updated PR CI is pending.
+  No emulator was available; only a physical phone was connected, and it was
+  not used. MM-218 to MM-221 remain proposed; no open product decisions were
+  silently made.
 
 ## Session 17: 2026-10-11, Claude (why the panel missed the Add food concerns)
 
