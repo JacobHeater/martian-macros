@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MmButton } from './MmButton';
 import { MmClockTimeDialog } from './MmClockTimeDialog';
 import { MmDateDialog } from './MmDateDialog';
@@ -20,30 +20,30 @@ interface Snack {
 }
 
 /**
- * Gives every screen under it `useOverlays`, and draws whatever question or
- * short message is showing over them. One question at a time: a new one
- * replaces the one showing, which is answered as closed.
+ * Gives every screen under it `useOverlays`, and draws whatever questions
+ * and short message are showing over them. A question asked while another
+ * is showing goes over it, and the one underneath is as it was left when
+ * the one over it is answered.
  */
 export function MmOverlays({ children }: { children: ReactNode }) {
-  const [dialog, setDialog] = useState<ReactNode>(null);
+  const [dialogs, setDialogs] = useState<readonly { id: number; node: ReactNode }[]>([]);
+  const dialogCount = useRef(0);
   const [snack, setSnack] = useState<Snack>();
-  const dismissCurrent = useRef<(() => void) | undefined>(undefined);
   const snackCount = useRef(0);
 
   /** Shows what `render` draws and answers with what it is finished with. */
   const ask = useCallback(<T,>(render: (finish: (answer: T | undefined) => void) => ReactNode): Promise<T | undefined> => {
-    dismissCurrent.current?.();
     return new Promise<T | undefined>((resolve) => {
+      dialogCount.current += 1;
+      const id = dialogCount.current;
       let answered = false;
       const finish = (answer: T | undefined) => {
         if (answered) return;
         answered = true;
-        dismissCurrent.current = undefined;
-        setDialog(null);
+        setDialogs((current) => current.filter((dialog) => dialog.id !== id));
         resolve(answer);
       };
-      dismissCurrent.current = () => finish(undefined);
-      setDialog(render(finish));
+      setDialogs((current) => [...current, { id, node: render(finish) }]);
     });
   }, []);
 
@@ -155,7 +155,9 @@ export function MmOverlays({ children }: { children: ReactNode }) {
   return (
     <OverlaysContext.Provider value={overlays}>
       {children}
-      {dialog}
+      {dialogs.map((dialog) => (
+        <Fragment key={dialog.id}>{dialog.node}</Fragment>
+      ))}
       <div className="mm-snack-host" role="status" aria-live="polite">
         {snack === undefined ? null : (
           <div className="mm-snack" key={snack.id}>

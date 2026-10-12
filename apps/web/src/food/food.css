@@ -32,3 +32,152 @@
 .food-hero-confidence {
   margin-top: var(--space-8);
 }
+
+.food-line {
+  margin: var(--space-8) 0;
+}
+.food-label {
+  margin: 0 0 var(--space-4);
+  font: var(--type-label);
+}
+.food-no-hits {
+  padding: var(--space-12) 0;
+}
+.food-trust {
+  display: flex;
+  flex-direction: column;
+  color: var(--text3);
+  font: var(--type-caption);
+}
+.food-trust-doubtful {
+  color: var(--info);
+  font-weight: 600;
+}
+.food-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 56px;
+  padding: var(--space-8) 0;
+}
+.food-entry-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.food-entry-name {
+  font: var(--type-body);
+}
+.food-entry-line {
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.food-entry-portion {
+  color: var(--text3);
+}
+.food-entry-kcal {
+  font: var(--type-heading);
+}
+.food-entry-open {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.food-meal-head {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4) 0 0;
+}
+.food-meal-toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  min-height: 56px;
+  padding: var(--space-12) var(--space-16);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.food-meal-title {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.food-meal-name {
+  font: var(--type-label);
+}
+.food-meal-total {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.food-meal-marker {
+  display: inline-grid;
+  color: var(--text3);
+}
+.food-meal-entry {
+  display: flex;
+  align-items: center;
+  margin: 0 var(--space-16);
+  border-top: 1px solid var(--outline);
+}
+.food-complete-question {
+  margin: var(--space-12) 0 var(--space-8);
+}
+.food-easy-to-miss {
+  margin-bottom: var(--space-8);
+}
+/* Room for the last line to scroll clear of the floating action. */
+.food-fab-room {
+  height: 88px;
+}
+.food-sheet {
+  padding: var(--space-4) var(--space-16) var(--space-16);
+}
+.food-label-spaced {
+  margin-top: var(--space-12);
+}
+.food-chips {
+  margin-top: var(--space-8);
+}
+.food-fields {
+  display: flex;
+  gap: var(--space-8);
+}
+.food-fields > * {
+  flex: 1;
+  min-width: 0;
+}
+.food-fields > .food-field-wide {
+  flex: 1.5;
+}
+.food-totals {
+  margin: var(--space-12) 0 0;
+}
+.food-recents {
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+}
+.food-recents > * {
+  flex: none;
+}
+.food-ingredient-adder {
+  margin-top: var(--space-12);
+}

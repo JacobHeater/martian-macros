@@ -1,0 +1,37 @@
+import type { FixedClock } from '../../src/fixtures/FixedClock';
+import type { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
+import { FoodCatalog } from '../../src/foodCatalog/FoodCatalog';
+import { constant } from '../../src/lang/constant';
+import { NoCamera } from '../../src/platform/NoCamera';
+import type { AppServices } from '../../src/state/AppServices';
+
+/** The stores `repos` holds, with `clock`, as the app takes them. */
+export function servicesOf(repos: InMemoryRepositories, clock: FixedClock): AppServices {
+  // Never the device's camera in a test, and no food pack unless the test brings one.
+  const camera = new NoCamera();
+  return {
+    catalog: constant(new FoodCatalog([])),
+    barcodeScanner: camera,
+    labelReader: camera,
+    clock,
+    setup: repos.setup,
+    weights: repos.weights,
+    weightEvents: repos.weightEvents,
+    waist: repos.waist,
+    food: repos.food,
+    customFoods: repos.customFoods,
+    dayMarks: repos.dayMarks,
+    intake: repos.intake,
+    targets: repos.targets,
+    preferences: repos.preferences,
+    insightLog: repos.insightLog,
+    pauses: repos.pauses,
+    reminders: repos.reminders,
+    recovery: repos.recovery,
+    workouts: repos.workouts,
+    customExercises: repos.customExercises,
+    healthSamples: repos.healthSamples,
+    exerciseProgressions: repos.exerciseProgressions,
+    eraser: repos.eraser,
+  };
+}
