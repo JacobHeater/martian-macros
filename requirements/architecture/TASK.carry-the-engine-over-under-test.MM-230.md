@@ -81,7 +81,7 @@ Scenario: No Dart is left
 | food_catalog | 1,550 lines, 36 files | 17 + the download's | reading, searching and writing packs done; downloading a pack is not (see MM-231) | 25: 17 carried over, the manifest's 2, and 6 added |
 | fixtures | 3,541 lines, 54 files | | waits on MM-231 | |
 | data | 20,359 lines, 48 files (18,030 of them generated) | | waits on MM-231 | |
-| food_pipeline | 922 lines, 22 files | | waits on MM-231 | |
+| food_pipeline | 922 lines, 22 files | 30 | done, except its two command-line entry points, which move with the task runner | 36: all 30 carried over (one changed, below) and 6 added |
 | `mm` task runner | 8,361 lines | 191 | not started | |
 
 **Domain (2026-10-12):** `apps/web/src/domain/` and `apps/web/src/lang/`.
@@ -118,6 +118,23 @@ The type check is clean.
   digit-for-digit check, and that holding a reduction that cannot be held
   is refused (Dart checked that with an `assert`, which is off in a release
   build).
+- **The food pipeline builds what the Dart pipeline built.**
+  `test/foodPipeline/dartParity.test.ts` reads 230 invented candidates
+  (shared barcodes, older versions, bad check digits, missing and impossible
+  values, raw and cooked names) and compares the report and every row of
+  both packs with what the Dart package made of the same files, under each
+  of the three conflict rules. All equal. Not measured: a build from the
+  real sources. The Dart pipeline wrote a pack straight to disk; this one
+  builds it in memory and writes it out whole, and nobody has yet built the
+  full barcode pack that way, so whether it fits in memory is unknown.
+- One pipeline test changed: Dart installed a published pack through the
+  app's download code, which is not carried over yet (MM-231). The test now
+  unpacks the published file and reads it as a pack.
+- `mm food build` and `mm food publish` still run the Dart pipeline. They
+  switch when the task runner is converted.
+- Files that read and write disk live in a folder called `node`, and a test
+  fails if any other file imports a Node module or that folder, so a
+  developer tool cannot leak into the app.
 - One thing was learned the hard way and is now in the conventions table: a
   default on a destructured parameter also replaces a key given as
   `undefined`, which Dart's does not do for an explicit `null`. It bit a test

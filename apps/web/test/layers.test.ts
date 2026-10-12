@@ -13,6 +13,7 @@ const allowed: Record<string, readonly string[]> = {
   healthIngest: ['lang'],
   sql: ['lang'],
   foodCatalog: ['lang', 'sql'],
+  foodPipeline: ['lang', 'domain', 'foodCatalog', 'sql'],
 };
 
 /**
@@ -24,6 +25,13 @@ const adapters: Record<string, string> = {
   '@sqlite.org/sqlite-wasm': 'sql/wasm/',
   '@capacitor/core': 'platform/',
 };
+
+/**
+ * Node's own modules exist on a developer's machine and not in the app, so
+ * only a folder called `node` may import them: the file steps of a developer
+ * tool, which no screen can reach.
+ */
+const isNodeOnly = (file: string) => relative(src, file).split(sep).includes('node');
 
 const inFolder = (file: string, folder: string) => relative(src, file).split(sep).join('/').startsWith(folder);
 
@@ -58,6 +66,7 @@ describe('layers', () => {
           const target = specifier.startsWith('.') ? layerOf(resolve(dirname(file), specifier)) : specifier;
           const adapterFolder = adapters[specifier];
           if (adapterFolder !== undefined && inFolder(file, adapterFolder)) continue;
+          if (specifier.startsWith('node:') && isNodeOnly(file)) continue;
           if (target !== layer && !mayImport.includes(target)) {
             broken.push(`${relative(src, file)} imports ${specifier}`);
           }
@@ -66,6 +75,18 @@ describe('layers', () => {
       expect(broken).toEqual([]);
     });
   }
+
+  it('only a folder called node imports Node, and nothing outside it imports that folder', () => {
+    const broken: string[] = [];
+    for (const file of filesIn(src)) {
+      if (isNodeOnly(file)) continue;
+      for (const specifier of importsOf(file)) {
+        const reachesNode = specifier.startsWith('node:') || specifier.split('/').includes('node');
+        if (reachesNode) broken.push(`${relative(src, file)} imports ${specifier}`);
+      }
+    }
+    expect(broken).toEqual([]);
+  });
 
   for (const [library, folder] of Object.entries(adapters)) {
     it(`only ${folder} imports ${library}`, () => {
