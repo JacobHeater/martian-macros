@@ -188,7 +188,14 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   `apps/web/src/engine/`: all 567 of its tests are carried over with their
   expected values unchanged, and its simulator matches the Dart engine with
   no difference at all. Health import is done in `apps/web/src/healthIngest/`
-  with its 71 tests. The food catalog is next. Read
+  with its 71 tests.
+- **What is left of the Dart all touches SQLite** (food catalog, data layer,
+  fixtures, food pipeline), so it waits on MM-231: one `SqlDatabase` seam
+  with a WebAssembly adapter for tests and the browser and a native plugin
+  on the phone. Read its Progress first: Node's own SQLite has no FTS5 and
+  cannot read a food pack; the official SQLite WebAssembly build can, and
+  was tried. Whether a native plugin has FTS5 on Android is not verified.
+  The task runner (`tool/`) is the last Dart and waits for nothing. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
   it says how enums, nulls, dates, rounding and streams are written.
 - **The Dart stays until the switch** and is the reference. A fix made in
