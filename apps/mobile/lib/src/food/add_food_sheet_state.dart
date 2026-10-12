@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
+import '../charts/macro_split_chart.dart';
+
 import '../format/fmt.dart';
 import '../format/meal_label.dart';
 import '../format/parse_number.dart';
@@ -35,6 +37,7 @@ import 'scan/barcode_scan_step.dart';
 class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   final _search = TextEditingController();
   CatalogFood? _picked;
+  var _manualEntry = false;
   var _scanning = false;
   var _estimating = false;
   var _myFoods = false;
@@ -76,6 +79,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
     if (query != null) _search.text = query;
     if (widget.estimateSize != null) _estimating = true;
     if (entry == null) return;
+    _manualEntry = true;
     final portion = entry.portion;
     _name.text = entry.name;
     _source = entry.source;
@@ -212,6 +216,7 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
   }
 
   void _fill(FoodEntry e) => setState(() {
+    _manualEntry = true;
     String n(double v) =>
         v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(1);
     _name.text = e.name;
@@ -427,7 +432,10 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
             _myFoods = true;
             _labelBarcode = gtin;
           }),
-          onManual: () => setState(() => _scanning = false),
+          onManual: () => setState(() {
+            _scanning = false;
+            _manualEntry = true;
+          }),
           onBack: () => setState(() => _scanning = false),
         ),
       );
@@ -445,14 +453,14 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
         children: [
           Text(editing ? 'Edit food' : 'Add food', style: text.titleLarge),
           const SizedBox(height: 12),
-          if (!editing)
+          if (!editing && !_manualEntry)
             MmTextField(
               key: const ValueKey('food-search'),
               controller: _search,
               label: 'Search foods',
               onChanged: (_) => setState(() {}),
             ),
-          if (!editing && query.isEmpty)
+          if (!editing && !_manualEntry && query.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Wrap(
@@ -492,45 +500,43 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
                   : null,
               onLabelTap: null,
             ),
-          if (!editing && query.isNotEmpty) ...[
-            for (final f
-                in ref
-                    .watch(customFoodsProvider)
-                    .maybeWhen(
-                      data: (all) => all
-                          .where(
-                            (f) => f.name.toLowerCase().contains(
-                              query.toLowerCase(),
-                            ),
-                          )
-                          .toList(),
-                      orElse: () => const <CustomFood>[],
-                    ))
-              MmListRow(
-                key: ValueKey('custom-hit-${f.id}'),
-                title: f.name,
-                subtitle:
-                    '${f.kind == CustomFoodKind.recipe ? 'Your recipe' : 'Your food'} · '
-                    '${f.servingDescription} · ${Fmt.kcal(f.perServing.kcal)}',
-                onTap: () => setState(() => _pickedCustom = f),
+          if (!editing && !_manualEntry) ...[
+            if (query.isNotEmpty) ...[
+              for (final f
+                  in ref
+                      .watch(customFoodsProvider)
+                      .maybeWhen(
+                        data: (all) => all
+                            .where(
+                              (f) => f.name.toLowerCase().contains(
+                                query.toLowerCase(),
+                              ),
+                            )
+                            .toList(),
+                        orElse: () => const <CustomFood>[],
+                      ))
+                MmListRow(
+                  key: ValueKey('custom-hit-${f.id}'),
+                  title: f.name,
+                  subtitle:
+                      '${f.kind == CustomFoodKind.recipe ? 'Your recipe' : 'Your food'} · '
+                      '${f.servingDescription} · ${Fmt.kcal(f.perServing.kcal)}',
+                  onTap: () => setState(() => _pickedCustom = f),
+                ),
+              for (final e in matchingRecents)
+                MmListRow(
+                  title: e.name,
+                  subtitle: 'Your recent food · ${e.kcal.round()} kcal',
+                  onTap: () => _fill(e),
+                ),
+              FoodSearchResults(
+                query: query,
+                onPick: (food) => setState(() => _picked = food),
               ),
-            for (final e in matchingRecents)
-              MmListRow(
-                title: e.name,
-                subtitle: 'Your recent food · ${e.kcal.round()} kcal',
-                onTap: () => _fill(e),
-              ),
-            FoodSearchResults(
-              query: query,
-              onPick: (food) => setState(() => _picked = food),
-              onEnterManually: () => setState(() {
-                _name.text = query;
-                _search.clear();
-              }),
-            ),
-          ] else ...[
-            if (!editing && recents.isNotEmpty) ...[
+            ] else if (recents.isNotEmpty) ...[
               const SizedBox(height: 12),
+              Text('Recent foods', style: text.labelLarge),
+              const SizedBox(height: 4),
               SizedBox(
                 height: 40,
                 child: ListView.separated(
@@ -544,6 +550,26 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
                 ),
               ),
             ],
+            const SizedBox(height: 12),
+            MmButton(
+              key: const ValueKey('food-enter-manually'),
+              label: 'Enter manually',
+              kind: MmButtonKind.secondary,
+              expand: true,
+              onPressed: () => setState(() {
+                if (query.isNotEmpty) _name.text = query;
+                _search.clear();
+                _manualEntry = true;
+              }),
+            ),
+          ] else ...[
+            if (!editing)
+              MmButton(
+                key: const ValueKey('food-manual-back'),
+                label: 'Back to food choices',
+                kind: MmButtonKind.text,
+                onPressed: () => setState(() => _manualEntry = false),
+              ),
             ..._form(),
           ],
         ],
@@ -574,13 +600,32 @@ class AddFoodSheetState extends ConsumerState<AddFoodSheet> {
       MmTextField(
         key: const ValueKey('food-name'),
         controller: _name,
-        label: 'Food',
+        label: 'Food name',
         onChanged: (_) => setState(() {}),
       ),
       if (calc != null)
         ..._calculatedFields(text, calc)
       else
         ..._typedFields(text),
+      if (totals != null &&
+          totals.proteinG >= 0 &&
+          totals.carbsG >= 0 &&
+          totals.fatG >= 0) ...[
+        const SizedBox(height: 16),
+        Text('Macro split', style: text.labelLarge),
+        const SizedBox(height: 8),
+        MacroSplitChart(
+          key: const ValueKey('food-macro-preview'),
+          isPreview: true,
+          intake: IntakeDay(
+            date: _day,
+            kcal: totals.kcal,
+            proteinG: totals.proteinG,
+            carbsG: totals.carbsG,
+            fatG: totals.fatG,
+          ),
+        ),
+      ],
       const SizedBox(height: 16),
       Wrap(
         spacing: 8,

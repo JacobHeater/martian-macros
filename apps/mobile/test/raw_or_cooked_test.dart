@@ -160,6 +160,7 @@ void main() {
   ) async {
     await pick(tester, 'white rice', 'White rice, cooked');
     expect(find.text('Weighed as'), findsNothing, reason: 'a serving');
+    await tester.ensureVisible(find.text('Back to search'));
     await tester.tap(find.text('Back to search'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('food-search')), 'banana');

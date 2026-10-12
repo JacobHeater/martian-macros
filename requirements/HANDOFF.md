@@ -5,11 +5,13 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, Session 18.
+Last updated: 2026-10-11, by Copilot, Session 19.
 
-**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) is being
-updated with the food-review work from #100, which is already merged to
-`main`. #81 remains a draft while CI runs on the updated head.
+**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) remains a
+draft; #100 is already merged to `main`. Session 19's Add food,
+cross-app-usability work and MM-225 macro preview continue on
+`feature/mm205-expert-mobile-ux`. Linux screenshot baselines and updated PR CI
+are still pending.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -17,20 +19,26 @@ Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-223 (`mm req next` is the authority; MM-209 to MM-222
+**Next ticket ID.** MM-226 (`mm req next` is the authority; MM-209 to MM-225
 are taken).
 
 **HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
 from their tickets under `## UI/UX Assets` (MM-210). Every view and
 component has a drawing there, listed in `coverage.json` (MM-211); a UI
 change is not done until its drawing and manifest entry are changed with
-it. #81's Dashboard/Food entry-point changes and this session's Add food fixes
-are reflected in the drawings and manifest.
+it. #81's Dashboard/Food entry-point changes and MM-223's Add food
+discovery/manual-entry states are reflected in the drawings and manifest;
+Linux golden images remain pending.
 
 **What to build next.**
+- Finish MM-223 verification after importing Linux goldens; review the
+  cross-app findings for MM-224 and give each a concrete disposition.
+- Continue cross-app hierarchy work under MM-224. The owner has approved this
+  as a standing mandate; do not ask whether to do it.
 - MM-214 and MM-215 remain ready to fix, each with a skipped test waiting.
-- MM-218 to MM-221 remain proposed Add food stories; confirm or change them
-  before implementing the broader sheet changes. MM-222 covers workout logging.
+- MM-218 to MM-222 remain proposed stories with individual behavior choices
+  unresolved. Ask only about a consequential choice that evidence cannot
+  settle; never treat the broader usability mandate as awaiting approval.
 - Health sync, what is left: see an import of a real reading on a phone
   whose Health Connect has data (not yet seen); choosing the primary scale
   in Settings (MM-71); background updates (MM-72); history beyond the
@@ -60,15 +68,12 @@ are reflected in the drawings and manifest.
 - MM-188 still needs phone checks: other apps' Health Connect segments, and
   how a written workout looks in each platform's own app. Owner accepted
   the exercise mappings for now.
-- **Usability, from the walkthrough reviews (Session 17). Each is a proposed
-  story; say accept, change or decline:** MM-218 (the sheet says what it will
-  log; includes whether typed numbers should default to "Everything I ate",
-  MM-167 decision 3), MM-219 (finding a food against typing one), MM-220 (the
-  action in view, a reason when it is off, a way out of the sheet), MM-221
-  (editing shows what was typed), MM-222 (a logged set looks logged; which
-  action leads on a workout).
-- Is `design/screen-direction.md` still the target for the Add food sheet,
-  and should Train have a section in it? The built screens match neither.
+- MM-218 to MM-222 contain unresolved, individual behavior choices. Present
+  a concrete, evidence-backed recommendation only when one blocks
+  implementation; the overall usability effort is not awaiting approval.
+- `design/screen-direction.md` does not describe the built Add food and Train
+  screens; reconcile it during evidence-led design rather than treating it as
+  an unresolved gate.
 - Needs a phone, nobody has checked: the rest signal with the display off;
   a screen-reader pass over Add food and a workout; both at large text; how
   the Add food sheet answers a drag or the back gesture.
@@ -83,6 +88,16 @@ appearing, ease-deficit offer, per-meal protein marker, resume-after-pause
 screen, palm portions, real-camera label reading. Tickets record limitations.
 
 **Standing owner rules beyond AGENTS.md.**
+- **Cross-app usability is a standing product mandate (MM-224, Session 19).**
+  Prevent choice overload and equal-weight card piles across Dashboard, Food,
+  Coach, Progress and Train. Research and apply professional information
+  hierarchy; do not use cards as the default wrapper. Do not ask the owner
+  again whether this class of usability work is warranted, and do not park an
+  obvious inspection finding just because no user study was run. Ask only
+  about a consequential product choice that evidence cannot settle.
+- Material screen reviews and redesigns use current, credible external
+  research and cite it. Distinguish built-screen evidence from a reference
+  drawing, and give every finding an explicit disposition.
 - Dashboard is metrics-heavy; synthetic seeds belong only to the separate
   demo app/database, never normal storage.
 - Horizon arc is the only calorie visual (MM-187). Dashboard, Food and Coach
@@ -112,6 +127,40 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Native plugins need release-build validation; iOS needs macOS.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
+
+## Session 19: 2026-10-11, Copilot (Add food and cross-app hierarchy)
+
+- Built MM-225's food-entry macro split pie using the shared 4/4/9 chart
+  without another card. Manual/recent/edit forms, food amount steps (including
+  selected cooking oil), and meal estimates preview the current food's macros.
+  Preview labels and semantics distinguish this from logged daily intake.
+  Tests verify sector values, live updates, serving scaling, empty/invalid
+  states, cooking oil/preparation, estimates, and enlarged-text semantics.
+  Added a focused Linux screenshot case and updated browser-inspected drawings.
+- The owner reaffirmed that pervasive card overload and choice paralysis are
+  a standing mandate, not a new approval question. Added this direction and
+  the external-research/evidence rule to the standing owner rules above.
+- Opened MM-224 for Dashboard, Food/Add food, Coach, Progress and Train,
+  making built-screen evidence, explicit finding outcomes and hierarchy
+  acceptance criteria part of the work. Linked MM-37 to it.
+- MM-223 separates food discovery (search and recents) from manual entry.
+  The form is reached with “Enter manually,” labels its field “Food name,”
+  and has a “Back to food choices” route. Search queries carry into the
+  manual name; choosing a recent item retains its existing typed-form route.
+  Added narrow-screen regression coverage and a manual-entry screenshot case.
+- `mm check` passed: mobile 627 passed, 69 skipped; 225 tickets valid;
+  formatting, analysis, architecture and all workspace checks passed.
+  No emulator was connected (only a physical phone, which was not used).
+- Requirements, implementation, tests, and the Add food drawing/manifest are
+  updated in the local worktree. Linux golden images have not been
+  generated/imported. `mm analyze` and `mm check` passed (`All checks
+  passed.`). The bounded cross-app panel survey is complete; its limits,
+  recommendations, and research caveats are recorded in MM-224. ACM pages
+  were not freshly retrievable, so DOI metadata and the prior research record
+  were used.
+- Continue on `feature/mm205-expert-mobile-ux`; Linux baseline generation and
+  PR CI are the remaining delivery checks. The broader MM-224 effort remains
+  open; the pie chart does not claim to resolve cross-app hierarchy.
 
 ## Session 18: 2026-10-11, Copilot (joining the meal-logging PRs)
 
@@ -168,32 +217,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Eight new screenshot tests (seven of the Add food sheet, one of a set being
   timed). The reference library's fields now take typing and its text scales
   alone.
-
-## Session 16: 2026-10-11, Claude (HTML reference library)
-
-- **MM-211, done.** `requirements/ui-ux-assets/index.html` opens an HTML
-  drawing of every view and component as built: eight view sheets, a
-  component catalog, a flows sheet. `coverage.json` lists all 165 widget
-  files with the frame that draws each, the states drawn, its tickets, how
-  it was checked and what limits it. 83 tickets link their drawings under
-  `## UI/UX Assets`, status `Current`.
-- **Standing rule (AGENTS.md):** a new view, component, sheet or dialog is
-  drawn, listed in the manifest and linked from its tickets in the same pull
-  request; a changed one is redrawn; a removed one loses its frames and its
-  entry. `mm req` fails on a widget file the manifest does not list, on an
-  entry pointing at a file, symbol, frame or ticket that does not exist,
-  and on a link to a frame that does not exist.
-- **How to add a frame:** sheets are built by `shared/mm.js` from helper
-  calls (`m.phone`, `m.info`, `m.row`, `m.frame('id', ...)`); copy a
-  neighboring frame. Styles and tokens are in `shared/mm.css`, copied from
-  `apps/mobile/lib/src/theme/`.
-- **Checked how:** 76 entries compared by eye with a screenshot test, 83
-  drawn from the source alone, 6 not drawn (hosts, the camera, the phone's
-  pickers) with the reason. Every sheet was opened in headless Edge. Nothing
-  was compared with the app on an emulator or phone.
-- **Corrections the comparison forced**, worth knowing when reading the
-  source for a drawing: confirm dialogs use the primary button, not a red
-  one; `showMmOptions` is a dialog, not a sheet; the download strip is at
-  the bottom of the screen; a lift's history is titled with the lift.
-- The session began by misreading the request as "track the HTML that
-  exists" (that is MM-210, Session 15). The owner meant "draw everything".

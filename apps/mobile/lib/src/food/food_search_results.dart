@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import '../food_packs/food_catalog_provider.dart';
-import '../ui/mm_button.dart';
-import '../ui/mm_button_kind.dart';
 import '../ui/mm_list_row.dart';
 import 'food_trust_mark.dart';
 
@@ -14,13 +12,11 @@ class FoodSearchResults extends ConsumerWidget {
   const FoodSearchResults({
     required this.query,
     required this.onPick,
-    required this.onEnterManually,
     super.key,
   });
 
   final String query;
   final ValueChanged<CatalogFood> onPick;
-  final VoidCallback onEnterManually;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,12 +35,6 @@ class FoodSearchResults extends ConsumerWidget {
                         'one in Settings, or enter the food yourself.'
                   : 'Nothing found for "${query.trim()}".',
               style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            MmButton(
-              label: 'Enter manually',
-              kind: MmButtonKind.secondary,
-              onPressed: onEnterManually,
             ),
           ],
         ),

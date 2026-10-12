@@ -8,9 +8,14 @@ import '../ui/macro_kind.dart';
 
 /// The 4/4/9 energy split of logged macros, not percentages of target grams.
 class MacroSplitChart extends StatelessWidget {
-  const MacroSplitChart({super.key, required this.intake});
+  const MacroSplitChart({
+    super.key,
+    required this.intake,
+    this.isPreview = false,
+  });
 
   final IntakeDay intake;
+  final bool isPreview;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +30,12 @@ class MacroSplitChart extends StatelessWidget {
     };
     final total = energy.values.reduce((a, b) => a + b);
     if (total == 0) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Text(
-          'Log macro amounts to see your protein, carbs and fat split.',
+          isPreview
+              ? 'Enter macro amounts to preview the protein, carbs and fat split.'
+              : 'Log macro amounts to see your protein, carbs and fat split.',
         ),
       );
     }
@@ -50,7 +57,9 @@ class MacroSplitChart extends StatelessWidget {
           children: [
             Semantics(
               image: true,
-              label: 'Logged macronutrient energy split. ${labels.join('. ')}.',
+              label:
+                  '${isPreview ? 'Food preview' : 'Logged'} '
+                  'macronutrient energy split. ${labels.join('. ')}.',
               child: ExcludeSemantics(
                 child: SizedBox(
                   width: 112,
@@ -98,7 +107,7 @@ class MacroSplitChart extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '${Fmt.kcal(total)} from recorded macros · '
+          '${Fmt.kcal(total)} from ${isPreview ? 'food' : 'recorded'} macros · '
           'protein/carbs 4 kcal/g, fat 9 kcal/g. '
           'Alcohol and other calorie differences are not part of this split.',
           style: Theme.of(context).textTheme.bodySmall
