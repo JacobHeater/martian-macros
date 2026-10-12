@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { ReactNode } from 'react';
 import type { MmMenuItem } from './MmMenuItem';
 
 /**
@@ -42,6 +43,12 @@ export interface Overlays {
 
   /** Asks for a time of day to the second. Gives milliseconds after midnight. */
   clockTime(question: { title: string; initialMs: number }): Promise<number | undefined>;
+
+  /**
+   * Brings a panel up from the bottom of the screen. `content` draws it and
+   * is given the way to close it, with an answer or without one.
+   */
+  sheet<T>(label: string, content: (close: (answer?: T) => void) => ReactNode): Promise<T | undefined>;
 
   /** Shows a short message at the bottom of the screen, optionally with one action (an "Undo", say). */
   snack(message: string, action?: { label: string; onAction: () => void }): void;

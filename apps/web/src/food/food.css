@@ -1,0 +1,34 @@
+.food-hero-figure {
+  display: block;
+  margin: 0;
+  font: var(--type-figure-xl);
+  text-align: center;
+}
+.food-hero-caption {
+  display: block;
+  margin: 0;
+  color: var(--text2);
+  text-align: center;
+}
+.food-hero-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.food-hero-macros {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-24);
+}
+.food-hero-status {
+  margin-top: var(--space-12);
+  border-top: 1px solid var(--outline);
+}
+.food-hero-confidence {
+  margin-top: var(--space-8);
+}

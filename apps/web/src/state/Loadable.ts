@@ -25,7 +25,7 @@ export const Loadable = {
   },
 
   /** Whether the read went wrong. */
-  hasFailed<T>(loadable: Loadable<T>): boolean {
+  hasFailed(loadable: Loadable<unknown>): boolean {
     return !loadable.ready && 'error' in loadable;
   },
 } as const;
