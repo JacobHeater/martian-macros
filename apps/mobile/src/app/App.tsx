@@ -1,6 +1,6 @@
 import { HardwareBack } from './HardwareBack';
 import { DownloadStatusHost } from '../foodPacks/DownloadStatusHost';
-import { useEffect, useMemo } from 'react';
+import { type ReactNode, useEffect, useMemo } from 'react';
 import type { SystemBars } from '../platform/SystemBars';
 import type { AppServices } from '../state/AppServices';
 import { AppState } from '../state/AppState';
@@ -23,10 +23,16 @@ interface AppProps {
   systemBars?: SystemBars | undefined;
   /** Marks every screen as showing synthetic data. */
   demo?: boolean;
+  /**
+   * Drawn beside the app's root, inside everything the app provides. The
+   * design register opens a screen from here (MM-237); the app itself
+   * passes nothing.
+   */
+  children?: ReactNode;
 }
 
 /** The app: its state over the stores it is given, its theme, and the screen that is due. */
-export function App({ services, systemBars, demo = false }: AppProps) {
+export function App({ services, systemBars, demo = false, children }: AppProps) {
   const state = useMemo(() => new AppState(services), [services]);
   const scope = useMemo(() => ({ services, state }), [services, state]);
 
@@ -76,6 +82,7 @@ export function App({ services, systemBars, demo = false }: AppProps) {
         <NavigatorHost>
           <HardwareBack />
           <AppRoot />
+          {children}
         </NavigatorHost>
       </DownloadStatusHost>
     </MmOverlays>

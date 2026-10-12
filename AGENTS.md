@@ -52,7 +52,10 @@ delegation and sequential fallback do not supersede the working agreements here.
   session can end without warning. Nothing private goes in it.
 - Design decisions are reviewed in Storybook (MM-237). The stories render
   the real tokens, icons and components the app ships, in every palette
-  (`mm storybook`, or `mm storybook build` for a static page). When you add
+  (`mm storybook`, or `mm storybook build` for a static page). Every
+  screen, sheet and step has a story too, in `src/gallery/screens/`: the
+  whole app over in-memory stores, opened at that screen. A new one with no
+  story fails the tests. When you add
   or change a component, change or add its story in the same pull request;
   a ticket that needs a design decision links the story under `## UI/UX`.
   The old HTML register (`requirements/ui-ux-assets/`, MM-210/MM-211) is
