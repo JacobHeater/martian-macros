@@ -5,7 +5,10 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-12, by Copilot, Session 19.
+Last updated: 2026-10-12, by Claude, Session 20.
+
+**The app is being rebuilt as a React HTML5 app (MM-228). Flutter work is
+frozen. Read Session 20 below before anything else.**
 
 **Delivery.** #81 is merged at `c226eb6`; #100 was already merged to `main`.
 The final verification was still in flight when the owner merged #81.
@@ -150,6 +153,26 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
+## Session 20: 2026-10-12, Claude (the move to a React HTML5 app)
+
+- **The product owner decided to rebuild the app as a React HTML5 app in a
+  native shell.** MM-228 is the epic: read it first. Offline stays a hard
+  requirement; the web is never a product; we write our own plugins where
+  none fits; everything on `main` at the decision is approved as it stands.
+- **Flutter work is frozen** except for a defect whose fix carries over. Do
+  not add or restyle Flutter screens. Do not patch the hand-drawn HTML
+  sheets to chase the Flutter app either; they are replaced as each
+  destination is rebuilt.
+- **New app work goes in `apps/web/`** (TypeScript, Vite, React, design
+  tokens as CSS variables, no UI kit; Capacitor as the shell).
+- **Order:** a walking skeleton (MM-229), then the engine under its Dart
+  tests (MM-230), data, screens starting with Food and Add food, phone
+  plugins, the switch, iOS.
+- **One agent owns the new app's structure at a time.** If you are not that
+  agent, work on a ticket inside what already exists and say so here.
+- #102 (Copilot's, green) was merged at the start of this session under the
+  standing rule.
+
 ## Session 19: 2026-10-11, Copilot (Add food and cross-app hierarchy)
 
 - Built MM-225's food-entry macro split pie using the shared 4/4/9 chart
@@ -205,38 +228,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   No emulator was available; only a physical phone was connected, and it was
   not used. MM-218 to MM-221 remain proposed; no open product decisions were
   silently made.
-
-## Session 17: 2026-10-11, Claude (why the panel missed the Add food concerns)
-
-- **MM-212, done.** An outside review of one sheet raised usability concerns
-  the owner already had; the panel's earlier audit (the MM-205 run, on #81's
-  branch) had not put them to the owner. Its records show the reviewers saw
-  part of it and filed it as an "unverified hypothesis" for want of observed
-  users; only confirmed defects were ticketed; nobody could see the sheet (no
-  screenshot test; the designer asked for one); and depth was never chosen.
-- **What changed in how the panel reviews** (`agents/review-contract.md`,
-  `agents/panel-protocol.md`; role files untouched):
-  a step-by-step **task walkthrough** of the built screen is evidence, with
-  its own finding class, *usability problem found by inspection*; the chair
-  names **depth targets by counting** controls and branches and gives each a
-  **render of the built screen**; reports say **walked or surveyed**; and
-  **every finding gets an outcome** (bug ticket, proposed story, owner
-  question, verified now, or rejected). "Needs verification" is not one.
-- **A drawing is not the screen.** The sheets in `requirements/ui-ux-assets/`
-  orient a reviewer; a walkthrough is done on screenshot tests or a device.
-  The first real screenshot of the Add food sheet showed a defect the drawing
-  did not have.
-- **Two runs under the new rules**, both valid with `mm panel <run>`:
-  `docs/agent-runs/mm212-add-food-walkthrough/` and
-  `docs/agent-runs/mm212-workout-logging-walkthrough/` (chosen by count, not
-  named by the owner). Reviewers were given tasks, never leads.
-- **Five defects, each with a test that failed once and is now skipped under
-  its ticket:** MM-213 (Saved and Estimate break mid-word), MM-214 (a reps
-  field shows what is not stored), MM-215 (removing a set cannot be undone),
-  MM-216 (changing the method clears the amount silently), MM-217 (a hand
-  portion of a found food reads as exact). None is fixed.
-- **Five proposed stories for the owner:** MM-218 to MM-221 (Add food) and
-  MM-222 (workout logging). Nothing in the app was changed.
-- Eight new screenshot tests (seven of the Add food sheet, one of a set being
-  timed). The reference library's fields now take typing and its text scales
-  alone.
