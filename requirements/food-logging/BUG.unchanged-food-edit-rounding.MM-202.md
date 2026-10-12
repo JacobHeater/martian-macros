@@ -1,6 +1,6 @@
 ---
 id: MM-202
-status: in-progress
+status: done
 component: food-logging
 related: [MM-167, MM-201]
 ---
@@ -14,8 +14,9 @@ MM-167 requires unchanged saves to preserve consumed totals.
 
 ## Description
 Preserve recorded precision on an unchanged edit, including fractional
-calculated servings and typed/legacy totals. Application fix is deferred:
-PR #79 is tooling only.
+calculated servings and typed/legacy totals. Fixed alongside MM-226's simple
+serving flow: edit seeds retain full numeric precision, including older
+serving entries converted from recorded totals.
 
 ## Acceptance Criteria
 ```gherkin
@@ -33,7 +34,10 @@ Scenario: Typed totals survive an unchanged edit
 ## Notes
 Guard: `MM-202 unchanged fractional calculated edit preserves nutrition` and
 `MM-202 unchanged legacy edit preserves recorded totals` in food_portion_test.
-Tests are skipped with this ID until the separately scoped application fix.
+Both guards are enabled alongside MM-226.
 Both widget guards ran before skipping and failed at the intended assertions:
 100 kcal became 99; legacy 100.123 became 100.1. Source inspection plus
 synthetic widget reproduction, not an emulator or production-data test.
+
+Verified with full `mm check`: both guards pass, alongside the complete mobile
+suite (633 passed, 65 skipped). No emulator/device verification.

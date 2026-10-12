@@ -1,6 +1,6 @@
 ---
 id: MM-204
-status: in-progress
+status: done
 component: food-logging
 related: [MM-167, MM-169, MM-201, MM-203]
 ---
@@ -31,3 +31,6 @@ Guard: `MM-204 converting calculated entry to totals preserves alcohol` in
 food_portion_test. Now enabled alongside MM-226.
 Owner ran the guard before skipping: energy remained 138 kcal but alcohol
 became null instead of 14 g. Synthetic widget reproduction, no device claim.
+
+The enabled guard now passes in full `mm check` (mobile 633 passed, 65
+skipped), preserving both consumed alcohol and energy during typed edits.
