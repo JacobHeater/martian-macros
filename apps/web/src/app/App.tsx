@@ -1,3 +1,4 @@
+import { DownloadStatusHost } from '../foodPacks/DownloadStatusHost';
 import { useEffect, useMemo } from 'react';
 import type { SystemBars } from '../platform/SystemBars';
 import type { AppServices } from '../state/AppServices';
@@ -70,9 +71,11 @@ export function App({ services, systemBars, demo = false }: AppProps) {
 
   const content = (
     <MmOverlays>
-      <NavigatorHost>
-        <AppRoot />
-      </NavigatorHost>
+      <DownloadStatusHost>
+        <NavigatorHost>
+          <AppRoot />
+        </NavigatorHost>
+      </DownloadStatusHost>
     </MmOverlays>
   );
   return <AppContext.Provider value={scope}>{demo ? <DemoNotice>{content}</DemoNotice> : content}</AppContext.Provider>;

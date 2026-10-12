@@ -1,10 +1,13 @@
 import type { FixedClock } from '../../src/fixtures/FixedClock';
 import { InMemoryReminderScheduler } from '../../src/fixtures/InMemoryReminderScheduler';
 import type { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
+import { InMemoryPackHttp } from '../../src/foodCatalog/download/InMemoryPackHttp';
+import { InMemoryPackStore } from '../../src/foodCatalog/download/InMemoryPackStore';
 import { FoodCatalog } from '../../src/foodCatalog/FoodCatalog';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { constant } from '../../src/lang/constant';
 import { NoCamera } from '../../src/platform/NoCamera';
+import { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../../src/state/AppServices';
 
 /** The stores `repos` holds, with `clock`, as the app takes them. */
@@ -13,6 +16,10 @@ export function servicesOf(repos: InMemoryRepositories, clock: FixedClock): AppS
   const camera = new NoCamera();
   return {
     catalog: constant(new FoodCatalog([])),
+    // Never the network in a test: nothing to fetch, and nowhere to fetch a list from.
+    packStore: new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes })),
+    packHttp: new InMemoryPackHttp(),
+    packManifestUrl: '',
     barcodeScanner: camera,
     labelReader: camera,
     // Never the device's vibration in a test.

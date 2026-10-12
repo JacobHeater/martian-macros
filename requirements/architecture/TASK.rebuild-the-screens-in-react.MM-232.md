@@ -223,6 +223,22 @@ the Settings and Coach cases of `activity_and_theme`, and the cases of
 `profile_correction` over found MM-233, a fault in the React app's state
 that the Flutter app does not have; it is fixed with its own tests.
 
+**10. Food packs (2026-10-12).** The download itself, which MM-230 had left
+in Dart: `apps/web/src/foodCatalog/download/` now has `PackDownload` (resume
+from what is kept, the checksum, unpacking, the check that it is a pack this
+app reads, and only then the swap), with the storage (`PackStore`) and the
+network (`PackHttp`) each behind an interface and an in-memory one of each
+for tests. `apps/web/src/foodPacks/`: the food database screen, the card for
+the download as it stands, the card for a pack on offer, and the strip
+shown on every screen while a download runs. The app's state holds the one
+download, the check of what is on offer and what is installed. 29 tests:
+the Dart tests of `pack_download` (the package's) and
+`pack_download_controller`, and the Flutter tests of `food_database`, which
+here run the real download over a file of the size the host serves where
+Flutter stood a fake controller in. The app is given no address to read a
+list from until step 5, so it makes no request; the screen says downloads
+are not set up.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
