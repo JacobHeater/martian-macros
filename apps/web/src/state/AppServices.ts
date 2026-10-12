@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
@@ -55,4 +56,7 @@ export interface AppServices {
   readonly catalog: Watched<FoodCatalog>;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
+
+  /** How the end of a rest is signalled (MM-191). */
+  readonly restSignal: RestSignal;
 }

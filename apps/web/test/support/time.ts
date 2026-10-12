@@ -1,0 +1,84 @@
+import { act, fireEvent, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, vi } from 'vitest';
+import type { FixedClock } from '../../src/fixtures/FixedClock';
+
+/**
+ * For a file of tests about running timers: the app's ticking is the
+ * test's to move.
+ */
+export function withTimersInHand(): void {
+  beforeEach(() => {
+    // Only what repeats: the app's running displays and its rest alarm tick
+    // on an interval. One-off timers are left alone, because the testing
+    // library waits on its own.
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+}
+
+/** Presses and types without a pause between, so it needs no timer. */
+export const user = userEvent.setup({ delay: null });
+
+/** Lets what was just done be saved and drawn. */
+export async function settle(): Promise<void> {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(0);
+  });
+}
+
+/**
+ * Lets `ms` pass on the app's clock, and `timersMs` for its timers: all of
+ * it by default, or a second when only the next tick of a display matters.
+ */
+export async function pass(clock: FixedClock, ms: number, timersMs: number = ms): Promise<void> {
+  clock.elapseMs(ms);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(timersMs);
+  });
+}
+
+export const seconds = (count: number) => count * 1000;
+export const minutes = (count: number) => count * 60000;
+
+/** Gives a time of day to the dialog that asks for one ("19:15"), and confirms it. */
+export async function enterTime(title: string, value: string): Promise<void> {
+  const dialog = await screen.findByRole('dialog', { name: title });
+  fireEvent.change(dialog.querySelector('input[type="time"]') as HTMLInputElement, { target: { value } });
+  await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+  await settle();
+}
+
+/** Gives a day to the dialog that asks for one ("2026-10-02"), and confirms it. */
+export async function enterDate(value: string): Promise<void> {
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.change(dialog.querySelector('input[type="date"]') as HTMLInputElement, { target: { value } });
+  await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+  await settle();
+}
+
+/** Types a time into the clock time entry of a set. With `confirm` false the dialog is left open. */
+export async function enterClock(
+  hour: number,
+  minute: number,
+  second = 0,
+  { period, confirm = true }: { period?: 'AM' | 'PM'; confirm?: boolean } = {},
+): Promise<HTMLElement> {
+  const dialog = await screen.findByRole('dialog', { name: /^Set (started|ended)$/ });
+  const type = async (label: string, value: number) => {
+    const field = within(dialog).getByRole('textbox', { name: label });
+    await user.clear(field);
+    await user.type(field, `${value}`);
+  };
+  await type('Hour', hour);
+  await type('Min', minute);
+  await type('Sec', second);
+  if (period !== undefined) await user.click(within(dialog).getByRole('button', { name: period }));
+  if (confirm) {
+    await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+    await settle();
+  }
+  return dialog;
+}

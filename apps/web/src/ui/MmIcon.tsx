@@ -10,6 +10,7 @@ const PATHS: Record<MmIconName, string> = {
     'M12 9a3 3 0 100 6 3 3 0 000-6zM10.3 3h3.4l.5 2.6 1.7 1 2.5-.9 1.7 3-2 1.7v2l2 1.7-1.7 3-2.5-.9-1.7 1-.5 2.6h-3.4l-.5-2.6-1.7-1-2.5.9-1.7-3 2-1.7v-2l-2-1.7 1.7-3 2.5.9 1.7-1z',
   back: 'M20 12H5M11 6l-6 6 6 6',
   plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
   chevronDown: 'M6 9l6 6 6-6',
   chevronLeft: 'M15 6l-6 6 6 6',
   chevronRight: 'M9 6l6 6-6 6',

@@ -8,6 +8,7 @@ export type MmIconName =
   | 'settings'
   | 'back'
   | 'plus'
+  | 'minus'
   | 'chevronDown'
   | 'chevronLeft'
   | 'chevronRight'

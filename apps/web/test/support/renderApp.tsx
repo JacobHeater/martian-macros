@@ -18,9 +18,16 @@ export function renderApp(
     systemBars,
     change,
     hour,
-  }: { systemBars?: SystemBars; change?: (services: AppServices) => AppServices; hour?: number } = {},
+    clock: given,
+  }: {
+    systemBars?: SystemBars;
+    change?: (services: AppServices) => AppServices;
+    hour?: number;
+    /** A clock already running, for an app opened again later the same day. */
+    clock?: FixedClock;
+  } = {},
 ) {
-  const clock = new FixedClock(today, hour === undefined ? {} : { hour });
+  const clock = given ?? new FixedClock(today, hour === undefined ? {} : { hour });
   const services = servicesOf(repos, clock);
   const view = render(<App services={change?.(services) ?? services} systemBars={systemBars} />);
   return { ...view, repos, clock, today };
