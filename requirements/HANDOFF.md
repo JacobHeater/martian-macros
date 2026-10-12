@@ -17,8 +17,10 @@ The precision fix MM-202 and five refreshed Linux screenshots continue on
 defects MM-203/MM-204 are fixed too; all four existing regression guards are
 enabled. Full local `mm check` passes (mobile 633 passed, 65 skipped).
 Linux run 38200742381 succeeded for #81's final source head `85f5542`;
-the five changed screenshots were visually inspected and imported. The
-follow-up still needs exact-head CI and merge. No emulator/device check.
+the five changed screenshots were visually inspected and imported. The follow-up is merged as #101 at `c324222`; CI was still running when
+last checked, not claimed green. No emulator/device check.
+MM-227 now corrects a confirmed HTML parity defect: amount-step Back to search
+was drawn full-width/centered despite the app's content-width left placement.
 Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 (#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
@@ -26,7 +28,7 @@ Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-227 (`mm req next` is the authority; MM-209 to MM-226
+**Next ticket ID.** MM-228 (`mm req next` is the authority; MM-209 to MM-227
 are taken).
 
 **HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
@@ -41,7 +43,8 @@ drawings and manifest. Linux golden images were inspected and imported.
 - MM-223 and MM-225 are verified with tests and Linux screenshots; device
   verification remains unavailable. Review the cross-app findings for MM-224
   and give each a concrete disposition.
-- Finish the serving-verification follow-up with green exact-head CI and merge.
+- Verify CI for merged #101; reconcile historical observations in MM-218 to
+  MM-221 with shipped changes rather than treating every old finding as open.
 - Continue cross-app hierarchy work under MM-224. The owner has approved this
   as a standing mandate; do not ask whether to do it.
 - MM-214 and MM-215 remain ready to fix, each with a skipped test waiting.
