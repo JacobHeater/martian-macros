@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'requirements_scan.dart';
 import 'ticket.dart';
+import 'ui_ux_assets.dart';
+import 'ui_ux_coverage.dart';
 
 /// The requirements tracker: validates `requirements/` against the rules in
 /// its README and answers questions about tickets.
@@ -17,6 +19,20 @@ Future<int> runRequirements(Directory repoRoot, List<String> args) async {
     return 66;
   }
   final scan = _scan(root);
+  final htmlFiles = await _htmlFiles(repoRoot);
+  if (htmlFiles == null) {
+    stderr.writeln(
+      'git could not list the HTML files, so HTML outside '
+      '$uiUxAssetsFolder/ was not checked (MM-210).',
+    );
+  }
+  scan.problems.addAll(uiUxAssetProblems(repoRoot, htmlFiles: htmlFiles));
+  scan.problems.addAll(
+    uiUxCoverageProblems(
+      repoRoot,
+      ticketIds: {for (final ticket in scan.tickets) ticket.id},
+    ),
+  );
 
   switch (args.firstOrNull) {
     case 'next':
@@ -140,6 +156,8 @@ RequirementsScan _scan(Directory root) {
       continue;
     }
     if (entity is! Directory) continue;
+    // The one folder that is not a component: the HTML assets (MM-210).
+    if ('requirements/$name' == uiUxAssetsFolder) continue;
     if (!RegExp(r'^[a-z0-9]+(-[a-z0-9]+)*$').hasMatch(name)) {
       problems.add('$name/: component folders are kebab-case.');
     }
@@ -231,6 +249,31 @@ RequirementsScan _scan(Directory root) {
   tickets.sort((a, b) => a.number.compareTo(b.number));
   final highest = tickets.isEmpty ? 0 : tickets.last.number;
   return (tickets: tickets, problems: problems, highestNumber: highest);
+}
+
+/// Every HTML file in the repository that git does not ignore, tracked or
+/// not, as paths from the root; null when git cannot say.
+Future<List<String>?> _htmlFiles(Directory repoRoot) async {
+  try {
+    final result = await Process.run('git', const [
+      'ls-files',
+      '--cached',
+      '--others',
+      '--exclude-standard',
+      '--',
+      '*.html',
+      '*.htm',
+    ], workingDirectory: repoRoot.path);
+    if (result.exitCode != 0) return null;
+    return [
+      for (final line in (result.stdout as String).split('\n'))
+        if (line.trim().isNotEmpty &&
+            File('${repoRoot.path}/${line.trim()}').existsSync())
+          line.trim(),
+    ];
+  } on ProcessException {
+    return null;
+  }
 }
 
 /// Reads `key: value` pairs between the leading `---` fences.

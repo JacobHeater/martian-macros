@@ -1,9 +1,14 @@
 import 'package:mm_domain/mm_domain.dart';
 
+import 'build_strength_trends.dart';
 import 'coach_constants.dart';
+import 'mode_recommendation.dart';
 import 'monthly_report.dart';
+import 'recomp_review.dart';
+import 'recomp_review_of.dart';
 import 'report_estimate.dart';
 import 'report_estimate_gap.dart';
+import 'report_lift.dart';
 import 'report_period.dart';
 import 'report_target_change.dart';
 import 'targets_record.dart';
@@ -23,6 +28,9 @@ MonthlyReport buildMonthlyReport({
   required List<WaistObservation> waist,
   required List<TargetsRecord> history,
   required List<WeightTrendPoint> trend,
+  List<Workout> workouts = const [],
+  List<Exercise> exercises = const [],
+  ModeRecommendation? recommendation,
 }) {
   bool inPeriod(CalendarDate d) =>
       !d.isBefore(period.from) && !d.isAfter(period.to);
@@ -110,8 +118,79 @@ MonthlyReport buildMonthlyReport({
     }
   }
 
+  // Strength as it stood at the end of the month, so a report reread later
+  // says what it said then.
+  final lifts =
+      <ReportLift>[
+        for (final lift in buildStrengthTrends(
+          workouts: workouts,
+          exercises: exercises,
+          weights: weights,
+          today: period.to,
+        ))
+          if (lift.points.where((p) => inPeriod(p.date)).toList()
+              case final month when month.length >= 2)
+            ReportLift(
+              name: lift.name,
+              sessions: month.length,
+              fromKg: month.first.trendKg,
+              toKg: month.last.trendKg,
+            ),
+      ]..sort((a, b) {
+        final sessions = b.sessions.compareTo(a.sessions);
+        return sessions != 0 ? sessions : a.name.compareTo(b.name);
+      });
+
+  // The recomp review that fell due in the month (MM-133): due on the
+  // first day of the month it would have been shown, and read on the last,
+  // when it had the most to go on.
+  RecompReview? recompReview;
+  if (recommendation != null) {
+    RecompReview? on(CalendarDate day, {bool full = true}) => recompReviewOf(
+      history: history,
+      trend: trend,
+      waist: full ? waist : const [],
+      strengthTrends: full
+          ? buildStrengthTrends(
+              workouts: workouts,
+              exercises: exercises,
+              weights: weights,
+              today: day,
+            )
+          : const [],
+      recommendation: recommendation,
+      today: day,
+    );
+    CalendarDate? shownUntil;
+    var dueInMonth = false;
+    // A review already showing when the month began fell due in the month
+    // before, and is in that report.
+    int? carriedOver;
+    for (var i = 0; i < ReportPeriod.days; i++) {
+      final day = period.from.addDays(i);
+      // Whether a review is due depends only on the goal's history.
+      final shown = on(day, full: false);
+      if (shown == null) {
+        if (dueInMonth) break;
+        continue;
+      }
+      if (!dueInMonth) {
+        if (i == 0 && on(day.addDays(-1), full: false)?.week == shown.week) {
+          carriedOver = shown.week;
+        }
+        if (shown.week == carriedOver) continue;
+        dueInMonth = true;
+      }
+      shownUntil = day;
+    }
+    if (shownUntil != null) recompReview = on(shownUntil);
+  }
+
   return MonthlyReport(
     period: period,
+    recompReview: recompReview,
+    workouts: workouts.where((w) => !w.inProgress && inPeriod(w.date)).length,
+    lifts: lifts,
     daysLogged: logged.length,
     completeDays: whole.length,
     weighIns: weighIns,

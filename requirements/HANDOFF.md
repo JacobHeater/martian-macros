@@ -5,49 +5,54 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Copilot, after checking PR #81 CI.
+Last updated: 2026-10-11, by Copilot, Session 18.
 
-**Panel and novice experience.** PR #79 merged to `main` at
-`44251604bac61bdc5dd9eb69bec045e13f7e2929`. MM-205's distinct UX/Product
-Designer guidance and bounded novice meal-logging audit are complete on
-`feature/mm205-expert-mobile-ux`. Copilot native picker/CLI/cloud enforcement
-remains untested; cup terminology research remains explicitly unverified.
+**Open pull requests.** #81 (novice meal logging, MM-205 to MM-208) is being
+updated with the food-review work from #100, which is already merged to
+`main`. #81 remains a draft while the updated screenshots and CI are pending.
+Session 13's pull requests (#90 to #94), the expert panel (#79), `mm ci`
+(#82, MM-209) and the usability-review work (#100, MM-212) are merged.
 
-**MM-206/207/208.** Dashboard Add food now targets today regardless of Food's
-retained historical date; Food's own action still targets the selected date.
-Meal rows have a named visible delete menu with Undo while swipe remains.
-Dashboard Add food is a labeled app-bar action, no longer obscuring the macro
-chart. All three regression guards are enabled and pass. MM-205 audit,
-research, decisions, and limits remain persisted in
-`docs/agent-runs/mm205-novice-mobile-experience/`. No Simple-mode chart policy
-change was made; existing MM-176/MM-179 behavior remains.
+**Database.** Schema 31 (a rep range and load step per exercise, MM-79),
+merged. Nothing in flight changes the schema. Only one schema change at a
+time.
 
-**Food audit follow-up.** MM-202, MM-203 and MM-204 record reproduced existing
-food-edit/alcohol defects; each has a skipped regression guard pending a
-separately scoped application fix. Other audit hypotheses and unreviewed
-areas are recorded in `docs/agent-runs/pr79-food-feature-audit/`.
+**Next ticket ID.** MM-223 (`mm req next` is the authority; MM-209 to MM-222
+are taken).
 
-**Branch state.** Strength #77, weekly volume #78 and typed-set overlap #80
-are green and merged. PR #79 merged to main at
-`44251604bac61bdc5dd9eb69bec045e13f7e2929`; this branch carries the MM-205
-panel work and its separately ticketed follow-up fixes.
+**HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
+from their tickets under `## UI/UX Assets` (MM-210). Every view and
+component has a drawing there, listed in `coverage.json` (MM-211); a UI
+change is not done until its drawing and manifest entry are changed with
+it. #81's Dashboard/Food entry-point changes and this session's Add food fixes
+are reflected in the drawings and manifest.
 
-**Database.** Schema 27 (pausing the workout clock, MM-191). No panel migration.
-Only one schema change in flight at a time.
-
-**Next ticket ID.** MM-209 (`mm req next` is the authority). Cloud panel's
-provisional MM-195 collided with training MM-195. Allocated MM-197 for the
-panel bug after inspecting fresh main; upstream MM-195/MM-196 are unchanged.
-
-**What to build next.** Continue WS-10: remaining rest countdown/signals and
-timing gaps (MM-191), then progression (MM-79). Food-log fixes MM-202/203/204
-remain separately ticketed follow-ups.
-Strength unlocks recomp (MM-133, MM-32) and remaining strength/PR parts of
-monthly reports/rewards (MM-33, MM-92). Phase planning (MM-36) needs body-fat
-estimates (MM-34). Health sync starts at the interface/fixture (MM-67);
-Android segments require app-owned native code later (MM-188, MM-189).
+**What to build next.**
+- MM-214 and MM-215 remain ready to fix, each with a skipped test waiting.
+- MM-218 to MM-221 remain proposed Add food stories; confirm or change them
+  before implementing the broader sheet changes. MM-222 covers workout logging.
+- Health sync, what is left: see an import of a real reading on a phone
+  whose Health Connect has data (not yet seen); choosing the primary scale
+  in Settings (MM-71); background updates (MM-72); history beyond the
+  first month (MM-73); the onboarding offer and the other kinds (MM-68).
+- MM-155, the rest: the protocol drawing and the waist chart. The shared
+  change function, the three-reading entry and the per-user noise figure
+  are built.
+- Small leftovers: MM-191's sound, background signal and free-typed rest
+  length; MM-155's protocol drawing and chart.
+- Blocked: phase planning (MM-36) needs body-fat estimates (MM-34); Android
+  exercise segments need app-owned native code (MM-188, MM-189).
 
 **Waiting on the product owner.**
+- Session 12 ran with the owner away, on the instruction to use the expert
+  panel. Every choice made that way is listed in its ticket under "Choices
+  made with the expert panel" or "Progress" (MM-191, MM-79, MM-32, MM-133,
+  MM-92, MM-67) and is the owner's to overturn.
+- MM-191: whether to add an audio package and a sound file for the end of a
+  rest (only a vibration is given now).
+- MM-92: a personal record on a bodyweight lift can come partly from a change
+  in body weight; it is shown to everyone, including people with a history
+  of an eating disorder, because the wording never mentions weight.
 - MM-173: noisy honest low intake is dropped as partial, drifting expenditure
   about 160 kcal high. Ticket lists four options; regression is skipped.
 - Android reminders are inexact, possibly an hour late. Exact timing needs
@@ -55,6 +60,20 @@ Android segments require app-owned native code later (MM-188, MM-189).
 - MM-188 still needs phone checks: other apps' Health Connect segments, and
   how a written workout looks in each platform's own app. Owner accepted
   the exercise mappings for now.
+- **Usability, from the walkthrough reviews (Session 17). Each is a proposed
+  story; say accept, change or decline:** MM-218 (the sheet says what it will
+  log; includes whether typed numbers should default to "Everything I ate",
+  MM-167 decision 3), MM-219 (finding a food against typing one), MM-220 (the
+  action in view, a reason when it is off, a way out of the sheet), MM-221
+  (editing shows what was typed), MM-222 (a logged set looks logged; which
+  action leads on a workout).
+- Is `design/screen-direction.md` still the target for the Add food sheet,
+  and should Train have a section in it? The built screens match neither.
+- Needs a phone, nobody has checked: the rest signal with the display off;
+  a screen-reader pass over Add food and a workout; both at large text; how
+  the Add food sheet answers a drag or the back gesture.
+- MM-210: whether the palette preview's Today mock is the reference for
+  the dashboard. It is linked only from the two color tickets.
 - Eating-disorder support wording in MM-114 lacks a reviewed helpline
   (MM-29, MM-96).
 
@@ -94,88 +113,85 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
 
-## Session 13: 2026-10-11, Copilot (implementing novice-experience findings)
+## Session 18: 2026-10-11, Copilot (joining the meal-logging PRs)
 
-- Implemented MM-206: Dashboard Add food explicitly targets today; Food
-  retains selected-day logging. Enabled the end-to-end regression covering
-  both routes and persisted dates.
-- Implemented MM-207: added a named, 48-by-48 design-system row menu with
-  Delete; swipe and Undo remain. Enabled the delete/Undo regression.
-- Implemented MM-208: moved Dashboard Add food to the labeled app bar so it
-  cannot overlay the macro chart. Enabled geometry and 1.5x text reachability
-  checks for all chart labels. Simple-mode chart behavior is unchanged.
-- Focused Dashboard/Food/insight/app tests passed (24 tests); the full mobile
-  suite passed (519 passed, 56 skipped). `mm format --check`, `mm analyze`,
-  `mm req`, `mm panel` and repository-wide `mm check` passed. No emulator or
-  native screen-reader check was performed.
-- Linux golden workflow 38112620983 succeeded. Imported and visually reviewed
-  the 15 changed Dashboard and meal-row screenshots from its artifact; these
-  include the app-bar Add food action and visible row menu. No Windows golden
-  baseline was used.
-- Commits `2a04f86`, `a54fe81` and `a1868a2` are pushed on
-  `feature/mm205-expert-mobile-ux`; draft PR #81 is open and mergeable. GitHub
-  CI on the golden-update commit is still in progress. Keep the PR in draft
-  until CI passes on the latest head.
+- PR #100 (MM-212) had already merged to `main`; brought that review contract,
+  screenshot tests, and reference-library changes into #81 by merging current
+  `main`. Resolved overlapping panel instructions by retaining #81's novice
+  audit guidance alongside #100's task-walkthrough rules.
+- Preserved #81's MM-206/207/208 entry-point fixes and updated the Add food
+  drawing/manifest for its changed UI.
+- Fixed MM-213 by letting the Scan/Saved/Estimate controls size to their
+  labels and wrap at 360 dp and 2.0x text. Fixed MM-216 by explaining when a
+  previously entered amount is cleared by changing methods. Fixed MM-217 by
+  marking hand-portion grams, totals, and saved summaries as estimates.
+- Enabled the three regression tests. `mm test apps/mobile` passed: 617 passed,
+  67 skipped. `mm req`, `mm analyze`, and `mm format --check` passed.
+- The Add food opening screenshot golden still needs regeneration through the
+  Linux Update goldens workflow. `mm check`, updated PR CI, and an emulator
+  review remain outstanding. MM-218 to MM-221 remain proposed; no open product
+  decisions were silently made.
 
-## Session 12: 2026-10-11, Copilot (novice mobile-experience audit)
+## Session 17: 2026-10-11, Claude (why the panel missed the Add food concerns)
 
-- Owner reports novice cognitive overload from card- and analysis-heavy
-  screens; this is a problem signal, not proof that cards or required metrics
-  are harmful. MM-205 keeps app redesign out of scope.
-- Product Designer and UX independently audited the existing novice
-  meal-log journey; they remained distinct. Chair-delegated source research
-  found indirect food-entry friction evidence but no direct novice
-  progressive-disclosure study or support for chart demotion.
-- Flutter corroborated Dashboard Add food using Food's retained historical
-  date; QA corroborated the visible deletion alternative rule and golden
-  overlap. Parent reproduced MM-206 wrong-day, MM-207 missing action and
-  MM-208 FAB overlap with targeted widget probes. Each is ticketed with a
-  skipped guard pending its own UI fix; no app behavior changed.
-- Persisted audit, source provenance, decisions, checkpoint and test results
-  in `docs/agent-runs/mm205-novice-mobile-experience/`. MM-49/MM-179 Simple
-  scope remains with the owner. Full `mm check` previously failed due Dart
-  VM/JIT crash; no claim that it passed.
-- Fixed guard syntax to `skip: true` with ticket IDs in comments; focused
-  Dashboard/Food tests passed with three tracked skips. Platform/device,
-  screen-reader and novice-user behavior remain unverified.
+- **MM-212, done.** An outside review of one sheet raised usability concerns
+  the owner already had; the panel's earlier audit (the MM-205 run, on #81's
+  branch) had not put them to the owner. Its records show the reviewers saw
+  part of it and filed it as an "unverified hypothesis" for want of observed
+  users; only confirmed defects were ticketed; nobody could see the sheet (no
+  screenshot test; the designer asked for one); and depth was never chosen.
+- **What changed in how the panel reviews** (`agents/review-contract.md`,
+  `agents/panel-protocol.md`; role files untouched):
+  a step-by-step **task walkthrough** of the built screen is evidence, with
+  its own finding class, *usability problem found by inspection*; the chair
+  names **depth targets by counting** controls and branches and gives each a
+  **render of the built screen**; reports say **walked or surveyed**; and
+  **every finding gets an outcome** (bug ticket, proposed story, owner
+  question, verified now, or rejected). "Needs verification" is not one.
+- **A drawing is not the screen.** The sheets in `requirements/ui-ux-assets/`
+  orient a reviewer; a walkthrough is done on screenshot tests or a device.
+  The first real screenshot of the Add food sheet showed a defect the drawing
+  did not have.
+- **Two runs under the new rules**, both valid with `mm panel <run>`:
+  `docs/agent-runs/mm212-add-food-walkthrough/` and
+  `docs/agent-runs/mm212-workout-logging-walkthrough/` (chosen by count, not
+  named by the owner). Reviewers were given tasks, never leads.
+- **Five defects, each with a test that failed once and is now skipped under
+  its ticket:** MM-213 (Saved and Estimate break mid-word), MM-214 (a reps
+  field shows what is not stored), MM-215 (removing a set cannot be undone),
+  MM-216 (changing the method clears the amount silently), MM-217 (a hand
+  portion of a found food reads as exact). None is fixed.
+- **Five proposed stories for the owner:** MM-218 to MM-221 (Add food) and
+  MM-222 (workout logging). Nothing in the app was changed.
+- Eight new screenshot tests (seven of the Add food sheet, one of a set being
+  timed). The reference library's fields now take typing and its text scales
+  alone.
 
-## Session 11: 2026-10-10, Copilot (merge confirmation)
+## Session 16: 2026-10-11, Claude (HTML reference library)
 
-- Owner confirmed switching to main and pulling. Verified clean `main` equals
-  `origin/main` at merge commit 44251604; GitHub reports #79 merged.
-- Updated this handoff: panel work is complete; no #79 blocker/merge exception
-  remains. MM-202/203/204 are separately deferred food behavior fixes.
-
-rformed WebSearch/WebFetch, then
-  a fresh Claude session resumed repository artifacts without chat/research
-  repetition. Unmodified resume profile exposed exactly five allowed tools.
-  Real sources/results/hashes persist in `docs/agent-runs/pr79-research-smoke/`;
-  templates remain inert. Copilot picker/CLI/cloud runtime was not exercised.
-- Native Claude isolated missing-doc smoke returned PANEL_CONFIG_MISSING,
-  stopped without review or fallback. Scoped validator review found MM-199
-  malformed-schema crash and MM-200 unexplained omissions; both reproduced
-  before fix, regression-tested and fixed. Full check passes (82 tool tests,
-  25 panel cases). Earlier PowerShell stream-redirection aborted on expected
-  negative-fixture stderr; OS-level redirection ran the real gate successfully.
-- Owner added MM-201: every role audits existing code, requirements, tests and
-  docs before proposals. Added audit modes, classified findings and portable
-  coverage; independent native nutrition and QA food-feature audits in flight.
-  Historical research run is explicitly stale for new instructions, retaining
-  applicable sources and real prior smoke results.
-- Nutrition audit returned classified findings/coverage. Parent reproduced
-  unchanged fractional/legacy rounding (MM-202) and per-serving alcohol mismatch
-  (MM-203). Added guards and skipped them with ticket IDs until separate app
-  fixes; no app implementation changed. Other gaps/hypotheses remain distinct.
-  Existing food tests pass (13, three tracked skips); full gate still passes.
-- QA completed independently and challenged recents interpretation. Shared
-  precision/alcohol causes deduplicated; distinct convert-to-totals alcohol
-  loss reproduced (MM-204) and guarded/skipped. No application fixes.
-  Real audit reports/state record inspected/uninspected layers, classifications,
-  dissent and owner executions. All native review processes quiescent.
-  Cup terminology request remains unverified: eCFR blocked, GovInfo unparsed.
-- Final post-QA full Windows check passed, exit 0 and All checks passed:
-  82 tool tests/25 panel cases. Saved research/audit runs validate. Four
-  reproduced app-bug guards are explicitly skipped; not claimed fixed.
-- Delivered merge commit 41ca7ae to original #79 branch, no force push.
-  PR description preserves original task and records actual checks, runtime
-  limits and deferred defects. Trusted CI ran on the merged PR head.
+- **MM-211, done.** `requirements/ui-ux-assets/index.html` opens an HTML
+  drawing of every view and component as built: eight view sheets, a
+  component catalog, a flows sheet. `coverage.json` lists all 165 widget
+  files with the frame that draws each, the states drawn, its tickets, how
+  it was checked and what limits it. 83 tickets link their drawings under
+  `## UI/UX Assets`, status `Current`.
+- **Standing rule (AGENTS.md):** a new view, component, sheet or dialog is
+  drawn, listed in the manifest and linked from its tickets in the same pull
+  request; a changed one is redrawn; a removed one loses its frames and its
+  entry. `mm req` fails on a widget file the manifest does not list, on an
+  entry pointing at a file, symbol, frame or ticket that does not exist,
+  and on a link to a frame that does not exist.
+- **How to add a frame:** sheets are built by `shared/mm.js` from helper
+  calls (`m.phone`, `m.info`, `m.row`, `m.frame('id', ...)`); copy a
+  neighboring frame. Styles and tokens are in `shared/mm.css`, copied from
+  `apps/mobile/lib/src/theme/`.
+- **Checked how:** 76 entries compared by eye with a screenshot test, 83
+  drawn from the source alone, 6 not drawn (hosts, the camera, the phone's
+  pickers) with the reason. Every sheet was opened in headless Edge. Nothing
+  was compared with the app on an emulator or phone.
+- **Corrections the comparison forced**, worth knowing when reading the
+  source for a drawing: confirm dialogs use the primary button, not a red
+  one; `showMmOptions` is a dialog, not a sheet; the download strip is at
+  the bottom of the screen; a lift's history is titled with the lift.
+- The session began by misreading the request as "track the HTML that
+  exists" (that is MM-210, Session 15). The owner meant "draw everything".

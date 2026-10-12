@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'recomp_review_body.dart';
 import '../format/fmt.dart';
 import '../format/monthly_report_text.dart';
 import '../providers.dart';
@@ -52,6 +53,33 @@ class MonthlyReportScreen extends ConsumerWidget {
               children: [for (final (a, b) in words.body) StatRow(a, b)],
             ),
           ),
+          if (report.recompReview case final review?)
+            InfoCard(
+              key: const ValueKey('report-recomp-review'),
+              title: 'Recomp review, week ${review.week}',
+              child: RecompReviewBody(
+                review: review,
+                fmt: Fmt(setup.unitSystem),
+              ),
+            ),
+          if (words.lifts.isNotEmpty)
+            InfoCard(
+              key: const ValueKey('report-lifts'),
+              title: 'Your lifts',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final (a, b) in words.lifts) StatRow(a, b),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Estimated one-rep max, smoothed over recent sessions, '
+                    'at the first and the last session of the month. It is '
+                    'worked out from reps and load, not tested.',
+                    style: text.bodySmall?.copyWith(color: context.mm.text2),
+                  ),
+                ],
+              ),
+            ),
           InfoCard(
             key: const ValueKey('report-estimate'),
             title: 'What the coach measured',

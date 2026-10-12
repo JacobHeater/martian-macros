@@ -4139,8 +4139,47 @@ class $WaistEntriesTable extends WaistEntries
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _reading1CmMeta = const VerificationMeta(
+    'reading1Cm',
+  );
   @override
-  List<GeneratedColumn> get $columns => [epochDay, waistCm];
+  late final GeneratedColumn<double> reading1Cm = GeneratedColumn<double>(
+    'reading1_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reading2CmMeta = const VerificationMeta(
+    'reading2Cm',
+  );
+  @override
+  late final GeneratedColumn<double> reading2Cm = GeneratedColumn<double>(
+    'reading2_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reading3CmMeta = const VerificationMeta(
+    'reading3Cm',
+  );
+  @override
+  late final GeneratedColumn<double> reading3Cm = GeneratedColumn<double>(
+    'reading3_cm',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    epochDay,
+    waistCm,
+    reading1Cm,
+    reading2Cm,
+    reading3Cm,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4167,6 +4206,24 @@ class $WaistEntriesTable extends WaistEntries
     } else if (isInserting) {
       context.missing(_waistCmMeta);
     }
+    if (data.containsKey('reading1_cm')) {
+      context.handle(
+        _reading1CmMeta,
+        reading1Cm.isAcceptableOrUnknown(data['reading1_cm']!, _reading1CmMeta),
+      );
+    }
+    if (data.containsKey('reading2_cm')) {
+      context.handle(
+        _reading2CmMeta,
+        reading2Cm.isAcceptableOrUnknown(data['reading2_cm']!, _reading2CmMeta),
+      );
+    }
+    if (data.containsKey('reading3_cm')) {
+      context.handle(
+        _reading3CmMeta,
+        reading3Cm.isAcceptableOrUnknown(data['reading3_cm']!, _reading3CmMeta),
+      );
+    }
     return context;
   }
 
@@ -4184,6 +4241,18 @@ class $WaistEntriesTable extends WaistEntries
         DriftSqlType.double,
         data['${effectivePrefix}waist_cm'],
       )!,
+      reading1Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading1_cm'],
+      ),
+      reading2Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading2_cm'],
+      ),
+      reading3Cm: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reading3_cm'],
+      ),
     );
   }
 
@@ -4196,12 +4265,34 @@ class $WaistEntriesTable extends WaistEntries
 class WaistRow extends DataClass implements Insertable<WaistRow> {
   final int epochDay;
   final double waistCm;
-  const WaistRow({required this.epochDay, required this.waistCm});
+
+  /// The readings the measurement was taken from (MM-155): all three, the
+  /// first alone for a quick entry, or none for an entry made before
+  /// readings were kept.
+  final double? reading1Cm;
+  final double? reading2Cm;
+  final double? reading3Cm;
+  const WaistRow({
+    required this.epochDay,
+    required this.waistCm,
+    this.reading1Cm,
+    this.reading2Cm,
+    this.reading3Cm,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['epoch_day'] = Variable<int>(epochDay);
     map['waist_cm'] = Variable<double>(waistCm);
+    if (!nullToAbsent || reading1Cm != null) {
+      map['reading1_cm'] = Variable<double>(reading1Cm);
+    }
+    if (!nullToAbsent || reading2Cm != null) {
+      map['reading2_cm'] = Variable<double>(reading2Cm);
+    }
+    if (!nullToAbsent || reading3Cm != null) {
+      map['reading3_cm'] = Variable<double>(reading3Cm);
+    }
     return map;
   }
 
@@ -4209,6 +4300,15 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return WaistEntriesCompanion(
       epochDay: Value(epochDay),
       waistCm: Value(waistCm),
+      reading1Cm: reading1Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading1Cm),
+      reading2Cm: reading2Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading2Cm),
+      reading3Cm: reading3Cm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reading3Cm),
     );
   }
 
@@ -4220,6 +4320,9 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return WaistRow(
       epochDay: serializer.fromJson<int>(json['epochDay']),
       waistCm: serializer.fromJson<double>(json['waistCm']),
+      reading1Cm: serializer.fromJson<double?>(json['reading1Cm']),
+      reading2Cm: serializer.fromJson<double?>(json['reading2Cm']),
+      reading3Cm: serializer.fromJson<double?>(json['reading3Cm']),
     );
   }
   @override
@@ -4228,17 +4331,38 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
     return <String, dynamic>{
       'epochDay': serializer.toJson<int>(epochDay),
       'waistCm': serializer.toJson<double>(waistCm),
+      'reading1Cm': serializer.toJson<double?>(reading1Cm),
+      'reading2Cm': serializer.toJson<double?>(reading2Cm),
+      'reading3Cm': serializer.toJson<double?>(reading3Cm),
     };
   }
 
-  WaistRow copyWith({int? epochDay, double? waistCm}) => WaistRow(
+  WaistRow copyWith({
+    int? epochDay,
+    double? waistCm,
+    Value<double?> reading1Cm = const Value.absent(),
+    Value<double?> reading2Cm = const Value.absent(),
+    Value<double?> reading3Cm = const Value.absent(),
+  }) => WaistRow(
     epochDay: epochDay ?? this.epochDay,
     waistCm: waistCm ?? this.waistCm,
+    reading1Cm: reading1Cm.present ? reading1Cm.value : this.reading1Cm,
+    reading2Cm: reading2Cm.present ? reading2Cm.value : this.reading2Cm,
+    reading3Cm: reading3Cm.present ? reading3Cm.value : this.reading3Cm,
   );
   WaistRow copyWithCompanion(WaistEntriesCompanion data) {
     return WaistRow(
       epochDay: data.epochDay.present ? data.epochDay.value : this.epochDay,
       waistCm: data.waistCm.present ? data.waistCm.value : this.waistCm,
+      reading1Cm: data.reading1Cm.present
+          ? data.reading1Cm.value
+          : this.reading1Cm,
+      reading2Cm: data.reading2Cm.present
+          ? data.reading2Cm.value
+          : this.reading2Cm,
+      reading3Cm: data.reading3Cm.present
+          ? data.reading3Cm.value
+          : this.reading3Cm,
     );
   }
 
@@ -4246,49 +4370,77 @@ class WaistRow extends DataClass implements Insertable<WaistRow> {
   String toString() {
     return (StringBuffer('WaistRow(')
           ..write('epochDay: $epochDay, ')
-          ..write('waistCm: $waistCm')
+          ..write('waistCm: $waistCm, ')
+          ..write('reading1Cm: $reading1Cm, ')
+          ..write('reading2Cm: $reading2Cm, ')
+          ..write('reading3Cm: $reading3Cm')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(epochDay, waistCm);
+  int get hashCode =>
+      Object.hash(epochDay, waistCm, reading1Cm, reading2Cm, reading3Cm);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WaistRow &&
           other.epochDay == this.epochDay &&
-          other.waistCm == this.waistCm);
+          other.waistCm == this.waistCm &&
+          other.reading1Cm == this.reading1Cm &&
+          other.reading2Cm == this.reading2Cm &&
+          other.reading3Cm == this.reading3Cm);
 }
 
 class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
   final Value<int> epochDay;
   final Value<double> waistCm;
+  final Value<double?> reading1Cm;
+  final Value<double?> reading2Cm;
+  final Value<double?> reading3Cm;
   const WaistEntriesCompanion({
     this.epochDay = const Value.absent(),
     this.waistCm = const Value.absent(),
+    this.reading1Cm = const Value.absent(),
+    this.reading2Cm = const Value.absent(),
+    this.reading3Cm = const Value.absent(),
   });
   WaistEntriesCompanion.insert({
     this.epochDay = const Value.absent(),
     required double waistCm,
+    this.reading1Cm = const Value.absent(),
+    this.reading2Cm = const Value.absent(),
+    this.reading3Cm = const Value.absent(),
   }) : waistCm = Value(waistCm);
   static Insertable<WaistRow> custom({
     Expression<int>? epochDay,
     Expression<double>? waistCm,
+    Expression<double>? reading1Cm,
+    Expression<double>? reading2Cm,
+    Expression<double>? reading3Cm,
   }) {
     return RawValuesInsertable({
       if (epochDay != null) 'epoch_day': epochDay,
       if (waistCm != null) 'waist_cm': waistCm,
+      if (reading1Cm != null) 'reading1_cm': reading1Cm,
+      if (reading2Cm != null) 'reading2_cm': reading2Cm,
+      if (reading3Cm != null) 'reading3_cm': reading3Cm,
     });
   }
 
   WaistEntriesCompanion copyWith({
     Value<int>? epochDay,
     Value<double>? waistCm,
+    Value<double?>? reading1Cm,
+    Value<double?>? reading2Cm,
+    Value<double?>? reading3Cm,
   }) {
     return WaistEntriesCompanion(
       epochDay: epochDay ?? this.epochDay,
       waistCm: waistCm ?? this.waistCm,
+      reading1Cm: reading1Cm ?? this.reading1Cm,
+      reading2Cm: reading2Cm ?? this.reading2Cm,
+      reading3Cm: reading3Cm ?? this.reading3Cm,
     );
   }
 
@@ -4301,6 +4453,15 @@ class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
     if (waistCm.present) {
       map['waist_cm'] = Variable<double>(waistCm.value);
     }
+    if (reading1Cm.present) {
+      map['reading1_cm'] = Variable<double>(reading1Cm.value);
+    }
+    if (reading2Cm.present) {
+      map['reading2_cm'] = Variable<double>(reading2Cm.value);
+    }
+    if (reading3Cm.present) {
+      map['reading3_cm'] = Variable<double>(reading3Cm.value);
+    }
     return map;
   }
 
@@ -4308,7 +4469,10 @@ class WaistEntriesCompanion extends UpdateCompanion<WaistRow> {
   String toString() {
     return (StringBuffer('WaistEntriesCompanion(')
           ..write('epochDay: $epochDay, ')
-          ..write('waistCm: $waistCm')
+          ..write('waistCm: $waistCm, ')
+          ..write('reading1Cm: $reading1Cm, ')
+          ..write('reading2Cm: $reading2Cm, ')
+          ..write('reading3Cm: $reading3Cm')
           ..write(')'))
         .toString();
   }
@@ -9430,8 +9594,25 @@ class $WorkoutExercisesTable extends WorkoutExercises
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _restTargetSecondsMeta = const VerificationMeta(
+    'restTargetSeconds',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, workoutId, position, exerciseId];
+  late final GeneratedColumn<int> restTargetSeconds = GeneratedColumn<int>(
+    'rest_target_seconds',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    workoutId,
+    position,
+    exerciseId,
+    restTargetSeconds,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -9471,6 +9652,15 @@ class $WorkoutExercisesTable extends WorkoutExercises
     } else if (isInserting) {
       context.missing(_exerciseIdMeta);
     }
+    if (data.containsKey('rest_target_seconds')) {
+      context.handle(
+        _restTargetSecondsMeta,
+        restTargetSeconds.isAcceptableOrUnknown(
+          data['rest_target_seconds']!,
+          _restTargetSecondsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -9496,6 +9686,10 @@ class $WorkoutExercisesTable extends WorkoutExercises
         DriftSqlType.string,
         data['${effectivePrefix}exercise_id'],
       )!,
+      restTargetSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rest_target_seconds'],
+      ),
     );
   }
 
@@ -9513,11 +9707,15 @@ class WorkoutExerciseRow extends DataClass
 
   /// The id of a built-in exercise or one of the user's own (MM-76).
   final String exerciseId;
+
+  /// The rest the user means to take after a set, if chosen (MM-191).
+  final int? restTargetSeconds;
   const WorkoutExerciseRow({
     required this.id,
     required this.workoutId,
     required this.position,
     required this.exerciseId,
+    this.restTargetSeconds,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -9526,6 +9724,9 @@ class WorkoutExerciseRow extends DataClass
     map['workout_id'] = Variable<int>(workoutId);
     map['position'] = Variable<int>(position);
     map['exercise_id'] = Variable<String>(exerciseId);
+    if (!nullToAbsent || restTargetSeconds != null) {
+      map['rest_target_seconds'] = Variable<int>(restTargetSeconds);
+    }
     return map;
   }
 
@@ -9535,6 +9736,9 @@ class WorkoutExerciseRow extends DataClass
       workoutId: Value(workoutId),
       position: Value(position),
       exerciseId: Value(exerciseId),
+      restTargetSeconds: restTargetSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restTargetSeconds),
     );
   }
 
@@ -9548,6 +9752,7 @@ class WorkoutExerciseRow extends DataClass
       workoutId: serializer.fromJson<int>(json['workoutId']),
       position: serializer.fromJson<int>(json['position']),
       exerciseId: serializer.fromJson<String>(json['exerciseId']),
+      restTargetSeconds: serializer.fromJson<int?>(json['restTargetSeconds']),
     );
   }
   @override
@@ -9558,6 +9763,7 @@ class WorkoutExerciseRow extends DataClass
       'workoutId': serializer.toJson<int>(workoutId),
       'position': serializer.toJson<int>(position),
       'exerciseId': serializer.toJson<String>(exerciseId),
+      'restTargetSeconds': serializer.toJson<int?>(restTargetSeconds),
     };
   }
 
@@ -9566,11 +9772,15 @@ class WorkoutExerciseRow extends DataClass
     int? workoutId,
     int? position,
     String? exerciseId,
+    Value<int?> restTargetSeconds = const Value.absent(),
   }) => WorkoutExerciseRow(
     id: id ?? this.id,
     workoutId: workoutId ?? this.workoutId,
     position: position ?? this.position,
     exerciseId: exerciseId ?? this.exerciseId,
+    restTargetSeconds: restTargetSeconds.present
+        ? restTargetSeconds.value
+        : this.restTargetSeconds,
   );
   WorkoutExerciseRow copyWithCompanion(WorkoutExercisesCompanion data) {
     return WorkoutExerciseRow(
@@ -9580,6 +9790,9 @@ class WorkoutExerciseRow extends DataClass
       exerciseId: data.exerciseId.present
           ? data.exerciseId.value
           : this.exerciseId,
+      restTargetSeconds: data.restTargetSeconds.present
+          ? data.restTargetSeconds.value
+          : this.restTargetSeconds,
     );
   }
 
@@ -9589,13 +9802,15 @@ class WorkoutExerciseRow extends DataClass
           ..write('id: $id, ')
           ..write('workoutId: $workoutId, ')
           ..write('position: $position, ')
-          ..write('exerciseId: $exerciseId')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('restTargetSeconds: $restTargetSeconds')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, workoutId, position, exerciseId);
+  int get hashCode =>
+      Object.hash(id, workoutId, position, exerciseId, restTargetSeconds);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9603,7 +9818,8 @@ class WorkoutExerciseRow extends DataClass
           other.id == this.id &&
           other.workoutId == this.workoutId &&
           other.position == this.position &&
-          other.exerciseId == this.exerciseId);
+          other.exerciseId == this.exerciseId &&
+          other.restTargetSeconds == this.restTargetSeconds);
 }
 
 class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
@@ -9611,17 +9827,20 @@ class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
   final Value<int> workoutId;
   final Value<int> position;
   final Value<String> exerciseId;
+  final Value<int?> restTargetSeconds;
   const WorkoutExercisesCompanion({
     this.id = const Value.absent(),
     this.workoutId = const Value.absent(),
     this.position = const Value.absent(),
     this.exerciseId = const Value.absent(),
+    this.restTargetSeconds = const Value.absent(),
   });
   WorkoutExercisesCompanion.insert({
     this.id = const Value.absent(),
     required int workoutId,
     required int position,
     required String exerciseId,
+    this.restTargetSeconds = const Value.absent(),
   }) : workoutId = Value(workoutId),
        position = Value(position),
        exerciseId = Value(exerciseId);
@@ -9630,12 +9849,14 @@ class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
     Expression<int>? workoutId,
     Expression<int>? position,
     Expression<String>? exerciseId,
+    Expression<int>? restTargetSeconds,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (workoutId != null) 'workout_id': workoutId,
       if (position != null) 'position': position,
       if (exerciseId != null) 'exercise_id': exerciseId,
+      if (restTargetSeconds != null) 'rest_target_seconds': restTargetSeconds,
     });
   }
 
@@ -9644,12 +9865,14 @@ class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
     Value<int>? workoutId,
     Value<int>? position,
     Value<String>? exerciseId,
+    Value<int?>? restTargetSeconds,
   }) {
     return WorkoutExercisesCompanion(
       id: id ?? this.id,
       workoutId: workoutId ?? this.workoutId,
       position: position ?? this.position,
       exerciseId: exerciseId ?? this.exerciseId,
+      restTargetSeconds: restTargetSeconds ?? this.restTargetSeconds,
     );
   }
 
@@ -9668,6 +9891,9 @@ class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
     if (exerciseId.present) {
       map['exercise_id'] = Variable<String>(exerciseId.value);
     }
+    if (restTargetSeconds.present) {
+      map['rest_target_seconds'] = Variable<int>(restTargetSeconds.value);
+    }
     return map;
   }
 
@@ -9677,7 +9903,8 @@ class WorkoutExercisesCompanion extends UpdateCompanion<WorkoutExerciseRow> {
           ..write('id: $id, ')
           ..write('workoutId: $workoutId, ')
           ..write('position: $position, ')
-          ..write('exerciseId: $exerciseId')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('restTargetSeconds: $restTargetSeconds')
           ..write(')'))
         .toString();
   }
@@ -10679,6 +10906,1038 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExerciseRow> {
   }
 }
 
+class $ImportedSamplesTable extends ImportedSamples
+    with TableInfo<$ImportedSamplesTable, ImportedSampleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImportedSamplesTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<HealthDataType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<HealthDataType>($ImportedSamplesTable.$convertertype);
+  static const VerificationMeta _platformIdMeta = const VerificationMeta(
+    'platformId',
+  );
+  @override
+  late final GeneratedColumn<String> platformId = GeneratedColumn<String>(
+    'platform_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startMsMeta = const VerificationMeta(
+    'startMs',
+  );
+  @override
+  late final GeneratedColumn<int> startMs = GeneratedColumn<int>(
+    'start_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMsMeta = const VerificationMeta('endMs');
+  @override
+  late final GeneratedColumn<int> endMs = GeneratedColumn<int>(
+    'end_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<String> sourceId = GeneratedColumn<String>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceNameMeta = const VerificationMeta(
+    'sourceName',
+  );
+  @override
+  late final GeneratedColumn<String> sourceName = GeneratedColumn<String>(
+    'source_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    type,
+    platformId,
+    value,
+    startMs,
+    endMs,
+    sourceId,
+    sourceName,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'imported_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ImportedSampleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('platform_id')) {
+      context.handle(
+        _platformIdMeta,
+        platformId.isAcceptableOrUnknown(data['platform_id']!, _platformIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_platformIdMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('start_ms')) {
+      context.handle(
+        _startMsMeta,
+        startMs.isAcceptableOrUnknown(data['start_ms']!, _startMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startMsMeta);
+    }
+    if (data.containsKey('end_ms')) {
+      context.handle(
+        _endMsMeta,
+        endMs.isAcceptableOrUnknown(data['end_ms']!, _endMsMeta),
+      );
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    if (data.containsKey('source_name')) {
+      context.handle(
+        _sourceNameMeta,
+        sourceName.isAcceptableOrUnknown(data['source_name']!, _sourceNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceNameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {type, platformId};
+  @override
+  ImportedSampleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ImportedSampleRow(
+      type: $ImportedSamplesTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      platformId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}platform_id'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}value'],
+      )!,
+      startMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ms'],
+      )!,
+      endMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ms'],
+      ),
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_id'],
+      )!,
+      sourceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_name'],
+      )!,
+    );
+  }
+
+  @override
+  $ImportedSamplesTable createAlias(String alias) {
+    return $ImportedSamplesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<HealthDataType, String, String> $convertertype =
+      const EnumNameConverter<HealthDataType>(HealthDataType.values);
+}
+
+class ImportedSampleRow extends DataClass
+    implements Insertable<ImportedSampleRow> {
+  final HealthDataType type;
+
+  /// The platform's own id for the reading.
+  final String platformId;
+
+  /// In the unit of [type].
+  final double value;
+  final int startMs;
+  final int? endMs;
+
+  /// The app or device that wrote it, and its name as shown.
+  final String sourceId;
+  final String sourceName;
+  const ImportedSampleRow({
+    required this.type,
+    required this.platformId,
+    required this.value,
+    required this.startMs,
+    this.endMs,
+    required this.sourceId,
+    required this.sourceName,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['type'] = Variable<String>(
+        $ImportedSamplesTable.$convertertype.toSql(type),
+      );
+    }
+    map['platform_id'] = Variable<String>(platformId);
+    map['value'] = Variable<double>(value);
+    map['start_ms'] = Variable<int>(startMs);
+    if (!nullToAbsent || endMs != null) {
+      map['end_ms'] = Variable<int>(endMs);
+    }
+    map['source_id'] = Variable<String>(sourceId);
+    map['source_name'] = Variable<String>(sourceName);
+    return map;
+  }
+
+  ImportedSamplesCompanion toCompanion(bool nullToAbsent) {
+    return ImportedSamplesCompanion(
+      type: Value(type),
+      platformId: Value(platformId),
+      value: Value(value),
+      startMs: Value(startMs),
+      endMs: endMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endMs),
+      sourceId: Value(sourceId),
+      sourceName: Value(sourceName),
+    );
+  }
+
+  factory ImportedSampleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ImportedSampleRow(
+      type: $ImportedSamplesTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+      platformId: serializer.fromJson<String>(json['platformId']),
+      value: serializer.fromJson<double>(json['value']),
+      startMs: serializer.fromJson<int>(json['startMs']),
+      endMs: serializer.fromJson<int?>(json['endMs']),
+      sourceId: serializer.fromJson<String>(json['sourceId']),
+      sourceName: serializer.fromJson<String>(json['sourceName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'type': serializer.toJson<String>(
+        $ImportedSamplesTable.$convertertype.toJson(type),
+      ),
+      'platformId': serializer.toJson<String>(platformId),
+      'value': serializer.toJson<double>(value),
+      'startMs': serializer.toJson<int>(startMs),
+      'endMs': serializer.toJson<int?>(endMs),
+      'sourceId': serializer.toJson<String>(sourceId),
+      'sourceName': serializer.toJson<String>(sourceName),
+    };
+  }
+
+  ImportedSampleRow copyWith({
+    HealthDataType? type,
+    String? platformId,
+    double? value,
+    int? startMs,
+    Value<int?> endMs = const Value.absent(),
+    String? sourceId,
+    String? sourceName,
+  }) => ImportedSampleRow(
+    type: type ?? this.type,
+    platformId: platformId ?? this.platformId,
+    value: value ?? this.value,
+    startMs: startMs ?? this.startMs,
+    endMs: endMs.present ? endMs.value : this.endMs,
+    sourceId: sourceId ?? this.sourceId,
+    sourceName: sourceName ?? this.sourceName,
+  );
+  ImportedSampleRow copyWithCompanion(ImportedSamplesCompanion data) {
+    return ImportedSampleRow(
+      type: data.type.present ? data.type.value : this.type,
+      platformId: data.platformId.present
+          ? data.platformId.value
+          : this.platformId,
+      value: data.value.present ? data.value.value : this.value,
+      startMs: data.startMs.present ? data.startMs.value : this.startMs,
+      endMs: data.endMs.present ? data.endMs.value : this.endMs,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      sourceName: data.sourceName.present
+          ? data.sourceName.value
+          : this.sourceName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedSampleRow(')
+          ..write('type: $type, ')
+          ..write('platformId: $platformId, ')
+          ..write('value: $value, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('sourceName: $sourceName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    type,
+    platformId,
+    value,
+    startMs,
+    endMs,
+    sourceId,
+    sourceName,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ImportedSampleRow &&
+          other.type == this.type &&
+          other.platformId == this.platformId &&
+          other.value == this.value &&
+          other.startMs == this.startMs &&
+          other.endMs == this.endMs &&
+          other.sourceId == this.sourceId &&
+          other.sourceName == this.sourceName);
+}
+
+class ImportedSamplesCompanion extends UpdateCompanion<ImportedSampleRow> {
+  final Value<HealthDataType> type;
+  final Value<String> platformId;
+  final Value<double> value;
+  final Value<int> startMs;
+  final Value<int?> endMs;
+  final Value<String> sourceId;
+  final Value<String> sourceName;
+  final Value<int> rowid;
+  const ImportedSamplesCompanion({
+    this.type = const Value.absent(),
+    this.platformId = const Value.absent(),
+    this.value = const Value.absent(),
+    this.startMs = const Value.absent(),
+    this.endMs = const Value.absent(),
+    this.sourceId = const Value.absent(),
+    this.sourceName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ImportedSamplesCompanion.insert({
+    required HealthDataType type,
+    required String platformId,
+    required double value,
+    required int startMs,
+    this.endMs = const Value.absent(),
+    required String sourceId,
+    required String sourceName,
+    this.rowid = const Value.absent(),
+  }) : type = Value(type),
+       platformId = Value(platformId),
+       value = Value(value),
+       startMs = Value(startMs),
+       sourceId = Value(sourceId),
+       sourceName = Value(sourceName);
+  static Insertable<ImportedSampleRow> custom({
+    Expression<String>? type,
+    Expression<String>? platformId,
+    Expression<double>? value,
+    Expression<int>? startMs,
+    Expression<int>? endMs,
+    Expression<String>? sourceId,
+    Expression<String>? sourceName,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (type != null) 'type': type,
+      if (platformId != null) 'platform_id': platformId,
+      if (value != null) 'value': value,
+      if (startMs != null) 'start_ms': startMs,
+      if (endMs != null) 'end_ms': endMs,
+      if (sourceId != null) 'source_id': sourceId,
+      if (sourceName != null) 'source_name': sourceName,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ImportedSamplesCompanion copyWith({
+    Value<HealthDataType>? type,
+    Value<String>? platformId,
+    Value<double>? value,
+    Value<int>? startMs,
+    Value<int?>? endMs,
+    Value<String>? sourceId,
+    Value<String>? sourceName,
+    Value<int>? rowid,
+  }) {
+    return ImportedSamplesCompanion(
+      type: type ?? this.type,
+      platformId: platformId ?? this.platformId,
+      value: value ?? this.value,
+      startMs: startMs ?? this.startMs,
+      endMs: endMs ?? this.endMs,
+      sourceId: sourceId ?? this.sourceId,
+      sourceName: sourceName ?? this.sourceName,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $ImportedSamplesTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (platformId.present) {
+      map['platform_id'] = Variable<String>(platformId.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    if (startMs.present) {
+      map['start_ms'] = Variable<int>(startMs.value);
+    }
+    if (endMs.present) {
+      map['end_ms'] = Variable<int>(endMs.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<String>(sourceId.value);
+    }
+    if (sourceName.present) {
+      map['source_name'] = Variable<String>(sourceName.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedSamplesCompanion(')
+          ..write('type: $type, ')
+          ..write('platformId: $platformId, ')
+          ..write('value: $value, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs, ')
+          ..write('sourceId: $sourceId, ')
+          ..write('sourceName: $sourceName, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HealthImportTokensTable extends HealthImportTokens
+    with TableInfo<$HealthImportTokensTable, HealthImportTokenRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HealthImportTokensTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<HealthDataType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<HealthDataType>($HealthImportTokensTable.$convertertype);
+  static const VerificationMeta _tokenMeta = const VerificationMeta('token');
+  @override
+  late final GeneratedColumn<String> token = GeneratedColumn<String>(
+    'token',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [type, token];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'health_import_tokens';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HealthImportTokenRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('token')) {
+      context.handle(
+        _tokenMeta,
+        token.isAcceptableOrUnknown(data['token']!, _tokenMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tokenMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {type};
+  @override
+  HealthImportTokenRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HealthImportTokenRow(
+      type: $HealthImportTokensTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      token: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}token'],
+      )!,
+    );
+  }
+
+  @override
+  $HealthImportTokensTable createAlias(String alias) {
+    return $HealthImportTokensTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<HealthDataType, String, String> $convertertype =
+      const EnumNameConverter<HealthDataType>(HealthDataType.values);
+}
+
+class HealthImportTokenRow extends DataClass
+    implements Insertable<HealthImportTokenRow> {
+  final HealthDataType type;
+  final String token;
+  const HealthImportTokenRow({required this.type, required this.token});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['type'] = Variable<String>(
+        $HealthImportTokensTable.$convertertype.toSql(type),
+      );
+    }
+    map['token'] = Variable<String>(token);
+    return map;
+  }
+
+  HealthImportTokensCompanion toCompanion(bool nullToAbsent) {
+    return HealthImportTokensCompanion(type: Value(type), token: Value(token));
+  }
+
+  factory HealthImportTokenRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HealthImportTokenRow(
+      type: $HealthImportTokensTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+      token: serializer.fromJson<String>(json['token']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'type': serializer.toJson<String>(
+        $HealthImportTokensTable.$convertertype.toJson(type),
+      ),
+      'token': serializer.toJson<String>(token),
+    };
+  }
+
+  HealthImportTokenRow copyWith({HealthDataType? type, String? token}) =>
+      HealthImportTokenRow(type: type ?? this.type, token: token ?? this.token);
+  HealthImportTokenRow copyWithCompanion(HealthImportTokensCompanion data) {
+    return HealthImportTokenRow(
+      type: data.type.present ? data.type.value : this.type,
+      token: data.token.present ? data.token.value : this.token,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HealthImportTokenRow(')
+          ..write('type: $type, ')
+          ..write('token: $token')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(type, token);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HealthImportTokenRow &&
+          other.type == this.type &&
+          other.token == this.token);
+}
+
+class HealthImportTokensCompanion
+    extends UpdateCompanion<HealthImportTokenRow> {
+  final Value<HealthDataType> type;
+  final Value<String> token;
+  final Value<int> rowid;
+  const HealthImportTokensCompanion({
+    this.type = const Value.absent(),
+    this.token = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HealthImportTokensCompanion.insert({
+    required HealthDataType type,
+    required String token,
+    this.rowid = const Value.absent(),
+  }) : type = Value(type),
+       token = Value(token);
+  static Insertable<HealthImportTokenRow> custom({
+    Expression<String>? type,
+    Expression<String>? token,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (type != null) 'type': type,
+      if (token != null) 'token': token,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HealthImportTokensCompanion copyWith({
+    Value<HealthDataType>? type,
+    Value<String>? token,
+    Value<int>? rowid,
+  }) {
+    return HealthImportTokensCompanion(
+      type: type ?? this.type,
+      token: token ?? this.token,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $HealthImportTokensTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (token.present) {
+      map['token'] = Variable<String>(token.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HealthImportTokensCompanion(')
+          ..write('type: $type, ')
+          ..write('token: $token, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ExerciseProgressionsTable extends ExerciseProgressions
+    with TableInfo<$ExerciseProgressionsTable, ExerciseProgressionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExerciseProgressionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _exerciseIdMeta = const VerificationMeta(
+    'exerciseId',
+  );
+  @override
+  late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
+    'exercise_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repsLowMeta = const VerificationMeta(
+    'repsLow',
+  );
+  @override
+  late final GeneratedColumn<int> repsLow = GeneratedColumn<int>(
+    'reps_low',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repsHighMeta = const VerificationMeta(
+    'repsHigh',
+  );
+  @override
+  late final GeneratedColumn<int> repsHigh = GeneratedColumn<int>(
+    'reps_high',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _loadStepKgMeta = const VerificationMeta(
+    'loadStepKg',
+  );
+  @override
+  late final GeneratedColumn<double> loadStepKg = GeneratedColumn<double>(
+    'load_step_kg',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    exerciseId,
+    repsLow,
+    repsHigh,
+    loadStepKg,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exercise_progressions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExerciseProgressionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('exercise_id')) {
+      context.handle(
+        _exerciseIdMeta,
+        exerciseId.isAcceptableOrUnknown(data['exercise_id']!, _exerciseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_exerciseIdMeta);
+    }
+    if (data.containsKey('reps_low')) {
+      context.handle(
+        _repsLowMeta,
+        repsLow.isAcceptableOrUnknown(data['reps_low']!, _repsLowMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_repsLowMeta);
+    }
+    if (data.containsKey('reps_high')) {
+      context.handle(
+        _repsHighMeta,
+        repsHigh.isAcceptableOrUnknown(data['reps_high']!, _repsHighMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_repsHighMeta);
+    }
+    if (data.containsKey('load_step_kg')) {
+      context.handle(
+        _loadStepKgMeta,
+        loadStepKg.isAcceptableOrUnknown(
+          data['load_step_kg']!,
+          _loadStepKgMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {exerciseId};
+  @override
+  ExerciseProgressionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExerciseProgressionRow(
+      exerciseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exercise_id'],
+      )!,
+      repsLow: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reps_low'],
+      )!,
+      repsHigh: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reps_high'],
+      )!,
+      loadStepKg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}load_step_kg'],
+      ),
+    );
+  }
+
+  @override
+  $ExerciseProgressionsTable createAlias(String alias) {
+    return $ExerciseProgressionsTable(attachedDatabase, alias);
+  }
+}
+
+class ExerciseProgressionRow extends DataClass
+    implements Insertable<ExerciseProgressionRow> {
+  /// The id of a built-in exercise or one of the user's own.
+  final String exerciseId;
+  final int repsLow;
+  final int repsHigh;
+
+  /// Null for the default step of the exercise's equipment.
+  final double? loadStepKg;
+  const ExerciseProgressionRow({
+    required this.exerciseId,
+    required this.repsLow,
+    required this.repsHigh,
+    this.loadStepKg,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['exercise_id'] = Variable<String>(exerciseId);
+    map['reps_low'] = Variable<int>(repsLow);
+    map['reps_high'] = Variable<int>(repsHigh);
+    if (!nullToAbsent || loadStepKg != null) {
+      map['load_step_kg'] = Variable<double>(loadStepKg);
+    }
+    return map;
+  }
+
+  ExerciseProgressionsCompanion toCompanion(bool nullToAbsent) {
+    return ExerciseProgressionsCompanion(
+      exerciseId: Value(exerciseId),
+      repsLow: Value(repsLow),
+      repsHigh: Value(repsHigh),
+      loadStepKg: loadStepKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(loadStepKg),
+    );
+  }
+
+  factory ExerciseProgressionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExerciseProgressionRow(
+      exerciseId: serializer.fromJson<String>(json['exerciseId']),
+      repsLow: serializer.fromJson<int>(json['repsLow']),
+      repsHigh: serializer.fromJson<int>(json['repsHigh']),
+      loadStepKg: serializer.fromJson<double?>(json['loadStepKg']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'exerciseId': serializer.toJson<String>(exerciseId),
+      'repsLow': serializer.toJson<int>(repsLow),
+      'repsHigh': serializer.toJson<int>(repsHigh),
+      'loadStepKg': serializer.toJson<double?>(loadStepKg),
+    };
+  }
+
+  ExerciseProgressionRow copyWith({
+    String? exerciseId,
+    int? repsLow,
+    int? repsHigh,
+    Value<double?> loadStepKg = const Value.absent(),
+  }) => ExerciseProgressionRow(
+    exerciseId: exerciseId ?? this.exerciseId,
+    repsLow: repsLow ?? this.repsLow,
+    repsHigh: repsHigh ?? this.repsHigh,
+    loadStepKg: loadStepKg.present ? loadStepKg.value : this.loadStepKg,
+  );
+  ExerciseProgressionRow copyWithCompanion(ExerciseProgressionsCompanion data) {
+    return ExerciseProgressionRow(
+      exerciseId: data.exerciseId.present
+          ? data.exerciseId.value
+          : this.exerciseId,
+      repsLow: data.repsLow.present ? data.repsLow.value : this.repsLow,
+      repsHigh: data.repsHigh.present ? data.repsHigh.value : this.repsHigh,
+      loadStepKg: data.loadStepKg.present
+          ? data.loadStepKg.value
+          : this.loadStepKg,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseProgressionRow(')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('repsLow: $repsLow, ')
+          ..write('repsHigh: $repsHigh, ')
+          ..write('loadStepKg: $loadStepKg')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(exerciseId, repsLow, repsHigh, loadStepKg);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExerciseProgressionRow &&
+          other.exerciseId == this.exerciseId &&
+          other.repsLow == this.repsLow &&
+          other.repsHigh == this.repsHigh &&
+          other.loadStepKg == this.loadStepKg);
+}
+
+class ExerciseProgressionsCompanion
+    extends UpdateCompanion<ExerciseProgressionRow> {
+  final Value<String> exerciseId;
+  final Value<int> repsLow;
+  final Value<int> repsHigh;
+  final Value<double?> loadStepKg;
+  final Value<int> rowid;
+  const ExerciseProgressionsCompanion({
+    this.exerciseId = const Value.absent(),
+    this.repsLow = const Value.absent(),
+    this.repsHigh = const Value.absent(),
+    this.loadStepKg = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExerciseProgressionsCompanion.insert({
+    required String exerciseId,
+    required int repsLow,
+    required int repsHigh,
+    this.loadStepKg = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : exerciseId = Value(exerciseId),
+       repsLow = Value(repsLow),
+       repsHigh = Value(repsHigh);
+  static Insertable<ExerciseProgressionRow> custom({
+    Expression<String>? exerciseId,
+    Expression<int>? repsLow,
+    Expression<int>? repsHigh,
+    Expression<double>? loadStepKg,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (exerciseId != null) 'exercise_id': exerciseId,
+      if (repsLow != null) 'reps_low': repsLow,
+      if (repsHigh != null) 'reps_high': repsHigh,
+      if (loadStepKg != null) 'load_step_kg': loadStepKg,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExerciseProgressionsCompanion copyWith({
+    Value<String>? exerciseId,
+    Value<int>? repsLow,
+    Value<int>? repsHigh,
+    Value<double?>? loadStepKg,
+    Value<int>? rowid,
+  }) {
+    return ExerciseProgressionsCompanion(
+      exerciseId: exerciseId ?? this.exerciseId,
+      repsLow: repsLow ?? this.repsLow,
+      repsHigh: repsHigh ?? this.repsHigh,
+      loadStepKg: loadStepKg ?? this.loadStepKg,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (exerciseId.present) {
+      map['exercise_id'] = Variable<String>(exerciseId.value);
+    }
+    if (repsLow.present) {
+      map['reps_low'] = Variable<int>(repsLow.value);
+    }
+    if (repsHigh.present) {
+      map['reps_high'] = Variable<int>(repsHigh.value);
+    }
+    if (loadStepKg.present) {
+      map['load_step_kg'] = Variable<double>(loadStepKg.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseProgressionsCompanion(')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('repsLow: $repsLow, ')
+          ..write('repsHigh: $repsHigh, ')
+          ..write('loadStepKg: $loadStepKg, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10709,6 +11968,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CustomExercisesTable customExercises = $CustomExercisesTable(
     this,
   );
+  late final $ImportedSamplesTable importedSamples = $ImportedSamplesTable(
+    this,
+  );
+  late final $HealthImportTokensTable healthImportTokens =
+      $HealthImportTokensTable(this);
+  late final $ExerciseProgressionsTable exerciseProgressions =
+      $ExerciseProgressionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10732,6 +11998,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     workoutExercises,
     workoutSets,
     customExercises,
+    importedSamples,
+    healthImportTokens,
+    exerciseProgressions,
   ];
 }
 
@@ -12533,11 +13802,17 @@ typedef $$WaistEntriesTableCreateCompanionBuilder =
     WaistEntriesCompanion Function({
       Value<int> epochDay,
       required double waistCm,
+      Value<double?> reading1Cm,
+      Value<double?> reading2Cm,
+      Value<double?> reading3Cm,
     });
 typedef $$WaistEntriesTableUpdateCompanionBuilder =
     WaistEntriesCompanion Function({
       Value<int> epochDay,
       Value<double> waistCm,
+      Value<double?> reading1Cm,
+      Value<double?> reading2Cm,
+      Value<double?> reading3Cm,
     });
 
 class $$WaistEntriesTableFilterComposer
@@ -12556,6 +13831,21 @@ class $$WaistEntriesTableFilterComposer
 
   ColumnFilters<double> get waistCm => $composableBuilder(
     column: $table.waistCm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -12578,6 +13868,21 @@ class $$WaistEntriesTableOrderingComposer
     column: $table.waistCm,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WaistEntriesTableAnnotationComposer
@@ -12594,6 +13899,21 @@ class $$WaistEntriesTableAnnotationComposer
 
   GeneratedColumn<double> get waistCm =>
       $composableBuilder(column: $table.waistCm, builder: (column) => column);
+
+  GeneratedColumn<double> get reading1Cm => $composableBuilder(
+    column: $table.reading1Cm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reading2Cm => $composableBuilder(
+    column: $table.reading2Cm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reading3Cm => $composableBuilder(
+    column: $table.reading3Cm,
+    builder: (column) => column,
+  );
 }
 
 class $$WaistEntriesTableTableManager
@@ -12625,17 +13945,33 @@ class $$WaistEntriesTableTableManager
               $$WaistEntriesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$WaistEntriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> epochDay = const Value.absent(),
-            Value<double> waistCm = const Value.absent(),
-          }) => WaistEntriesCompanion(epochDay: epochDay, waistCm: waistCm),
+          updateCompanionCallback:
+              ({
+                Value<int> epochDay = const Value.absent(),
+                Value<double> waistCm = const Value.absent(),
+                Value<double?> reading1Cm = const Value.absent(),
+                Value<double?> reading2Cm = const Value.absent(),
+                Value<double?> reading3Cm = const Value.absent(),
+              }) => WaistEntriesCompanion(
+                epochDay: epochDay,
+                waistCm: waistCm,
+                reading1Cm: reading1Cm,
+                reading2Cm: reading2Cm,
+                reading3Cm: reading3Cm,
+              ),
           createCompanionCallback:
               ({
                 Value<int> epochDay = const Value.absent(),
                 required double waistCm,
+                Value<double?> reading1Cm = const Value.absent(),
+                Value<double?> reading2Cm = const Value.absent(),
+                Value<double?> reading3Cm = const Value.absent(),
               }) => WaistEntriesCompanion.insert(
                 epochDay: epochDay,
                 waistCm: waistCm,
+                reading1Cm: reading1Cm,
+                reading2Cm: reading2Cm,
+                reading3Cm: reading3Cm,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -15274,6 +16610,7 @@ typedef $$WorkoutExercisesTableCreateCompanionBuilder =
       required int workoutId,
       required int position,
       required String exerciseId,
+      Value<int?> restTargetSeconds,
     });
 typedef $$WorkoutExercisesTableUpdateCompanionBuilder =
     WorkoutExercisesCompanion Function({
@@ -15281,6 +16618,7 @@ typedef $$WorkoutExercisesTableUpdateCompanionBuilder =
       Value<int> workoutId,
       Value<int> position,
       Value<String> exerciseId,
+      Value<int?> restTargetSeconds,
     });
 
 class $$WorkoutExercisesTableFilterComposer
@@ -15309,6 +16647,11 @@ class $$WorkoutExercisesTableFilterComposer
 
   ColumnFilters<String> get exerciseId => $composableBuilder(
     column: $table.exerciseId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get restTargetSeconds => $composableBuilder(
+    column: $table.restTargetSeconds,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -15341,6 +16684,11 @@ class $$WorkoutExercisesTableOrderingComposer
     column: $table.exerciseId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get restTargetSeconds => $composableBuilder(
+    column: $table.restTargetSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WorkoutExercisesTableAnnotationComposer
@@ -15363,6 +16711,11 @@ class $$WorkoutExercisesTableAnnotationComposer
 
   GeneratedColumn<String> get exerciseId => $composableBuilder(
     column: $table.exerciseId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get restTargetSeconds => $composableBuilder(
+    column: $table.restTargetSeconds,
     builder: (column) => column,
   );
 }
@@ -15408,11 +16761,13 @@ class $$WorkoutExercisesTableTableManager
                 Value<int> workoutId = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<String> exerciseId = const Value.absent(),
+                Value<int?> restTargetSeconds = const Value.absent(),
               }) => WorkoutExercisesCompanion(
                 id: id,
                 workoutId: workoutId,
                 position: position,
                 exerciseId: exerciseId,
+                restTargetSeconds: restTargetSeconds,
               ),
           createCompanionCallback:
               ({
@@ -15420,11 +16775,13 @@ class $$WorkoutExercisesTableTableManager
                 required int workoutId,
                 required int position,
                 required String exerciseId,
+                Value<int?> restTargetSeconds = const Value.absent(),
               }) => WorkoutExercisesCompanion.insert(
                 id: id,
                 workoutId: workoutId,
                 position: position,
                 exerciseId: exerciseId,
+                restTargetSeconds: restTargetSeconds,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -15985,6 +17342,645 @@ typedef $$CustomExercisesTableProcessedTableManager =
       CustomExerciseRow,
       PrefetchHooks Function()
     >;
+typedef $$ImportedSamplesTableCreateCompanionBuilder =
+    ImportedSamplesCompanion Function({
+      required HealthDataType type,
+      required String platformId,
+      required double value,
+      required int startMs,
+      Value<int?> endMs,
+      required String sourceId,
+      required String sourceName,
+      Value<int> rowid,
+    });
+typedef $$ImportedSamplesTableUpdateCompanionBuilder =
+    ImportedSamplesCompanion Function({
+      Value<HealthDataType> type,
+      Value<String> platformId,
+      Value<double> value,
+      Value<int> startMs,
+      Value<int?> endMs,
+      Value<String> sourceId,
+      Value<String> sourceName,
+      Value<int> rowid,
+    });
+
+class $$ImportedSamplesTableFilterComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<HealthDataType, HealthDataType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ImportedSamplesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ImportedSamplesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImportedSamplesTable> {
+  $$ImportedSamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<HealthDataType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get platformId => $composableBuilder(
+    column: $table.platformId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<int> get startMs =>
+      $composableBuilder(column: $table.startMs, builder: (column) => column);
+
+  GeneratedColumn<int> get endMs =>
+      $composableBuilder(column: $table.endMs, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceName => $composableBuilder(
+    column: $table.sourceName,
+    builder: (column) => column,
+  );
+}
+
+class $$ImportedSamplesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImportedSamplesTable,
+          ImportedSampleRow,
+          $$ImportedSamplesTableFilterComposer,
+          $$ImportedSamplesTableOrderingComposer,
+          $$ImportedSamplesTableAnnotationComposer,
+          $$ImportedSamplesTableCreateCompanionBuilder,
+          $$ImportedSamplesTableUpdateCompanionBuilder,
+          (
+            ImportedSampleRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ImportedSamplesTable,
+              ImportedSampleRow
+            >,
+          ),
+          ImportedSampleRow,
+          PrefetchHooks Function()
+        > {
+  $$ImportedSamplesTableTableManager(
+    _$AppDatabase db,
+    $ImportedSamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ImportedSamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImportedSamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImportedSamplesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<HealthDataType> type = const Value.absent(),
+                Value<String> platformId = const Value.absent(),
+                Value<double> value = const Value.absent(),
+                Value<int> startMs = const Value.absent(),
+                Value<int?> endMs = const Value.absent(),
+                Value<String> sourceId = const Value.absent(),
+                Value<String> sourceName = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedSamplesCompanion(
+                type: type,
+                platformId: platformId,
+                value: value,
+                startMs: startMs,
+                endMs: endMs,
+                sourceId: sourceId,
+                sourceName: sourceName,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required HealthDataType type,
+                required String platformId,
+                required double value,
+                required int startMs,
+                Value<int?> endMs = const Value.absent(),
+                required String sourceId,
+                required String sourceName,
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedSamplesCompanion.insert(
+                type: type,
+                platformId: platformId,
+                value: value,
+                startMs: startMs,
+                endMs: endMs,
+                sourceId: sourceId,
+                sourceName: sourceName,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ImportedSamplesTable, ImportedSampleRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ImportedSamplesTable,
+                    ImportedSampleRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ImportedSamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImportedSamplesTable,
+      ImportedSampleRow,
+      $$ImportedSamplesTableFilterComposer,
+      $$ImportedSamplesTableOrderingComposer,
+      $$ImportedSamplesTableAnnotationComposer,
+      $$ImportedSamplesTableCreateCompanionBuilder,
+      $$ImportedSamplesTableUpdateCompanionBuilder,
+      (
+        ImportedSampleRow,
+        BaseReferences<_$AppDatabase, $ImportedSamplesTable, ImportedSampleRow>,
+      ),
+      ImportedSampleRow,
+      PrefetchHooks Function()
+    >;
+typedef $$HealthImportTokensTableCreateCompanionBuilder =
+    HealthImportTokensCompanion Function({
+      required HealthDataType type,
+      required String token,
+      Value<int> rowid,
+    });
+typedef $$HealthImportTokensTableUpdateCompanionBuilder =
+    HealthImportTokensCompanion Function({
+      Value<HealthDataType> type,
+      Value<String> token,
+      Value<int> rowid,
+    });
+
+class $$HealthImportTokensTableFilterComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<HealthDataType, HealthDataType, String>
+  get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HealthImportTokensTableOrderingComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HealthImportTokensTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HealthImportTokensTable> {
+  $$HealthImportTokensTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<HealthDataType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get token =>
+      $composableBuilder(column: $table.token, builder: (column) => column);
+}
+
+class $$HealthImportTokensTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HealthImportTokensTable,
+          HealthImportTokenRow,
+          $$HealthImportTokensTableFilterComposer,
+          $$HealthImportTokensTableOrderingComposer,
+          $$HealthImportTokensTableAnnotationComposer,
+          $$HealthImportTokensTableCreateCompanionBuilder,
+          $$HealthImportTokensTableUpdateCompanionBuilder,
+          (
+            HealthImportTokenRow,
+            BaseReferences<
+              _$AppDatabase,
+              $HealthImportTokensTable,
+              HealthImportTokenRow
+            >,
+          ),
+          HealthImportTokenRow,
+          PrefetchHooks Function()
+        > {
+  $$HealthImportTokensTableTableManager(
+    _$AppDatabase db,
+    $HealthImportTokensTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HealthImportTokensTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HealthImportTokensTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HealthImportTokensTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<HealthDataType> type = const Value.absent(),
+                Value<String> token = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HealthImportTokensCompanion(
+                type: type,
+                token: token,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required HealthDataType type,
+                required String token,
+                Value<int> rowid = const Value.absent(),
+              }) => HealthImportTokensCompanion.insert(
+                type: type,
+                token: token,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HealthImportTokensTable, HealthImportTokenRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $HealthImportTokensTable,
+                    HealthImportTokenRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HealthImportTokensTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HealthImportTokensTable,
+      HealthImportTokenRow,
+      $$HealthImportTokensTableFilterComposer,
+      $$HealthImportTokensTableOrderingComposer,
+      $$HealthImportTokensTableAnnotationComposer,
+      $$HealthImportTokensTableCreateCompanionBuilder,
+      $$HealthImportTokensTableUpdateCompanionBuilder,
+      (
+        HealthImportTokenRow,
+        BaseReferences<
+          _$AppDatabase,
+          $HealthImportTokensTable,
+          HealthImportTokenRow
+        >,
+      ),
+      HealthImportTokenRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ExerciseProgressionsTableCreateCompanionBuilder =
+    ExerciseProgressionsCompanion Function({
+      required String exerciseId,
+      required int repsLow,
+      required int repsHigh,
+      Value<double?> loadStepKg,
+      Value<int> rowid,
+    });
+typedef $$ExerciseProgressionsTableUpdateCompanionBuilder =
+    ExerciseProgressionsCompanion Function({
+      Value<String> exerciseId,
+      Value<int> repsLow,
+      Value<int> repsHigh,
+      Value<double?> loadStepKg,
+      Value<int> rowid,
+    });
+
+class $$ExerciseProgressionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repsLow => $composableBuilder(
+    column: $table.repsLow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repsHigh => $composableBuilder(
+    column: $table.repsHigh,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ExerciseProgressionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repsLow => $composableBuilder(
+    column: $table.repsLow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repsHigh => $composableBuilder(
+    column: $table.repsHigh,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ExerciseProgressionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExerciseProgressionsTable> {
+  $$ExerciseProgressionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repsLow =>
+      $composableBuilder(column: $table.repsLow, builder: (column) => column);
+
+  GeneratedColumn<int> get repsHigh =>
+      $composableBuilder(column: $table.repsHigh, builder: (column) => column);
+
+  GeneratedColumn<double> get loadStepKg => $composableBuilder(
+    column: $table.loadStepKg,
+    builder: (column) => column,
+  );
+}
+
+class $$ExerciseProgressionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExerciseProgressionsTable,
+          ExerciseProgressionRow,
+          $$ExerciseProgressionsTableFilterComposer,
+          $$ExerciseProgressionsTableOrderingComposer,
+          $$ExerciseProgressionsTableAnnotationComposer,
+          $$ExerciseProgressionsTableCreateCompanionBuilder,
+          $$ExerciseProgressionsTableUpdateCompanionBuilder,
+          (
+            ExerciseProgressionRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ExerciseProgressionsTable,
+              ExerciseProgressionRow
+            >,
+          ),
+          ExerciseProgressionRow,
+          PrefetchHooks Function()
+        > {
+  $$ExerciseProgressionsTableTableManager(
+    _$AppDatabase db,
+    $ExerciseProgressionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExerciseProgressionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExerciseProgressionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ExerciseProgressionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> exerciseId = const Value.absent(),
+                Value<int> repsLow = const Value.absent(),
+                Value<int> repsHigh = const Value.absent(),
+                Value<double?> loadStepKg = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExerciseProgressionsCompanion(
+                exerciseId: exerciseId,
+                repsLow: repsLow,
+                repsHigh: repsHigh,
+                loadStepKg: loadStepKg,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String exerciseId,
+                required int repsLow,
+                required int repsHigh,
+                Value<double?> loadStepKg = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExerciseProgressionsCompanion.insert(
+                exerciseId: exerciseId,
+                repsLow: repsLow,
+                repsHigh: repsHigh,
+                loadStepKg: loadStepKg,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $ExerciseProgressionsTable,
+                    ExerciseProgressionRow
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ExerciseProgressionsTable,
+                    ExerciseProgressionRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ExerciseProgressionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExerciseProgressionsTable,
+      ExerciseProgressionRow,
+      $$ExerciseProgressionsTableFilterComposer,
+      $$ExerciseProgressionsTableOrderingComposer,
+      $$ExerciseProgressionsTableAnnotationComposer,
+      $$ExerciseProgressionsTableCreateCompanionBuilder,
+      $$ExerciseProgressionsTableUpdateCompanionBuilder,
+      (
+        ExerciseProgressionRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ExerciseProgressionsTable,
+          ExerciseProgressionRow
+        >,
+      ),
+      ExerciseProgressionRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -16025,4 +18021,10 @@ class $AppDatabaseManager {
       $$WorkoutSetsTableTableManager(_db, _db.workoutSets);
   $$CustomExercisesTableTableManager get customExercises =>
       $$CustomExercisesTableTableManager(_db, _db.customExercises);
+  $$ImportedSamplesTableTableManager get importedSamples =>
+      $$ImportedSamplesTableTableManager(_db, _db.importedSamples);
+  $$HealthImportTokensTableTableManager get healthImportTokens =>
+      $$HealthImportTokensTableTableManager(_db, _db.healthImportTokens);
+  $$ExerciseProgressionsTableTableManager get exerciseProgressions =>
+      $$ExerciseProgressionsTableTableManager(_db, _db.exerciseProgressions);
 }

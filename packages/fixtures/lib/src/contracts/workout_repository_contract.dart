@@ -47,12 +47,15 @@ void workoutRepositoryContract(
             WorkoutExercise(
               exerciseId: 'pull-up',
               sets: [WorkoutSet(reps: 6, loadKg: -20, rir: 0)],
+              restTarget: Duration(seconds: 150),
             ),
           ],
         ),
       );
       expect(id, greaterThan(0));
       final read = (await repo.watchWorkouts().first).single;
+      expect(read.exercises[0].restTarget, isNull);
+      expect(read.exercises[1].restTarget, const Duration(seconds: 150));
       expect(read.id, id);
       expect(read.date, day);
       expect(read.startedAt.isAtSameMomentAs(six), isTrue);

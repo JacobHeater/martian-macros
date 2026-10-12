@@ -65,3 +65,11 @@ Scenario: Under 18 by correction
 - Tests: engine (new revision issues targets at once and unthrottled; same revision waits; a health answer makes maintenance flagged; no rewrite loop), repositories (revision round-trips through Drift and in-memory), and app (correct sex, cancel, male clears female-only answers, pregnant, no longer breastfeeding and every goal offered again, under 18, height, an implausible height cannot be saved).
 - **Not verified**: on a device; a user whose weigh-ins or food are many days old when they correct a profile. Whether unticking pregnancy should hold the user at maintenance for a while (postpartum) is a question for MM-112.
 - **Not done**: a changed health answer explains itself only through the existing Coach flag text; the fuller "why targets changed" explanation is MM-138.
+
+## UI/UX Assets
+
+- [Settings](../ui-ux-assets/views/settings.html) — Current. Draws
+  EditHeightSheet and ProfileSection as built on 2026-10-11: US units, shown,
+  change sex confirm. Frames: `#settings-edit-height`, `#settings-default`.
+  Partly compared with screenshot tests, the rest drawn from the source alone.
+  It shows what exists and approves nothing.

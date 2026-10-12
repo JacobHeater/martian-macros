@@ -1,5 +1,7 @@
+import 'recomp_review.dart';
 import 'report_estimate.dart';
 import 'report_estimate_gap.dart';
+import 'report_lift.dart';
 import 'report_period.dart';
 import 'report_target_change.dart';
 
@@ -20,6 +22,9 @@ final class MonthlyReport {
     this.waistToCm,
     this.estimate,
     this.estimateGap,
+    this.workouts = 0,
+    this.lifts = const [],
+    this.recompReview,
   });
 
   final ReportPeriod period;
@@ -50,6 +55,17 @@ final class MonthlyReport {
   /// saying why.
   final ReportEstimate? estimate;
   final ReportEstimateGap? estimateGap;
+
+  /// Finished workouts in the month.
+  final int workouts;
+
+  /// The lifts with at least two sessions in the month that gave an
+  /// estimate, most trained first. One session cannot show a change.
+  final List<ReportLift> lifts;
+
+  /// The recomp review that fell due in the month, if one did (MM-133),
+  /// as it stood on the last day of the month it was shown.
+  final RecompReview? recompReview;
 
   /// Every change to the targets in the month, oldest first.
   final List<ReportTargetChange> targetChanges;

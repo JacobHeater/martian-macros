@@ -1,11 +1,15 @@
 import 'package:drift/drift.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_engine/mm_engine.dart';
+import 'package:mm_health_ingest/mm_health_ingest.dart';
 
 import 'custom_exercises.dart';
 import 'custom_foods.dart';
 import 'day_marks.dart';
+import 'exercise_progressions.dart';
 import 'food_entries.dart';
+import 'health_import_tokens.dart';
+import 'imported_samples.dart';
 import 'insight_log.dart';
 import 'migration_step.dart';
 import 'pauses.dart';
@@ -45,6 +49,9 @@ part 'app_database.g.dart';
     WorkoutExercises,
     WorkoutSets,
     CustomExercises,
+    ImportedSamples,
+    HealthImportTokens,
+    ExerciseProgressions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -52,7 +59,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this with every change to a table, add the step to
   /// [migrationSteps], and run `mm schema` to export the new snapshot.
-  static const currentSchemaVersion = 27;
+  static const currentSchemaVersion = 31;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -316,6 +323,35 @@ class AppDatabase extends _$AppDatabase {
       if (!existing.contains('paused_for_ms')) {
         await m.addColumn(workouts, workouts.pausedForMs);
       }
+    },
+    // 27 to 28: the rest the user means to take per exercise (MM-191).
+    27: (m) async {
+      final existing = {
+        for (final row in await customSelect(
+          'PRAGMA table_info(workout_exercises)',
+        ).get())
+          row.read<String>('name'),
+      };
+      if (!existing.contains('rest_target_seconds')) {
+        await m.addColumn(workoutExercises, workoutExercises.restTargetSeconds);
+      }
+    },
+    // 28 to 29: readings imported from a health platform, and where each
+    // import left off (MM-67).
+    28: (m) async {
+      await m.createTable(importedSamples);
+      await m.createTable(healthImportTokens);
+    },
+    // 29 to 30: the readings a waist measurement was taken from (MM-155).
+    // Measurements already stored keep none; none are invented.
+    29: (m) async {
+      await m.addColumn(waistEntries, waistEntries.reading1Cm);
+      await m.addColumn(waistEntries, waistEntries.reading2Cm);
+      await m.addColumn(waistEntries, waistEntries.reading3Cm);
+    },
+    // 30 to 31: the rep range and load step set per exercise (MM-79).
+    30: (m) async {
+      await m.createTable(exerciseProgressions);
     },
   };
 

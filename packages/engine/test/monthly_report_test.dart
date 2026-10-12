@@ -224,4 +224,184 @@ void main() {
       expect(report(history: const []).targetChanges, isEmpty);
     });
   });
+
+  group('strength', () {
+    final squat = builtInExercises.firstWhere((e) => e.id == 'back-squat');
+    final row = builtInExercises.firstWhere((e) => e.id == 'barbell-row');
+    var nextId = 1;
+
+    /// A finished workout on [day] of the month: exercise id to load, each
+    /// for one set of six.
+    Workout trained(int day, Map<String, double> loads, {bool done = true}) {
+      final date = start.addDays(day);
+      final began = DateTime(date.year, date.month, date.day, 18);
+      return Workout(
+        id: nextId++,
+        date: date,
+        startedAt: began,
+        endedAt: done ? began.add(const Duration(minutes: 50)) : null,
+        exercises: [
+          for (final entry in loads.entries)
+            WorkoutExercise(
+              exerciseId: entry.key,
+              sets: [WorkoutSet(reps: 6, loadKg: entry.value)],
+            ),
+        ],
+      );
+    }
+
+    MonthlyReport withWorkouts(List<Workout> workouts) => buildMonthlyReport(
+      period: month,
+      intake: [for (var d = 0; d < 28; d++) ate(d)],
+      weights: [for (var d = 0; d < 28; d += 2) weighed(d, 90)],
+      waist: const [],
+      history: [record(14)],
+      trend: [for (var d = 0; d < 28; d++) point(d, 90)],
+      workouts: workouts,
+      exercises: [squat, row],
+    );
+
+    test('a month with no training has no workouts and no lifts', () {
+      final r = report();
+      expect(r.workouts, 0);
+      expect(r.lifts, isEmpty);
+    });
+
+    test('each lift goes from its first to its last session of the month', () {
+      final r = withWorkouts([
+        trained(1, {squat.id: 100, row.id: 60}),
+        trained(8, {squat.id: 102.5, row.id: 60}),
+        trained(15, {squat.id: 105}),
+        trained(22, {squat.id: 107.5}),
+      ]);
+      expect(r.workouts, 4);
+      expect(r.lifts.map((l) => l.name), [squat.name, row.name]);
+      final first = r.lifts.first;
+      expect(first.sessions, 4);
+      expect(first.toKg, greaterThan(first.fromKg));
+      // The first session of the month stands for itself: nothing before
+      // it to smooth with.
+      expect(
+        first.fromKg,
+        closeTo(
+          estimatedOneRepMax(
+            const WorkoutSet(reps: 6, loadKg: 100),
+            load: squat.load,
+            bodyweightKg: null,
+          )!,
+          1e-9,
+        ),
+      );
+      expect(r.lifts.last.toKg, closeTo(r.lifts.last.fromKg, 1e-9));
+    });
+
+    test('a lift done once in the month is not listed: one session shows '
+        'no change', () {
+      final r = withWorkouts([
+        trained(1, {squat.id: 100, row.id: 60}),
+        trained(8, {squat.id: 102.5}),
+      ]);
+      expect(r.lifts.map((l) => l.name), [squat.name]);
+    });
+
+    test('sessions outside the month, and unfinished ones, do not count', () {
+      final r = withWorkouts([
+        trained(-7, {squat.id: 95}),
+        trained(1, {squat.id: 100}),
+        trained(20, {squat.id: 110}, done: false),
+        trained(35, {squat.id: 120}),
+      ]);
+      expect(r.workouts, 1);
+      expect(r.lifts, isEmpty);
+    });
+
+    test('a later session does not change what an old report says', () {
+      final inMonth = [
+        trained(1, {squat.id: 100}),
+        trained(22, {squat.id: 105}),
+      ];
+      final then = withWorkouts(inMonth).lifts.single;
+      final later = withWorkouts([
+        ...inMonth,
+        trained(40, {squat.id: 130}),
+      ]).lifts.single;
+      expect(later.fromKg, then.fromKg);
+      expect(later.toKg, then.toKg);
+    });
+  });
+
+  group('the recomp review', () {
+    const eligible = ModeRecommendation(
+      GoalMode.recomp,
+      ModeReason.recompEligible,
+    );
+
+    TargetsRecord onRecomp(int day, [GoalMode mode = GoalMode.recomp]) =>
+        TargetsRecord(
+          effectiveFrom: start.addDays(day),
+          mode: mode,
+          tdeeKcal: 2500,
+          tdeeSigmaKcal: 150,
+          tdeeStatus: TdeeStatus.updated,
+          targets: const DailyTargets(
+            kcal: 2400,
+            proteinG: 160,
+            fatG: 70,
+            carbsG: 250,
+            weeklyRateFraction: -0.001,
+          ),
+        );
+
+    /// The report of the month that begins [monthStart] days after recomp
+    /// began on day 0, with waist measured weekly throughout.
+    MonthlyReport reportFrom(
+      int monthStart, {
+      ModeRecommendation? recommendation = eligible,
+      GoalMode mode = GoalMode.recomp,
+    }) => buildMonthlyReport(
+      period: ReportPeriod(index: 0, from: start.addDays(monthStart)),
+      intake: const [],
+      weights: const [],
+      waist: [
+        for (var d = 0; d <= 140; d += 7)
+          WaistObservation(date: start.addDays(d), waistCm: 92 - d * 0.04),
+      ],
+      history: [onRecomp(0, mode)],
+      trend: [for (var d = 0; d <= 140; d++) point(d, 82)],
+      recommendation: recommendation,
+    );
+
+    test('a month in which none falls due has none', () {
+      expect(reportFrom(0).recompReview, isNull);
+      expect(reportFrom(100).recompReview, isNull);
+    });
+
+    test('the week 8 review is in the month it fell due in', () {
+      // Days 42 to 69: the review is due on day 56.
+      final review = reportFrom(42).recompReview!;
+      expect(review.week, 8);
+      // Read on the last day it was shown in the month, day 69.
+      expect(review.periodDays, 69);
+      expect(review.waist, MeasuredChange.down);
+      expect(review.missing, [RecompMeasure.strength]);
+    });
+
+    test('a review due in the month before is not repeated, and the next '
+        'one due is shown', () {
+      // Days 60 to 87: week 8 was already showing; week 12 is due on day 84.
+      final review = reportFrom(60).recompReview!;
+      expect(review.week, 12);
+      // Days 57 to 84: week 8 fell due on day 56, the day before.
+      expect(reportFrom(57).recompReview!.week, 12);
+      // Days 56 to 83: week 8 falls due on the first day and week 12 the
+      // day after the last.
+      expect(reportFrom(56).recompReview!.week, 8);
+    });
+
+    test('there is none on another goal, or when no recommendation is '
+        'given', () {
+      expect(reportFrom(42, mode: GoalMode.fatLoss).recompReview, isNull);
+      expect(reportFrom(42, recommendation: null).recompReview, isNull);
+    });
+  });
 }

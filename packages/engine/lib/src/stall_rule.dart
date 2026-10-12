@@ -20,11 +20,6 @@ abstract final class StallRule {
   static const minimumFoodDays = 12;
   static const minimumWeighIns = 10;
 
-  /// A waist change must exceed this to count as more than its noise. A
-  /// stand-in until measurement noise is modelled (MM-155).
-  static const waistNoiseCm = 1.5;
-  static const minimumWaistReadings = 3;
-
   /// Below this multiple of resting energy an estimate often means food is
   /// missing from the log.
   static const lowEstimateRestingMultiple = 1.3;

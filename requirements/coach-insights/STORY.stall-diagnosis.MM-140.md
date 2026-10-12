@@ -118,7 +118,7 @@ user's numbers, lists options as plain lines, and opens to what it rests on. Tes
 `stall_card_test.dart` (wording, a list of words that may not appear, and one test through the real app).
 
 Not built, or approximate:
-- **Waist noise is a stand-in** (1.5 cm) until MM-155 models it.
+- Waist noise was a stand-in (1.5 cm) until 2026-10-11; the waist is now judged by MM-155's shared function (`waistChangeOf`).
 - **Cycle windows and the start of training** as masking causes: only passing weight events and the waist are used.
 - **Options are text, not actions**: a gentler pace (MM-128), shaping the week (MM-124) and a maintenance break (MM-135) are not
   built, so nothing can be tapped.
@@ -128,3 +128,10 @@ Not built, or approximate:
   slightly slower to call a stall.
 - The simulated "accurate logger whose expenditure is 300 kcal below the estimate" scenario is tested with a constructed snapshot,
   not through the closed-loop simulator.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html#coach-stall) — Current. Draws
+  StallCard as built on 2026-10-11: one cause, evidence open. Drawn from the
+  source alone; not compared with the running app. One of the causes is drawn.
+  It shows what exists and approves nothing.

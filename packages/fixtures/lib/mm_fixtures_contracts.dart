@@ -10,6 +10,7 @@ export 'src/contracts/custom_food_repository_contract.dart';
 export 'src/contracts/data_eraser_contract.dart';
 export 'src/contracts/day_mark_repository_contract.dart';
 export 'src/contracts/entitlement_reader_contract.dart';
+export 'src/contracts/exercise_progression_repository_contract.dart';
 export 'src/contracts/food_barcode_lookup_contract.dart';
 export 'src/contracts/food_repository_contract.dart';
 export 'src/contracts/food_search_contract.dart';

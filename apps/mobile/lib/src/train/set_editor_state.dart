@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mm_domain/mm_domain.dart';
+import 'package:mm_engine/mm_engine.dart';
 
 import '../format/clock_time_text.dart';
 import '../format/load_number.dart';
@@ -15,8 +16,8 @@ import '../ui/mm_segment.dart';
 import '../ui/mm_segmented.dart';
 import '../ui/mm_text_field.dart';
 import '../ui/mm_text_field_kind.dart';
+import '../ui/show_mm_clock_time.dart';
 import '../ui/show_mm_snack_bar.dart';
-import '../ui/show_mm_time_picker.dart';
 import 'set_editor.dart';
 
 class SetEditorState extends State<SetEditor> {
@@ -79,26 +80,29 @@ class SetEditorState extends State<SetEditor> {
   }
 
   static String _timeText(DateTime? time) =>
-      time == null ? 'Not timed' : clockTimeText(time);
+      time == null ? 'Not timed' : clockTimeText(time, seconds: true);
 
-  /// Sets the start or the end by hand, to the minute. A time that cannot
+  /// Sets the start or the end by hand, to the second. A time that cannot
   /// be right is refused with the reason.
   Future<void> _pickTime({required bool start}) async {
     final current = start ? _set.startedAt : _set.endedAt;
     final opensAt = current ?? _set.endedAt ?? widget.timeBase;
     final messenger = ScaffoldMessenger.of(context);
-    final minutes = await showMmTimePicker(
+    final timeOfDay = await showMmClockTime(
       context,
-      initialMinuteOfDay: opensAt.hour * 60 + opensAt.minute,
-      helpText: start ? 'Set started' : 'Set ended',
+      title: start ? 'Set started' : 'Set ended',
+      initial: Duration(
+        hours: opensAt.hour,
+        minutes: opensAt.minute,
+        seconds: opensAt.second,
+      ),
     );
-    if (minutes == null || !mounted) return;
-    final base = widget.timeBase;
-    final picked = DateTime(
-      base.year,
-      base.month,
-      base.day,
-    ).add(Duration(minutes: minutes));
+    if (timeOfDay == null || !mounted) return;
+    final picked = placeTimeOfDay(
+      notBefore: widget.timeBase,
+      notAfter: widget.timeLimit,
+      timeOfDay: timeOfDay,
+    );
     final changed = start
         ? _set.copyWith(startedAt: () => picked)
         : _set.copyWith(endedAt: () => picked);

@@ -43,3 +43,14 @@ Scenario: Inches are stored as centimeters
 - The waist `_EntryCard` and `_waistSummary` in `progress_screen.dart`; `MmStore.saveWaist` and `watchWaist`.
 - **No test covers waist**, in the data package or the app, and it was not exercised on a device. Add both under MM-93.
 - Not built: a waist chart, and using waist in the recomp signal (MM-32) or a body-fat estimate (MM-34).
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-waist-entry) —
+  Current. Draws WaistEntryCard as built on 2026-10-11: empty, three readings,
+  one reading, refused value. Drawn from the source alone; not compared with
+  the running app. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#weigh-in-and-trend) — Current.
+  Draws the "a weigh-in, a weight event and a waist measurement" path as built
+  on 2026-10-11. Drawn from the source alone; not compared with the running
+  app. It shows what exists and approves nothing.

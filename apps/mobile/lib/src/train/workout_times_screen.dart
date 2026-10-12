@@ -24,14 +24,21 @@ class WorkoutTimesScreen extends ConsumerWidget {
 
   final int workoutId;
 
-  static DateTime _on(CalendarDate date, DateTime time) => DateTime(
-    date.year,
-    date.month,
-    date.day,
-    time.hour,
-    time.minute,
-    time.second,
-  );
+  static DateTime _on(CalendarDate date, DateTime time, {int addDays = 0}) =>
+      DateTime(
+        date.year,
+        date.month,
+        date.day + addDays,
+        time.hour,
+        time.minute,
+        time.second,
+      );
+
+  /// How many days after its start a workout ended: 1 for one that ran
+  /// past midnight.
+  static int _daysOn(DateTime start, DateTime end) =>
+      CalendarDate.fromDateTime(end).epochDay -
+      CalendarDate.fromDateTime(start).epochDay;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -118,7 +125,14 @@ class WorkoutTimesScreen extends ConsumerWidget {
                   await change(
                     date: date,
                     startedAt: _on(date, workout.startedAt),
-                    endedAt: ended == null ? null : _on(date, ended),
+                    // An end after midnight stays on the day after.
+                    endedAt: ended == null
+                        ? null
+                        : _on(
+                            date,
+                            ended,
+                            addDays: _daysOn(workout.startedAt, ended),
+                          ),
                   );
                 },
               ),
@@ -136,11 +150,25 @@ class WorkoutTimesScreen extends ConsumerWidget {
                 MmListRow(
                   key: const ValueKey('workout-time-end'),
                   title: 'Ended',
-                  subtitle: clockTimeText(ended),
+                  subtitle: _daysOn(workout.startedAt, ended) > 0
+                      ? '${clockTimeText(ended)}, next day'
+                      : clockTimeText(ended),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
                     final picked = await pickTime(ended, 'Ended');
-                    if (picked != null) await change(endedAt: picked);
+                    if (picked == null) return;
+                    // A time of day before the start is after midnight,
+                    // on the next day, when that is not still to come.
+                    await change(
+                      endedAt: placeTimeOfDay(
+                        notBefore: workout.startedAt,
+                        notAfter: ref.read(clockProvider).now(),
+                        timeOfDay: Duration(
+                          hours: picked.hour,
+                          minutes: picked.minute,
+                        ),
+                      ),
+                    );
                   },
                 ),
             ],

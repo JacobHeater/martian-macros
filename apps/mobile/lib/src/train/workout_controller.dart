@@ -9,7 +9,7 @@ final class WorkoutController {
   final Clock clock;
 
   /// Starts a workout now. With [from], it starts with that workout's
-  /// exercises and no sets. Returns its id.
+  /// exercises and their rest targets, and no sets. Returns its id.
   Future<int> start({Workout? from}) => workouts.saveWorkout(
     Workout(
       id: 0,
@@ -17,7 +17,10 @@ final class WorkoutController {
       startedAt: clock.now(),
       exercises: [
         for (final exercise in from?.exercises ?? const <WorkoutExercise>[])
-          WorkoutExercise(exerciseId: exercise.exerciseId),
+          WorkoutExercise(
+            exerciseId: exercise.exerciseId,
+            restTarget: exercise.restTarget,
+          ),
       ],
     ),
   );
@@ -98,12 +101,31 @@ final class WorkoutController {
 
   Future<void> delete(Workout workout) => workouts.deleteWorkout(workout.id);
 
-  Future<void> addExercise(Workout workout, String exerciseId) =>
+  /// Adds an exercise, with the rest target it had last, if any.
+  Future<void> addExercise(
+    Workout workout,
+    String exerciseId, {
+    Duration? restTarget,
+  }) => workouts.saveWorkout(
+    workout.copyWith(
+      exercises: [
+        ...workout.exercises,
+        WorkoutExercise(exerciseId: exerciseId, restTarget: restTarget),
+      ],
+    ),
+  );
+
+  /// Sets how long the user means to rest after a set of the exercise at
+  /// [index] (MM-191), or none. A rest already running is measured against
+  /// it from when that rest began.
+  Future<void> setRestTarget(Workout workout, int index, Duration? target) =>
       workouts.saveWorkout(
         workout.copyWith(
           exercises: [
-            ...workout.exercises,
-            WorkoutExercise(exerciseId: exerciseId),
+            for (var i = 0; i < workout.exercises.length; i++)
+              i == index
+                  ? workout.exercises[i].withRestTarget(target)
+                  : workout.exercises[i],
           ],
         ),
       );

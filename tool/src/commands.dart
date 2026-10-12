@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'arch/arch_command.dart';
+import 'ci/ci_command.dart';
 import 'command.dart';
 import 'demo_command.dart';
 import 'food/food_command.dart';
@@ -18,6 +19,7 @@ const _packages = <({String path, bool flutter})>[
   (path: 'packages/data', flutter: false),
   (path: 'packages/food_catalog', flutter: false),
   (path: 'packages/food_pipeline', flutter: false),
+  (path: 'packages/health_ingest', flutter: false),
   (path: 'packages/fixtures', flutter: false),
   (path: 'apps/mobile', flutter: true),
   (path: 'tool', flutter: false),
@@ -40,6 +42,10 @@ final _commands = <String, (String, Command)>{
   'panel': (
     'Expert panel: validate roles, native adapters and templates [run-dir]',
     (tc, args) => runPanel(tc.repoRoot, args),
+  ),
+  'ci': (
+    'Watch pull request checks without waiting: mm ci help',
+    (tc, args) => runCi(tc.repoRoot, args),
   ),
   'test': ('Run tests: mm test [package-path ...]', _test),
   'goldens': ('Screenshot tests (Linux only): mm goldens [--update]', _goldens),
