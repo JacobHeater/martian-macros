@@ -174,3 +174,25 @@ Not built:
 - Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
 - Time comes from the app's `Clock`, never the device directly (MM-190), so every scenario above is testable with a fixed clock.
 - Not planned: automatic rep counting, heart rate, or timing from a watch.
+
+## UI/UX Assets
+
+- [Train](../ui-ux-assets/views/train.html) — Current. Draws RestAlarm,
+  SetEditor, SetTimerBar, Ticking, WorkoutClockCard, WorkoutExerciseCard and
+  WorkoutTimesScreen as built on 2026-10-11: none of its own, new set,
+  bodyweight, timed, rest, set running, counting down, target reached, and
+  more. Frames: `#workout-rest-reached`, `#workout-default`,
+  `#workout-rest-counting`, `#workout-set-running`, `#workout-paused`,
+  `#workout-times`. Partly compared with screenshot tests, the rest drawn from
+  the source alone. Vibrates the phone when the rest target is reached; it
+  draws nothing. Rebuilds its child every second; it draws nothing itself. It
+  shows what exists and approves nothing.
+- [Component catalog](../ui-ux-assets/components/index.html) — Current. Draws
+  MmClockTimeDialog, showMmClockTime and showMmOptions as built on 2026-10-11:
+  valid, refused, open, open, one chosen. Frames: `#mm-clock-time-dialog`,
+  `#show-mm-options`. Drawn from the source alone; not compared with the
+  running app. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-workout) — Current. Draws the
+  "a workout from start to finish" path as built on 2026-10-11. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

@@ -60,3 +60,13 @@ Scenario: In words
   (`apps/mobile/test/charts_test.dart`). Token contrast is tested in `theme_test.dart`.
 - **Not built**: the range bar and weekly bars, because no screen uses them yet; waist and strength charts do not exist. Add them to `charts/` when they do.
 - **Not verified**: the line, band and dots in both themes were checked by token contrast, and by eye only in dark mode on the emulator earlier.
+
+## UI/UX Assets
+
+- [Component catalog](../ui-ux-assets/components/index.html) — Current. Draws
+  HistoryChart, MacroSplitChart, TrendChart and TrendSparkline as built on
+  2026-10-11: a series with a gap, three macros, with band and event, shown.
+  Frames: `#history-chart`, `#macro-split-chart`, `#trend-chart`,
+  `#trend-sparkline`. Partly compared with screenshot tests, the rest drawn
+  from the source alone. Drawn as bars; the app draws points joined by a line.
+  It shows what exists and approves nothing.

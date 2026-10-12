@@ -7,7 +7,15 @@ const uiUxAssetsFolder = 'requirements/ui-ux-assets';
 const uiUxAssetsHeading = '## UI/UX Assets';
 
 /// What an asset can be said to be. Linking one approves nothing.
-const uiUxAssetStatuses = ['exploratory', 'proposed', 'accepted', 'superseded'];
+///
+/// `current` is a drawing of what is built (MM-211); the others are designs.
+const uiUxAssetStatuses = [
+  'current',
+  'exploratory',
+  'proposed',
+  'accepted',
+  'superseded',
+];
 
 const _unresolvedHeading = '## Unresolved assets';
 const _notAssetsHeading = '## HTML that is not a UI/UX asset';
@@ -107,6 +115,17 @@ List<String> uiUxAssetProblems(Directory repoRoot, {List<String>? htmlFiles}) {
           );
         } else {
           linked.add(target);
+          final frame = _fragment(entry[2]!);
+          if (frame != null &&
+              !uiUxAssetHasAnchor(
+                File('$root/$target').readAsStringSync(),
+                frame,
+              )) {
+            problems.add(
+              '$where: asset "$title" links $target#$frame, and that sheet '
+              'has no frame "$frame".',
+            );
+          }
         }
       }
     }
@@ -190,6 +209,18 @@ List<String> uiUxAssetProblems(Directory repoRoot, {List<String>? htmlFiles}) {
       if (!File('$root/$target').existsSync() &&
           !Directory('$root/$target').existsSync()) {
         problems.add('$path: refers to $reference, which is missing.');
+        continue;
+      }
+      final frame = _fragment(reference);
+      if (frame != null &&
+          target.toLowerCase().endsWith('.html') &&
+          !uiUxAssetHasAnchor(
+            File('$root/$target').readAsStringSync(),
+            frame,
+          )) {
+        problems.add(
+          '$path: links $reference, and that sheet has no frame "$frame".',
+        );
       }
     }
   }
@@ -273,6 +304,19 @@ List<String> _items(List<String> lines, String heading) {
     }
   }
   return items;
+}
+
+/// The part of [link] after `#`, or null.
+String? _fragment(String link) {
+  final at = link.indexOf('#');
+  return at == -1 || at == link.length - 1 ? null : link.substring(at + 1);
+}
+
+/// Whether [html] has something addressed by [id]: an element with that id,
+/// or a frame the shared script is asked to draw with it.
+bool uiUxAssetHasAnchor(String html, String id) {
+  final quoted = RegExp.escape(id);
+  return RegExp('id="$quoted"|\'$quoted\'').hasMatch(html);
 }
 
 /// [link], written in a file in [fromFolder], as a path from the repository

@@ -58,3 +58,11 @@ Scenario: The user overrides the recommendation
 - `recommendMode` in `packages/engine/lib/src/mode_advisor.dart` (engine tests cover each branch and both sexes); the screen is `_goal` in
   the onboarding screen.
 - Verified by hand on the emulator for the novice case. The override scenario is not covered by a widget test.
+
+## UI/UX Assets
+
+- [First launch and
+  gates](../ui-ux-assets/views/onboarding.html#onboarding-goal) — Current.
+  Draws GoalStep as built on 2026-10-11: recommended, restricted. Drawn from
+  the source alone; not compared with the running app. It shows what exists
+  and approves nothing.

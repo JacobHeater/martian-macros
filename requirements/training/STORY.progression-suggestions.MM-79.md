@@ -101,3 +101,16 @@ Not built:
 
 ## Notes
 - This is deliberately simple. Periodization, deloads and programs are out of scope.
+
+## UI/UX Assets
+
+- [Train](../ui-ux-assets/views/train.html) — Current. Draws
+  ProgressionSettingsScreen and WorkoutExerciseCard as built on 2026-10-11:
+  defaults, invalid range, with sets, suggestion, rest target options, remove
+  confirm. Frames: `#progression-settings`, `#workout-default`. Partly
+  compared with screenshot tests, the rest drawn from the source alone. It
+  shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-workout) — Current. Draws the
+  "a workout from start to finish" path as built on 2026-10-11. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

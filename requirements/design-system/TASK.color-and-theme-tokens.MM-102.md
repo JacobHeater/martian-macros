@@ -87,3 +87,7 @@ Scenario: Without color vision
   app code: its fonts fall back to the system's, its Today mock is an
   illustration and not the reference for that screen, and it has not been
   compared with the built screens since.
+- [Component catalog](../ui-ux-assets/components/index.html#colors) — Current.
+  Draws ColorSwatches as built on 2026-10-11: three themes. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

@@ -44,3 +44,11 @@ Scenario: Removing it
   - The sliders write to the database on every movement, not when released.
 - Whether a change here should apply at once instead of waiting for the check-in is worth deciding. Waiting is consistent, but a user who
   corrects their body fat from 30% to 15% keeps a loss rate that is too fast for up to a week.
+
+## UI/UX Assets
+
+- [Settings](../ui-ux-assets/views/settings.html#settings-default) — Current.
+  Draws SettingsScreen as built on 2026-10-11: populated, own body fat, erase
+  confirm. Compared with a screenshot test of the built screen. Compared with
+  the screenshot test for the top of the page only. It shows what exists and
+  approves nothing.

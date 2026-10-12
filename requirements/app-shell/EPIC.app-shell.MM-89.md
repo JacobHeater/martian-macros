@@ -22,3 +22,11 @@ joining with the training log (MM-97, MM-99). The look of every screen moves ont
 ## Acceptance Criteria (narrative)
 The Epic is done when every screen has been seen in both themes on a small and a large phone, every interactive behavior listed in MM-93 is
 covered by a test, and what the app celebrates follows the rules in MM-92.
+
+## UI/UX Assets
+
+- [First launch and gates](../ui-ux-assets/views/onboarding.html#app-loading)
+  — Current. Draws AppRoot as built on 2026-10-11: loading, data error, theme
+  error. Drawn from the source alone; not compared with the running app. Which
+  gate is shown first is described on the flows sheet, not drawn as one frame.
+  It shows what exists and approves nothing.

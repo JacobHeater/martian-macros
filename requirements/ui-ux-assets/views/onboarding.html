@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First launch and gates · Martian Macros UI reference</title>
+<link rel="stylesheet" href="../shared/mm.css">
+<script src="../shared/mm.js"></script>
+</head>
+<body>
+<script>
+(function (m) {
+  function step(n, parts, next, off) {
+    return m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.steps(7, n)].concat(parts).concat(['<div class="grow" style="min-height:40px"></div>',
+      m.rowx([n > 1 ? m.btn('Back', 'text') : '', '<span class="grow"></span>', m.btn(next || 'Next', off ? 'off' : 'primary')])]) });
+  }
+  var healthRows = ['Pregnant', 'Breastfeeding', 'PCOS', 'Perimenopause or menopause', 'History of an eating disorder', 'Chronic kidney disease', 'Thyroid condition', 'Testosterone therapy or anabolic steroids',
+    'Diabetes treated with insulin or a sulfonylurea', 'I have had bariatric surgery', 'A medication I take can change my weight or water retention'];
+  function health(checked) { return healthRows.slice(4).map(function (r, n) { return m.row(r, '', '', { lead: m.check(n === checked), cls: 'bare' }); }).join(''); }
+  var weighIn = m.info('Today’s weigh-in', [m.rowx(['<div class="grow">' + m.field('', '', { sfx: 'lb' }) + '</div>', m.btn('Save', 'off')]), m.cap('First thing in the morning, after the bathroom.')]);
+
+  m.page({
+    title: 'First launch and gates',
+    intro: 'What a person sees before the five destinations: the theme chooser, onboarding, and the full-screen gates that can stand in front of the app later (adults only, the repeated health check, welcome back after a gap), plus the loading and failure states of the app itself.',
+    sources: ['apps/mobile/lib/src/theme/theme_chooser_screen.dart', 'apps/mobile/lib/src/onboarding/', 'apps/mobile/lib/src/app/', 'apps/mobile/lib/src/reminders/', 'apps/mobile/lib/src/ui/demo_notice.dart'],
+    tickets: ['MM-184', 'MM-9', 'MM-10', 'MM-11', 'MM-12', 'MM-13', 'MM-14', 'MM-164', 'MM-112', 'MM-147', 'MM-146', 'MM-89', 'MM-90', 'MM-177'],
+    limits: 'The order of onboarding steps four to seven (your day, training, health check, plan) is read from the source file names and has a screenshot test only for the first step. The phone’s date picker is not drawn.',
+    sections: [
+      { h: 'Theme chooser (new installations only)', id: 'theme-chooser', frames: [
+        m.frame('theme-chooser', 'Choose your theme', 'MM-184. Martian is preselected; choosing another previews it at once and saves only on Continue. Tap a card.', m.phone({ cls: 'short', bodyCls: 'pad24', body: [
+          m.title('Make it your planet.'), m.title('Choose your theme'), m.p('Martian is our retro original. Try a look below; you can change it anytime in Settings.'),
+          m.choices([m.choice('Martian', 'Acid lime, cyan and pink on deep grape.', { on: true, tag: 'Default' }), m.choice('Light', 'Cool gray, white and crisp ink.'), m.choice('Dark', 'Midnight blue with warm orange accents.'), m.choice('System', 'Follow your phone\'s light or dark appearance.')]),
+          m.heading('A little color preview'), m.bar('Protein', '65 / 100 g', 65, 'protein'), m.bar('Carbs', '65 / 100 g', 65, 'carbs'), m.bar('Fat', '65 / 100 g', 65, 'fat'), m.btn('Continue', 'primary', { block: true })] })),
+        m.frame('theme-chooser-saving', 'Saving, and a save that failed', '', m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.notice('caution', 'Could not save your theme. Please try again.'), m.btn('Saving…', 'off', { block: true })] }))
+      ] },
+      { h: 'Onboarding', id: 'onboarding', frames: [
+        m.frame('onboarding-welcome', 'Welcome', '', m.phone({ bodyCls: 'pad24', body: ['<div style="height:120px"></div>', '<div class="fig">Martian Macros</div>', m.p('Coaching for fat loss and muscle gain that adapts to your body, not a formula.', 't2'),
+          '<div class="hero" style="border:0;background:none;padding:0">' + m.arc(60) + '</div>', m.p('A few questions first. It takes about two minutes, and everything stays on this phone.', 't2'), '<div class="grow"></div>', m.rowx(['<span class="grow"></span>', m.btn('Get started', 'primary')])] })),
+        m.frame('onboarding-sex', '1 · Biological sex', 'Next is off until one is chosen.', step(1, [m.title('Biological sex'), m.p('Energy needs, safe body-fat ranges, and safety limits differ between males and females.', 't2'),
+          '<div class="rowx choices">' + m.choice('Male').replace('class="choice', 'style="flex:1" class="choice') + m.choice('Female').replace('class="choice', 'style="flex:1" class="choice') + '</div>'], 'Next', true)),
+        m.frame('onboarding-birth-date', '2 · Date of birth', '', step(2, [m.title('Date of birth'), m.p('Age changes energy needs and some safety limits.', 't2'), m.btn('Choose date', 'secondary')], 'Next', true)),
+        m.frame('onboarding-under-18', '2 · Under 18', 'MM-13. The flow cannot continue.', step(2, [m.title('Date of birth'), m.btn('March 4, 2011', 'secondary'),
+          m.notice('safety', 'Martian Macros is for adults 18 and over. Growing bodies need different guidance than this app provides.')], 'Next', true)),
+        m.frame('onboarding-measurements', '3 · Your measurements', 'Metric shows one height field, Centimeters.', step(3, [m.title('Your measurements'), m.seg(['lb / ft', 'kg / cm'], 0), m.label('Height'),
+          m.rowx(['<div class="grow">' + m.field('Feet', '5', { cls: 'oncanvas' }) + '</div>', '<div class="grow">' + m.field('Inches', '10', { cls: 'oncanvas' }) + '</div>']), m.label('Current weight'), m.field('', '189.4', { cls: 'oncanvas', sfx: 'lb' }), m.cap('This becomes your first weigh-in.')])),
+        m.frame('onboarding-activity', '4 · Your day', 'MM-164.', step(4, [m.title('Your day'), m.p('Outside of workouts, how much are you on your feet? This sets your starting calorie estimate until the app has measured your own.', 't2'),
+          m.choices([m.choice('Mostly seated', 'Desk work, driving. About 3,000 steps a day.'), m.choice('Light movement', 'Some walking and errands. About 6,000 steps a day.', { on: true }), m.choice('On my feet most of the day', 'Retail, teaching, care work. About 10,000 steps a day.'), m.choice('Physical job', 'Trades, farming, delivery on foot. 12,000 steps or more.')])])),
+        m.frame('onboarding-training', '5 · Training', '', step(5, [m.title('Training'), m.label('Resistance training experience'),
+          m.choices([m.choice('Not lifting yet'), m.choice('Under 1 year', '', { on: true }), m.choice('Returning after 6+ months off'), m.choice('1–3 years'), m.choice('3+ years')]),
+          m.label('Training days per week: 3'), m.slider(43), m.label('Body fat (optional)'), m.cap('If you have a recent estimate (DEXA, calipers, or a consistent scale), enter it. Otherwise leave it off and the app estimates.'),
+          m.row('I don’t know', '', m.sw(true), { cls: 'bare' }), m.label('Creatine'), m.row('I currently take creatine', '', m.sw(true), { cls: 'bare' }), m.row('When did you start?', 'September 1, 2026', m.i('cal', 's'), { cls: 'bare' })])),
+        m.frame('onboarding-health', '6 · Health check', 'MM-11, MM-112. A female profile has four more rows first: Pregnant, Breastfeeding, PCOS, Perimenopause or menopause.', step(6, [m.title('Health check'), m.p('Tick anything that applies. These change what the app will recommend, and some switch off calorie deficits entirely.', 't2'), health(2),
+          m.row('I have discussed a calorie deficit with my care team', '', '', { lead: m.check(false), cls: 'bare' }), m.cap('This app is not medical advice. Talk to your clinician before changing your diet if you have a medical condition.')])),
+        m.frame('onboarding-goal', '7 · Your plan', 'MM-12. Only the goals the health check allows are shown.', step(7, [m.title('Your plan'),
+          m.notice('info', 'We recommend fat loss. At your estimated body fat, steady fat loss gives the fastest visible progress while training protects your muscle. Body fat here is an estimate that can be off by a few points either way.'),
+          m.choices([m.choice('Fat loss', 'Lose fat at a steady pace while keeping muscle.', { on: true, tag: 'Recommended' }), m.choice('Recomp', 'Hold weight roughly steady while trading fat for muscle.'), m.choice('Lean gain', 'Build muscle in a small, controlled surplus.'), m.choice('Maintenance', 'Hold where you are.')]),
+          m.notice('plain', 'Your first two weeks are calibration: log your food and weigh in daily, and your targets hold steady. After that they adapt weekly to how your body actually responds.')], 'Start')),
+        m.frame('onboarding-goal-restricted', '7 · A plan the health check limits', '', step(7, [m.title('Your plan'), m.notice('info', 'We recommend maintenance. Based on your health check, the app will not prescribe a calorie deficit.'),
+          m.choices([m.choice('Maintenance', 'Hold where you are.', { on: true, tag: 'Recommended' })])], 'Start'))
+      ] },
+      { h: 'Gates in front of the app', id: 'gates', frames: [
+        m.frame('adults-only', 'Adults only', 'MM-13. Shown when the stored date of birth makes the user under 18.', m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.title('Martian Macros is for adults'),
+          m.notice('safety', 'Martian Macros is for adults 18 and over. Growing bodies need different guidance than this app provides. Coaching is switched off.'), m.btn('Correct date of birth', 'secondary')] })),
+        m.frame('health-recheck', 'The repeated health check', 'MM-112. Asked again at intervals.', m.phone({ cls: 'short', bar: { title: 'Health check' }, body: [m.p('Has anything changed since your last health check? Your answers help keep your coaching safe.'), health(2), m.btn('Confirm answers', 'primary', { block: true }), m.btn('Not now', 'text', { block: true })] })),
+        m.frame('health-recheck-second-skip', 'Skipped once already', '', m.phone({ cls: 'short', bar: { title: 'Health check' }, body: [m.btn('Confirm answers', 'primary', { block: true }), m.btn('Skip again and pause deficit coaching', 'text', { block: true })] })),
+        m.frame('welcome-back', 'Welcome back after a gap', 'MM-147.', m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.title('Welcome back'),
+          m.p('A weigh-in gets the coach going again. Your targets are what they were, and the next check-in is in a week. Expect the scale to move for a few days while water settles; that is not fat.', 't2'), weighIn, m.btn('Later', 'text')] })),
+        m.frame('welcome-back-after-pause', 'Ready to resume, after a pause', '', m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.title('Ready to resume?'), m.p('To pick up, the coach needs one thing: a weigh-in.', 't2'), weighIn, m.btn('Later', 'text')] }))
+      ] },
+      { h: 'The app itself', id: 'app', frames: [
+        m.frame('app-loading', 'Opening', '', m.phone({ cls: 'short', body: ['<div style="height:120px"></div>', m.spinner(), '<div style="height:120px"></div>'] })),
+        m.frame('app-data-error', 'Data could not be opened', 'The error text follows the message.', m.phone({ cls: 'short', bodyCls: 'pad24', body: ['<div style="height:80px"></div>', m.p('Could not open your data.<br><br>(the error)', 'center')] })),
+        m.frame('app-theme-error', 'Theme preference could not be loaded', '', m.phone({ cls: 'short', bodyCls: 'pad24', body: [m.notice('caution', 'Could not load your theme preference.'), m.btn('Try again', 'secondary')] })),
+        m.frame('app-demo', 'The demo build', 'MM-177. A strip marks seeded data; the app is titled “Martian Macros DEMO”.', m.phone({ cls: 'short', body: ['<div class="demo" id="demo-notice">DEMO · Synthetic data</div>', '<div style="height:40px"></div>'], bar: { title: 'Today', acts: ['gear'] }, nav: 'dashboard' })),
+        m.frame('reminder-paused', 'A reminder that went unanswered', 'MM-146. Shown on the Dashboard after a week of ignored reminders.', m.phone({ cls: 'short', bar: { title: 'Today', acts: ['gear'] }, body: [
+          m.notice('info', 'Weigh-in reminders are paused. Keep them or turn them off?', { acts: [m.btn('Keep', 'secondary', { sm: true }), m.btn('Turn off', 'text', { sm: true })] })] })),
+        m.frame('target-summary-error', 'A target summary that could not finish', '', m.phone({ cls: 'short', bar: { title: 'Today', acts: ['gear'] }, body: ['<div style="height:100px"></div>'], over: m.snack('Could not finish the target summary. It will be available again when you reopen the app.') }))
+      ] }
+    ]
+  });
+})(mm);
+</script>
+</body>
+</html>

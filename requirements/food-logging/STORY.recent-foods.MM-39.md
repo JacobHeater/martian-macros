@@ -40,3 +40,11 @@ Scenario: A new user
 - The chip row is not covered by a widget test.
 - Recents are a stopgap for saved foods with servings (MM-45): a recent has one fixed amount, so "half of that" means retyping four
   numbers.
+
+## UI/UX Assets
+
+- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) —
+  Current. Draws AddFoodSheet as built on 2026-10-11: empty, filled, label
+  serving, alcohol, invalid, estimate source, search, edit, and more. Drawn
+  from the source alone; not compared with the running app. It shows what
+  exists and approves nothing.

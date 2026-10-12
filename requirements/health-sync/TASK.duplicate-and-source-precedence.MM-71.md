@@ -75,3 +75,15 @@ Not built:
   window is a small later addition.
 - When the primary scale changes, the trend filter will see a step if the scales disagree. The outlier rule (MM-18) absorbs a small one;
   a large one needs a per-source offset, which MM-34's design should cover for weight as well as body fat.
+
+## UI/UX Assets
+
+- [Progress](../ui-ux-assets/views/progress.html#progress-default) — Current.
+  Draws ProgressScreen as built on 2026-10-11: populated, empty, typed,
+  imported, few weigh-ins. Compared with a screenshot test of the built
+  screen. It shows what exists and approves nothing.
+- [Settings](../ui-ux-assets/views/settings.html#settings-health-none) —
+  Current. Draws HealthConnectSection as built on 2026-10-11: some allowed,
+  none allowed, absent, refused, read failed. Drawn from the source alone; not
+  compared with the running app. Never seen on a real phone. It shows what
+  exists and approves nothing.

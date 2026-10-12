@@ -11,6 +11,8 @@ mascots: Maurice is a requested review concern, not an approved asset or change
 to that rule. Flag the conflict for the owner before any implementation.
 Maintain the HTML UI/UX assets and the design status each entry gives
 (`requirements/ui-ux-assets/README.md`, MM-210); never record approval the owner has not given.
+Check each drawing of a built screen against the real screen for visual
+fidelity, hierarchy and design-system consistency (MM-211).
 ## Existing implementation audit
 Audit implemented screens/components against the approved design system,
 visual hierarchy, interaction states, consistency and product identity, using

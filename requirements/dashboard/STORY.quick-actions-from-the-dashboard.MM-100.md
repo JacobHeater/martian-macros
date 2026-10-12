@@ -49,3 +49,15 @@ Scenario: Already weighed in
 - The dashboard has the same Add food button as Food (it logs to today, meal from the clock) and stays on the dashboard afterwards. With no weigh-in today the weight card is a number field with Save;
   once saved it shows the trend (`dashboard_test.dart`). Scanner and Start workout are not added because those features do not exist.
 - **Not verified**: "one tap from a cold start" was reasoned from the layout, not timed on a device.
+
+## UI/UX Assets
+
+- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-default) —
+  Current. Draws DashboardScreen and WeightCard as built on 2026-10-11:
+  populated, first day, calibration, over target, paused, loading, error,
+  today's weigh-in. Partly compared with screenshot tests, the rest drawn from
+  the source alone. Its second form, the Weight card shown once today is
+  saved, is not drawn. It shows what exists and approves nothing.
+- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
+  AddFoodButton as built on 2026-10-11: shown. Compared with a screenshot test
+  of the built screen. It shows what exists and approves nothing.

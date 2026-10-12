@@ -63,3 +63,15 @@ Scenario: No implicit production seed
 - No physical phone installation or launch is authorized. Device acceptance
   and visual inspection remain unverified. Seeded demo startup resets on
   every launch (not only on a new command invocation); this is intentional.
+
+## UI/UX Assets
+
+- [First launch and gates](../ui-ux-assets/views/onboarding.html#app-demo) —
+  Current. Draws MartianMacrosApp as built on 2026-10-11: themes, demo title.
+  Drawn from the source alone; not compared with the running app. Applies the
+  theme and the app title; the themes are the switch on every sheet. It shows
+  what exists and approves nothing.
+- [Component catalog](../ui-ux-assets/components/index.html#demo-notice) —
+  Current. Draws DemoNotice as built on 2026-10-11: shown. Drawn from the
+  source alone; not compared with the running app. It shows what exists and
+  approves nothing.

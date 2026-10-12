@@ -156,3 +156,19 @@ Scenario: Never blame
 - Tests: engine (ordinary change with a step-limit line, floor named with what the target would otherwise be, goal change as the cause, first targets, JSON round trip, the 16-week sum; every hold rule), repositories (explanation through Drift and in-memory), app (the card and its four parts, old records, first targets, the held note, the history of six, a hold once and not again, not on an increase), and screenshot baselines for the Coach screen and the sheet.
 - **Not done**: simulator calibration and product-owner confirmation of the hold-a-reduction behavior. MM-136 weight-event integration is
   now implemented and covered by deterministic simulator tests.
+
+## UI/UX Assets
+
+- [Coach](../ui-ux-assets/views/coach.html) — Current. Draws
+  TargetChangeSummaryHost, LastChangeCard, showTargetChangeSheet,
+  TargetChangeSheet and TargetsHistoryScreen as built on 2026-10-11: shown
+  once, could not finish, a change, first targets, open, no change, populated,
+  empty. Frames: `#target-change-sheet`, `#coach-default`, `#targets-history`.
+  Partly compared with screenshot tests, the rest drawn from the source alone.
+  Shows the explanation sheet after a check-in; its failure message is
+  views/onboarding.html#target-summary-error. The no-change wording is not
+  drawn. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#weekly-check-in) — Current. Draws
+  the "the check-in, its explanation and the recovery questions" path as built
+  on 2026-10-11. Drawn from the source alone; not compared with the running
+  app. It shows what exists and approves nothing.

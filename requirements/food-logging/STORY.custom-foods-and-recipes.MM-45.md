@@ -63,3 +63,18 @@ Tests: `custom_foods_test.dart`, `recipe_test.dart`, the repository contract in 
 Not built: inclusion in backup (MM-63 is unbuilt; its format must carry these tables); ingredient lines do not remember which
 database food they came from, only the totals at the time; a recipe's ingredients cannot yet be reordered; saved foods are not used by
 the "Fix this food" copy (MM-153); the raw-or-cooked prompt (MM-151) for ingredients. Not seen on the emulator.
+
+## UI/UX Assets
+
+- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Draws
+  CustomFoodForm, MyFoodsStep, RecipeForm and RecipeIngredientAdder as built
+  on 2026-10-11: filled from a label, label not read, bad barcode, populated,
+  empty, delete confirm, with ingredients, by numbers. Frames:
+  `#add-food-custom-food`, `#add-food-my-foods`, `#add-food-recipe`,
+  `#add-food-recipe-ingredient`. Drawn from the source alone; not compared
+  with the running app. Picking an ingredient from search is described, not
+  drawn. It shows what exists and approves nothing.
+- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
+  "adding, editing and removing a food, and closing the day" path as built on
+  2026-10-11. Drawn from the source alone; not compared with the running app.
+  It shows what exists and approves nothing.
