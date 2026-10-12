@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -11,7 +11,20 @@ const allowed: Record<string, readonly string[]> = {
   domain: ['lang'],
   engine: ['lang', 'domain'],
   healthIngest: ['lang'],
+  sql: ['lang'],
 };
+
+/**
+ * A library that reaches something outside the app, and the one folder
+ * that may import it: its adapter (MM-159, MM-231). Everything else goes
+ * through the interface the adapter implements.
+ */
+const adapters: Record<string, string> = {
+  '@sqlite.org/sqlite-wasm': 'sql/wasm/',
+  '@capacitor/core': 'platform/',
+};
+
+const inFolder = (file: string, folder: string) => relative(src, file).split(sep).join('/').startsWith(folder);
 
 const src = resolve('src');
 
@@ -42,12 +55,23 @@ describe('layers', () => {
       for (const file of files) {
         for (const specifier of importsOf(file)) {
           const target = specifier.startsWith('.') ? layerOf(resolve(dirname(file), specifier)) : specifier;
+          const adapterFolder = adapters[specifier];
+          if (adapterFolder !== undefined && inFolder(file, adapterFolder)) continue;
           if (target !== layer && !mayImport.includes(target)) {
             broken.push(`${relative(src, file)} imports ${specifier}`);
           }
         }
       }
       expect(broken).toEqual([]);
+    });
+  }
+
+  for (const [library, folder] of Object.entries(adapters)) {
+    it(`only ${folder} imports ${library}`, () => {
+      const outside = filesIn(src)
+        .filter((file) => !inFolder(file, folder) && importsOf(file).includes(library))
+        .map((file) => relative(src, file));
+      expect(outside).toEqual([]);
     });
   }
 });
