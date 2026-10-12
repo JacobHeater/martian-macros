@@ -990,3 +990,30 @@
 .theme-light .mm-horizon-glow {
   display: none;
 }
+
+/* A panel from the bottom of the screen. */
+.mm-scrim-sheet {
+  place-items: end center;
+  padding: 0;
+}
+.mm-sheet {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 640px);
+  max-height: 90%;
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow-y: auto;
+  border-radius: var(--radius-group) var(--radius-group) 0 0;
+  outline: 0;
+  background: var(--overlay);
+}
+.mm-sheet-handle {
+  flex: none;
+  align-self: center;
+  width: 32px;
+  height: 4px;
+  margin: var(--space-12) 0 var(--space-8);
+  border-radius: 2px;
+  background: var(--text2);
+  opacity: 0.4;
+}

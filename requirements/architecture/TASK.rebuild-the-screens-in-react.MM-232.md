@@ -122,6 +122,31 @@ macro-split tests are carried over. Looked at in the gallery in three
 palettes. One difference from Flutter: the trend line joins its points with
 straight segments, where Flutter's chart library curved them.
 
+**5. Dashboard, Coach and Pause (2026-10-12).** `apps/web/src/dashboard/`
+(the screen, the weight card, the logging line, the report notice and the
+history under it), `apps/web/src/coach/` (the screen and its cards: targets,
+last change and its account, target history, the summary of an unseen
+change, stall, insight, under-eating, relief offer, recovery and its
+check-in, recomp review, monthly reports, metabolism, confidence, goal
+change through the health check), `apps/web/src/pause/` (the banner and the
+screen, reached from Settings and from the Coach screen) and the calorie
+hero. The app's state gained the strength trends, the recomp review, the
+dashboard's range and the selected day; overlays gained the bottom sheet;
+the navigator gained a way back to the root. 123 tests: the Flutter tests of
+`dashboard`, `dashboard_metrics`, `process_rewards`, `pause_state_display`,
+`coach_flows`, `coach_confidence_widget`, `one_calorie_visual`,
+`stall_card`, `insight_card`, `last_change`, `adherence_summary`,
+`relief_offer`, `under_eating_notice`, `recovery_check_in`, `recomp_review`,
+`monthly_report`, `target_change_summary`, `target_history`, `pause` and
+the two Coach cases of `health_recheck`. Looked at in headless Chrome over
+the demo seed, dark and light. **Still to come with the Food screen:** the
+Dashboard's "Add food" action and the cases of these files that go through
+it (MM-206, the low-day question, the easy-to-miss line, the Food screen's
+arc and its wait for pauses, bariatric logging). The two Flutter cases that
+measured whether "Add food" covers something (MM-208, the insight's
+Dismiss) have no equivalent in a test without layout; they belong to the
+screenshot tests of MM-229.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
