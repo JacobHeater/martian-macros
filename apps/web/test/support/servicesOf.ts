@@ -13,6 +13,8 @@ export function servicesOf(repos: InMemoryRepositories, clock: FixedClock): AppS
     catalog: constant(new FoodCatalog([])),
     barcodeScanner: camera,
     labelReader: camera,
+    // Never the device's vibration in a test.
+    restSignal: { restOver: () => undefined },
     clock,
     setup: repos.setup,
     weights: repos.weights,

@@ -190,6 +190,21 @@ read the health platform as the app opens. The Flutter case that drew the
 strength cards at a narrow width and a large text size measured layout and
 belongs to the screenshot tests of MM-229; the count of cards is tested.
 
+**8. Train (2026-10-12).** `apps/web/src/train/`: the Train screen, a
+workout (its clock, pausing, exercises, sets and their controls, the set
+and rest timer, the rest alarm), editing a workout's times, choosing an
+exercise and creating one, the suggestion's own range and step, and weekly
+training volume. `WorkoutController` is in the app's state; `MuscleVolumeRow`
+joins the component library; the services gained the rest signal. 82 tests
+(and 3 skipped): the Flutter tests of `train`, `progression`,
+`personal_records`, `weekly_volume`, `workout_times` and `rest_target`. The
+three skipped are `workout_set_editor_findings` (MM-214, MM-215), which are
+skipped in Flutter too: known defects, each to be enabled with its fix.
+**Difference from Flutter:** the rest alarm asks the app's clock a few
+times a second instead of setting one timer for the whole rest, because a
+phone holds timers while its screen is off and the clock is right whenever
+it is next asked.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with

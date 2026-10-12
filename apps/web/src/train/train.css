@@ -1,0 +1,87 @@
+.train-intro {
+  margin: 0 0 var(--space-16);
+}
+.train-summary {
+  margin: 0 0 var(--space-12);
+}
+.train-first {
+  margin: 0 0 var(--space-12);
+}
+.train-clock {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+.train-clock-text {
+  flex: 1;
+  min-width: 0;
+}
+.train-clock-time {
+  margin: 0;
+  font: var(--type-figure);
+}
+.train-clock-line {
+  margin: 0;
+}
+.train-last-time {
+  margin: 0 0 var(--space-8);
+  color: var(--text2);
+}
+.train-suggestion {
+  margin: 0 0 var(--space-8);
+}
+.train-set-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) 0;
+}
+.train-set-title {
+  margin: 0;
+  font: var(--type-label);
+}
+.train-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.train-stepper > .mm-field {
+  flex: 1;
+  min-width: 0;
+}
+.train-rir-label {
+  margin: var(--space-4) 0 0;
+  color: var(--text2);
+}
+.train-fields {
+  display: flex;
+  gap: var(--space-12);
+}
+.train-fields > * {
+  flex: 1;
+  min-width: 0;
+}
+.train-problem {
+  margin: var(--space-12) 0 0;
+  color: var(--danger);
+}
+.train-timer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
+  background: var(--raised);
+}
+.train-timer-text {
+  flex: 1;
+  min-width: 0;
+}
+.train-timer-label {
+  margin: 0;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.train-timer-time {
+  margin: 0;
+  font: var(--type-title);
+}
