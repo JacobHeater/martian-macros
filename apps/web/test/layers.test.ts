@@ -17,7 +17,7 @@ const allowed: Record<string, readonly string[]> = {
   fixtures: ['lang', 'domain', 'engine', 'healthIngest'],
   data: ['lang', 'domain', 'engine', 'healthIngest', 'sql'],
   format: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog'],
-  platform: ['lang', 'domain'],
+  platform: ['lang', 'domain', 'healthIngest'],
   state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'platform'],
 };
 

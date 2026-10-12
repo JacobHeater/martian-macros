@@ -1,7 +1,7 @@
 import { MmButton } from '../ui/MmButton';
 import { Notice } from '../ui/Notice';
 import { Screen } from './Screen';
-import { SettingsScreen } from './SettingsScreen';
+import { SettingsScreen } from '../settings/SettingsScreen';
 import { useNavigator } from './useNavigator';
 
 /**

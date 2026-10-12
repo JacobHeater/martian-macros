@@ -89,6 +89,55 @@ describe('a derived cell', () => {
   });
 });
 
+describe('MM-233: a derived cell is never worked out from one new value and one old', () => {
+  it('reads a sibling that has not been told of the change yet as it is now', () => {
+    const base = new ValueCell(1);
+    const doubled = new DerivedCell(() => base.value * 2);
+    // Reads the base first, so it starts watching the base before `doubled` does
+    // and is told of a change first.
+    const pair = new DerivedCell(() => [base.value, doubled.value] as const);
+    const seen: (readonly [number, number])[] = [];
+    const stop = pair.subscribe((value) => seen.push(value));
+    base.put(2);
+    base.put(5);
+    stop();
+    expect(seen).toEqual([
+      [1, 2],
+      [2, 4],
+      [5, 10],
+    ]);
+  });
+
+  it('works a value out once for one change, however many of its sources that change reached', () => {
+    const base = new ValueCell(1);
+    const doubled = new DerivedCell(() => base.value * 2);
+    let worked = 0;
+    const sum = new DerivedCell(() => {
+      worked += 1;
+      return base.value + doubled.value;
+    });
+    const stop = sum.subscribe(() => undefined);
+    worked = 0;
+    base.put(3);
+    stop();
+    expect(sum.peek()).toBe(9);
+    expect(worked).toBe(1);
+  });
+
+  it('is brought up to date by being read, before it has been told', () => {
+    const base = new ValueCell(1);
+    const doubled = new DerivedCell(() => base.value * 2);
+    const read: number[] = [];
+    // Watches the base before `doubled` does, and reads `doubled` as soon as it is told.
+    const stopReader = base.subscribe(() => read.push(doubled.peek()));
+    const stop = doubled.subscribe(() => undefined);
+    base.put(4);
+    stop();
+    stopReader();
+    expect(read[read.length - 1]).toBe(8);
+  });
+});
+
 describe('a cell over something a repository watches', () => {
   it('is not ready until watched, then holds the first value and follows it', () => {
     const store = new ObservableValue(1);

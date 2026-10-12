@@ -1,6 +1,8 @@
 import type { FixedClock } from '../../src/fixtures/FixedClock';
+import { InMemoryReminderScheduler } from '../../src/fixtures/InMemoryReminderScheduler';
 import type { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { FoodCatalog } from '../../src/foodCatalog/FoodCatalog';
+import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { constant } from '../../src/lang/constant';
 import { NoCamera } from '../../src/platform/NoCamera';
 import type { AppServices } from '../../src/state/AppServices';
@@ -15,6 +17,12 @@ export function servicesOf(repos: InMemoryRepositories, clock: FixedClock): AppS
     labelReader: camera,
     // Never the device's vibration in a test.
     restSignal: { restOver: () => undefined },
+    // Never the device's notifications in a test.
+    reminderScheduler: new InMemoryReminderScheduler(),
+    // Never the device's health platform in a test: one with nothing in it, unless the test brings its own.
+    healthSource: FakeHealthSource.fromJson('{"sources": [], "events": []}'),
+    evidence: () => import('../../src/app/evidenceText').then((module) => module.evidenceText),
+    environment: 'dev',
     clock,
     setup: repos.setup,
     weights: repos.weights,
