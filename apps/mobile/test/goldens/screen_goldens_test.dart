@@ -644,6 +644,7 @@ void main() {
 
     testWidgets('editing a logged entry', (tester) async {
       await open(tester, await seeded(dark: true), tab: 'Food');
+      await tester.scrollUntilVisible(find.text('Chicken and rice'), 200);
       await tester.ensureVisible(find.text('Chicken and rice'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Chicken and rice'));
