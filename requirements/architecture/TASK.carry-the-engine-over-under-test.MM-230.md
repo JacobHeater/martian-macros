@@ -1,6 +1,6 @@
 ---
 id: MM-230
-status: proposed
+status: in-progress
 component: architecture
 related: [MM-228, MM-229, MM-23, MM-24, MM-28, MM-30, MM-143]
 ---
@@ -53,5 +53,43 @@ Scenario: The route is chosen on evidence
   Then this ticket records what compiling and porting each cost on the check-in and the trend, and why one was chosen
 ```
 
-## Notes
-- Not started.
+## Progress
+**Measured on 2026-10-12 (compiling the Dart to JavaScript):**
+- The packages' own Dart tests were run compiled to JavaScript on Node
+  (`dart test -p node`), with no change to any source file:
+
+  | Package | Passed | Failed | Why it failed |
+  | --- | --- | --- | --- |
+  | engine | 565 (1 skipped, MM-173) | 1 | The evidence register test reads a file from disk, which compiled Dart cannot do on Node |
+  | domain | 101 | 1 | The Health Connect identifier test reads a file from disk, the same |
+  | health_ingest | 71 | 0 | |
+  | food_catalog | did not compile | | It imports `sqlite3`, which needs `dart:ffi` |
+
+  No arithmetic test failed. The two failures are tests that read
+  repository files and still run on the Dart VM.
+- The weight trend was exposed to JavaScript through `dart:js_interop` in a
+  30-line file, compiled with `dart compile js -O2`, and called from Node on
+  a 60-day series with gaps and one outlier. Its output was the same text,
+  digit for digit, as the same code run on the Dart VM. The compiled file
+  was 68 kB (22 kB compressed) and the call took under 6 ms.
+
+**What this shows:** compiled Dart gives the same numbers as native Dart on
+everything the tests cover, and the trend alone is small. The engine and
+the domain rules can stay one source, guarded by the tests they already
+have, run both ways.
+
+**Not measured yet:**
+- The weekly check-in through the same boundary. It takes and returns far
+  richer types than the trend, so it decides how much boundary code the
+  compile route needs.
+- The size of the whole engine compiled, not the trend alone.
+- What porting to TypeScript costs. The source to port would be 6,700 lines
+  of engine and 3,600 of domain, with their tests.
+- Integers: Dart compiled to JavaScript has 53-bit integers. No test
+  failed because of it, which is evidence and not proof.
+- The simulator (MM-30) compiled.
+
+**The food catalog needs its own answer.** It reads a SQLite pack through
+`dart:ffi` and cannot be compiled to JavaScript as it is. Its search and
+ranking rules are separable from its storage; that split belongs with the
+data layer (MM-228 part 3).
