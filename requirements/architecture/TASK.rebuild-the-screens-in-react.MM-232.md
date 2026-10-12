@@ -239,6 +239,17 @@ Flutter stood a fake controller in. The app is given no address to read a
 list from until step 5, so it makes no request; the screen says downloads
 are not set up.
 
+**11. The last of the Flutter tests (2026-10-12).** An audit of
+`apps/mobile/test` against what had been carried over found six files with
+nothing here: `underweight_flows`, `voice`, `mode_reason_estimate`,
+`demo_configuration`, `demo_notice` and `gallery`. They are carried over
+(31 tests). `voice` reads the app's text two ways here, quoted strings and
+the words written between the tags of a screen, and finds none of the words
+MM-108 bans. The seventh, `health_connect_sample`, tests the mapping from
+the Health Connect plugin's readings and comes with that plugin in step 5.
+The golden images of `apps/mobile/test/goldens` are MM-229's screenshot
+tests.
+
 ## Notes
 - MM-229's leftovers (screenshot tests of the React app, a CI build of the
   Android shell, a run on a physical phone) are still open and belong with
