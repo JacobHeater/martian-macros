@@ -1,17 +1,24 @@
+import { MmIcon } from './MmIcon';
+import type { MmIconName } from './MmIconName';
 import type { MmButtonKind } from './MmButtonKind';
 import './ui.css';
 
 interface MmButtonProps {
   label: string;
   kind?: MmButtonKind;
+  icon?: MmIconName | undefined;
   /** Fills the width it is given. */
   expand?: boolean;
   /** With no action the button is shown as off. */
   onPress?: (() => void) | undefined;
 }
 
-/** The one button (MM-104, MM-163). The primary kind is flat, with no glow (MM-181). */
-export function MmButton({ label, kind = 'primary', expand = false, onPress }: MmButtonProps) {
+/**
+ * The app's button. Every button in the app is this component, so two
+ * screens cannot differ in size, shape or press behavior. The primary kind
+ * is flat, with no glow (MM-181).
+ */
+export function MmButton({ label, kind = 'primary', icon, expand = false, onPress }: MmButtonProps) {
   return (
     <button
       type="button"
@@ -19,6 +26,7 @@ export function MmButton({ label, kind = 'primary', expand = false, onPress }: M
       disabled={onPress === undefined}
       onClick={onPress}
     >
+      {icon === undefined ? null : <MmIcon name={icon} size={20} />}
       {label}
     </button>
   );
