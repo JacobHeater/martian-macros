@@ -82,8 +82,8 @@ Scenario: No Dart is left
 | fixtures | 3,541 lines, 54 files | 141 | done (it never touched SQLite; the first count here was wrong to say it waited) | 144: all 141 carried over and 3 added |
 | data | 20,359 lines, 48 files (18,030 of them generated) | the contract suites and 22 of its own | done on the SQLite seam, with the schema at version 1 (MM-231); the 31 released upgrade steps and their 10 tests are not carried over, by that decision | 147: every contract suite (125 tests), 12 of its own carried over and 10 added |
 | food_pipeline | 922 lines, 22 files | 30 | done, except its two command-line entry points, which move with the task runner | 36: all 30 carried over (one changed, below) and 6 added |
-| the Flutter app's wording (`apps/mobile/lib/src/format`) | 1,293 lines, 50 files | none of its own: tested through the screens | done | 70, all new: 45 compare with what Dart printed, 25 test the sentences |
-| the rest of the Flutter app (`apps/mobile`) | about 19,400 lines of screens and their state, 81 test files | | not started: rebuilt as screens (MM-228 part 4) | |
+| the Flutter app's wording (`apps/mobile/lib/src/format`, and 8 files of messages kept beside its screens) | 1,515 lines, 58 files | none of its own: tested through the screens | done | 88, all new: 58 compare with what Dart printed, 30 test the sentences |
+| the rest of the Flutter app (`apps/mobile`) | about 19,200 lines of screens and their state, 81 test files | | not started: rebuilt as screens (MM-228 part 4) | |
 | `mm` task runner | 8,361 lines | 191 | not started | |
 
 **Domain (2026-10-12):** `apps/web/src/domain/` and `apps/web/src/lang/`.
@@ -165,6 +165,11 @@ The type check is clean.
     the screens that show them, and those tests come over with the screens.
   Dates and thousands separators are written out in the code and not asked
   of the device, so they read the same on every phone.
+  The eight files of messages the Flutter app kept beside its screens
+  (cautions, target flags, the reason for a goal, the dashboard's line about
+  the coach, the waist card's line) are here too, each compared with what
+  Dart printed, and the rule for the next check-in is now in the engine
+  (`nextCheckIn`), where a rule belongs.
 - `mm food build` and `mm food publish` still run the Dart pipeline. They
   switch when the task runner is converted.
 - Files that read and write disk live in a folder called `node`, and a test
