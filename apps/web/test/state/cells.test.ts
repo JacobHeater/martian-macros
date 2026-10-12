@@ -115,7 +115,7 @@ describe('a cell over something a repository watches', () => {
     expect(seen).toEqual(['from a', 'from b', 'b changed']);
   });
 
-  it('keeps what went wrong', () => {
+  it('says what went wrong, and can be asked again', () => {
     const failure = new Error('the store is gone');
     const cell = new StreamCell<number>(() => ({
       subscribe: (_, onError) => {
@@ -124,7 +124,7 @@ describe('a cell over something a repository watches', () => {
       },
     }));
     cell.subscribe(() => undefined)();
-    expect(cell.error).toBe(failure);
-    expect(cell.value.ready).toBe(false);
+    expect(cell.value).toEqual({ ready: false, error: failure });
+    expect(Loadable.hasFailed(cell.value)).toBe(true);
   });
 });

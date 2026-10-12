@@ -5,21 +5,26 @@ import { Loadable } from './Loadable';
 
 /**
  * What a repository's `watch...` gives, as a cell: not ready until its
- * first value arrives. `open` is asked for the thing to watch each time the
- * cell wakes, and again whenever a cell that `open` read changes (the food
- * since sixty days before today is a different question tomorrow).
+ * first value arrives, and failed if reading goes wrong. `open` is asked
+ * for the thing to watch each time the cell wakes, and again whenever a
+ * cell that `open` read changes (the food since sixty days before today is
+ * a different question tomorrow).
  */
 export class StreamCell<T> extends Cell<Loadable<T>> {
   private readonly open: () => Watched<T>;
   private stop: Unsubscribe | undefined;
   private readonly sources = new Map<Cell<unknown>, Unsubscribe>();
 
-  /** The last thing that went wrong reading, for whatever shows an error. */
-  error: unknown;
-
   constructor(open: () => Watched<T>) {
     super(Loadable.loading);
     this.open = open;
+  }
+
+  /** Asks again, after a read that went wrong. */
+  retry(): void {
+    if (!this.watched) return;
+    this.set(Loadable.loading);
+    this.connect();
   }
 
   protected override wake(): void {
@@ -60,7 +65,7 @@ export class StreamCell<T> extends Cell<Loadable<T>> {
         if (current) this.set(Loadable.of(value));
       },
       (error) => {
-        if (current) this.error = error;
+        if (current) this.set(Loadable.failed(error));
       },
     );
     this.stop = () => {
