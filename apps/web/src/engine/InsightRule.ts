@@ -1,0 +1,43 @@
+import type { InsightPriority } from './InsightPriority';
+
+const rules = {
+  /** The log is thin in a way that limits the coach: many partial days. */
+  partialDays: { priority: 'dataQuality', aboutWeight: false },
+  /** More than half the calories come from estimated entries (MM-150). */
+  estimatesRising: { priority: 'dataQuality', aboutWeight: false },
+  /** Fewer than four weigh-ins a week. */
+  weighInTiming: { priority: 'dataQuality', aboutWeight: true },
+  /** Progress has stalled, with its diagnosis (MM-140). */
+  stall: { priority: 'coaching', aboutWeight: true },
+  /** The protein minimum is met on fewer than half of whole days (MM-121). */
+  proteinShort: { priority: 'pattern', aboutWeight: false },
+  /**
+   * On days the protein minimum is missed, one meal has almost none
+   * (MM-125). Advice about reaching the total, not about timing.
+   */
+  proteinByMeal: { priority: 'education', aboutWeight: false },
+} as const satisfies Record<string, { priority: InsightPriority; aboutWeight: boolean }>;
+
+/**
+ * The catalog of insight rules (MM-141). Every insight comes from one of
+ * these; there is no text generated at run time.
+ */
+export type InsightRule = keyof typeof rules;
+
+export const InsightRule = {
+  values: Object.keys(rules) as readonly InsightRule[],
+
+  priority(rule: InsightRule): InsightPriority {
+    return rules[rule].priority;
+  },
+
+  /** Suppressed entirely for a user with an eating-disorder history. */
+  aboutWeight(rule: InsightRule): boolean {
+    return rules[rule].aboutWeight;
+  },
+
+  /** The place of a rule in the catalog: 0 is first. */
+  index(rule: InsightRule): number {
+    return (Object.keys(rules) as InsightRule[]).indexOf(rule);
+  },
+} as const;

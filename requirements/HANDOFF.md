@@ -184,7 +184,10 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - **The owner decided all of the Dart is converted to TypeScript** (MM-230,
   read it: the table under Progress says which package is done). Nothing is
   compiled from Dart. The domain is done in `apps/web/src/domain/`, with
-  every Dart test carried over and passing. The engine is next. Read
+  every Dart test carried over and passing. The engine is done in
+  `apps/web/src/engine/`: all 567 of its tests are carried over with their
+  expected values unchanged, and its simulator matches the Dart engine with
+  no difference at all. Health import is next. Read
   "Carrying Dart over" in `apps/web/README.md` before converting anything:
   it says how enums, nulls, dates, rounding and streams are written.
 - **The Dart stays until the switch** and is the reference. A fix made in
