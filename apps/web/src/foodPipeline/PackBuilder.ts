@@ -1,0 +1,141 @@
+import { checkNutrition } from '../domain/food/checkNutrition';
+import { normalizeBarcode } from '../domain/food/normalizeBarcode';
+import type { PackEntry } from '../foodCatalog/PackEntry';
+import { byName } from '../lang/byName';
+import { compareStrings } from '../lang/compareStrings';
+import { BuildReport } from './BuildReport';
+import type { CandidateFood } from './CandidateFood';
+import type { ConflictPolicy } from './ConflictPolicy';
+import { DropReason } from './DropReason';
+import type { PackBuildResult } from './PackBuildResult';
+import { packEntryFor } from './packEntryFor';
+import type { PreparationLink } from './PreparationLink';
+import { preparationLinks } from './preparationLinks';
+
+const disagreement = 'Two sources disagree about this product by more than 10%. Check it against the package.';
+
+function isNewer(candidate: CandidateFood, existing: CandidateFood): boolean {
+  if (candidate.versionKey !== existing.versionKey) return candidate.versionKey > existing.versionKey;
+  return compareStrings(candidate.sourceId, existing.sourceId) > 0;
+}
+
+/**
+ * Turns candidates into pack entries (MM-52): applies the nutrition checks
+ * (MM-53) and barcode normalization (MM-54) from the domain, keeps the
+ * newest version of a product within a source, resolves a barcode two
+ * sources share with `policy`, and accounts for every entry read.
+ *
+ * The output depends only on the candidates and the policy, never on their
+ * order or the clock, so the same sources build the same packs.
+ */
+export class PackBuilder {
+  readonly policy: ConflictPolicy;
+  readonly genericPackId: string;
+  readonly barcodePackId: string;
+
+  constructor({
+    policy,
+    genericPackId = 'generic',
+    barcodePackId = 'barcode_us',
+  }: {
+    policy: ConflictPolicy;
+    genericPackId?: string;
+    barcodePackId?: string;
+  }) {
+    this.policy = policy;
+    this.genericPackId = genericPackId;
+    this.barcodePackId = barcodePackId;
+  }
+
+  async build(candidates: AsyncIterable<CandidateFood> | Iterable<CandidateFood>): Promise<PackBuildResult> {
+    const report = new BuildReport();
+    const generic: CandidateFood[] = [];
+    const byBarcode = new Map<string, Map<string, CandidateFood>>();
+
+    for await (const c of candidates) {
+      report.countRead(c.source);
+      const problem = checkNutrition({
+        name: c.name,
+        kcal: c.kcal,
+        proteinG: c.proteinG,
+        carbsG: c.carbsG,
+        fatG: c.fatG,
+        fiberG: c.fiberG,
+        alcoholG: c.alcoholG,
+      });
+      if (problem !== undefined) {
+        report.countDropped(c.source, byName(DropReason.values, problem));
+        continue;
+      }
+      if (c.kind === 'generic') {
+        generic.push(c);
+        continue;
+      }
+      const raw = c.rawBarcode;
+      const gtin = raw === undefined ? undefined : normalizeBarcode(raw);
+      if (gtin === undefined) {
+        report.countDropped(c.source, 'invalidBarcode');
+        continue;
+      }
+      let bySource = byBarcode.get(gtin);
+      if (bySource === undefined) {
+        bySource = new Map();
+        byBarcode.set(gtin, bySource);
+      }
+      const existing = bySource.get(c.source);
+      if (existing === undefined) {
+        bySource.set(c.source, c);
+      } else if (isNewer(c, existing)) {
+        bySource.set(c.source, c);
+        report.countDropped(existing.source, 'supersededVersion');
+      } else {
+        report.countDropped(c.source, 'supersededVersion');
+      }
+    }
+
+    const barcodeEntries: PackEntry[] = [];
+    for (const gtin of [...byBarcode.keys()].sort(compareStrings)) {
+      const sources = byBarcode.get(gtin) as Map<string, CandidateFood>;
+      const [firstName, ...otherNames] = [...sources.keys()].sort(compareStrings);
+      let winner = sources.get(firstName as string) as CandidateFood;
+      let disagree = false;
+      for (const name of otherNames) {
+        const other = sources.get(name) as CandidateFood;
+        const resolution = this.policy.resolve(winner, other);
+        const loser = resolution.winner === winner ? other : winner;
+        report.countDropped(loser.source, 'lostConflict');
+        winner = resolution.winner;
+        disagree = disagree || resolution.disagree;
+      }
+      barcodeEntries.push(
+        packEntryFor(winner, {
+          id: barcodeEntries.length + 1,
+          packId: this.barcodePackId,
+          gtin14: gtin,
+          disagreement: disagree ? disagreement : undefined,
+          preparation: 'packaged',
+        }),
+      );
+      report.countWritten(winner.source);
+    }
+
+    generic.sort((a, b) => {
+      const byFoodName = compareStrings(a.name.toLowerCase(), b.name.toLowerCase());
+      return byFoodName !== 0 ? byFoodName : compareStrings(a.sourceId, b.sourceId);
+    });
+    // Raw and cooked versions of one food are linked (MM-151).
+    const links = preparationLinks(generic.map((c) => c.name));
+    const genericEntries = generic.map((c, i) => {
+      const link = links[i] as PreparationLink;
+      return packEntryFor(c, {
+        id: i + 1,
+        packId: this.genericPackId,
+        preparation: link.state,
+        pairedFoodId: link.pairIndex === undefined ? undefined : link.pairIndex + 1,
+      });
+    });
+    for (const c of generic) report.countWritten(c.source);
+
+    return { generic: genericEntries, barcode: barcodeEntries, report };
+  }
+}
