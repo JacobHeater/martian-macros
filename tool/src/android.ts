@@ -1,8 +1,9 @@
 import { existsSync, rmSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
 import { capture, run } from './proc.ts';
 
-const webApp = 'apps/web';
+const webApp = 'apps/mobile';
 const androidDir = `${webApp}/android`;
 
 const sdk = () => process.env['ANDROID_HOME'] ?? process.env['ANDROID_SDK_ROOT'];
@@ -17,7 +18,9 @@ const emulatorPath = () => {
   return home === undefined ? 'emulator' : `${home}/emulator/emulator`;
 };
 
-const gradle = () => (process.platform === 'win32' ? './gradlew.bat' : './gradlew');
+// An absolute path: Windows may not resolve a command from the working
+// directory at all (NoDefaultCurrentDirectoryInExePath).
+const gradle = (dir: string) => resolve(dir, process.platform === 'win32' ? 'gradlew.bat' : 'gradlew');
 
 /** Ids of connected devices and running emulators, from `adb devices`. */
 export async function deviceIds(): Promise<string[]> {
@@ -115,7 +118,8 @@ export async function runBuild(repoRoot: string, args: readonly string[]): Promi
   const synced = await sync(repoRoot);
   if (synced !== 0) return synced;
   const task = args.includes('--release') ? 'assembleRelease' : 'assembleDebug';
-  return run([gradle(), task], { cwd: `${repoRoot}/${androidDir}` });
+  const androidRoot = `${repoRoot}/${androidDir}`;
+  return run([gradle(androidRoot), task], { cwd: androidRoot });
 }
 
 const appId = 'com.martianmacros.martian_macros.demo';

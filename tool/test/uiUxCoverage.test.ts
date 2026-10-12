@@ -19,7 +19,7 @@ const put = (path: string, content: string) => {
 };
 
 const entry = ({
-  source = 'apps/web/src/coach/CoachScreen.tsx',
+  source = 'apps/mobile/src/coach/CoachScreen.tsx',
   symbol = 'CoachScreen',
   asset = 'views/coach.html#coach-default',
   requirements = ['MM-24'] as unknown,
@@ -53,8 +53,8 @@ const problems = () => uiUxCoverageProblems(root, new Set(['MM-24', 'MM-104']));
 
 beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'mm_ui_ux_coverage'));
-  put('apps/web/src/coach/CoachScreen.tsx', 'export function CoachScreen() {\n  return <p>coach</p>;\n}\n');
-  put('apps/web/src/coach/coachText.ts', "export const coachText = () => 'x';\n");
+  put('apps/mobile/src/coach/CoachScreen.tsx', 'export function CoachScreen() {\n  return <p>coach</p>;\n}\n');
+  put('apps/mobile/src/coach/coachText.ts', "export const coachText = () => 'x';\n");
   put(`${uiUxAssetsFolder}/views/coach.html`, "<script>m.frame('coach-default', 'Coach', '', '')</script>");
   put(`${uiUxAssetsFolder}/index.html`, '<a href="views/coach.html">Coach</a>');
   manifest([entry()]);
@@ -68,23 +68,23 @@ test('a component file with its entry and its frame is fine', () => {
 
 describe('what draws something', () => {
   test('a .tsx file that returns JSX does; the rest does not', () => {
-    put('apps/web/src/ui/MmDropdown.tsx', 'export function MmDropdown() {\n  return (\n    <select />\n  );\n}\n');
-    put('apps/web/src/charts/ArcChart.tsx', 'export const ArcChart = () => <svg />;\n');
+    put('apps/mobile/src/ui/MmDropdown.tsx', 'export function MmDropdown() {\n  return (\n    <select />\n  );\n}\n');
+    put('apps/mobile/src/charts/ArcChart.tsx', 'export const ArcChart = () => <svg />;\n');
     // An effect with nothing of its own to draw.
-    put('apps/web/src/app/HardwareBack.tsx', 'export function HardwareBack() {\n  return null;\n}\n');
+    put('apps/mobile/src/app/HardwareBack.tsx', 'export function HardwareBack() {\n  return null;\n}\n');
     // Not components at all.
-    put('apps/web/src/coach/CoachScreen.test.tsx', 'test("x", () => { const a = <p/>; return a; });\n');
-    put('apps/web/src/coach/coachMath.ts', 'export const smaller = (a: number, b: number) => a < b;\n');
+    put('apps/mobile/src/coach/CoachScreen.test.tsx', 'test("x", () => { const a = <p/>; return a; });\n');
+    put('apps/mobile/src/coach/coachMath.ts', 'export const smaller = (a: number, b: number) => a < b;\n');
     assert.deepEqual(uiSurfaceSources(root), [
-      'apps/web/src/charts/ArcChart.tsx',
-      'apps/web/src/coach/CoachScreen.tsx',
-      'apps/web/src/ui/MmDropdown.tsx',
+      'apps/mobile/src/charts/ArcChart.tsx',
+      'apps/mobile/src/coach/CoachScreen.tsx',
+      'apps/mobile/src/ui/MmDropdown.tsx',
     ]);
   });
 });
 
 test('a new component file that is not listed is reported', () => {
-  put('apps/web/src/coach/NewCard.tsx', 'export function NewCard() {\n  return <div />;\n}\n');
+  put('apps/mobile/src/coach/NewCard.tsx', 'export function NewCard() {\n  return <div />;\n}\n');
   const found = problems();
   assert.equal(found.length, 1);
   assert.match(found[0]!, /coach\/NewCard\.tsx/);
@@ -92,7 +92,7 @@ test('a new component file that is not listed is reported', () => {
 });
 
 test('a removed component file still listed is reported', () => {
-  manifest([entry(), entry({ source: 'apps/web/src/coach/Gone.tsx', symbol: 'Gone' })]);
+  manifest([entry(), entry({ source: 'apps/mobile/src/coach/Gone.tsx', symbol: 'Gone' })]);
   const found = problems();
   assert.equal(found.length, 1);
   assert.match(found[0]!, /coach\/Gone\.tsx/);
@@ -141,8 +141,8 @@ test('a frame may be an element id as well as a drawn frame', () => {
 });
 
 test('two files may share one frame', () => {
-  put('apps/web/src/coach/ReportsCard.tsx', 'export function ReportsCard() {\n  return <div />;\n}\n');
-  manifest([entry(), entry({ source: 'apps/web/src/coach/ReportsCard.tsx', symbol: 'ReportsCard' })]);
+  put('apps/mobile/src/coach/ReportsCard.tsx', 'export function ReportsCard() {\n  return <div />;\n}\n');
+  manifest([entry(), entry({ source: 'apps/mobile/src/coach/ReportsCard.tsx', symbol: 'ReportsCard' })]);
   assert.deepEqual(problems(), []);
 });
 

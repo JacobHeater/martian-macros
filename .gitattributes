@@ -7,4 +7,4 @@
 *.jar binary
 *.pack binary
 # Recorded test input whose line ends are part of the test.
-apps/web/test/foodPipeline/support/extract/*.csv -text
+apps/mobile/test/foodPipeline/support/extract/*.csv -text

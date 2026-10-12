@@ -8,7 +8,7 @@ private belongs here. Requirements are authoritative for behavior.
 Last updated: 2026-10-12, by Claude, Session 21.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
-The app is the React one in `apps/web/`, inside a thin Capacitor shell with
+The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
 the app's own Kotlin plugins; the Flutter app, the Dart packages and the
 Dart task runner are removed (git history keeps them). `mm` is TypeScript
 run by Node itself. Read Session 21 below before anything else.
@@ -22,11 +22,18 @@ emulator: onboarding survives `am force-stop`; the real manifest lists two
 packs; Common foods downloads, checks, unpacks, commits and answers a
 search; a weigh-in reminder puts alarms in `dumpsys alarm`; Health Connect
 grants weight and syncs. The switch itself (this session's PR) replaces the
-task runner, re-points `coverage.json` at `apps/web/src` (150 surfaces),
-records the Flutter theme in `apps/web/test/support/flutterTheme.json` for
+task runner, re-points `coverage.json` at `apps/mobile/src` (150 surfaces),
+records the Flutter theme in `apps/mobile/test/support/flutterTheme.json` for
 the tokens test, and rewrites CI to Node + a debug Android build.
 
-**Database.** The React app's schema lives in `apps/web/src/data/schema.ts`
+**Standing rule (owner, 2026-10-12).** Screen and design verification is
+done in a browser; `requirements/ui-ux-assets/` is where design decisions
+are tracked and where the owner opines without running the app. Device and
+emulator screenshots verify native behavior only, never the design.
+The app folder is `apps/mobile` (renamed from `apps/web` the same day): a
+mobile application built on web technologies.
+
+**Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
 with its migration steps and tests. Only one schema change at a time.
 
 **Next ticket ID.** `mm req next` is the authority (MM-234 at this writing).
@@ -85,7 +92,7 @@ limitations.
   Node and assembles the debug APK; `coverage.json` lists the React
   sources; the evidence register and docs now name the TypeScript files.
 - The pack build keeps DuckDB extract + the TS pipeline
-  (`mm food build` drives `apps/web/scripts/food-build.mjs` through vite).
+  (`mm food build` drives `apps/mobile/scripts/food-build.mjs` through vite).
 
 ## Session 20: 2026-10-12, Claude (the move to a React HTML5 app)
 
@@ -97,7 +104,7 @@ limitations.
   not add or restyle Flutter screens. Do not patch the hand-drawn HTML
   sheets to chase the Flutter app either; they are replaced as each
   destination is rebuilt.
-- **New app work goes in `apps/web/`** (TypeScript, Vite, React, design
+- **New app work goes in `apps/mobile/`** (TypeScript, Vite, React, design
   tokens as CSS variables, no UI kit; Capacitor as the shell).
 - **Order:** a walking skeleton (MM-229), then the engine under its Dart
   tests (MM-230), data, screens starting with Food and Add food, phone
@@ -105,23 +112,23 @@ limitations.
 - **One agent owns the new app's structure at a time.** If you are not that
   agent, work on a ticket inside what already exists and say so here.
 - **The web half of the skeleton exists** (MM-229, read its Progress): the
-  app in `apps/web/` with tokens checked against the Flutter theme, the five
+  app in `apps/mobile/` with tokens checked against the Flutter theme, the five
   destinations, Settings with the theme choice, and a `?gallery` page of
   every token and component. `mm bootstrap` now runs `npm ci` there and
   `mm check` ends with `mm web` (type check, tests, build, offline check),
   so Node 22 is needed locally. Not built: screenshot tests.
-- **The Android shell exists** in `apps/web/android/` (Capacitor, demo app
+- **The Android shell exists** in `apps/mobile/android/` (Capacitor, demo app
   ID only). It was built and run on the emulator with the network off; it
-  has not been on a physical phone. `apps/web/README.md` says how to build
+  has not been on a physical phone. `apps/mobile/README.md` says how to build
   it. Always name the device with `adb -s`: the owner's phone is usually
   connected and only the demo app may go on it.
 - **The owner decided all of the Dart is converted to TypeScript** (MM-230,
   read it: the table under Progress says which package is done). Nothing is
-  compiled from Dart. The domain is done in `apps/web/src/domain/`, with
+  compiled from Dart. The domain is done in `apps/mobile/src/domain/`, with
   every Dart test carried over and passing. The engine is done in
-  `apps/web/src/engine/`: all 567 of its tests are carried over with their
+  `apps/mobile/src/engine/`: all 567 of its tests are carried over with their
   expected values unchanged, and its simulator matches the Dart engine with
-  no difference at all. Health import is done in `apps/web/src/healthIngest/`
+  no difference at all. Health import is done in `apps/mobile/src/healthIngest/`
   with its 71 tests.
 - **What is left of the Dart all touches SQLite** (food catalog, data layer,
   fixtures, food pipeline), so it waits on MM-231: one `SqlDatabase` seam
@@ -129,21 +136,21 @@ limitations.
   on the phone. Read its Progress first: Node's own SQLite has no FTS5 and
   cannot read a food pack; the official SQLite WebAssembly build can. The
   seam, that adapter and a 14-test contract suite are built
-  (`apps/web/src/sql/`), and on it the food catalog
-  (`apps/web/src/foodCatalog/`): it reads a pack the Dart writer wrote and
+  (`apps/mobile/src/sql/`), and on it the food catalog
+  (`apps/mobile/src/foodCatalog/`): it reads a pack the Dart writer wrote and
   gives the same searches with the same scores. The food pipeline
-  (`apps/web/src/foodPipeline/`) builds the same packs as the Dart one from
+  (`apps/mobile/src/foodPipeline/`) builds the same packs as the Dart one from
   a recorded extract; `mm food build` still runs the Dart one. The in-memory
-  repositories and their 23 contract suites are in `apps/web/src/fixtures/`
-  and `apps/web/test/contracts/`. Not built: the native
+  repositories and their 23 contract suites are in `apps/mobile/src/fixtures/`
+  and `apps/mobile/test/contracts/`. Not built: the native
   adapter, downloading a pack (it needs an interface to the phone's files
-  first). The data layer is built (`apps/web/src/data/`): every repository
+  first). The data layer is built (`apps/mobile/src/data/`): every repository
   on SQLite, passing those same suites, with the schema at version 1 in
   the shape the Dart database had; it has run only against the WebAssembly
   build, never on a phone. The Flutter app's wording is carried over too
-  (`apps/web/src/format/`), checked against what Dart printed. Whether a native
+  (`apps/mobile/src/format/`), checked against what Dart printed. Whether a native
   plugin has FTS5 on Android is not verified.
-  Read "Carrying Dart over" in `apps/web/README.md` before converting
+  Read "Carrying Dart over" in `apps/mobile/README.md` before converting
   anything: it says how enums, nulls, dates, rounding and streams are
   written.
 - **What Dart is left, and in what order.** (1) The Flutter app's screens

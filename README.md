@@ -73,7 +73,7 @@ wired into the shell yet; it belongs to MM-228.
 ## Layout
 
 ```
-apps/web/           The app: React + TypeScript (src/), its tests (test/) and the Android shell (android/)
+apps/mobile/           The app: React + TypeScript (src/), its tests (test/) and the Android shell (android/)
 tool/               The mm task runner: TypeScript run by Node, zero dependencies
 config/             Per-environment build values (the food-pack manifest address)
 requirements/       Every epic, story, task, bug and spike, as files (start with its README)
@@ -81,7 +81,7 @@ roadmap/            What to build next and in what order: workstreams, dependenc
 docs/               Architecture overview
 ```
 
-Inside `apps/web/src`, the layers the Dart packages kept apart stay apart —
+Inside `apps/mobile/src`, the layers the Dart packages kept apart stay apart —
 `lang`, `domain`, `engine`, `healthIngest`, `sql`, `foodCatalog`,
 `foodPipeline`, `fixtures`, `data`, `format`, `platform`, `state`, then the
 screens — enforced by `test/layers.test.ts`.
