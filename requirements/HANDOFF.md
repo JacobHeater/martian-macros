@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-11, by Claude, end of Session 16.
+Last updated: 2026-10-11, by Claude, end of Session 17.
 
 **Open pull requests.** #81 (draft, Copilot's: novice meal logging, MM-205 to
 MM-208) is not Claude's and was not touched; its handoff edits will conflict
@@ -17,8 +17,8 @@ with this file. Nothing else is open: Session 13's pull requests (#90 to
 merged. Nothing in flight changes the schema. Only one schema change at a
 time.
 
-**Next ticket ID.** MM-212 once #81 merges (it uses MM-205 to MM-208;
-MM-209 to MM-211 are taken). `mm req next` is the authority.
+**Next ticket ID.** MM-223 once #81 merges (it uses MM-205 to MM-208;
+MM-209 to MM-222 are taken). `mm req next` is the authority.
 
 **HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
 from their tickets under `## UI/UX Assets` (MM-210). Every view and
@@ -28,6 +28,7 @@ it. #81 adds or changes screens and will need its drawings brought up to
 date when it merges: `mm req` will say which files.
 
 **What to build next.**
+- Ready to fix, each with a skipped test waiting: MM-213 to MM-217.
 - Health sync, what is left: see an import of a real reading on a phone
   whose Health Connect has data (not yet seen); choosing the primary scale
   in Settings (MM-71); background updates (MM-72); history beyond the
@@ -57,6 +58,18 @@ date when it merges: `mm req` will say which files.
 - MM-188 still needs phone checks: other apps' Health Connect segments, and
   how a written workout looks in each platform's own app. Owner accepted
   the exercise mappings for now.
+- **Usability, from the walkthrough reviews (Session 17). Each is a proposed
+  story; say accept, change or decline:** MM-218 (the sheet says what it will
+  log; includes whether typed numbers should default to "Everything I ate",
+  MM-167 decision 3), MM-219 (finding a food against typing one), MM-220 (the
+  action in view, a reason when it is off, a way out of the sheet), MM-221
+  (editing shows what was typed), MM-222 (a logged set looks logged; which
+  action leads on a workout).
+- Is `design/screen-direction.md` still the target for the Add food sheet,
+  and should Train have a section in it? The built screens match neither.
+- Needs a phone, nobody has checked: the rest signal with the display off;
+  a screen-reader pass over Add food and a workout; both at large text; how
+  the Add food sheet answers a drag or the back gesture.
 - MM-210: whether the palette preview's Today mock is the reference for
   the dashboard. It is linked only from the two color tickets.
 - Eating-disorder support wording in MM-114 lacks a reviewed helpline
@@ -98,6 +111,41 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
 - Native plugins need release-build validation; iOS needs macOS.
 - One declaration/file, narrow repository roles, design-system controls;
   stateful screens have a separate `_state.dart`.
+
+## Session 17: 2026-10-11, Claude (why the panel missed the Add food concerns)
+
+- **MM-212, done.** An outside review of one sheet raised usability concerns
+  the owner already had; the panel's earlier audit (the MM-205 run, on #81's
+  branch) had not put them to the owner. Its records show the reviewers saw
+  part of it and filed it as an "unverified hypothesis" for want of observed
+  users; only confirmed defects were ticketed; nobody could see the sheet (no
+  screenshot test; the designer asked for one); and depth was never chosen.
+- **What changed in how the panel reviews** (`agents/review-contract.md`,
+  `agents/panel-protocol.md`; role files untouched):
+  a step-by-step **task walkthrough** of the built screen is evidence, with
+  its own finding class, *usability problem found by inspection*; the chair
+  names **depth targets by counting** controls and branches and gives each a
+  **render of the built screen**; reports say **walked or surveyed**; and
+  **every finding gets an outcome** (bug ticket, proposed story, owner
+  question, verified now, or rejected). "Needs verification" is not one.
+- **A drawing is not the screen.** The sheets in `requirements/ui-ux-assets/`
+  orient a reviewer; a walkthrough is done on screenshot tests or a device.
+  The first real screenshot of the Add food sheet showed a defect the drawing
+  did not have.
+- **Two runs under the new rules**, both valid with `mm panel <run>`:
+  `docs/agent-runs/mm212-add-food-walkthrough/` and
+  `docs/agent-runs/mm212-workout-logging-walkthrough/` (chosen by count, not
+  named by the owner). Reviewers were given tasks, never leads.
+- **Five defects, each with a test that failed once and is now skipped under
+  its ticket:** MM-213 (Saved and Estimate break mid-word), MM-214 (a reps
+  field shows what is not stored), MM-215 (removing a set cannot be undone),
+  MM-216 (changing the method clears the amount silently), MM-217 (a hand
+  portion of a found food reads as exact). None is fixed.
+- **Five proposed stories for the owner:** MM-218 to MM-221 (Add food) and
+  MM-222 (workout logging). Nothing in the app was changed.
+- Eight new screenshot tests (seven of the Add food sheet, one of a set being
+  timed). The reference library's fields now take typing and its text scales
+  alone.
 
 ## Session 16: 2026-10-11, Claude (HTML reference library)
 
@@ -150,27 +198,3 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   dashboard ticket links it, because nothing records it as that screen's
   reference.
 - Nothing about `mm ci` changed.
-
-## Session 14: 2026-10-11, Claude (Health Connect)
-
-- MM-68, first part: `HealthConnectSource` over the `health` plugin
-  (13.3.2, new dependency; read permissions only), a Health Connect group
-  in Settings, and `HealthReadFailure`: a platform that cannot be read is
-  an error, never an empty answer.
-- **Found on a real phone:** Health Connect refuses reads while the app is
-  not on screen, and the plugin reports that as no readings. Any import
-  must run in the foreground; the adapter now checks every read.
-- Run on the owner's Pixel as the **demo app only**
-  (`com.martianmacros.martian_macros.demo`), read only:
-  `flutter run integration_test/health_connect_test.dart -d <id>
-  --dart-define=MM_DEMO_APP=true --dart-define-from-file=../../config/dev.json`
-  (`flutter test` uninstalls the app afterwards, which drops permissions).
-  The contract passes unlocked. The phone's Health Connect held no
-  readings, so a real reading has not been seen imported.
-- The phone's normal app was not touched. The demo test app was left
-  installed with six read permissions granted over adb.
-- MM-71 and the rest of MM-68's weight path, stacked on the first part:
-  `dailyWeighIns`, `primaryWeightSource`, `mergeWeighIns`; `weightsProvider`
-  is now typed weigh-ins plus the imported one that counts for each other
-  day (`typedWeightsProvider` is what was typed); `healthSyncProvider` runs
-  when the home shell opens and on resume.

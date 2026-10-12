@@ -1,0 +1,557 @@
+{
+  "schema_version": 1,
+  "task_id": "mm212-workout-logging-walkthrough",
+  "audit_mode": "feature",
+  "baseline": {
+    "branch": "feature/mm212-usability-by-inspection",
+    "commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, supply renders, verify reviewer claims, synthesize and dispose of every finding.",
+      "role": "chair",
+      "reviewer": "claude-code-session-9c9d02ab",
+      "status": "omitted",
+      "omission_reason": "The chair synthesizes; it did not write an independent review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "An independent chair review"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Synthesis, not a separate review."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "See decision.md; the method's sources are in MM-212.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "See MM-212.",
+        "limitations": "None beyond MM-212's."
+      }
+    },
+    {
+      "task": "Walk four tasks through the built workout log and report failing steps. No findings were suggested.",
+      "role": "ux-accessibility",
+      "reviewer": "claude-code-subagent-panel-ux-accessibility",
+      "status": "complete",
+      "inspected_commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb",
+      "input_hashes": {
+        "AGENTS.md": "0872b8c61b7e6d653d5a0a88597f485a03792ffb3d7b09883b62bafc0f341d4d",
+        "agents/panel-protocol.md": "75107ef685da23d3a2b8f09a7717a48f6426b51c00ae0de6fb5f381489d7fe73",
+        "agents/review-contract.md": "866e576d25986c694e4438ed1ad9fd3d50ea627c77d2554d605cfd53739d04be",
+        "agents/templates/findings/role.md": "ceff5de882039d1586365dd84cb1a98cff29535d30d3ae7afa12ba2e7a4cd726",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/ux-architecture.md": "a7a23cabfab5b46a24c248d76f915123c97e82040d76b958d79d54e28840d0c0",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/voice-and-wording.md": "f7f30ec19ddd963b2b535909780959b6750acec82a2c2012951bc5c575b21ca9",
+        "agents/roles/ux-accessibility.md": "3aa7028843a35504f186eccd006b9e7efa3c07a4b88ee0b0b77e9272f0125885",
+        ".claude/agents/panel-ux-accessibility.md": "068f1a6d246cf95c32f735bcfe071eef4831b76d0054e1c76902567858cddab1",
+        "docs/agent-runs/mm212-workout-logging-walkthrough/brief.md": "cad69827ace8acc382d9d3897e269198256436fd82dea019866c172c544556b2",
+        "apps/mobile/lib/src/train/train_screen.dart": "90a1498498a46ff11881a937dfe5af1f71330d7e591ff8918137ccac01009bf1",
+        "apps/mobile/lib/src/train/workout_screen.dart": "c87fbeaf8ad1d7feea28e47270055d6c790128c8bbe398d8cbbfcdf25c5a99f2",
+        "apps/mobile/lib/src/train/workout_exercise_card_state.dart": "02cb37b4a55c6ced618690fdd02ac26d40b873b335fe7a1676b974e236de2544",
+        "apps/mobile/lib/src/train/set_editor_state.dart": "6e3e79f332c0fe2a399e0c3eeb004adee5d5e7a0d0e079df6004c5493c521255",
+        "apps/mobile/lib/src/train/set_timer_bar.dart": "eead732f670945427d46341a6a964a28c4f7aab4a8bbff5c734b82923edcd6ec",
+        "apps/mobile/lib/src/train/workout_clock_card.dart": "b7cfeafaa3cd33629c47b2a1eadbe80cde9838cd8b0fec629f564418eeac5dcc",
+        "apps/mobile/lib/src/train/workout_times_screen.dart": "63651b6d839476b3a782ddc62d536e9fb7df46b4ef7e65019e74962b2e7b077e",
+        "apps/mobile/lib/src/train/exercise_picker_screen_state.dart": "05aef1e72bb230ea52912510fa4ccf175cf4f54cf18fcff7c496bfee07cc4cd7",
+        "apps/mobile/lib/src/train/workout_controller.dart": "c9a9a090d071ab456d35de3490dafd049a0296c9fab78ba9340f3d4a58f7ad38",
+        "apps/mobile/test/goldens/images/train_dark.png": "a30addb6262f5a095452f0ee72c395bd270be220894fb1a37fc540a90556d5f2",
+        "apps/mobile/test/goldens/images/workout_dark.png": "2502853ceca82bfb3df9b2d90b1386fb196cba6ccb5a991f2f653d24e3b2b505",
+        "apps/mobile/test/goldens/images/workout_martian.png": "a2f0fef0a41a6a8633d5b995f4b94b51c4b37cbd75f0671abbf5c6719964dc4e",
+        "apps/mobile/test/goldens/images/exercise_picker_dark.png": "cfb1dfd3059c72f63fdf8e80ca49a8bd7ab874088768e390a7f9873fe73217a7"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [
+          "Train, workout in progress, set controls, exercise picker, timer bar at rest: walked on source and four screenshot tests",
+          "Running set timer, countdown, paused bar, time dialog, rest-target options, finished workout: walked from source only"
+        ],
+        "not_inspected": [
+          "Workout times, creating an exercise, suggestions screen (surveyed)",
+          "Any device, screen reader, text scale or contrast measurement"
+        ],
+        "referrals": [
+          "product-designer: emphasis of Start set against Add set",
+          "flutter: hit areas, keyboard over the bar, timer with the display off",
+          "qa: device checks"
+        ],
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "limitations": "Nothing was run. Four static screenshots; sizes read by eye."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No claim rests on an external standard or platform convention; every finding rests on the built screen and the repository's own rules.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None consulted.",
+        "limitations": "No external source was read."
+      }
+    },
+    {
+      "task": "Walk four tasks through the built workout log from the visual side and report failing steps. No findings were suggested.",
+      "role": "product-designer",
+      "reviewer": "claude-code-subagent-panel-product-designer",
+      "status": "complete",
+      "inspected_commit": "ca3ff573a90466eb87117c87e25fc8e72a7412eb",
+      "input_hashes": {
+        "AGENTS.md": "0872b8c61b7e6d653d5a0a88597f485a03792ffb3d7b09883b62bafc0f341d4d",
+        "agents/panel-protocol.md": "75107ef685da23d3a2b8f09a7717a48f6426b51c00ae0de6fb5f381489d7fe73",
+        "agents/review-contract.md": "866e576d25986c694e4438ed1ad9fd3d50ea627c77d2554d605cfd53739d04be",
+        "agents/templates/findings/role.md": "ceff5de882039d1586365dd84cb1a98cff29535d30d3ae7afa12ba2e7a4cd726",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/ux-architecture.md": "a7a23cabfab5b46a24c248d76f915123c97e82040d76b958d79d54e28840d0c0",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/voice-and-wording.md": "f7f30ec19ddd963b2b535909780959b6750acec82a2c2012951bc5c575b21ca9",
+        "agents/roles/product-designer.md": "094d476357e38f47cc58d320f064d5cabbf5f2c185ad6c741f59b79628eac456",
+        ".claude/agents/panel-product-designer.md": "188148eb85ee6398eeee43e1d4cde3a2455c56cbe75ac1549ebfe7f000b06c08",
+        "docs/agent-runs/mm212-workout-logging-walkthrough/brief.md": "cad69827ace8acc382d9d3897e269198256436fd82dea019866c172c544556b2",
+        "apps/mobile/lib/src/train/train_screen.dart": "90a1498498a46ff11881a937dfe5af1f71330d7e591ff8918137ccac01009bf1",
+        "apps/mobile/lib/src/train/workout_screen.dart": "c87fbeaf8ad1d7feea28e47270055d6c790128c8bbe398d8cbbfcdf25c5a99f2",
+        "apps/mobile/lib/src/train/workout_exercise_card_state.dart": "02cb37b4a55c6ced618690fdd02ac26d40b873b335fe7a1676b974e236de2544",
+        "apps/mobile/lib/src/train/set_editor_state.dart": "6e3e79f332c0fe2a399e0c3eeb004adee5d5e7a0d0e079df6004c5493c521255",
+        "apps/mobile/lib/src/train/set_timer_bar.dart": "eead732f670945427d46341a6a964a28c4f7aab4a8bbff5c734b82923edcd6ec",
+        "apps/mobile/lib/src/train/workout_clock_card.dart": "b7cfeafaa3cd33629c47b2a1eadbe80cde9838cd8b0fec629f564418eeac5dcc",
+        "apps/mobile/lib/src/train/workout_times_screen.dart": "63651b6d839476b3a782ddc62d536e9fb7df46b4ef7e65019e74962b2e7b077e",
+        "apps/mobile/lib/src/train/exercise_picker_screen_state.dart": "05aef1e72bb230ea52912510fa4ccf175cf4f54cf18fcff7c496bfee07cc4cd7",
+        "apps/mobile/lib/src/train/workout_controller.dart": "c9a9a090d071ab456d35de3490dafd049a0296c9fab78ba9340f3d4a58f7ad38",
+        "apps/mobile/test/goldens/images/train_dark.png": "a30addb6262f5a095452f0ee72c395bd270be220894fb1a37fc540a90556d5f2",
+        "apps/mobile/test/goldens/images/workout_dark.png": "2502853ceca82bfb3df9b2d90b1386fb196cba6ccb5a991f2f653d24e3b2b505",
+        "apps/mobile/test/goldens/images/workout_martian.png": "a2f0fef0a41a6a8633d5b995f4b94b51c4b37cbd75f0671abbf5c6719964dc4e",
+        "apps/mobile/test/goldens/images/exercise_picker_dark.png": "cfb1dfd3059c72f63fdf8e80ca49a8bd7ab874088768e390a7f9873fe73217a7"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [
+          "Train, workout in progress with a set open, exercise picker, set controls, timer bar: walked on source and four screenshot tests",
+          "Empty workout, time dialog, workout times, finished workout: walked from source only"
+        ],
+        "not_inspected": [
+          "Rest-target options, creating an exercise, suggestions settings, personal records (surveyed)",
+          "Light theme, text scaling, keyboard-open layout"
+        ],
+        "referrals": [
+          "ux-accessibility: the one-tap restart of the clock, the reasonless disabled Finish workout, target sizes",
+          "training and product: MM-191 decisions"
+        ],
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "limitations": "Nothing was run. Distances read off screenshots are approximate."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No claim rests on an external standard or platform convention; every finding rests on the built screen and the repository's own rules.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None consulted.",
+        "limitations": "No external source was read."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "training",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "training"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "nutrition",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "nutrition"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "micronutrients",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "micronutrients"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "coaching",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "coaching"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "measurement",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "measurement"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "safety",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "safety"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "product",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "product"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "architecture",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "architecture"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "flutter",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/flutter.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "flutter"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "integrations",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "integrations"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "privacy-security",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "privacy-security"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    },
+    {
+      "task": "Omitted: no domain rule, data handling or code is under review.",
+      "role": "qa",
+      "reviewer": "chair",
+      "status": "omitted",
+      "omission_reason": "Outside a usability walkthrough of built screens; no rule of this domain is proposed or changed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/qa.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "qa"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not reviewed by this role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "No review by this role."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagent (panel-product-designer, panel-ux-accessibility)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-11",
+      "limitations": "Observed in use by the product designer in the Add food run (one FDA page). Retrieval returns a summary made by a small model, not the page itself. Reviewers have no shell and cannot run the app or a browser."
+    }
+  ],
+  "unresolved_questions": [
+    "Which action carries the emphasis on a workout in progress? (MM-222)",
+    "Should the latest set stay open or return to a row? (MM-222)",
+    "Should a timed rest be readable afterwards? (MM-191, MM-222)",
+    "Should Train have a section in design/screen-direction.md? (MM-222)"
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "Confirmed defects are bug tickets with guards; usability problems found by inspection are proposed stories for the owner; nothing in the app is changed by this run.",
+      "authority": "AGENTS.md bug rule; MM-212; the owner decides each proposed story."
+    }
+  ],
+  "pending_work": [
+    "Owner decision on MM-222. Fixes for MM-214 and MM-215. Not supplied, and needing a phone: the rest signal with the display off; a screen-reader pass; large text. Not supplied: screenshots of the empty workout, the paused bar, the time dialog and a reopened finished workout."
+  ],
+  "tests": [
+    {
+      "command": "fvm flutter test test/workout_set_editor_findings_test.dart (enabled once)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 1,
+      "result": "failed",
+      "summary": "MM-214 reproduced twice (stored 8, field empty or \"8.5\"); MM-215 reproduced (no Undo). Skipped again."
+    },
+    {
+      "command": "flutter test test/goldens --update-goldens (Linux, WSL)",
+      "commit": "a362e5ce3b94bfbb257816358c26cd70773e05db",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "60 screenshot tests passed; workout_set_running_dark written, the state both reviewers asked for."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-11T23:30:00Z",
+    "writers_stopped": true
+  }
+}

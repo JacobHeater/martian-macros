@@ -18,7 +18,7 @@
   function stats() {
     return m.rowx(['Trend weight|184.1 lb', 'Last 7 days|−0.6 lb', 'Since start|−5.5 lb'].map(function (s) {
       var p = s.split('|');
-      return '<div class="grow"><div class="label t2">' + p[0] + '</div><div class="fig" style="font-size:20px;line-height:28px">' + p[1] + '</div></div>';
+      return '<div class="grow"><div class="label t2">' + p[0] + '</div><div class="fig" style="font-size:calc(20px * var(--ts, 1));line-height:calc(28px * var(--ts, 1))">' + p[1] + '</div></div>';
     }), 'top');
   }
   var legend = m.p('Dots are weigh-ins. The line is your trend with water swings filtered out; the band is its uncertainty. Daily jumps inside the band are noise, not fat. Dashed markers show recorded weight events.', 't2');
@@ -37,7 +37,7 @@
   var recomp = m.info('Recomp signal', [m.p('Trend weight held near 184.1 lb. Waist down about 0.8 in. Estimated maxes are up on Back squat and Barbell bench press. This pattern is consistent with losing fat while keeping or gaining muscle. It does not measure either.')]);
   var strengthHead = m.info('Strength trends', [m.p('Your most-trained lifts over the last 90 days. Each point comes from a finished workout.'), m.btn('All lift histories', 'secondary')]);
   var lift = m.info('Back squat', [
-    '<div><div class="fig" style="font-size:26px">319.7 lb</div><div class="cap">Smoothed e1RM · October 5, 2026</div></div>',
+    '<div><div class="fig" style="font-size:calc(26px * var(--ts, 1))">319.7 lb</div><div class="cap">Smoothed e1RM · October 5, 2026</div></div>',
     m.rowx(['<span>4 weeks: +16.8 lb</span>', '<span>12 weeks: +50.3 lb</span>']),
     '<p class="cap">– – Session best e1RM &nbsp; <span class="c-ion">● Smoothed e1RM</span></p>', m.lineChart(),
     m.cap('Estimated one-rep max is a comparison tool, not a prediction of a real max. The line averages up to 3 recent sessions. Changes end at the latest qualifying session.'),

@@ -47,8 +47,8 @@ Choices I made without asking (say if any is wrong):
 - **Hosts and platform surfaces are listed as `not-drawn`, with the reason**:
   six files that draw nothing themselves or open something that belongs to
   the phone (the camera view, the time picker, notifications).
-- **Text size is shown by scaling the whole frame**, which is close to and
-  not the same as the app scaling only text.
+- **Text size is shown by scaling the text alone** at a fixed frame width
+  (since MM-212; at first the whole frame was scaled, which misled).
 
 ## Description
 - `requirements/ui-ux-assets/index.html` is the way in.
