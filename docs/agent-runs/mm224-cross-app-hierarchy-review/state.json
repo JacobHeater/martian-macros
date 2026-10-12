@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "task_id": "mm224-cross-app-hierarchy-review",
+  "audit_mode": "feature",
+  "baseline": {
+    "branch": "unavailable: no Git/status tool exposed",
+    "commit": null
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Direct bounded existing-UI/documentation audit, source/render coverage, prior-review process trace and recommendation; no specialist panel.",
+      "role": "chair",
+      "reviewer": "current API session; identity not otherwise exposed",
+      "status": "complete",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [
+          "Dashboard, Food/Add food, Coach, Progress and Train Dart source",
+          "Stored Dashboard, Food, Add food, Coach, Progress and Train screenshot-test PNGs",
+          "MM-224, MM-219, MM-223, MM-176, MM-179, MM-98, MM-49, MM-47 and MM-222",
+          "MM-205/MM-212 prior briefs, decisions, findings and handoff evidence",
+          "UX architecture, screen direction, HTML asset README and coverage manifest"
+        ],
+        "not_inspected": [
+          "Current Git branch/commit/status or SHA-256 input hashes",
+          "Current runtime/device state, tests, iOS, large text, keyboard/focus and assistive technology",
+          "Full detail-state renders and novice task performance for all destinations",
+          "Every widget or state outside the bounded hierarchy question"
+        ],
+        "referrals": [
+          "Product owner: approve or revise Dashboard, Coach, Progress and remaining MM-219 hierarchy policies",
+          "Flutter/QA: reconcile MM-223 current code, widget test and pending screenshot baseline",
+          "Product Designer and UX/accessibility: assess only after a bounded owner-approved follow-up",
+          "Safety/privacy review if approved hierarchy would reduce safeguard, uncertainty or sensitive-data visibility"
+        ],
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "limitations": "All current destination areas were surveyed, not newly walked. Prior Add-food walkthrough applies to its recorded commit. Stored PNGs are not device sessions; the Add-food opening PNG conflicts with current source. No commands/tests ran."
+      },
+      "research": {
+        "status": "blocked",
+        "question": "What current empirical evidence directly supports a cross-app primary-information hierarchy or progressive disclosure for novice wellness logging?",
+        "reason": "Explicit request for current external research and protocol research gate; fresh general web discovery/retrieval was unavailable.",
+        "path": "unavailable",
+        "sources": [
+          {
+            "url": "https://depstein.net/assets/pubs/fcordeiro_chi15.pdf",
+            "title": "Barriers and Negative Nudges: Exploring Challenges in Food Journaling",
+            "published_or_updated": "2015",
+            "accessed": "2026-10-10",
+            "claim": "Prior research record reports a survey of 141 mixed-experience journalers and 5,526 forum posts identifying food-journaling/search/portion friction; indirect to this UI and not a disclosure experiment."
+          },
+          {
+            "url": "https://depstein.net/assets/pubs/lsilva_dis21.pdf",
+            "title": "Investigating Preferred Food Description Practices in Digital Food Journaling",
+            "published_or_updated": "2021",
+            "accessed": "2026-10-10",
+            "claim": "Prior research record reports a two-week study with 15 participants and 1,008 logs, mainly prior journalers; not novice hierarchy evidence."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+            "title": "Understanding Success Criterion 1.4.4: Resize Text",
+            "published_or_updated": "WCAG 2.2 Recommendation date reported as 2023-12-05; not independently reverified",
+            "accessed": "2026-10-10",
+            "claim": "Prior retrieval describes normative web accessibility text-resize guidance; informs verification, not hierarchy effectiveness or native Flutter conformance."
+          },
+          {
+            "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
+            "title": "Accessibility - Human Interface Guidelines",
+            "published_or_updated": "Latest changelog entry reported as 2025-06-09; page-level date not established",
+            "accessed": "2026-10-10",
+            "claim": "Prior retrieval describes official platform accessibility guidance, not a comparative usability study or nutrition-hierarchy policy."
+          }
+        ],
+        "summary": "Reused source details from the verified prior chair retrieval in docs/agent-runs/mm205-novice-mobile-experience/findings/research.md. Current general web search/retrieval was not observed; a bounded research delegation returned a maximum-depth error. No fresh research result is claimed.",
+        "limitations": "Evidence is indirect and does not establish that card count causes user difficulty, that progressive disclosure improves this app's task success, or which required data should be prominent. Current research capability blocked."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Current API session",
+      "discovery": [
+        "GitHub-scoped repository/code search tools were exposed, but do not provide general public-web discovery for this question."
+      ],
+      "retrieval": [
+        "functions.view retrieved workspace files and stored screenshot images only; no arbitrary URL retrieval tool was exposed."
+      ],
+      "status": "blocked",
+      "checked_at": "2026-10-11",
+      "limitations": "A bounded research-agent request failed with maximum sub-agent depth; no external search or retrieval occurred in this session."
+    }
+  ],
+  "unresolved_questions": [
+    "What is the actual current Git baseline and input-hash set?",
+    "Does a fresh current build match the MM-223 source and separate discovery/manual states?",
+    "Which Dashboard information is first-fold prominent under MM-176/MM-179?",
+    "What is the one routine Coach priority/next action?",
+    "What remaining MM-219 changes are accepted, revised or declined, including recent-food behavior?",
+    "What first-priority action remains on Progress once today's weigh-in is complete?"
+  ],
+  "decisions": [
+    {
+      "id": "MM224-hierarchy-direction",
+      "status": "pending",
+      "summary": "Recommendation proposes one primary task/status, supporting summaries, and grouped detail; no information-removal or hierarchy policy is approved by this review.",
+      "authority": "Product owner"
+    }
+  ],
+  "pending_work": [
+    "Reconcile current Add-food code, test, screenshot baseline and MM-223 status.",
+    "Obtain product-owner dispositions for MM-219 and explicit cross-destination hierarchy decisions.",
+    "Create fresh built renders and conduct device/accessibility/task validation after requirements are approved."
+  ],
+  "tests": [],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": true
+  }
+}

@@ -18,6 +18,7 @@ import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import '../support/fake_pack_download_controller.dart';
 import '../support/pump_app.dart';
+import '../support/enter_manual_food.dart';
 import 'load_golden_fonts.dart';
 
 /// Screenshot tests (MM-105): main screens in all three palettes, with fixed
@@ -616,8 +617,36 @@ void main() {
       await shot(tester, 'add_food_opened_dark');
     }, skip: !linux);
 
+    testWidgets('manual entry is a separate step', (tester) async {
+      await openSheet(tester);
+      await enterManualFood(tester);
+      await shot(tester, 'add_food_manual_dark');
+    }, skip: !linux);
+
+    testWidgets('manual food macro preview', (tester) async {
+      await openSheet(tester);
+      await enterManualFood(tester);
+      for (final (key, value) in [
+        ('food-name', 'Chicken and rice'),
+        ('food-protein', '40'),
+        ('food-carbs', '61'),
+        ('food-fat', '18'),
+      ]) {
+        final field = find.byKey(ValueKey(key));
+        await tester.ensureVisible(field);
+        await tester.enterText(field, value);
+        await tester.pumpAndSettle();
+      }
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('food-macro-preview')),
+      );
+      await tester.pumpAndSettle();
+      await shot(tester, 'add_food_macro_preview_dark');
+    }, skip: !linux);
+
     testWidgets('the rest of the form', (tester) async {
       await openSheet(tester);
+      await enterManualFood(tester);
       await tester.ensureVisible(find.byKey(const ValueKey('food-save')));
       await tester.pumpAndSettle();
       await shot(tester, 'add_food_form_end_dark');
@@ -661,6 +690,7 @@ void main() {
     // typed with its numbers for one serving, opened again.
     testWidgets('editing an entry typed per serving', (tester) async {
       await openSheet(tester);
+      await enterManualFood(tester);
       await tester.enterText(
         find.byKey(const ValueKey('food-name')),
         'Protein bar',

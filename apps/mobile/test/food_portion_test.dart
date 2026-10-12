@@ -6,6 +6,7 @@ import 'package:mm_fixtures/mm_fixtures.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 import 'support/reveal_on_food_screen.dart';
 
 /// MM-167: quantity, unit and what the typed numbers are for, in the add-food
@@ -42,10 +43,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> openSheet(WidgetTester tester) async {
+  Future<void> openSheet(WidgetTester tester, {bool manual = true}) async {
     await openFood(tester);
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    if (manual) await enterManualFood(tester);
   }
 
   Future<void> type(WidgetTester tester, String key, String value) async {
@@ -234,7 +236,7 @@ void main() {
   testWidgets('a searched food is logged by weight and calculated', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);
@@ -267,7 +269,7 @@ void main() {
   testWidgets('editing a calculated entry restores it and recalculates', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);
@@ -300,7 +302,7 @@ void main() {
   testWidgets('editing a pack food keeps which food it came from (MM-169)', (
     tester,
   ) async {
-    await openSheet(tester);
+    await openSheet(tester, manual: false);
     await type(tester, 'food-search', 'banana');
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Banana').first);

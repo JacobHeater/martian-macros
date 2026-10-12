@@ -12,6 +12,7 @@ import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'goldens/load_golden_fonts.dart';
 import 'support/in_memory_overrides.dart';
+import 'support/enter_manual_food.dart';
 
 void main() {
   final today = CalendarDate(2026, 10, 5);
@@ -224,6 +225,7 @@ void main() {
 
       await tester.tap(find.text('Add food'));
       await tester.pumpAndSettle();
+      await enterManualFood(tester);
       await tester.enterText(
         find.byKey(const ValueKey('food-name')),
         'MM-206 new food',
@@ -262,6 +264,7 @@ void main() {
       expect(find.text('Yesterday'), findsOneWidget);
       await tester.tap(find.text('Add food'));
       await tester.pumpAndSettle();
+      await enterManualFood(tester);
       await tester.enterText(
         find.byKey(const ValueKey('food-name')),
         'MM-206 historical food',

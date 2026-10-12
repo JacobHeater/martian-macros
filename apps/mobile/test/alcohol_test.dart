@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 
 /// MM-127: alcohol counts toward calories, is its own line, and is not
 /// turned into carbohydrate or fat.
@@ -70,6 +71,7 @@ void main() {
     await openFood(tester);
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.tap(find.text('Weighed').last);
     await tester.pump();
     await type(tester, 'food-name', 'Two beers');

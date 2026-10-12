@@ -4,6 +4,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/pump_app.dart';
+import 'support/enter_manual_food.dart';
 
 /// MM-216: MM-167 says that changing how a food was measured clears the
 /// amount "and the form says so". The amount is cleared and nothing is said.
@@ -21,6 +22,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
 
     // The sheet opens on Label serving with one serving.
     await tester.ensureVisible(find.byKey(const ValueKey('portion-quantity')));

@@ -7,6 +7,7 @@ import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_fixtures/mm_fixtures.dart';
 
 import 'support/in_memory_overrides.dart';
+import 'support/enter_manual_food.dart';
 import 'support/reveal_on_food_screen.dart';
 import 'support/confirm_initial_theme.dart';
 
@@ -206,6 +207,7 @@ void main() {
 
     await tester.tap(find.text('Add food'));
     await tester.pumpAndSettle();
+    await enterManualFood(tester);
     await tester.enterText(
       find.byKey(const ValueKey('food-name')),
       'Chicken and rice',

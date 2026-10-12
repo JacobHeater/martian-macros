@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mm_domain/mm_domain.dart';
 import 'package:mm_food_catalog/mm_food_catalog.dart';
 
+import '../charts/macro_split_chart.dart';
 import '../format/meal_label.dart';
 import '../format/portion_unit_label.dart';
 import '../format/quantity_text.dart';
@@ -297,6 +298,7 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
             CatalogServing(description: 'amount', grams: grams),
           );
     final invalid = _quantity.text.trim().isNotEmpty && _amount == null;
+    final oil = _offersOil ? _oil.totals : null;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,6 +385,25 @@ class FoodAmountStepState extends ConsumerState<FoodAmountStep> {
             ],
             selected: {_oil},
             onChanged: (s) => setState(() => _oil = s.first),
+          ),
+        ],
+        if (totals != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            _choice.unit.isHand ? 'Estimated macro split' : 'Macro split',
+            style: text.labelLarge,
+          ),
+          const SizedBox(height: 8),
+          MacroSplitChart(
+            key: const ValueKey('food-macro-preview'),
+            isPreview: true,
+            intake: IntakeDay(
+              date: widget.day,
+              kcal: totals.kcal + (oil?.kcal ?? 0),
+              proteinG: totals.proteinG + (oil?.proteinG ?? 0),
+              carbsG: totals.carbsG + (oil?.carbsG ?? 0),
+              fatG: totals.fatG + (oil?.fatG ?? 0),
+            ),
           ),
         ],
         const SizedBox(height: 16),

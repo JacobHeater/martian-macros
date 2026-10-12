@@ -556,11 +556,18 @@
         "MM-39",
         "MM-48",
         "MM-167",
+        "MM-219",
         "MM-213",
-        "MM-216"
+        "MM-216",
+        "MM-223",
+        "MM-225"
       ],
       "asset": "views/add-food.html#add-food-default",
       "states": [
+        "discovery",
+        "manual entry",
+        "manual entry from search",
+        "macro preview",
         "empty",
         "filled",
         "label serving",
@@ -572,9 +579,9 @@
         "edit",
         "legacy entry"
       ],
-      "verification": "screenshot-compared",
+      "verification": "source-only",
       "status": "covered",
-      "limits": "The route buttons wrap at larger text sizes. Validation and method-change states are drawn from source."
+      "limits": "The route buttons wrap at larger text sizes. The search-to-manual query carry is covered by a widget test and drawn, but its updated Linux screenshot baseline is pending. Validation and method-change states are drawn from source."
     },
     {
       "source": "apps/mobile/lib/src/food/calorie_hero.dart",
@@ -591,8 +598,9 @@
         "logged only",
         "paused"
       ],
-      "verification": "screenshot-compared",
-      "status": "covered"
+      "verification": "source-only",
+      "status": "incomplete",
+      "limits": "The separate discovery/manual-entry states have widget coverage; the refreshed Linux screenshots are pending."
     },
     {
       "source": "apps/mobile/lib/src/food/custom/custom_food_form.dart",
@@ -675,14 +683,17 @@
       "symbol": "EstimateMealStep",
       "kind": "sheet",
       "requirements": [
-        "MM-150"
+        "MM-150",
+        "MM-225"
       ],
       "asset": "views/add-food.html#add-food-estimate",
       "states": [
         "default",
+        "estimated macro preview",
         "before first weigh-in"
       ],
-      "verification": "screenshot-compared",
+      "verification": "source-only",
+      "limits": "The estimated macro preview is drawn from source; updated Linux goldens are pending.",
       "status": "covered"
     },
     {
@@ -708,18 +719,20 @@
         "MM-42",
         "MM-151",
         "MM-167",
-        "MM-217"
+        "MM-217",
+        "MM-225"
       ],
       "asset": "views/add-food.html#add-food-amount",
       "states": [
         "a serving",
         "hand portion estimate",
         "raw or cooked with oil",
+        "macro preview with cooking oil",
         "no amount"
       ],
-      "verification": "screenshot-compared",
+      "verification": "source-only",
       "status": "covered",
-      "limits": "The hand-portion estimate and raw-or-cooked frames are drawn from source alone."
+      "limits": "Macro previews, hand-portion estimates and raw-or-cooked frames are drawn from source. Updated Linux goldens are pending."
     },
     {
       "source": "apps/mobile/lib/src/food/food_day_header.dart",
@@ -779,7 +792,8 @@
       "symbol": "FoodSearchResults",
       "kind": "part",
       "requirements": [
-        "MM-42"
+        "MM-42",
+        "MM-223"
       ],
       "asset": "views/add-food.html#add-food-search",
       "states": [
@@ -1725,11 +1739,15 @@
       "symbol": "MacroSplitChart",
       "kind": "component",
       "requirements": [
-        "MM-107"
+        "MM-107",
+        "MM-179",
+        "MM-225"
       ],
       "asset": "components/index.html#macro-split-chart",
       "states": [
-        "three macros"
+        "three macros",
+        "food preview",
+        "empty food preview"
       ],
       "verification": "screenshot-compared",
       "status": "covered"
