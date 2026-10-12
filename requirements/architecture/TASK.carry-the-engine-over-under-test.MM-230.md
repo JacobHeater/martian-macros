@@ -1,6 +1,6 @@
 ---
 id: MM-230
-status: in-progress
+status: done
 component: architecture
 related: [MM-228, MM-229, MM-23, MM-24, MM-28, MM-30, MM-143]
 ---
@@ -235,3 +235,5 @@ have, run both ways.
 `dart:ffi` and cannot be compiled to JavaScript as it is. Its search and
 ranking rules are separable from its storage; that split belongs with the
 data layer (MM-228 part 3).
+
+**Done (2026-10-12).** Every Dart package is carried over under its tests: domain, engine, healthIngest, foodCatalog, foodPipeline, fixtures and data live under `apps/web/src` with the layers test holding them apart, and the food catalog reads SQLite through the MM-231 seam. The Dart originals were removed with MM-232 step 6.
