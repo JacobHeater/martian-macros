@@ -170,6 +170,13 @@ screen, palm portions, real-camera label reading. Tickets record limitations.
   plugins, the switch, iOS.
 - **One agent owns the new app's structure at a time.** If you are not that
   agent, work on a ticket inside what already exists and say so here.
+- **The web half of the skeleton exists** (MM-229, read its Progress): the
+  app in `apps/web/` with tokens checked against the Flutter theme, the five
+  destinations, Settings with the theme choice, and a `?gallery` page of
+  every token and component. `mm bootstrap` now runs `npm ci` there and
+  `mm check` ends with `mm web` (type check, tests, build, offline check),
+  so Node 22 is needed locally. Not built: the Android shell, screenshot
+  tests. Seen only in desktop Edge, never in a phone's web view.
 - #102 (Copilot's, green) was merged at the start of this session under the
   standing rule.
 

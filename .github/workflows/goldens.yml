@@ -35,6 +35,13 @@ jobs:
           channel: stable
           cache: true
 
+      # Bootstrap also installs the React app (MM-228).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
       - name: Bootstrap
         run: ./mm bootstrap
         env:

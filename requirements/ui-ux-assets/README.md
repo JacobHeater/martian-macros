@@ -138,3 +138,5 @@ Generated and ignored files (build output, coverage) need no entry.
   writes (MM-166). A generated report for contributors, not a product screen.
 - `tool/assets/roadmap_report.template.html`: the template `mm roadmap`
   fills to write that page. Tooling, not a product screen.
+- `apps/web/index.html`: the page the React app starts from (MM-228). It is
+  the app itself, not a drawing of it.
