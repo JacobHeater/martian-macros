@@ -41,3 +41,6 @@ the same store account, and, if they never buy, keep logging with all their data
   competitors' current prices before deciding.
 - **The weakness of a one-time price** is that it does not fund years of maintenance and data updates. The usual answers are a tip jar or
   a paid major version every few years. Neither is being built; the marketing must simply not promise "lifetime updates".
+
+## Decision (2026-10-13)
+- **The purchase plugin is our own**, a thin Capacitor plugin over StoreKit 2 and Play Billing Library 9 beside the other Mm* plugins (MM-88 has the survey and the design): list two products, buy, restore, read a transaction's original purchase date. Capgo's plugin is the fallback if that proves costly. The price is still open.

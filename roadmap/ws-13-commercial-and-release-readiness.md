@@ -120,6 +120,7 @@ to WS-12.
   "XX-day Trial" item; nothing on Play, so Android times it on the device).
 - Remaining: MM-95, MM-29, MM-85, MM-86, MM-87, MM-96, MM-94. Epic: MM-84.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-244 (observe what the barcode and label reader sends).
+- Placed 2026-10-13: MM-247 (the terms and the privacy policy, published from the repository on GitHub Pages; the workflow needs the owner's merge).
 
 ## Notes for whoever builds it
 - The free tier, as decided: food logging, barcode scanning, the training

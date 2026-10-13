@@ -225,13 +225,11 @@ and the leftovers held open across WS-08 and WS-09.
 
 | Step | Tickets | Why |
 | --- | --- | --- |
-| WS-03 step 1 | MM-103, MM-181 | **Start here.** One question per onboarding screen; the glow. Small leftovers of built work. WS-14 step 4 (the React conversion) and WS-01 step 3 (CI) closed on 2026-10-13. |
-| WS-01 step 6 | MM-177 | The demo seed wired into the shell; the phone run itself is done (MM-175). |
-| WS-06 step 3 | MM-138, MM-139 | The last of M1: simulator calibration and the owner's confirmation of holding a reduction. |
-| WS-02 step 6 | MM-135 | An owner decision (the diet break), then an engine change. |
-| WS-04 step 1 | MM-51 | The food pack lane, the gap to M2: close the spike, then steps 3 to 6 on a device (MM-55, MM-56, MM-57, MM-153). |
-| WS-13 step 1 | MM-88, MM-95, MM-244 | Long leads: the store trial spike, the privacy policy, and watching what ML Kit sends on a release build. MM-244 gates every "nothing is uploaded" sentence. |
-| WS-11 step 2, WS-12 step 1 | MM-71, MM-65 | M3 work with no dependency; good to hand off. |
+| WS-02 step 6 | MM-135 | **Start here.** The owner decided (2026-10-13): a break offered at 12 weeks and when recovery signals fail, forced only at 20. The engine change replaces MM-31's forced week at sixteen. M1 closed the same day (WS-06 step 3, WS-03 step 1, WS-01 step 6 and WS-14 step 4 are done). |
+| WS-11 step 2 | MM-71 | Choosing the primary scale in Settings, which the ticket promises; a preference column and a Settings row. |
+| WS-13 step 1 | MM-95, MM-247, MM-244 | The privacy policy draft (decided: now, with the terms), the public page from the repository (the workflow is the owner's merge), and watching what ML Kit sends on a release build. |
+| WS-09 step 4 | MM-248 | Reminders on the minute: the exact-alarm permission, decided 2026-10-13. |
+| WS-04 step 1 | MM-51 | The food pack lane, the gap to M2: the spike's two checks need a real pantry (no online source was found); steps 3 to 6 on a device (MM-55, MM-56, MM-57, MM-153) do not wait for them. |
 
 Later steps of a workstream whose earlier step is held open for a leftover
 (WS-03 steps 2 and 3, WS-04 steps 3 to 6, WS-11 steps 3 and 4) are

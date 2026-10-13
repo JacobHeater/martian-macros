@@ -125,6 +125,7 @@ beside anything.
   boundaries simulator-validated).
 - Remaining: MM-138, MM-123, MM-128, MM-130,
   MM-122, MM-124, MM-129. Epics: MM-119, MM-137.
+- Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
 
 ## Notes for whoever builds it
 - The explanation is data, not prose: a list of signed contributions with

@@ -90,28 +90,22 @@ attorney has reviewed it and the owner has settled what is listed under
   check and adds a catch-all; it says the app's limits are not medical
   clearance. It has no clinical sign-off (MM-29).
 
-## Still to be decided (the owner; a lawyer for the first five)
+## Decided by the owner on 2026-10-13, and what is left for the attorney
 
-1. **Who grants the licence.** The text says "the developer of Martian
-   Macros" until there is a legal name.
-2. **Governing law and venue.** No such clause is in the draft.
-3. **Disputes.** Arbitration or a class waiver, wanted or not. None is in
-   the draft.
-4. **A contact address** for legal notices. None is in the draft.
+1. **Who grants the licence.** Placeholder kept: "the developer of Martian
+   Macros" until an entity exists or the attorney asks.
+2. **Governing law and venue.** Left blank in the draft for the attorney.
+3. **Disputes.** Left blank in the draft for the attorney.
+4. **A contact address.** Left empty for the attorney.
 5. **What counts as a change that matters**, and the effective date and
-   version of the first released terms.
-6. **Where the guard sits.** Built as the first guard (the product
-   reviewer's recommendation; one rule for every installation). UX would
-   put it after the theme chooser for a new person, so the text is read in
-   the chosen palette; coaching would put it after the welcome screen.
-7. **Whether a privacy policy ships with this or in MM-95.** Google Play
-   requires one separately from any terms, at a public web address and
-   inside the app. It is not built.
-8. **The four behaviours the safety reviewer flagged** as straining the
-   general-wellness footing (a protein cap for kidney disease, a pace
-   limit for insulin users, a line about thyroid treatment, a lactation
-   offset): keep, reword or make refer-only, with the attorney and MM-29.
-9. **Store terms.** Whether the same text is given to the stores.
+   version of the first released terms: still open, the attorney's.
+6. **Where the guard sits.** First screen on every installation, as built.
+7. **The privacy policy.** Drafted now, with the terms, for the same
+   attorney (MM-95); the public page (MM-247) carries both.
+8. **The four flagged behaviours.** Kept as built, listed for the attorney
+   and the clinician (MM-29) to rule on.
+9. **Store terms.** The same text, one source: the stores link to a page
+   generated from the app's terms file (MM-247).
 
 ## Acceptance criteria
 
