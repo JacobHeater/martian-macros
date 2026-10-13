@@ -9,8 +9,8 @@
     "test": "vitest run",
     "build": "vite build",
     "offline": "node scripts/check-offline.mjs",
-    "android": "vite build && cap sync android",
-    "storybook": "storybook dev -p 6006",
+    "android": "vite build && cap telemetry off && cap sync android",
+    "storybook": "storybook dev -p 6006 --no-version-updates",
     "build-storybook": "storybook build",
     "check": "npm run typecheck && npm run test && npm run build && npm run offline"
   },
