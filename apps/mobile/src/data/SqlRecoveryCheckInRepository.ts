@@ -3,7 +3,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, integer, optionalNumber, orNull } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `RecoveryCheckInRepository` kept in the database. */
 export class SqlRecoveryCheckInRepository implements RecoveryCheckInRepository {

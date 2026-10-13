@@ -9,6 +9,7 @@ import { HorizonArc } from '../ui/HorizonArc';
 import { MacroBar } from '../ui/MacroBar';
 import { MacroKind } from '../ui/MacroKind';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
+import { MmPressable } from '../ui/MmPressable';
 import { MmStatusChip } from '../ui/MmStatusChip';
 import { StatusRow } from '../ui/StatusRow';
 import './food.css';
@@ -77,10 +78,10 @@ export function CalorieHero({
           <p className="food-hero-caption">{caption}</p>
         </>
       ) : (
-        <button type="button" className="food-hero-open" aria-label={pressLabel} onClick={onPress}>
+        <MmPressable label={pressLabel} onPress={onPress}>
           <span className="food-hero-figure">{figure}</span>
           <span className="food-hero-caption">{caption}</span>
-        </button>
+        </MmPressable>
       )}
       <div className="food-hero-macros">
         {shown.map((macro) => (

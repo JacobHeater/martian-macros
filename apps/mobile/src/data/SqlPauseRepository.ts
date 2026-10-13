@@ -4,7 +4,7 @@ import type { PauseRepository } from '../domain/repositories/PauseRepository';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { asFlag, day, flag, named } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `PauseRepository` kept in the database. */
 export class SqlPauseRepository implements PauseRepository {

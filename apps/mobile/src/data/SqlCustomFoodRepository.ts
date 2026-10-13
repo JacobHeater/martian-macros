@@ -7,7 +7,8 @@ import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
 import { integer, named, number, optionalNumber, optionalText, orNull, text } from './columns';
-import { insert, update } from './statements';
+import { insert } from './insert';
+import { update } from './update';
 
 const totalsOf = (r: SqlRow) =>
   new NutritionTotals({

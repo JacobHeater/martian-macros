@@ -12,6 +12,7 @@ import { useLoaded } from '../app/useLoaded';
 import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmMenuButton } from '../ui/MmMenuButton';
+import { MmPressable } from '../ui/MmPressable';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { useOverlays } from '../ui/useOverlays';
 import { copyEntries } from './copyEntries';
@@ -60,13 +61,9 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   return (
     <section className="food-meal" aria-label={label}>
       <div className="food-meal-head">
-        <button
-          type="button"
-          className="food-meal-toggle"
-          aria-expanded={expanded}
-          aria-controls={id}
-          onClick={() => setExpanded(!expanded)}
-        >
+        <div className="food-meal-toggle">
+          <MmPressable expanded={expanded} controls={id} onPress={() => setExpanded(!expanded)}>
+            <span className="food-meal-toggle-body">
           <span className="food-meal-title">
             <span className="food-meal-name">{label}</span>
             {entries.length === 0 ? null : (
@@ -83,7 +80,9 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
           <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
             <MmIcon name="chevronDown" size={16} />
           </span>
-        </button>
+            </span>
+          </MmPressable>
+        </div>
         {entries.length > 0 && day !== today ? (
           <MmIconButton
             icon="copy"
@@ -102,14 +101,11 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
         {entries.map((entry) => (
           <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
             <div className="food-meal-entry">
-              <button
-                type="button"
-                className="food-entry-open"
-                aria-label={`Edit ${entry.name}`}
-                onClick={() => void showAddFoodSheet(overlays, day, { entry })}
-              >
-                <FoodEntryTile entry={entry} />
-              </button>
+              <div className="food-entry-open">
+                <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
+                  <FoodEntryTile entry={entry} />
+                </MmPressable>
+              </div>
               <MmMenuButton<string>
                 icon="more"
                 label={`More actions for ${entry.name}`}

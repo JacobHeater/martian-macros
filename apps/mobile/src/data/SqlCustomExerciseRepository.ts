@@ -8,7 +8,8 @@ import { tryParseInt } from '../lang/tryParseInt';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { integer, named, text } from './columns';
-import { insert, update } from './statements';
+import { insert } from './insert';
+import { update } from './update';
 
 /** The row a custom exercise's id names, or undefined for an id that is not one of ours. */
 const rowIdOf = (id: string) =>

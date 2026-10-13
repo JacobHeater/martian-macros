@@ -151,8 +151,8 @@ delegation and sequential fallback do not supersede the working agreements here.
   blocked. It adds no requirements of its own.
 - Keep dependencies flowing with the existing layers. In particular, keep
   domain and engine logic independent of React and persistence details.
-- A change to any table bumps `currentSchemaVersion` in
-  `apps/mobile/src/data/schema.ts` by one and adds the migration step; the
+- A change to any table bumps `apps/mobile/src/data/currentSchemaVersion.ts`
+  by one, changes `currentSchema.ts` and adds the migration step; the
   migration tests hold every released version's upgrade path.
 
 ## Engineering principles (binding)
@@ -165,8 +165,9 @@ interface segregation (I) win.
 2. Every integration point is an interface that any subtype can replace
    (food source, barcode scanner, health source, backup provider, entitlement,
    clock). Never import a vendor or platform package outside its adapter
-   folder; `apps/mobile/test/layers.test.ts` names the folders each may live in,
-   and `apps/mobile/src/app/openAppServices.ts` is the one place implementations
+   folder; `apps/mobile/test/architecture.test.ts` lists every library and
+   the folders that may import it (MM-246), and
+   `apps/mobile/src/app/openAppServices.ts` is the one place implementations
    are chosen.
 3. Consumers depend on the **narrowest** interface they need
    (`WeightReader`, not a store). Interfaces live with the consumer's layer.
@@ -175,7 +176,9 @@ interface segregation (I) win.
    decision.
 5. **One declaration per file.** Every model, interface, class, union and
    function module has its own file, named for it. Barrel files only
-   `export`.
+   `export`. A component may carry its `<Name>Props` type, a union type its
+   same-named value, and a file of constants may hold a group;
+   `apps/mobile/test/architecture.test.ts` checks it (MM-246).
 6. All database access goes through a repository interface with a SQL
    implementation and an in-memory fixture. Screens and state never use SQL
    or a concrete store.
@@ -183,8 +186,9 @@ interface segregation (I) win.
    implementation, fixtures included. That is how substitutability is proved.
 8. A reusable part of a view is a design-system component, written once. A
    screen never uses a raw HTML control (`<button>`, `<input>`, `<select>`,
-   …); it uses the component. Components take meaning
-   (`kind="primary"`), never a color, radius or padding.
+   …); it uses the component (`MmPressable` for content that is pressed as
+   a whole). Components take meaning (`kind="primary"`), never a color,
+   radius or padding. The architecture test checks it (MM-246).
 9. Prefer composition to inheritance and plain function components, so state
    lives in `state/` cells and controllers, not in component classes.
 

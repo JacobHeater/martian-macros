@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest';
 import { AppDatabase } from '../../src/data/AppDatabase';
 import type { MigrationStep } from '../../src/data/MigrationStep';
-import { currentSchema, currentSchemaVersion as current } from '../../src/data/schema';
+import { currentSchema } from '../../src/data/currentSchema';
+import { currentSchemaVersion as current } from '../../src/data/currentSchemaVersion';
 import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';

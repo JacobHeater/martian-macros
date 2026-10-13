@@ -5,8 +5,10 @@ import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { orNull } from './columns';
 import { foodFromRow } from './foodFromRow';
-import { portionValues } from './portionColumns';
-import { insert, update, type Values } from './statements';
+import { portionValues } from './portionValues';
+import { insert } from './insert';
+import { update } from './update';
+import type { Values } from './Values';
 
 const valuesOf = (entry: FoodEntry): Values => ({
   epoch_day: entry.date.epochDay,

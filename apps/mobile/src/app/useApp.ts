@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { AppContext, type AppScope } from './AppContext';
+import { AppContext } from './AppContext';
+import type { AppScope } from './AppScope';
 
 /** The stores and the state worked out from them. */
 export function useApp(): AppScope {

@@ -4,7 +4,9 @@ import type { SqlDatabase } from '../sql/SqlDatabase';
 import { integer } from './columns';
 import type { MigrationStep } from './MigrationStep';
 import { migrationSteps } from './migrationSteps';
-import { currentSchema, currentSchemaVersion, type Table } from './schema';
+import { currentSchema } from './currentSchema';
+import { currentSchemaVersion } from './currentSchemaVersion';
+import type { Table } from './Table';
 import { SchemaMigrationError } from './SchemaMigrationError';
 
 interface Watcher {

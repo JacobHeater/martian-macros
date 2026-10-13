@@ -1,43 +1,7 @@
 /**
- * The user's database (MM-231). Version 1 of the TypeScript app is the
- * shape the Dart app's database had reached at its version 31: the app was
- * never released, so there is nothing installed to migrate and the 31 steps
- * that led here are not carried over. A test compares every column with
- * what the Dart database declared.
- *
- * Bump `currentSchemaVersion` with every change to a table, change
- * `currentSchema` to the new shape (a new install is created from it), and
- * add the step that takes an existing database there to `migrationSteps`.
+ * The shape a new installation is created from, at `currentSchemaVersion`.
+ * An existing database is taken here by the steps in `migrationSteps`.
  */
-export const currentSchemaVersion = 2;
-
-/** Every table, in the order they are created and emptied. */
-export const tables = [
-  'setups',
-  'weight_entries',
-  'food_entries',
-  'day_marks',
-  'waist_entries',
-  'targets_history',
-  'user_preferences',
-  'weight_events',
-  'custom_foods',
-  'recipe_ingredients',
-  'insight_log',
-  'pauses',
-  'reminders',
-  'recovery_check_ins',
-  'workouts',
-  'workout_exercises',
-  'workout_sets',
-  'custom_exercises',
-  'imported_samples',
-  'health_import_tokens',
-  'exercise_progressions',
-] as const;
-
-export type Table = (typeof tables)[number];
-
 export const currentSchema = `
 CREATE TABLE "setups" (
   "id" INTEGER NOT NULL CHECK("id" = 1),

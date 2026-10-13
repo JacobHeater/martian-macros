@@ -4,7 +4,7 @@ import { WaistObservation } from '../domain/WaistObservation';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, number, optionalNumber, orNull } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `WaistRepository` kept in the database. */
 export class SqlWaistRepository implements WaistRepository {

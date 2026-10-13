@@ -12,7 +12,7 @@ import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
 import { asFlag, day, flag, integer, named, number, optionalDay, optionalNumber, orNull, text } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 function setupFrom(r: SqlRow): UserSetup {
   return new UserSetup({

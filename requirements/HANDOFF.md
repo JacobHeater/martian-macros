@@ -61,8 +61,14 @@ sources and the chair's decisions are in `docs/agent-runs/mm242-eula/`.
 Change what the app does with data and the terms together: they say
 only what the code does, and never "nothing is uploaded" (MM-244).
 
-**Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
-with its migration steps and tests (version 2 since MM-242). Only one schema change at a time.
+**Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
+`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 2
+since MM-242). Only one schema change at a time.
+
+**The engineering rules are checked (MM-246).** `test/architecture.test.ts`
+fails the suite on a file with two declarations or the wrong name, a
+library imported outside the folders it lists, or a raw control in a
+screen; `MmPressable` is the component for content pressed as a whole.
 
 **Next ticket ID.** `mm req next` is the authority (MM-246 at this writing).
 
@@ -81,10 +87,9 @@ the first one starts answering 504 until it is restarted.
 
 **What to build next** (the roadmap's "What is available right now", in
 order; `mm roadmap` draws it).
-- WS-14 step 4, MM-229's leftovers: the TypeScript architecture checker
-  (one declaration per file, vendor imports, raw controls) to replace the
-  Dart `mm arch`; a run on the physical phone (demo identity only, device
-  47261FDAS00EDR); the demo seed wired into the shell (MM-228).
+- WS-14 step 4, MM-229's leftovers: a run on the physical phone (demo
+  identity only, device 47261FDAS00EDR); screenshot tests; the demo seed
+  wired into the shell (MM-228). The architecture checker is done (MM-246).
 - WS-03 step 1 leftovers (MM-103 one question per screen, MM-181), and
   WS-01 step 3: close MM-7, CI has been green on every pull request.
 - WS-06 step 3, the last of M1: MM-138 and MM-139 want simulator calibration
@@ -128,9 +133,17 @@ limitations.
   states derived from status, milestone lists regenerated from the steps,
   paths translated to `apps/mobile/src`, the README's "available now" and
   "do not touch" rewritten for 2026-10-13, the progress page regenerated.
-- Moved the needle: no milestone advanced; M0 is 39 of 47, M1 11 of 13, M2
-  26 of 64. What this session made available is an honest "What is
-  available right now" table: WS-14 step 4 is the start.
+- Then the first item of that table, WS-14 step 4: the TypeScript
+  architecture checker (MM-246, `test/architecture.test.ts`): one
+  declaration per file named for it, libraries only in their adapter
+  folders, no raw control in a screen. Twelve files were split to meet it
+  (`schema.ts` is now `currentSchemaVersion.ts`, `currentSchema.ts`,
+  `tables.ts` and `Table.ts`), `MmPressable` replaced the three raw buttons
+  in `CalorieHero` and `MealSection`, and `columns.ts` is the one file on
+  the baseline.
+- Moved the needle: M0 went from 39 of 47 to 40 of 48 (MM-246 done); no
+  milestone closed. M1 is 11 of 13, M2 26 of 64. What this session made
+  available is an honest "What is available right now" table.
 - Not done: the workstream files' prose still describes the plan as
   written in October's first week; only their sources and sequences carry
   the additions. The 58 in-progress tickets were not walked; many are built
