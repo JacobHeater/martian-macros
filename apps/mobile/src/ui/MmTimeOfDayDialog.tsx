@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MmButton } from './MmButton';
 import { MmDialog } from './MmDialog';
+import { MmPickerField } from './MmPickerField';
 import './ui.css';
 
 interface MmTimeOfDayDialogProps {
@@ -32,13 +33,7 @@ export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, onDone }: MmTi
         </>
       }
     >
-      <input
-        type="time"
-        className="mm-field-input mm-time-input"
-        aria-label={title}
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-      />
+      <MmPickerField kind="time" label={title} value={value} onChange={setValue} />
     </MmDialog>
   );
 }

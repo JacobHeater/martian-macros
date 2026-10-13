@@ -66,3 +66,6 @@ Scenario: Looked at
 
 ## Progress
 **Done (2026-10-13).** The test failed first on the missing detail line and rules, then passed. The DateOfBirth story was looked at in a browser from the static build at phone size in Martian and Light: the indicator sits off the edge and takes the palette, the dialog floats on its outline and shadow, the day reads back in words. The focus mark on the first date segment is the browser's own.
+
+## Seen again on the phone (2026-10-13)
+The owner's next screenshot, from the Android build: the chevron still flush against the field's edge, and the field not stretched to the dialog. Android's date control draws its own arrow inside the box and ignores padding and the indicator pseudo-element, so the first fix held only in a desktop browser. **The fix that holds everywhere:** the platform draws nothing. `MmPickerField` wraps the date or time input in the design system's field box with `appearance: none`, the indicator hidden on every engine, the value at the start, full width, and our own chevron (`MmIcon` chevronDown) at the field's inset; pressing anywhere in the field opens the native picker. The time dialog uses it too. The test now checks for the box, the chevron and the rules; it failed before this change on the missing box and chevron.

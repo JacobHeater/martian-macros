@@ -3,6 +3,7 @@ import { CalendarDate } from '../domain/CalendarDate';
 import { Fmt } from '../format/Fmt';
 import { MmButton } from './MmButton';
 import { MmDialog } from './MmDialog';
+import { MmPickerField } from './MmPickerField';
 import './ui.css';
 
 interface MmDateDialogProps {
@@ -23,8 +24,9 @@ function parsed(iso: string): CalendarDate | undefined {
 }
 
 /**
- * Asks for a calendar day with the phone's own date control, and says the
- * day back in words under it, or why it cannot be taken (MM-260).
+ * Asks for a calendar day with the phone's own date picker behind the
+ * design system's field, and says the day back in words under it, or why
+ * it cannot be taken (MM-260).
  */
 export function MmDateDialog({ helpText, initial, first, last, onDone }: MmDateDialogProps) {
   const [value, setValue] = useState(initial.toString());
@@ -41,14 +43,13 @@ export function MmDateDialog({ helpText, initial, first, last, onDone }: MmDateD
         </>
       }
     >
-      <input
-        type="date"
-        className="mm-field-input mm-time-input"
-        aria-label={helpText}
+      <MmPickerField
+        kind="date"
+        label={helpText}
         min={first.toString()}
         max={last.toString()}
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={setValue}
       />
       {allowed ? (
         <p className="mm-date-detail">{Fmt.longDate(date)}</p>
