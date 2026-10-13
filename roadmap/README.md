@@ -227,6 +227,7 @@ and the leftovers held open across WS-08 and WS-09.
 | Step | Tickets | Why |
 | --- | --- | --- |
 | WS-02 step 6 | MM-135 | **Start here.** The owner decided (2026-10-13): a break offered at 12 weeks and when recovery signals fail, forced only at 20. The engine change replaces MM-31's forced week at sixteen. M1 closed the same day (WS-06 step 3, WS-03 step 1, WS-01 step 6 and WS-14 step 4 are done). |
+| WS-03 step 9 | MM-253 first, then MM-254 to MM-259 | **Hierarchy and wayfinding** (the owner, 2026-10-13): the direction written into `design/screen-direction.md` and graded by the product-designer and UX roles on the built stories, then each destination rebuilt in tiers with icons, grouped lists and one primary action, before and after in the register. |
 | WS-15 steps 1 and 2 | MM-250, MM-251 | **Sleep, first class** (the owner, 2026-10-13): the nightly record from the health platform or by hand, and the sleep-disorder item in the health check. Step 3 (the coach reads it) waits for the panel pass MM-249 asks for. |
 | WS-11 step 2 | MM-71 | Choosing the primary scale in Settings, which the ticket promises; a preference column and a Settings row. |
 | WS-13 step 1 | MM-95, MM-247, MM-244 | The privacy policy draft (decided: now, with the terms), the public page from the repository (the workflow is the owner's merge), and watching what ML Kit sends on a release build. |
