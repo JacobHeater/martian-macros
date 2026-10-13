@@ -218,6 +218,12 @@ limitations.
 - The owner's diagnosis of the views' hierarchy, checked against the
   register and written as MM-253 (the direction and the panel pass) and
   MM-254 to MM-259 (each destination), WS-03 step 9, M2.
+- MM-260, from the owner's screenshot of the Date of birth dialog: the
+  phone's date control now follows the palette (`color-scheme`), its
+  picker indicator has a margin, the dialog has an outline and a shadow,
+  and the day is said back in words or the allowed range is. A story
+  (Settings, DateOfBirth) and a test guard it. Every other dialog gains
+  the outline and shadow with it.
 - Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
   from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
   gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
