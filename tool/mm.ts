@@ -27,6 +27,17 @@ async function test(args: readonly string[]): Promise<number> {
 /** Type check, tests, build and the offline check of the React app. */
 const web: Command = () => run(['npm', 'run', 'check'], { cwd: webApp });
 
+/**
+ * Installs the dependencies, then opts this machine out of the telemetry of
+ * Capacitor's CLI (MM-243), which is on until it is turned off and is kept
+ * for the machine, not the repository.
+ */
+async function bootstrap(): Promise<number> {
+  const installed = await run(['npm', 'ci'], { cwd: webApp });
+  if (installed !== 0) return installed;
+  return run(['npx', 'cap', 'telemetry', 'off'], { cwd: webApp });
+}
+
 async function check(): Promise<number> {
   const steps: [string, Command][] = [
     ['req', (a) => runRequirements(repoRoot, a)],
@@ -56,7 +67,7 @@ async function doctor(): Promise<number> {
 
 const commands: Record<string, [string, Command]> = {
   doctor: ['Check the toolchain', doctor],
-  bootstrap: ['Install the exact dependencies from the lock file', () => run(['npm', 'ci'], { cwd: webApp })],
+  bootstrap: ['Install the exact dependencies from the lock file, and opt this machine out of Capacitor telemetry', bootstrap],
   check: ['CI gate: requirements, panel, tool tests, web (type check, tests, build, offline)', check],
   web: ['Check the React app: type check, tests, build, offline', web],
   storybook: ['The design register, live: mm storybook [build] (MM-237)', (a) => run(['npm', 'run', a[0] === 'build' ? 'build-storybook' : 'storybook'], { cwd: webApp })],

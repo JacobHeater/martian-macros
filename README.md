@@ -30,7 +30,7 @@ Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
 | Command | What it does |
 | --- | --- |
 | `mm doctor` | Checks the toolchain |
-| `mm bootstrap` | Installs the exact dependencies from the lock file |
+| `mm bootstrap` | Installs the exact dependencies from the lock file, and opts this machine out of Capacitor's telemetry (MM-243) |
 | `mm check` | CI gate: requirements, panel, the tool's tests, then the web check (type check, tests, build, offline) |
 | `mm web` | The web check alone |
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
