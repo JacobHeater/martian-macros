@@ -61,6 +61,7 @@ to exactly one workstream.
 | 12 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | in progress | C |
 | 13 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | not started | C |
 | 14 | WS-13 | [Commercial and release readiness](ws-13-commercial-and-release-readiness.md) | not started | D |
+| 15 | WS-15 | [Sleep](ws-15-sleep.md) | not started (added 2026-10-13, the owner's decision) | C |
 
 The state column is `status` in `roadmap.json`, derived from the tickets:
 "in progress" means at least one ticket is being worked on, and most
@@ -226,6 +227,7 @@ and the leftovers held open across WS-08 and WS-09.
 | Step | Tickets | Why |
 | --- | --- | --- |
 | WS-02 step 6 | MM-135 | **Start here.** The owner decided (2026-10-13): a break offered at 12 weeks and when recovery signals fail, forced only at 20. The engine change replaces MM-31's forced week at sixteen. M1 closed the same day (WS-06 step 3, WS-03 step 1, WS-01 step 6 and WS-14 step 4 are done). |
+| WS-15 steps 1 and 2 | MM-250, MM-251 | **Sleep, first class** (the owner, 2026-10-13): the nightly record from the health platform or by hand, and the sleep-disorder item in the health check. Step 3 (the coach reads it) waits for the panel pass MM-249 asks for. |
 | WS-11 step 2 | MM-71 | Choosing the primary scale in Settings, which the ticket promises; a preference column and a Settings row. |
 | WS-13 step 1 | MM-95, MM-247, MM-244 | The privacy policy draft (decided: now, with the terms), the public page from the repository (the workflow is the owner's merge), and watching what ML Kit sends on a release build. |
 | WS-09 step 4 | MM-248 | Reminders on the minute: the exact-alarm permission, decided 2026-10-13. |

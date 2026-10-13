@@ -506,6 +506,14 @@
             "MM-140",
             "MM-168"
           ]
+        },
+        {
+          "workstream": "WS-15",
+          "tickets": [
+            "MM-250",
+            "MM-251",
+            "MM-252"
+          ]
         }
       ]
     },
@@ -1946,7 +1954,8 @@
         "WS-10"
       ],
       "unlocks": [
-        "WS-13"
+        "WS-13",
+        "WS-15"
       ],
       "primaryOwnership": [
         "apps/mobile/src/engine (new modules: adherence, insights, stall, notices, gap and pause rules)",
@@ -2233,7 +2242,9 @@
         "WS-14",
         "WS-01"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "WS-15"
+      ],
       "primaryOwnership": [
         "apps/mobile/src/healthIngest (new)",
         "Android manifest and permissions",
@@ -2519,6 +2530,75 @@
         "meaning": "The app is live in the United States on both stores."
       },
       "notes": "Step 1 has no code dependency and should start well before the rest: finding a reviewer for MM-29 and learning the stores' trial rules both take calendar time, not engineering time."
+    },
+    {
+      "id": "WS-15",
+      "name": "Sleep",
+      "file": "ws-15-sleep.md",
+      "intent": "Sleep as a first-class signal: a nightly record from a wearable or by hand, sleep disorders in the health check, and a coach that reads it (MM-249, the owner's decision of 2026-10-13).",
+      "recommendedOrder": 15,
+      "status": "not-started",
+      "riskLevel": "medium",
+      "parallelGroup": "PG-C",
+      "dependsOn": [
+        "WS-09",
+        "WS-11"
+      ],
+      "unlocks": [],
+      "primaryOwnership": [
+        "apps/mobile/src/domain (the sleep record, reader and screening answer)",
+        "apps/mobile/src/healthIngest and the MmHealth plugin (sleep)",
+        "apps/mobile/src/engine (the relief signal, explanation lines, the insight rule)",
+        "apps/mobile/src/progress, coach, onboarding/HealthStep.tsx"
+      ],
+      "sharedContracts": [
+        "SC-schema",
+        "SC-health-source",
+        "SC-setup",
+        "SC-analysis"
+      ],
+      "coordinationHotspots": [
+        "HS-schema-lane",
+        "HS-coach-screen",
+        "HS-onboarding-screen"
+      ],
+      "sourceRequirements": {
+        "built": [],
+        "remaining": [
+          "MM-249",
+          "MM-250",
+          "MM-251",
+          "MM-252"
+        ]
+      },
+      "sequence": [
+        {
+          "step": 1,
+          "title": "The record, imported and typed",
+          "tickets": [
+            "MM-250"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 2,
+          "title": "The health-check item, refer-only",
+          "tickets": [
+            "MM-251"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 3,
+          "title": "The coach reads it, after the panel pass in grading mode",
+          "tickets": [
+            "MM-252"
+          ],
+          "milestone": "M2"
+        }
+      ],
+      "gate": null,
+      "notes": "Added 2026-10-13 on the owner's decision that sleep is first class; the earlier \"emerging\" grading in MM-116 is overruled with the evidence in MM-249."
     }
   ],
   "dependencyEdges": [
@@ -3331,6 +3411,30 @@
       "scope": "all",
       "satisfiedBy": [],
       "reason": "MM-160 splits engine files; engine work in flight must rebase."
+    },
+    {
+      "from": "WS-11",
+      "to": "WS-15",
+      "type": "contract-dependency",
+      "scope": [
+        1
+      ],
+      "satisfiedBy": [
+        "MM-67"
+      ],
+      "reason": "Sleep is one more type through the HealthSource interface and its fake."
+    },
+    {
+      "from": "WS-09",
+      "to": "WS-15",
+      "type": "contract-dependency",
+      "scope": [
+        3
+      ],
+      "satisfiedBy": [
+        "MM-117"
+      ],
+      "reason": "The relief rule gains a signal of its own; the rule must exist first."
     }
   ],
   "parallelGroups": [
@@ -3378,7 +3482,8 @@
         "WS-09",
         "WS-10",
         "WS-11",
-        "WS-12"
+        "WS-12",
+        "WS-15"
       ],
       "startCondition": "WS-06's gate done for WS-09. MM-61 and WS-03's gate done for WS-10. MM-61 done for WS-11 step 2 onward and WS-12 step 2 onward.",
       "whySafe": "WS-10, WS-11 and WS-12 are mostly new packages and new screens. WS-09 adds new engine modules and cards.",
