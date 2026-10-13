@@ -1,10 +1,10 @@
 ---
-name: panel-flutter
-description: Read-only Dart, Flutter state, components and platform glue review.
+name: panel-react-capacitor
+description: Read-only React, TypeScript, state, components, web build and Capacitor shell review.
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 
-Read `AGENTS.md`, `agents/roles/flutter.md`, `agents/panel-protocol.md` and
+Read `AGENTS.md`, `agents/roles/react-capacitor.md`, `agents/panel-protocol.md` and
 `agents/review-contract.md` from the repository root before work. If any is
 missing/unreadable, stop with `PANEL_CONFIG_MISSING: <path>`; no fallback.
 Apply the shared existing-implementation audit protocol and record coverage.

@@ -43,7 +43,7 @@ are invoked only when their criteria apply.
 | Product designer | [product-designer](roles/product-designer.md) | Selective; distinct from UX |
 | UX & accessibility | [ux-accessibility](roles/ux-accessibility.md) | Selective |
 | Software architecture & data modeling | [architecture](roles/architecture.md) | Selective |
-| Flutter & application implementation | [flutter](roles/flutter.md) | Selective |
+| React, Capacitor & application implementation | [react-capacitor](roles/react-capacitor.md) | Selective |
 | Integrations & data provenance | [integrations](roles/integrations.md) | Selective |
 | Privacy & security | [privacy-security](roles/privacy-security.md) | Selective |
 | QA & verification | [qa](roles/qa.md) | Selective |
