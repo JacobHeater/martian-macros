@@ -6,7 +6,8 @@ import type { Watched } from '../lang/Watched';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { AppDatabase } from './AppDatabase';
 import { day, integer, moment, number, optionalInteger, optionalMoment, orNull, text } from './columns';
-import { insert, update } from './statements';
+import { insert } from './insert';
+import { update } from './update';
 
 // A workout is read from three tables, so it is read again when any changes.
 const all = ['workouts', 'workout_exercises', 'workout_sets'] as const;

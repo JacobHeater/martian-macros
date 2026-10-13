@@ -1,5 +1,6 @@
 import { ArgumentError } from '../lang/ArgumentError';
-import { bodyMassIndex, lowWeightCautionBmi, lowWeightMaxLossFraction, underweightBmi } from './bodyMassIndex';
+import { bodyMassIndex } from './bodyMassIndex';
+import { lowWeightCautionBmi, lowWeightMaxLossFraction, underweightBmi } from './lowWeightLimits';
 import type { CalendarDate } from './CalendarDate';
 import type { Caution } from './Caution';
 import { GoalMode } from './GoalMode';

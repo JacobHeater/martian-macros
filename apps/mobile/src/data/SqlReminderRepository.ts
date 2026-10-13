@@ -4,7 +4,7 @@ import type { ReminderRepository } from '../domain/repositories/ReminderReposito
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { asFlag, flag, integer, named, optionalDay, orNull } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `ReminderRepository` kept in the database. */
 export class SqlReminderRepository implements ReminderRepository {

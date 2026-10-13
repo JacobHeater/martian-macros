@@ -13,7 +13,9 @@ import type { ExplanationTrigger } from './ExplanationTrigger';
 import { latestEndedPause } from './latestEndedPause';
 import { lossSafetyRaiseKcal } from './lossSafetyRaiseKcal';
 import { pauseOn } from './pauseOn';
-import { cautiousBodyFatPercent, safetyBodyFatDeadbandPercent, safetyBodyFatPercent } from './safetyBodyFat';
+import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
+import { safetyBodyFatDeadbandPercent } from './safetyBodyFatConstants';
+import { safetyBodyFatPercent } from './safetyBodyFatPercent';
 import { TargetInputs } from './TargetInputs';
 import { TargetsRecord } from './TargetsRecord';
 

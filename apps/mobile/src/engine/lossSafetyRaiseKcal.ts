@@ -7,7 +7,7 @@ import {
   safetyRaiseMinWeighIns,
   safetyRaiseSigmas,
 } from './coachConstants';
-import { energyDensityForSlope } from './partition';
+import { energyDensityForSlope } from './energyDensityForSlope';
 import { SafetyBounds } from './SafetyBounds';
 import { settlingWindows } from './settlingWindows';
 import type { TargetsRecord } from './TargetsRecord';

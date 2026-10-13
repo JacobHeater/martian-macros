@@ -3,7 +3,7 @@ import { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { integer, optionalNumber, orNull, text } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `ExerciseProgressionRepository` kept in the database. */
 export class SqlExerciseProgressionRepository implements ExerciseProgressionRepository {
