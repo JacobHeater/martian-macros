@@ -228,6 +228,14 @@ limitations.
   `MmPickerField` now hides the platform's drawing entirely and carries
   the design system's box and chevron; the time dialog uses it too. The
   lesson, for every native control: the platform draws nothing.
+- MM-261: why it took the owner three prompts to get a component. The
+  architecture check exempted `src/ui/`, so a raw control could live in a
+  dialog or the overlay host. Now each native control kind has one home
+  (`controlHomes` in `test/architecture.test.ts`), composites write no
+  control, and `MmOption` replaced the overlay host's inline option button.
+  The panel's product-designer, UX-accessibility and React-Capacitor roles
+  were put on the whole component register the same hour (MM-253's
+  component walk); their findings become bug tickets with tests.
 - Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
   from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
   gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
