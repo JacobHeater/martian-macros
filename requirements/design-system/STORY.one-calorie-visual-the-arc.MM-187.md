@@ -51,16 +51,3 @@ Scenario: No second hero
 - Regression tests: `apps/mobile/test/one_calorie_visual_test.dart` (one arc on each of the three screens, none doubled; a pause on
   the Coach screen) and `tool/test/arch_rules_test.dart` (the rule is in the default set). Both fail with the old code.
 - Screenshots of the Dashboard and Coach screens change; they are regenerated in CI and reviewed in the pull request.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
-  CalorieHero as built on 2026-10-11: left, over, logged only, paused.
-  Compared with a screenshot test of the built screen. It shows what exists
-  and approves nothing.
-- [Component catalog](../ui-ux-assets/components/index.html) — Current. Draws
-  HeroBackdropPainter, HorizonArc, HorizonArcPainter and MmHeroSurface as
-  built on 2026-10-11: shown, empty, part, full. Frames: `#mm-hero-surface`,
-  `#horizon-arc`. Compared with a screenshot test of the built screen. The
-  drawn rings of the backdrop are replaced by a plain gradient. The glow on
-  the marker is not drawn. It shows what exists and approves nothing.

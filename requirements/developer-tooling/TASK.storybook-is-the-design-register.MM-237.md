@@ -19,10 +19,10 @@ drawings of them.
 What this supersedes:
 
 - **MM-210's convention** (HTML assets under `requirements/ui-ux-assets/`,
-  linked under `## UI/UX Assets`): retired for new work. The folder stays
-  as the historical record of the Flutter-era screens, and old tickets'
-  links keep resolving; nothing new is added to it and `mm req` no longer
-  checks it.
+  linked under `## UI/UX Assets`): retired, then deleted on the owner's
+  call the same day ("Old html files need to go"):
+  the folder, and the `## UI/UX Assets` section of the 90 tickets that
+  linked into it. Git history has both.
 - **MM-211's manifest** (`coverage.json`, a drawing of every surface):
   retired and deleted. Its replacement arrives in steps: stories cover the
   design system first (this ticket), screens next.
@@ -60,9 +60,10 @@ Scenario: the owner reviews without running the app
   Then the palettes, the type roles, every component and every icon are
   there, in all three palettes, as the live components the app ships
 
-Scenario: the old register is retired, not broken
-  Then mm req passes with no coverage.json and no asset checks,
-  And requirements/ui-ux-assets/README.md says it is the historical record
+Scenario: the old register is gone
+  Then requirements/ui-ux-assets does not exist,
+  And no ticket has a "## UI/UX Assets" section or a link into it,
+  And mm req passes
 
 Scenario: every screen is in the register
   Then every component of the app named for a screen, a sheet or a step is
@@ -99,3 +100,11 @@ The expert panel's role files and protocol (`agents/`) still told reviewers
 to maintain the HTML assets and the coverage manifest; they now name the
 stories. The static build is not part of `mm check`: on Windows it writes a valid build
 and then exits 127 from a libuv assertion on the way out.
+
+**Step 3 (2026-10-12): the old register is deleted.** On the owner's call,
+`requirements/ui-ux-assets/` (15 files) is removed, with the
+`## UI/UX Assets` section of the 90 tickets that linked into it and the
+folder's exemption in `mm req`. The design notes and the roadmap point at
+the Tokens story where they pointed at the HTML palette preview. MM-210 and
+MM-211 carry a note that they are superseded. Two tracked leftovers of the
+Dart runner under `tool/.dart_tool/` went with it.

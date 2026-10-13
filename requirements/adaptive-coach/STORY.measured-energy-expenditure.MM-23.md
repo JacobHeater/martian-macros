@@ -65,10 +65,3 @@ Scenario: An implausible log
 - The under-reporter result was a surprise worth recording. Weight change is valued in true calories, so the estimate is not simply "true
   expenditure in logging units"; it is exactly that only once intake is steady at target, which is the point the weekly loop converges to.
 - Seen on a device only in the held state. No user has yet reached a measurement through the app.
-
-## UI/UX Assets
-
-- [Coach](../ui-ux-assets/views/coach.html#coach-metabolism-states) — Current.
-  Draws MetabolismSummary as built on 2026-10-11: measured, starting,
-  settling, implausible. Drawn from the source alone; not compared with the
-  running app. It shows what exists and approves nothing.

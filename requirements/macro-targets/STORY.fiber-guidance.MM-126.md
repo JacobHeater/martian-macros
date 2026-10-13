@@ -81,10 +81,3 @@ from entries with fiber, never a total that treats missing as zero. Nothing else
 Tested in `fiber_test.dart` and `detail_level_test.dart`.
 
 Not built: the insight rule (MM-141) and any fiber on the Today dashboard.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-detail-full) — Current. Draws
-  FiberLine as built on 2026-10-11: with a guide. Drawn from the source alone;
-  not compared with the running app. It shows what exists and approves
-  nothing.

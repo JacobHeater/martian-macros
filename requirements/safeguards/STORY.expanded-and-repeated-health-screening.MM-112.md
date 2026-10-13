@@ -138,20 +138,3 @@ Scenario: New answers in Settings
 - Verified with focused health-check, Settings, policy, migration, and target-safety tests, then `fvm dart run tool/bin/mm.dart check` (full workspace).
 
 The age-transition explanation is part of MM-138; MM-112 derives the policy from today's date so its limits change on the birthday.
-
-## UI/UX Assets
-
-- [First launch and gates](../ui-ux-assets/views/onboarding.html) — Current.
-  Draws HealthRecheckScreen and HealthStep as built on 2026-10-11: first ask,
-  second skip, male list, one ticked. Frames: `#health-recheck`,
-  `#onboarding-health`. Drawn from the source alone; not compared with the
-  running app. The female list is views/settings.html#health-check-female. It
-  shows what exists and approves nothing.
-- [Settings](../ui-ux-assets/views/settings.html#health-check) — Current.
-  Draws HealthCheckScreen as built on 2026-10-11: male, female. Drawn from the
-  source alone; not compared with the running app. It shows what exists and
-  approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#opening-the-app-later) — Current.
-  Draws the "the gates that can stand in front of the app" path as built on
-  2026-10-11. Drawn from the source alone; not compared with the running app.
-  It shows what exists and approves nothing.

@@ -61,15 +61,3 @@ both themes. The integrated workspace passed `mm check` with exit 0 and
 "All checks passed." Populated summary, nutrition, measurements and coaching
 sections were inspected on the Android emulator using MM-177 synthetic data.
 Linux screenshot regeneration and PR checks remain delivery gates.
-
-## UI/UX Assets
-
-- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-metrics) —
-  Current. Draws DashboardMetrics as built on 2026-10-11: 30 days, empty
-  history, error. Compared with a screenshot test of the built screen. It
-  shows what exists and approves nothing.
-- [Component catalog](../ui-ux-assets/components/index.html) — Current. Draws
-  HistoryChart and MetricFacts as built on 2026-10-11: a series with a gap,
-  two figures. Frames: `#history-chart`, `#metric-facts`. Compared with a
-  screenshot test of the built screen. Drawn as bars; the app draws points
-  joined by a line. It shows what exists and approves nothing.

@@ -36,10 +36,6 @@ When a method change clears an amount that was entered or restored from an
 existing entry, the amount field says to enter it again. Choosing the already
 selected method does not clear the amount.
 
-## UI/UX Assets
-- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows the
-  amount-field instruction after changing the measurement method.
-
 ## Notes
 - Regression: `apps/mobile/test/add_food_method_change_test.dart`, enabled for
   a user-entered amount that is cleared by a method change.

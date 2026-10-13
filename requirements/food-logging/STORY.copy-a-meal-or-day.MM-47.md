@@ -40,11 +40,3 @@ editing one leaves the original alone. Tested in `food_copy_test.dart`.
 
 Limits: copying a meal to a day other than today is not offered (only today); a day that already has entries does not offer
 "Copy yesterday". Not seen on the emulator yet.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
-  FoodScreen and MealSection as built on 2026-10-11: populated, collapsed,
-  empty, past day, complete, paused, error, expanded, and more. Compared with
-  a screenshot test of the built screen. The per-meal protein marker is not
-  drawn. It shows what exists and approves nothing.

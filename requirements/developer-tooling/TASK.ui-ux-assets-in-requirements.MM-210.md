@@ -7,6 +7,11 @@ related: [MM-6, MM-102, MM-184, MM-166, MM-174]
 
 # Task: HTML UI/UX assets are kept and linked in the requirements folder
 
+> **Superseded and removed (2026-10-12, MM-237).** Storybook is the design
+> register. The folder this ticket set up, and every ticket's section that
+> linked into it, are deleted on the owner's call; git history has them.
+> What follows is the record of what was built, not a convention in force.
+
 ## Context
 A design can be shown as an HTML page: a screen prototype, an interaction
 demonstration, an exploration, a visual specification. One existed,

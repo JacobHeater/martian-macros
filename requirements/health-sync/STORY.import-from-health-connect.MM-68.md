@@ -89,11 +89,3 @@ Not built:
 ## Notes
 - Health Connect has no biological-sex record, so nothing here touches MM-14.
 - Google Play requires a declaration of each health permission and why it is needed (MM-95).
-
-## UI/UX Assets
-
-- [Settings](../ui-ux-assets/views/settings.html#settings-health-none) —
-  Current. Draws HealthConnectSection as built on 2026-10-11: some allowed,
-  none allowed, absent, refused, read failed. Drawn from the source alone; not
-  compared with the running app. Never seen on a real phone. It shows what
-  exists and approves nothing.

@@ -79,9 +79,6 @@ function scan(root: string): RequirementsScan {
       }
       continue;
     }
-    // The one folder that is not a component: the retired HTML register,
-    // kept as the historical record (MM-210, superseded by MM-237).
-    if (name === 'ui-ux-assets') continue;
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
       problems.push(`${name}/: component folders are kebab-case.`);
     }
