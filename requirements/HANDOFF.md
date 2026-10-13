@@ -113,6 +113,19 @@ with the terms (MM-95); exact alarms are requested (MM-248); the rest timer
 stays vibration only (MM-191); no helpline until a clinician reviews one
 (MM-114); MM-51's pantry checks stay open (no online source of barcodes).
 
+**Sleep is a first-class signal (owner's rule, 2026-10-13; MM-249).**
+The owner overruled the panel's "emerging" grade of short sleep's effect
+on fat loss, with reason: MM-116 graded it on one trial and that trial
+(Nedeltcheva 2010: 55% less of the loss as fat, 60% more lean mass lost,
+less fat oxidised, at 5.5 against 8.5 hours) was not alone (Tasali 2022;
+Shechter 2016 on sleep apnea). WS-15 holds the work: a nightly record from
+the health platform or by hand (MM-250), sleep disorders in the health
+check, refer-only (MM-251), and a coach that reads it (MM-252) after a
+panel pass in grading mode with the sources pre-listed. Lesson for the
+panel protocol, not yet written into it: an "emerging" grade on one trial
+is not a grade; the research gate should require a search before any
+evidence is graded below "moderate".
+
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
@@ -187,6 +200,9 @@ limitations.
   list under "Decided by the product owner" above); MM-138 and MM-103
   closed on those answers, MM-135 moved to in-progress with its decision,
   and MM-247 and MM-248 were opened.
+- The owner asked why sleep was not first class, and ruled that it is.
+  Written as WS-15 with MM-249 (epic, with the evidence read today),
+  MM-250, MM-251 and MM-252; placed in M2.
 - Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
   from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
   gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new

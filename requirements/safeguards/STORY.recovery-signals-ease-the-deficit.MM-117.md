@@ -104,3 +104,6 @@ Not built:
   not be.
 - The pace names and what each costs (MM-128): the offer shows the percentage only.
 - Not checked on a device.
+
+## Note (2026-10-13, MM-249)
+"Short sleep adds a line, not a trigger" is superseded: MM-252 makes a fourteen-night average under six hours a recovery signal of its own in this rule, and the offer names the gentler pace. The sentence stays worded "appears to" until the panel pass MM-249 asks for.
