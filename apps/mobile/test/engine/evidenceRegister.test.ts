@@ -20,7 +20,7 @@ it('the evidence register covers safety and model tuning values', () => {
 
   // The limits of SafetyBounds are top-level numbers in its file.
   const safety = names('src/engine/SafetyBounds.ts', 'SafetyBounds.', /^const (\w+) = \d+(?:\.\d+)?;/gm);
-  const partition = names('src/engine/partition.ts', '', /^export const (\w+) = \d+(?:\.\d+)?;/gm);
+  const partition = names('src/engine/partitionConstants.ts', '', /^export const (\w+) = \d+(?:\.\d+)?;/gm);
   const trend = names('src/engine/WeightTrendModel.ts', 'WeightTrendModel.', constructorDefault);
   const estimator = names('src/engine/TdeeEstimator.ts', 'TdeeEstimator.', constructorDefault);
 

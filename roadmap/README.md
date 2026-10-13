@@ -157,8 +157,9 @@ starting it, why it is safe, and the specific collisions to manage.
 
 ### The schema lane
 
-`apps/mobile/src/data/schema.ts` carries `currentSchemaVersion` and the
-migration steps (MM-61 is done; the schema is at version 2 since MM-242).
+`apps/mobile/src/data/currentSchemaVersion.ts`, `currentSchema.ts` and
+`migrationSteps.ts` carry the schema (MM-61 is done; it is at version 2
+since MM-242).
 Nine workstreams need to change it. Rules:
 
 - **One schema change in flight at a time.** The branch that takes the next
@@ -224,7 +225,7 @@ and the leftovers held open across WS-08 and WS-09.
 
 | Step | Tickets | Why |
 | --- | --- | --- |
-| WS-14 step 4 | MM-229 | **Start here.** The React conversion's leftovers: the TypeScript architecture checker (one declaration per file, vendor imports, raw controls), a run on the physical phone. Everything else is built. |
+| WS-14 step 4 | MM-229 | **Start here.** The React conversion's leftovers: a run on the physical phone, screenshot tests. The architecture checker is built (MM-246). |
 | WS-03 step 1 | MM-103, MM-181 | One question per onboarding screen; the glow. Small leftovers of built work. |
 | WS-01 step 3 | MM-7 | CI has run green on every pull request since the switch; close it, minus the iOS build. |
 | WS-06 step 3 | MM-138, MM-139 | The last of M1: simulator calibration and the owner's confirmation of holding a reduction. |
@@ -243,9 +244,9 @@ Progress to be sure.
 - **One schema change in flight at a time**, each with its migration step
   and upgrade test (the schema lane above).
 - **No new file with several declarations, no raw control in a screen, no
-  vendor import outside its adapter folder.** The rules are in `AGENTS.md`;
-  until MM-229's checker exists, `test/layers.test.ts` covers the imports and
-  the rest is by hand.
+  vendor import outside its adapter folder.** The rules are in `AGENTS.md`
+  and `test/architecture.test.ts` fails the suite on each (MM-246);
+  `test/layers.test.ts` keeps the layers apart.
 - **No screen without a story** (`test/gallery/stories.test.tsx` fails it)
   and no design verified anywhere but a browser.
 - **No purchase or trial code** until MM-88 has answered how each store allows

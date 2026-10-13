@@ -8,7 +8,8 @@ import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
 import { asFlag, day, flag, integer, named, optionalDay, optionalInteger } from './columns';
-import { upsert, type Values } from './statements';
+import { upsert } from './upsert';
+import type { Values } from './Values';
 
 /**
  * `PreferencesRepository` kept in the database, in one row. Each save

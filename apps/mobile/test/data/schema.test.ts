@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { AppDatabase } from '../../src/data/AppDatabase';
-import { currentSchemaVersion, tables } from '../../src/data/schema';
+import { currentSchemaVersion } from '../../src/data/currentSchemaVersion';
+import { tables } from '../../src/data/tables';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { SqlFailure } from '../../src/sql/SqlFailure';

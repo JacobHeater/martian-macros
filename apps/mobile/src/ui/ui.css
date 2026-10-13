@@ -324,6 +324,20 @@
 .mm-toggle-row {
   cursor: pointer;
 }
+
+/* Pressable content (MmPressable): the button draws nothing, the content does. */
+.mm-pressable {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
 .mm-toggle-row-flush {
   padding-inline: 0;
 }

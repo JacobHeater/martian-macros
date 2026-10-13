@@ -50,7 +50,7 @@ Every workstream that persists anything: WS-05, WS-06, WS-07, WS-08, WS-09,
 WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 
 ## Packages and surfaces
-- `apps/mobile/src/data/schema.ts`, `SqlRepositories.ts`, `apps/mobile/test/data`
+- `apps/mobile/src/data/currentSchemaVersion.ts`, `currentSchema.ts`, `migrationSteps.ts`, `apps/mobile/test/data`
 - `tool/mm.ts` (test timeout)
 - `apps/mobile/test`
 - `.github/` (workflow)

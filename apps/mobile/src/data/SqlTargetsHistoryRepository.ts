@@ -11,7 +11,7 @@ import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
 import { asFlag, day, flag, integer, named, number, optionalNumber, optionalText, orNull, text } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 function recordFrom(r: SqlRow): TargetsRecord {
   const explanation = optionalText(r, 'explanation');

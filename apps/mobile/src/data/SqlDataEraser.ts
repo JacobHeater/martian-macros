@@ -1,6 +1,6 @@
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { AppDatabase } from './AppDatabase';
-import { tables } from './schema';
+import { tables } from './tables';
 
 /**
  * `DataEraser` for the database: empties every table, all or none. The ids

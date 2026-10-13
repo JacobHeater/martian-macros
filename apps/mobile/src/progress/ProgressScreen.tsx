@@ -18,7 +18,8 @@ import { NumberEntryCard } from '../ui/NumberEntryCard';
 import { RecompSignalCard } from './RecompSignalCard';
 import { StrengthSection } from './StrengthSection';
 import { WaistEntryCard } from './WaistEntryCard';
-import { onboardingCreatine, WeightEventsCard } from './WeightEventsCard';
+import { onboardingCreatine } from './onboardingCreatine';
+import { WeightEventsCard } from './WeightEventsCard';
 import './progress.css';
 
 /** The body's record: today's weigh-in, the weight trend, weight events, the waist and strength. */

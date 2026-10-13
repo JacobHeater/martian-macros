@@ -17,6 +17,7 @@ import { MmIconButton } from '../ui/MmIconButton';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmOverlays } from '../ui/MmOverlays';
+import { MmPressable } from '../ui/MmPressable';
 import { MmProgressBar } from '../ui/MmProgressBar';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
@@ -117,6 +118,12 @@ export function ComponentsCatalog() {
       <MmDisclosure title="How this was worked out" initiallyExpanded>
         <p style={{ margin: 0, color: 'var(--text2)' }}>From your last fourteen days.</p>
       </MmDisclosure>
+      <MmSurface kind="compact">
+        <MmPressable label="Open today's detail" onPress={nothing}>
+          <p style={{ margin: 0, font: 'var(--type-figure-xl)' }}>1,534</p>
+          <p style={{ margin: 0, color: 'var(--text2)' }}>Pressable content: the button draws nothing.</p>
+        </MmPressable>
+      </MmSurface>
       <Notice text="Targets hold while the app learns your metabolism." />
       <Notice kind="caution" text="Thyroid conditions affect energy needs." />
       <Notice

@@ -1,9 +1,7 @@
 import { energyAgreesWithMacros } from '../energyAgreesWithMacros';
 import type { NutritionPer100g } from './NutritionPer100g';
+import { maxKcalPer100g } from './maxKcalPer100g';
 import type { NutritionProblem } from './NutritionProblem';
-
-/** Per 100 g, energy above this is not a food (pure fat is about 900). */
-export const maxKcalPer100g = 900;
 
 /**
  * The first reason `food` must not be used, or undefined when it is sound
