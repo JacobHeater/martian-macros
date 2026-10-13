@@ -116,8 +116,9 @@ package and the entitlement interface, and can run beside late work in WS-09
 to WS-12.
 
 ## Requirement sources
-- Remaining: MM-88, MM-95, MM-29, MM-85, MM-86, MM-87, MM-96, MM-94.
-  Epic: MM-84.
+- Built: MM-88 (the store-trial spike, answered 2026-10-13: Apple's
+  "XX-day Trial" item; nothing on Play, so Android times it on the device).
+- Remaining: MM-95, MM-29, MM-85, MM-86, MM-87, MM-96, MM-94. Epic: MM-84.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-244 (observe what the barcode and label reader sends).
 
 ## Notes for whoever builds it
