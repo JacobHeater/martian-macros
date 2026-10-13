@@ -159,6 +159,13 @@ limitations.
   so Android times the trial on the device and a reinstall restarts it;
   the plugin is the owner's call (our own over StoreKit 2 and Billing 9 is
   the recommendation; Capgo's is the fallback). Nothing is built.
+- MM-65 (the backup-rules spike, WS-12 step 1) answered from Apple's and
+  Google's pages, read 2026-10-13: guideline 5.1.3(ii) has no encryption
+  exception, so no iCloud (or Drive) provider; the database and packs are
+  excluded from OS backups on both platforms (Android already is); the
+  backup is one encrypted file the person places (MM-63, MM-64). Open:
+  encryption at rest for the database, which Play's health guidance asks
+  for and nothing provides.
 - Moved the needle: M0 went from 39 of 47 to 43 of 48 (MM-246, MM-229,
   MM-245, MM-181 done; MM-103, MM-108, MM-176, MM-179 and MM-183 remain);
   M2 gained MM-7 and MM-175. No milestone closed. M1 is 11 of 13.
