@@ -126,6 +126,18 @@ panel protocol, not yet written into it: an "emerging" grade on one trial
 is not a grade; the research gate should require a search before any
 evidence is graded below "moderate".
 
+**Hierarchy and wayfinding (owner's rule, 2026-10-13; MM-253).** The owner's
+diagnosis: monolithic views, no iconography, cognitive overload; the app
+needs more graphics, natural segmenting and view hierarchies. Looked at in
+the register, it holds: every screen is a column of same-weight cards,
+facts repeat, explanations sit inline, lists have no shape, icons only in
+the nav bar, primary actions compete. Decided: Material icons everywhere now
+(custom art after MM-109), both macro pictures behind a switch, one
+direction across all destinations built in stages. MM-253 writes the
+direction and runs the product-designer and UX roles on the built stories;
+MM-254 to MM-259 rebuild each destination with before and after stories.
+Nothing is built yet.
+
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
@@ -203,6 +215,9 @@ limitations.
 - The owner asked why sleep was not first class, and ruled that it is.
   Written as WS-15 with MM-249 (epic, with the evidence read today),
   MM-250, MM-251 and MM-252; placed in M2.
+- The owner's diagnosis of the views' hierarchy, checked against the
+  register and written as MM-253 (the direction and the panel pass) and
+  MM-254 to MM-259 (each destination), WS-03 step 9, M2.
 - Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
   from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
   gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
