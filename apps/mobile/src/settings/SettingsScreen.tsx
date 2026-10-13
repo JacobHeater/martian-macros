@@ -7,10 +7,13 @@ import type { UnitSystem } from '../domain/UnitSystem';
 import { dailyActivityLabel } from '../format/dailyActivityLabel';
 import { detailLevelDescription } from '../format/detailLevelDescription';
 import { detailLevelLabel } from '../format/detailLevelLabel';
+import { Fmt } from '../format/Fmt';
 import { trainingStatusLabel } from '../format/trainingStatusLabel';
 import { clamp } from '../lang/clamp';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { PauseScreen } from '../pause/PauseScreen';
+import { TermsScreen } from '../terms/TermsScreen';
+import { termsOfUse } from '../terms/termsOfUse';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
@@ -41,6 +44,7 @@ export function SettingsScreen() {
   const setup = useLoaded(state.setup);
   const detail = useLoaded(state.detailLevel) ?? 'standard';
   const easyToMiss = useLoaded(state.easyToMiss)?.enabled ?? true;
+  const termsAccepted = useLoaded(state.termsAcceptance);
   if (setup === undefined) return <Screen title="Settings">{null}</Screen>;
   const chevron = <MmIcon name="chevronRight" />;
   const bodyFat = setup.bodyFatPercent;
@@ -179,6 +183,21 @@ export function SettingsScreen() {
           subtitle="Where each number comes from, and how sure we are."
           trailing={chevron}
           onPress={() => void navigator.push(() => <HowThisWorksScreen />)}
+        />
+        <MmListRow
+          leadingIcon="shield"
+          title="Not medical advice"
+          subtitle="A general wellness app, not a medical device. It does not diagnose or treat anything."
+        />
+        <MmListRow
+          leadingIcon="info"
+          title="Terms of use"
+          subtitle={
+            `Version ${termsOfUse.version}` +
+            (termsAccepted === undefined ? '' : `, agreed ${Fmt.longDate(termsAccepted.acceptedOn)}`)
+          }
+          trailing={chevron}
+          onPress={() => void navigator.push(() => <TermsScreen />)}
         />
       </MmListGroup>
       <GroupHeader text="Data" />

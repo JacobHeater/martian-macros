@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
+import type { TermsAcceptance } from '../domain/TermsAcceptance';
 import type { ThemePreference } from '../domain/ThemePreference';
 import type { Watched } from '../lang/Watched';
 import { ObservableValue } from './ObservableValue';
@@ -14,6 +15,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly underEatingDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly returnDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly recoverySkipped = new ObservableValue<CalendarDate | undefined>(undefined);
+  private readonly terms = new ObservableValue<TermsAcceptance | undefined>(undefined);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -67,6 +69,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.recoverySkipped.value = day;
   }
 
+  watchTermsAcceptance(): Watched<TermsAcceptance | undefined> {
+    return this.terms.watch();
+  }
+
+  async saveTermsAcceptance(acceptance: TermsAcceptance): Promise<void> {
+    this.terms.value = acceptance;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.theme.value = 'unselected';
@@ -75,5 +85,6 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.underEatingDismissed.value = undefined;
     this.returnDismissed.value = undefined;
     this.recoverySkipped.value = undefined;
+    this.terms.value = undefined;
   }
 }

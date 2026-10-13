@@ -111,3 +111,5 @@ Not built: confidence set to Fair after a 7 to 27 day gap (confidence follows th
 re-calibration (the estimator holds until it has its usual minimum of data, which is longer); re-confirming the goal after 90 days;
 the trend chart drawing the gap dashed; streaks and the monthly report (neither exists yet); a simulator user who lapses for four weeks and returns (MM-30). Food logged more than 60 days ago is not
 loaded, so an old stretch with food but no weigh-ins can read as a gap for the deficit count.
+
+**Note (2026-10-12, MM-242).** Someone returning after a gap whose app was updated in between can meet changed terms of use before this screen (MM-242). That screen says nothing about time away. "One screen is shown before the dashboard" holds for the return itself, not for the terms.

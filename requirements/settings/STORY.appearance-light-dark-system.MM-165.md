@@ -53,3 +53,5 @@ Scenario: Existing data survives the upgrade
 - `ThemePreference` and `PreferencesRepository` (domain), `DriftPreferencesRepository` and `InMemoryPreferencesRepository`, both run through `preferencesRepositoryContract`; the eraser contract checks that erasing resets it to System.
 - Settings has an Appearance control (System, Light, Dark) at the top; `MaterialApp.themeMode` follows the stored choice. Tests: applies at once, is stored, a stored choice applies on open. Checked on the emulator: Dark applies immediately.
 - **Not verified**: a cold start with Dark chosen while the phone is in light mode may show one light frame before the stored choice is read; not measured.
+
+**Note (2026-10-12, MM-242).** After an erase the stored theme is `unselected`, so the chooser is shown (MM-184), after the terms of use (MM-242). The "System" in the erase criterion above predates both.

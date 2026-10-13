@@ -1,3 +1,4 @@
+import { TermsAcceptance } from '../../src/domain/TermsAcceptance';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { FoodEntry } from '../../src/domain/FoodEntry';
@@ -80,6 +81,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       await r.customExercises.saveCustomExercise(
         new Exercise({ id: '', name: 'Landmine press', equipment: 'barbell', primary: 'shoulders' }),
       );
+      await r.preferences.saveTermsAcceptance(new TermsAcceptance({ version: 1, acceptedOn: day }));
 
       await r.eraser.eraseAll();
 
@@ -91,6 +93,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.workouts.watchWorkouts())).toEqual([]);
       expect(await first(r.customExercises.watchCustomExercises())).toEqual([]);
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');
+      // MM-242: first use again, so the terms are asked again.
+      expect(await first(r.preferences.watchTermsAcceptance())).toBeUndefined();
     });
   });
 }

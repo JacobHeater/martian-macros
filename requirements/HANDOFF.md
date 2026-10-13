@@ -39,10 +39,22 @@ glyphs. Device and emulator screenshots verify native behavior only, never
 the design. The app folder is `apps/mobile` (renamed from `apps/web` the
 same day): a mobile application built on web technologies.
 
-**Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
-with its migration steps and tests. Only one schema change at a time.
+**Terms of use (MM-242, in progress).** The first guard on every
+installation is the terms of use (`apps/mobile/src/terms/`): a short
+account, the full text, "I agree" and "Not now". The agreement (version
+and day) is in `user_preferences`, schema version 2. A test or a story
+has agreed already unless it says otherwise (`renderApp`'s `terms`
+option, `screenStory`'s `terms`). **The text is a draft by non-lawyers
+and blocks release** until an attorney reviews it and the owner settles
+what MM-242 lists as still to be decided. The expert panel's reports,
+sources and the chair's decisions are in `docs/agent-runs/mm242-eula/`.
+Change what the app does with data and the terms together: they say
+only what the code does, and never "nothing is uploaded" (MM-244).
 
-**Next ticket ID.** `mm req next` is the authority (MM-244 at this writing; MM-242 is the EULA, in progress).
+**Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
+with its migration steps and tests (version 2 since MM-242). Only one schema change at a time.
+
+**Next ticket ID.** `mm req next` is the authority (MM-245 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as

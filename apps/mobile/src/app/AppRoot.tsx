@@ -1,6 +1,8 @@
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { OnboardingScreen } from '../onboarding/OnboardingScreen';
 import { Loadable } from '../state/Loadable';
+import { TermsGuardScreen } from '../terms/TermsGuardScreen';
+import { termsOfUse } from '../terms/termsOfUse';
 import { MmButton } from '../ui/MmButton';
 import { MmSpinner } from '../ui/MmSpinner';
 import { Notice } from '../ui/Notice';
@@ -14,11 +16,12 @@ import { WelcomeBackScreen } from './WelcomeBackScreen';
 
 const describe = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** Routes to onboarding until setup exists, then to the main shell. */
+/** Asks for the terms first, then routes to onboarding until setup exists, then to the main shell. */
 export function AppRoot() {
   const { state } = useApp();
   const setup = useCell(state.setup);
   const theme = useCell(state.themePreference);
+  const terms = useCell(state.termsAcceptance);
   const today = useCell(state.today);
   const resumeDue = useCell(state.resumeDue);
   const welcomeBackDue = useCell(state.welcomeBackDue);
@@ -49,6 +52,22 @@ export function AppRoot() {
       </div>
     );
   }
+  // The terms come before everything, on every installation (MM-242). An
+  // agreement that cannot be read is not an agreement: the app is not entered.
+  if (!terms.ready) {
+    return Loadable.hasFailed(terms) ? (
+      <div className="app-centered app-centered-page">
+        <Notice kind="caution" text="Could not check whether you have agreed to the terms of use." />
+        <div className="app-gap" />
+        <MmButton label="Try again" onPress={() => state.termsAcceptance.retry()} />
+      </div>
+    ) : (
+      <div className="app-centered app-centered-page app-centered-middle">
+        <MmSpinner />
+      </div>
+    );
+  }
+  if (terms.value?.version !== termsOfUse.version) return <TermsGuardScreen previous={terms.value} />;
   const value = setup.value;
   if (value === undefined && theme.value === 'unselected') return <ThemeChooserScreen />;
   if (value === undefined) return <OnboardingScreen />;
