@@ -1,6 +1,6 @@
 ---
 id: MM-177
-status: in-progress
+status: done
 component: developer-tooling
 related: [MM-176]
 ---
@@ -63,3 +63,18 @@ Scenario: No implicit production seed
 - No physical phone installation or launch is authorized. Device acceptance
   and visual inspection remain unverified. Seeded demo startup resets on
   every launch (not only on a new command invocation); this is intentional.
+
+**Done (2026-10-13), in the React shell.** `mm demo --seed -d <id>` builds
+the web app with `MM_DEMO_SEED=1`, which Vite turns into the
+`__MM_DEMO_SEED__` constant; `src/app/seedDemo.ts` then replaces the demo
+app's data with `DemoSeed` (seventy days, anchored to the phone's current
+day, the same on every launch) before any screen subscribes, inside the
+shell only, and `App` shows the DEMO strip. A normal `mm run` or `mm build`
+never carries the variable, even when the shell that ran it had it set
+(`tool/test/webBuildEnv.test.ts`); a build that was not asked, or a
+browser, is never seeded (`test/app/seedDemo.test.ts`: seeded, anchored,
+replaced without duplicates, not seeded otherwise). The shell has only the
+demo identity (MM-228), so the normal app's database is never opened. Run
+on the owner's Pixel with `mm demo --seed -d 47261FDAS00EDR`; the phone was
+locked, so the Dashboard was not seen there. The same seed is the Today
+story's data in Storybook (`demoScenario`), where it was looked at.
