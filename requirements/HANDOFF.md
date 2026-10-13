@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-12, by Claude, Session 21.
+Last updated: 2026-10-13, by Claude, Session 22.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -39,6 +39,16 @@ glyphs. Device and emulator screenshots verify native behavior only, never
 the design. The app folder is `apps/mobile` (renamed from `apps/web` the
 same day): a mobile application built on web technologies.
 
+**The roadmap is current and checked (MM-245, owner's rule 2026-10-13).**
+`roadmap/roadmap.json` is where you choose what to build; keep it that way.
+A ticket you create goes into a workstream and a step in the same pull
+request; a ticket you finish moves to built; `mm req` (so `mm check` and
+CI) fails when the roadmap and the tickets disagree; `mm roadmap`
+regenerates the progress page. Before you finish, say in this file which
+step or milestone your session advanced, or that none did. The "What is
+available right now" table in `roadmap/README.md` is current as of
+2026-10-13.
+
 **Terms of use (MM-242, in progress).** The first guard on every
 installation is the terms of use (`apps/mobile/src/terms/`): a short
 account, the full text, "I agree" and "Not now". The agreement (version
@@ -54,7 +64,7 @@ only what the code does, and never "nothing is uploaded" (MM-244).
 **Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
 with its migration steps and tests (version 2 since MM-242). Only one schema change at a time.
 
-**Next ticket ID.** `mm req next` is the authority (MM-245 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-246 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -69,22 +79,22 @@ field drew two rings), and a slider inside a list group is an
 `storybook dev` while one is running: they share a dependency cache and
 the first one starts answering 504 until it is restarted.
 
-**What to build next.**
-- MM-229's leftovers: screenshot tests of the React app, and a run on the
-  physical phone (demo identity only, device 47261FDAS00EDR).
-- MM-228's leftovers: the demo seed wired into the shell; later, the switch
-  of identities from `.demo` to the normal app ID (owner's call on timing).
-- Step 5 odds and ends: the label photo path and reading real Health
-  Connect data back need a phone; the 47 MB pack download on a device;
-  a release build of the shell with the new plugins.
-- An architecture checker for TypeScript (one declaration per file, vendor
-  imports, raw controls) to replace the Dart `mm arch`; the layers test
-  covers imports today.
-- MM-214 and MM-215 remain skipped in the web suite as they were in
-  Flutter's, each waiting on its fix.
-- Health sync, what is left: choosing the primary scale (MM-71); background
-  updates (MM-72); history beyond the first month (MM-73); the onboarding
-  offer and the other kinds (MM-68).
+**What to build next** (the roadmap's "What is available right now", in
+order; `mm roadmap` draws it).
+- WS-14 step 4, MM-229's leftovers: the TypeScript architecture checker
+  (one declaration per file, vendor imports, raw controls) to replace the
+  Dart `mm arch`; a run on the physical phone (demo identity only, device
+  47261FDAS00EDR); the demo seed wired into the shell (MM-228).
+- WS-03 step 1 leftovers (MM-103 one question per screen, MM-181), and
+  WS-01 step 3: close MM-7, CI has been green on every pull request.
+- WS-06 step 3, the last of M1: MM-138 and MM-139 want simulator calibration
+  and the owner's confirmation of holding a reduction.
+- WS-04, the gap to M2: close the MM-51 spike; the pack download, a barcode
+  scan and a label photograph on a device with a release build, under a
+  network monitor, which also answers MM-244 (WS-13 step 1).
+- Then WS-08 step 4's storage gaps (MM-167), MM-57 licensing, MM-153's
+  ranking by trust tier.
+- MM-214 and MM-215 remain skipped in the web suite, each waiting on its fix.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34).
 
 **Waiting on the product owner.**
@@ -97,6 +107,34 @@ the first one starts answering 504 until it is restarted.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 22: 2026-10-13, Claude (the roadmap caught up and checked, MM-245)
+
+- The owner asked how the roadmap looked. It was derived on 2026-10-09 and
+  knew tickets only to MM-191: 79 tickets (the React conversion, Storybook,
+  the expert panel, the terms of use) were in no workstream, seven done
+  tickets were listed as remaining, its "start here" table pointed at MM-61
+  and MM-160, and the file paths were the Dart packages'. The working
+  agreements asked for the handoff to be kept, and said nothing about the
+  roadmap.
+- The owner's rule: agents keep the roadmap up to date, always, and at the
+  end of a session check whether they moved the needle. It is now a working
+  agreement in `AGENTS.md` and in the Completion section, and `mm req`
+  checks the roadmap against the tickets (`tool/src/roadmapChecker.ts`,
+  nine tests): placement, built/remaining by status, steps, edges,
+  `dependsOn`/`unlocks`, cycles, milestone lists.
+- The catch-up: every ticket placed (new steps: WS-01 5 and 6, WS-14 4,
+  WS-03 7 and 8, WS-08 9, WS-10 8, WS-02 8), built/remaining and workstream
+  states derived from status, milestone lists regenerated from the steps,
+  paths translated to `apps/mobile/src`, the README's "available now" and
+  "do not touch" rewritten for 2026-10-13, the progress page regenerated.
+- Moved the needle: no milestone advanced; M0 is 39 of 47, M1 11 of 13, M2
+  26 of 64. What this session made available is an honest "What is
+  available right now" table: WS-14 step 4 is the start.
+- Not done: the workstream files' prose still describes the plan as
+  written in October's first week; only their sources and sequences carry
+  the additions. The 58 in-progress tickets were not walked; many are built
+  with a leftover and could close.
 
 ## Session 21: 2026-10-12, Claude (the switch out of Flutter, MM-232 step 5 and 6)
 
@@ -204,38 +242,3 @@ limitations.
   one language is made in the other.
 - #102 (Copilot's, green) was merged at the start of this session under the
   standing rule.
-
-## Session 19: 2026-10-11, Copilot (Add food and cross-app hierarchy)
-
-- Built MM-225's food-entry macro split pie using the shared 4/4/9 chart
-  without another card. Manual/recent/edit forms, food amount steps (including
-  selected cooking oil), and meal estimates preview the current food's macros.
-  Preview labels and semantics distinguish this from logged daily intake.
-  Tests verify sector values, live updates, serving scaling, empty/invalid
-  states, cooking oil/preparation, estimates, and enlarged-text semantics.
-  Added a focused Linux screenshot case and updated browser-inspected drawings.
-- The owner reaffirmed that pervasive card overload and choice paralysis are
-  a standing mandate, not a new approval question. Added this direction and
-  the external-research/evidence rule to the standing owner rules above.
-- Opened MM-224 for Dashboard, Food/Add food, Coach, Progress and Train,
-  making built-screen evidence, explicit finding outcomes and hierarchy
-  acceptance criteria part of the work. Linked MM-37 to it.
-- MM-223 separates food discovery (search and recents) from manual entry.
-  The form is reached with “Enter manually,” labels its field “Food name,”
-  and has a “Back to food choices” route. Search queries carry into the
-  manual name; choosing a recent item retains its existing typed-form route.
-  Added narrow-screen regression coverage and a manual-entry screenshot case.
-- `mm check` passed: mobile 627 passed, 69 skipped; 225 tickets valid;
-  formatting, analysis, architecture and all workspace checks passed.
-  No emulator was connected (only a physical phone, which was not used).
-- Requirements, implementation, tests, and the Add food drawing/manifest are
-  published to #81 in d632d64. Linux run 38199739648 passed; nine new/changed
-  entry images were inspected and imported with matching hashes. `mm analyze`
-  and `mm check` passed (`All checks passed.`). The bounded cross-app panel
-  survey is complete; its limits,
-  recommendations, and research caveats are recorded in MM-224. ACM pages
-  were not freshly retrievable, so DOI metadata and the prior research record
-  were used.
-- Continue on `feature/mm205-expert-mobile-ux`; updated PR CI is the remaining
-  delivery check. The broader MM-224 effort remains
-  open; the pie chart does not claim to resolve cross-app hierarchy.

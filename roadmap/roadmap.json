@@ -1,24 +1,20 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-13",
   "generatedFrom": {
-    "requirements": "requirements/ (158 tickets, MM-1 to MM-158; 33 done, 7 in-progress, 118 proposed)",
-    "statusSource": "mm req list (ticket status in requirements/ is authoritative; the built/remaining lists here are a snapshot)",
+    "requirements": "requirements/ (245 tickets, MM-1 to MM-245; 127 done, 59 in-progress, 59 proposed)",
+    "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
     "documents": [
       "requirements/README.md",
       "docs/architecture.md",
       "README.md",
       "AGENTS.md",
       "CLAUDE.md",
-      ".claude/agents/requirements-reviewer.md",
-      ".claude/agents/dart-reviewer.md"
+      ".claude/agents/requirements-reviewer.md"
     ],
     "code": [
-      "apps/mobile/lib",
-      "packages/domain/lib",
-      "packages/engine/lib",
-      "packages/engine/test/support",
-      "packages/data/lib",
+      "apps/mobile/src",
+      "apps/mobile/android",
       "tool/src"
     ]
   },
@@ -45,73 +41,73 @@
     {
       "id": "SC-schema",
       "name": "Database schema and migrations",
-      "location": "packages/data/lib/src/app_database.dart (schemaVersion is 1; no migrations exist yet)",
+      "location": "apps/mobile/src/data/schema.ts (schemaVersion is 1; no migrations exist yet)",
       "rule": "One schema change in flight at a time. Each change adds exactly one schemaVersion step with a migration and a migration test. See HS-schema-lane."
     },
     {
       "id": "SC-store",
       "name": "MmStore API",
-      "location": "packages/data/lib/src/mm_store.dart",
+      "location": "apps/mobile/src/data/src/SqlRepositories.ts",
       "rule": "The app reads and writes only through MmStore. New tables get new methods; existing method signatures change only with every caller updated in the same change."
     },
     {
       "id": "SC-setup",
       "name": "UserSetup, ScreeningAnswers and CoachingPolicy",
-      "location": "packages/domain/lib/src/user_setup.dart, screening.dart, profile.dart, goal.dart",
+      "location": "apps/mobile/src/domain/UserSetup.ts, ScreeningAnswers.ts, Profile.ts, GoalMode.ts",
       "rule": "Every new setting or screening answer lands here and in the Setups table. WS-02, WS-05 and WS-06 all add fields; add them additively with defaults and never repurpose a field."
     },
     {
       "id": "SC-food-entry",
       "name": "FoodEntry, QuantitySource and IntakeDay",
-      "location": "packages/domain/lib/src/food_entry.dart, quantity_source.dart, observations.dart",
+      "location": "apps/mobile/src/domain/FoodEntry.ts, QuantitySource.ts, WeightObservation.ts and its neighbours",
       "rule": "A new way of measuring food is a new QuantitySource value with an uncertainty, never a new entry type. The estimator's logging-style rule (MM-27) must be told about every new value."
     },
     {
       "id": "SC-targets",
       "name": "Target calculation contract",
-      "location": "packages/engine/lib/src/targets.dart, coach.dart (TargetInputs, computeTargets, TargetFlag, TargetsRecord, nextTargets)",
+      "location": "apps/mobile/src/engine/computeTargets.ts, nextTargets.ts (TargetInputs, computeTargets, TargetFlag, TargetsRecord, nextTargets)",
       "rule": "WS-02 owns the semantics (step limit, floors, flags). WS-06 owns what a target contains (protein minimum, explanation). Change the output shape once, in WS-06 step 3, not ticket by ticket."
     },
     {
       "id": "SC-analysis",
       "name": "Analysis snapshot and trend model inputs",
-      "location": "packages/engine/lib/src/coach.dart (analyze, CoachSnapshot), weight_trend.dart, tdee_estimator.dart",
+      "location": "apps/mobile/src/engine/nextTargets.ts (analyze, CoachSnapshot), WeightTrendModel.ts, TdeeEstimator.ts",
       "rule": "New inputs to analyze (events, pauses, phase changes) are optional parameters with a no-data default that reproduces today's behavior."
     },
     {
       "id": "SC-safety",
       "name": "SafetyBounds",
-      "location": "packages/engine/lib/src/safety_bounds.dart",
+      "location": "apps/mobile/src/engine/SafetyBounds.ts",
       "rule": "Every public constant needs a row in the evidence register once MM-143 exists. Limits change only with their ticket and test."
     },
     {
       "id": "SC-simulator",
       "name": "Synthetic user and closed-loop harness",
-      "location": "packages/engine/test/support/synthetic_user.dart, coach_loop.dart",
+      "location": "apps/mobile/test/engine/support/SyntheticUser.ts, closedLoop.test.ts",
       "rule": "New physiology or behavior is an optional parameter that defaults to off, so existing seeds and tests keep their results."
     },
     {
       "id": "SC-nav",
       "name": "App shell, navigation and providers",
-      "location": "apps/mobile/lib/src/app.dart, providers.dart",
+      "location": "apps/mobile/src/app/ (Navigator.ts, destinations.ts, openAppServices.ts)",
       "rule": "WS-03 owns the destination list. Other workstreams add a destination or a provider; they do not restructure the shell."
     },
     {
       "id": "SC-ui-kit",
       "name": "Tokens, component library, chart components and strings",
-      "location": "apps/mobile/lib/src/widgets.dart, format.dart today; a shared component package and localization files after MM-104 and MM-108",
+      "location": "apps/mobile/src/ui/ (the component library, MM-104) and format/; localization files after MM-108",
       "rule": "After WS-03 steps 1 and 2, screens use library components and localized strings only. No inline colors, spacing or user-facing text."
     },
     {
       "id": "SC-food-pack",
       "name": "Food pack format and reader API",
-      "location": "packages/food_catalog (to be created by MM-55)",
+      "location": "apps/mobile/src/foodCatalog (to be created by MM-55)",
       "rule": "The pack format is versioned. WS-08 depends on the reader API and a fixture pack, not on the full pipeline."
     },
     {
       "id": "SC-health-source",
       "name": "HealthSource interface and fake",
-      "location": "packages/health_ingest (to be created by MM-67)",
+      "location": "apps/mobile/src/healthIngest (to be created by MM-67)",
       "rule": "Everything above the interface is built and tested against the fake on Windows."
     },
     {
@@ -123,14 +119,14 @@
     {
       "id": "SC-ports",
       "name": "Repository and integration interfaces",
-      "location": "packages/domain/lib/src/ports (new), implementations in packages/data and packages/fixtures",
+      "location": "apps/mobile/src/domain/ports (new), implementations in apps/mobile/src/data and apps/mobile/src/fixtures",
       "rule": "Each interface is an abstract interface class in its own file, narrow, owned by its consumer's layer, with a fixture and a contract suite run against every implementation. Added to by any workstream that needs a seam, using the same pattern; existing interfaces change only with their contract suite."
     }
   ],
   "coordinationHotspots": [
     {
       "id": "HS-schema-lane",
-      "surface": "packages/data/lib/src/app_database.dart, app_database.g.dart, mm_store.dart",
+      "surface": "apps/mobile/src/data/schema.ts, migrationSteps.ts, SqlRepositories.ts",
       "workstreams": [
         "WS-01",
         "WS-05",
@@ -146,7 +142,7 @@
     },
     {
       "id": "HS-compute-targets",
-      "surface": "packages/engine/lib/src/targets.dart, coach.dart, safety_bounds.dart",
+      "surface": "apps/mobile/src/engine/computeTargets.ts, nextTargets.ts, SafetyBounds.ts",
       "workstreams": [
         "WS-02",
         "WS-06",
@@ -156,7 +152,7 @@
     },
     {
       "id": "HS-policy",
-      "surface": "packages/domain/lib/src/screening.dart",
+      "surface": "apps/mobile/src/domain/ScreeningAnswers.ts",
       "workstreams": [
         "WS-02",
         "WS-05"
@@ -165,7 +161,7 @@
     },
     {
       "id": "HS-estimator-style",
-      "surface": "packages/engine/lib/src/tdee_estimator.dart (logging-style switch, partial-day rule)",
+      "surface": "apps/mobile/src/engine/TdeeEstimator.ts (logging-style switch, partial-day rule)",
       "workstreams": [
         "WS-02",
         "WS-06",
@@ -175,7 +171,7 @@
     },
     {
       "id": "HS-simulator",
-      "surface": "packages/engine/test/support/synthetic_user.dart",
+      "surface": "apps/mobile/test/engine/support/SyntheticUser.ts",
       "workstreams": [
         "WS-02",
         "WS-06",
@@ -187,7 +183,7 @@
     },
     {
       "id": "HS-nav",
-      "surface": "apps/mobile/lib/src/app.dart",
+      "surface": "apps/mobile/src/app/",
       "workstreams": [
         "WS-03",
         "WS-10",
@@ -197,7 +193,7 @@
     },
     {
       "id": "HS-strings",
-      "surface": "all user-facing text in apps/mobile/lib/src",
+      "surface": "all user-facing text in apps/mobile/src",
       "workstreams": [
         "WS-03",
         "WS-05",
@@ -211,7 +207,7 @@
     },
     {
       "id": "HS-coach-screen",
-      "surface": "apps/mobile/lib/src/coach/coach_screen.dart",
+      "surface": "apps/mobile/src/coach/CoachScreen.tsx",
       "workstreams": [
         "WS-05",
         "WS-06",
@@ -221,7 +217,7 @@
     },
     {
       "id": "HS-onboarding-screen",
-      "surface": "apps/mobile/lib/src/onboarding/onboarding_screen.dart (531 lines, one file)",
+      "surface": "apps/mobile/src/onboarding/OnboardingScreen.tsx and its step files",
       "workstreams": [
         "WS-03",
         "WS-05",
@@ -233,7 +229,7 @@
     },
     {
       "id": "HS-progress-screen",
-      "surface": "apps/mobile/lib/src/progress/progress_screen.dart",
+      "surface": "apps/mobile/src/progress/ProgressScreen.tsx",
       "workstreams": [
         "WS-03",
         "WS-07",
@@ -245,7 +241,7 @@
     },
     {
       "id": "HS-food-screen",
-      "surface": "apps/mobile/lib/src/today/today_screen.dart, add_food_sheet.dart",
+      "surface": "apps/mobile/src/food/FoodScreen.tsx, AddFoodSheet.tsx",
       "workstreams": [
         "WS-03",
         "WS-06",
@@ -255,7 +251,7 @@
     },
     {
       "id": "HS-weight-entries",
-      "surface": "WeightEntries table and MmStore.saveWeight",
+      "surface": "WeightEntries table and the weight repository",
       "workstreams": [
         "WS-07",
         "WS-11"
@@ -264,7 +260,7 @@
     },
     {
       "id": "HS-module-layout",
-      "surface": "every .dart file during the MM-160 split",
+      "surface": "every .ts file during the MM-160 split",
       "workstreams": [
         "WS-14",
         "WS-01",
@@ -275,7 +271,7 @@
     },
     {
       "id": "HS-persistence-access",
-      "surface": "packages/data/lib/src/mm_store.dart and apps/mobile/lib/src/providers.dart",
+      "surface": "apps/mobile/src/data/SqlRepositories.ts and apps/mobile/src/app/openAppServices.ts",
       "workstreams": [
         "WS-14",
         "WS-05",
@@ -297,7 +293,12 @@
           "tickets": [
             "MM-160",
             "MM-161",
-            "MM-162"
+            "MM-162",
+            "MM-229",
+            "MM-230",
+            "MM-231",
+            "MM-232",
+            "MM-233"
           ]
         },
         {
@@ -308,11 +309,45 @@
             "MM-104",
             "MM-105",
             "MM-163",
+            "MM-181",
+            "MM-184",
+            "MM-185",
+            "MM-186",
+            "MM-236",
+            "MM-239",
+            "MM-240",
             "MM-108",
             "MM-99",
             "MM-98",
             "MM-100",
-            "MM-107"
+            "MM-176",
+            "MM-179",
+            "MM-183",
+            "MM-206",
+            "MM-208",
+            "MM-107",
+            "MM-187",
+            "MM-237"
+          ]
+        },
+        {
+          "workstream": "WS-01",
+          "tickets": [
+            "MM-166",
+            "MM-174",
+            "MM-197",
+            "MM-198",
+            "MM-199",
+            "MM-200",
+            "MM-201",
+            "MM-205",
+            "MM-209",
+            "MM-210",
+            "MM-211",
+            "MM-212",
+            "MM-241",
+            "MM-243",
+            "MM-245"
           ]
         }
       ]
@@ -363,23 +398,32 @@
       "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating.",
       "requires": [
         {
+          "workstream": "WS-03",
+          "tickets": [
+            "MM-91",
+            "MM-106"
+          ]
+        },
+        {
           "workstream": "WS-01",
           "tickets": [
             "MM-93",
-            "MM-7"
+            "MM-190",
+            "MM-7",
+            "MM-175",
+            "MM-177",
+            "MM-178",
+            "MM-182",
+            "MM-234",
+            "MM-235",
+            "MM-238"
           ]
         },
         {
           "workstream": "WS-02",
           "tickets": [
-            "MM-135"
-          ]
-        },
-        {
-          "workstream": "WS-03",
-          "tickets": [
-            "MM-91",
-            "MM-106"
+            "MM-135",
+            "MM-173"
           ]
         },
         {
@@ -424,12 +468,31 @@
           "tickets": [
             "MM-48",
             "MM-47",
+            "MM-207",
             "MM-150",
             "MM-152",
             "MM-42",
             "MM-49",
+            "MM-167",
+            "MM-169",
+            "MM-170",
+            "MM-202",
+            "MM-203",
+            "MM-204",
+            "MM-216",
+            "MM-217",
             "MM-43",
-            "MM-151"
+            "MM-151",
+            "MM-180",
+            "MM-213",
+            "MM-223",
+            "MM-225",
+            "MM-226",
+            "MM-227",
+            "MM-218",
+            "MM-219",
+            "MM-220",
+            "MM-221"
           ]
         },
         {
@@ -439,7 +502,8 @@
             "MM-147",
             "MM-114",
             "MM-141",
-            "MM-140"
+            "MM-140",
+            "MM-168"
           ]
         }
       ]
@@ -450,15 +514,16 @@
       "intent": "Everything the store listing promises exists, every external review is recorded, and the free tier and the Coach unlock work as sold.",
       "requires": [
         {
-          "workstream": "WS-01",
+          "workstream": "WS-03",
           "tickets": [
-            "MM-8"
+            "MM-109",
+            "MM-242"
           ]
         },
         {
-          "workstream": "WS-03",
+          "workstream": "WS-01",
           "tickets": [
-            "MM-109"
+            "MM-8"
           ]
         },
         {
@@ -481,7 +546,13 @@
           "tickets": [
             "MM-76",
             "MM-75",
-            "MM-77"
+            "MM-193",
+            "MM-194",
+            "MM-77",
+            "MM-192",
+            "MM-214",
+            "MM-215",
+            "MM-222"
           ]
         },
         {
@@ -490,7 +561,8 @@
             "MM-67",
             "MM-71",
             "MM-68",
-            "MM-73"
+            "MM-73",
+            "MM-188"
           ]
         },
         {
@@ -506,6 +578,7 @@
           "tickets": [
             "MM-88",
             "MM-95",
+            "MM-244",
             "MM-29",
             "MM-85",
             "MM-86",
@@ -520,7 +593,79 @@
       "id": "M4",
       "name": "Depth after launch",
       "intent": "Everything else: remaining tickets in every workstream, in each workstream's own order.",
-      "requires": []
+      "requires": [
+        {
+          "workstream": "WS-02",
+          "tickets": [
+            "MM-35"
+          ]
+        },
+        {
+          "workstream": "WS-05",
+          "tickets": [
+            "MM-113"
+          ]
+        },
+        {
+          "workstream": "WS-06",
+          "tickets": [
+            "MM-122",
+            "MM-124",
+            "MM-129"
+          ]
+        },
+        {
+          "workstream": "WS-07",
+          "tickets": [
+            "MM-118",
+            "MM-156",
+            "MM-34",
+            "MM-157"
+          ]
+        },
+        {
+          "workstream": "WS-08",
+          "tickets": [
+            "MM-127",
+            "MM-126",
+            "MM-171",
+            "MM-46",
+            "MM-44",
+            "MM-58",
+            "MM-172"
+          ]
+        },
+        {
+          "workstream": "WS-09",
+          "tickets": [
+            "MM-116",
+            "MM-117",
+            "MM-133",
+            "MM-32",
+            "MM-125",
+            "MM-36"
+          ]
+        },
+        {
+          "workstream": "WS-10",
+          "tickets": [
+            "MM-78",
+            "MM-195",
+            "MM-79",
+            "MM-189",
+            "MM-191",
+            "MM-196"
+          ]
+        },
+        {
+          "workstream": "WS-11",
+          "tickets": [
+            "MM-72",
+            "MM-70",
+            "MM-69"
+          ]
+        }
+      ]
     }
   ],
   "workstreams": [
@@ -530,7 +675,7 @@
       "file": "ws-14-architecture-and-module-boundaries.md",
       "intent": "Make the code follow the product owner's engineering rules before more is built on it: one declaration per file, narrow interfaces for every repository and integration point, fixtures that let work proceed without waiting on a decision.",
       "recommendedOrder": 1,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-A",
       "dependsOn": [],
@@ -549,10 +694,10 @@
       ],
       "primaryOwnership": [
         "tool/ (the mm arch command and its baseline)",
-        "packages/domain/lib (repository and integration interfaces)",
-        "packages/data/lib (Drift repository implementations; MmStore removed)",
-        "packages/fixtures (new: in-memory implementations and contract suites)",
-        "apps/mobile/lib/src/providers.dart and the one registration file"
+        "apps/mobile/src/domain (repository and integration interfaces)",
+        "apps/mobile/src/data (SQL repository implementations; no store class)",
+        "apps/mobile/src/fixtures (new: in-memory implementations and contract suites)",
+        "apps/mobile/src/app/openAppServices.ts and the one registration file"
       ],
       "sharedContracts": [
         "SC-ports"
@@ -565,10 +710,16 @@
         "built": [
           "MM-160",
           "MM-161",
-          "MM-162"
+          "MM-162",
+          "MM-230",
+          "MM-231",
+          "MM-232",
+          "MM-233"
         ],
         "remaining": [
-          "MM-159"
+          "MM-159",
+          "MM-228",
+          "MM-229"
         ]
       },
       "sequence": [
@@ -582,7 +733,7 @@
         },
         {
           "step": 2,
-          "title": "Repository role interfaces, Drift implementations, in-memory fixtures and contract tests; remove MmStore",
+          "title": "Repository role interfaces, SQL implementations, in-memory fixtures and contract tests; remove MmStore",
           "tickets": [
             "MM-161"
           ],
@@ -595,6 +746,18 @@
             "MM-162"
           ],
           "milestone": "M0"
+        },
+        {
+          "step": 4,
+          "title": "The React HTML5 app in a native shell (MM-228): skeleton, engine and rules carried over, the SQLite seam, the screens",
+          "milestone": "M0",
+          "tickets": [
+            "MM-229",
+            "MM-230",
+            "MM-231",
+            "MM-232",
+            "MM-233"
+          ]
         }
       ],
       "gate": {
@@ -612,7 +775,7 @@
       "file": "ws-01-delivery-foundations.md",
       "intent": "Make it safe to change the schema and safe to merge: migrations, tests for what shipped untested, and CI.",
       "recommendedOrder": 3,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-A",
       "dependsOn": [],
@@ -629,8 +792,8 @@
       ],
       "primaryOwnership": [
         "tool/",
-        "packages/data/lib/src/app_database.dart (migration framework)",
-        "packages/data/test",
+        "apps/mobile/src/data/schema.ts (migration framework)",
+        "apps/mobile/test/data",
         "apps/mobile/test",
         ".github/"
       ],
@@ -652,12 +815,35 @@
           "MM-60",
           "MM-61",
           "MM-62",
-          "MM-93"
+          "MM-93",
+          "MM-166",
+          "MM-174",
+          "MM-178",
+          "MM-182",
+          "MM-190",
+          "MM-197",
+          "MM-198",
+          "MM-199",
+          "MM-200",
+          "MM-201",
+          "MM-205",
+          "MM-209",
+          "MM-210",
+          "MM-211",
+          "MM-212",
+          "MM-234",
+          "MM-235",
+          "MM-238",
+          "MM-241",
+          "MM-243"
         ],
         "remaining": [
           "MM-1",
           "MM-7",
-          "MM-8"
+          "MM-8",
+          "MM-175",
+          "MM-177",
+          "MM-245"
         ]
       },
       "sequence": [
@@ -673,7 +859,8 @@
           "step": 2,
           "title": "Test timeout guard, then tests for shipped-but-untested behavior",
           "tickets": [
-            "MM-93"
+            "MM-93",
+            "MM-190"
           ],
           "milestone": "M2"
         },
@@ -692,6 +879,42 @@
             "MM-8"
           ],
           "milestone": "M3"
+        },
+        {
+          "step": 5,
+          "title": "The agents’ workflow: handoff, roadmap page and checks, CI watch, the expert panel, no telemetry",
+          "milestone": "M0",
+          "tickets": [
+            "MM-166",
+            "MM-174",
+            "MM-197",
+            "MM-198",
+            "MM-199",
+            "MM-200",
+            "MM-201",
+            "MM-205",
+            "MM-209",
+            "MM-210",
+            "MM-211",
+            "MM-212",
+            "MM-241",
+            "MM-243",
+            "MM-245"
+          ]
+        },
+        {
+          "step": 6,
+          "title": "Devices from the runner: run on a phone, the isolated demo app, screenshots",
+          "milestone": "M2",
+          "tickets": [
+            "MM-175",
+            "MM-177",
+            "MM-178",
+            "MM-182",
+            "MM-234",
+            "MM-235",
+            "MM-238"
+          ]
         }
       ],
       "gate": {
@@ -719,9 +942,9 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "packages/engine/lib",
-        "packages/engine/test",
-        "packages/domain/lib/src/screening.dart (MM-111 only)"
+        "apps/mobile/src/engine",
+        "apps/mobile/test/engine",
+        "apps/mobile/src/domain/ScreeningAnswers.ts (MM-111 only)"
       ],
       "sharedContracts": [
         "SC-targets",
@@ -759,7 +982,8 @@
           "MM-22",
           "MM-35",
           "MM-110",
-          "MM-135"
+          "MM-135",
+          "MM-173"
         ]
       },
       "sequence": [
@@ -818,6 +1042,14 @@
             "MM-35"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 8,
+          "title": "The partial-day rule for estimate-heavy logging",
+          "milestone": "M2",
+          "tickets": [
+            "MM-173"
+          ]
         }
       ],
       "gate": {
@@ -829,7 +1061,7 @@
         ],
         "meaning": "The target calculation's semantics are settled; WS-06 may change what a target contains and WS-09 may reason about stalls."
       },
-      "notes": "Pure Dart, no schema, no UI: it can start today and run beside WS-01, WS-03 and WS-04 with no shared files. MM-131 is a predicted defect; its first acceptance criterion is to reproduce and measure it."
+      "notes": "Pure TypeScript, no schema, no UI: it can start today and run beside WS-01, WS-03 and WS-04 with no shared files. MM-131 is a predicted defect; its first acceptance criterion is to reproduce and measure it."
     },
     {
       "id": "WS-03",
@@ -837,7 +1069,7 @@
       "file": "ws-03-design-system-and-app-shell.md",
       "intent": "Give every later screen a component library, a string catalog, a chart language and the dashboard-first navigation, while only four screens exist to migrate.",
       "recommendedOrder": 2,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-A",
       "dependsOn": [
@@ -853,9 +1085,9 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "apps/mobile/lib/src/app.dart",
-        "apps/mobile/lib/src/widgets.dart",
-        "apps/mobile/lib/src/format.dart",
+        "apps/mobile/src/app/",
+        "apps/mobile/src/ui/",
+        "apps/mobile/src/format/",
         "a shared UI component package (new)",
         "localization files (new)",
         "a dashboard screen (new)"
@@ -883,7 +1115,17 @@
           "MM-105",
           "MM-107",
           "MM-163",
-          "MM-165"
+          "MM-165",
+          "MM-184",
+          "MM-185",
+          "MM-186",
+          "MM-187",
+          "MM-206",
+          "MM-208",
+          "MM-236",
+          "MM-237",
+          "MM-239",
+          "MM-240"
         ],
         "remaining": [
           "MM-89",
@@ -893,7 +1135,13 @@
           "MM-103",
           "MM-106",
           "MM-108",
-          "MM-109"
+          "MM-109",
+          "MM-176",
+          "MM-179",
+          "MM-181",
+          "MM-183",
+          "MM-224",
+          "MM-242"
         ]
       },
       "sequence": [
@@ -905,7 +1153,14 @@
             "MM-103",
             "MM-104",
             "MM-105",
-            "MM-163"
+            "MM-163",
+            "MM-181",
+            "MM-184",
+            "MM-185",
+            "MM-186",
+            "MM-236",
+            "MM-239",
+            "MM-240"
           ],
           "milestone": "M0"
         },
@@ -923,7 +1178,12 @@
           "tickets": [
             "MM-99",
             "MM-98",
-            "MM-100"
+            "MM-100",
+            "MM-176",
+            "MM-179",
+            "MM-183",
+            "MM-206",
+            "MM-208"
           ],
           "milestone": "M0"
         },
@@ -931,7 +1191,8 @@
           "step": 4,
           "title": "Shared chart components and the uncertainty language",
           "tickets": [
-            "MM-107"
+            "MM-107",
+            "MM-187"
           ],
           "milestone": "M0"
         },
@@ -951,6 +1212,22 @@
             "MM-109"
           ],
           "milestone": "M3"
+        },
+        {
+          "step": 7,
+          "title": "Storybook as the design register",
+          "milestone": "M0",
+          "tickets": [
+            "MM-237"
+          ]
+        },
+        {
+          "step": 8,
+          "title": "The terms of use before anything else",
+          "milestone": "M3",
+          "tickets": [
+            "MM-242"
+          ]
         }
       ],
       "gate": {
@@ -969,7 +1246,7 @@
       "file": "ws-04-food-data-pack.md",
       "intent": "Build the offline US food pack and the reader the app queries, as new packages that touch nothing existing.",
       "recommendedOrder": 5,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "high",
       "parallelGroup": "PG-A",
       "dependsOn": [
@@ -980,9 +1257,9 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "tools/food_pipeline (new)",
-        "packages/food_catalog (new)",
-        "packages/domain (nutrition validation, MM-53)"
+        "apps/mobile/src/foodPipeline (new)",
+        "apps/mobile/src/foodCatalog (new)",
+        "apps/mobile/src/domain (nutrition validation, MM-53)"
       ],
       "sharedContracts": [
         "SC-food-pack",
@@ -1084,10 +1361,10 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "packages/domain/lib/src/screening.dart",
-        "packages/domain/lib/src/user_setup.dart",
-        "apps/mobile/lib/src/onboarding",
-        "apps/mobile/lib/src/settings"
+        "apps/mobile/src/domain/ScreeningAnswers.ts",
+        "apps/mobile/src/domain/UserSetup.ts",
+        "apps/mobile/src/onboarding",
+        "apps/mobile/src/settings"
       ],
       "sharedContracts": [
         "SC-setup",
@@ -1115,8 +1392,8 @@
           "MM-81",
           "MM-82",
           "MM-83",
-          "MM-164",
-          "MM-112"
+          "MM-112",
+          "MM-164"
         ],
         "remaining": [
           "MM-80",
@@ -1196,9 +1473,9 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "packages/engine/lib/src/targets.dart",
-        "packages/engine/lib/src/coach.dart",
-        "apps/mobile/lib/src/coach",
+        "apps/mobile/src/engine/computeTargets.ts",
+        "apps/mobile/src/engine/nextTargets.ts",
+        "apps/mobile/src/coach",
         "docs/evidence.md (new)",
         "docs/non-goals.md (new)"
       ],
@@ -1224,9 +1501,9 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-121",
           "MM-143",
-          "MM-144",
-          "MM-121"
+          "MM-144"
         ],
         "remaining": [
           "MM-119",
@@ -1327,7 +1604,7 @@
       "file": "ws-07-progress-and-measurement.md",
       "intent": "Make waist, weight context and the scale display trustworthy enough for the coach to reason from, and for the user to believe.",
       "recommendedOrder": 8,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-B",
       "dependsOn": [
@@ -1340,9 +1617,9 @@
         "WS-09"
       ],
       "primaryOwnership": [
-        "apps/mobile/lib/src/progress",
-        "packages/domain/lib/src/observations.dart",
-        "packages/engine (measurement-change function, weight events, jump explanation)"
+        "apps/mobile/src/progress",
+        "apps/mobile/src/domain/WeightObservation.ts and its neighbours",
+        "apps/mobile/src/engine (measurement-change function, weight events, jump explanation)"
       ],
       "sharedContracts": [
         "SC-analysis",
@@ -1459,7 +1736,7 @@
       "file": "ws-08-food-logging-experience.md",
       "intent": "Make logging a real day fast and honest: search, barcode, edit, copy, custom foods, rough estimates, and the nutrient detail the targets need.",
       "recommendedOrder": 9,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-B",
       "dependsOn": [
@@ -1470,9 +1747,9 @@
       ],
       "unlocks": [],
       "primaryOwnership": [
-        "apps/mobile/lib/src/today (add-food flow, entry rows)",
-        "packages/domain/lib/src/food_entry.dart",
-        "packages/domain/lib/src/quantity_source.dart"
+        "apps/mobile/src/food (add-food flow, entry rows)",
+        "apps/mobile/src/domain/FoodEntry.ts",
+        "apps/mobile/src/domain/QuantitySource.ts"
       ],
       "sharedContracts": [
         "SC-food-entry",
@@ -1495,8 +1772,23 @@
           "MM-39",
           "MM-40",
           "MM-41",
+          "MM-47",
           "MM-48",
-          "MM-47"
+          "MM-169",
+          "MM-170",
+          "MM-171",
+          "MM-172",
+          "MM-202",
+          "MM-203",
+          "MM-204",
+          "MM-207",
+          "MM-213",
+          "MM-216",
+          "MM-217",
+          "MM-223",
+          "MM-225",
+          "MM-226",
+          "MM-227"
         ],
         "remaining": [
           "MM-37",
@@ -1512,7 +1804,12 @@
           "MM-150",
           "MM-151",
           "MM-152",
-          "MM-167"
+          "MM-167",
+          "MM-180",
+          "MM-218",
+          "MM-219",
+          "MM-220",
+          "MM-221"
         ]
       },
       "sequence": [
@@ -1521,7 +1818,8 @@
           "title": "Edit a logged entry; copy a meal or a day",
           "tickets": [
             "MM-48",
-            "MM-47"
+            "MM-47",
+            "MM-207"
           ],
           "milestone": "M2"
         },
@@ -1548,7 +1846,14 @@
           "tickets": [
             "MM-42",
             "MM-49",
-            "MM-167"
+            "MM-167",
+            "MM-169",
+            "MM-170",
+            "MM-202",
+            "MM-203",
+            "MM-204",
+            "MM-216",
+            "MM-217"
           ],
           "milestone": "M2"
         },
@@ -1566,7 +1871,8 @@
           "title": "Alcohol and fiber against the targets",
           "tickets": [
             "MM-127",
-            "MM-126"
+            "MM-126",
+            "MM-171"
           ],
           "milestone": "M4"
         },
@@ -1583,9 +1889,27 @@
           "title": "Nutrition-label scanning; live lookup with consent",
           "tickets": [
             "MM-44",
-            "MM-58"
+            "MM-58",
+            "MM-172"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 9,
+          "title": "The Food screen and Add food hierarchy (MM-224)",
+          "milestone": "M2",
+          "tickets": [
+            "MM-180",
+            "MM-213",
+            "MM-223",
+            "MM-225",
+            "MM-226",
+            "MM-227",
+            "MM-218",
+            "MM-219",
+            "MM-220",
+            "MM-221"
+          ]
         }
       ],
       "gate": {
@@ -1603,7 +1927,7 @@
       "file": "ws-09-coaching-intelligence-and-adherence.md",
       "intent": "Everything the coach says and does beyond the weekly number: adherence, stalls, safety notices, gaps and pauses, recovery, recomp verdicts, rewards and reports.",
       "recommendedOrder": 10,
-      "status": "partially-built",
+      "status": "in-progress",
       "riskLevel": "high",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -1620,7 +1944,7 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "packages/engine (new modules: adherence, insights, stall, notices, gap and pause rules)",
+        "apps/mobile/src/engine (new modules: adherence, insights, stall, notices, gap and pause rules)",
         "apps/mobile (insight card, summaries, return screen, pause, reminders, recovery sheet, report)"
       ],
       "sharedContracts": [
@@ -1645,9 +1969,12 @@
         "HS-strings"
       ],
       "sourceRequirements": {
-        "built": [],
-        "remaining": [
+        "built": [
           "MM-32",
+          "MM-133",
+          "MM-168"
+        ],
+        "remaining": [
           "MM-33",
           "MM-36",
           "MM-92",
@@ -1655,7 +1982,6 @@
           "MM-116",
           "MM-117",
           "MM-125",
-          "MM-133",
           "MM-140",
           "MM-141",
           "MM-145",
@@ -1688,7 +2014,8 @@
           "title": "Insight framework, built with its first rule: stall diagnosis",
           "tickets": [
             "MM-141",
-            "MM-140"
+            "MM-140",
+            "MM-168"
           ],
           "milestone": "M2"
         },
@@ -1746,7 +2073,7 @@
         ],
         "meaning": "The safety and re-entry behavior a public release needs exists."
       },
-      "notes": "New engine code goes in new files beside coach.dart, not inside computeTargets. Step 6 and the strength trigger of MM-117 wait for WS-10; everything earlier does not. Safety insights are never behind the paywall."
+      "notes": "New engine code goes in new files beside nextTargets.ts, not inside computeTargets. Step 6 and the strength trigger of MM-117 wait for WS-10; everything earlier does not. Safety insights are never behind the paywall."
     },
     {
       "id": "WS-10",
@@ -1754,7 +2081,7 @@
       "file": "ws-10-training-log-and-strength.md",
       "intent": "Log workouts set by set and derive the strength trend, the third headline measure and the signal recomp coaching needs.",
       "recommendedOrder": 11,
-      "status": "not-started",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -1766,9 +2093,9 @@
         "WS-09"
       ],
       "primaryOwnership": [
-        "apps/mobile/lib/src/train (new)",
-        "packages/domain (workout types, new)",
-        "packages/engine (e1RM, volume, progression; new files)",
+        "apps/mobile/src/train (new)",
+        "apps/mobile/src/domain (workout types, new)",
+        "apps/mobile/src/engine (e1RM, volume, progression; new files)",
         "exercise library data (new)"
       ],
       "sharedContracts": [
@@ -1785,16 +2112,24 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-75",
           "MM-76",
-          "MM-75"
-        ],
-        "remaining": [
-          "MM-74",
           "MM-77",
           "MM-78",
           "MM-79",
+          "MM-192",
+          "MM-193",
+          "MM-194",
+          "MM-195",
+          "MM-196"
+        ],
+        "remaining": [
+          "MM-74",
           "MM-189",
-          "MM-191"
+          "MM-191",
+          "MM-214",
+          "MM-215",
+          "MM-222"
         ]
       },
       "sequence": [
@@ -1810,7 +2145,9 @@
           "step": 2,
           "title": "Log a workout; the Train destination",
           "tickets": [
-            "MM-75"
+            "MM-75",
+            "MM-193",
+            "MM-194"
           ],
           "milestone": "M3"
         },
@@ -1818,7 +2155,8 @@
           "step": 3,
           "title": "Estimated one-rep max and the strength trend",
           "tickets": [
-            "MM-77"
+            "MM-77",
+            "MM-192"
           ],
           "milestone": "M3"
         },
@@ -1826,7 +2164,8 @@
           "step": 4,
           "title": "Weekly hard sets per muscle group",
           "tickets": [
-            "MM-78"
+            "MM-78",
+            "MM-195"
           ],
           "milestone": "M4"
         },
@@ -1850,9 +2189,20 @@
           "step": 7,
           "title": "Set times, entered by hand or with set and rest timers (after step 2; needed before any set is written to a platform as a segment)",
           "tickets": [
-            "MM-191"
+            "MM-191",
+            "MM-196"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 8,
+          "title": "The Train screen hierarchy (MM-224)",
+          "milestone": "M3",
+          "tickets": [
+            "MM-214",
+            "MM-215",
+            "MM-222"
+          ]
         }
       ],
       "gate": {
@@ -1869,7 +2219,7 @@
       "file": "ws-11-health-platform-sync.md",
       "intent": "Read weigh-ins and related data from Health Connect and, later, HealthKit, behind an interface that can be faked on Windows.",
       "recommendedOrder": 12,
-      "status": "not-started",
+      "status": "in-progress",
       "riskLevel": "high",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -1878,7 +2228,7 @@
       ],
       "unlocks": [],
       "primaryOwnership": [
-        "packages/health_ingest (new)",
+        "apps/mobile/src/healthIngest (new)",
         "Android manifest and permissions",
         "apps/mobile settings (connection screen)"
       ],
@@ -1893,17 +2243,18 @@
         "HS-progress-screen"
       ],
       "sourceRequirements": {
-        "built": [],
+        "built": [
+          "MM-67",
+          "MM-188"
+        ],
         "remaining": [
           "MM-66",
-          "MM-67",
           "MM-68",
           "MM-69",
           "MM-70",
           "MM-71",
           "MM-72",
-          "MM-73",
-          "MM-188"
+          "MM-73"
         ]
       },
       "sequence": [
@@ -1998,7 +2349,7 @@
         "WS-13"
       ],
       "primaryOwnership": [
-        "packages/data (snapshot, encrypt, restore)",
+        "apps/mobile/src/data (snapshot, encrypt, restore)",
         "a backup providers package (new)",
         "apps/mobile settings (backup screen)"
       ],
@@ -2093,7 +2444,8 @@
           "MM-88",
           "MM-94",
           "MM-95",
-          "MM-96"
+          "MM-96",
+          "MM-244"
         ]
       },
       "sequence": [
@@ -2102,7 +2454,8 @@
           "title": "Long-lead items: store trial mechanics spike; privacy policy and data declarations draft",
           "tickets": [
             "MM-88",
-            "MM-95"
+            "MM-95",
+            "MM-244"
           ],
           "milestone": "M3"
         },
@@ -2384,7 +2737,7 @@
       "satisfiedBy": [
         "MM-111"
       ],
-      "reason": "MM-111 and MM-112 both extend CoachingPolicy.derive in screening.dart."
+      "reason": "MM-111 and MM-112 both extend CoachingPolicy.derive in ScreeningAnswers.ts."
     },
     {
       "from": "WS-02",
@@ -2984,7 +3337,7 @@
       "whySafe": "Four disjoint ownership areas: tool/ and the data package; the engine; the app's shell and components; two packages that do not exist yet. WS-14 is the exception: its step 1 touches nearly every file, so it goes first and fast, one package at a time, while the others hold or rebase.",
       "coordination": [
         "WS-01 step 2 writes widget tests for screens WS-03 is restructuring. Write tests against behavior and keys, or do the screen tests after WS-03 step 3.",
-        "WS-02 step 5 edits screening.dart, which nothing else in this group touches.",
+        "WS-02 step 5 edits ScreeningAnswers.ts, which nothing else in this group touches.",
         "WS-03 leads the UI lane. Screens needed for M1 (WS-05 step 1 MM-83, MM-112; WS-06 MM-138, MM-139) should be built after WS-03 steps 1 and 2 so they are born in the new system. Engine tickets in WS-02 are unaffected.",
         "WS-14 step 1 splits packages one commit at a time; nothing else is in flight in the package being split. WS-03 step 1b waits for it for the app's screens."
       ]
@@ -3038,5 +3391,5 @@
       ]
     }
   ],
-  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both."
+  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both. Caught up 2026-10-13 (MM-245): the tickets of the React conversion, Storybook, the expert panel and the terms of use (MM-166 to MM-245) were placed, built/remaining now follow ticket status, and mm req checks that they do."
 }
