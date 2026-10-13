@@ -145,9 +145,14 @@ limitations.
   closed, MM-7 closed (CI green on every pull request since the switch),
   MM-245 closed. MM-229's screenshot tests are superseded by the stories
   test under the owner's Storybook rule.
-- Moved the needle: M0 went from 39 of 47 to 42 of 48 (MM-246, MM-229,
-  MM-245 done; MM-103, MM-108, MM-176, MM-179, MM-183 and MM-181 remain);
+- MM-181 (the flat floating action) closed: the React rebuild never had the
+  glow; `test/ui/flatFab.test.ts` now guards it by reading the stylesheet.
+- Moved the needle: M0 went from 39 of 47 to 43 of 48 (MM-246, MM-229,
+  MM-245, MM-181 done; MM-103, MM-108, MM-176, MM-179 and MM-183 remain);
   M2 gained MM-7 and MM-175. No milestone closed. M1 is 11 of 13.
+- MM-103's leftover, one question per onboarding screen, is a design
+  change the owner should call: measurements, training and the health
+  check each hold several related fields on one screen today.
 - Not done: the workstream files' prose still describes the plan as
   written in October's first week; only their sources and sequences carry
   the additions. The 58 in-progress tickets were not walked; many are built
