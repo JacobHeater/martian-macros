@@ -42,3 +42,6 @@ Scenario: A new library
 - The United States has no single health-privacy law covering an app like this, but the FTC's Health Breach Notification Rule and several
   state laws (Washington's My Health My Data Act among them) can apply to health apps. Keeping the data on the device avoids most of it;
   have the conclusion checked.
+
+## Decision (2026-10-13)
+- **Draft it now, with the terms, for the same attorney.** Written from what the code does (MM-242, MM-65): nothing sent by default, one pack download, the scanner's own reporting pending MM-244. It gets a row in Settings, About, and the public page MM-247 publishes carries it beside the terms. The contact address stays empty for the attorney.
