@@ -94,7 +94,7 @@ the tests used moved to `src/gallery/fixtureServices.ts` and the tests use
 the same ones. `apps/mobile/test/gallery/stories.test.tsx` draws and walks
 every story and fails when a screen, sheet or step has none. Looked at in
 a browser from the static build at phone size: Settings, Add food, the
-onboarding Training step and a workout, across the three palettes. The
+onboarding Training step and a workout, across the three palettes.
 The expert panel's role files and protocol (`agents/`) still told reviewers
 to maintain the HTML assets and the coverage manifest; they now name the
 stories. The static build is not part of `mm check`: on Windows it writes a valid build
