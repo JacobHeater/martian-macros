@@ -33,11 +33,18 @@ describe('the date dialog', () => {
     expect(done).toBe('untouched');
   });
 
-  it('the stylesheet gives the control the palette and the indicator its distance', () => {
+  it('the field draws its own chevron at the inset, and the platform draws nothing', () => {
+    const { container } = render(<MmDateDialog {...props} onDone={() => undefined} />);
+    const box = container.querySelector('.mm-field-box.mm-picker-box');
+    expect(box).not.toBeNull();
+    expect(box?.querySelector('input.mm-picker-input')).not.toBeNull();
+    expect(box?.querySelector('.mm-picker-chevron svg')).not.toBeNull();
     const css = readFileSync('src/ui/ui.css', 'utf8');
-    expect(css).toMatch(/\.mm-time-input\s*\{[^}]*color-scheme:\s*dark/);
-    expect(css).toMatch(/\.theme-light \.mm-time-input\s*\{[^}]*color-scheme:\s*light/);
-    expect(css).toMatch(/\.mm-time-input::-webkit-calendar-picker-indicator\s*\{[^}]*margin-inline-start/);
+    expect(css).toMatch(/\.mm-picker-input\s*\{[^}]*appearance:\s*none/);
+    expect(css).toMatch(/\.mm-picker-input\s*\{[^}]*width:\s*100%/);
+    expect(css).toMatch(/\.mm-picker-input::-webkit-calendar-picker-indicator\s*\{[^}]*display:\s*none/);
+    expect(css).toMatch(/\.mm-picker-input\s*\{[^}]*color-scheme:\s*dark/);
+    expect(css).toMatch(/\.theme-light \.mm-picker-input\s*\{[^}]*color-scheme:\s*light/);
     expect(css).toMatch(/\.mm-dialog\s*\{[^}]*box-shadow/);
   });
 });
