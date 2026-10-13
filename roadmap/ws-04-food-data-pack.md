@@ -53,10 +53,10 @@ WS-08 steps 4 to 8. WS-13, which cannot release without a licensed,
 downloadable pack.
 
 ## Packages and surfaces
-- `tools/food_pipeline/` (new; DuckDB, not shipped in the app)
-- `packages/food_catalog/` (new; pure Dart reader)
-- `packages/domain/` (the validation function; today's `macrosMatchEnergy`
-  in `food_entry.dart` is its starting point)
+- `apps/mobile/src/foodPipeline/` (new; DuckDB, not shipped in the app)
+- `apps/mobile/src/foodCatalog/` (new; pure TypeScript reader)
+- `apps/mobile/src/domain/` (the validation function; today's `macrosMatchEnergy`
+  in `FoodEntry.ts` is its starting point)
 - static hosting for packs (outside the repository)
 
 ## Risks
@@ -99,7 +99,7 @@ WS-08 steps 4 onward. Nothing else waits on it.
 
 ## Parallel with
 Everything. Its only contact with existing code is the validation function in
-`packages/domain`, which WS-08 also calls; define it in step 2 and both use it.
+`apps/mobile/src/domain`, which WS-08 also calls; define it in step 2 and both use it.
 
 ## Requirement sources
 - Built: MM-53 (nutrition checks), MM-54 (barcode normalization), MM-52 (the pipeline).
@@ -121,7 +121,7 @@ Everything. Its only contact with existing code is the validation function in
   must appear in the privacy documents (WS-13), reveal nothing but an IP
   address, verify a checksum, and swap in only when complete.
 - The architecture document names the planned locations as
-  `tools/food_pipeline` and `packages/food_catalog`. The existing task runner
+  `apps/mobile/src/foodPipeline` and `apps/mobile/src/foodCatalog`. The existing task runner
   lives in `tool/` (singular). Decide once whether the pipeline goes under
   `tool/` or a new `tools/`, and add it to the workspace file accordingly.
 - No food is ever described as "verified". The tiers say what is true:

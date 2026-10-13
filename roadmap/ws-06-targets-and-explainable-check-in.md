@@ -56,10 +56,10 @@ WS-09 entirely. WS-13: the professional reviews against the evidence
 register, and the paywall gates features built here.
 
 ## Packages and surfaces
-- `packages/engine/lib/src/targets.dart`, `coach.dart`, `safety_bounds.dart`
-- `packages/domain` (`UserSetup` gains pace, macro balance, week shape)
-- `packages/data` (targets history gains an explanation; settings columns)
-- `apps/mobile/lib/src/coach/`, the Food screen's summary card, the dashboard
+- `apps/mobile/src/engine/computeTargets.ts`, `nextTargets.ts`, `SafetyBounds.ts`
+- `apps/mobile/src/domain` (`UserSetup` gains pace, macro balance, week shape)
+- `apps/mobile/src/data` (targets history gains an explanation; settings columns)
+- `apps/mobile/src/coach/`, the Food screen's summary card, the dashboard
 - `docs/evidence.md`, `docs/non-goals.md` (new)
 
 ## Risks

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { stderr, stdout } from 'node:process';
+import { roadmapProblems } from './roadmapChecker.ts';
 import type { Ticket } from './ticket.ts';
 
 interface RequirementsScan {
@@ -153,6 +154,21 @@ function scan(root: string): RequirementsScan {
   return { tickets, problems, highestNumber: tickets.at(-1)?.number ?? 0 };
 }
 
+/**
+ * The roadmap's problems against the tickets (MM-245): every ticket is in
+ * one workstream and one step, on the side its status says. A missing
+ * roadmap is a problem too, since `mm roadmap` and the agents read it.
+ */
+function roadmapCheck(repoRoot: string, tickets: readonly Ticket[]): string[] {
+  const path = `${repoRoot}/roadmap/roadmap.json`;
+  if (!existsSync(path)) return ['roadmap/roadmap.json is missing.'];
+  try {
+    return roadmapProblems(JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>, tickets);
+  } catch (error) {
+    return [`roadmap/roadmap.json is not valid JSON: ${error instanceof Error ? error.message : String(error)}`];
+  }
+}
+
 const option = (args: readonly string[], name: string): string | undefined => {
   const at = args.indexOf(name);
   return at === -1 || at + 1 >= args.length ? undefined : args[at + 1];
@@ -208,9 +224,10 @@ export async function runRequirements(repoRoot: string, args: readonly string[])
       return 64;
   }
 
-  if (found.problems.length > 0) {
-    for (const problem of found.problems) stderr.write(`  ${problem}\n`);
-    stderr.write(`\n${found.problems.length} requirements problem(s).\n`);
+  const problems = [...found.problems, ...roadmapCheck(repoRoot, found.tickets)];
+  if (problems.length > 0) {
+    for (const problem of problems) stderr.write(`  ${problem}\n`);
+    stderr.write(`\n${problems.length} requirements problem(s).\n`);
     return 1;
   }
 

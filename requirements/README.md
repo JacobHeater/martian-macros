@@ -66,7 +66,10 @@ The short_id is the ticket's identity. It appears in two places that
 must agree: the last segment of the filename, and the `id` field in
 the frontmatter.
 
-- **To get the next id**, run `mm req next`.
+- **To get the next id**, run `mm req next`. A new ticket is placed in a
+  workstream and a step of `roadmap/roadmap.json` in the same change
+  (`roadmap/README.md`, "Keeping the roadmap current"); `mm req` fails
+  until it is.
 - **To refer to a ticket**, use its short_id and nothing else, in
   `related` and in prose ("see MM-42"). Never refer to a ticket by its
   filename or path: the description part of a filename may be reworded

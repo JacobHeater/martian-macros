@@ -45,22 +45,27 @@ to exactly one workstream.
 
 ## The workstreams
 
-| Order | Id | Workstream | State on 2026-10-08 | Group |
+| Order | Id | Workstream | State on 2026-10-13 | Group |
 | --- | --- | --- | --- | --- |
-| 1 | WS-14 | [Architecture and module boundaries](ws-14-architecture-and-module-boundaries.md) | built (epic open) | A |
+| 1 | WS-14 | [Architecture and module boundaries](ws-14-architecture-and-module-boundaries.md) | in progress (the React conversion's leftovers) | A |
 | 2 | WS-03 | [Design system and app shell](ws-03-design-system-and-app-shell.md) | in progress | A |
-| 3 | WS-01 | [Delivery foundations](ws-01-delivery-foundations.md) | partly built | A |
-| 4 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built | A |
-| 5 | WS-04 | [Food data pack](ws-04-food-data-pack.md) | not started | A |
-| 6 | WS-05 | [Setup, screening and profile lifecycle](ws-05-setup-screening-and-profile.md) | partly built | B |
+| 3 | WS-01 | [Delivery foundations](ws-01-delivery-foundations.md) | in progress | A |
+| 4 | WS-02 | [Engine truth and safety limits](ws-02-engine-truth-and-safety-limits.md) | partly built (M1 steps done) | A |
+| 5 | WS-04 | [Food data pack](ws-04-food-data-pack.md) | in progress | A |
+| 6 | WS-05 | [Setup, screening and profile lifecycle](ws-05-setup-screening-and-profile.md) | partly built (M1 steps done) | B |
 | 7 | WS-06 | [Targets and the explainable check-in](ws-06-targets-and-explainable-check-in.md) | in progress | B |
-| 8 | WS-07 | [Progress and measurement](ws-07-progress-and-measurement.md) | partly built | B |
-| 9 | WS-08 | [Food logging experience](ws-08-food-logging-experience.md) | partly built | B |
-| 10 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | not started | C |
-| 11 | WS-10 | [Training log and strength](ws-10-training-log-and-strength.md) | not started | C |
-| 12 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | not started | C |
+| 8 | WS-07 | [Progress and measurement](ws-07-progress-and-measurement.md) | in progress | B |
+| 9 | WS-08 | [Food logging experience](ws-08-food-logging-experience.md) | in progress | B |
+| 10 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | in progress | C |
+| 11 | WS-10 | [Training log and strength](ws-10-training-log-and-strength.md) | in progress | C |
+| 12 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | in progress | C |
 | 13 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | not started | C |
 | 14 | WS-13 | [Commercial and release readiness](ws-13-commercial-and-release-readiness.md) | not started | D |
+
+The state column is `status` in `roadmap.json`, derived from the tickets:
+"in progress" means at least one ticket is being worked on, and most
+workstreams have a built step with a leftover held open. The progress page
+(`mm roadmap`) shows each step's tickets with their status.
 
 Ids are stable labels. If the order changes, `recommendedOrder` changes and
 the ids do not. WS-03 was moved to order 1 on 2026-10-08 (design first); the
@@ -122,8 +127,8 @@ In this order of precedence:
    semantics (WS-02) settle before its contents change (WS-06), and both
    before anything reasons about targets (WS-09).
 4. **Schema sequencing.** The database file is a single-lane road (see below).
-5. **Engine before screen.** The engine is pure Dart and is tested against
-   simulated users. A feature's engine half lands with its tests before its
+5. **Engine before screen.** The engine is pure TypeScript and is tested
+   against simulated users. A feature's engine half lands with its tests before its
    screen is built.
 6. **End-to-end slices.** Within those limits, prefer the step that makes a
    whole user journey work over the one that deepens a single layer.
@@ -153,7 +158,8 @@ starting it, why it is safe, and the specific collisions to manage.
 ### The schema lane
 
 `apps/mobile/src/data/schema.ts` carries `currentSchemaVersion` and the
-migration steps. Nine workstreams need to change it. Rules, once MM-61 lands:
+migration steps (MM-61 is done; the schema is at version 2 since MM-242).
+Nine workstreams need to change it. Rules:
 
 - **One schema change in flight at a time.** The branch that takes the next
   version number merges before the next one starts.
@@ -172,7 +178,7 @@ most if ignored:
 
 | Hotspot | Why |
 | --- | --- |
-| `targets.ts`, `coach.ts`, `SafetyBounds.ts` | Four workstreams want to change the target calculation. WS-02 finishes first; then WS-06 owns it; WS-09 adds beside it. |
+| `computeTargets.ts`, `nextTargets.ts`, `SafetyBounds.ts` | Four workstreams want to change the target calculation. WS-02's M1 steps are done; WS-06 owns it now; WS-09 adds beside it. |
 | `TdeeEstimator.ts` | Phase changes, week shapes and new logging styles each change what the estimator must tolerate. One at a time, each with a full simulator run. |
 | `SyntheticUser.ts` | Five workstreams extend the simulator. Additions are optional and default off, so seeded results never change. |
 | All user-facing text | MM-108 moves every string into localization files in one pass. Do it while four screens exist. |
@@ -211,35 +217,41 @@ normal; skipping ahead two steps inside a workstream usually is not.
 
 ### What is available right now
 
-With nothing beyond the current `done` tickets, these steps have no unmet
-dependency:
+As of 2026-10-13, with the `done` tickets as they are, these steps have no
+unmet dependency and no earlier step of their workstream still open. M0 and
+M1 are nearly closed; the gap to M2 (a closed beta) is the food pack lane
+and the leftovers held open across WS-08 and WS-09.
 
-| Step | Tickets | Why first |
+| Step | Tickets | Why |
 | --- | --- | --- |
-| WS-01 step 1 | MM-61 | Blocks more than any other ticket. |
-| WS-02 step 1 | MM-120 | A small, self-contained defect in a headline number. |
-| WS-02 step 2 | MM-131 | The largest risk to the product's central claim; starts by measuring it. |
-| WS-14 step 1 | MM-160 | **Start here.** Enforces one declaration per file and splits the packages; nearly every file is touched, so it goes before other work in those packages. |
-| WS-03 step 1 | MM-102, MM-103, MM-104, MM-105, MM-163 | 1a (theme) is done. 1b (components, gallery, one implementation per control, screen migration) waits for WS-14 step 1. |
-| WS-04 step 1 | MM-51 | Starts the longest lead time. |
-| WS-05 step 1 | MM-83 | Screening answers cannot be corrected at all today. Needed for M1; build it after WS-03 steps 1 and 2 so it is born in the new system. |
-| WS-06 step 1 | MM-143, MM-144 | Documents and one test. Makes the professional review cheaper. |
-| WS-10 step 1, WS-11 step 1 | MM-76, MM-67 | New data and a new package with no dependencies. Not urgent (M3); good work to hand off. |
-| WS-12 step 1, WS-13 step 1 | MM-65, MM-88, MM-95 | Research and documents with no code. |
+| WS-14 step 4 | MM-229 | **Start here.** The React conversion's leftovers: the TypeScript architecture checker (one declaration per file, vendor imports, raw controls), a run on the physical phone. Everything else is built. |
+| WS-03 step 1 | MM-103, MM-181 | One question per onboarding screen; the glow. Small leftovers of built work. |
+| WS-01 step 3 | MM-7 | CI has run green on every pull request since the switch; close it, minus the iOS build. |
+| WS-06 step 3 | MM-138, MM-139 | The last of M1: simulator calibration and the owner's confirmation of holding a reduction. |
+| WS-02 step 6 | MM-135 | An owner decision (the diet break), then an engine change. |
+| WS-04 step 1 | MM-51 | The food pack lane, the gap to M2: close the spike, then steps 3 to 6 on a device (MM-55, MM-56, MM-57, MM-153). |
+| WS-13 step 1 | MM-88, MM-95, MM-244 | Long leads: the store trial spike, the privacy policy, and watching what ML Kit sends on a release build. MM-244 gates every "nothing is uploaded" sentence. |
+| WS-11 step 2, WS-12 step 1 | MM-71, MM-65 | M3 work with no dependency; good to hand off. |
+
+Later steps of a workstream whose earlier step is held open for a leftover
+(WS-03 steps 2 and 3, WS-04 steps 3 to 6, WS-11 steps 3 and 4) are
+available too, since the leftover rarely blocks them; read the open ticket's
+Progress to be sure.
 
 ### What not to touch yet
 
-- **No new `MmStore` methods and no new file with several declarations.** The rules are in `AGENTS.md`; after MM-161, persistence is a new narrow repository interface.
-- **No new tables or columns** until MM-61 is done.
-- **No changes to what a target contains** (protein minimum, explanation,
-  bands) until WS-02 steps 1 to 4 are done.
-- **No stall diagnosis, insight or adherence feature** until targets carry
-  bands and a confidence level (WS-06's gate).
-- **No new screens in large numbers** until the component library and string
-  catalog exist (WS-03 steps 1 and 2, M0). A screen built before them is built
-  twice. Engine work is not affected.
+- **One schema change in flight at a time**, each with its migration step
+  and upgrade test (the schema lane above).
+- **No new file with several declarations, no raw control in a screen, no
+  vendor import outside its adapter folder.** The rules are in `AGENTS.md`;
+  until MM-229's checker exists, `test/layers.test.ts` covers the imports and
+  the rest is by hand.
+- **No screen without a story** (`test/gallery/stories.test.tsx` fails it)
+  and no design verified anywhere but a browser.
 - **No purchase or trial code** until MM-88 has answered how each store allows
   a trial for a one-time purchase.
+- **No sentence that says nothing leaves the phone** until MM-244 has watched
+  a release build; the terms of use (MM-242) are worded for either answer.
 
 ## Dependency relationships
 
@@ -258,9 +270,17 @@ types only.
 
 ## Keeping the roadmap current
 
-**When a ticket is finished:** nothing here needs to change. Availability is
-computed from ticket status. Move the id from `remaining` to `built` in
-`roadmap.json` when convenient; that list is a snapshot, dated by `asOf`.
+This is a working agreement in `AGENTS.md` (MM-245): the roadmap changes in
+the same pull request as the work, and `mm req` fails when it and the
+tickets disagree.
+
+**When a ticket is finished:** move its id from `remaining` to `built` in
+`roadmap.json`. Availability is computed from ticket status, so nothing else
+changes unless the step's description no longer fits.
+
+**When a session ends:** say in `requirements/HANDOFF.md` which workstream
+step or milestone the session advanced and what that makes available, or
+that nothing moved and why. Run `mm roadmap` so the progress page agrees.
 
 **When a ticket is added:**
 
@@ -280,18 +300,25 @@ computed from ticket status. Move the id from `remaining` to `built` in
 ownership area nobody has and would otherwise be scattered across three or
 more workstreams. Otherwise they belong to the existing ones.
 
-**Restaged 2026-10-08:** design first. See `restaged` in `roadmap.json`.
+**Restaged 2026-10-08:** design first. **Caught up 2026-10-13** (MM-245):
+the tickets of the React conversion, Storybook, the expert panel and the
+terms of use were placed, and the file names here name the React app. See
+`restaged` in `roadmap.json`.
 
-**Checks worth running after any edit** (none is automated yet; a `mm roadmap`
-command that performs them would be a reasonable addition to `tool/`):
+**What `mm req` checks** (`tool/src/roadmapChecker.ts`; it runs inside
+`mm check` and CI, so none of this can drift unnoticed):
 
-- every ticket in `requirements/` is in exactly one workstream;
-- every non-epic remaining ticket is in exactly one step;
+- every ticket in `requirements/` is in exactly one workstream, as `built`
+  when it is done and `remaining` otherwise;
+- every non-epic remaining ticket is in exactly one step of its workstream,
+  and no step names another workstream's ticket;
 - every ticket in an edge's `satisfiedBy` belongs to the edge's `from`
-  workstream;
-- `dependsOn` and `unlocks` match the edges;
+  workstream, and its `scope` names steps the `to` workstream has;
+- `dependsOn` and `unlocks` match the ordering edges;
 - the ordering edges contain no cycle;
 - each milestone's ticket list matches the steps tagged with it.
+
+`mm roadmap --check` says whether the committed progress page is current.
 
 ## Limits of this roadmap
 
@@ -302,6 +329,9 @@ command that performs them would be a reasonable addition to `tool/`):
   reason, not because it matters less.
 - **Several tickets await product-owner decisions.** The roadmap sequences
   them as written; a decision that changes a ticket may change an edge.
-- **It was derived by reading**, on 2026-10-07, from 158 tickets and the code
-  as it stood. Where a workstream file says a file "will collide" or a change
+- **It was derived by reading**, on 2026-10-07, from 158 tickets and the Dart
+  code as it stood, and caught up on 2026-10-13 with 245 tickets and the
+  React app. Where a workstream file says a file "will collide" or a change
   "needs no schema", that is a judgment from the code, not a tested fact.
+  The workstream files' prose still describes the plan as first written;
+  their "Requirement sources" and "Sequence" sections carry the additions.
