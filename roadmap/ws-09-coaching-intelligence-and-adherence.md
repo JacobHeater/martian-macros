@@ -69,10 +69,10 @@ WS-13: the under-eating notice and the gap flow are release must-haves, and
 the trial is timed to end after the first monthly report.
 
 ## Packages and surfaces
-- `packages/engine` (new files: adherence, insights and their catalog, stall
+- `apps/mobile/src/engine` (new files: adherence, insights and their catalog, stall
   diagnosis, notices, gap and pause rules, recomp review)
-- `packages/domain` (pause, recovery answers, insight records)
-- `packages/data` (insight and notice state, pauses, reminder settings,
+- `apps/mobile/src/domain` (pause, recovery answers, insight records)
+- `apps/mobile/src/data` (insight and notice state, pauses, reminder settings,
   recovery answers, stored reports)
 - `apps/mobile`: an insight card on the dashboard and Coach screen, the
   weekly summary, the return screen, the pause sheet, reminder settings, the
@@ -93,7 +93,7 @@ the trial is timed to end after the first monthly report.
   register and should be tunable in one place.
 - **Local notifications on two platforms.** Exact-alarm permission on
   Android and the pending-notification limit on iOS need checking against
-  the pinned Flutter version.
+  the shell's `MmReminders` plugin.
 - **Scope.** Sixteen tickets. The internal sequence matters more here than
   anywhere; the first three steps are the ones a beta and a release need.
 
@@ -120,6 +120,7 @@ the trial is timed to end after the first monthly report.
 8. **Protein across meals; phase planning (MM-125, MM-36).** M4. Phase
    planning's projections are fiction without the body-fat estimate from
    WS-07 step 7.
+- Also placed 2026-10-13 in earlier steps: step 3: MM-168.
 
 ## Done enough to unblock others
 MM-149, MM-114 and MM-147 are done. That is the part a public release
@@ -155,9 +156,10 @@ independent of step 3.
   MM-92 (the logging streak, forgiving one missed day in seven, as a quiet Dashboard line; no personal records or
   workouts yet).
 - Remaining: MM-133, MM-32, MM-36. Epic: MM-145.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).
 
 ## Notes for whoever builds it
-- New engine code goes in new files beside `coach.dart`. Do not add branches
+- New engine code goes in new files beside `nextTargets.ts`. Do not add branches
   to `computeTargets` for anything here.
 - Every insight comes from a named rule that is a pure function with tests.
   No text is generated at run time, and no language model or server is

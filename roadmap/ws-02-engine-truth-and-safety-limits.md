@@ -11,7 +11,7 @@ anything else is built on it.
 The engine is the product. It is also the best-tested part of the repository:
 sixty tests, including a closed loop against simulated users. The later
 requirements work found five things it gets wrong or cannot yet do, all in
-`packages/engine`, all pure Dart, none needing a schema change or a screen:
+`apps/mobile/src/engine`, all pure TypeScript, none needing a schema change or a screen:
 
 | Problem | Ticket | Consequence if left |
 | --- | --- | --- |
@@ -55,12 +55,12 @@ estimate), WS-09 (stall diagnosis, notices), WS-13 (the professional review
 should see corrected limits).
 
 ## Packages and surfaces
-- `packages/engine/lib/src/`: `safety_bounds.dart`, `targets.dart`,
-  `coach.dart`, `weight_trend.dart`, `tdee_estimator.dart`,
-  `body_composition.dart`, `mode_advisor.dart`
-- `packages/engine/test/` and `test/support/synthetic_user.dart`,
-  `coach_loop.dart`
-- `packages/domain/lib/src/screening.dart` (the underweight rule in
+- `apps/mobile/src/engine/`: `SafetyBounds.ts`, `computeTargets.ts`,
+  `nextTargets.ts`, `WeightTrendModel.ts`, `TdeeEstimator.ts`,
+  `BodyFatEstimate.ts`, `recommendMode.ts`
+- `apps/mobile/test/engine/` and `test/support/SyntheticUser.ts`,
+  `closedLoop.test.ts`
+- `apps/mobile/src/domain/ScreeningAnswers.ts` (the underweight rule in
   `CoachingPolicy.derive`, MM-111 only)
 
 ## Risks
@@ -95,6 +95,7 @@ should see corrected limits).
    spike lists five questions and the panel's proposed answers.
 7. **Joint model spike (MM-35).** M4. Only after step 2 has shown what the
    two-step model can and cannot do with a glycogen term.
+8. **The partial-day rule for estimate-heavy logging (MM-173).** M2. Placed 2026-10-13.
 
 ## Done enough to unblock others
 MM-120, MM-131, MM-115 and MM-132 are done, the full engine suite passes, and
@@ -119,6 +120,7 @@ is changing.
   limit); MM-111 (underweight guard); MM-132 (body-fat thresholds under
   uncertainty).
 - Remaining: MM-135, MM-35. Epics: MM-22, MM-110.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-173 (Honest low days from a noisy logger are dropped as partial, and the estimate drifts high).
 
 ## Notes for whoever builds it
 - Simulator changes are additive and default off. A simulated user created

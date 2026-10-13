@@ -12,7 +12,7 @@ The task runner, the monorepo, the requirements tracker, the version 1 schema
 and data erasure are built. What is missing is small and blocks almost
 everything:
 
-- **The schema cannot change.** `app_database.dart` declares `schemaVersion => 1`
+- **The schema cannot change.** `schema.ts` declares `schemaVersion => 1`
   and has no migration strategy. Nine later workstreams add tables or columns.
   The first one to do so without a framework either breaks every existing
   install or invents its own approach.
@@ -50,19 +50,20 @@ Every workstream that persists anything: WS-05, WS-06, WS-07, WS-08, WS-09,
 WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 
 ## Packages and surfaces
-- `packages/data/lib/src/app_database.dart`, `mm_store.dart`, `packages/data/test`
-- `tool/src/commands.dart` (test timeout)
+- `apps/mobile/src/data/schema.ts`, `SqlRepositories.ts`, `apps/mobile/test/data`
+- `tool/mm.ts` (test timeout)
 - `apps/mobile/test`
 - `.github/` (workflow)
 - Android and iOS project configuration (app ids)
 
 ## Risks
 - **Getting the migration pattern wrong is expensive to undo.** Once two
-  migrations exist in the wild, the pattern is fixed. Use Drift's own
-  step-by-step migrations and schema export; do not write a bespoke runner.
-- **Widget tests written now may be invalidated by WS-03.** See the sequence.
-- **CI for Flutter on hosted runners is slow.** Cache the pub and FVM
-  directories from the first version of the workflow.
+  migrations exist in the wild, the pattern is fixed. The versioned steps in
+  `apps/mobile/src/data/migrationSteps.ts` are the one runner; do not write
+  a second.
+- **Screen tests written now may be invalidated by WS-03.** See the sequence.
+- **CI on hosted runners.** Node and a debug Android build; cache npm and
+  Gradle from the first version of the workflow.
 
 ## Sequence
 1. **Migrations (MM-61).** M1. Do this before anything else in the
@@ -75,6 +76,9 @@ WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 3. **CI (MM-7).** M2.
 4. **Dev and prod app ids (MM-8).** M3. Needed before release so both builds
    install side by side; not needed before.
+5. **The agents’ workflow: handoff, roadmap page and checks, CI watch, the expert panel, no telemetry (MM-166, MM-174, MM-197, MM-198, MM-199, MM-200, MM-201, MM-205, MM-209, MM-210, MM-211, MM-212, MM-241, MM-243, MM-245).** M0. Placed 2026-10-13.
+6. **Devices from the runner: run on a phone, the isolated demo app, screenshots (MM-175, MM-177, MM-178, MM-182, MM-234, MM-235, MM-238).** M2. Placed 2026-10-13.
+- Also placed 2026-10-13 in earlier steps: step 2: MM-190.
 
 ## Done enough to unblock others
 MM-61 is done: a migration from version 1 to 2 exists, is tested against a
@@ -89,9 +93,10 @@ WS-02, WS-03 and WS-04 from the start. WS-02 does not touch the schema; WS-04
 builds a separate read-only pack database with its own format.
 
 ## Requirement sources
-- Built: MM-2, MM-3, MM-4, MM-5, MM-6 (task runner, emulator, pinned Flutter,
-  workspace, requirements tracker); MM-60 (schema v1); MM-62 (erase all data).
+- Built: MM-2, MM-3, MM-4, MM-5, MM-6 (task runner, emulator, pinned
+  toolchain, workspace, requirements tracker); MM-60 (schema v1); MM-62 (erase all data).
 - Remaining: MM-61, MM-93, MM-7, MM-8. Epic: MM-1.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-190 (Six Food-screen tests passed or failed by the hour they ran, done); MM-166 (A roadmap progress page that opens from disk, done); MM-174 (A handoff document every agent keeps, so work can change hands, done); MM-197 (Panel validation accepts non-object schemas and rejects native paths, done); MM-198 (Portable, research-capable development expert panel, done); MM-199 (Malformed panel schema keywords crash validation, done); MM-200 (Panel completion accepts unexplained review omissions, done); MM-201 (Every panel role audits existing implementation, done); MM-205 (Expert mobile-experience panel for novice fitness users, done); MM-209 (Watch pull request checks in the background, without waiting for them, done); MM-210 (HTML UI/UX assets are kept and linked in the requirements folder, done); MM-211 (An HTML reference of every view and component, kept with the requirements, done); MM-212 (The panel can find a usability problem by inspection, and no finding is left without an outcome, done); MM-241 (the panel's implementation role is for the app as it is built, done); MM-243 (the developer tools send no telemetry, done); MM-245 (the roadmap is kept current, and checked); MM-175 (Run on a connected Android phone with one command); MM-177 (Repeatable synthetic data in an isolated demo app); MM-178 (Android demo identity script fails to compile, done); MM-182 (Demo identification has no painted themed background, done); MM-234 (`mm run --env phone` was lost in the task runner's port, done); MM-235 (the runner's Android commands need env vars the machine never set, done); MM-238 (screenshot a device from the runner, done).
 
 ## Notes for whoever builds it
 - The first real migration will come from whichever of WS-05 step 2, WS-06

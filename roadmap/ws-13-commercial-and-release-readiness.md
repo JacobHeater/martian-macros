@@ -101,6 +101,7 @@ Nothing further. It is the end of the graph.
 5. **Health-claims review (MM-96).** M3. Best done with the reviewer from
    step 2.
 6. **Release (MM-94).** M3.
+- Also placed 2026-10-13 in earlier steps: step 1: MM-244.
 
 ## Done enough to unblock others
 Not applicable. The workstream is done when the app is live on both stores in
@@ -117,6 +118,7 @@ to WS-12.
 ## Requirement sources
 - Remaining: MM-88, MM-95, MM-29, MM-85, MM-86, MM-87, MM-96, MM-94.
   Epic: MM-84.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-244 (observe what the barcode and label reader sends).
 
 ## Notes for whoever builds it
 - The free tier, as decided: food logging, barcode scanning, the training

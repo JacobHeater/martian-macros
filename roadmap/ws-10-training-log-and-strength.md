@@ -52,10 +52,10 @@ WS-09 step 6, and the strength halves of WS-09 step 5 and WS-06 step 8. The
 training-lapse rules owned by WS-05.
 
 ## Packages and surfaces
-- `apps/mobile/lib/src/train/` (new)
-- `packages/domain` (workout, exercise, set; new files)
-- `packages/engine` (e1RM, strength trend, volume, progression; new files)
-- `packages/data` (new tables)
+- `apps/mobile/src/train/` (new)
+- `apps/mobile/src/domain` (workout, exercise, set; new files)
+- `apps/mobile/src/engine` (e1RM, strength trend, volume, progression; new files)
+- `apps/mobile/src/data` (new tables)
 - exercise library data (new asset)
 - the Progress screen, for strength cards, through components WS-07 exposes
 
@@ -81,6 +81,8 @@ training-lapse rules owned by WS-05.
 4. **Weekly volume per muscle group (MM-78).** M4.
 5. **Progression suggestions (MM-79).** M4. Wording changes with the goal: on
    a cut, matching last time is the aim.
+8. **The Train screen hierarchy (MM-224) (MM-214, MM-215, MM-222).** M3. Placed 2026-10-13.
+- Also placed 2026-10-13 in earlier steps: step 2: MM-193, MM-194; step 3: MM-192; step 4: MM-195; step 7: MM-196.
 
 ## Done enough to unblock others
 MM-77 is done: one engine function returns a smoothed e1RM trend per lift
@@ -99,6 +101,7 @@ creates is new.
 - Built: MM-76 (the library, its search, the picker and the user's own exercises), MM-75 (workouts set by set, the Train
   destination, schema 25).
 - Remaining: MM-191, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-193 (Demo workouts repeated for each nutrition day, done); MM-194 (Deleting a custom exercise hides preserved strength sessions, done); MM-192 (Invalid strength evidence bypasses the retry state, done); MM-195 (Weekly volume navigation disappears during a workout, done); MM-196 (Typed set times can overlap another set in the workout, done); MM-214 (A set's reps field can show a value the set does not have); MM-215 (Removing a set happens at once and cannot be undone); MM-222 (A logged set looks logged, and the next action is in reach).
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do
@@ -107,8 +110,8 @@ creates is new.
   Connect can name some exercises inside a workout; HealthKit names only the kind of workout, so iOS is session-level. The
   mappings come from the spike MM-188 (WS-11 step 8) and are never written from memory. The library
   (`builtInExercises` in `mm_domain`) carries them; a test holds its Health Connect identifiers to MM-188's table.
-- **Where the training code is**: the model and library in `packages/domain/lib/src/training/`; `searchExercises`,
-  `previousSetsOf` and `recentExerciseIds` in the engine; the screens in `apps/mobile/lib/src/train/`. A set editor keeps its own
+- **Where the training code is**: the model and library in `apps/mobile/src/domain/training/`; `searchExercises`,
+  `previousSetsOf` and `recentExerciseIds` in the engine; the screens in `apps/mobile/src/train/`. A set editor keeps its own
   state while open, so two quick taps cannot lose the first to a save that has not come back.
 - Load is entered in the user's weight unit and stored in kilograms, like
   every other quantity. Bodyweight exercises record added load, which may be

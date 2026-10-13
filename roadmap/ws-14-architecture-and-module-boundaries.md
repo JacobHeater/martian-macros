@@ -34,8 +34,8 @@ no waiting on vendors, and swapping a provider is one line.
 - `mm arch`: a check for one declaration per file, name and file agreement, and
   no concrete-store or vendor import in screens; a shrinking baseline.
 - Splitting the existing files in `domain`, `engine`, `data` and `tool`.
-- Repository role interfaces (`packages/domain`), Drift implementations
-  (`packages/data`), in-memory fixtures and contract suites (`packages/fixtures`,
+- Repository role interfaces (`apps/mobile/src/domain`), SQL implementations
+  (`apps/mobile/src/data`), in-memory fixtures and contract suites (`apps/mobile/src/fixtures`,
   new), removal of `MmStore`.
 - The integration seams that exist as needs today: `Clock`, food lookup, backup
   storage, entitlement, plus the contract-test harness.
@@ -55,8 +55,8 @@ Everything with persistence or an integration: WS-03 (components, dashboard),
 WS-04 step 3 and 6, WS-05 to WS-13.
 
 ## Packages and surfaces
-`tool/`, `packages/domain`, `packages/data`, `packages/fixtures` (new),
-`apps/mobile/lib/src/providers.dart` and one registration file.
+`tool/`, `apps/mobile/src/domain`, `apps/mobile/src/data`, `apps/mobile/src/fixtures` (new),
+`apps/mobile/src/app/openAppServices.ts` and one registration file.
 
 ## Risks
 - **Blast radius.** Step 1 changes imports in nearly every file. Mitigation: one
@@ -65,18 +65,19 @@ WS-04 step 3 and 6, WS-05 to WS-13.
   cost. Mitigation: a seam is added only when a ticket needs it (MM-162); role
   interfaces are cut from consumers' needs, not from the implementation.
 - **Fixtures that lie.** An in-memory implementation that behaves differently
-  from Drift hides bugs. Mitigation: one contract suite run against both.
+  from SQL hides bugs. Mitigation: one contract suite run against both.
 - **State classes.** One declaration per file forces public `State` classes
   unless widgets are stateless. Prefer `ConsumerWidget`; flag if a case cannot.
 
 ## Sequence
 1. **One declaration per file (MM-160).** M0. The check and baseline first, then
    `domain`, `engine`, `data`, `tool`, one commit each.
-2. **Repositories (MM-161).** M0. Interfaces, Drift implementations, fixtures,
+2. **Repositories (MM-161).** M0. Interfaces, SQL implementations, fixtures,
    contract tests; the app overrides to fixtures in tests; delete `MmStore`.
    Schema is untouched.
 3. **Integration seams (MM-162).** M0. `Clock`, `FoodSearch`/`FoodBarcodeLookup`,
    `BackupStorage`, `EntitlementReader` and the harness.
+4. **The React HTML5 app in a native shell (MM-228): skeleton, engine and rules carried over, the SQLite seam, the screens (MM-229, MM-230, MM-231, MM-232, MM-233).** M0. Placed 2026-10-13.
 
 ## Done enough to unblock others
 MM-160 and MM-161 are done: new files follow the rules and all persistence is
@@ -92,6 +93,7 @@ files during the engine split: do the split first.
 
 ## Requirement sources
 - Built: MM-160, MM-161, MM-162. Remaining: MM-159 (epic), open until the design-system control rule in WS-03 step 1 is done.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-229 (A walking skeleton of the React app); MM-230 (Carry the engine and the rules over under test, done); MM-231 (One SQLite seam for the TypeScript app, done); MM-232 (Rebuild the screens in React, done); MM-233 (Derived state could be worked out from one new value and one old, done); MM-228 (The app becomes a React HTML5 app in a native shell).
 
 ## Notes for whoever builds it
 - Liskov is proved by tests, not asserted: write the contract suite before the
