@@ -1,8 +1,8 @@
 ---
 id: MM-7
-status: in-progress
+status: done
 component: developer-tooling
-related: [MM-1, MM-2, MM-4, MM-6]
+related: [MM-1, MM-2, MM-4, MM-6, MM-232]
 ---
 
 # Task: Continuous integration that runs the same commands
@@ -12,12 +12,12 @@ related: [MM-1, MM-2, MM-4, MM-6]
 
 ## Description
 A GitHub Actions workflow that, on every pull request and on pushes to `main`:
-- installs the Flutter version named in `.fvmrc`;
+- sets up the pinned Node and Java;
 - runs `mm bootstrap` and `mm check` on Linux (the fastest runner);
-- builds the Android app (`mm build android --env dev`) on Linux;
+- assembles the Android shell (`mm build android`) on Linux;
 - builds the iOS app without signing on a macOS runner, once the project builds for iOS.
 
-CI calls `mm`, never `flutter` directly, so local and CI behavior cannot drift.
+CI calls `mm`, never npm, gradle or the platform tools directly, so local and CI behavior cannot drift.
 
 ## Acceptance Criteria
 ```gherkin
@@ -30,16 +30,14 @@ Scenario: A pull request with a dangling requirement reference
   Then the check fails with the tracker's message
 
 Scenario: The pinned version is the one used
-  Given .fvmrc names a Flutter version
-  Then the workflow installs exactly that version
+  Given the workflow names a Node major and a Java version
+  Then the runner uses exactly those
 ```
 
 ## Notes
-- Open question: whether generated Drift code is committed (as now) or regenerated in CI with a "no diff" check. Committed is simpler;
-  the no-diff check catches a forgotten `mm gen`.
+- Written for the Flutter toolchain (`.fvmrc`, Drift's generated code); rewritten for Node at the switch (MM-232), when the pinned version became Node 22 and the Android build a Capacitor debug assembly.
 
 ## Progress
-- `.github/workflows/ci.yml`: on pull requests and pushes to `main` it reads the Flutter version from `.fvmrc`, installs exactly that, then runs `./mm bootstrap`, `./mm check` and
-  `./mm build android --env dev` on Linux. It calls `mm`, never `flutter`.
-- **Not verified**: the workflow has never run (nothing is pushed); the action versions and the Android build step are unproven. **Not done**: the iOS build on macOS (the project does not build for iOS yet).
-  Status stays in-progress until a pull request has gone green.
+- `.github/workflows/ci.yml`: on pull requests and pushes to `main` it sets up Node 22 and Temurin 21, then runs `./mm bootstrap`, `./mm check` and `./mm build android`. It calls `mm`, never a toolchain directly.
+- **Verified (2026-10-13):** the workflow has run green on every pull request since the switch (PRs #120 to #139), including one whose local `mm check` could not finish under machine load and was gated by CI alone (#137). A failing test and a dangling requirement reference both fail `./mm check`, which fails the job.
+- **Not done:** the iOS build on macOS; the shell has no iOS project yet. That is a later ticket when iOS exists, not this one.

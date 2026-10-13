@@ -1,7 +1,7 @@
 ---
 id: MM-245
 component: developer-tooling
-status: in-progress
+status: done
 related: [MM-1, MM-166, MM-174, MM-209]
 ---
 
@@ -80,6 +80,9 @@ that passes and one change per rule that fails.
 
 ## Progress
 
-**Built (2026-10-13).** The checker failed against the committed roadmap
-(85 problems: 75 unplaced tickets, 7 done tickets listed as remaining, 3
-milestone lists out of step) before the catch-up and passes after it.
+**Done (2026-10-13, PR #138).** The checker failed against the committed
+roadmap (85 problems: 75 unplaced tickets, 7 done tickets listed as
+remaining, 3 milestone lists out of step) before the catch-up and passes
+after it. The agreement was followed in the next two pull requests (#139
+placed MM-246 on creation; this one moves MM-7, MM-175 and MM-245 to
+built), and the handoff says what moved.
