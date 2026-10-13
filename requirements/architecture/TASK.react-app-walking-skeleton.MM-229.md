@@ -1,6 +1,6 @@
 ---
 id: MM-229
-status: in-progress
+status: done
 component: architecture
 related: [MM-228, MM-102, MM-103, MM-104, MM-159, MM-99, MM-7]
 ---
@@ -117,11 +117,17 @@ Scenario: Screenshots anywhere
 - The emulator's normal app was not touched. The owner's phone was connected
   throughout and nothing was installed on it.
 
-**Not built yet:**
-- Screenshot tests.
-- CI does not build the Android shell.
-- ~~Rules that enforce the engineering principles in TypeScript~~: built
-  as MM-246 (`test/architecture.test.ts`, 2026-10-13).
-
-**Not verified:** a physical phone. The shell has run on the emulator only.
-Typing, the keyboard and sheets have nothing to be judged on yet.
+**Closed 2026-10-13.** What was left, and where each went:
+- Screenshot tests in one pinned environment: superseded. The owner ruled
+  (2026-10-12) that screens are verified in a browser and Storybook is the
+  design register (MM-237); `test/gallery/stories.test.tsx` draws and
+  walks every screen's story on every run, and a device screenshot is for
+  native behavior only. No image comparison is built, by that decision.
+- CI builds the Android shell: done at the switch (MM-7, MM-232).
+- Rules that enforce the engineering principles in TypeScript: MM-246.
+- A physical phone: `mm run --env phone` installed and launched the demo
+  app on the owner's Pixel 9 Pro XL (MM-175's record has the detail); the
+  normal app was untouched. The phone was locked, so the Dashboard was not
+  seen on it; the owner can unlock and look. Typing, the keyboard and sheets
+  on a phone remain the device checks listed in later tickets (MM-242,
+  MM-232).
