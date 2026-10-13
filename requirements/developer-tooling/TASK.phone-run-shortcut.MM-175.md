@@ -1,6 +1,6 @@
 ---
 id: MM-175
-status: in-progress
+status: done
 component: developer-tooling
 related: [MM-174]
 ---
@@ -49,3 +49,11 @@ Scenario: Existing environments are unchanged
 - Verified on connected hardware using `mm run --env phone --help`: the phone
   was selected instead of the running emulator and the command exited with 0.
   App installation and launch were not performed by this verification.
+- **Done (2026-10-13), in the TypeScript runner.** `mm run --env phone` on
+  the owner's Pixel 9 Pro XL (the only device connected; no emulator was
+  started): the web build, `cap sync`, the debug assembly, `adb -s <phone>
+  install -r` of the demo APK and `am start` of
+  `com.martianmacros.martian_macros.demo/.MainActivity`, exit 0. Afterwards
+  the demo activity was the resumed one and the normal app's package record
+  was unchanged (last updated 2026-10-11). The phone was locked, so what the
+  app showed was not seen; the screen is the owner's to check.

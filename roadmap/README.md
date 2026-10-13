@@ -225,9 +225,8 @@ and the leftovers held open across WS-08 and WS-09.
 
 | Step | Tickets | Why |
 | --- | --- | --- |
-| WS-14 step 4 | MM-229 | **Start here.** The React conversion's leftovers: a run on the physical phone, screenshot tests. The architecture checker is built (MM-246). |
-| WS-03 step 1 | MM-103, MM-181 | One question per onboarding screen; the glow. Small leftovers of built work. |
-| WS-01 step 3 | MM-7 | CI has run green on every pull request since the switch; close it, minus the iOS build. |
+| WS-03 step 1 | MM-103, MM-181 | **Start here.** One question per onboarding screen; the glow. Small leftovers of built work. WS-14 step 4 (the React conversion) and WS-01 step 3 (CI) closed on 2026-10-13. |
+| WS-01 step 6 | MM-177 | The demo seed wired into the shell; the phone run itself is done (MM-175). |
 | WS-06 step 3 | MM-138, MM-139 | The last of M1: simulator calibration and the owner's confirmation of holding a reduction. |
 | WS-02 step 6 | MM-135 | An owner decision (the diet break), then an engine change. |
 | WS-04 step 1 | MM-51 | The food pack lane, the gap to M2: close the spike, then steps 3 to 6 on a device (MM-55, MM-56, MM-57, MM-153). |
