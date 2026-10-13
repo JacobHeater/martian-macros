@@ -29,10 +29,10 @@ Review proposed Maurice placement, scale and expression without trivializing
 safety or crowding data. Existing design documents prohibit mascots: Maurice
 is a requested review concern, not an approved asset or change to that rule.
 Flag the conflict for the owner before any implementation.
-Maintain the HTML UI/UX assets and the design status each entry gives
-(`requirements/ui-ux-assets/README.md`, MM-210); never record approval the owner has not given.
-Check each drawing of a built screen against the real screen for visual
-fidelity, hierarchy and design-system consistency (MM-211).
+Review design in Storybook (`mm storybook`, MM-237): the app's own
+components and screens, in every palette; never record approval the owner has not given.
+Check each screen's story for visual fidelity, hierarchy and design-system
+consistency.
 ## Existing implementation audit
 Audit implemented screens/components against the approved design system,
 visual hierarchy, interaction states, consistency and product identity, using
