@@ -106,15 +106,3 @@ Scenario: Wording follows level
   deterministic travel-related water rise. This is behavioral validation, not population calibration.
 - **Not done:** next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this ticket in progress
   until those remaining simulations are checked.
-
-## UI/UX Assets
-
-- [Coach](../ui-ux-assets/views/coach.html#coach-default) — Current. Draws
-  CoachScreen as built on 2026-10-11: populated, first day, learning. Compared
-  with a screenshot test of the built screen. Compared with the screenshot
-  test for the top of the page only. It shows what exists and approves
-  nothing.
-- [Component catalog](../ui-ux-assets/components/index.html#mm-status-chip) —
-  Current. Draws MmStatusChip as built on 2026-10-11: shown. Compared with a
-  screenshot test of the built screen. It shows what exists and approves
-  nothing.

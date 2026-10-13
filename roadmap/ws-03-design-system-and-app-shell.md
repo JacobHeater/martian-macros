@@ -48,8 +48,7 @@ navigation structure that will not move under them.
 ## Prerequisites
 None in code. Two product-owner decisions gated two steps:
 - the visual direction (palette and type): **decided 2026-10-08**, recorded in
-  [`design/`](../design/README.md) and previewed in
-  `requirements/ui-ux-assets/palette-preview.html`; MM-102 and MM-103 stay `proposed` until it is
+  [`design/`](../design/README.md) and shown in Storybook's Tokens story; MM-102 and MM-103 stay `proposed` until it is
   seen in the app and the gallery;
 - the dashboard's contents and order before step 3 (MM-98): still open.
 

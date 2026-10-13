@@ -7,6 +7,12 @@ related: [MM-210, MM-104, MM-105, MM-6, MM-174]
 
 # Task: An HTML reference of every view and component, kept with the requirements
 
+> **Superseded and removed (2026-10-12, MM-237).** Storybook holds a story
+> for every screen and component, drawn by the app's own code. The HTML
+> sheets and `coverage.json` are deleted on the owner's call; git history
+> has them. What follows is the record of what was built, not a convention
+> in force.
+
 ## Context
 MM-210 said where HTML UI/UX assets live and how tickets link them, and found
 one such file in the repository. The owner's intent was larger: every screen,
@@ -178,16 +184,3 @@ Scenario: Reading the library
   weight card; metric units in onboarding.
 - **No defect in the app was found while drawing.** Had one been, it would
   have a BUG ticket and the drawing would show the defect.
-
-## UI/UX Assets
-
-- [Library index](../ui-ux-assets/index.html) — Current. Draws the library
-  index as built on 2026-10-11: every sheet. Drawn from the source alone; not
-  compared with the running app. It shows what exists and approves nothing.
-- [Component catalog](../ui-ux-assets/components/index.html#tokens) — Current.
-  Draws the component catalog as built on 2026-10-11. Drawn from the source
-  alone; not compared with the running app. It shows what exists and approves
-  nothing.
-- [Flows](../ui-ux-assets/flows/index.html#navigation-map) — Current. Draws
-  the flows sheet as built on 2026-10-11. Drawn from the source alone; not
-  compared with the running app. It shows what exists and approves nothing.

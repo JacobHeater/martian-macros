@@ -27,10 +27,9 @@ needs a design decision links the story under the optional heading
 ```
 
 The ticket stays the requirement: a linked story approves nothing by
-itself. The earlier HTML register in [ui-ux-assets/](ui-ux-assets/README.md)
-is retired and kept only as the historical record of the Flutter-era
-screens (MM-210, MM-211; superseded by MM-237); old tickets' links into it
-keep resolving, and nothing new is added to it.
+itself. The earlier HTML register (MM-210, MM-211) is
+deleted, with the sections of old tickets that linked into it; git history
+has both. Storybook is the only register.
 
 ## Folder Structure
 
@@ -156,8 +155,7 @@ Scenario: ...
 
 ## UI/UX
 Optional. The stories that carry this ticket's design decisions, one entry
-each (see "UI/UX stories" above). Older tickets link `ui-ux-assets/`
-drawings instead; those are the historical record.
+each (see "UI/UX stories" above).
 
 ## Notes
 Optional: implementation notes, explicitly out-of-scope items, open

@@ -104,15 +104,3 @@ Not built:
   not be.
 - The pace names and what each costs (MM-128): the offer shows the percentage only.
 - Not checked on a device.
-
-## UI/UX Assets
-
-- [Coach](../ui-ux-assets/views/coach.html#coach-relief) — Current. Draws
-  ReliefOfferCard as built on 2026-10-11: maintenance week offer. Drawn from
-  the source alone; not compared with the running app. The slower-pace and
-  short-sleep wordings are not drawn. It shows what exists and approves
-  nothing.
-- [Flows](../ui-ux-assets/flows/index.html#weekly-check-in) — Current. Draws
-  the "the check-in, its explanation and the recovery questions" path as built
-  on 2026-10-11. Drawn from the source alone; not compared with the running
-  app. It shows what exists and approves nothing.

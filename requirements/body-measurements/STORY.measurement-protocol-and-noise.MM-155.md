@@ -138,10 +138,3 @@ Not built:
 - A measurement reminder is in MM-146.
 - For female profiles, waist also swings with the cycle (bloating). The cycle window (MM-19) could widen the noise for entries inside it,
   as it does for weight. Worth doing if cycle data exists; not required here.
-
-## UI/UX Assets
-
-- [Progress](../ui-ux-assets/views/progress.html#progress-waist-entry) —
-  Current. Draws WaistEntryCard as built on 2026-10-11: empty, three readings,
-  one reading, refused value. Drawn from the source alone; not compared with
-  the running app. It shows what exists and approves nothing.

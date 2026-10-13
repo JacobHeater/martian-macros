@@ -50,9 +50,6 @@ Scenario: Selecting a recent food
   Then the existing recent-food editing behavior is preserved
 ```
 
-## UI/UX Assets
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) — Current. Shows discovery, a blank manual form, and manual entry from a search query; the regression widget test verifies the transition and query carry. Linux discovery and manual-form screenshots were inspected and imported from run 38199739648. It does not decide the open behavior of found or recent foods in MM-219.
-
 ## Notes
 - Regression coverage: `apps/mobile/test/add_food_discovery_test.dart`.
 - `mm check` and Linux Update goldens run 38199739648 passed. No emulator

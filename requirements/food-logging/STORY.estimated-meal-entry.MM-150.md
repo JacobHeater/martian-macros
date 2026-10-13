@@ -118,14 +118,3 @@ day of several estimated meals; each is 40% uncertain): no bias and honest uncer
 about 160 kcal high, because the unmarked-partial-day rule (MM-27: a day under 65% of the window's 75th-percentile intake is treated
 as partial) starts dropping honest low days. Days marked complete are always used, so marking days complete is the protection. Whether
 the rule should be softer for estimate-heavy logging is a decision for the owner; it is not changed here.
-
-## UI/UX Assets
-
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-estimate) —
-  Current. Draws EstimateMealStep as built on 2026-10-11: default, before
-  first weigh-in. Drawn from the source alone; not compared with the running
-  app. It shows what exists and approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
-  "adding, editing and removing a food, and closing the day" path as built on
-  2026-10-11. Drawn from the source alone; not compared with the running app.
-  It shows what exists and approves nothing.

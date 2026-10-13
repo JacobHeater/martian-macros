@@ -44,10 +44,6 @@ Hand portions now label the amount-step grams and nutrient totals as estimates,
 and the saved food-log line uses the same estimate wording. The regression
 test covers both the pre-log display and the saved portion summary.
 
-## UI/UX Assets
-- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows
-  hand-portion grams and nutrient totals marked as estimates.
-
 ## Notes
 - Regression: `apps/mobile/test/hand_portion_summary_test.dart`, enabled for
   both the amount-step estimate and the saved log line.

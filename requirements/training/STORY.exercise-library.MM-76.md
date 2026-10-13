@@ -73,15 +73,3 @@ an exercise. Creating an exercise was not seen there.
 
 ## Notes
 - Source for the library: write it, or find an openly licensed list (check the license as carefully as for food data, MM-57).
-
-## UI/UX Assets
-
-- [Train](../ui-ux-assets/views/train.html) — Current. Draws
-  CustomExerciseScreen and ExercisePickerScreen as built on 2026-10-11:
-  filled, recent and all, no match. Frames: `#custom-exercise`,
-  `#exercise-picker`. Partly compared with screenshot tests, the rest drawn
-  from the source alone. It shows what exists and approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#log-a-workout) — Current. Draws the
-  "a workout from start to finish" path as built on 2026-10-11. Drawn from the
-  source alone; not compared with the running app. It shows what exists and
-  approves nothing.

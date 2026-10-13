@@ -74,14 +74,3 @@ Scenario: Recomputed volume
 - Martian volume screen and all eleven rows inspected in the isolated headless
   Android emulator; no physical phone or normal storage used. Reviewed Linux
   goldens cover Light/Dark/Martian. iOS was not run.
-
-## UI/UX Assets
-
-- [Train](../ui-ux-assets/views/train.html#weekly-volume) — Current. Draws
-  WeeklyVolumeScreen as built on 2026-10-11: populated, loading, error,
-  unmapped sets. Compared with a screenshot test of the built screen. It shows
-  what exists and approves nothing.
-- [Component catalog](../ui-ux-assets/components/index.html#muscle-volume-row)
-  — Current. Draws MuscleVolumeRow as built on 2026-10-11: shown. Compared
-  with a screenshot test of the built screen. It shows what exists and
-  approves nothing.

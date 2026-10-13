@@ -58,8 +58,8 @@ delegation and sequential fallback do not supersede the working agreements here.
   story fails the tests. When you add
   or change a component, change or add its story in the same pull request;
   a ticket that needs a design decision links the story under `## UI/UX`.
-  The old HTML register (`requirements/ui-ux-assets/`, MM-210/MM-211) is
-  retired and read-only: the historical record of the Flutter-era screens.
+  The old HTML register (MM-210/MM-211) is deleted; git history has it.
+  Do not add HTML drawings of screens anywhere in the repository.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements

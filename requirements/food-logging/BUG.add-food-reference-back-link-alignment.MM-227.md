@@ -28,11 +28,6 @@ Scenario: Amount-step reference matches the built navigation action
   And Log it remains full width
 ```
 
-## UI/UX Assets
-
-- [Add food](../ui-ux-assets/views/add-food.html#add-food-amount) - Current;
-  corrects regular, hand-portion, and cooked-food amount-step drawings.
-
 ## Notes
 
 Browser regression checks all three frames for exactly one Back to search text
