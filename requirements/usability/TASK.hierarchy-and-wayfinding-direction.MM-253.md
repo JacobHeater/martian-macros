@@ -100,3 +100,6 @@ Scenario: The rules are checkable
 
 Before: every destination's story as of 2026-10-13. After: each story's
 screen rebuilt under MM-254 to MM-259, linked from those tickets.
+
+## The component walk ran (2026-10-13)
+The product-designer, UX-accessibility and React-Capacitor roles walked every file of src/ui and every design-system story; their reports, the chair's decision and the owner's rulings are in docs/agent-runs/mm253-components/. The owner ruled that nothing native shows (MM-262), which becomes this direction's eighth rule: **the design system draws every control and every state of it.** The findings are MM-262 to MM-282; the destinations (MM-254 to MM-259) build on the controls those tickets deliver, pickers and pressed states first.
