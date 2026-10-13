@@ -39,6 +39,65 @@ const libraries: Record<string, readonly string[]> = {
 /** Controls a screen never writes itself: the design system has a component for each (rule 8). */
 const rawControls = /<(button|input|select|textarea|dialog|progress|meter)\b/;
 
+/**
+ * Inside the design system, each kind of native form control lives in the
+ * one component that is it, and nowhere else (MM-261): a dialog, a sheet,
+ * the overlay host or a row delegates to that component rather than writing
+ * an `<input>` of its own, so what the platform draws is styled in one
+ * place. The key is the `type` of an `<input>`, or the element name.
+ */
+const controlHomes: Record<string, readonly string[]> = {
+  text: ['ui/MmTextField.tsx'],
+  search: ['ui/MmTextField.tsx'],
+  number: ['ui/MmTextField.tsx'],
+  date: ['ui/MmPickerField.tsx'],
+  time: ['ui/MmPickerField.tsx'],
+  'datetime-local': ['ui/MmPickerField.tsx'],
+  range: ['ui/MmSlider.tsx'],
+  checkbox: ['ui/MmCheckRow.tsx', 'ui/MmSwitchRow.tsx'],
+  radio: ['ui/MmSegmented.tsx'],
+  select: ['ui/MmDropdown.tsx'],
+  textarea: [],
+};
+
+/** Composites inside the design system that compose components and write no control of their own. */
+const composites = ['ui/MmOverlays.tsx', 'ui/MmDialog.tsx', 'ui/MmSheet.tsx', 'ui/MmListGroup.tsx', 'ui/MmFooterActions.tsx'];
+
+/** Every native form control in `text`, as the key `controlHomes` uses. */
+function controlsIn(text: string): string[] {
+  const found: string[] = [];
+  for (const match of text.matchAll(/<(input|select|textarea)\b([^>]*)>/gs)) {
+    const element = match[1] as string;
+    if (element !== 'input') {
+      found.push(element);
+      continue;
+    }
+    const attributes = match[2] as string;
+    const literal = /\btype=["']([\w-]+)["']/.exec(attributes)?.[1];
+    found.push(literal ?? (/\btype=\{/.test(attributes) ? 'dynamic' : 'text'));
+  }
+  return found;
+}
+
+/** What is wrong with a design-system file's native controls, or nothing. */
+function uiControlProblems(path: string, text: string): string[] {
+  const problems: string[] = [];
+  if (composites.includes(path) && rawControls.test(withoutComments(text))) {
+    problems.push(`${path} is a composite and writes a raw control; it composes components.`);
+  }
+  for (const control of controlsIn(withoutComments(text))) {
+    if (control === 'dynamic') {
+      const homes = Object.values(controlHomes).flat();
+      if (!homes.includes(path)) problems.push(`${path} writes an <input> whose type is computed; only a control's own component may.`);
+      continue;
+    }
+    const homes = controlHomes[control];
+    if (homes === undefined) problems.push(`${path} writes an <input type="${control}"> that no component owns; add it to controlHomes with its component.`);
+    else if (!homes.includes(path)) problems.push(`${path} writes <${control === 'select' || control === 'textarea' ? control : `input type="${control}"`}>; only ${homes.join(' or ') || 'no file yet'} may.`);
+  }
+  return problems;
+}
+
 const files = (folder: string): string[] =>
   readdirSync(folder).flatMap((name) => {
     const path = join(folder, name);
@@ -137,6 +196,29 @@ describe('the one-declaration rule, on samples', () => {
   }
 });
 
+describe('the native-control rule, on samples', () => {
+  it('a date input in a dialog is reported; in its component it is not', () => {
+    const dialog = uiControlProblems('ui/MmDateDialog.tsx', '<input type="date" className="x" />');
+    expect(dialog).toEqual(['ui/MmDateDialog.tsx writes <input type="date">; only ui/MmPickerField.tsx may.']);
+    expect(uiControlProblems('ui/MmPickerField.tsx', '<input type={kind} />')).toEqual([]);
+    expect(uiControlProblems('ui/MmTextField.tsx', '<input type="number" />')).toEqual([]);
+  });
+
+  it('a composite that writes a button is reported', () => {
+    expect(uiControlProblems('ui/MmOverlays.tsx', '<button type="button">x</button>')).toEqual([
+      'ui/MmOverlays.tsx is a composite and writes a raw control; it composes components.',
+    ]);
+    expect(uiControlProblems('ui/MmOverlays.tsx', '<MmOption label="x" />')).toEqual([]);
+  });
+
+  it('a control kind nobody owns is reported', () => {
+    expect(uiControlProblems('ui/MmSomething.tsx', '<input type="file" />')).toEqual([
+      'ui/MmSomething.tsx writes an <input type="file"> that no component owns; add it to controlHomes with its component.',
+    ]);
+    expect(uiControlProblems('ui/MmNotes.tsx', '<textarea />')).toEqual(['ui/MmNotes.tsx writes <textarea>; only no file yet may.']);
+  });
+});
+
 describe('architecture', () => {
   it('every file exports one declaration and is named for it (rule 5)', () => {
     const broken: string[] = [];
@@ -167,6 +249,16 @@ describe('architecture', () => {
           broken.push(`${path} imports ${specifier}; only ${libraries[library]!.join(', ')} may.`);
         }
       }
+    }
+    expect(broken).toEqual([]);
+  });
+
+  it('inside the design system, each native control lives in its one component (MM-261)', () => {
+    const broken: string[] = [];
+    for (const file of everyFile) {
+      const path = pathOf(file);
+      if (!path.startsWith('ui/') || !path.endsWith('.tsx')) continue;
+      broken.push(...uiControlProblems(path, readFileSync(file, 'utf8')));
     }
     expect(broken).toEqual([]);
   });

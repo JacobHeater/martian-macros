@@ -3,7 +3,7 @@ import { MmButton } from './MmButton';
 import { MmClockTimeDialog } from './MmClockTimeDialog';
 import { MmDateDialog } from './MmDateDialog';
 import { MmDialog } from './MmDialog';
-import { MmIcon } from './MmIcon';
+import { MmOption } from './MmOption';
 import { MmSheet } from './MmSheet';
 import { MmTimeOfDayDialog } from './MmTimeOfDayDialog';
 import type { Overlays } from './Overlays';
@@ -96,27 +96,14 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         return ask((finish) => (
           <MmDialog title={title} onDismiss={() => finish(undefined)}>
             <div className="mm-options" role="listbox" aria-label={title}>
-              {options.map((option) => {
-                const chosen = option.value === selected;
-                return (
-                  <button
-                    key={option.label}
-                    type="button"
-                    role="option"
-                    aria-selected={chosen}
-                    className="mm-option"
-                    onClick={() => finish(option)}
-                  >
-                    <span>{option.label}</span>
-                    {chosen ? (
-                      <span className="mm-option-check">
-                        <MmIcon name="check" />
-                        <span className="mm-visually-hidden">Chosen</span>
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
+              {options.map((option) => (
+                <MmOption
+                  key={option.label}
+                  label={option.label}
+                  chosen={option.value === selected}
+                  onSelect={() => finish(option)}
+                />
+              ))}
             </div>
           </MmDialog>
         ));
