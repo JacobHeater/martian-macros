@@ -188,7 +188,14 @@ interface segregation (I) win.
    screen never uses a raw HTML control (`<button>`, `<input>`, `<select>`,
    …); it uses the component (`MmPressable` for content that is pressed as
    a whole). Components take meaning (`kind="primary"`), never a color,
-   radius or padding. The architecture test checks it (MM-246).
+   radius or padding. The architecture test checks it (MM-246). **Nothing
+   native shows** (the owner, 2026-10-13, MM-262): no native date or time
+   picker, select list, engine-drawn checkbox, slider thumb, tap highlight
+   or focus ring; the design system draws every control and every state of
+   it, in every palette, and a native element may exist underneath only
+   for the keyboard and assistive technology, invisible or wholly
+   restyled. Inside the design system each control kind has one home
+   (MM-261) and a composite writes no control of its own.
 9. Prefer composition to inheritance and plain function components, so state
    lives in `state/` cells and controllers, not in component classes.
 
