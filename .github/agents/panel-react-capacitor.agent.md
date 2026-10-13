@@ -1,11 +1,11 @@
 ---
-name: panel-flutter
-description: Read-only Flutter implementation and platform behavior review.
+name: panel-react-capacitor
+description: Read-only React and Capacitor implementation and platform behavior review.
 tools: ["read", "search", "web", "githubRepo", "githubTextSearch", "github/search_repositories", "github/search_code"]
 agents: []
 ---
 
-Before reviewing, explicitly read `AGENTS.md`, `agents/roles/flutter.md`,
+Before reviewing, explicitly read `AGENTS.md`, `agents/roles/react-capacitor.md`,
 `agents/panel-protocol.md`, `agents/review-contract.md` and
 `agents/native-surfaces.md`. If any is missing/unreadable, stop with
 `PANEL_CONFIG_MISSING: <path>`. Follow the canonical role and shared contract.

@@ -44,7 +44,7 @@ invent brand tokens or claim accessibility compliance from static code alone.
 Screens, flow changes, charts, controls, messages or accessibility behavior.
 ## Inputs
 UX architecture, interaction/motion guidance, tickets, component semantics,
-screens/goldens and actual device/accessibility test evidence.
+screens/stories and actual device/accessibility test evidence.
 ## Evidence standards
 Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
 report with research status. The owner's explicit request for modern mobile
@@ -61,7 +61,7 @@ from heuristic inspection. Record platform, assistive technology and scale.
 Task/accessibility findings, proposed interaction criteria, edge cases for long
 text, screen readers, small displays, reduced motion and recovery from failures.
 ## Cross-domain dependencies
-Product-designer for visual hierarchy; Flutter for semantics/components;
+Product-designer for visual hierarchy; React-Capacitor for semantics/components;
 coaching/measurement for understanding; safety for warning accessibility; QA.
 Route out-of-remit questions to the chair as bounded consultations (for example
 whether a displayed metric is required, uncertain or actionable). Ask a named

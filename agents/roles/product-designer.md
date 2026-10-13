@@ -53,7 +53,7 @@ Any visible change, theme/token/component work, mascot placement or visual copy.
 ## Inputs
 design/README.md, visual-language, color-and-theme-system, screen-direction,
 anti-cruft-and-anti-slop, design-map, relevant tickets, tokens and actual rendered
-screens/goldens in Light/Dark/Martian.
+screens/stories in Light/Dark/Martian.
 ## Evidence standards
 Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
 report with research status. Explicit requests for modern experience guidance
@@ -69,7 +69,7 @@ Visual findings, concrete direction and component/token recommendations,
 mascot constraints, acceptance criteria and required rendered verification.
 ## Cross-domain dependencies
 UX-accessibility for usability/contrast/text scaling; coaching/safety for tone;
-Flutter for shared components; product for scope and owner-approved exceptions.
+React-Capacitor for shared components; product for scope and owner-approved exceptions.
 Ask the chair for bounded read-only consultation when nutrition/training/
 measurement interpretation, coaching behavior, safety, privacy or architecture
 is outside the visual remit. State the exact question, why it affects hierarchy
