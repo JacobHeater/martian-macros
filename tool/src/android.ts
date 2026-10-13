@@ -155,18 +155,32 @@ export async function runEmulator(repoRoot: string, args: readonly string[]): Pr
   return code;
 }
 
+/**
+ * The environment the web build runs in: `base`, plus `MM_DEMO_SEED=1` when
+ * the build is to start from the demo scenario on every launch (MM-177).
+ * The variable is never left over from the caller's shell.
+ */
+export function webBuildEnv(base: NodeJS.ProcessEnv, { seed }: { seed: boolean }): NodeJS.ProcessEnv {
+  const { MM_DEMO_SEED: _ignored, ...rest } = base;
+  return seed ? { ...rest, MM_DEMO_SEED: '1' } : rest;
+}
+
 /** Builds the web app and syncs it into the Android shell. */
-async function sync(repoRoot: string): Promise<number> {
-  return run(['npm', 'run', 'android'], { cwd: `${repoRoot}/${webApp}` });
+async function sync(repoRoot: string, { seed }: { seed: boolean }): Promise<number> {
+  return run(['npm', 'run', 'android'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed }) });
 }
 
 /** `mm build android [--release]`: the web app, the sync and the APK. */
-export async function runBuild(repoRoot: string, args: readonly string[]): Promise<number> {
+export async function runBuild(
+  repoRoot: string,
+  args: readonly string[],
+  { seed = false }: { seed?: boolean } = {},
+): Promise<number> {
   if (args[0] !== 'android') {
     stderr.write('Usage: mm build android [--release]\n');
     return 64;
   }
-  const synced = await sync(repoRoot);
+  const synced = await sync(repoRoot, { seed });
   if (synced !== 0) return synced;
   const task = args.includes('--release') ? 'assembleRelease' : 'assembleDebug';
   const androidRoot = `${repoRoot}/${androidDir}`;
@@ -176,8 +190,8 @@ export async function runBuild(repoRoot: string, args: readonly string[]): Promi
 const appId = 'com.martianmacros.martian_macros.demo';
 
 /** Builds, installs and launches the app on `device` (or the one device). */
-async function installAndLaunch(repoRoot: string, device: string): Promise<number> {
-  const built = await runBuild(repoRoot, ['android']);
+async function installAndLaunch(repoRoot: string, device: string, { seed = false }: { seed?: boolean } = {}): Promise<number> {
+  const built = await runBuild(repoRoot, ['android'], { seed });
   if (built !== 0) return built;
   const apk = `${repoRoot}/${androidDir}/app/build/outputs/apk/debug/app-debug.apk`;
   const installed = await run([adbPath(), '-s', device, 'install', '-r', apk]);
@@ -243,14 +257,18 @@ export async function runApp(repoRoot: string, args: readonly string[]): Promise
 }
 
 /**
- * `mm demo -d <device>`: the isolated demo app on an exact device. The app
- * installs only under the demo identity (${appId}), so it can never share
- * the normal app's sandbox.
+ * `mm demo [--seed] -d <device>`: the isolated demo app on an exact device.
+ * The app installs only under the demo identity (${appId}), so it can never
+ * share the normal app's sandbox. With `--seed` the build replaces that
+ * sandbox's data with the deterministic demo scenario on every launch and
+ * says DEMO on every screen (MM-177); without it the data is left alone.
  */
 export async function runDemo(repoRoot: string, args: readonly string[]): Promise<number> {
   const device = args.includes('-d') ? args[args.indexOf('-d') + 1] : args.includes('--device-id') ? args[args.indexOf('--device-id') + 1] : undefined;
-  if (device === undefined || device.startsWith('-')) {
-    stderr.write('Usage: mm demo -d <Android device ID>\n');
+  const seed = args.includes('--seed');
+  const unknown = args.filter((arg) => arg.startsWith('-') && !['-d', '--device-id', '--seed'].includes(arg));
+  if (device === undefined || device.startsWith('-') || unknown.length > 0) {
+    stderr.write('Usage: mm demo [--seed] -d <Android device ID>\n');
     return 64;
   }
   const devices = await deviceIds();
@@ -258,8 +276,10 @@ export async function runDemo(repoRoot: string, args: readonly string[]): Promis
     stderr.write(`Choose an exact connected Android ID: ${devices.join(', ')}. Use "adb devices" to list phones and emulators.\n`);
     return 69;
   }
-  stdout.write('Starting Martian Macros DEMO (.demo): only its isolated sandbox is touched. The normal app is untouched.\n');
-  return installAndLaunch(repoRoot, device);
+  stdout.write(
+    `Starting Martian Macros DEMO (.demo)${seed ? ', seeded with the demo scenario on every launch' : ''}: only its isolated sandbox is touched. The normal app is untouched.\n`,
+  );
+  return installAndLaunch(repoRoot, device, { seed });
 }
 
 /**
