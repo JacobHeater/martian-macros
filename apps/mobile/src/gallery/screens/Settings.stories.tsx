@@ -1,6 +1,7 @@
 import type { Meta } from '@storybook/react-vite';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
+import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
@@ -37,6 +38,21 @@ export const EditHeight = screenStory({
     void overlays.sheet<void>('Height', (close) => (
       <EditHeightSheet initialCm={180} imperial onSave={() => close()} />
     ));
+  },
+});
+
+/** MM-260: the phone's date control inside a dialog, with the day said back in words. */
+export const DateOfBirth = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'January 1, 1996',
+  open: ({ navigator, overlays }) => {
+    void navigator.push(() => <SettingsScreen />);
+    void overlays.date({
+      helpText: 'Date of birth',
+      initial: CalendarDate.of(1996, 1, 1),
+      first: CalendarDate.of(1926, 1, 1),
+      last: CalendarDate.of(2008, 10, 12),
+    });
   },
 });
 
