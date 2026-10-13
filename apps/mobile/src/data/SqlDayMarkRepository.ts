@@ -4,7 +4,7 @@ import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { named } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `DayMarkRepository` kept in the database. */
 export class SqlDayMarkRepository implements DayMarkRepository {

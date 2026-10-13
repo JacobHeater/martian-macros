@@ -10,15 +10,6 @@
   color: var(--text2);
   text-align: center;
 }
-.food-hero-open {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-}
 .food-hero-macros {
   display: flex;
   flex-direction: column;
@@ -82,13 +73,6 @@
 .food-entry-open {
   flex: 1;
   min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
 }
 .food-meal-head {
   display: flex;
@@ -96,19 +80,16 @@
   padding: 0 var(--space-4) 0 0;
 }
 .food-meal-toggle {
-  display: flex;
   flex: 1;
+  min-width: 0;
+}
+.food-meal-toggle-body {
+  display: flex;
   align-items: center;
   gap: var(--space-12);
   min-width: 0;
   min-height: 56px;
   padding: var(--space-12) var(--space-16);
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
 }
 .food-meal-title {
   display: flex;

@@ -204,16 +204,17 @@ Binding rules from the product owner (MM-159); the short form is in
   run against every implementation.
 - **Repositories for all persistence** (MM-161), designed as small role
   interfaces (`WeightReader`, `WeightWriter`, ...), not one store.
-- **One declaration per file** (MM-160). The Dart checker (`mm arch`) was
-  removed with the toolchain; a TypeScript counterpart is on the list, and
-  the layers test guards the imports meanwhile.
+- **One declaration per file** (MM-160, MM-246). The Dart checker (`mm arch`)
+  went with the toolchain; `apps/mobile/test/architecture.test.ts` is its
+  TypeScript counterpart.
 - **One implementation per control** (MM-163): reusable view parts are
-  design-system components; screens never use raw Material controls.
+  design-system components; screens never use raw HTML controls.
 
-State on 2026-10-08: true of the code (MM-160 to MM-162 done, MM-163 in progress).
-The layers test (`apps/mobile/test/layers.test.ts`) enforces the layering and
-the adapter folders; the one-declaration and design-system checks await a
-TypeScript `mm arch` (see the handoff).
+State on 2026-10-13: true of the code. The layers test
+(`apps/mobile/test/layers.test.ts`) keeps the folders of `src/` apart; the
+architecture test checks one declaration per file named for it, that a
+library is imported only in the folders listed for it, and that no screen
+writes a raw control. One file is on its baseline (`data/columns.ts`).
 
 ## Developer experience
 

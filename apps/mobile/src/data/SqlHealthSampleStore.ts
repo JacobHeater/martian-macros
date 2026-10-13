@@ -4,7 +4,7 @@ import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { AppDatabase } from './AppDatabase';
 import { moment, named, number, optionalMoment, orNull, text } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** How many ids go into one statement: well under what SQLite allows. */
 const idsPerStatement = 500;

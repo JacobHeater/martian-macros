@@ -4,7 +4,7 @@ import { WeightEventType } from '../domain/WeightEventType';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, named } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `WeightEventRepository` kept in the database. */
 export class SqlWeightEventRepository implements WeightEventRepository {

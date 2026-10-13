@@ -77,7 +77,7 @@ WS-04 step 3 and 6, WS-05 to WS-13.
    Schema is untouched.
 3. **Integration seams (MM-162).** M0. `Clock`, `FoodSearch`/`FoodBarcodeLookup`,
    `BackupStorage`, `EntitlementReader` and the harness.
-4. **The React HTML5 app in a native shell (MM-228): skeleton, engine and rules carried over, the SQLite seam, the screens (MM-229, MM-230, MM-231, MM-232, MM-233).** M0. Placed 2026-10-13.
+, MM-246).** M0. Placed 2026-10-13.
 
 ## Done enough to unblock others
 MM-160 and MM-161 are done: new files follow the rules and all persistence is
@@ -93,7 +93,7 @@ files during the engine split: do the split first.
 
 ## Requirement sources
 - Built: MM-160, MM-161, MM-162. Remaining: MM-159 (epic), open until the design-system control rule in WS-03 step 1 is done.
-- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-229 (A walking skeleton of the React app); MM-230 (Carry the engine and the rules over under test, done); MM-231 (One SQLite seam for the TypeScript app, done); MM-232 (Rebuild the screens in React, done); MM-233 (Derived state could be worked out from one new value and one old, done); MM-228 (The app becomes a React HTML5 app in a native shell).
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-229 (A walking skeleton of the React app); MM-230 (Carry the engine and the rules over under test, done); MM-231 (One SQLite seam for the TypeScript app, done); MM-232 (Rebuild the screens in React, done); MM-233 (Derived state could be worked out from one new value and one old, done); MM-228 (The app becomes a React HTML5 app in a native shell); MM-246 (the engineering rules are checked in TypeScript, done).
 
 ## Notes for whoever builds it
 - Liskov is proved by tests, not asserted: write the contract suite before the

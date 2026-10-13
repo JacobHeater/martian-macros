@@ -3,14 +3,7 @@ import { Fmt } from '../format/Fmt';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmTextField } from '../ui/MmTextField';
 import { SectionLabel } from '../ui/SectionLabel';
-
-/** What has been typed into the measurement fields, as typed. */
-export interface MeasurementsTyped {
-  readonly feet: string;
-  readonly inches: string;
-  readonly cm: string;
-  readonly weight: string;
-}
+import type { MeasurementsTyped } from './MeasurementsTyped';
 
 interface MeasurementsStepProps {
   units: UnitSystem;

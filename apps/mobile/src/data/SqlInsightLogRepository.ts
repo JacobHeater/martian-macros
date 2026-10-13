@@ -5,7 +5,7 @@ import { InsightRule } from '../engine/InsightRule';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, integer, named, optionalDay } from './columns';
-import { insert } from './statements';
+import { insert } from './insert';
 
 /** `InsightLogRepository` kept in the database. */
 export class SqlInsightLogRepository implements InsightLogRepository {

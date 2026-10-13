@@ -1,11 +1,6 @@
 import type { CalendarDate } from '../../CalendarDate';
 import type { EasyToMissPreference } from './EasyToMissPreference';
-
-/** How many days the line is shown every time a day is marked complete. */
-export const easyToMissDailyDays = 14;
-
-/** How many days apart it is shown after that. */
-export const easyToMissWeeklyGap = 7;
+import { easyToMissDailyDays, easyToMissWeeklyGap } from './easyToMissSchedule';
 
 /**
  * Whether the easy-to-miss line should be shown under a day that is marked

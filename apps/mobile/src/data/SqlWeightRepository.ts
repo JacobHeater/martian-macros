@@ -4,7 +4,7 @@ import type { WeightObservation } from '../domain/WeightObservation';
 import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, number, optionalText } from './columns';
-import { upsert } from './statements';
+import { upsert } from './upsert';
 
 /** `WeightRepository` kept in the database. */
 export class SqlWeightRepository implements WeightRepository {

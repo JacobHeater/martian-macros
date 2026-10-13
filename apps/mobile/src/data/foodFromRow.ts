@@ -3,7 +3,7 @@ import { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
 import type { SqlRow } from '../sql/SqlRow';
 import { day, integer, named, number, optionalNumber, text } from './columns';
-import { portionFromRow } from './portionColumns';
+import { portionFromRow } from './portionFromRow';
 
 /** The food entry a row of the food log holds. */
 export function foodFromRow(r: SqlRow): FoodEntry {

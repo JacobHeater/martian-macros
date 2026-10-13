@@ -120,9 +120,8 @@ Scenario: Screenshots anywhere
 **Not built yet:**
 - Screenshot tests.
 - CI does not build the Android shell.
-- Rules that enforce the engineering principles in TypeScript (one
-  declaration per file is followed by hand so far; no vendor import outside
-  its adapter and no raw control in a screen have nothing to check yet).
+- ~~Rules that enforce the engineering principles in TypeScript~~: built
+  as MM-246 (`test/architecture.test.ts`, 2026-10-13).
 
 **Not verified:** a physical phone. The shell has run on the emulator only.
 Typing, the keyboard and sheets have nothing to be judged on yet.
