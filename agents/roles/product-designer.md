@@ -29,10 +29,10 @@ Review proposed Maurice placement, scale and expression without trivializing
 safety or crowding data. Existing design documents prohibit mascots: Maurice
 is a requested review concern, not an approved asset or change to that rule.
 Flag the conflict for the owner before any implementation.
-Maintain the HTML UI/UX assets and the design status each entry gives
-(`requirements/ui-ux-assets/README.md`, MM-210); never record approval the owner has not given.
-Check each drawing of a built screen against the real screen for visual
-fidelity, hierarchy and design-system consistency (MM-211).
+Review design in Storybook (`mm storybook`, MM-237): the app's own
+components and screens, in every palette; never record approval the owner has not given.
+Check each screen's story for visual fidelity, hierarchy and design-system
+consistency.
 ## Existing implementation audit
 Audit implemented screens/components against the approved design system,
 visual hierarchy, interaction states, consistency and product identity, using
@@ -53,7 +53,7 @@ Any visible change, theme/token/component work, mascot placement or visual copy.
 ## Inputs
 design/README.md, visual-language, color-and-theme-system, screen-direction,
 anti-cruft-and-anti-slop, design-map, relevant tickets, tokens and actual rendered
-screens/goldens in Light/Dark/Martian.
+screens/stories in Light/Dark/Martian.
 ## Evidence standards
 Read `agents/panel-protocol.md` and `agents/review-contract.md`; return the shared
 report with research status. Explicit requests for modern experience guidance
@@ -69,7 +69,7 @@ Visual findings, concrete direction and component/token recommendations,
 mascot constraints, acceptance criteria and required rendered verification.
 ## Cross-domain dependencies
 UX-accessibility for usability/contrast/text scaling; coaching/safety for tone;
-Flutter for shared components; product for scope and owner-approved exceptions.
+React-Capacitor for shared components; product for scope and owner-approved exceptions.
 Ask the chair for bounded read-only consultation when nutrition/training/
 measurement interpretation, coaching behavior, safety, privacy or architecture
 is outside the visual remit. State the exact question, why it affects hierarchy

@@ -2,7 +2,7 @@
 name: panel-chair
 description: Coordinate bounded specialist reviews, research and portable task artifacts.
 tools: ["read", "search", "web", "githubRepo", "githubTextSearch", "github/search_repositories", "github/search_code", "edit", "agent"]
-agents: ["panel-training", "panel-nutrition", "panel-micronutrients", "panel-coaching", "panel-measurement", "panel-safety", "panel-product", "panel-product-designer", "panel-ux-accessibility", "panel-architecture", "panel-flutter", "panel-integrations", "panel-privacy-security", "panel-qa"]
+agents: ["panel-training", "panel-nutrition", "panel-micronutrients", "panel-coaching", "panel-measurement", "panel-safety", "panel-product", "panel-product-designer", "panel-ux-accessibility", "panel-architecture", "panel-react-capacitor", "panel-integrations", "panel-privacy-security", "panel-qa"]
 ---
 
 Apply the shared existing-implementation audit protocol and record coverage.

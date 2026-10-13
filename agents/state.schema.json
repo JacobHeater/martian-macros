@@ -31,7 +31,7 @@
         "required": ["task", "role", "reviewer", "status", "inspected_commit", "input_hashes", "report", "coverage", "research"],
         "properties": {
           "task": {"type": "string", "minLength": 1},
-          "role": {"type": "string", "enum": ["chair", "training", "nutrition", "micronutrients", "coaching", "measurement", "safety", "product", "product-designer", "ux-accessibility", "architecture", "flutter", "integrations", "privacy-security", "qa"]},
+          "role": {"type": "string", "enum": ["chair", "training", "nutrition", "micronutrients", "coaching", "measurement", "safety", "product", "product-designer", "ux-accessibility", "architecture", "react-capacitor", "integrations", "privacy-security", "qa"]},
           "reviewer": {"type": "string", "minLength": 1},
           "status": {"type": "string", "enum": ["pending", "complete", "stale", "omitted"]},
           "omission_reason": {"type": "string", "minLength": 1},

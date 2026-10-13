@@ -65,10 +65,3 @@ Scenario: A reusable part
 ## Progress (closed)
 - The gallery (MM-105) now exists: `apps/mobile/lib/src/gallery/` shows every component and color in light and dark and at larger text sizes, behind Settings in development builds only, with widget tests (`gallery_test.dart`) that open every section in both themes. The restyle (MM-103) replaced the stock Material look on these components.
 - **Still true, not enforced by a tool**: nothing mechanical stops a component from accepting a styling argument; that holds by convention and review. The gallery shows the main states of each component, not every state of every one.
-
-## UI/UX Assets
-
-- [Component catalog](../ui-ux-assets/components/index.html#buttons) —
-  Current. Draws the component catalog as built on 2026-10-11: every control.
-  Drawn from the source alone; not compared with the running app. It shows
-  what exists and approves nothing.

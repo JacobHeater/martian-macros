@@ -54,15 +54,3 @@ Scenario: Erased
   check a release build's start time before launch.
 - **Superseded by MM-99.** The product owner has since decided the app starts on a dashboard, with Food, Progress and Coach on their own
   icons; "Today" becomes "Food". This ticket remains as the record of what was built first.
-
-## UI/UX Assets
-
-- [Flows](../ui-ux-assets/flows/index.html#navigation-map) — Current. Draws
-  HomeShell and the "how the five destinations and Settings connect" path as
-  built on 2026-10-11: five destinations. Partly compared with screenshot
-  tests, the rest drawn from the source alone. Drawn as the bottom bar on
-  every destination sheet. It shows what exists and approves nothing.
-- [Food](../ui-ux-assets/views/food.html#food-past-day) — Current. Draws
-  FoodDayHeader as built on 2026-10-11: today, a past day. Compared with a
-  screenshot test of the built screen. It shows what exists and approves
-  nothing.

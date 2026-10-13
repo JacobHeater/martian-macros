@@ -52,11 +52,3 @@ Scenario: No future days
   checks the logged-entry case.
 - **Not verified**: the over-target wording, viewing a past day against earlier targets, and the day picker (MM-93).
 - With the dashboard (MM-98, MM-99) this screen is renamed from "Today" to "Food" and the calibration banner moves to the dashboard.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
-  CalorieHero and FoodScreen as built on 2026-10-11: left, over, logged only,
-  paused, populated, collapsed, empty, past day, and more. Compared with a
-  screenshot test of the built screen. It shows what exists and approves
-  nothing.

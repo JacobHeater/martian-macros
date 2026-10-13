@@ -22,11 +22,3 @@ connections (MM-68), and the purchase (MM-87).
 ## Acceptance Criteria (narrative)
 The Epic is done when everything a user told the app at onboarding can be corrected afterwards without erasing their data, and a correction
 that changes the coach's inputs takes effect the way a user would expect.
-
-## UI/UX Assets
-
-- [Settings](../ui-ux-assets/views/settings.html#settings-default) — Current.
-  Draws SettingsScreen as built on 2026-10-11: populated, own body fat, erase
-  confirm. Compared with a screenshot test of the built screen. Compared with
-  the screenshot test for the top of the page only. It shows what exists and
-  approves nothing.

@@ -10,18 +10,25 @@
     "build": "vite build",
     "offline": "node scripts/check-offline.mjs",
     "android": "vite build && cap sync android",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
     "check": "npm run typecheck && npm run test && npm run build && npm run offline"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "8.5.3",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
     "@sqlite.org/sqlite-wasm": "3.53.4-build2",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3",
+    "@storybook/react-vite": "^10.6.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.7",
@@ -30,6 +37,7 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
     "jsdom": "27.0.1",
+    "storybook": "^10.6.2",
     "typescript": "7.0.2",
     "vite": "8.3.4",
     "vitest": "5.0.3"

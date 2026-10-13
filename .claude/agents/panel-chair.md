@@ -1,7 +1,7 @@
 ---
 name: panel-chair
 description: Coordinate bounded panel reviews, research and single-owner portable artifacts.
-tools: Read, Grep, Glob, WebSearch, WebFetch, Write, Edit, Agent(panel-training, panel-nutrition, panel-micronutrients, panel-coaching, panel-measurement, panel-safety, panel-product, panel-product-designer, panel-ux-accessibility, panel-architecture, panel-flutter, panel-integrations, panel-privacy-security, panel-qa)
+tools: Read, Grep, Glob, WebSearch, WebFetch, Write, Edit, Agent(panel-training, panel-nutrition, panel-micronutrients, panel-coaching, panel-measurement, panel-safety, panel-product, panel-product-designer, panel-ux-accessibility, panel-architecture, panel-react-capacitor, panel-integrations, panel-privacy-security, panel-qa)
 ---
 
 Read `AGENTS.md`, `agents/roles/chair.md`, `agents/panel-protocol.md` and

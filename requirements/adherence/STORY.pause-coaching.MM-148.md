@@ -128,18 +128,3 @@ Not built:
   component yet.
 - Checked on the Android emulator: the form, a running pause, and the paused dashboard. The resume screen, the Food screen and the
   Coach notice were not looked at there, and iOS is untried.
-
-## UI/UX Assets
-
-- [Dashboard](../ui-ux-assets/views/dashboard.html#pause-banner) — Current.
-  Draws PauseBanner as built on 2026-10-11: paused. Drawn from the source
-  alone; not compared with the running app. It shows what exists and approves
-  nothing.
-- [Settings](../ui-ux-assets/views/settings.html#pause-new) — Current. Draws
-  PauseScreen as built on 2026-10-11: new, heavy use, current, scheduled.
-  Drawn from the source alone; not compared with the running app. It shows
-  what exists and approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#pause-and-return) — Current. Draws
-  the "pausing and coming back" path as built on 2026-10-11. Drawn from the
-  source alone; not compared with the running app. It shows what exists and
-  approves nothing.

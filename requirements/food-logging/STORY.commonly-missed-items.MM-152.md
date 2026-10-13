@@ -104,10 +104,3 @@ choosing one logs a second entry, "Cooking oil" (4.5 g or 13.5 g of fat, about 4
 dismissed" (the control is optional and defaults to No each time, so there is nothing to dismiss), and "cooked" is judged from the
 pack's preparation state because the pack has no category for pan-fried or roasted foods, so rice, which is not usually cooked in
 oil, is offered it too.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-complete) — Current. Draws
-  EasyToMissLine as built on 2026-10-11: shown. Drawn from the source alone;
-  not compared with the running app. It shows what exists and approves
-  nothing.

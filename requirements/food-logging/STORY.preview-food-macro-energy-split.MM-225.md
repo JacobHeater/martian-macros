@@ -73,9 +73,6 @@ Scenario: Accessible preview
   And the chart remains usable on a narrow phone at enlarged text
 ```
 
-## UI/UX Assets
-- [Add food](../ui-ux-assets/views/add-food.html#add-food-macro-preview) - Current. Food-entry previews reuse the shared macro-energy chart; drawings are not device verification.
-
 ## Notes
 - Tests: `apps/mobile/test/add_food_macro_split_test.dart` and
   `apps/mobile/test/macro_split_chart_test.dart`.

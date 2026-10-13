@@ -43,14 +43,3 @@ Scenario: The estimate hears about it
   reaching the intake stream and the stream re-emitting when a mark changes); the widget test taps Complete.
 - A day with nothing logged cannot be marked. That is right for "partial" and "missing", but a deliberate full-day fast cannot be recorded
   as a complete day of zero. Rare; note it if it comes up.
-
-## UI/UX Assets
-
-- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
-  FoodScreen as built on 2026-10-11: populated, collapsed, empty, past day,
-  complete, paused, error. Compared with a screenshot test of the built
-  screen. It shows what exists and approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
-  "adding, editing and removing a food, and closing the day" path as built on
-  2026-10-11. Drawn from the source alone; not compared with the running app.
-  It shows what exists and approves nothing.

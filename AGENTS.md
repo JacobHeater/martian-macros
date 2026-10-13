@@ -50,29 +50,16 @@ delegation and sequential fallback do not supersede the working agreements here.
   any standing rule the owner gave you that is not in this file. Update it in
   the same pull request as the work, and again before you finish, since a
   session can end without warning. Nothing private goes in it.
-- Keep HTML UI/UX assets with the requirements (MM-210). A screen prototype,
-  interaction demonstration, design exploration or visual specification
-  written as HTML lives in `requirements/ui-ux-assets/` and nowhere else, and
-  every ticket it supports links it under the exact heading
-  `## UI/UX Assets`, with its status and what it shows. Add the asset and its
-  links in the same pull request; when you change an asset materially, bring
-  its entries up to date. An asset you cannot confidently give to a ticket
-  goes on that folder's unresolved list, never to a guessed ticket. The
-  ticket stays the requirement: a linked asset approves nothing and proves
-  nothing about the app. The convention is in
-  [requirements/ui-ux-assets/README.md](requirements/ui-ux-assets/README.md);
-  `mm req` checks the bookkeeping.
-- Every view and reusable component has an HTML drawing (MM-211). The
-  library at `requirements/ui-ux-assets/index.html` draws the app as built,
-  and `coverage.json` beside it lists every component file with the frame
-  that draws it. When you add a view, a component, a sheet or a dialog, draw
-  it with its states, add its manifest entry and link the sheet from its
-  tickets, in the same pull request; when you change how one looks or
-  behaves, change its drawing with it; when you remove one, remove its
-  frames and its entry. `mm req` fails on a component file the manifest does
-  not list. A `Current` sheet shows what is built and nothing else: a
-  redesign goes on its own sheet, marked as a proposal, and a broken screen
-  is drawn broken and given a bug ticket.
+- Design decisions are reviewed in Storybook (MM-237). The stories render
+  the real tokens, icons and components the app ships, in every palette
+  (`mm storybook`, or `mm storybook build` for a static page). Every
+  screen, sheet and step has a story too, in `src/gallery/screens/`: the
+  whole app over in-memory stores, opened at that screen. A new one with no
+  story fails the tests. When you add
+  or change a component, change or add its story in the same pull request;
+  a ticket that needs a design decision links the story under `## UI/UX`.
+  The old HTML register (MM-210/MM-211) is deleted; git history has it.
+  Do not add HTML drawings of screens anywhere in the repository.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
@@ -106,11 +93,11 @@ delegation and sequential fallback do not supersede the working agreements here.
   suite while another failed.
 - Screen and design verification happens in a browser (owner's standing
   rule, 2026-10-12). A change to how a screen looks is not done until you
-  have looked at it in a browser — the dev server or the built page — and
-  its HTML drawing in `requirements/ui-ux-assets/` is updated with it
-  (MM-211). The assets are where the owner opines on design, on the
-  tickets, without running the app; that is a reason the app moved to web
-  technologies. How the app looks matters as much as what it does.
+  have looked at it in a browser — the dev server, the built page or its
+  story — and its story is updated with it (MM-237). Storybook is where
+  the owner opines on design without running the app; that is a reason the
+  app moved to web technologies. How the app looks matters as much as what
+  it does.
 - Device and emulator screenshots are only for verifying native behavior:
   plugins, permissions, persistence, notifications, the back button and the
   like. They are never the design check.

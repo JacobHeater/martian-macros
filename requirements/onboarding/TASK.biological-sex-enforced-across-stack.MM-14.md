@@ -51,11 +51,3 @@ Scenario: Sex-specific formulas differ
 - Domain test "rejects anything outside the binary instead of defaulting"; data test "the schema itself rejects any sex outside the binary"
   (four bad values and null).
 - Health platform pre-fill is not built (MM-69). Correcting a mis-tapped sex after onboarding is not built (MM-83).
-
-## UI/UX Assets
-
-- [First launch and
-  gates](../ui-ux-assets/views/onboarding.html#onboarding-sex) — Current.
-  Draws SexStep as built on 2026-10-11: none chosen. Compared with a
-  screenshot test of the built screen. It shows what exists and approves
-  nothing.

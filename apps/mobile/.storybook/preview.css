@@ -1,0 +1,16 @@
+/* Storybook's root stands where the app's #root does. */
+#storybook-root {
+  height: 100%;
+}
+.story-canvas {
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--canvas);
+  color: var(--text);
+}
+.story-screen {
+  position: relative;
+  height: 100vh;
+  background: var(--canvas);
+  color: var(--text);
+}

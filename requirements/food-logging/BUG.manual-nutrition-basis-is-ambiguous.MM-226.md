@@ -45,11 +45,6 @@ Scenario: Other measurement methods use portion totals
   And the entered nutrition is not multiplied by that measured amount
 ```
 
-## UI/UX Assets
-
-- [Add food](../ui-ux-assets/views/add-food.html) - Current drawing; manual
-  entry, populated portion, and per-serving edit states must match the fix.
-
 ## Notes
 
 Regressions: `manual servings have no basis switch and scale nutrition (MM-226)`

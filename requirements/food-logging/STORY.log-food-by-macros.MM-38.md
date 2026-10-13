@@ -69,20 +69,3 @@ stored. This ticket's "how it was measured" behavior stands until MM-167 is buil
 
 Decided with the product owner (MM-167): Estimate's uncertainty becomes 40%, to match MM-150. The "estimate (20%)" above is what shipped
 and is to be changed with MM-167.
-
-## UI/UX Assets
-
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-default) —
-  Current. Draws AddFoodSheet and showAddFoodSheet as built on 2026-10-11:
-  empty, filled, label serving, alcohol, invalid, estimate source, search,
-  edit, and more. Drawn from the source alone; not compared with the running
-  app. It shows what exists and approves nothing.
-- [Food](../ui-ux-assets/views/food.html#food-default) — Current. Draws
-  FoodEntryTile, FoodScreen and MealSection as built on 2026-10-11: an entry,
-  populated, collapsed, empty, past day, complete, paused, error, and more.
-  Compared with a screenshot test of the built screen. The per-meal protein
-  marker is not drawn. It shows what exists and approves nothing.
-- [Flows](../ui-ux-assets/flows/index.html#log-a-food) — Current. Draws the
-  "adding, editing and removing a food, and closing the day" path as built on
-  2026-10-11. Drawn from the source alone; not compared with the running app.
-  It shows what exists and approves nothing.
