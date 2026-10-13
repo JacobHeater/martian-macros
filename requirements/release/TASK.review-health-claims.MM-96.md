@@ -39,3 +39,5 @@ Scenario: No precise promises
 
 ## Notes
 - Best done by, or with, the professional doing MM-29.
+
+**Note (2026-10-12, MM-242).** From the MM-242 panel run (`docs/agent-runs/mm242-eula/`): Settings, About now says "Not medical advice" in a line of its own, which is this ticket's Settings clause; the terms of use alone are not "where a user would look". The safety reviewer flagged wording the terms would sit against, to be judged here: "will not prescribe a deficit" (`format/cautionMessage.ts`, `format/modeReasonExplanation.ts`); "safe" as an assurance (`app/HealthRecheckScreen.tsx`, `onboarding/SexStep.tsx`, `coach/MetabolismSummary.tsx`) and "healthy range" (`format/cautionMessage.ts`); "keep your treatment stable where you can" for thyroid conditions; and the welcome screen's "not a formula" beside a formula-based starting estimate. The claims list should include the terms' own statements. Google Play's health policy also requires the "not a medical device" sentence in the store description.

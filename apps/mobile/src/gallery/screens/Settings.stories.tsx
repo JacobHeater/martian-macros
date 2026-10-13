@@ -6,6 +6,7 @@ import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
 import { SettingsScreen } from '../../settings/SettingsScreen';
+import { TermsScreen } from '../../terms/TermsScreen';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
@@ -49,6 +50,13 @@ export const FoodDatabase = screenStory({
   covers: ['FoodDatabaseScreen'],
   shows: 'Food database',
   open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
+});
+
+/** MM-242: the terms, to read again, with the day they were agreed to. */
+export const TermsOfUse = screenStory({
+  covers: ['TermsScreen'],
+  shows: 'Before you start',
+  open: ({ navigator }) => void navigator.push(() => <TermsScreen />),
 });
 
 export const HowThisWorks = screenStory({

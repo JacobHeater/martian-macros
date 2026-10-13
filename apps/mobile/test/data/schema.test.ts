@@ -20,14 +20,22 @@ async function opened() {
   return { sql, repos: await SqlRepositories.open(sql) };
 }
 
+/** The columns added since the Dart database's last version, after the ones it had, by table and in order. */
+const addedSince: Readonly<Record<string, readonly string[]>> = {
+  // Version 2 (MM-242): the agreement to the terms of use.
+  user_preferences: ['terms_accepted_version', 'terms_accepted_epoch_day'],
+};
+
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart
 // app's database declared it at its last version, written by that database
-// on 2026-10-12.
-it('every table has the columns the Dart database had, in the same order, of the same kind', async () => {
+// on 2026-10-12. Anything since is named in `addedSince`, and nothing else.
+it('every table has the columns the Dart database had, in the same order, of the same kind, then what was added', async () => {
   const { sql } = await opened();
   expect([...tables].sort()).toEqual(Object.keys(dartTables).sort());
   for (const [table, columns] of Object.entries(dartTables)) {
-    expect(await sql.select(`PRAGMA table_info("${table}")`), table).toEqual(columns);
+    const found = await sql.select(`PRAGMA table_info("${table}")`);
+    expect(found.slice(0, columns.length), table).toEqual(columns);
+    expect(found.slice(columns.length).map((column) => column['name']), table).toEqual(addedSince[table] ?? []);
   }
 });
 

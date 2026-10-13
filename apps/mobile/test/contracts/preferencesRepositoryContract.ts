@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { DetailLevel } from '../../src/domain/food/detail/DetailLevel';
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
+import { TermsAcceptance } from '../../src/domain/TermsAcceptance';
 import { ThemePreference } from '../../src/domain/ThemePreference';
 import { expectChangeEmits } from '../support/expectChangeEmits';
 import { first } from '../support/first';
@@ -101,6 +102,26 @@ export function preferencesRepositoryContract(
       expect(p.enabled).toBe(true);
       expect(p.lastShown, 'theme and setting are separate').toBe(day);
       expect(await first(repo.watchThemePreference())).toBe('dark');
+    });
+
+    // MM-242.
+    it('nobody has agreed to the terms until they do', async () => {
+      expect(await first(repo.watchTermsAcceptance())).toBeUndefined();
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchTermsAcceptance()), 'saving something else is not agreeing').toBeUndefined();
+    });
+
+    it('keeps the version agreed to and the day, and a later agreement replaces it', async () => {
+      const day = CalendarDate.of(2026, 10, 12);
+      await repo.saveTermsAcceptance(new TermsAcceptance({ version: 1, acceptedOn: day }));
+      expect(await first(repo.watchTermsAcceptance())).toEqual(new TermsAcceptance({ version: 1, acceptedOn: day }));
+      await repo.saveThemePreference('light');
+      expect((await first(repo.watchTermsAcceptance()))?.version, 'other preferences leave it alone').toBe(1);
+      await repo.saveTermsAcceptance(new TermsAcceptance({ version: 2, acceptedOn: day.addDays(30) }));
+      expect(await first(repo.watchTermsAcceptance())).toEqual(
+        new TermsAcceptance({ version: 2, acceptedOn: day.addDays(30) }),
+      );
+      expect(await first(repo.watchThemePreference())).toBe('light');
     });
 
     it('emits the current choice first, then each change', async () => {
