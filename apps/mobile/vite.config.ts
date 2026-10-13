@@ -14,9 +14,13 @@ const manifestUrl =
   ] ??
   '';
 
+// A build made by `mm demo --seed` replaces the demo app's data with the
+// synthetic scenario on every launch (MM-177). Never set for a normal build.
+const demoSeed = process.env['MM_DEMO_SEED'] === '1';
+
 export default defineConfig({
   base: './',
-  define: { __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl) },
+  define: { __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl), __MM_DEMO_SEED__: demoSeed },
   plugins: [react()],
   build: { target: 'es2022', sourcemap: true },
   // The evidence register is one file, docs/evidence.md at the top of the
