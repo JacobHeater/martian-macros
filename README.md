@@ -35,7 +35,7 @@ Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
 | `mm web` | The web check alone |
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
 | `mm run [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator |
-| `mm demo -d <Android device ID>` | The isolated DEMO app on an exact device |
+| `mm demo [--seed] -d <Android device ID>` | The isolated DEMO app on an exact device; `--seed` starts it from the demo scenario on every launch |
 | `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm build android [--release]` | Builds the web app, syncs the shell and assembles the APK |
@@ -65,12 +65,15 @@ Android phone (or an already running emulator), list device IDs with
 
 ```powershell
 .\mm.cmd demo -d <exact-Android-device-ID>
+.\mm.cmd demo --seed -d <exact-Android-device-ID>
 ```
 
 The command requires an explicit Android ID and does not start emulators or
-choose a phone implicitly. The in-app DEMO strip and launcher name identify
-it. The demo seed of the Flutter app (a 70-day synthetic scenario) is not
-wired into the shell yet; it belongs to MM-228.
+choose a phone implicitly. With `--seed` the build starts from the
+deterministic demo scenario on every launch (seventy days of history,
+anchored to the phone's current day) and shows a DEMO strip on every screen
+(MM-177); without it the demo app's data is left as it is. A normal `mm run`
+or `mm build` never seeds.
 
 ## Layout
 
