@@ -300,7 +300,8 @@
             "MM-232",
             "MM-233",
             "MM-246",
-            "MM-261"
+            "MM-261",
+            "MM-278"
           ]
         },
         {
@@ -411,7 +412,24 @@
             "MM-256",
             "MM-257",
             "MM-258",
-            "MM-259"
+            "MM-259",
+            "MM-263",
+            "MM-264",
+            "MM-265",
+            "MM-266",
+            "MM-267",
+            "MM-268",
+            "MM-271",
+            "MM-272",
+            "MM-273",
+            "MM-274",
+            "MM-275",
+            "MM-276",
+            "MM-277",
+            "MM-279",
+            "MM-280",
+            "MM-281",
+            "MM-282"
           ]
         },
         {
@@ -741,7 +759,8 @@
         ],
         "remaining": [
           "MM-159",
-          "MM-228"
+          "MM-228",
+          "MM-278"
         ]
       },
       "sequence": [
@@ -780,7 +799,8 @@
             "MM-232",
             "MM-233",
             "MM-246",
-            "MM-261"
+            "MM-261",
+            "MM-278"
           ]
         }
       ],
@@ -1173,7 +1193,25 @@
           "MM-256",
           "MM-257",
           "MM-258",
-          "MM-259"
+          "MM-259",
+          "MM-262",
+          "MM-263",
+          "MM-264",
+          "MM-265",
+          "MM-266",
+          "MM-267",
+          "MM-268",
+          "MM-271",
+          "MM-272",
+          "MM-273",
+          "MM-274",
+          "MM-275",
+          "MM-276",
+          "MM-277",
+          "MM-279",
+          "MM-280",
+          "MM-281",
+          "MM-282"
         ]
       },
       "sequence": [
@@ -1273,6 +1311,30 @@
             "MM-257",
             "MM-258",
             "MM-259"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 10,
+          "title": "Own the full visual experience (MM-262): every control drawn by the design system, every overlay behaving, every state in the register; the component walk's findings",
+          "tickets": [
+            "MM-263",
+            "MM-264",
+            "MM-265",
+            "MM-266",
+            "MM-267",
+            "MM-268",
+            "MM-271",
+            "MM-272",
+            "MM-273",
+            "MM-274",
+            "MM-275",
+            "MM-276",
+            "MM-277",
+            "MM-279",
+            "MM-280",
+            "MM-281",
+            "MM-282"
           ],
           "milestone": "M2"
         }

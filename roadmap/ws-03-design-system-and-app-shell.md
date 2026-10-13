@@ -114,6 +114,7 @@ trend line.
 8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-181, MM-184, MM-185, MM-186, MM-236, MM-239, MM-240; step 3: MM-176, MM-179, MM-183, MM-206, MM-208; step 4: MM-187.
 9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories.
+10. **Own the full visual experience (MM-262; MM-263 to MM-282 less MM-278).** M2. The owner's rule of 2026-10-13: nothing native shows. Custom date, time and select pickers; checkbox and slider drawn by us; a pressed state on every control; menus never clipped; focus trapped in overlays; a story for every component and state; tokens honoured; the written system. From the component walk in docs/agent-runs/mm253-components.
 
 ## Done enough to unblock others
 MM-104, MM-108 and MM-99 are done: existing screens use library components
@@ -138,6 +139,7 @@ conflicts with this one.
 - Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
 - Placed 2026-10-13 (the hierarchy pass): MM-253 (the direction and the panel pass), MM-254 Dashboard, MM-255 Food, MM-256 Coach, MM-257 Progress, MM-258 Train, MM-259 Settings.
 - Placed 2026-10-13 in step 1: MM-260 (the date dialog's chevron and flat surface; the phone's date control follows the palette and the dialog floats).
+- Placed 2026-10-13 (the component walk): MM-262 (epic), MM-263 date picker, MM-264 time picker, MM-265 select, MM-266 checkbox and slider, MM-267 pressed states, MM-268 menus, MM-271 overlays, MM-272 snack, MM-273 stories, MM-274 tokens, MM-275 focus ring, MM-276 Ember tint and glyph, MM-277 sheet and cards, MM-279 field errors, MM-280 destructive kind, MM-281 48 dp, MM-282 the document.
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.
