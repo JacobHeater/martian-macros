@@ -1,6 +1,6 @@
 ---
 id: MM-138
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-61, MM-136, MM-137, MM-23, MM-24, MM-28, MM-31, MM-33, MM-60, MM-98, MM-108, MM-115, MM-123, MM-139, MM-146]
 ---
@@ -154,5 +154,8 @@ Scenario: Never blame
 - **No-change and held history.** The Coach card and explanation say when no calculated contribution was large enough to move the target. Target history labels records where the user kept the previous targets.
 - **Keeping last week's targets.** On the latest, ordinary reduction (causes limited to expenditure, pace and weight, and the step limit; never an increase, a safety change, or something the user changed), "Keep last week's targets for now" replaces that day's record with last week's numbers, flagged `heldByUser`, with an explanation that still adds up (to no change). It is not offered the week after a hold, nor on older records in the history. The next check-in starts from the held targets as usual, so the reduction is deferred by one check-in, not cancelled.
 - Tests: engine (ordinary change with a step-limit line, floor named with what the target would otherwise be, goal change as the cause, first targets, JSON round trip, the 16-week sum; every hold rule), repositories (explanation through Drift and in-memory), app (the card and its four parts, old records, first targets, the held note, the history of six, a hold once and not again, not on an increase), and screenshot baselines for the Coach screen and the sheet.
-- **Not done**: simulator calibration and product-owner confirmation of the hold-a-reduction behavior. MM-136 weight-event integration is
-  now implemented and covered by deterministic simulator tests.
+- **Done (2026-10-13).** The product owner confirmed the hold-a-reduction behavior as built: one deferral per reduction, never two
+  running, never for increases, safety changes or the person's own changes. The simulator side is covered by MM-136's deterministic
+  weight-event tests and MM-139's population validation of the confidence that gates ordinary updates; no further calibration is owed
+  by this ticket. The product owner also chose, for the diet break that this explanation will one day describe, "offered with a hard
+  cap as backstop" (MM-135).

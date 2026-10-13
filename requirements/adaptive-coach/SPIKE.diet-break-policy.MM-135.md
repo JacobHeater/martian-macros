@@ -1,6 +1,6 @@
 ---
 id: MM-135
-status: proposed
+status: in-progress
 component: adaptive-coach
 related: [MM-22, MM-24, MM-28, MM-31, MM-115, MM-116, MM-117, MM-124, MM-130, MM-143]
 ---
@@ -54,6 +54,14 @@ The panel's recommendation, to be confirmed or overruled by the product owner:
 - **Any 7 or more consecutive days at or above maintenance targets resets the count**, however it came about.
 - **Exempt from the step limit** (MM-115).
 - **Wording makes no metabolic claim.**
+
+## The product owner's decision (2026-10-13)
+**Offered, with a hard cap as backstop.** A break is offered at 12 unbroken weeks of deficit and whenever the recovery signals fail
+(MM-117), whatever the week; it is forced only at a longer cap, 20 weeks, as a safety floor. Not adopted from the panel's proposal:
+the earlier forced cap at 16 weeks for the lean bands of MM-28 (the owner may add it; it was not put to them). Still the panel's
+recommendation, not yet ruled on: two weeks by default with one selectable; seven consecutive days at or above maintenance reset the
+count; exempt from the step limit; no metabolic claim in the wording. The engine change (replacing MM-31's forced week at sixteen with
+the offer at twelve, the signal-triggered offer and the cap at twenty) is this ticket's remaining work; status moves to in-progress.
 
 ## Acceptance Criteria
 ```gherkin

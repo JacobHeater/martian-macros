@@ -100,12 +100,25 @@ order; `mm roadmap` draws it).
 - MM-214 and MM-215 remain skipped in the web suite, each waiting on its fix.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34).
 
+**Decided by the product owner on 2026-10-13** (each recorded in its
+ticket): the hold-a-reduction stays as built (MM-138 closed; M1 is
+complete); the diet break is offered at 12 weeks and on failing recovery
+signals, forced only at 20 (MM-135, engine change to do); onboarding's
+grouped screens stay grouped (MM-103 closed); the purchase plugin is our
+own over StoreKit 2 and Billing 9 (MM-84); the terms guard stays first, the
+legal blanks stay blank for the attorney, the four flagged behaviours stay
+and are listed for review, the stores get the same text from one public
+page on GitHub Pages (MM-242, MM-247); the privacy policy is drafted now
+with the terms (MM-95); exact alarms are requested (MM-248); the rest timer
+stays vibration only (MM-191); no helpline until a clinician reviews one
+(MM-114); MM-51's pantry checks stay open (no online source of barcodes).
+
 **Waiting on the product owner.**
-- MM-191: whether to add a sound for the end of a rest (vibration only now).
-- Android reminders are inexact, possibly an hour late. Exact timing needs
-  permission; not requested yet.
-- Eating-disorder support wording in MM-114 lacks a reviewed helpline
-  (MM-29, MM-96).
+- The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
+  legal name and a contact address when they exist.
+- Fifty pantry barcodes and the hand check of fifty products (MM-51).
+- The merge of MM-247's workflow pull request, when it is opened.
+- Unlocking the Pixel to look at the seeded demo app.
 
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
@@ -170,10 +183,14 @@ limitations.
   simulator-validated on a hundred users per logging habit
   (`test/engine/coachConfidenceBoundariesSimulation.test.ts`); nothing was
   tuned. M1 is 12 of 13; MM-138 (holding a reduction) waits on the owner.
-- Moved the needle: M0 went from 39 of 47 to 43 of 48 (MM-246, MM-229,
-  MM-245, MM-181 done; MM-103, MM-108, MM-176, MM-179 and MM-183 remain);
-  M1 from 11 of 13 to 12 of 13; M2 gained MM-7, MM-175 and MM-177; M3
-  gained MM-88 and MM-65. No milestone closed.
+- The owner answered every open decision in a wizard of questions (the
+  list under "Decided by the product owner" above); MM-138 and MM-103
+  closed on those answers, MM-135 moved to in-progress with its decision,
+  and MM-247 and MM-248 were opened.
+- Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
+  from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
+  gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
+  tickets (MM-247, MM-248).
 - MM-103's leftover, one question per onboarding screen, is a design
   change the owner should call: measurements, training and the health
   check each hold several related fields on one screen today.

@@ -174,3 +174,6 @@ Not built:
 - Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
 - Time comes from the app's `Clock`, never the device directly (MM-190), so every scenario above is testable with a fixed clock.
 - Not planned: automatic rep counting, heart rate, or timing from a watch.
+
+## Decision (2026-10-13)
+- **Vibration only.** The product owner chose no sound at the end of a rest: no audio dependency, nothing to silence in a gym. The open question above is closed.

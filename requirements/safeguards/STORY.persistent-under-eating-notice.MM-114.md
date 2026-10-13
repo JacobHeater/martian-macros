@@ -105,3 +105,6 @@ Open, and needing the owner or MM-29:
   decision, not made here.
 - The question on marking a low day complete is asked each time such a day is marked, not once per day.
 - The adherence summary's pointer to this notice (MM-149) is not built.
+
+## Decision (2026-10-13)
+- **No helpline until a clinician has reviewed one** (MM-29). The notice keeps pointing to a doctor, a registered dietitian or someone trusted, and names no organisation or number. Confirmed by the product owner.
