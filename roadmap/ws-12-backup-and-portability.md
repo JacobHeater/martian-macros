@@ -94,7 +94,10 @@ The release step of WS-13.
 Everything in group C. It touches the schema lane only to read the version.
 
 ## Requirement sources
-- Remaining: MM-65, MM-63, MM-64. Epic: MM-59.
+- Built: MM-65 (the backup-rules spike, answered 2026-10-13: no iCloud or
+  Drive as a provider; the database excluded from OS backups on both
+  platforms; one encrypted file the person places).
+- Remaining: MM-63, MM-64. Epic: MM-59.
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app
