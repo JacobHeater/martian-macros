@@ -1,6 +1,6 @@
 ---
 id: MM-139
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-137, MM-23, MM-27, MM-40, MM-98, MM-107, MM-131, MM-132, MM-136, MM-138, MM-140, MM-149, MM-153]
 ---
@@ -104,5 +104,12 @@ Scenario: Wording follows level
 - **Weight-event integration is in place.** `analyze` supplies the latest lasting-event date to the stability assessment. Engine simulation
   coverage confirms a recent creatine event lowers stability; MM-136 also tests that event noise reduces the trend response to a
   deterministic travel-related water rise. This is behavioral validation, not population calibration.
-- **Not done:** next-step priority and data boundaries have engine tests but are not simulator-validated. Keep this ticket in progress
-  until those remaining simulations are checked.
+- **Done (2026-10-13): the next-step priority and the data boundaries are simulator-validated.**
+  `test/engine/coachConfidenceBoundariesSimulation.test.ts` runs a hundred deterministic users for eight weeks per logging habit and
+  asks what most of them are told. Measured on the committed engine: skipping three weigh-ins in four (about 7 in the window) gives
+  "record your weight" to 100 and Good to none; skipping half (about 14) gives Fair to 96, Good to 3 who crossed twenty by chance, and
+  "record your weight" to 97; skipping seven food days in ten gives "complete the food log" to 100; both thin (about 5 usable days,
+  7 weigh-ins) gives "complete the food log" to 98 and Learning to 99; a Fair food log beside Learning weigh-ins names the weigh-ins
+  (the weakest part first; the food-first rule is for ties), and daily logging gives Good to 70 or more with "keep going". The
+  thresholds are the ones the unit tests pin; nothing was tuned. Not done, and not promised here: calibrating the Fair band's
+  accuracy (Good's "within 200 kcal nine times in ten" is the one calibrated claim).
