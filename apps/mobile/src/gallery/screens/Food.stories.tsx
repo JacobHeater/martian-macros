@@ -13,9 +13,12 @@ export default meta;
 
 const addFood = ({ overlays, today }: StoryStage) => void showAddFoodSheet(overlays, today);
 
-/** Presses a button of the sheet, once it is there. */
+/**
+ * Presses a button of the sheet, once it is there. A search result takes a
+ * read of the food database to arrive, so this waits longer than a second.
+ */
 const press = (name: string | RegExp) => async (canvas: HTMLElement) =>
-  userEvent.click(await within(canvas).findByRole('button', { name }));
+  userEvent.click(await within(canvas).findByRole('button', { name }, { timeout: 10000 }));
 
 export const Food = screenStory({
   covers: ['FoodScreen'],

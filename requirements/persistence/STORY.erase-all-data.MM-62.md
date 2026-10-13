@@ -35,3 +35,5 @@ Scenario: Cancelling
 - **The settings screen has no widget test** and the dialog was not exercised on a device (MM-93).
 - Rows are deleted; the database file is not removed or overwritten, so deleted data may remain in free pages until SQLite reuses them.
   When backup files exist (MM-63), erasing should also say that backups elsewhere are not touched.
+
+**Note (2026-10-12, MM-242).** After an erase the app shows the terms of use (MM-242), then the theme chooser (MM-184), then onboarding. "Onboarding is shown" in the criteria above predates both. The agreement to the terms is erased with everything else.

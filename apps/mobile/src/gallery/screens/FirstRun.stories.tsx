@@ -5,11 +5,47 @@ import { minorScenario } from './minorScenario';
 import { newInstallScenario } from './newInstallScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
+import { userEvent, within } from 'storybook/test';
 import { walkOnboarding } from './walkOnboarding';
 
 /** What a person sees before the app has a plan for them, and when it has to stop and ask. */
 const meta = { title: 'Screens/First run and gates', ...screensMeta } satisfies Meta;
 export default meta;
+
+/** Presses a button of the screen, once it is there. */
+const press = (name: string) => async (canvas: HTMLElement) =>
+  userEvent.click(await within(canvas).findByRole('button', { name }));
+
+/** MM-242: the first thing a new installation shows. */
+export const TermsOfUse = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: 'Before you start',
+  scenario: newInstallScenario,
+  terms: 'unanswered',
+});
+
+export const TermsNotNow = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: 'That is fine',
+  scenario: newInstallScenario,
+  terms: 'unanswered',
+  walk: press('Not now'),
+});
+
+/** Someone with ten weeks of records meets terms newer than the ones they agreed to. */
+export const TermsChanged = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: 'The terms have changed',
+  terms: 'earlier',
+});
+
+/** They can still erase their records without agreeing. */
+export const TermsChangedNotNow = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: 'Erase all data',
+  terms: 'earlier',
+  walk: press('Not now'),
+});
 
 export const ThemeChooser = screenStory({
   covers: ['ThemeChooserScreen'],

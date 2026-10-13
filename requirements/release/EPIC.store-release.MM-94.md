@@ -31,3 +31,5 @@ and a date, and nothing in the listing promises what the app does not do.
 - The app icon and launch screen are MM-109; accessibility is MM-106.
 - Not yet ticketed, and needed before submission: store screenshots and listing text, signing keys and their safekeeping, a support
   contact, and a release-build performance check.
+
+**Note (2026-10-12, MM-242).** A gate this list did not have: the terms of use (MM-242) ship as a draft written by non-lawyers. A licensed attorney's review of the text and of the regulatory position, and the owner's decisions on licensor, governing law, disputes and contact address, are outstanding and block submission. Google Play also requires a privacy policy at a public address and inside the app (MM-95), separately from any terms. MM-244 (what the scanner sends, observed) must be done before the Data safety form is filled in.

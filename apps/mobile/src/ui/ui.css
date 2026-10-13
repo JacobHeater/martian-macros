@@ -1030,6 +1030,17 @@
   opacity: 0.4;
 }
 
+/* A screen's actions, under its scrolling content and clear of the gesture bar. */
+.mm-footer-actions {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-24) calc(var(--space-16) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--outline);
+  background: var(--canvas);
+}
+
 /* A row with an action of its own beside the part that is pressed. */
 .mm-list-row-with-action {
   padding: 0;

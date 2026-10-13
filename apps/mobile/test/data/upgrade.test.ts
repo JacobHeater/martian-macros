@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { AppDatabase } from '../../src/data/AppDatabase';
 import type { MigrationStep } from '../../src/data/MigrationStep';
-import { currentSchemaVersion as current } from '../../src/data/schema';
+import { currentSchema, currentSchemaVersion as current } from '../../src/data/schema';
 import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -129,4 +129,26 @@ it('data saved by a newer version of the app is refused and left alone', async (
   expect((failed as SchemaMigrationError).message).toContain('Update the app to open it');
   expect(await versionOf(sql)).toBe(current + 1);
   expect(await columnsOf(sql, 'weight_entries')).toContain('note');
+});
+
+// MM-242: the first real step. A database as version 1 left it gains the two
+// columns for the agreement to the terms, and keeps what it held.
+it('a version 1 database comes up to date: nothing lost, and nobody has agreed to the terms yet', async () => {
+  const versionOne = currentSchema
+    .replace('  "terms_accepted_version" INTEGER NULL,\n', '')
+    .replace('  "terms_accepted_epoch_day" INTEGER NULL,\n', '');
+  expect(versionOne).not.toContain('terms_accepted');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 1, schema: versionOne });
+  await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
+  expect(await columnsOf(old, 'user_preferences')).not.toContain('terms_accepted_version');
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await columnsOf(sql, 'user_preferences')).toEqual(
+    expect.arrayContaining(['terms_accepted_version', 'terms_accepted_epoch_day']),
+  );
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  expect(await first(repos.preferences.watchTermsAcceptance())).toBeUndefined();
 });

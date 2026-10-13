@@ -8,6 +8,8 @@ import type { RecoverySkipReader } from './RecoverySkipReader';
 import type { RecoverySkipWriter } from './RecoverySkipWriter';
 import type { ReturnScreenReader } from './ReturnScreenReader';
 import type { ReturnScreenWriter } from './ReturnScreenWriter';
+import type { TermsAcceptanceReader } from './TermsAcceptanceReader';
+import type { TermsAcceptanceWriter } from './TermsAcceptanceWriter';
 import type { UnderEatingNoticeReader } from './UnderEatingNoticeReader';
 import type { UnderEatingNoticeWriter } from './UnderEatingNoticeWriter';
 
@@ -27,4 +29,6 @@ export interface PreferencesRepository
     ReturnScreenReader,
     ReturnScreenWriter,
     RecoverySkipReader,
-    RecoverySkipWriter {}
+    RecoverySkipWriter,
+    TermsAcceptanceReader,
+    TermsAcceptanceWriter {}
