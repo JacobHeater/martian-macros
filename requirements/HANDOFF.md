@@ -138,6 +138,20 @@ direction and runs the product-designer and UX roles on the built stories;
 MM-254 to MM-259 rebuild each destination with before and after stories.
 Nothing is built yet.
 
+**Nothing native shows (owner's rule, 2026-10-13; MM-262).** After the date
+dialog took three prompts to become a component, the owner ruled: "make
+everything custom and beautiful for Martian Macros. I want to own the full
+visual experience." No native picker, list, glyph, thumb, highlight or
+focus ring; the design system draws every control and every state, judged
+in the register in three palettes. The panel's product-designer,
+UX-accessibility and React-Capacitor roles walked every file of `src/ui/`
+the same day (`docs/agent-runs/mm253-components/`, 74 findings); the
+result is WS-03 step 10: MM-263 to MM-282 (less MM-278, in WS-14), each a
+bug with a regression test or a story with its stories. Also decided: a
+quiet destructive button kind with Cancel the stronger (MM-280); the
+Ember switch stays; 48 dp for everything pressable (MM-281); a snack with
+Undo waits (MM-272, from the interaction doc).
+
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
@@ -228,6 +242,15 @@ limitations.
   `MmPickerField` now hides the platform's drawing entirely and carries
   the design system's box and chevron; the time dialog uses it too. The
   lesson, for every native control: the platform draws nothing.
+- The three reviewers' reports came back (74 findings; saved under
+  `docs/agent-runs/mm253-components/`), the owner answered the decisions
+  they raised and ruled that nothing native shows, and the findings became
+  MM-262 (epic) and eighteen tickets: three custom pickers, the checkbox
+  and slider drawn by us, pressed states, menus, overlays, the snack,
+  stories for every component and state, tokens, the focus ring, Ember
+  tint and glyph, the sheet and cards, composites and the checker, field
+  errors, the destructive kind, 48 dp, the written system. Nothing of it
+  is built yet; WS-03 step 10 is the next code, pickers first.
 - MM-261: why it took the owner three prompts to get a component. The
   architecture check exempted `src/ui/`, so a raw control could live in a
   dialog or the overlay host. Now each native control kind has one home

@@ -1,0 +1,490 @@
+{
+  "schema_version": 1,
+  "task_id": "mm253-components",
+  "audit_mode": "domain",
+  "baseline": {
+    "branch": "feature/mm260-own-chevron",
+    "commit": "1b709599246072141b37a4e4b5d76ffb432863a0"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Fable 5.1 parent session, acting as chair and single edit owner, branch feature/mm262-own-every-control",
+    "paths": [
+      "requirements",
+      "roadmap",
+      "AGENTS.md",
+      "docs/agent-runs/mm253-components"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Scope the component walk, assign three reviewers, save reports, put decisions to the owner, write the tickets.",
+      "role": "chair",
+      "reviewer": "Claude Fable 5.1 parent session, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "f63ec3861cd796240c91eb5062e08331f62a722e",
+      "input_hashes": {
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "apps/mobile/src/ui/ui.css": "e6e6fc740b677d0c0adbde36b12c5731d7571b69cd0cf5ebe748465d5397ab48",
+        "apps/mobile/src/ui/MmPickerField.tsx": "6f7f202503cb6e009250ed90ff7091ec229385c3f74a2905f976b5b50e9b7fd8",
+        "apps/mobile/src/ui/MmDateDialog.tsx": "3b0240c6acf2733dbc82d4c5d9589ca71fa9b960cb5ffdf5cd6099581ec72b0f",
+        "apps/mobile/src/ui/MmOverlays.tsx": "ca43f399e906a67f59d44432bd02da84e8ef63717d1f02cf9ddaf440542bf2d6",
+        "apps/mobile/test/architecture.test.ts": "91f202c1427511141842b36bf4eb91143aa5301b6d6390c375efef19e9a4beeb",
+        "design/visual-language.md": "cd24e229dcf13722ac1d98652555da4c18fee698aba6cb8484ff64d832ddcd84",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "apps/mobile/src/theme/tokens.css": "02cb51340c05cf054604fafc063c448590dfe30928add01c67f14169dd1f7c5e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "All three reports in full",
+          "The date dialog story in Martian and Light (MM-260, same day)"
+        ],
+        "not_inspected": [
+          "The reviewers' citations line by line",
+          "Anything on a device",
+          "Any story at 200% text"
+        ],
+        "referrals": [
+          "Owner: the four decisions, answered",
+          "MM-254 to MM-259: the tier and header-icon findings"
+        ],
+        "limitations": "The chair is also the edit owner, so its view of the result is not independent."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Every claim rests on the repository's own design documents and source.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Walk every design-system component and story against MM-253's seven rules: spacing against the scale, the state set, what the platform draws, raw controls in composites, stories.",
+      "role": "product-designer",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "1b709599246072141b37a4e4b5d76ffb432863a0",
+      "input_hashes": {
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "apps/mobile/src/ui/ui.css": "e6e6fc740b677d0c0adbde36b12c5731d7571b69cd0cf5ebe748465d5397ab48",
+        "apps/mobile/src/ui/MmPickerField.tsx": "6f7f202503cb6e009250ed90ff7091ec229385c3f74a2905f976b5b50e9b7fd8",
+        "apps/mobile/src/ui/MmDateDialog.tsx": "3b0240c6acf2733dbc82d4c5d9589ca71fa9b960cb5ffdf5cd6099581ec72b0f",
+        "apps/mobile/src/ui/MmOverlays.tsx": "ca43f399e906a67f59d44432bd02da84e8ef63717d1f02cf9ddaf440542bf2d6",
+        "apps/mobile/test/architecture.test.ts": "91f202c1427511141842b36bf4eb91143aa5301b6d6390c375efef19e9a4beeb",
+        "design/visual-language.md": "cd24e229dcf13722ac1d98652555da4c18fee698aba6cb8484ff64d832ddcd84",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "apps/mobile/src/theme/tokens.css": "02cb51340c05cf054604fafc063c448590dfe30928add01c67f14169dd1f7c5e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "Every file under apps/mobile/src/ui and ui.css",
+          "Every catalog and story under apps/mobile/src/gallery (not screens/)",
+          "tokens.css, base.css, .storybook/preview",
+          "Three bounded task walkthroughs from source"
+        ],
+        "not_inspected": [
+          "src/charts",
+          "the screen stories",
+          "the remainder of mmIcons.tsx",
+          "every screen beyond spot checks"
+        ],
+        "referrals": [
+          "ux-accessibility: PD-2, PD-6, PD-9, PD-13, PD-19, PD-25",
+          "react-capacitor: PD-2, PD-19",
+          "owner: PD-13, PD-14, the switch fill, PD-27"
+        ],
+        "limitations": "No render, no device; clipping claims follow from CSS containment rules."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Every claim rests on the repository's own design documents and source.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Walk every design-system component, dialog and sheet for names, roles, keyboard and screen-reader operability, touch targets, what the person is told, native controls in composites, text scaling, stories.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "1b709599246072141b37a4e4b5d76ffb432863a0",
+      "input_hashes": {
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "apps/mobile/src/ui/ui.css": "e6e6fc740b677d0c0adbde36b12c5731d7571b69cd0cf5ebe748465d5397ab48",
+        "apps/mobile/src/ui/MmPickerField.tsx": "6f7f202503cb6e009250ed90ff7091ec229385c3f74a2905f976b5b50e9b7fd8",
+        "apps/mobile/src/ui/MmDateDialog.tsx": "3b0240c6acf2733dbc82d4c5d9589ca71fa9b960cb5ffdf5cd6099581ec72b0f",
+        "apps/mobile/src/ui/MmOverlays.tsx": "ca43f399e906a67f59d44432bd02da84e8ef63717d1f02cf9ddaf440542bf2d6",
+        "apps/mobile/test/architecture.test.ts": "91f202c1427511141842b36bf4eb91143aa5301b6d6390c375efef19e9a4beeb",
+        "design/visual-language.md": "cd24e229dcf13722ac1d98652555da4c18fee698aba6cb8484ff64d832ddcd84",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "apps/mobile/src/theme/tokens.css": "02cb51340c05cf054604fafc063c448590dfe30928add01c67f14169dd1f7c5e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "Every file under apps/mobile/src/ui and ui.css",
+          "The dialogs, sheets and the overlay host",
+          "tokens.css, base.css, the ui tests, the stories test",
+          "One bounded task walkthrough (the weigh-in reminder time) from source"
+        ],
+        "not_inspected": [
+          "ChartsCatalog, IconsCatalog, TokensCatalog, .storybook/preview",
+          "mmIcons.tsx beyond line 60",
+          "src/charts",
+          "screens beyond the cited lines"
+        ],
+        "referrals": [
+          "react-capacitor: focus containment, button with block content",
+          "product-designer: pressed state, sheet motion, chevron glyphs",
+          "coaching: the MuscleVolumeRow reference range"
+        ],
+        "limitations": "No runtime, no TalkBack, no 200% text, no contrast measured on pixels."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Target-size thresholds, modal focus containment, showPicker behaviour, and when resized text fails.",
+        "reason": "Platform and standards facts that change a recommendation.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+            "title": "Understanding SC 2.5.8 Target Size (Minimum)",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "24 by 24 CSS px at AA; the repository rule of 48 dp is stricter."
+          },
+          {
+            "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/showPicker",
+            "title": "HTMLInputElement.showPicker()",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "Requires transient activation; a click handler is the right trigger."
+          },
+          {
+            "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+            "title": "WAI-ARIA APG Modal Dialog pattern",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "Tab and Shift+Tab stay inside; Escape closes; focus returns to the opener; a visible close is recommended."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+            "title": "Understanding SC 1.4.4 Resize Text",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "Clipping or truncation at 200% is failure F69."
+          }
+        ],
+        "summary": "Standards and platform facts cited per finding in the report.",
+        "limitations": "Known-URL retrieval only; no empirical user studies."
+      }
+    },
+    {
+      "task": "Walk every design-system file for native controls and their homes, what the engines draw that CSS does not control, what a stricter architecture rule should say, API consistency, and stories.",
+      "role": "react-capacitor",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "f63ec3861cd796240c91eb5062e08331f62a722e",
+      "input_hashes": {
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "apps/mobile/src/ui/ui.css": "e6e6fc740b677d0c0adbde36b12c5731d7571b69cd0cf5ebe748465d5397ab48",
+        "apps/mobile/src/ui/MmPickerField.tsx": "6f7f202503cb6e009250ed90ff7091ec229385c3f74a2905f976b5b50e9b7fd8",
+        "apps/mobile/src/ui/MmDateDialog.tsx": "3b0240c6acf2733dbc82d4c5d9589ca71fa9b960cb5ffdf5cd6099581ec72b0f",
+        "apps/mobile/src/ui/MmOverlays.tsx": "ca43f399e906a67f59d44432bd02da84e8ef63717d1f02cf9ddaf440542bf2d6",
+        "apps/mobile/test/architecture.test.ts": "91f202c1427511141842b36bf4eb91143aa5301b6d6390c375efef19e9a4beeb",
+        "design/visual-language.md": "cd24e229dcf13722ac1d98652555da4c18fee698aba6cb8484ff64d832ddcd84",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "apps/mobile/src/theme/tokens.css": "02cb51340c05cf054604fafc063c448590dfe30928add01c67f14169dd1f7c5e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/react-capacitor.md": "5a1b5908177e4ec456bb680361115fcfb2e4e360bc4990f0a737c4bbee71d37f"
+      },
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "All 68 files of apps/mobile/src/ui and ui.css, base.css",
+          "test/architecture.test.ts (before and after MM-261)",
+          "The six catalogs, three catalog stories, Settings.stories.tsx, the ui tests, the stories test"
+        ],
+        "not_inspected": [
+          "The other screen stories",
+          "src/charts",
+          "the Android shell",
+          "tool/"
+        ],
+        "referrals": [
+          "product-designer and ux-accessibility: RC-2, RC-3, RC-11, RC-15",
+          "qa and integrations: RC-18 on a device"
+        ],
+        "limitations": "No render, no device, no test run; the tree changed under the review and the later state was reviewed."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What appearance: none removes on select, checkbox and range; what showPicker requires; Android WebView support.",
+        "reason": "Platform claims that change the remediations for RC-1, RC-2, RC-3 and RC-18.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/showPicker",
+            "title": "HTMLInputElement.showPicker()",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "Transient activation required; NotAllowedError without it."
+          },
+          {
+            "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/appearance",
+            "title": "appearance",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "none makes a widget stylable while keeping its function."
+          },
+          {
+            "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Advanced_form_styling",
+            "title": "Advanced form styling",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "appearance: none removes the select icon; checkbox needs an own glyph; range thumb needs engine pseudo-elements; date internals keep their popup."
+          },
+          {
+            "url": "https://caniuse.com/mdn-api_htmlinputelement_showpicker",
+            "title": "caniuse: showPicker",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "Supported in current Chrome for Android and Android WebView."
+          }
+        ],
+        "summary": "Documented engine behaviour cited per finding.",
+        "limitations": "Documentation, not observation on the shell's WebView."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing in a component walk of the design system touches a health rule, a coaching message or a measurement; the tickets are visual and structural.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing in a component walk of the design system touches a health rule, a coaching message or a measurement; the tickets are visual and structural.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing in a component walk of the design system touches a health rule, a coaching message or a measurement; the tickets are visual and structural.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing in a component walk of the design system touches a health rule, a coaching message or a measurement; the tickets are visual and structural.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing in a component walk of the design system touches a health rule, a coaching message or a measurement; the tickets are visual and structural.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch was available; the two reviewers who researched used known URLs and needed no search."
+      ],
+      "retrieval": [
+        "WebFetch retrieved MDN, caniuse and W3C pages; it returns a summarising extraction, not raw text, and compatibility tables were not always present in it."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-13",
+      "limitations": "No reviewer could render a story or reach a device; every platform-drawing claim is documentation plus source, not observation on the shell."
+    }
+  ],
+  "unresolved_questions": [
+    "Do segmented controls and the menu list clip at 200% text (UX-13)? Chair to render.",
+    "Is the light palette's field border at or above 3:1 against the sunken fill (UX-25)? Chair to measure."
+  ],
+  "decisions": [
+    {
+      "id": "MM262-nothing-native-shows",
+      "status": "accepted",
+      "summary": "The design system draws every control and every state; no native picker, list, glyph, thumb, highlight or focus ring shows. Overturns MM-260's acceptance of the native pickers.",
+      "authority": "Product owner, 2026-10-13"
+    },
+    {
+      "id": "MM280-quiet-destructive",
+      "status": "accepted",
+      "summary": "A quiet destructive button kind; Cancel is the stronger button in a confirm dialog.",
+      "authority": "Product owner, 2026-10-13"
+    },
+    {
+      "id": "MM262-ember-switch-stays",
+      "status": "accepted",
+      "summary": "An on switch stays Ember; the theme docs get the exception.",
+      "authority": "Product owner, 2026-10-13"
+    },
+    {
+      "id": "MM281-48dp-floor",
+      "status": "accepted",
+      "summary": "48 dp for everything pressable; chips and compact segments grow or gain a hit area.",
+      "authority": "Product owner, 2026-10-13"
+    },
+    {
+      "id": "MM272-snack-waits",
+      "status": "accepted",
+      "summary": "A snack with an action has no timeout, from the interaction doc's \"nothing is time-limited\".",
+      "authority": "Chair, from UX-8"
+    },
+    {
+      "id": "MM253-tier-findings-to-rebuilds",
+      "status": "accepted",
+      "summary": "Row icon size, header icon slots, the volume bar grammar and a tier-2 strip primitive land in MM-254 to MM-259, once.",
+      "authority": "Chair"
+    }
+  ],
+  "pending_work": [
+    "Build WS-03 step 10, pickers first (MM-263, MM-264, MM-265), then MM-266 and MM-267.",
+    "Chair verification: 200% text in segmented controls and menus; the light field-border contrast.",
+    "MM-282: the design-system document for the React library."
+  ],
+  "tests": [],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": true
+  }
+}
