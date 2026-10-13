@@ -402,7 +402,14 @@
           "workstream": "WS-03",
           "tickets": [
             "MM-91",
-            "MM-106"
+            "MM-106",
+            "MM-253",
+            "MM-254",
+            "MM-255",
+            "MM-256",
+            "MM-257",
+            "MM-258",
+            "MM-259"
           ]
         },
         {
@@ -1154,7 +1161,14 @@
           "MM-179",
           "MM-183",
           "MM-224",
-          "MM-242"
+          "MM-242",
+          "MM-253",
+          "MM-254",
+          "MM-255",
+          "MM-256",
+          "MM-257",
+          "MM-258",
+          "MM-259"
         ]
       },
       "sequence": [
@@ -1241,6 +1255,20 @@
           "tickets": [
             "MM-242"
           ]
+        },
+        {
+          "step": 9,
+          "title": "Hierarchy and wayfinding (MM-224): tiers, icons as wayfinding, lists with shape, one primary action, the macro switch; the direction and the panel pass first, then each destination",
+          "tickets": [
+            "MM-253",
+            "MM-254",
+            "MM-255",
+            "MM-256",
+            "MM-257",
+            "MM-258",
+            "MM-259"
+          ],
+          "milestone": "M2"
         }
       ],
       "gate": {

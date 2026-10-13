@@ -113,6 +113,7 @@ trend line.
 7. **Storybook as the design register (MM-237).** M0. Placed 2026-10-13.
 8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-181, MM-184, MM-185, MM-186, MM-236, MM-239, MM-240; step 3: MM-176, MM-179, MM-183, MM-206, MM-208; step 4: MM-187.
+9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories.
 
 ## Done enough to unblock others
 MM-104, MM-108 and MM-99 are done: existing screens use library components
@@ -135,6 +136,7 @@ conflicts with this one.
   MM-91, MM-106, MM-109. Epics: MM-89, MM-97, MM-101.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-181 (Remove the primary action's incandescent glow); MM-184 (Martian by default, with a first-launch theme choice, done); MM-185 (Theme confirmation resets the preview before storage publishes it, done); MM-186 (Preference loading incorrectly previews Martian for existing users, done); MM-236 (the hand-drawn icons are unreadable, so the set becomes Material, done); MM-239 (a focused text field draws two outlines, done); MM-240 (sliders in a list group sit at different insets, done); MM-176 (A metrics-heavy dashboard with useful history); MM-179 (See the logged macronutrient split on Dashboard and Food); MM-183 (Do not present ordinary targets before pause state is known); MM-206 (Dashboard Add food can log to a historical day, done); MM-208 (Dashboard Add food action obscures a chart label, done); MM-187 (One calorie visual, the arc, everywhere a day's calories are shown, done); MM-237 (Storybook is the design register, done); MM-242 (the terms of use come before anything else); MM-224 (Cross-app usability and information hierarchy).
 - Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
+- Placed 2026-10-13 (the hierarchy pass): MM-253 (the direction and the panel pass), MM-254 Dashboard, MM-255 Food, MM-256 Coach, MM-257 Progress, MM-258 Train, MM-259 Settings.
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.
