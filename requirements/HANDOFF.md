@@ -42,7 +42,7 @@ same day): a mobile application built on web technologies.
 **Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
 with its migration steps and tests. Only one schema change at a time.
 
-**Next ticket ID.** `mm req next` is the authority (MM-242 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-244 at this writing; MM-242 is the EULA, in progress).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
