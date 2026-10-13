@@ -166,9 +166,14 @@ limitations.
   backup is one encrypted file the person places (MM-63, MM-64). Open:
   encryption at rest for the database, which Play's health guidance asks
   for and nothing provides.
+- MM-139 closed: the confidence next step and data boundaries are now
+  simulator-validated on a hundred users per logging habit
+  (`test/engine/coachConfidenceBoundariesSimulation.test.ts`); nothing was
+  tuned. M1 is 12 of 13; MM-138 (holding a reduction) waits on the owner.
 - Moved the needle: M0 went from 39 of 47 to 43 of 48 (MM-246, MM-229,
   MM-245, MM-181 done; MM-103, MM-108, MM-176, MM-179 and MM-183 remain);
-  M2 gained MM-7 and MM-175. No milestone closed. M1 is 11 of 13.
+  M1 from 11 of 13 to 12 of 13; M2 gained MM-7, MM-175 and MM-177; M3
+  gained MM-88 and MM-65. No milestone closed.
 - MM-103's leftover, one question per onboarding screen, is a design
   change the owner should call: measurements, training and the health
   check each hold several related fields on one screen today.
