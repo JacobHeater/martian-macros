@@ -66,6 +66,19 @@ screens are built: findings with outcomes, as MM-212 requires. Scope and
 direction are decided; the panel grades execution and names what the
 direction misses.
 
+**And a walk of every component, one by one.** The owner found the date
+dialog's picker indicator flush against its field and the dialog flat
+(MM-260); nobody had looked at that component on its own. The same pass
+opens every story under "Design system" in the register (fields, bars,
+charts, components, icons, tokens) and every dialog and sheet, at phone
+size in Martian, Dark and Light, and records for each: spacing against the
+scale, the state set (rest, focus, pressed, disabled, error), what the
+browser draws that the design system does not (native controls, their
+indicators and pickers), and whether it floats or sits as it should. Each
+finding gets a bug ticket with a regression test, as MM-260 did, or a
+written outcome that it is accepted. No component is "fine" because it
+was not looked at.
+
 ## Acceptance criteria
 
 ```gherkin
@@ -74,6 +87,10 @@ Scenario: The direction is written
 
 Scenario: The panel has graded it
   Then docs/agent-runs/ holds a run with product-designer and ux-accessibility findings on every destination, each with an outcome
+
+Scenario: Every component was looked at
+  Then the run lists every Design system story and every dialog and sheet, in three palettes, with a finding or an accepted outcome for each
+  And every finding has a bug ticket with a regression test
 
 Scenario: The rules are checkable
   Then a test fails a screen that nests a card in a card, or shows two macro pictures at once
