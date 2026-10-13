@@ -111,3 +111,6 @@ The epic is done when:
   lists or tasks; headings can structure multiple lists. Use a container only
   when its content and actions form a meaningful group, not as a default
   wrapper.
+
+## The owner's diagnosis (2026-10-13)
+The app lacks iconography and segmenting; its views are monolithic and the person carries the load; it needs more graphics, more natural segmenting and view hierarchies. Decided with it: Material icons everywhere now and custom art after MM-109; both macro pictures behind a switcher; one direction across every destination, built in stages. The direction is MM-253; the destinations are MM-254 to MM-259. This epic stays open until they are built and the panel has graded them.

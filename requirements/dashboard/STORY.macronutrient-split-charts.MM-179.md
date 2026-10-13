@@ -46,3 +46,6 @@ bars. Tests verify exact 400/600/450 kcal sector values and percentage labels,
 empty/zero-share behavior, both themes and Food's selected-day versus
 Dashboard's current-day data. Integrated `mm check` passed. Charts were
 inspected on the seeded Android emulator.
+
+## Note (2026-10-13, MM-253)
+The donut repeats the hero's macro bars. The owner chose to keep both behind a switch (bars or donut, remembered as a preference) inside the hero, on Dashboard and Food alike (MM-254, MM-255); the separate "Macronutrient split" card goes.
