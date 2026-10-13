@@ -105,3 +105,6 @@ Not built:
 - Its reminder (MM-146 lists one; that ticket's build left it out).
 - The offer of relief that the answers lead to is MM-117.
 - Checked on the Android emulator: the card, the five questions, saving, and the lines for one check-in. iOS untried.
+
+## Note (2026-10-13, MM-249)
+The "emerging" grade this ticket gave short sleep was overruled by the product owner with the evidence in MM-249: the one trial cited here was the right one and was not alone. Sleep becomes a first-class signal (WS-15); the optional typed hours here are pre-filled from the nightly record (MM-252), and the sleep-quality question stays.
