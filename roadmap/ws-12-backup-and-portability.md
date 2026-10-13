@@ -55,7 +55,7 @@ WS-13: backup is part of what the listing promises, and its platform rules
 feed the privacy declarations.
 
 ## Packages and surfaces
-- `packages/data` (snapshot with `VACUUM INTO`, encryption, restore)
+- `apps/mobile/src/data` (snapshot with `VACUUM INTO`, encryption, restore)
 - a backup providers package (new), one adapter per provider
 - `apps/mobile` settings: a backup screen
 - OAuth configuration for each cloud provider (outside the repository)

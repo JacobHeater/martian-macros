@@ -55,13 +55,13 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
 (phase planning needs the body-fat estimate).
 
 ## Packages and surfaces
-- `apps/mobile/lib/src/progress/`
-- `packages/domain/lib/src/observations.dart` (measurements, events, cycle
+- `apps/mobile/src/progress/`
+- `apps/mobile/src/domain/WeightObservation.ts and its neighbours` (measurements, events, cycle
   days)
-- `packages/engine` (new: measurement noise and change; event handling in the
+- `apps/mobile/src/engine` (new: measurement noise and change; event handling in the
   trend filter; the jump-explanation function)
-- `packages/data` (measurements, events, cycle days, display setting)
-- `packages/engine/test/support/synthetic_user.dart` (events)
+- `apps/mobile/src/data` (measurements, events, cycle days, display setting)
+- `apps/mobile/test/engine/support/SyntheticUser.ts` (events)
 
 ## Risks
 - **Thresholds without data.** The waist noise figures (1.0 cm for a median

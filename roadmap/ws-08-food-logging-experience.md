@@ -61,13 +61,13 @@ No workstream is blocked on it. It improves WS-07 step 4 (jump explanation)
 and WS-09 steps 1 and 8.
 
 ## Packages and surfaces
-- `apps/mobile/lib/src/today/` (to be the Food screen): `add_food_sheet.dart`
+- `apps/mobile/src/food/` (to be the Food screen): `AddFoodSheet.tsx`
   and entry rows
-- `packages/domain/lib/src/food_entry.dart`, `quantity_source.dart`
-- `packages/data` (food entries gain nutrients; custom foods and recipes)
-- `packages/food_catalog` (consumer)
+- `apps/mobile/src/domain/FoodEntry.ts`, `QuantitySource.ts`
+- `apps/mobile/src/data` (food entries gain nutrients; custom foods and recipes)
+- `apps/mobile/src/foodCatalog` (consumer)
 - camera and ML Kit plugins (barcode, label text)
-- `packages/engine/lib/src/tdee_estimator.dart` (logging styles, by
+- `apps/mobile/src/engine/TdeeEstimator.ts` (logging styles, by
   agreement with WS-02)
 
 ## Risks
@@ -76,9 +76,10 @@ and WS-09 steps 1 and 8.
   knows two styles today. Estimates (step 2) and hand portions (step 7) are
   new ones, each with its own bias. Each needs a simulated user and a full
   estimator run before it ships.
-- **Camera plugins on the pinned Flutter version.** Barcode scanning and
-  label text recognition bring native dependencies, permissions and, on iOS,
-  work that needs the Mac. Check plugin support early in step 5.
+- **The camera is the shell's own plugin.** Barcode scanning and label text
+  recognition are `MmScanner` over ML Kit in `apps/mobile/android/`, with
+  permissions and, on iOS, work that needs the Mac. What ML Kit sends about
+  itself is MM-244's question.
 - **Add-food flow sprawl.** Four ways to add food (search, scan, estimate,
   type) plus recents and custom foods. Decide the sheet's structure once, at
   the WS-03 migration, with all of them in mind.
@@ -106,6 +107,8 @@ and WS-09 steps 1 and 8.
 7. **Hand portions (MM-46).** M4. Needs food densities in the pack and a
    third logging style in the estimator.
 8. **Label scanning; live lookup (MM-44, MM-58).** M4.
+9. **The Food screen and Add food hierarchy (MM-224) (MM-180, MM-213, MM-223, MM-225, MM-226, MM-227, MM-218, MM-219, MM-220, MM-221).** M2. Placed 2026-10-13.
+- Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -128,6 +131,7 @@ workstream's.
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
   need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food; not yet tried with the real camera). Epic: MM-37.
 - Remaining: MM-127, MM-126, MM-58.
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-207 (Food entry deletion lacks a visible alternative to swipe, done); MM-169 (Editing a logged pack food dropped the record of which food it came from, done); MM-170 (Choosing "Raw" while weighing, then a serving, logged the raw food, done); MM-202 (An unchanged food edit rounds stored quantity and totals, done); MM-203 (Per-serving alcohol grams are not scaled with consumed energy, done); MM-204 (Converting a calculated entry to typed totals drops alcohol, done); MM-216 (Changing how a food was measured clears the amount without saying so, done); MM-217 (A found food logged by palm, cupped hand or thumb reads as an exact amount, done); MM-171 (The fiber and alcohol lines sat against the meals card, done); MM-172 (The Android release build failed after the label reader was added, done); MM-180 (Give each meal its own card); MM-213 (Saved and Estimate break mid-word at the top of the Add food sheet, done); MM-223 (Add food search and manual entry compete on the opening screen, done); MM-225 (Preview the macro-energy split before logging food, done); MM-226 (Manual nutrition does not explain what the entered values represent, done); MM-227 (Add food reference incorrectly centers Back to search, done); MM-218 (Before logging, the sheet says what it will log); MM-219 (Finding a food and typing one are told apart, and every way in stays in reach); MM-220 (The action that finishes a step is in view, says what it is waiting for, and the sheet can be left); MM-221 (Editing an entry shows what was typed, and says what its day control does).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
@@ -137,7 +141,7 @@ workstream's.
   rough entry is worth more to the estimator than a missing one.
 - The energy check (energy must roughly match 4P + 4C + 9F, plus 7 per gram
   of alcohol and 2 per gram of fiber) has one implementation in
-  `packages/domain`, shared with the pipeline. Today's `macrosMatchEnergy`
+  `apps/mobile/src/domain`, shared with the pipeline. Today's `macrosMatchEnergy`
   is its starting point.
 - Search names always state the preparation state ("Rice, white, cooked").
   The raw-or-cooked switch appears only when logging by weight a food with a

@@ -61,11 +61,11 @@ check; notices read the flags), WS-13 (the professional review covers the
 screening rules).
 
 ## Packages and surfaces
-- `packages/domain/lib/src/screening.dart`, `user_setup.dart`, `profile.dart`
-- `packages/data` (Setups columns; one migration for step 2)
-- `apps/mobile/lib/src/onboarding/`, `settings/`
+- `apps/mobile/src/domain/ScreeningAnswers.ts`, `UserSetup.ts`, `Profile.ts`
+- `apps/mobile/src/data` (Setups columns; one migration for step 2)
+- `apps/mobile/src/onboarding/`, `settings/`
 - the app shell, for the re-check screen
-- `packages/engine/lib/src/mode_advisor.dart` (goal-sheet notes read the
+- `apps/mobile/src/engine/recommendMode.ts` (goal-sheet notes read the
   recommendation)
 
 ## Risks

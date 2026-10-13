@@ -50,6 +50,15 @@ delegation and sequential fallback do not supersede the working agreements here.
   any standing rule the owner gave you that is not in this file. Update it in
   the same pull request as the work, and again before you finish, since a
   session can end without warning. Nothing private goes in it.
+- Keep the roadmap current, always (MM-245). `roadmap/roadmap.json` is
+  where the next agent looks for what to build, so it changes in the same
+  pull request as the work: a ticket you create is placed in a workstream
+  and a step the moment it exists; a ticket you finish moves to built; a
+  step that no longer describes the work is rewritten. `mm req` fails when
+  the roadmap and the tickets disagree, and `mm roadmap` regenerates the
+  progress page. Before a session ends, check whether it moved the needle:
+  say in the handoff which workstream step or milestone advanced and what
+  that makes available, or that nothing moved and why.
 - Design decisions are reviewed in Storybook (MM-237). The stories render
   the real tokens, icons and components the app ships, in every palette
   (`mm storybook`, or `mm storybook build` for a static page). Every
@@ -199,6 +208,8 @@ unverified.
 
 Before finishing, review the diff for unintended changes and ensure the
 requirements, implementation, and tests agree. Update
-[requirements/HANDOFF.md](requirements/HANDOFF.md). Summarize the changes and list
+[requirements/HANDOFF.md](requirements/HANDOFF.md) and the roadmap: every
+ticket you touched is in its workstream on the right side, and the handoff
+says which step or milestone moved. Summarize the changes and list
 the checks actually run, including any failures or omissions. Commit and push
 per the delivery workflow above.

@@ -51,10 +51,10 @@ WS-07 step 3 with cycle days, and WS-13 with the list of health permissions
 to declare.
 
 ## Packages and surfaces
-- `packages/health_ingest/` (new)
+- `apps/mobile/src/healthIngest/` (new)
 - Android manifest, permissions and the Health Connect declaration
 - iOS entitlements and purpose strings (step 7)
-- `packages/data` (weigh-in source and precedence; imported observations)
+- `apps/mobile/src/data` (weigh-in source and precedence; imported observations)
 - `apps/mobile` settings: a connection screen; source labels on Progress
 
 ## Risks
