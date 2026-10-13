@@ -134,6 +134,7 @@ conflicts with this one.
 - Remaining: MM-102, MM-103, MM-104, MM-108, MM-99, MM-98, MM-100, MM-107,
   MM-91, MM-106, MM-109. Epics: MM-89, MM-97, MM-101.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-181 (Remove the primary action's incandescent glow); MM-184 (Martian by default, with a first-launch theme choice, done); MM-185 (Theme confirmation resets the preview before storage publishes it, done); MM-186 (Preference loading incorrectly previews Martian for existing users, done); MM-236 (the hand-drawn icons are unreadable, so the set becomes Material, done); MM-239 (a focused text field draws two outlines, done); MM-240 (sliders in a list group sit at different insets, done); MM-176 (A metrics-heavy dashboard with useful history); MM-179 (See the logged macronutrient split on Dashboard and Food); MM-183 (Do not present ordinary targets before pause state is known); MM-206 (Dashboard Add food can log to a historical day, done); MM-208 (Dashboard Add food action obscures a chart label, done); MM-187 (One calorie visual, the arc, everywhere a day's calories are shown, done); MM-237 (Storybook is the design register, done); MM-242 (the terms of use come before anything else); MM-224 (Cross-app usability and information hierarchy).
+- Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.
