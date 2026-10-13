@@ -152,6 +152,13 @@ limitations.
   with `DemoSeed` on every launch of such a build, inside the shell only,
   then the DEMO strip shows. A normal build never carries the variable
   (`tool/test/webBuildEnv.test.ts`, `test/app/seedDemo.test.ts`).
+- MM-88 (the store-trial spike, WS-13 step 1) answered from the stores'
+  pages, read 2026-10-13: Apple's "XX-day Trial" zero-priced non-consumable
+  is current guideline 3.1.1 with a three-part disclosure; Google Play has
+  no trial for one-time products (buy, rent, pre-order and discount only),
+  so Android times the trial on the device and a reinstall restarts it;
+  the plugin is the owner's call (our own over StoreKit 2 and Billing 9 is
+  the recommendation; Capgo's is the fallback). Nothing is built.
 - Moved the needle: M0 went from 39 of 47 to 43 of 48 (MM-246, MM-229,
   MM-245, MM-181 done; MM-103, MM-108, MM-176, MM-179 and MM-183 remain);
   M2 gained MM-7 and MM-175. No milestone closed. M1 is 11 of 13.
