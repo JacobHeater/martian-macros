@@ -223,7 +223,11 @@ limitations.
   picker indicator has a margin, the dialog has an outline and a shadow,
   and the day is said back in words or the allowed range is. A story
   (Settings, DateOfBirth) and a test guard it. Every other dialog gains
-  the outline and shadow with it.
+  the outline and shadow with it. Seen again on the phone: Android's own
+  date control ignores padding and the indicator pseudo-element, so
+  `MmPickerField` now hides the platform's drawing entirely and carries
+  the design system's box and chevron; the time dialog uses it too. The
+  lesson, for every native control: the platform draws nothing.
 - Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
   from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
   gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
