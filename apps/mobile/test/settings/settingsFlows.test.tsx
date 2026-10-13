@@ -116,6 +116,8 @@ it('confirming erases everything and returns to initial setup', async () => {
   await userEvent.click(settings.getByRole('button', { name: 'Erase all data and start over' }));
   const question = await screen.findByRole('dialog', { name: 'Erase everything?' });
   await userEvent.click(within(question).getByRole('button', { name: 'Erase' }));
+  // First use again: the terms (MM-242), then the theme, then onboarding.
+  await userEvent.click(await screen.findByRole('button', { name: 'I agree' }));
   expect(await screen.findByRole('heading', { name: 'Choose your theme' })).toBeInTheDocument();
   expect(await repos.setup.loadSetup()).toBeUndefined();
   expect(await first(repos.weights.watchWeights())).toEqual([]);

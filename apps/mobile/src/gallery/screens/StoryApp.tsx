@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { App } from '../../app/App';
+import { TermsAcceptance } from '../../domain/TermsAcceptance';
 import type { ThemePreference } from '../../domain/ThemePreference';
 import { FixedClock } from '../../fixtures/FixedClock';
 import { InMemoryRepositories } from '../../fixtures/InMemoryRepositories';
@@ -10,11 +11,13 @@ import { writeFoodPack } from '../../foodCatalog/writeFoodPack';
 import { constant } from '../../lang/constant';
 import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../../state/AppServices';
+import { termsOfUse } from '../../terms/termsOfUse';
 import { fixtureServices } from '../fixtureServices';
 import { demoScenario } from './demoScenario';
 import { StoryOpener } from './StoryOpener';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import type { StoryTerms } from './StoryTerms';
 import { storyToday } from './storyToday';
 
 interface StoryAppProps {
@@ -22,6 +25,8 @@ interface StoryAppProps {
   palette: ThemePreference | undefined;
   /** What the person has stored. The demo's ten weeks unless a story is about something else. */
   scenario?: StoryScenario | undefined;
+  /** Whether the terms of use were agreed to. They were, unless a story is about the terms (MM-242). */
+  terms?: StoryTerms | undefined;
   /** Brings the app to the screen the story is about, once it is up. */
   open?: ((stage: StoryStage) => void | Promise<void>) | undefined;
 }
@@ -38,7 +43,7 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
  * the screens in a story are the app's own, reached the way the app reaches
  * them, with nothing of the device or the network underneath.
  */
-export function StoryApp({ palette, scenario = demoScenario, open }: StoryAppProps) {
+export function StoryApp({ palette, scenario = demoScenario, terms = 'agreed', open }: StoryAppProps) {
   const [services, setServices] = useState<AppServices>();
   useEffect(() => {
     let current = true;
@@ -46,13 +51,23 @@ export function StoryApp({ palette, scenario = demoScenario, open }: StoryAppPro
       const repos = new InMemoryRepositories();
       await scenario(repos, storyToday);
       if (palette !== undefined) await repos.preferences.saveThemePreference(palette);
+      if (terms !== 'unanswered') {
+        // An earlier agreement is to a version before this one, a month ago.
+        const earlier = terms === 'earlier';
+        await repos.preferences.saveTermsAcceptance(
+          new TermsAcceptance({
+            version: termsOfUse.version - (earlier ? 1 : 0),
+            acceptedOn: storyToday.addDays(earlier ? -30 : 0),
+          }),
+        );
+      }
       const catalog = await fixtureCatalog();
       if (current) setServices({ ...fixtureServices(repos, new FixedClock(storyToday)), catalog: constant(catalog) });
     })();
     return () => {
       current = false;
     };
-  }, [scenario, palette]);
+  }, [scenario, palette, terms]);
   if (services === undefined) return null;
   return <App services={services}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
 }

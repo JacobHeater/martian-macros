@@ -74,3 +74,5 @@ emulator using only the isolated synthetic demo. Live Light preview and
 continuing to onboarding were checked. Linux Update goldens run `38025912745`
 passed; reviewed screenshots are committed with the delivery. Physical phone
 and iOS behavior were not tested.
+
+**Note (2026-10-12, MM-242).** The theme chooser is no longer the first screen of a new installation: the terms of use come before it (MM-242). It is still shown before onboarding, and Continue still opens onboarding.

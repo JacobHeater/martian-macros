@@ -9,7 +9,7 @@
  * `currentSchema` to the new shape (a new install is created from it), and
  * add the step that takes an existing database there to `migrationSteps`.
  */
-export const currentSchemaVersion = 1;
+export const currentSchemaVersion = 2;
 
 /** Every table, in the order they are created and emptied. */
 export const tables = [
@@ -154,6 +154,8 @@ CREATE TABLE "user_preferences" (
   "under_eating_dismissed_epoch_day" INTEGER NULL,
   "return_screen_dismissed_epoch_day" INTEGER NULL,
   "recovery_check_in_skipped_epoch_day" INTEGER NULL,
+  "terms_accepted_version" INTEGER NULL,
+  "terms_accepted_epoch_day" INTEGER NULL,
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

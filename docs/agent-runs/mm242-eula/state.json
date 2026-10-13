@@ -1,0 +1,726 @@
+{
+  "schema_version": 1,
+  "task_id": "mm242-eula",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feature/mm237-storybook-material",
+    "commit": "40c8d1b72f02e98fda875457ae812969d651f737"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, acting as chair and single edit owner, branch feature/mm242-eula",
+    "paths": [
+      "apps/mobile/src/terms",
+      "apps/mobile/src/app/AppRoot.tsx",
+      "apps/mobile/src/data",
+      "apps/mobile/src/domain",
+      "apps/mobile/src/settings/SettingsScreen.tsx",
+      "apps/mobile/test",
+      "requirements",
+      "docs/agent-runs/mm242-eula"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Scope, assign, save reports, resolve conflicts, own the edits.",
+      "role": "chair",
+      "reviewer": "Claude Opus 5.5 parent session, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [
+          "All five reports in full",
+          "The code changed for MM-242",
+          "The built stories in a browser"
+        ],
+        "not_inspected": [
+          "The reviewers' citations line by line",
+          "Anything on a device"
+        ],
+        "referrals": [
+          "Owner: MM-242 \"Still to be decided\"",
+          "Attorney: the whole text",
+          "QA and UX: the built story and a device"
+        ],
+        "methods": [
+          "source-inspection",
+          "test-results",
+          "render-inspection"
+        ],
+        "limitations": "The chair is also the edit owner, so its view of the result is not independent."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Each reviewer researched its own question directly.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None by the chair.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Statements a consumer wellness coaching app must and must not make; whether the general-wellness framing is supportable; guard order; what needs an attorney.",
+      "role": "safety",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/safety.md": "2a75216f74052225f1712a0759a0fa78c513e14761a85d89a4d2cdb6688944f7",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "AppRoot, onboarding, HealthStep, HealthRecheckScreen, AdultsOnlyScreen, CoachingPolicy, ScreeningAnswers, cautionMessage, underEatingText",
+          "MM-11, MM-13, MM-29, MM-95, MM-96, MM-112, MM-114",
+          "docs/evidence.md lines 1-125 and docs/non-goals.md in part"
+        ],
+        "not_inspected": [
+          "MM-113, MM-115 to MM-118, MM-110, MM-94",
+          "coach and dashboard screens, stories, tests, the Android shell, any store listing"
+        ],
+        "referrals": [
+          "Attorney: the four condition-specific behaviours (S1)",
+          "MM-29 reviewer: the numbers and the emergency symptom list",
+          "MM-96: S2, S4, S5"
+        ],
+        "limitations": "Not a whole-app claims audit. Nothing run, no render. Input hashes were computed by the chair for seven key files, not every file read."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is a general-wellness footing supportable for what the app does, and what do FDA, FTC and Google Play say a health app must and must not claim?",
+        "reason": "Explicit request, and a regulatory fact the repository cannot answer.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/general-wellness-policy-low-risk-devices",
+            "title": "www.fda.gov/regulatory-information/search-fda-guidance-documents/general-wellness-policy-low-risk-devices",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.fda.gov/medical-devices/device-software-functions-including-mobile-medical-applications/examples-software-functions-are-not-medical-devices",
+            "title": "www.fda.gov/medical-devices/device-software-functions-including-mobile-medical-applications/examples-software-functions-are-not-medical-devices",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.fda.gov/medical-devices/digital-health-center-excellence/step-3-software-function-intended-maintaining-or-encouraging-healthy-lifestyle",
+            "title": "www.fda.gov/medical-devices/digital-health-center-excellence/step-3-software-function-intended-maintaining-or-encouraging-healthy-lifestyle",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.ftc.gov/business-guidance/resources/mobile-health-apps-interactive-tool",
+            "title": "www.ftc.gov/business-guidance/resources/mobile-health-apps-interactive-tool",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.ftc.gov/business-guidance/resources/health-products-compliance-guidance",
+            "title": "www.ftc.gov/business-guidance/resources/health-products-compliance-guidance",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/16679511?hl=en",
+            "title": "support.google.com/googleplay/android-developer/answer/16679511",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/safety.md; its sources table gives the page title, date and the claim it supports."
+          }
+        ],
+        "summary": "The core functions match FDA non-device examples; four behaviours that change a number because of a named condition are not established as within that footing. A disclaimer does not rescue a contradicting claim.",
+        "limitations": "Partly blocked: both FDA guidance PDFs could not be read, so the guidance text itself is unquoted. Pages were read through a summarising retrieval tool."
+      }
+    },
+    {
+      "task": "What the agreement may truthfully say about data; whether a separate privacy policy is required; the acceptance record; third-party terms; what needs an attorney.",
+      "role": "privacy-security",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/privacy-security.md": "a7d512ae077effe52fa0954492579e0347adf64c332a2e477798231178557b0d",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "Settings, HealthConnectSection, AppRoot, FoodDatabaseScreen, PackManifest, SqlDataEraser, schema, check-offline.mjs",
+          "AndroidManifest, build.gradle, MmDbPlugin, MmHealthPlugin, MmPacksPlugin, MmScannerPlugin, ScanActivity",
+          "MM-95, MM-57, MM-56, MM-62, MM-68, MM-13"
+        ],
+        "not_inspected": [
+          "Reminder receivers, PackDownload.ts, openAppServices, the resolved Gradle graph and merged manifest, the built APK, all tests"
+        ],
+        "referrals": [
+          "QA: a release build under a network monitor (MM-244)",
+          "Attorney: HBNR, Washington and Nevada applicability, Play encryption wording"
+        ],
+        "limitations": "No runtime and no network capture: the ML Kit telemetry concern rests on Google's disclosure, not observation. Statute readings are a non-lawyer's."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does the platform or the law require a privacy policy separate from the terms for an app that keeps health data only on the device?",
+        "reason": "Explicit request; current platform policy and legal applicability.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/10144311?hl=en",
+            "title": "support.google.com/googleplay/android-developer/answer/10144311",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
+            "title": "support.google.com/googleplay/android-developer/answer/10787469",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/12991134?hl=en",
+            "title": "support.google.com/googleplay/android-developer/answer/12991134",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/16555673",
+            "title": "support.google.com/googleplay/android-developer/answer/16555673",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://developer.android.com/health-and-fitness/guides/health-connect/develop/get-started",
+            "title": "developer.android.com/health-and-fitness/guides/health-connect/develop/get-started",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://developers.google.com/ml-kit/android-data-disclosure",
+            "title": "developers.google.com/ml-kit/android-data-disclosure",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://developer.android.com/identity/data/autobackup",
+            "title": "developer.android.com/identity/data/autobackup",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.law.cornell.edu/cfr/text/16/318.2",
+            "title": "www.law.cornell.edu/cfr/text/16/318.2",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.ftc.gov/business-guidance/resources/complying-ftcs-health-breach-notification-rule-0",
+            "title": "www.ftc.gov/business-guidance/resources/complying-ftcs-health-breach-notification-rule-0",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://app.leg.wa.gov/RCW/default.aspx?cite=19.373&full=true",
+            "title": "app.leg.wa.gov/RCW/default.aspx",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.atg.wa.gov/protecting-washingtonians-personal-health-data-and-privacy",
+            "title": "www.atg.wa.gov/protecting-washingtonians-personal-health-data-and-privacy",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.leg.state.nv.us/NRS/NRS-603A.html",
+            "title": "www.leg.state.nv.us/NRS/NRS-603A.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/privacy-security.md; its sources table gives the page title, date and the claim it supports."
+          }
+        ],
+        "summary": "Google Play requires a privacy policy for every app, separate from any terms, at a public address and inside the app. Whether the HBNR or state consumer-health-data laws reach on-device-only processing is not settled by any source retrieved.",
+        "limitations": "eCFR was not retrievable; Cornell LII was used. Other states, GitHub's privacy statement, ML Kit terms and the ODbL text were not researched."
+      }
+    },
+    {
+      "task": "Scope and non-goals, guard order, proposed acceptance criteria, owner decisions, traceability.",
+      "role": "product",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/product.md": "df56dea206866be95e0ffa546dbf9eea73909554f6510c1cdccba49d6417ca5e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/product.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "AppRoot, AdultsOnlyScreen, PreferencesRepository, SqlPreferencesRepository, SqlDataEraser, schema, SettingsScreen, FirstRun stories",
+          "MM-9, MM-11, MM-13, MM-29, MM-62, MM-80, MM-87, MM-89, MM-94, MM-95, MM-96, MM-112, MM-165, MM-184",
+          "docs/non-goals.md, roadmap README and WS-13"
+        ],
+        "not_inspected": [
+          "docs/architecture.md, docs/evidence.md, voice.test.ts, state/, the Android shell, most of roadmap.json"
+        ],
+        "referrals": [
+          "Owner: thirteen listed decisions",
+          "QA: the erase path at runtime"
+        ],
+        "limitations": "Source inspection only. The roadmap graph was read in part."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Do the stores require, default to or constrain a developer EULA?",
+        "reason": "A platform-policy fact affecting an owner decision.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://play.google/developer-distribution-agreement.html",
+            "title": "play.google/developer-distribution-agreement.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/product.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/googleplay/android-developer/answer/16679511",
+            "title": "support.google.com/googleplay/android-developer/answer/16679511",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/product.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+            "title": "www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/product.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://developer.apple.com/help/app-store-connect/manage-app-information/provide-a-custom-license-agreement/",
+            "title": "developer.apple.com/help/app-store-connect/manage-app-information/provide-a-custom-license-agreement/",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/product.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://developer.apple.com/app-store/review/guidelines/",
+            "title": "developer.apple.com/app-store/review/guidelines/",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/product.md; its sources table gives the page title, date and the claim it supports."
+          }
+        ],
+        "summary": "Neither store requires an in-app agreement. On Play a custom EULA is optional and cannot override the Distribution Agreement.",
+        "limitations": "Pages summarised by the retrieval tool; Apple's minimum terms not retrieved."
+      }
+    },
+    {
+      "task": "How a legal agreement at the start affects comprehension and trust; wording for the short account, the actions and a change of terms; wording to avoid.",
+      "role": "coaching",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/coaching.md": "a0df7e673a2d8aa16e8c58cf9c14177fb34185dca0db40c3b73607b46c0df48b",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "voice.test.ts, HealthStep, WelcomeStep, ThemeChooserScreen, AppRoot, AdultsOnlyScreen, design/voice-and-wording.md",
+          "MM-110, MM-112, MM-114, MM-11, MM-13, MM-158, MM-147, MM-96"
+        ],
+        "not_inspected": [
+          "The other onboarding steps, WelcomeBackScreen, HealthRecheckScreen, Settings beyond a search, the stories"
+        ],
+        "referrals": [
+          "Safety: the clinician sentence",
+          "Lawyer: whether a summary may sit above binding text and which governs"
+        ],
+        "limitations": "No render, no test run, no readers observed. Effects on trust and on people at risk of eating disorders are inference."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Do people read and understand terms and consent documents, and do plain-language or layered summaries improve comprehension?",
+        "reason": "Explicit request, and a material behavioural claim.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:23879694%20AND%20SRC:MED&resultType=core&format=json",
+            "title": "www.ebi.ac.uk/europepmc/webservices/rest/search",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/coaching.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.springerprofessional.de/doi/10.1007/978-3-642-03168-7_3",
+            "title": "www.springerprofessional.de/doi/10.1007/978-3-642-03168-7_3",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/coaching.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://chicagounbound.uchicago.edu/jls/vol45/iss3/3",
+            "title": "chicagounbound.uchicago.edu/jls/vol45/iss3/3",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/coaching.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.yorku.ca/news/2022/12/06/service-agreement-sees-internet-users-consenting-to-give-up-a-kidney/",
+            "title": "www.yorku.ca/news/2022/12/06/service-agreement-sees-internet-users-consenting-to-give-up-a-kidney/",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/coaching.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.ftc.gov/news-events/news/press-releases/2022/09/ftc-report-shows-rise-sophisticated-dark-patterns-designed-trick-trap-consumers",
+            "title": "www.ftc.gov/news-events/news/press-releases/2022/09/ftc-report-shows-rise-sophisticated-dark-patterns-designed-trick-trap-consumers",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/coaching.md; its sources table gives the page title, date and the claim it supports."
+          }
+        ],
+        "summary": "Most people accept without reading; format changes help little for privacy notices and more in research consent. Write the short account well but plan as though it is not read, and repeat the safety facts in context.",
+        "limitations": "Partly blocked: the original Obar paper, the FTC staff report and the Common Rule text were not retrievable. Evidence is indirect and dated 2009 to 2022."
+      }
+    },
+    {
+      "task": "Structure of the guard screen, its states, how the terms are reached later, a pre-build walkthrough, dark patterns to exclude.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-12",
+      "status": "complete",
+      "inspected_commit": "40c8d1b72f02e98fda875457ae812969d651f737",
+      "input_hashes": {
+        "AGENTS.md": "1f434f7936840b12c4a04219f6125b8f3f9083865fc3f796f45e11a2379d7306",
+        "apps/mobile/src/app/AppRoot.tsx": "330848cb61854794f8402285bc84ae51a4e8b9d1e2f45a0ec8d7a9e263f3fa35",
+        "apps/mobile/src/onboarding/HealthStep.tsx": "5430c837c8f3ef17051fcf029ba02633622bd594c38b81e22142de2de2fda4c8",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "7f45fb77056bd095213301d27e550d90328c7e971876f91810f0ebed5225221e",
+        "apps/mobile/src/data/schema.ts": "355265fd3331fd4f41c24b6b98500d93b2262eaa100285b62fdcbbd3ace0962f",
+        "apps/mobile/src/domain/CoachingPolicy.ts": "99b72fe1acd726c62aa5d6aefff9abebaa55c9fb19aa3d5303e02d83f431445a",
+        "apps/mobile/test/voice.test.ts": "6b4b31131faa90935547fa67e743e7421b17a01cb9ac9e390edab4d6aaaf4b36",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "AppRoot, Screen, App, NavigatorHost, HardwareBack, BackButton, the four comparable guards, OnboardingScreen, the shared controls and their CSS",
+          "HowThisWorksScreen, EvidenceQuestionScreen, SettingsScreen, FirstRun stories, stories.test.tsx"
+        ],
+        "not_inspected": [
+          "platform/leaveApp, the preferences interfaces, overlays internals, the Android shell text-zoom setting, requirement tickets"
+        ],
+        "referrals": [
+          "QA: TalkBack, hardware back and 200% text on a device",
+          "Lawyer: whether a single button is sufficient assent"
+        ],
+        "limitations": "A walkthrough of a proposal, before the screen existed: it has to be repeated on the built story. No render, device or assistive technology."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Which WCAG 2.2 criteria apply to a terms screen, and is there evidence for scroll-to-accept over an explicit action?",
+        "reason": "Explicit request.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/reflow.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/reflow.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html",
+            "title": "www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.w3.org/TR/coga-usable/",
+            "title": "www.w3.org/TR/coga-usable/",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://support.google.com/accessibility/android/answer/7101858",
+            "title": "support.google.com/accessibility/android/answer/7101858",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          },
+          {
+            "url": "https://www.kau.se/en/news/blog-do-we-truly-have-agree-online-terms-and-conditions-blindly",
+            "title": "www.kau.se/en/news/blog-do-we-truly-have-agree-online-terms-and-conditions-blindly",
+            "published_or_updated": null,
+            "accessed": "2026-10-12",
+            "claim": "Cited in findings/ux-accessibility.md; its sources table gives the page title, date and the claim it supports."
+          }
+        ],
+        "summary": "Headings, a short summary, actions always in view, no scroll gate and a spoken failure message. Evidence on forced scrolling is contested and carries an accessibility cost.",
+        "limitations": "Partly blocked: Material 3 dialog guidance, the EDPB guidelines and the FTC report were not retrievable."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training content is in scope: the task is an agreement and one guard screen.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "No training content is in scope: the task is an agreement and one guard screen."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The condition-specific numbers the safety reviewer flagged go to MM-29's qualified reviewer, not to a panel lens.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "The condition-specific numbers the safety reviewer flagged go to MM-29's qualified reviewer, not to a panel lens."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The only measurement claim in the agreement is that the numbers are estimates, which the evidence register already states.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "The only measurement claim in the agreement is that the numbers are estimates, which the evidence register already states."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch was used by each reviewer for discovery."
+      ],
+      "retrieval": [
+        "WebFetch retrieved the cited pages; it returns a summarising model's extraction, not raw text, and could not read PDFs."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-12",
+      "limitations": "PDF guidance documents and several journal pages were not readable. Quotes in the reports are as the tool returned them."
+    }
+  ],
+  "unresolved_questions": [
+    "Who grants the licence, under which state's law, with what dispute terms and contact address?",
+    "Does the general-wellness footing hold for the four condition-specific behaviours (safety S1)?",
+    "What does ML Kit actually send from this app (MM-244)?",
+    "Do the Health Breach Notification Rule or the Washington and Nevada consumer-health-data laws reach an app that keeps data only on the device?",
+    "Is a single labelled button sufficient assent, and may a short account sit above the binding text?",
+    "Where does the owner want the guard relative to the theme chooser?"
+  ],
+  "decisions": [
+    {
+      "id": "MM242-guard-first",
+      "status": "pending",
+      "summary": "Built as the first guard on every installation (product). UX and coaching prefer a later position for a new person; the owner decides.",
+      "authority": "Product owner"
+    },
+    {
+      "id": "MM242-draft-until-reviewed",
+      "status": "pending",
+      "summary": "The shipped text is a draft by non-lawyers. Attorney review is a release gate added to MM-94.",
+      "authority": "Product owner, with a licensed attorney"
+    },
+    {
+      "id": "MM242-no-absolute-privacy-claim",
+      "status": "accepted",
+      "summary": "The terms say the app does not send the person's records, and report Google's own statement about ML Kit; they never say nothing is uploaded.",
+      "authority": "Chair, from the privacy-security finding PS-1; within the owner's offline constraint"
+    },
+    {
+      "id": "MM242-no-scroll-gate-no-checkbox",
+      "status": "accepted",
+      "summary": "One labelled button, both actions always in view, nothing gated on scrolling (UX, coaching).",
+      "authority": "Chair, subject to the attorney's view on assent"
+    },
+    {
+      "id": "MM242-erase-clears-agreement",
+      "status": "accepted",
+      "summary": "Erase all data removes the agreement, so first use starts with the terms (product, privacy).",
+      "authority": "Chair; consistent with MM-62"
+    },
+    {
+      "id": "MM242-decline-does-not-strand-records",
+      "status": "accepted",
+      "summary": "A person with records who chooses Not now can erase them from the guard after confirming (product P-6, UX-7, coaching C-6).",
+      "authority": "Chair; consistent with MM-62"
+    }
+  ],
+  "pending_work": [
+    "Owner decisions listed in MM-242 under \"Still to be decided\".",
+    "Attorney review of the whole text and of the regulatory position.",
+    "MM-244: observe what the scanner sends.",
+    "Device checks: TalkBack order and announcements, hardware back on the guard, 200% text and 320 px width.",
+    "MM-96: the in-app wording the safety reviewer flagged (S2, S4, S5)."
+  ],
+  "tests": [],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": true
+  }
+}

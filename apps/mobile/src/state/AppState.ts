@@ -11,6 +11,7 @@ import { Meal } from '../domain/Meal';
 import type { Pause } from '../domain/Pause';
 import type { PlannedReminder } from '../domain/PlannedReminder';
 import type { RecoveryCheckIn } from '../domain/RecoveryCheckIn';
+import type { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ReminderKind } from '../domain/ReminderKind';
 import { ReminderSetting } from '../domain/ReminderSetting';
 import type { ThemePreference } from '../domain/ThemePreference';
@@ -122,6 +123,9 @@ export class AppState {
 
   /** Light, dark or follow the phone (MM-165). */
   readonly themePreference: StreamCell<ThemePreference>;
+
+  /** The agreement to the terms of use, if there is one (MM-242). */
+  readonly termsAcceptance: StreamCell<TermsAcceptance | undefined>;
 
   /** A look being tried on the theme chooser before it is kept (MM-184). */
   readonly themePreview = new ValueCell<ThemePreference | undefined>(undefined);
@@ -353,6 +357,7 @@ export class AppState {
 
     this.setup = stream(() => s.setup.watchSetup());
     this.themePreference = stream(() => s.preferences.watchThemePreference());
+    this.termsAcceptance = stream(() => s.preferences.watchTermsAcceptance());
     this.foodCatalog = stream(() => {
       // Read here so that an install or a removal makes this ask again.
       void this.packChanges.value;

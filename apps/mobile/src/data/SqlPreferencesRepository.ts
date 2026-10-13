@@ -2,11 +2,12 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
+import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, flag, named, optionalDay } from './columns';
+import { asFlag, day, flag, integer, named, optionalDay, optionalInteger } from './columns';
 import { upsert, type Values } from './statements';
 
 /**
@@ -90,5 +91,23 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveRecoveryCheckInSkippedOn(day: CalendarDate): Promise<void> {
     return this.save({ recovery_check_in_skipped_epoch_day: day.epochDay });
+  }
+
+  watchTermsAcceptance(): Watched<TermsAcceptance | undefined> {
+    return this.watch((row) =>
+      row === undefined || optionalInteger(row, 'terms_accepted_version') === undefined
+        ? undefined
+        : new TermsAcceptance({
+            version: integer(row, 'terms_accepted_version'),
+            acceptedOn: day(row, 'terms_accepted_epoch_day'),
+          }),
+    );
+  }
+
+  saveTermsAcceptance(acceptance: TermsAcceptance): Promise<void> {
+    return this.save({
+      terms_accepted_version: acceptance.version,
+      terms_accepted_epoch_day: acceptance.acceptedOn.epochDay,
+    });
   }
 }
