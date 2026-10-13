@@ -66,18 +66,3 @@ Scenario: A biased, sloppy logger still progresses
   the first ten days left out of the measurement, so their first adaptive change comes at day 28, not day 14. The "first adaptive
   change" scenario above holds as written only for a user who starts at maintenance.
 - A user is never told that targets changed; they have to notice. A notice or summary at check-in belongs with MM-33.
-
-## UI/UX Assets
-
-- [Flows](../ui-ux-assets/flows/index.html) — Current. Draws CheckInHost, the
-  "the gates that can stand in front of the app" path and the "the check-in,
-  its explanation and the recovery questions" path as built on 2026-10-11:
-  none of its own. Frames: `#weekly-check-in`, `#opening-the-app-later`. Drawn
-  from the source alone; not compared with the running app. Runs the weekly
-  check-in when the app opens; it draws nothing itself. It shows what exists
-  and approves nothing.
-- [Coach](../ui-ux-assets/views/coach.html#coach-default) — Current. Draws
-  CoachScreen as built on 2026-10-11: populated, first day, learning. Compared
-  with a screenshot test of the built screen. Compared with the screenshot
-  test for the top of the page only. It shows what exists and approves
-  nothing.

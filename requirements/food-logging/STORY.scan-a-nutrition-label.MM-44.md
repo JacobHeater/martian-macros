@@ -62,10 +62,3 @@ Not built or not verified: the real camera and ML Kit have not been run on the e
 real photographs is unknown; panels whose labels and values sit in separate columns are not read; sugars and saturated fat are not
 read (a saved food has no place for them yet); unsure fields are not individually marked, only the calories-versus-macros check and
 the missing-fields note; the iOS build with ML Kit is untried; contributing to Open Food Facts is undecided.
-
-## UI/UX Assets
-
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-custom-food) —
-  Current. Draws CustomFoodForm as built on 2026-10-11: filled from a label,
-  label not read, bad barcode. Drawn from the source alone; not compared with
-  the running app. It shows what exists and approves nothing.

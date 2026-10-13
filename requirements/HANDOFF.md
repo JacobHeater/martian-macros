@@ -26,23 +26,36 @@ task runner, re-points `coverage.json` at `apps/mobile/src` (150 surfaces),
 records the Flutter theme in `apps/mobile/test/support/flutterTheme.json` for
 the tokens test, and rewrites CI to Node + a debug Android build.
 
-**Standing rule (owner, 2026-10-12).** Screen and design verification is
-done in a browser; `requirements/ui-ux-assets/` is where design decisions
-are tracked and where the owner opines without running the app. Device and
-emulator screenshots verify native behavior only, never the design.
-The app folder is `apps/mobile` (renamed from `apps/web` the same day): a
-mobile application built on web technologies.
+**Standing rules (owner, 2026-10-12).** Screen and design verification is
+done in a browser; **Storybook is the design register** (MM-237,
+`mm storybook`), where design decisions are tracked on tickets (`## UI/UX`
+story links) and where the owner opines without running the app. The old
+HTML register (`requirements/ui-ux-assets/`) is deleted, by the owner's call,
+with every ticket's `## UI/UX Assets` section; never add HTML drawings of
+screens. The panel's implementation role is `react-capacitor` (MM-241);
+there is no `flutter` role.
+Icons are Material's Outlined set behind `MmIcon` (MM-236); no hand-drawn
+glyphs. Device and emulator screenshots verify native behavior only, never
+the design. The app folder is `apps/mobile` (renamed from `apps/web` the
+same day): a mobile application built on web technologies.
 
 **Database.** The React app's schema lives in `apps/mobile/src/data/schema.ts`
 with its migration steps and tests. Only one schema change at a time.
 
-**Next ticket ID.** `mm req next` is the authority (MM-234 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-242 at this writing).
 
-**HTML UI/UX assets** live in `requirements/ui-ux-assets/` and are linked
-from their tickets under `## UI/UX Assets` (MM-210). Every React view and
-component is listed in `coverage.json` (MM-211) against the same drawings
-the Flutter app was built from; a UI change is not done until its drawing
-and manifest entry are changed with it.
+**The register is complete (MM-237, done).** Every screen, sheet and step
+has a story under `apps/mobile/src/gallery/screens/`: the whole app as
+shipped over in-memory stores on a fixed day, in a phone's viewport, opened
+at that screen (`screenStory({ covers, shows, open, walk })`). A new
+`*Screen.tsx`, `*Sheet.tsx` or `*Step.tsx` with no story fails
+`test/gallery/stories.test.tsx`, which also draws and walks every story.
+Two rules came out of the owner's phone review the same day: a stylesheet
+rule that removes an outline must name `:focus-visible` (MM-239, a focused
+field drew two rings), and a slider inside a list group is an
+`MmSliderRow`, never a bare `MmSlider` (MM-240). Do not start a second
+`storybook dev` while one is running: they share a dependency cache and
+the first one starts answering 504 until it is restarted.
 
 **What to build next.**
 - MM-229's leftovers: screenshot tests of the React app, and a run on the
@@ -91,6 +104,11 @@ limitations.
   `packages/`, `.fvmrc` and the goldens workflow are deleted; CI runs on
   Node and assembles the debug APK; `coverage.json` lists the React
   sources; the evidence register and docs now name the TypeScript files.
+- Late in the session the owner rejected the hand-drawn nav icons
+  ("hammers tangled together") and ruled: standard Material icons
+  (MM-236) and Storybook as the design register, replacing the HTML
+  register entirely (MM-237). Both shipped the same day; screen stories
+  remain MM-237's open step.
 - The pack build keeps DuckDB extract + the TS pipeline
   (`mm food build` drives `apps/mobile/scripts/food-build.mjs` through vite).
 

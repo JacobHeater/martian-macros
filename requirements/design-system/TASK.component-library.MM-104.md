@@ -60,27 +60,3 @@ Scenario: Screens changed over
 ## Notes (built and verified)
 - The component library is `apps/mobile/lib/src/ui/` (35 files; see MM-163) and `charts/`. Every existing screen was migrated onto it and split one declaration per file. It is a folder in the app,
   not yet a `packages/ui` package; that move is not needed until a second app or tool shares it.
-
-## UI/UX Assets
-
-- [Component catalog](../ui-ux-assets/components/index.html) — Current. Draws
-  ChoiceCard, DayStepper, GroupHeader, InfoCard, MacroBar, MacroFigure,
-  MmActionChip, MmAppBar, MmButton, MmCheckRow, MmChoiceChip, MmDisclosure,
-  MmDropdown, MmFab, MmIconButton, MmListGroup, MmListRow, MmMenuButton,
-  MmNavigationBar, MmProgressBar, MmSegmented, MmSlider, MmSpinner,
-  MmStatusChip, MmStrokeIcon, MmStrokeIconPainter, MmSurface, MmSwitchRow,
-  MmTextField, Notice, NumberEntryCard, SectionLabel, showMmChoice,
-  showMmConfirm, showMmSnackBar, StatRow, StatusRow and StepProgress as built
-  on 2026-10-11: unselected, selected, badge, a past day, today, shown, plain,
-  with action, and more. Frames: `#choice-card`, `#day-stepper`,
-  `#mm-list-group`, `#info-card`, `#macro-bar`, `#macro-figure`,
-  `#mm-action-chip`, `#mm-app-bar`, `#mm-button`, `#mm-check-row`,
-  `#mm-choice-chip`, `#mm-disclosure`, `#mm-dropdown`, `#mm-fab`,
-  `#mm-icon-button`, `#mm-menu-button`, `#mm-navigation-bar`,
-  `#mm-progress-bar`, `#mm-segmented`, `#mm-slider`, `#mm-spinner`,
-  `#mm-status-chip`, `#mm-stroke-icon`, `#mm-surface`, `#mm-switch-row`,
-  `#mm-text-field`, `#notice`, `#number-entry-card`, `#section-label`,
-  `#show-mm-choice`, `#show-mm-confirm`, `#show-mm-snack-bar`, `#stat-row`,
-  `#status-row`, `#step-progress`. Partly compared with screenshot tests, the
-  rest drawn from the source alone. It turns in the app and is still here. It
-  shows what exists and approves nothing.

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
-import { runEmulator, runApp, runBuild, runClean, runDemo } from './src/android.ts';
+import { runEmulator, runApp, runBuild, runClean, runDemo, runScreenshot } from './src/android.ts';
 import { runCi } from './src/ci/ciCommand.ts';
 import { runFood } from './src/food.ts';
 import { runPanel } from './src/panelCommand.ts';
@@ -59,6 +59,7 @@ const commands: Record<string, [string, Command]> = {
   bootstrap: ['Install the exact dependencies from the lock file', () => run(['npm', 'ci'], { cwd: webApp })],
   check: ['CI gate: requirements, panel, tool tests, web (type check, tests, build, offline)', check],
   web: ['Check the React app: type check, tests, build, offline', web],
+  storybook: ['The design register, live: mm storybook [build] (MM-237)', (a) => run(['npm', 'run', a[0] === 'build' ? 'build-storybook' : 'storybook'], { cwd: webApp })],
   test: ['Run the tests: the tool’s own, then the web suite (--tool for the tool alone)', test],
   req: ['Requirements: mm req [list | next | show <id>] (no args validates)', (a) => runRequirements(repoRoot, a)],
   panel: ['Expert panel: validate roles, native adapters and templates [run-dir]', (a) => runPanel(repoRoot, a)],
@@ -68,6 +69,7 @@ const commands: Record<string, [string, Command]> = {
   run: ['Build, install and launch on a device: mm run [-d DEVICE]', (a) => runApp(repoRoot, a)],
   demo: ['The isolated demo app on an exact device: mm demo -d <device ID>', (a) => runDemo(repoRoot, a)],
   emulator: ['Start an emulator: mm emulator [id] [--cold] | list', (a) => runEmulator(repoRoot, a)],
+  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238)', (a) => runScreenshot(a)],
   build: ['Build the Android app: mm build android [--release]', (a) => runBuild(repoRoot, a)],
   clean: ['Remove build outputs and caches', () => runClean(repoRoot)],
 };

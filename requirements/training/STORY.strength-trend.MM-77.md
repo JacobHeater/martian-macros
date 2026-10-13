@@ -97,19 +97,3 @@ Scenario: Data cannot be read
 - Progress charts, full lift detail, all-lift navigation and an unusable
   high-rep history were inspected in the isolated Martian Android emulator
   demo. Linux screenshots cover Light, Dark and Martian. iOS was not run.
-
-## UI/UX Assets
-
-- [Progress](../ui-ux-assets/views/progress.html) — Current. Draws
-  StrengthHistoryScreen, StrengthLiftsScreen and StrengthSection as built on
-  2026-10-11: populated, empty, loading, error. Frames: `#strength-history`,
-  `#strength-lifts`, `#progress-strength-states`. Partly compared with
-  screenshot tests, the rest drawn from the source alone. It shows what exists
-  and approves nothing.
-- [Component
-  catalog](../ui-ux-assets/components/index.html#strength-trend-card) —
-  Current. Draws StrengthTrendCard as built on 2026-10-11: populated, no
-  estimate, deleted exercise. Compared with a screenshot test of the built
-  screen. The no-estimate and deleted states are on
-  views/progress.html#progress-strength-states. It shows what exists and
-  approves nothing.

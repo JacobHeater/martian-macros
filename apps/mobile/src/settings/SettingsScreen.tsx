@@ -8,7 +8,6 @@ import { dailyActivityLabel } from '../format/dailyActivityLabel';
 import { detailLevelDescription } from '../format/detailLevelDescription';
 import { detailLevelLabel } from '../format/detailLevelLabel';
 import { trainingStatusLabel } from '../format/trainingStatusLabel';
-import { Gallery } from '../gallery/Gallery';
 import { clamp } from '../lang/clamp';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { PauseScreen } from '../pause/PauseScreen';
@@ -23,6 +22,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
+import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { HealthConnectSection } from './HealthConnectSection';
@@ -124,7 +124,7 @@ export function SettingsScreen() {
           onChange={(on) => void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: on ? 25 : undefined }))}
         />
         {bodyFat === undefined ? null : (
-          <MmSlider
+          <MmSliderRow
             name="Body fat percent"
             value={clamp(bodyFat, 5, 55)}
             min={5}
@@ -202,19 +202,6 @@ export function SettingsScreen() {
           onPress={() => void erase()}
         />
       </MmListGroup>
-      {services.environment === 'dev' ? (
-        <>
-          <GroupHeader text="Development" />
-          <MmListGroup>
-            <MmListRow
-              leadingIcon="edit"
-              title="Component gallery"
-              subtitle="Every color and component, light and dark."
-              onPress={() => void navigator.push(() => <Gallery />)}
-            />
-          </MmListGroup>
-        </>
-      ) : null}
       <p className="app-caption settings-about">Martian Macros · {services.environment}</p>
     </Screen>
   );

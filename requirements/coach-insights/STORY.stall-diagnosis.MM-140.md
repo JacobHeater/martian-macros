@@ -128,10 +128,3 @@ Not built, or approximate:
   slightly slower to call a stall.
 - The simulated "accurate logger whose expenditure is 300 kcal below the estimate" scenario is tested with a constructed snapshot,
   not through the closed-loop simulator.
-
-## UI/UX Assets
-
-- [Coach](../ui-ux-assets/views/coach.html#coach-stall) — Current. Draws
-  StallCard as built on 2026-10-11: one cause, evidence open. Drawn from the
-  source alone; not compared with the running app. One of the causes is drawn.
-  It shows what exists and approves nothing.

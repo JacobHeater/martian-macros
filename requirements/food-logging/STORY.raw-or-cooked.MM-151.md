@@ -101,10 +101,3 @@ Done since: the choice is remembered. Because an entry now stores which food it 
 cooked pair starts on the state it was last logged in, weighed in grams, found among the recent foods (the last 20 distinct entries,
 so a state not logged recently is forgotten). The switch still applies to weighing only; choosing a serving logs the food as picked.
 Tested in `raw_or_cooked_test.dart`.
-
-## UI/UX Assets
-
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-amount) —
-  Current. Draws FoodAmountStep as built on 2026-10-11: filled, no amount.
-  Drawn from the source alone; not compared with the running app. It shows
-  what exists and approves nothing.

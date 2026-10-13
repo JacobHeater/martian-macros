@@ -105,10 +105,3 @@ Open, and needing the owner or MM-29:
   decision, not made here.
 - The question on marking a low day complete is asked each time such a day is marked, not once per day.
 - The adherence summary's pointer to this notice (MM-149) is not built.
-
-## UI/UX Assets
-
-- [Coach](../ui-ux-assets/views/coach.html#coach-under-eating) — Current.
-  Draws UnderEatingNotice as built on 2026-10-11: shown. Drawn from the source
-  alone; not compared with the running app. It shows what exists and approves
-  nothing.

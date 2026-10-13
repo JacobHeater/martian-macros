@@ -103,10 +103,3 @@ Done: the tier and its reason are computed in the pipeline and stored in the pac
 Not done, because the screens they belong on do not exist yet (MM-42, MM-43): ranking by tier in search, the amount-step display,
 hiding lower-tier duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the pipeline rules still
 provisional in `pack_entry_for.dart` (near-tolerance, missing fields, older than five years). The ticket stays in progress.
-
-## UI/UX Assets
-
-- [Add food sheet](../ui-ux-assets/views/add-food.html#add-food-search) —
-  Current. Draws FoodTrustMark as built on 2026-10-11: reference, label, check
-  this. Drawn from the source alone; not compared with the running app. It
-  shows what exists and approves nothing.

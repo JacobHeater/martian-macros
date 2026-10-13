@@ -44,10 +44,6 @@ Replaced the equal-width route row with intrinsic-width buttons in a wrapping
 layout. The regression test checks the three labels at 360 dp at the default
 and 2.0x text scales.
 
-## UI/UX Assets
-- [Add food sheet](../ui-ux-assets/views/add-food.html) — Current. Shows the
-  route buttons wrapping without splitting their labels.
-
 ## Notes
 - Regression: `apps/mobile/test/add_food_route_labels_test.dart`, enabled for
   the fixed layout at default and 2.0x text scaling.

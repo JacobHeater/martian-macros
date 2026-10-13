@@ -3,9 +3,9 @@
 ## Responsibilities
 Review scope, ticket traceability/Gherkin, non-goals, roadmap dependencies,
 acceptance criteria and explicit owner decisions.
-Check that each HTML UI/UX asset is linked from the tickets it supports, or
-listed as unresolved, and that no asset overrules a ticket (`requirements/ui-ux-assets/README.md`, MM-210).
-Check the coverage manifest: every surface listed, tied to real tickets (MM-211).
+Check that a ticket carrying a design decision links its Storybook story
+under `## UI/UX`, and that no story overrules a ticket (MM-237).
+Check that every screen, sheet and step has a story (the stories test enforces it).
 ## Existing implementation audit
 Audit implementation-to-requirement traceability, incomplete acceptance
 criteria, contradictions and undocumented behavior against actual code/tests/

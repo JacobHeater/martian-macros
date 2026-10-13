@@ -55,7 +55,7 @@ export class PanelChecker {
       'product-designer',
       'ux-accessibility',
       'architecture',
-      'flutter',
+      'react-capacitor',
       'integrations',
       'privacy-security',
       'qa',
@@ -93,7 +93,7 @@ export class PanelChecker {
             'Agent(panel-training, panel-nutrition, panel-micronutrients, ' +
             'panel-coaching, panel-measurement, panel-safety, panel-product, ' +
             'panel-product-designer, panel-ux-accessibility, panel-architecture, ' +
-            'panel-flutter, panel-integrations, panel-privacy-security, panel-qa)'
+            'panel-react-capacitor, panel-integrations, panel-privacy-security, panel-qa)'
           : 'Read, Grep, Glob, WebSearch, WebFetch';
       const lines = adapter.split('\n');
       if (

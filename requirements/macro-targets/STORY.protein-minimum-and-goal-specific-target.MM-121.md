@@ -117,10 +117,3 @@ Scenario: Historical target before the minimum existed
   minimum and target marks; target-history rows from before the migration show only their recorded target.
 - Verified with focused engine calculation/body-fat uncertainty tests, migration tests, and Food/history/target-change UI tests. The full
   `fvm dart run tool/bin/mm.dart check` passed.
-
-## UI/UX Assets
-
-- [Component catalog](../ui-ux-assets/components/index.html#macro-bar) —
-  Current. Draws MacroBar as built on 2026-10-11: three macros, protein
-  minimum mark. Compared with a screenshot test of the built screen. It shows
-  what exists and approves nothing.

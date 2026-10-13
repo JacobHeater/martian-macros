@@ -28,10 +28,3 @@ Scenario: Flat primary action
 Guarded by `mm_fab_test.dart`, alongside the existing app food-entry tests.
 The integrated workspace passed `mm check`; the flat Add food button was
 inspected on the seeded Android emulator in both themes.
-
-## UI/UX Assets
-
-- [Component catalog](../ui-ux-assets/components/index.html#mm-button) —
-  Current. Draws MmButton as built on 2026-10-11: primary, off, secondary,
-  with icon, text, expanded. Compared with a screenshot test of the built
-  screen. It shows what exists and approves nothing.

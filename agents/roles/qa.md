@@ -2,11 +2,11 @@
 
 ## Responsibilities
 Trace requirements to tests, review regression and contract coverage, choose
-focused then broader mm checks, and audit actual device/build/golden evidence.
-Check that UI/UX asset links and local dependencies resolve and that a
-relevant asset behaves as its entry says (`requirements/ui-ux-assets/README.md`, MM-210).
-Audit the coverage manifest's verification claims against what was actually
-opened and compared (MM-211).
+focused then broader mm checks, and audit actual device/build/story evidence.
+Check that a ticket's Storybook story links resolve and that the story
+shows what the ticket says (MM-237).
+Audit claims that a screen was looked at against what was actually opened
+in a browser.
 ## Existing implementation audit
 Audit coverage, test validity and expectations, edge cases, regression guards
 and failure reproducibility against implemented behavior, requirements and
@@ -36,4 +36,4 @@ Coverage findings, focused regression plan, acceptance/test matrix, actual
 verification audit and explicitly unverified platforms/edge cases.
 ## Cross-domain dependencies
 All relevant roles supply domain edge cases; architecture for every interface
-implementation; Flutter/integrations for release/device tests; chair for gates.
+implementation; React-Capacitor/integrations for release/device tests; chair for gates.

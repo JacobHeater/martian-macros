@@ -79,6 +79,16 @@ it('body fat can be entered and removed', async () => {
   await expect.poll(async () => (await setup()).bodyFatPercent).toBeUndefined();
 });
 
+// MM-240: the body fat slider was put into its group bare, and ran edge to edge.
+it('every slider sits in a list row, at the row’s inset', async () => {
+  const settings = await open();
+  await userEvent.click(settings.getByRole('switch', { name: /Let the app estimate/ }));
+  await settings.findByRole('slider', { name: 'Body fat percent' });
+  const sliders = settings.getAllByRole('slider');
+  expect(sliders).toHaveLength(2);
+  for (const slider of sliders) expect(slider.closest('.mm-list-row')).not.toBeNull();
+});
+
 it('the detail of nutrition shown can be changed, and says what each shows', async () => {
   const settings = await open();
   await userEvent.click(settings.getByRole('button', { name: 'Full' }));
@@ -113,10 +123,10 @@ it('confirming erases everything and returns to initial setup', async () => {
   expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
 });
 
-it('the development group and the build are shown in a development build', async () => {
+it('the build is named, and the gallery is gone to Storybook (MM-237)', async () => {
   const settings = await open();
   expect(settings.getByText('Martian Macros · dev')).toBeInTheDocument();
-  expect(settings.getByRole('button', { name: /^Component gallery/ })).toBeInTheDocument();
+  expect(settings.queryByRole('button', { name: /gallery/i })).not.toBeInTheDocument();
 });
 
 describe('theme preference (MM-165)', () => {

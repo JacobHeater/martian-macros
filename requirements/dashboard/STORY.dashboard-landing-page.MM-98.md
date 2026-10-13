@@ -76,10 +76,3 @@ Scenario: Drilling in
   moved here from Food. Tests in `apps/mobile/test/dashboard_test.dart` follow the scenarios above.
 - Built as proposed; the product owner has not yet confirmed the contents. **Not built**: "This week" and the recomp signal (their features do not exist yet).
 - **Not verified**: the first three cards fitting one phone screen without scrolling was not measured on a device; layout is the stock Material look, not the `design/` hero.
-
-## UI/UX Assets
-
-- [Dashboard](../ui-ux-assets/views/dashboard.html#dashboard-default) —
-  Current. Draws DashboardScreen as built on 2026-10-11: populated, first day,
-  calibration, over target, paused, loading, error. Compared with a screenshot
-  test of the built screen. It shows what exists and approves nothing.
