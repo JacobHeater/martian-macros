@@ -86,7 +86,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-298 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-300 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -105,10 +105,10 @@ the first one starts answering 504 until it is restarted.
 order; `mm roadmap` draws it).
 - WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
   weeks and on failing recovery signals, forced at 20); an engine change.
-- WS-03 step 12: MM-297 (the disabled primary reads as a field in Light;
-  Storybook and the panel first), and the owner's two questions in
-  `docs/agent-runs/mm291-weigh-in/decision.md` (the weigh-in below the fold
-  at 360 by 740; the trend before and after the weigh-in).
+- WS-03 step 12 is built (MM-290 to MM-299). Open from its panel runs:
+  whether the trend above the weigh-in field anchors the entry
+  (measurement), whether a first-section "Change goal" invites switching
+  (safety), and the goal as one row instead of a section (PD-4, owner).
 - WS-03 step 11: MM-286 (destinations keep their state across tabs),
   MM-287 (Progress with one figure and lift rows), MM-289 (a demo seed
   that shows every mark); MM-288 is the owner's decision on Ember text.
@@ -235,8 +235,18 @@ limitations.
   swapped to `main`'s to prove the tests fail first; the edits were
   re-applied from the session's scripts and the suite re-run. Copy files
   to back them up, never tar to a drive path in Git Bash.
-- Moved the needle: **WS-03 step 12 placed and mostly built** (MM-290 to
-  MM-296 done, MM-297 proposed). Available next: as before, plus MM-297.
+- **The owner's answers, built the same session** (second panel run,
+  `docs/agent-runs/mm298-trend-goal-themes/`, guard pass): small phones
+  (360 by 740) are not designed for (rule 7 says so); the weight row says
+  "Trend so far 189.6 lb" before the weigh-in and "Trend 184.1 lb" with
+  "Today 183.9 lb · 7 days −0.6 lb" after it, the first weigh-in shown once
+  (MM-298); the goal is the first section of Coach under the hero and its
+  warnings, with "Change goal" (MM-299, story `Screens/Coach/Check In
+  Due`); a disabled primary or secondary has no fill, an outline at 16% and
+  a label at 38% of `--text` in every palette (MM-297), with Disabled cells
+  in the States story and a token test holding the field border at 3:1.
+- Moved the needle: **WS-03 step 12 built** (MM-290 to MM-299). Available
+  next: WS-02 step 6 (MM-135), WS-03 step 11, WS-15.
 
 ## Session 24: 2026-10-13, Claude (the hierarchy rebuild with iconography: WS-03 step 9 built)
 

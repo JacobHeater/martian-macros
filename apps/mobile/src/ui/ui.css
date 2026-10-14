@@ -54,9 +54,17 @@
 }
 .mm-button:disabled {
   border-color: transparent;
-  background: var(--selected);
-  color: var(--text3);
+  background: transparent;
+  color: color-mix(in srgb, var(--text) 38%, transparent);
   cursor: default;
+}
+/* An inert primary or secondary keeps its shape as a faint outline, never a
+   fill a field could be mistaken for, and its label fades as the platform's
+   do (38% of the text color), so it never reads as an enabled secondary, in
+   every palette (MM-297). */
+.mm-button-primary:disabled,
+.mm-button-secondary:disabled {
+  border-color: color-mix(in srgb, var(--text) 16%, transparent);
 }
 
 .mm-icon-button {

@@ -311,10 +311,7 @@
       "limitations": "No reviewer could render a story, run a test or reach a device; render claims are about the captures the chair supplied."
     }
   ],
-  "unresolved_questions": [
-    "PD-5/UX-9a: at 360 by 740 the weigh-in row is below the fold on a morning before the weigh-in; reorder, smaller hero, or sheet fallback? Owner.",
-    "Coaching/measurement: show the last trend in the row before the weigh-in, and today's raw entry after it? Owner with the coaching role."
-  ],
+  "unresolved_questions": [],
   "decisions": [
     {
       "id": "MM291-row-in-the-group",
@@ -342,15 +339,21 @@
     },
     {
       "id": "MM297-disabled-primary",
-      "status": "pending",
+      "status": "accepted",
       "summary": "The disabled primary drawn quieter than the field in every palette, through Storybook and the panel first.",
       "authority": "Chair, panel review owed"
     },
     {
       "id": "MM291-first-viewport-360",
-      "status": "pending",
+      "status": "rejected",
       "summary": "Keeping the weigh-in in the first viewport at 360 by 740.",
-      "authority": "Product owner"
+      "authority": "Product owner, 2026-10-14: small phones are not designed for"
+    },
+    {
+      "id": "MM298-trend-and-today",
+      "status": "accepted",
+      "summary": "The row shows the trend before the weigh-in and today’s entry after it; built in mm298-trend-goal-themes.",
+      "authority": "Product owner, 2026-10-14"
     }
   ],
   "pending_work": [
@@ -358,8 +361,7 @@
     "PD-8: spacing above and below the rhythm strip, drawn in the story first.",
     "UX-6: the heard name of the macro switch group.",
     "UX-8: stories for NumberEntry in a row with a value typed, an error, and a refusal.",
-    "MM-297: the disabled primary in every palette.",
-    "The owner questions under unresolved_questions."
+    "MM-297 and the owner questions: answered and built in mm298-trend-goal-themes."
   ],
   "tests": [
     {

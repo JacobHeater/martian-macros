@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "task_id": "mm298-trend-goal-themes",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "fix/dashboard-split-weighin-storybook",
+    "commit": "7908e67b5e4e1ce860b0a19011f2115db28a9195"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, acting as chair and single edit owner, branch fix/dashboard-split-weighin-storybook",
+    "paths": [
+      "apps/mobile",
+      "design",
+      "requirements",
+      "roadmap",
+      "docs/agent-runs/mm298-trend-goal-themes"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Debate the weight row before and after the weigh-in, the goal first on Coach, and the disabled button in three palettes, as drawn in their stories.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "7908e67b5e4e1ce860b0a19011f2115db28a9195",
+      "input_hashes": {
+        "docs/agent-runs/mm298-trend-goal-themes/brief.md": "d9224d8543a21b52cc4e5a96df0b8b6bc0b2027047bd9c102d1cb99e3eb78e0c",
+        "design/screen-direction.md": "0ec9cda4436dc355e80ed5d82836c48914be5205a7f9140c6b6a910c257777cf",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "docs/agent-runs/mm291-weigh-in/decision.md": "4a9c6a9dbaca0a51b800db960bcbba8df1466947afc941f733387b155270ea6f",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "DashboardScreen, WeighInRow, MmListRow, CoachScreen, OneThingRow, ui.css, tokens.css, StatesCatalog, CustomFoodForm",
+          "Eight captures at 412 by 915 and two before captures"
+        ],
+        "not_inspected": [
+          "The no-trend branch render",
+          "Dark after-state and Dark States",
+          "Coach in Light and Dark",
+          "Tests",
+          "360 by 740 (out of scope)"
+        ],
+        "referrals": [
+          "ux-accessibility: PD-2, PD-7",
+          "measurement/coaching: anchoring",
+          "safety/coaching: goal switching"
+        ],
+        "limitations": "Uncommitted working tree over the baseline; contrast by hand; fold positions estimated; no tests run."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What the convention is for disabled primary buttons, and whether an inert button label is exempt from contrast rules.",
+        "reason": "The brief asked for alternatives to the disabled outline.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://flutter.googlesource.com/mirrors/flutter/+/HEAD/dev/tools/gen_defaults/data/button_filled.json",
+            "title": "Flutter gen_defaults button_filled.json (Material 3 tokens)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "An M3 disabled filled button keeps an onSurface container at 0.12 opacity and an onSurface label at 0.38."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+            "title": "Understanding SC 1.4.3: Contrast (Minimum) (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "Text in an inactive user interface component has no contrast requirement."
+          }
+        ],
+        "summary": "Platform practice fades a disabled label to 38%; inactive labels are exempt from SC 1.4.3.",
+        "limitations": "A convention, not usability evidence; the M3 outlined disabled token was not retrieved."
+      }
+    },
+    {
+      "task": "UX guard on the same designs: comprehension of the two weights, the heard order, the disabled affordance, the field border contrast, the Coach order and the Change action.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "7908e67b5e4e1ce860b0a19011f2115db28a9195",
+      "input_hashes": {
+        "docs/agent-runs/mm298-trend-goal-themes/brief.md": "d9224d8543a21b52cc4e5a96df0b8b6bc0b2027047bd9c102d1cb99e3eb78e0c",
+        "design/screen-direction.md": "0ec9cda4436dc355e80ed5d82836c48914be5205a7f9140c6b6a910c257777cf",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "docs/agent-runs/mm291-weigh-in/decision.md": "4a9c6a9dbaca0a51b800db960bcbba8df1466947afc941f733387b155270ea6f",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "DashboardScreen, WeighInRow, MmListRow, NumberEntry, MmTextField, MmButton, MmSection, CoachScreen, OneThingRow, CoachSnapshot, ui.css, tokens.css, stories and scenarios",
+          "Eight captures at 412 by 915"
+        ],
+        "not_inspected": [
+          "Typed, invalid and refused row states",
+          "First Day render",
+          "Coach with the one thing due",
+          "360 by 740 (out of scope)",
+          "200% text",
+          "TalkBack"
+        ],
+        "referrals": [
+          "product-designer: UX-4 visual, UX-1 and UX-3 copy",
+          "measurement: anchoring",
+          "qa: a First Day render and scenario 3 test"
+        ],
+        "limitations": "Static captures; contrast by hand; no device or assistive technology; no tests run."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What SC 1.4.11 requires of text field borders and of disabled controls.",
+        "reason": "The brief asked for the field border contrast.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+            "title": "Understanding SC 1.4.11: Non-text Contrast (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "3:1 against adjacent colors outside the component; inactive components are exempt; an identifying input border must meet 3:1."
+          }
+        ],
+        "summary": "The field border passes against the surface in every palette; disabled controls are exempt.",
+        "limitations": "Ratios computed from token values, not measured on a render."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md, with no separate chair review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Owner decisions on layout and wording of figures the app already shows, and a button style; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Owner decisions on layout and wording of figures the app already shows, and a button style; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Owner decisions on layout and wording of figures the app already shows, and a button style; no health rule, coaching message, measurement, data flow or engine changes. The owner answered the coaching question (trend before, today's entry after) himself.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Owner decisions on layout and wording of figures the app already shows, and a button style; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Owner decisions on layout and wording of figures the app already shows, and a button style; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch, used once by the product designer."
+      ],
+      "retrieval": [
+        "WebFetch retrieved the Flutter M3 token source and two W3C Understanding pages."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "No reviewer could render a story, run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [
+    "Measurement: does showing the trend directly above the weigh-in field anchor the number typed, and should it sit below the field? Not asked in this run.",
+    "Safety/coaching: does a first-section Change goal invite frequent goal switching? Not asked in this run.",
+    "PD-4: the goal as one row instead of a section? Owner."
+  ],
+  "decisions": [
+    {
+      "id": "MM298-trend-named",
+      "status": "accepted",
+      "summary": "The figure reads \"Trend 184.1 lb\"; the line \"Today 183.9 lb · 7 days −0.6 lb\"; the first weigh-in is shown once.",
+      "authority": "Product owner (show both), chair on wording (UX-1, UX-2)"
+    },
+    {
+      "id": "MM297-disabled-faded",
+      "status": "accepted",
+      "summary": "Disabled primary and secondary: no fill, outline at 16% and label at 38% of --text, in every palette.",
+      "authority": "Chair, both reviewers concurring on the direction"
+    },
+    {
+      "id": "MM299-goal-first",
+      "status": "accepted",
+      "summary": "The goal is the first section under the hero and its warnings, with \"Change goal\".",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM291-first-viewport-360",
+      "status": "rejected",
+      "summary": "Designing for 360 by 740.",
+      "authority": "Product owner, 2026-10-14: not interested in small phones"
+    },
+    {
+      "id": "PD4-goal-as-row",
+      "status": "pending",
+      "summary": "The goal as one row rather than a section.",
+      "authority": "Product owner"
+    }
+  ],
+  "pending_work": [
+    "UX-3: put the \"Trend so far\" line in the weigh-in field description.",
+    "The anchoring and goal-switching questions under unresolved_questions.",
+    "PD-4 as an owner option."
+  ],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "7908e67b5e4e1ce860b0a19011f2115db28a9195",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Exit 0, last line \"All checks passed.\" on the branch working tree before this change was committed."
+    }
+  ],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

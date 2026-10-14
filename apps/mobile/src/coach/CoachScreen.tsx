@@ -75,8 +75,8 @@ function holdNote(setup: UserSetup, snapshot: CoachSnapshot, today: CalendarDate
 /**
  * What the engine believes, why, and what it will do next, in tiers
  * (MM-256): the safeguards above everything, the hero with the confidence
- * word, one thing to do, then sections with icons; the sections with
- * nothing new are folded to a line.
+ * word and its warnings, the goal (MM-299), one thing to do, then sections
+ * with icons; the sections with nothing new are folded to a line.
  */
 export function CoachScreen() {
   const { services, state } = useApp();
@@ -156,6 +156,14 @@ export function CoachScreen() {
           ))}
         </>
       )}
+      {/* The goal first, under the figures and the warnings (MM-299). */}
+      <MmSection
+        icon="flag"
+        title={`Goal: ${goalModeLabel(setup.goalMode)}`}
+        trailing={<MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />}
+      >
+        <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
+      </MmSection>
       <OneThingRow />
       {current === undefined ? null : (
         <MmSection icon="tune" title="Your targets">
@@ -192,13 +200,6 @@ export function CoachScreen() {
           <StatRow label="Weigh-ins" value={confidenceLabel(snapshot.confidence.weighIns)} />
           <StatRow label="Stability" value={confidenceLabel(snapshot.confidence.stability)} />
         </MmDisclosure>
-      </MmSection>
-      <MmSection
-        icon="flag"
-        title={`Goal: ${goalModeLabel(setup.goalMode)}`}
-        trailing={<MmButton label="Change" kind="text" onPress={() => void changeGoal()} />}
-      >
-        <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
       </MmSection>
       <MmSection icon="body" title="Body">
         <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
