@@ -446,7 +446,11 @@
             "MM-296",
             "MM-297",
             "MM-298",
-            "MM-299"
+            "MM-299",
+            "MM-301",
+            "MM-302",
+            "MM-303",
+            "MM-304"
           ]
         },
         {
@@ -1237,7 +1241,10 @@
           "MM-296",
           "MM-297",
           "MM-298",
-          "MM-299"
+          "MM-299",
+          "MM-301",
+          "MM-302",
+          "MM-303"
         ],
         "remaining": [
           "MM-89",
@@ -1255,7 +1262,8 @@
           "MM-286",
           "MM-287",
           "MM-288",
-          "MM-289"
+          "MM-289",
+          "MM-304"
         ]
       },
       "sequence": [
@@ -1410,6 +1418,24 @@
             "MM-297",
             "MM-298",
             "MM-299"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 13,
+          "title": "The waist measured on the Dashboard (MM-301 to MM-303): the waist row takes it in place, the confirmation offers Progress and stands above the navigation bar, and a failed save is not called a wrong value",
+          "tickets": [
+            "MM-301",
+            "MM-302",
+            "MM-303"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 14,
+          "title": "What the waist panel left for later (MM-304): focus after an in-place save, Open Progress landing on the waist, how to correct today's waist, and the owner's calls on the stacked morning and the snack's lifetime",
+          "tickets": [
+            "MM-304"
           ],
           "milestone": "M2"
         }

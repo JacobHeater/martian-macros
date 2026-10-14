@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { MmButton } from './MmButton';
 import { MmClockTimeDialog } from './MmClockTimeDialog';
 import { MmDateDialog } from './MmDateDialog';
@@ -177,6 +177,25 @@ export function MmOverlays({ children }: { children: ReactNode }) {
     [ask],
   );
 
+  // While a snack shows, a floating action stands above it, as Material lifts its FAB (MM-302).
+  const snackBox = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = snackBox.current;
+    const root = document.documentElement.style;
+    if (element === null) {
+      root.removeProperty('--mm-snack-clearance');
+      return undefined;
+    }
+    const publish = () => root.setProperty('--mm-snack-clearance', `${element.getBoundingClientRect().height + 16}px`);
+    publish();
+    const observer = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(publish);
+    observer?.observe(element);
+    return () => {
+      observer?.disconnect();
+      root.removeProperty('--mm-snack-clearance');
+    };
+  }, [snack]);
+
   useEffect(() => {
     if (snack === undefined || snack.action !== undefined || held) return undefined;
     const timer = setTimeout(() => setSnack((current) => (current?.id === snack.id ? undefined : current)), snackMs);
@@ -194,6 +213,7 @@ export function MmOverlays({ children }: { children: ReactNode }) {
       <div className="mm-snack-host" role="status" aria-live="polite">
         {snack === undefined ? null : (
           <div
+            ref={snackBox}
             className="mm-snack"
             key={snack.id}
             tabIndex={snack.action === undefined ? 0 : -1}

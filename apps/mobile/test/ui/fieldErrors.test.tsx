@@ -1,3 +1,4 @@
+import { FormatError } from '../../src/lang/FormatError';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -48,7 +49,7 @@ describe('the number entry', () => {
           initial={undefined}
           hint="First thing."
           onSave={async () => {
-            throw new Error('too light');
+            throw new FormatError('too light');
           }}
         />
       </MmOverlays>,

@@ -4,9 +4,11 @@ import { UnderEatingNotice } from '../coach/UnderEatingNotice';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { intakeDayFrom } from '../domain/intakeDayFrom';
 import { nextCheckIn } from '../engine/nextCheckIn';
+import { ReminderRule } from '../engine/ReminderRule';
 import { coachLineText } from '../format/coachLineText';
 import { confidenceLabel } from '../format/confidenceLabel';
 import { Fmt } from '../format/Fmt';
+import { waistAmount } from '../format/waistAmount';
 import type { HomeDestination } from '../state/HomeDestination';
 import { Loadable } from '../state/Loadable';
 import { targetsOn } from '../state/targetsOn';
@@ -16,6 +18,7 @@ import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseScreen } from '../pause/PauseScreen';
+import { saveWaistReadings } from '../progress/saveWaistReadings';
 import { ReminderPausedNotice } from '../reminders/ReminderPausedNotice';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
@@ -27,6 +30,7 @@ import { DashboardMetrics } from './DashboardMetrics';
 import { ProcessCard } from './ProcessCard';
 import { ReportReadyNotice } from './ReportReadyNotice';
 import { rhythmDays } from './rhythmDays';
+import { WaistRow } from './WaistRow';
 import { WeighInRow } from './WeighInRow';
 import './dashboard.css';
 
@@ -85,6 +89,12 @@ export function DashboardScreen() {
   const weekAgo = trend.length > 7 ? trend[trend.length - 8] : undefined;
   const todaysWeight = weights.find((w) => w.date === today);
   const latestWaist = waist[waist.length - 1];
+  // A measurement counts for a week, as it does for the weekly reminder (MM-301).
+  const waistCounts =
+    latestWaist !== undefined && latestWaist.date.daysUntil(today) < ReminderRule.measurementEveryDays;
+  // A save on the Dashboard is confirmed with what was typed, and offers where it is kept (MM-294, MM-301).
+  const confirm = (message: string) =>
+    overlays.snack(message, { label: 'Open Progress', onAction: () => open('progress') });
   const trainedThisWeek = workouts.filter(
     (workout) => !workout.inProgress && today.daysUntil(workout.date) > -7 && !workout.date.isAfter(today),
   ).length;
@@ -133,7 +143,7 @@ export function DashboardScreen() {
             lastTrendKg={last?.levelKg}
             onSaveWeight={async (kg) => {
               await services.weights.saveWeight(today, kg);
-              overlays.snack(`Saved ${fmt.weight(kg)} for today`);
+              confirm(`Saved ${fmt.weight(kg)} for today`);
             }}
           />
         ) : last === undefined || trend.length < 2 ? (
@@ -156,13 +166,28 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         )}
-        <MmListRow
-          leadingIcon="tape"
-          title={latestWaist === undefined ? 'No waist measurement yet' : fmt.length(latestWaist.waistCm)}
-          subtitle={latestWaist === undefined ? 'Waist · measure it in Progress' : `Waist · ${Fmt.day(latestWaist.date, today)}`}
-          opens
-          onPress={() => open('progress')}
-        />
+        {latestWaist === undefined || !waistCounts ? (
+          <WaistRow
+            fmt={fmt}
+            last={
+              latestWaist === undefined
+                ? undefined
+                : `Last ${waistAmount(latestWaist.waistCm, fmt)} · ${Fmt.day(latestWaist.date, today)}`
+            }
+            onSaveWaist={async (cm) => {
+              await saveWaistReadings(services.waist, today, [cm]);
+              confirm(`Waist saved: ${waistAmount(cm, fmt)}`);
+            }}
+          />
+        ) : (
+          <MmListRow
+            leadingIcon="tape"
+            title={waistAmount(latestWaist.waistCm, fmt)}
+            subtitle={`Waist · ${Fmt.day(latestWaist.date, today)}`}
+            opens
+            onPress={() => open('progress')}
+          />
+        )}
         {current === undefined ? null : (
           <MmListRow
             leadingIcon="calendarCheck"

@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-14, by Claude, Session 25.
+Last updated: 2026-10-14, by Claude, Session 26.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -93,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-301 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-305 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -108,8 +108,19 @@ field drew two rings), and a slider inside a list group is an
 `storybook dev` while one is running: they share a dependency cache and
 the first one starts answering 504 until it is restarted.
 
+**Rows that are windows into a measurement take it in place (owner,
+2026-10-14, MM-301).** The Dashboard's weigh-in and waist rows hold their
+field when the measurement is due; the confirmation snack offers the
+destination ("Open Progress"). **Snacks always stand above the
+navigation bar** (owner, same day, MM-302): the bar publishes
+`--mm-navigation-bar-height`, and a floating action rises above a snack
+(`--mm-snack-clearance`). Don't position bottom overlays without them.
+
 **What to build next** (the roadmap's "What is available right now", in
 order; `mm roadmap` draws it).
+- WS-03 step 14: MM-304, what the waist panel left (focus after an
+  in-place save, Open Progress landing on the waist, correcting today's
+  waist) and three owner calls listed in it.
 - WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
   weeks and on failing recovery signals, forced at 20); an engine change.
 - WS-03 step 12 is built (MM-290 to MM-299). Open from its panel runs:
@@ -202,6 +213,33 @@ were looked at in a headless browser in three palettes.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 26: 2026-10-14, Claude (the waist measured on the Dashboard; snacks above the bar)
+
+- The owner, on his phone: the Dashboard's rows that are windows into a
+  measurement should take it without another screen, the waist among
+  them, and the confirmation should offer the other screen. Mid-session:
+  "Toasts should always display above the nav bar."
+- **Story, panel, build (MM-293).** The waist row drawn in
+  `Screens/Today` (Not Weighed Today, a new Waist Due), reviewed by the
+  product-designer, UX-accessibility and measurement roles; every
+  finding's outcome is in `docs/agent-runs/mm301-waist-in-place/decision.md`.
+- **Built.** MM-301: the waist row asks in place when no measurement in
+  the last 7 days (the reminder's window), one reading through the shared
+  `saveWaistReadings`, a secondary Save heard as "Save waist" (`MmButton
+  name`, `NumberEntry saves`/`saveKind`), MM-155's conditions in the
+  hint, values to the quarter inch, "Waist saved: 36 in" with "Open
+  Progress" (the weigh-in's snack too). MM-302: the snack above the
+  navigation bar, and Food's Add food above a snack. MM-303:
+  "That value looks off" only for a refusal (`FormatError`).
+- **Stories added:** Waist Due, Waist Typed, Waist Refused, Both Typed,
+  Weigh In Saved, Waist Saved (Today) and Entry Removed (Food), each
+  looked at in the three palettes at 412 by 915. Headless captures freeze
+  the snack's rise animation half-way; stop animations in the capture
+  frame to see it as shown.
+- **Left:** MM-304 (proposed). Not looked at: the phone, TalkBack.
+- **Roadmap:** WS-03 steps 13 (built) and 14 (MM-304) added; M2 moved by
+  MM-301 to MM-303.
 
 ## Session 25: 2026-10-14, Claude (the owner's phone review: Split, the weigh-in in its card, Storybook first)
 
@@ -328,63 +366,3 @@ limitations.
 - Moved the needle: **WS-03 step 9 done** (seven tickets plus three bugs);
   **WS-03 step 11** placed (four tickets); M2 gained fourteen. Available
   next: WS-02 step 6, WS-03 step 11, WS-15.
-
-## Session 23: 2026-10-13, Claude (the whole of MM-262 built: nothing native shows)
-
-- The owner's instruction at the start: "You better aim higher than a
-  couple components. I want the whole fucking thing... NOW!" So the
-  eighteen tickets of WS-03 step 10 (and MM-278 in WS-14) were built in one
-  branch, each with its regression test, and the epic MM-262 is closed.
-- **The pickers.** `MmDatePicker` is a month grid (`role="grid"` of
-  `MmCalendarDay` cells, a year list of `MmOption`, previous and next
-  month, arrow keys across months, a swipe) inside `MmDateDialog`, which
-  says the day back or the range. `MmDrum` is a snapping column that is a
-  spinbutton to the keyboard (arrows, Page keys, typed digits);
-  `MmTimePicker` has Hour and Minute drums, Second when asked, and AM or PM
-  as a segmented control; `MmTimeOfDayDialog` takes a range and refuses a
-  time before OK (the reminders screen's refusal after the fact is gone);
-  `MmClockTimeDialog` is drums too, so nothing typed can be invalid.
-  `MmPickerField` is now a field-shaped button with the value in words and
-  our chevron (the onboarding birth-date step uses it). `MmDropdown`
-  renders no `<select>`: it composes `MmPickerField` and opens
-  `overlays.options`. `controlHomes` gives date, time and select no home.
-- **Every control drawn.** `.mm-checkbox` and `.mm-slider` have
-  `appearance: none`; the box, the tick, the track, the fill and the thumb
-  are ours; `MmSlider` requires `label`. The pressed family at the foot of
-  `ui.css`: every `cursor: pointer` selector has an `:active` rule and a
-  `.mm-pressed` twin. Inset focus rings inside clipping containers. The
-  add plate is `--selected` with an Ember plus; the chip's check is
-  `MmIcon`. Chips 48 dp. Sheet on `--raised` with the sheet-top radius and
-  the Light shadow; cards carry the Light shadow and the Dark highlight.
-- **Overlays.** The app root is `inert` while an overlay is up; Tab is
-  trapped; Escape closes from anywhere; the options dialog has Cancel; the
-  sheet has Close and a handle that drags it away; `EditHeightSheet` says
-  its range and has Cancel. A menu is `overlays.menu`, drawn at the
-  trigger's anchor (`MmMenu` of `MmMenuItemRow`) so a row cannot clip it;
-  Settings' daily activity and experience are `overlays.options` with the
-  value marked Chosen. A confirmation draws the destructive action quiet
-  (`kind="destructive"`) and Cancel secondary. A snack with an action waits.
-- **The register.** Design system/States (every control at rest, pressed,
-  disabled, selected, in error; focus by play) and Design system/Overlays
-  (every overlay on its own). The stories test fails a component of
-  `src/ui` that no gallery file imports. Settings/ChangeDailyActivity and
-  Food/EntryMenu stories added.
-- **Tokens and the checker.** `--motion-*` tokens, `--space-20`,
-  `--radius-check` in `tokens.css`; `test/ui/stylesheetTokens.test.ts`
-  fails a literal radius, duration, gap, undeclared property or hex colour
-  in any sheet. The architecture test derives composites, lists
-  `buttonHomes`, balances braces, and fails a `color`, `className` or
-  `style` prop and a screen-drawn chevron; `MmListRow opens` draws it;
-  `StatusRow` is gone; `MmProgressBar` takes `kind` and `weight`.
-- **The written system.** `design/design-system-implementation.md` is the
-  React library's document; `visual-language.md`'s icon sentence is the
-  Outlined-only decision.
-- Test helpers for the pickers: `test/support/pickers.ts` (`chooseDay`,
-  `pickDate`, `turnDrum`, `turnClock`, `pickTime`); `time.ts` and
-  `openSettings.ts` use them.
-- Moved the needle: **WS-03 step 10 done** (17 tickets) and MM-278 in
-  **WS-14 step 4**; M0 gained MM-278 (45 of 48); M2 gained the seventeen
-  (MM-263 to MM-282). Available next: WS-02 step 6, WS-03 step 9, WS-15.
-- Not done: the chair's two pending verifications from the component walk
-  (200% text in segmented controls and menus; the light palette's field
-  border contrast) are still owed; nothing was looked at on the phone.
