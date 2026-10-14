@@ -24,7 +24,13 @@ in here.
    to read a chart, what an event means, the history) is a disclosure
    (`MmDisclosure`, or a section folded to its summary), one tap down,
    never inline. A notice is a surface of its own and is never drawn inside
-   a card, the hero or a list group.
+   a card, the hero or a list group. **Anything that holds a control sits
+   on a surface** (the owner's ruling, 2026-10-14, MM-291): a field, its
+   button and its hint go in the hero, a list group row (`MmListRow
+   entry`), a sheet or a dialog, inside that surface's padding, never bare
+   on the canvas beside cards. A bare canvas section carries read-only rows
+   only, and a lone row that belongs with the rows of a group goes in the
+   group. `hierarchyProblems` fails a screen that draws a bare field.
 2. **Icons as wayfinding.** Every section header, list row, caution, notice
    and empty state carries a leading icon from the set the app ships
    (`MmIcon`, Material Outlined), 20 dp in rows, 24 dp in headers, always
@@ -41,8 +47,9 @@ in here.
    picture; across the app it has one home, and another screen cites it
    with a row that opens the home. The owner's one exception: the macro
    picture is a switch between the bars (grams against target) and the
-   donut (share of calories), remembered per person as a preference,
-   named "Grams" and "Share", and never both at once.
+   donut (the split of calories), remembered per person as a preference,
+   named "Grams" and "Split" (the owner, 2026-10-14, MM-290: the word is
+   the domain's own; "Share" is wrong), and never both at once.
 5. **Graphics that carry information.** The horizon arc stays the signature
    and reappears in empty states; the rhythm strip on Dashboard and Train;
    meal icons in Food; method icons on food rows beside their word;
@@ -94,7 +101,7 @@ MM-254 to MM-259. The story names are the register's.
 
 | Destination | Before | After |
 |---|---|---|
-| Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Share switch and the confidence word labelled; the rhythm strip of the last seven days; the streak and the insight as a row and a section; weight, waist, next check-in and training as rows that open their destinations; the weigh-in in place only on a day without one; the history behind "More about this week". |
+| Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Split switch and the confidence word labelled; the rhythm strip of the last seven days; the insight as a section; weight (or, on a morning before the weigh-in, the weigh-in row with its field, MM-291), waist, next check-in, training and the streak as rows of one group; the history behind "More about this week". |
 | Food (`Screens/Food`, Food and NothingLogged) | A hero, a second macro picture, four meal cards, a segmented completeness control at the foot. | The hero with the switch; the meals as sections with their icons, subtotal and add button, entries as rows with a method icon beside its word; the completeness row after the last meal with its state in words, the mark repeated in the day header; "More about today" one tap down. |
 | Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, goal, body), recovery and reports folded to one line when nothing is due. |
 | Progress (`Screens/Progress`, Progress) | An entry card, a chart card with a four-line caption, an events card with a four-line paragraph, a waist card with the technique inline, strength cards. | One hero: the weigh-in and the trend with its range switch, one line about the band, "How to read this" one tap down; weight events as rows with an icon and the day in words, the add action in the header; Waist and Strength folded to their lines. |

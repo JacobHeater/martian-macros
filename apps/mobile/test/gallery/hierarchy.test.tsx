@@ -19,9 +19,12 @@ interface ComposedStory {
   play?: (context: { canvasElement: HTMLElement }) => Promise<void>;
 }
 
-/** The six destinations' own stories (the first story of each screens module), over the demo scenario. */
+/**
+ * The six destinations' own stories (the first story of each screens module), over the demo scenario,
+ * and the Dashboard on a morning before the weigh-in (MM-292), the state the owner found on his phone.
+ */
 const modules = import.meta.glob<StoriesModule>('../../src/gallery/screens/*.stories.tsx', { eager: true });
-const destinations = ['Dashboard', 'Food', 'Coach', 'Progress', 'Train', 'Settings'];
+const destinations = ['Dashboard', 'Food', 'Coach', 'Progress', 'Train', 'Settings', 'NotWeighedToday'];
 const stories = Object.entries(modules).flatMap(([path, module]) =>
   Object.entries(composeStories(module, preview) as unknown as Record<string, ComposedStory>)
     .filter(([name]) => destinations.includes(name))
@@ -35,12 +38,14 @@ describe('the rules', () => {
       '<section class="mm-surface"><section class="mm-surface"></section></section>' +
       '<section class="mm-surface"><div class="mm-notice"></div></section>' +
       '<div class="mm-macro-bar"></div><svg class="chart-split-ring"></svg>' +
-      '<button class="mm-button mm-button-primary"></button><button class="mm-fab"></button>';
+      '<button class="mm-button mm-button-primary"></button><button class="mm-fab"></button>' +
+      '<section class="mm-section"><div class="mm-field"></div></section>';
     expect(hierarchyProblems(root)).toEqual([
       'a card is nested in a card or in the hero (rule 1)',
       'a notice is drawn inside a card, the hero or a list group (rule 1)',
       'the macro bars and the macro donut are shown at once (rule 4)',
       '2 primary actions are shown; one is the limit (rule 6)',
+      '1 field(s) sit bare on the canvas (rule 1)',
     ]);
   });
 
@@ -48,7 +53,7 @@ describe('the rules', () => {
     const root = document.createElement('div');
     root.innerHTML =
       '<section class="mm-hero"><div class="mm-macro-bar"></div></section>' +
-      '<section class="mm-section"><div class="mm-list-group"><div class="mm-list-row"></div></div></section>' +
+      '<section class="mm-section"><div class="mm-list-group"><div class="mm-list-row"><div class="mm-field"></div></div></div></section>' +
       '<div class="mm-notice"></div><button class="mm-button mm-button-primary"></button>';
     expect(hierarchyProblems(root)).toEqual([]);
   });

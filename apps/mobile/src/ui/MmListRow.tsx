@@ -24,6 +24,12 @@ interface MmListRowProps {
   dense?: boolean;
   /** No horizontal padding, for use inside a padded surface. */
   flush?: boolean;
+  /**
+   * A control the row holds under its title (a number to enter): the row
+   * is not pressed itself, its icon stays level with the title and the
+   * control sits on the text column inside the row's padding (MM-291).
+   */
+  entry?: ReactNode;
 }
 
 /** One row of a list: a title with optional detail, icon and trailing content. */
@@ -39,7 +45,23 @@ export function MmListRow({
   onPress,
   dense = false,
   flush = false,
+  entry,
 }: MmListRowProps) {
+  if (entry !== undefined) {
+    return (
+      <div className="mm-list-row mm-list-row-entry">
+        {leadingIcon === undefined ? null : (
+          <span className="mm-list-row-leading">
+            <MmIcon name={leadingIcon} />
+          </span>
+        )}
+        <div className="mm-list-row-text">
+          <span className="mm-list-row-title">{title}</span>
+          <div className="mm-list-row-entry-body">{entry}</div>
+        </div>
+      </div>
+    );
+  }
   const body = (
     <>
       {leadingIcon === undefined ? null : (

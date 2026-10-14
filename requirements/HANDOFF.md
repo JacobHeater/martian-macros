@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-13, by Claude, Session 24.
+Last updated: 2026-10-14, by Claude, Session 25.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -38,6 +38,18 @@ Icons are Material's Outlined set behind `MmIcon` (MM-236); no hand-drawn
 glyphs. Device and emulator screenshots verify native behavior only, never
 the design. The app folder is `apps/mobile` (renamed from `apps/web` the
 same day): a mobile application built on web technologies.
+
+**Storybook first, then the panel, then the build (owner's rule,
+2026-10-14; MM-293, in `AGENTS.md`).** Every design is drawn in a story in
+every state the screen can be in, looked at in the three palettes, reviewed
+by the product-designer and UX-accessibility roles (reports and outcomes
+under `docs/agent-runs/`), and built only once the UX guard has no open
+blocking finding. A phone state with no story is a defect (MM-292). Words
+are the domain's own: the macro switch is "Grams | Split" (MM-290). Nothing
+that holds a control sits bare on the canvas (rule 1 amended,
+`hierarchyProblems` checks it, MM-291). Brief the reviewers with the
+findings template and create the run folder first (the lesson of
+`docs/agent-runs/mm291-weigh-in/`).
 
 **The roadmap is current and checked (MM-245, owner's rule 2026-10-13).**
 `roadmap/roadmap.json` is where you choose what to build; keep it that way.
@@ -74,7 +86,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-290 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-298 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -93,6 +105,10 @@ the first one starts answering 504 until it is restarted.
 order; `mm roadmap` draws it).
 - WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
   weeks and on failing recovery signals, forced at 20); an engine change.
+- WS-03 step 12: MM-297 (the disabled primary reads as a field in Light;
+  Storybook and the panel first), and the owner's two questions in
+  `docs/agent-runs/mm291-weigh-in/decision.md` (the weigh-in below the fold
+  at 360 by 740; the trend before and after the weigh-in).
 - WS-03 step 11: MM-286 (destinations keep their state across tabs),
   MM-287 (Progress with one figure and lift rows), MM-289 (a demo seed
   that shows every mark); MM-288 is the owner's decision on Ember text.
@@ -179,6 +195,48 @@ were looked at in a headless browser in three palettes.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 25: 2026-10-14, Claude (the owner's phone review: Split, the weigh-in in its card, Storybook first)
+
+- The sitrep, then the owner's review of the Dashboard on his phone: the
+  switch said "Share" where the word is "split"; on a morning before the
+  weigh-in the field floated on the canvas with no padding and the waist
+  card touched its hint; and Storybook had no story of that state, which
+  he read, rightly, as the screen not being designed in Storybook. His
+  rule, now MM-293 and in `AGENTS.md`: story, inspect, panel, then build.
+- **In that order.** `Screens/Today/Not Weighed Today`
+  (`notWeighedTodayScenario`) reproduced the phone's layout in Storybook
+  first (MM-292). The proposal (the weigh-in as the first row of the
+  Dashboard's list group, the slot the trend row takes once saved) was
+  drawn in the same story and reviewed by the product-designer (approve
+  with changes; two blocking documentation findings) and UX-accessibility
+  (guard pass). Every finding's outcome is in
+  `docs/agent-runs/mm291-weigh-in/decision.md`; `mm panel` validates it.
+- **Built.** "Grams | Split" (MM-290), with equal segments in every
+  `MmSegmented`; `MmListRow entry` (a row that holds a control, icon level
+  with the title) and `WeighInRow` (MM-291); the streak row moved into the
+  group as its last row; rule 1 and rule 4 of `design/screen-direction.md`
+  amended; `hierarchyProblems` fails a bare field and checks Not Weighed
+  Today with the destinations. From the UX guard: the save says "Saved
+  181.4 lb for today" through the snack's status (MM-294); the hint is in
+  the field's description (MM-295, `MmTextField describedBy`); Enter saves
+  (MM-296, `MmTextField onSubmit`). MM-297 (the disabled primary in Light)
+  is proposed, for Storybook and the panel first.
+- **Tests.** Six new or changed tests, each failing on `main`'s source
+  first: the switch, the row in the group, the saved status, the hint
+  described, Enter saves, and the bare-field rule on the new story.
+- **Looked at** from the static Storybook: Not Weighed Today in Martian,
+  Light and Dark at 412 by 915 and Martian at 360 by 740 (the row starts
+  under the fold there: an owner question); the demo Dashboard; Pause,
+  Recovery check-in and Workout for the segment change. Not looked at:
+  the phone, TalkBack, 200% text.
+- **A slip, recovered:** a backup made with `tar` to a `C:` path failed
+  silently (tar reads `C:` as a remote host) while seven source files were
+  swapped to `main`'s to prove the tests fail first; the edits were
+  re-applied from the session's scripts and the suite re-run. Copy files
+  to back them up, never tar to a drive path in Git Bash.
+- Moved the needle: **WS-03 step 12 placed and mostly built** (MM-290 to
+  MM-296 done, MM-297 proposed). Available next: as before, plus MM-297.
 
 ## Session 24: 2026-10-13, Claude (the hierarchy rebuild with iconography: WS-03 step 9 built)
 
@@ -309,111 +367,3 @@ limitations.
 - Not done: the chair's two pending verifications from the component walk
   (200% text in segmented controls and menus; the light palette's field
   border contrast) are still owed; nothing was looked at on the phone.
-
-## Session 22: 2026-10-13, Claude (the roadmap caught up and checked, MM-245)
-
-- The owner asked how the roadmap looked. It was derived on 2026-10-09 and
-  knew tickets only to MM-191: 79 tickets (the React conversion, Storybook,
-  the expert panel, the terms of use) were in no workstream, seven done
-  tickets were listed as remaining, its "start here" table pointed at MM-61
-  and MM-160, and the file paths were the Dart packages'. The working
-  agreements asked for the handoff to be kept, and said nothing about the
-  roadmap.
-- The owner's rule: agents keep the roadmap up to date, always, and at the
-  end of a session check whether they moved the needle. It is now a working
-  agreement in `AGENTS.md` and in the Completion section, and `mm req`
-  checks the roadmap against the tickets (`tool/src/roadmapChecker.ts`,
-  nine tests): placement, built/remaining by status, steps, edges,
-  `dependsOn`/`unlocks`, cycles, milestone lists.
-- The catch-up: every ticket placed (new steps: WS-01 5 and 6, WS-14 4,
-  WS-03 7 and 8, WS-08 9, WS-10 8, WS-02 8), built/remaining and workstream
-  states derived from status, milestone lists regenerated from the steps,
-  paths translated to `apps/mobile/src`, the README's "available now" and
-  "do not touch" rewritten for 2026-10-13, the progress page regenerated.
-- Then the first item of that table, WS-14 step 4: the TypeScript
-  architecture checker (MM-246, `test/architecture.test.ts`): one
-  declaration per file named for it, libraries only in their adapter
-  folders, no raw control in a screen. Twelve files were split to meet it
-  (`schema.ts` is now `currentSchemaVersion.ts`, `currentSchema.ts`,
-  `tables.ts` and `Table.ts`), `MmPressable` replaced the three raw buttons
-  in `CalorieHero` and `MealSection`, and `columns.ts` is the one file on
-  the baseline.
-- Then the leftovers the table named: `mm run --env phone` installed and
-  launched the demo app on the owner's Pixel (the normal app untouched;
-  the phone was locked, so the screen was not seen), MM-175 and MM-229
-  closed, MM-7 closed (CI green on every pull request since the switch),
-  MM-245 closed. MM-229's screenshot tests are superseded by the stories
-  test under the owner's Storybook rule.
-- MM-181 (the flat floating action) closed: the React rebuild never had the
-  glow; `test/ui/flatFab.test.ts` now guards it by reading the stylesheet.
-- MM-177 closed: `mm demo --seed -d <id>` builds the shell with
-  `MM_DEMO_SEED=1`, and `src/app/seedDemo.ts` replaces the demo app's data
-  with `DemoSeed` on every launch of such a build, inside the shell only,
-  then the DEMO strip shows. A normal build never carries the variable
-  (`tool/test/webBuildEnv.test.ts`, `test/app/seedDemo.test.ts`).
-- MM-88 (the store-trial spike, WS-13 step 1) answered from the stores'
-  pages, read 2026-10-13: Apple's "XX-day Trial" zero-priced non-consumable
-  is current guideline 3.1.1 with a three-part disclosure; Google Play has
-  no trial for one-time products (buy, rent, pre-order and discount only),
-  so Android times the trial on the device and a reinstall restarts it;
-  the plugin is the owner's call (our own over StoreKit 2 and Billing 9 is
-  the recommendation; Capgo's is the fallback). Nothing is built.
-- MM-65 (the backup-rules spike, WS-12 step 1) answered from Apple's and
-  Google's pages, read 2026-10-13: guideline 5.1.3(ii) has no encryption
-  exception, so no iCloud (or Drive) provider; the database and packs are
-  excluded from OS backups on both platforms (Android already is); the
-  backup is one encrypted file the person places (MM-63, MM-64). Open:
-  encryption at rest for the database, which Play's health guidance asks
-  for and nothing provides.
-- MM-139 closed: the confidence next step and data boundaries are now
-  simulator-validated on a hundred users per logging habit
-  (`test/engine/coachConfidenceBoundariesSimulation.test.ts`); nothing was
-  tuned. M1 is 12 of 13; MM-138 (holding a reduction) waits on the owner.
-- The owner answered every open decision in a wizard of questions (the
-  list under "Decided by the product owner" above); MM-138 and MM-103
-  closed on those answers, MM-135 moved to in-progress with its decision,
-  and MM-247 and MM-248 were opened.
-- The owner asked why sleep was not first class, and ruled that it is.
-  Written as WS-15 with MM-249 (epic, with the evidence read today),
-  MM-250, MM-251 and MM-252; placed in M2.
-- The owner's diagnosis of the views' hierarchy, checked against the
-  register and written as MM-253 (the direction and the panel pass) and
-  MM-254 to MM-259 (each destination), WS-03 step 9, M2.
-- MM-260, from the owner's screenshot of the Date of birth dialog: the
-  phone's date control now follows the palette (`color-scheme`), its
-  picker indicator has a margin, the dialog has an outline and a shadow,
-  and the day is said back in words or the allowed range is. A story
-  (Settings, DateOfBirth) and a test guard it. Every other dialog gains
-  the outline and shadow with it. Seen again on the phone: Android's own
-  date control ignores padding and the indicator pseudo-element, so
-  `MmPickerField` now hides the platform's drawing entirely and carries
-  the design system's box and chevron; the time dialog uses it too. The
-  lesson, for every native control: the platform draws nothing.
-- The three reviewers' reports came back (74 findings; saved under
-  `docs/agent-runs/mm253-components/`), the owner answered the decisions
-  they raised and ruled that nothing native shows, and the findings became
-  MM-262 (epic) and eighteen tickets: three custom pickers, the checkbox
-  and slider drawn by us, pressed states, menus, overlays, the snack,
-  stories for every component and state, tokens, the focus ring, Ember
-  tint and glyph, the sheet and cards, composites and the checker, field
-  errors, the destructive kind, 48 dp, the written system. Nothing of it
-  is built yet; WS-03 step 10 is the next code, pickers first.
-- MM-261: why it took the owner three prompts to get a component. The
-  architecture check exempted `src/ui/`, so a raw control could live in a
-  dialog or the overlay host. Now each native control kind has one home
-  (`controlHomes` in `test/architecture.test.ts`), composites write no
-  control, and `MmOption` replaced the overlay host's inline option button.
-  The panel's product-designer, UX-accessibility and React-Capacitor roles
-  were put on the whole component register the same hour (MM-253's
-  component walk); their findings become bug tickets with tests.
-- Moved the needle: **M1 closed** (13 of 13: MM-138 was its last). M0 went
-  from 39 of 47 to 44 of 48 (MM-108, MM-176, MM-179, MM-183 remain); M2
-  gained MM-7, MM-175 and MM-177; M3 gained MM-88 and MM-65, and two new
-  tickets (MM-247, MM-248).
-- MM-103's leftover, one question per onboarding screen, is a design
-  change the owner should call: measurements, training and the health
-  check each hold several related fields on one screen today.
-- Not done: the workstream files' prose still describes the plan as
-  written in October's first week; only their sources and sequences carry
-  the additions. The 58 in-progress tickets were not walked; many are built
-  with a leftover and could close.

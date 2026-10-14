@@ -22,11 +22,12 @@ import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmRhythmStrip } from '../ui/MmRhythmStrip';
 import { Notice } from '../ui/Notice';
+import { useOverlays } from '../ui/useOverlays';
 import { DashboardMetrics } from './DashboardMetrics';
 import { ProcessCard } from './ProcessCard';
 import { ReportReadyNotice } from './ReportReadyNotice';
 import { rhythmDays } from './rhythmDays';
-import { WeighInSection } from './WeighInSection';
+import { WeighInRow } from './WeighInRow';
 import './dashboard.css';
 
 /**
@@ -36,6 +37,7 @@ import './dashboard.css';
  */
 export function DashboardScreen() {
   const { services, state } = useApp();
+  const overlays = useOverlays();
   const navigator = useNavigator();
   const setupState = useCell(state.setup);
   const pausesState = useCell(state.pauses);
@@ -123,11 +125,7 @@ export function DashboardScreen() {
           }}
         />
       </div>
-      <ProcessCard />
       <InsightCard />
-      {weighedToday && last !== undefined ? null : (
-        <WeighInSection fmt={fmt} onSaveWeight={(kg) => services.weights.saveWeight(today, kg)} />
-      )}
       <MmListGroup>
         {weighedToday && last !== undefined ? (
           <MmListRow
@@ -137,7 +135,15 @@ export function DashboardScreen() {
             opens
             onPress={() => open('progress')}
           />
-        ) : null}
+        ) : (
+          <WeighInRow
+            fmt={fmt}
+            onSaveWeight={async (kg) => {
+              await services.weights.saveWeight(today, kg);
+              overlays.snack(`Saved ${fmt.weight(kg)} for today`);
+            }}
+          />
+        )}
         <MmListRow
           leadingIcon="tape"
           title={latestWaist === undefined ? 'No waist measurement yet' : fmt.length(latestWaist.waistCm)}
@@ -161,6 +167,7 @@ export function DashboardScreen() {
           opens
           onPress={() => open('train')}
         />
+        <ProcessCard />
       </MmListGroup>
       <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back">
         <DashboardMetrics />
