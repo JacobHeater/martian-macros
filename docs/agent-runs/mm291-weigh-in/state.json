@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "task_id": "mm291-weigh-in",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "main",
+    "commit": "00766215cc3753aa0c081d3e186c8cf91f4a4876"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, acting as chair and single edit owner, branch fix/dashboard-split-weighin-storybook",
+    "paths": [
+      "apps/mobile",
+      "design",
+      "requirements",
+      "roadmap",
+      "AGENTS.md",
+      "docs/agent-runs/mm291-weigh-in"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Debate the proposed Dashboard weigh-in row and the Split label as drawn in Screens/Today/Not Weighed Today: visual hierarchy, alignment, padding, alternatives, the design system.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "00766215cc3753aa0c081d3e186c8cf91f4a4876",
+      "input_hashes": {
+        "docs/agent-runs/mm291-weigh-in/brief.md": "d8fc0eea721caf382436eb8979d382aed2fc15d609b5ec37b349b36819ceede3",
+        "design/screen-direction.md": "63451a1cdb2ffcabdef4fba7878bdb4c8d0a34126d9429fbee282872da9c48b6",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "requirements/dashboard/BUG.macro-switch-says-share.MM-290.md": "2196cebbd07cd5f8290b9d2c02193e08064b36a32f3c784d305486dd6f19a290",
+        "requirements/dashboard/BUG.weigh-in-floats-on-the-canvas.MM-291.md": "1a97f082d65ea35123bd5446596e5061f40bf99adc56fe888ae6847104db2469",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "The proposal source (WeighInRow, DashboardScreen, dashboard.css, NumberEntry, MmListRow)",
+          "Five captures at 412 by 915: before Martian and demo; after Martian, Light, Dark",
+          "screen-direction.md rules 1 to 8"
+        ],
+        "not_inspected": [
+          "360 by 740",
+          "InsightCard",
+          "The Progress hero and welcome-back NumberEntry"
+        ],
+        "referrals": [
+          "ux-accessibility: PD-3 contrast",
+          "coaching/measurement: the trend in the row before the weigh-in",
+          "react-capacitor/qa: PD-7"
+        ],
+        "limitations": "Uncommitted working tree over the baseline; pixel positions read from images; no tests run."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Visual judgment against the repository direction; no empirical claim.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "UX guard on the same proposal: novice task flow, names and descriptions, focus order, targets, the save transition, the Split label.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "00766215cc3753aa0c081d3e186c8cf91f4a4876",
+      "input_hashes": {
+        "docs/agent-runs/mm291-weigh-in/brief.md": "d8fc0eea721caf382436eb8979d382aed2fc15d609b5ec37b349b36819ceede3",
+        "design/screen-direction.md": "63451a1cdb2ffcabdef4fba7878bdb4c8d0a34126d9429fbee282872da9c48b6",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "requirements/dashboard/BUG.macro-switch-says-share.MM-290.md": "2196cebbd07cd5f8290b9d2c02193e08064b36a32f3c784d305486dd6f19a290",
+        "requirements/dashboard/BUG.weigh-in-floats-on-the-canvas.MM-291.md": "1a97f082d65ea35123bd5446596e5061f40bf99adc56fe888ae6847104db2469",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "WeighInRow, DashboardScreen, NumberEntry, MmTextField, MmListRow, MmButton, MmListGroup, MmSegmented, CalorieHero, AppState coach cell",
+          "Five captures at 412 by 915",
+          "dashboard.test.tsx weigh-in test"
+        ],
+        "not_inspected": [
+          "hierarchyProblems",
+          "parseNumber",
+          "WelcomeBackScreen and ProgressScreen",
+          "360 by 740"
+        ],
+        "referrals": [
+          "coaching/measurement: raw entry vs trend after the save (UX-4)",
+          "product-designer: Light fills (UX-7)"
+        ],
+        "limitations": "No device, screen reader, text scaling or measured contrast; no tests run."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What WCAG 2.2 requires of a success result shown without moving focus, of inactive component contrast, and of focus order when the focused element is removed.",
+        "reason": "UX-1 and UX-7 rest on WCAG success criteria.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "Understanding SC 4.1.3: Status Messages (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "A success result shown without moving focus is a status message and must be programmatically determinable; role=status is a sufficient technique."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+            "title": "Understanding SC 1.4.3: Contrast (Minimum) (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "Text in inactive user interface components has no contrast requirement."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html",
+            "title": "Understanding SC 2.4.3: Focus Order (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "The criterion does not address the removal of the focused element."
+          }
+        ],
+        "summary": "A success result shown without a focus change is a status message (role=status); inactive components have no text contrast requirement; focus order does not address a removed element.",
+        "limitations": "Accessed 2026-10-14; the focus recommendation is interpretation."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md, with no separate chair review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout, label and input change on the Dashboard; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout, label and input change on the Dashboard; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout, label and input change on the Dashboard; no health rule, coaching message, measurement, data flow or engine changes. The bounded question on the trend before and after the weigh-in is left open for this role.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout, label and input change on the Dashboard; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout, label and input change on the Dashboard; no health rule, coaching message, measurement, data flow or engine changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch was available; not needed."
+      ],
+      "retrieval": [
+        "WebFetch retrieved three W3C Understanding pages for the UX role."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "No reviewer could render a story, run a test or reach a device; render claims are about the captures the chair supplied."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM291-row-in-the-group",
+      "status": "accepted",
+      "summary": "The weigh-in asks in the first row of the Dashboard list group, the slot the trend row takes once saved (MmListRow entry).",
+      "authority": "Chair, both reviewers concurring; owner free to overrule"
+    },
+    {
+      "id": "MM290-split",
+      "status": "accepted",
+      "summary": "The macro switch reads Grams and Split everywhere, the direction included.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM291-no-bare-control",
+      "status": "accepted",
+      "summary": "Anything holding a control sits on a surface; hierarchyProblems fails a bare field (rule 1 amended).",
+      "authority": "Product owner ruling, written by the chair (PD-2)"
+    },
+    {
+      "id": "MM294-saved-snack",
+      "status": "accepted",
+      "summary": "A save from the Dashboard is confirmed by a polite snack naming the number typed.",
+      "authority": "Chair (UX-1, UX-4)"
+    },
+    {
+      "id": "MM297-disabled-primary",
+      "status": "accepted",
+      "summary": "The disabled primary drawn quieter than the field in every palette, through Storybook and the panel first.",
+      "authority": "Chair, panel review owed"
+    },
+    {
+      "id": "MM291-first-viewport-360",
+      "status": "rejected",
+      "summary": "Keeping the weigh-in in the first viewport at 360 by 740.",
+      "authority": "Product owner, 2026-10-14: small phones are not designed for"
+    },
+    {
+      "id": "MM298-trend-and-today",
+      "status": "accepted",
+      "summary": "The row shows the trend before the weigh-in and today’s entry after it; built in mm298-trend-goal-themes.",
+      "authority": "Product owner, 2026-10-14"
+    }
+  ],
+  "pending_work": [
+    "PD-7/UX-9b: investigate whether a weighed day with no trend yet shows an empty weigh-in row; ticket and test if it does.",
+    "PD-8: spacing above and below the rhythm strip, drawn in the story first.",
+    "UX-6: the heard name of the macro switch group.",
+    "UX-8: stories for NumberEntry in a row with a value typed, an error, and a refusal.",
+    "MM-297 and the owner questions: answered and built in mm298-trend-goal-themes."
+  ],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "00766215cc3753aa0c081d3e186c8cf91f4a4876",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All checks passed: requirements, panel, tool tests, type check, 2,135 passed and 4 skipped in the app suite, build, offline; on the branch working tree before its commit."
+    }
+  ],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

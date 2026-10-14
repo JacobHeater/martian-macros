@@ -68,6 +68,17 @@ delegation and sequential fallback do not supersede the working agreements here.
   or change a component, change or add its story in the same pull request;
   a ticket that needs a design decision links the story under `## UI/UX`.
   The old HTML register (MM-210/MM-211) is deleted; git history has it.
+- Every design goes through Storybook and the panel before it is built
+  (owner's rule, 2026-10-14, MM-293), in this order: (1) draw it in a
+  story, in every state the screen can be in (first day, not done yet
+  today, done, empty, error); (2) look at it in the browser in the three
+  palettes; (3) have the panel's product-designer and UX-accessibility
+  roles review it, saving their reports and an outcome for every finding
+  under `docs/agent-runs/`; (4) build the spec only once the UX guard (the
+  UX-accessibility role) has no open blocking finding. A state the phone
+  can show that no story draws is a defect (MM-292). Words are the
+  domain's own ("split", never an invented "share"), and nothing that
+  holds a control sits bare on the canvas (MM-291).
   Do not add HTML drawings of screens anywhere in the repository.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.

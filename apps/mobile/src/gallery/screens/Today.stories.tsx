@@ -1,5 +1,6 @@
 import type { Meta } from '@storybook/react-vite';
 import { firstDayScenario } from './firstDayScenario';
+import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 
@@ -18,4 +19,11 @@ export const FirstDay = screenStory({
   covers: ['DashboardScreen'],
   shows: /kcal left/,
   scenario: firstDayScenario,
+});
+
+/** Most mornings: no weigh-in yet today, so the Dashboard asks for one in place. */
+export const NotWeighedToday = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'First thing in the morning, after the bathroom.',
+  scenario: notWeighedTodayScenario,
 });

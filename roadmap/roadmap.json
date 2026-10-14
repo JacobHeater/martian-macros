@@ -436,7 +436,17 @@
             "MM-286",
             "MM-287",
             "MM-288",
-            "MM-289"
+            "MM-289",
+            "MM-290",
+            "MM-291",
+            "MM-292",
+            "MM-293",
+            "MM-294",
+            "MM-295",
+            "MM-296",
+            "MM-297",
+            "MM-298",
+            "MM-299"
           ]
         },
         {
@@ -1217,7 +1227,17 @@
           "MM-259",
           "MM-283",
           "MM-284",
-          "MM-285"
+          "MM-285",
+          "MM-290",
+          "MM-291",
+          "MM-292",
+          "MM-293",
+          "MM-294",
+          "MM-295",
+          "MM-296",
+          "MM-297",
+          "MM-298",
+          "MM-299"
         ],
         "remaining": [
           "MM-89",
@@ -1373,6 +1393,23 @@
             "MM-287",
             "MM-288",
             "MM-289"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 12,
+          "title": "The owner's phone review (2026-10-14, MM-290 to MM-299): the split named a split, the weigh-in inside its card and what the panel found in it, a story for the morning before the weigh-in, the Storybook-first design gate, the trend and today in the weight row, and the goal first on Coach",
+          "tickets": [
+            "MM-290",
+            "MM-291",
+            "MM-292",
+            "MM-293",
+            "MM-294",
+            "MM-295",
+            "MM-296",
+            "MM-297",
+            "MM-298",
+            "MM-299"
           ],
           "milestone": "M2"
         }
