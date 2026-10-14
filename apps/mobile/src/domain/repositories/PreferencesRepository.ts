@@ -2,6 +2,8 @@ import type { DetailLevelReader } from './DetailLevelReader';
 import type { DetailLevelWriter } from './DetailLevelWriter';
 import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
+import type { MacroPictureReader } from './MacroPictureReader';
+import type { MacroPictureWriter } from './MacroPictureWriter';
 import type { PreferencesReader } from './PreferencesReader';
 import type { PreferencesWriter } from './PreferencesWriter';
 import type { RecoverySkipReader } from './RecoverySkipReader';
@@ -24,6 +26,8 @@ export interface PreferencesRepository
     EasyToMissWriter,
     DetailLevelReader,
     DetailLevelWriter,
+    MacroPictureReader,
+    MacroPictureWriter,
     UnderEatingNoticeReader,
     UnderEatingNoticeWriter,
     ReturnScreenReader,

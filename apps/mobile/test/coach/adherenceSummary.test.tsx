@@ -99,7 +99,7 @@ it('the Coach screen shows the card from stored days', async () => {
   await repos.weights.saveWeight(today, 82);
   renderApp(repos, today);
   await openTab('Coach');
-  const card = (await screen.findByRole('heading', { name: 'Your last 7 days' })).closest('.mm-surface');
+  const card = (await screen.findByRole('heading', { name: 'Your last 7 days' })).closest('.mm-section');
   expect(card).toHaveTextContent('5, all complete');
   expect(card).toHaveTextContent(/Weigh-ins\s*7/);
   expect(card).toHaveTextContent('2,100 kcal');

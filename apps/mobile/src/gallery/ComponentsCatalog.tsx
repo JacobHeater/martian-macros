@@ -22,6 +22,8 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmOverlays } from '../ui/MmOverlays';
 import { MmPressable } from '../ui/MmPressable';
 import { MmProgressBar } from '../ui/MmProgressBar';
+import { MmRhythmStrip } from '../ui/MmRhythmStrip';
+import { MmSection } from '../ui/MmSection';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
 import { MmSpinner } from '../ui/MmSpinner';
@@ -31,7 +33,7 @@ import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
-import { NumberEntryCard } from '../ui/NumberEntryCard';
+import { NumberEntry } from '../ui/NumberEntry';
 import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
 import { StepProgress } from '../ui/StepProgress';
@@ -111,6 +113,23 @@ export function ComponentsCatalog() {
         <MmIconButton icon="plus" kind="add" label="Add" onPress={nothing} />
         <MmSpinner />
       </div>
+      <MmSection icon="calendar" title="Weight events" summary="2 this month" trailing={<MmIconButton icon="plus" kind="add" label="Add a weight event" onPress={nothing} />}>
+        <MmListRow title="Travel" subtitle="Yesterday · Scale noise widened around this event." leadingIcon="travel" />
+      </MmSection>
+      <MmSection icon="tape" title="Waist" summary="Latest: 34.2 in on Oct 5." collapsible initiallyExpanded={false}>
+        <p style={{ margin: 0, color: 'var(--text2)' }}>Three fields and Save, once opened.</p>
+      </MmSection>
+      <MmRhythmStrip
+        name="Last seven days"
+        days={['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'].map((letter, i) => ({
+          key: letter,
+          letter,
+          label: `${letter}: ${i % 3 === 0 ? 'logged and marked complete' : i % 3 === 1 ? 'partly logged' : 'nothing logged'}`,
+          mark: i % 3 === 0 ? 'full' : i % 3 === 1 ? 'half' : 'none',
+          today: i === 6,
+        }))}
+        onSelect={nothing}
+      />
       <GroupHeader text="Reminders" />
       <MmListGroup>
         <MmSwitchRow title="Weigh-in" subtitle="On days with no weigh-in yet." value={on} onChange={setOn} />
@@ -135,7 +154,7 @@ export function ComponentsCatalog() {
         text="Insulin treatment can cause low blood sugar when you eat less."
         action={<MmButton label="I have" kind="secondary" onPress={nothing} />}
       />
-      <NumberEntryCard title="Today's weigh-in" unit="lb" initial="184.1" hint="First thing in the morning." onSave={async () => undefined} />
+      <NumberEntry title="Today's weigh-in" unit="lb" initial="184.1" hint="First thing in the morning." onSave={async () => undefined} />
       <DayStepper label="Yesterday" onPrevious={nothing} onNext={nothing} onLabelPress={nothing} />
       <MmSurface kind="compact" padded={false}>
         <MmSwipeToRemove onRemove={nothing}>

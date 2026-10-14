@@ -27,9 +27,13 @@ export function MetabolismSummary({ snapshot, calibrating }: MetabolismSummaryPr
     <MmDisclosure
       title="Your metabolism estimate"
       subtitle={
-        measured
-          ? 'Measured from your logged food and weight trend.'
-          : 'Starting estimate; it improves as you log food and weight.'
+        measured && tdee.clampedToBounds
+          ? 'Held at a safe limit until your logs and weight trend agree.'
+          : measured
+            ? 'Measured from your logged food and weight trend.'
+            : tdee.settlingUntil !== undefined
+              ? `Waiting for water changes to settle, until ${Fmt.longDate(tdee.settlingUntil)}.`
+              : 'Starting estimate; it improves as you log food and weight.'
       }
     >
       <p className="app-text coach-range">

@@ -11,6 +11,7 @@ import { paceLabel } from '../../src/format/paceLabel';
 import { first } from '../support/first';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /** MM-117: an offer to ease a deficit when recovery is failing. Carried over from relief_offer_test.dart. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -55,7 +56,7 @@ const offer = () => screen.queryByText('Two hard weeks in a row')?.closest('.mm-
 /** The dashboard, once the check-in of this launch has settled. */
 async function open(): Promise<TargetsRecord[]> {
   renderApp(repos, today);
-  await screen.findByRole('heading', { name: 'Logging coverage' });
+  await dashboardLoaded();
   return history();
 }
 

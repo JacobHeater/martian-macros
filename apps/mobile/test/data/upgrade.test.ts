@@ -137,8 +137,10 @@ it('data saved by a newer version of the app is refused and left alone', async (
 it('a version 1 database comes up to date: nothing lost, and nobody has agreed to the terms yet', async () => {
   const versionOne = currentSchema
     .replace('  "terms_accepted_version" INTEGER NULL,\n', '')
-    .replace('  "terms_accepted_epoch_day" INTEGER NULL,\n', '');
+    .replace('  "terms_accepted_epoch_day" INTEGER NULL,\n', '')
+    .replace("  \"macro_picture\" TEXT NOT NULL DEFAULT 'bars',\n", '');
   expect(versionOne).not.toContain('terms_accepted');
+  expect(versionOne).not.toContain('macro_picture');
   const old = await openSql();
   await AppDatabase.open(old, { version: 1, schema: versionOne });
   await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
@@ -148,8 +150,10 @@ it('a version 1 database comes up to date: nothing lost, and nobody has agreed t
   const repos = await SqlRepositories.open(sql);
   expect(await versionOf(sql)).toBe(current);
   expect(await columnsOf(sql, 'user_preferences')).toEqual(
-    expect.arrayContaining(['terms_accepted_version', 'terms_accepted_epoch_day']),
+    expect.arrayContaining(['terms_accepted_version', 'terms_accepted_epoch_day', 'macro_picture']),
   );
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
   expect(await first(repos.preferences.watchTermsAcceptance())).toBeUndefined();
+  // MM-254: the macro picture arrives as bars.
+  expect(await first(repos.preferences.watchMacroPicture())).toBe('bars');
 });

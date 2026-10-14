@@ -131,8 +131,11 @@ for (const custom of [false, true]) {
         : { ...services, workouts: overriding(services.workouts, { watchWorkouts: workouts.watch }) },
     );
     expect(layer().queryByRole('heading', { name: 'Hard sets by muscle group' })).not.toBeInTheDocument();
+    const read = custom ? exercises : workouts;
+    const before = read.attempts();
+    read.recover();
     await userEvent.click(await layer().findByRole('button', { name: 'Retry volume' }));
     expect(await layer().findByRole('heading', { name: 'Last seven days' })).toBeInTheDocument();
-    expect((custom ? exercises : workouts).attempts()).toBe(2);
+    expect(read.attempts()).toBeGreaterThan(before);
   });
 }

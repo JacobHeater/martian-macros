@@ -1351,6 +1351,9 @@
   position: relative;
   background: var(--surface);
 }
+.mm-section .mm-swipe-row {
+  background: var(--canvas);
+}
 
 /* Text inside a card that is drawn by a component of this library. */
 .mm-card-text {
@@ -1567,6 +1570,122 @@
   text-align: center;
 }
 
+/* ---- Sections (MM-253, rule 1): the second tier, an icon and a heading on the
+   canvas with rows beneath; nothing of it is a card. ---- */
+
+.mm-section {
+  display: block;
+  width: 100%;
+  margin: var(--space-12) 0 0;
+}
+.mm-section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.mm-section-head-main {
+  flex: 1;
+  min-width: 0;
+}
+.mm-section-head-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 48px;
+  padding: var(--space-4) 0;
+}
+.mm-section-icon {
+  display: grid;
+  flex: none;
+  color: var(--text2);
+}
+.mm-section-words {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.mm-section-title {
+  margin: 0;
+  font: var(--type-heading);
+}
+.mm-section-summary {
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.mm-section-opens {
+  display: grid;
+  color: var(--text3);
+}
+.mm-section-body {
+  padding-left: calc(24px + var(--space-12));
+}
+.mm-section-body[hidden] {
+  display: none;
+}
+/* A list group inside a section already has the inset from its own rows. */
+.mm-section-body > .mm-list-group,
+.mm-section-body > .mm-surface,
+.mm-section-body-flush {
+  margin-left: calc(-1 * (24px + var(--space-12)));
+}
+
+/* ---- The rhythm strip (MM-253, rule 3): seven days as dots; shape and fill, no colour of their own. ---- */
+
+.mm-rhythm {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+.mm-rhythm-day {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-width: 0;
+  min-height: 48px;
+  padding: var(--space-4) 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.mm-rhythm-day-button {
+  cursor: pointer;
+  transition: background var(--motion-fast);
+}
+.mm-rhythm-dot {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--outline-strong);
+  border-radius: 50%;
+  background: transparent;
+  transition: background var(--motion-base);
+}
+.mm-rhythm-full {
+  border-color: var(--ion);
+  background: var(--ion);
+}
+.mm-rhythm-half {
+  border-color: var(--ion);
+  background: linear-gradient(to right, var(--ion) 50%, transparent 50%);
+}
+.mm-rhythm-today {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
+}
+.mm-rhythm-letter {
+  font: var(--type-caption);
+}
+
+.mm-number-entry-block {
+  display: block;
+}
+
 /* ---- Pressed (MM-267): every pressable shows a tap landed, within --motion-fast ----
    The `.mm-pressed` twin of each selector lets the register show the state. */
 
@@ -1599,7 +1718,9 @@
 .mm-day:not(.mm-day-chosen):active,
 .mm-pressed .mm-day:not(.mm-day-chosen),
 .mm-sheet-grip:active,
-.mm-pressed .mm-sheet-grip {
+.mm-pressed .mm-sheet-grip,
+.mm-rhythm-day-button:active,
+.mm-pressed .mm-rhythm-day-button {
   background: var(--selected);
 }
 .mm-button-primary:not(:disabled):active,

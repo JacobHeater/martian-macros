@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-13, by Claude, Session 23.
+Last updated: 2026-10-13, by Claude, Session 24.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -62,8 +62,8 @@ Change what the app does with data and the terms together: they say
 only what the code does, and never "nothing is uploaded" (MM-244).
 
 **Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
-`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 2
-since MM-242). Only one schema change at a time.
+`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 3
+since MM-254: `macro_picture`). Only one schema change at a time.
 
 **The engineering rules are checked (MM-246, MM-261, MM-278).**
 `test/architecture.test.ts` fails the suite on a file with two declarations
@@ -74,7 +74,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-283 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-290 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -93,8 +93,9 @@ the first one starts answering 504 until it is restarted.
 order; `mm roadmap` draws it).
 - WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
   weeks and on failing recovery signals, forced at 20); an engine change.
-- WS-03 step 9: MM-253 (the hierarchy direction and the panel pass), then
-  MM-254 to MM-259, each destination rebuilt with before and after stories.
+- WS-03 step 11: MM-286 (destinations keep their state across tabs),
+  MM-287 (Progress with one figure and lift rows), MM-289 (a demo seed
+  that shows every mark); MM-288 is the owner's decision on Ember text.
 - WS-15 steps 1 and 2: MM-250 (the nightly sleep record), MM-251 (sleep
   disorders in the health check).
 - WS-11 step 2 (MM-71), WS-13 step 1 (MM-95, MM-247, MM-244), WS-09 step 4
@@ -138,7 +139,12 @@ the nav bar, primary actions compete. Decided: Material icons everywhere now
 direction across all destinations built in stages. MM-253 writes the
 direction and runs the product-designer and UX roles on the built stories;
 MM-254 to MM-259 rebuild each destination with before and after stories.
-Nothing is built yet.
+**All of it was built the same day** (Session 24): read the direction at
+the top of `design/screen-direction.md` before touching a screen, and
+`MmSection`, `MmRhythmStrip` and `NumberEntry` in `src/ui/` before adding
+a tier. The panel's reports and the chair's outcomes are in
+`docs/agent-runs/mm253-hierarchy/`; what it left for later is WS-03 step
+11 (MM-286 to MM-289).
 
 **Nothing native shows (owner's rule, 2026-10-13; MM-262, built).** After
 the date dialog took three prompts to become a component, the owner ruled:
@@ -173,6 +179,76 @@ were looked at in a headless browser in three palettes.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 24: 2026-10-13, Claude (the hierarchy rebuild with iconography: WS-03 step 9 built)
+
+- The owner's instruction: "I want the hierarchy rebuild with iconography."
+  MM-253 to MM-259 were built in one branch, with the panel pass first.
+- **The panel pass (MM-253).** The product-designer and UX-accessibility
+  roles graded the six destinations as built on `main` at `9fb8c79`
+  (first-viewport renders in Martian and Light, source for the rest):
+  28 and 25 findings, every one with an outcome in
+  `docs/agent-runs/mm253-hierarchy/decision.md` and `state.json`
+  (`mm panel` validates the run). Folded into the build: the confidence
+  word labelled, never alone; a heading in the hero; the completeness
+  control as a row after the last meal with the mark in the header; method
+  icons beside their word; one sentence of uncertainty kept with the trend
+  chart; the held or settling estimate said in the folded line; the
+  safeguards above the hero and outside the one-thing rationing; the Save
+  that waits for a change; dates in words; no default event type; a
+  Dashboard named Dashboard; the star, not a trophy, for a record; both
+  strips the rolling last seven days. Three bugs became tickets with
+  regression tests (MM-283 the coach line, MM-284 the unit heard, MM-285
+  event dates and default). Left for later as WS-03 step 11: MM-286
+  (destinations keep their state; the Food primary first in focus order),
+  MM-287 (one figure, lift rows), MM-288 (the Ember budget for text
+  actions, the owner's call), MM-289 (a demo seed that shows every mark).
+  Owner decisions still open, listed in `decision.md`: PD-2 Ember text,
+  PD-9 whether the arc leaves Coach (MM-187 stands), UX-24 numeric
+  settings as sheets, the meal glyph family.
+- **The direction** is the first section of `design/screen-direction.md`:
+  eight rules, what sits outside them, what "one tap down" means, the
+  first-viewport budget per destination, empty states, and the
+  before-and-after table. `test/gallery/hierarchy.test.tsx` makes rules 1,
+  4 and 6 checkable on every destination story.
+- **The design system.** `MmSection` (icon, heading, summary, trailing
+  action; folds with `collapsible`, keeps state with `maintainState`, or
+  opens a screen with `onPress`), `MmRhythmStrip` (seven named dots, full,
+  half, empty, today ringed; buttons when `onSelect` is given, listed in
+  `buttonHomes`), `NumberEntry` (the bare field; `NumberEntryCard` is
+  gone), `MmSwitchRow leadingIcon`, `MmDropdown placeholder`,
+  `MmTextField` describing its suffix, thirty-five meaning names in
+  `MmIconName`, `.mm-section` and `.mm-rhythm` in `ui.css`. The macro
+  picture is a preference (`MacroPicture`, `user_preferences.macro_picture`,
+  schema version 3, in-memory and SQL repositories, the contract test).
+- **The screens.** Dashboard: hero with the Grams/Share switch, the rhythm
+  strip (`rhythmDays`), streak row, insight section, rows for weight,
+  waist, next check-in and training, the weigh-in in place only on a day
+  without one, the history behind "More about this week". Food: meals as
+  sections with icons, method icons on rows, the completeness row and the
+  header mark, "More about today". Coach: safeguards first, the hero with
+  the check-in and the confidence word, `OneThingRow`, eleven sections
+  (recovery and reports folded when quiet). Progress: one hero with the
+  weigh-in and the trend, events as rows with icons and an add button in
+  the header, Waist and Strength folded. Train: one primary, the strip
+  (`trainedDays`), the volume section, `workoutGroups` by week and month
+  with a star for a record. Settings: seven sections of rows with icons,
+  choosers through the options dialog, erase last.
+- **Tests.** The suite is 2,145 with the new ones (`hierarchy`, `section`,
+  `rhythmDays`, `workoutGroups`, `weightEvents`, the unit, the coach line);
+  `test/support/dashboardLoaded.ts` replaces the "Logging coverage"
+  sentinel (the history is one tap down); `failsFirst` now fails until
+  `recover()` is called, because the Dashboard's rows read the workouts
+  before a later screen does.
+- **Looked at** in a headless browser from the static Storybook: the six
+  destinations at 412 by 915 in Martian, Light and Dark. Not looked at:
+  below the first viewport (the frame is fixed to the phone's height, so a
+  tall capture shows the same 915 px; the tails were walked by the tests),
+  anything on the phone, 200% text, the donut legend's contrast on the hero
+  (the chair's measurement is still owed, with the two from Session 23).
+- Moved the needle: **WS-03 step 9 done** (seven tickets plus three bugs);
+  **WS-03 step 11** placed (four tickets); M2 gained fourteen. Available
+  next: WS-02 step 6, WS-03 step 11, WS-15.
 
 ## Session 23: 2026-10-13, Claude (the whole of MM-262 built: nothing native shows)
 
@@ -341,29 +417,3 @@ limitations.
   written in October's first week; only their sources and sequences carry
   the additions. The 58 in-progress tickets were not walked; many are built
   with a leftover and could close.
-
-## Session 21: 2026-10-12, Claude (the switch out of Flutter, MM-232 step 5 and 6)
-
-- Step 5 in two merged PRs (#129, #130): five Kotlin plugins in the shell
-  (`MmDb`, `MmPacks`, `MmReminders`, `MmScanner`, `MmHealth`) behind the
-  interfaces the app already had, TypeScript adapters in `sql/native/`,
-  `foodCatalog/download/native/` and `platform/`, `openAppServices`
-  branching once on the shell, the hardware back button, `minSdk` 26.
-  The `SqlDatabase` contract runs against the native adapter over a fake
-  bridge; `healthSourceContract` runs against `NativeHealthSource`; the
-  Dart `health_connect_sample_test` is ported. Everything above was
-  exercised on the emulator end to end.
-- Step 6 (this PR): the Dart task runner is rewritten in TypeScript
-  (`tool/`, run by Node 22.18+, zero dependencies), with `req`, `panel`,
-  `ci`, `roadmap`, `food`, `run/demo/emulator/build/clean`, `check`; its
-  Dart tests are ported to `node:test` (140 pass). `apps/mobile`,
-  `packages/`, `.fvmrc` and the goldens workflow are deleted; CI runs on
-  Node and assembles the debug APK; `coverage.json` lists the React
-  sources; the evidence register and docs now name the TypeScript files.
-- Late in the session the owner rejected the hand-drawn nav icons
-  ("hammers fucking each other") and ruled: standard Material icons
-  (MM-236) and Storybook as the design register, replacing the HTML
-  register entirely (MM-237). Both shipped the same day; screen stories
-  remain MM-237's open step.
-- The pack build keeps DuckDB extract + the TS pipeline
-  (`mm food build` drives `apps/mobile/scripts/food-build.mjs` through vite).

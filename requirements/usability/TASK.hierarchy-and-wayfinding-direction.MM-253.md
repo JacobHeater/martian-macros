@@ -1,7 +1,7 @@
 ---
 id: MM-253
 component: usability
-status: proposed
+status: done
 related: [MM-224, MM-109, MM-179, MM-236, MM-237, MM-101, MM-106, MM-108]
 ---
 
@@ -103,3 +103,7 @@ screen rebuilt under MM-254 to MM-259, linked from those tickets.
 
 ## The component walk ran (2026-10-13)
 The product-designer, UX-accessibility and React-Capacitor roles walked every file of src/ui and every design-system story; their reports, the chair's decision and the owner's rulings are in docs/agent-runs/mm253-components/. The owner ruled that nothing native shows (MM-262), which becomes this direction's eighth rule: **the design system draws every control and every state of it.** The findings are MM-262 to MM-282; the destinations (MM-254 to MM-259) build on the controls those tickets deliver, pickers and pressed states first.
+
+## Progress
+
+Done 2026-10-13. The eight rules, what sits outside them (safety above the hero, one sentence of uncertainty with its chart), what "one tap down" means, the first-viewport budget per destination, the empty states and the before-and-after table are in `design/screen-direction.md`. The panel run is `docs/agent-runs/mm253-hierarchy/` (product-designer, 28 findings; UX-accessibility, 25; the chair's `decision.md` gives every one an outcome; `mm panel` validates it). The rules are checked by `test/gallery/hierarchy.test.tsx`: a destination story that nests a card in a card or the hero, draws a notice inside a card, shows the bars and the donut at once, draws two heroes or two primary actions fails. The design system gained `MmSection` (icon, heading, summary, trailing action, fold or open-a-screen), `MmRhythmStrip` (seven named dots), `NumberEntry` (the bare number field) and thirty-five meaning names in `MmIconName`. The component walk (the second scenario) ran the same day as `mm253-components` and became MM-262 to MM-282.

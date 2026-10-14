@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { DetailLevel } from '../../src/domain/food/detail/DetailLevel';
+import { MacroPicture } from '../../src/domain/MacroPicture';
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
 import { TermsAcceptance } from '../../src/domain/TermsAcceptance';
 import { ThemePreference } from '../../src/domain/ThemePreference';
@@ -54,6 +55,20 @@ export function preferencesRepositoryContract(
       }
       await repo.saveThemePreference('dark');
       expect(await first(repo.watchDetailLevel())).toBe('full');
+    });
+
+    // MM-254: the macro picture, bars or donut, remembered per person.
+    it('the macro picture is bars until changed, and each choice is kept', async () => {
+      expect(await first(repo.watchMacroPicture())).toBe('bars');
+      for (const picture of MacroPicture.values) {
+        await repo.saveMacroPicture(picture);
+        expect(await first(repo.watchMacroPicture())).toBe(picture);
+      }
+      await repo.saveMacroPicture('donut');
+      await repo.saveThemePreference('dark');
+      await repo.saveDetailLevel('full');
+      expect(await first(repo.watchMacroPicture()), 'other preferences leave it alone').toBe('donut');
+      expect(await first(repo.watchThemePreference())).toBe('dark');
     });
 
     it('the under-eating notice is undismissed until dismissed', async () => {

@@ -1,3 +1,26 @@
+.progress-hero-title {
+  margin: 0 0 var(--space-8);
+  font: var(--type-heading);
+}
+.progress-hero-trend {
+  margin-top: var(--space-16);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--outline);
+}
+.progress-hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+.progress-hero-head > .progress-hero-title {
+  margin: 0;
+}
+.progress-waist-how {
+  margin: 0 0 var(--space-12);
+}
 .progress-waist-fields {
   display: flex;
   gap: var(--space-8);

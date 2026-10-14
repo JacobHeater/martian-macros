@@ -1,10 +1,105 @@
 # Screen direction
 
-Per-screen tone, density, hierarchy and what must not happen. Delivery order and
+The direction every destination follows (MM-253) comes first; the per-screen tone, density, hierarchy and what must not happen follow it. Delivery order and
 prerequisites are in the roadmap; behavior is in the tickets. The current app has
 three tabs (Today, Progress, Coach); the planned split into Dashboard and Food is
 in [ux-architecture.md](ux-architecture.md). Where this file says "Today" it means
 the current combined screen, which becomes the Dashboard hero plus the Food list.
+
+## The direction: tiers, icons and one primary action (MM-253, 2026-10-13)
+
+The owner's diagnosis: the app suffered from a lack of iconography and
+segmenting; monolithic views; cognitive overload. These rules now govern
+every destination; the sections below them are the older per-screen notes
+and stand where they do not conflict. The product-designer and
+UX-accessibility roles graded the built screens against the rules before
+the rebuild (`docs/agent-runs/mm253-hierarchy/`); what they added is folded
+in here.
+
+1. **Tiers, not cards.** Each screen has one hero (`MmHeroSurface`, 24
+   padding, one `figureXL` or `figure`). Secondary facts are sections and
+   rows on the canvas (`MmSection`: a 24 dp icon, a `heading`, an optional
+   one-line summary, rows beneath at 56 dp or 48 dense, 20 dp icons,
+   hairlines between them, no surface), never cards. Tertiary content (how
+   to read a chart, what an event means, the history) is a disclosure
+   (`MmDisclosure`, or a section folded to its summary), one tap down,
+   never inline. A notice is a surface of its own and is never drawn inside
+   a card, the hero or a list group.
+2. **Icons as wayfinding.** Every section header, list row, caution, notice
+   and empty state carries a leading icon from the set the app ships
+   (`MmIcon`, Material Outlined), 20 dp in rows, 24 dp in headers, always
+   with a label. The set grows by meaning names (`MmIconName`); no custom
+   glyph until the app mark exists (MM-109), and where the set has no glyph
+   for a meaning (a muscle group) the mark is text until then.
+3. **Lists with shape.** Entries group by week (this week, last week, then
+   months); a rhythm strip (`MmRhythmStrip`) shows the last seven days as
+   dots, full, half or empty, today ringed, every dot named with its day
+   and its state; notable rows (a personal record, a complete day) carry a
+   mark with its words. Both strips in the app mean the same thing: the
+   rolling last seven days, so every dot is a real day.
+4. **One picture per fact, one home per fact.** On a screen a fact has one
+   picture; across the app it has one home, and another screen cites it
+   with a row that opens the home. The owner's one exception: the macro
+   picture is a switch between the bars (grams against target) and the
+   donut (share of calories), remembered per person as a preference,
+   named "Grams" and "Share", and never both at once.
+5. **Graphics that carry information.** The horizon arc stays the signature
+   and reappears in empty states; the rhythm strip on Dashboard and Train;
+   meal icons in Food; method icons on food rows beside their word;
+   motion on the arc and the strips within `interaction-and-motion.md`. No
+   decorative colour.
+6. **One primary action per screen.** At most one Ember fill
+   (`MmButton` primary or the floating action) in view; the rest are text
+   actions, a menu, a header action or rows. Train keeps "Start workout";
+   "Repeat last workout" is a text action. Save for a value already saved
+   waits until the value changes; a disabled primary is never parked in a
+   hero.
+7. **Progressive disclosure is the default** (`anti-cruft` section 7): a
+   screen answers today's question in the first viewport (412 by 915, and
+   360 by 740). Per destination that is: Dashboard, the arc, the macro
+   picture, the strip and the first rows; Food, the hero and the first
+   meal; Coach, the hero and the one thing to do; Progress, the weigh-in,
+   the figure and the chart; Train, Start, the strip and the first group;
+   Settings, the first two sections.
+8. **Nothing native shows** (MM-262): the design system draws every control
+   and every state of it.
+
+**Outside the rules.** Safety content (the under-eating notice, the relief
+offer, the policy cautions, the pause banner, the target flags) is outside
+the rationing: it sits above the hero, in full, in that order, never
+collapsed and never as "the one thing to do". Material uncertainty is
+outside rule 1's "never inline": one sentence stays with the chart it
+qualifies (the weight trend's band), and a held or settling estimate says
+so in the line that is visible when its disclosure is closed.
+
+**"One tap down" means:** unfold in place when the content is rows or one
+chart (Waist, Strength, Recovery, Reports, "More about this week"); push a
+screen when it is a list that scrolls or has its own actions (a lift's
+history, the weekly volume).
+
+**Empty states.** Food: the four meal headers and one line. Weigh-in: the
+field and its hint. Weight events: one sentence. Waist and Strength: the
+section's summary line says what starting them takes. Train: one line and
+Start. Coach: "Log a weigh-in to get started."
+
+**Checked by tests.** `test/gallery/hierarchy.test.tsx` fails a destination
+story that nests a card in a card or in the hero, draws a notice inside a
+card, shows the bars and the donut at once, draws more than one hero, or
+shows more than one primary action.
+
+### Before and after, per destination (the register, 2026-10-13)
+
+Before is `main` at `9fb8c79`; after is each screen as rebuilt under
+MM-254 to MM-259. The story names are the register's.
+
+| Destination | Before | After |
+|---|---|---|
+| Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Share switch and the confidence word labelled; the rhythm strip of the last seven days; the streak and the insight as a row and a section; weight, waist, next check-in and training as rows that open their destinations; the weigh-in in place only on a day without one; the history behind "More about this week". |
+| Food (`Screens/Food`, Food and NothingLogged) | A hero, a second macro picture, four meal cards, a segmented completeness control at the foot. | The hero with the switch; the meals as sections with their icons, subtotal and add button, entries as rows with a method icon beside its word; the completeness row after the last meal with its state in words, the mark repeated in the day header; "More about today" one tap down. |
+| Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, goal, body), recovery and reports folded to one line when nothing is due. |
+| Progress (`Screens/Progress`, Progress) | An entry card, a chart card with a four-line caption, an events card with a four-line paragraph, a waist card with the technique inline, strength cards. | One hero: the weigh-in and the trend with its range switch, one line about the band, "How to read this" one tap down; weight events as rows with an icon and the day in words, the add action in the header; Waist and Strength folded to their lines. |
+| Train (`Screens/Train`, Train) | Two full-width buttons, a chip, thirteen identical rows. | One primary, Repeat as a text action; the strip of the last seven days; the weekly volume as a section that opens its screen; workouts grouped by this week, last week and month, each row with the day, the length and a record mark with its words. |
+| Settings (`Screens/Settings`, Settings and MeasuredBodyFat) | Twelve groups mixing chips, a segmented control, sliders and rows. | Seven sections of rows in the order of use (Today's setup, You, Reminders, Data, Appearance, About, Erase), every row with its icon, the choosers opening the options dialog; the two sliders stay in their rows as the one other inline control. |
 
 ## Today (the screen that must be fixed)
 

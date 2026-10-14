@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { WeightEventType } from '../domain/WeightEventType';
+import { Fmt } from '../format/Fmt';
 import { weightEventLabel } from '../format/weightEventLabel';
 import { useApp } from '../app/useApp';
 import { MmButton } from '../ui/MmButton';
@@ -13,7 +14,8 @@ import './progress.css';
 export function WeightEventEntrySheet({ today, onDone }: { today: CalendarDate; onDone: () => void }) {
   const { services } = useApp();
   const overlays = useOverlays();
-  const [type, setType] = useState<WeightEventType>('illness');
+  // No default: a person adding travel must not record an illness by not looking (UX-21).
+  const [type, setType] = useState<WeightEventType>();
   const [date, setDate] = useState(today);
   const [saving, setSaving] = useState(false);
 
@@ -31,6 +33,7 @@ export function WeightEventEntrySheet({ today, onDone }: { today: CalendarDate; 
   const save = async () => {
     setSaving(true);
     try {
+      if (type === undefined) return;
       await services.weightEvents.saveWeightEvent({ date, type });
     } catch {
       setSaving(false);
@@ -43,23 +46,24 @@ export function WeightEventEntrySheet({ today, onDone }: { today: CalendarDate; 
   return (
     <div className="progress-sheet">
       <h2 className="app-headline">Add a weight event</h2>
-      <MmDropdown<WeightEventType>
+      <MmDropdown<WeightEventType | undefined>
         label="Event"
         value={type}
+        placeholder="Choose an event"
         items={WeightEventType.values.map((value) => ({ value, label: weightEventLabel(value) }))}
         onChange={saving ? undefined : setType}
       />
       <MmListRow
         title="Date"
-        subtitle={date.toString()}
-        leadingIcon="history"
+        subtitle={Fmt.day(date, today)}
+        leadingIcon="calendar"
         opens
         onPress={saving ? undefined : () => void pickDate()}
       />
       <p className="app-text">Events can be added for the last 28 days.</p>
       <div className="app-row app-row-end">
         <MmButton label="Cancel" kind="text" onPress={saving ? undefined : onDone} />
-        <MmButton label="Save event" onPress={saving ? undefined : () => void save()} />
+        <MmButton label="Save event" onPress={saving || type === undefined ? undefined : () => void save()} />
       </div>
     </div>
   );

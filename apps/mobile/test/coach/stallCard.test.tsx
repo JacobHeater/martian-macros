@@ -154,5 +154,5 @@ it('a flat month on target shows the card on the Coach screen', async () => {
   renderApp(repos, today);
   await openTab('Coach');
   const title = await screen.findByRole('heading', { name: 'Progress has slowed' });
-  expect(title.closest('.mm-surface')).toHaveTextContent('your weight has held');
+  expect(title.closest('.mm-section')).toHaveTextContent('your weight has held');
 });
