@@ -2,7 +2,8 @@ import { existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
-import { capture, run } from './proc.ts';
+import { liveRunPlan } from './liveRunPlan.ts';
+import { capture, run, start } from './proc.ts';
 
 const webApp = 'apps/mobile';
 const androidDir = `${webApp}/android`;
@@ -217,25 +218,24 @@ export function physicalAndroidDeviceId(ids: readonly string[]): string {
 }
 
 /**
- * `mm run [--env dev|prod|phone] [-d DEVICE]`: build, install and launch.
- * `--env phone` selects the one physical phone, never an emulator; `dev`
- * and `prod` are accepted and change nothing, since the build has no
- * per-environment defines (one config).
+ * The device a run is for, from `args` (MM-234): `-d DEVICE`, or with
+ * `--env phone` the one physical phone, else the one connected device,
+ * starting an emulator when none is. A number is the exit code of a failure.
  */
-export async function runApp(repoRoot: string, args: readonly string[]): Promise<number> {
+async function chosenDevice(args: readonly string[]): Promise<string | number> {
   const env = args.includes('--env') ? args[args.indexOf('--env') + 1] : undefined;
   if (env !== undefined && !['dev', 'prod', 'phone'].includes(env)) {
     stderr.write('--env must be one of: dev, prod, phone\n');
     return 64;
   }
-  let device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  const device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
   if (env === 'phone') {
     if (device !== undefined) {
       stderr.write('Use mm run -d DEVICE_ID for an explicit device, or mm run --env phone for automatic phone selection.\n');
       return 64;
     }
     try {
-      device = physicalAndroidDeviceId(await deviceIds());
+      return physicalAndroidDeviceId(await deviceIds());
     } catch (error) {
       stderr.write(`${error instanceof Error ? error.message : error}\n`);
       return 69;
@@ -243,16 +243,84 @@ export async function runApp(repoRoot: string, args: readonly string[]): Promise
   } else if (env !== undefined) {
     stdout.write('The build has no per-environment defines; --env chooses nothing here (MM-232).\n');
   }
-  if (device === undefined) {
-    const ready = await ensureDevice();
-    if (ready !== 0) return ready;
-    const devices = await deviceIds();
-    if (devices.length > 1) {
-      stderr.write(`More than one device is connected: ${devices.join(', ')}. Choose one with -d DEVICE.\n`);
-      return 64;
-    }
-    device = devices[0]!;
+  if (device !== undefined) return device;
+  const ready = await ensureDevice();
+  if (ready !== 0) return ready;
+  const devices = await deviceIds();
+  if (devices.length > 1) {
+    stderr.write(`More than one device is connected: ${devices.join(', ')}. Choose one with -d DEVICE.\n`);
+    return 64;
   }
+  return devices[0]!;
+}
+
+/** Waits until something answers on `127.0.0.1:port`, for up to `ms`. */
+async function answers(port: number, ms: number): Promise<boolean> {
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try {
+      await fetch(`http://127.0.0.1:${port}/`);
+      return true;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+  return false;
+}
+
+/**
+ * `mm run --live` (MM-300): the app on the device from the Vite dev server,
+ * with hot reload. The shell is built with Capacitor's own live reload
+ * pointed at `localhost`, which adb reverse maps to this machine, so the
+ * server never listens on the network. Runs until Ctrl+C. The live URL is
+ * only in the git-ignored synced config; the next `mm run` replaces it.
+ */
+async function runLive(repoRoot: string, args: readonly string[]): Promise<number> {
+  const plan = liveRunPlan(args);
+  if (typeof plan === 'string') {
+    stderr.write(`${plan}\n`);
+    return 64;
+  }
+  const device = await chosenDevice(args);
+  if (typeof device === 'number') return device;
+  const app = `${repoRoot}/${webApp}`;
+  // Capacitor copies the built files into the shell on every run, so they must exist.
+  if (!existsSync(`${app}/dist/index.html`)) {
+    const built = await run(['npx', 'vite', 'build'], { cwd: app });
+    if (built !== 0) return built;
+  }
+  const server = start(plan.devServer, { cwd: app });
+  const stop = async () => {
+    await server.stop();
+    await capture([adbPath(), '-s', device, 'reverse', '--remove', `tcp:${plan.port}`]);
+  };
+  process.once('SIGINT', () => void stop().then(() => process.exit(0)));
+  if (!(await answers(plan.port, 30_000))) {
+    stderr.write(`The dev server did not answer on port ${plan.port}. Is another one using it? Try --port.\n`);
+    await stop();
+    return 69;
+  }
+  stdout.write(
+    `\nLive on ${device}: save a file under apps/mobile/src and the app reloads.\n` +
+      'Ctrl+C ends the session; mm run puts the bundled app back.\n\n',
+  );
+  // Capacitor builds, installs and launches, then stays until Ctrl+C.
+  const launched = await run(plan.capRun(device), { cwd: app, env: plan.capRunEnv(gradleEnv()) });
+  await stop();
+  return launched;
+}
+
+/**
+ * `mm run [--env dev|prod|phone] [-d DEVICE] [--live [--port N]]`: build,
+ * install and launch. `--env phone` selects the one physical phone, never
+ * an emulator; `dev` and `prod` are accepted and change nothing, since the
+ * build has no per-environment defines (one config). `--live` serves the
+ * app from the dev server with hot reload instead (MM-300).
+ */
+export async function runApp(repoRoot: string, args: readonly string[]): Promise<number> {
+  if (args.includes('--live')) return runLive(repoRoot, args);
+  const device = await chosenDevice(args);
+  if (typeof device === 'number') return device;
   return installAndLaunch(repoRoot, device);
 }
 
