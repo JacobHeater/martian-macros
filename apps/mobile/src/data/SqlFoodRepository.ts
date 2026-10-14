@@ -5,6 +5,7 @@ import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { orNull } from './columns';
 import { foodFromRow } from './foodFromRow';
+import { microsValues } from './microsValues';
 import { portionValues } from './portionValues';
 import { insert } from './insert';
 import { update } from './update';
@@ -22,6 +23,7 @@ const valuesOf = (entry: FoodEntry): Values => ({
   fiber_g: orNull(entry.fiberG),
   sodium_mg: orNull(entry.sodiumMg),
   alcohol_g: orNull(entry.alcoholG),
+  ...microsValues(entry.micros),
   ...portionValues(entry.portion),
 });
 

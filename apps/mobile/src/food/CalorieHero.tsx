@@ -1,11 +1,14 @@
 import { MacroSplitChart } from '../charts/MacroSplitChart';
+import type { FoodEntry } from '../domain/FoodEntry';
 import type { IntakeDay } from '../domain/IntakeDay';
+import { NutritionGoals } from '../domain/NutritionGoals';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { MacroPicture } from '../domain/MacroPicture';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { Fmt } from '../format/Fmt';
 import { clamp } from '../lang/clamp';
 import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { HorizonArc } from '../ui/HorizonArc';
 import { MacroBar } from '../ui/MacroBar';
@@ -14,10 +17,13 @@ import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
 import { MmSegmented } from '../ui/MmSegmented';
+import { MicrosPanel } from './MicrosPanel';
 import './food.css';
 
 interface CalorieHeroProps {
   intake: IntakeDay;
+  /** The day's foods, for the Micros picture (MM-310). */
+  entries: readonly FoodEntry[];
   targets: DailyTargets | undefined;
   /**
    * During a pause `targets` are a guide (MM-148): the hero shows what was
@@ -43,10 +49,12 @@ interface CalorieHeroProps {
  * the app (MM-187): the Dashboard, the Food screen and the Coach screen all
  * use it, and the arc is always drawn. The macro picture is a switch
  * between grams against target and the split of calories (MM-253, rule 4),
- * remembered per person, never both at once.
+ * remembered per person, never both at once. At Full detail the switch has
+ * a third choice, the day's micronutrients (MM-310).
  */
 export function CalorieHero({
   intake,
+  entries,
   targets,
   paused = false,
   macros = MacroKind.values,
@@ -60,6 +68,9 @@ export function CalorieHero({
   // Simple detail shows calories and protein only (MM-49).
   const level = useLoaded(state.detailLevel) ?? 'standard';
   const picture = useLoaded(state.macroPicture) ?? 'bars';
+  const setup = useLoaded(state.setup);
+  const today = useCell(state.today);
+  const goals = useLoaded(state.nutritionGoals) ?? NutritionGoals.none;
   const shown = DetailLevel.showsCarbsAndFat(level) ? macros : macros.filter((macro) => macro === 'protein');
   const t = targets;
   const left = t === undefined || paused ? undefined : t.kcal - intake.kcal;
@@ -76,7 +87,9 @@ export function CalorieHero({
   const target: Readonly<Record<MacroKind, number | undefined>> = { protein: t?.proteinG, carbs: t?.carbsG, fat: t?.fatG };
   // The split of calories needs all three macros; at Simple detail only the bars are offered.
   const switchable = DetailLevel.showsCarbsAndFat(level);
-  const chosen: MacroPicture = switchable ? picture : 'bars';
+  // Micros is a choice at Full detail only; remembered below it, the bars are shown.
+  const micros = DetailLevel.showsExtras(level);
+  const chosen: MacroPicture = !switchable || (picture === 'micros' && !micros) ? 'bars' : picture;
 
   return (
     <MmHeroSurface>
@@ -101,6 +114,7 @@ export function CalorieHero({
             segments={[
               { value: 'bars', label: 'Grams' },
               { value: 'donut', label: 'Split' },
+              ...(micros ? [{ value: 'micros' as const, label: 'Micros' }] : []),
             ]}
             selected={chosen}
             onChange={(next) => {
@@ -109,7 +123,9 @@ export function CalorieHero({
           />
         </div>
       ) : null}
-      {chosen === 'donut' ? (
+      {chosen === 'micros' ? (
+        <MicrosPanel entries={entries} setup={setup} today={today} goals={goals} />
+      ) : chosen === 'donut' ? (
         <div className="food-hero-split">
           <MacroSplitChart intake={intake} compact />
         </div>

@@ -21,4 +21,5 @@ export const tables = [
   'imported_samples',
   'health_import_tokens',
   'exercise_progressions',
+  'water_entries',
 ] as const;

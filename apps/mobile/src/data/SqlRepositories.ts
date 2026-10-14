@@ -11,6 +11,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
@@ -35,6 +36,7 @@ import { SqlReminderRepository } from './SqlReminderRepository';
 import { SqlSetupRepository } from './SqlSetupRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlWaistRepository } from './SqlWaistRepository';
+import { SqlWaterRepository } from './SqlWaterRepository';
 import { SqlWeightEventRepository } from './SqlWeightEventRepository';
 import { SqlWeightRepository } from './SqlWeightRepository';
 import { SqlWorkoutRepository } from './SqlWorkoutRepository';
@@ -50,6 +52,7 @@ export class SqlRepositories {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
@@ -72,6 +75,7 @@ export class SqlRepositories {
     this.weights = new SqlWeightRepository(db);
     this.weightEvents = new SqlWeightEventRepository(db);
     this.waist = new SqlWaistRepository(db);
+    this.water = new SqlWaterRepository(db);
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);
     this.dayMarks = new SqlDayMarkRepository(db);

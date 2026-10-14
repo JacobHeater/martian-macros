@@ -1,8 +1,10 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
+import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { screensMeta } from './screensMeta';
+import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 import type { StoryStage } from './StoryStage';
 import { valueOf } from './valueOf';
@@ -114,5 +116,90 @@ export const EditFood = screenStory({
   open: async ({ services, overlays, today }) => {
     const [entry] = await valueOf(services.food.watchFood(today));
     if (entry !== undefined) void showAddFoodSheet(overlays, today, { entry });
+  },
+});
+
+/** Yesterday's food, opened on the Food screen, at Full detail with the Micros picture (MM-310). */
+const yesterdaysFood = ({ state, today }: StoryStage) => {
+  state.homeTab.put('food');
+  state.selectedDay.put(today.addDays(-1));
+};
+
+/** MM-310: the nutrition card's third picture; the snack states fewer nutrients, so some rows say their coverage. */
+export const Micros = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: today so far, one food logged. */
+export const MicrosToday = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: nothing logged yet; no number is shown. */
+export const MicrosEmpty = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Nothing logged yet today.',
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.preferences.saveDetailLevel('full');
+    await repos.preferences.saveMacroPicture('micros');
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: pregnant, so no reference amounts, and the care-team line. */
+export const MicrosCareTeam = screenStory({
+  covers: ['FoodScreen'],
+  shows: /your care team can say/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', pregnant: true }),
+  open: yesterdaysFood,
+});
+
+/** MM-311: a sodium limit of 1,200 mg, and a day over it by 200 mg. */
+export const MicrosOverLimit = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Over your limit/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', sodiumLimitMg: 1200 }),
+  open: yesterdaysFood,
+});
+
+/** MM-313: the water section of a whole day, in imperial, no goal. */
+export const WaterSection = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Bottle',
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add another amount of water' }));
+  },
+});
+
+/** MM-313: a goal of 1.5 L in metric, and a day past it. */
+export const WaterGoalReached = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Goal reached/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Goal reached/));
+  },
+});
+
+/** MM-313: another amount, typed. */
+export const WaterOtherAmount = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Up to 3,000 ml at a time.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Add another amount of water' }));
+    const field = await within(canvas).findByRole('textbox', { name: 'Water, millilitres' });
+    await userEvent.type(field, '330');
+    reveal(field);
   },
 });

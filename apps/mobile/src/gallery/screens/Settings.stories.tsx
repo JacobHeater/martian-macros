@@ -9,8 +9,10 @@ import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
+import { demoWith } from './demoWith';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
+import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 
 /**
@@ -104,5 +106,26 @@ export const EvidenceQuestion = screenStory({
   open: async ({ services, navigator }) => {
     const [question] = EvidenceRegister.parse(await services.evidence()).questions;
     if (question !== undefined) void navigator.push(() => <EvidenceQuestionScreen question={question} />);
+  },
+});
+
+/** MM-311, MM-313: both goals switched on, each with its amount in the row below. */
+export const NutritionGoals = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Daily sodium limit',
+  scenario: demoWith({ sodiumLimitMg: 2300, waterGoalMl: 2000 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Water goal'));
+  },
+});
+
+/** MM-311: the section as a new installation has it: both off. */
+export const NutritionGoalsOff = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Daily water goal',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Daily water goal'));
   },
 });

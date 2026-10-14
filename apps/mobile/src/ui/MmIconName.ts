@@ -70,4 +70,6 @@ export type MmIconName =
   | 'school'
   | 'dayUnmarked'
   | 'dayComplete'
-  | 'dayPartial';
+  | 'dayPartial'
+  // Water and micronutrients (MM-305).
+  | 'water';

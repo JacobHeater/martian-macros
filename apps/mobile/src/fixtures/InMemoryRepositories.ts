@@ -11,6 +11,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
@@ -33,6 +34,7 @@ import { InMemoryReminderRepository } from './InMemoryReminderRepository';
 import { InMemorySetupRepository } from './InMemorySetupRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryWaistRepository } from './InMemoryWaistRepository';
+import { InMemoryWaterRepository } from './InMemoryWaterRepository';
 import { InMemoryWeightEventRepository } from './InMemoryWeightEventRepository';
 import { InMemoryWeightRepository } from './InMemoryWeightRepository';
 import { InMemoryWorkoutRepository } from './InMemoryWorkoutRepository';
@@ -47,6 +49,7 @@ export class InMemoryRepositories {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
@@ -68,6 +71,7 @@ export class InMemoryRepositories {
     const weights = new InMemoryWeightRepository();
     const weightEvents = new InMemoryWeightEventRepository();
     const waist = new InMemoryWaistRepository();
+    const water = new InMemoryWaterRepository();
     const food = new InMemoryFoodRepository();
     const customFoods = new InMemoryCustomFoodRepository();
     const dayMarks = new InMemoryDayMarkRepository();
@@ -86,6 +90,7 @@ export class InMemoryRepositories {
     this.weights = weights;
     this.weightEvents = weightEvents;
     this.waist = waist;
+    this.water = water;
     this.food = food;
     this.customFoods = customFoods;
     this.dayMarks = dayMarks;
@@ -105,6 +110,7 @@ export class InMemoryRepositories {
       () => weights.clear(),
       () => weightEvents.clear(),
       () => waist.clear(),
+      () => water.clear(),
       () => food.clear(),
       () => customFoods.clear(),
       () => dayMarks.clear(),

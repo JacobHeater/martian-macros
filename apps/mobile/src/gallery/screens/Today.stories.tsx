@@ -1,8 +1,10 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
+import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { screensMeta } from './screensMeta';
+import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 import { waistDueScenario } from './waistDueScenario';
 
@@ -82,4 +84,35 @@ export const WaistSaved = screenStory({
   shows: 'Open Progress',
   scenario: waistDueScenario,
   walk: type('Today’s waist, inches', '36{Enter}'),
+});
+
+/** MM-313: today's water in the Dashboard's group, a glass in one tap; no goal. */
+export const Water = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /fl oz today/,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add a glass of water' }));
+  },
+});
+
+/** MM-313: a goal of 2.5 L in metric, and the snack after one tap, with Undo. */
+export const WaterGlassAdded = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /Added a glass/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
+  walk: async (canvas) => {
+    const add = await within(canvas).findByRole('button', { name: 'Add a glass of water' });
+    reveal(add);
+    await userEvent.click(add);
+  },
+});
+
+/** MM-313: the first day, no water yet. */
+export const WaterNone = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'No water yet today',
+  scenario: firstDayScenario,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('No water yet today'));
+  },
 });

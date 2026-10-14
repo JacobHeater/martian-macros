@@ -4,6 +4,8 @@ import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { MacroPicture } from '../domain/MacroPicture';
+import type { NutritionGoals } from '../domain/NutritionGoals';
+import type { WaterEntry } from '../domain/water/WaterEntry';
 import type { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { HandSize } from '../domain/food/hand/HandSize';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -196,6 +198,9 @@ export class AppState {
 
   /** Which picture of the macros the hero shows (MM-254): bars or donut, never both. */
   readonly macroPicture: Cell<Loadable<MacroPicture>>;
+
+  /** The sodium limit and the water goal, each off until set (MM-311, MM-313). */
+  readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
   readonly recentFoods: Cell<Loadable<FoodEntry[]>>;
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
@@ -350,6 +355,7 @@ export class AppState {
   readonly selectedDay = new ValueCell<CalendarDate | undefined>(undefined);
 
   private readonly foodByDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
+  private readonly waterByDay = new Map<number, Cell<Loadable<WaterEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
   private readonly reportIntakeByIndex = new Map<number, Cell<Loadable<IntakeDay[]>>>();
   private readonly reportByIndex = new Map<number, Cell<MonthlyReport | undefined>>();
@@ -431,6 +437,7 @@ export class AppState {
     });
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
+    this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
     this.coach = derived(() => {
@@ -920,6 +927,16 @@ export class AppState {
     if (cell === undefined) {
       cell = stream(() => this.services.food.watchFood(date));
       this.foodByDay.set(date.epochDay, cell);
+    }
+    return cell;
+  }
+
+  /** The water logged on `date` (MM-313). */
+  waterForDay(date: CalendarDate): Cell<Loadable<WaterEntry[]>> {
+    let cell = this.waterByDay.get(date.epochDay);
+    if (cell === undefined) {
+      cell = stream(() => this.services.water.watchWater(date));
+      this.waterByDay.set(date.epochDay, cell);
     }
     return cell;
   }
