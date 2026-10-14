@@ -49,3 +49,32 @@ export function capture(
     child.on('close', (code) => resolve({ code: code ?? 124, stdout: out, stderr: err }));
   });
 }
+
+/** A process left running in the background, and how to end it. */
+export interface Started {
+  /** Its exit code, when it ends on its own. */
+  readonly exited: Promise<number>;
+  /** Ends it and everything it started (on Windows, the shell's whole tree). */
+  stop(): Promise<void>;
+}
+
+/** Starts `command` with inherited stdio and leaves it running (a dev server). */
+export function start(command: readonly string[], { cwd, env }: { cwd?: string; env?: NodeJS.ProcessEnv } = {}): Started {
+  stdout.write(`\x1B[2m$ ${command.join(' ')}  (in ${cwd ?? '.'})\x1B[0m\n`);
+  const child = windows
+    ? spawn(command.map(quoted).join(' '), { cwd, env, stdio: 'inherit', shell: true })
+    : spawn(command[0]!, command.slice(1), { cwd, env, stdio: 'inherit', detached: true });
+  const exited = new Promise<number>((resolve) => {
+    child.on('error', () => resolve(127));
+    child.on('close', (code) => resolve(code ?? 1));
+  });
+  return {
+    exited,
+    async stop() {
+      if (child.exitCode !== null || child.pid === undefined) return;
+      if (windows) await capture(['taskkill', '/pid', `${child.pid}`, '/T', '/F']);
+      else process.kill(-child.pid, 'SIGTERM');
+      await exited;
+    },
+  };
+}
