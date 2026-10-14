@@ -461,7 +461,8 @@
             "MM-182",
             "MM-234",
             "MM-235",
-            "MM-238"
+            "MM-238",
+            "MM-300"
           ]
         },
         {
@@ -900,7 +901,8 @@
           "MM-238",
           "MM-241",
           "MM-243",
-          "MM-245"
+          "MM-245",
+          "MM-300"
         ],
         "remaining": [
           "MM-1",
@@ -976,6 +978,14 @@
             "MM-235",
             "MM-238"
           ]
+        },
+        {
+          "step": 7,
+          "title": "Live reload on a device (MM-300): mm run --live, the dev server through adb reverse and Capacitor live reload",
+          "tickets": [
+            "MM-300"
+          ],
+          "milestone": "M2"
         }
       ],
       "gate": {

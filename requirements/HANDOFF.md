@@ -73,6 +73,13 @@ sources and the chair's decisions are in `docs/agent-runs/mm242-eula/`.
 Change what the app does with data and the terms together: they say
 only what the code does, and never "nothing is uploaded" (MM-244).
 
+**Live reload on a device (MM-300).** `mm run --live [-d DEVICE] [--port N]`
+serves the app from the Vite dev server on `127.0.0.1` and runs Capacitor's
+live reload through adb reverse: save a file and the emulator updates
+without a build. Ctrl+C ends it; `mm run` puts the bundled app back. Do
+not launch it with PowerShell redirection (`*>`, `2>&1`): PowerShell 5.1
+turns Vite's stderr into an error and kills the runner.
+
 **Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
 `currentSchema.ts` and `migrationSteps.ts`, with their tests (version 3
 since MM-254: `macro_picture`). Only one schema change at a time.
@@ -86,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-300 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-301 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -245,6 +252,10 @@ limitations.
   Due`); a disabled primary or secondary has no fill, an outline at 16% and
   a label at 38% of `--text` in every palette (MM-297), with Disabled cells
   in the States story and a token test holding the field border at 3:1.
+- **Live reload (MM-300, PR #157):** `mm run --live` on the emulator, found
+  and fixed on the way: Vite on "localhost" bound only `::1` (adb reverse
+  got an empty response), and Capacitor's bare `gradlew` failed under the
+  agent shell's `NoDefaultCurrentDirectoryInExePath`. WS-01 step 7 built.
 - Moved the needle: **WS-03 step 12 built** (MM-290 to MM-299). Available
   next: WS-02 step 6 (MM-135), WS-03 step 11, WS-15.
 
