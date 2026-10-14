@@ -1,7 +1,7 @@
 ---
 id: MM-274
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-102, MM-103]
 ---
 
@@ -48,3 +48,7 @@ Scenario: Radii, durations and tokens
 Scenario: The catalogs sit on the canvas
   Then the Icons story has its gaps and the Bars and Tokens stories sit on --canvas in every palette
 ```
+
+## Progress
+
+Built 2026-10-13: `tokens.css` declares `--motion-fast`, `--motion-base`, `--motion-slow`, `--motion-reveal`, `--motion-fade` and `--motion-turn`, zeroing the movement tokens under reduced motion; `--space-20` and `--radius-check` are declared with their reasons. Every radius in every sheet is a `--radius-*` token (or 999px, 50%, 2px), every duration a motion token, every gap a `--space-*` token, every custom property declared, and no hex colour sits outside `tokens.css`; the icon catalog's gaps exist and the catalogs sit on `--canvas`. Tests: `test/ui/stylesheetTokens.test.ts`.

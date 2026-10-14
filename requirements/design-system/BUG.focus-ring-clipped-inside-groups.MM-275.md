@@ -1,7 +1,7 @@
 ---
 id: MM-275
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-239, MM-106]
 ---
 
@@ -40,3 +40,7 @@ Scenario: Whole ring in a segmented control
   Given a segment is focused
   Then the entire focus mark is visible
 ```
+
+## Progress
+
+Built 2026-10-13: focusables inside a list group, the segmented control, a flush surface, the hero, a swipe row, the options list, the year list and a drum draw the ring inset (`outline-offset: -2px`). `test/ui/focusRing.test.ts` fails a container that hides overflow without the inset rule (the visually hidden box, the progress bar and the ellipsised value are listed as not containers). Looked at in States/FocusedInGroup.

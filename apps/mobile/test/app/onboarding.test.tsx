@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
+import { chooseDay } from '../support/pickers';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { expectClose } from '../support/expectClose';
@@ -41,9 +42,9 @@ it('onboarding requires sex and birth date, then creates a plan', async () => {
 
   expect(heading('Date of birth')).toBeInTheDocument();
   expect(next(), 'no date of birth yet').toBeDisabled();
-  await press('Choose date');
+  await press(/Choose a date/);
   await acceptDate();
-  expect(screen.getByRole('button', { name: 'January 1, 1996' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /January 1, 1996/ })).toBeInTheDocument();
   expect(next()).toBeEnabled();
   await userEvent.click(next());
 
@@ -84,7 +85,7 @@ it('female onboarding offers female-only health questions', async () => {
   await begin();
   await press('Female');
   await userEvent.click(next());
-  await press('Choose date');
+  await press(/Choose a date/);
   await acceptDate();
   await userEvent.click(next());
   await type('Feet', '5');
@@ -109,9 +110,9 @@ it('someone under eighteen is told why and cannot go on', async () => {
   await begin();
   await press('Male');
   await userEvent.click(next());
-  await press('Choose date');
+  await press(/Choose a date/);
   const dialog = await screen.findByRole('dialog');
-  fireEvent.change(within(dialog).getByLabelText('Date of birth'), { target: { value: '2010-05-01' } });
+  await chooseDay(dialog, CalendarDate.of(2010, 5, 1));
   await userEvent.click(within(dialog).getByRole('button', { name: 'OK' }));
   expect(screen.getByText(/Martian Macros is for adults 18 and over/)).toBeInTheDocument();
   expect(next()).toBeDisabled();
@@ -121,7 +122,7 @@ it('changing units clears what was typed, and metric asks for centimeters', asyn
   await begin();
   await press('Male');
   await userEvent.click(next());
-  await press('Choose date');
+  await press(/Choose a date/);
   await acceptDate();
   await userEvent.click(next());
   await type('Feet', '5');

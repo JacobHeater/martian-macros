@@ -1,7 +1,7 @@
 ---
 id: MM-266
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-240, MM-104]
 ---
 
@@ -50,3 +50,7 @@ Scenario: Slider
 Scenario: No accent-color
   Then the stylesheet has no accent-color rule
 ```
+
+## Progress
+
+Built 2026-10-13: `.mm-checkbox` and `.mm-slider` have `appearance: none`; the box is 20 dp in `--outline-strong` on `--sunken`, Ember with `MmIcon` check when checked; the slider's track is 4 dp `--track` with the filled part Ember (a share carried as `--mm-slider-fill`), the thumb a 20 dp Ember disc in a 48 dp row with our focus ring, grown while pressed; `label` is required on `MmSlider` and `MmSliderRow` so every slider speaks its value (Settings and Pause gained theirs). No `accent-color` anywhere. Tests: `test/ui/nativeControls.test.tsx`. Looked at in States and Fields/Sliders in three palettes.

@@ -1,7 +1,7 @@
 ---
 id: MM-265
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-261, MM-104]
 ---
 
@@ -43,3 +43,7 @@ Scenario: Disabled
 
 `test/ui/dropdown.test.tsx`; the architecture test fails any `<select>` in
 `src/`.
+
+## Progress
+
+Built 2026-10-13: `MmDropdown` renders no `<select>`; it composes `MmPickerField` (`aria-haspopup="listbox"`, `aria-expanded`) and opens `overlays.options`, which marks the current value Chosen and has a Cancel. Off, it is drawn quiet with the value readable. `WeightEventEntrySheet` and `CustomExerciseScreen` changed nothing. Tests: `test/ui/dropdown.test.tsx`; `controlHomes` gives `select` no home.

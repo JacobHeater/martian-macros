@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -120,8 +120,11 @@ it('the time can be changed, but not to the night', async () => {
   await giveTime('08:30');
   await expect.poll(async () => (await stored())[0]?.minuteOfDay).toBe(8 * 60 + 30);
   await userEvent.click(await settings.findByRole('button', { name: /^At 8:30 AM/ }));
-  await giveTime('23:00');
-  expect(await screen.findByText('Reminders are not sent between 9 pm and 7 am.')).toBeInTheDocument();
+  const dialog = await giveTime('23:00');
+  // The picker itself says the range and will not take the time (MM-264).
+  expect(within(dialog).getByRole('alert')).toHaveTextContent('Choose a time between 7:00 AM and 8:59 PM.');
+  expect(within(dialog).getByRole('button', { name: 'OK' })).toBeDisabled();
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
   expect((await stored())[0]?.minuteOfDay).toBe(8 * 60 + 30);
 });
 

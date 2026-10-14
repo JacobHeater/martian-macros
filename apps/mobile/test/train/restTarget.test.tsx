@@ -279,18 +279,20 @@ describe('a set’s times, to the second', () => {
     await oneSet(minutes(10) + seconds(7));
     await pressInSet(/^Ended/, 1, user);
     const dialog = within(await screen.findByRole('dialog', { name: 'Set ended' }));
-    expect(dialog.getByRole('textbox', { name: 'Hour' })).toHaveValue('12');
-    expect(dialog.getByRole('textbox', { name: 'Min' })).toHaveValue('10');
-    expect(dialog.getByRole('textbox', { name: 'Sec' })).toHaveValue('07');
+    expect(dialog.getByRole('spinbutton', { name: 'Hour' })).toHaveValue(12);
+    expect(dialog.getByRole('spinbutton', { name: 'Minute' })).toHaveValue(10);
+    expect(dialog.getByRole('spinbutton', { name: 'Second' })).toHaveValue(7);
+    expect(dialog.getByText('12:10:07 PM')).toBeInTheDocument();
   });
 
-  it('a number that is no time is refused in the entry', async () => {
+  it('the entry offers only times that exist, so nothing typed can be refused (MM-264)', async () => {
     await oneSet();
     await pressInSet(/^Started/, 1, user);
-    const dialog = await enterClock(12, 5, 75);
-    expect(within(dialog).getByText('The second is from 0 to 59.')).toBeInTheDocument();
-    await enterClock(13, 5, 75);
-    expect(within(dialog).getByText('The hour is from 1 to 12.')).toBeInTheDocument();
+    const dialog = await enterClock(12, 5, 75, { confirm: false });
+    // Seventy-five seconds is not on the drum: the second digit stands alone.
+    expect(within(dialog).getByRole('spinbutton', { name: 'Second' })).toHaveAttribute('aria-valuemax', '59');
+    expect(within(dialog).getByRole('spinbutton', { name: 'Second' })).toHaveValue(5);
+    expect(within(dialog).getByRole('spinbutton', { name: 'Hour' })).toHaveAttribute('aria-valuemax', '12');
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
     await settle();
     expect((await onlySet())?.startedAt).toBeUndefined();

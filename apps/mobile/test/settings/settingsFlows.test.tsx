@@ -36,9 +36,12 @@ const setup = async () => {
   return stored;
 };
 
-async function chooseFromMenu(button: string, item: string): Promise<void> {
+/** Opens a choice from Settings and picks `item` in the options dialog, which marks the value in force (MM-268). */
+async function chooseFromOptions(button: string, item: string): Promise<void> {
   await userEvent.click(within(topLayer()).getByRole('button', { name: button }));
-  await userEvent.click(await screen.findByRole('menuitem', { name: item }));
+  const dialog = await screen.findByRole('dialog');
+  expect(within(dialog).getByText('Chosen')).toBeInTheDocument();
+  await userEvent.click(within(dialog).getByRole('option', { name: item }));
 }
 
 it('switching units saves the choice', async () => {
@@ -50,14 +53,14 @@ it('switching units saves the choice', async () => {
 
 it('experience can be changed', async () => {
   await open();
-  await chooseFromMenu('Change experience', '3+ years');
+  await chooseFromOptions('Change experience', '3+ years');
   await expect.poll(async () => (await setup()).trainingStatus).toBe('advanced');
 });
 
 it('daily activity can be changed (MM-164)', async () => {
   const settings = await open();
   expect(settings.getByText('Light movement')).toBeInTheDocument();
-  await chooseFromMenu('Change daily activity', 'Physical job');
+  await chooseFromOptions('Change daily activity', 'Physical job');
   await expect.poll(async () => (await setup()).dailyActivity).toBe('physicalJob');
   expect(await settings.findByText('Physical job')).toBeInTheDocument();
 });

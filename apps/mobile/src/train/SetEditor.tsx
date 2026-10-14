@@ -12,7 +12,6 @@ import { timeSpanProblemMessage } from '../format/timeSpanProblemMessage';
 import { clamp } from '../lang/clamp';
 import { tryParseInt } from '../lang/tryParseInt';
 import { MmButton } from '../ui/MmButton';
-import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSegmented } from '../ui/MmSegmented';
@@ -123,7 +122,6 @@ export function SetEditor({ set: given, number, load, fmt, onChange, timeBase, t
   };
 
   const loadLabel = bodyweight ? 'Added weight' : 'Load';
-  const chevron = <MmIcon name="chevronRight" />;
   return (
     <div className="train-set-editor" role="group" aria-label={`Set ${number}`}>
       <p className="train-set-title">Set {number}</p>
@@ -155,8 +153,8 @@ export function SetEditor({ set: given, number, load, fmt, onChange, timeBase, t
         // Tapping the chosen one again clears it.
         onChange={(chosen) => change(set.copyWith({ rir: chosen }))}
       />
-      <MmListRow dense title="Started" subtitle={timeText(set.startedAt)} trailing={chevron} onPress={() => void pickTime(true)} />
-      <MmListRow dense title="Ended" subtitle={timeText(set.endedAt)} trailing={chevron} onPress={() => void pickTime(false)} />
+      <MmListRow dense title="Started" subtitle={timeText(set.startedAt)} opens onPress={() => void pickTime(true)} />
+      <MmListRow dense title="Ended" subtitle={timeText(set.endedAt)} opens onPress={() => void pickTime(false)} />
       <div className="app-row app-row-end">
         <MmButton label="Remove set" kind="text" onPress={onRemove} />
       </div>

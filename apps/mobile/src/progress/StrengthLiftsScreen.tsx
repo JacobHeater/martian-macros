@@ -3,7 +3,6 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useNavigator } from '../app/useNavigator';
 import { InfoCard } from '../ui/InfoCard';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { StrengthHistoryScreen } from './StrengthHistoryScreen';
 import { StrengthSection } from './StrengthSection';
@@ -25,7 +24,7 @@ export function StrengthLiftsScreen() {
               key={trend.exerciseId}
               title={trend.name}
               subtitle={`${trend.loggedSessions} logged sessions · ${trend.points.length} qualifying`}
-              trailing={<MmIcon name="chevronRight" />}
+              opens
               onPress={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}
             />
           ))}

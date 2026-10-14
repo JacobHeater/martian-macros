@@ -10,8 +10,8 @@ interface MmSliderRowProps {
   max?: number;
   /** How many equal steps the range is cut into; any value when left out. */
   divisions?: number | undefined;
-  /** The value in words ("0.5% a week"), for assistive technology. */
-  label?: string | undefined;
+  /** The value in words ("0.5% a week"), so every slider speaks its value. */
+  label: string;
 }
 
 /**

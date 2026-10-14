@@ -1,7 +1,7 @@
 ---
 id: MM-263
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-260, MM-104, MM-184]
 ---
 
@@ -54,3 +54,7 @@ Scenario: Keyboard
 
 Rendering and choosing in `test/ui/datePicker.test.tsx`; the architecture
 test fails any `<input type="date">` in `src/`.
+
+## Progress
+
+Built 2026-10-13: `MmDatePicker` (a `role="grid"` of `MmCalendarDay` cells, a year list of `MmOption`, previous and next month, arrow keys, a swipe) inside `MmDateDialog`, which says the day back or the range; `MmPickerField` is a field-shaped button with the value in words and our chevron, used by the onboarding birth-date step; every `overlays.date` caller passes `today` so it is marked. No `<input type="date">` is allowed anywhere (`controlHomes`). Tests: `test/ui/datePicker.test.tsx`; the test helpers drive the calendar (`test/support/pickers.ts`). Looked at in Overlays/Date and Fields in three palettes.

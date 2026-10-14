@@ -102,6 +102,8 @@
   --radius-control: 12px;
   --radius-chip: 8px;
   --radius-sheet-top: 24px;
+  /* A 20 dp check box at the chip radius reads as a circle; 6 keeps a corner (MM-266). */
+  --radius-check: 6px;
 
   /* Spacing (MmSpace). */
   --space-4: 4px;
@@ -110,6 +112,20 @@
   --space-16: 16px;
   --space-24: 24px;
   --space-32: 32px;
+  /* The one value off the scale: a text button's horizontal padding, 20,
+     which the Flutter theme set (extendedPadding) and the visual language
+     kept so a label sits clear of a 12 dp corner (MM-274). */
+  --space-20: 20px;
+
+  /* Motion (interaction-and-motion.md): press states and toggles, row
+     changes, value changes, the one-time arc draw-in; and the spinner's
+     turn, the one perpetual motion, allowed for a labelled wait (MM-274). */
+  --motion-fast: 100ms;
+  --motion-base: 180ms;
+  --motion-slow: 280ms;
+  --motion-reveal: 600ms;
+  --motion-fade: 100ms;
+  --motion-turn: 1000ms;
 
   /* Type roles (MmType), in rem so text follows the phone's text size:
      size / line height, at 16px to the rem. */
@@ -123,4 +139,16 @@
   --type-label: 600 0.8125rem/1rem var(--font-text);
   --type-caption: 400 0.75rem/1rem var(--font-text);
   --type-nav: 500 0.75rem/1rem var(--font-text);
+}
+
+/* Reduced motion: movement goes, the state change stays; fades keep 100 ms,
+   and the spinner turns slowly (interaction-and-motion.md). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+    --motion-reveal: 0ms;
+    --motion-turn: 4000ms;
+  }
 }

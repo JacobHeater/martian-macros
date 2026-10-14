@@ -82,11 +82,14 @@ numerals so digits never shift.
 
 ## Icons
 
-One family: Material Symbols **Rounded**, weight 500, optical size 24, fill
-variable. Selected nav destinations use the filled variant; unselected, the
-outline. 24 dp default, 20 dp inside rows. Always paired with a text label where
-the meaning is not universal. No custom icon set until the app icon and mark are
-designed (MM-109); when they are, the mark should be built from the same arc.
+One family: Material's **Outlined** set, through `MmIcon` (MM-236), selected or
+not: a selected nav destination is told by its Ember colour, its weight and
+the indicator behind it, never by a filled variant (MM-236, decided against
+the filled set). 24 dp default, 20 dp inside rows. Always paired with a text
+label where the meaning is not universal. No custom icon set until the app
+icon and mark are designed (MM-109); when they are, the mark should be built
+from the same arc. No check, chevron or other glyph is ever a font character
+(MM-276).
 
 ## Charts
 

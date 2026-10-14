@@ -33,6 +33,17 @@ export const NothingLogged = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
 });
 
+/** MM-268: an entry's menu is drawn by the overlay host, so the swipe row cannot clip it. */
+export const EntryMenu = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Delete',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+  },
+});
+
 export const AddFood = screenStory({ covers: ['AddFoodSheet'], shows: 'Search foods', open: addFood });
 
 /** MM-239: the search field with the keyboard in it shows one mark of focus, its box. */

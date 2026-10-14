@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef, useState } from 'react';
-import { MmIcon } from './MmIcon';
+import { useRef, useState } from 'react';
+import { MmIconButton } from './MmIconButton';
 import type { MmIconName } from './MmIconName';
 import type { MmMenuItem } from './MmMenuItem';
+import { useOverlays } from './useOverlays';
 import './ui.css';
 
 interface MmMenuButtonProps<T> {
@@ -12,59 +13,27 @@ interface MmMenuButtonProps<T> {
   onSelect: (value: T) => void;
 }
 
-/** An icon that opens a short menu of choices. */
+/**
+ * An icon that opens a short menu of actions. The menu is drawn by the
+ * overlay host at the button's anchor, so a row or a group cannot clip it
+ * (MM-268). A choice between values is not a menu: that is `overlays.options`.
+ */
 export function MmMenuButton<T>({ icon, label, items, onSelect }: MmMenuButtonProps<T>) {
+  const overlays = useOverlays();
+  const anchor = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
-  const id = useId();
-  const root = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return undefined;
-    const close = (event: Event) => {
-      if (event instanceof KeyboardEvent ? event.key === 'Escape' : !root.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('pointerdown', close);
-    document.addEventListener('keydown', close);
-    return () => {
-      document.removeEventListener('pointerdown', close);
-      document.removeEventListener('keydown', close);
-    };
-  }, [open]);
+  const show = async () => {
+    const rect = anchor.current?.getBoundingClientRect() ?? { top: 0, right: 0, bottom: 0, left: 0 };
+    setOpen(true);
+    const chosen = await overlays.menu({ label, items, anchor: rect });
+    setOpen(false);
+    if (chosen !== undefined) onSelect(chosen.value);
+  };
 
   return (
-    <div className="mm-menu" ref={root}>
-      <button
-        type="button"
-        className="mm-icon-button mm-icon-button-standard"
-        aria-label={label}
-        title={label}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={open ? id : undefined}
-        onClick={() => setOpen(!open)}
-      >
-        <MmIcon name={icon} />
-      </button>
-      {open ? (
-        <div id={id} className="mm-menu-list" role="menu" aria-label={label}>
-          {items.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              role="menuitem"
-              className="mm-menu-item"
-              onClick={() => {
-                setOpen(false);
-                onSelect(item.value);
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </div>
+    <span ref={anchor} className="mm-menu">
+      <MmIconButton icon={icon} label={label} opens="menu" expanded={open} onPress={() => void show()} />
+    </span>
   );
 }

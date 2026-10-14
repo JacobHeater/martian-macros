@@ -95,7 +95,7 @@ files during the engine split: do the split first.
 - Built: MM-160, MM-161, MM-162. Remaining: MM-159 (epic), open until the design-system control rule in WS-03 step 1 is done.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-229 (A walking skeleton of the React app); MM-230 (Carry the engine and the rules over under test, done); MM-231 (One SQLite seam for the TypeScript app, done); MM-232 (Rebuild the screens in React, done); MM-233 (Derived state could be worked out from one new value and one old, done); MM-228 (The app becomes a React HTML5 app in a native shell); MM-246 (the engineering rules are checked in TypeScript, done).
 - Placed 2026-10-13 in step 4: MM-261 (the architecture check let a raw control live outside its component inside src/ui; the map of control kind to component is now enforced, done).
-- Placed 2026-10-13 in step 4: MM-278 (composites still write controls and a component takes a colour; the checker learns what a composite is).
+- Placed 2026-10-13 in step 4: MM-278 (composites still write controls and a component takes a colour; the checker learns what a composite is). Done the same day: `buttonHomes`, a derived composite, a brace-aware scanner, and no `color`, `className` or `style` prop.
 
 ## Notes for whoever builds it
 - Liskov is proved by tests, not asserted: write the contract suite before the

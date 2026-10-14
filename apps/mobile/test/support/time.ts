@@ -1,7 +1,8 @@
-import { act, fireEvent, screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, vi } from 'vitest';
 import type { FixedClock } from '../../src/fixtures/FixedClock';
+import { clockTurnOf, pickDate, turnClock } from './pickers';
 
 /**
  * For a file of tests about running timers: the app's ticking is the
@@ -43,23 +44,25 @@ export async function pass(clock: FixedClock, ms: number, timersMs: number = ms)
 export const seconds = (count: number) => count * 1000;
 export const minutes = (count: number) => count * 60000;
 
-/** Gives a time of day to the dialog that asks for one ("19:15"), and confirms it. */
+/** Turns the drums of the dialog that asks for a time of day ("19:15"), and confirms it. */
 export async function enterTime(title: string, value: string): Promise<void> {
   const dialog = await screen.findByRole('dialog', { name: title });
-  fireEvent.change(dialog.querySelector('input[type="time"]') as HTMLInputElement, { target: { value } });
+  await turnClock(dialog, clockTurnOf(value));
   await user.click(within(dialog).getByRole('button', { name: 'OK' }));
   await settle();
 }
 
-/** Gives a day to the dialog that asks for one ("2026-10-02"), and confirms it. */
+/** Brings the calendar that asks for a day to `value` ("2026-10-02"), and confirms it. */
 export async function enterDate(value: string): Promise<void> {
-  const dialog = await screen.findByRole('dialog');
-  fireEvent.change(dialog.querySelector('input[type="date"]') as HTMLInputElement, { target: { value } });
-  await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+  await pickDate(value);
   await settle();
 }
 
-/** Types a time into the clock time entry of a set. With `confirm` false the dialog is left open. */
+/**
+ * Turns the drums of the clock time entry of a set: `hour` on the twelve-hour
+ * clock, with `period` where it matters. With `confirm` false the dialog is
+ * left open.
+ */
 export async function enterClock(
   hour: number,
   minute: number,
@@ -67,15 +70,7 @@ export async function enterClock(
   { period, confirm = true }: { period?: 'AM' | 'PM'; confirm?: boolean } = {},
 ): Promise<HTMLElement> {
   const dialog = await screen.findByRole('dialog', { name: /^Set (started|ended)$/ });
-  const type = async (label: string, value: number) => {
-    const field = within(dialog).getByRole('textbox', { name: label });
-    await user.clear(field);
-    await user.type(field, `${value}`);
-  };
-  await type('Hour', hour);
-  await type('Min', minute);
-  await type('Sec', second);
-  if (period !== undefined) await user.click(within(dialog).getByRole('button', { name: period }));
+  await turnClock(dialog, { hour, minute, second, period });
   if (confirm) {
     await user.click(within(dialog).getByRole('button', { name: 'OK' }));
     await settle();

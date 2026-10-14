@@ -274,7 +274,8 @@ describe('choosing an exercise', () => {
     await userEvent.click(layer().getByRole('button', { name: 'Create your own exercise' }));
     // The name typed in the search is carried over.
     expect(await layer().findByRole('textbox', { name: 'Name' })).toHaveValue('Landmine press');
-    await userEvent.selectOptions(layer().getByRole('combobox', { name: 'Main muscle group' }), 'Shoulders');
+    await userEvent.click(layer().getByRole('button', { name: /^Main muscle group/ }));
+    await userEvent.click(await screen.findByRole('option', { name: 'Shoulders' }));
     await userEvent.click(layer().getByRole('button', { name: 'Triceps' }));
     await userEvent.click(layer().getByRole('button', { name: 'Save exercise' }));
 

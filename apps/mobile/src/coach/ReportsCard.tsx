@@ -3,7 +3,6 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useNavigator } from '../app/useNavigator';
 import { InfoCard } from '../ui/InfoCard';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { MonthlyReportScreen } from './MonthlyReportScreen';
 
@@ -23,7 +22,7 @@ export function ReportsCard() {
           key={period.index}
           dense
           title={`${Fmt.shortDay(period.from)} – ${Fmt.shortDay(period.to)}`}
-          trailing={<MmIcon name="chevronRight" />}
+          opens
           onPress={() => void navigator.push(() => <MonthlyReportScreen index={period.index} />)}
         />
       ))}

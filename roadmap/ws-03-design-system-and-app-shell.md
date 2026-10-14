@@ -114,7 +114,7 @@ trend line.
 8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-181, MM-184, MM-185, MM-186, MM-236, MM-239, MM-240; step 3: MM-176, MM-179, MM-183, MM-206, MM-208; step 4: MM-187.
 9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories.
-10. **Own the full visual experience (MM-262; MM-263 to MM-282 less MM-278).** M2. The owner's rule of 2026-10-13: nothing native shows. Custom date, time and select pickers; checkbox and slider drawn by us; a pressed state on every control; menus never clipped; focus trapped in overlays; a story for every component and state; tokens honoured; the written system. From the component walk in docs/agent-runs/mm253-components.
+10. **Own the full visual experience (MM-262; MM-263 to MM-282 less MM-278).** M2. The owner's rule of 2026-10-13: nothing native shows. Custom date, time and select pickers; checkbox and slider drawn by us; a pressed state on every control; menus never clipped; focus trapped in overlays; a story for every component and state; tokens honoured; the written system. From the component walk in docs/agent-runs/mm253-components. **Built 2026-10-13**, the same day, in one pull request: the step is done.
 
 ## Done enough to unblock others
 MM-104, MM-108 and MM-99 are done: existing screens use library components

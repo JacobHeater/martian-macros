@@ -106,6 +106,7 @@ export function OnboardingScreen() {
       initial: CalendarDate.of(now.getFullYear() - 30, 1, 1),
       first: CalendarDate.of(now.getFullYear() - 100, 1, 1),
       last: CalendarDate.fromDate(now),
+      today: CalendarDate.fromDate(now),
     });
     if (picked !== undefined) setBirthDate(picked);
   };
@@ -116,6 +117,7 @@ export function OnboardingScreen() {
       initial: creatineStartedOn ?? today,
       first: CalendarDate.of(today.year - 100, today.month, today.day),
       last: today,
+      today,
     });
     if (picked !== undefined) setCreatineStartedOn(picked);
   };
