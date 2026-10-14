@@ -18,7 +18,6 @@ import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
-import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
@@ -78,7 +77,6 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
         settings,
       });
   const timeLimit = () => workout.endedAt ?? services.clock.now();
-  const chevron = <MmIcon name="chevronRight" />;
   // An exercise of the user's own that has since been deleted.
   const name = exercise?.name ?? 'Deleted exercise';
 
@@ -176,14 +174,14 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
               loadStepKg: settings?.loadStepKg ?? defaultLoadStepKg({ exercise, units }),
               fmt,
             })}
-            trailing={chevron}
+            opens
             onPress={() => void navigator.push(() => <ProgressionSettingsScreen exerciseId={entry.exerciseId} />)}
           />
           <MmListRow
             dense
             title="Rest target"
             subtitle={restTargetText(entry.restTargetMs)}
-            trailing={chevron}
+            opens
             onPress={() => void pickRestTarget()}
           />
         </>

@@ -7,7 +7,6 @@ import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { useWorkoutController } from './useWorkoutController';
 import { WeeklyVolumeScreen } from './WeeklyVolumeScreen';
@@ -74,7 +73,7 @@ export function TrainScreen() {
                 dense
                 title={Fmt.day(workout.date, today)}
                 subtitle={workoutSummaryText(workout, { records: records.get(workout.id)?.length ?? 0 })}
-                trailing={<MmIcon name="chevronRight" />}
+                opens
                 onPress={() => open(workout.id)}
               />
             ))}

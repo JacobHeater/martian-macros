@@ -1,6 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import { Fmt } from '../format/Fmt';
-import { MmButton } from '../ui/MmButton';
+import { MmPickerField } from '../ui/MmPickerField';
 import { Notice } from '../ui/Notice';
 
 interface BirthDateStepProps {
@@ -9,20 +9,18 @@ interface BirthDateStepProps {
   onPickBirthDate: () => void;
 }
 
-/** Step 2: date of birth. Under 18 stops here. */
+/** Step 2: date of birth, as a field that opens the design system's calendar (MM-263). Under 18 stops here. */
 export function BirthDateStep({ birthDate, isMinor, onPickBirthDate }: BirthDateStepProps) {
   return (
     <>
       <h1 className="app-headline">Date of birth</h1>
       <p className="app-text app-muted">Age changes energy needs and some safety limits.</p>
       <div className="app-gap" />
-      <div>
-        <MmButton
-          label={birthDate === undefined ? 'Choose date' : Fmt.longDate(birthDate)}
-          kind="secondary"
-          onPress={onPickBirthDate}
-        />
-      </div>
+      <MmPickerField
+        label="Date of birth"
+        valueText={birthDate === undefined ? 'Choose a date' : Fmt.longDate(birthDate)}
+        onPress={onPickBirthDate}
+      />
       {isMinor ? (
         <>
           <div className="app-gap" />

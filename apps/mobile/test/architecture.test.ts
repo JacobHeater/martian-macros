@@ -44,48 +44,115 @@ const rawControls = /<(button|input|select|textarea|dialog|progress|meter)\b/;
  * one component that is it, and nowhere else (MM-261): a dialog, a sheet,
  * the overlay host or a row delegates to that component rather than writing
  * an `<input>` of its own, so what the platform draws is styled in one
- * place. The key is the `type` of an `<input>`, or the element name.
+ * place. The key is the `type` of an `<input>`, or the element name. A kind
+ * with no home may not be written at all: nothing native shows (MM-262), so
+ * the date, time and select controls have none, and the design system draws
+ * its own calendar, drums and options list.
  */
 const controlHomes: Record<string, readonly string[]> = {
   text: ['ui/MmTextField.tsx'],
   search: ['ui/MmTextField.tsx'],
   number: ['ui/MmTextField.tsx'],
-  date: ['ui/MmPickerField.tsx'],
-  time: ['ui/MmPickerField.tsx'],
-  'datetime-local': ['ui/MmPickerField.tsx'],
+  date: [],
+  time: [],
+  'datetime-local': [],
   range: ['ui/MmSlider.tsx'],
   checkbox: ['ui/MmCheckRow.tsx', 'ui/MmSwitchRow.tsx'],
   radio: ['ui/MmSegmented.tsx'],
-  select: ['ui/MmDropdown.tsx'],
+  select: [],
   textarea: [],
 };
 
-/** Composites inside the design system that compose components and write no control of their own. */
-const composites = ['ui/MmOverlays.tsx', 'ui/MmDialog.tsx', 'ui/MmSheet.tsx', 'ui/MmListGroup.tsx', 'ui/MmFooterActions.tsx'];
+/**
+ * The design-system files that may write a `<button>` (MM-278): each is a
+ * control in its own right. The list only shrinks; a composite composes
+ * one of these instead.
+ */
+const buttonHomes: readonly string[] = [
+  'ui/ChoiceCard.tsx',
+  'ui/MmActionChip.tsx',
+  'ui/MmButton.tsx',
+  'ui/MmCalendarDay.tsx',
+  'ui/MmChoiceChip.tsx',
+  'ui/MmDisclosure.tsx',
+  'ui/MmFab.tsx',
+  'ui/MmIconButton.tsx',
+  'ui/MmListRow.tsx',
+  'ui/MmMenuItemRow.tsx',
+  'ui/MmNavigationBar.tsx',
+  'ui/MmOption.tsx',
+  'ui/MmPickerField.tsx',
+  'ui/MmPressable.tsx',
+  'ui/MmSegmented.tsx',
+];
 
-/** Every native form control in `text`, as the key `controlHomes` uses. */
-function controlsIn(text: string): string[] {
-  const found: string[] = [];
-  for (const match of text.matchAll(/<(input|select|textarea)\b([^>]*)>/gs)) {
-    const element = match[1] as string;
-    if (element !== 'input') {
-      found.push(element);
-      continue;
+/** Drawings, not controls: importing one does not make a composite. */
+const drawings = ['./MmIcon', './mmIcons'];
+
+/**
+ * A composite is known by what it does (MM-278): a design-system file that
+ * imports another component's value, or renders a dialog, listbox or menu
+ * role, composes components and may hold no control of its own.
+ */
+function isComposite(text: string): boolean {
+  const plain = withoutComments(text);
+  const importsComponent = [...plain.matchAll(/^import\s+(?!type\b)\{[^}]*\b[A-Z]\w*\b[^}]*\}\s+from\s+'(\.\/[^']+)'/gm)].some(
+    (match) => !drawings.includes(match[1] as string),
+  );
+  return importsComponent || /role="(dialog|listbox|menu)"/.test(plain);
+}
+
+/**
+ * The attributes of every `<name ...>` tag in `text`, read with the braces
+ * of a JSX expression balanced, so an arrow function in an attribute does
+ * not end the tag at its first `>`.
+ */
+function tagsIn(text: string, names: readonly string[]): { element: string; attributes: string }[] {
+  const found: { element: string; attributes: string }[] = [];
+  const opener = new RegExp(`<(${names.join('|')})\\b`, 'g');
+  for (const match of text.matchAll(opener)) {
+    let at = match.index + match[0].length;
+    let depth = 0;
+    while (at < text.length) {
+      const char = text[at];
+      if (char === '{') depth += 1;
+      else if (char === '}') depth -= 1;
+      else if (char === '>' && depth === 0) break;
+      at += 1;
     }
-    const attributes = match[2] as string;
-    const literal = /\btype=["']([\w-]+)["']/.exec(attributes)?.[1];
-    found.push(literal ?? (/\btype=\{/.test(attributes) ? 'dynamic' : 'text'));
+    found.push({ element: match[1] as string, attributes: text.slice(match.index + match[0].length, at) });
   }
   return found;
 }
 
+/** Every native form control in `text`, as the key `controlHomes` uses. */
+function controlsIn(text: string): string[] {
+  return tagsIn(text, ['input', 'select', 'textarea']).map(({ element, attributes }) => {
+    if (element !== 'input') return element;
+    const literal = /\btype=["']([\w-]+)["']/.exec(attributes)?.[1];
+    return literal ?? (/\btype=\{/.test(attributes) ? 'dynamic' : 'text');
+  });
+}
+
+/** Props a design-system component never takes: it takes meaning, never a colour, a class or a style (rule 8). */
+const forbiddenProps = /^\s*(color|className|style)\??\s*:/m;
+
 /** What is wrong with a design-system file's native controls, or nothing. */
 function uiControlProblems(path: string, text: string): string[] {
   const problems: string[] = [];
-  if (composites.includes(path) && rawControls.test(withoutComments(text))) {
+  const plain = withoutComments(text);
+  const composite = isComposite(text);
+  if (composite && rawControls.test(plain)) {
     problems.push(`${path} is a composite and writes a raw control; it composes components.`);
   }
-  for (const control of controlsIn(withoutComments(text))) {
+  if (!composite && /<button\b/.test(plain) && !buttonHomes.includes(path)) {
+    problems.push(`${path} writes a <button> and is not one of its homes; compose MmButton, MmIconButton or MmPressable, or add it to buttonHomes.`);
+  }
+  const forbidden = forbiddenProps.exec(plain);
+  if (forbidden !== null) {
+    problems.push(`${path} takes a prop named ${forbidden[1]}; a component takes meaning, never a colour, a class or a style.`);
+  }
+  for (const control of controlsIn(plain)) {
     if (control === 'dynamic') {
       const homes = Object.values(controlHomes).flat();
       if (!homes.includes(path)) problems.push(`${path} writes an <input> whose type is computed; only a control's own component may.`);
@@ -197,18 +264,37 @@ describe('the one-declaration rule, on samples', () => {
 });
 
 describe('the native-control rule, on samples', () => {
-  it('a date input in a dialog is reported; in its component it is not', () => {
+  it('a native date input is reported wherever it is, and a text input is fine in its component', () => {
     const dialog = uiControlProblems('ui/MmDateDialog.tsx', '<input type="date" className="x" />');
-    expect(dialog).toEqual(['ui/MmDateDialog.tsx writes <input type="date">; only ui/MmPickerField.tsx may.']);
-    expect(uiControlProblems('ui/MmPickerField.tsx', '<input type={kind} />')).toEqual([]);
+    expect(dialog).toEqual(['ui/MmDateDialog.tsx writes <input type="date">; only no file yet may.']);
     expect(uiControlProblems('ui/MmTextField.tsx', '<input type="number" />')).toEqual([]);
+    expect(uiControlProblems('ui/MmSlider.tsx', '<input type={kind} />')).toEqual([]);
   });
 
-  it('a composite that writes a button is reported', () => {
-    expect(uiControlProblems('ui/MmOverlays.tsx', '<button type="button">x</button>')).toEqual([
-      'ui/MmOverlays.tsx is a composite and writes a raw control; it composes components.',
+  it('a composite that composes a component and writes a button is reported', () => {
+    const dialog = "import { MmButton } from './MmButton';\nexport function MmThing() { return <><MmButton label=\"x\" /><button type=\"button\">x</button></>; }";
+    expect(uiControlProblems('ui/MmThing.tsx', dialog)).toEqual(['ui/MmThing.tsx is a composite and writes a raw control; it composes components.']);
+    expect(uiControlProblems('ui/MmOverlays.tsx', '<div role="dialog"><MmOption label="x" /></div>')).toEqual([]);
+    // A drawing is not a component: importing the icon does not make a composite.
+    expect(uiControlProblems('ui/MmOption.tsx', "import { MmIcon } from './MmIcon';\n<button type=\"button\" />")).toEqual([]);
+  });
+
+  it('a button in a file that is not one of its homes is reported', () => {
+    expect(uiControlProblems('ui/MmSomething.tsx', '<button type="button">x</button>')).toEqual([
+      'ui/MmSomething.tsx writes a <button> and is not one of its homes; compose MmButton, MmIconButton or MmPressable, or add it to buttonHomes.',
     ]);
-    expect(uiControlProblems('ui/MmOverlays.tsx', '<MmOption label="x" />')).toEqual([]);
+  });
+
+  it('a prop named color, className or style is reported', () => {
+    expect(uiControlProblems('ui/MmBar.tsx', 'interface MmBarProps {\n  value: number;\n  color?: string | undefined;\n}')).toEqual([
+      'ui/MmBar.tsx takes a prop named color; a component takes meaning, never a colour, a class or a style.',
+    ]);
+    expect(uiControlProblems('ui/MmBar.tsx', 'const style = { height } as CSSProperties;\n<span style={style} />')).toEqual([]);
+  });
+
+  it('an input whose first attribute is an arrow function is classified by its type', () => {
+    expect(controlsIn('<input onChange={(event) => onChange(event.target.value)} type="range" />')).toEqual(['range']);
+    expect(controlsIn('<input onChange={(e) => f(e)} />')).toEqual(['text']);
   });
 
   it('a control kind nobody owns is reported', () => {
@@ -272,5 +358,20 @@ describe('architecture', () => {
       if (found !== null) broken.push(`${path} writes <${found[1]}>; use the design-system component.`);
     }
     expect(broken).toEqual([]);
+  });
+
+  it('a screen never draws the chevron of a row that opens something; the row does (MM-278)', () => {
+    const broken: string[] = [];
+    for (const file of everyFile) {
+      const path = pathOf(file);
+      if (path.startsWith('ui/') || !path.endsWith('.tsx')) continue;
+      if (/"chevronRight"/.test(withoutComments(readFileSync(file, 'utf8')))) broken.push(`${path} draws a chevron; pass opens to MmListRow.`);
+    }
+    expect(broken).toEqual([]);
+  });
+
+  it('every button home still writes a button, so the list only shrinks (MM-278)', () => {
+    const idle = buttonHomes.filter((home) => !/<button\b/.test(withoutComments(readFileSync(join(src, home), 'utf8'))));
+    expect(idle).toEqual([]);
   });
 });

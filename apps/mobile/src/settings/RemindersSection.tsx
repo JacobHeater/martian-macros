@@ -8,7 +8,6 @@ import { minuteOfDayNow } from '../state/minuteOfDayNow';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { GroupHeader } from '../ui/GroupHeader';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
@@ -51,12 +50,11 @@ export function RemindersSection() {
     const picked = await overlays.timeOfDay({
       initialMinuteOfDay: setting.minuteOfDay,
       helpText: `${reminderLabel(setting.kind)} reminder`,
+      first: ReminderRule.quietToMinute,
+      last: ReminderRule.quietFromMinute - 1,
     });
-    if (picked === undefined) return;
-    if (ReminderRule.isQuiet(picked)) {
-      overlays.snack('Reminders are not sent between 9 pm and 7 am.');
-      return;
-    }
+    // The picker refuses the quiet hours itself; this only guards a stale value.
+    if (picked === undefined || ReminderRule.isQuiet(picked)) return;
     await services.reminders.saveReminder(setting.copyWith({ minuteOfDay: picked }));
   };
 
@@ -77,7 +75,7 @@ export function RemindersSection() {
                 dense
                 leadingIcon="timer"
                 title={`At ${time(setting.minuteOfDay)}`}
-                trailing={<MmIcon name="chevronRight" />}
+                opens
                 onPress={() => void changeTime(setting)}
               />
             ) : null}

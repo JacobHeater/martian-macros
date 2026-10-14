@@ -19,10 +19,9 @@ import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { GroupHeader } from '../ui/GroupHeader';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
-import { MmMenuButton } from '../ui/MmMenuButton';
+import { MmIconButton } from '../ui/MmIconButton';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
 import { MmSliderRow } from '../ui/MmSliderRow';
@@ -46,7 +45,6 @@ export function SettingsScreen() {
   const easyToMiss = useLoaded(state.easyToMiss)?.enabled ?? true;
   const termsAccepted = useLoaded(state.termsAcceptance);
   if (setup === undefined) return <Screen title="Settings">{null}</Screen>;
-  const chevron = <MmIcon name="chevronRight" />;
   const bodyFat = setup.bodyFatPercent;
 
   const erase = async () => {
@@ -84,11 +82,21 @@ export function SettingsScreen() {
           title="Daily activity"
           subtitle={dailyActivityLabel(setup.dailyActivity)}
           trailingAction={
-            <MmMenuButton<DailyActivity>
+            <MmIconButton
               icon="edit"
               label="Change daily activity"
-              items={DailyActivity.values.map((value) => ({ value, label: dailyActivityLabel(value) }))}
-              onSelect={(dailyActivity) => void services.setup.saveSetup(setup.copyWith({ dailyActivity }))}
+              opens="listbox"
+              onPress={() =>
+                void overlays
+                  .options<DailyActivity>({
+                    title: 'Daily activity',
+                    options: DailyActivity.values.map((value) => ({ value, label: dailyActivityLabel(value) })),
+                    selected: setup.dailyActivity,
+                  })
+                  .then((chosen) => {
+                    if (chosen !== undefined) void services.setup.saveSetup(setup.copyWith({ dailyActivity: chosen.value }));
+                  })
+              }
             />
           }
         />
@@ -96,11 +104,21 @@ export function SettingsScreen() {
           title="Experience"
           subtitle={trainingStatusLabel(setup.trainingStatus)}
           trailingAction={
-            <MmMenuButton<TrainingStatus>
+            <MmIconButton
               icon="edit"
               label="Change experience"
-              items={TrainingStatus.values.map((value) => ({ value, label: trainingStatusLabel(value) }))}
-              onSelect={(trainingStatus) => void services.setup.saveSetup(setup.copyWith({ trainingStatus }))}
+              opens="listbox"
+              onPress={() =>
+                void overlays
+                  .options<TrainingStatus>({
+                    title: 'Experience',
+                    options: TrainingStatus.values.map((value) => ({ value, label: trainingStatusLabel(value) })),
+                    selected: setup.trainingStatus,
+                  })
+                  .then((chosen) => {
+                    if (chosen !== undefined) void services.setup.saveSetup(setup.copyWith({ trainingStatus: chosen.value }));
+                  })
+              }
             />
           }
         />
@@ -112,6 +130,7 @@ export function SettingsScreen() {
               value={setup.trainingDaysPerWeek}
               max={7}
               divisions={7}
+              label={`${setup.trainingDaysPerWeek} days`}
               onChange={(days) =>
                 void services.setup.saveSetup(setup.copyWith({ trainingDaysPerWeek: roundHalfAwayFromZero(days) }))
               }
@@ -169,7 +188,7 @@ export function SettingsScreen() {
           leadingIcon="pause"
           title="Pause"
           subtitle="For a holiday, an illness or an injury."
-          trailing={chevron}
+          opens
           onPress={() => void navigator.push(() => <PauseScreen />)}
         />
       </MmListGroup>
@@ -181,7 +200,7 @@ export function SettingsScreen() {
           leadingIcon="info"
           title="How this works"
           subtitle="Where each number comes from, and how sure we are."
-          trailing={chevron}
+          opens
           onPress={() => void navigator.push(() => <HowThisWorksScreen />)}
         />
         <MmListRow
@@ -196,7 +215,7 @@ export function SettingsScreen() {
             `Version ${termsOfUse.version}` +
             (termsAccepted === undefined ? '' : `, agreed ${Fmt.longDate(termsAccepted.acceptedOn)}`)
           }
-          trailing={chevron}
+          opens
           onPress={() => void navigator.push(() => <TermsScreen />)}
         />
       </MmListGroup>
@@ -206,7 +225,7 @@ export function SettingsScreen() {
           leadingIcon="download"
           title="Food database"
           subtitle="Optional download for barcode scanning. The only thing this app ever fetches."
-          trailing={chevron}
+          opens
           onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
         />
         <MmListRow

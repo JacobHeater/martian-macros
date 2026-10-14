@@ -87,10 +87,9 @@ export function HealthConnectSection() {
                   <span role="img" aria-label="Allowed">
                     <MmIcon name="check" />
                   </span>
-                ) : (
-                  <MmIcon name="chevronRight" />
-                )
+                ) : undefined
               }
+              opens={!permitted}
               onPress={permitted ? undefined : () => void allow(type)}
             />
           );

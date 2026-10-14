@@ -5,7 +5,6 @@ import { weightEventLabel } from '../format/weightEventLabel';
 import { useApp } from '../app/useApp';
 import { MmButton } from '../ui/MmButton';
 import { MmDropdown } from '../ui/MmDropdown';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
 import './progress.css';
@@ -24,6 +23,7 @@ export function WeightEventEntrySheet({ today, onDone }: { today: CalendarDate; 
       initial: date,
       first: today.addDays(-28),
       last: today,
+      today,
     });
     if (picked !== undefined) setDate(picked);
   };
@@ -52,7 +52,8 @@ export function WeightEventEntrySheet({ today, onDone }: { today: CalendarDate; 
       <MmListRow
         title="Date"
         subtitle={date.toString()}
-        trailing={<MmIcon name="history" />}
+        leadingIcon="history"
+        opens
         onPress={saving ? undefined : () => void pickDate()}
       />
       <p className="app-text">Events can be added for the last 28 days.</p>

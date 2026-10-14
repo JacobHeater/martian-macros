@@ -1,7 +1,7 @@
 ---
 id: MM-279
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-104, MM-106]
 ---
 
@@ -44,3 +44,7 @@ Scenario: The card explains itself
   Given a non-number in the weigh-in card
   Then the reason is under the field and focus stays there
 ```
+
+## Progress
+
+Built 2026-10-13: `MmTextField` takes `error` (danger box, `aria-invalid`, `aria-describedby`, `role="alert"`), and `name` composes with `label` rather than replacing it; `NumberEntryCard` says "Enter a number above zero." under the field while Save is inert and the refusal under the field, keeping the keyboard there; `MetricFacts` renders `dt` before `dd` (drawn value-over-label by `column-reverse`); the clock dialog's drums are Hour, Minute and Second. Tests: `test/ui/fieldErrors.test.tsx`.

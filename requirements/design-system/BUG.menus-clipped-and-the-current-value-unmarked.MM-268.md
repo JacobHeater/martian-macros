@@ -1,7 +1,7 @@
 ---
 id: MM-268
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-261, MM-104, MM-180]
 ---
 
@@ -49,3 +49,7 @@ Scenario: Focus
   When a menu opens
   Then focus is on its first item, and on close it returns to the trigger
 ```
+
+## Progress
+
+Built 2026-10-13: Settings' daily activity and experience are `overlays.options` from an edit icon button, so the value in force is marked Chosen (Settings/ChangeDailyActivity story, `test/settings/settingsFlows.test.tsx`). `MmMenuButton` composes `MmIconButton` and asks the overlay host for `overlays.menu`, which draws `MmMenu` (of `MmMenuItemRow`) fixed at the trigger's anchor, so no row or group can clip it; it opens with focus on its first item, the arrows move, Escape, Tab and a press outside close it, and focus returns to the trigger (Food/EntryMenu story, Overlays/MenuOpen, `test/ui/menuButton.test.tsx`).

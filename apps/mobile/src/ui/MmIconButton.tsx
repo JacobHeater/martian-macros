@@ -10,16 +10,21 @@ interface MmIconButtonProps {
   /** With no action the button is shown as off. */
   onPress: (() => void) | undefined;
   kind?: MmIconButtonKind;
+  /** What pressing opens, when it opens something, and whether that is showing. */
+  opens?: 'menu' | 'listbox' | 'dialog' | undefined;
+  expanded?: boolean | undefined;
 }
 
-/** An action shown as an icon, in a 48 by 48 target. The add kind is a small tinted plus. */
-export function MmIconButton({ icon, label, onPress, kind = 'standard' }: MmIconButtonProps) {
+/** An action shown as an icon, in a 48 by 48 target. The add kind is a plus on a quiet plate. */
+export function MmIconButton({ icon, label, onPress, kind = 'standard', opens, expanded }: MmIconButtonProps) {
   return (
     <button
       type="button"
       className={`mm-icon-button mm-icon-button-${kind}`}
       aria-label={label}
       title={label}
+      aria-haspopup={opens}
+      aria-expanded={expanded}
       disabled={onPress === undefined}
       onClick={onPress}
     >

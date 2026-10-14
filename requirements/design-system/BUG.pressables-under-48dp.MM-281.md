@@ -1,7 +1,7 @@
 ---
 id: MM-281
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-106, MM-104]
 ---
 
@@ -32,3 +32,7 @@ hit-area padding.
 Scenario: Every pressable is 48 dp
   Then no pressable rule sets a min-height under 48px
 ```
+
+## Progress
+
+Built 2026-10-13: `.mm-chip` is 48 dp (the status chip, which does nothing when touched, keeps 32), compact segments are 48 dp with tighter padding. Tests: `test/ui/targets.test.ts` (no pressable rule sets a min-height under 48 px).

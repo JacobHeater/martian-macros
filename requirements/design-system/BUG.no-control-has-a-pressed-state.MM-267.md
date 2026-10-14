@@ -1,7 +1,7 @@
 ---
 id: MM-267
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-104, MM-181]
 ---
 
@@ -43,3 +43,7 @@ Scenario: The primary depresses
 Scenario: Reduced motion
   Then under prefers-reduced-motion the fill remains and the scale is removed
 ```
+
+## Progress
+
+Built 2026-10-13: one pressed family at the foot of `ui.css`. Every selector with `cursor: pointer` has an `:active` rule and a `.mm-pressed` twin (the States story uses it); the primary button and the floating action depress to 98% over `--motion-fast`, every other pressable fills `--selected`, the switch and check box gain a `--selected` halo, the slider's thumb grows; under reduced motion the scale goes and an opacity change stays. Tests: `test/ui/pressedStates.test.ts`.

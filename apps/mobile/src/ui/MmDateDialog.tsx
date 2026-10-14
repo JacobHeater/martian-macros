@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { CalendarDate } from '../domain/CalendarDate';
+import type { CalendarDate } from '../domain/CalendarDate';
 import { Fmt } from '../format/Fmt';
 import { MmButton } from './MmButton';
+import { MmDatePicker } from './MmDatePicker';
 import { MmDialog } from './MmDialog';
-import { MmPickerField } from './MmPickerField';
 import './ui.css';
 
 interface MmDateDialogProps {
@@ -11,27 +11,21 @@ interface MmDateDialogProps {
   initial: CalendarDate;
   first: CalendarDate;
   last: CalendarDate;
+  today?: CalendarDate | undefined;
   /** Called with the day chosen, or undefined when backed out of. */
   onDone: (date: CalendarDate | undefined) => void;
 }
 
-function parsed(iso: string): CalendarDate | undefined {
-  try {
-    return CalendarDate.parse(iso);
-  } catch {
-    return undefined;
-  }
-}
-
 /**
- * Asks for a calendar day with the phone's own date picker behind the
- * design system's field, and says the day back in words under it, or why
- * it cannot be taken (MM-260).
+ * Asks for a calendar day with the design system's own calendar (MM-263),
+ * and says the day back in words under it, or the allowed range when a day
+ * outside it is tried (MM-260). No native control is anywhere in it.
  */
-export function MmDateDialog({ helpText, initial, first, last, onDone }: MmDateDialogProps) {
-  const [value, setValue] = useState(initial.toString());
-  const date = parsed(value);
-  const allowed = date !== undefined && !date.isBefore(first) && !date.isAfter(last);
+export function MmDateDialog({ helpText, initial, first, last, today, onDone }: MmDateDialogProps) {
+  const [chosen, setChosen] = useState(initial);
+  const [refused, setRefused] = useState(false);
+  const allowed = !chosen.isBefore(first) && !chosen.isAfter(last);
+  const range = `Choose a day between ${Fmt.longDate(first)} and ${Fmt.longDate(last)}.`;
   return (
     <MmDialog
       title={helpText}
@@ -39,25 +33,27 @@ export function MmDateDialog({ helpText, initial, first, last, onDone }: MmDateD
       actions={
         <>
           <MmButton label="Cancel" kind="text" onPress={() => onDone(undefined)} />
-          <MmButton label="OK" onPress={allowed ? () => onDone(date) : undefined} />
+          <MmButton label="OK" onPress={allowed ? () => onDone(chosen) : undefined} />
         </>
       }
     >
-      <MmPickerField
-        kind="date"
-        label={helpText}
-        min={first.toString()}
-        max={last.toString()}
-        value={value}
-        onChange={setValue}
+      <MmDatePicker
+        name={helpText}
+        value={chosen}
+        first={first}
+        last={last}
+        today={today}
+        onChange={(day) => {
+          setChosen(day);
+          setRefused(false);
+        }}
+        onRefuse={() => setRefused(true)}
       />
-      {allowed ? (
-        <p className="mm-date-detail">{Fmt.longDate(date)}</p>
+      {allowed && !refused ? (
+        <p className="mm-date-detail">{Fmt.longDate(chosen)}</p>
       ) : (
         <p className="mm-dialog-error" role="alert">
-          {date === undefined
-            ? 'Enter a full date.'
-            : `Choose a day between ${Fmt.longDate(first)} and ${Fmt.longDate(last)}.`}
+          {range}
         </p>
       )}
     </MmDialog>

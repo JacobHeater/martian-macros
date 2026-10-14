@@ -1,7 +1,7 @@
 ---
 id: MM-273
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-237, MM-253, MM-260]
 ---
 
@@ -45,3 +45,7 @@ Scenario: Every overlay can be looked at
 Scenario: Every state can be looked at
   Then rest, focus, pressed, disabled, error and selected are shown for each control that has them
 ```
+
+## Progress
+
+Built 2026-10-13: Design system/States (`StatesCatalog`: every control at rest, pressed through `.mm-pressed`, disabled, selected, in error; focus by a play step, in a group too) and Design system/Overlays (`OverlaysCatalog`: dialog, confirm, choice, options, date, time, clock, the pickers bare, sheet through the host and bare, snack with and without Undo, the menu bare and from its button). The Components catalog gained the floating action, the swipe row, the footer actions and the demo strip; Charts gained the volume row and the strength card. `test/gallery/stories.test.tsx` fails when a component of `src/ui` is imported by no gallery file.

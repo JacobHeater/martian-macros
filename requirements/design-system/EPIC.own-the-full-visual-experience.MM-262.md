@@ -1,7 +1,7 @@
 ---
 id: MM-262
 component: design-system
-status: proposed
+status: done
 related: [MM-101, MM-104, MM-163, MM-224, MM-253, MM-260, MM-261, MM-109]
 ---
 
@@ -85,3 +85,7 @@ Scenario: Every control, every state, in the register
 Scenario: The rule is enforced
   Then the architecture test fails a native date, time, select, checkbox or range control that is not wholly restyled by the design system, and a composite that writes a control
 ```
+
+## Progress
+
+Built 2026-10-13 in one pull request with every ticket below it. `test/architecture.test.ts` gives the native date, time and select controls no home, so one cannot be written anywhere; the design system draws the calendar, the drums and the options list, every control's states and every overlay, judged in the States and Overlays stories in three palettes. `design/design-system-implementation.md` is the written system.

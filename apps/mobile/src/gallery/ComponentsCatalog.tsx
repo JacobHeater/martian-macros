@@ -6,12 +6,15 @@ import { InfoCard } from '../ui/InfoCard';
 import { MacroBar } from '../ui/MacroBar';
 import { MacroFigure } from '../ui/MacroFigure';
 import { MetricFacts } from '../ui/MetricFacts';
+import { DemoNotice } from '../ui/DemoNotice';
 import { MmActionChip } from '../ui/MmActionChip';
 import { MmButton } from '../ui/MmButton';
 import { MmCheckRow } from '../ui/MmCheckRow';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmDropdown } from '../ui/MmDropdown';
+import { MmFab } from '../ui/MmFab';
+import { MmFooterActions } from '../ui/MmFooterActions';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListGroup } from '../ui/MmListGroup';
@@ -24,13 +27,13 @@ import { MmSlider } from '../ui/MmSlider';
 import { MmSpinner } from '../ui/MmSpinner';
 import { MmStatusChip } from '../ui/MmStatusChip';
 import { MmSurface } from '../ui/MmSurface';
+import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { NumberEntryCard } from '../ui/NumberEntryCard';
 import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
-import { StatusRow } from '../ui/StatusRow';
 import { StepProgress } from '../ui/StepProgress';
 import { useState } from 'react';
 import './gallery.css';
@@ -73,7 +76,7 @@ export function ComponentsCatalog() {
           ]}
         />
         <StatRow label="Days logged" value="7, all complete" />
-        <StatusRow text="Calibration, day 4 of 14." onPress={nothing} />
+        <MmListRow title="Calibration, day 4 of 14." leadingIcon="info" dense flush opens onPress={nothing} />
         <MmProgressBar value={0.6} markers={[0.8, 1]} />
       </MmSurface>
       <StepProgress current={2} count={6} />
@@ -100,7 +103,7 @@ export function ComponentsCatalog() {
         selected={unit}
         onChange={setUnit}
       />
-      <MmSlider name="Pace" value={pace} onChange={setPace} divisions={4} />
+      <MmSlider name="Pace" value={pace} onChange={setPace} divisions={4} label={`${pace}% a week`} />
       <div className="gallery-row">
         <MmChoiceChip label="Chosen" selected onSelect={nothing} />
         <MmChoiceChip label="Choice" selected={false} onSelect={nothing} />
@@ -134,7 +137,21 @@ export function ComponentsCatalog() {
       />
       <NumberEntryCard title="Today's weigh-in" unit="lb" initial="184.1" hint="First thing in the morning." onSave={async () => undefined} />
       <DayStepper label="Yesterday" onPrevious={nothing} onNext={nothing} onLabelPress={nothing} />
+      <MmSurface kind="compact" padded={false}>
+        <MmSwipeToRemove onRemove={nothing}>
+          <MmListRow title="Oats, 80 g" subtitle="Drag left to remove" />
+        </MmSwipeToRemove>
+      </MmSurface>
       <DownloadStatusStrip label="Downloading foods" fraction={0.4} onCancel={nothing} />
+      <MmFooterActions>
+        <MmButton label="Save" expand onPress={nothing} />
+      </MmFooterActions>
+      <DemoNotice>
+        <p style={{ margin: 0, color: 'var(--text2)' }}>What every screen of a seeded demo build carries above it.</p>
+      </DemoNotice>
+      <div className="app-fab-anchor">
+        <MmFab label="Add food" icon="plus" onPress={nothing} />
+      </div>
     </MmOverlays>
   );
 }
