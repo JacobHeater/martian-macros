@@ -3,7 +3,6 @@ import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useNavigator } from '../app/useNavigator';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { EvidenceQuestionScreen } from './EvidenceQuestionScreen';
 
@@ -29,7 +28,7 @@ export function HowThisWorksScreen() {
             <MmListRow
               key={question.title}
               title={question.title}
-              trailing={<MmIcon name="chevronRight" />}
+              opens
               onPress={() => void navigator.push(() => <EvidenceQuestionScreen question={question} />)}
             />
           ))}

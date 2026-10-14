@@ -25,7 +25,7 @@ it('a 170 cm woman at 50 kg is offered maintenance and lean gain only, and told 
   await userEvent.click(await screen.findByRole('button', { name: 'Get started' }));
   await press('Female');
   await press('Next');
-  await press('Choose date');
+  await press(/Choose a date/);
   await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'OK' }));
   await press('Next');
   await type('Feet', '5');

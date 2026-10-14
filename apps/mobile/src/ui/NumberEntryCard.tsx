@@ -3,7 +3,6 @@ import { parseNumber } from '../format/parseNumber';
 import { InfoCard } from './InfoCard';
 import { MmButton } from './MmButton';
 import { MmTextField } from './MmTextField';
-import { useOverlays } from './useOverlays';
 import './ui.css';
 
 interface NumberEntryCardProps {
@@ -11,33 +10,46 @@ interface NumberEntryCardProps {
   unit: string;
   initial: string | undefined;
   hint: string;
-  /** Saves the value; if it fails, the card says "That value looks off". */
+  /** Saves the value; if it fails, the card says "That value looks off" under the field. */
   onSave: (value: number) => Promise<void>;
 }
 
 /**
  * A card for entering one number (a weigh-in, a waist measurement), with a
- * save button and a hint.
+ * save button and a hint. What is wrong with a value is said under the
+ * field, and the keyboard stays in it (MM-279).
  */
 export function NumberEntryCard({ title, unit, initial, hint, onSave }: NumberEntryCardProps) {
   const [text, setText] = useState(initial ?? '');
-  const overlays = useOverlays();
+  const [refused, setRefused] = useState<string>();
   const value = parseNumber(text);
   const changed = text !== (initial ?? '');
+  const notANumber = text.trim() !== '' && (value === undefined || value <= 0) ? 'Enter a number above zero.' : undefined;
 
   const save = async (toSave: number) => {
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     try {
       await onSave(toSave);
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     } catch {
-      overlays.snack('That value looks off. Check it.');
+      setRefused('That value looks off. Check it.');
     }
   };
 
   return (
     <InfoCard title={title}>
       <div className="mm-number-entry">
-        <MmTextField name={title} kind="number" suffix={unit} dense value={text} onChange={setText} />
+        <MmTextField
+          name={title}
+          kind="number"
+          suffix={unit}
+          dense
+          value={text}
+          error={refused ?? notANumber}
+          onChange={(typed) => {
+            setText(typed);
+            setRefused(undefined);
+          }}
+        />
         <MmButton
           label="Save"
           onPress={value === undefined || value <= 0 || !changed ? undefined : () => void save(value)}

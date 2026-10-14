@@ -1,4 +1,6 @@
-/* The design-system components. Every value is a token. */
+/* The design-system components. Every value is a token (MM-274): radii from
+   --radius-*, gaps from --space-*, durations from --motion-*. Nothing native
+   shows (MM-262): every control, and every state of it, is drawn here. */
 
 .mm-icon {
   flex: none;
@@ -6,18 +8,25 @@
   fill: currentColor;
 }
 
+/* ---- Buttons ---- */
+
 .mm-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-8);
+  min-width: 64px;
   min-height: 48px;
-  padding: 0 20px;
+  padding: 0 var(--space-20);
   border: 1px solid transparent;
   border-radius: var(--radius-control);
   background: none;
   font: var(--type-heading);
   font-size: 0.9375rem;
   cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    transform var(--motion-fast);
 }
 .mm-button-primary {
   background: var(--ember);
@@ -28,8 +37,16 @@
   color: var(--text);
 }
 .mm-button-text {
-  padding: 0 12px;
+  min-width: 48px;
+  padding: 0 var(--space-12);
   color: var(--ember);
+}
+/* The quiet destructive kind (MM-280): danger as text, never a fill, so the
+   safe exit beside it is the stronger button. */
+.mm-button-destructive {
+  min-width: 48px;
+  padding: 0 var(--space-12);
+  color: var(--danger);
 }
 .mm-button-expand {
   display: flex;
@@ -53,7 +70,53 @@
   background: none;
   color: var(--text);
   cursor: pointer;
+  transition: background var(--motion-fast);
 }
+.mm-icon-button:disabled {
+  color: var(--text3);
+  cursor: default;
+}
+/* The add plate: a quiet plate with the plus in Ember; pressed, hovered or
+   focused it fills Ember. Ember is never a tint (MM-276). */
+.mm-icon-button-plate {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-chip);
+  background: var(--selected);
+  color: var(--ember);
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
+}
+.mm-icon-button-add:not(:disabled):hover .mm-icon-button-plate,
+.mm-icon-button-add:not(:disabled):focus-visible .mm-icon-button-plate,
+.mm-icon-button-add:not(:disabled):active .mm-icon-button-plate,
+.mm-pressed .mm-icon-button-add:not(:disabled) .mm-icon-button-plate {
+  background: var(--ember);
+  color: var(--on-ember);
+}
+
+.mm-fab {
+  position: absolute;
+  right: var(--space-16);
+  bottom: var(--space-16);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 56px;
+  padding: 0 var(--space-20);
+  border: 0;
+  border-radius: var(--radius-group);
+  background: var(--ember);
+  color: var(--on-ember);
+  font: var(--type-heading);
+  cursor: pointer;
+  transition: transform var(--motion-fast);
+}
+
+/* ---- Bars ---- */
 
 .mm-app-bar {
   display: flex;
@@ -65,6 +128,7 @@
 }
 .mm-app-bar-title {
   flex: 1;
+  min-width: 0;
   margin: 0;
   font: var(--type-title);
 }
@@ -84,10 +148,12 @@
   min-width: 0;
   padding: 0;
   border: 0;
+  border-radius: var(--radius-control);
   background: none;
   color: var(--text2);
   font: var(--type-nav);
   cursor: pointer;
+  transition: background var(--motion-fast);
 }
 .mm-nav-indicator {
   display: grid;
@@ -95,6 +161,7 @@
   width: 56px;
   height: 30px;
   border-radius: var(--radius-nav-indicator);
+  transition: background var(--motion-base);
 }
 .mm-nav-destination-current {
   color: var(--ember);
@@ -104,80 +171,26 @@
   background: var(--selected);
 }
 
-.mm-surface {
-  padding: var(--space-16);
-  border: 1px solid var(--outline);
-  border-radius: var(--radius-group);
-  background: var(--surface);
-}
-
-/* ---- Everything below is the component library carried over from the
-   Flutter app's ui/ folder and its theme (MM-232). Every value is a token
-   or a size the Flutter theme set. ---- */
-
-.mm-visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-.mm-danger {
-  color: var(--danger);
-}
-
-.mm-button {
-  gap: var(--space-8);
-  min-width: 64px;
-}
-.mm-button-text {
-  min-width: 48px;
-}
-
-.mm-icon-button:disabled {
-  color: var(--text3);
-  cursor: default;
-}
-.mm-icon-button-plate {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--ember) 15%, transparent);
-  color: var(--ember);
-  transition:
-    background 150ms,
-    color 150ms;
-}
-.mm-icon-button-add:not(:disabled):hover .mm-icon-button-plate,
-.mm-icon-button-add:not(:disabled):focus-visible .mm-icon-button-plate,
-.mm-icon-button-add:not(:disabled):active .mm-icon-button-plate {
-  background: var(--ember);
-  color: var(--on-ember);
-}
+/* ---- Surfaces (MM-277: cards carry their per-theme elevation) ---- */
 
 .mm-surface {
   display: block;
   width: 100%;
   margin: 0 0 var(--space-12);
+  padding: var(--space-16);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-group);
+  background: var(--surface);
   color: inherit;
   font: inherit;
   text-align: start;
 }
 .mm-surface-compact {
-  border-radius: 12px;
+  border-radius: var(--radius-control);
 }
 .mm-surface-flush {
   padding: 0;
   overflow: hidden;
-}
-.mm-surface-button {
-  cursor: pointer;
 }
 
 .mm-hero {
@@ -194,8 +207,19 @@
   font: inherit;
   text-align: start;
 }
+/* Light: a hairline and a soft shadow. Dark: a 1 dp inner top highlight. */
+.theme-light .mm-surface,
+.theme-light .mm-list-group,
 .theme-light .mm-hero {
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 6%, transparent);
+  box-shadow: 0 1px 2px rgb(12 18 32 / 6%);
+}
+.theme-martian .mm-surface,
+.theme-martian .mm-list-group,
+.theme-martian .mm-hero,
+.theme-dark .mm-surface,
+.theme-dark .mm-list-group,
+.theme-dark .mm-hero {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
 .mm-hero-backdrop {
   position: absolute;
@@ -219,6 +243,39 @@
   padding: var(--space-24);
 }
 
+/* Pressable content (MmPressable): the button draws nothing, the content does. */
+.mm-pressable {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--motion-fast);
+}
+
+/* ---- Fields ---- */
+
+.mm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.mm-danger {
+  color: var(--danger);
+}
+
 .mm-field {
   display: flex;
   flex: 1;
@@ -234,11 +291,19 @@
   display: flex;
   align-items: center;
   gap: var(--space-8);
+  width: 100%;
   min-height: 56px;
   padding: 0 var(--space-12);
   border: 1px solid var(--outline-strong);
   border-radius: var(--radius-control);
   background: var(--sunken);
+  color: var(--text);
+  font: var(--type-body);
+  font-size: 1rem;
+  text-align: start;
+  transition:
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 .mm-field-dense .mm-field-box {
   min-height: 48px;
@@ -246,6 +311,12 @@
 .mm-field-box:focus-within {
   border-color: var(--text);
   box-shadow: inset 0 0 0 1px var(--text);
+}
+/* A field with an error (MM-279): the danger colour on the box and the
+   message beneath, which is also spoken. */
+.mm-field-box-error {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
 }
 .mm-field-input {
   flex: 1;
@@ -276,37 +347,36 @@
 .mm-field-helper-warning {
   color: var(--caution);
 }
-.mm-select {
-  min-height: 46px;
-  appearance: auto;
+.mm-field-error {
+  color: var(--danger);
 }
-/* A date or time field (MmPickerField, MM-260): the design system's box
-   around the phone's own control. The platform draws nothing: its indicator
-   is hidden on every engine, its value sits at the start like any other
-   field, and the box carries the chevron at the field's inset. */
+
+/* A field that opens a chooser (MmPickerField, MM-263, MM-265): the design
+   system's box as a button, with the value in words and our chevron. The
+   dropdown composes it and opens the options list; a date or time field
+   opens its picker. No native control is anywhere near it. */
 .mm-picker-box {
-  width: 100%;
   cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast);
 }
-.mm-picker-input {
-  width: 100%;
-  min-height: 54px;
-  appearance: none;
-  -webkit-appearance: none;
-  text-align: start;
-  cursor: pointer;
-  /* The native picker that opens follows the palette. */
-  color-scheme: dark;
+.mm-picker-box:focus-visible {
+  outline: 0;
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text);
 }
-.theme-light .mm-picker-input {
-  color-scheme: light;
+.mm-picker-box:disabled {
+  border-color: var(--outline);
+  color: var(--text2);
+  cursor: default;
 }
-.mm-picker-input::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
-}
-.mm-picker-input::-webkit-date-and-time-value {
-  text-align: start;
+.mm-picker-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .mm-picker-chevron {
   display: grid;
@@ -314,11 +384,16 @@
   place-items: center;
   color: var(--text2);
 }
+.mm-picker-box:disabled .mm-picker-chevron {
+  color: var(--text3);
+}
 .mm-date-detail {
   margin: 0;
   color: var(--text2);
   font: var(--type-caption);
 }
+
+/* ---- Lists ---- */
 
 .mm-list-group {
   margin: 0 0 var(--space-12);
@@ -343,31 +418,19 @@
   color: var(--text);
   font: inherit;
   text-align: start;
+  transition: background var(--motion-fast);
 }
 .mm-list-row-dense {
   min-height: 48px;
   padding-block: var(--space-4);
 }
+.mm-list-row-flush,
+.mm-toggle-row-flush {
+  padding-inline: 0;
+}
 .mm-list-row-button,
 .mm-toggle-row {
   cursor: pointer;
-}
-
-/* Pressable content (MmPressable): the button draws nothing, the content does. */
-.mm-pressable {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-.mm-toggle-row-flush {
-  padding-inline: 0;
 }
 .mm-list-row-leading {
   display: grid;
@@ -390,7 +453,33 @@
 .mm-list-row-trailing {
   display: flex;
   align-items: center;
+  gap: var(--space-8);
   color: var(--text2);
+}
+/* The chevron of a row that opens something (MM-278): drawn here, never by a screen. */
+.mm-list-row-opens {
+  display: grid;
+  color: var(--text3);
+}
+
+/* A row with an action of its own beside the part that is pressed. */
+.mm-list-row-with-action {
+  padding: 0;
+}
+.mm-list-row-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  min-height: inherit;
+  padding: var(--space-8) var(--space-16);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  transition: background var(--motion-fast);
 }
 
 .mm-group-header {
@@ -404,6 +493,8 @@
   font: var(--type-heading);
 }
 
+/* ---- Toggles: the switch, the check box and the slider are drawn here (MM-266) ---- */
+
 .mm-switch {
   position: relative;
   flex: none;
@@ -411,10 +502,14 @@
   height: 32px;
   margin: 0;
   border: 2px solid var(--outline-strong);
-  border-radius: 16px;
+  border-radius: 999px;
   background: var(--track);
   appearance: none;
   cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 .mm-switch::after {
   position: absolute;
@@ -425,7 +520,12 @@
   border-radius: 50%;
   background: var(--outline-strong);
   content: '';
-  transition: transform 150ms;
+  transition:
+    transform var(--motion-fast),
+    width var(--motion-fast),
+    height var(--motion-fast),
+    top var(--motion-fast),
+    left var(--motion-fast);
 }
 .mm-switch:checked {
   border-color: var(--ember);
@@ -439,21 +539,126 @@
   background: var(--on-ember);
   transform: translateX(20px);
 }
+
 .mm-check-row {
   min-height: 48px;
 }
-.mm-checkbox {
+.mm-check {
+  position: relative;
+  display: grid;
   flex: none;
+  place-items: center;
   width: 20px;
   height: 20px;
   margin: 0 var(--space-4);
-  accent-color: var(--ember);
 }
+.mm-checkbox {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 2px solid var(--outline-strong);
+  border-radius: var(--radius-check);
+  background: var(--sunken);
+  appearance: none;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+.mm-checkbox:checked {
+  border-color: var(--ember);
+  background: var(--ember);
+}
+.mm-checkbox:disabled {
+  border-color: var(--outline);
+  background: var(--selected);
+  cursor: default;
+}
+.mm-check-mark {
+  position: relative;
+  display: grid;
+  color: var(--on-ember);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast);
+}
+.mm-checkbox:checked + .mm-check-mark {
+  opacity: 1;
+}
+
+.mm-slider {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  background: none;
+  appearance: none;
+  cursor: pointer;
+}
+/* The track is --track with the filled part in Ember; the thumb is a 20 dp
+   Ember disc in a 48 dp row. Each engine names the parts differently. */
+.mm-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--ember), var(--ember)) 0 0 / var(--mm-slider-fill, 0%) 100% no-repeat,
+    var(--track);
+}
+.mm-slider::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  margin-top: -8px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ember);
+  appearance: none;
+  transition: transform var(--motion-fast);
+}
+.mm-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--track);
+}
+.mm-slider::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ember);
+}
+.mm-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ember);
+  transition: transform var(--motion-fast);
+}
+/* The ring belongs on the thumb, not around the whole row. */
+.mm-slider:focus-visible {
+  outline: 0;
+}
+.mm-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.mm-slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+/* A slider in a list group: the row's inset, and part of the setting over it (MM-240). */
+.mm-list-group > .mm-slider-row {
+  border-top: 0;
+  padding-block: 0 var(--space-4);
+}
+
+/* ---- Chips and segments: 48 dp for everything pressable (MM-281) ---- */
 
 .mm-chip {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
+  gap: var(--space-4);
+  min-height: 48px;
   padding: 0 var(--space-12);
   border: 1px solid var(--outline-strong);
   border-radius: var(--radius-chip);
@@ -461,18 +666,18 @@
   color: var(--text);
   font: var(--type-label);
   cursor: pointer;
-}
-.mm-chip-choice {
-  min-height: 48px;
+  transition: background var(--motion-fast);
 }
 .mm-chip-selected {
   background: var(--selected);
 }
-.mm-chip-selected::before {
-  margin-inline-end: var(--space-4);
-  content: '✓';
+.mm-chip-check {
+  display: grid;
+  color: var(--ember);
 }
+/* A status chip does nothing when touched, so it keeps the quiet 32 dp. */
 .mm-chip-status {
+  min-height: 32px;
   cursor: default;
 }
 
@@ -496,12 +701,13 @@
   color: var(--text2);
   font: var(--type-label);
   cursor: pointer;
+  transition: background var(--motion-fast);
 }
 .mm-segment + .mm-segment {
   border-inline-start: 1px solid var(--outline-strong);
 }
 .mm-segmented-compact .mm-segment {
-  min-height: 40px;
+  min-height: 48px;
   padding: 0 var(--space-12);
 }
 .mm-segment-selected {
@@ -509,17 +715,7 @@
   color: var(--ember);
 }
 
-.mm-slider {
-  width: 100%;
-  min-height: 48px;
-  margin: 0;
-  accent-color: var(--ember);
-}
-/* A slider in a list group: the row's inset, and part of the setting over it (MM-240). */
-.mm-list-group > .mm-slider-row {
-  border-top: 0;
-  padding-block: 0 var(--space-4);
-}
+/* ---- Progress ---- */
 
 .mm-spinner {
   display: inline-block;
@@ -528,24 +724,15 @@
   border: 4px solid var(--track);
   border-top-color: var(--energy);
   border-radius: 50%;
-  animation: mm-spin 1s linear infinite;
+  animation: mm-spin var(--motion-turn) linear infinite;
 }
 @keyframes mm-spin {
   to {
     transform: rotate(360deg);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .mm-spinner {
-    animation-duration: 4s;
-  }
-  .mm-switch::after,
-  .mm-icon-button-plate,
-  .mm-disclosure-chevron {
-    transition: none;
-  }
-}
 
+/* A bar takes its meaning and its weight, never a colour or a size (MM-278). */
 .mm-progress {
   position: relative;
   display: block;
@@ -553,10 +740,29 @@
   border-radius: 999px;
   background: var(--track);
 }
+.mm-progress-thin {
+  height: 4px;
+}
+.mm-progress-quiet {
+  height: 6px;
+}
+.mm-progress-regular {
+  height: 8px;
+}
 .mm-progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--mm-bar-color, var(--energy));
+  background: var(--energy);
+  transition: width var(--motion-slow);
+}
+.mm-progress-protein .mm-progress-fill {
+  background: var(--protein);
+}
+.mm-progress-carbs .mm-progress-fill {
+  background: var(--carbs);
+}
+.mm-progress-fat .mm-progress-fill {
+  background: var(--fat);
 }
 .mm-progress-marker {
   position: absolute;
@@ -565,6 +771,22 @@
   width: 2px;
   background: var(--text);
 }
+
+.mm-steps {
+  display: flex;
+  gap: var(--space-8);
+}
+.mm-step {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--track);
+}
+.mm-step-done {
+  background: var(--energy);
+}
+
+/* ---- Disclosure ---- */
 
 .mm-disclosure-toggle {
   display: flex;
@@ -579,6 +801,7 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
+  transition: background var(--motion-fast);
 }
 .mm-disclosure-with-header .mm-disclosure-toggle {
   padding: var(--space-12) var(--space-16);
@@ -586,7 +809,7 @@
 .mm-disclosure-chevron {
   display: grid;
   color: var(--text3);
-  transition: transform 200ms;
+  transition: transform var(--motion-base);
 }
 .mm-disclosure-toggle:hover .mm-disclosure-chevron {
   color: var(--text2);
@@ -595,40 +818,34 @@
   transform: rotate(180deg);
 }
 
-.mm-fab {
-  position: absolute;
-  right: var(--space-16);
-  bottom: var(--space-16);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-8);
-  min-height: 56px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: var(--radius-group);
-  background: var(--ember);
-  color: var(--on-ember);
-  font: var(--type-heading);
-  cursor: pointer;
-}
+/* ---- Menus (MM-268): through the overlay host, anchored to the trigger ---- */
 
 .mm-menu {
-  position: relative;
+  display: inline-grid;
+}
+.mm-menu-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
 }
 .mm-menu-list {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 10;
+  position: fixed;
+  z-index: 101;
   display: flex;
   flex-direction: column;
+  /* Wide enough for "Copy to today" at 200% text without wrapping. */
   min-width: 180px;
+  max-width: calc(100vw - var(--space-32));
   padding: var(--space-8) 0;
+  border: 1px solid var(--outline);
   border-radius: var(--radius-control);
   background: var(--overlay);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+  animation: mm-fade-in var(--motion-fade) ease-out;
 }
 .mm-menu-item {
+  display: flex;
+  align-items: center;
   min-height: 48px;
   padding: 0 var(--space-16);
   border: 0;
@@ -638,11 +855,14 @@
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
+  transition: background var(--motion-fast);
+}
+.mm-menu-item:hover,
+.mm-menu-item:focus-visible {
+  background: var(--selected);
 }
 
-.mm-app-bar-title {
-  min-width: 0;
-}
+/* ---- Notices and cards ---- */
 
 .mm-notice {
   display: flex;
@@ -701,12 +921,15 @@
   margin: 0 0 var(--space-8);
   padding: var(--space-16);
   border: 1px solid var(--outline);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
   font: inherit;
   text-align: start;
   cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast);
 }
 .mm-choice-card-dense {
   padding-block: var(--space-12);
@@ -735,24 +958,10 @@
 }
 .mm-badge {
   padding: 2px var(--space-8);
-  border-radius: 8px;
+  border-radius: var(--radius-chip);
   background: var(--sunken);
   color: var(--text);
   font: var(--type-caption);
-}
-
-.mm-steps {
-  display: flex;
-  gap: 6px;
-}
-.mm-step {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--track);
-}
-.mm-step-done {
-  background: var(--energy);
 }
 
 .mm-stat-row {
@@ -770,32 +979,8 @@
   text-align: end;
 }
 
-.mm-status-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  width: 100%;
-  min-height: 48px;
-  padding: var(--space-8) 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: var(--type-caption);
-  text-align: start;
-  cursor: pointer;
-}
-.mm-status-row-icon {
-  display: grid;
-  color: var(--info);
-}
-.mm-status-row-text {
-  flex: 1;
-}
-.mm-status-row-chevron {
-  display: grid;
-  color: var(--text3);
-}
-
+/* Facts: the label is first in the markup so a screen reader pairs them
+   (MM-279); the value is drawn over it. */
 .mm-metric-facts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -804,7 +989,7 @@
 }
 .mm-metric-fact {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   min-width: 0;
 }
 .mm-metric-value {
@@ -842,7 +1027,7 @@
 .mm-macro-bar-head {
   display: flex;
   gap: var(--space-8);
-  margin-bottom: 6px;
+  margin-bottom: var(--space-4);
 }
 .mm-macro-bar-name {
   font: var(--type-label);
@@ -894,13 +1079,19 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-4);
   min-width: 0;
 }
 .mm-download-strip-label {
   font: var(--type-label);
 }
 
+/* ---- Overlays ---- */
+
+/* The app beneath an overlay is inert (MM-271); the wrapper takes no space. */
+.mm-app-root {
+  display: contents;
+}
 .mm-scrim {
   position: fixed;
   inset: 0;
@@ -909,6 +1100,12 @@
   place-items: center;
   padding: var(--space-24);
   background: rgb(0 0 0 / 54%);
+  animation: mm-fade-in var(--motion-fade) ease-out;
+}
+@keyframes mm-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 .mm-dialog {
   display: flex;
@@ -924,6 +1121,13 @@
   /* A question floats over the screen: the scrim and a soft shadow lift it
      off the canvas, so it is not one more flat surface (MM-260). */
   box-shadow: 0 16px 40px rgb(0 0 0 / 45%);
+  animation: mm-rise var(--motion-base) ease-out;
+}
+@keyframes mm-rise {
+  from {
+    transform: translateY(var(--space-16));
+    opacity: 0;
+  }
 }
 .mm-dialog:focus-visible,
 .mm-sheet:focus-visible {
@@ -952,10 +1156,6 @@
   color: var(--danger);
   font: var(--type-caption);
 }
-.mm-clock-fields {
-  display: flex;
-  gap: var(--space-8);
-}
 .mm-options {
   display: flex;
   flex-direction: column;
@@ -975,12 +1175,14 @@
   font-size: 1rem;
   text-align: start;
   cursor: pointer;
+  transition: background var(--motion-fast);
 }
 .mm-option-check {
   display: grid;
   color: var(--text2);
 }
 
+/* A snack (MM-272): one with an action waits for it; one without goes after four seconds. */
 .mm-snack-host {
   position: fixed;
   right: var(--space-16);
@@ -998,10 +1200,13 @@
   width: min(100%, 560px);
   min-height: 48px;
   padding: var(--space-4) var(--space-8) var(--space-4) var(--space-16);
+  border: 1px solid var(--outline);
   border-radius: var(--radius-control);
   background: var(--overlay);
   color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
   pointer-events: auto;
+  animation: mm-rise var(--motion-base) ease-out;
 }
 .mm-snack-message {
   flex: 1;
@@ -1009,7 +1214,7 @@
 
 .mm-number-entry {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-12);
 }
 .mm-number-entry-hint {
@@ -1017,6 +1222,8 @@
   color: var(--text2);
   font: var(--type-caption);
 }
+
+/* ---- The horizon arc ---- */
 
 .mm-horizon {
   display: block;
@@ -1050,7 +1257,8 @@
   display: none;
 }
 
-/* A panel from the bottom of the screen. */
+/* ---- The sheet (MM-277 to spec; MM-271 with a way out) ---- */
+
 .mm-scrim-sheet {
   place-items: end center;
   padding: 0;
@@ -1062,18 +1270,54 @@
   max-height: 90%;
   padding-bottom: env(safe-area-inset-bottom);
   overflow-y: auto;
-  border-radius: var(--radius-group) var(--radius-group) 0 0;
-  background: var(--overlay);
+  border-radius: var(--radius-sheet-top) var(--radius-sheet-top) 0 0;
+  background: var(--raised);
+  animation: mm-sheet-rise var(--motion-slow) ease-out;
+}
+.theme-light .mm-sheet {
+  box-shadow: 0 8px 24px rgb(12 18 32 / 12%);
+}
+@keyframes mm-sheet-rise {
+  from {
+    transform: translateY(var(--space-32));
+    opacity: 0;
+  }
+}
+.mm-sheet-dragging {
+  animation: none;
+  transition: none;
+}
+/* The handle is the drag target: 48 dp tall, with the close action beside it. */
+.mm-sheet-head {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+.mm-sheet-grip {
+  display: grid;
+  flex: 1;
+  align-self: stretch;
+  place-items: center;
+  border: 0;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  transition: background var(--motion-fast);
 }
 .mm-sheet-handle {
-  flex: none;
-  align-self: center;
   width: 32px;
   height: 4px;
-  margin: var(--space-12) 0 var(--space-8);
   border-radius: 2px;
   background: var(--text2);
   opacity: 0.4;
+}
+.mm-sheet-close {
+  position: absolute;
+  top: 0;
+  right: var(--space-4);
 }
 
 /* A screen's actions, under its scrolling content and clear of the gesture bar. */
@@ -1085,25 +1329,6 @@
   padding: var(--space-12) var(--space-24) calc(var(--space-16) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--outline);
   background: var(--canvas);
-}
-
-/* A row with an action of its own beside the part that is pressed. */
-.mm-list-row-with-action {
-  padding: 0;
-}
-.mm-list-row-main {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: var(--space-12);
-  min-width: 0;
-  min-height: inherit;
-  padding: var(--space-8) var(--space-16);
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
 }
 
 /* A row removed by dragging it left. */
@@ -1188,4 +1413,259 @@
 .mm-volume-previous {
   width: 2px;
   background: var(--text2);
+}
+
+/* ---- The calendar (MmDatePicker, MM-263) ---- */
+
+.mm-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  color: var(--text);
+}
+.mm-calendar-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.mm-calendar-month {
+  flex: 1;
+  min-width: 0;
+}
+.mm-calendar-month-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 48px;
+  border-radius: var(--radius-control);
+  font: var(--type-heading);
+}
+.mm-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  touch-action: pan-y;
+  animation: mm-fade-in var(--motion-base) ease-out;
+}
+.mm-calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.mm-calendar-weekday {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  color: var(--text2);
+  font: var(--type-label);
+}
+.mm-day {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text);
+  font: var(--type-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
+}
+.mm-day-today {
+  box-shadow: inset 0 0 0 1px var(--outline-strong);
+}
+.mm-day-chosen {
+  background: var(--ember);
+  color: var(--on-ember);
+  font-weight: 700;
+}
+.mm-day-outside {
+  color: var(--text3);
+  cursor: default;
+}
+.mm-year-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 336px;
+  margin: 0 calc(-1 * var(--space-24));
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+}
+.mm-year-list > * {
+  scroll-snap-align: start;
+}
+
+/* ---- The drums (MmTimePicker, MM-264) ---- */
+
+.mm-time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+.mm-drums {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+}
+.mm-drums-band {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  left: 0;
+  height: 48px;
+  border-radius: var(--radius-control);
+  background: var(--selected);
+  pointer-events: none;
+}
+.mm-drum-colon {
+  display: grid;
+  place-items: center;
+  height: 144px;
+  font: var(--type-figure);
+  color: var(--text2);
+}
+.mm-drum {
+  position: relative;
+  width: 72px;
+  height: 144px;
+  overflow-y: auto;
+  border-radius: var(--radius-control);
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(transparent, rgb(0 0 0) 30%, rgb(0 0 0) 70%, transparent);
+  mask-image: linear-gradient(transparent, rgb(0 0 0) 30%, rgb(0 0 0) 70%, transparent);
+}
+.mm-drum::-webkit-scrollbar {
+  display: none;
+}
+.mm-drum-items {
+  padding-block: 48px;
+}
+.mm-drum-item {
+  display: grid;
+  place-items: center;
+  height: 48px;
+  color: var(--text3);
+  font: var(--type-title);
+  font-variant-numeric: tabular-nums;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition: color var(--motion-fast);
+}
+.mm-drum-item-chosen {
+  color: var(--text);
+  font: var(--type-figure);
+}
+.mm-time-detail {
+  margin: 0;
+  color: var(--text2);
+  font: var(--type-caption);
+  text-align: center;
+}
+
+/* ---- Pressed (MM-267): every pressable shows a tap landed, within --motion-fast ----
+   The `.mm-pressed` twin of each selector lets the register show the state. */
+
+.mm-button:not(:disabled):active,
+.mm-pressed .mm-button:not(:disabled),
+.mm-icon-button:not(:disabled):active,
+.mm-pressed .mm-icon-button:not(:disabled),
+.mm-nav-destination:active,
+.mm-pressed .mm-nav-destination,
+.mm-pressable:active,
+.mm-pressed .mm-pressable,
+.mm-list-row-button:active,
+.mm-pressed .mm-list-row-button,
+.mm-toggle-row:active,
+.mm-pressed .mm-toggle-row,
+.mm-chip:not(.mm-chip-status):active,
+.mm-pressed .mm-chip:not(.mm-chip-status),
+.mm-segment:active,
+.mm-pressed .mm-segment,
+.mm-disclosure-toggle:active,
+.mm-pressed .mm-disclosure-toggle,
+.mm-menu-item:active,
+.mm-pressed .mm-menu-item,
+.mm-choice-card:active,
+.mm-pressed .mm-choice-card,
+.mm-option:active,
+.mm-pressed .mm-option,
+.mm-picker-box:not(:disabled):active,
+.mm-pressed .mm-picker-box:not(:disabled),
+.mm-day:not(.mm-day-chosen):active,
+.mm-pressed .mm-day:not(.mm-day-chosen),
+.mm-sheet-grip:active,
+.mm-pressed .mm-sheet-grip {
+  background: var(--selected);
+}
+.mm-button-primary:not(:disabled):active,
+.mm-pressed .mm-button-primary:not(:disabled) {
+  background: var(--ember);
+  transform: scale(0.98);
+}
+.mm-fab:active,
+.mm-pressed .mm-fab {
+  transform: scale(0.98);
+}
+.mm-switch:active,
+.mm-pressed .mm-switch,
+.mm-checkbox:active,
+.mm-pressed .mm-checkbox {
+  box-shadow: 0 0 0 4px var(--selected);
+}
+.mm-slider:active::-webkit-slider-thumb,
+.mm-pressed .mm-slider::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+.mm-slider:active::-moz-range-thumb,
+.mm-pressed .mm-slider::-moz-range-thumb {
+  transform: scale(1.2);
+}
+.mm-drum-item:active,
+.mm-pressed .mm-drum-item {
+  color: var(--text);
+}
+.mm-pressable:active .mm-surface,
+.mm-pressed .mm-pressable .mm-surface,
+.mm-pressable:active .mm-hero,
+.mm-pressed .mm-pressable .mm-hero {
+  background: var(--selected);
+}
+
+/* ---- Focus inside a clipping container (MM-275): the ring is drawn inset,
+   so no part of it falls outside the group, the segmented control, the flush
+   surface, the hero, the swipe row, the year list or a drum. ---- */
+
+.mm-list-group :focus-visible,
+.mm-segmented :focus-visible,
+.mm-surface-flush :focus-visible,
+.mm-hero :focus-visible,
+.mm-swipe :focus-visible,
+.mm-options :focus-visible,
+.mm-year-list :focus-visible,
+.mm-drum:focus-visible {
+  outline-offset: -2px;
+}
+
+/* ---- Reduced motion: the scale goes, a non-moving change stays ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-button-primary:not(:disabled):active,
+  .mm-pressed .mm-button-primary:not(:disabled),
+  .mm-fab:active,
+  .mm-pressed .mm-fab {
+    transform: none;
+    opacity: 0.85;
+  }
+  .mm-slider:active::-webkit-slider-thumb,
+  .mm-pressed .mm-slider::-webkit-slider-thumb,
+  .mm-slider:active::-moz-range-thumb,
+  .mm-pressed .mm-slider::-moz-range-thumb {
+    transform: none;
+    box-shadow: 0 0 0 4px var(--selected);
+  }
 }

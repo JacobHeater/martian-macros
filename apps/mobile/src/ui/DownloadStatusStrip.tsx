@@ -25,7 +25,7 @@ export function DownloadStatusStrip({ label, fraction, onCancel }: DownloadStatu
         <span className="mm-download-strip-label" aria-hidden="true">
           {label}
         </span>
-        <MmProgressBar value={fraction} height={4} />
+        <MmProgressBar value={fraction} weight="thin" />
       </div>
       <MmButton label="Cancel" kind="text" onPress={onCancel} />
     </div>

@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-13, by Claude, Session 22.
+Last updated: 2026-10-13, by Claude, Session 23.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -65,12 +65,16 @@ only what the code does, and never "nothing is uploaded" (MM-244).
 `currentSchema.ts` and `migrationSteps.ts`, with their tests (version 2
 since MM-242). Only one schema change at a time.
 
-**The engineering rules are checked (MM-246).** `test/architecture.test.ts`
-fails the suite on a file with two declarations or the wrong name, a
-library imported outside the folders it lists, or a raw control in a
-screen; `MmPressable` is the component for content pressed as a whole.
+**The engineering rules are checked (MM-246, MM-261, MM-278).**
+`test/architecture.test.ts` fails the suite on a file with two declarations
+or the wrong name, a library imported outside the folders it lists, a raw
+control in a screen, a native date, time or select control anywhere, a
+`<button>` outside its homes, a composite that writes a control, a
+component prop named `color`, `className` or `style`, or a screen that
+draws a row's chevron; `MmPressable` is the component for content pressed
+as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-246 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-283 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -87,16 +91,14 @@ the first one starts answering 504 until it is restarted.
 
 **What to build next** (the roadmap's "What is available right now", in
 order; `mm roadmap` draws it).
-- WS-03 step 1 leftovers (MM-103 one question per screen, MM-181). WS-14
-  step 4 (MM-229) and WS-01 step 3 (MM-7) are closed; the demo seed wired
-  into the shell (MM-177, MM-228) is what is left of the conversion.
-- WS-06 step 3, the last of M1: MM-138 and MM-139 want simulator calibration
-  and the owner's confirmation of holding a reduction.
-- WS-04, the gap to M2: close the MM-51 spike; the pack download, a barcode
-  scan and a label photograph on a device with a release build, under a
-  network monitor, which also answers MM-244 (WS-13 step 1).
-- Then WS-08 step 4's storage gaps (MM-167), MM-57 licensing, MM-153's
-  ranking by trust tier.
+- WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
+  weeks and on failing recovery signals, forced at 20); an engine change.
+- WS-03 step 9: MM-253 (the hierarchy direction and the panel pass), then
+  MM-254 to MM-259, each destination rebuilt with before and after stories.
+- WS-15 steps 1 and 2: MM-250 (the nightly sleep record), MM-251 (sleep
+  disorders in the health check).
+- WS-11 step 2 (MM-71), WS-13 step 1 (MM-95, MM-247, MM-244), WS-09 step 4
+  (MM-248), WS-04 step 1 (MM-51, waiting on a pantry).
 - MM-214 and MM-215 remain skipped in the web suite, each waiting on its fix.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34).
 
@@ -138,30 +140,99 @@ direction and runs the product-designer and UX roles on the built stories;
 MM-254 to MM-259 rebuild each destination with before and after stories.
 Nothing is built yet.
 
-**Nothing native shows (owner's rule, 2026-10-13; MM-262).** After the date
-dialog took three prompts to become a component, the owner ruled: "make
-everything custom and beautiful for Martian Macros. I want to own the full
-visual experience." No native picker, list, glyph, thumb, highlight or
+**Nothing native shows (owner's rule, 2026-10-13; MM-262, built).** After
+the date dialog took three prompts to become a component, the owner ruled:
+"make everything custom and beautiful for Martian Macros. I want to own the
+full visual experience." No native picker, list, glyph, thumb, highlight or
 focus ring; the design system draws every control and every state, judged
 in the register in three palettes. The panel's product-designer,
 UX-accessibility and React-Capacitor roles walked every file of `src/ui/`
-the same day (`docs/agent-runs/mm253-components/`, 74 findings); the
-result is WS-03 step 10: MM-263 to MM-282 (less MM-278, in WS-14), each a
-bug with a regression test or a story with its stories. Also decided: a
-quiet destructive button kind with Cancel the stronger (MM-280); the
-Ember switch stays; 48 dp for everything pressable (MM-281); a snack with
-Undo waits (MM-272, from the interaction doc).
+(`docs/agent-runs/mm253-components/`, 74 findings), the findings became
+MM-263 to MM-282, and **all of it was built the same day** (Session 23):
+the calendar (`MmDatePicker`), the drums (`MmTimePicker`), the select that
+opens the options list (`MmDropdown`), the checkbox and slider drawn in
+`ui.css`, a pressed family with `.mm-pressed` twins, menus through the
+overlay host (`overlays.menu`), inert app root and focus trap in every
+overlay, a snack with Undo that waits, the States and Overlays stories,
+motion tokens, inset focus rings, the quiet destructive kind, 48 dp chips,
+and `design/design-system-implementation.md` rewritten for the React
+library. Read that document before adding a component. Also decided: the
+Ember switch stays. Not yet looked at on the phone: the drums' scroll feel
+and the calendar swipe (the Pixel was disconnected); the Storybook stories
+were looked at in a headless browser in three palettes.
 
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
 - The merge of MM-247's workflow pull request, when it is opened.
-- Unlocking the Pixel to look at the seeded demo app.
+- Unlocking the Pixel to look at the seeded demo app, and plugging it in,
+  so the new pickers can be felt on glass (`mm run --env phone`, then
+  Settings → Profile → Date of birth, and a reminder's time).
 
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 23: 2026-10-13, Claude (the whole of MM-262 built: nothing native shows)
+
+- The owner's instruction at the start: "You better aim higher than a
+  couple components. I want the whole thing... NOW!" So the
+  eighteen tickets of WS-03 step 10 (and MM-278 in WS-14) were built in one
+  branch, each with its regression test, and the epic MM-262 is closed.
+- **The pickers.** `MmDatePicker` is a month grid (`role="grid"` of
+  `MmCalendarDay` cells, a year list of `MmOption`, previous and next
+  month, arrow keys across months, a swipe) inside `MmDateDialog`, which
+  says the day back or the range. `MmDrum` is a snapping column that is a
+  spinbutton to the keyboard (arrows, Page keys, typed digits);
+  `MmTimePicker` has Hour and Minute drums, Second when asked, and AM or PM
+  as a segmented control; `MmTimeOfDayDialog` takes a range and refuses a
+  time before OK (the reminders screen's refusal after the fact is gone);
+  `MmClockTimeDialog` is drums too, so nothing typed can be invalid.
+  `MmPickerField` is now a field-shaped button with the value in words and
+  our chevron (the onboarding birth-date step uses it). `MmDropdown`
+  renders no `<select>`: it composes `MmPickerField` and opens
+  `overlays.options`. `controlHomes` gives date, time and select no home.
+- **Every control drawn.** `.mm-checkbox` and `.mm-slider` have
+  `appearance: none`; the box, the tick, the track, the fill and the thumb
+  are ours; `MmSlider` requires `label`. The pressed family at the foot of
+  `ui.css`: every `cursor: pointer` selector has an `:active` rule and a
+  `.mm-pressed` twin. Inset focus rings inside clipping containers. The
+  add plate is `--selected` with an Ember plus; the chip's check is
+  `MmIcon`. Chips 48 dp. Sheet on `--raised` with the sheet-top radius and
+  the Light shadow; cards carry the Light shadow and the Dark highlight.
+- **Overlays.** The app root is `inert` while an overlay is up; Tab is
+  trapped; Escape closes from anywhere; the options dialog has Cancel; the
+  sheet has Close and a handle that drags it away; `EditHeightSheet` says
+  its range and has Cancel. A menu is `overlays.menu`, drawn at the
+  trigger's anchor (`MmMenu` of `MmMenuItemRow`) so a row cannot clip it;
+  Settings' daily activity and experience are `overlays.options` with the
+  value marked Chosen. A confirmation draws the destructive action quiet
+  (`kind="destructive"`) and Cancel secondary. A snack with an action waits.
+- **The register.** Design system/States (every control at rest, pressed,
+  disabled, selected, in error; focus by play) and Design system/Overlays
+  (every overlay on its own). The stories test fails a component of
+  `src/ui` that no gallery file imports. Settings/ChangeDailyActivity and
+  Food/EntryMenu stories added.
+- **Tokens and the checker.** `--motion-*` tokens, `--space-20`,
+  `--radius-check` in `tokens.css`; `test/ui/stylesheetTokens.test.ts`
+  fails a literal radius, duration, gap, undeclared property or hex colour
+  in any sheet. The architecture test derives composites, lists
+  `buttonHomes`, balances braces, and fails a `color`, `className` or
+  `style` prop and a screen-drawn chevron; `MmListRow opens` draws it;
+  `StatusRow` is gone; `MmProgressBar` takes `kind` and `weight`.
+- **The written system.** `design/design-system-implementation.md` is the
+  React library's document; `visual-language.md`'s icon sentence is the
+  Outlined-only decision.
+- Test helpers for the pickers: `test/support/pickers.ts` (`chooseDay`,
+  `pickDate`, `turnDrum`, `turnClock`, `pickTime`); `time.ts` and
+  `openSettings.ts` use them.
+- Moved the needle: **WS-03 step 10 done** (17 tickets) and MM-278 in
+  **WS-14 step 4**; M0 gained MM-278 (45 of 48); M2 gained the seventeen
+  (MM-263 to MM-282). Available next: WS-02 step 6, WS-03 step 9, WS-15.
+- Not done: the chair's two pending verifications from the component walk
+  (200% text in segmented controls and menus; the light palette's field
+  border contrast) are still owed; nothing was looked at on the phone.
 
 ## Session 22: 2026-10-13, Claude (the roadmap caught up and checked, MM-245)
 
@@ -296,84 +367,3 @@ limitations.
   remain MM-237's open step.
 - The pack build keeps DuckDB extract + the TS pipeline
   (`mm food build` drives `apps/mobile/scripts/food-build.mjs` through vite).
-
-## Session 20: 2026-10-12, Claude (the move to a React HTML5 app)
-
-- **The product owner decided to rebuild the app as a React HTML5 app in a
-  native shell.** MM-228 is the epic: read it first. Offline stays a hard
-  requirement; the web is never a product; we write our own plugins where
-  none fits; everything on `main` at the decision is approved as it stands.
-- **Flutter work is frozen** except for a defect whose fix carries over. Do
-  not add or restyle Flutter screens. Do not patch the hand-drawn HTML
-  sheets to chase the Flutter app either; they are replaced as each
-  destination is rebuilt.
-- **New app work goes in `apps/mobile/`** (TypeScript, Vite, React, design
-  tokens as CSS variables, no UI kit; Capacitor as the shell).
-- **Order:** a walking skeleton (MM-229), then the engine under its Dart
-  tests (MM-230), data, screens starting with Food and Add food, phone
-  plugins, the switch, iOS.
-- **One agent owns the new app's structure at a time.** If you are not that
-  agent, work on a ticket inside what already exists and say so here.
-- **The web half of the skeleton exists** (MM-229, read its Progress): the
-  app in `apps/mobile/` with tokens checked against the Flutter theme, the five
-  destinations, Settings with the theme choice, and a `?gallery` page of
-  every token and component. `mm bootstrap` now runs `npm ci` there and
-  `mm check` ends with `mm web` (type check, tests, build, offline check),
-  so Node 22 is needed locally. Not built: screenshot tests.
-- **The Android shell exists** in `apps/mobile/android/` (Capacitor, demo app
-  ID only). It was built and run on the emulator with the network off; it
-  has not been on a physical phone. `apps/mobile/README.md` says how to build
-  it. Always name the device with `adb -s`: the owner's phone is usually
-  connected and only the demo app may go on it.
-- **The owner decided all of the Dart is converted to TypeScript** (MM-230,
-  read it: the table under Progress says which package is done). Nothing is
-  compiled from Dart. The domain is done in `apps/mobile/src/domain/`, with
-  every Dart test carried over and passing. The engine is done in
-  `apps/mobile/src/engine/`: all 567 of its tests are carried over with their
-  expected values unchanged, and its simulator matches the Dart engine with
-  no difference at all. Health import is done in `apps/mobile/src/healthIngest/`
-  with its 71 tests.
-- **What is left of the Dart all touches SQLite** (food catalog, data layer,
-  fixtures, food pipeline), so it waits on MM-231: one `SqlDatabase` seam
-  with a WebAssembly adapter for tests and the browser and a native plugin
-  on the phone. Read its Progress first: Node's own SQLite has no FTS5 and
-  cannot read a food pack; the official SQLite WebAssembly build can. The
-  seam, that adapter and a 14-test contract suite are built
-  (`apps/mobile/src/sql/`), and on it the food catalog
-  (`apps/mobile/src/foodCatalog/`): it reads a pack the Dart writer wrote and
-  gives the same searches with the same scores. The food pipeline
-  (`apps/mobile/src/foodPipeline/`) builds the same packs as the Dart one from
-  a recorded extract; `mm food build` still runs the Dart one. The in-memory
-  repositories and their 23 contract suites are in `apps/mobile/src/fixtures/`
-  and `apps/mobile/test/contracts/`. Not built: the native
-  adapter, downloading a pack (it needs an interface to the phone's files
-  first). The data layer is built (`apps/mobile/src/data/`): every repository
-  on SQLite, passing those same suites, with the schema at version 1 in
-  the shape the Dart database had; it has run only against the WebAssembly
-  build, never on a phone. The Flutter app's wording is carried over too
-  (`apps/mobile/src/format/`), checked against what Dart printed. Whether a native
-  plugin has FTS5 on Android is not verified.
-  Read "Carrying Dart over" in `apps/mobile/README.md` before converting
-  anything: it says how enums, nulls, dates, rounding and streams are
-  written.
-- **What Dart is left, and in what order.** (1) The Flutter app's screens
-  and their state, about 19,200 lines and 81 test files: rebuilt as React
-  screens (MM-228 part 4), not started. (2) Downloading a pack and the
-  native SQLite adapter, which need the phone. (3) The task runner
-  (`tool/`), last, at the switch: most of what it does is check and build
-  the Dart, and that part goes when the Dart goes. MM-230's table has the
-  state of every package.
-- **To prove TypeScript matches Dart**, have the Dart write a file and
-  compare against it in a test: `test/engine/dartParity.test.ts`,
-  `test/foodCatalog/dartParity.test.ts`, `test/foodPipeline/`,
-  `test/data/schema.test.ts` and `test/format/` all do. Record the file
-  with a throwaway script run by `fvm dart run` and do not commit the
-  script.
-- **Open when the session ended:** #115 (data layer), #116 (wording) and
-  #117 (messages), stacked in that order, each passing `mm check` locally
-  with CI still running. Merge in order when green; retarget the next to
-  `main` after each.
-- **The Dart stays until the switch** and is the reference. A fix made in
-  one language is made in the other.
-- #102 (Copilot's, green) was merged at the start of this session under the
-  standing rule.

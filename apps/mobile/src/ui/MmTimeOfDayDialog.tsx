@@ -1,27 +1,37 @@
 import { useState } from 'react';
 import { MmButton } from './MmButton';
 import { MmDialog } from './MmDialog';
-import { MmPickerField } from './MmPickerField';
+import { MmTimePicker } from './MmTimePicker';
 import './ui.css';
 
 interface MmTimeOfDayDialogProps {
   initialMinuteOfDay: number;
   helpText?: string | undefined;
+  /** The earliest and latest allowed, in minutes after midnight; a time outside is refused with the range said. */
+  first?: number | undefined;
+  last?: number | undefined;
+  everyMinute?: boolean;
   /** Called with minutes after midnight, or undefined when backed out of. */
   onDone: (minuteOfDay: number | undefined) => void;
 }
 
 const two = (n: number) => String(n).padStart(2, '0');
 
-/** Asks for a time of day with the phone's own time control. */
-export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, onDone }: MmTimeOfDayDialogProps) {
-  const [value, setValue] = useState(`${two(Math.trunc(initialMinuteOfDay / 60))}:${two(initialMinuteOfDay % 60)}`);
+/** A time of day in words: "6:30 AM". */
+const said = (minuteOfDay: number) => {
+  const hour = Math.floor(minuteOfDay / 60) % 24;
+  return `${hour % 12 === 0 ? 12 : hour % 12}:${two(minuteOfDay % 60)} ${hour < 12 ? 'AM' : 'PM'}`;
+};
+
+/**
+ * Asks for a time of day with the design system's drums (MM-264), says the
+ * time back in words beneath them, and refuses a time outside the allowed
+ * range with the range said, so nothing is refused after the fact.
+ */
+export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, first, last, everyMinute = false, onDone }: MmTimeOfDayDialogProps) {
+  const [minute, setMinute] = useState(initialMinuteOfDay);
   const title = helpText ?? 'Select time';
-  const confirm = () => {
-    const [hours, minutes] = value.split(':').map(Number);
-    if (hours === undefined || minutes === undefined || Number.isNaN(hours) || Number.isNaN(minutes)) return;
-    onDone(hours * 60 + minutes);
-  };
+  const allowed = (first === undefined || minute >= first) && (last === undefined || minute <= last);
   return (
     <MmDialog
       title={title}
@@ -29,11 +39,18 @@ export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, onDone }: MmTi
       actions={
         <>
           <MmButton label="Cancel" kind="text" onPress={() => onDone(undefined)} />
-          <MmButton label="OK" onPress={confirm} />
+          <MmButton label="OK" onPress={allowed ? () => onDone(minute) : undefined} />
         </>
       }
     >
-      <MmPickerField kind="time" label={title} value={value} onChange={setValue} />
+      <MmTimePicker value={minute * 60} everyMinute={everyMinute} onChange={(seconds) => setMinute(Math.floor(seconds / 60))} />
+      {allowed ? (
+        <p className="mm-time-detail">{said(minute)}</p>
+      ) : (
+        <p className="mm-dialog-error" role="alert">
+          Choose a time between {said(first ?? 0)} and {said(last ?? 24 * 60 - 1)}.
+        </p>
+      )}
     </MmDialog>
   );
 }
