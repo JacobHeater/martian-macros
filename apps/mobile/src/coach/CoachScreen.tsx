@@ -22,20 +22,22 @@ import { useNavigator } from '../app/useNavigator';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseBanner } from '../pause/PauseBanner';
 import { ChoiceCard } from '../ui/ChoiceCard';
-import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
+import { MmSection } from '../ui/MmSection';
 import { Notice } from '../ui/Notice';
 import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { LastChangeCard } from './LastChangeCard';
 import { MetabolismSummary } from './MetabolismSummary';
+import { OneThingRow } from './OneThingRow';
 import { RecompReviewCard } from './RecompReviewCard';
 import { RecoveryCard } from './RecoveryCard';
 import { ReliefOfferCard } from './ReliefOfferCard';
 import { ReportsCard } from './ReportsCard';
 import { StallCard } from './StallCard';
+import { TargetsHistoryScreen } from './TargetsHistoryScreen';
 import { UnderEatingNotice } from './UnderEatingNotice';
 import './coach.css';
 
@@ -70,7 +72,12 @@ function holdNote(setup: UserSetup, snapshot: CoachSnapshot, today: CalendarDate
   );
 }
 
-/** What the engine believes, why, and what it will do next. */
+/**
+ * What the engine believes, why, and what it will do next, in tiers
+ * (MM-256): the safeguards above everything, the hero with the confidence
+ * word, one thing to do, then sections with icons; the sections with
+ * nothing new are folded to a line.
+ */
 export function CoachScreen() {
   const { services, state } = useApp();
   const navigator = useNavigator();
@@ -119,11 +126,13 @@ export function CoachScreen() {
   };
 
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
+  const confidence = confidenceLabel(snapshot.confidence.level);
   return (
     <>
+      {/* The safeguards are outside the rationing: above the hero, in full, in this order. */}
       {[...snapshot.policy.cautions].map((caution) => (
         <div key={caution} className="app-stack-item">
-          <Notice kind="caution" icon="heart" text={cautionMessage(caution)} />
+          <Notice kind="caution" text={cautionMessage(caution)} />
         </div>
       ))}
       <PauseBanner />
@@ -136,38 +145,43 @@ export function CoachScreen() {
             intake={intakeDayFrom(today, food)}
             targets={pause !== undefined ? guide : current.targets}
             paused={pause !== undefined}
+            status={`Next check-in ${Fmt.day(nextCheckIn(setup, current), today)}`}
+            confidence={confidence}
+            onStatusPress={() => void navigator.push(() => <TargetsHistoryScreen />)}
           />
-          <InfoCard title="Your targets">
-            {current.targets.proteinMinimumG === undefined ? null : (
-              <StatRow label="Protein minimum" value={Fmt.grams(current.targets.proteinMinimumG)} />
-            )}
-            <StatRow
-              label="Intended pace"
-              value={
-                current.targets.weeklyRateFraction === 0 ? 'Hold weight' : Fmt.percentPerWeek(current.targets.weeklyRateFraction)
-              }
-            />
-            {detail === undefined ? null : <p className="app-caption coach-pace-detail">{detail}</p>}
-            <StatRow label="Next check-in" value={Fmt.day(nextCheckIn(setup, current), today)} />
-            <StatRow label="Coach confidence" value={confidenceLabel(snapshot.confidence.level)} />
-            {[...current.targets.flags].map((flag) => (
-              <div key={flag} className="coach-flag">
-                <Notice kind="caution" text={targetFlagMessage(flag)} />
-              </div>
-            ))}
-          </InfoCard>
+          {[...current.targets.flags].map((flag) => (
+            <div key={flag} className="app-stack-item">
+              <Notice kind="caution" text={targetFlagMessage(flag)} />
+            </div>
+          ))}
         </>
+      )}
+      <OneThingRow />
+      {current === undefined ? null : (
+        <MmSection icon="tune" title="Your targets">
+          {current.targets.proteinMinimumG === undefined ? null : (
+            <StatRow label="Protein minimum" value={Fmt.grams(current.targets.proteinMinimumG)} />
+          )}
+          <StatRow
+            label="Intended pace"
+            value={
+              current.targets.weeklyRateFraction === 0 ? 'Hold weight' : Fmt.percentPerWeek(current.targets.weeklyRateFraction)
+            }
+          />
+          {detail === undefined ? null : <p className="app-caption coach-pace-detail">{detail}</p>}
+          <StatRow label="Next check-in" value={Fmt.day(nextCheckIn(setup, current), today)} />
+        </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />
       <StallCard />
       <RecompReviewCard />
       <AdherenceCard />
-      <ReportsCard />
       <RecoveryCard />
-      <InfoCard title="Your metabolism">
+      <ReportsCard />
+      <MmSection icon="bolt" title="Your metabolism">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
-      </InfoCard>
-      <InfoCard title={`Coach confidence · ${confidenceLabel(snapshot.confidence.level)}`}>
+      </MmSection>
+      <MmSection icon="coach" title={`Coach confidence · ${confidence}`}>
         {snapshot.confidence.level === 'learning' ? (
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
@@ -178,14 +192,15 @@ export function CoachScreen() {
           <StatRow label="Weigh-ins" value={confidenceLabel(snapshot.confidence.weighIns)} />
           <StatRow label="Stability" value={confidenceLabel(snapshot.confidence.stability)} />
         </MmDisclosure>
-      </InfoCard>
-      <InfoCard
+      </MmSection>
+      <MmSection
+        icon="flag"
         title={`Goal: ${goalModeLabel(setup.goalMode)}`}
         trailing={<MmButton label="Change" kind="text" onPress={() => void changeGoal()} />}
       >
         <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
-      </InfoCard>
-      <InfoCard title="Body">
+      </MmSection>
+      <MmSection icon="body" title="Body">
         <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
         <StatRow
           label="Body fat"
@@ -196,7 +211,7 @@ export function CoachScreen() {
           }
         />
         <StatRow label="Resting energy (BMR)" value={Fmt.kcal(snapshot.bmrKcal)} />
-      </InfoCard>
+      </MmSection>
     </>
   );
 }

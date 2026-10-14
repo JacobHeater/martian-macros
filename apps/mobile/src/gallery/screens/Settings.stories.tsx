@@ -13,20 +13,25 @@ import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 
-/** Everything the person set up and can change, and what the app says about itself. */
+/**
+ * Everything the person set up and can change, and what the app says about
+ * itself. Before MM-259 (main at 9fb8c79, 2026-10-13) twelve groups mixing
+ * chips, segments, sliders and rows; after, sections of rows in the order
+ * of use, every row with its icon, erase last.
+ */
 const meta = { title: 'Screens/Settings', ...screensMeta } satisfies Meta;
 export default meta;
 
 export const Settings = screenStory({
   covers: ['SettingsScreen'],
-  shows: 'Activity and training',
+  shows: 'Today’s setup',
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
 });
 
 /** MM-240: both sliders, each in a row at the row's inset. */
 export const MeasuredBodyFat = screenStory({
   covers: ['SettingsScreen'],
-  shows: 'About 22%',
+  shows: /About 22%/,
   scenario: measuredBodyFatScenario,
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
 });

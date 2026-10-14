@@ -1,7 +1,7 @@
 ---
 id: MM-254
 component: dashboard
-status: proposed
+status: done
 related: [MM-253, MM-224, MM-176, MM-179, MM-187, MM-98]
 ---
 
@@ -48,3 +48,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Today.stories.tsx` (Dashboard, FirstDay),
 before and after.
+
+## Progress
+
+Built 2026-10-13. The hero carries the Grams/Share switch (`MacroPicture`, `user_preferences.macro_picture`, schema version 3, shared with Food), a visually hidden heading and the confidence word in the status row's subtitle ("Coach confidence: Good"), never alone (UX-2, PD-5). The rhythm strip is the last seven days (`rhythmDays`), each dot named, pressable to that day in Food, edge to edge so seven 48 dp targets fit a 360 dp phone (UX-11). The streak is a row, the insight a section with the Dismiss in its header, and weight, waist, next check-in and training are rows that open their destinations; with no weigh-in today the weigh-in field is the one in-place exception, in a "Weigh-in" section (UX-18). The history, its four charts and the 7/30 switch sit behind "More about this week" (UX-17, PD-8); "Macronutrient split" and the weight card are gone. The bar names the screen Dashboard (UX-16). Tests: `test/dashboard/dashboard.test.tsx`, `rhythmDays.test.ts`, `dashboardMetrics.test.tsx` (the history one tap down), `test/food/mealCards.test.tsx` (the switch remembered and shared). Story: `Screens/Today` Dashboard and FirstDay, with before (`main` at `9fb8c79`) and after noted in the story file.

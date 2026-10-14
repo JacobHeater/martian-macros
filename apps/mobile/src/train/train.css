@@ -1,6 +1,15 @@
 .train-intro {
   margin: 0 0 var(--space-16);
 }
+.train-repeat {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+.train-record {
+  display: grid;
+  color: var(--text2);
+}
 .train-summary {
   margin: 0 0 var(--space-12);
 }

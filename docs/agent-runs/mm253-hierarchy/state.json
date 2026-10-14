@@ -1,0 +1,411 @@
+{
+  "schema_version": 1,
+  "task_id": "mm253-hierarchy",
+  "audit_mode": "feature",
+  "baseline": {
+    "branch": "main",
+    "commit": "9fb8c796831f98f11bb9a0c77c9d9cb0b9ddf5ae"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Fable 5.1 parent session, acting as chair and single edit owner, branch feature/mm253-hierarchy",
+    "paths": [
+      "apps/mobile",
+      "design",
+      "requirements",
+      "roadmap",
+      "docs/agent-runs/mm253-hierarchy"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Freeze the brief, render the six destinations, assign two reviewers, save their reports, give every finding an outcome, fold the accepted ones into the rebuild of MM-254 to MM-259.",
+      "role": "chair",
+      "reviewer": "Claude Fable 5.1 parent session, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "9fb8c796831f98f11bb9a0c77c9d9cb0b9ddf5ae",
+      "input_hashes": {
+        "docs/agent-runs/mm253-hierarchy/brief.md": "bf2527c61900b5eb2013c64c06ff31d239d1b621ddde9bf3b075838eb9053b42",
+        "docs/agent-runs/mm253-hierarchy/findings/product-designer.md": "867cd692474505380b7033c97078ca1d0d1a1724bcadef722f429f1581a3486f",
+        "docs/agent-runs/mm253-hierarchy/findings/ux-accessibility.md": "9d814575cb8c46801f9b2027245382c6b907d6a537f8170b08adb310f4021964",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/visual-language.md": "a7a5a7f2b0ad8c0d25be65974561c958e3b40fc0c9c1509e7250cf98db1ea502",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "Both reports in full",
+          "The six destination stories at 412 by 915 in Martian, Light and Dark, after the rebuild",
+          "The test suite on the branch"
+        ],
+        "not_inspected": [
+          "Anything on a device",
+          "Below the first viewport as a render",
+          "200% text",
+          "The donut legend's contrast on the hero"
+        ],
+        "referrals": [
+          "Owner: MM-288 (Ember text actions), the arc on Coach, numeric settings as sheets, the meal glyph family",
+          "WS-03 step 11: MM-286, MM-287, MM-289"
+        ],
+        "limitations": "The chair is also the edit owner, so its view of the result is not independent; the frame is fixed to the phone's height, so no capture shows a tail."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Every outcome rests on the repository's design documents, the tickets and the reports.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Grade the six destinations as built against the eight rules and MM-254 to MM-259: visual hierarchy, the design system, identity; propose per-destination criteria and the icon map.",
+      "role": "product-designer",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "9fb8c796831f98f11bb9a0c77c9d9cb0b9ddf5ae",
+      "input_hashes": {
+        "docs/agent-runs/mm253-hierarchy/brief.md": "bf2527c61900b5eb2013c64c06ff31d239d1b621ddde9bf3b075838eb9053b42",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "design/visual-language.md": "a7a5a7f2b0ad8c0d25be65974561c958e3b40fc0c9c1509e7250cf98db1ea502",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/design-system-implementation.md": "a33ca9631d99c3ddcc84c918bca115a26f1c14fb2c5889540f03709567a049f0",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "Every destination screen file and the components each composes",
+          "The six screen stories, the five design documents, design-map and ux-architecture, the seven tickets",
+          "Twelve first-viewport renders (Martian, Light)",
+          "The installed icon package's names"
+        ],
+        "not_inspected": [
+          "The sheets and pushed screens under each destination",
+          "Dark; any state outside the demo scenario; hover, focus and pressed states",
+          "Below the fold, except from source"
+        ],
+        "referrals": [
+          "coaching/safety: PD-11, PD-19",
+          "measurement: PD-19 wording",
+          "ux-accessibility: PD-5, PD-17, PD-24, icon labels",
+          "react-capacitor: PD-3, PD-2",
+          "qa: PD-16, PD-22",
+          "product: PD-2, PD-21, PD-27"
+        ],
+        "limitations": "First viewport only in the renders; no runtime reproduction; no tests run."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Every claim rests on the repository's design rules, the tickets, the renders and the installed icon package.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None; one bounded request on icon-plus-label research is offered in the report if the owner wants evidence.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Grade the six destinations as built against the eight rules and MM-254 to MM-259: task flow, comprehension, names, keyboard and screen-reader order, targets, text scaling; propose acceptance lines.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-13",
+      "status": "complete",
+      "inspected_commit": "9fb8c796831f98f11bb9a0c77c9d9cb0b9ddf5ae",
+      "input_hashes": {
+        "docs/agent-runs/mm253-hierarchy/brief.md": "bf2527c61900b5eb2013c64c06ff31d239d1b621ddde9bf3b075838eb9053b42",
+        "design/screen-direction.md": "e47c999b64fcd7163076aa286a889d20225ed56ef13934cfaf440fb53f9745ab",
+        "design/anti-cruft-and-anti-slop.md": "ddeb7c127b69c5c93181e98ba6455f6478fb0a26e14e22d7905499f1763c9e2d",
+        "design/visual-language.md": "a7a5a7f2b0ad8c0d25be65974561c958e3b40fc0c9c1509e7250cf98db1ea502",
+        "design/interaction-and-motion.md": "e0f4e3f79c437b3892dc73092fd26b8eb7f19ad6b4ca5e1632714f3ea5cbd885",
+        "design/design-system-implementation.md": "a33ca9631d99c3ddcc84c918bca115a26f1c14fb2c5889540f03709567a049f0",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "AGENTS.md": "af50d527c202aa068490f0772d03da163011095291acd350ae919b586acdd31b"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "Dashboard, Food and Progress walked as tasks from source; Coach, Train and Settings surveyed",
+          "Every destination screen file, the design documents, the seven tickets",
+          "Twelve first-viewport renders (Martian, Light)",
+          "test/ui/targets.test.ts and a grep of mealCards.test.tsx"
+        ],
+        "not_inspected": [
+          "The sheets and pushed screens",
+          "Dark; below the fold except from source",
+          "No screen reader, keyboard session, device, text-scale run or contrast measurement"
+        ],
+        "referrals": [
+          "coaching/nutrition: the protein min and target pair; the confidence word on Dashboard",
+          "measurement: event-effect wording",
+          "chair: contrast of the donut legend on the hero; a screen-reader pass"
+        ],
+        "limitations": "Every reading-order and announcement claim is derived from the DOM the source produces, unverified at runtime."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does HTML permit interactive content inside a button?",
+        "reason": "MM-254 proposed a pressable hero holding a segmented switch; the constraint is not in the repository's documents.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element",
+            "title": "HTML Living Standard: the button element",
+            "published_or_updated": null,
+            "accessed": "2026-10-13",
+            "claim": "The button element's content model forbids interactive content descendants."
+          }
+        ],
+        "summary": "One retrieval, cited under UX-4; no query text left the machine.",
+        "limitations": "Known-URL retrieval only."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The rebuild moves and segments what the screens already compute and say; no health rule, coaching message, measurement, data flow or component contract changes, and the React-Capacitor role walked the components the same day.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The rebuild moves and segments what the screens already compute and say; no health rule, coaching message, measurement, data flow or component contract changes, and the React-Capacitor role walked the components the same day.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The rebuild moves and segments what the screens already compute and say; no health rule, coaching message, measurement, data flow or component contract changes, and the React-Capacitor role walked the components the same day.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The rebuild moves and segments what the screens already compute and say; no health rule, coaching message, measurement, data flow or component contract changes, and the React-Capacitor role walked the components the same day.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The rebuild moves and segments what the screens already compute and say; no health rule, coaching message, measurement, data flow or component contract changes, and the React-Capacitor role walked the components the same day.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch was available; neither reviewer needed a search."
+      ],
+      "retrieval": [
+        "WebFetch retrieved one HTML Living Standard page for the UX role; the product-designer read the installed icon package's file names instead of fetching."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-13",
+      "limitations": "No reviewer could render a story, run a test or reach a device; every render claim is about the twelve first-viewport captures the chair supplied."
+    }
+  ],
+  "unresolved_questions": [
+    "PD-2: do text actions stay Ember, or become --text with Ember reserved (MM-288)? Owner.",
+    "PD-9: does CalorieHero stay on Coach (MM-187) or does Coach get a hero of its targets? Owner.",
+    "UX-24: do numeric settings become sheets with a field rather than sliders in rows? Owner.",
+    "PD-27: food-type or time-of-day meal glyphs, judged in the Icons story? Owner.",
+    "Chair: the donut legend's contrast on the hero in three palettes; 200% text in segmented controls and menus (also from mm253-components)."
+  ],
+  "decisions": [
+    {
+      "id": "MM253-safety-outside-rationing",
+      "status": "accepted",
+      "summary": "The pause banner, policy cautions, under-eating notice, relief offer and target flags sit above the hero in full and are never the one-thing row (PD-11, UX-7).",
+      "authority": "Chair, from the brief's constraint"
+    },
+    {
+      "id": "MM253-one-sentence-of-uncertainty",
+      "status": "accepted",
+      "summary": "One sentence about the band stays under the trend chart; the rest is one tap down; a held or settling estimate is said in the folded line (PD-19, UX-5, UX-6).",
+      "authority": "Chair, with the owner free to overrule"
+    },
+    {
+      "id": "MM253-completeness-row",
+      "status": "accepted",
+      "summary": "The completeness control is a row after the last meal with its state in words; the day header shows only the mark (PD-14, UX-10).",
+      "authority": "Chair, with the owner free to overrule"
+    },
+    {
+      "id": "MM253-rolling-seven-days",
+      "status": "accepted",
+      "summary": "Both rhythm strips are the rolling last seven days, named 'Last seven days' (PD unresolved 5, UX unresolved 6).",
+      "authority": "Chair"
+    },
+    {
+      "id": "MM253-text-marks-until-MM109",
+      "status": "accepted",
+      "summary": "Muscle groups are text marks on the volume section's line until the app has its own glyphs (PD-21).",
+      "authority": "Chair"
+    },
+    {
+      "id": "MM253-star-not-trophy",
+      "status": "accepted",
+      "summary": "A record day carries a star with 'personal record' in its words, never a trophy (PD-22, UX-15).",
+      "authority": "Chair"
+    },
+    {
+      "id": "MM288-ember-text-actions",
+      "status": "pending",
+      "summary": "Text actions in --text with Ember reserved, or the budget rewritten (PD-2).",
+      "authority": "Product owner"
+    },
+    {
+      "id": "MM253-arc-on-coach",
+      "status": "pending",
+      "summary": "Whether CalorieHero leaves Coach (PD-9); MM-187 stands until decided.",
+      "authority": "Product owner"
+    }
+  ],
+  "pending_work": [
+    "Merge the pull request when CI is green.",
+    "WS-03 step 11: MM-286 (destinations keep their state; the Food primary first in focus order), MM-287 (one figure, lift rows), MM-289 (the demo seed).",
+    "The owner's decisions: MM-288, the arc on Coach, numeric settings, the meal glyphs.",
+    "Chair verification: the donut legend's contrast on the hero; 200% text; the light field-border contrast from the component walk."
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run (apps/mobile)",
+      "commit": "9fb8c796831f98f11bb9a0c77c9d9cb0b9ddf5ae",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "2,145 passed, 4 skipped, on the branch's working tree before its commit."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-13T23:30:00Z",
+    "writers_stopped": true
+  }
+}

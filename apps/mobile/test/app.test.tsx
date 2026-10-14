@@ -26,7 +26,8 @@ describe('the five destinations', () => {
     const places = within(await bar()).getAllByRole('button');
     expect(places.map((place) => place.textContent)).toEqual(['Dashboard', 'Food', 'Train', 'Progress', 'Coach']);
     expect(places[0]).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Today');
+    // The Dashboard is named Dashboard, as the bar names it (MM-254).
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Dashboard');
   });
 
   it('show the chosen one and mark it current in words', async () => {
@@ -50,11 +51,14 @@ describe('the theme', () => {
     renderApp(repos, today);
     await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
     expect(screen.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
-    const choices = within(screen.getByRole('group', { name: 'Appearance' })).getAllByRole('button');
-    expect(choices.map((choice) => choice.textContent)).toEqual(['Martian', 'Light', 'Dark', 'System']);
+    // The look is a row that opens the chooser (MM-259); the value in force is marked.
+    await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Appearance' });
+    const choices = within(dialog).getAllByRole('option');
+    expect(choices.map((choice) => choice.textContent?.replace('Chosen', ''))).toEqual(['Martian', 'Light', 'Dark', 'System']);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Light' }));
-    await screen.findByRole('button', { name: 'Light', pressed: true });
+    await userEvent.click(within(dialog).getByRole('option', { name: 'Light' }));
+    await screen.findByText('Light', { selector: '.mm-list-row-subtitle' });
     expect(document.documentElement).toHaveClass('theme-light');
 
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
@@ -78,13 +82,17 @@ describe('the theme', () => {
       }),
     });
     await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Martian' }));
+    const choose = async (name: string) => {
+      await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
+      await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name }));
+    };
+    await choose('Martian');
     expect(await screen.findByText('Could not save your theme. Please try again.')).toBeInTheDocument();
     expect(document.documentElement).toHaveClass('theme-light');
 
     fail = false;
-    await userEvent.click(screen.getByRole('button', { name: 'Martian' }));
-    await screen.findByRole('button', { name: 'Martian', pressed: true });
+    await choose('Martian');
+    await screen.findByText('Martian', { selector: '.mm-list-row-subtitle' });
     expect(document.documentElement).toHaveClass('theme-martian');
     expect(screen.queryByText('Could not save your theme. Please try again.')).not.toBeInTheDocument();
   });
@@ -107,8 +115,9 @@ describe("the phone's bars", () => {
     expect(told.at(-1)).toBe(true);
 
     await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Light' }));
-    await screen.findByRole('button', { name: 'Light', pressed: true });
+    await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
+    await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name: 'Light' }));
+    await screen.findByText('Light', { selector: '.mm-list-row-subtitle' });
     expect(told.at(-1)).toBe(false);
   });
 });

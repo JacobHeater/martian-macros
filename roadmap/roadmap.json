@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "asOf": "2026-10-13",
   "generatedFrom": {
-    "requirements": "requirements/ (245 tickets, MM-1 to MM-282; 127 done, 59 in-progress, 59 proposed)",
+    "requirements": "requirements/ (287 tickets, MM-1 to MM-289; 170 done, 51 in-progress, 66 proposed)",
     "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
     "documents": [
       "requirements/README.md",
@@ -429,7 +429,14 @@
             "MM-279",
             "MM-280",
             "MM-281",
-            "MM-282"
+            "MM-282",
+            "MM-283",
+            "MM-284",
+            "MM-285",
+            "MM-286",
+            "MM-287",
+            "MM-288",
+            "MM-289"
           ]
         },
         {
@@ -1190,7 +1197,17 @@
           "MM-279",
           "MM-280",
           "MM-281",
-          "MM-282"
+          "MM-282",
+          "MM-253",
+          "MM-254",
+          "MM-255",
+          "MM-256",
+          "MM-257",
+          "MM-258",
+          "MM-259",
+          "MM-283",
+          "MM-284",
+          "MM-285"
         ],
         "remaining": [
           "MM-89",
@@ -1205,13 +1222,10 @@
           "MM-183",
           "MM-224",
           "MM-242",
-          "MM-253",
-          "MM-254",
-          "MM-255",
-          "MM-256",
-          "MM-257",
-          "MM-258",
-          "MM-259"
+          "MM-286",
+          "MM-287",
+          "MM-288",
+          "MM-289"
         ]
       },
       "sequence": [
@@ -1302,7 +1316,7 @@
         },
         {
           "step": 9,
-          "title": "Hierarchy and wayfinding (MM-224): tiers, icons as wayfinding, lists with shape, one primary action, the macro switch; the direction and the panel pass first, then each destination",
+          "title": "Hierarchy and wayfinding (MM-224): tiers, icons as wayfinding, lists with shape, one primary action, the macro switch; the direction and the panel pass first, then each destination. Built 2026-10-13 in one pull request, with the three bugs the panel found (MM-283 to MM-285)",
           "tickets": [
             "MM-253",
             "MM-254",
@@ -1310,7 +1324,10 @@
             "MM-256",
             "MM-257",
             "MM-258",
-            "MM-259"
+            "MM-259",
+            "MM-283",
+            "MM-284",
+            "MM-285"
           ],
           "milestone": "M2"
         },
@@ -1335,6 +1352,17 @@
             "MM-280",
             "MM-281",
             "MM-282"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 11,
+          "title": "What the hierarchy panel left for later (MM-286 to MM-289): destinations keep their state, Progress with one figure and lift rows, the Ember budget decision, a demo seed that shows every mark",
+          "tickets": [
+            "MM-286",
+            "MM-287",
+            "MM-288",
+            "MM-289"
           ],
           "milestone": "M2"
         }

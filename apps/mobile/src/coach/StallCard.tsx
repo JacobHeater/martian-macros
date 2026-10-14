@@ -3,7 +3,7 @@ import { stallText } from '../format/stallText';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { InfoCard } from '../ui/InfoCard';
+import { MmSection } from '../ui/MmSection';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { StatRow } from '../ui/StatRow';
 
@@ -21,7 +21,7 @@ export function StallCard() {
   const fmt = new Fmt(setup.unitSystem);
   const [body, options] = stallText(stall, fmt);
   return (
-    <InfoCard title="Progress has slowed">
+    <MmSection icon="trend" title="Progress has slowed">
       <p className="app-text">{body}</p>
       {options.length === 0 ? null : (
         <>
@@ -44,6 +44,6 @@ export function StallCard() {
           <StatRow label="Intended" value={`${fmt.weightDelta(stall.intendedKgPerWeek)} a week`} />
         )}
       </MmDisclosure>
-    </InfoCard>
+    </MmSection>
   );
 }

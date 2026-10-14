@@ -17,7 +17,7 @@ import { MmSegmented } from '../../src/ui/MmSegmented';
 import { MmSwitchRow } from '../../src/ui/MmSwitchRow';
 import { MmTextField } from '../../src/ui/MmTextField';
 import { Notice } from '../../src/ui/Notice';
-import { NumberEntryCard } from '../../src/ui/NumberEntryCard';
+import { NumberEntry } from '../../src/ui/NumberEntry';
 import type { Overlays } from '../../src/ui/Overlays';
 import { StepProgress } from '../../src/ui/StepProgress';
 import { useOverlays } from '../../src/ui/useOverlays';
@@ -102,7 +102,8 @@ describe('a text field', () => {
     render(<Field kind="number" helper="That looks high." warning />);
     const field = screen.getByRole('textbox', { name: 'Weight' });
     expect(field).toHaveAttribute('inputmode', 'decimal');
-    expect(field).toHaveAccessibleDescription('That looks high.');
+    // The unit is part of the description (MM-284), then the helper.
+    expect(field).toHaveAccessibleDescription('kg That looks high.');
     expect(screen.getByText('That looks high.')).toHaveClass('mm-field-helper-warning');
   });
 });
@@ -262,20 +263,20 @@ describe('stepping between days', () => {
 describe('entering one number', () => {
   const card = (onSave: (value: number) => Promise<void>, initial?: string) => (
     <MmOverlays>
-      <NumberEntryCard title="Today's weigh-in" unit="lb" initial={initial} hint="First thing in the morning." onSave={onSave} />
+      <NumberEntry title="Today's weigh-in" unit="lb" initial={initial} hint="First thing in the morning." onSave={onSave} />
     </MmOverlays>
   );
 
   it('saves a number, typed with a comma or a point, and only once it has changed', async () => {
     const saved: number[] = [];
     render(card(async (value) => void saved.push(value), '181.4'));
-    const save = screen.getByRole('button', { name: 'Save' });
-    expect(save).toBeDisabled();
-    const field = screen.getByRole('textbox', { name: "Today's weigh-in" });
+    // With a value already saved there is no Save until it changes (MM-257): never a disabled primary.
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
+    const field = screen.getByRole('textbox', { name: /^Today's weigh-in/ });
     await userEvent.clear(field);
-    expect(save).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     await userEvent.type(field, '180,6');
-    await userEvent.click(save);
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(saved).toEqual([180.6]);
   });
 

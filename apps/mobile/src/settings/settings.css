@@ -1,6 +1,9 @@
 .settings-note {
   margin: var(--space-8) 0 0;
 }
+.settings-inset {
+  padding: 0 var(--space-16) var(--space-8);
+}
 .settings-about {
   margin: var(--space-24) 0;
   text-align: center;

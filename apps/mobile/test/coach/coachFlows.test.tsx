@@ -95,7 +95,8 @@ it('Learning explains the target hold and what to do next', async () => {
   expect(
     await screen.findByText('Calibration, day 1 of 14. Targets hold while the app learns your metabolism.'),
   ).toBeInTheDocument();
-  expect(within(document.querySelector('.mm-hero') as HTMLElement).getByText('Learning')).toBeInTheDocument();
+  // The confidence word is said with its label, never alone (MM-254).
+  expect(within(document.querySelector('.mm-hero') as HTMLElement).getByText('Coach confidence: Learning')).toBeInTheDocument();
 
   await openTab('Coach');
   expect(await screen.findByText(/^About .* so far$/)).toBeInTheDocument();

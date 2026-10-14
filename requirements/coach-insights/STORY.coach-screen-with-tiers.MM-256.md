@@ -1,7 +1,7 @@
 ---
 id: MM-256
 component: coach-insights
-status: proposed
+status: done
 related: [MM-253, MM-224, MM-138, MM-139, MM-141, MM-149, MM-116, MM-33]
 ---
 
@@ -42,3 +42,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Coach.stories.tsx` (Coach), before and
 after.
+
+## Progress
+
+Built 2026-10-13. The safeguards (cautions, the pause banner, the under-eating notice, the relief offer) stay above the hero in full and are outside the rationing (UX-7, PD-11); the target flags are notices on the canvas under the hero, never inside a card (PD-10). The hero keeps the arc (MM-187) with the next check-in as its status row and the confidence word labelled. `OneThingRow` names the recovery check-in when due, else a report in its first week. The sections, each with its icon: Your targets, Last change, Progress has slowed, the recomp review, Your last 7 days, How you are holding up (open when due, else folded to "Last answered …"), Monthly reports (open the week a report arrives, else folded to its count), Your metabolism (the folded line says held or settling, UX-6), Coach confidence with "What this rests on" one tap down, Goal with Change, Body. The "Coach confidence" row left the targets. Tests: `test/coach/*` updated to sections and folds. Story: `Screens/Coach` Coach. Not built here: whether `CalorieHero` should leave Coach (PD-9) is the owner's to decide; MM-187 stands.

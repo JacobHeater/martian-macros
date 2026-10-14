@@ -5,7 +5,7 @@ import { explanationLineText } from '../format/explanationLineText';
 import { Fmt } from '../format/Fmt';
 import { useApp } from '../app/useApp';
 import { useNavigator } from '../app/useNavigator';
-import { InfoCard } from '../ui/InfoCard';
+import { MmSection } from '../ui/MmSection';
 import { MmButton } from '../ui/MmButton';
 import { useOverlays } from '../ui/useOverlays';
 import { showTargetChangeSheet } from './showTargetChangeSheet';
@@ -20,7 +20,8 @@ interface LastChangeCardProps {
 
 /**
  * The most recent change to the user's targets, in one line, and the way
- * to the full account and to the whole history (MM-138).
+ * to the full account and to the whole history (MM-138), as a section
+ * with the history icon (MM-256).
  */
 export function LastChangeCard({ history, today, holdNote }: LastChangeCardProps) {
   const { services } = useApp();
@@ -45,7 +46,8 @@ export function LastChangeCard({ history, today, holdNote }: LastChangeCardProps
       explanationLineText(largest);
   }
   return (
-    <InfoCard
+    <MmSection
+      icon="history"
       title={`Last change · ${Fmt.day(current.effectiveFrom, today)}`}
       trailing={
         <MmButton label="History" kind="text" onPress={() => void navigator.push(() => <TargetsHistoryScreen />)} />
@@ -58,6 +60,6 @@ export function LastChangeCard({ history, today, holdNote }: LastChangeCardProps
         kind="text"
         onPress={() => void showTargetChangeSheet(overlays, services.targets, history)}
       />
-    </InfoCard>
+    </MmSection>
   );
 }

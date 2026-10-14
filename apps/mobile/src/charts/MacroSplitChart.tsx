@@ -8,6 +8,8 @@ interface MacroSplitChartProps {
   intake: IntakeDay;
   /** For a food that is about to be logged, not what has been. */
   isPreview?: boolean;
+  /** Inside the hero: the ring and its figures, without the caption about how the split is counted. */
+  compact?: boolean;
 }
 
 const size = 112;
@@ -32,7 +34,7 @@ function sector(from: number, to: number): string {
 }
 
 /** The 4/4/9 energy split of logged macros, not percentages of target grams. */
-export function MacroSplitChart({ intake, isPreview = false }: MacroSplitChartProps) {
+export function MacroSplitChart({ intake, isPreview = false, compact = false }: MacroSplitChartProps) {
   const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
   const energy = (macro: MacroKind) => grams[macro] * (macro === 'fat' ? 9 : 4);
   const total = MacroKind.values.reduce((sum, macro) => sum + energy(macro), 0);
@@ -78,10 +80,12 @@ export function MacroSplitChart({ intake, isPreview = false }: MacroSplitChartPr
           ))}
         </ul>
       </div>
-      <p className="chart-caption">
-        {Fmt.kcal(total)} from {isPreview ? 'food' : 'recorded'} macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol
-        and other calorie differences are not part of this split.
-      </p>
+      {compact ? null : (
+        <p className="chart-caption">
+          {Fmt.kcal(total)} from {isPreview ? 'food' : 'recorded'} macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol
+          and other calorie differences are not part of this split.
+        </p>
+      )}
     </div>
   );
 }

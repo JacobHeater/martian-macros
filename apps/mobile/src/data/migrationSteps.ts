@@ -13,4 +13,11 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE user_preferences ADD COLUMN terms_accepted_epoch_day INTEGER NULL');
     },
   ],
+  // 2 to 3 (MM-254): which macro picture the hero shows, bars or donut.
+  [
+    2,
+    async (db) => {
+      await db.execute("ALTER TABLE user_preferences ADD COLUMN macro_picture TEXT NOT NULL DEFAULT 'bars'");
+    },
+  ],
 ]);

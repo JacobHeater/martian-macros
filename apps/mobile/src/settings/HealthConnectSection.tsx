@@ -4,10 +4,8 @@ import { healthDataTypeLabel } from '../format/healthDataTypeLabel';
 import { healthDataTypePurpose } from '../format/healthDataTypePurpose';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
-import { GroupHeader } from '../ui/GroupHeader';
 import { MmButton } from '../ui/MmButton';
 import { MmIcon } from '../ui/MmIcon';
-import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
 
@@ -19,7 +17,7 @@ function count(samples: readonly HealthSample[]): string {
 }
 
 /**
- * The Health Connect group of Settings (MM-68). Connecting is offered,
+ * The Health Connect rows of the Data section (MM-68, MM-259). Connecting is offered,
  * never required: each kind of reading is allowed by itself, with what it
  * is for, and refusing one does not block the others. The app only reads.
  */
@@ -31,13 +29,11 @@ export function HealthConnectSection() {
   if (connection === undefined || setup === undefined) return null;
   if (connection.available.size === 0) {
     return (
-      <>
-        <GroupHeader text="Health Connect" />
-        <p className="app-text settings-note">
-          Health Connect is not on this phone, so there is nothing to connect. Everything in the app works without
-          it.
-        </p>
-      </>
+      <MmListRow
+        leadingIcon="sync"
+        title="Health Connect"
+        subtitle="Health Connect is not on this phone, so there is nothing to connect. Everything in the app works without it."
+      />
     );
   }
 
@@ -71,13 +67,12 @@ export function HealthConnectSection() {
   );
   return (
     <>
-      <GroupHeader text="Health Connect" />
-      <MmListGroup>
-        {offered.map((type) => {
+      {offered.map((type) => {
           const permitted = connection.permitted.has(type);
           return (
             <MmListRow
               key={type}
+              leadingIcon="sync"
               title={healthDataTypeLabel(type)}
               subtitle={
                 permitted ? count(connection.imported.get(type) ?? []) : `Not allowed. ${healthDataTypePurpose(type)}`
@@ -94,13 +89,12 @@ export function HealthConnectSection() {
             />
           );
         })}
-      </MmListGroup>
       {connection.permitted.size === 0 ? null : (
-        <div className="settings-note">
+        <div className="settings-note settings-inset">
           <MmButton label="Read from Health Connect now" kind="secondary" expand onPress={() => void read()} />
         </div>
       )}
-      <p className="app-caption settings-note">
+      <p className="app-caption settings-note settings-inset">
         The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in
         counts for a day: the first of the morning, or the middle of the day’s readings. A value you type for a day is
         used instead. To stop, take the permission away in Health Connect: what was read is kept until you erase your

@@ -134,7 +134,7 @@ describe('on the Coach screen', () => {
     await screen.findByRole('heading', { name: 'Body' });
   }
 
-  const card = () => screen.queryByRole('heading', { name: /^Recomp review, week/ })?.closest('.mm-surface') ?? null;
+  const card = () => screen.queryByRole('heading', { name: /^Recomp review, week/ })?.closest('.mm-section') ?? null;
 
   it('twelve weeks, waist down and lifts up: working, with the facts, and the goal unchanged', async () => {
     await setUpUser('recomp');
@@ -169,8 +169,10 @@ describe('on the Coach screen', () => {
     await openCoach();
     // Coaching began 100 days ago and recomp 84: the third report covers
     // days 40 to 67 of it, and the week 8 review fell due on day 56.
-    const reports = screen.getByRole('heading', { name: 'Monthly reports' }).closest('.mm-surface') as HTMLElement;
-    const rows = within(reports).getAllByRole('button');
+    // Folded to one line when no report is new (MM-256): open it first.
+    await userEvent.click(screen.getByRole('button', { name: /^Monthly reports/ }));
+    const reports = screen.getByRole('heading', { name: 'Monthly reports' }).closest('.mm-section') as HTMLElement;
+    const rows = within(reports).getAllByRole('button', { name: /^[A-Z][a-z]{2} \d+ – / });
     expect(rows).toHaveLength(3);
     await userEvent.click(rows[0] as HTMLElement);
     expect(await within(topLayer()).findByRole('heading', { name: 'Recomp review, week 8' })).toBeInTheDocument();

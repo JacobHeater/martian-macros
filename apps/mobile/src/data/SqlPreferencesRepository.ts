@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
+import { MacroPicture } from '../domain/MacroPicture';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
@@ -66,6 +67,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveDetailLevel(level: DetailLevel): Promise<void> {
     return this.save({ detail_level: level });
+  }
+
+  watchMacroPicture(): Watched<MacroPicture> {
+    return this.watch((row) => (row === undefined ? 'bars' : named(MacroPicture.values, row, 'macro_picture')));
+  }
+
+  saveMacroPicture(picture: MacroPicture): Promise<void> {
+    return this.save({ macro_picture: picture });
   }
 
   watchUnderEatingDismissedOn(): Watched<CalendarDate | undefined> {

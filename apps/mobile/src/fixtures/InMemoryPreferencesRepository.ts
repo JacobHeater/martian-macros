@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
+import type { MacroPicture } from '../domain/MacroPicture';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import type { TermsAcceptance } from '../domain/TermsAcceptance';
 import type { ThemePreference } from '../domain/ThemePreference';
@@ -12,6 +13,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly theme = new ObservableValue<ThemePreference>('unselected');
   private readonly easyToMiss = new ObservableValue(new EasyToMissPreference());
   private readonly detail = new ObservableValue<DetailLevel>('standard');
+  private readonly picture = new ObservableValue<MacroPicture>('bars');
   private readonly underEatingDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly returnDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly recoverySkipped = new ObservableValue<CalendarDate | undefined>(undefined);
@@ -43,6 +45,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
 
   async saveDetailLevel(level: DetailLevel): Promise<void> {
     this.detail.value = level;
+  }
+
+  watchMacroPicture(): Watched<MacroPicture> {
+    return this.picture.watch();
+  }
+
+  async saveMacroPicture(picture: MacroPicture): Promise<void> {
+    this.picture.value = picture;
   }
 
   watchUnderEatingDismissedOn(): Watched<CalendarDate | undefined> {
@@ -82,6 +92,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.theme.value = 'unselected';
     this.easyToMiss.value = new EasyToMissPreference();
     this.detail.value = 'standard';
+    this.picture.value = 'bars';
     this.underEatingDismissed.value = undefined;
     this.returnDismissed.value = undefined;
     this.recoverySkipped.value = undefined;

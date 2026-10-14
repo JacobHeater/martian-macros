@@ -12,8 +12,9 @@ import { foodOn } from '../support/foodOn';
 import { macroGrams } from '../support/macroPreview';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
-/** The meals of the Food screen, one card each. Carried over from meal_cards_test.dart. */
+/** The meals of the Food screen, one section each (MM-255). Carried over from meal_cards_test.dart. */
 const today = CalendarDate.of(2026, 10, 10);
 let repos: InMemoryRepositories;
 
@@ -41,16 +42,31 @@ const card = (meal: Meal) => screen.getByRole('region', { name: mealLabel(meal) 
 const toggle = (meal: Meal) => within(card(meal)).getByRole('button', { name: new RegExp(`^${mealLabel(meal)}`) });
 const body = () => document.querySelector<HTMLElement>('.app-body') as HTMLElement;
 
-it('each empty meal has a separate card and an add control with a name', async () => {
+it('each empty meal has a separate section and an add control with a name', async () => {
   await openFood();
   for (const meal of Meal.values) {
-    expect(card(meal).closest('.mm-surface')).not.toBeNull();
+    expect(card(meal).closest('.mm-section')).not.toBeNull();
+    expect(card(meal).closest('.mm-surface'), 'a section is never on a card').toBeNull();
     expect(
       within(card(meal)).getByRole('button', { name: `Add food to ${mealLabel(meal).toLowerCase()}` }),
     ).toBeInTheDocument();
   }
-  expect(new Set(Meal.values.map((meal) => card(meal).closest('.mm-surface'))).size).toBe(Meal.values.length);
-  expect(document.querySelectorAll('.chart-split, .chart-note')).toHaveLength(1);
+  expect(new Set(Meal.values.map((meal) => card(meal).closest('.mm-section'))).size).toBe(Meal.values.length);
+});
+
+// MM-255: one macro picture at a time, the choice remembered and shared with the Dashboard (MM-254).
+it('shows the bars or the donut, never both, and remembers which', async () => {
+  await openFood({ populated: true });
+  expect(document.querySelectorAll('.mm-macro-bar').length).toBeGreaterThan(0);
+  expect(document.querySelectorAll('.chart-split-ring')).toHaveLength(0);
+  await userEvent.click(screen.getByRole('button', { name: 'Share' }));
+  await screen.findByRole('img', { name: /^Logged macronutrient energy split/ });
+  expect(document.querySelectorAll('.mm-macro-bar')).toHaveLength(0);
+  expect(await first(repos.preferences.watchMacroPicture())).toBe('donut');
+  await openTab('Dashboard');
+  await dashboardLoaded();
+  expect(document.querySelectorAll('.chart-split-ring')).toHaveLength(1);
+  expect(document.querySelectorAll('.mm-macro-bar')).toHaveLength(0);
 });
 
 it('meals expand independently and keep their add controls', async () => {
@@ -66,6 +82,8 @@ it('meals expand independently and keep their add controls', async () => {
 });
 
 it('the Food split follows the selected day; the Dashboard stays on today', async () => {
+  // The split is the donut picture (MM-255); the person chose it.
+  await repos.preferences.saveMacroPicture('donut');
   await repos.food.addFood(
     foodOn(today.addDays(-1), { name: 'Yesterday only', meal: 'lunch', kcal: 200, proteinG: 10, carbsG: 20, fatG: 5 }),
   );
@@ -74,7 +92,7 @@ it('the Food split follows the selected day; the Dashboard stays on today', asyn
   await screen.findByText('Yesterday only');
   expect(macroGrams(body(), 'Protein')).toBe(10);
   await openTab('Dashboard');
-  await screen.findByRole('heading', { name: 'Logging coverage' });
+  await dashboardLoaded();
   expect(macroGrams(body(), 'Protein')).toBe(120);
 });
 

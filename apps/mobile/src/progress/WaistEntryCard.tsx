@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
-import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
+import { MmSection } from '../ui/MmSection';
 import { MmTextField } from '../ui/MmTextField';
 import { useOverlays } from '../ui/useOverlays';
 import './progress.css';
@@ -9,17 +9,18 @@ import './progress.css';
 interface WaistEntryCardProps {
   /** The unit the readings are typed in, in words: "inches". */
   unit: string;
-  /** What is known so far, under the fields; undefined before any measurement. */
+  /** What is known so far, as the section's one line; undefined before any measurement. */
   summary: string | undefined;
-  /** Saves one reading or three, in the user's unit. If it fails, the card says "That value looks off". */
+  /** Saves one reading or three, in the user's unit. If it fails, the section says "That value looks off". */
   onSave: (readings: readonly number[]) => Promise<void>;
 }
 
 const places = ['1st', '2nd', '3rd'] as const;
 
 /**
- * The waist measurement card (MM-155): three readings, of which the middle
- * one is kept, or one reading for a quick entry.
+ * The waist section (MM-155, MM-257): folded to its one line, it opens to
+ * how to measure, three fields of which the middle reading is kept (or one
+ * for a quick entry), and Save as a quiet action.
  */
 export function WaistEntryCard({ unit, summary, onSave }: WaistEntryCardProps) {
   const overlays = useOverlays();
@@ -45,14 +46,24 @@ export function WaistEntryCard({ unit, summary, onSave }: WaistEntryCardProps) {
       'One reading is kept as it is. It is noisier than the middle of three, so a change takes longer to show.';
   }
   return (
-    <InfoCard title="Waist">
+    <MmSection
+      icon="tape"
+      title="Waist"
+      summary={summary ?? 'Not measured yet. Once a week is enough.'}
+      collapsible
+      initiallyExpanded={false}
+    >
+      <p className="app-caption progress-waist-how">
+        Morning, after the bathroom, before eating. Tape level with the navel, snug, breathe out normally, the same
+        tape each time.
+      </p>
       <div className="progress-waist-fields">
         {places.map((place, i) => (
           // Short enough to fit three across a phone; the unit is said once, under the fields.
           <MmTextField
             key={place}
             label={place}
-            name={`${place} waist reading`}
+            name={`${place} waist reading, ${unit}`}
             kind="number"
             dense
             value={readings[i] ?? ''}
@@ -62,13 +73,8 @@ export function WaistEntryCard({ unit, summary, onSave }: WaistEntryCardProps) {
       </div>
       <div className="progress-waist-save">
         <p className="app-caption progress-waist-note">{note}</p>
-        <MmButton label="Save" onPress={ready ? () => void save() : undefined} />
+        <MmButton label="Save" kind="secondary" onPress={ready ? () => void save() : undefined} />
       </div>
-      {summary === undefined ? null : <p className="app-text">{summary}</p>}
-      <p className="app-caption">
-        First thing in the morning, after the bathroom, before eating. Stand relaxed and breathe out normally. Keep the
-        tape level with the navel, snug and not pressing in, and use the same tape each time. Once a week is enough.
-      </p>
-    </InfoCard>
+    </MmSection>
   );
 }

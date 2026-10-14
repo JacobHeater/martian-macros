@@ -94,8 +94,10 @@ it('the waist start is the middle of the first three entries', async () => {
 it('a waist measurement can be saved from its card', async () => {
   await repos.weights.saveWeight(today, 82);
   await openProgress();
-  await userEvent.type(screen.getByRole('textbox', { name: '1st waist reading' }), '35');
-  const card = screen.getByRole('heading', { name: 'Waist' }).closest('.mm-surface') as HTMLElement;
+  // The waist section is folded to its line until opened (MM-257).
+  await userEvent.click(screen.getByRole('button', { name: /^Waist/ }));
+  await userEvent.type(screen.getByRole('textbox', { name: /^1st waist reading/ }), '35');
+  const card = screen.getByRole('heading', { name: 'Waist' }).closest('.mm-section') as HTMLElement;
   await userEvent.click(card.querySelector('.progress-waist-save button') as HTMLElement);
   await expect.poll(async () => (await first(repos.waist.watchWaist())).length).toBe(1);
   const saved = (await first(repos.waist.watchWaist()))[0];
