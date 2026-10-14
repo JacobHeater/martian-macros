@@ -24,6 +24,22 @@
 .food-hero-split {
   margin-top: var(--space-16);
 }
+.food-micros {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin-top: var(--space-16);
+}
+.food-micros-group .mm-section-label {
+  margin-bottom: 0;
+  color: var(--text2);
+  font: var(--type-label);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.food-micros-withheld {
+  margin: 0;
+}
 .food-hero-status {
   margin-top: var(--space-12);
   border-top: 1px solid var(--outline);
@@ -163,4 +179,12 @@
 }
 .food-ingredient-adder {
   margin-top: var(--space-12);
+}
+
+/* The water section's one-tap amounts (MM-313). */
+.food-water-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
 }

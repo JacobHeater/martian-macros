@@ -39,6 +39,7 @@ export class InMemoryFoodRepository implements FoodRepository {
         fiberG: entry.fiberG,
         sodiumMg: entry.sodiumMg,
         alcoholG: entry.alcoholG,
+        micros: entry.micros,
       }),
     ];
     return id;

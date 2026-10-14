@@ -27,6 +27,7 @@ import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { HealthConnectSection } from './HealthConnectSection';
+import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
@@ -183,6 +184,7 @@ export function SettingsScreen() {
           />
         </MmListGroup>
       </MmSection>
+      <NutritionGoalsSection />
       <ProfileSection />
       <RemindersSection />
       <MmSection icon="lock" title="Data">

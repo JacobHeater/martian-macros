@@ -14,6 +14,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
@@ -40,6 +41,7 @@ export interface AppServices {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;

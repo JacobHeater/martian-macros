@@ -788,6 +788,9 @@
 .mm-progress-fat .mm-progress-fill {
   background: var(--fat);
 }
+.mm-progress-nutrient .mm-progress-fill {
+  background: var(--info);
+}
 .mm-progress-marker {
   position: absolute;
   top: 0;
@@ -1063,6 +1066,30 @@
 }
 .mm-macro-bar-emphasized {
   color: var(--text);
+}
+
+/* One nutrient of the Micros view (MM-310). */
+.mm-nutrient-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8) 0;
+}
+.mm-nutrient-row-head {
+  display: flex;
+  gap: var(--space-8);
+}
+.mm-nutrient-row-name {
+  font: var(--type-label);
+}
+.mm-nutrient-row-figures {
+  flex: 1;
+  color: var(--text);
+  text-align: end;
+}
+.mm-nutrient-row-note {
+  font: var(--type-caption);
+  color: var(--text2);
 }
 
 .mm-day-stepper {
