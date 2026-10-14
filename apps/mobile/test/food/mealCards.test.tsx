@@ -59,7 +59,9 @@ it('shows the bars or the donut, never both, and remembers which', async () => {
   await openFood({ populated: true });
   expect(document.querySelectorAll('.mm-macro-bar').length).toBeGreaterThan(0);
   expect(document.querySelectorAll('.chart-split-ring')).toHaveLength(0);
-  await userEvent.click(screen.getByRole('button', { name: 'Share' }));
+  // MM-290: the switch names the split a split; nothing in it says "Share".
+  expect(screen.queryByRole('button', { name: 'Share' })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Split' }));
   await screen.findByRole('img', { name: /^Logged macronutrient energy split/ });
   expect(document.querySelectorAll('.mm-macro-bar')).toHaveLength(0);
   expect(await first(repos.preferences.watchMacroPicture())).toBe('donut');

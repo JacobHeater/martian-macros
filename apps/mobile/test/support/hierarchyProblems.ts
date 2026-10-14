@@ -21,6 +21,12 @@ export function hierarchyProblems(root: ParentNode): string[] {
   // Rule 6: one primary action per screen.
   const primaries = count('.mm-button-primary:not([disabled]), .mm-fab');
   if (primaries > 1) problems.push(`${primaries} primary actions are shown; one is the limit (rule 6)`);
+  // Rule 1, the owner's ruling of 2026-10-14 (MM-291): a field sits on a surface
+  // (a card, the hero, a list group, a sheet or a dialog), never bare on the canvas.
+  const bare = [...root.querySelectorAll('.mm-field')].filter(
+    (field) => field.closest('.mm-surface, .mm-hero, .mm-list-group, .mm-sheet, .mm-dialog, [role="dialog"]') === null,
+  ).length;
+  if (bare > 0) problems.push(`${bare} field(s) sit bare on the canvas (rule 1)`);
   // Rule 1 again: at most one hero.
   if (count('.mm-hero') > 1) problems.push('more than one hero is drawn (rule 1)');
   return problems;

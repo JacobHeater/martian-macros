@@ -25,7 +25,7 @@ it('entering a deficit confirms health answers before saving the goal', async ()
   renderApp(repos, today);
 
   await openTab('Coach');
-  await userEvent.click(await screen.findByRole('button', { name: 'Change' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   await userEvent.click(within(sheet).getByText('Fat loss'));
 

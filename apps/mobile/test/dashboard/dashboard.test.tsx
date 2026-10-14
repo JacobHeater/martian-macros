@@ -77,8 +77,9 @@ it('a normal day shows calories, protein and the trend weight', async () => {
   expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('1,000')).toBeInTheDocument();
   expect(screen.getByText('95 / 170 g')).toBeInTheDocument();
-  // The weight row (MM-254): the figure as its title, what it is and the week beneath.
-  expect(screen.getByText(/^Trend weight · Last 7 days/)).toBeInTheDocument();
+  // The weight row (MM-254, MM-298): the trend names itself; today's entry and the week beneath.
+  expect(screen.getByText(/^Trend [\d.]+ (lb|kg)$/)).toBeInTheDocument();
+  expect(screen.getByText(/^Today [\d.]+ (lb|kg) · 7 days /)).toBeInTheDocument();
 });
 
 it('with no weigh-in today the weight card asks for one', async () => {
@@ -87,12 +88,60 @@ it('with no weigh-in today the weight card asks for one', async () => {
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
   // Once saved, the weight row shows the trend and no longer asks.
-  expect(await screen.findByText(/^Trend weight/)).toBeInTheDocument();
+  expect(await screen.findByText(/^Trend [\d.]+ (lb|kg)$/)).toBeInTheDocument();
   expect(screen.queryByRole('textbox', { name: 'Today’s weigh-in' })).not.toBeInTheDocument();
   const weights = await first(repos.weights.watchWeights());
   const last = weights[weights.length - 1];
   expect(last?.date).toBe(today);
   expectClose(last?.weightKg ?? 0, 82.28, 0.01);
+});
+
+// MM-291: the weigh-in asks in the slot the answer takes, inside the card, never bare on the canvas.
+it('asks for the weigh-in in the first row of the list group, and answers in the same slot', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  const field = await screen.findByRole('textbox', { name: 'Today’s weigh-in' });
+  const group = field.closest('.mm-list-group');
+  expect(group).not.toBeNull();
+  expect(group?.firstElementChild?.contains(field)).toBe(true);
+  expect(group).toHaveTextContent('No waist measurement yet');
+  await userEvent.type(field, '181.4{Enter}');
+  const trend = await screen.findByText(/^Trend [\d.]+ (lb|kg)$/);
+  expect(group?.firstElementChild?.contains(trend)).toBe(true);
+});
+
+// MM-294: a save that removes the field says so, aloud, with the number typed.
+it('says the weigh-in was saved, with the number typed', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  expect(await screen.findByRole('status')).toHaveTextContent('Saved 181.4 lb for today');
+});
+
+// MM-298: the trend before the weigh-in; the trend named, with today's entry, after it.
+it('says the trend so far before the weigh-in, and today beside the trend after it', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  const field = await screen.findByRole('textbox', { name: 'Today’s weigh-in' });
+  const row = field.closest('.mm-list-row') as HTMLElement;
+  expect(row).toHaveTextContent(/Trend so far [\d.]+ lb/);
+  await userEvent.type(field, '181.4{Enter}');
+  expect(await screen.findByText(/^Today 181\.4 lb · 7 days [−+]/)).toBeInTheDocument();
+  expect(screen.getByText(/^Trend [\d.]+ (lb|kg)$/)).toBeInTheDocument();
+  expect(screen.queryByText(/^Trend ·/)).not.toBeInTheDocument();
+});
+
+// MM-298, UX-2: the first weigh-in is shown once, never as a trend of itself and never with a bare dash.
+it('shows the first weigh-in once and says the trend starts tomorrow', async () => {
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today }));
+  await repos.weights.saveWeight(today, 82);
+  renderApp(repos, today);
+  expect(await screen.findByText('Today’s weigh-in · the trend starts tomorrow')).toBeInTheDocument();
+  expect(screen.getByText('180.8 lb')).toBeInTheDocument();
+  expect(screen.queryByText(/^Trend /)).not.toBeInTheDocument();
+  expect(screen.queryByText(/—/)).not.toBeInTheDocument();
+  expect(screen.queryByRole('textbox', { name: 'Today’s weigh-in' })).not.toBeInTheDocument();
 });
 
 it('during calibration the coach line says which day', async () => {

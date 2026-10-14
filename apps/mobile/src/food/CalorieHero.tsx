@@ -42,7 +42,7 @@ interface CalorieHeroProps {
  * of the macros, and optionally one status line. The one calorie visual in
  * the app (MM-187): the Dashboard, the Food screen and the Coach screen all
  * use it, and the arc is always drawn. The macro picture is a switch
- * between grams against target and the share of calories (MM-253, rule 4),
+ * between grams against target and the split of calories (MM-253, rule 4),
  * remembered per person, never both at once.
  */
 export function CalorieHero({
@@ -74,7 +74,7 @@ export function CalorieHero({
 
   const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
   const target: Readonly<Record<MacroKind, number | undefined>> = { protein: t?.proteinG, carbs: t?.carbsG, fat: t?.fatG };
-  // The share of calories needs all three macros; at Simple detail only the bars are offered.
+  // The split of calories needs all three macros; at Simple detail only the bars are offered.
   const switchable = DetailLevel.showsCarbsAndFat(level);
   const chosen: MacroPicture = switchable ? picture : 'bars';
 
@@ -100,7 +100,7 @@ export function CalorieHero({
             compact
             segments={[
               { value: 'bars', label: 'Grams' },
-              { value: 'donut', label: 'Share' },
+              { value: 'donut', label: 'Split' },
             ]}
             selected={chosen}
             onChange={(next) => {
