@@ -23,8 +23,8 @@ async function opened() {
 
 /** The columns added since the Dart database's last version, after the ones it had, by table and in order. */
 const addedSince: Readonly<Record<string, readonly string[]>> = {
-  // Version 2 (MM-242): the agreement to the terms of use.
-  user_preferences: ['terms_accepted_version', 'terms_accepted_epoch_day'],
+  // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
+  user_preferences: ['terms_accepted_version', 'terms_accepted_epoch_day', 'macro_picture'],
 };
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

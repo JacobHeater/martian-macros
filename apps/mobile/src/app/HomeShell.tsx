@@ -35,7 +35,7 @@ export function HomeShell() {
   return (
     <div className="app-frame">
       <MmAppBar
-        title={current === 'dashboard' || current === 'food' ? 'Today' : HomeDestination.label(current)}
+        title={current === 'food' ? 'Today' : HomeDestination.label(current)}
         titleContent={current === 'food' ? <FoodDayHeader /> : undefined}
         actions={
           <>

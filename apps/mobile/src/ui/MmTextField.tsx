@@ -42,8 +42,15 @@ export function MmTextField({
   const id = useId();
   const helperId = `${id}-helper`;
   const errorId = `${id}-error`;
+  const suffixId = `${id}-suffix`;
   const spoken = name === undefined ? undefined : label === undefined || name.includes(label) ? name : `${label}, ${name}`;
-  const describedBy = [error === undefined ? undefined : errorId, helper === undefined ? undefined : helperId].filter(Boolean).join(' ');
+  const describedBy = [
+    error === undefined ? undefined : errorId,
+    suffix === undefined ? undefined : suffixId,
+    helper === undefined ? undefined : helperId,
+  ]
+    .filter(Boolean)
+    .join(' ');
   return (
     <div className={`mm-field${dense ? ' mm-field-dense' : ''}`}>
       {label === undefined ? null : (
@@ -66,7 +73,11 @@ export function MmTextField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />
-        {suffix === undefined ? null : <span className="mm-field-suffix">{suffix}</span>}
+        {suffix === undefined ? null : (
+          <span id={suffixId} className="mm-field-suffix">
+            {suffix}
+          </span>
+        )}
       </div>
       {error === undefined ? null : (
         <p id={errorId} className="mm-field-helper mm-field-error" role="alert">

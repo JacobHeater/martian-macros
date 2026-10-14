@@ -127,7 +127,10 @@ async function markComplete(name: string, kcal: number): Promise<HTMLElement> {
   await repos.food.addFood(foodOn(today, { name, meal: 'breakfast', kcal, proteinG: 6, carbsG: 30, fatG: 5 }));
   renderApp(repos, today);
   await openTab('Food');
-  await userEvent.click(await screen.findByRole('button', { name: 'Complete' }));
+  // The completeness row after the last meal opens the question (MM-255).
+  await userEvent.click(await screen.findByRole('button', { name: /^Is this day fully logged\?/ }));
+  const options = await screen.findByRole('dialog', { name: 'Is this day fully logged?' });
+  await userEvent.click(within(options).getByRole('option', { name: 'Complete' }));
   return screen.findByRole('dialog', { name: 'Is this everything you ate today?' });
 }
 

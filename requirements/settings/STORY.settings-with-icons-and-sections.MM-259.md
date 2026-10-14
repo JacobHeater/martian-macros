@@ -1,7 +1,7 @@
 ---
 id: MM-259
 component: settings
-status: proposed
+status: done
 related: [MM-253, MM-224, MM-80, MM-184, MM-242]
 ---
 
@@ -37,3 +37,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Settings.stories.tsx` (Settings), before
 and after.
+
+## Progress
+
+Built 2026-10-13. Seven sections of rows in the order of use: Today's setup (daily activity, experience, training days, body fat, nutrition detail, the easy-to-miss line, pause), You, Reminders, Data (food database, Health Connect, stored on this device), Appearance (the look and the units as rows opening the options dialog), About, Erase last in its own section (one more than the design map's six; Coaching merged into Today's setup, PD-25). Every row, switch row included, carries its icon. The body-fat switch is named by its state ("Estimated by the app" or "About 25%, your measurement", PD-24). The two sliders stay in their rows as the one other inline control: fifty-one options for body fat would be worse (UX-24; the owner may still ask for a sheet with a field). Tests: `test/settings/settingsFlows.test.tsx`, `test/app.test.tsx` (the look and the units through the options dialog). Story: `Screens/Settings` Settings and MeasuredBodyFat.

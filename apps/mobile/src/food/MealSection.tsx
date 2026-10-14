@@ -1,4 +1,3 @@
-import { useId, useState } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -13,11 +12,13 @@ import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmPressable } from '../ui/MmPressable';
+import { MmSection } from '../ui/MmSection';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { useOverlays } from '../ui/useOverlays';
 import { copyEntries } from './copyEntries';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FoodEntryTile } from './FoodEntryTile';
+import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
 import './food.css';
 
@@ -28,11 +29,12 @@ interface MealSectionProps {
 }
 
 /**
- * One meal: its header with subtotal and an add button, then its entries.
- * A meal with no entries still shows its header, so every meal is an add
- * target and the list never jumps. The header opens and closes the entries;
- * its actions are beside it, not inside it, so pressing one never toggles
- * the meal. Swiping an entry away is an accelerator for deleting it.
+ * One meal as a section (MM-255): its icon, its name, its subtotal and an
+ * add button in the header, its entries as rows beneath. A meal with no
+ * entries still shows its header, so every meal is an add target and the
+ * list never jumps. The header opens and closes the entries; its actions
+ * are beside it, not inside it, so pressing one never toggles the meal.
+ * Swiping an entry away is an accelerator for deleting it.
  */
 export function MealSection({ meal, day, entries }: MealSectionProps) {
   const { services, state } = useApp();
@@ -46,8 +48,6 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const weightKg = useCell(state.coach)?.trendWeightKg;
   const solid = full && weightKg !== undefined && mealHasSolidProtein({ proteinG: protein, weightKg });
   const label = mealLabel(meal);
-  const [expanded, setExpanded] = useState(true);
-  const id = useId();
 
   /** Deletes `entry` and offers to put it back for a few seconds (MM-48). */
   const remove = (entry: FoodEntry) => {
@@ -59,65 +59,60 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   };
 
   return (
-    <section className="food-meal" aria-label={label}>
-      <div className="food-meal-head">
-        <div className="food-meal-toggle">
-          <MmPressable expanded={expanded} controls={id} onPress={() => setExpanded(!expanded)}>
-            <span className="food-meal-toggle-body">
-          <span className="food-meal-title">
-            <span className="food-meal-name">{label}</span>
-            {entries.length === 0 ? null : (
-              <span className="food-meal-total">
-                {full ? `${Fmt.kcal(total)} · ${Fmt.grams(protein)} protein` : Fmt.kcal(total)}
-                {solid ? (
-                  <span className="food-meal-marker" role="img" aria-label="A solid serving of protein">
-                    <MmIcon name="checkCircle" size={16} />
-                  </span>
-                ) : null}
+    <MmSection
+      icon={mealIcon(meal)}
+      title={label}
+      summary={
+        entries.length === 0 ? undefined : (
+          <span className="food-meal-total">
+            {full ? `${Fmt.kcal(total)} · ${Fmt.grams(protein)} protein` : Fmt.kcal(total)}
+            {solid ? (
+              <span className="food-meal-marker" role="img" aria-label="A solid serving of protein">
+                <MmIcon name="checkCircle" size={16} />
               </span>
-            )}
+            ) : null}
           </span>
-          <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
-            <MmIcon name="chevronDown" size={16} />
-          </span>
-            </span>
-          </MmPressable>
-        </div>
-        {entries.length > 0 && day !== today ? (
+        )
+      }
+      collapsible
+      maintainState
+      trailing={
+        <>
+          {entries.length > 0 && day !== today ? (
+            <MmIconButton
+              icon="copy"
+              label={`Copy ${label.toLowerCase()} to today`}
+              onPress={() => void copyEntries(services.food, entriesCopiedTo(today, entries))}
+            />
+          ) : null}
           <MmIconButton
-            icon="copy"
-            label={`Copy ${label.toLowerCase()} to today`}
-            onPress={() => void copyEntries(services.food, entriesCopiedTo(today, entries))}
+            icon="plus"
+            kind="add"
+            label={`Add food to ${label.toLowerCase()}`}
+            onPress={() => void showAddFoodSheet(overlays, day, { meal })}
           />
-        ) : null}
-        <MmIconButton
-          icon="plus"
-          kind="add"
-          label={`Add food to ${label.toLowerCase()}`}
-          onPress={() => void showAddFoodSheet(overlays, day, { meal })}
-        />
-      </div>
-      <div id={id} hidden={!expanded}>
-        {entries.map((entry) => (
-          <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
-            <div className="food-meal-entry">
-              <div className="food-entry-open">
-                <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
-                  <FoodEntryTile entry={entry} />
-                </MmPressable>
-              </div>
-              <MmMenuButton<string>
-                icon="more"
-                label={`More actions for ${entry.name}`}
-                items={[{ value: 'delete', label: 'Delete' }]}
-                onSelect={(action) => {
-                  if (action === 'delete') remove(entry);
-                }}
-              />
+        </>
+      }
+    >
+      {entries.map((entry) => (
+        <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
+          <div className="food-meal-entry">
+            <div className="food-entry-open">
+              <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
+                <FoodEntryTile entry={entry} />
+              </MmPressable>
             </div>
-          </MmSwipeToRemove>
-        ))}
-      </div>
-    </section>
+            <MmMenuButton<string>
+              icon="more"
+              label={`More actions for ${entry.name}`}
+              items={[{ value: 'delete', label: 'Delete' }]}
+              onSelect={(action) => {
+                if (action === 'delete') remove(entry);
+              }}
+            />
+          </div>
+        </MmSwipeToRemove>
+      ))}
+    </MmSection>
   );
 }

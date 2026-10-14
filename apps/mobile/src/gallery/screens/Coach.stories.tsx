@@ -8,7 +8,12 @@ import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
 
-/** What the coach believes, why, and what it will do next. */
+/**
+ * What the coach believes, why, and what it will do next. Before MM-256
+ * (main at 9fb8c79, 2026-10-13) eleven cards of equal weight; after, the
+ * safeguards, the hero with the confidence word, one thing to do, and
+ * sections with icons, folded to a line when quiet.
+ */
 const meta = { title: 'Screens/Coach', ...screensMeta } satisfies Meta;
 export default meta;
 

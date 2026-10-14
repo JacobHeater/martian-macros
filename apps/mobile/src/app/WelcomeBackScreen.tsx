@@ -1,7 +1,7 @@
 import { Fmt } from '../format/Fmt';
 import { Loadable } from '../state/Loadable';
 import { MmButton } from '../ui/MmButton';
-import { NumberEntryCard } from '../ui/NumberEntryCard';
+import { NumberEntry } from '../ui/NumberEntry';
 import { Screen } from './Screen';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
@@ -33,7 +33,7 @@ export function WelcomeBackScreen({ resuming = false }: { resuming?: boolean }) 
           : 'To pick up, the coach needs one thing: a weigh-in.'}
       </p>
       <div className="app-gap" />
-      <NumberEntryCard
+      <NumberEntry
         title="Today’s weigh-in"
         unit={fmt.weightUnit}
         initial={undefined}

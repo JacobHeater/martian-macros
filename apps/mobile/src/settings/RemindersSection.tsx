@@ -7,9 +7,9 @@ import { reminderSentWhen } from '../format/reminderSentWhen';
 import { minuteOfDayNow } from '../state/minuteOfDayNow';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
-import { GroupHeader } from '../ui/GroupHeader';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
+import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 
@@ -59,12 +59,12 @@ export function RemindersSection() {
   };
 
   return (
-    <>
-      <GroupHeader text="Reminders" />
+    <MmSection icon="bell" title="Reminders">
       <MmListGroup>
         {settings.map((setting) => (
           <div key={setting.kind}>
             <MmSwitchRow
+              leadingIcon="bell"
               title={reminderLabel(setting.kind)}
               subtitle={reminderSentWhen(setting.kind)}
               value={setting.enabled}
@@ -86,6 +86,6 @@ export function RemindersSection() {
         At most two a day, never at night, and never during a pause. A reminder that goes unanswered for a week stops
         by itself. Nothing about your weight or food ever appears in one.
       </p>
-    </>
+    </MmSection>
   );
 }

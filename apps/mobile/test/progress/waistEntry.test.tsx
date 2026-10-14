@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -28,11 +28,14 @@ let card: HTMLElement;
 async function openWaist(): Promise<void> {
   renderApp(repos, today);
   await openTab('Progress');
-  card = (await screen.findByRole('heading', { name: 'Waist' })).closest('.mm-surface') as HTMLElement;
+  card = (await screen.findByRole('heading', { name: 'Waist' })).closest('.mm-section') as HTMLElement;
+  // Folded to its line until opened (MM-257).
+  await userEvent.click(within(card).getByRole('button', { name: /^Waist/ }));
 }
 
 const fields = ['1st waist reading', '2nd waist reading', '3rd waist reading'];
-const field = (i: number) => screen.getByRole<HTMLInputElement>('textbox', { name: fields[i] as string });
+// The unit is part of what is heard for the field (MM-284).
+const field = (i: number) => screen.getByRole<HTMLInputElement>('textbox', { name: new RegExp(`^${fields[i] as string}`) });
 
 async function type(readings: readonly string[]): Promise<void> {
   for (const [i, reading] of readings.entries()) {

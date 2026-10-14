@@ -1,7 +1,7 @@
 ---
 id: MM-258
 component: training
-status: proposed
+status: done
 related: [MM-253, MM-224, MM-222, MM-75, MM-77, MM-78, MM-79]
 ---
 
@@ -38,3 +38,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Train.stories.tsx` (Train), before and
 after.
+
+## Progress
+
+Built 2026-10-13. Start workout is the one primary; Repeat last workout is a text action under it. The strip (`trainedDays`) marks the last seven days with a finished workout, the same rolling week as the Dashboard's. Weekly training volume is a section whose header opens the volume screen, with the week's hard sets per muscle group as its line in words ("Back 4 · Chest 2 …", the text marks until the app has its own glyphs, PD-21). Workouts are grouped by `workoutGroups`: This week, Last week, then months (the first open, older months folded with their count, PD-23); a row is the day, the summary with the record count in words, and a star mark with "personal record" spoken (UX-15, PD-22; not a trophy). Suggestions (MM-79) have no data source on this screen and were not added. Tests: `test/train/workoutGroups.test.ts`, the Train suites. Story: `Screens/Train` Train. The demo seed shows a record on every row; MM-289 varies it.

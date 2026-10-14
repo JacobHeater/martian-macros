@@ -47,7 +47,7 @@ async function chooseFromOptions(button: string, item: string): Promise<void> {
 it('switching units saves the choice', async () => {
   const settings = await open();
   expect((await setup()).unitSystem).toBe('imperial');
-  await userEvent.click(settings.getByRole('button', { name: 'kg / cm' }));
+  await chooseFromOptions('Change units', 'kg / cm');
   await expect.poll(async () => (await setup()).unitSystem).toBe('metric');
 });
 
@@ -76,7 +76,7 @@ it('training days can be changed with the slider', async () => {
 it('body fat can be entered and removed', async () => {
   const settings = await open();
   expect((await setup()).bodyFatPercent).toBeUndefined();
-  await userEvent.click(settings.getByRole('switch', { name: /Let the app estimate/ }));
+  await userEvent.click(settings.getByRole('switch', { name: /Estimated by the app/ }));
   await expect.poll(async () => (await setup()).bodyFatPercent).toBe(25);
   await userEvent.click(await settings.findByRole('switch', { name: /About 25%/ }));
   await expect.poll(async () => (await setup()).bodyFatPercent).toBeUndefined();
@@ -85,7 +85,7 @@ it('body fat can be entered and removed', async () => {
 // MM-240: the body fat slider was put into its group bare, and ran edge to edge.
 it('every slider sits in a list row, at the row’s inset', async () => {
   const settings = await open();
-  await userEvent.click(settings.getByRole('switch', { name: /Let the app estimate/ }));
+  await userEvent.click(settings.getByRole('switch', { name: /Estimated by the app/ }));
   await settings.findByRole('slider', { name: 'Body fat percent' });
   const sliders = settings.getAllByRole('slider');
   expect(sliders).toHaveLength(2);
@@ -94,7 +94,7 @@ it('every slider sits in a list row, at the row’s inset', async () => {
 
 it('the detail of nutrition shown can be changed, and says what each shows', async () => {
   const settings = await open();
-  await userEvent.click(settings.getByRole('button', { name: 'Full' }));
+  await chooseFromOptions('Change nutrition detail', 'Full');
   await expect.poll(() => first(repos.preferences.watchDetailLevel())).toBe('full');
   expect(settings.getByText(/Changes what is shown, never what is stored\./)).toBeInTheDocument();
 });
@@ -139,12 +139,12 @@ describe('theme preference (MM-165)', () => {
 
   it('Dark and Light apply at once and are stored', async () => {
     const settings = await open();
-    await userEvent.click(settings.getByRole('button', { name: 'Dark' }));
+    await chooseFromOptions('Change appearance', 'Dark');
     await expect.poll(palette).toBe('theme-dark');
     expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
-    await userEvent.click(settings.getByRole('button', { name: 'Light' }));
+    await chooseFromOptions('Change appearance', 'Light');
     await expect.poll(palette).toBe('theme-light');
-    await userEvent.click(settings.getByRole('button', { name: 'System' }));
+    await chooseFromOptions('Change appearance', 'System');
     await expect.poll(() => first(repos.preferences.watchThemePreference())).toBe('system');
   });
 

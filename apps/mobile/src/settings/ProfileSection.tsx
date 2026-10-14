@@ -9,9 +9,9 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { GroupHeader } from '../ui/GroupHeader';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
+import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { EditHeightSheet } from './EditHeightSheet';
 import { HealthCheckScreen } from './HealthCheckScreen';
@@ -32,8 +32,8 @@ const tickedCount = (s: ScreeningAnswers) =>
   ].filter((ticked) => ticked).length;
 
 /**
- * The Profile group of Settings: sex, date of birth, height and the health
- * check, each correctable (MM-83). Every change issues new targets at once.
+ * The You section of Settings (MM-259): sex, date of birth, height and the
+ * health check, each correctable (MM-83). Every change issues new targets at once.
  */
 export function ProfileSection() {
   const { services, state } = useApp();
@@ -122,27 +122,29 @@ export function ProfileSection() {
     ));
 
   return (
-    <>
-      <GroupHeader text="Profile" />
+    <MmSection icon="person" title="You">
       <MmListGroup>
         <MmListRow
+          leadingIcon="person"
           title="Biological sex"
           trailing={<span>{profile.sex === 'male' ? 'Male' : 'Female'}</span>}
           onPress={() => void changeSex()}
         />
         <MmListRow
+          leadingIcon="calendar"
           title="Date of birth"
           subtitle={`Age ${profile.ageOn(today)}`}
           trailing={<span>{Fmt.longDate(profile.birthDate)}</span>}
           onPress={() => void changeBirthDate()}
         />
-        <MmListRow title="Height" trailing={<span>{height}</span>} onPress={() => void changeHeight()} />
+        <MmListRow leadingIcon="ruler" title="Height" trailing={<span>{height}</span>} onPress={() => void changeHeight()} />
         <MmListRow
+          leadingIcon="health"
           title="Health check"
           subtitle={ticked === 0 ? 'Nothing ticked' : `${ticked} ${ticked === 1 ? 'answer' : 'answers'} ticked`}
           onPress={() => void navigator.push(() => <HealthCheckScreen />)}
         />
       </MmListGroup>
-    </>
+    </MmSection>
   );
 }

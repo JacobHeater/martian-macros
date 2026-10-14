@@ -2,7 +2,7 @@ import { Fmt } from '../format/Fmt';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { InfoCard } from '../ui/InfoCard';
+import { MmSection } from '../ui/MmSection';
 import { RecompReviewBody } from './RecompReviewBody';
 
 /**
@@ -17,8 +17,8 @@ export function RecompReviewCard() {
   const setup = useLoaded(state.setup);
   if (review === undefined || setup === undefined) return null;
   return (
-    <InfoCard title={`Recomp review, week ${review.week}`}>
+    <MmSection icon="insight" title={`Recomp review, week ${review.week}`}>
       <RecompReviewBody review={review} fmt={new Fmt(setup.unitSystem)} />
-    </InfoCard>
+    </MmSection>
   );
 }

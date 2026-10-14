@@ -59,7 +59,7 @@ async function openProgress(): Promise<void> {
   await screen.findByRole('heading', { name: 'Strength trends' });
 }
 
-const card = () => screen.queryByRole('heading', { name: /recomp signal$/i })?.closest('.mm-surface') ?? null;
+const card = () => screen.queryByRole('heading', { name: /recomp signal$/i })?.closest('.mm-section') ?? null;
 const cardText = () => card()?.querySelector('.app-text')?.textContent ?? '';
 
 it('weight flat, waist down, two lifts up: the signal is shown', async () => {

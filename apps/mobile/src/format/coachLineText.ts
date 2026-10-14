@@ -3,6 +3,14 @@ import { calibrationDays, type ConfidenceLevel, nextCheckIn, type TargetsRecord 
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { Fmt } from './Fmt';
 
+/** "today", "yesterday", or "on Sat, Oct 10": a day in a sentence, never "on Today" (MM-283). */
+const whenText = (date: CalendarDate, today: CalendarDate): string => {
+  const diff = today.daysUntil(date);
+  if (diff === 0) return 'today';
+  if (diff === -1) return 'yesterday';
+  return `on ${Fmt.day(date, today)}`;
+};
+
 /** The one line the dashboard says about what the coach is doing. */
 export function coachLineText({
   setup,
@@ -30,8 +38,8 @@ export function coachLineText({
         'Targets went ' +
         `${change < 0 ? 'down' : 'up'} ` +
         `${approximate ? 'about ' : ''}` +
-        `${roundHalfAwayFromZero(Math.abs(change))} kcal on ` +
-        `${Fmt.day(current.effectiveFrom, today)}` +
+        `${roundHalfAwayFromZero(Math.abs(change))} kcal ` +
+        `${whenText(current.effectiveFrom, today)}` +
         `${approximate ? ', so far' : ''}.`
       );
     }

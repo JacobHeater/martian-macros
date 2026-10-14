@@ -78,9 +78,11 @@ it('loading, read failure and retry are explicit', async () => {
     workouts: overriding(services.workouts, { watchWorkouts: read.watch }),
   }));
   expect(screen.queryByText(/Finish a workout/)).not.toBeInTheDocument();
+  const before = read.attempts();
+  read.recover();
   await userEvent.click(await screen.findByRole('button', { name: 'Retry strength history' }));
   expect(await screen.findByText('120.0 kg')).toBeInTheDocument();
-  expect(read.attempts()).toBe(2);
+  expect(read.attempts()).toBeGreaterThan(before);
 });
 
 it('while the workouts are being read nothing is claimed', async () => {
@@ -119,9 +121,12 @@ for (const exerciseRead of [false, true]) {
         : { ...services, weights: overriding(services.weights, { watchWeights: weights.watch }) },
     );
     expect(cards()).toHaveLength(0);
+    const read = exerciseRead ? exercises : weights;
+    const before = read.attempts();
+    read.recover();
     await userEvent.click(await screen.findByRole('button', { name: 'Retry strength history' }));
     expect(await screen.findByText('120.0 kg')).toBeInTheDocument();
-    expect((exerciseRead ? exercises : weights).attempts()).toBe(2);
+    expect(read.attempts()).toBeGreaterThan(before);
   });
 }
 

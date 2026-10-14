@@ -11,7 +11,12 @@ import { screenStory } from './screenStory';
 import type { StoryStage } from './StoryStage';
 import { valueOf } from './valueOf';
 
-/** Logging training, set by set. */
+/**
+ * Logging training, set by set. Before MM-258 (main at 9fb8c79,
+ * 2026-10-13) two full-width buttons and thirteen identical rows; after,
+ * one primary, the week's rhythm, the volume as a section, and workouts
+ * grouped by week and month with a mark on a record day.
+ */
 const meta = { title: 'Screens/Train', ...screensMeta } satisfies Meta;
 export default meta;
 

@@ -7,6 +7,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { foodOn } from '../support/foodOn';
 import { renderApp } from '../support/renderApp';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /** MM-92: reward the work, never the deficit. Carried over from process_rewards_test.dart. */
 const today = CalendarDate.of(2026, 10, 14);
@@ -33,8 +34,8 @@ async function logWholeDay(daysAgo: number, kcal = 2100): Promise<void> {
 
 async function card(): Promise<string> {
   renderApp(repos, today);
-  const title = await screen.findByRole('heading', { name: 'Your logging' });
-  return title.closest('.mm-surface')?.textContent ?? '';
+  const title = await screen.findByText('Your logging');
+  return title.closest('.mm-list-row')?.textContent ?? '';
 }
 
 it('a run of whole days is acknowledged quietly', async () => {
@@ -66,8 +67,8 @@ it('a short run says nothing at all', async () => {
   await logWholeDay(1);
   await logWholeDay(2);
   renderApp(repos, today);
-  await screen.findByRole('heading', { name: 'Logging coverage' });
-  expect(screen.queryByRole('heading', { name: 'Your logging' })).not.toBeInTheDocument();
+  await dashboardLoaded();
+  expect(screen.queryByText('Your logging')).not.toBeInTheDocument();
 });
 
 it('it never mentions weight, deficit or eating less', async () => {

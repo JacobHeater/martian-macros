@@ -43,7 +43,7 @@ async function start({
 async function openFood(): Promise<void> {
   renderApp(repos, today);
   await openTab('Food');
-  await screen.findByText('Is this day fully logged?');
+  await screen.findByRole('region', { name: 'Breakfast' });
 }
 
 const line = () => screen.queryByText('Easy to miss');

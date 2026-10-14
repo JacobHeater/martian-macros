@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { MetricFacts } from '../../src/ui/MetricFacts';
 import { MmOverlays } from '../../src/ui/MmOverlays';
 import { MmTextField } from '../../src/ui/MmTextField';
-import { NumberEntryCard } from '../../src/ui/NumberEntryCard';
+import { NumberEntry } from '../../src/ui/NumberEntry';
 
 /**
  * MM-279: a field's error is beside it, described to it and spoken; the
@@ -30,11 +30,19 @@ describe('a field with an error', () => {
   });
 });
 
-describe('the number card', () => {
+// MM-284: the unit after a value is part of what a screen reader hears for the field.
+describe('a field with a unit', () => {
+  it('says the unit in its description', () => {
+    render(<MmTextField name="Today's weigh-in" kind="number" suffix="lb" value="" onChange={() => undefined} />);
+    expect(screen.getByRole('textbox', { name: "Today's weigh-in" })).toHaveAccessibleDescription(/lb/);
+  });
+});
+
+describe('the number entry', () => {
   it('explains an inert Save under the field, and a refusal, keeping the keyboard in the field', async () => {
     render(
       <MmOverlays>
-        <NumberEntryCard
+        <NumberEntry
           title="Today's weigh-in"
           unit="lb"
           initial={undefined}
@@ -54,7 +62,7 @@ describe('the number card', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('That value looks off. Check it.');
-    expect(screen.getByRole('alert').closest('.mm-surface')).not.toBeNull();
+    expect(screen.getByRole('alert').closest('.mm-number-entry-block')).not.toBeNull();
     await userEvent.type(field, '0');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });

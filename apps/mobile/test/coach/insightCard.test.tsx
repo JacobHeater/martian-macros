@@ -13,6 +13,7 @@ import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /** MM-141: one rationed insight, in fixed words, with its evidence. Carried over from insight_card_test.dart. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -131,7 +132,7 @@ describe('on the dashboard', () => {
     return repos;
   }
 
-  const card = () => screen.queryByRole('button', { name: 'Dismiss' })?.closest('.mm-surface') ?? null;
+  const card = () => screen.queryByRole('button', { name: 'Dismiss' })?.closest('.mm-section') ?? null;
 
   it('a pattern is shown once, with its evidence', async () => {
     const repos = await shortOnProtein();
@@ -159,7 +160,7 @@ describe('on the dashboard', () => {
     }
     view.unmount();
     renderApp(repos, today.addDays(10));
-    await screen.findByRole('heading', { name: 'Logging coverage' });
+    await dashboardLoaded();
     // Another pattern may take its place; this one does not return.
     expect(screen.queryByText(/g short/)).not.toBeInTheDocument();
   });
@@ -170,7 +171,7 @@ describe('on the dashboard', () => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today }));
     await repos.weights.saveWeight(today, 82);
     renderApp(repos, today);
-    await screen.findByRole('heading', { name: 'Logging coverage' });
+    await dashboardLoaded();
     expect(card()).toBeNull();
   });
 });

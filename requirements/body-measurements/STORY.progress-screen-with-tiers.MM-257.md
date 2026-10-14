@@ -1,7 +1,7 @@
 ---
 id: MM-257
 component: body-measurements
-status: proposed
+status: done
 related: [MM-253, MM-224, MM-17, MM-136, MM-155, MM-77]
 ---
 
@@ -41,3 +41,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Progress.stories.tsx` (Progress), before
 and after.
+
+## Progress
+
+Built 2026-10-13. One hero holds today's weigh-in (`NumberEntry`; Save appears once the value changes, so no disabled primary sits in the hero, PD-17) and the trend: the 30/90 switch in its header, the three figures, the chart, one line about the band kept in view ("day-to-day jumps inside it are noise, not fat", UX-5, PD-19), and "How to read this" one tap down. Weight events are a section with the add action in its header and one row per event with its icon (illness, travel, creatine, training, meal) and the day in words (MM-285); the empty state is one sentence. Waist and Strength are sections folded to their lines (the waist summary; the lifts over 90 days), Waist opening to the technique line first (UX-22), the fields and a quiet Save (PD-4); Strength opens by itself when there are recent lifts. Tests: `test/progress/*` updated (`weightEvents.test.tsx` new). Story: `Screens/Progress` Progress. Left for MM-287: one figure instead of three and the lifts as rows (PD-18, PD-20).

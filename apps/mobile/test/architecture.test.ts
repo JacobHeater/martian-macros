@@ -83,6 +83,7 @@ const buttonHomes: readonly string[] = [
   'ui/MmOption.tsx',
   'ui/MmPickerField.tsx',
   'ui/MmPressable.tsx',
+  'ui/MmRhythmStrip.tsx',
   'ui/MmSegmented.tsx',
 ];
 

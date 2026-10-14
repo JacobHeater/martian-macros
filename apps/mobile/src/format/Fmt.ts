@@ -110,4 +110,8 @@ export class Fmt {
   static longDate(date: CalendarDate): string {
     return `${monthOf(date)} ${date.day}, ${date.year}`;
   }
+
+  static monthYear(date: CalendarDate): string {
+    return `${monthOf(date)} ${date.year}`;
+  }
 }
