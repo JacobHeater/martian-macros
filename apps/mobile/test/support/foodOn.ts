@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../../src/domain/CalendarDate';
+import type { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import type { Meal } from '../../src/domain/Meal';
 
@@ -12,7 +13,18 @@ export function foodOn(
     proteinG = 150,
     carbsG = 200,
     fatG = 70,
-  }: { name?: string; meal?: Meal; kcal?: number; proteinG?: number; carbsG?: number; fatG?: number } = {},
+    sodiumMg,
+    micros,
+  }: {
+    name?: string;
+    meal?: Meal;
+    kcal?: number;
+    proteinG?: number;
+    carbsG?: number;
+    fatG?: number;
+    sodiumMg?: number;
+    micros?: Micronutrients;
+  } = {},
 ): FoodEntry {
-  return new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source: 'weighed' });
+  return new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source: 'weighed', sodiumMg, micros });
 }

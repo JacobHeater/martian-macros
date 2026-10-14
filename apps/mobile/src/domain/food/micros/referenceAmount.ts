@@ -11,7 +11,10 @@ import type { Micronutrient } from './Micronutrient';
  * sheets (tables of RDAs and AIs), which reproduce the National Academies'
  * DRI reports; potassium is the 2019 AI.
  */
-export function referenceAmount(nutrient: Micronutrient, { sex, age }: { sex: BiologicalSex; age: number }): number | undefined {
+export function referenceAmount(
+  nutrient: Micronutrient,
+  { sex, age }: { sex: BiologicalSex; age: number },
+): number | undefined {
   if (age < 19) return undefined;
   const male = sex === 'male';
   switch (nutrient) {

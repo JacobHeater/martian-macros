@@ -1,3 +1,4 @@
+import { PackMicronutrient } from '../../src/foodCatalog/PackMicronutrient';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -34,12 +35,22 @@ async function rowsOf(path: string) {
   const rows = async (sql: string) => (await db.select(sql)).map((row) => Object.values(row));
   const dump = {
     header: await rows('SELECT key, value FROM header ORDER BY key'),
-    foods: await rows('SELECT * FROM foods ORDER BY id'),
+    // The columns of format 1, the one Dart wrote; format 2's micronutrients (MM-307) are checked apart.
+    foods: await rows(
+      'SELECT id, name, brand, kcal, protein, carbs, fat, fiber, sodium_mg, alcohol, preparation, pair_id, ' +
+        'density, source, source_id, tier, tier_reason FROM foods ORDER BY id',
+    ),
+    micros: await rows(
+      `SELECT ${PackMicronutrient.values.map((n) => PackMicronutrient.column(n)).join(', ')} FROM foods`,
+    ),
     servings: await rows('SELECT food_id, description, grams FROM servings ORDER BY rowid'),
     barcodes: await rows('SELECT gtin, food_id FROM barcodes ORDER BY gtin'),
   };
   await db.close();
-  return dump;
+  // The Dart extract carries no micronutrients, so every one is unknown.
+  expect(dump.micros.flat().every((value) => value === null)).toBe(true);
+  const { micros: _micros, ...dartColumns } = dump;
+  return dartColumns;
 }
 
 for (const [prefer, policy] of Object.entries(policies) as [keyof typeof recorded, ConflictPolicy][]) {

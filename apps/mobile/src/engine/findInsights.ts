@@ -7,6 +7,7 @@ import { InsightPriority } from './InsightPriority';
 import { InsightRationing } from './InsightRationing';
 import { InsightRule } from './InsightRule';
 import { ProteinSpreadRule } from './ProteinSpreadRule';
+import type { SodiumPattern } from './SodiumPattern';
 import type { StallAssessment } from './StallAssessment';
 import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
@@ -21,8 +22,8 @@ const mainMeals: readonly Meal[] = ['breakfast', 'lunch', 'dinner'];
  * Each rule is a pattern over `InsightRationing.patternDays` days resting on
  * at least `InsightRationing.minimumBasisDays` days of data, so nothing here
  * can be about a single day or a single weigh-in. For a user with an
- * eating-disorder history (`limitToProteinAndLogging`) rules about weight
- * are left out entirely.
+ * eating-disorder history (`limitToProteinAndLogging`) rules about weight,
+ * and about intake other than protein and logging, are left out entirely.
  */
 export function findInsights({
   through,
@@ -31,6 +32,7 @@ export function findInsights({
   history,
   stall,
   mealProtein = new Map(),
+  sodium,
   limitToProteinAndLogging = false,
 }: {
   through: CalendarDate;
@@ -39,6 +41,8 @@ export function findInsights({
   history: readonly TargetsRecord[];
   stall?: StallAssessment | undefined;
   mealProtein?: ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>;
+  /** The sodium limit and each day's sodium; absent when no limit is set (MM-312). */
+  sodium?: SodiumPattern | undefined;
   limitToProteinAndLogging?: boolean;
 }): Insight[] {
   const days = InsightRationing.patternDays;
@@ -108,6 +112,29 @@ export function findInsights({
     add('proteinShort', { wholeDays: judged, metDays: met, averageShortfallG: shortfall / (judged - met) });
   }
 
+  // Known sodium over the limit on more than half of the whole days since it
+  // was set that can be judged (MM-312). A day over is over whatever is
+  // missing; a day under counts only when enough of it states sodium.
+  if (sodium !== undefined) {
+    let over = 0;
+    let judgedSodium = 0;
+    let leftOut = 0;
+    for (const d of whole) {
+      if (d.date.isBefore(sodium.since)) continue;
+      const day = sodium.days.get(d.date);
+      const verdict = day === undefined ? 'unknown' : day.against(sodium.limitMg);
+      if (verdict === 'unknown') {
+        leftOut++;
+        continue;
+      }
+      judgedSodium++;
+      if (verdict === 'over') over++;
+    }
+    if (judgedSodium >= minimum && over * 2 > judgedSodium) {
+      add('sodiumOverLimit', { overDays: over, judgedDays: judgedSodium, leftOutDays: leftOut, limitMg: sodium.limitMg });
+    }
+  }
+
   // On most of the days the minimum was missed, one main meal had almost
   // no protein (MM-125). The earliest such meal is named.
   if (judged >= minimum && met * 2 < judged) {
@@ -123,7 +150,9 @@ export function findInsights({
     }
   }
 
-  const allowed = found.filter((i) => !(limitToProteinAndLogging && InsightRule.aboutWeight(i.rule)));
+  const allowed = found.filter(
+    (i) => !(limitToProteinAndLogging && (InsightRule.aboutWeight(i.rule) || InsightRule.otherIntake(i.rule))),
+  );
   // A stable sort by priority keeps the catalog order within a priority.
   const priority = (insight: Insight) => InsightPriority.index(InsightRule.priority(insight.rule));
   return allowed

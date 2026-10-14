@@ -1,5 +1,6 @@
 import type { CustomFood } from '../../domain/food/custom/CustomFood';
 import { CatalogFood } from '../../foodCatalog/CatalogFood';
+import { PackMicronutrient } from '../../foodCatalog/PackMicronutrient';
 
 /**
  * A saved food shown as the catalog food the amount step and trust mark
@@ -10,6 +11,7 @@ import { CatalogFood } from '../../foodCatalog/CatalogFood';
 export function customCatalogFood(food: CustomFood): CatalogFood {
   const grams = food.servingGrams;
   const scale = grams === undefined ? 1.0 : 100 / grams;
+  const perHundred = (perServing: number | undefined) => (perServing === undefined ? undefined : perServing * scale);
   return new CatalogFood({
     id: food.id,
     packId: 'custom',
@@ -18,6 +20,14 @@ export function customCatalogFood(food: CustomFood): CatalogFood {
     proteinG: food.perServing.proteinG * scale,
     carbsG: food.perServing.carbsG * scale,
     fatG: food.perServing.fatG * scale,
+    // Fiber, sodium and the micronutrients follow the same scale (MM-309).
+    fiberG: perHundred(food.fiberG),
+    sodiumMg: perHundred(food.micros.of('sodium')),
+    micros: Object.fromEntries(
+      PackMicronutrient.values
+        .map((n) => [n, perHundred(food.micros.of(n))] as const)
+        .filter(([, value]) => value !== undefined),
+    ),
     source: 'user',
     tier: 'label',
     tierReason: 'Entered by you.',

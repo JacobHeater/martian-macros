@@ -1,6 +1,6 @@
 ---
 id: MM-308
-status: in-progress
+status: done
 component: food-logging
 related: [MM-305, MM-307, MM-309, MM-49, MM-167, MM-48, MM-47]
 ---
@@ -55,3 +55,11 @@ Scenario: An older database is upgraded
   When the app opens it
   Then the entries are kept and have no micronutrients
 ```
+
+## Progress
+Built: `Micronutrients` (domain), `FoodEntry.micros` with sodium kept in one place (its field wins),
+thirteen columns on `food_entries` in schema version 4 with the migration, the SQL and in-memory
+repositories, logging from a pack or own food scaled to the grams eaten (`microsOfPackFood`), an edit
+rescaled with the energy, a copy kept. Tested in the food repository contract (both implementations),
+`test/data/upgrade.test.ts` (a version 3 database with an entry upgrades with none) and
+`test/food/ownFoodMicros.test.ts`.

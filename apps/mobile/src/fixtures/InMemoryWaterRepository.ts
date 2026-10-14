@@ -11,7 +11,9 @@ export class InMemoryWaterRepository implements WaterRepository {
 
   watchWater(date: CalendarDate): Watched<WaterEntry[]> {
     return this.entries.watchAs((all) =>
-      all.filter((e) => e.date.epochDay === date.epochDay).sort((a, b) => a.at.getTime() - b.at.getTime() || a.id - b.id),
+      all
+        .filter((e) => e.date.epochDay === date.epochDay)
+        .sort((a, b) => a.at.getTime() - b.at.getTime() || a.id - b.id),
     );
   }
 

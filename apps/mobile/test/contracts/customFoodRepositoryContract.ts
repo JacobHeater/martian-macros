@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
+import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import type { CustomFoodRepository } from '../../src/domain/repositories/CustomFoodRepository';
 import { expectChangeEmits } from '../support/expectChangeEmits';
@@ -50,6 +51,28 @@ export function customFoodRepositoryContract(
       expect(bar.perServing.kcal).toBe(120);
       expect(bar.perServing.proteinG).toBe(10);
       expect(bar.barcode).toBe('00012345678905');
+    });
+
+    // MM-309: fiber, sodium and the micronutrients per serving are kept; unknown stays unknown.
+    it('a food keeps fiber, sodium and its micronutrients', async () => {
+      await repo.saveCustomFood(
+        new CustomFood({
+          id: 0,
+          name: 'Oat milk',
+          kind: 'food',
+          servingDescription: '1 cup',
+          servingGrams: 240,
+          perServing: new NutritionTotals({ kcal: 120, proteinG: 3, carbsG: 16, fatG: 5 }),
+          fiberG: 2,
+          micros: new Micronutrients({ sodium: 160, calcium: 260, vitaminD: 2 }),
+        }),
+      );
+      const food = single(await first(repo.watchCustomFoods()));
+      expect(food.fiberG).toBe(2);
+      expect(food.micros.of('sodium')).toBe(160);
+      expect(food.micros.of('calcium')).toBe(260);
+      expect(food.micros.of('vitaminD')).toBe(2);
+      expect(food.micros.of('iron')).toBeUndefined();
     });
 
     it('saving with an id replaces that food', async () => {

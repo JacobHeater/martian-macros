@@ -24,6 +24,11 @@ interface CalorieHeroProps {
   intake: IntakeDay;
   /** The day's foods, for the Micros picture (MM-310). */
   entries: readonly FoodEntry[];
+  /**
+   * Whether Micros is a choice here: on Food only, its one home (owner,
+   * 2026-10-14; the panel's PD-1). Elsewhere a remembered Micros shows Grams.
+   */
+  microsOffered?: boolean;
   targets: DailyTargets | undefined;
   /**
    * During a pause `targets` are a guide (MM-148): the hero shows what was
@@ -50,11 +55,12 @@ interface CalorieHeroProps {
  * use it, and the arc is always drawn. The macro picture is a switch
  * between grams against target and the split of calories (MM-253, rule 4),
  * remembered per person, never both at once. At Full detail the switch has
- * a third choice, the day's micronutrients (MM-310).
+ * a third choice on Food, the day's micronutrients (MM-310).
  */
 export function CalorieHero({
   intake,
   entries,
+  microsOffered = false,
   targets,
   paused = false,
   macros = MacroKind.values,
@@ -88,7 +94,7 @@ export function CalorieHero({
   // The split of calories needs all three macros; at Simple detail only the bars are offered.
   const switchable = DetailLevel.showsCarbsAndFat(level);
   // Micros is a choice at Full detail only; remembered below it, the bars are shown.
-  const micros = DetailLevel.showsExtras(level);
+  const micros = microsOffered && DetailLevel.showsExtras(level);
   const chosen: MacroPicture = !switchable || (picture === 'micros' && !micros) ? 'bars' : picture;
 
   return (
@@ -109,7 +115,7 @@ export function CalorieHero({
       {switchable ? (
         <div className="food-hero-switch">
           <MmSegmented<MacroPicture>
-            name="Macro picture"
+            name="What the card shows"
             compact
             segments={[
               { value: 'bars', label: 'Grams' },

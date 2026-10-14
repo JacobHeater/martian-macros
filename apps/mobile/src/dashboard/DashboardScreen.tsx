@@ -190,13 +190,7 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         )}
-        <WaterRow
-          today={today}
-          onOpen={() => {
-            state.selectedDay.put(undefined);
-            open('food');
-          }}
-        />
+        <WaterRow today={today} />
         {current === undefined ? null : (
           <MmListRow
             leadingIcon="calendarCheck"

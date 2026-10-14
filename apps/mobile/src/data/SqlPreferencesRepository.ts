@@ -110,13 +110,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
         ? NutritionGoals.none
         : new NutritionGoals({
             sodiumLimitMg: optionalInteger(row, 'sodium_limit_mg'),
+            sodiumLimitSince: optionalDay(row, 'sodium_limit_since_epoch_day'),
             waterGoalMl: optionalNumber(row, 'water_goal_ml'),
           }),
     );
   }
 
-  saveSodiumLimit(mg: number | undefined): Promise<void> {
-    return this.save({ sodium_limit_mg: orNull(mg) });
+  saveSodiumLimit(mg: number | undefined, on: CalendarDate): Promise<void> {
+    return this.save({ sodium_limit_mg: orNull(mg), sodium_limit_since_epoch_day: mg === undefined ? null : on.epochDay });
   }
 
   saveWaterGoal(ml: number | undefined): Promise<void> {

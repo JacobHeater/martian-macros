@@ -31,6 +31,7 @@ import { Notice } from '../ui/Notice';
 import type { AmountChoice } from './AmountChoice';
 import { FoodTrustMark } from './FoodTrustMark';
 import { MealChips } from './MealChips';
+import { microsOfPackFood } from './microsOfPackFood';
 import './food.css';
 
 interface FoodAmountStepProps {
@@ -184,6 +185,7 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         fiberG: extra(food.fiberG),
         sodiumMg: extra(food.sodiumMg),
         alcoholG: extra(food.alcoholG),
+        micros: grams === undefined ? undefined : microsOfPackFood(food).times(grams / 100),
         portion: {
           method: method(),
           basis: 'calculated',

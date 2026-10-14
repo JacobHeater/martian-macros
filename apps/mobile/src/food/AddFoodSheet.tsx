@@ -377,6 +377,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       fiberG: scaledExtra(entry?.fiberG),
       sodiumMg: scaledExtra(entry?.sodiumMg),
       alcoholG,
+      // The micronutrients scale with the amount, as fiber and sodium do (MM-308).
+      micros:
+        entry === undefined || totals === undefined
+          ? undefined
+          : entry.micros.times(entry.kcal <= 0 ? 1 : totals.kcal / entry.kcal),
     });
     await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
     onDone();

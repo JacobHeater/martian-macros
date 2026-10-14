@@ -1,12 +1,15 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
+import { FoodEntry } from '../../domain/FoodEntry';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
 
 /**
@@ -144,7 +147,7 @@ export const MicrosToday = screenStory({
 /** MM-310: nothing logged yet; no number is shown. */
 export const MicrosEmpty = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Nothing logged yet today.',
+  shows: 'Nothing logged yet. Start with breakfast.',
   scenario: async (repos, today) => {
     await firstDayScenario(repos, today);
     await repos.preferences.saveDetailLevel('full');
@@ -156,7 +159,7 @@ export const MicrosEmpty = screenStory({
 /** MM-310: pregnant, so no reference amounts, and the care-team line. */
 export const MicrosCareTeam = screenStory({
   covers: ['FoodScreen'],
-  shows: /your care team can say/,
+  shows: /ask your care team which apply/,
   scenario: demoWith({ detail: 'full', picture: 'micros', pregnant: true }),
   open: yesterdaysFood,
 });
@@ -164,7 +167,7 @@ export const MicrosCareTeam = screenStory({
 /** MM-311: a sodium limit of 1,200 mg, and a day over it by 200 mg. */
 export const MicrosOverLimit = screenStory({
   covers: ['FoodScreen'],
-  shows: /Over your limit/,
+  shows: /over your limit/,
   scenario: demoWith({ detail: 'full', picture: 'micros', sodiumLimitMg: 1200 }),
   open: yesterdaysFood,
 });
@@ -172,10 +175,10 @@ export const MicrosOverLimit = screenStory({
 /** MM-313: the water section of a whole day, in imperial, no goal. */
 export const WaterSection = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Bottle',
+  shows: /Bottle, /,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    reveal(await within(canvas).findByRole('button', { name: 'Add another amount of water' }));
+    reveal(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
   },
 });
 
@@ -197,9 +200,122 @@ export const WaterOtherAmount = screenStory({
   scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: 'Add another amount of water' }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
     const field = await within(canvas).findByRole('textbox', { name: 'Water, millilitres' });
     await userEvent.type(field, '330');
     reveal(field);
+  },
+});
+
+/** A typed food with no sodium or micronutrients, added to yesterday. */
+const typedSnack: StoryScenario = async (repos, today) => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'snack',
+      name: 'Granola bar',
+      kcal: 190,
+      proteinG: 4,
+      carbsG: 29,
+      fatG: 7,
+      source: 'quickAdd',
+    }),
+  );
+};
+
+/** MM-311: under the limit, with a food that states no sodium, so the row says its coverage. */
+export const MicrosUnderLimit = screenStory({
+  covers: ['FoodScreen'],
+  shows: /your limit/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', sodiumLimitMg: 2300, then: typedSnack }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: one food today stating only sodium, so most rows are stated by none. */
+export const MicrosNotStated = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Not stated by any food: /,
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.preferences.saveDetailLevel('full');
+    await repos.preferences.saveMacroPicture('micros');
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'breakfast',
+        name: 'Instant oats',
+        kcal: 150,
+        proteinG: 5,
+        carbsG: 27,
+        fatG: 3,
+        source: 'labelServing',
+        sodiumMg: 110,
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: kidney disease, so no reference markers and the care-team line. */
+export const MicrosKidney = screenStory({
+  covers: ['FoodScreen'],
+  shows: /With kidney disease/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', screening: { chronicKidneyDisease: true } }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: after bariatric surgery (the panel's MN-6), the surgical team's line. */
+export const MicrosSurgery = screenStory({
+  covers: ['FoodScreen'],
+  shows: /After bariatric surgery/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', screening: { bariatricSurgery: true } }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: eighteen, so the adult reference bands do not apply. */
+export const MicrosEighteen = screenStory({
+  covers: ['FoodScreen'],
+  shows: /different under 19/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', birthYear: storyToday.year - 18 }),
+  open: yesterdaysFood,
+});
+
+/** MM-313: a drink removed; the snack says what and offers Undo. */
+export const WaterRemoved = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Removed .* of water/,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    const [remove] = await within(canvas).findAllByRole('button', { name: /^Remove .* of water$/ });
+    if (remove !== undefined) await userEvent.click(remove);
+  },
+});
+
+/** MM-313: another amount over the most one entry may be, refused with the range. */
+export const WaterOtherRefused = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Up to 3,000 ml at a time.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
+    const field = await within(canvas).findByRole('textbox', { name: 'Water, millilitres' });
+    await userEvent.type(field, '5000');
+    await userEvent.click(within(canvas).getByRole('button', { name: 'Save water' }));
+    reveal(field);
+  },
+});
+
+/** MM-313: imperial, nothing yet today, Other amount opened: the sizes on one line each, the field below. */
+export const WaterOtherOpen = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Up to 101 fl oz at a time.',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
+    reveal(await within(canvas).findByRole('textbox', { name: 'Water, fluid ounces' }));
   },
 });

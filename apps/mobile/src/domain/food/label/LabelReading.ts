@@ -1,3 +1,5 @@
+import { Micronutrients } from '../micros/Micronutrients';
+
 interface LabelReadingInit {
   servingText?: string | undefined;
   servingGrams?: number | undefined;
@@ -7,6 +9,7 @@ interface LabelReadingInit {
   fatG?: number | undefined;
   fiberG?: number | undefined;
   sodiumMg?: number | undefined;
+  micros?: Micronutrients;
 }
 
 /**
@@ -25,6 +28,12 @@ export class LabelReading {
   readonly fiberG: number | undefined;
   readonly sodiumMg: number | undefined;
 
+  /**
+   * The other lines read with an amount and its unit (MM-309), per serving;
+   * sodium is `sodiumMg`.
+   */
+  readonly micros: Micronutrients;
+
   constructor(init: LabelReadingInit = {}) {
     this.servingText = init.servingText;
     this.servingGrams = init.servingGrams;
@@ -34,6 +43,7 @@ export class LabelReading {
     this.fatG = init.fatG;
     this.fiberG = init.fiberG;
     this.sodiumMg = init.sodiumMg;
+    this.micros = init.micros ?? Micronutrients.none;
   }
 
   /** Whether nothing usable was found. */

@@ -116,3 +116,10 @@ export const WaterNone = screenStory({
     reveal(await within(canvas).findByText('No water yet today'));
   },
 });
+
+/** MM-310 (owner, 2026-10-14): Micros lives on Food; remembered, the Dashboard shows the grams. */
+export const MicrosRemembered = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Grams',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+});

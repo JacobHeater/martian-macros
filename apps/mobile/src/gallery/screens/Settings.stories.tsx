@@ -116,7 +116,7 @@ export const NutritionGoals = screenStory({
   scenario: demoWith({ sodiumLimitMg: 2300, waterGoalMl: 2000 }),
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText('Water goal'));
+    reveal(await within(canvas).findByText('Daily water goal'));
   },
 });
 
@@ -127,5 +127,42 @@ export const NutritionGoalsOff = screenStory({
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
+  },
+});
+
+/** MM-311: a limit under 1,500 mg, refused with the range (the panel's UX-4). */
+export const SodiumLimitRefused = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Daily sodium limit',
+  scenario: demoWith({ sodiumLimitMg: 2300 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    const field = await within(canvas).findByRole('textbox', { name: 'Daily sodium limit, milligrams' });
+    await userEvent.clear(field);
+    await userEvent.type(field, '800');
+    await userEvent.click(within(canvas).getByRole('button', { name: 'Save sodium limit' }));
+    reveal(field);
+  },
+});
+
+/** MM-311, MM-313: with kidney disease, both switches say a care team may set these (the panel's SA-5). */
+export const NutritionGoalsKidney = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Daily water goal',
+  scenario: demoWith({ screening: { chronicKidneyDisease: true } }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Daily water goal'));
+  },
+});
+
+/** MM-313: a goal above 4 L carries a plain note (owner, 2026-10-14; the panel's SA-5). */
+export const WaterGoalHigh = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /More than most people need/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 5000 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/More than most people need/));
   },
 });
