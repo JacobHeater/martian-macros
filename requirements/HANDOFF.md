@@ -61,6 +61,13 @@ sources and the chair's decisions are in `docs/agent-runs/mm242-eula/`.
 Change what the app does with data and the terms together: they say
 only what the code does, and never "nothing is uploaded" (MM-244).
 
+**Live reload on a device (MM-300).** `mm run --live [-d DEVICE] [--port N]`
+serves the app from the Vite dev server on `127.0.0.1` and runs Capacitor's
+live reload through adb reverse: save a file and the emulator updates
+without a build. Ctrl+C ends it; `mm run` puts the bundled app back. Do
+not launch it with PowerShell redirection (`*>`, `2>&1`): PowerShell 5.1
+turns Vite's stderr into an error and kills the runner.
+
 **Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
 `currentSchema.ts` and `migrationSteps.ts`, with their tests (version 3
 since MM-254: `macro_picture`). Only one schema change at a time.
