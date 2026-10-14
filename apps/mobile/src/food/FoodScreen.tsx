@@ -57,7 +57,7 @@ export function FoodScreen() {
 
   return (
     <>
-      <CalorieHero intake={intake} entries={entries} targets={paused ? guide : targets?.targets} paused={paused} />
+      <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
       <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
       {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
       {entries.length === 0 ? (

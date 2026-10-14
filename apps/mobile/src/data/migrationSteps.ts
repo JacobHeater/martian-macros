@@ -33,6 +33,7 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
         await db.execute(`ALTER TABLE custom_foods ADD COLUMN ${column} REAL NULL`);
       }
       await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_mg INTEGER NULL');
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_since_epoch_day INTEGER NULL');
       await db.execute('ALTER TABLE user_preferences ADD COLUMN water_goal_ml REAL NULL');
       await db.execute(
         'CREATE TABLE "water_entries" (' +

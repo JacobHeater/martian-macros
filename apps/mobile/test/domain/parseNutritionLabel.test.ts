@@ -59,3 +59,48 @@ it('text with no label is empty', () => {
   expect(parseNutritionLabel('hello world').isEmpty).toBe(true);
   expect(parseNutritionLabel('').isEmpty).toBe(true);
 });
+
+// MM-309: the label's other lines, read only with an amount and its unit.
+const full = `Nutrition Facts
+Serving size 1 cup (240mL)
+Calories 150
+Total Fat 8g 10%
+Sat. Fat 1g 5%
+Trans Fat 0g
+Cholesterol 0mg 0%
+Sodium 160mg 7%
+Total Carb. 12g 4%
+Dietary Fiber 2g 7%
+Total Sugars 12g
+Incl. 10g Added Sugars 20%
+Protein 8g
+Vit. D 2mcg 10% Calcium 260mg 20%
+Iron 8mg 45% Potassium 240mg 6%
+Vitamin A 10% Vitamin C 15mg 15%
+`;
+
+it('the mandatory lines and any other nutrient with an amount are read', () => {
+  const m = parseNutritionLabel(full).micros;
+  expect(m.of('saturatedFat')).toBe(1);
+  expect(m.of('cholesterol')).toBe(0);
+  expect(m.of('sugars')).toBe(12);
+  expect(m.of('vitaminD')).toBe(2);
+  expect(m.of('calcium')).toBe(260);
+  expect(m.of('iron')).toBe(8);
+  expect(m.of('potassium')).toBe(240);
+  expect(m.of('vitaminC')).toBe(15);
+});
+
+it('a nutrient printed with a percent only is left empty', () => {
+  const m = parseNutritionLabel(full).micros;
+  expect(m.of('vitaminA')).toBeUndefined();
+  expect(m.of('zinc')).toBeUndefined();
+});
+
+it('added sugars are not taken for the total', () => {
+  expect(parseNutritionLabel('Includes 10g Added Sugars\nTotal Sugars 14g').micros.of('sugars')).toBe(14);
+});
+
+it('vitamin D in IU is converted to micrograms', () => {
+  expect(parseNutritionLabel('Vitamin D 100 IU').micros.of('vitaminD')).toBe(2.5);
+});

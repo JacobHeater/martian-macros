@@ -135,6 +135,7 @@ CREATE TABLE "user_preferences" (
   "terms_accepted_epoch_day" INTEGER NULL,
   "macro_picture" TEXT NOT NULL DEFAULT 'bars',
   "sodium_limit_mg" INTEGER NULL,
+  "sodium_limit_since_epoch_day" INTEGER NULL,
   "water_goal_ml" REAL NULL,
   PRIMARY KEY ("id")
 );

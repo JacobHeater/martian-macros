@@ -788,8 +788,18 @@
 .mm-progress-fat .mm-progress-fill {
   background: var(--fat);
 }
+.mm-progress-nutrient {
+  /* The marker stands above and below the bar, so it reads over the fill too (MM-310). */
+  overflow: visible;
+}
 .mm-progress-nutrient .mm-progress-fill {
-  background: var(--info);
+  border-radius: inherit;
+  background: var(--text3);
+}
+.mm-progress-nutrient .mm-progress-marker {
+  top: -4px;
+  bottom: -4px;
+  box-shadow: 0 0 0 2px var(--surface);
 }
 .mm-progress-marker {
   position: absolute;

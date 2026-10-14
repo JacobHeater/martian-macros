@@ -22,6 +22,8 @@ interface NumberEntryProps {
    * "That value looks off"; any other failure as one to try again (MM-303).
    */
   onSave: (value: number) => Promise<void>;
+  /** What a refusal says in place of "That value looks off", when the caller knows the range (MM-311). */
+  refusal?: string | undefined;
 }
 
 /**
@@ -32,7 +34,7 @@ interface NumberEntryProps {
  * stays in it (MM-279). The keyboard's action key saves as Save does
  * (MM-296).
  */
-export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave }: NumberEntryProps) {
+export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave, refusal }: NumberEntryProps) {
   const hintId = useId();
   const [text, setText] = useState(initial ?? '');
   const [refused, setRefused] = useState<string>();
@@ -46,7 +48,9 @@ export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'pri
       await onSave(toSave);
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     } catch (error) {
-      setRefused(error instanceof FormatError ? 'That value looks off. Check it.' : 'Could not save. Try again.');
+      setRefused(
+        error instanceof FormatError ? (refusal ?? 'That value looks off. Check it.') : 'Could not save. Try again.',
+      );
     }
   };
 

@@ -3,6 +3,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
 import type { NutritionGoals } from '../domain/NutritionGoals';
 import type { WaterEntry } from '../domain/water/WaterEntry';
@@ -35,6 +36,7 @@ import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
+import type { SodiumPattern } from '../engine/SodiumPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
 import { findUnderEating } from '../engine/findUnderEating';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
@@ -223,6 +225,8 @@ export class AppState {
 
   /** Protein by meal for each of the days insights look at (MM-125). */
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
+  /** The sodium limit and each recent day's sodium, for the coach (MM-312); undefined with no limit. */
+  private readonly sodiumPattern: Cell<SodiumPattern | undefined>;
 
   /** The monthly reports that are ready (MM-33), oldest first. */
   readonly reportPeriods: Cell<readonly ReportPeriod[]>;
@@ -528,6 +532,21 @@ export class AppState {
       return byDay;
     });
 
+    this.sodiumPattern = derived<SodiumPattern | undefined>(() => {
+      const goals = of(this.nutritionGoals);
+      const limitMg = goals?.sodiumLimitMg;
+      const since = goals?.sodiumLimitSince;
+      if (limitMg === undefined || since === undefined) return undefined;
+      const today = this.today.value;
+      const days = new Map<CalendarDate, SodiumDay>();
+      for (let i = 1; i <= InsightRationing.patternDays; i++) {
+        const day = today.addDays(-i);
+        const entries = of(this.foodForDay(day));
+        if (entries !== undefined) days.set(day, SodiumDay.of(entries));
+      }
+      return { limitMg, since, days };
+    });
+
     this.reportPeriods = derived<readonly ReportPeriod[]>(() => {
       const setup = of(this.setup);
       const today = this.today.value;
@@ -577,6 +596,7 @@ export class AppState {
           history,
           stall: this.stallAssessment.value,
           mealProtein: this.mealProtein.value,
+          sodium: this.sodiumPattern.value,
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
         }),
         log,

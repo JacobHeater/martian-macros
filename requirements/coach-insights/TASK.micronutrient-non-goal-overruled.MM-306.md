@@ -1,6 +1,6 @@
 ---
 id: MM-306
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-144, MM-49, MM-126, MM-305]
 ---
@@ -39,3 +39,7 @@ Scenario: The ticket agrees
 ## Notes
 - The coverage the sources actually have is still unmeasured. The first real pack built with MM-307's
   columns will report it (the build report counts foods carrying each nutrient).
+
+## Progress
+Done: MM-144's line and `docs/non-goals.md` say the item was overruled by the owner on 2026-10-14 and name
+MM-305 and MM-306; the reasoning is kept.

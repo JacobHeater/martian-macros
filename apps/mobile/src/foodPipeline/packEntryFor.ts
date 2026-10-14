@@ -4,6 +4,7 @@ import type { PreparationState } from '../foodCatalog/PreparationState';
 import type { TrustTier } from '../foodCatalog/TrustTier';
 import { StateError } from '../lang/StateError';
 import type { CandidateFood } from './CandidateFood';
+import { plausibleMicros } from './plausibleMicros';
 
 function tierOf(source: string): readonly [TrustTier, string] {
   switch (source) {
@@ -64,6 +65,7 @@ export function packEntryFor(
       fiberG: food.fiberG,
       sodiumMg: food.sodiumMg,
       alcoholG: food.alcoholG,
+      micros: plausibleMicros(food),
       source: food.source,
       preparation,
       pairedFoodId,

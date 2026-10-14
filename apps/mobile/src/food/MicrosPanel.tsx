@@ -22,10 +22,19 @@ interface MicrosPanelProps {
 }
 
 const withheldLine: Readonly<Record<ReferenceWithheld, string>> = {
-  careTeam: 'Reference amounts are different in pregnancy and breastfeeding; your care team can say which apply.',
-  kidney: 'With kidney disease, your care team sets these amounts.',
+  careTeam: 'Reference amounts are different in pregnancy and breastfeeding; ask your care team which apply.',
+  kidney: 'With kidney disease, some of these amounts may be different for you; ask your care team.',
+  surgery: 'After bariatric surgery, your care team sets these amounts; ask them which apply.',
   young: 'Reference amounts are different under 19.',
 };
+
+/**
+ * What "reference" means, said once above the rows (the panel's UX-6, MN-4,
+ * SA-1): a usual daily amount for a healthy adult, averaged over many days.
+ */
+const referenceLine = (setup: UserSetup) =>
+  `Reference: a daily amount for a healthy ${setup.profile.sex === 'male' ? 'man' : 'woman'} of your age, ` +
+  'as an average over many days, not one day. If a clinician gave you amounts, use theirs.';
 
 /** "from 4 of 7 foods", when some of the day's foods do not state the nutrient. */
 const coverage = (total: MicronutrientTotal) =>
@@ -55,19 +64,17 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
   const row = (total: MicronutrientTotal) => {
     const n = total.nutrient;
     const name = Micronutrient.label(n);
-    if (total.noData) return <MmNutrientRow key={n} name={name} figures="No data yet" />;
     if (n === 'sodium' && limit !== undefined) {
       const over = total.over(limit);
       return (
         <MmNutrientRow
           key={n}
           name={name}
-          figures={
-            over
-              ? `Over your limit by ${nutrientAmount(n, total.known - limit)}`
-              : `${nutrientAmount(n, total.known).replace(/ mg$/, '')} of ${nutrientAmount(n, limit)}`
-          }
-          note={joined(coverage(total), 'your limit')}
+          figures={`${nutrientAmount(n, total.known).replace(/ mg$/, '')} of ${nutrientAmount(n, limit)}`}
+          note={joined(
+            coverage(total),
+            over ? `${nutrientAmount(n, total.known - limit)} over your limit` : 'your limit',
+          )}
           amount={total.known}
           reference={limit}
         />
@@ -86,18 +93,29 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
     );
   };
 
+  // With nothing logged there is nothing to list, and the screen already says so (MM-316).
+  if (entries.length === 0) return null;
   return (
     <div className="food-micros">
-      {entries.length === 0 ? <p className="app-text app-muted">Nothing logged yet today.</p> : null}
-      {withheld === undefined ? null : <p className="app-text app-muted food-micros-withheld">{withheldLine[withheld]}</p>}
-      {entries.length === 0
-        ? null
-        : MicronutrientGroup.values.map((group) => (
-            <div key={group} className="food-micros-group">
-              <SectionLabel text={MicronutrientGroup.label(group)} />
-              {totals.filter((t) => Micronutrient.group(t.nutrient) === group).map(row)}
-            </div>
-          ))}
+      {withheld !== undefined ? (
+        <p className="app-caption app-muted food-micros-line">{withheldLine[withheld]}</p>
+      ) : setup !== undefined ? (
+        <p className="app-caption app-muted food-micros-line">{referenceLine(setup)}</p>
+      ) : null}
+      {MicronutrientGroup.values.map((group) => {
+        const inGroup = totals.filter((t) => Micronutrient.group(t.nutrient) === group);
+        // The nutrients no food states are named once, in a line, not a row each.
+        const unstated = inGroup.filter((t) => t.noData).map((t) => Micronutrient.label(t.nutrient));
+        return (
+          <div key={group} className="food-micros-group">
+            <SectionLabel text={MicronutrientGroup.label(group)} />
+            {inGroup.filter((t) => !t.noData).map(row)}
+            {unstated.length === 0 ? null : (
+              <p className="app-caption app-muted food-micros-line">Not stated by any food: {unstated.join(', ')}.</p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

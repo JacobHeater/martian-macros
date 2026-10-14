@@ -32,12 +32,8 @@
 }
 .food-micros-group .mm-section-label {
   margin-bottom: 0;
-  color: var(--text2);
-  font: var(--type-label);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
-.food-micros-withheld {
+.food-micros-line {
   margin: 0;
 }
 .food-hero-status {
@@ -184,7 +180,19 @@
 /* The water section's one-tap amounts (MM-313). */
 .food-water-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-8);
-  margin-bottom: var(--space-12);
+}
+.food-water-other {
+  margin-top: var(--space-4);
+}
+.food-water-other + .mm-number-entry-block {
+  margin-top: var(--space-8);
+}
+
+/* A custom food's extra nutrients, two to a line (MM-309). */
+.food-extra-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8);
 }

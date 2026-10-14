@@ -9,6 +9,8 @@ import type { AppDatabase } from './AppDatabase';
 import { integer, named, number, optionalNumber, optionalText, orNull, text } from './columns';
 import { insert } from './insert';
 import { update } from './update';
+import { microsFromRow } from './microsFromRow';
+import { microsValues } from './microsValues';
 
 const totalsOf = (r: SqlRow) =>
   new NutritionTotals({
@@ -53,6 +55,8 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
             servings: optionalNumber(r, 'servings'),
             cookedWeightGrams: optionalNumber(r, 'cooked_weight_grams'),
             ingredients: byRecipe.get(integer(r, 'id')) ?? [],
+            fiberG: optionalNumber(r, 'fiber_g'),
+            micros: microsFromRow(r),
           }),
       );
     });
@@ -72,6 +76,9 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
         barcode: orNull(food.barcode),
         servings: orNull(food.servings),
         cooked_weight_grams: orNull(food.cookedWeightGrams),
+        fiber_g: orNull(food.fiberG),
+        sodium_mg: orNull(food.micros.of('sodium')),
+        ...microsValues(food.micros),
       };
       let id = food.id;
       if (id === 0) {

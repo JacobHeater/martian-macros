@@ -1,6 +1,6 @@
 ---
 id: MM-309
-status: in-progress
+status: done
 component: food-logging
 related: [MM-305, MM-308, MM-44, MM-45]
 ---
@@ -18,13 +18,14 @@ often printed only as a percent of the Daily Value.
 
 ## Decisions
 Choices I made without asking (say if any is wrong):
-- **The reader finds amounts, not percents.** A line with an amount and its unit ("Potassium 240mg 6%") is
+- **The reader finds amounts, not percents** (vitamin D in IU is converted at 40 IU to the microgram). A line with an amount and its unit ("Potassium 240mg 6%") is
   read; a line with only a percent ("Vitamin A 10%") is left empty, so nothing is converted through a
   Daily Value the label may not have used.
 - **A custom food keeps fiber, sodium and the thirteen nutrients** (fifteen new nullable columns on
   `custom_foods`, the same schema version as MM-308). They are per serving, like its macros.
 - **The form shows them folded** under "More nutrients (optional)", so the four numbers most people type
-  stay the form. A label read that found any of them says how many and opens the fold.
+  stay the form. A label read that found any of them says how many and opens the fold. Vitamin A and
+  folate are labelled "µg RAE" and "µg DFE" (the panel's MN-7).
 - **A recipe carries none** in this change: its ingredients store only the macros. Said in the recipe's
   notes; a later ticket if wanted.
 
@@ -61,3 +62,13 @@ Scenario: Edited later
   When it is opened for editing
   Then the calcium is in its field
 ```
+
+## Progress
+Built: `parseNutritionLabel` reads saturated fat, cholesterol, total sugars (never added sugars), vitamin
+D, calcium, iron, potassium and the others only with an amount and unit; `CustomFood` keeps fiber and
+`micros` (fifteen columns on `custom_foods`, schema version 4); `customCatalogFood` passes them per 100 g;
+the form's fold. Tested in `test/domain/parseNutritionLabel.test.ts`, the custom food repository contract
+and `test/food/ownFoodMicros.test.ts`.
+
+Not done: a recipe's ingredients carry no micronutrients; a supplement label can still be saved as a food
+(the panel's SA-9, an owner question for later).

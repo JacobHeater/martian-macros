@@ -144,6 +144,7 @@ const versionThree = (() => {
     .replace(foodEntries, '$1\n);')
     .replace(customFoods, '  "cooked_weight_grams" REAL NULL\n);')
     .replace('  "sodium_limit_mg" INTEGER NULL,\n', '')
+    .replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '')
     .replace('  "water_goal_ml" REAL NULL,\n', '')
     .replace(/CREATE TABLE "water_entries" \([\s\S]*?\n\);\n/, '');
 })();

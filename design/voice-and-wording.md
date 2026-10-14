@@ -31,7 +31,7 @@ One term for one thing, used everywhere.
 | trend weight | the filtered estimate of tissue weight | true weight, real weight |
 | weigh-in | one reading of the scale | weigh, entry (for weight) |
 | targets | the daily numbers (calories, protein, carbs, fat) | goals |
-| goal | fat loss, recomp, lean gain or maintenance | plan type, mode (in text) |
+| goal | fat loss, recomp, lean gain or maintenance; also an amount a person chooses to aim for and switches on (the water goal, the Nutrition goals section; owner, 2026-10-14, MM-313) | plan type, mode (in text) |
 | check-in | the weekly review of targets | update, reset |
 | calibration | the first fourteen days | trial, setup period |
 | metabolism | the friendly title of the energy-expenditure card | burn |

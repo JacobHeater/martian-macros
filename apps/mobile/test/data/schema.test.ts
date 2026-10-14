@@ -31,6 +31,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'terms_accepted_epoch_day',
     'macro_picture',
     'sodium_limit_mg',
+    'sodium_limit_since_epoch_day',
     'water_goal_ml',
   ],
   // Version 4 (MM-308): the micronutrients a food log entry keeps.

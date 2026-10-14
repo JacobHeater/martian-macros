@@ -4,8 +4,10 @@ import type { UserSetup } from '../../UserSetup';
 const values = [
   /** Pregnant or breastfeeding: the amounts differ (MM-310). */
   'careTeam',
-  /** Chronic kidney disease: potassium and others are set by a care team. */
+  /** Chronic kidney disease: potassium and others may be set by a care team. */
   'kidney',
+  /** After bariatric surgery: a surgical care team sets these (MM-310, the panel's MN-6). */
+  'surgery',
   /** Under 19: the adult bands do not apply. */
   'young',
 ] as const;
@@ -24,6 +26,7 @@ export const ReferenceWithheld = {
     const s = setup.screening;
     if (s.pregnant || s.breastfeeding) return 'careTeam';
     if (s.chronicKidneyDisease) return 'kidney';
+    if (s.bariatricSurgery) return 'surgery';
     if (setup.profile.ageOn(today) < 19) return 'young';
     return undefined;
   },

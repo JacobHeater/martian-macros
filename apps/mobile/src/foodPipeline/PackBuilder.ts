@@ -135,6 +135,7 @@ export class PackBuilder {
       });
     });
     for (const c of generic) report.countWritten(c.source);
+    for (const entry of [...genericEntries, ...barcodeEntries]) report.countStated(entry.food);
 
     return { generic: genericEntries, barcode: barcodeEntries, report };
   }

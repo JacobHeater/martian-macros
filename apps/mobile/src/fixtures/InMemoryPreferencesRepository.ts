@@ -93,12 +93,13 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     return this.goals.watch();
   }
 
-  async saveSodiumLimit(mg: number | undefined): Promise<void> {
-    this.goals.value = new NutritionGoals({ sodiumLimitMg: mg, waterGoalMl: this.goals.value.waterGoalMl });
+  async saveSodiumLimit(mg: number | undefined, on: CalendarDate): Promise<void> {
+    this.goals.value = new NutritionGoals({ sodiumLimitMg: mg, sodiumLimitSince: on, waterGoalMl: this.goals.value.waterGoalMl });
   }
 
   async saveWaterGoal(ml: number | undefined): Promise<void> {
-    this.goals.value = new NutritionGoals({ sodiumLimitMg: this.goals.value.sodiumLimitMg, waterGoalMl: ml });
+    const { sodiumLimitMg, sodiumLimitSince } = this.goals.value;
+    this.goals.value = new NutritionGoals({ sodiumLimitMg, sodiumLimitSince, waterGoalMl: ml });
   }
 
   /** Back to the defaults (used by `InMemoryDataEraser`). */

@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-14, by Claude, Session 26.
+Last updated: 2026-10-14, by Claude, Session 27.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -93,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-315 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-318 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -201,6 +201,19 @@ Ember switch stays. Not yet looked at on the phone: the drums' scroll feel
 and the calendar swipe (the Pixel was disconnected); the Storybook stories
 were looked at in a headless browser in three palettes.
 
+**Questions to the owner go through the interactive question tool (owner,
+2026-10-14).** Never as a numbered list in a chat reply: batches of up to
+four, concrete options, the recommendation first.
+
+**Water, sodium and micronutrients (MM-305, built 2026-10-14).** Micros is
+a choice of the nutrition card on the Food screen only (`CalorieHero
+microsOffered`), at Full detail. Every micronutrient total is the known
+amount with its coverage, never treating missing as zero; references are
+withheld in pregnancy, breastfeeding, kidney disease, after bariatric
+surgery and under 19. Insight rules about intake other than protein and
+logging are flagged `otherIntake` and suppressed for an eating-disorder
+history (MM-141).
+
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
@@ -214,28 +227,44 @@ were looked at in a headless browser in three palettes.
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
-## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305, in progress)
+## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305 built)
 
 - The owner pasted new food tracker requirements: track water, track
   micronutrients, configure a sodium goal, and show micronutrients on the
   nutrition card as a third choice beside Grams and Split. **New working
   agreement: every question to the owner goes through the interactive
   question tool, never as a list in chat.**
-- The owner answered sixteen questions (recorded in MM-305 and each
-  story): the micronutrient non-goal is **overruled** (MM-306; MM-144 and
-  `docs/non-goals.md` say so); minerals and key vitamins plus the label's
-  sugars, saturated fat and cholesterol; totals with a reference marker and
-  coverage; the pack, labels and own foods as sources; a third segment
-  "Micros" at Full detail; a sodium limit off by default (2,300 mg
-  suggested), set in Settings, with a coach line; water by glass, bottle or
-  typed amount with an optional goal, plain water only, on Food and the
-  Dashboard with a one-tap add, written to Health Connect (MM-314, waits
-  on MM-70).
-- Branch `feature/water-sodium-micronutrients`, **stacked on #158**
-  (MM-301 to MM-304), which was green; merging it was refused by the
-  session's permission classifier, so it waits for the owner.
-- Tickets MM-305 to MM-314 placed: WS-08 step 10, WS-04 step 7, WS-09
-  step 9, WS-11 step 9.
+- The owner answered sixteen questions, then four more after the panel
+  (all recorded in MM-305 and each story): the micronutrient non-goal is
+  **overruled** (MM-306); minerals and key vitamins plus the label's
+  sugars, saturated fat and cholesterol; totals with a reference marker
+  and coverage; **Micros on the Food screen only**; a sodium limit off by
+  default, 2,300 mg suggested, **1,500 mg minimum**, with a coach line;
+  water by glass, bottle or typed amount with an optional **goal** (the
+  word kept; glossary amended), up to 6 L with a note above 4 L, plain
+  water only; written to Health Connect later (MM-314, waits on MM-70).
+- **Story, panel, build (MM-293).** Drawn in Storybook, reviewed by the
+  product-designer, UX-accessibility, micronutrients, coaching and safety
+  roles (`docs/agent-runs/mm305-water-micros/`, every finding's outcome in
+  `decision.md`); the UX guard passed on a re-review of the new states.
+  Blocking findings resolved: the long Micros card (owner: Food only) and
+  the sodium insight reaching an eating-disorder history (now suppressed,
+  MM-141). The owner caught the sized water buttons wrapping mid-unit
+  after the review; redrawn and looked at in three palettes.
+- **Built:** MM-306 to MM-313, bugs MM-315 ("share picture"), MM-316 (Micros
+  said "today" on a past day), MM-317 (focus lost after another amount).
+  Schema version 4 (micronutrient columns on entries and own foods, the
+  goals and the day the limit was set, `water_entries`); pack format 2
+  (reads format 1); `extract.sql` maps USDA ids and Open Food Facts
+  (vitamin A and folate left unknown there); label reading of the
+  mandatory lines; the sodium insight; eleven evidence-register rows.
+- **Branch** `feature/water-sodium-micronutrients`, **stacked on #158**
+  (green; merging it was refused by the session's permission classifier,
+  so it waits for the owner).
+- **Not verified:** the phone, TalkBack, 200% text; a real pack build (so
+  the coverage MM-306 asked about and the pack's size are unmeasured).
+- **Roadmap:** WS-08 step 10, WS-04 step 7 and WS-09 step 9 built; WS-11
+  step 9 (MM-314) waits on MM-70.
 
 ## Session 26: 2026-10-14, Claude (the waist measured on the Dashboard; snacks above the bar)
 
