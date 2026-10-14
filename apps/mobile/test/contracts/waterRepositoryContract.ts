@@ -43,6 +43,17 @@ export function waterRepositoryContract(name: string, create: () => WaterReposit
       expect((await first(repo.watchWater(d1))).map((e) => e.id)).toEqual([b]);
     });
 
+    it('an update changes the amount and keeps the day and time', async () => {
+      const id = await repo.addWater(drink(d1, 250, 8));
+      await repo.addWater(drink(d1, 500, 9));
+      await repo.updateWater(new WaterEntry({ id, date: d1, ml: 330, at: at(d1, 8) }));
+      const day = await first(repo.watchWater(d1));
+      expect(day.map((e) => [e.id, e.ml, e.at.getTime()])).toEqual([
+        [id, 330, at(d1, 8).getTime()],
+        [day[1]?.id, 500, at(d1, 9).getTime()],
+      ]);
+    });
+
     it('emits the current list first, then each change', async () => {
       await expectChangeEmits(repo.watchWater(d1), {
         see: (l) => l.length,

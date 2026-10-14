@@ -172,40 +172,8 @@ export const MicrosOverLimit = screenStory({
   open: yesterdaysFood,
 });
 
-/** MM-313: the water section of a whole day, in imperial, no goal. */
-export const WaterSection = screenStory({
-  covers: ['FoodScreen'],
-  shows: /Bottle, /,
-  open: yesterdaysFood,
-  walk: async (canvas) => {
-    reveal(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
-  },
-});
 
-/** MM-313: a goal of 1.5 L in metric, and a day past it. */
-export const WaterGoalReached = screenStory({
-  covers: ['FoodScreen'],
-  shows: /Goal reached/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
-  open: yesterdaysFood,
-  walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/Goal reached/));
-  },
-});
 
-/** MM-313: another amount, typed. */
-export const WaterOtherAmount = screenStory({
-  covers: ['FoodScreen'],
-  shows: 'Up to 3,000 ml at a time.',
-  scenario: demoWith({ units: 'metric' }),
-  open: yesterdaysFood,
-  walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
-    const field = await within(canvas).findByRole('textbox', { name: 'Water, millilitres' });
-    await userEvent.type(field, '330');
-    reveal(field);
-  },
-});
 
 /** A typed food with no sodium or micronutrients, added to yesterday. */
 const typedSnack: StoryScenario = async (repos, today) => {
@@ -282,40 +250,138 @@ export const MicrosEighteen = screenStory({
   open: yesterdaysFood,
 });
 
-/** MM-313: a drink removed; the snack says what and offers Undo. */
+/** Opens the Water section's "+", once the Food screen is there. */
+const addWater = async (canvas: HTMLElement) => {
+  const add = await within(canvas).findByRole('button', { name: 'Add water' });
+  reveal(add);
+  await userEvent.click(add);
+};
+
+/** MM-318: Water as a section like the meals, beside them, in imperial with no goal. */
+export const WaterSection = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Water',
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add water' }));
+  },
+});
+
+/** MM-318: no water yet and no goal: the header alone, as an empty meal. */
+export const WaterNone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Water',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add water' }));
+  },
+});
+
+/** MM-313, MM-318: a goal of 1.5 L in metric, and a day past it. */
+export const WaterGoalReached = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Goal reached/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Goal reached/));
+  },
+});
+
+/** MM-318: the header's "+" opens the Add water sheet, as a meal's opens Add food. */
+export const WaterAddSheet = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Other amount',
+  open: yesterdaysFood,
+  walk: addWater,
+});
+
+/** MM-318: the sheet in metric with another amount typed. */
+export const WaterOtherAmount = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Up to 3,000 ml at a time.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await addWater(canvas);
+    const body = canvas.ownerDocument.body;
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '330');
+  },
+});
+
+/** MM-318: imperial, nothing yet today, the sheet open. */
+export const WaterOtherOpen = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Up to 101 fl oz at a time.',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: addWater,
+});
+
+/** MM-318: another amount over the most one drink may be, refused with the range below. */
+export const WaterOtherRefused = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'That is more than one drink can be.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await addWater(canvas);
+    const body = canvas.ownerDocument.body;
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '5000');
+    await userEvent.click(within(body).getByRole('button', { name: 'Save water' }));
+  },
+});
+
+/** MM-318: a drink deleted from its "More actions", as a meal's food; the snack offers Undo. */
 export const WaterRemoved = screenStory({
   covers: ['FoodScreen'],
   shows: /Removed .* of water/,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    const [remove] = await within(canvas).findAllByRole('button', { name: /^Remove .* of water$/ });
-    if (remove !== undefined) await userEvent.click(remove);
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for .* of water/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Delete' }));
   },
 });
 
-/** MM-313: another amount over the most one entry may be, refused with the range. */
-export const WaterOtherRefused = screenStory({
+/** MM-318 (the panel's PD-2): a goal of 2 L and nothing yet: the header says the goal alone. */
+export const WaterGoalSetNone = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Up to 3,000 ml at a time.',
+  shows: /Goal 2 L/,
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'metric' }));
+    await repos.preferences.saveWaterGoal(2000);
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Goal 2 L/));
+  },
+});
+
+/** MM-318 (the panel's PD-2): a goal of 2.5 L and part of it drunk. */
+export const WaterGoalPartway = screenStory({
+  covers: ['FoodScreen'],
+  shows: /of 2.5 L/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/of 2.5 L/));
+  },
+});
+
+/** MM-318 (the panel's PD-1): a drink pressed opens Edit water, as a food opens Edit food. */
+export const WaterEdit = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Edit water',
   scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
-    const field = await within(canvas).findByRole('textbox', { name: 'Water, millilitres' });
-    await userEvent.type(field, '5000');
-    await userEvent.click(within(canvas).getByRole('button', { name: 'Save water' }));
-    reveal(field);
-  },
-});
-
-/** MM-313: imperial, nothing yet today, Other amount opened: the sizes on one line each, the field below. */
-export const WaterOtherOpen = screenStory({
-  covers: ['FoodScreen'],
-  shows: 'Up to 101 fl oz at a time.',
-  scenario: firstDayScenario,
-  open: ({ state }) => state.homeTab.put('food'),
-  walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: 'Other amount of water' }));
-    reveal(await within(canvas).findByRole('textbox', { name: 'Water, fluid ounces' }));
+    const [drink] = await within(canvas).findAllByRole('button', { name: /^Edit .* of water/ });
+    if (drink !== undefined) {
+      reveal(drink);
+      await userEvent.click(drink);
+    }
   },
 });

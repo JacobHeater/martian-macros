@@ -24,6 +24,12 @@ Scenario: Focus comes back
   Then focus is on "Other amount of water"
 ```
 
+## Second cause (found with MM-318)
+When "Other amount" moved into the Add water sheet, focus still fell to the document: `NumberEntry` blurred
+whatever was focused after a save, and by then the sheet had closed and put focus back on the section's
+"+". It now lets go only of focus inside itself.
+
 ## Notes
-Regression test: "after another amount is saved, focus is back on Other amount" in
-`test/food/waterAndMicros.test.tsx`; it failed before the fix and passes after.
+Regression test: "after another amount is saved, focus is back on Add water" in
+`test/food/waterAndMicros.test.tsx` (it was "…on Other amount" before MM-318 moved the field into a sheet);
+each version failed before its fix and passes after.
