@@ -93,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-305 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-315 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -214,6 +214,29 @@ were looked at in a headless browser in three palettes.
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
+## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305, in progress)
+
+- The owner pasted new food tracker requirements: track water, track
+  micronutrients, configure a sodium goal, and show micronutrients on the
+  nutrition card as a third choice beside Grams and Split. **New working
+  agreement: every question to the owner goes through the interactive
+  question tool, never as a list in chat.**
+- The owner answered sixteen questions (recorded in MM-305 and each
+  story): the micronutrient non-goal is **overruled** (MM-306; MM-144 and
+  `docs/non-goals.md` say so); minerals and key vitamins plus the label's
+  sugars, saturated fat and cholesterol; totals with a reference marker and
+  coverage; the pack, labels and own foods as sources; a third segment
+  "Micros" at Full detail; a sodium limit off by default (2,300 mg
+  suggested), set in Settings, with a coach line; water by glass, bottle or
+  typed amount with an optional goal, plain water only, on Food and the
+  Dashboard with a one-tap add, written to Health Connect (MM-314, waits
+  on MM-70).
+- Branch `feature/water-sodium-micronutrients`, **stacked on #158**
+  (MM-301 to MM-304), which was green; merging it was refused by the
+  session's permission classifier, so it waits for the owner.
+- Tickets MM-305 to MM-314 placed: WS-08 step 10, WS-04 step 7, WS-09
+  step 9, WS-11 step 9.
+
 ## Session 26: 2026-10-14, Claude (the waist measured on the Dashboard; snacks above the bar)
 
 - The owner, on his phone: the Dashboard's rows that are windows into a
@@ -296,73 +319,3 @@ limitations.
   agent shell's `NoDefaultCurrentDirectoryInExePath`. WS-01 step 7 built.
 - Moved the needle: **WS-03 step 12 built** (MM-290 to MM-299). Available
   next: WS-02 step 6 (MM-135), WS-03 step 11, WS-15.
-
-## Session 24: 2026-10-13, Claude (the hierarchy rebuild with iconography: WS-03 step 9 built)
-
-- The owner's instruction: "I want the hierarchy rebuild with iconography."
-  MM-253 to MM-259 were built in one branch, with the panel pass first.
-- **The panel pass (MM-253).** The product-designer and UX-accessibility
-  roles graded the six destinations as built on `main` at `9fb8c79`
-  (first-viewport renders in Martian and Light, source for the rest):
-  28 and 25 findings, every one with an outcome in
-  `docs/agent-runs/mm253-hierarchy/decision.md` and `state.json`
-  (`mm panel` validates the run). Folded into the build: the confidence
-  word labelled, never alone; a heading in the hero; the completeness
-  control as a row after the last meal with the mark in the header; method
-  icons beside their word; one sentence of uncertainty kept with the trend
-  chart; the held or settling estimate said in the folded line; the
-  safeguards above the hero and outside the one-thing rationing; the Save
-  that waits for a change; dates in words; no default event type; a
-  Dashboard named Dashboard; the star, not a trophy, for a record; both
-  strips the rolling last seven days. Three bugs became tickets with
-  regression tests (MM-283 the coach line, MM-284 the unit heard, MM-285
-  event dates and default). Left for later as WS-03 step 11: MM-286
-  (destinations keep their state; the Food primary first in focus order),
-  MM-287 (one figure, lift rows), MM-288 (the Ember budget for text
-  actions, the owner's call), MM-289 (a demo seed that shows every mark).
-  Owner decisions still open, listed in `decision.md`: PD-2 Ember text,
-  PD-9 whether the arc leaves Coach (MM-187 stands), UX-24 numeric
-  settings as sheets, the meal glyph family.
-- **The direction** is the first section of `design/screen-direction.md`:
-  eight rules, what sits outside them, what "one tap down" means, the
-  first-viewport budget per destination, empty states, and the
-  before-and-after table. `test/gallery/hierarchy.test.tsx` makes rules 1,
-  4 and 6 checkable on every destination story.
-- **The design system.** `MmSection` (icon, heading, summary, trailing
-  action; folds with `collapsible`, keeps state with `maintainState`, or
-  opens a screen with `onPress`), `MmRhythmStrip` (seven named dots, full,
-  half, empty, today ringed; buttons when `onSelect` is given, listed in
-  `buttonHomes`), `NumberEntry` (the bare field; `NumberEntryCard` is
-  gone), `MmSwitchRow leadingIcon`, `MmDropdown placeholder`,
-  `MmTextField` describing its suffix, thirty-five meaning names in
-  `MmIconName`, `.mm-section` and `.mm-rhythm` in `ui.css`. The macro
-  picture is a preference (`MacroPicture`, `user_preferences.macro_picture`,
-  schema version 3, in-memory and SQL repositories, the contract test).
-- **The screens.** Dashboard: hero with the Grams/Share switch, the rhythm
-  strip (`rhythmDays`), streak row, insight section, rows for weight,
-  waist, next check-in and training, the weigh-in in place only on a day
-  without one, the history behind "More about this week". Food: meals as
-  sections with icons, method icons on rows, the completeness row and the
-  header mark, "More about today". Coach: safeguards first, the hero with
-  the check-in and the confidence word, `OneThingRow`, eleven sections
-  (recovery and reports folded when quiet). Progress: one hero with the
-  weigh-in and the trend, events as rows with icons and an add button in
-  the header, Waist and Strength folded. Train: one primary, the strip
-  (`trainedDays`), the volume section, `workoutGroups` by week and month
-  with a star for a record. Settings: seven sections of rows with icons,
-  choosers through the options dialog, erase last.
-- **Tests.** The suite is 2,145 with the new ones (`hierarchy`, `section`,
-  `rhythmDays`, `workoutGroups`, `weightEvents`, the unit, the coach line);
-  `test/support/dashboardLoaded.ts` replaces the "Logging coverage"
-  sentinel (the history is one tap down); `failsFirst` now fails until
-  `recover()` is called, because the Dashboard's rows read the workouts
-  before a later screen does.
-- **Looked at** in a headless browser from the static Storybook: the six
-  destinations at 412 by 915 in Martian, Light and Dark. Not looked at:
-  below the first viewport (the frame is fixed to the phone's height, so a
-  tall capture shows the same 915 px; the tails were walked by the tests),
-  anything on the phone, 200% text, the donut legend's contrast on the hero
-  (the chair's measurement is still owed, with the two from Session 23).
-- Moved the needle: **WS-03 step 9 done** (seven tickets plus three bugs);
-  **WS-03 step 11** placed (four tickets); M2 gained fourteen. Available
-  next: WS-02 step 6, WS-03 step 11, WS-15.

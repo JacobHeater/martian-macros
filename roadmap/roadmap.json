@@ -692,7 +692,13 @@
             "MM-46",
             "MM-44",
             "MM-58",
-            "MM-172"
+            "MM-172",
+            "MM-306",
+            "MM-308",
+            "MM-309",
+            "MM-310",
+            "MM-311",
+            "MM-313"
           ]
         },
         {
@@ -703,7 +709,8 @@
             "MM-133",
             "MM-32",
             "MM-125",
-            "MM-36"
+            "MM-36",
+            "MM-312"
           ]
         },
         {
@@ -722,7 +729,14 @@
           "tickets": [
             "MM-72",
             "MM-70",
-            "MM-69"
+            "MM-69",
+            "MM-314"
+          ]
+        },
+        {
+          "workstream": "WS-04",
+          "tickets": [
+            "MM-307"
           ]
         }
       ]
@@ -1488,7 +1502,8 @@
           "MM-55",
           "MM-56",
           "MM-57",
-          "MM-153"
+          "MM-153",
+          "MM-307"
         ]
       },
       "sequence": [
@@ -1541,6 +1556,14 @@
             "MM-56"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 7,
+          "title": "Micronutrients in the pack (MM-307): format version 2, the extract and the build report",
+          "tickets": [
+            "MM-307"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -1955,7 +1978,9 @@
         "WS-03",
         "WS-04"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "WS-09"
+      ],
       "primaryOwnership": [
         "apps/mobile/src/food (add-food flow, entry rows)",
         "apps/mobile/src/domain/FoodEntry.ts",
@@ -2019,7 +2044,14 @@
           "MM-218",
           "MM-219",
           "MM-220",
-          "MM-221"
+          "MM-221",
+          "MM-305",
+          "MM-306",
+          "MM-308",
+          "MM-309",
+          "MM-310",
+          "MM-311",
+          "MM-313"
         ]
       },
       "sequence": [
@@ -2120,6 +2152,19 @@
             "MM-220",
             "MM-221"
           ]
+        },
+        {
+          "step": 10,
+          "title": "Water, sodium and micronutrients (MM-305, the owner 2026-10-14): the log keeps micronutrients, labels and own foods, the Micros segment, the sodium limit, water",
+          "tickets": [
+            "MM-306",
+            "MM-308",
+            "MM-309",
+            "MM-310",
+            "MM-311",
+            "MM-313"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -2148,7 +2193,8 @@
         "WS-05",
         "WS-06",
         "WS-07",
-        "WS-10"
+        "WS-10",
+        "WS-08"
       ],
       "unlocks": [
         "WS-13",
@@ -2200,7 +2246,8 @@
           "MM-147",
           "MM-148",
           "MM-149",
-          "MM-248"
+          "MM-248",
+          "MM-312"
         ]
       },
       "sequence": [
@@ -2274,6 +2321,14 @@
           "tickets": [
             "MM-125",
             "MM-36"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 9,
+          "title": "The sodium-over-the-limit insight (MM-312)",
+          "tickets": [
+            "MM-312"
           ],
           "milestone": "M4"
         }
@@ -2469,7 +2524,8 @@
           "MM-70",
           "MM-71",
           "MM-72",
-          "MM-73"
+          "MM-73",
+          "MM-314"
         ]
       },
       "sequence": [
@@ -2536,6 +2592,14 @@
             "MM-188"
           ],
           "milestone": "M3"
+        },
+        {
+          "step": 9,
+          "title": "Water written to the health platform (MM-314), on MM-70 write path",
+          "tickets": [
+            "MM-314"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -3632,6 +3696,30 @@
         "MM-117"
       ],
       "reason": "The relief rule gains a signal of its own; the rule must exist first."
+    },
+    {
+      "from": "WS-04",
+      "to": "WS-08",
+      "type": "soft-preferred-order",
+      "scope": [
+        10
+      ],
+      "satisfiedBy": [
+        "MM-307"
+      ],
+      "reason": "The Micros segment is most useful once pack foods carry micronutrients; labels and own foods work without them."
+    },
+    {
+      "from": "WS-08",
+      "to": "WS-09",
+      "type": "contract-dependency",
+      "scope": [
+        9
+      ],
+      "satisfiedBy": [
+        "MM-311"
+      ],
+      "reason": "The sodium insight reads the sodium limit preference and the coverage rule of the Micros view."
     }
   ],
   "parallelGroups": [
