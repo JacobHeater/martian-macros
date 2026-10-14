@@ -125,6 +125,7 @@ export function PauseScreen() {
           value={startsIn}
           max={PauseRule.maximumDays}
           divisions={PauseRule.maximumDays}
+          label={startsIn === 0 ? 'today' : `in ${startsIn} ${daysWord(startsIn)}`}
           onChange={(value) => setStartsIn(roundHalfAwayFromZero(value))}
         />
         <div className="app-gap-small" />
@@ -135,6 +136,7 @@ export function PauseScreen() {
           min={1}
           max={PauseRule.maximumDays}
           divisions={PauseRule.maximumDays - 1}
+          label={`${days} ${daysWord(days)}`}
           onChange={(value) => setDays(roundHalfAwayFromZero(value))}
         />
         <div className="app-gap-small" />

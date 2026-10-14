@@ -1,7 +1,7 @@
 ---
 id: MM-272
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-48, MM-104]
 ---
 
@@ -38,3 +38,7 @@ Scenario: Plain snacks still go
   Given a snack with no action
   Then it is gone after four seconds, unless focused
 ```
+
+## Progress
+
+Built 2026-10-13: a snack with an action has no timeout; it stays until the action, a replacement, its Dismiss icon button or the hardware back (`closeTop` dismisses it when no question is up). A snack without an action keeps the four seconds and pauses while focused or pointed at. Tests: `test/ui/snack.test.tsx` with fake timers.

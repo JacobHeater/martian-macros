@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "asOf": "2026-10-13",
   "generatedFrom": {
-    "requirements": "requirements/ (245 tickets, MM-1 to MM-245; 127 done, 59 in-progress, 59 proposed)",
+    "requirements": "requirements/ (245 tickets, MM-1 to MM-282; 127 done, 59 in-progress, 59 proposed)",
     "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
     "documents": [
       "requirements/README.md",
@@ -755,12 +755,12 @@
           "MM-232",
           "MM-233",
           "MM-246",
-          "MM-261"
+          "MM-261",
+          "MM-278"
         ],
         "remaining": [
           "MM-159",
-          "MM-228",
-          "MM-278"
+          "MM-228"
         ]
       },
       "sequence": [
@@ -1172,7 +1172,25 @@
           "MM-237",
           "MM-239",
           "MM-240",
-          "MM-260"
+          "MM-260",
+          "MM-262",
+          "MM-263",
+          "MM-264",
+          "MM-265",
+          "MM-266",
+          "MM-267",
+          "MM-268",
+          "MM-271",
+          "MM-272",
+          "MM-273",
+          "MM-274",
+          "MM-275",
+          "MM-276",
+          "MM-277",
+          "MM-279",
+          "MM-280",
+          "MM-281",
+          "MM-282"
         ],
         "remaining": [
           "MM-89",
@@ -1193,25 +1211,7 @@
           "MM-256",
           "MM-257",
           "MM-258",
-          "MM-259",
-          "MM-262",
-          "MM-263",
-          "MM-264",
-          "MM-265",
-          "MM-266",
-          "MM-267",
-          "MM-268",
-          "MM-271",
-          "MM-272",
-          "MM-273",
-          "MM-274",
-          "MM-275",
-          "MM-276",
-          "MM-277",
-          "MM-279",
-          "MM-280",
-          "MM-281",
-          "MM-282"
+          "MM-259"
         ]
       },
       "sequence": [

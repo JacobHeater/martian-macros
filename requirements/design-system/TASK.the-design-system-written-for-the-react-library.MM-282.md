@@ -1,7 +1,7 @@
 ---
 id: MM-282
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-261, MM-236, MM-101]
 ---
 
@@ -36,3 +36,7 @@ Scenario: One document for the library
 Scenario: The icon sentence matches MM-236
   Then visual-language.md says the Outlined set is the one family, selected or not
 ```
+
+## Progress
+
+Written 2026-10-13: `design/design-system-implementation.md` describes the React library (the rule, where it lives, the control map, composites, the vocabulary, the state set, tokens, elevation, overlays, how a component gets its story and tests); `visual-language.md`'s icon sentence says the Outlined set is the one family, selected or not. The Flutter text is replaced.

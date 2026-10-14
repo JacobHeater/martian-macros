@@ -1,6 +1,6 @@
 import { composeStories } from '@storybook/react-vite';
 import { render, screen } from '@testing-library/react';
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
@@ -43,6 +43,30 @@ function surfaces(folder: string): string[] {
 /** The frames the screens are drawn in: components, with stories of their own in the catalog. */
 const frames = ['Screen', 'MmSheet'];
 
+/** Every component the design system exports, by the name of its file. */
+function components(): string[] {
+  return readdirSync('src/ui')
+    .filter((name) => name.endsWith('.tsx'))
+    .map((name) => name.replace(/\.tsx$/, ''))
+    .filter((name) => /^[A-Z]/.test(name));
+}
+
+/** Every component name a gallery file imports from the design system. */
+function shownInGallery(folder = 'src/gallery'): Set<string> {
+  const shown = new Set<string>();
+  for (const entry of readdirSync(folder, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      for (const name of shownInGallery(join(folder, entry.name))) shown.add(name);
+      continue;
+    }
+    if (!entry.name.endsWith('.tsx')) continue;
+    for (const match of readFileSync(join(folder, entry.name), 'utf8').matchAll(/import \{ (\w+) \} from '(?:\.\.\/)+ui\/(\w+)'/g)) {
+      shown.add(match[2] as string);
+    }
+  }
+  return shown;
+}
+
 describe('every story', () => {
   it.each(stories)('$id draws, and shows what it says it shows', async ({ Story }) => {
     const view = render(<Story />);
@@ -58,6 +82,11 @@ describe('the register', () => {
     const covered = new Set(stories.flatMap(({ Story }) => (Story.parameters['covers'] as string[] | undefined) ?? []));
     const missing = surfaces('src').filter((name) => !frames.includes(name) && !covered.has(name));
     expect(missing).toEqual([]);
+  });
+
+  it('has a story that imports every component of the design system (MM-273)', () => {
+    const shown = shownInGallery();
+    expect(components().filter((name) => !shown.has(name))).toEqual([]);
   });
 
   it('names only screens that exist', () => {

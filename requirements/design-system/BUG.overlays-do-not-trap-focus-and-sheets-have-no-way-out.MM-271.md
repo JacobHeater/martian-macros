@@ -1,7 +1,7 @@
 ---
 id: MM-271
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-104, MM-242]
 ---
 
@@ -49,3 +49,7 @@ Scenario: A way out
 Scenario: The height sheet explains itself
   Then the allowed range is a helper under the field and Save's inertness is explained
 ```
+
+## Progress
+
+Built 2026-10-13: `MmOverlays` wraps the app in a `display: contents` root that is `inert` while any overlay is up; `MmDialog` and `MmSheet` trap Tab inside the panel (`trapFocus`) and close on Escape from anywhere inside, with a document listener for a focus that slipped to the body; the options dialog has a Cancel; `MmSheet` has a Close icon button and a handle that drags it away; `EditHeightSheet` says the range as a helper (an error when the value is outside it) and has Cancel. Tests: `test/ui/overlays.test.tsx`.

@@ -36,7 +36,7 @@ export function MacroBar({ macro, grams, target, minimum, emphasized = false }: 
         <span className="mm-macro-bar-name">{MacroKind.label(macro)}</span>
         <span className={`mm-macro-bar-figures${emphasized ? ' mm-macro-bar-emphasized' : ''}`}>{figures}</span>
       </div>
-      <MmProgressBar value={value} markers={markers} color={`var(--${macro})`} height={emphasized ? 8 : 6} />
+      <MmProgressBar value={value} markers={markers} kind={macro} weight={emphasized ? 'regular' : 'quiet'} />
     </div>
   );
 }

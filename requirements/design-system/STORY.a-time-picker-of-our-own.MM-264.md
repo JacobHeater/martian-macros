@@ -1,7 +1,7 @@
 ---
 id: MM-264
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-260, MM-146, MM-191]
 ---
 
@@ -48,3 +48,7 @@ Scenario: Keyboard
 
 `test/ui/timePicker.test.tsx`; the architecture test fails any
 `<input type="time">` in `src/`.
+
+## Progress
+
+Built 2026-10-13: `MmDrum` (a snapping column, `role="spinbutton"`, arrows, Page keys, typed digits), `MmTimePicker` (Hour and Minute drums, Second when asked, AM or PM as a segmented control; every fifth minute unless told otherwise or the value needs every minute), `MmTimeOfDayDialog` with the time said back and an allowed range refused before OK (the reminders screen passes the quiet hours, so its refusal after the fact is gone), `MmClockTimeDialog` with Hour, Minute and Second drums, so nothing typed can be refused. Tests: `test/ui/timePicker.test.tsx`, `test/settings/reminders.test.tsx`, the train suites through `test/support/pickers.ts`. Looked at in Overlays/Time and Overlays/Clock in three palettes.

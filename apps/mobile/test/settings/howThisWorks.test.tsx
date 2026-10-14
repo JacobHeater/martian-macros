@@ -32,7 +32,7 @@ it('a question shows its answer, the grade in words, then the source', async () 
     question.getAllByText(/Well established|Reasonably supported|Early evidence|Our judgement/).length,
   ).toBeGreaterThan(0);
   expect(question.queryByText(/^Source:/)).not.toBeInTheDocument();
-  const rules = topLayer().querySelectorAll<HTMLElement>('.mm-surface-button');
+  const rules = topLayer().querySelectorAll<HTMLElement>('.mm-pressable');
   await userEvent.click(rules[0] as HTMLElement);
   expect(question.getAllByText(/^Source:/)).toHaveLength(1);
 });

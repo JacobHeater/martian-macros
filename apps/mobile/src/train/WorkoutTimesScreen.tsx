@@ -9,7 +9,6 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
@@ -63,6 +62,7 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
       initial: workout.date,
       first: CalendarDate.of(today.year - 5, 1, 1),
       last: today,
+      today,
     });
     if (date === undefined) return;
     // The times of day stay; the day they are on moves.
@@ -93,15 +93,14 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
     });
   };
 
-  const chevron = <MmIcon name="chevronRight" />;
   return (
     <Screen title="Workout times">
       <MmListGroup>
-        <MmListRow title="Day" subtitle={Fmt.day(workout.date, today)} trailing={chevron} onPress={() => void pickDay()} />
+        <MmListRow title="Day" subtitle={Fmt.day(workout.date, today)} opens onPress={() => void pickDay()} />
         <MmListRow
           title="Started"
           subtitle={clockTimeText(workout.startedAt)}
-          trailing={chevron}
+          opens
           onPress={() => void pickStart()}
         />
         {ended === undefined ? null : (
@@ -110,7 +109,7 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
             subtitle={
               daysOn(workout.startedAt, ended) > 0 ? `${clockTimeText(ended)}, next day` : clockTimeText(ended)
             }
-            trailing={chevron}
+            opens
             onPress={() => void pickEnd(ended)}
           />
         )}

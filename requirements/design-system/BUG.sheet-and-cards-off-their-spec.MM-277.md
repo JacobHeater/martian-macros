@@ -1,7 +1,7 @@
 ---
 id: MM-277
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-260, MM-102]
 ---
 
@@ -38,3 +38,7 @@ Scenario: The sheet to spec
 Scenario: Cards to spec
   Then surfaces and list groups carry the Light shadow and the Dark highlight
 ```
+
+## Progress
+
+Built 2026-10-13: `.mm-sheet` uses `--radius-sheet-top` on `--raised` with the Light shadow and a rise in `--motion-slow`; `.mm-surface`, `.mm-list-group` and `.mm-hero` carry the Light hairline-and-shadow and the Dark 1 dp top highlight. Tests: `test/ui/elevation.test.ts`. Looked at in Overlays/Sheet and Components in three palettes.

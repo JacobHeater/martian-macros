@@ -12,6 +12,8 @@ interface MmListRowProps {
   /** Marks a destructive row (erase): its icon uses the danger color. */
   danger?: boolean;
   trailing?: ReactNode;
+  /** The row opens something: it draws the chevron itself, so no screen does (MM-278). */
+  opens?: boolean;
   /**
    * An action of the row's own (delete, say), shown at its end. It sits
    * beside the part that is pressed, not inside it, so a row that opens
@@ -20,6 +22,8 @@ interface MmListRowProps {
   trailingAction?: ReactNode;
   onPress?: (() => void) | undefined;
   dense?: boolean;
+  /** No horizontal padding, for use inside a padded surface. */
+  flush?: boolean;
 }
 
 /** One row of a list: a title with optional detail, icon and trailing content. */
@@ -30,9 +34,11 @@ export function MmListRow({
   leadingIcon,
   danger = false,
   trailing,
+  opens = false,
   trailingAction,
   onPress,
   dense = false,
+  flush = false,
 }: MmListRowProps) {
   const body = (
     <>
@@ -45,10 +51,19 @@ export function MmListRow({
         <span className="mm-list-row-title">{title}</span>
         {detail ?? (subtitle === undefined ? null : <span className="mm-list-row-subtitle">{subtitle}</span>)}
       </span>
-      {trailing === undefined ? null : <span className="mm-list-row-trailing">{trailing}</span>}
+      {trailing === undefined && !opens ? null : (
+        <span className="mm-list-row-trailing">
+          {trailing}
+          {opens ? (
+            <span className="mm-list-row-opens" aria-hidden="true">
+              <MmIcon name="chevronRight" />
+            </span>
+          ) : null}
+        </span>
+      )}
     </>
   );
-  const className = `mm-list-row${dense ? ' mm-list-row-dense' : ''}`;
+  const className = `mm-list-row${dense ? ' mm-list-row-dense' : ''}${flush ? ' mm-list-row-flush' : ''}`;
   if (trailingAction !== undefined) {
     return (
       <div className={`${className} mm-list-row-with-action`}>

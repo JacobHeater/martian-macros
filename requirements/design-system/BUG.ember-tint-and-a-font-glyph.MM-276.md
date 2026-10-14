@@ -1,7 +1,7 @@
 ---
 id: MM-276
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-236, MM-102]
 ---
 
@@ -36,3 +36,7 @@ Scenario: Ember is never a tint
 Scenario: One icon family
   Then the selected chip's check is MmIcon, and no stylesheet draws a check as text
 ```
+
+## Progress
+
+Built 2026-10-13: the add plate is `--selected` with the plus in Ember, filling Ember when pressed, hovered or focused; `MmChoiceChip` renders `MmIcon` check when selected and the `::before` glyph is gone. Tests: `test/ui/emberAndGlyphs.test.tsx` (no background mixes Ember; no text check anywhere; a chosen chip renders an svg).

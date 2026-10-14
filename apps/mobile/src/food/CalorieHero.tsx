@@ -9,9 +9,9 @@ import { HorizonArc } from '../ui/HorizonArc';
 import { MacroBar } from '../ui/MacroBar';
 import { MacroKind } from '../ui/MacroKind';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
+import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
 import { MmStatusChip } from '../ui/MmStatusChip';
-import { StatusRow } from '../ui/StatusRow';
 import './food.css';
 
 interface CalorieHeroProps {
@@ -97,7 +97,7 @@ export function CalorieHero({
       </div>
       {status === undefined ? null : (
         <div className="food-hero-status">
-          <StatusRow text={status} onPress={onStatusPress ?? (() => undefined)} />
+          <MmListRow title={status} leadingIcon="info" dense flush opens onPress={onStatusPress ?? (() => undefined)} />
         </div>
       )}
       {confidence === undefined ? null : (

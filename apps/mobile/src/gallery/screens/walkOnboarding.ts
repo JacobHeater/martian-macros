@@ -15,7 +15,7 @@ export async function walkOnboarding(canvas: HTMLElement, upTo: number): Promise
   await press('Male');
   await next();
   if (upTo === 2) return;
-  await press('Choose date');
+  await press(/Choose a date/);
   await userEvent.click(await within(await app.findByRole('dialog')).findByRole('button', { name: 'OK' }));
   await next();
   if (upTo === 3) return;

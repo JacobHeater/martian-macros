@@ -1,7 +1,7 @@
 ---
 id: MM-278
 component: architecture
-status: proposed
+status: done
 related: [MM-262, MM-261, MM-246, MM-159]
 ---
 
@@ -58,3 +58,7 @@ Scenario: Meaning, not colour
 Scenario: One pressable row
   Then StatusRow is gone and no screen passes a chevron as trailing
 ```
+
+## Progress
+
+Built 2026-10-13: `MmSurface` and `MmHeroSurface` compose `MmPressable`; `MmMenuButton` composes `MmIconButton` and `MmMenu` composes `MmMenuItemRow`; `StatusRow` is gone (`MmListRow` with `leadingIcon`, `flush` and `opens`); `MmListRow opens` draws the chevron and no screen passes one; `MmProgressBar` takes `kind` (energy or a macro) and `weight` (thin, quiet, regular). The architecture test: `buttonHomes` lists the files that may write a `<button>` and only shrinks; a composite is derived (imports a component value, or renders a dialog, listbox or menu role) and may hold no control; the tag scanner balances braces; a prop named `color`, `className` or `style` fails; a screen that draws `chevronRight` fails. Samples in the test.

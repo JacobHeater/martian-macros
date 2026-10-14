@@ -1,170 +1,175 @@
-# Design system implementation (Flutter)
+# Design system implementation (the React library)
 
-Direction for implementation. Requirements and the roadmap decide **when**
-(WS-03). The app is still small and styles inline; nothing here is shipped.
+How the design system is built in `apps/mobile/src/ui/`, for whoever adds
+to it. Requirements decide **what**; the roadmap decides **when** (WS-03).
+This replaces the Flutter plan this file held until 2026-10-13; the
+Flutter app is gone (MM-232) and nothing here describes it.
+
+## The rule: nothing native shows
+
+The owner's rule (2026-10-13, MM-262): no native date or time picker, no
+native select list, no engine-drawn checkbox, slider thumb, tap highlight or
+focus ring. The design system draws every control and every state of it,
+in every palette, and it is judged in the register (Storybook, MM-237)
+before it ships. A native element may exist underneath only for the
+keyboard and assistive technology, invisible or wholly restyled:
+
+| Looks like | Underneath | Why |
+|---|---|---|
+| The switch, the check box, the slider | `<input type="checkbox">`, `<input type="range">` with `appearance: none` | Keyboard, drag and screen reader for free; nothing of the engine's is visible |
+| A text field | `<input type="text">` in our box | The keyboard is the phone's; the box, ring and error are ours |
+| The calendar (`MmDatePicker`) | Nothing native. A `role="grid"` of `MmCalendarDay` buttons | A native date popup cannot be styled |
+| The drums (`MmTimePicker`) | Nothing native. Each drum is a `role="spinbutton"` | A native time popup cannot be styled |
+| A select (`MmDropdown`) | Nothing native. A field button that opens `overlays.options` | A native list cannot be styled |
+| A menu (`MmMenuButton`) | Nothing native. The overlay host draws `MmMenu` at the trigger's anchor | Nothing can clip it |
+
+`test/architecture.test.ts` enforces the rule: a native date, time or
+select control has no home and fails wherever it is; each other control
+kind lives in exactly one component (`controlHomes`, MM-261); a `<button>`
+is written only by the components in `buttonHomes` (MM-278); a composite
+writes no control; a component never takes a prop named `color`,
+`className` or `style`.
 
 ## Where it lives
 
-MM-104 proposes a shared `packages/ui`. Until that package boundary is confirmed,
-the theme can live in `apps/mobile/lib/src/theme/`. Keep it free of domain and
-engine imports. Files:
-
 ```
-theme/
-  tokens.dart        // raw values: colors, spacing, radii, durations
-  mm_theme.dart      // ThemeData for light and dark; ThemeExtension
-  typography.dart    // text roles
-  signature.dart     // HorizonArc, OrbitHairlines, LimbGlow painters
+src/theme/tokens.css     every colour, radius, spacing, type role and motion duration
+src/theme/base.css       fonts, box-sizing, the app-wide focus ring
+src/ui/ui.css            every component's rules; nothing in it is a literal
+src/ui/*.tsx             one component per file, named for it (rule 5)
+src/gallery/*            the register: tokens, icons, components, fields, states, overlays, and every screen
 ```
 
-## No seed palette
+A component imports `./ui.css` and the icons it draws; it imports nothing
+from `domain/`, `engine/` or `state/` except a value type it displays
+(`CalendarDate`, `MuscleVolume`, `StrengthTrend`).
 
-Build both `ColorScheme`s explicitly. Do not call `fromSeed`. Map Material roles
-to tokens so stock widgets (buttons, fields, switches, sheets) inherit the system:
+## The control map
 
-```dart
-const darkScheme = ColorScheme(
-  brightness: Brightness.dark,
-  primary: Tokens.emberDark,          // #FF6A45
-  onPrimary: Tokens.onEmberDark,      // #1A0802
-  primaryContainer: Tokens.selectedDark, // #1C2842 (NOT an Ember tint)
-  onPrimaryContainer: Tokens.textDark,
-  secondary: Tokens.ionDark,          // #3FD8F0
-  onSecondary: Color(0xFF031A20),
-  secondaryContainer: Tokens.selectedDark,
-  onSecondaryContainer: Tokens.textDark,
-  tertiary: Tokens.ionDark,
-  onTertiary: Color(0xFF031A20),
-  error: Tokens.dangerDark,
-  onError: Color(0xFF2A0606),
-  surface: Tokens.surfaceDark,        // #101624
-  onSurface: Tokens.textDark,         // #ECF0F8
-  onSurfaceVariant: Tokens.text2Dark, // #A9B4CA
-  outline: Tokens.outlineStrongDark,  // #5A6A8C
-  outlineVariant: Tokens.outlineDark, // #2B3853
-  surfaceContainerLowest: Tokens.canvasDark,
-  surfaceContainerLow: Tokens.surfaceDark,
-  surfaceContainer: Tokens.surfaceDark,
-  surfaceContainerHigh: Tokens.raisedDark,
-  surfaceContainerHighest: Tokens.overlayDark,
-  // …scrim, shadow, inverse*, surfaceTint: Colors.transparent
-);
-```
+The one home of each native control kind, and the component a screen uses
+instead of writing one:
 
-Set `surfaceTint: Colors.transparent` (and Material 3's tint overlay off) in both
-schemes: M3 elevation tint is another source of muddy color. Do the same for the
-light scheme with its tokens. Set `scaffoldBackgroundColor` to `canvas`.
+| A screen wants | It uses | Native kind underneath (home) |
+|---|---|---|
+| A button | `MmButton` (`kind`: primary, secondary, text, destructive), `MmIconButton`, `MmFab` | `<button>` |
+| Content pressed as a whole | `MmPressable` | `<button>` |
+| A row | `MmListRow` (`opens` draws the chevron; `trailingAction` sits beside the pressed part) | `<button>` when it presses |
+| Text or a number | `MmTextField` (`kind`, `error`, `helper`, `name`) | `<input type="text">` (MmTextField) |
+| On or off | `MmSwitchRow` | `<input type="checkbox" role="switch">` (MmSwitchRow) |
+| Tick what applies | `MmCheckRow` | `<input type="checkbox">` (MmCheckRow) |
+| A value on a range | `MmSlider`, `MmSliderRow` in a group | `<input type="range">` (MmSlider) |
+| One of a few, visible | `MmSegmented`, `MmChoiceChip`, `ChoiceCard` | `<button>` |
+| One of a list | `MmDropdown`, or `overlays.options` from a row | none |
+| A day | `MmPickerField` opening `overlays.date` (`MmDateDialog` over `MmDatePicker`) | none |
+| A time | `MmPickerField` opening `overlays.timeOfDay` or `overlays.clockTime` (`MmTimePicker`) | none |
+| A short menu of actions | `MmMenuButton` (`overlays.menu`, drawn as `MmMenu` of `MmMenuItemRow`) | `<button role="menuitem">` (MmMenuItemRow) |
+| A question | `overlays.confirm`, `overlays.choice` (`MmDialog`) | none |
+| A panel from the bottom | `overlays.sheet` (`MmSheet`) | none |
+| A short message | `overlays.snack` | none |
 
-## App-specific tokens
+## Composites
 
-A `ThemeExtension<MmColors>` for everything Material has no slot for, with
-`lerp` implemented: `protein`, `carbs`, `fat`, `energy`, `trend`, `trendBand`,
-`reading`, `positive`, `caution`, `info`, `danger`, `track`, `selected`,
-`sunken`, `raised`, `overlay`, `limbGlow`. Access through one
-extension: `context.mm.protein`. Screens never call `Theme.of(context).colorScheme`
-for meaning.
+A composite composes components and writes no control of its own. The
+checker derives it: a `src/ui` file that imports another component's
+value (an icon is a drawing, not a component), or renders a `dialog`,
+`listbox` or `menu` role, is a composite. `MmOverlays`, `MmDialog`,
+`MmSheet`, `MmMenu`, `MmDatePicker`, `MmTimePicker`, `MmDropdown`,
+`MmMenuButton`, `MmSurface`, `MmHeroSurface`, `InfoCard`, `DayStepper`,
+`NumberEntryCard` and `DownloadStatusStrip` are composites. When a
+composite needs a pressable part it composes `MmButton`, `MmIconButton`,
+`MmPressable`, `MmOption`, `MmCalendarDay` or `MmMenuItemRow`.
 
-Note `secondary` and `tertiary` both map to Ion above so a stray stock widget
-never produces an off-palette color. Treat that as a guard rail, not a license to
-use them in screens.
+## The prop vocabulary
 
-## Component theming
+- `label`: visible words. `name`: what a person hears when the visible
+  words are not enough; with a label the two compose, never replace.
+- `valueText`: a value in words ("January 1, 1996").
+- `selected` (a segment, a chip, a card), `chosen` (an option), `current`
+  (a destination), `expanded` (what opens and closes).
+- `onPress` (a button, a row, a surface), `onSelect` (an option, an item, a
+  chip), `onChange` (a value). An absent `onPress` or `onChange` draws the
+  control as off; nothing is `disabled` by a separate flag.
+- `kind`: the meaning of a button, a surface, a notice, a text field, a
+  bar. Never a colour, a radius, a size or a class.
+- `helper` and `error`: words under a field; an error is also `aria-invalid`
+  and `role="alert"`.
+- `opens`: a row or an icon button that opens something, and what kind.
 
-Set these once in `ThemeData` rather than per widget:
+## The state set every control draws
 
-- `NavigationBarThemeData`: height 72, `raised` background, no surface tint,
-  indicator `selected` 56 × 32 full-round, selected icon/label `ember`, unselected
-  `text2`, labels always shown, label `label` role.
-- `FloatingActionButtonThemeData`: `ember` background, `onEmber` foreground,
-  `extendedPadding` 20, 16 radius, zero elevation in every interaction state
-  and no decorative shadow wrapper in either theme (MM-181).
-- `FilledButtonThemeData`: 48 dp min height, 12 radius, `ember`/`onEmber`.
-  `OutlinedButton`: `outlineStrong` border, `text` label. `TextButton`: `ember`.
-- `InputDecorationTheme`: filled `sunken`, 12 radius, `outlineStrong` 1 dp border,
-  focused 2 dp `text` border (not Ember: focus is not an action).
-- `CardThemeData`: `surface`, 16 radius, light 1 dp `outline` + soft shadow, dark
-  no shadow and a 1 dp top highlight via a decoration.
-- `ChipThemeData`, `SegmentedButtonThemeData`, `SwitchThemeData` (Ember thumb
-  track when on), `DividerThemeData` (`outline`, 1 dp), `BottomSheetThemeData`
-  (`raised`, 24 top radius, drag handle), `SnackBarThemeData` (`overlay`).
-- `PageTransitionsTheme`: default platform transitions.
+Rest, hover (where there is a pointer), focus, pressed, disabled, selected
+or chosen, error. In `ui.css`:
 
-## Fonts
+- **Pressed** (MM-267): one family at the foot of the sheet. Every
+  selector with `cursor: pointer` has an `:active` rule and a
+  `.mm-pressed` twin, so the register can show the state. The primary
+  button and the floating action depress to 98% in `--motion-fast`; every
+  other pressable fills `--selected`; under reduced motion the scale goes
+  and a non-moving change stays.
+- **Focus**: the app-wide ring (2 px `--text`, 2 px outside). Inside a
+  container that clips its overflow (a list group, the segmented control,
+  a flush surface, the hero, a swipe row, the options list, the year list,
+  a drum) the ring is drawn inset, so no part is hidden (MM-275). A text
+  field marks focus on its box and draws nothing inside it (MM-239).
+- **Disabled**: `--selected` on `--text3` for a button; quiet border and
+  `--text2` for a picker field, its value still readable.
+- **Selected**: `--selected` fill with Ember text or an Ember check;
+  Ember is never a tint (MM-276).
+- **Error**: `--danger` border and a caption under the field (MM-279).
 
-Bundle Space Grotesk and Inter (OFL) as app assets and declare them in
-`pubspec.yaml`; **do not** use the `google_fonts` package, which fetches over the
-network and contradicts the offline-only rule. Verify the licenses in `NOTICE`
-handling (MM-109/store). Figures use `FontFeature.tabularFigures()`.
-Expose roles as `TextTheme` overrides plus an `MmText` extension (`figureXL`,
-`figure`, `title`, `heading`, `body`, `label`, `caption`); screens use
-`context.text.figure`, never a raw `TextStyle(fontSize: …)`.
+## Tokens
 
-Respect `MediaQuery.textScaler`; test at 200%.
+Every value in `ui.css` and every screen sheet is a token (MM-274):
+radii from `--radius-*` (or `999px` for full-round, `50%` for a circle,
+`2px` for a hairline bar), gaps from `--space-*`, durations from
+`--motion-fast` (100 ms), `--motion-base` (180), `--motion-slow` (280),
+`--motion-reveal` (600) and `--motion-fade` (100), with `--motion-turn`
+for the spinner's one perpetual turn. Reduced motion zeroes the four
+movement tokens in `tokens.css` and leaves the fade. No hex colour appears
+outside `tokens.css`. `test/ui/stylesheetTokens.test.ts` reads every
+sheet and fails a literal.
 
-## Shared components (build order)
+Two values sit off the scale, each with its written reason in
+`tokens.css`: `--space-20`, a text button's horizontal padding, and
+`--radius-check`, the check box's corner.
 
-1. `MmSurface` (groups: canvas/surface/raised, hairline, radius)
-2. `FigureWithUnit`, `MacroBar` (label, value, bar; protein emphasis), `StatRow`
-3. `HorizonArc` (CustomPainter; `value`, `target`, `over`, semantics label)
-4. `Notice.info/caution/required` (no fills)
-5. `EntryRow`, `MealGroup`, `StatusRow`
-6. `SectionLabel`, `ChoiceCard`
-7. `AddSheet`, `EmptyState`, `ErrorState`, `SkeletonBlock`
-8. `TrendChart` wrapper over `fl_chart` (already a dependency) with the grammar
-9. `OrbitHairlines`, `LimbGlow`, `Starfield` (seeded, static)
+## Elevation
 
-Components take **meaning** (`NoticeKind.caution`, `Macro.protein`), not colors,
-radii or padding. Prefer assembling from these over generic configurable widgets.
+Light: cards, list groups and the hero carry a hairline and
+`0 1px 2px rgb(12 18 32 / 6%)`; the sheet `0 8px 24px rgb(12 18 32 / 12%)`.
+Dark palettes: no shadow on cards; a 1 dp inner top highlight (`--text` at
+6%). The dialog floats on its scrim with `0 16px 40px`. The floating
+action has no shadow in any palette (MM-181).
 
-### Painting notes
+## Overlays
 
-- `HorizonArc`: draw the track and fill as a stroked path along a circular arc
-  (`Path.arcTo`) using round caps; compute the progress point from
-  `PathMetric.getTangentForOffset`; paint the body dot there. Animate `value`
-  with an `AnimationController`/`TweenAnimationBuilder` in `slow`; run the
-  `reveal` fill only once per cold start (provider flag). Wrap in `Semantics`
-  with a label like "1,420 of 2,480 calories eaten, 1,060 left". Exclude the
-  painter itself from the semantics tree so it is not read twice.
-- `LimbGlow`: a `RadialGradient` `DecoratedBox` clipped to the card, alpha from the
-  token. `OrbitHairlines`: a `CustomPainter` of three arcs; pass `isDark` from the
-  theme.
-- The primary FAB is flat; do not add a glow or shadow wrapper (MM-181).
+`MmOverlays` is the one host. While a question is up the app beneath it
+is `inert`; focus stays inside the panel (`trapFocus`) and Escape closes
+it from anywhere (MM-271). Every dialog and sheet has a visible way out:
+the options dialog a Cancel, the sheet a Close and a handle that drags it
+away. A confirmation draws the destructive action quiet and Cancel as the
+stronger button (MM-280). A snack with an action waits for it, a
+replacement, a Dismiss or the back button; one without goes after four
+seconds unless it is focused or pointed at (MM-272).
 
-## Spacing, radii, durations
+## How a component gets its story and its tests
 
-Constants, not magic numbers: `Gap.s4…s32` as `SizedBox`es, `MmSpace`, `MmRadius`
-(16, 12, 8, full), `MmMotion.fast/base/slow/reveal`. A lint or review rule flags
-any padding or radius outside the scale in a screen file (MM-103).
+- Every component of `src/ui` is imported by a file under `src/gallery`,
+  or `test/gallery/stories.test.tsx` fails. The Components, Fields and
+  Charts catalogs show it in use; the States catalog shows each of its
+  states (rest, pressed through `.mm-pressed`, disabled, selected, error);
+  the Overlays catalog opens each overlay on its own.
+- Every story is drawn and walked by the stories test; a screen story
+  (`screenStory`) is the whole app opened at that screen.
+- A behaviour has a component test in `test/ui/` that renders it and
+  reads what a person sees, hears and does; a rule of the stylesheet has a
+  test that reads the stylesheet (`test/support/stylesheetRules.ts`),
+  because nothing lays out in the test browser.
+- A change to how a component looks is not done until it has been looked
+  at in a browser, in Martian, Dark and Light.
 
-## Accessibility implementation
+## Icons
 
-- Compute contrast in a test over every token pair per theme and fail under the
-  thresholds in the color doc (text 4.5, graphics 3). Keep the token list
-  machine-readable (`design-map.json`) so the test and the doc cannot drift.
-- `Semantics` on every chart and on the arc; chart caption = semantic summary.
-- Min tap target 48 dp: use `MaterialTapTargetSize.padded` (default) and test it.
-- Reduce motion: wrap animation durations in a helper that returns `Duration.zero`
-  when `MediaQuery.disableAnimations`.
-- Focus ring: 2 dp `text`, via `FocusTheme`/`ButtonStyle.side` with `states`.
-- Color-blind check: render the gallery through a CVD filter in a golden or by
-  inspection; macro rows must still read via label and lightness.
-
-## Verification expectations
-
-- **Component gallery (MM-105):** every component in light and dark, plus a
-  "palette sheet" of tokens with their contrast numbers. This is where MM-102's
-  rendered review happens.
-- Golden tests on one platform (Linux CI, per MM-105) for the gallery and the
-  Today screen with fixed data, in both themes, at 100% and 200% text.
-- Widget tests for behavior: preselected meal from "+", Undo on delete, notice
-  kinds, arc semantics, hide-weight on charts.
-- Manual: TalkBack and VoiceOver pass on Today and the add sheet before release.
-
-## Migration plan (sketch, subject to WS-03)
-
-1. Land tokens, `ThemeData` and fonts. Delete `colorSchemeSeed`. Existing screens
-   instantly lose the muddy palette without layout change.
-2. Land the component set and migrate Today, then Coach, Progress, Onboarding,
-   Settings. Delete private card/notice twins as each migrates.
-3. Add the signature painters and motion after the screens read well in plain
-   flat form: the system must look good before the arc is added.
+Material's Outlined set behind the app's names, through `MmIcon`
+(MM-236): one family, selected or not. No hand-drawn glyph, no font
+character (MM-276). Custom art waits for the app mark (MM-109).

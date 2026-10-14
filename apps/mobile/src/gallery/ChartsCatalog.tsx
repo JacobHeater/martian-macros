@@ -8,6 +8,11 @@ import { IntakeDay } from '../domain/IntakeDay';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { MiniTrend } from '../charts/MiniTrend';
 import { MmSurface } from '../ui/MmSurface';
+import { MuscleVolume } from '../engine/MuscleVolume';
+import { MuscleVolumeRow } from '../ui/MuscleVolumeRow';
+import { StrengthTrend } from '../engine/StrengthTrend';
+import { StrengthTrendCard } from '../ui/StrengthTrendCard';
+import { Exercise } from '../domain/training/Exercise';
 import { TrendChart } from '../charts/TrendChart';
 import { TrendSparkline } from '../charts/TrendSparkline';
 import { TrendStats } from '../charts/TrendStats';
@@ -65,6 +70,28 @@ export function ChartsCatalog() {
       <MmSurface kind="compact">
         <MiniTrend values={[3, 4, 2, 4, 5]} min={1} max={5} slots={8} label="Hunger" />
       </MmSurface>
+      <StrengthTrendCard
+        trend={
+          new StrengthTrend({
+            exerciseId: 'back-squat',
+            exercise: new Exercise({ id: 'back-squat', name: 'Back squat', equipment: 'barbell', primary: 'chest' }),
+            points: [0, 7, 14, 21, 28].map((daysAgo, at) => ({
+              workoutId: at + 1,
+              date: chartDay.addDays(-28 + daysAgo),
+              estimateKg: 120 + at * 2.5,
+              trendKg: 119 + at * 2.2,
+            })),
+            loggedSessions: 5,
+            recentSessions: 3,
+          })
+        }
+        fmt={fmt}
+        today={chartDay}
+        onHistory={() => undefined}
+      />
+      <InfoCard title="Weekly training volume">
+        <MuscleVolumeRow volume={new MuscleVolume({ group: 'chest', currentSets: 12, previousSets: 9 })} />
+      </InfoCard>
     </>
   );
 }

@@ -1,5 +1,7 @@
-import { useId } from 'react';
+import { useState } from 'react';
 import type { MmMenuItem } from './MmMenuItem';
+import { MmPickerField } from './MmPickerField';
+import { useOverlays } from './useOverlays';
 import './ui.css';
 
 interface MmDropdownProps<T> {
@@ -8,35 +10,33 @@ interface MmDropdownProps<T> {
   items: readonly MmMenuItem<T>[];
   /** With no action the field is shown as off. */
   onChange: ((value: T) => void) | undefined;
+  /** What is wrong with the value, said beside the field and aloud. */
+  error?: string | undefined;
 }
 
-/** A labeled, full-width dropdown field. */
-export function MmDropdown<T>({ label, value, items, onChange }: MmDropdownProps<T>) {
-  const id = useId();
-  const index = items.findIndex((item) => item.value === value);
+/**
+ * A labeled, full-width field for one of a short list. It renders no
+ * native select (MM-265): pressing it opens the design system's options
+ * list, with the current value marked "Chosen" (MM-261).
+ */
+export function MmDropdown<T>({ label, value, items, onChange, error }: MmDropdownProps<T>) {
+  const overlays = useOverlays();
+  const [open, setOpen] = useState(false);
+  const current = items.find((item) => item.value === value);
+  const choose = async () => {
+    setOpen(true);
+    const chosen = await overlays.options({ title: label, options: items, selected: value });
+    setOpen(false);
+    if (chosen !== undefined) onChange?.(chosen.value);
+  };
   return (
-    <div className="mm-field">
-      <label className="mm-field-label" htmlFor={id}>
-        {label}
-      </label>
-      <div className="mm-field-box">
-        <select
-          id={id}
-          className="mm-field-input mm-select"
-          value={index}
-          disabled={onChange === undefined}
-          onChange={(event) => {
-            const item = items[Number(event.target.value)];
-            if (item !== undefined) onChange?.(item.value);
-          }}
-        >
-          {items.map((item, i) => (
-            <option key={item.label} value={i}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
+    <MmPickerField
+      label={label}
+      valueText={current?.label ?? ''}
+      opens="listbox"
+      expanded={open}
+      error={error}
+      onPress={onChange === undefined ? undefined : () => void choose()}
+    />
   );
 }

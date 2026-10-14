@@ -21,9 +21,10 @@ import { NumberEntryCard } from '../../src/ui/NumberEntryCard';
 import type { Overlays } from '../../src/ui/Overlays';
 import { StepProgress } from '../../src/ui/StepProgress';
 import { useOverlays } from '../../src/ui/useOverlays';
+import { turnDrum } from '../support/pickers';
 
 /** MM-232: the component library, by what a person sees, hears and does. */
-const css = readFileSync('src/ui/ui.css', 'utf8');
+const css = readFileSync('src/ui/ui.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 
 /** The declarations of the last rule in ui.css whose selector is exactly `selector`. */
 function rule(selector: string): string {
@@ -47,7 +48,7 @@ describe('the floating action', () => {
 describe('the add button', () => {
   // Carried over from mm_icon_button_test.dart. Sizes and colors are read from the stylesheet:
   // the test browser lays nothing out.
-  it('is a drawn plus on a small tinted plate in a full-size target, and fills on hover', () => {
+  it('is a drawn plus on a small quiet plate in a full-size target, and fills Ember on hover (MM-276)', () => {
     render(<MmIconButton icon="plus" kind="add" label="Add food to lunch" onPress={() => undefined} />);
     const button = screen.getByRole('button', { name: 'Add food to lunch' });
     const drawing = button.querySelector('svg');
@@ -59,8 +60,9 @@ describe('the add button', () => {
 
     expect(rule('.mm-icon-button')).toMatch(/width: 48px;[\s\S]*height: 48px;/);
     const plate = rule('.mm-icon-button-plate');
-    expect(plate).toMatch(/width: 28px;[\s\S]*height: 28px;[\s\S]*border-radius: 8px;/);
-    expect(plate).toContain('color-mix(in srgb, var(--ember) 15%, transparent)');
+    expect(plate).toMatch(/width: 28px;[\s\S]*height: 28px;[\s\S]*border-radius: var\(--radius-chip\);/);
+    expect(plate).toContain('background: var(--selected);');
+    expect(plate).toContain('color: var(--ember);');
     expect(css).toMatch(
       /\.mm-icon-button-add:not\(:disabled\):hover \.mm-icon-button-plate,[\s\S]*?\{\s*background: var\(--ember\);\s*color: var\(--on-ember\);/,
     );
@@ -174,15 +176,17 @@ describe('a menu', () => {
   it('opens its choices, gives the one chosen and closes; Escape closes it too', async () => {
     const chosen: string[] = [];
     render(
-      <MmMenuButton
-        icon="more"
-        label="More"
-        items={[
-          { value: 'copy', label: 'Copy to today' },
-          { value: 'delete', label: 'Delete' },
-        ]}
-        onSelect={(value) => chosen.push(value)}
-      />,
+      <MmOverlays>
+        <MmMenuButton
+          icon="more"
+          label="More"
+          items={[
+            { value: 'copy', label: 'Copy to today' },
+            { value: 'delete', label: 'Delete' },
+          ]}
+          onSelect={(value) => chosen.push(value)}
+        />
+      </MmOverlays>,
     );
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'More' }));
@@ -373,50 +377,28 @@ describe('questions over the screen', () => {
     expect(screen.getByText('{"value":60,"label":"1:00"}')).toBeInTheDocument();
   });
 
-  it('a time to the second opens on the time given and gives what was typed', async () => {
+  it('a time to the second opens on the time given and gives what the drums are turned to', async () => {
     const dialog = await asking((o) => o.clockTime({ title: 'Set started', initialMs: (18 * 3600 + 2 * 60 + 10) * 1000 }));
-    expect(within(dialog).getByRole('textbox', { name: 'Hour' })).toHaveValue('6');
-    expect(within(dialog).getByRole('textbox', { name: 'Min' })).toHaveValue('02');
-    expect(within(dialog).getByRole('textbox', { name: 'Sec' })).toHaveValue('10');
+    expect(within(dialog).getByRole('spinbutton', { name: 'Hour' })).toHaveValue(6);
+    expect(within(dialog).getByRole('spinbutton', { name: 'Minute' })).toHaveValue(2);
+    expect(within(dialog).getByRole('spinbutton', { name: 'Second' })).toHaveValue(10);
     expect(within(dialog).getByRole('button', { name: 'PM' })).toHaveAttribute('aria-pressed', 'true');
+    expect(within(dialog).getByText('6:02:10 PM')).toBeInTheDocument();
 
-    const hour = within(dialog).getByRole('textbox', { name: 'Hour' });
-    await userEvent.clear(hour);
-    await userEvent.type(hour, '12');
+    turnDrum(dialog, 'Hour', 12);
     await userEvent.click(within(dialog).getByRole('button', { name: 'AM' }));
-    await userEvent.clear(within(dialog).getByRole('textbox', { name: 'Sec' }));
+    turnDrum(dialog, 'Second', 0, 2);
     await userEvent.click(within(dialog).getByRole('button', { name: 'OK' }));
-    // Twelve in the morning is the first hour of the day, and no seconds is the top of the minute.
+    // Twelve in the morning is the first hour of the day.
     expect(screen.getByText(String(2 * 60 * 1000))).toBeInTheDocument();
   });
 
-  it('a time that is not one is refused with the reason, and stays open', async () => {
-    const dialog = await asking((o) => o.clockTime({ title: 'Set started', initialMs: 0 }));
-    const type = async (name: string, text: string) => {
-      const field = within(dialog).getByRole('textbox', { name });
-      await userEvent.clear(field);
-      await userEvent.type(field, text);
-    };
-    const ok = within(dialog).getByRole('button', { name: 'OK' });
-
-    await type('Hour', '13');
-    await userEvent.click(ok);
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('The hour is from 1 to 12.');
-    await type('Hour', '9');
-    await type('Min', '60');
-    await userEvent.click(ok);
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('The minute is from 0 to 59.');
-    await type('Min', '15');
-    await type('Sec', 'x');
-    await userEvent.click(ok);
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('The second is from 0 to 59.');
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-  });
-
-  it('a time of day gives minutes after midnight', async () => {
+  it('a time of day gives minutes after midnight, said back in words', async () => {
     const dialog = await asking((o) => o.timeOfDay({ initialMinuteOfDay: 7 * 60 + 30, helpText: 'Weigh-in reminder' }));
     expect(dialog).toHaveAccessibleName('Weigh-in reminder');
-    expect(within(dialog).getByLabelText('Weigh-in reminder')).toHaveValue('07:30');
+    expect(within(dialog).getByRole('spinbutton', { name: 'Hour' })).toHaveValue(7);
+    expect(within(dialog).getByRole('spinbutton', { name: 'Minute' })).toHaveValue(30);
+    expect(within(dialog).getByText('7:30 AM')).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole('button', { name: 'OK' }));
     expect(screen.getByText('450')).toBeInTheDocument();
   });

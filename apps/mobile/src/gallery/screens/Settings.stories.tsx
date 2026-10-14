@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
+import { userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
@@ -41,7 +42,17 @@ export const EditHeight = screenStory({
   },
 });
 
-/** MM-260: the phone's date control inside a dialog, with the day said back in words. */
+/** MM-268: a choice in Settings is the options dialog, with the value in force marked Chosen. */
+export const ChangeDailyActivity = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Chosen',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Change daily activity' }));
+  },
+});
+
+/** MM-263: the design system's own calendar inside a dialog, with the day said back in words. */
 export const DateOfBirth = screenStory({
   covers: ['SettingsScreen'],
   shows: 'January 1, 1996',
@@ -52,6 +63,7 @@ export const DateOfBirth = screenStory({
       initial: CalendarDate.of(1996, 1, 1),
       first: CalendarDate.of(1926, 1, 1),
       last: CalendarDate.of(2008, 10, 12),
+      today: CalendarDate.of(2008, 10, 12),
     });
   },
 });

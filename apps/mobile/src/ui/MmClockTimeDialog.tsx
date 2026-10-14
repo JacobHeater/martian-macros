@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { tryParseInt } from '../lang/tryParseInt';
 import { MmButton } from './MmButton';
 import { MmDialog } from './MmDialog';
-import { MmSegmented } from './MmSegmented';
-import { MmTextField } from './MmTextField';
+import { MmTimePicker } from './MmTimePicker';
 import './ui.css';
 
 interface MmClockTimeDialogProps {
@@ -14,32 +12,23 @@ interface MmClockTimeDialogProps {
   onDone: (timeMs: number | undefined) => void;
 }
 
+const secondsPerDay = 24 * 3600;
 const two = (n: number) => String(n).padStart(2, '0');
 
+/** A time of day to the second, in words: "12:02:10 PM". */
+const said = (secondOfDay: number) => {
+  const hour = Math.floor(secondOfDay / 3600) % 24;
+  const minute = Math.floor(secondOfDay / 60) % 60;
+  return `${hour % 12 === 0 ? 12 : hour % 12}:${two(minute)}:${two(secondOfDay % 60)} ${hour < 12 ? 'AM' : 'PM'}`;
+};
+
 /**
- * Asks for a time of day to the second: hour, minute and second, each a
- * number (Hour, Min, Sec: short enough to fit a phone), and AM or PM.
+ * Asks for a time of day to the second with the design system's drums
+ * (MM-264): Hour, Minute and Second, and AM or PM. Nothing typed can be
+ * refused, because the drums only offer times that exist.
  */
 export function MmClockTimeDialog({ title, initialMs, onDone }: MmClockTimeDialogProps) {
-  const initialSeconds = Math.trunc(initialMs / 1000);
-  const initialHour = Math.trunc(initialSeconds / 3600) % 24;
-  const [hour, setHour] = useState(`${initialHour % 12 === 0 ? 12 : initialHour % 12}`);
-  const [minute, setMinute] = useState(two(Math.trunc(initialSeconds / 60) % 60));
-  const [second, setSecond] = useState(two(initialSeconds % 60));
-  const [pm, setPm] = useState(initialHour >= 12);
-  const [error, setError] = useState<string>();
-
-  const confirm = () => {
-    const h = tryParseInt(hour);
-    const m = tryParseInt(minute);
-    // An empty seconds field is the top of the minute.
-    const s = second.trim() === '' ? 0 : tryParseInt(second);
-    if (h === undefined || h < 1 || h > 12) return setError('The hour is from 1 to 12.');
-    if (m === undefined || m < 0 || m > 59) return setError('The minute is from 0 to 59.');
-    if (s === undefined || s < 0 || s > 59) return setError('The second is from 0 to 59.');
-    return onDone((((h % 12) + (pm ? 12 : 0)) * 3600 + m * 60 + s) * 1000);
-  };
-
+  const [seconds, setSeconds] = useState(Math.trunc(initialMs / 1000) % secondsPerDay);
   return (
     <MmDialog
       title={title}
@@ -47,29 +36,12 @@ export function MmClockTimeDialog({ title, initialMs, onDone }: MmClockTimeDialo
       actions={
         <>
           <MmButton label="Cancel" kind="text" onPress={() => onDone(undefined)} />
-          <MmButton label="OK" onPress={confirm} />
+          <MmButton label="OK" onPress={() => onDone(seconds * 1000)} />
         </>
       }
     >
-      <div className="mm-clock-fields">
-        <MmTextField label="Hour" kind="number" dense value={hour} onChange={setHour} />
-        <MmTextField label="Min" kind="number" dense value={minute} onChange={setMinute} />
-        <MmTextField label="Sec" kind="number" dense value={second} onChange={setSecond} />
-      </div>
-      <MmSegmented
-        name="AM or PM"
-        segments={[
-          { value: false, label: 'AM' },
-          { value: true, label: 'PM' },
-        ]}
-        selected={pm}
-        onChange={(chosen) => setPm(chosen ?? pm)}
-      />
-      {error === undefined ? null : (
-        <p className="mm-dialog-error" role="alert">
-          {error}
-        </p>
-      )}
+      <MmTimePicker value={seconds} everyMinute seconds onChange={setSeconds} />
+      <p className="mm-time-detail">{said(seconds)}</p>
     </MmDialog>
   );
 }

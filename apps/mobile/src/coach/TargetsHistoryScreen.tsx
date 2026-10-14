@@ -5,7 +5,6 @@ import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
 import { showTargetChangeSheet } from './showTargetChangeSheet';
@@ -41,7 +40,7 @@ export function TargetsHistoryScreen() {
                 `C ${whole(record.targets.carbsG)} · F ${whole(record.targets.fatG)}` +
                 `${record.targets.flags.has('heldByUser') ? ' · Kept by you' : ''}`
               }
-              trailing={<MmIcon name="chevronRight" />}
+              opens
               onPress={() =>
                 void showTargetChangeSheet(overlays, services.targets, history.slice(0, i + 1), {
                   isCurrent: i === history.length - 1,

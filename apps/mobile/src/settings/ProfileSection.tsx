@@ -102,6 +102,7 @@ export function ProfileSection() {
       initial: profile.birthDate,
       first: CalendarDate.of(today.year - 100, 1, 1),
       last: today,
+      today,
     });
     if (picked === undefined) return;
     await save(setup, { profile: new Profile({ sex: profile.sex, birthDate: picked, heightCm: profile.heightCm }) });
@@ -116,6 +117,7 @@ export function ProfileSection() {
           close();
           void save(setup, { profile: new Profile({ sex: profile.sex, birthDate: profile.birthDate, heightCm }) });
         }}
+        onCancel={() => close()}
       />
     ));
 

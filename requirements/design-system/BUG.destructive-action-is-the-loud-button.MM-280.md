@@ -1,7 +1,7 @@
 ---
 id: MM-280
 component: design-system
-status: proposed
+status: done
 related: [MM-262, MM-104, MM-62]
 ---
 
@@ -36,3 +36,7 @@ Scenario: Erase is quiet
   Given the erase-all-data confirmation
   Then Erase is a quiet danger-coloured button and Cancel is the stronger one
 ```
+
+## Progress
+
+Built 2026-10-13: `MmButtonKind` gains `destructive` (danger as text, no fill); `overlays.confirm` renders the destructive action in it and Cancel as `secondary`, so every erase and delete in the app changed through the one dialog. Tests: `test/ui/confirm.test.tsx`. Looked at in Overlays/Confirm.
