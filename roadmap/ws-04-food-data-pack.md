@@ -110,6 +110,7 @@ Everything. Its only contact with existing code is the validation function in
   near-tolerance, missing-field and age rules, and "Fix this food", are open).
 - Remaining: MM-57 (licensing review by a qualified person; the packs are already public).
   Epic: MM-50.
+- Added 2026-10-14 (step 7): MM-307 (micronutrients in the pack, format version 2, coverage in the build report).
 
 ## Notes for whoever builds it
 - Design the pack schema in step 3 from the tickets that will *read* it, not

@@ -96,11 +96,18 @@ should read this list as closely as any feature.
 - **Detail:** MM-108
 - **Reopen if:** Never.
 
-### No micronutrient targets
+### ~~No micronutrient targets~~ (overruled)
 
-- **Why:** For now the data is too patchy to be right.
-- **Detail:** MM-49
-- **Reopen if:** The food sources' coverage is measured and found adequate.
+- **Overruled by the product owner on 2026-10-14** (MM-306), without the
+  coverage measurement: the app now tracks minerals and key vitamins, shows
+  each against a reference amount, and lets the user set a sodium limit
+  (MM-305). The concern below is carried into the design instead: every
+  total says how much of the day it covers, and a missing value is never
+  counted as zero (MM-310).
+- **Why it was a non-goal:** For now the data is too patchy to be right.
+- **Detail:** MM-49, MM-305, MM-306
+- **Was to reopen if:** The food sources' coverage is measured and found
+  adequate. The first pack built with MM-307 measures it.
 
 ### No calorie or macro estimation from a meal photo
 
