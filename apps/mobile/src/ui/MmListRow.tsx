@@ -57,6 +57,7 @@ export function MmListRow({
         )}
         <div className="mm-list-row-text">
           <span className="mm-list-row-title">{title}</span>
+          {subtitle === undefined ? null : <span className="mm-list-row-subtitle">{subtitle}</span>}
           <div className="mm-list-row-entry-body">{entry}</div>
         </div>
       </div>

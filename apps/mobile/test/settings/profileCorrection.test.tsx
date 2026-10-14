@@ -149,7 +149,7 @@ it('no longer breastfeeding removes the 400 kcal and offers every goal again', a
   await back();
   await back();
   await openTab('Coach');
-  await userEvent.click(await screen.findByRole('button', { name: 'Change' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const goals = await screen.findByRole('dialog', { name: 'Choose a goal' });
   for (const label of ['Fat loss', 'Recomp', 'Lean gain', 'Maintenance']) {
     expect(within(goals).getByRole('button', { name: new RegExp(`^${label}`) }), label).toBeInTheDocument();

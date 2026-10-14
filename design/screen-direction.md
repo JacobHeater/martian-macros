@@ -62,10 +62,12 @@ in here.
    waits until the value changes; a disabled primary is never parked in a
    hero.
 7. **Progressive disclosure is the default** (`anti-cruft` section 7): a
-   screen answers today's question in the first viewport (412 by 915, and
-   360 by 740). Per destination that is: Dashboard, the arc, the macro
-   picture, the strip and the first rows; Food, the hero and the first
-   meal; Coach, the hero and the one thing to do; Progress, the weigh-in,
+   screen answers today's question in the first viewport (412 by 915;
+   smaller phones are not designed for, the owner's call of 2026-10-14).
+   Per destination that is: Dashboard, the arc, the macro picture, the
+   strip and the first rows; Food, the hero and the first meal; Coach, the
+   hero, its warnings and the goal (MM-299), with the one thing to do
+   next; Progress, the weigh-in,
    the figure and the chart; Train, Start, the strip and the first group;
    Settings, the first two sections.
 8. **Nothing native shows** (MM-262): the design system draws every control
@@ -103,7 +105,7 @@ MM-254 to MM-259. The story names are the register's.
 |---|---|---|
 | Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Split switch and the confidence word labelled; the rhythm strip of the last seven days; the insight as a section; weight (or, on a morning before the weigh-in, the weigh-in row with its field, MM-291), waist, next check-in, training and the streak as rows of one group; the history behind "More about this week". |
 | Food (`Screens/Food`, Food and NothingLogged) | A hero, a second macro picture, four meal cards, a segmented completeness control at the foot. | The hero with the switch; the meals as sections with their icons, subtotal and add button, entries as rows with a method icon beside its word; the completeness row after the last meal with its state in words, the mark repeated in the day header; "More about today" one tap down. |
-| Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, goal, body), recovery and reports folded to one line when nothing is due. |
+| Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the goal with "Change goal" (MM-299); the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, body), recovery and reports folded to one line when nothing is due. |
 | Progress (`Screens/Progress`, Progress) | An entry card, a chart card with a four-line caption, an events card with a four-line paragraph, a waist card with the technique inline, strength cards. | One hero: the weigh-in and the trend with its range switch, one line about the band, "How to read this" one tap down; weight events as rows with an icon and the day in words, the add action in the header; Waist and Strength folded to their lines. |
 | Train (`Screens/Train`, Train) | Two full-width buttons, a chip, thirteen identical rows. | One primary, Repeat as a text action; the strip of the last seven days; the weekly volume as a section that opens its screen; workouts grouped by this week, last week and month, each row with the day, the length and a record mark with its words. |
 | Settings (`Screens/Settings`, Settings and MeasuredBodyFat) | Twelve groups mixing chips, a segmented control, sliders and rows. | Seven sections of rows in the order of use (Today's setup, You, Reminders, Data, Appearance, About, Erase), every row with its icon, the choosers opening the options dialog; the two sliders stay in their rows as the one other inline control. |

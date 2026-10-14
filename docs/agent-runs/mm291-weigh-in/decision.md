@@ -27,15 +27,12 @@ documentation, fixed in this change.
 | UX-8 (no stories for the row's typed and error states) | Pending: state stories for `NumberEntry` in a row. |
 | QA note (MM-291 named a test file that did not exist) | Built: MM-291 names `test/dashboard/dashboard.test.tsx`. |
 
-## Open (owner)
+## Owner answers (2026-10-14)
 
-- At 360 by 740 the weigh-in row is below the fold on a morning before the
-  weigh-in. Options: the group before the rhythm strip on such a morning;
-  a smaller hero; or the sheet fallback. Not decided by the chair.
-- Bounded requests to coaching and measurement (both reviewers): should
-  the row show the last trend before the weigh-in, and should it show
-  today's raw entry after? Built meanwhile: neither; the snack confirms the
-  number typed.
+- The weigh-in below the fold at 360 by 740: not a goal; small phones are
+  not designed for.
+- The trend before the weigh-in and today's entry after it: yes, both.
+  Built with MM-297 and MM-299 in `docs/agent-runs/mm298-trend-goal-themes/`.
 
 ## Verification
 

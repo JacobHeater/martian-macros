@@ -4,6 +4,7 @@ import { RecoveryCheckInScreen } from '../../coach/RecoveryCheckInScreen';
 import { showTargetChangeSheet } from '../../coach/showTargetChangeSheet';
 import { TargetsHistoryScreen } from '../../coach/TargetsHistoryScreen';
 import { PauseScreen } from '../../pause/PauseScreen';
+import { checkInDueScenario } from './checkInDueScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
@@ -12,7 +13,8 @@ import { valueOf } from './valueOf';
  * What the coach believes, why, and what it will do next. Before MM-256
  * (main at 9fb8c79, 2026-10-13) eleven cards of equal weight; after, the
  * safeguards, the hero with the confidence word, one thing to do, and
- * sections with icons, folded to a line when quiet.
+ * sections with icons, folded to a line when quiet. Since MM-299 the goal
+ * comes first under the hero and its warnings, then the one thing to do.
  */
 const meta = { title: 'Screens/Coach', ...screensMeta } satisfies Meta;
 export default meta;
@@ -20,6 +22,14 @@ export default meta;
 export const Coach = screenStory({
   covers: ['CoachScreen'],
   shows: 'Your metabolism',
+  open: ({ state }) => state.homeTab.put('coach'),
+});
+
+/** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
+export const CheckInDue = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Answer this week’s five questions',
+  scenario: checkInDueScenario,
   open: ({ state }) => state.homeTab.put('coach'),
 });
 
