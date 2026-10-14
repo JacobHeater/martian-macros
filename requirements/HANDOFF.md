@@ -93,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-318 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-320 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -201,6 +201,14 @@ Ember switch stays. Not yet looked at on the phone: the drums' scroll feel
 and the calendar swipe (the Pixel was disconnected); the Storybook stories
 were looked at in a headless browser in three palettes.
 
+**Build a new part like its siblings (owner's rule, 2026-10-14, MM-318;
+rule 9 of `design/screen-direction.md`, in `AGENTS.md`).** Before drawing
+a new section, row or control, open the component of the nearest one on
+that screen and reuse it; name it in the ticket; inspect the whole screen;
+ask the panel to compare. The water section was invented beside the meal
+sections, shipped twice, and the owner had to point at the meals. His
+words: if it happens again, there are consequences.
+
 **Questions to the owner go through the interactive question tool (owner,
 2026-10-14).** Never as a numbered list in a chat reply: batches of up to
 four, concrete options, the recommendation first.
@@ -263,6 +271,13 @@ limitations.
   so it waits for the owner).
 - **Not verified:** the phone, TalkBack, 200% text; a real pack build (so
   the coverage MM-306 asked about and the pack's size are unmeasured).
+- **The water section, corrected (MM-318, MM-319).** The owner on the
+  Food screen: why is Water not an accordion like the others? It was a
+  card of buttons the chair invented without opening `MealSection`. Now a
+  section like the meals: "+" opens Add water, a drink opens Edit water,
+  rows swipe away; reviewed against the meals (UX guard pass,
+  `docs/agent-runs/mm318-water-section/`). Rule 9 written. MM-319: water
+  added to a past day said today's time; it says "Added later".
 - **Roadmap:** WS-08 step 10, WS-04 step 7 and WS-09 step 9 built; WS-11
   step 9 (MM-314) waits on MM-70.
 

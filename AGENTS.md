@@ -80,6 +80,16 @@ delegation and sequential fallback do not supersede the working agreements here.
   domain's own ("split", never an invented "share"), and nothing that
   holds a control sits bare on the canvas (MM-291).
   Do not add HTML drawings of screens anywhere in the repository.
+- Build a new part like its siblings (owner's rule, 2026-10-14, MM-318;
+  rule 9 of `design/screen-direction.md`). Before drawing a new section,
+  row or control, open the component of the nearest one on that screen
+  and reuse it; name that sibling in the ticket's Decisions, and give a
+  written reason for any different pattern. Inspect the whole screen with
+  the new part beside its siblings, and ask the panel to compare them.
+  When a reviewer says something outweighs or differs from its
+  neighbours, first ask whether it should simply be one of them. The
+  water section was invented beside the meal sections and shipped twice
+  before the owner had to point at the meals.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements

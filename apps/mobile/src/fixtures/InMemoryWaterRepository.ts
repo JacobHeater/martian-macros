@@ -23,6 +23,10 @@ export class InMemoryWaterRepository implements WaterRepository {
     return id;
   }
 
+  async updateWater(entry: WaterEntry): Promise<void> {
+    this.entries.value = this.entries.value.map((e) => (e.id === entry.id ? entry : e));
+  }
+
   async removeWater(id: number): Promise<void> {
     this.entries.value = this.entries.value.filter((e) => e.id !== id);
   }

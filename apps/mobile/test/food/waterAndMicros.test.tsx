@@ -146,34 +146,54 @@ it('a glass from the Dashboard in one tap, said with the total, and undone', asy
   await expect.poll(async () => (await first(repos.water.watchWater(today))).length).toBe(0);
 });
 
-it('on Food: a bottle, another amount, and a removal, each said, on the day shown', async () => {
+/** Presses the Water section's "+" and gives the Add water sheet (MM-318). */
+async function openAddWater() {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add water' }));
+  return within(await screen.findByRole('dialog', { name: 'Add water' }));
+}
+
+// MM-318: Water is a section like the meals: "+" in the header opens a sheet; rows delete from "More actions".
+it('on Food: a bottle and another amount from the header, and a delete, each said, on the day shown', async () => {
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
   await screen.findByText('Yesterday');
-  await userEvent.click(screen.getByRole('button', { name: /^Bottle, 500\s+ml of water$/ }));
+  let sheet = await openAddWater();
+  await userEvent.click(sheet.getByRole('button', { name: /^Bottle, 500\s+ml of water$/ }));
   expect(await screen.findByText('Added 0.5 L: 0.5 L yesterday')).toBeInTheDocument();
-  const other = screen.getByRole('button', { name: 'Other amount of water' });
-  await userEvent.click(other);
-  expect(other).toHaveAttribute('aria-expanded', 'true');
-  await userEvent.type(screen.getByRole('textbox', { name: 'Water, millilitres' }), '330');
-  await userEvent.click(screen.getByRole('button', { name: 'Save water' }));
+  expect(screen.queryByRole('dialog', { name: 'Add water' })).not.toBeInTheDocument();
+  sheet = await openAddWater();
+  await userEvent.type(sheet.getByRole('textbox', { name: 'Water, millilitres' }), '330');
+  await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
   await expect.poll(async () => (await first(repos.water.watchWater(today.addDays(-1)))).map((e) => e.ml)).toEqual([500, 330]);
   expect(await first(repos.water.watchWater(today))).toEqual([]);
-  await userEvent.click(screen.getByRole('button', { name: 'Remove 0.33 L of water' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'More actions for 0.33 L of water, added later' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
   await expect.poll(async () => (await first(repos.water.watchWater(today.addDays(-1)))).length).toBe(1);
   await userEvent.click(within(document.body).getByRole('button', { name: 'Undo' }));
   await expect.poll(async () => (await first(repos.water.watchWater(today.addDays(-1)))).length).toBe(2);
 });
 
+it('the Water section folds like a meal, its total in the summary', async () => {
+  await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml: 250, at: new Date(2026, 9, 10, 9) }));
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(water.closest('.mm-section')).not.toBeNull();
+  expect(within(water).getAllByText('0.25 L')).toHaveLength(2); // the summary, and the row's amount
+  const toggle = within(water).getByRole('button', { name: /^Water/ });
+  await userEvent.click(toggle);
+  expect(toggle).toHaveAttribute('aria-expanded', 'false');
+});
+
 it('another amount over 3,000 ml is refused with the range', async () => {
   renderApp(repos, today);
   await openTab('Food');
-  await userEvent.click(await screen.findByRole('button', { name: 'Other amount of water' }));
-  await userEvent.type(screen.getByRole('textbox', { name: 'Water, millilitres' }), '5000');
-  await userEvent.click(screen.getByRole('button', { name: 'Save water' }));
-  expect(await screen.findByText('That is more than one drink can be.')).toBeInTheDocument();
-  expect(screen.getByText('Up to 3,000 ml at a time.')).toBeInTheDocument();
+  const sheet = await openAddWater();
+  await userEvent.type(sheet.getByRole('textbox', { name: 'Water, millilitres' }), '5000');
+  await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
+  expect(await sheet.findByText('That is more than one drink can be.')).toBeInTheDocument();
+  expect(sheet.getByText('Up to 3,000 ml at a time.')).toBeInTheDocument();
   expect(await first(repos.water.watchWater(today))).toEqual([]);
 });
 
@@ -194,14 +214,45 @@ it('drinks logged as food are not water', async () => {
   expect(screen.getByText('No water yet today')).toBeInTheDocument();
 });
 
-// MM-317: after another amount is saved, focus goes back to the button that opened the field.
-it('after another amount is saved, focus is back on Other amount', async () => {
+// MM-317: after another amount is saved, focus goes back to the control that opened it (MM-318: the header's "+").
+it('after another amount is saved, focus is back on Add water', async () => {
   renderApp(repos, today);
   await openTab('Food');
-  await userEvent.click(await screen.findByRole('button', { name: 'Other amount of water' }));
-  await userEvent.type(screen.getByRole('textbox', { name: 'Water, millilitres' }), '330');
-  await userEvent.click(screen.getByRole('button', { name: 'Save water' }));
+  const sheet = await openAddWater();
+  await userEvent.type(sheet.getByRole('textbox', { name: 'Water, millilitres' }), '330');
+  await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
   await expect
     .poll(() => (document.activeElement as HTMLElement | null)?.getAttribute('aria-label'))
-    .toBe('Other amount of water');
+    .toBe('Add water');
+});
+
+// MM-319: water added to a past day never shows today's clock time on that day's row.
+it('a drink added to yesterday shows no time from today, and its actions are told apart', async () => {
+  await repos.water.addWater(new WaterEntry({ id: 0, date: today.addDays(-1), ml: 250, at: new Date(2026, 9, 9, 8) }));
+  renderApp(repos, today);
+  await openTab('Food');
+  await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
+  await screen.findByText('Yesterday');
+  const sheet = await openAddWater();
+  await userEvent.click(sheet.getByRole('button', { name: /^Glass, 250\s+ml of water$/ }));
+  expect(await screen.findByText('Added later')).toBeInTheDocument();
+  expect(screen.getByText('8:00 AM')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'More actions for 0.25 L of water at 8:00 AM' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'More actions for 0.25 L of water, added later' })).toBeInTheDocument();
+});
+
+// MM-318 (the panel's PD-1): pressing a drink opens Edit water, as a food opens Edit food; its time is kept.
+it('pressing a drink edits its amount and keeps its time', async () => {
+  await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml: 250, at: new Date(2026, 9, 10, 8) }));
+  renderApp(repos, today);
+  await openTab('Food');
+  await userEvent.click(await screen.findByRole('button', { name: 'Edit 0.25 L of water at 8:00 AM' }));
+  const sheet = within(await screen.findByRole('dialog', { name: 'Edit water' }));
+  const field = sheet.getByRole('textbox', { name: 'Water, millilitres' });
+  expect(field).toHaveValue('250');
+  await userEvent.clear(field);
+  await userEvent.type(field, '330');
+  await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
+  await expect.poll(async () => (await first(repos.water.watchWater(today))).map((e) => [e.ml, e.at.getHours()])).toEqual([[330, 8]]);
+  expect(await screen.findByText('Changed to 0.33 L')).toBeInTheDocument();
 });

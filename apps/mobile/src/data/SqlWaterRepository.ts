@@ -5,6 +5,7 @@ import type { Watched } from '../lang/Watched';
 import type { AppDatabase } from './AppDatabase';
 import { day, integer, moment, number } from './columns';
 import { insert } from './insert';
+import { update } from './update';
 
 /** `WaterRepository` kept in the database (MM-313). Ids are never reused. */
 export class SqlWaterRepository implements WaterRepository {
@@ -31,6 +32,17 @@ export class SqlWaterRepository implements WaterRepository {
   addWater(entry: WaterEntry): Promise<number> {
     return this.db.write(['water_entries'], (db) =>
       insert(db, 'water_entries', { epoch_day: entry.date.epochDay, ml: entry.ml, at_ms: entry.at.getTime() }),
+    );
+  }
+
+  updateWater(entry: WaterEntry): Promise<void> {
+    return this.db.write(['water_entries'], (db) =>
+      update(
+        db,
+        'water_entries',
+        { epoch_day: entry.date.epochDay, ml: entry.ml, at_ms: entry.at.getTime() },
+        { column: 'id', value: entry.id },
+      ),
     );
   }
 

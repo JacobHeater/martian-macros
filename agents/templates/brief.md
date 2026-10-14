@@ -10,6 +10,10 @@
 - Architecture/design/roadmap inputs and hashes: REPLACE
 - Existing facts, non-goals and approved owner decisions: REPLACE
 - Acceptance criteria and proposed criteria (separate): REPLACE
+- For a new section, row or control: its nearest siblings on the same screen
+  (component paths and captures), and the question every design reviewer
+  answers first: does it look and behave like them, and if not, why not
+  (rule 9 of `design/screen-direction.md`): REPLACE
 - Relevant core/selective role assignments and reasons for omissions: REPLACE
 - Dependencies, safety/privacy constraints and unresolved choices: REPLACE
 - Actual writer identity and ownership paths (or no owner): REPLACE

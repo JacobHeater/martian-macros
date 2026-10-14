@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
 import { FormatError } from '../lang/FormatError';
 import { MmButton } from './MmButton';
@@ -36,6 +36,7 @@ interface NumberEntryProps {
  */
 export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave, refusal }: NumberEntryProps) {
   const hintId = useId();
+  const block = useRef<HTMLDivElement>(null);
   const [text, setText] = useState(initial ?? '');
   const [refused, setRefused] = useState<string>();
   const value = parseNumber(text);
@@ -46,7 +47,9 @@ export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'pri
   const save = async (toSave: number) => {
     try {
       await onSave(toSave);
-      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      // Only its own focus is let go: a save that closed a sheet has already put focus back where it was (MM-317).
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && block.current?.contains(focused)) focused.blur();
     } catch (error) {
       setRefused(
         error instanceof FormatError ? (refusal ?? 'That value looks off. Check it.') : 'Could not save. Try again.',
@@ -55,7 +58,7 @@ export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'pri
   };
 
   return (
-    <div className="mm-number-entry-block">
+    <div className="mm-number-entry-block" ref={block}>
       <div className="mm-number-entry">
         <MmTextField
           name={title}
