@@ -23,6 +23,10 @@ interface MmTextFieldProps {
   suffix?: string | undefined;
   kind?: MmTextFieldKind;
   dense?: boolean;
+  /** The id of words outside the field that also describe it (a hint drawn across a row, MM-295). */
+  describedBy?: string | undefined;
+  /** The keyboard's action key does this ("Done"), when the value can be acted on (MM-296). */
+  onSubmit?: (() => void) | undefined;
 }
 
 /** The app's text input. */
@@ -38,6 +42,8 @@ export function MmTextField({
   suffix,
   kind = 'text',
   dense = false,
+  describedBy: describedByOutside,
+  onSubmit,
 }: MmTextFieldProps) {
   const id = useId();
   const helperId = `${id}-helper`;
@@ -48,6 +54,7 @@ export function MmTextField({
     error === undefined ? undefined : errorId,
     suffix === undefined ? undefined : suffixId,
     helper === undefined ? undefined : helperId,
+    describedByOutside,
   ]
     .filter(Boolean)
     .join(' ');
@@ -70,8 +77,15 @@ export function MmTextField({
           aria-invalid={error === undefined ? undefined : true}
           aria-describedby={describedBy === '' ? undefined : describedBy}
           placeholder={hint}
+          enterKeyHint={onSubmit === undefined ? undefined : 'done'}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && onSubmit !== undefined) {
+              event.preventDefault();
+              onSubmit();
+            }
+          }}
         />
         {suffix === undefined ? null : (
           <span id={suffixId} className="mm-field-suffix">

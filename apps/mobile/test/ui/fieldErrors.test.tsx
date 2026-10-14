@@ -68,6 +68,39 @@ describe('the number entry', () => {
   });
 });
 
+// MM-295: the hint is how to take the number, so it is heard with the field.
+// MM-296: the keyboard's action key saves, as Save does; never while the value is not a number.
+describe('the number entry, heard and submitted', () => {
+  it('describes the field with its hint', () => {
+    render(<NumberEntry title="Today's weigh-in" unit="lb" initial={undefined} hint="First thing." onSave={async () => undefined} />);
+    expect(screen.getByRole('textbox', { name: "Today's weigh-in" })).toHaveAccessibleDescription(/First thing\./);
+  });
+
+  it('saves on the keyboard action key, and only a number', async () => {
+    const saved: number[] = [];
+    render(
+      <NumberEntry
+        title="Today's weigh-in"
+        unit="lb"
+        initial={undefined}
+        hint="First thing."
+        onSave={async (value) => {
+          saved.push(value);
+        }}
+      />,
+    );
+    const field = screen.getByRole('textbox', { name: "Today's weigh-in" });
+    expect(field).not.toHaveAttribute('enterkeyhint');
+    await userEvent.type(field, 'heavy{Enter}');
+    expect(saved).toEqual([]);
+    await userEvent.clear(field);
+    await userEvent.type(field, '181.4');
+    expect(field).toHaveAttribute('enterkeyhint', 'done');
+    await userEvent.type(field, '{Enter}');
+    expect(saved).toEqual([181.4]);
+  });
+});
+
 describe('metric facts', () => {
   it('puts each label before its value', () => {
     const { container } = render(<MetricFacts facts={[['Trend weight', '184.1 lb']]} />);
