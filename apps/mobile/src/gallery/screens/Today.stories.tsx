@@ -1,8 +1,10 @@
 import type { Meta } from '@storybook/react-vite';
+import { userEvent, within } from 'storybook/test';
 import { firstDayScenario } from './firstDayScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
+import { waistDueScenario } from './waistDueScenario';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -26,4 +28,58 @@ export const NotWeighedToday = screenStory({
   covers: ['DashboardScreen'],
   shows: 'First thing in the morning, after the bathroom.',
   scenario: notWeighedTodayScenario,
+});
+
+/** Weighed today, the waist last measured over a week ago: the Dashboard asks for it in place (MM-301). */
+export const WaistDue = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  scenario: waistDueScenario,
+});
+
+/** Types into a field of the screen, once it is there. */
+const type = (name: string, text: string) => async (canvas: HTMLElement) =>
+  userEvent.type(await within(canvas).findByRole('textbox', { name }), text);
+
+/** A waist typed and not yet saved: Save is on, and secondary (MM-301). */
+export const WaistTyped = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  scenario: waistDueScenario,
+  walk: type('Today’s waist, inches', '36'),
+});
+
+/** A waist no tape could measure, refused under the field (MM-301). */
+export const WaistRefused = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'That value looks off. Check it.',
+  scenario: waistDueScenario,
+  walk: type('Today’s waist, inches', '3{Enter}'),
+});
+
+/** Both asking and both typed: one primary Save, the waist's secondary (MM-301, PD-1). */
+export const BothTyped = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'First thing in the morning, after the bathroom.',
+  scenario: notWeighedTodayScenario,
+  walk: async (canvas) => {
+    await type('Today’s weigh-in', '184.2')(canvas);
+    await type('Today’s waist, inches', '36')(canvas);
+  },
+});
+
+/** The weigh-in saved: the snack above the navigation bar offers Progress (MM-294, MM-301, MM-302). */
+export const WeighInSaved = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Open Progress',
+  scenario: notWeighedTodayScenario,
+  walk: type('Today’s weigh-in', '184.2{Enter}'),
+});
+
+/** The waist saved on the Dashboard: the snack confirms it above the navigation bar and offers Progress (MM-301, MM-302). */
+export const WaistSaved = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Open Progress',
+  scenario: waistDueScenario,
+  walk: type('Today’s waist, inches', '36{Enter}'),
 });

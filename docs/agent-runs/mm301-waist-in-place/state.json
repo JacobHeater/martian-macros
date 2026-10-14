@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "task_id": "mm301-waist-in-place",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "main",
+    "commit": "0ad476ad2441f20cb779a9a3ebffe481806a51f7"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, acting as chair and single edit owner, branch feature/dashboard-waist-in-place",
+    "paths": [
+      "apps/mobile",
+      "design",
+      "requirements",
+      "roadmap",
+      "docs/agent-runs/mm301-waist-in-place"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Debate the waist entry row on the Dashboard and its confirmation as drawn in Screens/Today: hierarchy, wording, alternatives, the design system.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "0ad476ad2441f20cb779a9a3ebffe481806a51f7",
+      "input_hashes": {
+        "docs/agent-runs/mm301-waist-in-place/brief.md": "4f1c6454cf3acaae6704b32244eb8b892f08c2a508a0ec87642412e837e10c31",
+        "requirements/dashboard/STORY.waist-in-place-on-the-dashboard.MM-301.md": "02bf10640e7eb7349d056507ecbd4adf0618901d986f67cb96965bdd20880476",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "apps/mobile/src/dashboard/WaistRow.tsx": "b5b4519673424e3a71166c1ace1da4bccf5e8f49d499df2469f2d273a85096e0",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "60c5b18399913a582df1f71986fad19b0e6fcdc823af9d31956691720b1df575",
+        "design/screen-direction.md": "9d1eec1f30c3f8a0835b3315492a8207924c1f42fe99109fb37fd7f5b9590f17",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/ui/NumberEntry.tsx": "b5396db9acb6ad32006e125775de192e8936a59fa7195b141af4da782010b0fe"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "WaistRow, DashboardScreen, WeighInRow, MmListRow, NumberEntry, MmButton, Overlays, WaistEntryCard, hierarchyProblems",
+          "Seven captures at 412 by 915"
+        ],
+        "not_inspected": [
+          "The snack rendered",
+          "Typed, refused and saved states",
+          "Progress rendered",
+          "Tests"
+        ],
+        "referrals": [
+          "measurement: hint timing, cadence line",
+          "ux-accessibility: Open Progress landing"
+        ],
+        "limitations": "Uncommitted working tree over the baseline; static captures only; hashes computed by the chair at decision time; the brief did not name agents/panel-protocol.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The questions concern the repository's own rules and copy.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not needed.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Guard the novice task flow and accessibility of the waist entry row, its Save, the confirmation snack and focus after save.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "0ad476ad2441f20cb779a9a3ebffe481806a51f7",
+      "input_hashes": {
+        "docs/agent-runs/mm301-waist-in-place/brief.md": "4f1c6454cf3acaae6704b32244eb8b892f08c2a508a0ec87642412e837e10c31",
+        "requirements/dashboard/STORY.waist-in-place-on-the-dashboard.MM-301.md": "02bf10640e7eb7349d056507ecbd4adf0618901d986f67cb96965bdd20880476",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "apps/mobile/src/dashboard/WaistRow.tsx": "b5b4519673424e3a71166c1ace1da4bccf5e8f49d499df2469f2d273a85096e0",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "60c5b18399913a582df1f71986fad19b0e6fcdc823af9d31956691720b1df575",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/ui/NumberEntry.tsx": "b5396db9acb6ad32006e125775de192e8936a59fa7195b141af4da782010b0fe",
+        "apps/mobile/src/ui/MmOverlays.tsx": "3a8428172306097fc90956f3b5e5a6beda0464b7bf4eb18b7eb8136f61eb5dab"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "WaistRow, DashboardScreen, WeighInRow, NumberEntry, MmTextField, MmListRow, MmButton, MmOverlays, ui.css, WaistEntryCard, saveWaistReadings, tests",
+          "Four captures at 412 by 915"
+        ],
+        "not_inspected": [
+          "Device, TalkBack, keyboard resize",
+          "Measured contrast",
+          "Progress rendered"
+        ],
+        "referrals": [
+          "measurement: hint conditions, plausibility check",
+          "product-designer: wording"
+        ],
+        "limitations": "No interaction observed; tests not run by the reviewer; hashes computed by the chair at decision time."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Where an action snackbar sits relative to bottom navigation, and how long it stays.",
+        "reason": "UX-1 and UX-5 rest on platform conventions.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://docs.flutter.dev/release/breaking-changes/snackbar-with-action-behavior-update",
+            "title": "SnackBar with action no longer auto-dismisses",
+            "published_or_updated": "2026-09-29",
+            "accessed": "2026-10-14",
+            "claim": "An action snackbar stays until dismissed, aligned with M3; persist: false restores auto-dismiss."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "Understanding SC 4.1.3 Status Messages (WCAG 2.2)",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "Confirmations are status messages announced without moving focus."
+          }
+        ],
+        "summary": "Action snacks wait for dismissal on the platform; placement above bottom navigation not retrieved from M3.",
+        "limitations": "The M3 placement page renders with JavaScript and was not retrieved."
+      }
+    },
+    {
+      "task": "Bounded question: one reading on the Dashboard against three in Progress, the 7-day window, the hint's conditions, same-day replacement.",
+      "role": "measurement",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "0ad476ad2441f20cb779a9a3ebffe481806a51f7",
+      "input_hashes": {
+        "docs/agent-runs/mm301-waist-in-place/brief.md": "4f1c6454cf3acaae6704b32244eb8b892f08c2a508a0ec87642412e837e10c31",
+        "requirements/dashboard/STORY.waist-in-place-on-the-dashboard.MM-301.md": "02bf10640e7eb7349d056507ecbd4adf0618901d986f67cb96965bdd20880476",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/templates/findings/role.md": "334f677102d80e82c3ee1ea796402a2d691ba7fa4ea2403ae25bdd70adc78d89",
+        "apps/mobile/src/dashboard/WaistRow.tsx": "b5b4519673424e3a71166c1ace1da4bccf5e8f49d499df2469f2d273a85096e0",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "60c5b18399913a582df1f71986fad19b0e6fcdc823af9d31956691720b1df575",
+        "agents/roles/measurement.md": "b887613d1c114b0da068e7cba6f497c39fa632b57e0088a903fb9e9d9bd10043",
+        "apps/mobile/src/engine/WaistRule.ts": "171064ac9acc64e00f08769d713361b9575ab99ffe7e2af38a8a3b5820eba35a",
+        "apps/mobile/src/engine/waistChangeOf.ts": "fec16a44613e7d9d286e56b244519d177bebe2098f9b419e845885e4e353356f",
+        "apps/mobile/src/progress/saveWaistReadings.ts": "e6c35a5b699333b94be93469c0bcbff76ba848a3dffe4a944da765bb91bafb24"
+      },
+      "report": "findings/measurement.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "WaistRule, waistNoiseOf, waistChangeOf, recompSignalOf, assessStall, ReminderRule, ReminderFacts, SqlWaistRepository, waistSummary, waistAmount, MM-155, MM-301 tests"
+        ],
+        "not_inspected": [
+          "Renders",
+          "Waist engine tests",
+          "Units.inchesToCm"
+        ],
+        "referrals": [
+          "safety and nutrition: rarer masked stall",
+          "ux-accessibility and product-designer: hint and cost wording"
+        ],
+        "limitations": "Arithmetic and source only; hashes computed by the chair at decision time."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Applies the approved MM-155 model to a new entry path.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not needed; resizing the single-reading factor would need it.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md, with no separate chair review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An entry row, its wording and the snack on the Dashboard over an approved measurement model (MM-155); no health rule, target, coaching message or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An entry row, its wording and the snack on the Dashboard over an approved measurement model (MM-155); no health rule, target, coaching message or engine change. ME-1 asks whether a rarer masked stall is acceptable; recorded as an unresolved question, not convened.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An entry row, its wording and the snack on the Dashboard over an approved measurement model (MM-155); no health rule, target, coaching message or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An entry row, its wording and the snack on the Dashboard over an approved measurement model (MM-155); no health rule, target, coaching message or engine change. ME-1 and the PD body-checking question are recorded as unresolved, not convened.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch, used by the UX-accessibility reviewer."
+      ],
+      "retrieval": [
+        "WebFetch retrieved the Flutter breaking-change page and a W3C Understanding page; m3.material.io returned no body."
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "No reviewer could render a story, run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [
+    "PD-3: both fields stacked on a morning with neither done, or the waist folded while the weigh-in asks? Owner (MM-304).",
+    "UX-1 option B: may a snack whose action repeats a destination time out? Owner, amends MM-272 (MM-304).",
+    "ME-1: is a rarer masked stall acceptable when Dashboard entries dominate? Safety and nutrition, not convened."
+  ],
+  "decisions": [
+    {
+      "id": "MM301-waist-in-place",
+      "status": "accepted",
+      "summary": "The waist row asks in place when none counts for 7 days; one reading; secondary Save heard as \"Save waist\"; hint with MM-155's conditions; \"Waist saved: 36 in\" with Open Progress.",
+      "authority": "Product owner (in place, toast offers the other screen); chair on the panel's remediations"
+    },
+    {
+      "id": "MM302-snack-above-bar",
+      "status": "accepted",
+      "summary": "A snack stands above the navigation bar; a floating action rises above a snack.",
+      "authority": "Product owner, 2026-10-14: \"Toasts should always display above the nav bar\"; UX-1"
+    },
+    {
+      "id": "MM303-refusal-only",
+      "status": "accepted",
+      "summary": "\"That value looks off\" only for a FormatError; other failures ask to try again.",
+      "authority": "Chair, UX-7"
+    },
+    {
+      "id": "MM304-later",
+      "status": "pending",
+      "summary": "Focus after save, the waist landing, correcting today's waist, the cost said once, and the owner's calls.",
+      "authority": "Product owner"
+    }
+  ],
+  "pending_work": [
+    "MM-304: UX-5, UX-6/PD-6, ME-6/UX-8, ME-3, and the owner options PD-3, UX-1 B, PD-4.",
+    "ME-7 with MM-155's re-estimation."
+  ],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "0ad476ad2441f20cb779a9a3ebffe481806a51f7",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Exit 0, last line \"All checks passed.\" on the branch working tree before it was committed."
+    }
+  ],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

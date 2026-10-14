@@ -1,6 +1,8 @@
 import { useId, useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
+import { FormatError } from '../lang/FormatError';
 import { MmButton } from './MmButton';
+import type { MmButtonKind } from './MmButtonKind';
 import { MmTextField } from './MmTextField';
 import './ui.css';
 
@@ -11,7 +13,14 @@ interface NumberEntryProps {
   initial: string | undefined;
   /** How to take the number: under the field and its Save, and heard with the field (MM-295). */
   hint: string;
-  /** Saves the value; if it fails, "That value looks off" is said under the field. */
+  /** What is saved, in a word ("waist"): Save is heard as "Save waist", told apart from another Save (MM-301). */
+  saves?: string;
+  /** How much Save weighs on the surface: secondary where it is not the screen's main action (MM-301). */
+  saveKind?: Extract<MmButtonKind, 'primary' | 'secondary'>;
+  /**
+   * Saves the value. A refusal (a `FormatError`) is said under the field as
+   * "That value looks off"; any other failure as one to try again (MM-303).
+   */
   onSave: (value: number) => Promise<void>;
 }
 
@@ -23,7 +32,7 @@ interface NumberEntryProps {
  * stays in it (MM-279). The keyboard's action key saves as Save does
  * (MM-296).
  */
-export function NumberEntry({ title, unit, initial, hint, onSave }: NumberEntryProps) {
+export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave }: NumberEntryProps) {
   const hintId = useId();
   const [text, setText] = useState(initial ?? '');
   const [refused, setRefused] = useState<string>();
@@ -36,8 +45,8 @@ export function NumberEntry({ title, unit, initial, hint, onSave }: NumberEntryP
     try {
       await onSave(toSave);
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-    } catch {
-      setRefused('That value looks off. Check it.');
+    } catch (error) {
+      setRefused(error instanceof FormatError ? 'That value looks off. Check it.' : 'Could not save. Try again.');
     }
   };
 
@@ -61,6 +70,8 @@ export function NumberEntry({ title, unit, initial, hint, onSave }: NumberEntryP
         {initial !== undefined && !changed ? null : (
           <MmButton
             label="Save"
+            name={saves === undefined ? undefined : `Save ${saves}`}
+            kind={saveKind}
             onPress={ready === undefined ? undefined : () => void save(ready)}
           />
         )}
