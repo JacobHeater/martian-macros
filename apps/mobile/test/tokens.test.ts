@@ -62,3 +62,28 @@ describe('the type roles', () => {
     }
   });
 });
+
+// MM-297, SC 1.4.11: a field's border identifies it, so it holds 3:1 against
+// every background a field sits on, in every palette.
+describe('the field border', () => {
+  const luminance = (hex: string) => {
+    const channel = (i: number) => {
+      const c = parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2);
+  };
+  const ratio = (a: string, b: string) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  for (const palette of ['martian', 'dark', 'light']) {
+    it(`holds 3:1 against surface, raised and canvas in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      const border = tokens.get('outline-strong')!;
+      for (const background of ['surface', 'raised', 'canvas']) {
+        expect(ratio(border, tokens.get(background)!), `${palette} ${background}`).toBeGreaterThanOrEqual(3);
+      }
+    });
+  }
+});

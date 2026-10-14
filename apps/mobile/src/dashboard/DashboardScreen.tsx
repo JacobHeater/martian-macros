@@ -22,11 +22,12 @@ import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmRhythmStrip } from '../ui/MmRhythmStrip';
 import { Notice } from '../ui/Notice';
+import { useOverlays } from '../ui/useOverlays';
 import { DashboardMetrics } from './DashboardMetrics';
 import { ProcessCard } from './ProcessCard';
 import { ReportReadyNotice } from './ReportReadyNotice';
 import { rhythmDays } from './rhythmDays';
-import { WeighInSection } from './WeighInSection';
+import { WeighInRow } from './WeighInRow';
 import './dashboard.css';
 
 /**
@@ -36,6 +37,7 @@ import './dashboard.css';
  */
 export function DashboardScreen() {
   const { services, state } = useApp();
+  const overlays = useOverlays();
   const navigator = useNavigator();
   const setupState = useCell(state.setup);
   const pausesState = useCell(state.pauses);
@@ -81,7 +83,7 @@ export function DashboardScreen() {
   const trend = coach?.trend ?? [];
   const last = trend[trend.length - 1];
   const weekAgo = trend.length > 7 ? trend[trend.length - 8] : undefined;
-  const weighedToday = weights.some((w) => w.date === today);
+  const todaysWeight = weights.find((w) => w.date === today);
   const latestWaist = waist[waist.length - 1];
   const trainedThisWeek = workouts.filter(
     (workout) => !workout.inProgress && today.daysUntil(workout.date) > -7 && !workout.date.isAfter(today),
@@ -123,21 +125,37 @@ export function DashboardScreen() {
           }}
         />
       </div>
-      <ProcessCard />
       <InsightCard />
-      {weighedToday && last !== undefined ? null : (
-        <WeighInSection fmt={fmt} onSaveWeight={(kg) => services.weights.saveWeight(today, kg)} />
-      )}
       <MmListGroup>
-        {weighedToday && last !== undefined ? (
+        {todaysWeight === undefined ? (
+          <WeighInRow
+            fmt={fmt}
+            lastTrendKg={last?.levelKg}
+            onSaveWeight={async (kg) => {
+              await services.weights.saveWeight(today, kg);
+              overlays.snack(`Saved ${fmt.weight(kg)} for today`);
+            }}
+          />
+        ) : last === undefined || trend.length < 2 ? (
           <MmListRow
             leadingIcon="scale"
-            title={fmt.weight(last.levelKg)}
-            subtitle={`Trend weight · Last 7 days ${weekAgo === undefined ? '—' : fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`}
+            title={fmt.weight(todaysWeight.weightKg)}
+            subtitle="Today’s weigh-in · the trend starts tomorrow"
             opens
             onPress={() => open('progress')}
           />
-        ) : null}
+        ) : (
+          <MmListRow
+            leadingIcon="scale"
+            title={`Trend ${fmt.weight(last.levelKg)}`}
+            subtitle={[
+              `Today ${fmt.weight(todaysWeight.weightKg)}`,
+              ...(weekAgo === undefined ? [] : [`7 days ${fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`]),
+            ].join(' · ')}
+            opens
+            onPress={() => open('progress')}
+          />
+        )}
         <MmListRow
           leadingIcon="tape"
           title={latestWaist === undefined ? 'No waist measurement yet' : fmt.length(latestWaist.waistCm)}
@@ -161,6 +179,7 @@ export function DashboardScreen() {
           opens
           onPress={() => open('train')}
         />
+        <ProcessCard />
       </MmListGroup>
       <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back">
         <DashboardMetrics />

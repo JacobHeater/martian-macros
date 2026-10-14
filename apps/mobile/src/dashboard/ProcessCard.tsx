@@ -5,7 +5,8 @@ import { MmListRow } from '../ui/MmListRow';
 
 /**
  * A quiet acknowledgement of the work (MM-92): how many whole days have
- * been logged in a row, as one row under the rhythm strip (MM-254). No
+ * been logged in a row, as the last row of the Dashboard's list group
+ * (MM-254; inside the card since MM-291, never bare on the canvas). No
  * confetti, no notification, and nothing about weight or how much was
  * eaten. Empty until there is a streak worth saying.
  */

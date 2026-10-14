@@ -41,10 +41,25 @@ async function seedHistory(days: number, dayOneKcal: number): Promise<void> {
 async function chooseMaintenance(): Promise<void> {
   await openTab('Coach');
   expect(await screen.findByRole('heading', { name: 'Goal: Fat loss' })).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Change' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   await userEvent.click(within(sheet).getByText('Maintenance'));
 }
+
+// MM-299: the goal is the first section, under the hero and its warnings, before the one thing to do.
+it('puts the goal first under the hero, before the one thing to do', async () => {
+  await seedHistory(30, 2600);
+  renderApp(repos, today);
+  await openTab('Coach');
+  const goal = await screen.findByRole('heading', { name: 'Goal: Fat loss' });
+  const oneThing = await screen.findByText('Answer this week’s five questions');
+  const hero = document.querySelector('.mm-hero') as HTMLElement;
+  const follows = (a: Node, b: Node) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  expect(follows(hero, goal)).toBe(true);
+  expect(follows(goal, oneThing)).toBe(true);
+  expect(document.querySelector('.mm-section')?.contains(goal)).toBe(true);
+  expect(screen.getByRole('button', { name: 'Change goal' })).toBeInTheDocument();
+});
 
 it('changing the goal applies at once', async () => {
   await seedHistory(30, 2500);

@@ -54,9 +54,17 @@
 }
 .mm-button:disabled {
   border-color: transparent;
-  background: var(--selected);
-  color: var(--text3);
+  background: transparent;
+  color: color-mix(in srgb, var(--text) 38%, transparent);
   cursor: default;
+}
+/* An inert primary or secondary keeps its shape as a faint outline, never a
+   fill a field could be mistaken for, and its label fades as the platform's
+   do (38% of the text color), so it never reads as an enabled secondary, in
+   every palette (MM-297). */
+.mm-button-primary:disabled,
+.mm-button-secondary:disabled {
+  border-color: color-mix(in srgb, var(--text) 16%, transparent);
 }
 
 .mm-icon-button {
@@ -450,6 +458,18 @@
   color: var(--text2);
   font: var(--type-caption);
 }
+/* A row that holds an entry (MM-291): the icon level with the title, the
+   control on the text column inside the row's padding. */
+.mm-list-row-entry {
+  align-items: flex-start;
+  padding-block: var(--space-12) var(--space-16);
+}
+.mm-list-row-entry .mm-list-row-title {
+  min-height: 24px;
+}
+.mm-list-row-entry-body {
+  margin-top: var(--space-8);
+}
 .mm-list-row-trailing {
   display: flex;
   align-items: center;
@@ -682,7 +702,10 @@
 }
 
 .mm-segmented {
-  display: inline-flex;
+  /* Every segment as wide as the widest, so a two-way switch is never lopsided (MM-290, PD-9). */
+  display: inline-grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--outline-strong);
