@@ -10,6 +10,7 @@ import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /**
  * MM-114: one neutral notice when logged days sit far below the floor.
@@ -38,7 +39,7 @@ const notice = () => screen.queryByText('About your logged days');
 
 async function open(day: CalendarDate = today) {
   const view = renderApp(repos, day);
-  await screen.findByRole('heading', { name: 'Logging coverage' });
+  await dashboardLoaded();
   return view;
 }
 

@@ -1,25 +1,27 @@
 import { useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
-import { InfoCard } from './InfoCard';
 import { MmButton } from './MmButton';
 import { MmTextField } from './MmTextField';
 import './ui.css';
 
-interface NumberEntryCardProps {
+interface NumberEntryProps {
+  /** What the number is ("Today’s weigh-in"): the field's name. */
   title: string;
   unit: string;
   initial: string | undefined;
   hint: string;
-  /** Saves the value; if it fails, the card says "That value looks off" under the field. */
+  /** Saves the value; if it fails, "That value looks off" is said under the field. */
   onSave: (value: number) => Promise<void>;
 }
 
 /**
- * A card for entering one number (a weigh-in, a waist measurement), with a
- * save button and a hint. What is wrong with a value is said under the
- * field, and the keyboard stays in it (MM-279).
+ * One number to enter (a weigh-in), with a save button and a hint, on
+ * whatever surface holds it. With a value already saved the button waits
+ * until the value changes, so no disabled primary sits in a hero (MM-257).
+ * What is wrong with a value is said under the field, and the keyboard
+ * stays in it (MM-279).
  */
-export function NumberEntryCard({ title, unit, initial, hint, onSave }: NumberEntryCardProps) {
+export function NumberEntry({ title, unit, initial, hint, onSave }: NumberEntryProps) {
   const [text, setText] = useState(initial ?? '');
   const [refused, setRefused] = useState<string>();
   const value = parseNumber(text);
@@ -36,7 +38,7 @@ export function NumberEntryCard({ title, unit, initial, hint, onSave }: NumberEn
   };
 
   return (
-    <InfoCard title={title}>
+    <div className="mm-number-entry-block">
       <div className="mm-number-entry">
         <MmTextField
           name={title}
@@ -50,12 +52,14 @@ export function NumberEntryCard({ title, unit, initial, hint, onSave }: NumberEn
             setRefused(undefined);
           }}
         />
-        <MmButton
-          label="Save"
-          onPress={value === undefined || value <= 0 || !changed ? undefined : () => void save(value)}
-        />
+        {initial !== undefined && !changed ? null : (
+          <MmButton
+            label="Save"
+            onPress={value === undefined || value <= 0 || !changed ? undefined : () => void save(value)}
+          />
+        )}
       </div>
       <p className="mm-number-entry-hint">{hint}</p>
-    </InfoCard>
+    </div>
   );
 }

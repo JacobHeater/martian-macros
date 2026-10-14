@@ -12,6 +12,8 @@ interface MmDropdownProps<T> {
   onChange: ((value: T) => void) | undefined;
   /** What is wrong with the value, said beside the field and aloud. */
   error?: string | undefined;
+  /** The words shown while nothing is chosen ("Choose an event"). */
+  placeholder?: string | undefined;
 }
 
 /**
@@ -19,7 +21,7 @@ interface MmDropdownProps<T> {
  * native select (MM-265): pressing it opens the design system's options
  * list, with the current value marked "Chosen" (MM-261).
  */
-export function MmDropdown<T>({ label, value, items, onChange, error }: MmDropdownProps<T>) {
+export function MmDropdown<T>({ label, value, items, onChange, error, placeholder }: MmDropdownProps<T>) {
   const overlays = useOverlays();
   const [open, setOpen] = useState(false);
   const current = items.find((item) => item.value === value);
@@ -32,7 +34,7 @@ export function MmDropdown<T>({ label, value, items, onChange, error }: MmDropdo
   return (
     <MmPickerField
       label={label}
-      valueText={current?.label ?? ''}
+      valueText={current?.label ?? placeholder ?? ''}
       opens="listbox"
       expanded={open}
       error={error}

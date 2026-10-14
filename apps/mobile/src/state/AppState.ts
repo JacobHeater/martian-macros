@@ -3,6 +3,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import type { MacroPicture } from '../domain/MacroPicture';
 import type { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { HandSize } from '../domain/food/hand/HandSize';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -192,6 +193,9 @@ export class AppState {
 
   /** How much nutrition to show (MM-49). */
   readonly detailLevel: Cell<Loadable<DetailLevel>>;
+
+  /** Which picture of the macros the hero shows (MM-254): bars or donut, never both. */
+  readonly macroPicture: Cell<Loadable<MacroPicture>>;
   readonly recentFoods: Cell<Loadable<FoodEntry[]>>;
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
@@ -426,6 +430,7 @@ export class AppState {
       return profile === undefined ? undefined : { heightCm: profile.heightCm, sex: profile.sex };
     });
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
+    this.macroPicture = stream(() => s.preferences.watchMacroPicture());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
     this.coach = derived(() => {

@@ -1,6 +1,4 @@
-import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
-import type { DayCompleteness } from '../domain/DayCompleteness';
 import { intakeDayFrom } from '../domain/intakeDayFrom';
 import { Meal } from '../domain/Meal';
 import { pauseOn } from '../engine/pauseOn';
@@ -10,26 +8,28 @@ import { targetsOn } from '../state/targetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
-import { MmSegmented } from '../ui/MmSegmented';
-import { MmSurface } from '../ui/MmSurface';
+import { MmDisclosure } from '../ui/MmDisclosure';
 import { Notice } from '../ui/Notice';
-import { useOverlays } from '../ui/useOverlays';
-import { askLowDayComplete } from './askLowDayComplete';
 import { CalorieHero } from './CalorieHero';
 import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
+import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { MealSection } from './MealSection';
 import { useShownDay } from './useShownDay';
 import './food.css';
 
-/** The day's hero and its meals. The day header lives in the app bar, and the add action floats over the screen. */
+/**
+ * The day's hero and its meals, in tiers (MM-255): the hero with its macro
+ * picture, the lines that carry a message for today, the meals as sections,
+ * the completeness row after the last meal, and how the day is counted one
+ * tap down. The day header lives in the app bar, and the add action floats
+ * over the screen.
+ */
 export function FoodScreen() {
   const { services, state } = useApp();
-  const overlays = useOverlays();
   const pausesState = useCell(state.pauses);
   const day = useShownDay();
   const today = useCell(state.today);
@@ -39,7 +39,6 @@ export function FoodScreen() {
   const setup = useLoaded(state.setup);
   const guide = useCell(state.maintenanceGuide);
   const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
-  const floor = useCell(state.coach)?.calorieFloorKcal;
 
   if (Loadable.hasFailed(pausesState)) {
     return <Notice kind="caution" text="Pause history could not be loaded. Reopen the app to retry." />;
@@ -55,24 +54,9 @@ export function FoodScreen() {
   const intake = intakeDayFrom(day, entries);
   const alcoholKcal = entries.reduce((sum, e) => sum + e.alcoholKcal, 0);
 
-  const mark = async (chosen: DayCompleteness | undefined) => {
-    let next: DayCompleteness = chosen ?? 'unmarked';
-    // A day under half the floor is asked about once, as it is marked (MM-114).
-    const logged = entries.reduce((total, e) => total + e.kcal, 0);
-    if (next === 'complete' && floor !== undefined && logged < floor / 2) {
-      const answer = await askLowDayComplete(overlays, logged);
-      if (answer === undefined) return;
-      next = answer;
-    }
-    await services.dayMarks.setCompleteness(day, next);
-  };
-
   return (
     <>
       <CalorieHero intake={intake} targets={paused ? guide : targets?.targets} paused={paused} />
-      <InfoCard title="Macronutrient split">
-        <MacroSplitChart intake={intake} />
-      </InfoCard>
       <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
       {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
       {entries.length === 0 ? (
@@ -90,28 +74,23 @@ export function FoodScreen() {
         </div>
       ) : null}
       {Meal.values.map((meal) => (
-        <MmSurface key={meal} kind="compact" padded={false}>
-          <MealSection meal={meal} day={day} entries={entries.filter((e) => e.meal === meal)} />
-        </MmSurface>
+        <MealSection key={meal} meal={meal} day={day} entries={entries.filter((e) => e.meal === meal)} />
       ))}
       {entries.length === 0 ? null : (
         <>
-          <h2 className="app-subhead food-complete-question">Is this day fully logged?</h2>
-          <MmSegmented<DayCompleteness>
-            name="Is this day fully logged?"
-            allowEmpty
-            segments={[
-              { value: 'complete', label: 'Complete' },
-              { value: 'partial', label: 'Partial' },
-            ]}
-            selected={completeness === 'unmarked' ? undefined : completeness}
-            onChange={(chosen) => void mark(chosen)}
-          />
-          <div className="app-gap-small" />
+          <div className="food-complete-row">
+            <FoodCompletenessRow day={day} entries={entries} />
+          </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
-          <p className="app-caption">
-            Partial days are left out of your metabolism estimate instead of being read as under-eating.
-          </p>
+          <MmDisclosure title="More about today">
+            <p className="app-caption">
+              Partial days are left out of your metabolism estimate instead of being read as under-eating.
+            </p>
+            <p className="app-caption">
+              The share picture counts protein and carbs at 4 kcal a gram and fat at 9. Alcohol and other calorie
+              differences are not part of it.
+            </p>
+          </MmDisclosure>
         </>
       )}
       <div className="food-fab-room" />

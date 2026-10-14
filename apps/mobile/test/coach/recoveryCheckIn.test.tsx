@@ -33,7 +33,12 @@ async function openCoach(): Promise<HTMLElement> {
   renderApp(repos, today);
   await openTab('Coach');
   const title = await screen.findByRole('heading', { name: 'How you are holding up' });
-  return title.closest('.mm-surface') as HTMLElement;
+  const section = title.closest('.mm-section') as HTMLElement;
+  // Folded to one line unless the check-in is due (MM-256).
+  if (within(section).queryByRole('button', { name: /^Answer/ }) === null) {
+    await userEvent.click(within(section).getByRole('button', { name: /^How you are holding up/ }));
+  }
+  return section;
 }
 
 const stored = () => first(repos.recovery.watchRecoveryCheckIns());
@@ -60,7 +65,7 @@ it('answering stores one record and shows the five lines', async () => {
   expect(saved?.sleepHours).toBe(6.5);
 
   // Back on the Coach screen: a line per question, and no offer this week.
-  const after = (await screen.findByText('2 of 5')).closest('.mm-surface') as HTMLElement;
+  const after = (await screen.findByText('2 of 5')).closest('.mm-section') as HTMLElement;
   expect(within(after).getByText('Hunger')).toBeInTheDocument();
   expect(within(after).getByText('Mood')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Answer this week' })).not.toBeInTheDocument();

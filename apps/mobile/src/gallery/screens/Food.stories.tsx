@@ -7,7 +7,13 @@ import { screenStory } from './screenStory';
 import type { StoryStage } from './StoryStage';
 import { valueOf } from './valueOf';
 
-/** The food log, and every step of adding to it. */
+/**
+ * The food log, and every step of adding to it. Before MM-255 (main at
+ * 9fb8c79, 2026-10-13) the meals were four cards under a second macro
+ * picture; after, the hero with the switch, the meals as sections with
+ * their icons, method icons on the rows and the completeness row after the
+ * last meal.
+ */
 const meta = { title: 'Screens/Food', ...screensMeta } satisfies Meta;
 export default meta;
 
@@ -22,7 +28,7 @@ const press = (name: string | RegExp) => async (canvas: HTMLElement) =>
 
 export const Food = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Macronutrient split',
+  shows: 'Breakfast',
   open: ({ state }) => state.homeTab.put('food'),
 });
 

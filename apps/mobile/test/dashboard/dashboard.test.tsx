@@ -77,8 +77,8 @@ it('a normal day shows calories, protein and the trend weight', async () => {
   expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('1,000')).toBeInTheDocument();
   expect(screen.getByText('95 / 170 g')).toBeInTheDocument();
-  expect(screen.getByText('Trend weight')).toBeInTheDocument();
-  expect(screen.getByText('Last 7 days')).toBeInTheDocument();
+  // The weight row (MM-254): the figure as its title, what it is and the week beneath.
+  expect(screen.getByText(/^Trend weight · Last 7 days/)).toBeInTheDocument();
 });
 
 it('with no weigh-in today the weight card asks for one', async () => {
@@ -86,8 +86,8 @@ it('with no weigh-in today the weight card asks for one', async () => {
   renderApp(repos, today);
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  // Once saved, the card shows the trend and no longer asks.
-  expect(await screen.findByText('Trend weight')).toBeInTheDocument();
+  // Once saved, the weight row shows the trend and no longer asks.
+  expect(await screen.findByText(/^Trend weight/)).toBeInTheDocument();
   expect(screen.queryByRole('textbox', { name: 'Today’s weigh-in' })).not.toBeInTheDocument();
   const weights = await first(repos.weights.watchWeights());
   const last = weights[weights.length - 1];

@@ -7,10 +7,11 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { failing } from '../support/failing';
 import { foodOn } from '../support/foodOn';
 import { never } from '../support/never';
+import { openDashboardHistory } from '../support/dashboardLoaded';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
-/** The history under the Dashboard. Carried over from dashboard_metrics_test.dart. */
+/** The history under the Dashboard, one tap down since MM-254. Carried over from dashboard_metrics_test.dart. */
 const today = CalendarDate.of(2026, 10, 10);
 let repos: InMemoryRepositories;
 
@@ -41,6 +42,7 @@ const historyCharts = () => document.querySelectorAll('.chart > svg.chart-plot')
 it('a populated history shows every section', async () => {
   await seed();
   renderApp(repos, today);
+  await openDashboardHistory();
   for (const title of [
     'Nutrition history',
     'Protein history',
@@ -61,6 +63,7 @@ it('a populated history shows every section', async () => {
 it('the range control changes the chart and the recorded-day window', async () => {
   await seed();
   renderApp(repos, today);
+  await openDashboardHistory();
   await screen.findByRole('heading', { name: 'Logging coverage' });
   expect(screen.getAllByText('30 / 30')).toHaveLength(4);
   await userEvent.click(screen.getByRole('button', { name: '7 days' }));
@@ -73,6 +76,7 @@ it('empty histories explain how to populate the sections', async () => {
   // Adults only: a minor is given no coaching estimate.
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
   renderApp(repos, today);
+  await openDashboardHistory();
   expect(await screen.findByText('Log food to populate your intake history.')).toBeInTheDocument();
   expect(screen.getAllByText('No records in this range yet.').length).toBeGreaterThan(0);
   expect(screen.getAllByText('Not recorded').length).toBeGreaterThan(0);
@@ -87,6 +91,7 @@ it('history that is still loading does not become an empty chart', async () => {
       intake: { ...services.intake, watchIntakeDays: () => never() },
     }),
   });
+  await openDashboardHistory();
   expect(await screen.findByText('Loading your recorded metrics…')).toBeInTheDocument();
   expect(screen.queryByText('No records in this range yet.')).not.toBeInTheDocument();
 });
@@ -99,6 +104,7 @@ it('history errors are visible, not an empty success', async () => {
       intake: { ...services.intake, watchIntakeDays: () => failing() },
     }),
   });
+  await openDashboardHistory();
   expect(
     await screen.findByText('Dashboard history could not be loaded. Reopen the app to retry.'),
   ).toBeInTheDocument();

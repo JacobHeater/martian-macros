@@ -1,7 +1,7 @@
 ---
 id: MM-255
 component: food-logging
-status: proposed
+status: done
 related: [MM-253, MM-254, MM-224, MM-180, MM-179, MM-219, MM-220]
 ---
 
@@ -46,3 +46,7 @@ Scenario: Nothing lost
 
 `apps/mobile/src/gallery/screens/Food.stories.tsx` (Food, NothingLogged),
 before and after.
+
+## Progress
+
+Built 2026-10-13. The hero shares the macro switch with Dashboard. The meals are `MmSection`s with their icons (coffee cup, burger, dinner, cookie), the subtotal as the summary line, the add and copy buttons beside the header, the fold kept with its state. Entries are rows with a 20 dp method icon beside the method's word in the portion line ("Weighed · 120 g"), so the glyph is learned from the word (UX-13, PD-16); the scanned source is not a method and has no icon. The completeness control is a quiet row after the last meal with its mark and its state in words, opening the options dialog; the day header shows only the mark once the day is marked (UX-10, PD-14). Alcohol stays a visible line when above zero and fiber at Full detail; the explanation of partial days and of the share picture sits behind "More about today". The meal header is `heading` with its 24 dp icon (PD-13). Tests: `test/food/mealCards.test.tsx`, `foodAndTheRest.test.tsx` (the row opens the question), `easyToMiss.test.tsx`. Story: `Screens/Food` Food and NothingLogged.

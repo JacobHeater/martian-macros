@@ -86,7 +86,10 @@ describe('the dashboard’s line about the coach', () => {
       'Targets went down about 75 kcal on Sat, Oct 10, so far.',
     );
     const raised = [record(today.addDays(-8), 2300), record(today.addDays(-1), 2350)];
-    expect(coachLineText({ setup, history: raised, today })).toBe('Targets went up 50 kcal on Yesterday.');
+    // MM-283: a near day is said as a word, never "on Yesterday".
+    expect(coachLineText({ setup, history: raised, today })).toBe('Targets went up 50 kcal yesterday.');
+    const todays = [record(today.addDays(-8), 2300), record(today, 2350)];
+    expect(coachLineText({ setup, history: todays, today })).toBe('Targets went up 50 kcal today.');
   });
 
   it('otherwise says when the next check-in is, or that targets are held while it learns', () => {

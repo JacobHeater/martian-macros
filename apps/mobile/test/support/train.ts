@@ -84,6 +84,9 @@ export async function pressInSet(label: string | RegExp, number = 1, user: User 
   await user.click(within(await findSetEditor(number)).getByRole('button', { name: label }));
 }
 
-/** The rows of finished workouts on the Train screen, newest first. */
+/**
+ * The rows of finished workouts on the Train screen, newest first: the rows
+ * of the week and month sections (MM-258), each named by its day.
+ */
 export const workoutRows = () =>
-  within(screen.getByRole('heading', { name: 'Workouts' }).closest('.mm-surface') as HTMLElement).getAllByRole('button');
+  screen.getAllByRole('button', { name: /^(Today|Yesterday|[A-Z][a-z]{2}, [A-Z][a-z]{2} \d{1,2})/ });

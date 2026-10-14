@@ -120,6 +120,7 @@ CREATE TABLE "user_preferences" (
   "recovery_check_in_skipped_epoch_day" INTEGER NULL,
   "terms_accepted_version" INTEGER NULL,
   "terms_accepted_epoch_day" INTEGER NULL,
+  "macro_picture" TEXT NOT NULL DEFAULT 'bars',
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

@@ -1,19 +1,22 @@
 import { MiniTrend } from '../charts/MiniTrend';
 import { RecoveryQuestion } from '../domain/RecoveryQuestion';
 import { RecoveryRule } from '../engine/RecoveryRule';
+import { Fmt } from '../format/Fmt';
 import { recoveryQuestionLabel } from '../format/recoveryQuestionLabel';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
+import { MmSection } from '../ui/MmSection';
 import { RecoveryCheckInScreen } from './RecoveryCheckInScreen';
 
 /**
  * How the user is holding up (MM-116): the weekly check-in when it is due,
- * and each answer as its own small line over the last eight check-ins. The
- * answers are never combined into one number, and never lower a target.
+ * and each answer as its own small line over the last eight check-ins. A
+ * section that is open while the check-in is due and folded to one line
+ * otherwise (MM-256). The answers are never combined into one number, and
+ * never lower a target.
  */
 export function RecoveryCard() {
   const { services, state } = useApp();
@@ -23,8 +26,12 @@ export function RecoveryCard() {
   const today = useCell(state.today);
   const shown = all.length > RecoveryRule.shownCheckIns ? all.slice(all.length - RecoveryRule.shownCheckIns) : all;
   const latest = shown[shown.length - 1];
+  let summary: string;
+  if (due) summary = 'This week’s five questions are due.';
+  else if (latest === undefined) summary = 'Five quick questions a week. Not answered yet.';
+  else summary = `Last answered ${Fmt.day(latest.date, today)}.`;
   return (
-    <InfoCard title="How you are holding up">
+    <MmSection icon="heart" title="How you are holding up" summary={summary} collapsible initiallyExpanded={due}>
       {latest === undefined ? (
         <p className="app-text">
           Five quick questions a week on hunger, energy, sleep, training and mood. They are what the food log and the
@@ -70,6 +77,6 @@ export function RecoveryCard() {
           />
         ) : null}
       </div>
-    </InfoCard>
+    </MmSection>
   );
 }

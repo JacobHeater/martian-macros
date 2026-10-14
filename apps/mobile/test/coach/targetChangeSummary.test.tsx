@@ -11,6 +11,7 @@ import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /** MM-138: a change to the targets is summarized once, on the next opening. From target_change_summary_test.dart. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -98,7 +99,7 @@ it('an unseen target change is shown once and remains in history', async () => {
 
   view.unmount();
   renderApp(repos, today);
-  await screen.findByRole('heading', { name: 'Logging coverage' });
+  await dashboardLoaded();
   expect(screen.queryByRole('dialog', { name: 'Why your targets are what they are' })).not.toBeInTheDocument();
 
   await openTab('Coach');

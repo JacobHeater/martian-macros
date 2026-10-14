@@ -12,6 +12,7 @@ import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
 import { workoutOn } from '../support/workoutOn';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 
 /** MM-33: a monthly report on day 28, then monthly. Carried over from monthly_report_test.dart. */
 const onboarded = CalendarDate.of(2026, 9, 1);
@@ -56,14 +57,18 @@ async function seed({
 
 async function open(today: CalendarDate): Promise<void> {
   renderApp(repos, today);
-  await screen.findByRole('heading', { name: 'Logging coverage' });
+  await dashboardLoaded();
 }
 
 async function openFirstReport(today: CalendarDate): Promise<void> {
   await open(today);
   await openTab('Coach');
-  const reports = (await screen.findByRole('heading', { name: 'Monthly reports' })).closest('.mm-surface');
-  await userEvent.click(within(reports as HTMLElement).getByRole('button', { name: /Sep 1 – Sep 28/ }));
+  const reports = (await screen.findByRole('heading', { name: 'Monthly reports' })).closest('.mm-section') as HTMLElement;
+  // The section is open in the week a report arrives and folded after (MM-256).
+  if (within(reports).queryByRole('button', { name: /^Sep 1 – Sep 28/ }) === null) {
+    await userEvent.click(within(reports).getByRole('button', { name: /^Monthly reports/ }));
+  }
+  await userEvent.click(within(reports).getByRole('button', { name: /^Sep 1 – Sep 28/ }));
   await within(topLayer()).findByRole('heading', { name: 'What you did' });
 }
 

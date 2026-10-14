@@ -1,5 +1,7 @@
+import { MacroSplitChart } from '../charts/MacroSplitChart';
 import type { IntakeDay } from '../domain/IntakeDay';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
+import type { MacroPicture } from '../domain/MacroPicture';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { Fmt } from '../format/Fmt';
 import { clamp } from '../lang/clamp';
@@ -11,7 +13,7 @@ import { MacroKind } from '../ui/MacroKind';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
-import { MmStatusChip } from '../ui/MmStatusChip';
+import { MmSegmented } from '../ui/MmSegmented';
 import './food.css';
 
 interface CalorieHeroProps {
@@ -26,6 +28,7 @@ interface CalorieHeroProps {
   macros?: readonly MacroKind[];
   /** One line about the coach (calibration, a recent change). */
   status?: string | undefined;
+  /** The coach's confidence, in a word; said with its label, never alone. */
   confidence?: string | undefined;
   onStatusPress?: (() => void) | undefined;
   /** Opens the day's detail. */
@@ -35,10 +38,12 @@ interface CalorieHeroProps {
 }
 
 /**
- * The hero of a day: calories as a horizon arc, what is left, the macros,
- * and optionally one status line. The one calorie visual in the app
- * (MM-187): the Dashboard, the Food screen and the Coach screen all use it,
- * and the arc is always drawn.
+ * The hero of a day: calories as a horizon arc, what is left, one picture
+ * of the macros, and optionally one status line. The one calorie visual in
+ * the app (MM-187): the Dashboard, the Food screen and the Coach screen all
+ * use it, and the arc is always drawn. The macro picture is a switch
+ * between grams against target and the share of calories (MM-253, rule 4),
+ * remembered per person, never both at once.
  */
 export function CalorieHero({
   intake,
@@ -51,9 +56,10 @@ export function CalorieHero({
   onPress,
   pressLabel,
 }: CalorieHeroProps) {
-  const { state } = useApp();
+  const { services, state } = useApp();
   // Simple detail shows calories and protein only (MM-49).
   const level = useLoaded(state.detailLevel) ?? 'standard';
+  const picture = useLoaded(state.macroPicture) ?? 'bars';
   const shown = DetailLevel.showsCarbsAndFat(level) ? macros : macros.filter((macro) => macro === 'protein');
   const t = targets;
   const left = t === undefined || paused ? undefined : t.kcal - intake.kcal;
@@ -68,9 +74,13 @@ export function CalorieHero({
 
   const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
   const target: Readonly<Record<MacroKind, number | undefined>> = { protein: t?.proteinG, carbs: t?.carbsG, fat: t?.fatG };
+  // The share of calories needs all three macros; at Simple detail only the bars are offered.
+  const switchable = DetailLevel.showsCarbsAndFat(level);
+  const chosen: MacroPicture = switchable ? picture : 'bars';
 
   return (
     <MmHeroSurface>
+      <h2 className="mm-visually-hidden">Calories today</h2>
       <HorizonArc progress={progress} label={`${figure} ${caption}`} />
       {onPress === undefined ? (
         <>
@@ -83,26 +93,51 @@ export function CalorieHero({
           <span className="food-hero-caption">{caption}</span>
         </MmPressable>
       )}
-      <div className="food-hero-macros">
-        {shown.map((macro) => (
-          <MacroBar
-            key={macro}
-            macro={macro}
-            grams={grams[macro]}
-            target={target[macro]}
-            minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
-            emphasized={macro === 'protein'}
+      {switchable ? (
+        <div className="food-hero-switch">
+          <MmSegmented<MacroPicture>
+            name="Macro picture"
+            compact
+            segments={[
+              { value: 'bars', label: 'Grams' },
+              { value: 'donut', label: 'Share' },
+            ]}
+            selected={chosen}
+            onChange={(next) => {
+              if (next !== undefined) void services.preferences.saveMacroPicture(next);
+            }}
           />
-        ))}
-      </div>
-      {status === undefined ? null : (
-        <div className="food-hero-status">
-          <MmListRow title={status} leadingIcon="info" dense flush opens onPress={onStatusPress ?? (() => undefined)} />
+        </div>
+      ) : null}
+      {chosen === 'donut' ? (
+        <div className="food-hero-split">
+          <MacroSplitChart intake={intake} compact />
+        </div>
+      ) : (
+        <div className="food-hero-macros">
+          {shown.map((macro) => (
+            <MacroBar
+              key={macro}
+              macro={macro}
+              grams={grams[macro]}
+              target={target[macro]}
+              minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
+              emphasized={macro === 'protein'}
+            />
+          ))}
         </div>
       )}
-      {confidence === undefined ? null : (
-        <div className="food-hero-confidence">
-          <MmStatusChip label={confidence} />
+      {status === undefined ? null : (
+        <div className="food-hero-status">
+          <MmListRow
+            title={status}
+            subtitle={confidence === undefined ? undefined : `Coach confidence: ${confidence}`}
+            leadingIcon="info"
+            dense
+            flush
+            opens
+            onPress={onStatusPress ?? (() => undefined)}
+          />
         </div>
       )}
     </MmHeroSurface>
