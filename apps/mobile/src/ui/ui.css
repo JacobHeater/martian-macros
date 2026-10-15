@@ -1685,6 +1685,9 @@
 .mm-section-body {
   padding-left: calc(24px + var(--space-12));
 }
+.mm-section-meter {
+  padding: 0 0 var(--space-8) calc(24px + var(--space-12));
+}
 .mm-section-body[hidden] {
   display: none;
 }
@@ -1745,6 +1748,14 @@
 }
 .mm-rhythm-letter {
   font: var(--type-caption);
+}
+
+/* ---- The tally (MM-326): marks to fill toward a goal, the rhythm strip's dots without days. ---- */
+
+.mm-tally {
+  display: grid;
+  justify-content: start;
+  gap: var(--space-8);
 }
 
 .mm-number-entry-block {

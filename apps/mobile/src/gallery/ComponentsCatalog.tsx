@@ -32,6 +32,7 @@ import { MmStatusChip } from '../ui/MmStatusChip';
 import { MmSurface } from '../ui/MmSurface';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
+import { MmTally } from '../ui/MmTally';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { NumberEntry } from '../ui/NumberEntry';
@@ -138,6 +139,7 @@ export function ComponentsCatalog() {
         }))}
         onSelect={nothing}
       />
+      <MmTally of={16} value={3.5} />
       <GroupHeader text="Reminders" />
       <MmListGroup>
         <MmSwitchRow title="Weigh-in" subtitle="On days with no weigh-in yet." value={on} onChange={setOn} />
