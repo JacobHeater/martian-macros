@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { BiologicalSex } from '../../src/domain/BiologicalSex';
@@ -114,6 +114,51 @@ it('when Health Connect cannot be read, it says so and nothing kept is changed',
     await screen.findByText('Health Connect could not be read just now. Nothing was changed.'),
   ).toBeInTheDocument();
   expect(await stored('weight')).toEqual(before);
+});
+
+describe('laid out as Reminders is (MM-320)', () => {
+  it('is its own section: rows in the card, the note under it, Read now a row', async () => {
+    await source.permit(new Set(['weight']));
+    const settings = await open();
+    const section = (await settings.findByRole('region', { name: 'Health Connect' })) as HTMLElement;
+    const card = section.querySelector('.mm-list-group')!;
+    const note = within(section).getByText(/^The app only reads/);
+    expect(card.contains(note)).toBe(false);
+    expect([...card.children].every((child) => child.classList.contains('mm-list-row'))).toBe(true);
+    expect(within(card as HTMLElement).getByRole('button', { name: 'Read from Health Connect now' })).toBeInTheDocument();
+    const data = settings.getByRole('region', { name: 'Data' });
+    expect(within(data).queryByText('Weight')).not.toBeInTheDocument();
+  });
+
+  it('allowing a kind says so, since its row stops being a button', async () => {
+    const settings = await open();
+    await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
+    expect(await screen.findByText('Weight allowed.')).toBeInTheDocument();
+  });
+
+  it('allowing a kind whose first read fails still says it was allowed', async () => {
+    source.unreadable = true;
+    const settings = await open();
+    await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
+    expect(
+      await screen.findByText('Weight allowed, but Health Connect could not be read just now. Nothing was changed.'),
+    ).toBeInTheDocument();
+  });
+
+  it('reading now says when it is done', async () => {
+    await source.permit(new Set(['weight']));
+    const settings = await open();
+    await settings.findByRole('button', { name: 'Read from Health Connect now' });
+    await readNow(settings);
+    expect(await screen.findByText(/^Read from Health Connect\. Everything allowed is up to date\./)).toBeInTheDocument();
+  });
+
+  it('an allowed kind is not heard as "Allowed" twice', async () => {
+    await source.permit(new Set(['weight']));
+    const settings = await open();
+    await expect.poll(() => row(settings, 'Weight')?.textContent ?? '').toContain('Allowed.');
+    expect(within(row(settings, 'Weight') as HTMLElement).queryByRole('img', { name: 'Allowed' })).toBeNull();
+  });
 });
 
 it('a permission taken away later is noticed, and what was read is kept', async () => {

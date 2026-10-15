@@ -4,12 +4,14 @@ import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
+import { Profile } from '../../domain/Profile';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { demoWith } from './demoWith';
+import { healthPlatform } from './healthPlatform';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
@@ -164,5 +166,132 @@ export const WaterGoalHigh = screenStory({
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/More than most people need/));
+  },
+});
+
+const settings = ({ navigator }: Parameters<NonNullable<Parameters<typeof screenStory>[0]['open']>>[0]) =>
+  void navigator.push(() => <SettingsScreen />);
+
+/** MM-320: a phone without Health Connect: one row says so. */
+export const HealthConnectAbsent = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Health Connect is not on this phone/,
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Health Connect is not on this phone/));
+  },
+});
+
+/** MM-320: Health Connect on the phone and nothing allowed yet: a row for each kind, and the note. */
+export const HealthConnectNoneAllowed = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /The app only reads/,
+  device: healthPlatform(),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-320: weight and steps allowed and read; the rest offered; "Read from Health Connect now". */
+export const HealthConnectSomeAllowed = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Read from Health Connect now',
+  device: healthPlatform({ allowed: ['weight', 'steps'] }),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-320: for a woman, menstruation is offered too (MM-68). */
+export const HealthConnectWoman = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Menstruation',
+  scenario: demoWith({
+    then: async (repos) => {
+      const setup = (await repos.setup.loadSetup())!;
+      const { birthDate, heightCm } = setup.profile;
+      await repos.setup.saveSetup(setup.copyWith({ profile: new Profile({ sex: 'female', birthDate, heightCm }) }));
+    },
+  }),
+  device: healthPlatform(),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Menstruation'));
+  },
+});
+
+/** MM-320: a kind turned down when asked: the row stays offered and a snack says where to allow it. */
+export const HealthConnectRefused = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Weight was not allowed/,
+  device: healthPlatform({ refuses: ['weight'] }),
+  open: settings,
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+  },
+});
+
+/** MM-320: Health Connect could not be read: a snack says so, and nothing kept changes. */
+export const HealthConnectReadFailed = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /could not be read just now/,
+  device: healthPlatform({ allowed: ['weight'], unreadable: true }),
+  open: settings,
+  walk: async (canvas) => {
+    const read = await within(canvas).findByRole('button', { name: 'Read from Health Connect now' });
+    reveal(read);
+    await userEvent.click(read);
+  },
+});
+
+/** MM-320 (the panel's UX-8): weight allowed with nothing in it yet. */
+export const HealthConnectNothingYet = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Allowed. Nothing to read yet.',
+  device: healthPlatform({ allowed: ['weight'], empty: ['weight'] }),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-320 (the panel's UX-8): every kind allowed; nothing left to offer. */
+export const HealthConnectAllAllowed = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Read from Health Connect now',
+  device: healthPlatform({ allowed: ['weight', 'bodyFat', 'leanMass', 'height', 'workout', 'steps'] }),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-320 (the panel's UX-3): a kind allowed; its row stops being a button, so a snack says so. */
+export const HealthConnectAllowing = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Weight allowed.',
+  device: healthPlatform(),
+  open: settings,
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+  },
+});
+
+/** MM-320 (the panel's UX-6): "Read from Health Connect now" says when it is done. */
+export const HealthConnectReadDone = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Everything allowed is up to date/,
+  device: healthPlatform({ allowed: ['weight'] }),
+  open: settings,
+  walk: async (canvas) => {
+    const read = await within(canvas).findByRole('button', { name: 'Read from Health Connect now' });
+    reveal(read);
+    await userEvent.click(read);
   },
 });

@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "task_id": "mm320-health-connect",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "fix/unseen-states",
+    "commit": "d4d6eae557760bbbb7567ea8146a822f43489dfd"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, chair and single edit owner",
+    "paths": [
+      "apps/mobile",
+      "requirements",
+      "roadmap",
+      "design",
+      "AGENTS.md",
+      "agents/templates/brief.md",
+      "docs/agent-runs/mm320-health-connect"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Does the Data section look and behave like its siblings on Settings; recommend a layout from existing parts; then re-review the built section.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "d4d6eae557760bbbb7567ea8146a822f43489dfd",
+      "input_hashes": {
+        "docs/agent-runs/mm320-health-connect/brief.md": "73c067d7599675ea2223d214ca68d300377956d62f39edab5c09cdde70671f6c",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/settings/BUG.health-connect-rows-never-drawn.MM-320.md": "cdfe6759759f7f90a34cb051ace41758584b99b49f41ffa396bb2cb8a571adde",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "HealthConnectSection, SettingsScreen Data, RemindersSection, settings.css, MmListRow, MmSection, MmIconName, ui.css lists",
+          "5 captures, then 8 after the build"
+        ],
+        "not_inspected": [
+          "Read Failed render",
+          "wording of the purposes",
+          "Food database screen"
+        ],
+        "referrals": [
+          "chair: does the app read Health Connect by itself (Read now placement)"
+        ],
+        "limitations": "Static renders and source; no device; no hashes computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "An internal comparison with sibling components; no external claim.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The UX guard: walk allow, refuse, read now and a failed read for a novice and a screen-reader user; then re-review the built section.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "d4d6eae557760bbbb7567ea8146a822f43489dfd",
+      "input_hashes": {
+        "docs/agent-runs/mm320-health-connect/brief.md": "73c067d7599675ea2223d214ca68d300377956d62f39edab5c09cdde70671f6c",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/settings/BUG.health-connect-rows-never-drawn.MM-320.md": "cdfe6759759f7f90a34cb051ace41758584b99b49f41ffa396bb2cb8a571adde",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "HealthConnectSection, SettingsScreen Data, RemindersSection, settings.css, MmListRow, ui.css lists, MmOverlays snack, healthConnect tests, stories",
+          "5 captures, then 7 after the build"
+        ],
+        "not_inspected": [
+          "TalkBack",
+          "contrast",
+          "text scaling",
+          "the new tests and stories on re-review"
+        ],
+        "referrals": [
+          "react-capacitor: can the plugin tell a refusal from a lock-out (MM-323)"
+        ],
+        "limitations": "Static renders and source; no device; no hashes computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "An internal comparison with sibling components; no external claim.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the Health Connect rows; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the Health Connect rows; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the Health Connect rows; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the Health Connect rows; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the Health Connect rows; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [],
+      "retrieval": [],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "No research needed; no reviewer could run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM320-own-section",
+      "status": "accepted",
+      "summary": "Health Connect is its own section laid out as Reminders: rows in the card, Read now a row, the note under the card.",
+      "authority": "Both reviewers; rule 9"
+    },
+    {
+      "id": "MM322-hairlines",
+      "status": "accepted",
+      "summary": "A list group draws a hairline between any two of its children, rows included.",
+      "authority": "Settings direction; bug MM-322"
+    }
+  ],
+  "pending_work": [
+    "MM-323: lock-out wording (plugin question)",
+    "MM-324: one text column for rows with and without an action"
+  ],
+  "tests": [],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

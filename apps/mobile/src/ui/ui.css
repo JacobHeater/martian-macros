@@ -411,9 +411,6 @@
   border-radius: var(--radius-group);
   background: var(--surface);
 }
-.mm-list-group > * + * {
-  border-top: 1px solid var(--outline);
-}
 .mm-list-row,
 .mm-toggle-row {
   display: flex;
@@ -428,6 +425,10 @@
   font: inherit;
   text-align: start;
   transition: background var(--motion-fast);
+}
+/* After, and heavier than a row's own `border: 0`, which used to win (MM-322). */
+.mm-list-group > :not(:first-child) {
+  border-top: 1px solid var(--outline);
 }
 .mm-list-row-dense {
   min-height: 48px;

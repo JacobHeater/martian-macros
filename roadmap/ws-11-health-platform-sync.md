@@ -105,6 +105,7 @@ can run during group A.
 ## Requirement sources
 - Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).
+- Added 2026-10-14 (step 10): MM-323 (after Health Connect stops asking, say where to allow a kind).
 
 ## Notes for whoever builds it
 - **Workouts are read and written, aligned with the exercises each platform can name (MM-189, the owner's direction).** MM-188 is

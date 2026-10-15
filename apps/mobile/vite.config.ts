@@ -33,6 +33,15 @@ export default defineConfig({
     watch: { ignored: ['**/android/**', '**/storybook-static/**', '**/dist/**'] },
   },
   test: {
+    // What the stories draw (MM-321, `npm run unseen`): the app's components,
+    // not the stories themselves. Off unless asked for.
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.tsx'],
+      exclude: ['src/**/*.stories.tsx', 'src/gallery/**'],
+      reporter: ['json'],
+      reportsDirectory: 'coverage/stories',
+    },
     // Only tests of what is drawn need a browser's document. Making one for
     // each file of rules and arithmetic took most of the run.
     projects: [
