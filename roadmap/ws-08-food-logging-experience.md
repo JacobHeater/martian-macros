@@ -135,6 +135,7 @@ workstream's.
 - Added 2026-10-14 (the owner, MM-305 water, sodium and micronutrients; step 10): MM-305 (epic), MM-306 (the micronutrient
   non-goal overruled), MM-308 (the log keeps micronutrients), MM-309 (labels and own foods), MM-310 (the Micros segment),
   MM-311 (the sodium limit), MM-313 (water).
+- Built 2026-10-14: MM-325 (version 5: the sodium limit's column for a phone that ran the first version 4).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

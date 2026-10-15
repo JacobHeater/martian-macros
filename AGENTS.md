@@ -179,7 +179,10 @@ delegation and sequential fallback do not supersede the working agreements here.
   domain and engine logic independent of React and persistence details.
 - A change to any table bumps `apps/mobile/src/data/currentSchemaVersion.ts`
   by one, changes `currentSchema.ts` and adds the migration step; the
-  migration tests hold every released version's upgrade path.
+  migration tests hold every released version's upgrade path. Never edit a
+  step or a version's shape after any build of it has run anywhere (a panel
+  build, the owner's phone): add a new version instead (MM-325). The schema's
+  fingerprint test fails when the schema changes without a new version.
 
 ## Engineering principles (binding)
 
