@@ -135,6 +135,22 @@ it('switched on, the sodium limit starts at 2,300 mg and is kept', async () => {
   expect((await first(repos.preferences.watchNutritionGoals())).sodiumLimitSince).toBe(today);
 });
 
+// MM-325: on the owner's phone the save failed and the switch sprang back, saying nothing.
+it('a sodium limit that cannot be saved says so, and the switch stays off', async () => {
+  renderApp(repos, today, {
+    change: (services) => {
+      const preferences = Object.create(services.preferences) as typeof services.preferences;
+      preferences.saveSodiumLimit = () => Promise.reject(new Error('no such column'));
+      return { ...services, preferences };
+    },
+  });
+  const settings = await openSettings();
+  const limit = await settings.findByRole('switch', { name: /^Daily sodium limit/ });
+  await userEvent.click(limit);
+  expect(await screen.findByText('The sodium limit could not be saved. Nothing was changed.')).toBeInTheDocument();
+  expect(limit).not.toBeChecked();
+});
+
 it('a glass from the Dashboard in one tap, said with the total, and undone', async () => {
   renderApp(repos, today);
   await dashboardLoaded();

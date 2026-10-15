@@ -44,4 +44,17 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 4 to 5 (MM-325): version 4 changed after a build of it was installed. The
+  // build drawn for the panel made it without the sodium limit's start day;
+  // a database from that build gains the column, one from any later build
+  // already has it.
+  [
+    4,
+    async (db) => {
+      const columns = await db.select('PRAGMA table_info("user_preferences")');
+      if (!columns.some((column) => column['name'] === 'sodium_limit_since_epoch_day')) {
+        await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_since_epoch_day INTEGER NULL');
+      }
+    },
+  ],
 ]);

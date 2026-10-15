@@ -13,6 +13,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { NumberEntry } from '../ui/NumberEntry';
+import { useOverlays } from '../ui/useOverlays';
 
 /** Litres to at most two decimals, for the water goal's field. */
 const litres = (ml: number) => toStringAsFixed(ml / 1000, 2).replace(/\.?0+$/, '');
@@ -28,6 +29,7 @@ const sodiumRange = 'A whole number from 1,500 to 6,000 mg.';
  */
 export function NutritionGoalsSection() {
   const { services, state } = useApp();
+  const overlays = useOverlays();
   const today = useCell(state.today);
   const setup = useLoaded(state.setup);
   const detail = useLoaded(state.detailLevel) ?? 'standard';
@@ -38,6 +40,10 @@ export function NutritionGoalsSection() {
   const water = goals.waterGoalMl;
   const waterRange = imperial ? 'From 17 to 202 fl oz.' : 'From 0.5 to 6 L.';
   const high = water !== undefined && water > NutritionGoals.highWaterGoalMl;
+
+  /** A switch whose save fails says so and stays as it was, never springing back in silence (MM-325). */
+  const switched = (goal: string, save: Promise<void>) =>
+    void save.catch(() => overlays.snack(`The ${goal} could not be saved. Nothing was changed.`));
 
   // Below Full detail the limit is kept but shown nowhere; say where it shows (the panel's UX-7).
   const where = DetailLevel.showsExtras(detail)
@@ -57,7 +63,10 @@ export function NutritionGoalsSection() {
           }
           value={sodium !== undefined}
           onChange={(on) =>
-            void services.preferences.saveSodiumLimit(on ? NutritionGoals.suggestedSodiumLimitMg : undefined, today)
+            switched(
+              'sodium limit',
+              services.preferences.saveSodiumLimit(on ? NutritionGoals.suggestedSodiumLimitMg : undefined, today),
+            )
           }
         />
         {sodium === undefined ? null : (
@@ -90,7 +99,7 @@ export function NutritionGoalsSection() {
           }
           value={water !== undefined}
           onChange={(on) =>
-            void services.preferences.saveWaterGoal(on ? NutritionGoals.suggestedWaterGoalMl : undefined)
+            switched('water goal', services.preferences.saveWaterGoal(on ? NutritionGoals.suggestedWaterGoalMl : undefined))
           }
         />
         {water === undefined ? null : (
