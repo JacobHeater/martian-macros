@@ -10,6 +10,11 @@ interface MmSectionProps {
   title: string;
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
+  /**
+   * A graphic of the summary (MM-326) under the header, in line with the
+   * title; it stays when the section folds, as the summary does.
+   */
+  meter?: ReactNode;
   /** An action of the header's own (add, history), beside the title. */
   trailing?: ReactNode;
   /** The header folds the rows beneath it; closed, the summary is all that shows. */
@@ -32,6 +37,7 @@ export function MmSection({
   icon,
   title,
   summary,
+  meter,
   trailing,
   collapsible = false,
   initiallyExpanded = true,
@@ -90,6 +96,7 @@ export function MmSection({
         <div className="mm-section-head-main">{header}</div>
         {trailing}
       </div>
+      {meter === undefined ? null : <div className="mm-section-meter">{meter}</div>}
       {children === undefined ? null : (
         <div id={`${id}-body`} className="mm-section-body" hidden={!open}>
           {open || maintainState ? children : null}

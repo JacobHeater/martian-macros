@@ -5,6 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { WaterEntry } from '../../src/domain/water/WaterEntry';
+import { WaterUnits } from '../../src/domain/water/WaterUnits';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
@@ -271,4 +272,66 @@ it('pressing a drink edits its amount and keeps its time', async () => {
   await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
   await expect.poll(async () => (await first(repos.water.watchWater(today))).map((e) => [e.ml, e.at.getHours()])).toEqual([[330, 8]]);
   expect(await screen.findByText('Changed to 0.33 L')).toBeInTheDocument();
+});
+
+/** MM-326: the marks of the Water section's tally, as full, half or none. */
+const glassMarks = (water: HTMLElement) =>
+  Array.from(water.querySelectorAll('.mm-tally [data-mark]'), (m) => m.getAttribute('data-mark'));
+
+const drink = (ml: number) => repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at: new Date(2026, 9, 10, 9) }));
+
+// MM-326: glasses to fill, the owner's choice (2026-10-14); the summary says them (the panel's PD-2).
+it('a gallon goal with 24 fl oz drunk shows 3 of 16 glasses under the header, folded or not', async () => {
+  await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'imperial' }));
+  await repos.preferences.saveWaterGoal(WaterUnits.flOzToMl(128));
+  for (let i = 0; i < 3; i++) await drink(WaterUnits.flOzToMl(8));
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText('24 fl oz of 128 fl oz · 3 of 16 glasses')).toBeInTheDocument();
+  expect(glassMarks(water)).toEqual([...Array<string>(3).fill('full'), ...Array<string>(13).fill('none')]);
+  expect(water.querySelector('.mm-tally')).toHaveAttribute('aria-hidden', 'true');
+  await userEvent.click(within(water).getByRole('button', { name: /^Water/ }));
+  expect(within(water).queryByRole('button', { name: /^Edit .* of water/ })).not.toBeInTheDocument();
+  expect(water.querySelector('.mm-tally')).toBeVisible();
+});
+
+it('a goal with nothing yet says its glasses, and a glass from the sheet fills one mark', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText('Goal 2 L · 8 glasses')).toBeInTheDocument();
+  expect(glassMarks(water)).toEqual(Array<string>(8).fill('none'));
+  const sheet = await openAddWater();
+  await userEvent.click(sheet.getByRole('button', { name: /^Glass, 250\s+ml of water$/ }));
+  expect(await within(water).findByText(/· 1 of 8 glasses$/)).toBeInTheDocument();
+  expect(glassMarks(water).filter((m) => m === 'full')).toHaveLength(1);
+});
+
+it('half a glass is a half mark, and the last mark waits for the goal', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  await drink(375);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText(/· 1½ of 8 glasses$/)).toBeInTheDocument();
+  expect(glassMarks(water).slice(0, 3)).toEqual(['full', 'half', 'none']);
+  await drink(1575);
+  expect(await within(water).findByText(/· 7½ of 8 glasses$/)).toBeInTheDocument();
+  expect(glassMarks(water).at(-1)).toBe('half');
+});
+
+it('the goal reached fills every mark and carries the check mark; no goal, no glasses', async () => {
+  await repos.preferences.saveWaterGoal(1500);
+  await drink(2250);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  await within(water).findByText('2.25 L · Goal reached');
+  expect(glassMarks(water)).toEqual(Array<string>(6).fill('full'));
+  expect(water.querySelector('.food-meal-marker')).not.toBeNull();
+  await repos.preferences.saveWaterGoal(undefined);
+  await expect.poll(() => water.querySelector('.mm-tally')).toBeNull();
+  expect(within(water).queryByText(/glass/)).not.toBeInTheDocument();
 });

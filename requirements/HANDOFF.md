@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-14, by Claude, Session 27.
+Last updated: 2026-10-14, by Claude, Session 29.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -247,6 +247,24 @@ history (MM-141).
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
+## Session 29: 2026-10-14, Claude (glasses to fill on the water section)
+
+- The owner, with a screenshot of the Water section: "add a visual here to
+  gamify the water and make it easier to accomplish the goal". Asked with
+  options, the owner chose **glasses to fill** (over a thin bar or a week's
+  streak), **always shown** (also folded) and **a quiet check mark** at the
+  goal (MM-326).
+- Built: `MmTally` (the rhythm strip's dots, packed on rows of at most 12
+  of equal length), `MmSection`'s `meter`, `waterGlasses` (a glass is the
+  sheet's: 8 fl oz or 250 ml), and the summary naming the glasses ("24 fl
+  oz of 128 fl oz · 3 of 16 glasses"). Seven stories; the panel's designer
+  and UX guard reviewed it (pass, `docs/agent-runs/mm326-water-glasses/`).
+- **Waits on the owner:** PD-1 (the marks, and the rhythm strip's, are Ion,
+  which means "estimated" and is protein's hex in Martian; a neutral for
+  both?) and PD-5 (smaller marks at big goals). Branch
+  `feature/water-glasses`, stacked on #160. Step 10 of WS-08 (M4) gained
+  MM-326, built. Not looked at on the phone.
+
 ## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
 
 - The owner, with a phone screenshot of Settings' Data section: "Where is
@@ -311,30 +329,3 @@ limitations.
   added to a past day said today's time; it says "Added later".
 - **Roadmap:** WS-08 step 10, WS-04 step 7 and WS-09 step 9 built; WS-11
   step 9 (MM-314) waits on MM-70.
-
-## Session 26: 2026-10-14, Claude (the waist measured on the Dashboard; snacks above the bar)
-
-- The owner, on his phone: the Dashboard's rows that are windows into a
-  measurement should take it without another screen, the waist among
-  them, and the confirmation should offer the other screen. Mid-session:
-  "Toasts should always display above the nav bar."
-- **Story, panel, build (MM-293).** The waist row drawn in
-  `Screens/Today` (Not Weighed Today, a new Waist Due), reviewed by the
-  product-designer, UX-accessibility and measurement roles; every
-  finding's outcome is in `docs/agent-runs/mm301-waist-in-place/decision.md`.
-- **Built.** MM-301: the waist row asks in place when no measurement in
-  the last 7 days (the reminder's window), one reading through the shared
-  `saveWaistReadings`, a secondary Save heard as "Save waist" (`MmButton
-  name`, `NumberEntry saves`/`saveKind`), MM-155's conditions in the
-  hint, values to the quarter inch, "Waist saved: 36 in" with "Open
-  Progress" (the weigh-in's snack too). MM-302: the snack above the
-  navigation bar, and Food's Add food above a snack. MM-303:
-  "That value looks off" only for a refusal (`FormatError`).
-- **Stories added:** Waist Due, Waist Typed, Waist Refused, Both Typed,
-  Weigh In Saved, Waist Saved (Today) and Entry Removed (Food), each
-  looked at in the three palettes at 412 by 915. Headless captures freeze
-  the snack's rise animation half-way; stop animations in the capture
-  frame to see it as shown.
-- **Left:** MM-304 (proposed). Not looked at: the phone, TalkBack.
-- **Roadmap:** WS-03 steps 13 (built) and 14 (MM-304) added; M2 moved by
-  MM-301 to MM-303.
