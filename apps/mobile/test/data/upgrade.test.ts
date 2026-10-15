@@ -208,3 +208,21 @@ it('a version 3 database comes up to date: entries kept with no micronutrients, 
   expect(goals.waterGoalMl).toBeUndefined();
   expect(await first(repos.water.watchWater(day))).toEqual([]);
 });
+
+// MM-325: version 4 changed after a build of it was installed. The build drawn
+// for the panel (14aa735) made version 4 without the sodium limit's start day;
+// on a phone that ran it, switching the limit on failed and sprang back.
+it('a version 4 database from the build drawn for the panel can switch the sodium limit on', async () => {
+  const old = await openSql();
+  // Version 4 as 14aa735 left it: today's tables, less the one column.
+  const firstVersionFour = currentSchema.replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '');
+  expect(firstVersionFour).not.toContain('sodium_limit_since_epoch_day');
+  await AppDatabase.open(old, { version: 4, schema: firstVersionFour });
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  await repos.preferences.saveSodiumLimit(2300, day);
+  const goals = await first(repos.preferences.watchNutritionGoals());
+  expect(goals.sodiumLimitMg).toBe(2300);
+  expect(goals.sodiumLimitSince).toBe(day);
+});

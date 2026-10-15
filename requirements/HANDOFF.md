@@ -81,8 +81,12 @@ not launch it with PowerShell redirection (`*>`, `2>&1`): PowerShell 5.1
 turns Vite's stderr into an error and kills the runner.
 
 **Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
-`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 3
-since MM-254: `macro_picture`). Only one schema change at a time.
+`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 5
+since MM-325). Only one schema change at a time. **A version's shape never
+changes once any build of it has run** (MM-325: version 4 gained a column
+after the owner's phone had it, and the sodium limit stopped switching on
+there); `test/data/schemaFingerprint.test.ts` fails when the schema changes
+without a new version.
 
 **The engineering rules are checked (MM-246, MM-261, MM-278).**
 `test/architecture.test.ts` fails the suite on a file with two declarations
