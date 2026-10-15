@@ -187,6 +187,7 @@ export function SettingsScreen() {
       <NutritionGoalsSection />
       <ProfileSection />
       <RemindersSection />
+      <HealthConnectSection />
       <MmSection icon="lock" title="Data">
         <MmListGroup>
           <MmListRow
@@ -196,7 +197,6 @@ export function SettingsScreen() {
             opens
             onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
           />
-          <HealthConnectSection />
           <MmListRow
             leadingIcon="lock"
             title="Stored only on this device"

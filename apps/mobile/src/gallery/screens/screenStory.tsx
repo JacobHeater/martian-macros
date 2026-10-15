@@ -1,6 +1,7 @@
 import type { StoryObj } from '@storybook/react-vite';
 import type { ThemePreference } from '../../domain/ThemePreference';
 import { StoryApp } from './StoryApp';
+import type { StoryDevice } from './StoryDevice';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import type { StoryTerms } from './StoryTerms';
@@ -11,6 +12,8 @@ interface ScreenStory {
   /** Words on the screen once it has arrived; the stories' test waits for them. */
   shows: string | RegExp;
   scenario?: StoryScenario;
+  /** What the phone brings; nothing of a device unless a story is about it. */
+  device?: StoryDevice;
   open?: (stage: StoryStage) => void | Promise<void>;
   /** What a person does from there to reach the screen, given where the story is drawn. */
   walk?: (canvas: HTMLElement) => Promise<void>;
@@ -21,12 +24,12 @@ interface ScreenStory {
 }
 
 /** A story of the whole app brought to one screen, in the palette of the toolbar. */
-export function screenStory({ covers, shows, scenario, open, walk, terms, unthemed = false }: ScreenStory): StoryObj {
+export function screenStory({ covers, shows, scenario, device, open, walk, terms, unthemed = false }: ScreenStory): StoryObj {
   return {
     parameters: { covers, shows },
     render: (_args, { globals }) => {
       const palette = globals['palette'] as ThemePreference;
-      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} terms={terms} open={open} />;
+      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} terms={terms} open={open} />;
     },
     ...(walk === undefined ? {} : { play: ({ canvasElement }) => walk(canvasElement) }),
   };

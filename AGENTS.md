@@ -76,7 +76,12 @@ delegation and sequential fallback do not supersede the working agreements here.
   roles review it, saving their reports and an outcome for every finding
   under `docs/agent-runs/`; (4) build the spec only once the UX guard (the
   UX-accessibility role) has no open blocking finding. A state the phone
-  can show that no story draws is a defect (MM-292). Words are the
+  can show that no story draws is a defect (MM-292), and `mm check` finds
+  it: `npm run unseen` fails on markup no story reaches unless
+  `apps/mobile/test/gallery/unseen.json` names it with a reason (MM-321).
+  Never add to that register to get past the check; draw the state. A
+  state that needs the phone (a health platform, a camera) is brought with
+  `screenStory`'s `device` (MM-320). Words are the
   domain's own ("split", never an invented "share"), and nothing that
   holds a control sits bare on the canvas (MM-291).
   Do not add HTML drawings of screens anywhere in the repository.

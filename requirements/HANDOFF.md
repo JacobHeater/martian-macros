@@ -93,7 +93,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-320 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-325 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -101,6 +101,14 @@ shipped over in-memory stores on a fixed day, in a phone's viewport, opened
 at that screen (`screenStory({ covers, shows, open, walk })`). A new
 `*Screen.tsx`, `*Sheet.tsx` or `*Step.tsx` with no story fails
 `test/gallery/stories.test.tsx`, which also draws and walks every story.
+**And every part of a screen is drawn (MM-321).** `npm run unseen`, part
+of `mm check`, draws the stories under coverage and fails on markup no
+story reaches unless `apps/mobile/test/gallery/unseen.json` names it with
+a reason; a place a story now draws fails until it leaves the register.
+A state that needs the phone (a health platform, a camera) is brought
+with `screenStory`'s `device` (`healthPlatform`). Settings' Health
+Connect rows went unseen and unreviewed for months because the stories'
+platform was empty (MM-320).
 Two rules came out of the owner's phone review the same day: a stylesheet
 rule that removes an outline must name `:focus-visible` (MM-239, a focused
 field drew two rings), and a slider inside a list group is an
@@ -235,6 +243,25 @@ history (MM-141).
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
+## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
+
+- The owner, with a phone screenshot of Settings' Data section: "Where is
+  this in Storybook? … this atrocity of padding". It was not: the stories'
+  health platform was empty, so only "not on this phone" was ever drawn,
+  and MM-237's check passed because Settings had a story (MM-320).
+- The owner chose the Data section plus an audit and a check. Built:
+  `device` on `screenStory`, `healthPlatform`, ten Health Connect stories;
+  the panel (product designer, UX guard) failed it against Reminders, it
+  was rebuilt as its own section like Reminders, and passed
+  (`docs/agent-runs/mm320-health-connect/`). MM-322: rows straight in a
+  list group had lost their hairlines everywhere; fixed in `ui.css`.
+- MM-321: the check of what the stories draw, with a register of 211
+  places, each with a reason. **Next: work the register down**, story by
+  story, starting with the 166 "not yet drawn".
+- Open: MM-323 (Health Connect lock-out; needs the plugin answer), MM-324
+  (two text columns for list rows). Branch `fix/unseen-states`, stacked on
+  #159. Not looked at on the phone.
+
 ## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305 built)
 
 - The owner pasted new food tracker requirements: track water, track
@@ -307,59 +334,3 @@ limitations.
 - **Left:** MM-304 (proposed). Not looked at: the phone, TalkBack.
 - **Roadmap:** WS-03 steps 13 (built) and 14 (MM-304) added; M2 moved by
   MM-301 to MM-303.
-
-## Session 25: 2026-10-14, Claude (the owner's phone review: Split, the weigh-in in its card, Storybook first)
-
-- The sitrep, then the owner's review of the Dashboard on his phone: the
-  switch said "Share" where the word is "split"; on a morning before the
-  weigh-in the field floated on the canvas with no padding and the waist
-  card touched its hint; and Storybook had no story of that state, which
-  he read, rightly, as the screen not being designed in Storybook. His
-  rule, now MM-293 and in `AGENTS.md`: story, inspect, panel, then build.
-- **In that order.** `Screens/Today/Not Weighed Today`
-  (`notWeighedTodayScenario`) reproduced the phone's layout in Storybook
-  first (MM-292). The proposal (the weigh-in as the first row of the
-  Dashboard's list group, the slot the trend row takes once saved) was
-  drawn in the same story and reviewed by the product-designer (approve
-  with changes; two blocking documentation findings) and UX-accessibility
-  (guard pass). Every finding's outcome is in
-  `docs/agent-runs/mm291-weigh-in/decision.md`; `mm panel` validates it.
-- **Built.** "Grams | Split" (MM-290), with equal segments in every
-  `MmSegmented`; `MmListRow entry` (a row that holds a control, icon level
-  with the title) and `WeighInRow` (MM-291); the streak row moved into the
-  group as its last row; rule 1 and rule 4 of `design/screen-direction.md`
-  amended; `hierarchyProblems` fails a bare field and checks Not Weighed
-  Today with the destinations. From the UX guard: the save says "Saved
-  181.4 lb for today" through the snack's status (MM-294); the hint is in
-  the field's description (MM-295, `MmTextField describedBy`); Enter saves
-  (MM-296, `MmTextField onSubmit`). MM-297 (the disabled primary in Light)
-  is proposed, for Storybook and the panel first.
-- **Tests.** Six new or changed tests, each failing on `main`'s source
-  first: the switch, the row in the group, the saved status, the hint
-  described, Enter saves, and the bare-field rule on the new story.
-- **Looked at** from the static Storybook: Not Weighed Today in Martian,
-  Light and Dark at 412 by 915 and Martian at 360 by 740 (the row starts
-  under the fold there: an owner question); the demo Dashboard; Pause,
-  Recovery check-in and Workout for the segment change. Not looked at:
-  the phone, TalkBack, 200% text.
-- **A slip, recovered:** a backup made with `tar` to a `C:` path failed
-  silently (tar reads `C:` as a remote host) while seven source files were
-  swapped to `main`'s to prove the tests fail first; the edits were
-  re-applied from the session's scripts and the suite re-run. Copy files
-  to back them up, never tar to a drive path in Git Bash.
-- **The owner's answers, built the same session** (second panel run,
-  `docs/agent-runs/mm298-trend-goal-themes/`, guard pass): small phones
-  (360 by 740) are not designed for (rule 7 says so); the weight row says
-  "Trend so far 189.6 lb" before the weigh-in and "Trend 184.1 lb" with
-  "Today 183.9 lb · 7 days −0.6 lb" after it, the first weigh-in shown once
-  (MM-298); the goal is the first section of Coach under the hero and its
-  warnings, with "Change goal" (MM-299, story `Screens/Coach/Check In
-  Due`); a disabled primary or secondary has no fill, an outline at 16% and
-  a label at 38% of `--text` in every palette (MM-297), with Disabled cells
-  in the States story and a token test holding the field border at 3:1.
-- **Live reload (MM-300, PR #157):** `mm run --live` on the emulator, found
-  and fixed on the way: Vite on "localhost" bound only `::1` (adb reverse
-  got an empty response), and Capacitor's bare `gradlew` failed under the
-  agent shell's `NoDefaultCurrentDirectoryInExePath`. WS-01 step 7 built.
-- Moved the needle: **WS-03 step 12 built** (MM-290 to MM-299). Available
-  next: WS-02 step 6 (MM-135), WS-03 step 11, WS-15.
