@@ -102,9 +102,10 @@ export const HowThisWorks = screenStory({
   open: ({ navigator }) => void navigator.push(() => <HowThisWorksScreen />),
 });
 
+/** Waits for the question's own screen (MM-321: `/./` matched before it was pushed, so it was drawn or not by chance). */
 export const EvidenceQuestion = screenStory({
   covers: ['EvidenceQuestionScreen'],
-  shows: /./,
+  shows: 'The rules behind this',
   open: async ({ services, navigator }) => {
     const [question] = EvidenceRegister.parse(await services.evidence()).questions;
     if (question !== undefined) void navigator.push(() => <EvidenceQuestionScreen question={question} />);

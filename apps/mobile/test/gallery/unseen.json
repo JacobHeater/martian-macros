@@ -1,22 +1,6 @@
 [
   {
-    "place": "src/about/EvidenceQuestionScreen.tsx: <EvidenceRowCard key={row.name} row={row} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/about/EvidenceQuestionScreen.tsx: <MmSurface>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/about/EvidenceQuestionScreen.tsx: export function EvidenceQuestionScreen({ question }: { question: EvidenceQuestion }) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/about/EvidenceRowCard.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/about/EvidenceRowCard.tsx: export function EvidenceRowCard({ row }: { row: EvidenceRow }) {",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {

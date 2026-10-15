@@ -47,3 +47,8 @@ and line text. The Health Connect rows (MM-320) were four of the places the firs
 took them out. The register starts at 211 places, each with its reason: 166 not yet drawn, 28 opened by a
 press no story walks (the sheet or screen drawn by its own story), 17 loading or failed-read states that a
 story cannot yet make happen. Working it down, story by story, is the next step.
+
+**A story that says it shows `/./` raced its own screen.** The Evidence Question story matched any word on
+the page, so its test could end before the question's screen was pushed, and what coverage counted depended
+on timing; the check failed on a merge that touched nothing near it. The story now waits for "The rules
+behind this", and the register is 207 places. A story's `shows` must be words of the screen it covers.
