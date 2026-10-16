@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-14, by Claude, Session 29.
+Last updated: 2026-10-15, by Claude, Session 30.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -247,6 +247,26 @@ history (MM-141).
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
+## Session 30: 2026-10-15, Claude (the Storybook register: Food and Dashboard)
+
+- PRs #159 to #161 had merged into each other's branches, not main (a stacked
+  PR only retargets when its base branch is deleted); #162 lands them on main.
+  When merging a stack, retarget the next PR to main before merging it.
+  Merged branches were deleted, local and remote.
+- **The owner chose the Storybook register (MM-321) as the focus**, in batches by
+  screen, and a batched phone session for device-only checks. Batch 1, Food and
+  Dashboard, is done: 37 stories, register 207 to 144. `screenStory`'s
+  `stores` (`waitingRead`, `failingRead`) draws loading and failed reads.
+- Looking at the new stories found nine defects: MM-330 to MM-332 fixed with
+  tests; MM-333 to MM-338 are design defects with skipped tests, for Storybook
+  and the panel before they are built.
+- **Next:** batch 2, Coach (35 places) and the monthly report; then Progress
+  and Train, Settings, packs and the shell, the rest.
+- **Phone checklist, to hand the owner when it is long enough** (they agreed to
+  run one session): a real barcode on packaging (MM-43); a pack download over
+  mobile data (MM-56); the pause and reminder screens on the device (MM-148,
+  MM-146); Health Connect import (MM-68).
+
 ## Session 29: 2026-10-14 to 15, Claude (water poured into a bar on the water section)
 
 - The owner, with a screenshot of the Water section: "add a visual here to
@@ -290,49 +310,3 @@ limitations.
 - Open: MM-323 (Health Connect lock-out; needs the plugin answer), MM-324
   (two text columns for list rows). Branch `fix/unseen-states`, stacked on
   #159. Not looked at on the phone.
-
-## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305 built)
-
-- The owner pasted new food tracker requirements: track water, track
-  micronutrients, configure a sodium goal, and show micronutrients on the
-  nutrition card as a third choice beside Grams and Split. **New working
-  agreement: every question to the owner goes through the interactive
-  question tool, never as a list in chat.**
-- The owner answered sixteen questions, then four more after the panel
-  (all recorded in MM-305 and each story): the micronutrient non-goal is
-  **overruled** (MM-306); minerals and key vitamins plus the label's
-  sugars, saturated fat and cholesterol; totals with a reference marker
-  and coverage; **Micros on the Food screen only**; a sodium limit off by
-  default, 2,300 mg suggested, **1,500 mg minimum**, with a coach line;
-  water by glass, bottle or typed amount with an optional **goal** (the
-  word kept; glossary amended), up to 6 L with a note above 4 L, plain
-  water only; written to Health Connect later (MM-314, waits on MM-70).
-- **Story, panel, build (MM-293).** Drawn in Storybook, reviewed by the
-  product-designer, UX-accessibility, micronutrients, coaching and safety
-  roles (`docs/agent-runs/mm305-water-micros/`, every finding's outcome in
-  `decision.md`); the UX guard passed on a re-review of the new states.
-  Blocking findings resolved: the long Micros card (owner: Food only) and
-  the sodium insight reaching an eating-disorder history (now suppressed,
-  MM-141). The owner caught the sized water buttons wrapping mid-unit
-  after the review; redrawn and looked at in three palettes.
-- **Built:** MM-306 to MM-313, bugs MM-315 ("share picture"), MM-316 (Micros
-  said "today" on a past day), MM-317 (focus lost after another amount).
-  Schema version 4 (micronutrient columns on entries and own foods, the
-  goals and the day the limit was set, `water_entries`); pack format 2
-  (reads format 1); `extract.sql` maps USDA ids and Open Food Facts
-  (vitamin A and folate left unknown there); label reading of the
-  mandatory lines; the sodium insight; eleven evidence-register rows.
-- **Branch** `feature/water-sodium-micronutrients`, **stacked on #158**
-  (green; merging it was refused by the session's permission classifier,
-  so it waits for the owner).
-- **Not verified:** the phone, TalkBack, 200% text; a real pack build (so
-  the coverage MM-306 asked about and the pack's size are unmeasured).
-- **The water section, corrected (MM-318, MM-319).** The owner on the
-  Food screen: why is Water not an accordion like the others? It was a
-  card of buttons the chair invented without opening `MealSection`. Now a
-  section like the meals: "+" opens Add water, a drink opens Edit water,
-  rows swipe away; reviewed against the meals (UX guard pass,
-  `docs/agent-runs/mm318-water-section/`). Rule 9 written. MM-319: water
-  added to a past day said today's time; it says "Added later".
-- **Roadmap:** WS-08 step 10, WS-04 step 7 and WS-09 step 9 built; WS-11
-  step 9 (MM-314) waits on MM-70.
