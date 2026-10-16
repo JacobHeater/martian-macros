@@ -89,7 +89,7 @@ export const ProgressFirstDay = screenStory({
 /** MM-321: the strength trends could not be read. */
 export const ProgressStrengthFailed = screenStory({
   covers: ['ProgressScreen'],
-  shows: /^Could not load strength history/,
+  shows: 'Could not read your strength history',
   stores: failingRead('workouts', 'watchWorkouts'),
   open: onProgress,
 });
@@ -100,7 +100,8 @@ export const ProgressOpensSessionHistory = screenStory({
   shows: 'Qualifying sessions',
   open: onProgress,
   walk: async (canvas) => {
-    const [first] = await within(canvas).findAllByRole('button', { name: 'Session history' }, { timeout: 5000 });
+    // A lift's row opens its history (MM-344).
+    const [first] = await within(canvas).findAllByRole('button', { name: /^Back squat/ }, { timeout: 5000 });
     if (first !== undefined) await userEvent.click(first);
   },
 });
@@ -111,7 +112,7 @@ export const ProgressOpensLiftHistories = screenStory({
   shows: 'Qualifying sessions',
   open: onProgress,
   walk: async (canvas) => {
-    await pressNamed('All lift histories')(canvas);
+    await pressNamed(/^All lift histories/)(canvas);
     const [lift] = await within(canvas).findAllByRole('button', { name: /logged sessions/ });
     if (lift !== undefined) await userEvent.click(lift);
   },
@@ -120,7 +121,7 @@ export const ProgressOpensLiftHistories = screenStory({
 /** MM-321: lift histories before any workout is finished. */
 export const LiftHistoriesEmpty = screenStory({
   covers: ['StrengthLiftsScreen'],
-  shows: 'No finished workouts yet.',
+  shows: 'No finished workouts yet',
   scenario: firstDayScenario,
   open: ({ navigator }) => void navigator.push(() => <StrengthLiftsScreen />),
 });
@@ -197,12 +198,20 @@ const oneSession: StoryScenario = async (repos, today) => {
   await repos.workouts.saveWorkout(storyWorkout(today.addDays(-3), [['back-squat', 5, 100], ['custom-deleted-row', 8, 40]]));
 };
 
-/** MM-321: one qualifying session: a trend needs more. */
+/** MM-321, MM-344: one qualifying session: the lift's row says a change needs more history. */
 export const ProgressOneSession = screenStory({
   covers: ['ProgressScreen'],
-  shows: 'One qualifying session. More sessions are needed for a trend.',
+  shows: / · 4-week change not ready yet$/,
   scenario: oneSession,
   open: onProgress,
+});
+
+/** MM-321, MM-344: the lift's own history, where its chart lives: one session is no trend yet. */
+export const LiftHistoryOneSession = screenStory({
+  covers: ['StrengthHistoryScreen'],
+  shows: 'One qualifying session. More sessions are needed for a trend.',
+  scenario: oneSession,
+  open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="back-squat" />),
 });
 
 /** MM-321: the history of an exercise since deleted: its sets are kept, its estimate cannot be worked out. */
@@ -211,4 +220,38 @@ export const LiftHistoryDeletedExercise = screenStory({
   shows: 'Qualifying sessions',
   scenario: oneSession,
   open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="custom-deleted-row" />),
+});
+
+/** MM-348: the lift list with an exercise since deleted: said as such, and when it was last logged. */
+export const LiftHistoriesDeletedExercise = screenStory({
+  covers: ['StrengthLiftsScreen'],
+  shows: /^Exercise deleted, sets kept · last logged /,
+  scenario: oneSession,
+  open: ({ navigator }) => void navigator.push(() => <StrengthLiftsScreen />),
+});
+
+/** MM-344: the lift list while the workouts are still being read: its own spinner. */
+export const LiftHistoriesLoading = screenStory({
+  covers: ['StrengthLiftsScreen'],
+  stores: waitingRead('workouts', 'watchWorkouts'),
+  open: ({ navigator }) => void navigator.push(() => <StrengthLiftsScreen />),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('heading', { level: 1, name: 'Lift histories' });
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
+});
+
+/** MM-344: the lift list when the workouts could not be read. */
+export const LiftHistoriesFailed = screenStory({
+  covers: ['StrengthLiftsScreen'],
+  shows: 'Could not read your strength history',
+  stores: failingRead('workouts', 'watchWorkouts'),
+  open: ({ navigator }) => void navigator.push(() => <StrengthLiftsScreen />),
+});
+
+/** MM-344: a bodyweight lift's own history, which says the estimate counts body weight. */
+export const LiftHistoryBodyweight = screenStory({
+  covers: ['StrengthHistoryScreen'],
+  shows: /^Uses total bodyweight plus added or assisted weight/,
+  open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="pull-up" />),
 });

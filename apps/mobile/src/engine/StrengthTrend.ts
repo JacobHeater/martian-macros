@@ -1,3 +1,4 @@
+import type { CalendarDate } from '../domain/CalendarDate';
 import type { Exercise } from '../domain/training/Exercise';
 import { ArgumentError } from '../lang/ArgumentError';
 import type { StrengthPoint } from './StrengthPoint';
@@ -8,6 +9,8 @@ interface StrengthTrendInit {
   points: readonly StrengthPoint[];
   loggedSessions: number;
   recentSessions: number;
+  /** The day of the last finished workout with a set of it, which tells two deleted exercises apart (MM-348). */
+  lastLoggedOn?: CalendarDate | undefined;
 }
 
 /** Session points in chronological order, including lifts with no usable sets. */
@@ -17,6 +20,7 @@ export class StrengthTrend {
   readonly points: readonly StrengthPoint[];
   readonly loggedSessions: number;
   readonly recentSessions: number;
+  readonly lastLoggedOn: CalendarDate | undefined;
 
   constructor(init: StrengthTrendInit) {
     this.exercise = init.exercise;
@@ -24,10 +28,12 @@ export class StrengthTrend {
     this.points = init.points;
     this.loggedSessions = init.loggedSessions;
     this.recentSessions = init.recentSessions;
+    this.lastLoggedOn = init.lastLoggedOn;
   }
 
+  /** The exercise's name; one since deleted is said as such, never by its id (MM-348). */
   get name(): string {
-    return this.exercise?.name ?? `Deleted exercise (${this.exerciseId})`;
+    return this.exercise?.name ?? 'Deleted exercise';
   }
 
   /**
