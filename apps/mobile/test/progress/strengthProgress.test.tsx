@@ -46,7 +46,14 @@ async function open(repos: InMemoryRepositories, change?: (services: AppServices
   await screen.findByRole('heading', { name: 'Strength trends' });
 }
 
-const cards = () => [...document.querySelectorAll('.app-layer:not([hidden]) .mm-card-figure')];
+/** The lifts shown under "Strength trends": its rows, less the one that opens every lift (MM-344). */
+const cards = () => {
+  const title = [...document.querySelectorAll('.app-layer:not([hidden]) .mm-section-title')].find(
+    (element) => element.textContent === 'Strength trends',
+  );
+  const rows = title?.closest('.mm-section')?.querySelectorAll('.mm-list-row') ?? [];
+  return [...rows].filter((row) => !row.textContent?.startsWith('All lift histories'));
+};
 
 it('MM-192: a set that cannot be worked out is a failure, not a trend', async () => {
   const repos = new InMemoryRepositories();
@@ -80,8 +87,8 @@ it('loading, read failure and retry are explicit', async () => {
   expect(screen.queryByText(/Finish a workout/)).not.toBeInTheDocument();
   const before = read.attempts();
   read.recover();
-  await userEvent.click(await screen.findByRole('button', { name: 'Retry strength history' }));
-  expect(await screen.findByText('120.0 kg')).toBeInTheDocument();
+  await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+  expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
   expect(read.attempts()).toBeGreaterThan(before);
 });
 
@@ -92,7 +99,7 @@ it('while the workouts are being read nothing is claimed', async () => {
     workouts: overriding(services.workouts, { watchWorkouts: () => never<Workout[]>() }),
   }));
   expect(screen.queryByText(/Finish a workout/)).not.toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Retry strength history' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   expect(cards()).toHaveLength(0);
 });
 
@@ -101,9 +108,7 @@ it('imperial presentation converts estimates and deltas', async () => {
   await repos.workouts.saveWorkout(workout({ load: 100, daysAgo: 28 }));
   await repos.workouts.saveWorkout(workout({ load: 110 }));
   await open(repos);
-  expect(await screen.findByText('277.8 lb')).toBeInTheDocument();
-  expect(screen.getByText('4 weeks: +13.2 lb')).toBeInTheDocument();
-  expect(screen.getByText('12 weeks: Not enough history')).toBeInTheDocument();
+  expect(await screen.findByText('Est. max 277.8 lb · +13.2 lb in 4 weeks')).toBeInTheDocument();
 });
 
 for (const exerciseRead of [false, true]) {
@@ -124,8 +129,8 @@ for (const exerciseRead of [false, true]) {
     const read = exerciseRead ? exercises : weights;
     const before = read.attempts();
     read.recover();
-    await userEvent.click(await screen.findByRole('button', { name: 'Retry strength history' }));
-    expect(await screen.findByText('120.0 kg')).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
     expect(read.attempts()).toBeGreaterThan(before);
   });
 }
@@ -138,8 +143,12 @@ it('MM-194: deleting a custom exercise retains its lift history', async () => {
   await expect.poll(() => cards().length).toBe(1);
   await repos.customExercises.deleteCustomExercise(id);
   await expect.poll(() => cards().length).toBe(0);
-  await userEvent.click(screen.getByRole('button', { name: 'All lift histories' }));
-  await userEvent.click(await screen.findByRole('button', { name: new RegExp(`^Deleted exercise \\(${id}\\)`) }));
+  await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
+  // MM-348: said as a deleted exercise, told apart by when it was last logged, never by its id.
+  const deleted = await screen.findByRole('button', { name: /^Deleted exercise/ });
+  expect(deleted).not.toHaveTextContent(id);
+  expect(deleted).toHaveTextContent('Exercise deleted, sets kept · last logged Oct 11');
+  await userEvent.click(deleted);
   expect(await within(topLayer()).findByText(/Exercise details were deleted/)).toBeInTheDocument();
   const saved = await first(repos.workouts.watchWorkouts());
   expect(saved[0]?.exercises[0]?.sets[0]?.loadKg).toBe(100);
@@ -149,7 +158,7 @@ it('the detail chart includes older history', async () => {
   const repos = await fresh();
   await repos.workouts.saveWorkout(workout({ daysAgo: 200 }));
   await open(repos);
-  await userEvent.click(screen.getByRole('button', { name: 'All lift histories' }));
+  await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
   await userEvent.click(await screen.findByRole('button', { name: /^Barbell bench press/ }));
   const chart = await within(topLayer()).findByRole('img', { name: /history, / });
   // 201 days: from the first session to today.
@@ -162,10 +171,10 @@ it('empty data is honest and a new workout appears as it is saved', async () => 
   await open(repos);
   expect(screen.getByText('Finish a workout in Train to start your strength history.')).toBeInTheDocument();
   const id = await repos.workouts.saveWorkout(workout());
-  expect(await screen.findByText('120.0 kg')).toBeInTheDocument();
+  expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
   expect(cards()).toHaveLength(1);
   await repos.workouts.saveWorkout(workout({ load: 80 }).copyWith({ id }));
-  expect(await screen.findByText('96.0 kg')).toBeInTheDocument();
+  expect(await screen.findByText(/^Est\. max 96\.0 kg/)).toBeInTheDocument();
   await repos.workouts.deleteWorkout(id);
   await expect.poll(() => cards().length).toBe(0);
 });
@@ -176,7 +185,7 @@ it('all histories include unusable lifts and same-day sessions', async () => {
   await repos.workouts.saveWorkout(workout({ load: 110 }));
   await repos.workouts.saveWorkout(workout({ exerciseId: 'pull-up', load: 0 }));
   await open(repos);
-  await userEvent.click(screen.getByRole('button', { name: 'All lift histories' }));
+  await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
   await userEvent.click(await screen.findByRole('button', { name: /^Pull-up/ }));
   expect(await within(topLayer()).findByText(/No usable estimate yet/)).toBeInTheDocument();
   expect(within(topLayer()).getByText(/Uses total bodyweight/)).toBeInTheDocument();
@@ -194,7 +203,7 @@ it('the four most-trained lifts each get a card with its comparisons', async () 
   await repos.preferences.saveThemePreference('martian');
   await open(repos);
   await expect.poll(() => cards().length).toBe(4);
-  expect(screen.getAllByText(/^12 weeks: \+/).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/ · [+−][\d.]+ (kg|lb) in 4 weeks$/).length).toBeGreaterThan(0);
 });
 
 it('a corrected weigh-in recomputes bodyweight strength', async () => {
@@ -202,7 +211,15 @@ it('a corrected weigh-in recomputes bodyweight strength', async () => {
   await repos.workouts.saveWorkout(workout({ exerciseId: 'pull-up', load: 0 }));
   await repos.weights.saveWeight(today, 80);
   await open(repos);
-  expect(await screen.findByText('96.0 kg')).toBeInTheDocument();
+  expect(await screen.findByText(/^Est\. max 96\.0 kg/)).toBeInTheDocument();
   await repos.weights.saveWeight(today, 90);
-  expect(await screen.findByText('108.0 kg')).toBeInTheDocument();
+  expect(await screen.findByText(/^Est\. max 108\.0 kg with body weight/)).toBeInTheDocument();
+});
+
+it('MM-355: one session is said in the singular in the list of lifts', async () => {
+  const repos = await fresh();
+  await repos.workouts.saveWorkout(workout());
+  await open(repos);
+  await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
+  expect(await within(topLayer()).findByText('1 logged session · 1 qualifying')).toBeInTheDocument();
 });
