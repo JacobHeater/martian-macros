@@ -1,3 +1,4 @@
+import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
@@ -43,17 +44,12 @@ it('a populated history shows every section', async () => {
   await seed();
   renderApp(repos, today);
   await openDashboardHistory();
-  for (const title of [
-    'Nutrition history',
-    'Protein history',
-    'Weight trend & uncertainty',
-    'Waist history',
-    'Logging coverage',
-    'Coach & expenditure',
-    'How you are holding up',
-  ]) {
-    expect(await screen.findByRole('heading', { name: title })).toBeInTheDocument();
+  // MM-335: sections of the Dashboard's hierarchy, with no headline of their own.
+  for (const title of ['Intake', 'Protein', 'Weight trend', 'Waist', 'Logging', 'Coach and expenditure', 'How you are holding up']) {
+    expect(await screen.findByText(title, { selector: '.mm-section-title' })).toBeInTheDocument();
   }
+  expect(screen.queryByRole('heading', { name: 'Your metrics' })).not.toBeInTheDocument();
+  expect(document.querySelector('.mm-disclosure .mm-info-card')).toBeNull();
   expect(historyCharts()).toHaveLength(4);
   expect(
     screen.getByRole('img', { name: /Weight trend in lb, 30 days, with observations and uncertainty band\./ }),
@@ -64,12 +60,12 @@ it('the range control changes the chart and the recorded-day window', async () =
   await seed();
   renderApp(repos, today);
   await openDashboardHistory();
-  await screen.findByRole('heading', { name: 'Logging coverage' });
-  expect(screen.getAllByText('30 / 30')).toHaveLength(4);
+  expect(await screen.findByText('30 of 30 days with food logged')).toBeInTheDocument();
+  expect(screen.getByText('2,300 kcal a day on average, over 30 days')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '7 days' }));
-  expect(screen.getAllByText('7 / 7')).toHaveLength(4);
+  expect(await screen.findByText('7 of 7 days with food logged')).toBeInTheDocument();
+  expect(screen.getAllByText('7 of 7')).toHaveLength(2);
   expect(screen.getByRole('img', { name: /Weight trend in lb, 7 days/ })).toBeInTheDocument();
-  expect(screen.getByText('Window').closest('div')).toHaveTextContent('7 days');
 });
 
 it('empty histories explain how to populate the sections', async () => {
@@ -77,10 +73,13 @@ it('empty histories explain how to populate the sections', async () => {
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
   renderApp(repos, today);
   await openDashboardHistory();
-  expect(await screen.findByText('Log food to populate your intake history.')).toBeInTheDocument();
-  expect(screen.getAllByText('No records in this range yet.').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('Not recorded').length).toBeGreaterThan(0);
-  expect(screen.getByText('No coaching estimate available.')).toBeInTheDocument();
+  // MM-335: each section's summary says what it is waiting for; nothing bare on the canvas.
+  expect(await screen.findByText('Nothing logged in these days yet')).toBeInTheDocument();
+  expect(screen.getByText('No protein logged in these days yet')).toBeInTheDocument();
+  expect(screen.getByText('Not measured in these days')).toBeInTheDocument();
+  expect(screen.getByText('No food logged yet today')).toBeInTheDocument();
+  expect(screen.getByText('No estimate yet')).toBeInTheDocument();
+  expect(document.querySelector('.mm-disclosure svg.chart-plot')).toBeNull();
 });
 
 it('history that is still loading does not become an empty chart', async () => {
@@ -92,7 +91,7 @@ it('history that is still loading does not become an empty chart', async () => {
     }),
   });
   await openDashboardHistory();
-  expect(await screen.findByText('Loading your recorded metrics…')).toBeInTheDocument();
+  expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
   expect(screen.queryByText('No records in this range yet.')).not.toBeInTheDocument();
 });
 
@@ -105,9 +104,8 @@ it('history errors are visible, not an empty success', async () => {
     }),
   });
   await openDashboardHistory();
-  expect(
-    await screen.findByText('Dashboard history could not be loaded. Reopen the app to retry.'),
-  ).toBeInTheDocument();
+  expect(await screen.findByText('Could not read your history')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
 });
 
 for (const failed of [false, true]) {
@@ -136,3 +134,40 @@ for (const failed of [false, true]) {
     }
   });
 }
+
+it('MM-335: today, still being logged, is an open dot apart from the line, not a whole day', async () => {
+  await seed();
+  await repos.dayMarks.setCompleteness(today, 'unmarked');
+  renderApp(repos, today);
+  await openDashboardHistory();
+  expect((await screen.findAllByText(/^○ Today so far/)).length).toBeGreaterThan(0);
+  expect(document.querySelectorAll('.chart-energy .chart-dot-unfinished')).toHaveLength(1);
+  expect(screen.getByText('2,300 kcal a day on average, over 29 days')).toBeInTheDocument();
+});
+
+it('MM-335: today alone, still being logged, is said as today so far, not as nothing', async () => {
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
+  await repos.food.addFood(foodOn(today, { name: 'Oats', meal: 'breakfast', kcal: 640, proteinG: 20, carbsG: 100, fatG: 12 }));
+  renderApp(repos, today);
+  await openDashboardHistory();
+  expect(await screen.findByText('Today so far: 640 kcal · counts once marked complete')).toBeInTheDocument();
+  expect(screen.queryByText('Nothing logged in these days yet')).not.toBeInTheDocument();
+});
+
+it('MM-335: a header that opens a tab stays a heading, and says where it goes', async () => {
+  await seed();
+  renderApp(repos, today);
+  await openDashboardHistory();
+  const intake = await screen.findByRole('button', { name: 'Intake' });
+  expect(intake).toHaveAccessibleDescription(/a day on average, over 30 days Opens Food$/);
+  expect(intake.closest('h2')).not.toBeNull();
+});
+
+it('MM-353: nothing of the recovery section is drawn outside it', async () => {
+  await seed();
+  await repos.recovery.saveRecoveryCheckIn(new RecoveryCheckIn({ date: today.addDays(-3), hunger: 3, energy: 3, sleep: 3, training: 3, mood: 3 }));
+  renderApp(repos, today);
+  await openDashboardHistory();
+  await screen.findByText('How you are holding up', { selector: '.mm-section-title' });
+  expect(screen.queryByText(/^Recovery observations:/)).not.toBeInTheDocument();
+});

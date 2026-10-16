@@ -34,7 +34,6 @@ import { rhythmDays } from './rhythmDays';
 import { WaistRow } from './WaistRow';
 import { WaterRow } from './WaterRow';
 import { WeighInRow } from './WeighInRow';
-import './dashboard.css';
 
 /**
  * How the user is doing today, in tiers (MM-254): the safety notices, the

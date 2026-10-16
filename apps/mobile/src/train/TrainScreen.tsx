@@ -101,6 +101,7 @@ export function TrainScreen() {
         title="Weekly training volume"
         summary={volumeSummary}
         onPress={() => void navigator.push(() => <WeeklyVolumeScreen />)}
+        opens="Opens weekly volume"
       />
       {workoutGroups(finished, today).map((group, index) => (
         <MmSection

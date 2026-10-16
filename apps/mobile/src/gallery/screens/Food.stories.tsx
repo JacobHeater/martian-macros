@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
@@ -295,6 +295,8 @@ export const WaterGoalReached = screenStory({
   open: yesterdaysFood,
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/Goal reached/));
+    // The ripple comes two frames after the bar (MM-326): waited for, so it is drawn on every runner.
+    await waitFor(() => expect(canvas.querySelector('.mm-progress-wave')).not.toBeNull());
   },
 });
 

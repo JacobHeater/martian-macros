@@ -135,17 +135,17 @@ const openHistory = async (canvas: HTMLElement) => {
   reveal(more);
 };
 
-/** MM-321: the history one tap down, over the demo's ten weeks. */
+/** MM-321, MM-335: the history one tap down, over the demo's ten weeks, in sections. */
 export const History = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Your metrics',
+  shows: 'Coach and expenditure',
   walk: openHistory,
 });
 
 /** MM-321: the history on the first day, with nothing recorded yet. */
 export const HistoryFirstDay = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Log food to populate your intake history.',
+  shows: 'Nothing logged in these days yet',
   scenario: firstDayScenario,
   walk: openHistory,
 });
@@ -153,15 +153,17 @@ export const HistoryFirstDay = screenStory({
 /** MM-321: the history while the recovery check-ins are still being read. */
 export const HistoryLoading = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Loading your recorded metrics…',
   stores: waitingRead('recovery', 'watchRecoveryCheckIns'),
-  walk: openHistory,
+  walk: async (canvas) => {
+    await openHistory(canvas);
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
 });
 
 /** MM-321: the history when the waist measurements could not be read. */
 export const HistoryFailed = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Dashboard history could not be loaded. Reopen the app to retry.',
+  shows: 'Could not read your history',
   stores: failingRead('waist', 'watchWaist'),
   walk: openHistory,
 });
@@ -218,7 +220,7 @@ export const Paused = screenStory({
 /** MM-321: the history while paused: paused days stay as observations. */
 export const HistoryPaused = screenStory({
   covers: ['DashboardScreen'],
-  shows: /^Paused days remain visible as observations/,
+  shows: /Paused days are shown; targets and coverage leave them out.$/,
   scenario: pausedScenario,
   walk: openHistory,
 });
@@ -226,7 +228,7 @@ export const HistoryPaused = screenStory({
 /** MM-321: the history with no weigh-in kept (each one deleted): no coaching estimate yet. */
 export const HistoryNoWeighIn = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'No coaching estimate available.',
+  shows: 'No estimate yet',
   scenario: async (repos, today) => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   },
