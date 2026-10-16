@@ -1,6 +1,6 @@
 ---
 id: MM-337
-status: proposed
+status: done
 component: food-logging
 related: [MM-321, MM-43, MM-224]
 ---
@@ -21,4 +21,4 @@ Scenario: A code the pack does not know
 ```
 
 ## Notes
-Guarded by "MM-337" in `apps/mobile/test/gallery/registerDefects.test.tsx`, skipped with this ID until the fix lands. A design fix: drawn in Storybook, reviewed by the panel's designer and UX guard, then built (AGENTS.md).
+Guarded by "MM-337" in `apps/mobile/test/gallery/registerDefects.test.tsx`, which failed before the fix. Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-337, MM-338, MM-346 and MM-347 as one batch; their changes were built. Once a code is unknown, "Read the label" is the one primary action; "Scan with the camera" steps down to secondary; "Enter manually" is a full-width secondary under it. Announcing the result is MM-351.

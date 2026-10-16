@@ -60,7 +60,7 @@ it.skip('MM-336: the alcohol of the day is said inside the screen hierarchy, not
   expect(line.closest('.mm-section, .food-hero')).not.toBeNull();
 });
 
-it.skip('MM-337: an unknown barcode leaves one primary action on the sheet', async () => {
+it('MM-337: an unknown barcode leaves one primary action on the sheet', async () => {
   renderApp(repos, today);
   await openTab('Food');
   const sheet = await openAddFood();
@@ -107,13 +107,13 @@ it.skip('MM-344: the strength trends on Progress are rows of their section, not 
   expect(section.querySelector('.mm-info-card, .mm-surface')).toBeNull();
 });
 
-it.skip('MM-347: a failed save of the look is said outside the list of Settings rows', async () => {
+it('MM-347: a failed save of the look is said outside the list of Settings rows', async () => {
   const { failingWrite } = await import('../../src/gallery/screens/failingWrite');
   const { openSettings } = await import('../support/openSettings');
   renderApp(repos, today, { change: failingWrite('preferences', 'saveThemePreference') });
   const settings = await openSettings();
   await userEvent.click(settings.getByRole('button', { name: 'Change appearance' }));
   await userEvent.click(await screen.findByText('Light'));
-  const notice = await screen.findByText('Could not save your theme. Please try again.');
+  const notice = await screen.findByText('Your appearance could not be saved. Nothing was changed.');
   expect(notice.closest('.mm-list-group')).toBeNull();
 });

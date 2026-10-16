@@ -396,12 +396,13 @@ export const ReminderOn = screenStory({
 /** MM-321: a new look chosen, and the save failing: it says so and keeps the old one. */
 export const ChangeAppearanceFails = screenStory({
   covers: ['SettingsScreen'],
-  shows: 'Could not save your theme. Please try again.',
+  shows: 'Your appearance could not be saved. Nothing was changed.',
   stores: failingWrite('preferences', 'saveThemePreference'),
   open: openSettingsScreen,
   walk: async (canvas) => {
     await pressAnywhere('Change appearance')(canvas);
-    await userEvent.click(await within(canvas.ownerDocument.body).findByText('Light'));
+    // An option by its role: in Light the row's own subtitle also says "Light".
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Dark' }));
   },
 });
 
@@ -468,6 +469,24 @@ export const FoodDatabaseInstalled = screenStory({
   device: storyPackHost(),
   open: openFoodDatabase,
   walk: download,
+});
+
+/** MM-346: back with the pack at the listed version: it is said once, and nothing is offered again. */
+export const FoodDatabaseUpToDate = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Nothing new to download',
+  device: storyPackHost({ installed: '2026-10-09' }),
+  open: openFoodDatabase,
+  walk: pressAnywhere('See what is available'),
+});
+
+/** MM-346: a newer version listed than the one on the phone: it is offered as an update. */
+export const FoodDatabaseUpdate = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Update',
+  device: storyPackHost({ installed: '2026-10-09', listed: '2026-10-16' }),
+  open: openFoodDatabase,
+  walk: pressAnywhere('See what is available'),
 });
 
 /** MM-321: a download going on under the Dashboard: the strip with Cancel. */

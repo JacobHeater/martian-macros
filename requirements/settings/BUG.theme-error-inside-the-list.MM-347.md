@@ -1,6 +1,6 @@
 ---
 id: MM-347
-status: proposed
+status: done
 component: settings
 related: [MM-321, MM-291]
 ---
@@ -24,5 +24,4 @@ Scenario: The look cannot be saved
 ```
 
 ## Notes
-Guarded by "MM-347" in `apps/mobile/test/gallery/registerDefects.test.tsx`, skipped with this ID until the
-fix lands. A design fix: drawn in Storybook, reviewed by the panel, then built.
+Guarded by "MM-347" in `apps/mobile/test/gallery/registerDefects.test.tsx`, which failed before the fix. Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-337, MM-338, MM-346 and MM-347 as one batch; their changes were built. A failed change of the look is a snack, as Settings says a failed save (`NutritionGoalsSection`): "Your appearance could not be saved. Nothing was changed.", with Try again; a snack with an action stays until dismissed and is announced. The first-run chooser keeps its own message.

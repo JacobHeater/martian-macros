@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { ThemePreference } from '../domain/ThemePreference';
 import { themePreferenceLabel } from '../format/themePreferenceLabel';
 import { themeChoices } from '../theme/themeChoices';
@@ -6,7 +5,6 @@ import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListRow } from '../ui/MmListRow';
-import { Notice } from '../ui/Notice';
 import { useOverlays } from '../ui/useOverlays';
 
 /**
@@ -18,7 +16,6 @@ export function ThemeSettings() {
   const overlays = useOverlays();
   const preference = useLoaded(state.themePreference);
   const selected = preference === 'unselected' || preference === undefined ? 'martian' : preference;
-  const [error, setError] = useState<string>();
 
   const choose = async () => {
     const chosen = await overlays.options<ThemePreference>({
@@ -27,23 +24,27 @@ export function ThemeSettings() {
       selected,
     });
     if (chosen === undefined) return;
-    setError(undefined);
+    await save(chosen.value);
+  };
+
+  // A failed change is said as Settings says one, in a snack outside the rows (MM-347).
+  const save = async (theme: ThemePreference): Promise<void> => {
     try {
-      await services.preferences.saveThemePreference(chosen.value);
+      await services.preferences.saveThemePreference(theme);
     } catch {
-      setError('Could not save your theme. Please try again.');
+      overlays.snack('Your appearance could not be saved. Nothing was changed.', {
+        label: 'Try again',
+        onAction: () => void save(theme),
+      });
     }
   };
 
   return (
-    <>
-      <MmListRow
-        leadingIcon="palette"
-        title="Appearance"
-        subtitle={themePreferenceLabel(selected)}
-        trailingAction={<MmIconButton icon="edit" label="Change appearance" opens="listbox" onPress={() => void choose()} />}
-      />
-      {error === undefined ? null : <Notice kind="caution" text={error} />}
-    </>
+    <MmListRow
+      leadingIcon="palette"
+      title="Appearance"
+      subtitle={themePreferenceLabel(selected)}
+      trailingAction={<MmIconButton icon="edit" label="Change appearance" opens="listbox" onPress={() => void choose()} />}
+    />
   );
 }
