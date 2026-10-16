@@ -24,7 +24,8 @@ import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmRhythmStrip } from '../ui/MmRhythmStrip';
-import { Notice } from '../ui/Notice';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
 import { useOverlays } from '../ui/useOverlays';
 import { DashboardMetrics } from './DashboardMetrics';
 import { ProcessCard } from './ProcessCard';
@@ -61,15 +62,18 @@ export function DashboardScreen() {
   // The app shows nothing below its root until the profile is read, and says so there when it fails (AppRoot).
   const setup = Loadable.valueOf(setupState);
   if (setup === undefined) return null;
-  if (Loadable.hasFailed(pausesState)) {
-    return <Notice kind="caution" text="Pause history could not be loaded. Reopen the app to retry." />;
-  }
-  if (!pausesState.ready) return <p className="app-text app-centered">Loading pause history…</p>;
+  // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
+  const pausesFailed = Loadable.hasFailed(pausesState);
   if ([foodState, historyState, weightsState].some((source) => Loadable.hasFailed(source))) {
-    return <Notice kind="caution" text="Dashboard records could not be loaded. Reopen the app to retry." />;
+    return (
+      <ReadFailedNotice
+        title="Could not read today’s food, targets or weigh-ins"
+        onRetry={() => state.retryDashboard()}
+      />
+    );
   }
-  if (!foodState.ready || !historyState.ready || !weightsState.ready) {
-    return <p className="app-text app-centered">Loading your Dashboard…</p>;
+  if ((!pausesState.ready && !pausesFailed) || !foodState.ready || !historyState.ready || !weightsState.ready) {
+    return <ScreenLoading />;
   }
   const entries = foodState.value;
   const history = historyState.value;
@@ -98,8 +102,24 @@ export function DashboardScreen() {
     (workout) => !workout.inProgress && today.daysUntil(workout.date) > -7 && !workout.date.isAfter(today),
   ).length;
 
+  // Without the pauses, today may be paused: no targets are shown as though it were not (MM-183).
+  let heroTargets = pause !== undefined ? guide : targetsOn(history, today, { targetsAllowed })?.targets;
+  let heroStatus: string | undefined =
+    pause !== undefined
+      ? `Paused until ${Fmt.day(pause.to, today)}. Nothing is counted against you.`
+      : coachLineText({ setup, history, today, confidence: coach?.confidence.level ?? 'learning' });
+  // Nor the coach's line about them: the notice above says why they are missing.
+  if (pausesFailed) [heroTargets, heroStatus] = [undefined, undefined];
+
   return (
     <>
+      {pausesFailed ? (
+        <ReadFailedNotice
+          title="Could not check whether today is paused"
+          consequence="Today’s targets are not shown until it can."
+          onRetry={() => state.retryPauses()}
+        />
+      ) : null}
       <UnderEatingNotice />
       <ReminderPausedNotice />
       <ReliefOfferCard />
@@ -107,13 +127,9 @@ export function DashboardScreen() {
       <CalorieHero
         intake={intake}
         entries={entries}
-        targets={pause !== undefined ? guide : targetsOn(history, today, { targetsAllowed })?.targets}
+        targets={heroTargets}
         paused={pause !== undefined}
-        status={
-          pause !== undefined
-            ? `Paused until ${Fmt.day(pause.to, today)}. Nothing is counted against you.`
-            : coachLineText({ setup, history, today, confidence: coach?.confidence.level ?? 'learning' })
-        }
+        status={heroStatus}
         confidence={coach === undefined || pause !== undefined ? undefined : confidenceLabel(coach.confidence.level)}
         onStatusPress={
           pause !== undefined ? () => void navigator.push(() => <PauseScreen />) : () => open('coach')

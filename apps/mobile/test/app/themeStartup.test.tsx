@@ -147,7 +147,7 @@ it('theme loading blocks onboarding and a load failure offers retry', async () =
   expect(screen.queryByRole('heading', { name: 'Choose your theme' })).not.toBeInTheDocument();
 
   theme.fail(new Error('theme read unavailable'));
-  expect(await screen.findByText('Could not load your theme preference.')).toBeInTheDocument();
+  expect(await screen.findByText('Could not load your theme preference')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
 
   failed = true;

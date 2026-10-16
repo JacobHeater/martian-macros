@@ -93,7 +93,7 @@ const all = texts();
 it('the text is found', () => {
   expect(all.length).toBeGreaterThan(1000);
   // Both kinds are found: a quoted sentence, and words between tags.
-  expect(all.some(([, text]) => text === 'Log a weigh-in to get started.')).toBe(true);
+  expect(all.some(([, text]) => text === 'Your first targets are worked out from your first weigh-in.')).toBe(true);
   expect(all.some(([, text]) => text.startsWith('Partial days are left out of your metabolism estimate'))).toBe(true);
 });
 

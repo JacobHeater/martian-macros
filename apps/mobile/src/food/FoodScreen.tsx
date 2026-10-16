@@ -10,7 +10,8 @@ import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
-import { Notice } from '../ui/Notice';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
 import { CalorieHero } from './CalorieHero';
 import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
@@ -41,22 +42,29 @@ export function FoodScreen() {
   const guide = useCell(state.maintenanceGuide);
   const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
 
-  if (Loadable.hasFailed(pausesState)) {
-    return <Notice kind="caution" text="Pause history could not be loaded. Reopen the app to retry." />;
-  }
-  if (!pausesState.ready) return <p className="app-text app-centered">Loading pause history…</p>;
+  // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
+  const pausesFailed = Loadable.hasFailed(pausesState);
+  if (!pausesState.ready && !pausesFailed) return <ScreenLoading />;
 
   const targetsAllowed =
     setup !== undefined &&
     CoachingPolicy.derive({ profile: setup.profile, screening: setup.screening, today }).targetsAllowed;
-  const targets = targetsOn(history, day, { targetsAllowed });
+  // Without the pauses, the day may be paused: no targets are shown as though it were not (MM-183).
+  const targets = pausesFailed ? undefined : targetsOn(history, day, { targetsAllowed });
   // On a paused day the targets are a maintenance guide (MM-148).
-  const paused = pauseOn(pausesState.value, day) !== undefined;
+  const paused = pauseOn(Loadable.valueOf(pausesState) ?? [], day) !== undefined;
   const intake = intakeDayFrom(day, entries);
   const alcoholKcal = entries.reduce((sum, e) => sum + e.alcoholKcal, 0);
 
   return (
     <>
+      {pausesFailed ? (
+        <ReadFailedNotice
+          title="Could not check whether this day is paused"
+          consequence="This day’s targets are not shown until it can."
+          onRetry={() => state.retryPauses()}
+        />
+      ) : null}
       <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
       <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
       {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}

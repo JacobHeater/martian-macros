@@ -25,5 +25,7 @@ openAppServices()
     );
   })
   .catch((error: unknown) => {
-    element.textContent = `Could not open your data.\n\n${error instanceof Error ? error.message : String(error)}`;
+    // In words a person can use (MM-333); what went wrong is for whoever debugs it.
+    element.textContent = 'Could not open your data. Nothing you logged has been changed. Close the app and open it again.';
+    console.error(error);
   });
