@@ -292,6 +292,11 @@ One component, three structures, no colored fills:
 | Caution | `surface`, `caution` icon, `caution` 1 dp border, label word "Heads up" | Health/safety guidance |
 | Required safeguard | As caution, 1.5 dp border, bold lead sentence, an action button | Screening results, floors, limits |
 
+On a sheet or a dialog every kind is drawn on `sunken` in place of `surface`: a
+well of the sheet, in every palette, since in Light a sheet is white too
+(MM-338). A notice's action there is a `secondary` button, never Ember text,
+which is too faint on Light's `sunken`.
+
 Each pairs an icon and a word so color is never the sole signal. Max one prominent
 non-critical notice at a time; required safeguards are never suppressed.
 

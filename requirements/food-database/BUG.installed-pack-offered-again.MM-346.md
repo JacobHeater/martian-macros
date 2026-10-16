@@ -1,6 +1,6 @@
 ---
 id: MM-346
-status: proposed
+status: done
 component: food-database
 related: [MM-56, MM-321]
 ---
@@ -25,6 +25,4 @@ Scenario: Installed and up to date
 ```
 
 ## Notes
-Guarded by "MM-346" in `apps/mobile/test/settings/foodDatabase.test.tsx`, skipped with this ID until the
-fix lands; the fix also changes "a downloaded pack is listed, searched, and can be removed", which asserts
-the disabled button today. A design fix: drawn in Storybook, reviewed by the panel, then built.
+Guarded by the three "MM-346" tests in `apps/mobile/test/settings/foodDatabase.test.tsx`, which failed before the fix. Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-337, MM-338, MM-346 and MM-347 as one batch; their changes were built. A pack at the listed version is not offered; with nothing to offer, the Download group says "Nothing new to download" (stories "Food Database Up To Date", "Food Database Update"). A listed version that differs from the installed one is offered as an update; versions are "a build date or version" (`PackListing`), so no order is assumed between them. The rows' icons are MM-352.

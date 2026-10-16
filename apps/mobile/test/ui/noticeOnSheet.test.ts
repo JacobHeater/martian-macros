@@ -7,7 +7,7 @@ const tokens = readFileSync('src/theme/tokens.css', 'utf8');
 const token = (palette: string, name: string) => {
   const start = tokens.indexOf(`.theme-${palette}`);
   const body = tokens.slice(tokens.indexOf('{', start) + 1, tokens.indexOf('}', start));
-  return new RegExp(`--${name}:\s*([^;]+);`).exec(body)?.[1]?.trim();
+  return new RegExp(`--${name}:\\s*([^;]+);`).exec(body)?.[1]?.trim();
 };
 
 /** The token a notice inside a sheet is painted with: a rule of its own, or the notice's own background. */
@@ -16,7 +16,7 @@ const background = (selector: string) =>
   /background:\s*var\(--([a-z-]+)\)/.exec(css.find((rule) => rule.selectors.includes(selector))?.body ?? '')?.[1];
 
 // MM-338: in Light a notice (--surface) on a sheet (--overlay) is white on white.
-it.skip('MM-338: a notice on a sheet stands apart from the sheet in every palette', () => {
+it('MM-338: a notice on a sheet stands apart from the sheet in every palette', () => {
   const notice = background('.mm-sheet .mm-notice') ?? background('.mm-notice');
   const sheet = background('.mm-sheet');
   expect(notice).toBeDefined();
