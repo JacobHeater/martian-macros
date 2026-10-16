@@ -54,6 +54,8 @@ export function ChartsCatalog() {
       <InfoCard title="Weight">
         <TrendStats trend={chartTrend} fmt={fmt} />
         <TrendSparkline trend={chartTrend} />
+        {/* One point is no trend yet (MM-321). */}
+        <TrendSparkline trend={chartTrend.slice(-1)} />
         <TrendChart
           label="Weight trend"
           trend={chartTrend}

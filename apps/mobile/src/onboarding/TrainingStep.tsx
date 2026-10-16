@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import { trainingStatusLabel } from '../format/trainingStatusLabel';
 import { clamp } from '../lang/clamp';
+import { Fmt } from '../format/Fmt';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { ChoiceCard } from '../ui/ChoiceCard';
 import { MmIcon } from '../ui/MmIcon';
@@ -96,7 +97,7 @@ export function TrainingStep({
       {creatineStartedOn === undefined ? null : (
         <MmListRow
           title="When did you start?"
-          subtitle={creatineStartedOn.toString()}
+          subtitle={Fmt.longDate(creatineStartedOn)}
           trailing={<MmIcon name="history" />}
           onPress={onPickCreatineStartDate}
         />

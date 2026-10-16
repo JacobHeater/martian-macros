@@ -275,3 +275,27 @@ export const WeeklyVolumeUnmapped = screenStory({
   scenario: oldLiftsScenario,
   open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
 });
+
+/** MM-321: a workout's start time pressed opens the clock to set it. */
+export const WorkoutTimesSetsTheStart = screenStory({
+  covers: ['WorkoutTimesScreen'],
+  shows: 'OK',
+  open: async (stage) => {
+    const workout = await lastWorkout(stage);
+    if (workout !== undefined) void stage.navigator.push(() => <WorkoutTimesScreen workoutId={workout.id} />);
+  },
+  walk: pressNamed(/^Started/),
+});
+
+/** MM-321: a set's own start time pressed: the clock to set it, to the second. */
+export const SetStartTime = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'OK',
+  open: (stage) => midWorkout(stage)(),
+  walk: async (canvas) => {
+    const [set] = await within(canvas).findAllByRole('button', { name: /Set 1/ });
+    if (set !== undefined) await userEvent.click(set);
+    const editor = await within(canvas).findByRole('group', { name: 'Set 1' });
+    await userEvent.click(within(editor).getByRole('button', { name: /^Started/ }));
+  },
+});

@@ -132,6 +132,14 @@ export function OverlaysCatalog({ kind }: { kind: OverlayKind }) {
       {kind === 'date' ? (
         <MmDateDialog helpText="Date of birth" initial={CalendarDate.of(1996, 1, 1)} first={CalendarDate.of(1926, 1, 1)} last={today} today={today} onDone={nothing} />
       ) : null}
+      {kind === 'dateRefused' ? (
+        // A day past the last allowed, so the dialog says the range (MM-321).
+        <MmDateDialog helpText="Date of birth" initial={today.addDays(30)} first={CalendarDate.of(1926, 1, 1)} last={today} today={today} onDone={nothing} />
+      ) : null}
+      {kind === 'timeRefused' ? (
+        // Before the first time allowed, so the dialog says the range (MM-321).
+        <MmTimeOfDayDialog initialMinuteOfDay={6 * 60} helpText="Weigh-in reminder" first={7 * 60} last={21 * 60 - 1} onDone={nothing} />
+      ) : null}
       {kind === 'time' ? <MmTimeOfDayDialog initialMinuteOfDay={7 * 60 + 30} helpText="Weigh-in reminder" first={7 * 60} last={21 * 60 - 1} onDone={nothing} /> : null}
       {kind === 'clock' ? <MmClockTimeDialog title="Set started" initialMs={(12 * 3600 + 2 * 60 + 10) * 1000} onDone={nothing} /> : null}
       {kind === 'sheetBare' ? (

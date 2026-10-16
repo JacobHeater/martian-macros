@@ -24,6 +24,12 @@ export const Date: Story = { args: { kind: 'date' }, parameters: { shows: 'Janua
 /** MM-264: the drums in their dialog, the time said back in words. */
 export const Time: Story = { args: { kind: 'time' }, parameters: { shows: '7:30 AM' } };
 
+/** MM-321: a time outside the hours allowed: the dialog says the range. */
+export const TimeRefused: Story = { args: { kind: 'timeRefused' }, parameters: { shows: /^Choose a time between/ } };
+
+/** MM-321: a day outside the dates allowed: the dialog says the range. */
+export const DateRefused: Story = { args: { kind: 'dateRefused' }, parameters: { shows: /1926/ } };
+
 /** MM-264: the drums with seconds, for a set's clock. */
 export const Clock: Story = { args: { kind: 'clock' }, parameters: { shows: '12:02:10 PM' } };
 
@@ -50,5 +56,24 @@ export const MenuOpen: Story = {
   parameters: { shows: 'Copy to today' },
   play: async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'More actions for Oats' }));
+  },
+};
+
+/** MM-321: the open menu walked with the keyboard: the arrow moves between its items. */
+export const MenuKeyboard: Story = {
+  args: { kind: 'menuButton' },
+  parameters: { shows: 'Copy to today' },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'More actions for Oats' }));
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowUp}{End}{Home}');
+  },
+};
+
+/** MM-321: the date picker's year list open, the shown year chosen. */
+export const PickersYears: Story = {
+  args: { kind: 'pickers' },
+  parameters: { shows: '1996' },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: /^January 1996/ }));
   },
 };

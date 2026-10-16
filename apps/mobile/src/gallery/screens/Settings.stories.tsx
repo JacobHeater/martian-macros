@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
+import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
 import type { StoryStage } from './StoryStage';
 import { storyPackHost } from './storyPackHost';
 import { reveal } from './reveal';
@@ -10,7 +11,6 @@ import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
 import { userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
-import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
@@ -490,4 +490,39 @@ export const FoodDatabaseUnreachable = screenStory({
   device: storyPackHost({ down: true }),
   open: openFoodDatabase,
   walk: pressAnywhere('See what is available'),
+});
+
+/** MM-321: the evidence register could not be read. */
+export const HowThisWorksFailed = screenStory({
+  covers: ['HowThisWorksScreen'],
+  shows: 'This could not be loaded.',
+  stores: (services) => ({ ...services, evidence: () => Promise.reject(new Error('The register failed, as the story asks')) }),
+  open: ({ navigator }) => void navigator.push(() => <HowThisWorksScreen />),
+});
+
+/** MM-321: a question pressed opens the rules behind it, and a rule pressed opens its source. */
+export const HowThisWorksOpensARule = screenStory({
+  covers: ['HowThisWorksScreen', 'EvidenceQuestionScreen'],
+  shows: /^Source: /,
+  open: ({ navigator }) => void navigator.push(() => <HowThisWorksScreen />),
+  walk: async (canvas) => {
+    const body = within(canvas.ownerDocument.body);
+    const [question] = await body.findAllByRole('button', { name: /\?$/ }, { timeout: 8000 });
+    if (question !== undefined) await userEvent.click(question);
+    await body.findByText('The rules behind this', undefined, { timeout: 8000 });
+    const rule = canvas.ownerDocument.querySelector<HTMLElement>('.about-rule');
+    if (rule !== null) await userEvent.click(rule);
+  },
+});
+
+/** MM-321: a reminder's time pressed opens the time of day to choose. */
+export const ReminderTimeOpens = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Weigh-in reminder',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^At 7:00/),
 });
