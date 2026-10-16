@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "task_id": "mm326-water-bar",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feature/water-glasses",
+    "commit": "624ad8dab1a9d3c8ca621acb1b0fefcd4981ee69"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Does the water bar look and behave like its siblings (the hero macro bars, the meal sections); hierarchy; colour; does the pour read as fluid without breaking the motion rules.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-15",
+      "status": "complete",
+      "inspected_commit": "624ad8dab1a9d3c8ca621acb1b0fefcd4981ee69",
+      "input_hashes": {
+        "docs/agent-runs/mm326-water-bar/brief.md": "3fac51b6425bce34d8f1afa4a97ee3f10bb9fd4a9f3dd9d6d74d271b27dd948c",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "design/interaction-and-motion.md": "be5a10301a41897c1dcd6fb0067c9540b674a8eb840a9628e4bd834e838500b7",
+        "requirements/food-logging/STORY.water-glasses-to-fill.MM-326.md": "6048b0760f9cdf560f44f5d0d079a7f639b1e958406366896138866efce8b4de",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MmProgressBar, usePoured, MmSection, MacroBar, water CSS, tokens, WaterSection, design docs",
+          "19 renders including pour frames"
+        ],
+        "not_inspected": [
+          "tests",
+          "device",
+          "Dark and Martian pour frames"
+        ],
+        "referrals": [
+          "ux-accessibility: contrast, reduced motion",
+          "chair: tab remount, PD-3"
+        ],
+        "limitations": "Static renders and source; no device; hashes computed by the chair."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Visual and hierarchy judgments against the repository rules.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "Colour figures hand-computed; replaced by computed ones."
+      }
+    },
+    {
+      "task": "The UX guard: the bar for a novice and a screen-reader user, folded and open; the pour under reduced motion; contrast of fill and track.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-15",
+      "status": "complete",
+      "inspected_commit": "624ad8dab1a9d3c8ca621acb1b0fefcd4981ee69",
+      "input_hashes": {
+        "docs/agent-runs/mm326-water-bar/brief.md": "3fac51b6425bce34d8f1afa4a97ee3f10bb9fd4a9f3dd9d6d74d271b27dd948c",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "design/interaction-and-motion.md": "be5a10301a41897c1dcd6fb0067c9540b674a8eb840a9628e4bd834e838500b7",
+        "requirements/food-logging/STORY.water-glasses-to-fill.MM-326.md": "6048b0760f9cdf560f44f5d0d079a7f639b1e958406366896138866efce8b4de",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MmProgressBar, usePoured, MmSection, water CSS, tokens, WaterSection, useLoaded, WelcomeStep, stories, MM-326 tests",
+          "19 renders including pour frames"
+        ],
+        "not_inspected": [
+          "TalkBack",
+          "200% text",
+          "device",
+          "reduced-motion render"
+        ],
+        "referrals": [
+          "react-capacitor: UX-1, UX-2",
+          "product-designer: UX-3, UX-5"
+        ],
+        "limitations": "Static renders and source; no device; hashes computed by the chair."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Do the reduced-motion handling and the fill contrast meet WCAG 2.2?",
+        "reason": "Bounded check.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html",
+            "title": "Understanding SC 2.3.3 Animation from Interactions",
+            "published_or_updated": null,
+            "accessed": "2026-10-15",
+            "claim": "Interaction-triggered motion can be turned off; prefers-reduced-motion is a sufficient technique."
+          }
+        ],
+        "summary": "Reduced motion meets 2.3.3 once the first paint is at the level; the fill meets 3:1.",
+        "limitations": "Partial."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-directed visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-directed visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-directed visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-directed visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-directed visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-15",
+      "limitations": "No reviewer could run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM326-bar",
+      "status": "accepted",
+      "summary": "A bar across the screen with fluid animation on add, remove and open; replaces the glasses.",
+      "authority": "Product owner, 2026-10-15"
+    },
+    {
+      "id": "MM326-bar-panel",
+      "status": "accepted",
+      "summary": "8 px, ripple only, ease-out cubic, Dark water moved; bugs MM-327 and MM-328 fixed.",
+      "authority": "Chair (PD-1 to PD-5, UX-1, UX-2)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [],
+  "checkpoint": {
+    "at": "2026-10-16T00:15:50Z",
+    "writers_stopped": true
+  }
+}

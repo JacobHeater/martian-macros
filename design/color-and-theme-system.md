@@ -133,6 +133,23 @@ decoration, never for anything that is not that macro.
 Applied as icon color, text color or 1 dp stroke on a neutral surface. Never as
 a fill wash. Being over a calorie target uses `text`, not `danger`.
 
+### Water (MM-326)
+
+| Token | Martian | Dark | Light | Job |
+|---|---|---|---|---|
+| `water` | `#4F9DFF` | `#1E88C8` | `#1590D8` | The fill of the water bar on Food, and nothing else |
+
+A blue kept at least 10 L* from each palette's protein and ion, one solid hue,
+no gradient. Computed (WCAG contrast; CIE L* difference):
+
+| | Martian | Dark | Light |
+|---|---|---|---|
+| Against `track` | 4.2 | 3.7 | 3.0 |
+| Against `canvas` | 6.9 | 5.0 | 3.2 |
+| L* from `protein` | -23.8 | -10.5 | +24.6 |
+| L* from `ion` | -23.8 | -25.8 | +10.8 |
+| L* from `info` | -15.9 | -19.5 | +14.1 |
+
 ## 6. Measured contrast
 
 Text roles need 4.5:1 (large text 3:1). Fills, lines and icons need 3:1.

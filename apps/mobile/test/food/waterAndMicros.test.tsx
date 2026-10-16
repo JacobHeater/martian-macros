@@ -5,6 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { WaterEntry } from '../../src/domain/water/WaterEntry';
+import { WaterUnits } from '../../src/domain/water/WaterUnits';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
@@ -271,4 +272,95 @@ it('pressing a drink edits its amount and keeps its time', async () => {
   await userEvent.click(sheet.getByRole('button', { name: 'Save water' }));
   await expect.poll(async () => (await first(repos.water.watchWater(today))).map((e) => [e.ml, e.at.getHours()])).toEqual([[330, 8]]);
   expect(await screen.findByText('Changed to 0.33 L')).toBeInTheDocument();
+});
+
+/** MM-326: how far the Water section's bar is filled, as its fill's width. */
+const waterLevel = (water: HTMLElement) =>
+  (water.querySelector('.mm-progress-water .mm-progress-fill') as HTMLElement | null)?.style.width;
+
+const drink = (ml: number) => repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at: new Date(2026, 9, 10, 9) }));
+
+// MM-326: the water pours into a bar across the section (the owner, 2026-10-15); the summary says glasses.
+it('a gallon goal with 24 fl oz drunk fills the bar 3/16 of the way, folded or not', async () => {
+  await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'imperial' }));
+  await repos.preferences.saveWaterGoal(WaterUnits.flOzToMl(128));
+  for (let i = 0; i < 3; i++) await drink(WaterUnits.flOzToMl(8));
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText('24 fl oz of 128 fl oz · 3 of 16 glasses')).toBeInTheDocument();
+  await expect.poll(() => waterLevel(water)).toBe('18.75%');
+  expect(water.querySelector('.mm-progress-water')).toHaveAttribute('aria-hidden', 'true');
+  await userEvent.click(within(water).getByRole('button', { name: /^Water/ }));
+  expect(within(water).queryByRole('button', { name: /^Edit .* of water/ })).not.toBeInTheDocument();
+  expect(water.querySelector('.mm-progress-water')).toBeVisible();
+});
+
+it('the bar pours from empty when it appears, and again when the section opens', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  await drink(1000);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  await expect.poll(() => waterLevel(water)).toBe('50%');
+  const toggle = within(water).getByRole('button', { name: /^Water/ });
+  await userEvent.click(toggle);
+  const folded = water.querySelector('.mm-progress-water');
+  await userEvent.click(toggle);
+  expect(water.querySelector('.mm-progress-water')).not.toBe(folded); // drawn anew, so it fills again
+  await expect.poll(() => waterLevel(water)).toBe('50%');
+});
+
+it('a goal with nothing yet says its glasses over an empty bar, and a glass from the sheet raises it', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText('Goal 2 L · 8 glasses')).toBeInTheDocument();
+  await expect.poll(() => waterLevel(water)).toBe('0%');
+  const sheet = await openAddWater();
+  await userEvent.click(sheet.getByRole('button', { name: /^Glass, 250\s+ml of water$/ }));
+  expect(await within(water).findByText(/· 1 of 8 glasses$/)).toBeInTheDocument();
+  await expect.poll(() => waterLevel(water)).toBe('12.5%');
+  expect(water.querySelector('.mm-progress-wave')).not.toBeNull(); // the change sloshes
+});
+
+it('half a glass is said as a half', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  await drink(375);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(await within(water).findByText(/· 1½ of 8 glasses$/)).toBeInTheDocument();
+});
+
+it('the goal reached fills the bar and carries the check mark; no goal, no bar', async () => {
+  await repos.preferences.saveWaterGoal(1500);
+  await drink(2250);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  await within(water).findByText('2.25 L · Goal reached');
+  await expect.poll(() => waterLevel(water)).toBe('100%');
+  expect(water.querySelector('.food-meal-marker')).not.toBeNull();
+  await repos.preferences.saveWaterGoal(undefined);
+  await expect.poll(() => water.querySelector('.mm-progress-water')).toBeNull();
+  expect(within(water).queryByText(/glass/)).not.toBeInTheDocument();
+});
+
+// MM-328: a new day's water is drawn anew, filling from empty, not moved from the old day's level as an add.
+it('changing the day draws the bar anew for that day', async () => {
+  await repos.preferences.saveWaterGoal(2000);
+  await drink(1000);
+  await repos.water.addWater(new WaterEntry({ id: 0, date: today.addDays(-1), ml: 2000, at: new Date(2026, 9, 9, 9) }));
+  renderApp(repos, today);
+  await openTab('Food');
+  let water = await screen.findByRole('region', { name: 'Water' });
+  await expect.poll(() => waterLevel(water)).toBe('50%');
+  const before = water.querySelector('.mm-progress-water');
+  await userEvent.click(screen.getByRole('button', { name: 'Previous day' }));
+  await screen.findByText('Yesterday');
+  water = screen.getByRole('region', { name: 'Water' });
+  await expect.poll(() => waterLevel(water)).toBe('100%');
+  expect(water.querySelector('.mm-progress-water')).not.toBe(before);
 });

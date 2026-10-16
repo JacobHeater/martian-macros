@@ -2,6 +2,9 @@ import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
+import type { UnitSystem } from '../../domain/UnitSystem';
+import { WaterEntry } from '../../domain/water/WaterEntry';
+import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { screensMeta } from './screensMeta';
@@ -383,5 +386,58 @@ export const WaterEdit = screenStory({
       reveal(drink);
       await userEvent.click(drink);
     }
+  },
+});
+
+/**
+ * MM-326: the first day in `units` with a water goal of `goalMl` and these
+ * drinks today, an hour apart from 7 AM, on the Food screen.
+ */
+const waterToday =
+  (units: UnitSystem, goalMl: number, drinksMl: readonly number[]): StoryScenario =>
+  async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: units }));
+    await repos.preferences.saveWaterGoal(goalMl);
+    for (const [i, ml] of drinksMl.entries()) {
+      const at = new Date(today.year, today.month - 1, today.day, 7 + i);
+      await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at }));
+    }
+  };
+
+const eightFlOz = WaterUnits.flOzToMl(8);
+
+/** MM-326: a gallon's goal and three glasses: the water poured a little way into its bar. */
+export const WaterBar = screenStory({
+  covers: ['FoodScreen'],
+  shows: /3 of 16 glasses/,
+  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+  },
+});
+
+/** MM-326: the section folded: the drinks hide and the bar stays. */
+export const WaterBarFolded = screenStory({
+  covers: ['FoodScreen'],
+  shows: /3 of 16 glasses/,
+  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const header = await within(canvas).findByRole('button', { name: /^Water/, expanded: true });
+    await userEvent.click(header);
+    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+  },
+});
+
+/** MM-326: most of a 2.5 L goal, a past day, beside the meals. */
+export const WaterBarNearlyThere = screenStory({
+  covers: ['FoodScreen'],
+  shows: /9 of 10 glasses/,
+  scenario: waterToday('metric', 2500, [500, 500, 500, 500, 250]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/9 of 10 glasses/));
   },
 });
