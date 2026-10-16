@@ -266,8 +266,10 @@ limitations.
   fixed with its test, MM-344 ticketed for the panel. **For the owner:** loads
   converted to pounds show two decimals ("182.98 lb", the demo stores kg);
   `loadNumber` does this on purpose, so it is a question, not a ticket yet.
-- **Next:** batch 4, Settings (16), the food packs (12) and the shell (13); then
-  the rest. **The owner will do all physical-device testing at the end**
+- Batch 4, Settings, packs and shell, is done: 27 stories, register 70 to 28;
+  MM-345 fixed, MM-346 and MM-347 ticketed. `storyPackHost` draws downloads.
+- **Next:** batch 5, the rest (28 places, half in the design system's own
+  components); then the design defects MM-333 to MM-347 through the panel. **The owner will do all physical-device testing at the end**
   (2026-10-16): keep adding to the phone checklist below, do not ask for it.
 - **Phone checklist, to hand the owner when it is long enough** (they agreed to
   run one session): a real barcode on packaging (MM-43); a pack download over
