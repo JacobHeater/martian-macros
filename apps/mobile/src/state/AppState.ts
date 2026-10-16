@@ -769,7 +769,8 @@ export class AppState {
       const weights = of(this.weights) ?? [];
       const suggestedMl = suggestedWaterGoalMl({
         sex: setup.profile.sex,
-        weightKg: this.coach.value?.trendWeightKg ?? weights[weights.length - 1]?.weightKg,
+        // The latest weigh-in, not the coach's trend: watching the coach would work it out on every food change.
+        weightKg: weights[weights.length - 1]?.weightKg,
         proteinTargetG: this.currentTargets.value?.targets.proteinG,
         trainingDaysPerWeek: setup.trainingDaysPerWeek,
         screening: setup.screening,

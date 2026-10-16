@@ -199,6 +199,20 @@ export const WaterGoalOwnAmount = screenStory({
   },
 });
 
+/** MM-358: back from their own amount to the suggestion: the field holds it, with focus on it. */
+export const WaterGoalBackToSuggested = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Suggested from your protein target and training. Type your own to change it./,
+  scenario: demoWith({ waterGoalMl: 3000 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    const back = await within(canvas).findByRole('button', { name: /^Use the suggested amount/ });
+    reveal(back);
+    await userEvent.click(back);
+    await within(canvas).findByText(/^Suggested from your protein target/);
+  },
+});
+
 /** MM-313: a goal above 4 L carries a plain note (owner, 2026-10-14; the panel's SA-5). */
 export const WaterGoalHigh = screenStory({
   covers: ['SettingsScreen'],
