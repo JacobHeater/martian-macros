@@ -44,10 +44,12 @@ export function buildStrengthTrends({
     const points: StrengthPoint[] = [];
     let loggedSessions = 0;
     let recentSessions = 0;
+    let lastLoggedOn: CalendarDate | undefined;
     for (const workout of finished) {
       const sets = workout.exercises.filter((entry) => entry.exerciseId === exerciseId).flatMap((e) => e.sets);
       if (sets.length === 0) continue;
       loggedSessions++;
+      lastLoggedOn = workout.date;
       if (exercise === undefined) continue;
       let bodyweightKg: number | undefined;
       for (const reading of readings) {
@@ -75,7 +77,7 @@ export function buildStrengthTrends({
       });
     }
     if (loggedSessions > 0) {
-      result.push(new StrengthTrend({ exercise, exerciseId, points, loggedSessions, recentSessions }));
+      result.push(new StrengthTrend({ exercise, exerciseId, points, loggedSessions, recentSessions, lastLoggedOn }));
     }
   }
 
