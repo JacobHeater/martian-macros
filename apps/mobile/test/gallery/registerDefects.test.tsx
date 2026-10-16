@@ -95,3 +95,14 @@ it.skip('MM-342: the last 7 days hold figures in their value column, not sentenc
   const value = label.parentElement?.lastElementChild?.textContent ?? '';
   expect(value.length).toBeLessThanOrEqual(16);
 });
+
+it.skip('MM-344: the strength trends on Progress are rows of their section, not cards inside it', async () => {
+  const { DemoSeed } = await import('../../src/fixtures/DemoSeed');
+  const demo = new InMemoryRepositories();
+  await new DemoSeed(today).replace(demo);
+  renderApp(demo, today);
+  await openTab('Progress');
+  const section = (await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement;
+  await within(section).findAllByText(/^Smoothed e1RM/);
+  expect(section.querySelector('.mm-info-card, .mm-surface')).toBeNull();
+});
