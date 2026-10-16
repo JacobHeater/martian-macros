@@ -28,6 +28,7 @@
   --positive: #c4ff48;
   --caution: #ffd166;
   --info: #85cfff;
+  --water: #4f9dff;
   --danger: #ff938e;
   --on-danger: #120b29;
   --radius-group: 12px;
@@ -59,6 +60,7 @@
   --positive: #4fdb8a;
   --caution: #ffb84d;
   --info: #7fb8ff;
+  --water: #1e88c8;
   --danger: #ff7a7a;
   --on-danger: #2a0606;
   --radius-group: 16px;
@@ -90,6 +92,7 @@
   --positive: #117a3e;
   --caution: #8f5600;
   --info: #1c62c9;
+  --water: #1590d8;
   --danger: #b3261e;
   --on-danger: #ffffff;
   --radius-group: 16px;
@@ -126,6 +129,8 @@
   --motion-reveal: 600ms;
   --motion-fade: 100ms;
   --motion-turn: 1000ms;
+  /* Water poured into its bar (MM-326): the fill moves and its edge settles. */
+  --motion-pour: 1200ms;
 
   /* Type roles (MmType), in rem so text follows the phone's text size:
      size / line height, at 16px to the rem. */
@@ -150,5 +155,6 @@
     --motion-slow: 0ms;
     --motion-reveal: 0ms;
     --motion-turn: 4000ms;
+    --motion-pour: 0ms;
   }
 }

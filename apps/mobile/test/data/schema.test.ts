@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { Micronutrient } from '../../src/domain/food/micros/Micronutrient';
 import { AppDatabase } from '../../src/data/AppDatabase';
 import { currentSchemaVersion } from '../../src/data/currentSchemaVersion';
 import { tables } from '../../src/data/tables';
@@ -24,15 +25,33 @@ async function opened() {
 /** The columns added since the Dart database's last version, after the ones it had, by table and in order. */
 const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
-  user_preferences: ['terms_accepted_version', 'terms_accepted_epoch_day', 'macro_picture'],
+  // Version 4 (MM-311, MM-313): the sodium limit and the water goal.
+  user_preferences: [
+    'terms_accepted_version',
+    'terms_accepted_epoch_day',
+    'macro_picture',
+    'sodium_limit_mg',
+    'sodium_limit_since_epoch_day',
+    'water_goal_ml',
+  ],
+  // Version 4 (MM-308): the micronutrients a food log entry keeps.
+  food_entries: Micronutrient.added.map((n) => Micronutrient.column(n)),
+  // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
+  custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n))],
 };
+
+/** The tables added since the Dart database's last version. */
+const tablesAddedSince: readonly string[] = [
+  // Version 4 (MM-313): the water log.
+  'water_entries',
+];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart
 // app's database declared it at its last version, written by that database
 // on 2026-10-12. Anything since is named in `addedSince`, and nothing else.
 it('every table has the columns the Dart database had, in the same order, of the same kind, then what was added', async () => {
   const { sql } = await opened();
-  expect([...tables].sort()).toEqual(Object.keys(dartTables).sort());
+  expect([...tables].sort()).toEqual([...Object.keys(dartTables), ...tablesAddedSince].sort());
   for (const [table, columns] of Object.entries(dartTables)) {
     const found = await sql.select(`PRAGMA table_info("${table}")`);
     expect(found.slice(0, columns.length), table).toEqual(columns);

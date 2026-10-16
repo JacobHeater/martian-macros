@@ -71,6 +71,27 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchThemePreference())).toBe('dark');
     });
 
+    // MM-311, MM-313: both goals off until set; each set and cleared on its own.
+    it('the sodium limit and the water goal are off until set, and each keeps to itself', async () => {
+      const off = await first(repo.watchNutritionGoals());
+      expect(off.sodiumLimitMg).toBeUndefined();
+      expect(off.waterGoalMl).toBeUndefined();
+      const day = CalendarDate.of(2026, 10, 1);
+      await repo.saveSodiumLimit(2300, day);
+      await repo.saveWaterGoal(2500);
+      await repo.saveDetailLevel('full');
+      let goals = await first(repo.watchNutritionGoals());
+      expect(goals.sodiumLimitMg).toBe(2300);
+      expect(goals.sodiumLimitSince).toBe(day);
+      expect(goals.waterGoalMl).toBe(2500);
+      await repo.saveSodiumLimit(undefined, day.addDays(3));
+      expect((await first(repo.watchNutritionGoals())).sodiumLimitSince).toBeUndefined();
+      goals = await first(repo.watchNutritionGoals());
+      expect(goals.sodiumLimitMg).toBeUndefined();
+      expect(goals.waterGoalMl).toBe(2500);
+      expect(await first(repo.watchDetailLevel())).toBe('full');
+    });
+
     it('the under-eating notice is undismissed until dismissed', async () => {
       expect(await first(repo.watchUnderEatingDismissedOn())).toBeUndefined();
       const day = CalendarDate.of(2026, 10, 5);

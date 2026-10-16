@@ -4,6 +4,8 @@ import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
+import type { NutritionGoalsReader } from './NutritionGoalsReader';
+import type { NutritionGoalsWriter } from './NutritionGoalsWriter';
 import type { PreferencesReader } from './PreferencesReader';
 import type { PreferencesWriter } from './PreferencesWriter';
 import type { RecoverySkipReader } from './RecoverySkipReader';
@@ -35,4 +37,6 @@ export interface PreferencesRepository
     RecoverySkipReader,
     RecoverySkipWriter,
     TermsAcceptanceReader,
-    TermsAcceptanceWriter {}
+    TermsAcceptanceWriter,
+    NutritionGoalsReader,
+    NutritionGoalsWriter {}

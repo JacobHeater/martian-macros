@@ -74,7 +74,20 @@ CREATE TABLE "food_entries" (
   "fiber_g" REAL NULL,
   "sodium_mg" REAL NULL,
   "alcohol_g" REAL NULL,
-  "created_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER))
+  "created_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)),
+  "potassium_mg" REAL NULL,
+  "calcium_mg" REAL NULL,
+  "iron_mg" REAL NULL,
+  "magnesium_mg" REAL NULL,
+  "zinc_mg" REAL NULL,
+  "vitamin_a_ug" REAL NULL,
+  "vitamin_c_mg" REAL NULL,
+  "vitamin_d_ug" REAL NULL,
+  "vitamin_b12_ug" REAL NULL,
+  "folate_ug" REAL NULL,
+  "sugars_g" REAL NULL,
+  "saturated_fat_g" REAL NULL,
+  "cholesterol_mg" REAL NULL
 );
 CREATE TABLE "day_marks" (
   "epoch_day" INTEGER NOT NULL,
@@ -121,6 +134,9 @@ CREATE TABLE "user_preferences" (
   "terms_accepted_version" INTEGER NULL,
   "terms_accepted_epoch_day" INTEGER NULL,
   "macro_picture" TEXT NOT NULL DEFAULT 'bars',
+  "sodium_limit_mg" INTEGER NULL,
+  "sodium_limit_since_epoch_day" INTEGER NULL,
+  "water_goal_ml" REAL NULL,
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -140,7 +156,22 @@ CREATE TABLE "custom_foods" (
   "fat_g" REAL NOT NULL CHECK("fat_g" >= 0.0),
   "barcode" TEXT NULL,
   "servings" REAL NULL,
-  "cooked_weight_grams" REAL NULL
+  "cooked_weight_grams" REAL NULL,
+  "fiber_g" REAL NULL,
+  "sodium_mg" REAL NULL,
+  "potassium_mg" REAL NULL,
+  "calcium_mg" REAL NULL,
+  "iron_mg" REAL NULL,
+  "magnesium_mg" REAL NULL,
+  "zinc_mg" REAL NULL,
+  "vitamin_a_ug" REAL NULL,
+  "vitamin_c_mg" REAL NULL,
+  "vitamin_d_ug" REAL NULL,
+  "vitamin_b12_ug" REAL NULL,
+  "folate_ug" REAL NULL,
+  "sugars_g" REAL NULL,
+  "saturated_fat_g" REAL NULL,
+  "cholesterol_mg" REAL NULL
 );
 CREATE TABLE "recipe_ingredients" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -232,6 +263,12 @@ CREATE TABLE "health_import_tokens" (
   "type" TEXT NOT NULL,
   "token" TEXT NOT NULL,
   PRIMARY KEY ("type")
+);
+CREATE TABLE "water_entries" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "epoch_day" INTEGER NOT NULL,
+  "ml" REAL NOT NULL CHECK("ml" > 0.0 AND "ml" <= 3000.0),
+  "at_ms" INTEGER NOT NULL
 );
 CREATE TABLE "exercise_progressions" (
   "exercise_id" TEXT NOT NULL,

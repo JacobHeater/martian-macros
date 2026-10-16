@@ -28,6 +28,7 @@ export function entriesCopiedTo(
         fiberG: e.fiberG,
         sodiumMg: e.sodiumMg,
         alcoholG: e.alcoholG,
+        micros: e.micros,
       }),
   );
 }

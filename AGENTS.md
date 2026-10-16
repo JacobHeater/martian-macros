@@ -76,10 +76,25 @@ delegation and sequential fallback do not supersede the working agreements here.
   roles review it, saving their reports and an outcome for every finding
   under `docs/agent-runs/`; (4) build the spec only once the UX guard (the
   UX-accessibility role) has no open blocking finding. A state the phone
-  can show that no story draws is a defect (MM-292). Words are the
+  can show that no story draws is a defect (MM-292), and `mm check` finds
+  it: `npm run unseen` fails on markup no story reaches unless
+  `apps/mobile/test/gallery/unseen.json` names it with a reason (MM-321).
+  Never add to that register to get past the check; draw the state. A
+  state that needs the phone (a health platform, a camera) is brought with
+  `screenStory`'s `device` (MM-320). Words are the
   domain's own ("split", never an invented "share"), and nothing that
   holds a control sits bare on the canvas (MM-291).
   Do not add HTML drawings of screens anywhere in the repository.
+- Build a new part like its siblings (owner's rule, 2026-10-14, MM-318;
+  rule 9 of `design/screen-direction.md`). Before drawing a new section,
+  row or control, open the component of the nearest one on that screen
+  and reuse it; name that sibling in the ticket's Decisions, and give a
+  written reason for any different pattern. Inspect the whole screen with
+  the new part beside its siblings, and ask the panel to compare them.
+  When a reviewer says something outweighs or differs from its
+  neighbours, first ask whether it should simply be one of them. The
+  water section was invented beside the meal sections and shipped twice
+  before the owner had to point at the meals.
 - If the request is ambiguous in a way that materially affects behavior,
   product scope, privacy, or data handling, ask before choosing an approach.
   Otherwise use the simplest implementation consistent with the requirements
@@ -164,7 +179,10 @@ delegation and sequential fallback do not supersede the working agreements here.
   domain and engine logic independent of React and persistence details.
 - A change to any table bumps `apps/mobile/src/data/currentSchemaVersion.ts`
   by one, changes `currentSchema.ts` and adds the migration step; the
-  migration tests hold every released version's upgrade path.
+  migration tests hold every released version's upgrade path. Never edit a
+  step or a version's shape after any build of it has run anywhere (a panel
+  build, the owner's phone): add a new version instead (MM-325). The schema's
+  fingerprint test fails when the schema changes without a new version.
 
 ## Engineering principles (binding)
 

@@ -2,7 +2,7 @@ import { Meal } from '../domain';
 import type { Insight } from '../engine';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { StateError } from '../lang/StateError';
-import type { Fmt } from './Fmt';
+import { Fmt } from './Fmt';
 import { mealLabel } from './mealLabel';
 import { stallText } from './stallText';
 
@@ -56,6 +56,20 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
           ['Fully logged days', `${n('wholeDays')}`],
           ['Days at or above the minimum', `${n('metDays')}`],
           ['Average shortfall', `${n('averageShortfallG')} g`],
+        ],
+      ];
+    case 'sodiumOverLimit':
+      return [
+        'Sodium over the limit you set',
+        `Sodium was over your limit of ${Fmt.whole(i.figures['limitMg'] ?? 0)} mg on ${n('overDays')} of ` +
+          `${n('judgedDays')} days with enough sodium data. In many diets, most sodium comes from ` +
+          'packaged and restaurant food.',
+        [
+          period,
+          ['Days over the limit', `${n('overDays')}`],
+          ['Days with enough sodium data', `${n('judgedDays')}`],
+          ['Days left out (too little sodium data)', `${n('leftOutDays')}`],
+          ['Your limit', `${Fmt.whole(i.figures['limitMg'] ?? 0)} mg`],
         ],
       ];
     case 'proteinByMeal': {

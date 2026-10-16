@@ -3,7 +3,10 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
+import type { NutritionGoals } from '../domain/NutritionGoals';
+import type { WaterEntry } from '../domain/water/WaterEntry';
 import type { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { HandSize } from '../domain/food/hand/HandSize';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -33,6 +36,7 @@ import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
+import type { SodiumPattern } from '../engine/SodiumPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
 import { findUnderEating } from '../engine/findUnderEating';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
@@ -196,6 +200,9 @@ export class AppState {
 
   /** Which picture of the macros the hero shows (MM-254): bars or donut, never both. */
   readonly macroPicture: Cell<Loadable<MacroPicture>>;
+
+  /** The sodium limit and the water goal, each off until set (MM-311, MM-313). */
+  readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
   readonly recentFoods: Cell<Loadable<FoodEntry[]>>;
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
@@ -218,6 +225,8 @@ export class AppState {
 
   /** Protein by meal for each of the days insights look at (MM-125). */
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
+  /** The sodium limit and each recent day's sodium, for the coach (MM-312); undefined with no limit. */
+  private readonly sodiumPattern: Cell<SodiumPattern | undefined>;
 
   /** The monthly reports that are ready (MM-33), oldest first. */
   readonly reportPeriods: Cell<readonly ReportPeriod[]>;
@@ -350,6 +359,7 @@ export class AppState {
   readonly selectedDay = new ValueCell<CalendarDate | undefined>(undefined);
 
   private readonly foodByDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
+  private readonly waterByDay = new Map<number, Cell<Loadable<WaterEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
   private readonly reportIntakeByIndex = new Map<number, Cell<Loadable<IntakeDay[]>>>();
   private readonly reportByIndex = new Map<number, Cell<MonthlyReport | undefined>>();
@@ -431,6 +441,7 @@ export class AppState {
     });
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
+    this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
     this.coach = derived(() => {
@@ -521,6 +532,21 @@ export class AppState {
       return byDay;
     });
 
+    this.sodiumPattern = derived<SodiumPattern | undefined>(() => {
+      const goals = of(this.nutritionGoals);
+      const limitMg = goals?.sodiumLimitMg;
+      const since = goals?.sodiumLimitSince;
+      if (limitMg === undefined || since === undefined) return undefined;
+      const today = this.today.value;
+      const days = new Map<CalendarDate, SodiumDay>();
+      for (let i = 1; i <= InsightRationing.patternDays; i++) {
+        const day = today.addDays(-i);
+        const entries = of(this.foodForDay(day));
+        if (entries !== undefined) days.set(day, SodiumDay.of(entries));
+      }
+      return { limitMg, since, days };
+    });
+
     this.reportPeriods = derived<readonly ReportPeriod[]>(() => {
       const setup = of(this.setup);
       const today = this.today.value;
@@ -570,6 +596,7 @@ export class AppState {
           history,
           stall: this.stallAssessment.value,
           mealProtein: this.mealProtein.value,
+          sodium: this.sodiumPattern.value,
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
         }),
         log,
@@ -920,6 +947,16 @@ export class AppState {
     if (cell === undefined) {
       cell = stream(() => this.services.food.watchFood(date));
       this.foodByDay.set(date.epochDay, cell);
+    }
+    return cell;
+  }
+
+  /** The water logged on `date` (MM-313). */
+  waterForDay(date: CalendarDate): Cell<Loadable<WaterEntry[]>> {
+    let cell = this.waterByDay.get(date.epochDay);
+    if (cell === undefined) {
+      cell = stream(() => this.services.water.watchWater(date));
+      this.waterByDay.set(date.epochDay, cell);
     }
     return cell;
   }

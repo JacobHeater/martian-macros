@@ -46,6 +46,7 @@ const every = [
   insight('proteinShort', { wholeDays: 14, metDays: 5, averageShortfallG: 28 }),
   insight('stall'),
   insight('proteinByMeal', { meal: 0, missedDays: 10, lowDays: 8 }),
+  insight('sodiumOverLimit', { overDays: 5, judgedDays: 8, leftOutDays: 6, limitMg: 2300 }),
 ] as const;
 
 it('every rule in the catalog has words', () => {
@@ -71,6 +72,15 @@ it('the protein-by-meal insight names the meal and grades itself', () => {
   expect(body).toContain('may help slightly');
   expect(body).toContain('your daily total matters much more');
   expect(evidence).toContainEqual(['Days under the minimum', '10']);
+});
+
+// MM-312: the sodium insight names its denominator and the days left out (the panel's CO-2).
+it('the sodium insight says how many days could be judged', () => {
+  const [title, body, evidence] = insightText(every[6], fmt);
+  expect(title).toBe('Sodium over the limit you set');
+  expect(body).toContain('over your limit of 2,300 mg on 5 of 8 days with enough sodium data');
+  expect(evidence).toContainEqual(['Days left out (too little sodium data)', '6']);
+  expect(body).not.toContain('usual place to look');
 });
 
 it('forbidden subjects never appear', () => {

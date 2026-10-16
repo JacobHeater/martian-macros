@@ -450,7 +450,11 @@
             "MM-301",
             "MM-302",
             "MM-303",
-            "MM-304"
+            "MM-304",
+            "MM-320",
+            "MM-321",
+            "MM-322",
+            "MM-324"
           ]
         },
         {
@@ -692,7 +696,18 @@
             "MM-46",
             "MM-44",
             "MM-58",
-            "MM-172"
+            "MM-172",
+            "MM-306",
+            "MM-308",
+            "MM-309",
+            "MM-310",
+            "MM-311",
+            "MM-313",
+            "MM-318",
+            "MM-325",
+            "MM-326",
+            "MM-327",
+            "MM-328"
           ]
         },
         {
@@ -703,7 +718,8 @@
             "MM-133",
             "MM-32",
             "MM-125",
-            "MM-36"
+            "MM-36",
+            "MM-312"
           ]
         },
         {
@@ -722,7 +738,15 @@
           "tickets": [
             "MM-72",
             "MM-70",
-            "MM-69"
+            "MM-69",
+            "MM-314",
+            "MM-323"
+          ]
+        },
+        {
+          "workstream": "WS-04",
+          "tickets": [
+            "MM-307"
           ]
         }
       ]
@@ -1244,7 +1268,9 @@
           "MM-299",
           "MM-301",
           "MM-302",
-          "MM-303"
+          "MM-303",
+          "MM-320",
+          "MM-322"
         ],
         "remaining": [
           "MM-89",
@@ -1263,7 +1289,9 @@
           "MM-287",
           "MM-288",
           "MM-289",
-          "MM-304"
+          "MM-304",
+          "MM-324",
+          "MM-321"
         ]
       },
       "sequence": [
@@ -1438,6 +1466,24 @@
             "MM-304"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 15,
+          "title": "Every part of a screen drawn by a story (MM-321): the check and its register; Settings' Health Connect rows drawn and rebuilt as their own section (MM-320); hairlines between rows in every list group (MM-322)",
+          "tickets": [
+            "MM-320",
+            "MM-321",
+            "MM-322"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 16,
+          "title": "One text column for list rows with and without an action (MM-324)",
+          "tickets": [
+            "MM-324"
+          ],
+          "milestone": "M2"
         }
       ],
       "gate": {
@@ -1480,7 +1526,8 @@
         "built": [
           "MM-52",
           "MM-53",
-          "MM-54"
+          "MM-54",
+          "MM-307"
         ],
         "remaining": [
           "MM-50",
@@ -1541,6 +1588,14 @@
             "MM-56"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 7,
+          "title": "Micronutrients in the pack (MM-307): format version 2, the extract and the build report",
+          "tickets": [
+            "MM-307"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -1955,7 +2010,9 @@
         "WS-03",
         "WS-04"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "WS-09"
+      ],
       "primaryOwnership": [
         "apps/mobile/src/food (add-food flow, entry rows)",
         "apps/mobile/src/domain/FoodEntry.ts",
@@ -1998,7 +2055,22 @@
           "MM-223",
           "MM-225",
           "MM-226",
-          "MM-227"
+          "MM-227",
+          "MM-315",
+          "MM-316",
+          "MM-317",
+          "MM-306",
+          "MM-308",
+          "MM-309",
+          "MM-310",
+          "MM-311",
+          "MM-313",
+          "MM-318",
+          "MM-325",
+          "MM-319",
+          "MM-326",
+          "MM-327",
+          "MM-328"
         ],
         "remaining": [
           "MM-37",
@@ -2019,7 +2091,8 @@
           "MM-218",
           "MM-219",
           "MM-220",
-          "MM-221"
+          "MM-221",
+          "MM-305"
         ]
       },
       "sequence": [
@@ -2120,6 +2193,24 @@
             "MM-220",
             "MM-221"
           ]
+        },
+        {
+          "step": 10,
+          "title": "Water, sodium and micronutrients (MM-305, the owner 2026-10-14): the log keeps micronutrients, labels and own foods, the Micros segment, the sodium limit, water",
+          "tickets": [
+            "MM-306",
+            "MM-308",
+            "MM-309",
+            "MM-310",
+            "MM-311",
+            "MM-313",
+            "MM-318",
+            "MM-325",
+            "MM-326",
+            "MM-327",
+            "MM-328"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -2148,7 +2239,8 @@
         "WS-05",
         "WS-06",
         "WS-07",
-        "WS-10"
+        "WS-10",
+        "WS-08"
       ],
       "unlocks": [
         "WS-13",
@@ -2183,7 +2275,8 @@
         "built": [
           "MM-32",
           "MM-133",
-          "MM-168"
+          "MM-168",
+          "MM-312"
         ],
         "remaining": [
           "MM-33",
@@ -2274,6 +2367,14 @@
           "tickets": [
             "MM-125",
             "MM-36"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 9,
+          "title": "The sodium-over-the-limit insight (MM-312)",
+          "tickets": [
+            "MM-312"
           ],
           "milestone": "M4"
         }
@@ -2469,7 +2570,9 @@
           "MM-70",
           "MM-71",
           "MM-72",
-          "MM-73"
+          "MM-73",
+          "MM-314",
+          "MM-323"
         ]
       },
       "sequence": [
@@ -2536,6 +2639,22 @@
             "MM-188"
           ],
           "milestone": "M3"
+        },
+        {
+          "step": 9,
+          "title": "Water written to the health platform (MM-314), on MM-70 write path",
+          "tickets": [
+            "MM-314"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 10,
+          "title": "After Health Connect stops asking, say where to allow a kind (MM-323)",
+          "tickets": [
+            "MM-323"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -3632,6 +3751,30 @@
         "MM-117"
       ],
       "reason": "The relief rule gains a signal of its own; the rule must exist first."
+    },
+    {
+      "from": "WS-04",
+      "to": "WS-08",
+      "type": "soft-preferred-order",
+      "scope": [
+        10
+      ],
+      "satisfiedBy": [
+        "MM-307"
+      ],
+      "reason": "The Micros segment is most useful once pack foods carry micronutrients; labels and own foods work without them."
+    },
+    {
+      "from": "WS-08",
+      "to": "WS-09",
+      "type": "contract-dependency",
+      "scope": [
+        9
+      ],
+      "satisfiedBy": [
+        "MM-311"
+      ],
+      "reason": "The sodium insight reads the sodium limit preference and the coverage rule of the Micros view."
     }
   ],
   "parallelGroups": [

@@ -17,6 +17,8 @@ interface MmButtonProps {
   expand?: boolean;
   /** With no action the button is shown as off. */
   onPress?: (() => void) | undefined;
+  /** For a button that shows or hides something below it: whether that is showing. */
+  expanded?: boolean | undefined;
 }
 
 /**
@@ -24,12 +26,13 @@ interface MmButtonProps {
  * screens cannot differ in size, shape or press behavior. The primary kind
  * is flat, with no glow (MM-181).
  */
-export function MmButton({ label, name, kind = 'primary', icon, expand = false, onPress }: MmButtonProps) {
+export function MmButton({ label, name, kind = 'primary', icon, expand = false, onPress, expanded }: MmButtonProps) {
   return (
     <button
       type="button"
       className={`mm-button mm-button-${kind}${expand ? ' mm-button-expand' : ''}`}
       aria-label={name}
+      aria-expanded={expanded}
       disabled={onPress === undefined}
       onClick={onPress}
     >

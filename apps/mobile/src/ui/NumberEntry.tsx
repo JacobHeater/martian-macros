@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
 import { FormatError } from '../lang/FormatError';
 import { MmButton } from './MmButton';
@@ -22,6 +22,8 @@ interface NumberEntryProps {
    * "That value looks off"; any other failure as one to try again (MM-303).
    */
   onSave: (value: number) => Promise<void>;
+  /** What a refusal says in place of "That value looks off", when the caller knows the range (MM-311). */
+  refusal?: string | undefined;
 }
 
 /**
@@ -32,8 +34,9 @@ interface NumberEntryProps {
  * stays in it (MM-279). The keyboard's action key saves as Save does
  * (MM-296).
  */
-export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave }: NumberEntryProps) {
+export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'primary', onSave, refusal }: NumberEntryProps) {
   const hintId = useId();
+  const block = useRef<HTMLDivElement>(null);
   const [text, setText] = useState(initial ?? '');
   const [refused, setRefused] = useState<string>();
   const value = parseNumber(text);
@@ -44,14 +47,18 @@ export function NumberEntry({ title, unit, initial, hint, saves, saveKind = 'pri
   const save = async (toSave: number) => {
     try {
       await onSave(toSave);
-      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      // Only its own focus is let go: a save that closed a sheet has already put focus back where it was (MM-317).
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && block.current?.contains(focused)) focused.blur();
     } catch (error) {
-      setRefused(error instanceof FormatError ? 'That value looks off. Check it.' : 'Could not save. Try again.');
+      setRefused(
+        error instanceof FormatError ? (refusal ?? 'That value looks off. Check it.') : 'Could not save. Try again.',
+      );
     }
   };
 
   return (
-    <div className="mm-number-entry-block">
+    <div className="mm-number-entry-block" ref={block}>
       <div className="mm-number-entry">
         <MmTextField
           name={title}

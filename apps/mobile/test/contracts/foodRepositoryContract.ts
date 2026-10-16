@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import type { Portion } from '../../src/domain/food/portion/Portion';
 import type { ReferenceNutrition } from '../../src/domain/food/portion/ReferenceNutrition';
@@ -230,6 +231,33 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       expect(lentils.netCarbsG).toBe(24);
       expect(found(byName, 'Plain').fiberG).toBeUndefined();
       expect(found(byName, 'Plain').netCarbsG).toBeUndefined();
+    });
+
+    // MM-308: every micronutrient given is kept, and the rest stay unknown.
+    it('micronutrients are kept, sodium among them, and unknown stays unknown', async () => {
+      await repo.addFood(
+        new FoodEntry({
+          id: 0,
+          date: d1,
+          meal: 'lunch',
+          name: 'Banana',
+          kcal: 105,
+          proteinG: 1.3,
+          carbsG: 27,
+          fatG: 0.4,
+          source: 'weighed',
+          sodiumMg: 1,
+          micros: new Micronutrients({ potassium: 422, vitaminC: 10.3, folate: 24, sugars: 14.4 }),
+        }),
+      );
+      const [banana] = await first(repo.watchFood(d1));
+      expect(banana?.micros.of('potassium')).toBe(422);
+      expect(banana?.micros.of('vitaminC')).toBe(10.3);
+      expect(banana?.micros.of('folate')).toBe(24);
+      expect(banana?.micros.of('sugars')).toBe(14.4);
+      expect(banana?.micros.of('sodium')).toBe(1);
+      expect(banana?.micros.of('calcium')).toBeUndefined();
+      expect(banana?.micros.of('cholesterol')).toBeUndefined();
     });
 
     it('an update can change or clear the portion', async () => {

@@ -38,8 +38,8 @@ Choices I made without asking (say if any is wrong). The list, each with its rea
 - **No supplement recommendations**, including creatine and protein powder. The app asks about creatine only because it moves the scale
   (MM-136).
 - **No food scoring, grading, or "clean" and "junk" labels** (MM-108).
-- **No micronutrient targets** for now: the data is too patchy to be right (MM-49). *Reopen if* the food sources' coverage is measured and
-  found adequate.
+- ~~**No micronutrient targets** for now: the data is too patchy to be right (MM-49). *Reopen if* the food sources' coverage is measured and
+  found adequate.~~ **Overruled by the product owner on 2026-10-14** (MM-306); built as MM-305.
 - **No calorie or macro estimation from a meal photo** (MM-44). *Reopen if* an on-device method's error is measured and acceptable.
 
 **Body and measurement**

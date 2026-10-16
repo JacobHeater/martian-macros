@@ -38,6 +38,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     setup: repos.setup,
     weights: repos.weights,
     weightEvents: repos.weightEvents,
+    water: repos.water,
     waist: repos.waist,
     food: repos.food,
     customFoods: repos.customFoods,

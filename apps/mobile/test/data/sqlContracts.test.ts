@@ -17,6 +17,7 @@ import { reminderRepositoryContract } from '../contracts/reminderRepositoryContr
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
+import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { weightEventRepositoryContract } from '../contracts/weightEventRepositoryContract';
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
@@ -32,6 +33,7 @@ setupRepositoryContract('SQLite', async () => (await open()).setup);
 weightRepositoryContract('SQLite', async () => (await open()).weights);
 weightEventRepositoryContract('SQLite', async () => (await open()).weightEvents);
 waistRepositoryContract('SQLite', async () => (await open()).waist);
+waterRepositoryContract('SQLite', async () => (await open()).water);
 preferencesRepositoryContract('SQLite', async () => (await open()).preferences);
 foodRepositoryContract('SQLite', async () => (await open()).food);
 customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);

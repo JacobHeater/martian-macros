@@ -1,10 +1,18 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
+import { FoodEntry } from '../../domain/FoodEntry';
+import type { UnitSystem } from '../../domain/UnitSystem';
+import { WaterEntry } from '../../domain/water/WaterEntry';
+import { WaterUnits } from '../../domain/water/WaterUnits';
+import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { screensMeta } from './screensMeta';
+import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
 
 /**
@@ -114,5 +122,322 @@ export const EditFood = screenStory({
   open: async ({ services, overlays, today }) => {
     const [entry] = await valueOf(services.food.watchFood(today));
     if (entry !== undefined) void showAddFoodSheet(overlays, today, { entry });
+  },
+});
+
+/** Yesterday's food, opened on the Food screen, at Full detail with the Micros picture (MM-310). */
+const yesterdaysFood = ({ state, today }: StoryStage) => {
+  state.homeTab.put('food');
+  state.selectedDay.put(today.addDays(-1));
+};
+
+/** MM-310: the nutrition card's third picture; the snack states fewer nutrients, so some rows say their coverage. */
+export const Micros = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: today so far, one food logged. */
+export const MicrosToday = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: nothing logged yet; no number is shown. */
+export const MicrosEmpty = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Nothing logged yet. Start with breakfast.',
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.preferences.saveDetailLevel('full');
+    await repos.preferences.saveMacroPicture('micros');
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: pregnant, so no reference amounts, and the care-team line. */
+export const MicrosCareTeam = screenStory({
+  covers: ['FoodScreen'],
+  shows: /ask your care team which apply/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', pregnant: true }),
+  open: yesterdaysFood,
+});
+
+/** MM-311: a sodium limit of 1,200 mg, and a day over it by 200 mg. */
+export const MicrosOverLimit = screenStory({
+  covers: ['FoodScreen'],
+  shows: /over your limit/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', sodiumLimitMg: 1200 }),
+  open: yesterdaysFood,
+});
+
+
+
+
+/** A typed food with no sodium or micronutrients, added to yesterday. */
+const typedSnack: StoryScenario = async (repos, today) => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'snack',
+      name: 'Granola bar',
+      kcal: 190,
+      proteinG: 4,
+      carbsG: 29,
+      fatG: 7,
+      source: 'quickAdd',
+    }),
+  );
+};
+
+/** MM-311: under the limit, with a food that states no sodium, so the row says its coverage. */
+export const MicrosUnderLimit = screenStory({
+  covers: ['FoodScreen'],
+  shows: /your limit/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', sodiumLimitMg: 2300, then: typedSnack }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: one food today stating only sodium, so most rows are stated by none. */
+export const MicrosNotStated = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Not stated by any food: /,
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.preferences.saveDetailLevel('full');
+    await repos.preferences.saveMacroPicture('micros');
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'breakfast',
+        name: 'Instant oats',
+        kcal: 150,
+        proteinG: 5,
+        carbsG: 27,
+        fatG: 3,
+        source: 'labelServing',
+        sodiumMg: 110,
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-310: kidney disease, so no reference markers and the care-team line. */
+export const MicrosKidney = screenStory({
+  covers: ['FoodScreen'],
+  shows: /With kidney disease/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', screening: { chronicKidneyDisease: true } }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: after bariatric surgery (the panel's MN-6), the surgical team's line. */
+export const MicrosSurgery = screenStory({
+  covers: ['FoodScreen'],
+  shows: /After bariatric surgery/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', screening: { bariatricSurgery: true } }),
+  open: yesterdaysFood,
+});
+
+/** MM-310: eighteen, so the adult reference bands do not apply. */
+export const MicrosEighteen = screenStory({
+  covers: ['FoodScreen'],
+  shows: /different under 19/,
+  scenario: demoWith({ detail: 'full', picture: 'micros', birthYear: storyToday.year - 18 }),
+  open: yesterdaysFood,
+});
+
+/** Opens the Water section's "+", once the Food screen is there. */
+const addWater = async (canvas: HTMLElement) => {
+  const add = await within(canvas).findByRole('button', { name: 'Add water' });
+  reveal(add);
+  await userEvent.click(add);
+};
+
+/** MM-318: Water as a section like the meals, beside them, in imperial with no goal. */
+export const WaterSection = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Water',
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add water' }));
+  },
+});
+
+/** MM-318: no water yet and no goal: the header alone, as an empty meal. */
+export const WaterNone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Water',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: 'Add water' }));
+  },
+});
+
+/** MM-313, MM-318: a goal of 1.5 L in metric, and a day past it. */
+export const WaterGoalReached = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Goal reached/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Goal reached/));
+  },
+});
+
+/** MM-318: the header's "+" opens the Add water sheet, as a meal's opens Add food. */
+export const WaterAddSheet = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Other amount',
+  open: yesterdaysFood,
+  walk: addWater,
+});
+
+/** MM-318: the sheet in metric with another amount typed. */
+export const WaterOtherAmount = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Up to 3,000 ml at a time.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await addWater(canvas);
+    const body = canvas.ownerDocument.body;
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '330');
+  },
+});
+
+/** MM-318: imperial, nothing yet today, the sheet open. */
+export const WaterOtherOpen = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Up to 101 fl oz at a time.',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: addWater,
+});
+
+/** MM-318: another amount over the most one drink may be, refused with the range below. */
+export const WaterOtherRefused = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'That is more than one drink can be.',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await addWater(canvas);
+    const body = canvas.ownerDocument.body;
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '5000');
+    await userEvent.click(within(body).getByRole('button', { name: 'Save water' }));
+  },
+});
+
+/** MM-318: a drink deleted from its "More actions", as a meal's food; the snack offers Undo. */
+export const WaterRemoved = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Removed .* of water/,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for .* of water/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Delete' }));
+  },
+});
+
+/** MM-318 (the panel's PD-2): a goal of 2 L and nothing yet: the header says the goal alone. */
+export const WaterGoalSetNone = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Goal 2 L/,
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'metric' }));
+    await repos.preferences.saveWaterGoal(2000);
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Goal 2 L/));
+  },
+});
+
+/** MM-318 (the panel's PD-2): a goal of 2.5 L and part of it drunk. */
+export const WaterGoalPartway = screenStory({
+  covers: ['FoodScreen'],
+  shows: /of 2.5 L/,
+  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/of 2.5 L/));
+  },
+});
+
+/** MM-318 (the panel's PD-1): a drink pressed opens Edit water, as a food opens Edit food. */
+export const WaterEdit = screenStory({
+  covers: ['AddWaterSheet'],
+  shows: 'Edit water',
+  scenario: demoWith({ units: 'metric' }),
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    const [drink] = await within(canvas).findAllByRole('button', { name: /^Edit .* of water/ });
+    if (drink !== undefined) {
+      reveal(drink);
+      await userEvent.click(drink);
+    }
+  },
+});
+
+/**
+ * MM-326: the first day in `units` with a water goal of `goalMl` and these
+ * drinks today, an hour apart from 7 AM, on the Food screen.
+ */
+const waterToday =
+  (units: UnitSystem, goalMl: number, drinksMl: readonly number[]): StoryScenario =>
+  async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: units }));
+    await repos.preferences.saveWaterGoal(goalMl);
+    for (const [i, ml] of drinksMl.entries()) {
+      const at = new Date(today.year, today.month - 1, today.day, 7 + i);
+      await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at }));
+    }
+  };
+
+const eightFlOz = WaterUnits.flOzToMl(8);
+
+/** MM-326: a gallon's goal and three glasses: the water poured a little way into its bar. */
+export const WaterBar = screenStory({
+  covers: ['FoodScreen'],
+  shows: /3 of 16 glasses/,
+  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+  },
+});
+
+/** MM-326: the section folded: the drinks hide and the bar stays. */
+export const WaterBarFolded = screenStory({
+  covers: ['FoodScreen'],
+  shows: /3 of 16 glasses/,
+  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const header = await within(canvas).findByRole('button', { name: /^Water/, expanded: true });
+    await userEvent.click(header);
+    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+  },
+});
+
+/** MM-326: most of a 2.5 L goal, a past day, beside the meals. */
+export const WaterBarNearlyThere = screenStory({
+  covers: ['FoodScreen'],
+  shows: /9 of 10 glasses/,
+  scenario: waterToday('metric', 2500, [500, 500, 500, 500, 250]),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/9 of 10 glasses/));
   },
 });

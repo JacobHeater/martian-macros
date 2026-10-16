@@ -5,7 +5,10 @@
 -- (src/domain and src/foodPipeline), so there is one implementation.
 --
 -- Columns: source, source_id, kind, name, brand, gtin, kcal, protein, carbs,
--- fat, fiber, sodium_mg, alcohol, servings (JSON [{"d": text, "g": grams}]),
+-- fat, fiber, sodium_mg, alcohol, then the MM-307 micronutrients (potassium_mg,
+-- calcium_mg, iron_mg, magnesium_mg, zinc_mg, vitamin_a_ug, vitamin_c_mg,
+-- vitamin_d_ug, vitamin_b12_ug, folate_ug, sugars_g, saturated_fat_g,
+-- cholesterol_mg; Open Food Facts states grams, converted here), servings (JSON [{"d": text, "g": grams}]),
 -- version_key (orders versions of one product within a source; highest wins),
 -- updated_at (when the source last changed the record, seconds since 1970).
 -- All nutrients are per 100 g.
@@ -20,10 +23,26 @@ COPY (
       max(CASE WHEN nutrient_id = '1004' THEN try_cast(amount AS DOUBLE) END) AS fat,
       max(CASE WHEN nutrient_id = '1079' THEN try_cast(amount AS DOUBLE) END) AS fiber,
       max(CASE WHEN nutrient_id = '1093' THEN try_cast(amount AS DOUBLE) END) AS sodium_mg,
-      max(CASE WHEN nutrient_id = '1018' THEN try_cast(amount AS DOUBLE) END) AS alcohol
+      max(CASE WHEN nutrient_id = '1018' THEN try_cast(amount AS DOUBLE) END) AS alcohol,
+      max(CASE WHEN nutrient_id = '1092' THEN try_cast(amount AS DOUBLE) END) AS potassium_mg,
+      max(CASE WHEN nutrient_id = '1087' THEN try_cast(amount AS DOUBLE) END) AS calcium_mg,
+      max(CASE WHEN nutrient_id = '1089' THEN try_cast(amount AS DOUBLE) END) AS iron_mg,
+      max(CASE WHEN nutrient_id = '1090' THEN try_cast(amount AS DOUBLE) END) AS magnesium_mg,
+      max(CASE WHEN nutrient_id = '1095' THEN try_cast(amount AS DOUBLE) END) AS zinc_mg,
+      max(CASE WHEN nutrient_id = '1106' THEN try_cast(amount AS DOUBLE) END) AS vitamin_a_ug,
+      max(CASE WHEN nutrient_id = '1162' THEN try_cast(amount AS DOUBLE) END) AS vitamin_c_mg,
+      max(CASE WHEN nutrient_id = '1114' THEN try_cast(amount AS DOUBLE) END) AS vitamin_d_ug,
+      max(CASE WHEN nutrient_id = '1110' THEN try_cast(amount AS DOUBLE) END) AS vitamin_d_iu,
+      max(CASE WHEN nutrient_id = '1178' THEN try_cast(amount AS DOUBLE) END) AS vitamin_b12_ug,
+      max(CASE WHEN nutrient_id = '1190' THEN try_cast(amount AS DOUBLE) END) AS folate_ug,
+      max(CASE WHEN nutrient_id = '2000' THEN try_cast(amount AS DOUBLE) END) AS sugars_g,
+      max(CASE WHEN nutrient_id = '1063' THEN try_cast(amount AS DOUBLE) END) AS sugars_nlea_g,
+      max(CASE WHEN nutrient_id = '1258' THEN try_cast(amount AS DOUBLE) END) AS saturated_fat_g,
+      max(CASE WHEN nutrient_id = '1253' THEN try_cast(amount AS DOUBLE) END) AS cholesterol_mg
     FROM read_csv('{{cache}}/usda_branded/food_nutrient.csv', header = true,
                   all_varchar = true, ignore_errors = true)
-    WHERE nutrient_id IN ('1008', '1003', '1005', '1004', '1079', '1093', '1018')
+    WHERE nutrient_id IN ('1008', '1003', '1005', '1004', '1079', '1093', '1018',
+                          '1092', '1087', '1089', '1090', '1095', '1106', '1162', '1114', '1110', '1178', '1190', '2000', '1063', '1258', '1253')
     GROUP BY fdc_id
   ),
   bf AS (
@@ -41,6 +60,7 @@ COPY (
     coalesce(nullif(bf.brand_name, ''), nullif(bf.brand_owner, '')) AS brand,
     bf.gtin_upc AS gtin,
     nut.kcal, nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
+    nut.potassium_mg, nut.calcium_mg, nut.iron_mg, nut.magnesium_mg, nut.zinc_mg, nut.vitamin_a_ug, nut.vitamin_c_mg, coalesce(nut.vitamin_d_ug, nut.vitamin_d_iu / 40) AS vitamin_d_ug, nut.vitamin_b12_ug, nut.folate_ug, coalesce(nut.sugars_g, nut.sugars_nlea_g) AS sugars_g, nut.saturated_fat_g, nut.cholesterol_mg,
     CASE WHEN try_cast(bf.serving_size AS DOUBLE) > 0
               AND lower(bf.serving_size_unit) IN ('g', 'grm')
          THEN to_json([{'d': coalesce(nullif(bf.household_serving_fulltext, ''),
@@ -64,6 +84,21 @@ COPY (
     try_cast(fiber_100g AS DOUBLE),
     try_cast(sodium_100g AS DOUBLE) * 1000,
     try_cast(alcohol_100g AS DOUBLE),
+    try_cast(potassium_100g AS DOUBLE) * 1000,
+    try_cast(calcium_100g AS DOUBLE) * 1000,
+    try_cast(iron_100g AS DOUBLE) * 1000,
+    try_cast(magnesium_100g AS DOUBLE) * 1000,
+    try_cast(zinc_100g AS DOUBLE) * 1000,
+    -- Vitamin A and folate are not taken from Open Food Facts: its values are
+    -- not reliably RAE or DFE (MM-307, the panel's MN-2), so they stay unknown.
+    NULL,
+    try_cast("vitamin-c_100g" AS DOUBLE) * 1000,
+    try_cast("vitamin-d_100g" AS DOUBLE) * 1000000,
+    try_cast("vitamin-b12_100g" AS DOUBLE) * 1000000,
+    NULL,
+    try_cast(sugars_100g AS DOUBLE),
+    try_cast("saturated-fat_100g" AS DOUBLE),
+    try_cast(cholesterol_100g AS DOUBLE) * 1000,
     CASE WHEN try_cast(serving_quantity AS DOUBLE) > 0 AND serving_size <> ''
          THEN to_json([{'d': serving_size, 'g': try_cast(serving_quantity AS DOUBLE)}])
     END,
@@ -107,9 +142,25 @@ COPY (
       max(CASE WHEN nutrient_id = '1004' THEN try_cast(amount AS DOUBLE) END) AS fat,
       max(CASE WHEN nutrient_id = '1079' THEN try_cast(amount AS DOUBLE) END) AS fiber,
       max(CASE WHEN nutrient_id = '1093' THEN try_cast(amount AS DOUBLE) END) AS sodium_mg,
-      max(CASE WHEN nutrient_id = '1018' THEN try_cast(amount AS DOUBLE) END) AS alcohol
+      max(CASE WHEN nutrient_id = '1018' THEN try_cast(amount AS DOUBLE) END) AS alcohol,
+      max(CASE WHEN nutrient_id = '1092' THEN try_cast(amount AS DOUBLE) END) AS potassium_mg,
+      max(CASE WHEN nutrient_id = '1087' THEN try_cast(amount AS DOUBLE) END) AS calcium_mg,
+      max(CASE WHEN nutrient_id = '1089' THEN try_cast(amount AS DOUBLE) END) AS iron_mg,
+      max(CASE WHEN nutrient_id = '1090' THEN try_cast(amount AS DOUBLE) END) AS magnesium_mg,
+      max(CASE WHEN nutrient_id = '1095' THEN try_cast(amount AS DOUBLE) END) AS zinc_mg,
+      max(CASE WHEN nutrient_id = '1106' THEN try_cast(amount AS DOUBLE) END) AS vitamin_a_ug,
+      max(CASE WHEN nutrient_id = '1162' THEN try_cast(amount AS DOUBLE) END) AS vitamin_c_mg,
+      max(CASE WHEN nutrient_id = '1114' THEN try_cast(amount AS DOUBLE) END) AS vitamin_d_ug,
+      max(CASE WHEN nutrient_id = '1110' THEN try_cast(amount AS DOUBLE) END) AS vitamin_d_iu,
+      max(CASE WHEN nutrient_id = '1178' THEN try_cast(amount AS DOUBLE) END) AS vitamin_b12_ug,
+      max(CASE WHEN nutrient_id = '1190' THEN try_cast(amount AS DOUBLE) END) AS folate_ug,
+      max(CASE WHEN nutrient_id = '2000' THEN try_cast(amount AS DOUBLE) END) AS sugars_g,
+      max(CASE WHEN nutrient_id = '1063' THEN try_cast(amount AS DOUBLE) END) AS sugars_nlea_g,
+      max(CASE WHEN nutrient_id = '1258' THEN try_cast(amount AS DOUBLE) END) AS saturated_fat_g,
+      max(CASE WHEN nutrient_id = '1253' THEN try_cast(amount AS DOUBLE) END) AS cholesterol_mg
     FROM nut_all
-    WHERE nutrient_id IN ('1008', '2047', '2048', '1003', '1005', '1004', '1079', '1093', '1018')
+    WHERE nutrient_id IN ('1008', '2047', '2048', '1003', '1005', '1004', '1079', '1093', '1018',
+                          '1092', '1087', '1089', '1090', '1095', '1106', '1162', '1114', '1110', '1178', '1190', '2000', '1063', '1258', '1253')
     GROUP BY source, fdc_id
   ),
   units AS (
@@ -143,6 +194,7 @@ COPY (
     NULL AS brand, NULL AS gtin,
     coalesce(nut.kcal, nut.kcal_atwater) AS kcal,
     nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
+    nut.potassium_mg, nut.calcium_mg, nut.iron_mg, nut.magnesium_mg, nut.zinc_mg, nut.vitamin_a_ug, nut.vitamin_c_mg, coalesce(nut.vitamin_d_ug, nut.vitamin_d_iu / 40) AS vitamin_d_ug, nut.vitamin_b12_ug, nut.folate_ug, coalesce(nut.sugars_g, nut.sugars_nlea_g) AS sugars_g, nut.saturated_fat_g, nut.cholesterol_mg,
     portions.servings, 0 AS version_key, 0 AS updated_at
   FROM fd
   LEFT JOIN nut ON nut.source = fd.source AND nut.fdc_id = fd.fdc_id

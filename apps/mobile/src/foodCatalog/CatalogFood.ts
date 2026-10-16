@@ -1,3 +1,4 @@
+import type { PackMicros } from './PackMicros';
 import type { PreparationState } from './PreparationState';
 import type { TrustTier } from './TrustTier';
 
@@ -16,6 +17,7 @@ interface CatalogFoodInit {
   fiberG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
+  micros?: PackMicros;
   preparation?: PreparationState;
   pairedFoodId?: number | undefined;
   densityGPerMl?: number | undefined;
@@ -36,6 +38,9 @@ export class CatalogFood {
   readonly fiberG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
+
+  /** The micronutrients besides sodium, per 100 g, as a format 2 pack states them (MM-307). */
+  readonly micros: PackMicros;
   readonly preparation: PreparationState;
 
   /** The raw food of a cooked one, or the cooked of a raw one. */
@@ -70,6 +75,7 @@ export class CatalogFood {
     this.fiberG = init.fiberG;
     this.sodiumMg = init.sodiumMg;
     this.alcoholG = init.alcoholG;
+    this.micros = init.micros ?? {};
     this.preparation = init.preparation ?? 'unspecified';
     this.pairedFoodId = init.pairedFoodId;
     this.densityGPerMl = init.densityGPerMl;

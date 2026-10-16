@@ -1,3 +1,4 @@
+import { Micronutrients } from '../micros/Micronutrients';
 import type { NutritionTotals } from '../portion/NutritionTotals';
 import type { CustomFoodKind } from './CustomFoodKind';
 import type { RecipeIngredient } from './RecipeIngredient';
@@ -13,6 +14,8 @@ interface CustomFoodInit {
   servings?: number | undefined;
   cookedWeightGrams?: number | undefined;
   ingredients?: readonly RecipeIngredient[];
+  fiberG?: number | undefined;
+  micros?: Micronutrients;
 }
 
 /**
@@ -47,6 +50,12 @@ export class CustomFood {
   readonly cookedWeightGrams: number | undefined;
   readonly ingredients: readonly RecipeIngredient[];
 
+  /** Fiber per serving, when the label or the user stated it (MM-309). */
+  readonly fiberG: number | undefined;
+
+  /** Sodium and the micronutrients per serving, when stated (MM-309); a recipe has none. */
+  readonly micros: Micronutrients;
+
   constructor(init: CustomFoodInit) {
     this.id = init.id;
     this.name = init.name;
@@ -58,5 +67,7 @@ export class CustomFood {
     this.servings = init.servings;
     this.cookedWeightGrams = init.cookedWeightGrams;
     this.ingredients = init.ingredients ?? [];
+    this.fiberG = init.fiberG;
+    this.micros = init.micros ?? Micronutrients.none;
   }
 }

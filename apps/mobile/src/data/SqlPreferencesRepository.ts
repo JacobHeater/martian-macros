@@ -2,13 +2,14 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { MacroPicture } from '../domain/MacroPicture';
+import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, day, flag, integer, named, optionalDay, optionalInteger } from './columns';
+import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, orNull } from './columns';
 import { upsert } from './upsert';
 import type { Values } from './Values';
 
@@ -101,6 +102,26 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveRecoveryCheckInSkippedOn(day: CalendarDate): Promise<void> {
     return this.save({ recovery_check_in_skipped_epoch_day: day.epochDay });
+  }
+
+  watchNutritionGoals(): Watched<NutritionGoals> {
+    return this.watch((row) =>
+      row === undefined
+        ? NutritionGoals.none
+        : new NutritionGoals({
+            sodiumLimitMg: optionalInteger(row, 'sodium_limit_mg'),
+            sodiumLimitSince: optionalDay(row, 'sodium_limit_since_epoch_day'),
+            waterGoalMl: optionalNumber(row, 'water_goal_ml'),
+          }),
+    );
+  }
+
+  saveSodiumLimit(mg: number | undefined, on: CalendarDate): Promise<void> {
+    return this.save({ sodium_limit_mg: orNull(mg), sodium_limit_since_epoch_day: mg === undefined ? null : on.epochDay });
+  }
+
+  saveWaterGoal(ml: number | undefined): Promise<void> {
+    return this.save({ water_goal_ml: orNull(ml) });
   }
 
   watchTermsAcceptance(): Watched<TermsAcceptance | undefined> {

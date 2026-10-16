@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-14, by Claude, Session 26.
+Last updated: 2026-10-14, by Claude, Session 29.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -81,8 +81,12 @@ not launch it with PowerShell redirection (`*>`, `2>&1`): PowerShell 5.1
 turns Vite's stderr into an error and kills the runner.
 
 **Database.** The React app's schema is `apps/mobile/src/data/currentSchemaVersion.ts`,
-`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 3
-since MM-254: `macro_picture`). Only one schema change at a time.
+`currentSchema.ts` and `migrationSteps.ts`, with their tests (version 5
+since MM-325). Only one schema change at a time. **A version's shape never
+changes once any build of it has run** (MM-325: version 4 gained a column
+after the owner's phone had it, and the sodium limit stopped switching on
+there); `test/data/schemaFingerprint.test.ts` fails when the schema changes
+without a new version.
 
 **The engineering rules are checked (MM-246, MM-261, MM-278).**
 `test/architecture.test.ts` fails the suite on a file with two declarations
@@ -93,7 +97,7 @@ component prop named `color`, `className` or `style`, or a screen that
 draws a row's chevron; `MmPressable` is the component for content pressed
 as a whole.
 
-**Next ticket ID.** `mm req next` is the authority (MM-305 at this writing).
+**Next ticket ID.** `mm req next` is the authority (MM-326 at this writing).
 
 **The register is complete (MM-237, done).** Every screen, sheet and step
 has a story under `apps/mobile/src/gallery/screens/`: the whole app as
@@ -101,6 +105,14 @@ shipped over in-memory stores on a fixed day, in a phone's viewport, opened
 at that screen (`screenStory({ covers, shows, open, walk })`). A new
 `*Screen.tsx`, `*Sheet.tsx` or `*Step.tsx` with no story fails
 `test/gallery/stories.test.tsx`, which also draws and walks every story.
+**And every part of a screen is drawn (MM-321).** `npm run unseen`, part
+of `mm check`, draws the stories under coverage and fails on markup no
+story reaches unless `apps/mobile/test/gallery/unseen.json` names it with
+a reason; a place a story now draws fails until it leaves the register.
+A state that needs the phone (a health platform, a camera) is brought
+with `screenStory`'s `device` (`healthPlatform`). Settings' Health
+Connect rows went unseen and unreviewed for months because the stories'
+platform was empty (MM-320).
 Two rules came out of the owner's phone review the same day: a stylesheet
 rule that removes an outline must name `:focus-visible` (MM-239, a focused
 field drew two rings), and a slider inside a list group is an
@@ -201,6 +213,27 @@ Ember switch stays. Not yet looked at on the phone: the drums' scroll feel
 and the calendar swipe (the Pixel was disconnected); the Storybook stories
 were looked at in a headless browser in three palettes.
 
+**Build a new part like its siblings (owner's rule, 2026-10-14, MM-318;
+rule 9 of `design/screen-direction.md`, in `AGENTS.md`).** Before drawing
+a new section, row or control, open the component of the nearest one on
+that screen and reuse it; name it in the ticket; inspect the whole screen;
+ask the panel to compare. The water section was invented beside the meal
+sections, shipped twice, and the owner had to point at the meals. His
+words: if it happens again, there are consequences.
+
+**Questions to the owner go through the interactive question tool (owner,
+2026-10-14).** Never as a numbered list in a chat reply: batches of up to
+four, concrete options, the recommendation first.
+
+**Water, sodium and micronutrients (MM-305, built 2026-10-14).** Micros is
+a choice of the nutrition card on the Food screen only (`CalorieHero
+microsOffered`), at Full detail. Every micronutrient total is the known
+amount with its coverage, never treating missing as zero; references are
+withheld in pregnancy, breastfeeding, kidney disease, after bariatric
+surgery and under 19. Insight rules about intake other than protein and
+logging are flagged `otherIntake` and suppressed for an eating-disorder
+history (MM-141).
+
 **Waiting on the product owner.**
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
@@ -214,155 +247,92 @@ were looked at in a headless browser in three palettes.
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
-## Session 26: 2026-10-14, Claude (the waist measured on the Dashboard; snacks above the bar)
+## Session 29: 2026-10-14 to 15, Claude (water poured into a bar on the water section)
 
-- The owner, on his phone: the Dashboard's rows that are windows into a
-  measurement should take it without another screen, the waist among
-  them, and the confirmation should offer the other screen. Mid-session:
-  "Toasts should always display above the nav bar."
-- **Story, panel, build (MM-293).** The waist row drawn in
-  `Screens/Today` (Not Weighed Today, a new Waist Due), reviewed by the
-  product-designer, UX-accessibility and measurement roles; every
-  finding's outcome is in `docs/agent-runs/mm301-waist-in-place/decision.md`.
-- **Built.** MM-301: the waist row asks in place when no measurement in
-  the last 7 days (the reminder's window), one reading through the shared
-  `saveWaistReadings`, a secondary Save heard as "Save waist" (`MmButton
-  name`, `NumberEntry saves`/`saveKind`), MM-155's conditions in the
-  hint, values to the quarter inch, "Waist saved: 36 in" with "Open
-  Progress" (the weigh-in's snack too). MM-302: the snack above the
-  navigation bar, and Food's Add food above a snack. MM-303:
-  "That value looks off" only for a refusal (`FormatError`).
-- **Stories added:** Waist Due, Waist Typed, Waist Refused, Both Typed,
-  Weigh In Saved, Waist Saved (Today) and Entry Removed (Food), each
-  looked at in the three palettes at 412 by 915. Headless captures freeze
-  the snack's rise animation half-way; stop animations in the capture
-  frame to see it as shown.
-- **Left:** MM-304 (proposed). Not looked at: the phone, TalkBack.
-- **Roadmap:** WS-03 steps 13 (built) and 14 (MM-304) added; M2 moved by
-  MM-301 to MM-303.
+- The owner, with a screenshot of the Water section: "add a visual here to
+  gamify the water and make it easier to accomplish the goal". Asked with
+  options, the owner first chose glasses to fill (dots, one per glass); built
+  and reviewed (`docs/agent-runs/mm326-water-glasses/`). Seeing it, the owner
+  took a **new direction (2026-10-15): a bar across the screen width with
+  fluid animation**, animating when water is added or removed and when the
+  section opens (MM-326).
+- Built: `MmProgressBar` kind `water` (8 px, the emphasized macro bar's
+  weight), `usePoured` (fills from empty when drawn), `MmSection`'s
+  `meter` (under the header, kept folded, drawn anew on opening), tokens
+  `--water` and `--motion-pour`, signature moment 5 "Water pour" in
+  `design/interaction-and-motion.md` (ripples and flattens; no loop, no
+  overshoot), the water colour's figures in the colour doc. The summary says
+  glasses ("24 fl oz of 128 fl oz · 3 of 16 glasses"). Panel: UX guard pass
+  (`docs/agent-runs/mm326-water-bar/`); bugs MM-327 (reduced motion blinked
+  empty) and MM-328 (a day change poured as an add) fixed with regression
+  tests. Capturing the pour mid-motion needs the DevTools protocol (headless
+  `--screenshot` only shows the settled frame).
+- Branch `feature/water-glasses` (PR #161), stacked on #160. **Merging the
+  green stack (#158 to #160) was refused by this session's permission
+  classifier; the owner merges or allows it.** Step 10 of WS-08 (M4) gained
+  MM-326 to MM-328, built. Not looked at on the phone.
 
-## Session 25: 2026-10-14, Claude (the owner's phone review: Split, the weigh-in in its card, Storybook first)
+## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
 
-- The sitrep, then the owner's review of the Dashboard on his phone: the
-  switch said "Share" where the word is "split"; on a morning before the
-  weigh-in the field floated on the canvas with no padding and the waist
-  card touched its hint; and Storybook had no story of that state, which
-  he read, rightly, as the screen not being designed in Storybook. His
-  rule, now MM-293 and in `AGENTS.md`: story, inspect, panel, then build.
-- **In that order.** `Screens/Today/Not Weighed Today`
-  (`notWeighedTodayScenario`) reproduced the phone's layout in Storybook
-  first (MM-292). The proposal (the weigh-in as the first row of the
-  Dashboard's list group, the slot the trend row takes once saved) was
-  drawn in the same story and reviewed by the product-designer (approve
-  with changes; two blocking documentation findings) and UX-accessibility
-  (guard pass). Every finding's outcome is in
-  `docs/agent-runs/mm291-weigh-in/decision.md`; `mm panel` validates it.
-- **Built.** "Grams | Split" (MM-290), with equal segments in every
-  `MmSegmented`; `MmListRow entry` (a row that holds a control, icon level
-  with the title) and `WeighInRow` (MM-291); the streak row moved into the
-  group as its last row; rule 1 and rule 4 of `design/screen-direction.md`
-  amended; `hierarchyProblems` fails a bare field and checks Not Weighed
-  Today with the destinations. From the UX guard: the save says "Saved
-  181.4 lb for today" through the snack's status (MM-294); the hint is in
-  the field's description (MM-295, `MmTextField describedBy`); Enter saves
-  (MM-296, `MmTextField onSubmit`). MM-297 (the disabled primary in Light)
-  is proposed, for Storybook and the panel first.
-- **Tests.** Six new or changed tests, each failing on `main`'s source
-  first: the switch, the row in the group, the saved status, the hint
-  described, Enter saves, and the bare-field rule on the new story.
-- **Looked at** from the static Storybook: Not Weighed Today in Martian,
-  Light and Dark at 412 by 915 and Martian at 360 by 740 (the row starts
-  under the fold there: an owner question); the demo Dashboard; Pause,
-  Recovery check-in and Workout for the segment change. Not looked at:
-  the phone, TalkBack, 200% text.
-- **A slip, recovered:** a backup made with `tar` to a `C:` path failed
-  silently (tar reads `C:` as a remote host) while seven source files were
-  swapped to `main`'s to prove the tests fail first; the edits were
-  re-applied from the session's scripts and the suite re-run. Copy files
-  to back them up, never tar to a drive path in Git Bash.
-- **The owner's answers, built the same session** (second panel run,
-  `docs/agent-runs/mm298-trend-goal-themes/`, guard pass): small phones
-  (360 by 740) are not designed for (rule 7 says so); the weight row says
-  "Trend so far 189.6 lb" before the weigh-in and "Trend 184.1 lb" with
-  "Today 183.9 lb · 7 days −0.6 lb" after it, the first weigh-in shown once
-  (MM-298); the goal is the first section of Coach under the hero and its
-  warnings, with "Change goal" (MM-299, story `Screens/Coach/Check In
-  Due`); a disabled primary or secondary has no fill, an outline at 16% and
-  a label at 38% of `--text` in every palette (MM-297), with Disabled cells
-  in the States story and a token test holding the field border at 3:1.
-- **Live reload (MM-300, PR #157):** `mm run --live` on the emulator, found
-  and fixed on the way: Vite on "localhost" bound only `::1` (adb reverse
-  got an empty response), and Capacitor's bare `gradlew` failed under the
-  agent shell's `NoDefaultCurrentDirectoryInExePath`. WS-01 step 7 built.
-- Moved the needle: **WS-03 step 12 built** (MM-290 to MM-299). Available
-  next: WS-02 step 6 (MM-135), WS-03 step 11, WS-15.
+- The owner, with a phone screenshot of Settings' Data section: "Where is
+  this in Storybook? … this atrocity of padding". It was not: the stories'
+  health platform was empty, so only "not on this phone" was ever drawn,
+  and MM-237's check passed because Settings had a story (MM-320).
+- The owner chose the Data section plus an audit and a check. Built:
+  `device` on `screenStory`, `healthPlatform`, ten Health Connect stories;
+  the panel (product designer, UX guard) failed it against Reminders, it
+  was rebuilt as its own section like Reminders, and passed
+  (`docs/agent-runs/mm320-health-connect/`). MM-322: rows straight in a
+  list group had lost their hairlines everywhere; fixed in `ui.css`.
+- MM-321: the check of what the stories draw, with a register of 211
+  places, each with a reason. **Next: work the register down**, story by
+  story, starting with the 166 "not yet drawn".
+- Open: MM-323 (Health Connect lock-out; needs the plugin answer), MM-324
+  (two text columns for list rows). Branch `fix/unseen-states`, stacked on
+  #159. Not looked at on the phone.
 
-## Session 24: 2026-10-13, Claude (the hierarchy rebuild with iconography: WS-03 step 9 built)
+## Session 27: 2026-10-14, Claude (water, sodium and micronutrients: MM-305 built)
 
-- The owner's instruction: "I want the hierarchy rebuild with iconography."
-  MM-253 to MM-259 were built in one branch, with the panel pass first.
-- **The panel pass (MM-253).** The product-designer and UX-accessibility
-  roles graded the six destinations as built on `main` at `9fb8c79`
-  (first-viewport renders in Martian and Light, source for the rest):
-  28 and 25 findings, every one with an outcome in
-  `docs/agent-runs/mm253-hierarchy/decision.md` and `state.json`
-  (`mm panel` validates the run). Folded into the build: the confidence
-  word labelled, never alone; a heading in the hero; the completeness
-  control as a row after the last meal with the mark in the header; method
-  icons beside their word; one sentence of uncertainty kept with the trend
-  chart; the held or settling estimate said in the folded line; the
-  safeguards above the hero and outside the one-thing rationing; the Save
-  that waits for a change; dates in words; no default event type; a
-  Dashboard named Dashboard; the star, not a trophy, for a record; both
-  strips the rolling last seven days. Three bugs became tickets with
-  regression tests (MM-283 the coach line, MM-284 the unit heard, MM-285
-  event dates and default). Left for later as WS-03 step 11: MM-286
-  (destinations keep their state; the Food primary first in focus order),
-  MM-287 (one figure, lift rows), MM-288 (the Ember budget for text
-  actions, the owner's call), MM-289 (a demo seed that shows every mark).
-  Owner decisions still open, listed in `decision.md`: PD-2 Ember text,
-  PD-9 whether the arc leaves Coach (MM-187 stands), UX-24 numeric
-  settings as sheets, the meal glyph family.
-- **The direction** is the first section of `design/screen-direction.md`:
-  eight rules, what sits outside them, what "one tap down" means, the
-  first-viewport budget per destination, empty states, and the
-  before-and-after table. `test/gallery/hierarchy.test.tsx` makes rules 1,
-  4 and 6 checkable on every destination story.
-- **The design system.** `MmSection` (icon, heading, summary, trailing
-  action; folds with `collapsible`, keeps state with `maintainState`, or
-  opens a screen with `onPress`), `MmRhythmStrip` (seven named dots, full,
-  half, empty, today ringed; buttons when `onSelect` is given, listed in
-  `buttonHomes`), `NumberEntry` (the bare field; `NumberEntryCard` is
-  gone), `MmSwitchRow leadingIcon`, `MmDropdown placeholder`,
-  `MmTextField` describing its suffix, thirty-five meaning names in
-  `MmIconName`, `.mm-section` and `.mm-rhythm` in `ui.css`. The macro
-  picture is a preference (`MacroPicture`, `user_preferences.macro_picture`,
-  schema version 3, in-memory and SQL repositories, the contract test).
-- **The screens.** Dashboard: hero with the Grams/Share switch, the rhythm
-  strip (`rhythmDays`), streak row, insight section, rows for weight,
-  waist, next check-in and training, the weigh-in in place only on a day
-  without one, the history behind "More about this week". Food: meals as
-  sections with icons, method icons on rows, the completeness row and the
-  header mark, "More about today". Coach: safeguards first, the hero with
-  the check-in and the confidence word, `OneThingRow`, eleven sections
-  (recovery and reports folded when quiet). Progress: one hero with the
-  weigh-in and the trend, events as rows with icons and an add button in
-  the header, Waist and Strength folded. Train: one primary, the strip
-  (`trainedDays`), the volume section, `workoutGroups` by week and month
-  with a star for a record. Settings: seven sections of rows with icons,
-  choosers through the options dialog, erase last.
-- **Tests.** The suite is 2,145 with the new ones (`hierarchy`, `section`,
-  `rhythmDays`, `workoutGroups`, `weightEvents`, the unit, the coach line);
-  `test/support/dashboardLoaded.ts` replaces the "Logging coverage"
-  sentinel (the history is one tap down); `failsFirst` now fails until
-  `recover()` is called, because the Dashboard's rows read the workouts
-  before a later screen does.
-- **Looked at** in a headless browser from the static Storybook: the six
-  destinations at 412 by 915 in Martian, Light and Dark. Not looked at:
-  below the first viewport (the frame is fixed to the phone's height, so a
-  tall capture shows the same 915 px; the tails were walked by the tests),
-  anything on the phone, 200% text, the donut legend's contrast on the hero
-  (the chair's measurement is still owed, with the two from Session 23).
-- Moved the needle: **WS-03 step 9 done** (seven tickets plus three bugs);
-  **WS-03 step 11** placed (four tickets); M2 gained fourteen. Available
-  next: WS-02 step 6, WS-03 step 11, WS-15.
+- The owner pasted new food tracker requirements: track water, track
+  micronutrients, configure a sodium goal, and show micronutrients on the
+  nutrition card as a third choice beside Grams and Split. **New working
+  agreement: every question to the owner goes through the interactive
+  question tool, never as a list in chat.**
+- The owner answered sixteen questions, then four more after the panel
+  (all recorded in MM-305 and each story): the micronutrient non-goal is
+  **overruled** (MM-306); minerals and key vitamins plus the label's
+  sugars, saturated fat and cholesterol; totals with a reference marker
+  and coverage; **Micros on the Food screen only**; a sodium limit off by
+  default, 2,300 mg suggested, **1,500 mg minimum**, with a coach line;
+  water by glass, bottle or typed amount with an optional **goal** (the
+  word kept; glossary amended), up to 6 L with a note above 4 L, plain
+  water only; written to Health Connect later (MM-314, waits on MM-70).
+- **Story, panel, build (MM-293).** Drawn in Storybook, reviewed by the
+  product-designer, UX-accessibility, micronutrients, coaching and safety
+  roles (`docs/agent-runs/mm305-water-micros/`, every finding's outcome in
+  `decision.md`); the UX guard passed on a re-review of the new states.
+  Blocking findings resolved: the long Micros card (owner: Food only) and
+  the sodium insight reaching an eating-disorder history (now suppressed,
+  MM-141). The owner caught the sized water buttons wrapping mid-unit
+  after the review; redrawn and looked at in three palettes.
+- **Built:** MM-306 to MM-313, bugs MM-315 ("share picture"), MM-316 (Micros
+  said "today" on a past day), MM-317 (focus lost after another amount).
+  Schema version 4 (micronutrient columns on entries and own foods, the
+  goals and the day the limit was set, `water_entries`); pack format 2
+  (reads format 1); `extract.sql` maps USDA ids and Open Food Facts
+  (vitamin A and folate left unknown there); label reading of the
+  mandatory lines; the sodium insight; eleven evidence-register rows.
+- **Branch** `feature/water-sodium-micronutrients`, **stacked on #158**
+  (green; merging it was refused by the session's permission classifier,
+  so it waits for the owner).
+- **Not verified:** the phone, TalkBack, 200% text; a real pack build (so
+  the coverage MM-306 asked about and the pack's size are unmeasured).
+- **The water section, corrected (MM-318, MM-319).** The owner on the
+  Food screen: why is Water not an accordion like the others? It was a
+  card of buttons the chair invented without opening `MealSection`. Now a
+  section like the meals: "+" opens Add water, a drink opens Edit water,
+  rows swipe away; reviewed against the meals (UX guard pass,
+  `docs/agent-runs/mm318-water-section/`). Rule 9 written. MM-319: water
+  added to a past day said today's time; it says "Added later".
+- **Roadmap:** WS-08 step 10, WS-04 step 7 and WS-09 step 9 built; WS-11
+  step 9 (MM-314) waits on MM-70.
