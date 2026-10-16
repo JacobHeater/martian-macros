@@ -38,7 +38,7 @@ describe('the macronutrient split', () => {
   it('empty macro history does not invent sectors', () => {
     render(<MacroSplitChart intake={intake(0, 0, 0, 500)} />);
     expect(sectors()).toEqual([]);
-    expect(screen.getByText(/Log macro amounts/)).toBeInTheDocument();
+    expect(screen.getByText('Log food with protein, carbs or fat to see the split.')).toBeInTheDocument();
   });
 
   it('zero shares have labels but no fake sectors', () => {

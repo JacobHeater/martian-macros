@@ -278,6 +278,10 @@ limitations.
   chart lives; "Lift histories" is a list group with its own waiting and
   failure. A deleted exercise is "Deleted exercise · last logged Oct 11",
   never its id. MM-355 ("1 logged sessions") fixed on the way.
+- **MM-354, the owner's split donut, done.** The split is always a centred
+  donut, its figures beneath it; with nothing logged, a whole `--track` ring
+  and "Log food with protein, carbs or fat to see the split.", as tall as the
+  figures so the hero does not grow with the first food.
 - Still for the panel: MM-336, MM-342, MM-329, MM-351, MM-352.
   Not built: loading skeletons (the designer recorded the spinner as a known
   deviation, needing its own ticket).

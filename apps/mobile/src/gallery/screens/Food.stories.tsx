@@ -600,6 +600,17 @@ export const FoodSplit = screenStory({
   },
 });
 
+/** MM-354: the split with nothing logged yet: a grey ring, centred, and what it needs. */
+export const FoodSplitEmpty = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Log food with protein, carbs or fat to see the split.',
+  scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Split' }));
+  },
+});
+
 /** MM-321: Food while the pauses are still being read. */
 export const FoodLoading = screenStory({
   covers: ['FoodScreen'],
