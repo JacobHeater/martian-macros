@@ -11,6 +11,7 @@ import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
 import { newInstallScenario } from './newInstallScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
+import { storyToday } from './storyToday';
 import { walkOnboarding } from './walkOnboarding';
 
 /** What a person sees before the app has a plan for them, and when it has to stop and ask. */
@@ -235,4 +236,45 @@ export const ThemeChoiceFails = screenStory({
   unthemed: true,
   stores: failingWrite('preferences', 'saveThemePreference'),
   walk: pressAnywhere('Continue'),
+});
+
+/** MM-321: a birth date picked from the year list that makes the person twelve: the app is for adults. */
+export const DateOfBirthMinor = screenStory({
+  covers: ['BirthDateStep'],
+  shows: /^Martian Macros is for adults 18 and over/,
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 2);
+    const app = within(canvas.ownerDocument.body);
+    await userEvent.click(await app.findByRole('button', { name: /Choose a date/ }));
+    const dialog = within(await app.findByRole('dialog'));
+    await userEvent.click(await dialog.findByRole('button', { name: /^[A-Z][a-z]+ \d{4}/, expanded: false }));
+    const year = storyToday.year - 12;
+    await userEvent.click(await dialog.findByRole('option', { name: String(year) }));
+    // The year moves the calendar; a day of it is then chosen.
+    await userEvent.click(await dialog.findByRole('gridcell', { name: new RegExp(`^[A-Z][a-z]+ 15, ${year}$`) }));
+    await userEvent.click(dialog.getByRole('button', { name: 'OK' }));
+  },
+});
+
+/** MM-321: the training step with a body-fat measurement and creatine both switched on. */
+export const TrainingWithBodyFatAndCreatine = screenStory({
+  covers: ['TrainingStep'],
+  shows: 'When did you start?',
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 5);
+    const app = within(canvas);
+    await userEvent.click(await app.findByRole('switch', { name: /I don’t know/ }));
+    await userEvent.click(await app.findByRole('switch', { name: /I currently take creatine/ }));
+  },
+});
+
+/** MM-321: "I agree" pressed and the agreement not saved: it says so, and asks again. */
+export const TermsAgreeFails = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: 'Could not save your answer, so nothing was recorded. Please try again.',
+  terms: 'unanswered',
+  stores: failingWrite('preferences', 'saveTermsAcceptance'),
+  walk: pressAnywhere('I agree'),
 });

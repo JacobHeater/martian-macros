@@ -1,4 +1,8 @@
 import type { Meta } from '@storybook/react-vite';
+import { PauseScreen } from '../../pause/PauseScreen';
+import { DemoSeed } from '../../fixtures/DemoSeed';
+import { Pause as PauseRecord } from '../../domain/Pause';
+import { pausedScenario } from './pausedScenario';
 import { userEvent, within } from 'storybook/test';
 import { RecoveryCheckIn as RecoveryAnswers } from '../../domain/RecoveryCheckIn';
 import { ExplanationLine } from '../../engine/ExplanationLine';
@@ -18,7 +22,6 @@ import { MonthlyReportScreen } from '../../coach/MonthlyReportScreen';
 import { RecoveryCheckInScreen } from '../../coach/RecoveryCheckInScreen';
 import { showTargetChangeSheet } from '../../coach/showTargetChangeSheet';
 import { TargetsHistoryScreen } from '../../coach/TargetsHistoryScreen';
-import { PauseScreen } from '../../pause/PauseScreen';
 import { checkInDueScenario } from './checkInDueScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
@@ -315,4 +318,37 @@ export const CoachEstimateHeld = screenStory({
   scenario: stalledScenario(900),
   open: onCoach,
   walk: pressOnCoach(/^Your metabolism estimate/),
+});
+
+/** MM-321: paused, Coach says so, and "Manage pause" opens it. */
+export const CoachPausedManage = screenStory({
+  covers: ['CoachScreen', 'PauseScreen'],
+  shows: 'Resume now',
+  scenario: pausedScenario,
+  open: onCoach,
+  walk: pressOnCoach('Manage pause'),
+});
+
+/** MM-321: a pause already extended once: no second extension, and why. */
+export const PauseExtended = screenStory({
+  covers: ['PauseScreen'],
+  shows: /^A pause can be extended once/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.pauses.savePause(new PauseRecord({ from: today.addDays(-9), to: today.addDays(4), reason: 'illness', extended: true }));
+  },
+  open: ({ navigator }) => void navigator.push(() => <PauseScreen />),
+});
+
+/** MM-321: sixty paused days in the last four months: a new pause asks whether maintenance would suit better. */
+export const PauseHeavyUse = screenStory({
+  covers: ['PauseScreen'],
+  shows: /^That makes a lot of paused days lately/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    for (const ends of [10, 40, 70]) {
+      await repos.pauses.savePause(new PauseRecord({ from: today.addDays(-ends - 19), to: today.addDays(-ends), reason: 'travel' }));
+    }
+  },
+  open: ({ navigator }) => void navigator.push(() => <PauseScreen />),
 });
