@@ -35,6 +35,8 @@ import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { NumberEntry } from '../ui/NumberEntry';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
 import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
 import { StepProgress } from '../ui/StepProgress';
@@ -173,6 +175,8 @@ export function ComponentsCatalog() {
         text="Insulin treatment can cause low blood sugar when you eat less."
         action={<MmButton label="I have" kind="secondary" onPress={nothing} />}
       />
+      <ReadFailedNotice title="Could not read your weigh-ins" onRetry={nothing} />
+      <ScreenLoading />
       <NumberEntry title="Today's weigh-in" unit="lb" initial="184.1" hint="First thing in the morning." onSave={async () => undefined} />
       <DayStepper label="Yesterday" onPrevious={nothing} onNext={nothing} onLabelPress={nothing} />
       <MmSurface kind="compact" padded={false}>

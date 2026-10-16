@@ -177,7 +177,7 @@ export const ThemeLoading = screenStory({
 /** MM-321: the look could not be read. */
 export const ThemeFailed = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Could not load your theme preference.',
+  shows: 'Could not load your theme preference',
   stores: failingRead('preferences', 'watchThemePreference'),
 });
 

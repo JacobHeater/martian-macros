@@ -601,15 +601,17 @@ export const FoodSplit = screenStory({
 /** MM-321: Food while the pauses are still being read. */
 export const FoodLoading = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Loading pause history…',
   stores: waitingRead('pauses', 'watchPauses'),
   open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
 });
 
 /** MM-321: Food when the pauses could not be read. */
 export const FoodPausesFailed = screenStory({
   covers: ['FoodScreen'],
-  shows: /could not be loaded/,
+  shows: 'Could not check whether this day is paused',
   stores: failingRead('pauses', 'watchPauses'),
   open: ({ state }) => state.homeTab.put('food'),
 });

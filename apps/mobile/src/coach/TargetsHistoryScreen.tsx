@@ -1,10 +1,12 @@
 import type { DailyTargets } from '../engine/DailyTargets';
+import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { Fmt } from '../format/Fmt';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
+import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
 import { showTargetChangeSheet } from './showTargetChangeSheet';
@@ -25,10 +27,21 @@ export function TargetsHistoryScreen() {
   const overlays = useOverlays();
   const history = useLoaded(state.targetsHistory) ?? [];
   const today = useCell(state.today);
+  const weighedIn = (useLoaded(state.weights)?.length ?? 0) > 0;
+  const setup = useLoaded(state.setup);
+  const allowed =
+    setup === undefined ||
+    CoachingPolicy.derive({ profile: setup.profile, screening: setup.screening, today }).targetsAllowed;
+  // Targets are first worked out from a weigh-in, unless the health check rules them out (MM-340).
+  let none = 'Your first targets are worked out from your first weigh-in.';
+  if (!allowed) none = 'Coach explains why targets are not set for you.';
+  else if (weighedIn) none = 'Your first targets are being worked out.';
   return (
     <Screen title="Target history">
       {history.length === 0 ? (
-        <p className="app-text">No targets yet.</p>
+        <MmListGroup>
+          <MmListRow leadingIcon="history" title="No targets yet" subtitle={none} />
+        </MmListGroup>
       ) : (
         history
           .map((record, i) => (

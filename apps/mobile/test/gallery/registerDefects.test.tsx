@@ -27,19 +27,20 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
-it.skip('MM-333: a profile that cannot be read is said in words, never the raw error', async () => {
+it('MM-333: a profile that cannot be read is said in words, never the raw error', async () => {
   renderApp(repos, today, { change: failingRead('setup', 'watchSetup') });
   expect(await screen.findByText(/Could not open your data/)).toBeInTheDocument();
   expect(screen.queryByText(/watchSetup/)).not.toBeInTheDocument();
 });
 
-it.skip('MM-334: Food loading says nothing of pauses, and a failed pause read keeps the Dashboard', async () => {
+it('MM-334: Food loading says nothing of pauses, and a failed pause read keeps the Dashboard', async () => {
   const waiting = renderApp(repos, today, { change: waitingRead('pauses', 'watchPauses') });
   await openTab('Food');
   expect(screen.queryByText(/pause history/i)).not.toBeInTheDocument();
   waiting.unmount();
   renderApp(repos, today, { change: failingRead('pauses', 'watchPauses') });
-  expect(await screen.findByText(/kcal left/)).toBeInTheDocument();
+  expect(await screen.findAllByText(/^kcal /)).not.toHaveLength(0);
+  expect(screen.getByText('Could not check whether today is paused')).toBeInTheDocument();
 });
 
 it.skip('MM-335: the history under the Dashboard has no headline of its own and no cards inside the disclosure', async () => {
@@ -71,14 +72,22 @@ it.skip('MM-337: an unknown barcode leaves one primary action on the sheet', asy
   expect(sheet.querySelectorAll('.mm-button-primary')).toHaveLength(1);
 });
 
-it.skip('MM-340: Coach with no weigh-in offers a way to log one', async () => {
+it('MM-340: Coach with no weigh-in offers a way to log one', async () => {
   const empty = new InMemoryRepositories();
   await empty.preferences.saveThemePreference('martian');
   await empty.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   renderApp(empty, today);
   await openTab('Coach');
-  await screen.findByText(/weigh-in/i);
+  await screen.findByText('Log a weigh-in to get started.');
   expect(screen.getByRole('button', { name: /weigh/i })).toBeInTheDocument();
+});
+
+it('MM-340: weighed in, and a record the coach needs unread: Coach says so, never a spinner for good', async () => {
+  renderApp(repos, today, { change: failingRead('pauses', 'watchPauses') });
+  await openTab('Coach');
+  expect(await screen.findByText('Could not read what your coach works from')).toBeInTheDocument();
+  expect(screen.getByRole('alert')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
 });
 
 it.skip('MM-342: the last 7 days hold figures in their value column, not sentences', async () => {

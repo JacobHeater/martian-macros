@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/react-vite';
 import { PauseScreen } from '../../pause/PauseScreen';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { Pause as PauseRecord } from '../../domain/Pause';
+import { ScreeningAnswers } from '../../domain/ScreeningAnswers';
 import { pausedScenario } from './pausedScenario';
 import { userEvent, within } from 'storybook/test';
 import { RecoveryCheckIn as RecoveryAnswers } from '../../domain/RecoveryCheckIn';
@@ -9,6 +10,8 @@ import { ExplanationLine } from '../../engine/ExplanationLine';
 import { TargetsExplanation } from '../../engine/TargetsExplanation';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { creatineScenario } from './creatineScenario';
+import { failingRead } from './failingRead';
+import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { recompScenario } from './recompScenario';
@@ -115,6 +118,35 @@ export const CoachNoWeighIn = screenStory({
   open: onCoach,
 });
 
+/** MM-340: weighed in, and the pauses could not be read: the coach says so, never a spinner for good. */
+export const CoachRecordsFailed = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Could not read what your coach works from',
+  stores: failingRead('pauses', 'watchPauses'),
+  open: onCoach,
+});
+
+/** MM-340: the weigh-ins still being read: Coach waits on its spinner. */
+export const CoachLoading = screenStory({
+  covers: ['CoachScreen'],
+  stores: waitingRead('weights', 'watchWeights'),
+  open: onCoach,
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
+});
+
+/** MM-340: the health check rules targets out: the empty history says where to read why. */
+export const TargetHistoryNotSet = screenStory({
+  covers: ['TargetsHistoryScreen'],
+  shows: 'Coach explains why targets are not set for you.',
+  scenario: async (repos, today) => {
+    const setup = typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today });
+    await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, bariatricSurgery: true }) }));
+  },
+  open: ({ navigator }) => void navigator.push(() => <TargetsHistoryScreen />),
+});
+
 /** MM-321: two health-check answers that bring the coach's cautions, above everything. */
 export const CoachCautions = screenStory({
   covers: ['CoachScreen'],
@@ -161,7 +193,7 @@ export const LastChangeHistory = screenStory({
 /** MM-321: the target history before there are any targets (set up, not yet weighed). */
 export const TargetHistoryEmpty = screenStory({
   covers: ['TargetsHistoryScreen'],
-  shows: 'No targets yet.',
+  shows: 'Your first targets are worked out from your first weigh-in.',
   scenario: async (repos, today) => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
   },
