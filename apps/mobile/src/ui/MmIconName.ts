@@ -72,4 +72,6 @@ export type MmIconName =
   | 'dayComplete'
   | 'dayPartial'
   // Water and micronutrients (MM-305).
-  | 'water';
+  | 'water'
+  // The day's protein, a shaker (the owner, MM-335).
+  | 'protein';

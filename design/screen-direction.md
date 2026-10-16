@@ -36,7 +36,9 @@ in here.
    (`MmIcon`, Material Outlined), 20 dp in rows, 24 dp in headers, always
    with a label. The set grows by meaning names (`MmIconName`); no custom
    glyph until the app mark exists (MM-109), and where the set has no glyph
-   for a meaning (a muscle group) the mark is text until then.
+   for a meaning (a muscle group) the mark is text until then. One exception,
+   the owner's (2026-10-16, MM-335): protein is a shaker bottle, drawn for the
+   app in the Outlined set's 2-unit line (`ShakerBottleOutlined`).
 3. **Lists with shape.** Entries group by week (this week, last week, then
    months); a rhythm strip (`MmRhythmStrip`) shows the last seven days as
    dots, full, half or empty, today ringed, every dot named with its day

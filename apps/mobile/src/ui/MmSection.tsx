@@ -25,6 +25,8 @@ interface MmSectionProps {
   maintainState?: boolean;
   /** The header opens something else (a screen) instead of folding. */
   onPress?: (() => void) | undefined;
+  /** With `onPress`: where it goes, said after the title and summary ("Opens Food", MM-335). */
+  opens?: string;
   children?: ReactNode;
 }
 
@@ -44,6 +46,7 @@ export function MmSection({
   initiallyExpanded = true,
   maintainState = false,
   onPress,
+  opens,
   children,
 }: MmSectionProps) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -55,12 +58,23 @@ export function MmSection({
   };
   const id = useId();
   const open = !collapsible || expanded;
+  // A header that opens something is a button inside the heading, so the heading stays one (MM-335).
+  const Title = onPress === undefined ? 'h2' : 'span';
   const words = (
     <span className="mm-section-words">
-      <h2 className="mm-section-title" id={`${id}-title`}>
+      <Title className="mm-section-title" id={`${id}-title`}>
         {title}
-      </h2>
-      {summary === undefined ? null : <span className="mm-section-summary">{summary}</span>}
+      </Title>
+      {summary === undefined ? null : (
+        <span className="mm-section-summary" id={`${id}-summary`}>
+          {summary}
+        </span>
+      )}
+      {onPress === undefined || opens === undefined ? null : (
+        <span className="mm-visually-hidden" id={`${id}-opens`}>
+          {opens}
+        </span>
+      )}
     </span>
   );
   const head = (
@@ -74,14 +88,24 @@ export function MmSection({
   let header: ReactNode;
   if (onPress !== undefined) {
     header = (
-      <MmPressable label={title} onPress={onPress}>
-        <span className="mm-section-head-body">
-          {head}
-          <span className="mm-section-opens" aria-hidden="true">
-            <MmIcon name="chevronRight" size={20} />
+      <h2 className="mm-section-heading">
+        <MmPressable
+          label={title}
+          describedBy={
+            [summary === undefined ? undefined : `${id}-summary`, opens === undefined ? undefined : `${id}-opens`]
+              .filter((part) => part !== undefined)
+              .join(' ') || undefined
+          }
+          onPress={onPress}
+        >
+          <span className="mm-section-head-body">
+            {head}
+            <span className="mm-section-opens" aria-hidden="true">
+              <MmIcon name="chevronRight" size={20} />
+            </span>
           </span>
-        </span>
-      </MmPressable>
+        </MmPressable>
+      </h2>
     );
   } else if (collapsible) {
     header = (

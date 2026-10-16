@@ -266,14 +266,20 @@ limitations.
   again. `storyPackHost` takes `listed` and `installed`. The panel's
   follow-ups are ticketed: MM-351 (a lookup's result is not announced), MM-352
   (the food database's rows have no icons).
+- **MM-335, the Dashboard history, done.** "Days shown" then sections, each
+  summary saying what the days add. Today, until marked complete, is an open
+  dot off the line, left out of the averages and of the axis scale. A header
+  that opens a tab is a button inside its heading, described by its summary
+  and "Opens …" (`MmSection opens`). The owner chose a protein icon: a shaker
+  bottle, drawn for the app (`ShakerBottleOutlined`, the one custom glyph).
+  The recovery line outside its section was its own bug, MM-353, fixed.
 - **MM-354, the owner's split donut, done.** The split is always a centred
   donut, its figures beneath it; with nothing logged, a whole `--track` ring
   and "Log food with protein, carbs or fat to see the split.", as tall as the
   figures so the hero does not grow with the first food.
-- Still for the panel: MM-335 (Dashboard history; `DashboardMetrics` still has
-  the old "Reopen the app to retry" notice), MM-336, MM-342, MM-344, MM-348,
-  MM-329, MM-351, MM-352. Not built: loading skeletons (the designer recorded
-  the spinner as a known deviation, needing its own ticket).
+- Still for the panel: MM-336, MM-342, MM-344, MM-348, MM-329, MM-351, MM-352.
+  Not built: loading skeletons (the designer recorded the spinner as a known
+  deviation, needing its own ticket).
 
 ## Session 30: 2026-10-15, Claude (the Storybook register: Food and Dashboard)
 

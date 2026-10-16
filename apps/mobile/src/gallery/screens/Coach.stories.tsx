@@ -132,6 +132,8 @@ export const CoachLoading = screenStory({
   stores: waitingRead('weights', 'watchWeights'),
   open: onCoach,
   walk: async (canvas) => {
+    // The Dashboard waits on the weigh-ins too: Coach's own spinner, once Coach is the screen.
+    await within(canvas).findByRole('heading', { level: 1, name: 'Coach' });
     await within(canvas).findByRole('progressbar', { name: 'Loading' });
   },
 });

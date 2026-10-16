@@ -7,18 +7,26 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { confidenceLabel } from '../format/confidenceLabel';
 import { confidenceNextStepText } from '../format/confidenceNextStepText';
 import { Fmt } from '../format/Fmt';
+import { waistAmount } from '../format/waistAmount';
 import type { HomeDestination } from '../state/HomeDestination';
 import { Loadable } from '../state/Loadable';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
-import { InfoCard } from '../ui/InfoCard';
-import { MetricFacts } from '../ui/MetricFacts';
-import { MmButton } from '../ui/MmButton';
+import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
+import { MmSection } from '../ui/MmSection';
 import { MmSegmented } from '../ui/MmSegmented';
-import { Notice } from '../ui/Notice';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
+import { StatRow } from '../ui/StatRow';
 import { DashboardHistory } from './DashboardHistory';
 
-/** The history under the Dashboard: what was recorded over 7 or 30 days, as facts and charts. */
+/**
+ * The history under the Dashboard: what was recorded over 7 or 30 days, as
+ * sections of the Dashboard's hierarchy, each a summary line and its chart
+ * (MM-335). Today, still being logged, is drawn apart and kept out of the
+ * averages.
+ */
 export function DashboardMetrics() {
   const { state } = useApp();
   const setup = Loadable.valueOf(useCell(state.setup));
@@ -33,14 +41,10 @@ export function DashboardMetrics() {
   const snapshot = useCell(state.coach);
   if (setup === undefined) return null;
   if ([intake, weights, waist, history, pauses, recovery].some((source) => Loadable.hasFailed(source))) {
-    return <Notice kind="caution" text="Dashboard history could not be loaded. Reopen the app to retry." />;
+    return <ReadFailedNotice title="Could not read your history" onRetry={() => state.retryHistory()} />;
   }
   if (!intake.ready || !weights.ready || !waist.ready || !history.ready || !pauses.ready || !recovery.ready) {
-    return (
-      <InfoCard title="Your history">
-        <p className="app-text">Loading your recorded metrics…</p>
-      </InfoCard>
-    );
+    return <ScreenLoading />;
   }
   const allowed =
     snapshot?.policy.targetsAllowed ??
@@ -62,160 +66,171 @@ export function DashboardMetrics() {
   for (const record of history.value) {
     if (record.tdeeStatus === 'updated') estimates.set(record.effectiveFrom, record.tdeeKcal);
   }
-  const detail = (label: string, tab: HomeDestination) => (
-    <MmButton label={label} kind="text" onPress={() => state.homeTab.put(tab)} />
-  );
+  const open = (tab: HomeDestination) => () => state.homeTab.put(tab);
   const chart = (series: readonly HistorySeries[], unit: string) => (
     <HistoryChart series={series} today={today} days={days} unit={unit} />
   );
-  const shownRecovery = recovery.value;
-  const firstShown = shownRecovery[shownRecovery.length > 8 ? shownRecovery.length - 8 : 0];
-  const lastShown = shownRecovery[shownRecovery.length - 1];
+  const trend = (snapshot?.trend ?? []).filter((point) => !point.date.isBefore(facts.start) && !point.date.isAfter(today));
+  const firstTrend = trend[0];
+  const lastTrend = trend[trend.length - 1];
+  const weighIns = weights.value.filter((w) => !w.date.isBefore(facts.start) && !w.date.isAfter(today)).length;
+  const firstWaist = waists[0];
+  const coached = snapshot !== undefined && allowed;
+  const sofar = facts.unfinished === undefined ? undefined : facts.calories.get(facts.unfinished);
+  const sofarProtein = facts.unfinished === undefined ? undefined : facts.protein.get(facts.unfinished);
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const signed = (text: string, value: number) => (text.startsWith('0 ') ? text : `${value < 0 ? '−' : '+'}${text}`);
+
+  // A summary says what the chosen days add, never a figure the rows above already give (MM-335).
+  let intakeSummary = 'Nothing logged in these days yet';
+  if (facts.meanCalories !== undefined) {
+    intakeSummary = `${Fmt.kcal(facts.meanCalories)} a day on average, over ${plural(facts.finishedDays, 'day', 'days')}`;
+  } else if (sofar !== undefined) intakeSummary = `Today so far: ${Fmt.kcal(sofar)} · counts once marked complete`;
+  let proteinSummary = 'No protein logged in these days yet';
+  if (facts.meanProtein !== undefined) proteinSummary = `${Fmt.grams(facts.meanProtein)} a day on average`;
+  else if (sofarProtein !== undefined) proteinSummary = `Today so far: ${Fmt.grams(sofarProtein)}`;
+  let weightSummary = 'No weigh-ins in these days yet';
+  if (firstTrend !== undefined && lastTrend !== undefined && trend.length > 1 && weighIns > 1) {
+    weightSummary = `${fmt.weightDelta(lastTrend.levelKg - firstTrend.levelKg)} since ${Fmt.shortDay(firstTrend.date)}`;
+  } else if (weighIns > 0) weightSummary = 'One weigh-in so far: the trend needs two';
+  let waistSummary = 'Not measured in these days';
+  if (firstWaist !== undefined && latestWaist !== undefined && waists.length > 1) {
+    const change = latestWaist.waistCm - firstWaist.waistCm;
+    waistSummary = `${signed(waistAmount(change, fmt), change)} since ${Fmt.shortDay(firstWaist.date)}`;
+  } else if (latestWaist !== undefined) waistSummary = 'Measured once in these days';
+  const loggingSummary =
+    facts.activeDays === 1
+      ? facts.loggedDays === 1
+        ? 'Food logged today'
+        : 'No food logged yet today'
+      : `${facts.loggedDays} of ${facts.activeDays} days with food logged`;
+
+  // Sections of the Dashboard's own hierarchy (MM-335): no headline of their own, no cards; each opens its home.
   return (
     <>
-      {facts.calories.size === 0 ? <p className="app-text">Log food to populate your intake history.</p> : null}
-      <div className="dashboard-metrics-head">
-        <h2 className="app-headline">Your metrics</h2>
-        <MmSegmented<number>
-          name="History range"
-          compact
-          segments={[
-            { value: 7, label: '7 days' },
-            { value: 30, label: '30 days' },
-          ]}
-          selected={days}
-          onChange={(chosen) => {
-            if (chosen !== undefined) state.dashboardRange.put(chosen);
-          }}
-        />
-      </div>
-      <InfoCard title="Nutrition history" trailing={detail('Food details', 'food')}>
-        <MetricFacts
-          facts={[
-            ['Average logged intake', facts.meanCalories === undefined ? 'Not recorded' : Fmt.kcal(facts.meanCalories)],
-            ['Days with intake records', `${facts.calories.size} / ${days}`],
-          ]}
-        />
-        {chart(
-          [
-            { label: 'Logged intake', values: facts.calories, kind: 'energy' },
-            { label: 'Target in force', values: facts.calorieTargets, kind: 'target', dashed: true },
-          ],
-          'kcal',
-        )}
-        <p className="app-text">
-          Missing logs are gaps, not zero intake. Averages use recorded days, including today’s unfinished log.
-        </p>
-        {pauses.value.some((p) => !p.to.isBefore(facts.start) && !p.from.isAfter(today)) ? (
-          <p className="app-text">
-            Paused days remain visible as observations; targets and coverage counts exclude them.
-          </p>
-        ) : null}
-      </InfoCard>
-      <InfoCard title="Protein history">
-        <MetricFacts
-          facts={[
-            ['Average logged protein', facts.meanProtein === undefined ? 'Not recorded' : Fmt.grams(facts.meanProtein)],
-            ['Recorded days used', `${facts.protein.size}`],
-          ]}
-        />
-        {chart(
-          [
-            { label: 'Logged protein', values: facts.protein, kind: 'protein' },
-            { label: 'Minimum / target', values: facts.proteinTargets, kind: 'target', dashed: true },
-          ],
-          'g',
-        )}
-        {facts.protein.size === 0 ? (
-          <p className="app-text">Log protein-containing food to populate this history.</p>
-        ) : null}
-      </InfoCard>
-      <InfoCard title="Weight trend & uncertainty" trailing={detail('Progress', 'progress')}>
-        <TrendChart
-          trend={snapshot?.trend ?? []}
-          weights={weights.value}
-          today={today}
-          rangeDays={days}
-          fmt={fmt}
-          label={`Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`}
-        />
-        <p className="app-text">
-          {fmt.weightUnit} · Dots are measurements; the line is the estimated trend. The band shows uncertainty.
-        </p>
-      </InfoCard>
-      <InfoCard title="Waist history">
-        <MetricFacts
-          facts={[
-            ['Latest in range', latestWaist === undefined ? 'Not recorded' : fmt.length(latestWaist.waistCm)],
-            ['Measurements', `${waists.length}`],
-          ]}
-        />
-        {chart(
-          [
-            {
-              label: 'Recorded waist',
-              values: new Map(waists.map((w) => [w.date, fmt.lengthFromCm(w.waistCm)])),
-              kind: 'measurement',
-              connectRecordedPoints: true,
-            },
-          ],
-          fmt.lengthUnit,
-        )}
-        {waists.length === 0 ? <p className="app-text">Add waist measurements in Progress to see history.</p> : null}
-      </InfoCard>
-      <InfoCard title="Logging coverage">
-        <MetricFacts
-          facts={[
-            ['Food days recorded', `${facts.loggedDays} / ${facts.activeDays}`],
-            ['Days marked complete', `${facts.completeDays} / ${facts.activeDays}`],
-            ['Weigh-in days', `${facts.weighInDays} / ${facts.activeDays}`],
-            ['Window', `${days} days`],
-          ]}
-        />
-        <p className="app-text">
-          Counts describe available records, not a score. Paused days and days before onboarding are excluded.
-        </p>
-      </InfoCard>
-      <InfoCard title="Coach & expenditure" trailing={detail('Coach details', 'coach')}>
-        {snapshot === undefined || !allowed ? (
-          <p className="app-text">No coaching estimate available.</p>
-        ) : (
-          <>
-            <MetricFacts
-              facts={[
-                ['Coach confidence', confidenceLabel(snapshot.confidence.level)],
-                [
-                  snapshot.tdee.status === 'updated' ? 'Measured expenditure range' : 'Starting / held estimate range',
-                  `${Fmt.whole(snapshot.tdee.kcal - snapshot.tdee.sigmaKcal)}–` +
-                    `${Fmt.whole(snapshot.tdee.kcal + snapshot.tdee.sigmaKcal)} kcal`,
-                ],
-                ['Food log evidence', confidenceLabel(snapshot.confidence.foodLog)],
-                ['Weight evidence', confidenceLabel(snapshot.confidence.weighIns)],
+      <MmListGroup>
+        <MmListRow
+          leadingIcon="calendar"
+          title="Days shown"
+          trailingAction={
+            <MmSegmented<number>
+              name="History range"
+              compact
+              segments={[
+                { value: 7, label: '7 days' },
+                { value: 30, label: '30 days' },
               ]}
+              selected={days}
+              onChange={(chosen) => {
+                if (chosen !== undefined) state.dashboardRange.put(chosen);
+              }}
             />
-            <p className="app-text">{confidenceNextStepText(snapshot.confidence)}</p>
+          }
+        />
+      </MmListGroup>
+      <MmSection icon="food" title="Intake" summary={intakeSummary} onPress={open('food')} opens="Opens Food">
+        {/* Nothing finished: the summary says so, with no near-empty grid under it. */}
+        {facts.finishedDays === 0 ? null : (
+          <>
             {chart(
               [
+                { label: 'Logged intake', values: facts.calories, kind: 'energy', unfinished: facts.unfinished },
+                { label: 'Target in force', values: facts.calorieTargets, kind: 'target', dashed: true },
+              ],
+              'kcal',
+            )}
+            <p className="app-caption">
+              Missing days are gaps, not zero intake. Today counts in the average once it is marked complete.
+              {pauses.value.some((p) => !p.to.isBefore(facts.start) && !p.from.isAfter(today))
+                ? ' Paused days are shown; targets and coverage leave them out.'
+                : ''}
+            </p>
+          </>
+        )}
+      </MmSection>
+      <MmSection icon="protein" title="Protein" summary={proteinSummary} onPress={open('food')} opens="Opens Food">
+        {facts.finishedDays === 0
+          ? null
+          : chart(
+              [
+                { label: 'Logged protein', values: facts.protein, kind: 'protein', unfinished: facts.unfinished },
+                { label: 'Minimum / target', values: facts.proteinTargets, kind: 'target', dashed: true },
+              ],
+              'g',
+            )}
+      </MmSection>
+      <MmSection icon="scale" title="Weight trend" summary={weightSummary} onPress={open('progress')} opens="Opens Progress">
+        {weighIns < 2 ? null : (
+          <>
+            <TrendChart
+              trend={snapshot?.trend ?? []}
+              weights={weights.value}
+              today={today}
+              rangeDays={days}
+              fmt={fmt}
+              label={`Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`}
+            />
+            <p className="app-caption">Dots are weigh-ins; the line is the trend. The band shows its uncertainty.</p>
+          </>
+        )}
+      </MmSection>
+      <MmSection icon="tape" title="Waist" summary={waistSummary} onPress={open('progress')} opens="Opens Progress">
+        {waists.length < 2
+          ? null
+          : chart(
+              [
                 {
-                  label: 'Measured estimates at check-ins',
-                  values: estimates,
-                  kind: 'estimate',
+                  label: 'Recorded waist',
+                  values: new Map(waists.map((w) => [w.date, fmt.lengthFromCm(w.waistCm)])),
+                  kind: 'measurement',
                   connectRecordedPoints: true,
                 },
               ],
-              'kcal/day',
+              fmt.lengthUnit,
             )}
-            <p className="app-text">Check-in estimates are not daily expenditure measurements.</p>
+      </MmSection>
+      <MmSection icon="checklist" title="Logging" summary={loggingSummary}>
+        <StatRow label="Days marked complete" value={`${facts.completeDays} of ${facts.activeDays}`} />
+        <StatRow label="Days weighed in" value={`${facts.weighInDays} of ${facts.activeDays}`} />
+        <p className="app-caption">What was recorded, not a score. Paused days and days before you started are left out.</p>
+      </MmSection>
+      <MmSection
+        icon="coach"
+        title="Coach and expenditure"
+        summary={coached ? `Confidence: ${confidenceLabel(snapshot.confidence.level)}` : 'No estimate yet'}
+        onPress={open('coach')}
+        opens="Opens Coach"
+      >
+        {coached ? (
+          <>
+            <StatRow
+              label={snapshot.tdee.status === 'updated' ? 'Measured expenditure' : 'Starting or held estimate'}
+              value={
+                `${Fmt.whole(snapshot.tdee.kcal - snapshot.tdee.sigmaKcal)}–` +
+                `${Fmt.whole(snapshot.tdee.kcal + snapshot.tdee.sigmaKcal)} kcal`
+              }
+            />
+            <StatRow label="Food log evidence" value={confidenceLabel(snapshot.confidence.foodLog)} />
+            <StatRow label="Weight evidence" value={confidenceLabel(snapshot.confidence.weighIns)} />
+            <p className="app-caption">{confidenceNextStepText(snapshot.confidence)}</p>
+            {estimates.size === 0
+              ? null
+              : chart(
+                  [
+                    {
+                      label: 'Measured estimates at check-ins',
+                      values: estimates,
+                      kind: 'estimate',
+                      connectRecordedPoints: true,
+                    },
+                  ],
+                  'kcal/day',
+                )}
           </>
-        )}
-      </InfoCard>
+        ) : null}
+      </MmSection>
+      {/* Its own section says what its answers are; nothing of it sits outside it, folded or not (MM-353). */}
       <RecoveryCard />
-      {firstShown === undefined || lastShown === undefined ? null : (
-        <p className="app-text dashboard-recovery-note">
-          Recovery observations: {Fmt.shortDay(firstShown.date)}–{Fmt.shortDay(lastShown.date)}. Each line is a separate
-          answer, not a combined score.
-        </p>
-      )}
     </>
   );
 }
