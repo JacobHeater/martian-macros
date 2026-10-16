@@ -742,6 +742,12 @@
 
 /* ---- Progress ---- */
 
+/* A screen waiting on its records (MM-334): the spinner where the content will be. */
+.mm-screen-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-32) 0;
+}
 .mm-spinner {
   display: inline-block;
   width: 36px;

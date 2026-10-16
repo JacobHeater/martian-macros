@@ -3,9 +3,8 @@ import { OnboardingScreen } from '../onboarding/OnboardingScreen';
 import { Loadable } from '../state/Loadable';
 import { TermsGuardScreen } from '../terms/TermsGuardScreen';
 import { termsOfUse } from '../terms/termsOfUse';
-import { MmButton } from '../ui/MmButton';
 import { MmSpinner } from '../ui/MmSpinner';
-import { Notice } from '../ui/Notice';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { AdultsOnlyScreen } from './AdultsOnlyScreen';
 import { HealthRecheckScreen } from './HealthRecheckScreen';
 import { HomeShell } from './HomeShell';
@@ -13,8 +12,6 @@ import { ThemeChooserScreen } from './ThemeChooserScreen';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
 import { WelcomeBackScreen } from './WelcomeBackScreen';
-
-const describe = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /** Asks for the terms first, then routes to onboarding until setup exists, then to the main shell. */
 export function AppRoot() {
@@ -30,8 +27,11 @@ export function AppRoot() {
   if (!setup.ready) {
     return Loadable.hasFailed(setup) ? (
       <div className="app-centered app-centered-page">
-        <p className="app-text">Could not open your data.</p>
-        <p className="app-text">{describe(setup.error)}</p>
+        <ReadFailedNotice
+          title="Could not open your data"
+          otherwise="If this keeps happening, close the app and open it again."
+          onRetry={() => state.setup.retry()}
+        />
       </div>
     ) : (
       <div className="app-centered app-centered-page app-centered-middle">
@@ -42,9 +42,7 @@ export function AppRoot() {
   if (!theme.ready) {
     return Loadable.hasFailed(theme) ? (
       <div className="app-centered app-centered-page">
-        <Notice kind="caution" text="Could not load your theme preference." />
-        <div className="app-gap" />
-        <MmButton label="Try again" onPress={() => state.themePreference.retry()} />
+        <ReadFailedNotice title="Could not load your theme preference" onRetry={() => state.themePreference.retry()} />
       </div>
     ) : (
       <div className="app-centered app-centered-page app-centered-middle">
@@ -57,9 +55,10 @@ export function AppRoot() {
   if (!terms.ready) {
     return Loadable.hasFailed(terms) ? (
       <div className="app-centered app-centered-page">
-        <Notice kind="caution" text="Could not check whether you have agreed to the terms of use." />
-        <div className="app-gap" />
-        <MmButton label="Try again" onPress={() => state.termsAcceptance.retry()} />
+        <ReadFailedNotice
+          title="Could not check whether you have agreed to the terms of use"
+          onRetry={() => state.termsAcceptance.retry()}
+        />
       </div>
     ) : (
       <div className="app-centered app-centered-page app-centered-middle">
