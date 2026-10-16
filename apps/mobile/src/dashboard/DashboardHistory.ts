@@ -23,6 +23,8 @@ export class DashboardHistory {
   readonly loggedDays: number;
   readonly completeDays: number;
   readonly weighInDays: number;
+  /** Today, while its log is not marked complete: drawn apart and left out of the averages (MM-335). */
+  readonly unfinished: CalendarDate | undefined;
 
   constructor({
     today,
@@ -77,6 +79,8 @@ export class DashboardHistory {
       if (day.completeness === 'complete') completeDays++;
     }
 
+    const todays = intake.find((day) => day.date === today);
+    this.unfinished = todays?.completeness === 'complete' || !this.calories.has(today) ? undefined : today;
     this.activeDays = activeDays;
     this.loggedDays = loggedDays;
     this.completeDays = completeDays;
@@ -87,11 +91,21 @@ export class DashboardHistory {
     ).size;
   }
 
+  /** The days whose logs count: every recorded day but an unfinished today. */
+  private finished(values: ReadonlyMap<CalendarDate, number>): number[] {
+    return [...values].filter(([date]) => date !== this.unfinished).map(([, value]) => value);
+  }
+
+  /** How many recorded days the averages use. */
+  get finishedDays(): number {
+    return this.finished(this.calories).length;
+  }
+
   get meanCalories(): number | undefined {
-    return mean(this.calories.values());
+    return mean(this.finished(this.calories));
   }
 
   get meanProtein(): number | undefined {
-    return mean(this.protein.values());
+    return mean(this.finished(this.protein));
   }
 }

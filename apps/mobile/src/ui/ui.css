@@ -1725,6 +1725,11 @@
   flex-direction: column;
   min-width: 0;
 }
+/* The heading round a header that opens something: no type of its own (MM-335). */
+.mm-section-heading {
+  margin: 0;
+  font: inherit;
+}
 .mm-section-title {
   margin: 0;
   font: var(--type-heading);

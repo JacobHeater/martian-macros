@@ -66,7 +66,7 @@ const facts = ({
   });
 
 it('missing days are gaps; averages only include recorded days', () => {
-  const result = facts({ intake: [food(0, 1000), food(2, 2000)] });
+  const result = facts({ intake: [food(0, 1000, { complete: true }), food(2, 2000)] });
   expect(result.calories.size).toBe(2);
   expect(result.calories.has(today.addDays(-1))).toBe(false);
   expect(result.meanCalories).toBe(1500);
@@ -128,5 +128,17 @@ it('coverage does not count days before onboarding', () => {
   const result = facts({ onboardedOn: today.addDays(-1), intake: [food(2, 2000), food(1, 2100), food(0, 2200)] });
   expect(result.activeDays).toBe(2);
   expect(result.loggedDays).toBe(2);
-  expect(result.meanCalories).toBe(2150);
+  // MM-335: today, not marked complete, is left out of the average.
+  expect(result.meanCalories).toBe(2100);
+});
+
+it('MM-335: today still being logged is drawn apart and kept out of the averages until it is complete', () => {
+  const unfinished = facts({ intake: [food(0, 600), food(1, 2000)] });
+  expect(unfinished.unfinished).toBe(today);
+  expect(unfinished.calories.get(today)).toBe(600);
+  expect(unfinished.meanCalories).toBe(2000);
+  expect(unfinished.finishedDays).toBe(1);
+  const complete = facts({ intake: [food(0, 600, { complete: true }), food(1, 2000)] });
+  expect(complete.unfinished).toBeUndefined();
+  expect(complete.meanCalories).toBe(1300);
 });
