@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-15, by Claude, Session 30.
+Last updated: 2026-10-16, by Claude, Session 30.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -260,8 +260,11 @@ limitations.
 - Looking at the new stories found nine defects: MM-330 to MM-332 fixed with
   tests; MM-333 to MM-338 are design defects with skipped tests, for Storybook
   and the panel before they are built.
-- **Next:** batch 2, Coach (35 places) and the monthly report; then Progress
-  and Train, Settings, packs and the shell, the rest.
+- Batch 2, Coach, is done (2026-10-16): 21 stories, register 144 to 109;
+  MM-339 and MM-341 fixed with tests, MM-340 and MM-342 ticketed for the panel.
+- **Next:** batch 3, Progress (18) and Train (20); then Settings, packs and the
+  shell, the rest. **The owner will do all physical-device testing at the end**
+  (2026-10-16): keep adding to the phone checklist below, do not ask for it.
 - **Phone checklist, to hand the owner when it is long enough** (they agreed to
   run one session): a real barcode on packaging (MM-43); a pack download over
   mobile data (MM-56); the pause and reminder screens on the device (MM-148,

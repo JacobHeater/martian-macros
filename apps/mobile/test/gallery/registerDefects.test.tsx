@@ -11,6 +11,7 @@ import { openAddFood, press, typeIn } from '../support/addFood';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
+import { targetsFrom } from '../support/targetsFrom';
 
 /**
  * Design defects found drawing the Food and Dashboard states no story drew (MM-321). Each is skipped
@@ -68,4 +69,29 @@ it.skip('MM-337: an unknown barcode leaves one primary action on the sheet', asy
   await press(sheet, 'Look up');
   await within(sheet).findByRole('button', { name: 'Read the label' });
   expect(sheet.querySelectorAll('.mm-button-primary')).toHaveLength(1);
+});
+
+it.skip('MM-340: Coach with no weigh-in offers a way to log one', async () => {
+  const empty = new InMemoryRepositories();
+  await empty.preferences.saveThemePreference('martian');
+  await empty.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
+  renderApp(empty, today);
+  await openTab('Coach');
+  await screen.findByText(/weigh-in/i);
+  expect(screen.getByRole('button', { name: /weigh/i })).toBeInTheDocument();
+});
+
+it.skip('MM-342: the last 7 days hold figures in their value column, not sentences', async () => {
+  await repos.targets.saveTargets(targetsFrom(today.addDays(-20), { kcal: 2100 }));
+  for (let i = 1; i <= 7; i++) {
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today.addDays(-i), meal: 'dinner', name: 'Day', kcal: 2600, proteinG: 150, carbsG: 250, fatG: 80, source: 'weighed' }),
+    );
+    await repos.dayMarks.setCompleteness(today.addDays(-i), 'complete');
+  }
+  renderApp(repos, today);
+  await openTab('Coach');
+  const label = await screen.findByText('Average intake');
+  const value = label.parentElement?.lastElementChild?.textContent ?? '';
+  expect(value.length).toBeLessThanOrEqual(16);
 });
