@@ -28,6 +28,7 @@ export function WeighInRow({ fmt, lastTrendKg, onSaveWeight }: WeighInRowProps) 
           unit={fmt.weightUnit}
           initial={undefined}
           hint="First thing in the morning, after the bathroom."
+          saves="weigh-in"
           onSave={(value) => onSaveWeight(fmt.weightToKg(value))}
         />
       }

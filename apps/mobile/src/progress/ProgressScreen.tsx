@@ -2,12 +2,9 @@ import { useState } from 'react';
 import { TrendChart } from '../charts/TrendChart';
 import { TrendStats } from '../charts/TrendStats';
 import { CalendarDate } from '../domain/CalendarDate';
-import { WaistObservation } from '../domain/WaistObservation';
-import { middleReading } from '../engine/middleReading';
 import { Fmt } from '../format/Fmt';
 import { importedWeighInText } from '../format/importedWeighInText';
 import { waistSummary } from '../format/waistSummary';
-import { FormatError } from '../lang/FormatError';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -20,6 +17,7 @@ import { RecompSignalCard } from './RecompSignalCard';
 import { StrengthSection } from './StrengthSection';
 import { WaistEntryCard } from './WaistEntryCard';
 import { onboardingCreatine } from './onboardingCreatine';
+import { saveWaistReadings } from './saveWaistReadings';
 import { WeightEventsCard } from './WeightEventsCard';
 import './progress.css';
 
@@ -51,14 +49,12 @@ export function ProgressScreen() {
     : [...imported].reverse().find((weighIn) => CalendarDate.fromDate(weighIn.day) === today);
   const last = trend[trend.length - 1];
 
-  const saveWaist = (readings: readonly number[]) => {
-    const cm = readings.map((value) => fmt.lengthToCm(value));
-    // Refused here, so it is refused whatever stores it.
-    if (cm.some((reading) => reading < WaistObservation.minCm || reading > WaistObservation.maxCm)) {
-      return Promise.reject(new FormatError('Not a waist measurement.'));
-    }
-    return services.waist.saveWaist(today, middleReading(cm), { readings: cm });
-  };
+  const saveWaist = (readings: readonly number[]) =>
+    saveWaistReadings(
+      services.waist,
+      today,
+      readings.map((value) => fmt.lengthToCm(value)),
+    );
 
   return (
     <>
