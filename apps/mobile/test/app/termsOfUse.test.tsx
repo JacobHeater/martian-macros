@@ -184,7 +184,7 @@ describe('when storage goes wrong', () => {
       ...services,
       preferences: overriding(services.preferences, { watchTermsAcceptance: () => failing() }),
     }));
-    expect(await screen.findByText('Could not check whether you have agreed to the terms of use.')).toBeInTheDocument();
+    expect(await screen.findByText('Could not check whether you have agreed to the terms of use')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
     expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
   });

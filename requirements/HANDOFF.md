@@ -247,6 +247,23 @@ history (MM-141).
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
+## Session 31: 2026-10-16, Claude (the register's design defects through the panel)
+
+- The owner: a load is said to a tenth, as a scale says a weight (MM-350, PR
+  #169). They want the Storybook path continued: the design defects found by
+  the register, and any backfill still needed.
+- **Batch A, waiting, failed and empty states (MM-333, MM-334, MM-340), done.**
+  Drawn, reviewed by the product designer and the UX guard, their changes
+  built. One pattern for a failed read, `ReadFailedNotice` (screen-direction's
+  Error state, now written there); waiting is `ScreenLoading`. MM-334 as
+  written clashed with MM-183: a failed pause read keeps the day but withholds
+  its targets, and the ticket now says so. The UX guard found Coach would spin
+  for good when any record it works from failed; fixed with its test.
+- Still for the panel: MM-335 (Dashboard history; `DashboardMetrics` still has
+  the old "Reopen the app to retry" notice), MM-336, MM-337, MM-338, MM-342,
+  MM-344, MM-346, MM-347, MM-348, MM-329. Not built: loading skeletons (the
+  designer recorded the spinner as a known deviation, needing its own ticket).
+
 ## Session 30: 2026-10-15, Claude (the Storybook register: Food and Dashboard)
 
 - PRs #159 to #161 had merged into each other's branches, not main (a stacked
@@ -305,22 +322,3 @@ limitations.
   classifier; the owner merges or allows it.** Step 10 of WS-08 (M4) gained
   MM-326 to MM-328, built. Not looked at on the phone. The owner saw a hard
   right edge while the bar pours: MM-329 (proposed, small), its test skipped.
-
-## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
-
-- The owner, with a phone screenshot of Settings' Data section: "Where is
-  this in Storybook? … this atrocity of padding". It was not: the stories'
-  health platform was empty, so only "not on this phone" was ever drawn,
-  and MM-237's check passed because Settings had a story (MM-320).
-- The owner chose the Data section plus an audit and a check. Built:
-  `device` on `screenStory`, `healthPlatform`, ten Health Connect stories;
-  the panel (product designer, UX guard) failed it against Reminders, it
-  was rebuilt as its own section like Reminders, and passed
-  (`docs/agent-runs/mm320-health-connect/`). MM-322: rows straight in a
-  list group had lost their hairlines everywhere; fixed in `ui.css`.
-- MM-321: the check of what the stories draw, with a register of 211
-  places, each with a reason. **Next: work the register down**, story by
-  story, starting with the 166 "not yet drawn".
-- Open: MM-323 (Health Connect lock-out; needs the plugin answer), MM-324
-  (two text columns for list rows). Branch `fix/unseen-states`, stacked on
-  #159. Not looked at on the phone.

@@ -169,35 +169,39 @@ export const HistoryFailed = screenStory({
 /** MM-321: the Dashboard while the pauses are still being read. */
 export const LoadingPauses = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Loading pause history…',
   stores: waitingRead('pauses', 'watchPauses'),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
 });
 
 /** MM-321: the Dashboard while the target history is still being read. */
 export const Loading = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Loading your Dashboard…',
   stores: waitingRead('targets', 'watchTargetsHistory'),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
 });
 
-/** MM-321: the pauses could not be read. */
+/** MM-321, MM-334: the pauses could not be read: the day stays, its targets withheld (MM-183). */
 export const PausesFailed = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Pause history could not be loaded. Reopen the app to retry.',
+  shows: 'Could not check whether today is paused',
   stores: failingRead('pauses', 'watchPauses'),
 });
 
 /** MM-321: the profile could not be read: the app says so before any screen. */
 export const ProfileFailed = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Could not open your data.',
+  shows: /^Could not open your data/,
   stores: failingRead('setup', 'watchSetup'),
 });
 
 /** MM-321: the day's food or the target history could not be read. */
 export const RecordsFailed = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Dashboard records could not be loaded. Reopen the app to retry.',
+  shows: 'Could not read today’s food, targets or weigh-ins',
   stores: failingRead('targets', 'watchTargetsHistory'),
 });
 
