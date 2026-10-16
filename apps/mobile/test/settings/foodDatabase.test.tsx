@@ -195,3 +195,18 @@ it('a downloaded pack is listed, searched, and can be removed', async () => {
   expect(await packs.findByText('Nothing downloaded yet')).toBeInTheDocument();
   expect(await store.installed()).toEqual([]);
 });
+
+// MM-346: an installed pack that is up to date is listed once, not offered again below its notice.
+it.skip('MM-346: an up-to-date pack is not offered for download again', async () => {
+  const d = await fixtureDownload();
+  http = new InMemoryPackHttp([[packUrl, d.gz]]);
+  http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
+  open(manifestUrl);
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Food database/ }));
+  const packs = within(topLayer());
+  await userEvent.click(await packs.findByRole('button', { name: 'See what is available' }));
+  await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
+  expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
+  expect(packs.queryByRole('button', { name: 'Up to date' })).not.toBeInTheDocument();
+});

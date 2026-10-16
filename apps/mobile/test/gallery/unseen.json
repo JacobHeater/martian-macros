@@ -4,14 +4,6 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/about/HowThisWorksScreen.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/about/HowThisWorksScreen.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/about/HowThisWorksScreen.tsx: <p className=\"app-text app-centered\">This could not be loaded.</p>",
     "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
   },
@@ -20,108 +12,8 @@
     "reason": "Opened by a press no story walks; EvidenceQuestionScreen is drawn by a story of its own. To walk it from here (MM-321)."
   },
   {
-    "place": "src/app/AdultsOnlyScreen.tsx: onPress={() => void navigator.push(() => <SettingsScreen />)}",
-    "reason": "Opened by a press no story walks; SettingsScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/app/App.tsx: return <AppContext.Provider value={scope}>{demo ? <DemoNotice>{content}</DemoNotice> : content}</AppContext.Provider>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: <div className=\"app-centered app-centered-page app-centered-middle\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: <div className=\"app-centered app-centered-page app-centered-middle\"> #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: <div className=\"app-centered app-centered-page\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: <div className=\"app-centered app-centered-page\"> #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: if (!terms.ready) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: if (!theme.ready) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: if (resumeDue) return <WelcomeBackScreen resuming />;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: if (value.healthCheckDueOn(today) && !recheckDismissed) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/AppRoot.tsx: if (welcomeBackDue) return <WelcomeBackScreen />;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/app/HomeShell.tsx: onPress={() => void navigator.push(() => <SettingsScreen />)}",
-    "reason": "Opened by a press no story walks; SettingsScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/app/ThemeChooserScreen.tsx: {error === undefined ? null : <Notice kind=\"caution\" text={error} />}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/charts/TrendSparkline.tsx: if (points.length < 2) return <p className=\"chart-caption\">A trend needs more weigh-ins.</p>;",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/AvailablePackCard.tsx: export function AvailablePackCard({ listing }: { listing: PackListing }) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/DownloadStatusHost.tsx: <DownloadStatusStrip",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: .map((listing) => <AvailablePackCard key={listing.id} listing={listing} />);",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: <div className=\"app-stack-item\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: if (manifest.checking) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: if (manifest.manifest !== undefined) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/FoodDatabaseScreen.tsx: installed.map((pack) => (",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/PackDownloadCard.tsx: if (download.status === 'failed') {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/PackDownloadCard.tsx: if (download.status === 'paused') {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/PackDownloadCard.tsx: if (download.status === 'running') {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/foodPacks/PackDownloadCard.tsx: {phase === 'downloading' ? <MmButton label=\"Cancel\" kind=\"secondary\" onPress={() => controller.cancel()} /> : null}",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
   },
   {
     "place": "src/main.tsx: .then(async (services) => {",
@@ -152,68 +44,8 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/settings/EditHeightSheet.tsx: <MmTextField label=\"Centimetres\" kind=\"number\" value={cm} onChange={setCm} error={error} helper={helper} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/EditHeightSheet.tsx: {onCancel === undefined ? null : <MmButton label=\"Cancel\" kind=\"text\" onPress={onCancel} />}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/ProfileSection.tsx: <EditHeightSheet",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/ProfileSection.tsx: onPress={() => void navigator.push(() => <HealthCheckScreen />)}",
-    "reason": "Opened by a press no story walks; HealthCheckScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/ProfileSection.tsx: overlays.sheet<void>('Height', (close) => (",
-    "reason": "Opened by a press no story walks; the sheet is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/RemindersSection.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/settings/SettingsScreen.tsx: if (setup === undefined) return <Screen title=\"Settings\">{null}</Screen>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}",
-    "reason": "Opened by a press no story walks; FoodDatabaseScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: onPress={() => void navigator.push(() => <HowThisWorksScreen />)}",
-    "reason": "Opened by a press no story walks; HowThisWorksScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: onPress={() => void navigator.push(() => <PauseScreen />)}",
-    "reason": "Opened by a press no story walks; PauseScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: onPress={() => void navigator.push(() => <TermsScreen />)}",
-    "reason": "Opened by a press no story walks; TermsScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: void overlays",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: void overlays #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/SettingsScreen.tsx: void overlays #3",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/ThemeSettings.tsx: const choose = async () => {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/settings/ThemeSettings.tsx: {error === undefined ? null : <Notice kind=\"caution\" text={error} />}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
+    "reason": "Shown only in the instant after Erase all data clears the setup, before onboarding takes over the root; no story can hold that instant (MM-321, reviewed 2026-10-16)."
   },
   {
     "place": "src/terms/TermsGuardScreen.tsx: <>",
