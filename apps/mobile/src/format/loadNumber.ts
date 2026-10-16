@@ -1,10 +1,9 @@
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 
-/** A load as typed: "225", "102.5". No trailing zeros, at most two decimals. */
+/** A load as typed: "225", "102.5". No trailing zero, at most one decimal, as a scale says a weight (MM-350). */
 export function loadNumber(value: number): string {
-  const rounded = roundHalfAwayFromZero(value * 100) / 100;
+  const rounded = roundHalfAwayFromZero(value * 10) / 10;
   if (Number.isInteger(rounded)) return String(rounded + 0);
-  const text = toStringAsFixed(rounded, 2);
-  return text.endsWith('0') ? text.substring(0, text.length - 1) : text;
+  return toStringAsFixed(rounded, 1);
 }
