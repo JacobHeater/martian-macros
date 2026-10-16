@@ -1,41 +1,42 @@
 import { Fmt } from '../format/Fmt';
+import { liftSummary } from '../format/liftSummary';
 import { Loadable } from '../state/Loadable';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { MmButton } from '../ui/MmButton';
+import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
-import { MmSpinner } from '../ui/MmSpinner';
-import { StrengthTrendCard } from '../ui/StrengthTrendCard';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
 import { StrengthHistoryScreen } from './StrengthHistoryScreen';
 import { StrengthLiftsScreen } from './StrengthLiftsScreen';
 
 /**
  * The most-trained lifts and how their estimated strength has moved, with
  * the way to every lift's history. A section (MM-257): open when there are
- * recent lifts to show, folded to one line when there are none.
+ * recent lifts to show, folded to one line when there are none. Each lift is
+ * a row that opens its history, where its chart lives (MM-344, rule 4).
  */
 export function StrengthSection() {
   const { state } = useApp();
   const navigator = useNavigator();
   const trends = useCell(state.strengthTrends);
   const setup = useLoaded(state.setup);
-  const today = useCell(state.today);
   if (setup === undefined) return null;
   const fmt = new Fmt(setup.unitSystem);
   if (Loadable.hasFailed(trends)) {
     return (
       <MmSection icon="train" title="Strength trends">
-        <p className="app-text">Could not load strength history. Your logged sets are not changed.</p>
-        <MmButton label="Retry strength history" kind="secondary" onPress={() => state.retryStrengthHistory()} />
+        <ReadFailedNotice title="Could not read your strength history" onRetry={() => state.retryStrengthHistory()} />
       </MmSection>
     );
   }
   if (!trends.ready) {
     return (
       <MmSection icon="train" title="Strength trends">
-        <MmSpinner />
+        <ScreenLoading />
       </MmSection>
     );
   }
@@ -49,31 +50,28 @@ export function StrengthSection() {
     <MmSection icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0}>
       {all.length === 0 ? null : (
         <>
-          <p className="app-text">
-            Your most-trained lifts over the last 90 days. Each point comes from a finished workout.
-          </p>
-          <MmButton
-            label="All lift histories"
-            kind="secondary"
-            onPress={() => void navigator.push(() => <StrengthLiftsScreen />)}
-          />
+          <MmListGroup>
+            {recent.slice(0, 4).map((trend) => (
+              <MmListRow
+                key={trend.exerciseId}
+                leadingIcon="train"
+                title={trend.name}
+                subtitle={liftSummary(trend, fmt)}
+                opens
+                onPress={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}
+              />
+            ))}
+            <MmListRow
+              leadingIcon="history"
+              title="All lift histories"
+              subtitle={recent.length === 0 ? 'Earlier sessions, and why an estimate is unavailable' : undefined}
+              opens
+              onPress={() => void navigator.push(() => <StrengthLiftsScreen />)}
+            />
+          </MmListGroup>
+          <p className="app-caption">Smoothed estimated one-rep max, from finished workouts. A comparison, not a real max.</p>
         </>
       )}
-      {recent.slice(0, 4).map((trend) => (
-        <StrengthTrendCard
-          key={trend.exerciseId}
-          trend={trend}
-          fmt={fmt}
-          today={today}
-          onHistory={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}
-        />
-      ))}
-      {all.length > 0 && recent.length === 0 ? (
-        <p className="app-text">
-          No qualifying sessions in the last 90 days. Open a lift history to see earlier sessions or why an estimate
-          is unavailable.
-        </p>
-      ) : null}
     </MmSection>
   );
 }

@@ -273,7 +273,12 @@ limitations.
   and "Opens …" (`MmSection opens`). The owner chose a protein icon: a shaker
   bottle, drawn for the app (`ShakerBottleOutlined`, the one custom glyph).
   The recovery line outside its section was its own bug, MM-353, fixed.
-- Still for the panel: MM-336, MM-342, MM-344, MM-348, MM-329, MM-351, MM-352.
+- **MM-344 and MM-348, strength on Progress, done.** Each recent lift is a row
+  ("Est. max 319.7 lb · +16.8 lb in 4 weeks") opening its history, where its
+  chart lives; "Lift histories" is a list group with its own waiting and
+  failure. A deleted exercise is "Deleted exercise · last logged Oct 11",
+  never its id. MM-355 ("1 logged sessions") fixed on the way.
+- Still for the panel: MM-336, MM-342, MM-329, MM-351, MM-352.
   Not built: loading skeletons (the designer recorded the spinner as a known
   deviation, needing its own ticket).
 

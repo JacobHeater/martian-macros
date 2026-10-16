@@ -1,6 +1,6 @@
 ---
 id: MM-348
-status: proposed
+status: done
 component: weight-trend
 related: [MM-321, MM-77, MM-108]
 ---
@@ -26,6 +26,7 @@ Scenario: A deleted exercise's history
 ```
 
 ## Notes
-Guarded by `apps/mobile/test/engine/deletedExerciseName.test.ts`, skipped with this ID until the fix lands;
-the fix also changes the lift-list test in `strengthProgress.test.tsx`, which finds the row by its id. A
-design and wording fix: drawn in Storybook, reviewed by the panel, then built.
+Guarded by "MM-348" in `apps/mobile/test/engine/deletedExerciseName.test.ts` and the MM-194 test in
+`apps/mobile/test/progress/strengthProgress.test.tsx`, which failed before the fix. Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-344 and MM-348 as one change; their changes were built. A deleted exercise is
+"Deleted exercise", its row saying "Exercise deleted, sets kept · last logged Oct 11" (`StrengthTrend.lastLoggedOn`).
+Two deleted on the same day are told apart only by their session counts; each row still opens its own history.
