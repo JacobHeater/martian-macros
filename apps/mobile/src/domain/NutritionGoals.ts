@@ -1,8 +1,10 @@
 import type { CalendarDate } from './CalendarDate';
 
 /**
- * The goals the user switched on in Settings (MM-311, MM-313). Each is
- * undefined while switched off, which is how a new installation starts.
+ * The goals the user set in Settings (MM-311, MM-313). The sodium limit is
+ * undefined while switched off, which is how a new installation starts. The
+ * water goal is on unless switched off (MM-358): an amount the person typed,
+ * or, while there is none, the one suggested for them.
  */
 export class NutritionGoals {
   /** Suggested when the sodium limit is first switched on: the DGA's CDRR for adults. */
@@ -11,8 +13,6 @@ export class NutritionGoals {
   static readonly minSodiumLimitMg = 1_500;
   static readonly maxSodiumLimitMg = 6_000;
 
-  /** Suggested when the water goal is first switched on. */
-  static readonly suggestedWaterGoalMl = 2_000;
   static readonly minWaterGoalMl = 500;
   static readonly maxWaterGoalMl = 6_000;
 
@@ -30,17 +30,22 @@ export class NutritionGoals {
    */
   readonly sodiumLimitSince: CalendarDate | undefined;
 
-  /** A daily amount to drink, in millilitres. */
+  /** A daily amount to drink the person typed, in millilitres; undefined while the suggestion is used. */
   readonly waterGoalMl: number | undefined;
+
+  /** The person switched the water goal off (MM-358). */
+  readonly waterGoalOff: boolean;
 
   constructor(init: {
     sodiumLimitMg?: number | undefined;
     sodiumLimitSince?: CalendarDate | undefined;
     waterGoalMl?: number | undefined;
+    waterGoalOff?: boolean | undefined;
   }) {
     this.sodiumLimitMg = init.sodiumLimitMg;
     this.sodiumLimitSince = init.sodiumLimitMg === undefined ? undefined : init.sodiumLimitSince;
     this.waterGoalMl = init.waterGoalMl;
+    this.waterGoalOff = init.waterGoalOff ?? false;
   }
 
   static sodiumLimitAllowed(mg: number): boolean {

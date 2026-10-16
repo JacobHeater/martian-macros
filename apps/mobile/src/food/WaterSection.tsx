@@ -1,6 +1,5 @@
 import { type ReactNode, useRef } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
-import { NutritionGoals } from '../domain/NutritionGoals';
 import { WaterEntry } from '../domain/water/WaterEntry';
 import { waterGlasses } from '../domain/water/waterGlasses';
 import { Fmt } from '../format/Fmt';
@@ -40,7 +39,8 @@ export function WaterSection({ day }: { day: CalendarDate }) {
   const setup = useLoaded(state.setup);
   const loaded = useLoaded(state.waterForDay(day));
   const entries = loaded ?? [];
-  const goal = (useLoaded(state.nutritionGoals) ?? NutritionGoals.none).waterGoalMl;
+  // The goal in force: the person's own, or the one suggested for them (MM-358).
+  const goal = useCell(state.waterGoal)?.ml;
   const units = setup?.unitSystem ?? 'metric';
   const total = entries.reduce((sum, e) => sum + e.ml, 0);
   const named = Fmt.day(day, today);

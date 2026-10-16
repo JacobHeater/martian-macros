@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import { WaterUnits } from '../domain/water/WaterUnits';
@@ -21,11 +22,12 @@ const litres = (ml: number) => toStringAsFixed(ml / 1000, 2).replace(/\.?0+$/, '
 const sodiumRange = 'A whole number from 1,500 to 6,000 mg.';
 
 /**
- * The two goals a person may switch on (MM-311, MM-313): a daily sodium
- * limit and a daily water goal. Both start off; switched on, each is
- * suggested and its amount can be typed in the row below. A refusal says
- * the range (the panel's UX-4); a water goal above 4 L, and either goal
- * with kidney disease, carries a plain note (SA-5).
+ * The two goals (MM-311, MM-313): a daily sodium limit, off until switched
+ * on, and a daily water goal, on unless switched off, suggested for the
+ * person (MM-358) until they type their own, and withheld where a care team
+ * sets what they drink (MM-359). A refusal says the range (the panel's
+ * UX-4); a water goal above 4 L, and the sodium limit with kidney disease,
+ * carries a plain note (SA-5).
  */
 export function NutritionGoalsSection() {
   const { services, state } = useApp();
@@ -37,9 +39,23 @@ export function NutritionGoalsSection() {
   const imperial = setup?.unitSystem === 'imperial';
   const kidney = setup?.screening.chronicKidneyDisease ?? false;
   const sodium = goals.sodiumLimitMg;
-  const water = goals.waterGoalMl;
+  // The goal in force: the person's own, or the one suggested for them (MM-358).
+  const water = useCell(state.waterGoal);
+  const [setting, setSetting] = useState(false);
+  const screening = setup?.screening;
+  // Where a care team sets what is drunk, nothing is suggested (MM-358, MM-359).
+  let careTeam: string | undefined;
+  if (screening?.chronicKidneyDisease) careTeam = 'With kidney disease, your care team sets how much you drink.';
+  else if (screening?.bariatricSurgery) careTeam = 'After bariatric surgery, your care team sets how much you drink.';
+  else if (screening?.fluidLimitedByClinician) careTeam = 'Your clinician limits how much you drink.';
+  // On unless switched off; where nothing is suggested, only once an amount is set.
+  const waterOn = !goals.waterGoalOff && (careTeam === undefined || goals.waterGoalMl !== undefined || setting);
+  let amountNote: string | undefined;
+  if (careTeam !== undefined) amountNote = 'Type the amount your care team gave you.';
+  else if (water?.suggested === true) amountNote = 'Suggested for you, from your protein target and training days.';
+  else amountNote = 'Your own amount.';
   const waterRange = imperial ? 'From 17 to 202 fl oz.' : 'From 0.5 to 6 L.';
-  const high = water !== undefined && water > NutritionGoals.highWaterGoalMl;
+  const high = water !== undefined && water.ml > NutritionGoals.highWaterGoalMl;
 
   /** A switch whose save fails says so and stays as it was, never springing back in silence (MM-325). */
   const switched = (goal: string, save: Promise<void>) =>
@@ -92,24 +108,24 @@ export function NutritionGoalsSection() {
         <MmSwitchRow
           leadingIcon="water"
           title="Daily water goal"
-          subtitle={
-            kidney
-              ? 'With kidney disease, a care team may limit how much you drink. Plain water only.'
-              : 'Shown with today’s water. Plain water only.'
-          }
-          value={water !== undefined}
-          onChange={(on) =>
-            switched('water goal', services.preferences.saveWaterGoal(on ? NutritionGoals.suggestedWaterGoalMl : undefined))
-          }
+          subtitle={careTeam ?? 'Plain water only. Drink to thirst, spread through the day; more in heat.'}
+          value={waterOn}
+          onChange={(on) => {
+            setSetting(on);
+            switched('water goal', services.preferences.saveWaterGoalOff(!on));
+          }}
         />
-        {water === undefined ? null : (
+        {!waterOn || (water === undefined && !setting) ? null : (
           <MmListRow
             title="Amount"
+            subtitle={amountNote}
             entry={
               <NumberEntry
+                // A new suggestion, or a return to it, starts the field again.
+                key={`${water?.ml ?? 'none'}-${String(water?.suggested)}`}
                 title={`Daily water goal, ${imperial ? 'fluid ounces' : 'litres'}`}
                 unit={imperial ? 'fl oz' : 'L'}
-                initial={imperial ? String(roundHalfAwayFromZero(WaterUnits.mlToFlOz(water))) : litres(water)}
+                initial={water === undefined ? undefined : imperial ? String(roundHalfAwayFromZero(WaterUnits.mlToFlOz(water.ml))) : litres(water.ml)}
                 hint={high ? `More than most people need; spread it through the day. ${waterRange}` : waterRange}
                 refusal="That goal is out of range."
                 saves="water goal"
@@ -121,6 +137,13 @@ export function NutritionGoalsSection() {
                 }}
               />
             }
+          />
+        )}
+        {/* Their own amount set, the way back to the one suggested for them (MM-358). */}
+        {!waterOn || goals.waterGoalMl === undefined || careTeam !== undefined ? null : (
+          <MmListRow
+            title="Use the suggested amount"
+            onPress={() => switched('water goal', services.preferences.saveWaterGoal(undefined))}
           />
         )}
       </MmListGroup>

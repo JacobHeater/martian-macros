@@ -25,7 +25,7 @@ async function opened() {
 /** The columns added since the Dart database's last version, after the ones it had, by table and in order. */
 const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
-  // Version 4 (MM-311, MM-313): the sodium limit and the water goal.
+  // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -33,7 +33,10 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'sodium_limit_mg',
     'sodium_limit_since_epoch_day',
     'water_goal_ml',
+    'water_goal_off',
   ],
+  // Version 6 (MM-359): a clinician's limit on what the person drinks.
+  setups: ['fluid_limited_by_clinician'],
   // Version 4 (MM-308): the micronutrients a food log entry keeps.
   food_entries: Micronutrient.added.map((n) => Micronutrient.column(n)),
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.

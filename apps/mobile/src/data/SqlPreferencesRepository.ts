@@ -112,6 +112,7 @@ export class SqlPreferencesRepository implements PreferencesRepository {
             sodiumLimitMg: optionalInteger(row, 'sodium_limit_mg'),
             sodiumLimitSince: optionalDay(row, 'sodium_limit_since_epoch_day'),
             waterGoalMl: optionalNumber(row, 'water_goal_ml'),
+            waterGoalOff: flag(row, 'water_goal_off'),
           }),
     );
   }
@@ -121,7 +122,11 @@ export class SqlPreferencesRepository implements PreferencesRepository {
   }
 
   saveWaterGoal(ml: number | undefined): Promise<void> {
-    return this.save({ water_goal_ml: orNull(ml) });
+    return this.save({ water_goal_ml: orNull(ml), water_goal_off: 0 });
+  }
+
+  saveWaterGoalOff(off: boolean): Promise<void> {
+    return this.save({ water_goal_off: off ? 1 : 0 });
   }
 
   watchTermsAcceptance(): Watched<TermsAcceptance | undefined> {
