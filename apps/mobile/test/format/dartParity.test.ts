@@ -58,6 +58,7 @@ import { trainingStatusLabel } from '../../src/format/trainingStatusLabel';
 import { trustTierLabel } from '../../src/format/trustTierLabel';
 import { waistAmount } from '../../src/format/waistAmount';
 import { HealthDataType } from '../../src/healthIngest';
+import { roundHalfAwayFromZero } from '../../src/lang/roundHalfAwayFromZero';
 import dart from './support/dartFormats.json';
 
 /**
@@ -107,7 +108,9 @@ it('paces', () => {
 });
 
 it('loads and amounts as typed back', () => {
-  expect(each(dart.numbers, loadNumber)).toEqual(dart.loadNumber);
+  // MM-350: a load is said to a tenth, where the Flutter app said up to two decimals.
+  const toATenth = dart.numbers.map((n) => String(roundHalfAwayFromZero((n as number) * 10) / 10 + 0));
+  expect(each(dart.numbers, loadNumber)).toEqual(toATenth);
   expect(each(dart.numbers, quantityText)).toEqual(dart.quantityText);
 });
 
