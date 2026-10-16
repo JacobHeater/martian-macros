@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
+import { storyWorkout } from './storyWorkout';
 import { userEvent, within } from 'storybook/test';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
@@ -187,4 +188,27 @@ export const LiftHistoryNoneQualify = screenStory({
   shows: 'No qualifying sessions yet.',
   scenario: oldLiftsScenario,
   open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="barbell-bench-press" />),
+});
+
+/** One qualifying squat this week, beside sets of an exercise of the person's own since deleted. */
+const oneSession: StoryScenario = async (repos, today) => {
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
+  await repos.weights.saveWeight(today, 84);
+  await repos.workouts.saveWorkout(storyWorkout(today.addDays(-3), [['back-squat', 5, 100], ['custom-deleted-row', 8, 40]]));
+};
+
+/** MM-321: one qualifying session: a trend needs more. */
+export const ProgressOneSession = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'One qualifying session. More sessions are needed for a trend.',
+  scenario: oneSession,
+  open: onProgress,
+});
+
+/** MM-321: the history of an exercise since deleted: its sets are kept, its estimate cannot be worked out. */
+export const LiftHistoryDeletedExercise = screenStory({
+  covers: ['StrengthHistoryScreen'],
+  shows: 'Qualifying sessions',
+  scenario: oneSession,
+  open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="custom-deleted-row" />),
 });
