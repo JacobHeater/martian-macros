@@ -266,6 +266,10 @@ limitations.
   again. `storyPackHost` takes `listed` and `installed`. The panel's
   follow-ups are ticketed: MM-351 (a lookup's result is not announced), MM-352
   (the food database's rows have no icons).
+- **MM-354, the owner's split donut, done.** The split is always a centred
+  donut, its figures beneath it; with nothing logged, a whole `--track` ring
+  and "Log food with protein, carbs or fat to see the split.", as tall as the
+  figures so the hero does not grow with the first food.
 - Still for the panel: MM-335 (Dashboard history; `DashboardMetrics` still has
   the old "Reopen the app to retry" notice), MM-336, MM-342, MM-344, MM-348,
   MM-329, MM-351, MM-352. Not built: loading skeletons (the designer recorded
