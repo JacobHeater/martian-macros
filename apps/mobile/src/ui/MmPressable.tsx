@@ -7,6 +7,8 @@ interface MmPressableProps {
   /** For content that opens and closes something: whether it is open, and the id of what it controls. */
   expanded?: boolean | undefined;
   controls?: string | undefined;
+  /** The ids of what says more about it, read after its name. */
+  describedBy?: string | undefined;
   onPress: () => void;
   children: ReactNode;
 }
@@ -17,7 +19,7 @@ interface MmPressableProps {
  * nothing of its own, so the content keeps its look, and it is the one way
  * a screen makes a region pressable without a raw button (MM-246).
  */
-export function MmPressable({ label, expanded, controls, onPress, children }: MmPressableProps) {
+export function MmPressable({ label, expanded, controls, describedBy, onPress, children }: MmPressableProps) {
   return (
     <button
       type="button"
@@ -25,6 +27,7 @@ export function MmPressable({ label, expanded, controls, onPress, children }: Mm
       aria-label={label}
       aria-expanded={expanded}
       aria-controls={controls}
+      aria-describedby={describedBy}
       onClick={onPress}
     >
       {children}

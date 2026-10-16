@@ -27,7 +27,12 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
   const inRange = (date: CalendarDate) => !date.isBefore(start) && !date.isAfter(today);
   const recorded = (item: HistorySeries) =>
     [...item.values].filter(([date]) => inRange(date)).sort((a, b) => a[0].compareTo(b[0]));
-  const values = series.flatMap((item) => recorded(item).map(([, value]) => value));
+  // The scale is the finished days': a day still being logged does not squash them (MM-335).
+  const values = series.flatMap((item) =>
+    recorded(item)
+      .filter(([date]) => date !== item.unfinished)
+      .map(([, value]) => value),
+  );
   if (values.length === 0) return <p className="chart-empty">No records in this range yet.</p>;
 
   const low = minimum ?? Math.max(0, Math.min(...values) * 0.85);
@@ -48,14 +53,29 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
       });
     }
     return Array.from({ length: days }, (_, i) => {
-      const value = item.values.get(start.addDays(i));
-      return value === undefined ? undefined : ([x(i), y(value)] as const);
+      const date = start.addDays(i);
+      const value = item.values.get(date);
+      return value === undefined || date === item.unfinished ? undefined : ([x(i), y(value)] as const);
     });
   };
 
+  /** What a day still being logged holds so far, if it is in range and recorded. */
+  const sofar = (item: HistorySeries): number | undefined =>
+    item.unfinished === undefined || !inRange(item.unfinished) ? undefined : item.values.get(item.unfinished);
+  /** Its open dot, where it falls inside the finished days' scale; outside it, the legend says the value. */
+  const unfinished = (item: HistorySeries): readonly [number, number] | undefined => {
+    const value = sofar(item);
+    if (item.unfinished === undefined || value === undefined || value < low || value > high) return undefined;
+    return [x(start.daysUntil(item.unfinished)), y(value)];
+  };
+  const todays = series.map(sofar).find((value) => value !== undefined);
+  const stillLogged = todays !== undefined;
+  const offScale = series.some((item) => sofar(item) !== undefined && unfinished(item) === undefined);
+
   const label =
     `${unit} history, ${Fmt.shortDay(start)} to ${Fmt.shortDay(today)}. ` +
-    series.map((item) => `${item.label}: ${recorded(item).length} recorded points`).join('. ');
+    series.map((item) => `${item.label}: ${recorded(item).length} recorded points`).join('. ') +
+    (stillLogged ? '. Today is still being logged.' : '');
 
   return (
     <div className="chart">
@@ -65,6 +85,11 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
             {item.dashed === true ? '– –' : '●'} {item.label}
           </span>
         ))}
+        {stillLogged ? (
+          <span className="chart-unfinished-key">
+            ○ Today so far{offScale ? `, ${Fmt.whole(todays)} ${unit}` : ''}
+          </span>
+        ) : null}
       </div>
       <svg className="chart-plot" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
         <text className="chart-axis" x={0} y={10}>
@@ -96,6 +121,7 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
         ))}
         {series.map((item) => {
           const drawn = points(item);
+          const open = unfinished(item);
           return (
             <g key={item.label} className={`chart-${item.kind}`}>
               <path
@@ -109,6 +135,9 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
                 : drawn.map((point, i) =>
                     point === undefined ? null : <circle key={i} className="chart-dot" cx={point[0]} cy={point[1]} r={3} />,
                   )}
+              {open === undefined ? null : (
+                <circle className="chart-dot chart-dot-unfinished" cx={open[0]} cy={open[1]} r={4} />
+              )}
             </g>
           );
         })}

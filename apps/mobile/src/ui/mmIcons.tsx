@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import AccessibilityNewOutlined from '@mui/icons-material/AccessibilityNewOutlined';
 import AddOutlined from '@mui/icons-material/AddOutlined';
 import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
@@ -70,6 +71,8 @@ import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
 import WaterDropOutlined from '@mui/icons-material/WaterDropOutlined';
 import type { MmIconName } from './MmIconName';
+import type { MmIconProps } from './MmIconProps';
+import { ShakerBottleOutlined } from './ShakerBottleOutlined';
 
 /**
  * Material's Outlined set behind the app's own names (MM-236): a standard
@@ -78,7 +81,7 @@ import type { MmIconName } from './MmIconName';
  * glyph it is. The wayfinding names (MM-253) give every section, row and
  * state a mark until the app has art of its own (MM-109).
  */
-export const mmIcons: Record<MmIconName, typeof AddOutlined> = {
+export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   home: HomeOutlined,
   food: RestaurantOutlined,
   train: FitnessCenterOutlined,
@@ -150,4 +153,6 @@ export const mmIcons: Record<MmIconName, typeof AddOutlined> = {
   dayComplete: TaskAltOutlined,
   dayPartial: TimelapseOutlined,
   water: WaterDropOutlined,
+  // Drawn for the app: Material has no shaker (MM-335).
+  protein: ShakerBottleOutlined,
 };
