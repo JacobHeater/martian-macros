@@ -14,18 +14,23 @@ import { goalModeBlurb } from '../format/goalModeBlurb';
 import { goalModeLabel } from '../format/goalModeLabel';
 import { targetFlagMessage } from '../format/targetFlagMessage';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { Loadable } from '../state/Loadable';
 import { HealthRecheckScreen } from '../app/HealthRecheckScreen';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
+import { WeighInRow } from '../dashboard/WeighInRow';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseBanner } from '../pause/PauseBanner';
 import { ChoiceCard } from '../ui/ChoiceCard';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
+import { MmListGroup } from '../ui/MmListGroup';
 import { MmSection } from '../ui/MmSection';
 import { Notice } from '../ui/Notice';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
+import { ScreenLoading } from '../ui/ScreenLoading';
 import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
@@ -90,9 +95,34 @@ export function CoachScreen() {
   const guide = useCell(state.maintenanceGuide);
   const food = useLoaded(state.foodForDay(today)) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
+  const weights = useCell(state.weights);
+  // What the coach works from; any of it unread leaves the coach with nothing to say (MM-340).
+  const sources = [weights, useCell(state.weightEvents), useCell(state.intakeDays), useCell(state.targetsHistory), useCell(state.pauses)];
 
-  if (setup === undefined || snapshot === undefined) {
-    return <p className="app-text coach-empty">Log a weigh-in to get started.</p>;
+  if (setup === undefined) return null;
+  if (snapshot === undefined) {
+    if (sources.some((source) => Loadable.hasFailed(source))) {
+      return <ReadFailedNotice title="Could not read what your coach works from" onRetry={() => state.retryCoach()} />;
+    }
+    if (Loadable.valueOf(weights)?.length !== 0) return <ScreenLoading />;
+    // Nothing to coach from yet: the weigh-in it asks for, in the row the Dashboard asks with (MM-340).
+    const fmt = new Fmt(setup.unitSystem);
+    return (
+      <MmListGroup>
+        <WeighInRow
+          fmt={fmt}
+          lastTrendKg={undefined}
+          note="Log a weigh-in to get started."
+          onSaveWeight={async (kg) => {
+            await services.weights.saveWeight(today, kg);
+            overlays.snack(`Saved ${fmt.weight(kg)} for today`, {
+              label: 'Open Progress',
+              onAction: () => state.homeTab.put('progress'),
+            });
+          }}
+        />
+      </MmListGroup>
+    );
   }
   const fmt = new Fmt(setup.unitSystem);
 

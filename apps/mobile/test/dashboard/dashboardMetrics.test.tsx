@@ -114,6 +114,7 @@ for (const failed of [false, true]) {
   // Carried over from pause_state_display_test.dart.
   it(`MM-183: the target display waits for pauses (${failed ? 'failed' : 'loading'})`, async () => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
+    await repos.targets.saveTargets(targetsFrom(today.addDays(-3), { kcal: 2000 }));
     renderApp(repos, today, {
       change: (services) => ({
         ...services,
@@ -124,11 +125,14 @@ for (const failed of [false, true]) {
         },
       }),
     });
-    expect(
-      await screen.findByText(
-        failed ? 'Pause history could not be loaded. Reopen the app to retry.' : 'Loading pause history…',
-      ),
-    ).toBeInTheDocument();
-    expect(document.querySelector('.mm-horizon')).toBeNull();
+    if (failed) {
+      // MM-334: the day stays, its targets withheld and the reason said.
+      expect(await screen.findByText('Could not check whether today is paused')).toBeInTheDocument();
+      expect(screen.queryByText(/^kcal (left|over) of/)).toBeNull();
+      expect(screen.getByText('kcal logged')).toBeInTheDocument();
+    } else {
+      expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
+      expect(document.querySelector('.mm-horizon')).toBeNull();
+    }
   });
 }

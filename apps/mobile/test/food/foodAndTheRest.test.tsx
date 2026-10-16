@@ -101,12 +101,15 @@ for (const failed of [false, true]) {
       }),
     });
     await openTab('Food');
-    expect(
-      await screen.findByText(
-        failed ? 'Pause history could not be loaded. Reopen the app to retry.' : 'Loading pause history…',
-      ),
-    ).toBeInTheDocument();
-    expect(document.querySelector('.mm-horizon')).toBeNull();
+    if (failed) {
+      // MM-334: the day stays, its targets withheld and the reason said.
+      expect(await screen.findByText('Could not check whether this day is paused')).toBeInTheDocument();
+      expect(screen.queryByText(/^kcal (left|over) of/)).toBeNull();
+      expect(screen.getByText('kcal logged')).toBeInTheDocument();
+    } else {
+      expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
+      expect(document.querySelector('.mm-horizon')).toBeNull();
+    }
   });
 }
 

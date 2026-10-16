@@ -908,6 +908,25 @@ export class AppState {
     }
   }
 
+  /** Reads the pauses again, after a read went wrong (MM-334). */
+  retryPauses(): void {
+    if (this.pauses instanceof StreamCell) this.pauses.retry();
+  }
+
+  /** Reads again what the coach works from, after a read went wrong (MM-340). */
+  retryCoach(): void {
+    for (const cell of [this.typedWeights, this.weightEvents, this.intakeDays, this.targetsHistory, this.pauses]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
+  /** Reads again what the Dashboard is drawn from, after a read went wrong (MM-334). */
+  retryDashboard(): void {
+    for (const cell of [this.pauses, this.foodForDay(this.today.value), this.targetsHistory, this.typedWeights]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
   /** What the check-in needs; made last, once everything it reads exists. */
   private makeCheckIn(): CheckIn {
     return new CheckIn({

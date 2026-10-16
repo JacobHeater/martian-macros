@@ -7,6 +7,8 @@ interface WeighInRowProps {
   /** The trend as it stands before today's weigh-in, said under the title (MM-298). */
   lastTrendKg: number | undefined;
   onSaveWeight: (kg: number) => Promise<void>;
+  /** Said under the title in place of the trend, where there is none to say (Coach before any weigh-in, MM-340). */
+  note?: string;
 }
 
 /**
@@ -16,12 +18,12 @@ interface WeighInRowProps {
  * padding, with the last trend under the title (MM-298). Once saved, the
  * trend weight row takes its place.
  */
-export function WeighInRow({ fmt, lastTrendKg, onSaveWeight }: WeighInRowProps) {
+export function WeighInRow({ fmt, lastTrendKg, onSaveWeight, note }: WeighInRowProps) {
   return (
     <MmListRow
       leadingIcon="scale"
       title="Weigh-in"
-      subtitle={lastTrendKg === undefined ? undefined : `Trend so far ${fmt.weight(lastTrendKg)}`}
+      subtitle={lastTrendKg === undefined ? note : `Trend so far ${fmt.weight(lastTrendKg)}`}
       entry={
         <NumberEntry
           title="Today’s weigh-in"
