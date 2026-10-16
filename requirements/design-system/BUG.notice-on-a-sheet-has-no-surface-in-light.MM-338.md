@@ -1,6 +1,6 @@
 ---
 id: MM-338
-status: proposed
+status: done
 component: design-system
 related: [MM-321, MM-291]
 ---
@@ -32,6 +32,4 @@ Scenario Outline: A notice on a sheet
 ```
 
 ## Notes
-Guarded by "MM-338" in `apps/mobile/test/ui/noticeOnSheet.test.ts`, skipped with this ID until the fix
-lands. A design fix (which surface a notice takes on a sheet): drawn in Storybook, reviewed by the panel's
-designer and UX guard, then built (AGENTS.md).
+Guarded by "MM-338" in `apps/mobile/test/ui/noticeOnSheet.test.ts`, which failed in Light before the fix (its token lookup also had a broken `\s`, fixed with it). Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-337, MM-338, MM-346 and MM-347 as one batch; their changes were built. A notice on a sheet or dialog is drawn on `sunken`, a well of the sheet, in every palette; the designer rejected a Light-only hairline, which would make Info look like Caution. The notice family in `design/screen-direction.md` says so, and that an action there is a secondary button. Measured on sunken: text 15.8 / 17.3 / 16.2, info icon 4.9 / 10.8 / 9.1 (Light / Martian / Dark).

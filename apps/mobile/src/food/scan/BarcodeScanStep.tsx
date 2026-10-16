@@ -85,7 +85,14 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
           }
         />
       ) : (
-        <MmButton label="Scan with the camera" icon="barcode" expand onPress={() => void scan()} />
+        // One primary action (MM-337): once a code is unknown, reading its label is the next step.
+        <MmButton
+          label="Scan with the camera"
+          icon="barcode"
+          kind={unknownGtin === undefined ? 'primary' : 'secondary'}
+          expand
+          onPress={() => void scan()}
+        />
       )}
       <div className="app-gap-small" />
       <MmTextField
@@ -109,9 +116,12 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
           <Notice text={message} />
           <div className="app-gap-small" />
           {unknownGtin === undefined ? null : (
-            <MmButton label="Read the label" expand onPress={() => onReadLabel(unknownGtin)} />
+            <>
+              <MmButton label="Read the label" expand onPress={() => onReadLabel(unknownGtin)} />
+              <div className="app-gap-small" />
+            </>
           )}
-          <MmButton label="Enter manually" kind="secondary" onPress={onManual} />
+          <MmButton label="Enter manually" kind="secondary" expand onPress={onManual} />
         </>
       )}
       <MmButton label="Back to search" kind="text" onPress={onBack} />

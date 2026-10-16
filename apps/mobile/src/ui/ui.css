@@ -959,6 +959,11 @@
   border-radius: var(--radius-control);
   background: var(--surface);
 }
+/* On a sheet or a dialog a notice is a well of it, in every palette: in Light both are white (MM-338). */
+.mm-sheet .mm-notice,
+.mm-dialog .mm-notice {
+  background: var(--sunken);
+}
 .mm-notice-caution {
   border: 1px solid var(--caution);
 }
