@@ -9,13 +9,15 @@ import { FoodTrustMark } from './FoodTrustMark';
 interface FoodSearchResultsProps {
   query: string;
   onPick: (food: CatalogFood) => void;
+  /** Whether the person's own or recent foods already matched above, so an empty pack search says nothing (MM-330). */
+  alsoFound?: boolean;
 }
 
 /**
  * Foods from the installed packs that match `query`, as the user types
  * (MM-42). Searching is on the phone and needs no network.
  */
-export function FoodSearchResults({ query, onPick }: FoodSearchResultsProps) {
+export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSearchResultsProps) {
   const { state } = useApp();
   const catalog = useLoaded(state.foodCatalog);
   const hits = useAsync(
@@ -24,6 +26,7 @@ export function FoodSearchResults({ query, onPick }: FoodSearchResultsProps) {
   );
   if (catalog === undefined || hits === undefined) return null;
   if (hits.length === 0) {
+    if (alsoFound && catalog.packs.length > 0) return null;
     return (
       <p className="app-text food-no-hits">
         {catalog.packs.length === 0

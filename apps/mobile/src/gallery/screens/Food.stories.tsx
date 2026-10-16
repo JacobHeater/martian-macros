@@ -2,10 +2,15 @@ import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
+import { CustomFood } from '../../domain/food/custom/CustomFood';
+import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
+import { DemoSeed } from '../../fixtures/DemoSeed';
+import { typicalSetup } from '../../fixtures/typicalSetup';
 import type { UnitSystem } from '../../domain/UnitSystem';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
+import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
@@ -14,6 +19,7 @@ import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
+import { waitingRead } from './waitingRead';
 
 /**
  * The food log, and every step of adding to it. Before MM-255 (main at
@@ -439,5 +445,297 @@ export const WaterBarNearlyThere = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/9 of 10 glasses/));
+  },
+});
+
+// ---- MM-321: the Food screen's states no story drew ----
+
+/** The sheet's controls, which sit on the document's body, outside the canvas. */
+const inSheet = (canvas: HTMLElement) => within(canvas.ownerDocument.body);
+
+/** Opens Add food, presses Enter manually, then the measuring method `method`. */
+const manuallyAs = (method: string) => async (canvas: HTMLElement) => {
+  await press('Enter manually')(canvas);
+  const methods = await inSheet(canvas).findByRole('group', { name: 'How was it measured?' });
+  await userEvent.click(within(methods).getByRole('button', { name: method }));
+};
+
+/** MM-321: entered by hand, weighed: grams or ounces to choose. */
+export const AddFoodWeighed = screenStory({ covers: ['AddFoodSheet'], shows: 'Protein', open: addFood, walk: manuallyAs('Weighed') });
+
+/** MM-321: entered by hand as an estimate: totals only, no amount. */
+export const AddFoodEstimatedTotals = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Enter calories and macros for this food.',
+  open: addFood,
+  walk: manuallyAs('Estimate'),
+});
+
+/** The demo with one food and one recipe of the person's own (MM-45). */
+const withOwnFoods: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  await repos.customFoods.saveCustomFood(
+    new CustomFood({
+      id: 0,
+      name: 'Demo overnight oats',
+      kind: 'food',
+      servingDescription: '1 jar',
+      servingGrams: 250,
+      perServing: new NutritionTotals({ kcal: 410, proteinG: 24, carbsG: 52, fatG: 11 }),
+    }),
+  );
+  await repos.customFoods.saveCustomFood(
+    new CustomFood({
+      id: 0,
+      name: 'Demo chili',
+      kind: 'recipe',
+      servingDescription: '1 bowl',
+      servings: 4,
+      perServing: new NutritionTotals({ kcal: 511, proteinG: 46, carbsG: 36, fatG: 20 }),
+      ingredients: [
+        { name: 'Ground beef, lean, cooked', grams: 500, totals: new NutritionTotals({ kcal: 1250, proteinG: 130, carbsG: 0, fatG: 75 }) },
+        { name: 'Black beans, cooked', grams: 600, totals: new NutritionTotals({ kcal: 792, proteinG: 53, carbsG: 144, fatG: 3 }) },
+      ],
+    }),
+  );
+};
+
+/** MM-321: a search that matches the person's own food and a recent one, above the pack's. */
+export const AddFoodOwnAndRecent = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Your recent food/,
+  scenario: withOwnFoods,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'demo');
+  },
+});
+
+/** MM-321: a search that finds nothing. */
+export const AddFoodNothingFound = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Nothing found for/,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'zzqx');
+  },
+});
+
+/** MM-321: a food from the pack, logged and opened again: the amount drives the totals. */
+export const EditFoodFromThePack = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Logs \d/,
+  open: ({ state, overlays, today }) => {
+    state.homeTab.put('food');
+    void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' });
+  },
+  walk: async (canvas) => {
+    await press(/^Chicken breast, cooked/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Log it' }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Chicken breast, cooked' }));
+  },
+});
+
+/** MM-321: a packaged food from the pack: its brand under its name. */
+export const AddFoodAmountBranded = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Test Brand',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'protein bar' }),
+  walk: press(/^Protein bar, chocolate/),
+});
+
+/** MM-321: a food the pack has raw and cooked: what the weight means either way. */
+export const AddFoodAmountRawOrCooked = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Weighed as',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, raw' }),
+  walk: press(/^White rice, raw/),
+});
+
+/** MM-321: a gram of cola, which a label would round to nothing. */
+export const AddFoodAmountRoundsToZero = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Labels may round small servings to zero. Many servings add up.',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'cola' }),
+  walk: async (canvas) => {
+    await press(/^Cola/)(canvas);
+    const amount = await inSheet(canvas).findByRole('textbox', { name: /^Amount/ });
+    await userEvent.clear(amount);
+    await userEvent.type(amount, '1');
+  },
+});
+
+/** MM-321: "Is this day fully logged?" pressed: the three answers. */
+export const DayCompleteness = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Not marked',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /(Mark it complete or partial|Press to change)/ }));
+  },
+});
+
+/** MM-321: a glass of wine today: the alcohol's energy said on its own line. */
+export const FoodWithAlcohol = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^Alcohol: /,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Red wine', kcal: 125, proteinG: 0, carbsG: 4, fatG: 0, source: 'weighed', alcoholG: 15.6 }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-321: the macro split picture on Food. */
+export const FoodSplit = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Split',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Split' }));
+  },
+});
+
+/** MM-321: Food while the pauses are still being read. */
+export const FoodLoading = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Loading pause history…',
+  stores: waitingRead('pauses', 'watchPauses'),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-321: Food when the pauses could not be read. */
+export const FoodPausesFailed = screenStory({
+  covers: ['FoodScreen'],
+  shows: /could not be loaded/,
+  stores: failingRead('pauses', 'watchPauses'),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-321: an estimate with no weigh-in kept (each one deleted): sizes wait for the person's own energy needs. */
+export const AddFoodEstimateNoWeighIn = screenStory({
+  covers: ['EstimateMealStep'],
+  shows: /^Sizes are scaled to your own energy needs/,
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
+  },
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { estimateSize: 'regular' }),
+});
+
+/** MM-321: Saved with the person's own food and recipe. */
+export const AddFoodSavedOwn = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Demo chili',
+  scenario: withOwnFoods,
+  open: addFood,
+  walk: press('Saved'),
+});
+
+/** MM-321: a new food of the person's own. */
+export const NewOwnFood = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'One serving is',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New food')(canvas);
+  },
+});
+
+/** MM-321: a recipe opened to change, its ingredients listed, one picked from the pack. */
+export const EditRecipe = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Makes servings',
+  scenario: withOwnFoods,
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo chili/)(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'rice');
+    await press(/^White rice, cooked/)(canvas);
+  },
+});
+
+/** MM-321: a new recipe's ingredient entered by its numbers. */
+export const NewRecipeByNumbers = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Totals for the amount you put in the pot.',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New recipe')(canvas);
+    await press('Enter numbers instead')(canvas);
+  },
+});
+
+/** MM-321: a barcode the pack does not know: read the label, or enter it by hand. */
+export const ScanUnknownCode = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: 'Read the label',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Scan')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Or type the digits' }), '4006381333931');
+    await press('Look up')(canvas);
+  },
+});
+
+/** MM-321: a food whose numbers did not add up when the pack was built: the reason under its source. */
+export const AddFoodAmountCheckThis = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Its calories and macros disagree by more than 20%.',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'trail mix' }),
+  walk: press(/^Trail mix, house/),
+});
+
+/** MM-321: an entry kept from before amounts were recorded, opened to change: it asks how it was measured. */
+export const EditFoodWithoutAmount = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'This entry was logged without an amount. Choose how it was measured to add one.',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'lunch', name: 'Demo soup', kcal: 220, proteinG: 9, carbsG: 30, fatG: 6, source: 'weighed' }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Demo soup' }));
+  },
+});
+
+/** MM-321: a new food, the label read with no camera on the phone: it says so and the fields stay. */
+export const NewOwnFoodNoCamera = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'One serving is',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New food')(canvas);
+    await press('Read the nutrition label')(canvas);
+  },
+});
+
+/** MM-321: scanning on a phone whose camera is not allowed: type the digits instead. */
+export const ScanNoCamera = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: /^The camera is not available/,
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Scan')(canvas);
+    await press('Scan with the camera')(canvas);
+  },
+});
+
+/** MM-321: entered by hand with alcohol: its grams, and what a standard drink is. */
+export const AddFoodWithAlcohol = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Enter manually')(canvas);
+    await press('Includes alcohol?')(canvas);
   },
 });

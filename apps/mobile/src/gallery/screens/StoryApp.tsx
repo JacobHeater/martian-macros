@@ -18,7 +18,9 @@ import type { StoryDevice } from './StoryDevice';
 import { StoryOpener } from './StoryOpener';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import type { StoryStores } from './StoryStores';
 import type { StoryTerms } from './StoryTerms';
+import { storyFoods } from './storyFoods';
 import { storyToday } from './storyToday';
 
 interface StoryAppProps {
@@ -28,16 +30,18 @@ interface StoryAppProps {
   scenario?: StoryScenario | undefined;
   /** What the phone brings: a health platform, a camera. Nothing of a device unless given. */
   device?: StoryDevice | undefined;
+  /** How storage behaves: a read still loading or one that failed (MM-321). Every read ready unless given. */
+  stores?: StoryStores | undefined;
   /** Whether the terms of use were agreed to. They were, unless a story is about the terms (MM-242). */
   terms?: StoryTerms | undefined;
   /** Brings the app to the screen the story is about, once it is up. */
   open?: ((stage: StoryStage) => void | Promise<void>) | undefined;
 }
 
-/** The fixture pack, written in memory and read as the app reads an installed pack. */
+/** The fixture pack with the stories' own foods, written in memory and read as the app reads an installed pack. */
 async function fixtureCatalog(): Promise<FoodCatalog> {
   const db = await WasmSqlDatabase.open();
-  await writeFoodPack(db, FixturePack.header, FixturePack.entries);
+  await writeFoodPack(db, FixturePack.header, [...FixturePack.entries, ...storyFoods]);
   return new FoodCatalog([await SqliteFoodPack.open(db)]);
 }
 
@@ -46,7 +50,7 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
  * the screens in a story are the app's own, reached the way the app reaches
  * them, with nothing of the device or the network underneath.
  */
-export function StoryApp({ palette, scenario = demoScenario, device, terms = 'agreed', open }: StoryAppProps) {
+export function StoryApp({ palette, scenario = demoScenario, device, stores, terms = 'agreed', open }: StoryAppProps) {
   const [services, setServices] = useState<AppServices>();
   useEffect(() => {
     let current = true;
@@ -67,12 +71,12 @@ export function StoryApp({ palette, scenario = demoScenario, device, terms = 'ag
       const catalog = await fixtureCatalog();
       const services = { ...fixtureServices(repos, new FixedClock(storyToday)), catalog: constant(catalog) };
       const brought = device === undefined ? services : await device(services);
-      if (current) setServices(brought);
+      if (current) setServices(stores === undefined ? brought : stores(brought));
     })();
     return () => {
       current = false;
     };
-  }, [scenario, device, palette, terms]);
+  }, [scenario, device, stores, palette, terms]);
   if (services === undefined) return null;
   return <App services={services}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
 }
