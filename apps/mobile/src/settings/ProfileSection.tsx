@@ -90,6 +90,7 @@ export function ProfileSection() {
               insulinCareTeamConfirmed: s.insulinCareTeamConfirmed,
               bariatricSurgery: s.bariatricSurgery,
               weightAffectingMedication: s.weightAffectingMedication,
+              fluidLimitedByClinician: s.fluidLimitedByClinician,
             }),
           }
         : {}),

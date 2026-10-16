@@ -92,6 +92,20 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchDetailLevel())).toBe('full');
     });
 
+    // MM-358: the water goal is on until switched off; an amount set switches it on again, and clearing it returns to the suggestion.
+    it('the water goal is switched off and on, apart from its amount', async () => {
+      expect((await first(repo.watchNutritionGoals())).waterGoalOff).toBe(false);
+      await repo.saveWaterGoal(3000);
+      await repo.saveWaterGoalOff(true);
+      let goals = await first(repo.watchNutritionGoals());
+      expect(goals.waterGoalOff).toBe(true);
+      expect(goals.waterGoalMl).toBe(3000);
+      await repo.saveWaterGoal(undefined);
+      goals = await first(repo.watchNutritionGoals());
+      expect(goals.waterGoalOff).toBe(false);
+      expect(goals.waterGoalMl).toBeUndefined();
+    });
+
     it('the under-eating notice is undismissed until dismissed', async () => {
       expect(await first(repo.watchUnderEatingDismissedOn())).toBeUndefined();
       const day = CalendarDate.of(2026, 10, 5);

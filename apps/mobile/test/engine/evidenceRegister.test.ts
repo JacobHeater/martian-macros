@@ -25,6 +25,8 @@ it('the evidence register covers safety and model tuning values', () => {
   const estimator = names('src/engine/TdeeEstimator.ts', 'TdeeEstimator.', constructorDefault);
   // The sodium limit and the water goal (MM-311, MM-313).
   const goals = names('src/domain/NutritionGoals.ts', 'NutritionGoals.', /static readonly (\w+) = [\d_]+;/g);
+  // The suggested water goal (MM-358): its numbers, then the table and the rule written by hand.
+  const water = names('src/domain/water/suggestedWaterGoalMl.ts', 'suggestedWaterGoalMl.', /^const (\w+) = [\d_.]+;/gm);
 
   // If a pattern stopped matching, the test would pass while checking
   // nothing: these are the numbers of values each file has today.
@@ -32,9 +34,10 @@ it('the evidence register covers safety and model tuning values', () => {
   expect(partition).toHaveLength(3);
   expect(trend).toHaveLength(8);
   expect(estimator).toHaveLength(9);
-  expect(goals).toHaveLength(7);
+  expect(goals).toHaveLength(6);
+  expect(water).toHaveLength(7);
 
-  const expected = [...safety, ...partition, ...trend, ...estimator, ...goals];
+  const expected = [...safety, ...partition, ...trend, ...estimator, ...goals, ...water, 'suggestedWaterGoalMl.baseMl', 'suggestedWaterGoalMl.withheld'];
   const registeredNames = new Set(register.rows.map((row) => row.name));
   const missing = expected.filter((name) => !registeredNames.has(name));
   expect(missing, 'Add an evidence row for each public tuning value.').toEqual([]);
