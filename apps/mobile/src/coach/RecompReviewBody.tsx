@@ -2,8 +2,8 @@ import type { MeasuredChange } from '../engine/MeasuredChange';
 import type { RecompReview } from '../engine/RecompReview';
 import type { Fmt } from '../format/Fmt';
 import { recompReviewText } from '../format/recompReviewText';
+import { signedPercent } from '../format/signedPercent';
 import { waistAmount } from '../format/waistAmount';
-import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { StatRow } from '../ui/StatRow';
 
 const direction = (change: MeasuredChange | undefined): string => {
@@ -32,7 +32,7 @@ export function RecompReviewBody({ review, fmt }: { review: RecompReview; fmt: F
       <StatRow label="Period" value={`${review.periodDays} days`} />
       <StatRow
         label="Trend weight"
-        value={weight === undefined ? 'Not enough logged' : `${weight > 0 ? '+' : ''}${toStringAsFixed(weight * 100, 1)}%`}
+        value={weight === undefined ? 'Not enough logged' : signedPercent(weight)}
       />
       <StatRow
         label="Waist"

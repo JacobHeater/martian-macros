@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { MiniTrend } from '../charts/MiniTrend';
 import { RecoveryQuestion } from '../domain/RecoveryQuestion';
 import { RecoveryRule } from '../engine/RecoveryRule';
@@ -24,6 +25,12 @@ export function RecoveryCard() {
   const all = useLoaded(state.recoveryCheckIns) ?? [];
   const due = useCell(state.recoveryCheckInDue);
   const today = useCell(state.today);
+  const [wasDue, setWasDue] = useState(due);
+  const [timesDue, setTimesDue] = useState(0);
+  if (due !== wasDue) {
+    setWasDue(due);
+    if (due) setTimesDue(timesDue + 1);
+  }
   const shown = all.length > RecoveryRule.shownCheckIns ? all.slice(all.length - RecoveryRule.shownCheckIns) : all;
   const latest = shown[shown.length - 1];
   let summary: string;
@@ -31,7 +38,9 @@ export function RecoveryCard() {
   else if (latest === undefined) summary = 'Five quick questions a week. Not answered yet.';
   else summary = `Last answered ${Fmt.day(latest.date, today)}.`;
   return (
-    <MmSection icon="heart" title="How you are holding up" summary={summary} collapsible initiallyExpanded={due}>
+    // Drawn anew each time it falls due, which may be after the check-ins are read, so it opens then;
+    // answering leaves it open with the answers (MM-339).
+    <MmSection key={timesDue} icon="heart" title="How you are holding up" summary={summary} collapsible initiallyExpanded={due}>
       {latest === undefined ? (
         <p className="app-text">
           Five quick questions a week on hunger, energy, sleep, training and mood. They are what the food log and the

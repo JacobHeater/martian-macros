@@ -63,3 +63,12 @@ recorded it, MM-231), so a "Check this" food is drawn. Looking at the new
 stories found nine defects: three fixed with their tests (MM-330, MM-331, MM-332) and six design defects
 ticketed with skipped tests, to go through Storybook and the panel (MM-333 to MM-338). Next: Coach and the
 monthly report.
+
+**Step 3 (2026-10-16): Coach.** Coach and the monthly report have no place left in the register: 21
+stories over scenarios the engine itself recognises (a stall, a stall over target, a measured estimate with
+partial days, one held at a safe limit, creatine settling, two hard weeks bringing the relief offer, twelve
+weeks of recomp with a review in its report, targets explained and unchanged), and the register is 109 places
+(144 before). Looking at them found four defects: MM-339 (the recovery section folded when due) and MM-341
+(a change that rounds to none was signed, in the recomp review and in `Fmt`) fixed with their tests; MM-340
+(Coach and the target history with nothing to show are dead ends) and MM-342 (sentences in the weekly
+summary's figure column) ticketed with skipped tests, for Storybook and the panel. Next: Progress and Train.
