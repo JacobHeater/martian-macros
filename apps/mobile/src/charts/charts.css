@@ -107,13 +107,37 @@
   margin: 0;
   font: var(--type-title);
 }
+/* The donut always centred, its figures beneath it (MM-354). */
+.chart-split {
+  --split-figure-line: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .chart-split-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-16);
+  gap: var(--space-12);
 }
 .chart-split-ring {
   flex: none;
+}
+/* No macros yet: the whole ring in the track grey. */
+.chart-split-empty {
+  fill: none;
+  stroke: var(--track);
+}
+/* Where the figures will be, as tall as they are, so the hero does not grow with the first food. */
+.chart-split-needs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(2 * var(--split-figure-line) + 2 * var(--space-4));
+  margin: var(--space-12) 0 0;
+  color: var(--text2);
+  font: var(--type-caption);
+  text-align: center;
 }
 .chart-sector-protein {
   fill: var(--protein);
@@ -125,7 +149,10 @@
   fill: var(--fat);
 }
 .chart-split-list {
-  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4) var(--space-16);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -133,8 +160,11 @@
 .chart-split-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: var(--space-4) 0;
   font: var(--type-label);
+  line-height: var(--split-figure-line);
+  white-space: nowrap;
 }
 .chart-text-protein {
   color: var(--protein);

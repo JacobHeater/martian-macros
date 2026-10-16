@@ -38,14 +38,19 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false }: 
   const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
   const energy = (macro: MacroKind) => grams[macro] * (macro === 'fat' ? 9 : 4);
   const total = MacroKind.values.reduce((sum, macro) => sum + energy(macro), 0);
-  // Less than half a calorie rounds to none: no split to show, never "0 g · 100%" (MM-331).
+  // Less than half a calorie rounds to none: no split to show, never "0 g · 100%" (MM-331). The ring is
+  // still drawn, whole and grey, where the split will be, with what it needs beneath it (MM-354).
   if (total < 0.5) {
+    const needs = isPreview
+      ? 'Enter macro amounts to preview the split.'
+      : 'Log food with protein, carbs or fat to see the split.';
     return (
-      <p className="chart-note">
-        {isPreview
-          ? 'Enter macro amounts to preview the protein, carbs and fat split.'
-          : 'Log macro amounts to see your protein, carbs and fat split.'}
-      </p>
+      <div className="chart-split">
+        <svg className="chart-split-ring" viewBox={`0 0 ${size} ${size}`} width={size} height={size} aria-hidden="true">
+          <circle className="chart-split-empty" cx={center} cy={center} r={(inner + outer) / 2} strokeWidth={outer - inner} />
+        </svg>
+        <p className="chart-split-needs">{needs}</p>
+      </div>
     );
   }
   const share = (macro: MacroKind) => `${toStringAsFixed((100 * energy(macro)) / total, 1)}%`;
