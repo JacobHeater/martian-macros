@@ -38,7 +38,8 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false }: 
   const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
   const energy = (macro: MacroKind) => grams[macro] * (macro === 'fat' ? 9 : 4);
   const total = MacroKind.values.reduce((sum, macro) => sum + energy(macro), 0);
-  if (total === 0) {
+  // Less than half a calorie rounds to none: no split to show, never "0 g · 100%" (MM-331).
+  if (total < 0.5) {
     return (
       <p className="chart-note">
         {isPreview

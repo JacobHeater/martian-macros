@@ -52,3 +52,14 @@ story cannot yet make happen. Working it down, story by story, is the next step.
 the page, so its test could end before the question's screen was pushed, and what coverage counted depended
 on timing; the check failed on a merge that touched nothing near it. The story now waits for "The rules
 behind this", and the register is 207 places. A story's `shows` must be words of the screen it covers.
+
+**Step 2 (2026-10-15): Food and Dashboard.** Stories can now make storage wait or fail: `screenStory`'s
+`stores` takes `waitingRead` or `failingRead` (one read of one store, the others as the fixtures have them),
+so the 17 loading and failed-read states are drawn like any other. Food and Dashboard have no place left in
+the register: 37 stories, and the register is 144 places (207 before). One place was code no phone can reach
+(the Dashboard's own failed-profile branch, which the app root shows first) and was removed, not drawn. The
+stories' pack adds a food whose numbers disagree (`storyFoods`; the fixture pack stays as the Dart writer
+recorded it, MM-231), so a "Check this" food is drawn. Looking at the new
+stories found nine defects: three fixed with their tests (MM-330, MM-331, MM-332) and six design defects
+ticketed with skipped tests, to go through Storybook and the panel (MM-333 to MM-338). Next: Coach and the
+monthly report.

@@ -673,7 +673,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                     onPress={() => fill(e)}
                   />
                 ))}
-              <FoodSearchResults query={query} onPick={(food) => void pick(food)} />
+              <FoodSearchResults
+                query={query}
+                onPick={(food) => void pick(food)}
+                alsoFound={customFoods.some((food) => matches(food.name)) || recents.some((e) => matches(e.name))}
+              />
             </>
           ) : recents.length > 0 ? (
             <>

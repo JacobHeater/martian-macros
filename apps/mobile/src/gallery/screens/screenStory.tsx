@@ -4,6 +4,7 @@ import { StoryApp } from './StoryApp';
 import type { StoryDevice } from './StoryDevice';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import type { StoryStores } from './StoryStores';
 import type { StoryTerms } from './StoryTerms';
 
 interface ScreenStory {
@@ -14,6 +15,8 @@ interface ScreenStory {
   scenario?: StoryScenario;
   /** What the phone brings; nothing of a device unless a story is about it. */
   device?: StoryDevice;
+  /** How storage behaves: a read still loading or one that failed (MM-321); every read ready unless given. */
+  stores?: StoryStores;
   open?: (stage: StoryStage) => void | Promise<void>;
   /** What a person does from there to reach the screen, given where the story is drawn. */
   walk?: (canvas: HTMLElement) => Promise<void>;
@@ -24,12 +27,12 @@ interface ScreenStory {
 }
 
 /** A story of the whole app brought to one screen, in the palette of the toolbar. */
-export function screenStory({ covers, shows, scenario, device, open, walk, terms, unthemed = false }: ScreenStory): StoryObj {
+export function screenStory({ covers, shows, scenario, device, stores, open, walk, terms, unthemed = false }: ScreenStory): StoryObj {
   return {
     parameters: { covers, shows },
     render: (_args, { globals }) => {
       const palette = globals['palette'] as ThemePreference;
-      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} terms={terms} open={open} />;
+      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} stores={stores} terms={terms} open={open} />;
     },
     ...(walk === undefined ? {} : { play: ({ canvasElement }) => walk(canvasElement) }),
   };

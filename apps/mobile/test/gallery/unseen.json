@@ -44,10 +44,6 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/app/AppRoot.tsx: <div className=\"app-centered app-centered-page\"> #3",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/app/AppRoot.tsx: if (!terms.ready) {",
     "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
   },
@@ -73,18 +69,6 @@
   },
   {
     "place": "src/app/ThemeChooserScreen.tsx: {error === undefined ? null : <Notice kind=\"caution\" text={error} />}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/charts/HistoryChart.tsx: if (values.length === 0) return <p className=\"chart-empty\">No records in this range yet.</p>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/charts/MacroSplitChart.tsx: if (total === 0) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/charts/TrendChart.tsx: if (points.length === 0) return <p className=\"chart-empty chart-empty-tall\">No weigh-ins in this range.</p>;",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
@@ -126,10 +110,6 @@
   {
     "place": "src/coach/CoachScreen.tsx: onStatusPress={() => void navigator.push(() => <TargetsHistoryScreen />)}",
     "reason": "Opened by a press no story walks; TargetsHistoryScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/coach/InsightCard.tsx: <StatRow key={label} label={label} value={value} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
     "place": "src/coach/LastChangeCard.tsx: <MmButton label=\"History\" kind=\"text\" onPress={() => void navigator.push(() => <TargetsHistoryScreen />)} />",
@@ -236,230 +216,6 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/dashboard/DashboardMetrics.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <HistoryChart series={series} today={today} days={days} unit={unit} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <MmButton label={label} kind=\"text\" onPress={() => state.homeTab.put(tab)} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <p className=\"app-text dashboard-recovery-note\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <p className=\"app-text\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <p className=\"app-text\">Log protein-containing food to populate this history.</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: <p className=\"app-text\">No coaching estimate available.</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: export function DashboardMetrics() {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: if (!intake.ready || !weights.ready || !waist.ready || !history.ready || !pauses.ready || !recovery.ready) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: if ([intake, weights, waist, history, pauses, recovery].some((source) => Loadable.hasFailed(source))) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: {facts.calories.size === 0 ? <p className=\"app-text\">Log food to populate your intake history.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardMetrics.tsx: {waists.length === 0 ? <p className=\"app-text\">Add waist measurements in Progress to see history.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardScreen.tsx: if (!pausesState.ready) return <p className=\"app-text app-centered\">Loading pause history…</p>;",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardScreen.tsx: if (Loadable.hasFailed(pausesState)) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardScreen.tsx: if (Loadable.hasFailed(setupState)) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardScreen.tsx: if ([foodState, historyState, weightsState].some((source) => Loadable.hasFailed(source))) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/dashboard/DashboardScreen.tsx: pause !== undefined ? () => void navigator.push(() => <PauseScreen />) : () => open('coach')",
-    "reason": "Opened by a press no story walks; PauseScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/dashboard/ReportReadyNotice.tsx: onPress={() => void navigator.push(() => <MonthlyReportScreen index={latest.index} />)}",
-    "reason": "Opened by a press no story walks; MonthlyReportScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <MmChoiceChip",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <MmChoiceChip key={u} label={portionUnitChipLabel(u)} selected={unit === u} onSelect={() => set({ unit: u })} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <div className=\"app-row food-chips\" role=\"group\" aria-label=\"Unit\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: <p className=\"app-subhead food-totals\" data-testid=\"logged-totals\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: const calculatedFields = (reference: ReferenceNutrition) => {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/AddFoodSheet.tsx: if (form.source === 'quickAdd') return <p className=\"app-caption\">Enter calories and macros for this food.</p>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/CalorieHero.tsx: <div className=\"food-hero-split\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodAmountStep.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodAmountStep.tsx: <p className=\"app-caption\">{consequence(grams, alternate)}</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodAmountStep.tsx: {food.brand === undefined ? null : <p className=\"app-text\">{food.brand}</p>}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodAmountStep.tsx: {note === undefined ? null : <Notice kind=\"info\" text={note} />}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodCompletenessRow.tsx: const ask = async () => {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodScreen.tsx: if (!pausesState.ready) return <p className=\"app-text app-centered\">Loading pause history…</p>;",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodScreen.tsx: if (Loadable.hasFailed(pausesState)) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodScreen.tsx: {alcoholKcal > 0 ? <p className=\"app-text app-muted food-line\">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodSearchResults.tsx: if (hits.length === 0) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/FoodTrustMark.tsx: {doubtful ? <span>{food.tierReason}</span> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/CustomFoodForm.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/CustomFoodForm.tsx: <> #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/CustomFoodForm.tsx: <MmTextField",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/CustomFoodForm.tsx: export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormProps) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/MyFoodsStep.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/MyFoodsStep.tsx: if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} onDone={() => show('list')} />;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/MyFoodsStep.tsx: if (page === 'recipeForm') return <RecipeForm recipe={editing} onDone={() => show('list')} />;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeForm.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeForm.tsx: export function RecipeForm({ recipe, onDone }: RecipeFormProps) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: <> #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: <MmListRow #2",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: <MmTextField label=\"Search ingredients\" value={query} onChange={setQuery} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/custom/RecipeIngredientAdder.tsx: export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredient) => void }) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/estimate/EstimateMealStep.tsx: <Notice",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/scan/BarcodeScanStep.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/scan/BarcodeScanStep.tsx: <MmButton label=\"Read the label\" expand onPress={() => onReadLabel(unknownGtin)} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/food/scan/BarcodeScanStep.tsx: <Notice",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/foodPacks/AvailablePackCard.tsx: export function AvailablePackCard({ listing }: { listing: PackListing }) {",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
@@ -533,10 +289,6 @@
   },
   {
     "place": "src/pause/PauseScreen.tsx: <p className=\"app-caption\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/pause/PauseScreen.tsx: function shown(pause: Pause, now: CalendarDate) {",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
@@ -773,10 +525,6 @@
   },
   {
     "place": "src/ui/MmDatePicker.tsx: <div ref={years} className=\"mm-year-list\" role=\"listbox\" aria-label=\"Year\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/ui/MmListRow.tsx: <button type=\"button\" className=\"mm-list-row-main mm-list-row-button\" onClick={onPress}>",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
