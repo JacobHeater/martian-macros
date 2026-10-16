@@ -72,3 +72,11 @@ weeks of recomp with a review in its report, targets explained and unchanged), a
 (a change that rounds to none was signed, in the recomp review and in `Fmt`) fixed with their tests; MM-340
 (Coach and the target history with nothing to show are dead ends) and MM-342 (sentences in the weekly
 summary's figure column) ticketed with skipped tests, for Storybook and the panel. Next: Progress and Train.
+
+**Step 4 (2026-10-16): Progress and Train.** No place of either is left in the register: 28 stories, and
+the register is 70 places (109 before). New scenarios: an old lifter (qualifying squats past 90 days, bench
+presses that never qualify, a set of a since-deleted exercise of their own), a workout an hour in with a set
+being timed, a finished workout paused along the way, weight events from onboarding and the person.
+Looking at them found two defects: MM-343 (Progress asked for a weigh-in while the trend loaded) fixed with
+its test; MM-344 (the strength trends are cards inside their section) ticketed with a skipped test. Next:
+Settings, the food packs and the app shell.
