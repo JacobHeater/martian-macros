@@ -112,7 +112,12 @@ it('loads and amounts as typed back', () => {
 });
 
 it('sizes of files', () => {
-  expect(each(dart.bytes, megabytes)).toEqual(dart.megabytes);
+  // MM-345: under a tenth of a megabyte the app says kilobytes, where the Flutter app said "0.0 MB".
+  const kilobytesBelowATenth = dart.megabytes.map((text, i) => {
+    const bytes = dart.bytes[i] as number;
+    return bytes < 100000 ? `${Math.round(bytes / 1000)} kB` : text;
+  });
+  expect(each(dart.bytes, megabytes)).toEqual(kilobytesBelowATenth);
 });
 
 it('timers and spoken lengths of time', () => {

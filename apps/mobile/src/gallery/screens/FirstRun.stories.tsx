@@ -1,11 +1,16 @@
 import type { Meta } from '@storybook/react-vite';
+import { waitingRead } from './waitingRead';
+import { minorScenario } from './minorScenario';
+import { failingWrite } from './failingWrite';
+import { failingRead } from './failingRead';
+import { typicalSetup } from '../../fixtures/typicalSetup';
+import { Pause } from '../../domain/Pause';
+import { userEvent, within } from 'storybook/test';
 import { HealthRecheckScreen } from '../../app/HealthRecheckScreen';
 import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
-import { minorScenario } from './minorScenario';
 import { newInstallScenario } from './newInstallScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
-import { userEvent, within } from 'storybook/test';
 import { walkOnboarding } from './walkOnboarding';
 
 /** What a person sees before the app has a plan for them, and when it has to stop and ask. */
@@ -131,4 +136,103 @@ export const HealthRecheck = screenStory({
   covers: ['HealthRecheckScreen'],
   shows: 'Health check',
   open: ({ navigator }) => void navigator.push(() => <HealthRecheckScreen />),
+});
+
+// ---- MM-321: the app shell, in the states no story drew ----
+
+/** Presses the button named `name` anywhere on the page, once it is there. */
+const pressAnywhere = (name: string | RegExp) => async (canvas: HTMLElement) => {
+  const button = await within(canvas.ownerDocument.body).findByRole('button', { name }, { timeout: 8000 });
+  await userEvent.click(button);
+};
+
+/** MM-321: the gear on the home screens opens Settings. */
+export const HomeOpensSettings = screenStory({
+  covers: ['DashboardScreen', 'SettingsScreen'],
+  shows: 'Today’s setup',
+  walk: pressAnywhere('Settings'),
+});
+
+/** MM-321: under eighteen: correcting the date of birth opens Settings. */
+export const AdultsOnlyOpensSettings = screenStory({
+  covers: ['AdultsOnlyScreen', 'SettingsScreen'],
+  shows: 'Today’s setup',
+  scenario: minorScenario,
+  walk: pressAnywhere('Correct date of birth'),
+});
+
+/** MM-321: the demo build, its notice around every screen. */
+export const DemoBuild = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', demo: true });
+
+/** MM-321: the look still being read: the app waits on its spinner. */
+export const ThemeLoading = screenStory({
+  covers: ['DashboardScreen'],
+  stores: waitingRead('preferences', 'watchThemePreference'),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
+});
+
+/** MM-321: the look could not be read. */
+export const ThemeFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Could not load your theme preference.',
+  stores: failingRead('preferences', 'watchThemePreference'),
+});
+
+/** MM-321: the agreement to the terms still being read. */
+export const TermsLoading = screenStory({
+  covers: ['TermsGuardScreen'],
+  stores: waitingRead('preferences', 'watchTermsAcceptance'),
+  walk: async (canvas) => {
+    await within(canvas).findByRole('progressbar', { name: 'Loading' });
+  },
+});
+
+/** MM-321: the agreement to the terms could not be read. */
+export const TermsFailed = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: /could not/i,
+  stores: failingRead('preferences', 'watchTermsAcceptance'),
+});
+
+/** MM-321: back after twelve days without a log or a weigh-in: welcome back. */
+export const WelcomeBackAfterAGap = screenStory({
+  covers: ['WelcomeBackScreen'],
+  shows: 'Welcome back',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today }));
+    for (let d = 60; d >= 12; d -= 2) await repos.weights.saveWeight(today.addDays(-d), 86 - (60 - d) * 0.03);
+  },
+});
+
+/** MM-321: a pause that ended yesterday, nothing weighed since: resuming. */
+export const ResumingAfterAPause = screenStory({
+  covers: ['WelcomeBackScreen'],
+  shows: 'Ready to resume?',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today }));
+    for (let d = 60; d >= 9; d -= 2) await repos.weights.saveWeight(today.addDays(-d), 86 - (60 - d) * 0.03);
+    await repos.pauses.savePause(new Pause({ from: today.addDays(-8), to: today.addDays(-1), reason: 'travel' }));
+  },
+});
+
+/** MM-321: ninety days since the health check: it is asked again before anything else. */
+export const HealthCheckDue = screenStory({
+  covers: ['HealthRecheckScreen'],
+  shows: 'Health check',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-120), healthCheckConfirmedOn: today.addDays(-100) }));
+    await repos.weights.saveWeight(today, 84);
+  },
+});
+
+/** MM-321: the first look chosen, and the save failing. */
+export const ThemeChoiceFails = screenStory({
+  covers: ['ThemeChooserScreen'],
+  shows: 'Could not save your theme. Please try again.',
+  scenario: newInstallScenario,
+  unthemed: true,
+  stores: failingWrite('preferences', 'saveThemePreference'),
+  walk: pressAnywhere('Continue'),
 });
