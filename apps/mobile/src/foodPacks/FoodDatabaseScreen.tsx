@@ -55,11 +55,24 @@ export function FoodDatabaseScreen() {
       );
     }
     if (manifest.manifest !== undefined) {
-      return manifest.manifest.packs
+      // A pack on the phone at the listed version is said once, above (MM-346).
+      const offered = manifest.manifest.packs
         .filter(
           (listing) => download.listing?.id !== listing.id || download.status === 'idle' || download.status === 'done',
         )
-        .map((listing) => <AvailablePackCard key={listing.id} listing={listing} />);
+        .filter((listing) => installed.find((pack) => pack.id === listing.id)?.version !== listing.version);
+      if (offered.length > 0) return offered.map((listing) => <AvailablePackCard key={listing.id} listing={listing} />);
+      // A download that just finished says so itself.
+      if (download.status === 'done') return null;
+      return (
+        <MmListGroup>
+          <MmListRow
+            leadingIcon={installed.length > 0 ? 'checkCircle' : 'info'}
+            title="Nothing new to download"
+            subtitle={installed.length > 0 ? 'Your food database is the newest version.' : 'No food database is offered yet.'}
+          />
+        </MmListGroup>
+      );
     }
     if (download.status === 'running') return null;
     return (

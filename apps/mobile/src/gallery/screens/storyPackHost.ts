@@ -11,14 +11,25 @@ import type { StoryDevice } from './StoryDevice';
  * memory. `stall` stops the download halfway with the connection open, as a
  * slow signal does; `corrupt` lists the wrong checksum, so the download is
  * thrown away; `checking` holds the manifest itself; `down` answers every
- * request with a server error.
+ * request with a server error. `listed` is the version the host lists;
+ * `installed` puts that version of the pack on the phone before the story
+ * opens (MM-346).
  */
 export function storyPackHost({
   stall = false,
   corrupt = false,
   checking = false,
   down = false,
-}: { stall?: boolean; corrupt?: boolean; checking?: boolean; down?: boolean } = {}): StoryDevice {
+  listed = '2026-10-09',
+  installed,
+}: {
+  stall?: boolean;
+  corrupt?: boolean;
+  checking?: boolean;
+  down?: boolean;
+  listed?: string;
+  installed?: string;
+} = {}): StoryDevice {
   return async (services) => {
     const db = await WasmSqlDatabase.open();
     await writeFoodPack(
@@ -56,7 +67,9 @@ export function storyPackHost({
     const manifestUrl = 'https://packs.example.test/manifest.json';
     const packUrl = 'https://packs.example.test/barcode_us.pack.gz';
     const manifest = new TextEncoder().encode(
-      '{"packs":[{"id":"barcode_us","title":"Barcode foods, United States","version":"2026-10-09",' +
+      '{"packs":[{"id":"barcode_us","title":"Barcode foods, United States","version":"' +
+        listed +
+        '",' +
         `"formatVersion":${FoodPackFormat.version},"url":"${packUrl}","bytes":${zipped.length},"sha256":"${sha}"}]}`,
     );
     const http = new InMemoryPackHttp(
@@ -75,6 +88,13 @@ export function storyPackHost({
         if (url.toString() === packUrl) http.stallAfterBytes = Math.floor(zipped.length / 2);
         return get(url, options);
       };
+    }
+    if (installed !== undefined) {
+      const partial = await services.packStore.writePartial('barcode_us', installed, { append: false });
+      await partial.write(zipped);
+      await partial.close();
+      await (await services.packStore.stage('barcode_us', installed, { gzip: true })).close();
+      await services.packStore.commit('barcode_us', installed, { title: 'Barcode foods, United States' });
     }
     return { ...services, packHttp: http, packManifestUrl: manifestUrl };
   };

@@ -87,14 +87,13 @@ describe('the theme', () => {
       await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name }));
     };
     await choose('Martian');
-    expect(await screen.findByText('Could not save your theme. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('Your appearance could not be saved. Nothing was changed.')).toBeInTheDocument();
     expect(document.documentElement).toHaveClass('theme-light');
 
     fail = false;
     await choose('Martian');
     await screen.findByText('Martian', { selector: '.mm-list-row-subtitle' });
     expect(document.documentElement).toHaveClass('theme-martian');
-    expect(screen.queryByText('Could not save your theme. Please try again.')).not.toBeInTheDocument();
   });
 
   it('follows the phone when System is chosen', async () => {

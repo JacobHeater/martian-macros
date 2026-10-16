@@ -187,7 +187,7 @@ it('a downloaded pack is listed, searched, and can be removed', async () => {
   await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
   expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
   expect(await packs.findByText(/^Version 2026-10-09 · /)).toBeInTheDocument();
-  expect(await packs.findByRole('button', { name: 'Up to date' })).toBeDisabled();
+  expect(packs.queryByRole('button', { name: 'Up to date' })).not.toBeInTheDocument();
 
   await userEvent.click(packs.getByRole('button', { name: 'Remove' }));
   const sure = await screen.findByRole('dialog', { name: 'Remove this food database?' });
@@ -197,7 +197,7 @@ it('a downloaded pack is listed, searched, and can be removed', async () => {
 });
 
 // MM-346: an installed pack that is up to date is listed once, not offered again below its notice.
-it.skip('MM-346: an up-to-date pack is not offered for download again', async () => {
+it('MM-346: an up-to-date pack is not offered for download again', async () => {
   const d = await fixtureDownload();
   http = new InMemoryPackHttp([[packUrl, d.gz]]);
   http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
@@ -209,4 +209,35 @@ it.skip('MM-346: an up-to-date pack is not offered for download again', async ()
   await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
   expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
   expect(packs.queryByRole('button', { name: 'Up to date' })).not.toBeInTheDocument();
+});
+
+/** The fixture pack put on the phone at `version`, as a finished download leaves it. */
+async function installed(gz: Uint8Array, version: string) {
+  const partial = await store.writePartial('barcode_us', version, { append: false });
+  await partial.write(gz);
+  await partial.close();
+  await (await store.stage('barcode_us', version, { gzip: true })).close();
+  await store.commit('barcode_us', version, { title: 'Barcode foods, United States' });
+}
+
+it('MM-346: back with the pack at the listed version, nothing is offered and it says so', async () => {
+  const d = await fixtureDownload();
+  await installed(d.gz, '2026-10-09');
+  http = new InMemoryPackHttp([[packUrl, d.gz]]);
+  http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
+  const packs = await openScreen(manifestUrl);
+  await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
+  expect(await packs.findByText('Nothing new to download')).toBeInTheDocument();
+  expect(packs.getByText('Your food database is the newest version.')).toBeInTheDocument();
+  expect(packs.queryByRole('button', { name: /^(Download|Update|Up to date)$/ })).not.toBeInTheDocument();
+});
+
+it('MM-346: a different version listed than the one on the phone is offered as an update', async () => {
+  const d = await fixtureDownload();
+  await installed(d.gz, '2026-10-01');
+  http = new InMemoryPackHttp([[packUrl, d.gz]]);
+  http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
+  const packs = await openScreen(manifestUrl);
+  await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
+  expect(await packs.findByRole('button', { name: 'Update' })).toBeEnabled();
 });
