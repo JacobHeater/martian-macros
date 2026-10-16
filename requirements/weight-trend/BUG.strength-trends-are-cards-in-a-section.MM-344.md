@@ -1,6 +1,6 @@
 ---
 id: MM-344
-status: proposed
+status: done
 component: weight-trend
 related: [MM-321, MM-224, MM-253, MM-77]
 ---
@@ -25,5 +25,10 @@ Scenario: Lifts with a trend
 ```
 
 ## Notes
-Guarded by "MM-344" in `apps/mobile/test/gallery/registerDefects.test.tsx`, skipped with this ID until the
-fix lands. A design fix: drawn in Storybook, reviewed by the panel's designer and UX guard, then built.
+Guarded by "MM-344" in `apps/mobile/test/gallery/registerDefects.test.tsx` and the strength tests in
+`apps/mobile/test/progress/strengthProgress.test.tsx`, which failed before the fix. Drawn in Storybook and reviewed by the panel's product designer and UX guard (2026-10-16), with MM-344 and MM-348 as one change; their changes were built. "Strength trends" is a
+list group: a row per recent lift ("Est. max 319.7 lb · +16.8 lb in 4 weeks", "with body weight" for a bodyweight
+exercise, "4-week change not ready yet" before there is one), opening its history, where the chart lives (rule 4,
+one home per fact; the designer ruled out a sparkline per row), then "All lift histories". "Lift histories" is a
+list group too, with its own waiting and failure (no Progress section inside it). A failed read is
+`ReadFailedNotice`, at the column's width inside a section. The plural slip found on the way is MM-355.
