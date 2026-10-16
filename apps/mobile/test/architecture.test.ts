@@ -33,6 +33,7 @@ const libraries: Record<string, readonly string[]> = {
   '@mui/icons-material/': ['ui/'],
   '@storybook/react-vite': ['gallery/'],
   'storybook/test': ['gallery/'],
+  'storybook/preview-api': ['gallery/'],
   vitest: ['*.test.ts', '*.test.tsx'],
 };
 
