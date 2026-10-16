@@ -2,4 +2,6 @@
 export interface WaterGoal {
   readonly ml: number;
   readonly suggested: boolean;
+  /** The amount suggested for the person, also while their own is in force; undefined where none is (MM-358). */
+  readonly suggestedMl: number | undefined;
 }

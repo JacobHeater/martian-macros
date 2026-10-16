@@ -766,9 +766,8 @@ export class AppState {
       const goals = of(this.nutritionGoals);
       const setup = of(this.setup);
       if (goals === undefined || setup === undefined || goals.waterGoalOff) return undefined;
-      if (goals.waterGoalMl !== undefined) return { ml: goals.waterGoalMl, suggested: false };
       const weights = of(this.weights) ?? [];
-      const ml = suggestedWaterGoalMl({
+      const suggestedMl = suggestedWaterGoalMl({
         sex: setup.profile.sex,
         weightKg: this.coach.value?.trendWeightKg ?? weights[weights.length - 1]?.weightKg,
         proteinTargetG: this.currentTargets.value?.targets.proteinG,
@@ -776,7 +775,8 @@ export class AppState {
         screening: setup.screening,
         units: setup.unitSystem,
       });
-      return ml === undefined ? undefined : { ml, suggested: true };
+      if (goals.waterGoalMl !== undefined) return { ml: goals.waterGoalMl, suggested: false, suggestedMl };
+      return suggestedMl === undefined ? undefined : { ml: suggestedMl, suggested: true, suggestedMl };
     });
 
     this.strengthTrends = derived<Loadable<readonly StrengthTrend[]>>(() => {

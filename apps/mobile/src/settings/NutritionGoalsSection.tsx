@@ -3,6 +3,7 @@ import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import { WaterUnits } from '../domain/water/WaterUnits';
 import { detailLevelLabel } from '../format/detailLevelLabel';
+import { waterAmount } from '../format/waterAmount';
 import { FormatError } from '../lang/FormatError';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
@@ -45,17 +46,23 @@ export function NutritionGoalsSection() {
   const screening = setup?.screening;
   // Where a care team sets what is drunk, nothing is suggested (MM-358, MM-359).
   let careTeam: string | undefined;
-  if (screening?.chronicKidneyDisease) careTeam = 'With kidney disease, your care team sets how much you drink.';
-  else if (screening?.bariatricSurgery) careTeam = 'After bariatric surgery, your care team sets how much you drink.';
-  else if (screening?.fluidLimitedByClinician) careTeam = 'Your clinician limits how much you drink.';
+  if (screening?.chronicKidneyDisease) careTeam = 'With kidney disease, your care team sets your fluids.';
+  else if (screening?.bariatricSurgery) careTeam = 'After bariatric surgery, your care team sets your fluids.';
+  else if (screening?.fluidLimitedByClinician) careTeam = 'Your clinician limits your fluids.';
+  const who = screening?.chronicKidneyDisease === true || screening?.bariatricSurgery === true ? 'care team' : 'clinician';
   // On unless switched off; where nothing is suggested, only once an amount is set.
   const waterOn = !goals.waterGoalOff && (careTeam === undefined || goals.waterGoalMl !== undefined || setting);
-  let amountNote: string | undefined;
-  if (careTeam !== undefined) amountNote = 'Type the amount your care team gave you.';
-  else if (water?.suggested === true) amountNote = 'Suggested for you, from your protein target and training days.';
+  // Read with the field, not beside it (the panel's UX-2); a limit is never asked for as a goal to fill (SA S-1).
+  let amountNote: string;
+  if (careTeam !== undefined) {
+    amountNote = `Only if your ${who} gave you an amount of water to drink. This counts plain water only, not other drinks or food.`;
+  } else if (water?.suggested === true) amountNote = 'Suggested from your protein target and training. Type your own to change it.';
   else amountNote = 'Your own amount.';
+  const amountField = `Daily water goal, ${imperial ? 'fluid ounces' : 'litres'}`;
   const waterRange = imperial ? 'From 17 to 202 fl oz.' : 'From 0.5 to 6 L.';
-  const high = water !== undefined && water.ml > NutritionGoals.highWaterGoalMl;
+  // With an eating-disorder history the note comes sooner, at the cap of a suggestion (the panel's safety S-4).
+  const highAt = screening?.eatingDisorderHistory === true ? NutritionGoals.highWaterGoalEatingDisorderMl : NutritionGoals.highWaterGoalMl;
+  const high = water !== undefined && water.ml > highAt;
 
   /** A switch whose save fails says so and stays as it was, never springing back in silence (MM-325). */
   const switched = (goal: string, save: Promise<void>) =>
@@ -108,7 +115,11 @@ export function NutritionGoalsSection() {
         <MmSwitchRow
           leadingIcon="water"
           title="Daily water goal"
-          subtitle={careTeam ?? 'Plain water only. Drink to thirst, spread through the day; more in heat.'}
+          subtitle={
+            careTeam === undefined
+              ? 'Plain water only. Drink to thirst, spread through the day; more in heat.'
+              : `${careTeam}${waterOn ? ' Type an amount below only if they gave you one.' : ''}`
+          }
           value={waterOn}
           onChange={(on) => {
             setSetting(on);
@@ -118,15 +129,14 @@ export function NutritionGoalsSection() {
         {!waterOn || (water === undefined && !setting) ? null : (
           <MmListRow
             title="Amount"
-            subtitle={amountNote}
             entry={
               <NumberEntry
                 // A new suggestion, or a return to it, starts the field again.
                 key={`${water?.ml ?? 'none'}-${String(water?.suggested)}`}
-                title={`Daily water goal, ${imperial ? 'fluid ounces' : 'litres'}`}
+                title={amountField}
                 unit={imperial ? 'fl oz' : 'L'}
                 initial={water === undefined ? undefined : imperial ? String(roundHalfAwayFromZero(WaterUnits.mlToFlOz(water.ml))) : litres(water.ml)}
-                hint={high ? `More than most people need; spread it through the day. ${waterRange}` : waterRange}
+                hint={`${amountNote} ${high ? `More than most people need; spread it through the day. ${waterRange}` : waterRange}`}
                 refusal="That goal is out of range."
                 saves="water goal"
                 saveKind="secondary"
@@ -140,10 +150,18 @@ export function NutritionGoalsSection() {
           />
         )}
         {/* Their own amount set, the way back to the one suggested for them (MM-358). */}
-        {!waterOn || goals.waterGoalMl === undefined || careTeam !== undefined ? null : (
+        {!waterOn || goals.waterGoalMl === undefined || water?.suggestedMl === undefined ? null : (
           <MmListRow
+            leadingIcon="history"
             title="Use the suggested amount"
-            onPress={() => switched('water goal', services.preferences.saveWaterGoal(undefined))}
+            subtitle={`Back to ${waterAmount(water.suggestedMl, imperial ? 'imperial' : 'metric')}, from your protein target and training.`}
+            onPress={() => {
+              // The row goes once pressed: focus moves to the field, now holding the suggestion (the panel's UX-3).
+              const back = services.preferences.saveWaterGoal(undefined).then(() => {
+                requestAnimationFrame(() => document.querySelector<HTMLInputElement>(`input[aria-label="${amountField}"]`)?.focus());
+              });
+              switched('water goal', back);
+            }}
           />
         )}
       </MmListGroup>
