@@ -1,12 +1,16 @@
 import type { Meta } from '@storybook/react-vite';
+import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
 import { demoWith } from './demoWith';
+import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
+import { pausedScenario } from './pausedScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 import { waistDueScenario } from './waistDueScenario';
+import { waitingRead } from './waitingRead';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -122,4 +126,118 @@ export const MicrosRemembered = screenStory({
   covers: ['DashboardScreen'],
   shows: 'Grams',
   scenario: demoWith({ detail: 'full', picture: 'micros' }),
+});
+
+/** Opens "More about this week", once the Dashboard is there. */
+const openHistory = async (canvas: HTMLElement) => {
+  const more = await within(canvas).findByRole('button', { name: /More about this week/ });
+  await userEvent.click(more);
+  reveal(more);
+};
+
+/** MM-321: the history one tap down, over the demo's ten weeks. */
+export const History = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Your metrics',
+  walk: openHistory,
+});
+
+/** MM-321: the history on the first day, with nothing recorded yet. */
+export const HistoryFirstDay = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Log food to populate your intake history.',
+  scenario: firstDayScenario,
+  walk: openHistory,
+});
+
+/** MM-321: the history while the recovery check-ins are still being read. */
+export const HistoryLoading = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Loading your recorded metrics…',
+  stores: waitingRead('recovery', 'watchRecoveryCheckIns'),
+  walk: openHistory,
+});
+
+/** MM-321: the history when the waist measurements could not be read. */
+export const HistoryFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Dashboard history could not be loaded. Reopen the app to retry.',
+  stores: failingRead('waist', 'watchWaist'),
+  walk: openHistory,
+});
+
+/** MM-321: the Dashboard while the pauses are still being read. */
+export const LoadingPauses = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Loading pause history…',
+  stores: waitingRead('pauses', 'watchPauses'),
+});
+
+/** MM-321: the Dashboard while the target history is still being read. */
+export const Loading = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Loading your Dashboard…',
+  stores: waitingRead('targets', 'watchTargetsHistory'),
+});
+
+/** MM-321: the pauses could not be read. */
+export const PausesFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Pause history could not be loaded. Reopen the app to retry.',
+  stores: failingRead('pauses', 'watchPauses'),
+});
+
+/** MM-321: the profile could not be read: the app says so before any screen. */
+export const ProfileFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Could not open your data.',
+  stores: failingRead('setup', 'watchSetup'),
+});
+
+/** MM-321: the day's food or the target history could not be read. */
+export const RecordsFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Dashboard records could not be loaded. Reopen the app to retry.',
+  stores: failingRead('targets', 'watchTargetsHistory'),
+});
+
+/** MM-321: paused for travel; the hero's line says so and opens the pause. */
+export const Paused = screenStory({
+  covers: ['DashboardScreen', 'PauseScreen'],
+  shows: /^Paused until/,
+  scenario: pausedScenario,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Paused until/ }));
+  },
+});
+
+/** MM-321: the history while paused: paused days stay as observations. */
+export const HistoryPaused = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /^Paused days remain visible as observations/,
+  scenario: pausedScenario,
+  walk: openHistory,
+});
+
+/** MM-321: the history with no weigh-in kept (each one deleted): no coaching estimate yet. */
+export const HistoryNoWeighIn = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'No coaching estimate available.',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
+  },
+  walk: openHistory,
+});
+
+/** MM-321: a month since onboarding: the first report is ready, and opens from the Dashboard. */
+export const ReportReady = screenStory({
+  covers: ['DashboardScreen', 'MonthlyReportScreen'],
+  shows: 'What you did',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-31), healthCheckConfirmedOn: today }));
+    for (let day = 31; day >= 0; day -= 3) await repos.weights.saveWeight(today.addDays(-day), 88 - (31 - day) * 0.05);
+  },
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Open the report' }));
+  },
 });

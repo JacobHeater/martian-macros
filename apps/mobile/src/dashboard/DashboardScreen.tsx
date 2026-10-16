@@ -58,9 +58,7 @@ export function DashboardScreen() {
   const workouts = useLoaded(state.workouts) ?? [];
   const current = useCell(state.currentTargets);
 
-  if (Loadable.hasFailed(setupState)) {
-    return <Notice kind="caution" text="Your profile could not be loaded. Reopen the app to retry." />;
-  }
+  // The app shows nothing below its root until the profile is read, and says so there when it fails (AppRoot).
   const setup = Loadable.valueOf(setupState);
   if (setup === undefined) return null;
   if (Loadable.hasFailed(pausesState)) {

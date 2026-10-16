@@ -3,6 +3,7 @@ import { calibrationDays, type MonthlyReport, ReportPeriod } from '../engine';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { explanationLineText } from './explanationLineText';
 import { Fmt } from './Fmt';
+import { wholeDaysLogged } from './wholeDaysLogged';
 
 type Pairs = (readonly [label: string, value: string])[];
 
@@ -98,8 +99,8 @@ export class MonthlyReportText {
     switch (report.estimateGap) {
       case 'tooFewFoodDays':
         return (
-          `Not measured this month: only ${report.completeDays} whole days ` +
-          `were logged, and the coach needs at least ${calibrationDays} to ` +
+          `Not measured this month: ${wholeDaysLogged(report.completeDays)}, ` +
+          `and the coach needs at least ${calibrationDays} to ` +
           'tell your expenditure from the scale.'
         );
       case 'notSettled':
