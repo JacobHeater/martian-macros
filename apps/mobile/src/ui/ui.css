@@ -109,7 +109,8 @@
 .mm-fab {
   position: absolute;
   right: var(--space-16);
-  bottom: var(--space-16);
+  /* Above a snack while one shows (MM-302). */
+  bottom: calc(var(--space-16) + var(--mm-snack-clearance, 0px));
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);
@@ -1205,11 +1206,14 @@
   color: var(--text2);
 }
 
-/* A snack (MM-272): one with an action waits for it; one without goes after four seconds. */
+/*
+ * A snack (MM-272): one with an action waits for it; one without goes after four seconds.
+ * It stands above the navigation bar while one is shown (MM-302), else above the safe area.
+ */
 .mm-snack-host {
   position: fixed;
   right: var(--space-16);
-  bottom: calc(var(--space-16) + env(safe-area-inset-bottom));
+  bottom: calc(var(--mm-navigation-bar-height, env(safe-area-inset-bottom)) + var(--space-16));
   left: var(--space-16);
   z-index: 90;
   display: flex;

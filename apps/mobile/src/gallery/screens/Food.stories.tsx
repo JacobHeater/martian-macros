@@ -50,6 +50,18 @@ export const EntryMenu = screenStory({
   },
 });
 
+/** MM-302: an entry deleted; the Undo snack stands above the navigation bar and Add food rises above it. */
+export const EntryRemoved = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Undo',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Delete' }));
+  },
+});
+
 export const AddFood = screenStory({ covers: ['AddFoodSheet'], shows: 'Search foods', open: addFood });
 
 /** MM-239: the search field with the keyboard in it shows one mark of focus, its box. */

@@ -1,3 +1,4 @@
+import { FormatError } from '../../src/lang/FormatError';
 import AddOutlined from '@mui/icons-material/AddOutlined';
 import { readFileSync } from 'node:fs';
 import { render, screen, within } from '@testing-library/react';
@@ -293,7 +294,7 @@ describe('entering one number', () => {
   it('says the value looks off when it is not accepted', async () => {
     render(
       card(async () => {
-        throw new Error('too light to be real');
+        throw new FormatError('too light to be real');
       }),
     );
     await userEvent.type(screen.getByRole('textbox', { name: "Today's weigh-in" }), '5');

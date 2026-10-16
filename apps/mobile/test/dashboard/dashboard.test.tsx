@@ -10,6 +10,8 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
 import { renderApp } from '../support/renderApp';
+import { ReminderRule } from '../../src/engine/ReminderRule';
+import { Fmt } from '../../src/format/Fmt';
 
 /** The Dashboard. Carried over from dashboard_test.dart. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -86,7 +88,7 @@ it('with no weigh-in today the weight card asks for one', async () => {
   await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save weigh-in' }));
   // Once saved, the weight row shows the trend and no longer asks.
   expect(await screen.findByText(/^Trend [\d.]+ (lb|kg)$/)).toBeInTheDocument();
   expect(screen.queryByRole('textbox', { name: 'Today’s weigh-in' })).not.toBeInTheDocument();
@@ -104,7 +106,7 @@ it('asks for the weigh-in in the first row of the list group, and answers in the
   const group = field.closest('.mm-list-group');
   expect(group).not.toBeNull();
   expect(group?.firstElementChild?.contains(field)).toBe(true);
-  expect(group).toHaveTextContent('No waist measurement yet');
+  expect(group).toHaveTextContent('Next check-in');
   await userEvent.type(field, '181.4{Enter}');
   const trend = await screen.findByText(/^Trend [\d.]+ (lb|kg)$/);
   expect(group?.firstElementChild?.contains(trend)).toBe(true);
@@ -115,7 +117,7 @@ it('says the weigh-in was saved, with the number typed', async () => {
   await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save weigh-in' }));
   expect(await screen.findByRole('status')).toHaveTextContent('Saved 181.4 lb for today');
 });
 
@@ -168,4 +170,86 @@ it('pressing the coach line opens the Coach destination', async () => {
   renderApp(repos, today);
   await userEvent.click(await screen.findByText(/Targets went down about 80 kcal/));
   expect(await screen.findByRole('heading', { name: 'Your targets' })).toBeInTheDocument();
+});
+
+// MM-301 (ME-4): the Dashboard asks on the day the weekly reminder does, never sooner.
+it('asks for the waist from the day a measurement stops counting, not before', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  await repos.waist.saveWaist(today.addDays(-(ReminderRule.measurementEveryDays - 1)), 94);
+  const view = renderApp(repos, today);
+  expect(await screen.findByText('Waist · ' + Fmt.day(today.addDays(-(ReminderRule.measurementEveryDays - 1)), today))).toBeInTheDocument();
+  expect(screen.queryByRole('textbox', { name: 'Today’s waist, inches' })).not.toBeInTheDocument();
+  view.unmount();
+  renderApp(repos, today.addDays(1));
+  expect(await screen.findByRole('textbox', { name: 'Today’s waist, inches' })).toBeInTheDocument();
+});
+
+// MM-301 (PD-1, UX-3): the weekly waist's Save is secondary, and each Save is heard with what it saves.
+it('names each Save for what it saves, and keeps the waist Save secondary', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
+  await userEvent.type(screen.getByRole('textbox', { name: 'Today’s waist, inches' }), '36');
+  expect(screen.getByRole('button', { name: 'Save weigh-in' })).toHaveClass('mm-button-primary');
+  expect(screen.getByRole('button', { name: 'Save waist' })).toHaveClass('mm-button-secondary');
+});
+
+// MM-301: the waist is measured in place when none counts, from one reading, and the save offers Progress.
+it('asks for the waist in place when none counts, and keeps one reading', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  await repos.waist.saveWaist(today.addDays(-9), 94);
+  renderApp(repos, today);
+  const field = await screen.findByRole('textbox', { name: 'Today’s waist, inches' });
+  const row = field.closest('.mm-list-row') as HTMLElement;
+  expect(row).toHaveTextContent(/Last 37 in · /);
+  await userEvent.type(field, '36{Enter}');
+  expect(await screen.findByRole('status')).toHaveTextContent('Waist saved: 36 in');
+  expect(screen.getByRole('button', { name: 'Open Progress' })).toBeInTheDocument();
+  expect(await screen.findByText('Waist · Today')).toBeInTheDocument();
+  expect(screen.queryByRole('textbox', { name: 'Today’s waist, inches' })).not.toBeInTheDocument();
+  const waist = await first(repos.waist.watchWaist());
+  const last = waist[waist.length - 1];
+  expect(last?.date).toBe(today);
+  expectClose(last?.waistCm ?? 0, 91.44, 0.01);
+  expect(last?.readings).toHaveLength(1);
+});
+
+it('shows a waist measured this week and does not ask for it', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  await repos.waist.saveWaist(today.addDays(-3), 94);
+  renderApp(repos, today);
+  expect(await screen.findByText('37 in')).toBeInTheDocument();
+  expect(screen.queryByRole('textbox', { name: 'Today’s waist, inches' })).not.toBeInTheDocument();
+});
+
+it('opens Progress from the waist confirmation', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '36{Enter}');
+  await userEvent.click(await screen.findByRole('button', { name: 'Open Progress' }));
+  expect(await screen.findByRole('button', { name: 'Progress', current: 'page' })).toBeInTheDocument();
+});
+
+it('refuses a waist that cannot be one, and records nothing', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '3{Enter}');
+  expect(await screen.findByText('That value looks off. Check it.')).toBeInTheDocument();
+  expect(await first(repos.waist.watchWaist())).toEqual([]);
+});
+
+it('offers Progress from the weigh-in confirmation too', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4{Enter}');
+  expect(await screen.findByRole('status')).toHaveTextContent('Saved 181.4 lb for today');
+  expect(screen.getByRole('button', { name: 'Open Progress' })).toBeInTheDocument();
+});
+
+// MM-301 (ME-5): the waist is said to the quarter inch a tape can tell, as typed.
+it('confirms a quarter-inch waist as typed', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '35.25{Enter}');
+  expect(await screen.findByRole('status')).toHaveTextContent('Waist saved: 35.25 in');
 });
