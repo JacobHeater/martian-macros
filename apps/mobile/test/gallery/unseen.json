@@ -152,78 +152,6 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/progress/ProgressScreen.tsx: <p className=\"app-text\">Log a weigh-in to start your trend.</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/ProgressScreen.tsx: {weights.length < 2 ? <p className=\"app-text\">A trend needs more weigh-ins.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthHistoryScreen.tsx: <InfoCard title=\"No sessions\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthHistoryScreen.tsx: {trend.points.length === 0 ? <p className=\"app-text\">No qualifying sessions yet.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthLiftsScreen.tsx: onPress={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}",
-    "reason": "Opened by a press no story walks; StrengthHistoryScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/progress/StrengthLiftsScreen.tsx: {trends.value.length === 0 ? <p className=\"app-text\">No finished workouts yet.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthSection.tsx: <p className=\"app-text\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthSection.tsx: if (Loadable.hasFailed(trends)) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/StrengthSection.tsx: onHistory={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}",
-    "reason": "Opened by a press no story walks; StrengthHistoryScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/progress/StrengthSection.tsx: onPress={() => void navigator.push(() => <StrengthLiftsScreen />)}",
-    "reason": "Opened by a press no story walks; StrengthLiftsScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: ) : Loadable.hasFailed(events) ? (",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: <MmIconButton",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: <MmListRow",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: <WeightEventEntrySheet today={today} onDone={() => close()} />",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: <p className=\"app-text\">Could not load weight events.</p>",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: <p className=\"app-text\">Loading weight events...</p>",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: trailing={event === fromOnboarding ? <span>Onboarding</span> : undefined}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/progress/WeightEventsCard.tsx: void overlays.sheet<void>('Add a weight event', (close) => (",
-    "reason": "Opened by a press no story walks; the sheet is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
     "place": "src/settings/EditHeightSheet.tsx: <MmTextField label=\"Centimetres\" kind=\"number\" value={cm} onChange={setCm} error={error} helper={helper} />",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
@@ -296,86 +224,6 @@
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {
-    "place": "src/train/ExercisePickerScreen.tsx: const create = async () => {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/ExercisePickerScreen.tsx: const id = await navigator.push<string>((close) => <CustomExerciseScreen name={search.trim()} onSaved={close} />);",
-    "reason": "Opened by a press no story walks; CustomExerciseScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/ExercisePickerScreen.tsx: {found.length === 0 ? <p className=\"app-text\">No exercise by that name.</p> : null}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/SetEditor.tsx: export function SetEditor({ set: given, number, load, fmt, onChange, timeBase, timeLimit, checkTimes, onRemove }: SetEditorProps) {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/SetTimerBar.tsx: {setStarted === undefined ? null : <p className=\"train-timer-label\">Tap Add set when the set is done.</p>}",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/TrainScreen.tsx: <MmSection icon=\"timer\" title=\"Workout in progress\" summary={workoutSummaryText(inProgress)}>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/TrainScreen.tsx: const open = (workoutId: number) => void navigator.push(() => <WorkoutScreen workoutId={workoutId} />);",
-    "reason": "Opened by a press no story walks; WorkoutScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/TrainScreen.tsx: onPress={() => void navigator.push(() => <WeeklyVolumeScreen />)}",
-    "reason": "Opened by a press no story walks; WeeklyVolumeScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/WeeklyVolumeScreen.tsx: <p className=\"app-text\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WeeklyVolumeScreen.tsx: if (Loadable.hasFailed(volume)) {",
-    "reason": "A loading or failed-read state; stories cannot yet make a store fail or wait (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutClockCard.tsx: <p className=\"app-muted train-clock-line\">Paused for {elapsedText(workout.pausedForMs)}</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutClockCard.tsx: onPress={() => void navigator.push(() => <WorkoutTimesScreen workoutId={workout.id} />)}",
-    "reason": "Opened by a press no story walks; WorkoutTimesScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/WorkoutExerciseCard.tsx: <SetEditor",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutExerciseCard.tsx: onPress={() => void navigator.push(() => <ProgressionSettingsScreen exerciseId={entry.exerciseId} />)}",
-    "reason": "Opened by a press no story walks; ProgressionSettingsScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/WorkoutScreen.tsx: <p className=\"app-text train-first\">Add the first exercise. Each set is one tap once the first is in.</p>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutScreen.tsx: const addExercise = async () => {",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutScreen.tsx: const exerciseId = await navigator.push<string>((done) => <ExercisePickerScreen onPick={done} />);",
-    "reason": "Opened by a press no story walks; ExercisePickerScreen is drawn by a story of its own. To walk it from here (MM-321)."
-  },
-  {
-    "place": "src/train/WorkoutScreen.tsx: if (workout === undefined) return <Screen title=\"Workout\">{null}</Screen>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutTimesScreen.tsx: <>",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/train/WorkoutTimesScreen.tsx: if (workout === undefined) return <Screen title=\"Workout times\">{null}</Screen>;",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
     "place": "src/ui/MmDateDialog.tsx: <p className=\"mm-dialog-error\" role=\"alert\">",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
@@ -425,10 +273,6 @@
   },
   {
     "place": "src/ui/StrengthTrendCard.tsx: <p className=\"mm-card-text\">",
-    "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
-  },
-  {
-    "place": "src/ui/StrengthTrendCard.tsx: <p className=\"mm-card-text\"> #2",
     "reason": "Not yet drawn by a story; found by the audit of 2026-10-14 (MM-321, to draw)."
   },
   {

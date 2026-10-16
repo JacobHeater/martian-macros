@@ -262,8 +262,12 @@ limitations.
   and the panel before they are built.
 - Batch 2, Coach, is done (2026-10-16): 21 stories, register 144 to 109;
   MM-339 and MM-341 fixed with tests, MM-340 and MM-342 ticketed for the panel.
-- **Next:** batch 3, Progress (18) and Train (20); then Settings, packs and the
-  shell, the rest. **The owner will do all physical-device testing at the end**
+- Batch 3, Progress and Train, is done: 28 stories, register 109 to 70; MM-343
+  fixed with its test, MM-344 ticketed for the panel. **For the owner:** loads
+  converted to pounds show two decimals ("182.98 lb", the demo stores kg);
+  `loadNumber` does this on purpose, so it is a question, not a ticket yet.
+- **Next:** batch 4, Settings (16), the food packs (12) and the shell (13); then
+  the rest. **The owner will do all physical-device testing at the end**
   (2026-10-16): keep adding to the phone checklist below, do not ask for it.
 - **Phone checklist, to hand the owner when it is long enough** (they agreed to
   run one session): a real barcode on packaging (MM-43); a pack download over
