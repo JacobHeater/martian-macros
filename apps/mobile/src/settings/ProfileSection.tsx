@@ -29,6 +29,7 @@ const tickedCount = (s: ScreeningAnswers) =>
     s.insulinOrSulfonylurea,
     s.bariatricSurgery,
     s.weightAffectingMedication,
+    s.fluidLimitedByClinician,
   ].filter((ticked) => ticked).length;
 
 /**

@@ -19,6 +19,9 @@ export class NutritionGoals {
   /** Above this a goal is said to be more than most people need (owner, 2026-10-14; the panel's SA-5). */
   static readonly highWaterGoalMl = 4_000;
 
+  /** The same note, sooner, with an eating-disorder history (the panel's safety S-4, 2026-10-16). */
+  static readonly highWaterGoalEatingDisorderMl = 3_500;
+
   static readonly none = new NutritionGoals({});
 
   /** A daily upper limit, in milligrams. */

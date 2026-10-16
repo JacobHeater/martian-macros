@@ -34,7 +34,7 @@ it('the evidence register covers safety and model tuning values', () => {
   expect(partition).toHaveLength(3);
   expect(trend).toHaveLength(8);
   expect(estimator).toHaveLength(9);
-  expect(goals).toHaveLength(6);
+  expect(goals).toHaveLength(7);
   expect(water).toHaveLength(7);
 
   const expected = [...safety, ...partition, ...trend, ...estimator, ...goals, ...water, 'suggestedWaterGoalMl.baseMl', 'suggestedWaterGoalMl.withheld'];

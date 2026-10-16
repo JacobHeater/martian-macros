@@ -282,6 +282,18 @@ limitations.
   donut, its figures beneath it; with nothing logged, a whole `--track` ring
   and "Log food with protein, carbs or fat to see the split.", as tall as the
   figures so the hero does not grow with the first food.
+- **The owner saw "Entry Menu" without the water bar** (the demo person had no
+  goal). Two decisions followed. Storybook gained a "Person" panel (MM-356,
+  #175): each screen story's facts, read from its data. An audit of all 249
+  screen stories with it is MM-357 (metric for no reason in 12, six goal
+  amounts), still to fix. The water goal is now on by default (MM-358): a
+  personal formula the owner chose from the panel's research (base by sex,
+  + 7 mL per g of protein above 0.8 g/kg, + 500 mL x training days / 7,
+  capped at 120 fl oz; withheld for kidney disease, bariatric surgery and a
+  new health-check answer, "A clinician has told me to limit my fluids",
+  MM-359). The coefficients are judgement, recorded in docs/evidence.md; a
+  dietitian or clinician should review the bounds before release. Schema
+  version 6.
 - Still for the panel: MM-336, MM-342, MM-329, MM-351, MM-352.
   Not built: loading skeletons (the designer recorded the spinner as a known
   deviation, needing its own ticket).

@@ -1,6 +1,6 @@
 ---
 id: MM-358
-status: proposed
+status: done
 component: food-logging
 related: [MM-313, MM-326, MM-357, MM-359]
 ---
@@ -88,6 +88,8 @@ Scenario: Never above the cap
 ```
 
 ## Notes
+Guarded by `apps/mobile/test/domain/suggestedWaterGoal.test.ts`, `apps/mobile/test/settings/waterGoalDefault.test.tsx`, the MM-358 tests in `apps/mobile/test/food/waterAndMicros.test.tsx` and the preferences contract. Schema version 6 adds `water_goal_off`. Drawn in Storybook and reviewed by the panel (2026-10-16): the product designer, the UX guard and the safety specialist; their changes were built. The health-check question reads "limit my fluids", since "limit how much I drink" reads as alcohol (UX-1). Where a care team sets fluids, the amount field says it is only for an amount of water they gave, and that it counts plain water only, never a limit to fill (safety S-1). The suggestion's note is read with the field (UX-2). "Use the suggested amount" says what it returns to and moves focus to the field (UX-3, PD-1). With an eating-disorder history the "more than most people need" note comes at 3.5 L (S-4). Not built, for a later ticket: a "drink to thirst" caption in the Water section itself (S-3).
+
 Sources, as the specialists gave them (accessed 2026-10-16): NASEM 2004/2005 water DRI
 (nationalacademies.org/read/10925/chapter/6), Martin 2006 (PMID 16567155), Yamada 2022 (Science, DOI
 10.1126/science.abm8668), ACSM 2007 (PMID 17277604), Cronin 2016 (IJES 9(5)), Kerksick 2018 (ISSN), Rangan 2021
