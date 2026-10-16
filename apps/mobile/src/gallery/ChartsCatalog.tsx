@@ -50,6 +50,22 @@ export function ChartsCatalog() {
             { label: 'Target in force', kind: 'target', dashed: true, values: valuesOf((d) => (d > 14 ? 2300 : 2250)) },
           ]}
         />
+        {/* Today still being logged, inside the finished days' scale: an open dot apart from the line (MM-335). */}
+        <HistoryChart
+          today={chartDay}
+          days={7}
+          unit="kcal"
+          series={[
+            {
+              label: 'Logged intake',
+              kind: 'energy',
+              values: valuesOf((d) => (d > 6 ? undefined : d === 0 ? 2050 : 2000 + ((d * 37) % 300))),
+              unfinished: chartDay,
+            },
+          ]}
+        />
+        {/* Nothing in the range (MM-321). */}
+        <HistoryChart today={chartDay} days={7} unit="kcal" series={[{ label: 'Logged intake', kind: 'energy', values: new Map() }]} />
       </InfoCard>
       <InfoCard title="Weight">
         <TrendStats trend={chartTrend} fmt={fmt} />
@@ -65,6 +81,8 @@ export function ChartsCatalog() {
           rangeDays={30}
           fmt={fmt}
         />
+        {/* No weigh-in in the range (MM-321). */}
+        <TrendChart label="Weight trend" trend={[]} weights={[]} today={chartDay} rangeDays={7} fmt={fmt} />
       </InfoCard>
       <InfoCard title="Macronutrient split">
         <MacroSplitChart intake={new IntakeDay({ date: chartDay, kcal: 1450, proteinG: 100, carbsG: 150, fatG: 50 })} />

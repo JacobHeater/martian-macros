@@ -920,6 +920,13 @@ export class AppState {
     }
   }
 
+  /** Reads again what the Dashboard's history is drawn from, after a read went wrong (MM-335). */
+  retryHistory(): void {
+    for (const cell of [this.intakeDays, this.typedWeights, this.waist, this.targetsHistory, this.pauses, this.recoveryCheckIns]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
   /** Reads again what the Dashboard is drawn from, after a read went wrong (MM-334). */
   retryDashboard(): void {
     for (const cell of [this.pauses, this.foodForDay(this.today.value), this.targetsHistory, this.typedWeights]) {

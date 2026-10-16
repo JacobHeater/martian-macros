@@ -11,4 +11,6 @@ export interface HistorySeries {
   readonly connectRecordedPoints?: boolean;
   /** With `connectRecordedPoints`: points further apart than this many days are not joined. */
   readonly maximumGapDays?: number | undefined;
+  /** A day still being logged (today): drawn as an open dot, not joined to the line as a whole day (MM-335). */
+  readonly unfinished?: CalendarDate | undefined;
 }
