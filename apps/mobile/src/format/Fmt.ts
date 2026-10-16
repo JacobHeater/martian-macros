@@ -25,6 +25,9 @@ const weekdayOf = (date: CalendarDate) => weekdays[new Date(date.year, date.mont
 
 const sign = (value: number) => (value > 0 ? '+' : value < 0 ? '−' : '');
 
+/** `text`, the rounded size of `value`, signed only when it is not zero once rounded (MM-341). */
+const signed = (value: number, text: string) => `${Number(text) === 0 ? '' : sign(value)}${text}`;
+
 /**
  * Unit-aware formatting. Storage is always SI; this is the only place
  * imperial units exist.
@@ -71,7 +74,7 @@ export class Fmt {
   /** A signed weight change, e.g. "−0.8 lb". */
   weightDelta(kg: number, { decimals = 1 }: { decimals?: number } = {}): string {
     const v = this.weightFromKg(kg);
-    return `${sign(v)}${toStringAsFixed(Math.abs(v), decimals)} ${this.weightUnit}`;
+    return `${signed(v, toStringAsFixed(Math.abs(v), decimals))} ${this.weightUnit}`;
   }
 
   length(cm: number): string {
@@ -92,7 +95,7 @@ export class Fmt {
 
   static percentPerWeek(fraction: number): string {
     const pct = fraction * 100;
-    return `${sign(pct)}${toStringAsFixed(Math.abs(pct), 2)}% / week`;
+    return `${signed(pct, toStringAsFixed(Math.abs(pct), 2))}% / week`;
   }
 
   static day(date: CalendarDate, today: CalendarDate): string {

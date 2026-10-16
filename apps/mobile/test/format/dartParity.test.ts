@@ -68,6 +68,9 @@ import dart from './support/dartFormats.json';
  */
 const each = <T>(values: readonly number[], format: (value: number) => T) => values.map((value) => format(value));
 
+/** Where the app now knowingly differs from the Flutter app. MM-341: a change that rounds to none carries no sign. */
+const unsignedZero = (shown: readonly string[]) => shown.map((text) => text.replace(/^[+−](0\.0+ )/, '$1'));
+
 describe.each([
   ['metric', new Fmt('metric'), dart.metric],
   ['imperial', new Fmt('imperial'), dart.imperial],
@@ -75,7 +78,7 @@ describe.each([
   it('weights, weight changes and lengths', () => {
     expect(each(dart.numbers, (n) => fmt.weight(n))).toEqual(recorded.weight);
     expect(each(dart.numbers, (n) => fmt.weight(n, { decimals: 0 }))).toEqual(recorded.weight0);
-    expect(each(dart.numbers, (n) => fmt.weightDelta(n))).toEqual(recorded.weightDelta);
+    expect(each(dart.numbers, (n) => fmt.weightDelta(n))).toEqual(unsignedZero(recorded.weightDelta));
     expect(each(dart.numbers, (n) => fmt.length(n))).toEqual(recorded.length);
     expect([fmt.weightUnit, fmt.lengthUnit]).toEqual(recorded.unit);
   });
