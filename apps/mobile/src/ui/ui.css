@@ -789,6 +789,50 @@
 .mm-progress-fat .mm-progress-fill {
   background: var(--fat);
 }
+/* Water pours (MM-326): a slow ease-out fill whose surface ripples and
+   flattens at each change of level. Nothing reverses or overshoots, and
+   nothing moves once it has settled. */
+.mm-progress-water .mm-progress-fill {
+  overflow: visible;
+  border-radius: inherit;
+  background: var(--water);
+  transition: width var(--motion-pour) cubic-bezier(0.33, 1, 0.68, 1);
+}
+/* While the level moves, the surface ripples, flattening and fading by the
+   end of the pour; the band is within the fill, so nothing shows past it. */
+.mm-progress-wave {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.mm-progress-wave::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: var(--track);
+  opacity: 0;
+  transform-origin: top;
+  animation: mm-water-ripple var(--motion-pour) ease-out;
+  content: '';
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3'%3E%3Cpath d='M0 0H20V1.5C15 3.5 15 -0.5 10 1.5S5 3.5 0 1.5Z'/%3E%3C/svg%3E") 0 0 / 20px 3px repeat-x;
+}
+@keyframes mm-water-ripple {
+  0% {
+    mask-position: 0 0;
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    mask-position: -60px 0;
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
 .mm-progress-nutrient {
   /* The marker stands above and below the bar, so it reads over the fill too (MM-310). */
   overflow: visible;
@@ -1685,8 +1729,9 @@
 .mm-section-body {
   padding-left: calc(24px + var(--space-12));
 }
+/* The meter spans the section, under its icon too (MM-326). */
 .mm-section-meter {
-  padding: 0 0 var(--space-8) calc(24px + var(--space-12));
+  padding: var(--space-4) 0 var(--space-12);
 }
 .mm-section-body[hidden] {
   display: none;
@@ -1748,14 +1793,6 @@
 }
 .mm-rhythm-letter {
   font: var(--type-caption);
-}
-
-/* ---- The tally (MM-326): marks to fill toward a goal, the rhythm strip's dots without days. ---- */
-
-.mm-tally {
-  display: grid;
-  justify-content: start;
-  gap: var(--space-8);
 }
 
 .mm-number-entry-block {

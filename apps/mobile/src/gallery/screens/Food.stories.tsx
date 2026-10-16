@@ -407,8 +407,8 @@ const waterToday =
 
 const eightFlOz = WaterUnits.flOzToMl(8);
 
-/** MM-326: a gallon's goal and three glasses: 3 of 16 glasses filled under the header. */
-export const WaterGlasses = screenStory({
+/** MM-326: a gallon's goal and three glasses: the water poured a little way into its bar. */
+export const WaterBar = screenStory({
   covers: ['FoodScreen'],
   shows: /3 of 16 glasses/,
   scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
@@ -418,8 +418,8 @@ export const WaterGlasses = screenStory({
   },
 });
 
-/** MM-326: the section folded: the drinks hide and the glasses stay. */
-export const WaterGlassesFolded = screenStory({
+/** MM-326: the section folded: the drinks hide and the bar stays. */
+export const WaterBarFolded = screenStory({
   covers: ['FoodScreen'],
   shows: /3 of 16 glasses/,
   scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
@@ -431,24 +431,13 @@ export const WaterGlassesFolded = screenStory({
   },
 });
 
-/** MM-326: 375 ml of a 2 L goal: one glass full and the next half. */
-export const WaterGlassesHalf = screenStory({
+/** MM-326: most of a 2.5 L goal, a past day, beside the meals. */
+export const WaterBarNearlyThere = screenStory({
   covers: ['FoodScreen'],
-  shows: /1½ of 8 glasses/,
-  scenario: waterToday('metric', 2000, [250, 125]),
+  shows: /9 of 10 glasses/,
+  scenario: waterToday('metric', 2500, [500, 500, 500, 500, 250]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/1½ of 8 glasses/));
-  },
-});
-
-/** MM-326: the largest goal, 6 L in imperial: 26 glasses on rows of 9, 9 and 8. */
-export const WaterMostGlasses = screenStory({
-  covers: ['FoodScreen'],
-  shows: /of 26 glasses/,
-  scenario: waterToday('imperial', 6000, [WaterUnits.flOzToMl(16.9), WaterUnits.flOzToMl(16.9), eightFlOz]),
-  open: ({ state }) => state.homeTab.put('food'),
-  walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/of 26 glasses/));
+    reveal(await within(canvas).findByText(/9 of 10 glasses/));
   },
 });

@@ -13,9 +13,9 @@ import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmPressable } from '../ui/MmPressable';
+import { MmProgressBar } from '../ui/MmProgressBar';
 import { MmSection } from '../ui/MmSection';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
-import { MmTally } from '../ui/MmTally';
 import { useOverlays } from '../ui/useOverlays';
 import { logWater } from './logWater';
 import { showAddWaterSheet } from './showAddWaterSheet';
@@ -29,15 +29,17 @@ import './food.css';
  * the header that opens the Add water sheet as a meal's opens Add food, and
  * the day's drinks as rows that open "Edit water" as a food opens "Edit
  * food", and swipe away or delete from "More actions", each with Undo. Plain water only: drinks logged as food are not counted.
- * With a goal, the glasses of it fill under the header, folded or not, and
- * the goal reached carries a meal's quiet check mark (MM-326).
+ * With a goal, the water pours into a bar across the section, folded or
+ * not, the summary says it in glasses, and the goal reached carries a
+ * meal's quiet check mark (MM-326).
  */
 export function WaterSection({ day }: { day: CalendarDate }) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const today = useCell(state.today);
   const setup = useLoaded(state.setup);
-  const entries = useLoaded(state.waterForDay(day)) ?? [];
+  const loaded = useLoaded(state.waterForDay(day));
+  const entries = loaded ?? [];
   const goal = (useLoaded(state.nutritionGoals) ?? NutritionGoals.none).waterGoalMl;
   const units = setup?.unitSystem ?? 'metric';
   const total = entries.reduce((sum, e) => sum + e.ml, 0);
@@ -84,7 +86,7 @@ export function WaterSection({ day }: { day: CalendarDate }) {
     });
   };
 
-  // The goal's glasses are said in the summary, beside the tally that draws them (the panel's PD-2).
+  // The goal's glasses are said in the summary, above the bar that draws the water (the panel's PD-2).
   const glasses = goal === undefined ? undefined : waterGlasses(total, goal, units);
   let summary: ReactNode;
   if (goal === undefined || glasses === undefined) summary = entries.length === 0 ? undefined : waterAmount(total, units);
@@ -105,7 +107,12 @@ export function WaterSection({ day }: { day: CalendarDate }) {
       icon="water"
       title="Water"
       summary={summary}
-      meter={glasses === undefined ? undefined : <MmTally of={glasses.of} value={glasses.drunk} />}
+      meter={
+        goal === undefined ? undefined : (
+          // The bar belongs to its day: a new day's is drawn anew once its drinks are in (MM-328).
+          <MmProgressBar key={loaded === undefined ? 'loading' : day.toString()} kind="water" value={loaded === undefined ? 0 : total / goal} />
+        )
+      }
       collapsible
       maintainState
       trailing={<MmIconButton icon="plus" kind="add" label="Add water" onPress={() => void add()} />}

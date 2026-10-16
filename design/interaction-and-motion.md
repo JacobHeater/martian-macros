@@ -22,6 +22,7 @@ pulse. It never decorates, delays a routine task, or dramatizes a number.
 | `base` | 180 ms | `easeOutCubic` (enter), `easeInCubic` (exit) | Row insert/remove, chip, sheet content |
 | `slow` | 280 ms | `easeOutCubic` | Arc and bar value changes, sheet open |
 | `reveal` | 600 ms | `easeOutCubic` | The one-time arc draw-in (first paint after cold start, onboarding welcome) |
+| `pour` | 1200 ms | `easeOutCubic` | The water bar's fill and its settling surface (MM-326) |
 
 Interruptible, never blocking: a CTA is never disabled to finish an animation.
 
@@ -38,6 +39,13 @@ Interruptible, never blocking: a CTA is never disabled to finish an animation.
    around the PR value and a medium haptic. The only celebration. Dismissible,
    never modal.
 4. **Primary press:** Ember button depresses to 98% scale in `fast`.
+5. **Water pour** (the owner, 2026-10-15, MM-326): the water bar on Food fills
+   from empty each time it appears or its section opens, and moves to a new
+   level when water is added or removed, in `pour`. While it moves, its
+   surface ripples and flattens to still by the end; nothing reverses or
+   overshoots, nothing moves once it settles, and a new day's bar fills anew
+   rather than moving from the last day's level (MM-328). Under reduce motion
+   the bar takes its level at once, never blinking empty (MM-327).
 
 No other motion is signature. Not screen transitions, not list scroll effects.
 

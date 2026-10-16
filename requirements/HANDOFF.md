@@ -247,23 +247,30 @@ history (MM-141).
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
 
-## Session 29: 2026-10-14, Claude (glasses to fill on the water section)
+## Session 29: 2026-10-14 to 15, Claude (water poured into a bar on the water section)
 
 - The owner, with a screenshot of the Water section: "add a visual here to
   gamify the water and make it easier to accomplish the goal". Asked with
-  options, the owner chose **glasses to fill** (over a thin bar or a week's
-  streak), **always shown** (also folded) and **a quiet check mark** at the
-  goal (MM-326).
-- Built: `MmTally` (the rhythm strip's dots, packed on rows of at most 12
-  of equal length), `MmSection`'s `meter`, `waterGlasses` (a glass is the
-  sheet's: 8 fl oz or 250 ml), and the summary naming the glasses ("24 fl
-  oz of 128 fl oz · 3 of 16 glasses"). Seven stories; the panel's designer
-  and UX guard reviewed it (pass, `docs/agent-runs/mm326-water-glasses/`).
-- **Waits on the owner:** PD-1 (the marks, and the rhythm strip's, are Ion,
-  which means "estimated" and is protein's hex in Martian; a neutral for
-  both?) and PD-5 (smaller marks at big goals). Branch
-  `feature/water-glasses`, stacked on #160. Step 10 of WS-08 (M4) gained
-  MM-326, built. Not looked at on the phone.
+  options, the owner first chose glasses to fill (dots, one per glass); built
+  and reviewed (`docs/agent-runs/mm326-water-glasses/`). Seeing it, the owner
+  took a **new direction (2026-10-15): a bar across the screen width with
+  fluid animation**, animating when water is added or removed and when the
+  section opens (MM-326).
+- Built: `MmProgressBar` kind `water` (8 px, the emphasized macro bar's
+  weight), `usePoured` (fills from empty when drawn), `MmSection`'s
+  `meter` (under the header, kept folded, drawn anew on opening), tokens
+  `--water` and `--motion-pour`, signature moment 5 "Water pour" in
+  `design/interaction-and-motion.md` (ripples and flattens; no loop, no
+  overshoot), the water colour's figures in the colour doc. The summary says
+  glasses ("24 fl oz of 128 fl oz · 3 of 16 glasses"). Panel: UX guard pass
+  (`docs/agent-runs/mm326-water-bar/`); bugs MM-327 (reduced motion blinked
+  empty) and MM-328 (a day change poured as an add) fixed with regression
+  tests. Capturing the pour mid-motion needs the DevTools protocol (headless
+  `--screenshot` only shows the settled frame).
+- Branch `feature/water-glasses` (PR #161), stacked on #160. **Merging the
+  green stack (#158 to #160) was refused by this session's permission
+  classifier; the owner merges or allows it.** Step 10 of WS-08 (M4) gained
+  MM-326 to MM-328, built. Not looked at on the phone.
 
 ## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
 
