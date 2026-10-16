@@ -290,7 +290,8 @@ limitations.
 - Branch `feature/water-glasses` (PR #161), stacked on #160. **Merging the
   green stack (#158 to #160) was refused by this session's permission
   classifier; the owner merges or allows it.** Step 10 of WS-08 (M4) gained
-  MM-326 to MM-328, built. Not looked at on the phone.
+  MM-326 to MM-328, built. Not looked at on the phone. The owner saw a hard
+  right edge while the bar pours: MM-329 (proposed, small), its test skipped.
 
 ## Session 28: 2026-10-14, Claude (Health Connect drawn and rebuilt; every part of a screen drawn)
 
