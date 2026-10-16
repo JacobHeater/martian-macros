@@ -259,10 +259,17 @@ limitations.
   written clashed with MM-183: a failed pause read keeps the day but withholds
   its targets, and the ticket now says so. The UX guard found Coach would spin
   for good when any record it works from failed; fixed with its test.
+- **Batch B, sheets and Settings (MM-337, MM-338, MM-346, MM-347), done**, the
+  same way. A notice on a sheet or dialog is a `sunken` well in every palette
+  (the designer rejected a Light-only hairline); a failed change of the look
+  is a snack with Try again; a pack at the listed version is not offered
+  again. `storyPackHost` takes `listed` and `installed`. The panel's
+  follow-ups are ticketed: MM-351 (a lookup's result is not announced), MM-352
+  (the food database's rows have no icons).
 - Still for the panel: MM-335 (Dashboard history; `DashboardMetrics` still has
-  the old "Reopen the app to retry" notice), MM-336, MM-337, MM-338, MM-342,
-  MM-344, MM-346, MM-347, MM-348, MM-329. Not built: loading skeletons (the
-  designer recorded the spinner as a known deviation, needing its own ticket).
+  the old "Reopen the app to retry" notice), MM-336, MM-342, MM-344, MM-348,
+  MM-329, MM-351, MM-352. Not built: loading skeletons (the designer recorded
+  the spinner as a known deviation, needing its own ticket).
 
 ## Session 30: 2026-10-15, Claude (the Storybook register: Food and Dashboard)
 
