@@ -106,3 +106,14 @@ it.skip('MM-344: the strength trends on Progress are rows of their section, not 
   await within(section).findAllByText(/^Smoothed e1RM/);
   expect(section.querySelector('.mm-info-card, .mm-surface')).toBeNull();
 });
+
+it.skip('MM-347: a failed save of the look is said outside the list of Settings rows', async () => {
+  const { failingWrite } = await import('../../src/gallery/screens/failingWrite');
+  const { openSettings } = await import('../support/openSettings');
+  renderApp(repos, today, { change: failingWrite('preferences', 'saveThemePreference') });
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: 'Change appearance' }));
+  await userEvent.click(await screen.findByText('Light'));
+  const notice = await screen.findByText('Could not save your theme. Please try again.');
+  expect(notice.closest('.mm-list-group')).toBeNull();
+});

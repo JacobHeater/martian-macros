@@ -10,8 +10,11 @@ import type { StoryTerms } from './StoryTerms';
 interface ScreenStory {
   /** The screens, sheets and steps this story shows, by the name of their component. */
   covers: readonly string[];
-  /** Words on the screen once it has arrived; the stories' test waits for them. */
-  shows: string | RegExp;
+  /**
+   * Words on the screen once it has arrived; the stories' test waits for them. Left out only for a
+   * state with no words at all, the app's spinner while a read is out (MM-321).
+   */
+  shows?: string | RegExp;
   scenario?: StoryScenario;
   /** What the phone brings; nothing of a device unless a story is about it. */
   device?: StoryDevice;
@@ -24,15 +27,17 @@ interface ScreenStory {
   terms?: StoryTerms;
   /** A new installation has chosen no look yet. */
   unthemed?: boolean;
+  /** The demo build, with its notice around every screen (MM-177). */
+  demo?: boolean;
 }
 
 /** A story of the whole app brought to one screen, in the palette of the toolbar. */
-export function screenStory({ covers, shows, scenario, device, stores, open, walk, terms, unthemed = false }: ScreenStory): StoryObj {
+export function screenStory({ covers, shows, scenario, device, stores, open, walk, terms, unthemed = false, demo = false }: ScreenStory): StoryObj {
   return {
-    parameters: { covers, shows },
+    parameters: shows === undefined ? { covers } : { covers, shows },
     render: (_args, { globals }) => {
       const palette = globals['palette'] as ThemePreference;
-      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} stores={stores} terms={terms} open={open} />;
+      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} stores={stores} terms={terms} demo={demo} open={open} />;
     },
     ...(walk === undefined ? {} : { play: ({ canvasElement }) => walk(canvasElement) }),
   };

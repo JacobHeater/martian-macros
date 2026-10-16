@@ -1,20 +1,25 @@
 import type { Meta } from '@storybook/react-vite';
+import type { StoryStage } from './StoryStage';
+import { storyPackHost } from './storyPackHost';
+import { reveal } from './reveal';
+import { failingWrite } from './failingWrite';
+import { demoWith } from './demoWith';
+import { SettingsScreen } from '../../settings/SettingsScreen';
+import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
+import { DemoSeed } from '../../fixtures/DemoSeed';
+import { ReminderSetting } from '../../domain/ReminderSetting';
 import { userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { HowThisWorksScreen } from '../../about/HowThisWorksScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
-import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
-import { SettingsScreen } from '../../settings/SettingsScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
-import { demoWith } from './demoWith';
 import { healthPlatform } from './healthPlatform';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
-import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 
 /**
@@ -295,4 +300,194 @@ export const HealthConnectReadDone = screenStory({
     reveal(read);
     await userEvent.click(read);
   },
+});
+
+// ---- MM-321: Settings and the food packs, in the states no story drew ----
+
+const openSettingsScreen = ({ navigator }: StoryStage) => void navigator.push(() => <SettingsScreen />);
+const openFoodDatabase = ({ navigator }: StoryStage) => void navigator.push(() => <FoodDatabaseScreen />);
+
+/** Presses the button named `name` anywhere on the page (sheets sit outside the canvas), once it is there. */
+const pressAnywhere = (name: string | RegExp) => async (canvas: HTMLElement) => {
+  const button = await within(canvas.ownerDocument.body).findByRole('button', { name }, { timeout: 8000 });
+  reveal(button);
+  await userEvent.click(button);
+};
+
+/** MM-321: each row of Settings that opens a screen, opened. */
+export const SettingsOpensFoodDatabase = screenStory({
+  covers: ['SettingsScreen', 'FoodDatabaseScreen'],
+  shows: 'See what is available',
+  device: storyPackHost(),
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^Food database/),
+});
+
+export const SettingsOpensHowThisWorks = screenStory({
+  covers: ['SettingsScreen', 'HowThisWorksScreen'],
+  shows: 'How this works',
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^How this works/),
+});
+
+export const SettingsOpensPause = screenStory({
+  covers: ['SettingsScreen', 'PauseScreen'],
+  shows: 'Reason',
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^Pause/),
+});
+
+export const SettingsOpensTerms = screenStory({
+  covers: ['SettingsScreen', 'TermsScreen'],
+  shows: 'Terms of use',
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^Terms of use/),
+});
+
+export const SettingsOpensHealthCheck = screenStory({
+  covers: ['SettingsScreen', 'HealthCheckScreen'],
+  shows: 'Health check',
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^Health check/),
+});
+
+/** MM-321: the experience, nutrition detail and units pickers. */
+export const ChangeExperience = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Experience',
+  open: openSettingsScreen,
+  walk: pressAnywhere('Change experience'),
+});
+
+export const ChangeNutritionDetail = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Nutrition detail',
+  open: openSettingsScreen,
+  walk: pressAnywhere('Change nutrition detail'),
+});
+
+export const ChangeUnits = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Units',
+  open: openSettingsScreen,
+  walk: pressAnywhere('Change units'),
+});
+
+/** MM-321: the height pressed in metric: centimetres, and Cancel. */
+export const ChangeHeightMetric = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Centimetres',
+  scenario: demoWith({ units: 'metric' }),
+  open: openSettingsScreen,
+  walk: pressAnywhere(/^Height/),
+});
+
+/** MM-321: a reminder switched on shows the time it comes at. */
+export const ReminderOn = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^At /,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: openSettingsScreen,
+});
+
+/** MM-321: a new look chosen, and the save failing: it says so and keeps the old one. */
+export const ChangeAppearanceFails = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Could not save your theme. Please try again.',
+  stores: failingWrite('preferences', 'saveThemePreference'),
+  open: openSettingsScreen,
+  walk: async (canvas) => {
+    await pressAnywhere('Change appearance')(canvas);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByText('Light'));
+  },
+});
+
+/** MM-321: the list of packs being fetched. */
+export const FoodDatabaseChecking = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Food database',
+  device: storyPackHost({ checking: true }),
+  open: openFoodDatabase,
+  walk: pressAnywhere('See what is available'),
+});
+
+/** MM-321: the pack the host offers, with its size. */
+export const FoodDatabaseAvailable = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Barcode foods, United States',
+  device: storyPackHost(),
+  open: openFoodDatabase,
+  walk: pressAnywhere('See what is available'),
+});
+
+const download = async (canvas: HTMLElement) => {
+  await pressAnywhere('See what is available')(canvas);
+  await pressAnywhere('Download')(canvas);
+};
+
+/** MM-321: halfway down a slow connection, with Cancel. */
+export const FoodDatabaseDownloading = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Downloading',
+  device: storyPackHost({ stall: true }),
+  open: openFoodDatabase,
+  walk: download,
+});
+
+/** MM-321: a download cancelled halfway: kept, to resume or discard. */
+export const FoodDatabasePaused = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Paused',
+  device: storyPackHost({ stall: true }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await download(canvas);
+    await within(canvas.ownerDocument.body).findByText('Downloading', undefined, { timeout: 8000 });
+    // The card's Cancel, not the strip's.
+    const [cancel] = within(canvas.ownerDocument.body).getAllByRole('button', { name: 'Cancel' });
+    if (cancel !== undefined) await userEvent.click(cancel);
+  },
+});
+
+/** MM-321: a download that does not check out: thrown away, nothing changed. */
+export const FoodDatabaseFailed = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: /thrown away/,
+  device: storyPackHost({ corrupt: true }),
+  open: openFoodDatabase,
+  walk: download,
+});
+
+/** MM-321: the pack downloaded and installed, listed with its foods. */
+export const FoodDatabaseInstalled = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Remove',
+  device: storyPackHost(),
+  open: openFoodDatabase,
+  walk: download,
+});
+
+/** MM-321: a download going on under the Dashboard: the strip with Cancel. */
+export const DownloadUnderTheDashboard = screenStory({
+  covers: ['FoodDatabaseScreen', 'DashboardScreen'],
+  shows: /^Downloading Barcode foods/,
+  device: storyPackHost({ stall: true }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await download(canvas);
+    await within(canvas.ownerDocument.body).findByText('Downloading', undefined, { timeout: 8000 });
+    await pressAnywhere('Back')(canvas);
+  },
+});
+
+/** MM-321: the host does not answer: it says so, and that nothing changed. */
+export const FoodDatabaseUnreachable = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: /Nothing was changed./,
+  device: storyPackHost({ down: true }),
+  open: openFoodDatabase,
+  walk: pressAnywhere('See what is available'),
 });

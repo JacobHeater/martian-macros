@@ -80,3 +80,15 @@ being timed, a finished workout paused along the way, weight events from onboard
 Looking at them found two defects: MM-343 (Progress asked for a weigh-in while the trend loaded) fixed with
 its test; MM-344 (the strength trends are cards inside their section) ticketed with a skipped test. Next:
 Settings, the food packs and the app shell.
+
+**Step 5 (2026-10-16): Settings, the food packs and the app shell.** 27 stories, and the register is 28
+places (70 before). `storyPackHost` serves a real fixture pack and its manifest from memory to a story's
+phone, and can stall, corrupt the checksum, hold the manifest or answer with a server error, so a download
+is drawn checking, available, running, paused, failed, installed and under the Dashboard. `failingWrite`
+joins `failingRead` and `waitingRead` (all on `withMethod`), and `screenStory` takes `demo`. A story of a
+wordless state (the app's spinner) leaves out `shows` and waits for the spinner in its walk; without the
+wait it ended before the spinner was drawn. One place stays in the register with its reason: Settings with
+no setup, only in the instant after Erase all data. Looking found three defects: MM-345 (a small download
+read "0.0 MB") fixed with its test; MM-346 (an installed, up-to-date pack offered again) and MM-347 (the
+theme error inside the list of rows) ticketed with skipped tests. Next: the rest (the design system's own
+components, About, onboarding, pause, terms, charts).

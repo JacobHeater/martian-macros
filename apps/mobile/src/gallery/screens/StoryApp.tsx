@@ -34,6 +34,8 @@ interface StoryAppProps {
   stores?: StoryStores | undefined;
   /** Whether the terms of use were agreed to. They were, unless a story is about the terms (MM-242). */
   terms?: StoryTerms | undefined;
+  /** The demo build, with its notice around every screen (MM-177). */
+  demo?: boolean | undefined;
   /** Brings the app to the screen the story is about, once it is up. */
   open?: ((stage: StoryStage) => void | Promise<void>) | undefined;
 }
@@ -50,7 +52,7 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
  * the screens in a story are the app's own, reached the way the app reaches
  * them, with nothing of the device or the network underneath.
  */
-export function StoryApp({ palette, scenario = demoScenario, device, stores, terms = 'agreed', open }: StoryAppProps) {
+export function StoryApp({ palette, scenario = demoScenario, device, stores, terms = 'agreed', demo = false, open }: StoryAppProps) {
   const [services, setServices] = useState<AppServices>();
   useEffect(() => {
     let current = true;
@@ -78,5 +80,5 @@ export function StoryApp({ palette, scenario = demoScenario, device, stores, ter
     };
   }, [scenario, device, stores, palette, terms]);
   if (services === undefined) return null;
-  return <App services={services}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
+  return <App services={services} demo={demo}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
 }
