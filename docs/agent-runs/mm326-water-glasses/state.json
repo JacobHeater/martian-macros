@@ -6,7 +6,7 @@
     "branch": "fix/unseen-states",
     "commit": "4527f320c8ef96c20dfda9c53e544e9031693d6c"
   },
-  "phase": "checkpoint",
+  "phase": "complete",
   "owner": null,
   "assignments": [
     {
@@ -301,12 +301,15 @@
       "status": "accepted",
       "summary": "The summary names the glasses; the tally is decoration.",
       "authority": "Chair (PD-2, UX-1)"
+    },
+    {
+      "id": "MM326-superseded",
+      "status": "accepted",
+      "summary": "The glasses replaced by a bar (mm326-water-bar); PD-1 answered by the --water token, PD-5 moot.",
+      "authority": "Product owner, 2026-10-15"
     }
   ],
-  "pending_work": [
-    "PD-1: the marks' Ion fill (owner)",
-    "PD-5: mark size at big goals (owner)"
-  ],
+  "pending_work": [],
   "tests": [
     {
       "command": "mm check",

@@ -11,8 +11,9 @@ interface MmSectionProps {
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
   /**
-   * A graphic of the summary (MM-326) under the header, in line with the
-   * title; it stays when the section folds, as the summary does.
+   * A graphic of the summary (MM-326) under the header, across the
+   * section; it stays when the section folds, as the summary does, and is
+   * drawn anew each time the section opens, so a bar fills again.
    */
   meter?: ReactNode;
   /** An action of the header's own (add, history), beside the title. */
@@ -46,6 +47,12 @@ export function MmSection({
   children,
 }: MmSectionProps) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
+  /** How many times the section has been opened, which draws the meter anew. */
+  const [opened, setOpened] = useState(0);
+  const toggle = () => {
+    if (!expanded) setOpened(opened + 1);
+    setExpanded(!expanded);
+  };
   const id = useId();
   const open = !collapsible || expanded;
   const words = (
@@ -78,7 +85,7 @@ export function MmSection({
     );
   } else if (collapsible) {
     header = (
-      <MmPressable expanded={expanded} controls={`${id}-body`} onPress={() => setExpanded(!expanded)}>
+      <MmPressable expanded={expanded} controls={`${id}-body`} onPress={toggle}>
         <span className="mm-section-head-body">
           {head}
           <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
@@ -96,7 +103,11 @@ export function MmSection({
         <div className="mm-section-head-main">{header}</div>
         {trailing}
       </div>
-      {meter === undefined ? null : <div className="mm-section-meter">{meter}</div>}
+      {meter === undefined ? null : (
+        <div key={opened} className="mm-section-meter">
+          {meter}
+        </div>
+      )}
       {children === undefined ? null : (
         <div id={`${id}-body`} className="mm-section-body" hidden={!open}>
           {open || maintainState ? children : null}

@@ -32,7 +32,6 @@ import { MmStatusChip } from '../ui/MmStatusChip';
 import { MmSurface } from '../ui/MmSurface';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
-import { MmTally } from '../ui/MmTally';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { NumberEntry } from '../ui/NumberEntry';
@@ -89,6 +88,7 @@ export function ComponentsCatalog() {
         <StatRow label="Days logged" value="7, all complete" />
         <MmListRow title="Calibration, day 4 of 14." leadingIcon="info" dense flush opens onPress={nothing} />
         <MmProgressBar value={0.6} markers={[0.8, 1]} />
+        <MmProgressBar kind="water" value={0.19} />
       </MmSurface>
       <StepProgress current={2} count={6} />
       <SectionLabel text="Your goal" />
@@ -139,7 +139,6 @@ export function ComponentsCatalog() {
         }))}
         onSelect={nothing}
       />
-      <MmTally of={16} value={3.5} />
       <GroupHeader text="Reminders" />
       <MmListGroup>
         <MmSwitchRow title="Weigh-in" subtitle="On days with no weigh-in yet." value={on} onChange={setOn} />
