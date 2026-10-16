@@ -1,4 +1,5 @@
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
+import type { PackMicros } from '../foodCatalog/PackMicros';
 import type { FoodKind } from './FoodKind';
 
 interface CandidateFoodInit {
@@ -15,6 +16,7 @@ interface CandidateFoodInit {
   fiberG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
+  micros?: PackMicros;
   servings?: readonly CatalogServing[];
   versionKey?: number;
   updatedAt?: number;
@@ -43,6 +45,9 @@ export class CandidateFood {
   readonly fiberG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
+
+  /** The micronutrients besides sodium the source states, per 100 g (MM-307). */
+  readonly micros: PackMicros;
   readonly servings: readonly CatalogServing[];
 
   /** Orders versions of the same product within one source: the highest wins. */
@@ -68,6 +73,7 @@ export class CandidateFood {
     this.fiberG = init.fiberG;
     this.sodiumMg = init.sodiumMg;
     this.alcoholG = init.alcoholG;
+    this.micros = init.micros ?? {};
     this.servings = init.servings ?? [];
     this.versionKey = init.versionKey ?? 0;
     this.updatedAt = init.updatedAt ?? 0;

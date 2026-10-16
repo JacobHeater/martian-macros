@@ -143,6 +143,7 @@ export function CoachScreen() {
           {/* The one calorie visual (MM-187): today against the targets in force, or the guide during a pause. */}
           <CalorieHero
             intake={intakeDayFrom(today, food)}
+            entries={food}
             targets={pause !== undefined ? guide : current.targets}
             paused={pause !== undefined}
             status={`Next check-in ${Fmt.day(nextCheckIn(setup, current), today)}`}

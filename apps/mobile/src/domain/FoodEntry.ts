@@ -1,4 +1,5 @@
 import type { CalendarDate } from './CalendarDate';
+import { Micronutrients } from './food/micros/Micronutrients';
 import type { Portion } from './food/portion/Portion';
 import type { Meal } from './Meal';
 import type { QuantitySource } from './QuantitySource';
@@ -17,6 +18,8 @@ interface FoodEntryInit {
   fiberG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
+  /** Sodium may be given here or as `sodiumMg`; `sodiumMg` wins. */
+  micros?: Micronutrients | undefined;
 }
 
 /** One logged food item. */
@@ -47,6 +50,12 @@ export class FoodEntry {
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
+  /**
+   * The micronutrients the source stated, scaled to the amount eaten
+   * (MM-308), sodium among them. Unknown is never zero.
+   */
+  readonly micros: Micronutrients;
+
   constructor(init: FoodEntryInit) {
     this.id = init.id;
     this.date = init.date;
@@ -59,7 +68,9 @@ export class FoodEntry {
     this.source = init.source;
     this.portion = init.portion;
     this.fiberG = init.fiberG;
-    this.sodiumMg = init.sodiumMg;
+    const micros = init.micros ?? Micronutrients.none;
+    this.sodiumMg = init.sodiumMg ?? micros.of('sodium');
+    this.micros = micros.with('sodium', this.sodiumMg);
     this.alcoholG = init.alcoholG;
   }
 

@@ -158,6 +158,7 @@ independent of step 3.
 - Remaining: MM-133, MM-32, MM-36. Epic: MM-145.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).
 - Placed 2026-10-13 in step 4: MM-248 (reminders on the minute: the exact-alarm permission, asked once with a reason; the owner's call).
+- Added 2026-10-14 (step 9): MM-312 (the sodium-over-the-limit insight, after MM-311).
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `nextTargets.ts`. Do not add branches

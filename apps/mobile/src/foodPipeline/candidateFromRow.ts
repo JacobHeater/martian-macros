@@ -1,4 +1,5 @@
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
+import { PackMicronutrient } from '../foodCatalog/PackMicronutrient';
 import { FormatError } from '../lang/FormatError';
 import { tryParseDouble } from '../lang/tryParseDouble';
 import { tryParseInt } from '../lang/tryParseInt';
@@ -51,6 +52,11 @@ export function candidateFromRow(header: readonly string[], row: readonly string
     fiberG: number('fiber'),
     sodiumMg: number('sodium_mg'),
     alcoholG: number('alcohol'),
+    micros: Object.fromEntries(
+      PackMicronutrient.values
+        .map((n) => [n, number(PackMicronutrient.column(n))] as const)
+        .filter(([, value]) => value !== undefined),
+    ),
     servings: servingsJson === undefined ? [] : servingsIn(servingsJson),
     versionKey: tryParseInt(text('version_key') ?? '') ?? 0,
     updatedAt: tryParseInt(text('updated_at') ?? '') ?? 0,

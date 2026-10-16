@@ -19,6 +19,7 @@ import { FiberLine } from './FiberLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { MealSection } from './MealSection';
 import { useShownDay } from './useShownDay';
+import { WaterSection } from './WaterSection';
 import './food.css';
 
 /**
@@ -56,7 +57,7 @@ export function FoodScreen() {
 
   return (
     <>
-      <CalorieHero intake={intake} targets={paused ? guide : targets?.targets} paused={paused} />
+      <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
       <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
       {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
       {entries.length === 0 ? (
@@ -76,6 +77,7 @@ export function FoodScreen() {
       {Meal.values.map((meal) => (
         <MealSection key={meal} meal={meal} day={day} entries={entries.filter((e) => e.meal === meal)} />
       ))}
+      <WaterSection day={day} />
       {entries.length === 0 ? null : (
         <>
           <div className="food-complete-row">
@@ -87,7 +89,7 @@ export function FoodScreen() {
               Partial days are left out of your metabolism estimate instead of being read as under-eating.
             </p>
             <p className="app-caption">
-              The share picture counts protein and carbs at 4 kcal a gram and fat at 9. Alcohol and other calorie
+              The Split picture counts protein and carbs at 4 kcal a gram and fat at 9. Alcohol and other calorie
               differences are not part of it.
             </p>
           </MmDisclosure>

@@ -27,6 +27,7 @@ import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { HealthConnectSection } from './HealthConnectSection';
+import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
@@ -183,8 +184,10 @@ export function SettingsScreen() {
           />
         </MmListGroup>
       </MmSection>
+      <NutritionGoalsSection />
       <ProfileSection />
       <RemindersSection />
+      <HealthConnectSection />
       <MmSection icon="lock" title="Data">
         <MmListGroup>
           <MmListRow
@@ -194,7 +197,6 @@ export function SettingsScreen() {
             opens
             onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
           />
-          <HealthConnectSection />
           <MmListRow
             leadingIcon="lock"
             title="Stored only on this device"

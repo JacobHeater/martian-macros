@@ -72,6 +72,13 @@ in here.
    Settings, the first two sections.
 8. **Nothing native shows** (MM-262): the design system draws every control
    and every state of it.
+9. **Like its siblings** (owner's rule, 2026-10-14, MM-318). A new section,
+   row or control is built the way the nearest one on the same screen is,
+   with the same component: on Food a new kind of log is a section like
+   the meals (collapsible, its total in the summary, "+" in the header,
+   rows that swipe away). A different pattern needs a written reason in
+   its ticket. Every inspection looks at the whole screen with the new part
+   beside its siblings, and every panel brief asks whether it matches them.
 
 **Outside the rules.** Safety content (the under-eating notice, the relief
 offer, the policy cautions, the pause banner, the target flags) is outside

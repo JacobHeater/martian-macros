@@ -7,12 +7,14 @@ import type { CatalogServing } from './CatalogServing';
 import type { FoodPack } from './FoodPack';
 import { FoodPackFormat } from './FoodPackFormat';
 import type { FoodPackHeader } from './FoodPackHeader';
+import { PackMicronutrient } from './PackMicronutrient';
+import type { PackMicros } from './PackMicros';
 import { PreparationState } from './PreparationState';
 import type { SearchHit } from './SearchHit';
 import { TrustTier } from './TrustTier';
 import { UnsupportedPackVersion } from './UnsupportedPackVersion';
 
-const columns =
+const formatOneColumns =
   'f.id, f.name, f.brand, f.kcal, f.protein, f.carbs, f.fat, f.fiber, ' +
   'f.sodium_mg, f.alcohol, f.preparation, f.pair_id, f.density, ' +
   'f.source, f.source_id, f.tier, f.tier_reason';
@@ -49,7 +51,7 @@ export class SqliteFoodPack implements FoodPack {
   static async open(db: SqlDatabase): Promise<SqliteFoodPack> {
     try {
       const version = number((await db.select('PRAGMA user_version'))[0]?.['user_version'], 'format version');
-      if (version !== FoodPackFormat.version) {
+      if (version < FoodPackFormat.oldestReadable || version > FoodPackFormat.version) {
         throw new UnsupportedPackVersion({ found: version, supported: FoodPackFormat.version });
       }
       const values = new Map<string, string>();
@@ -85,7 +87,7 @@ export class SqliteFoodPack implements FoodPack {
     if (words.length === 0) return [];
     const match = words.map((w) => `"${w}"*`).join(' ');
     const rows = await this.db.select(
-      `SELECT ${columns}, bm25(foods_fts, 10.0, 1.0) AS score ` +
+      `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score ` +
         'FROM foods_fts JOIN foods f ON f.id = foods_fts.rowid ' +
         'WHERE foods_fts MATCH ? ORDER BY score, f.id LIMIT ? OFFSET ?',
       [match, limit, offset],
@@ -95,7 +97,7 @@ export class SqliteFoodPack implements FoodPack {
 
   async byBarcode(gtin14: string): Promise<CatalogFood | undefined> {
     const rows = await this.db.select(
-      `SELECT ${columns} FROM barcodes b JOIN foods f ON f.id = b.food_id WHERE b.gtin = ?`,
+      `SELECT ${this.columns} FROM barcodes b JOIN foods f ON f.id = b.food_id WHERE b.gtin = ?`,
       [gtin14],
     );
     const row = rows[0];
@@ -105,7 +107,7 @@ export class SqliteFoodPack implements FoodPack {
   async pairOf(food: CatalogFood): Promise<CatalogFood | undefined> {
     const pairId = food.pairedFoodId;
     if (pairId === undefined || food.packId !== this.header.packId) return undefined;
-    const rows = await this.db.select(`SELECT ${columns} FROM foods f WHERE f.id = ?`, [pairId]);
+    const rows = await this.db.select(`SELECT ${this.columns} FROM foods f WHERE f.id = ?`, [pairId]);
     const row = rows[0];
     return row === undefined ? undefined : this.food(row);
   }
@@ -125,6 +127,23 @@ export class SqliteFoodPack implements FoodPack {
     return this.db.close();
   }
 
+  /** The columns a food is read from: format 2 adds the micronutrients (MM-307). */
+  private get columns(): string {
+    if (this.header.formatVersion < 2) return formatOneColumns;
+    return [formatOneColumns, ...PackMicronutrient.values.map((n) => `f.${PackMicronutrient.column(n)}`)].join(', ');
+  }
+
+  /** The micronutrient columns a format 2 pack has; a format 1 pack has none (MM-307). */
+  private microsOf(scaledIfStated: (column: string) => number | undefined): PackMicros {
+    if (this.header.formatVersion < 2) return {};
+    const micros: Partial<Record<PackMicronutrient, number>> = {};
+    for (const n of PackMicronutrient.values) {
+      const value = scaledIfStated(PackMicronutrient.column(n));
+      if (value !== undefined) micros[n] = value;
+    }
+    return micros;
+  }
+
   private food(row: SqlRow): CatalogFood {
     const scaled = (column: string) => number(row[column], column) / FoodPackFormat.nutrientScale;
     const scaledIfStated = (column: string) => {
@@ -141,6 +160,7 @@ export class SqliteFoodPack implements FoodPack {
       proteinG: scaled('protein'),
       carbsG: scaled('carbs'),
       fatG: scaled('fat'),
+      micros: this.microsOf(scaledIfStated),
       fiberG: scaledIfStated('fiber'),
       sodiumMg: scaledIfStated('sodium_mg'),
       alcoholG: scaledIfStated('alcohol'),

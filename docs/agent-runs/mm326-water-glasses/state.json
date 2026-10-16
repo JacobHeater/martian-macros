@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "task_id": "mm326-water-glasses",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "fix/unseen-states",
+    "commit": "4527f320c8ef96c20dfda9c53e544e9031693d6c"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Does the glasses tally look and behave like its siblings (meal sections, MmRhythmStrip, the hero bars); hierarchy; does it motivate.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "4527f320c8ef96c20dfda9c53e544e9031693d6c",
+      "input_hashes": {
+        "docs/agent-runs/mm326-water-glasses/brief.md": "df1a84bc193a5721ed082d643ca30c966bacafb9111989cb08a330c6b64636fd",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/food-logging/STORY.water-glasses-to-fill.MM-326.md": "ada7ac2fe162d8b507dc9ebace1881e7f9ff0cdba3f77ae51db72d42217d0398",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MmTally, MmSection, WaterSection, waterGlasses, glassesLabel, MealSection, MmRhythmStrip, tokens, design docs",
+          "9 captures"
+        ],
+        "not_inspected": [
+          "tests",
+          "device",
+          "motion"
+        ],
+        "referrals": [
+          "ux-accessibility: contrast, reduced motion",
+          "safety: marks past the goal"
+        ],
+        "limitations": "Static renders and source; no device; hashes computed by the chair."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does discrete fill-the-marks progress increase effort toward a goal?",
+        "reason": "Bounded check of one claim.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://ideas.repec.org/p/feb/natura/00658.html",
+            "title": "The Goal-Gradient Hypothesis Resurrected (Kivetz, Urminsky, Zheng)",
+            "published_or_updated": "2006",
+            "accessed": "2026-10-14",
+            "claim": "Discrete stamp-card progress speeds effort as the reward nears."
+          }
+        ],
+        "summary": "Goal-gradient field evidence supports discrete marks; indirect for water.",
+        "limitations": "Partial retrieval."
+      }
+    },
+    {
+      "task": "The UX guard: is the tally understood by a novice and a screen-reader user, folded and open, at every count.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "4527f320c8ef96c20dfda9c53e544e9031693d6c",
+      "input_hashes": {
+        "docs/agent-runs/mm326-water-glasses/brief.md": "df1a84bc193a5721ed082d643ca30c966bacafb9111989cb08a330c6b64636fd",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/food-logging/STORY.water-glasses-to-fill.MM-326.md": "ada7ac2fe162d8b507dc9ebace1881e7f9ff0cdba3f77ae51db72d42217d0398",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MmTally, MmSection, WaterSection, waterGlasses, glassesLabel, siblings, tokens, Water stories, MM-326 tests",
+          "9 captures"
+        ],
+        "not_inspected": [
+          "TalkBack",
+          "200% text",
+          "device"
+        ],
+        "referrals": [
+          "product-designer: UX-1, UX-2",
+          "chair: re-capture folded"
+        ],
+        "limitations": "Static renders and source; no device; hashes computed by the chair."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Non-text contrast threshold and img semantics.",
+        "reason": "Bounded check of one claim.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+            "title": "Understanding SC 1.4.11 Non-text Contrast",
+            "published_or_updated": "2026-09-06",
+            "accessed": "2026-10-14",
+            "claim": "3:1 for graphical objects needed to understand content."
+          }
+        ],
+        "summary": "3:1 for graphics needed to understand content; the rings pass.",
+        "limitations": "Partial retrieval."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-chosen visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-chosen visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-chosen visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-chosen visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "An owner-chosen visual of the water section; no health rule, advice wording, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "One retrieval returned 403; no reviewer could run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM326-glasses",
+      "status": "accepted",
+      "summary": "Glasses to fill, always shown, a quiet check mark at the goal.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM326-glasses-in-words",
+      "status": "accepted",
+      "summary": "The summary names the glasses; the tally is decoration.",
+      "authority": "Chair (PD-2, UX-1)"
+    },
+    {
+      "id": "MM326-superseded",
+      "status": "accepted",
+      "summary": "The glasses replaced by a bar (mm326-water-bar); PD-1 answered by the --water token, PD-5 moot.",
+      "authority": "Product owner, 2026-10-15"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "4527f320c8ef96c20dfda9c53e544e9031693d6c",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All checks passed, on the working tree before its commit."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-15T02:42:40Z",
+    "writers_stopped": true
+  }
+}

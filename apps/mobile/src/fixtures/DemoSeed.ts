@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import { Micronutrients } from '../domain/food/micros/Micronutrients';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { Meal } from '../domain/Meal';
 import { RecoveryCheckIn } from '../domain/RecoveryCheckIn';
@@ -8,9 +9,11 @@ import type { FoodEntryWriter } from '../domain/repositories/FoodEntryWriter';
 import type { RecoveryCheckInWriter } from '../domain/repositories/RecoveryCheckInWriter';
 import type { SetupWriter } from '../domain/repositories/SetupWriter';
 import type { WaistWriter } from '../domain/repositories/WaistWriter';
+import type { WaterWriter } from '../domain/repositories/WaterWriter';
 import type { WeightWriter } from '../domain/repositories/WeightWriter';
 import type { WorkoutWriter } from '../domain/repositories/WorkoutWriter';
 import { Workout } from '../domain/training/Workout';
+import { WaterEntry } from '../domain/water/WaterEntry';
 import { WorkoutExercise } from '../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
 import { DailyTargets } from '../engine/DailyTargets';
@@ -21,6 +24,32 @@ import { typicalSetup } from './typicalSetup';
 type DemoMeal = readonly [meal: Meal, name: string, protein: number, carbs: number, fat: number, fiber: number];
 
 const breakfast: DemoMeal = ['breakfast', 'Demo oats and yogurt', 40, 65, 18, 8];
+
+/**
+ * What each demo meal states beyond the macros (MM-308). The snack states
+ * fewer, as a label often does, so the Micros view shows partial coverage.
+ */
+const microsOf: Readonly<Record<string, Micronutrients>> = {
+  'Demo oats and yogurt': new Micronutrients({
+    potassium: 650, calcium: 380, iron: 3.5, magnesium: 120, zinc: 2.5, vitaminA: 120, vitaminC: 2,
+    vitaminD: 2.5, vitaminB12: 1.2, folate: 60, sugars: 22, saturatedFat: 6, cholesterol: 25,
+  }),
+  'Demo chicken and rice': new Micronutrients({
+    potassium: 700, calcium: 60, iron: 2.8, magnesium: 80, zinc: 3.5, vitaminA: 40, vitaminC: 8,
+    vitaminD: 0.3, vitaminB12: 0.6, folate: 45, sugars: 3, saturatedFat: 4, cholesterol: 120,
+  }),
+  'Demo tofu and potatoes': new Micronutrients({
+    potassium: 1100, calcium: 450, iron: 5.5, magnesium: 140, zinc: 2.8, vitaminA: 300, vitaminC: 30,
+    vitaminD: 0, vitaminB12: 0, folate: 90, sugars: 6, saturatedFat: 5, cholesterol: 0,
+  }),
+  'Demo fruit and nuts': new Micronutrients({
+    potassium: 450, calcium: 60, iron: 1.5, magnesium: 90, zinc: 1.2, vitaminC: 25, sugars: 18, saturatedFat: 2,
+  }),
+};
+
+/** The demo's water on a day: a bottle in the morning and glasses after (MM-313). */
+const waterOf = (partial: boolean): readonly (readonly [hour: number, ml: number])[] =>
+  partial ? [[8, 500], [10, 250]] : [[8, 500], [10, 250], [13, 250], [16, 500], [19, 250]];
 const restOfTheDay: readonly DemoMeal[] = [
   ['lunch', 'Demo chicken and rice', 55, 90, 22, 6],
   ['dinner', 'Demo tofu and potatoes', 50, 80, 25, 10],
@@ -52,6 +81,7 @@ export class DemoSeed {
     targets,
     recovery,
     workouts,
+    water,
   }: {
     eraser: DataEraser;
     setup: SetupWriter;
@@ -62,6 +92,7 @@ export class DemoSeed {
     targets: TargetsHistoryWriter;
     recovery: RecoveryCheckInWriter;
     workouts?: WorkoutWriter | undefined;
+    water?: WaterWriter | undefined;
   }): Promise<void> {
     await eraser.eraseAll();
     const start = this.today.addDays(-DemoSeed.historyDays);
@@ -121,9 +152,21 @@ export class DemoSeed {
             fatG: fat,
             fiberG: fiber,
             sodiumMg: 350,
+            micros: microsOf[name],
             source: 'weighed',
           }),
         );
+      }
+    }
+    if (water !== undefined) {
+      // The last two weeks of water, today's morning included.
+      for (let daysAgo = 13; daysAgo >= 0; daysAgo--) {
+        const date = this.today.addDays(-daysAgo);
+        for (const [hour, ml] of waterOf(daysAgo === 0)) {
+          await water.addWater(
+            new WaterEntry({ id: 0, date, ml, at: new Date(date.year, date.month - 1, date.day, hour) }),
+          );
+        }
       }
     }
     if (workouts !== undefined) {

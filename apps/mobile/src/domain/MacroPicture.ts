@@ -3,10 +3,12 @@ const values = [
   'bars',
   /** Each macro's share of the day's calories. */
   'donut',
+  /** The day's micronutrients, at Full detail only (MM-310). */
+  'micros',
 ] as const;
 
 /**
- * Which picture of the day's macros the hero shows (MM-253, rule 4): one
+ * Which picture of the day's nutrition the hero shows (MM-253, rule 4): one
  * at a time, remembered per person. It changes what is displayed, never
  * what is stored.
  */

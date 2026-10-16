@@ -22,4 +22,6 @@ export async function writePacks(result: PackBuildResult, provenance: BuildProve
   await writePackFile(join(out, 'generic.pack'), header('generic'), result.generic);
   await writePackFile(join(out, 'barcode_us.pack'), header('barcode_us'), result.barcode);
   writeFileSync(join(out, 'report.txt'), result.report.format());
+  // How many foods state each nutrient (MM-307), apart from the report the Dart pipeline wrote.
+  writeFileSync(join(out, 'coverage.txt'), result.report.formatCoverage());
 }

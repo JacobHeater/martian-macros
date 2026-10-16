@@ -132,10 +132,27 @@ it('data saved by a newer version of the app is refused and left alone', async (
   expect(await columnsOf(sql, 'weight_entries')).toContain('note');
 });
 
+/**
+ * The schema as version 3 left it: without the micronutrients (the columns
+ * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
+ * the goals and the water log (MM-305).
+ */
+const versionThree = (() => {
+  const foodEntries = /( {2}"created_at" INTEGER NOT NULL DEFAULT \(CAST\(strftime\('%s', CURRENT_TIMESTAMP\) AS INTEGER\)\)),\n[\s\S]*?\n\);/;
+  const customFoods = / {2}"cooked_weight_grams" REAL NULL,\n[\s\S]*?\n\);/;
+  return currentSchema
+    .replace(foodEntries, '$1\n);')
+    .replace(customFoods, '  "cooked_weight_grams" REAL NULL\n);')
+    .replace('  "sodium_limit_mg" INTEGER NULL,\n', '')
+    .replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '')
+    .replace('  "water_goal_ml" REAL NULL,\n', '')
+    .replace(/CREATE TABLE "water_entries" \([\s\S]*?\n\);\n/, '');
+})();
+
 // MM-242: the first real step. A database as version 1 left it gains the two
 // columns for the agreement to the terms, and keeps what it held.
 it('a version 1 database comes up to date: nothing lost, and nobody has agreed to the terms yet', async () => {
-  const versionOne = currentSchema
+  const versionOne = versionThree
     .replace('  "terms_accepted_version" INTEGER NULL,\n', '')
     .replace('  "terms_accepted_epoch_day" INTEGER NULL,\n', '')
     .replace("  \"macro_picture\" TEXT NOT NULL DEFAULT 'bars',\n", '');
@@ -156,4 +173,56 @@ it('a version 1 database comes up to date: nothing lost, and nobody has agreed t
   expect(await first(repos.preferences.watchTermsAcceptance())).toBeUndefined();
   // MM-254: the macro picture arrives as bars.
   expect(await first(repos.preferences.watchMacroPicture())).toBe('bars');
+});
+
+// MM-308, MM-311, MM-313: a version 3 database with food logged gains the
+// micronutrient columns, the goals and the water log; its entries are kept
+// and have no micronutrients, and both goals are off.
+it('a version 3 database comes up to date: entries kept with no micronutrients, goals off, water empty', async () => {
+  expect(versionThree).not.toContain('potassium_mg');
+  expect(versionThree).not.toContain('water_entries');
+  expect(versionThree).not.toContain('sodium_limit_mg');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 3, schema: versionThree });
+  await old.execute(
+    'INSERT INTO food_entries (epoch_day, meal, name, kcal, protein_g, carbs_g, fat_g, quantity_source, sodium_mg) ' +
+      "VALUES (?, 'lunch', 'Soup', 300, 10, 40, 8, 'weighed', 900)",
+    [day.epochDay],
+  );
+  await old.execute(
+    'INSERT INTO custom_foods (name, kind, serving_description, serving_grams, kcal, protein_g, carbs_g, fat_g) ' +
+      "VALUES ('Bar', 'food', '1 bar', 40, 200, 10, 20, 8)",
+  );
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  const [soup] = await first(repos.food.watchFood(day));
+  expect(soup?.name).toBe('Soup');
+  expect(soup?.sodiumMg).toBe(900);
+  expect(soup?.micros.of('potassium')).toBeUndefined();
+  expect(soup?.micros.of('sodium')).toBe(900);
+  expect((await first(repos.customFoods.watchCustomFoods())).map((f) => f.name)).toEqual(['Bar']);
+  const goals = await first(repos.preferences.watchNutritionGoals());
+  expect(goals.sodiumLimitMg).toBeUndefined();
+  expect(goals.waterGoalMl).toBeUndefined();
+  expect(await first(repos.water.watchWater(day))).toEqual([]);
+});
+
+// MM-325: version 4 changed after a build of it was installed. The build drawn
+// for the panel (14aa735) made version 4 without the sodium limit's start day;
+// on a phone that ran it, switching the limit on failed and sprang back.
+it('a version 4 database from the build drawn for the panel can switch the sodium limit on', async () => {
+  const old = await openSql();
+  // Version 4 as 14aa735 left it: today's tables, less the one column.
+  const firstVersionFour = currentSchema.replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '');
+  expect(firstVersionFour).not.toContain('sodium_limit_since_epoch_day');
+  await AppDatabase.open(old, { version: 4, schema: firstVersionFour });
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  await repos.preferences.saveSodiumLimit(2300, day);
+  const goals = await first(repos.preferences.watchNutritionGoals());
+  expect(goals.sodiumLimitMg).toBe(2300);
+  expect(goals.sodiumLimitSince).toBe(day);
 });

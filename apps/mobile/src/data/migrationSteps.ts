@@ -1,3 +1,4 @@
+import { Micronutrient } from '../domain/food/micros/Micronutrient';
 import type { MigrationStep } from './MigrationStep';
 
 /**
@@ -18,6 +19,42 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
     2,
     async (db) => {
       await db.execute("ALTER TABLE user_preferences ADD COLUMN macro_picture TEXT NOT NULL DEFAULT 'bars'");
+    },
+  ],
+  // 3 to 4 (MM-308, MM-309, MM-311, MM-313): micronutrients on entries and own
+  // foods, the sodium limit and the water goal, and the water log.
+  [
+    3,
+    async (db) => {
+      for (const column of Micronutrient.added.map((n) => Micronutrient.column(n))) {
+        await db.execute(`ALTER TABLE food_entries ADD COLUMN ${column} REAL NULL`);
+      }
+      for (const column of ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n))]) {
+        await db.execute(`ALTER TABLE custom_foods ADD COLUMN ${column} REAL NULL`);
+      }
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_mg INTEGER NULL');
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_since_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN water_goal_ml REAL NULL');
+      await db.execute(
+        'CREATE TABLE "water_entries" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"ml" REAL NOT NULL CHECK("ml" > 0.0 AND "ml" <= 3000.0), ' +
+          '"at_ms" INTEGER NOT NULL)',
+      );
+    },
+  ],
+  // 4 to 5 (MM-325): version 4 changed after a build of it was installed. The
+  // build drawn for the panel made it without the sodium limit's start day;
+  // a database from that build gains the column, one from any later build
+  // already has it.
+  [
+    4,
+    async (db) => {
+      const columns = await db.select('PRAGMA table_info("user_preferences")');
+      if (!columns.some((column) => column['name'] === 'sodium_limit_since_epoch_day')) {
+        await db.execute('ALTER TABLE user_preferences ADD COLUMN sodium_limit_since_epoch_day INTEGER NULL');
+      }
     },
   ],
 ]);

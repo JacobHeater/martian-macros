@@ -68,6 +68,7 @@ import TimelapseOutlined from '@mui/icons-material/TimelapseOutlined';
 import TimerOutlined from '@mui/icons-material/TimerOutlined';
 import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
+import WaterDropOutlined from '@mui/icons-material/WaterDropOutlined';
 import type { MmIconName } from './MmIconName';
 
 /**
@@ -148,4 +149,5 @@ export const mmIcons: Record<MmIconName, typeof AddOutlined> = {
   dayUnmarked: RadioButtonUncheckedOutlined,
   dayComplete: TaskAltOutlined,
   dayPartial: TimelapseOutlined,
+  water: WaterDropOutlined,
 };

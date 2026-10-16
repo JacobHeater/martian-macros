@@ -14,6 +14,7 @@ import type { AppServices } from '../../state/AppServices';
 import { termsOfUse } from '../../terms/termsOfUse';
 import { fixtureServices } from '../fixtureServices';
 import { demoScenario } from './demoScenario';
+import type { StoryDevice } from './StoryDevice';
 import { StoryOpener } from './StoryOpener';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
@@ -25,6 +26,8 @@ interface StoryAppProps {
   palette: ThemePreference | undefined;
   /** What the person has stored. The demo's ten weeks unless a story is about something else. */
   scenario?: StoryScenario | undefined;
+  /** What the phone brings: a health platform, a camera. Nothing of a device unless given. */
+  device?: StoryDevice | undefined;
   /** Whether the terms of use were agreed to. They were, unless a story is about the terms (MM-242). */
   terms?: StoryTerms | undefined;
   /** Brings the app to the screen the story is about, once it is up. */
@@ -43,7 +46,7 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
  * the screens in a story are the app's own, reached the way the app reaches
  * them, with nothing of the device or the network underneath.
  */
-export function StoryApp({ palette, scenario = demoScenario, terms = 'agreed', open }: StoryAppProps) {
+export function StoryApp({ palette, scenario = demoScenario, device, terms = 'agreed', open }: StoryAppProps) {
   const [services, setServices] = useState<AppServices>();
   useEffect(() => {
     let current = true;
@@ -62,12 +65,14 @@ export function StoryApp({ palette, scenario = demoScenario, terms = 'agreed', o
         );
       }
       const catalog = await fixtureCatalog();
-      if (current) setServices({ ...fixtureServices(repos, new FixedClock(storyToday)), catalog: constant(catalog) });
+      const services = { ...fixtureServices(repos, new FixedClock(storyToday)), catalog: constant(catalog) };
+      const brought = device === undefined ? services : await device(services);
+      if (current) setServices(brought);
     })();
     return () => {
       current = false;
     };
-  }, [scenario, palette, terms]);
+  }, [scenario, device, palette, terms]);
   if (services === undefined) return null;
   return <App services={services}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
 }

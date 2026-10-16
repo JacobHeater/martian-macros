@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "task_id": "mm318-water-section",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feature/water-sodium-micronutrients",
+    "commit": "75f00bacce195f3b5f5539ee0d565fffd6fbbc82"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, chair and single edit owner",
+    "paths": [
+      "apps/mobile",
+      "requirements",
+      "roadmap",
+      "design",
+      "AGENTS.md",
+      "agents/templates/brief.md",
+      "docs/agent-runs/mm318-water-section"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Does Water look and behave like the meal sections; are the stated differences justified; hierarchy and design system.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "75f00bacce195f3b5f5539ee0d565fffd6fbbc82",
+      "input_hashes": {
+        "docs/agent-runs/mm318-water-section/brief.md": "89a60f4b53794aa3977ec1a3ec26bb66af9b4ffb4b02de61f70712eb555229a9",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/food-logging/STORY.water-is-a-section-like-the-meals.MM-318.md": "9a68b6fbde49f3c2d7886b223450d643fb8ea007cdb72a71aad16f44d1cfea7e",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "WaterSection, WaterEntryTile, AddWaterSheet, showAddWaterSheet, MealSection, FoodEntryTile, AddFoodSheet head, logWater, food.css, water stories",
+          "10 captures"
+        ],
+        "not_inspected": [
+          "tests",
+          "NumberEntry",
+          "Dashboard row",
+          "Add food render"
+        ],
+        "referrals": [
+          "chair: is a drink's time meaningful on a past day"
+        ],
+        "limitations": "Static renders and source; no device; no hashes computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "An internal comparison with sibling components; no external claim.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The UX guard: does Water behave like the meal sections for a novice and a screen-reader user; walk add, another amount, delete and undo.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "75f00bacce195f3b5f5539ee0d565fffd6fbbc82",
+      "input_hashes": {
+        "docs/agent-runs/mm318-water-section/brief.md": "89a60f4b53794aa3977ec1a3ec26bb66af9b4ffb4b02de61f70712eb555229a9",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "design/screen-direction.md": "2179369c415884c9ffc1de2a5848cf12c77a0da344b2c00f74bc81b00ceccda8",
+        "requirements/food-logging/STORY.water-is-a-section-like-the-meals.MM-318.md": "9a68b6fbde49f3c2d7886b223450d643fb8ea007cdb72a71aad16f44d1cfea7e",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "WaterSection, WaterEntryTile, AddWaterSheet, showAddWaterSheet, NumberEntry, logWater, MealSection, showAddFoodSheet, MmSheet, MmSwipeToRemove, water tests",
+          "6 captures"
+        ],
+        "not_inspected": [
+          "TalkBack",
+          "contrast",
+          "text scaling",
+          "focus after a menu delete"
+        ],
+        "referrals": [
+          "react-capacitor: unique names",
+          "product-designer: time on past-day rows"
+        ],
+        "limitations": "Static renders and source; no device; no hashes computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "An internal comparison with sibling components; no external claim.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the water section; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the water section; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the water section; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the water section; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A layout change of the water section; no health rule, wording of advice, measurement or engine change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [],
+      "retrieval": [],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "No research needed; no reviewer could run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM318-like-meals",
+      "status": "accepted",
+      "summary": "Water is a section like the meals, rows pressable to edit.",
+      "authority": "Product owner, 2026-10-14; rule 9"
+    },
+    {
+      "id": "MM319-added-later",
+      "status": "accepted",
+      "summary": "A drink logged on another day says \"Added later\", not a time.",
+      "authority": "Chair (UX-1)"
+    }
+  ],
+  "pending_work": [
+    "PD-3: chevron column on a past day (MmSection)"
+  ],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "75f00bacce195f3b5f5539ee0d565fffd6fbbc82",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All checks passed: 2,258 passed and 4 skipped in the app suite, with requirements, panel, tool tests, type check, build, offline; on the working tree before its commit."
+    }
+  ],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

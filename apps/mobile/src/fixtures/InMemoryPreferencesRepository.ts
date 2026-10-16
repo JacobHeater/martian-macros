@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { MacroPicture } from '../domain/MacroPicture';
+import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import type { TermsAcceptance } from '../domain/TermsAcceptance';
 import type { ThemePreference } from '../domain/ThemePreference';
@@ -18,6 +19,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly returnDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly recoverySkipped = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly terms = new ObservableValue<TermsAcceptance | undefined>(undefined);
+  private readonly goals = new ObservableValue(NutritionGoals.none);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -87,6 +89,19 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.terms.value = acceptance;
   }
 
+  watchNutritionGoals(): Watched<NutritionGoals> {
+    return this.goals.watch();
+  }
+
+  async saveSodiumLimit(mg: number | undefined, on: CalendarDate): Promise<void> {
+    this.goals.value = new NutritionGoals({ sodiumLimitMg: mg, sodiumLimitSince: on, waterGoalMl: this.goals.value.waterGoalMl });
+  }
+
+  async saveWaterGoal(ml: number | undefined): Promise<void> {
+    const { sodiumLimitMg, sodiumLimitSince } = this.goals.value;
+    this.goals.value = new NutritionGoals({ sodiumLimitMg, sodiumLimitSince, waterGoalMl: ml });
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.theme.value = 'unselected';
@@ -97,5 +112,6 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.returnDismissed.value = undefined;
     this.recoverySkipped.value = undefined;
     this.terms.value = undefined;
+    this.goals.value = NutritionGoals.none;
   }
 }

@@ -4,6 +4,7 @@ import type { SqlValue } from '../sql/SqlValue';
 import { FoodPackFormat } from './FoodPackFormat';
 import type { FoodPackHeader } from './FoodPackHeader';
 import type { PackEntry } from './PackEntry';
+import { PackMicronutrient } from './PackMicronutrient';
 import { PreparationState } from './PreparationState';
 import { TrustTier } from './TrustTier';
 
@@ -55,15 +56,18 @@ export async function writeFoodPack(db: SqlDatabase, header: FoodPackHeader, ent
         f.sourceId ?? null,
         TrustTier.code(f.tier),
         f.tierReason,
+        ...PackMicronutrient.values.map((n) => scaled(f.micros[n])),
       ]);
       for (const s of e.servings ?? []) servings.push([f.id, s.description, scaled(s.grams)]);
       for (const b of e.barcodes ?? []) barcodes.push([b, f.id]);
     }
-    await insertAll(inside, 
+    const micros = PackMicronutrient.values.map((n) => PackMicronutrient.column(n));
+    await insertAll(
+      inside,
       'INSERT INTO foods (id, name, brand, kcal, protein, carbs, fat, fiber, ' +
         'sodium_mg, alcohol, preparation, pair_id, density, source, source_id, ' +
-        'tier, tier_reason) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        `tier, tier_reason, ${micros.join(', ')}) ` +
+        `VALUES (${Array.from({ length: 17 + micros.length }, () => '?').join(', ')})`,
       foods,
     );
     await insertAll(inside, 'INSERT INTO servings (food_id, description, grams) VALUES (?, ?, ?)', servings);

@@ -1,0 +1,523 @@
+{
+  "schema_version": 1,
+  "task_id": "mm305-water-micros",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feature/water-sodium-micronutrients",
+    "commit": "14aa7351c551688d068df8654dcec071cc5bca00"
+  },
+  "phase": "verification",
+  "owner": {
+    "identity": "Claude Opus 5.5 parent session, acting as chair and single edit owner, branch feature/water-sodium-micronutrients",
+    "paths": [
+      "apps/mobile",
+      "requirements",
+      "roadmap",
+      "docs",
+      "design/voice-and-wording.md",
+      "docs/agent-runs/mm305-water-micros"
+    ]
+  },
+  "assignments": [
+    {
+      "task": "Visual hierarchy, density and the design system of the Micros segment, the water row and section, and the Settings goals.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "input_hashes": {
+        "docs/agent-runs/mm305-water-micros/brief.md": "0d9ad461aa5cfe36c79cf65d0b3c5e1666ad5dc95c2b7060a4b821d73893405e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "requirements/food-logging/EPIC.water-sodium-and-micronutrients.MM-305.md": "c5227a5bd8a1761ee8dd57bf27ebc844283677a326f716e316a8bdd01f775b97",
+        "requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md": "5fcbd9125b48db00c2305b44361cf448348047843fcbac281a6bf1ba61fa6d7b",
+        "requirements/macro-targets/STORY.daily-sodium-limit.MM-311.md": "c54530e1f425f9fe7ce2ba91f14200fc52fa84617d8e46f5fe5e9f10eb384d94",
+        "requirements/coach-insights/STORY.sodium-over-the-limit-insight.MM-312.md": "dcabe0c1b0df860d1155229a1b558be9ec8d3994fc30c77e8dc348aaa20cb75d",
+        "requirements/food-logging/STORY.log-water.MM-313.md": "97089e19fe4d8231408671122612aac3f7dc6a1df168655372e9438fb3d18626",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "MicrosPanel, CalorieHero, MmNutrientRow, WaterRow, WaterSection, NutritionGoalsSection, ui.css, food.css",
+          "24 captures at 412 by 915"
+        ],
+        "not_inspected": [
+          "Dashboard and Coach with Micros (no story then)",
+          "tests",
+          "device"
+        ],
+        "referrals": [
+          "ux-accessibility: marker contrast, the \"+\" label",
+          "coaching: over-limit wording"
+        ],
+        "limitations": "Contrast calculated by hand; no hashes computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Repository rules and renders only.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The UX guard: novice task flow, names, announcements, focus, refusals and contrast; then a targeted re-review of the revised states.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "input_hashes": {
+        "docs/agent-runs/mm305-water-micros/brief.md": "0d9ad461aa5cfe36c79cf65d0b3c5e1666ad5dc95c2b7060a4b821d73893405e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "requirements/food-logging/EPIC.water-sodium-and-micronutrients.MM-305.md": "c5227a5bd8a1761ee8dd57bf27ebc844283677a326f716e316a8bdd01f775b97",
+        "requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md": "5fcbd9125b48db00c2305b44361cf448348047843fcbac281a6bf1ba61fa6d7b",
+        "requirements/macro-targets/STORY.daily-sodium-limit.MM-311.md": "c54530e1f425f9fe7ce2ba91f14200fc52fa84617d8e46f5fe5e9f10eb384d94",
+        "requirements/coach-insights/STORY.sodium-over-the-limit-insight.MM-312.md": "dcabe0c1b0df860d1155229a1b558be9ec8d3994fc30c77e8dc348aaa20cb75d",
+        "requirements/food-logging/STORY.log-water.MM-313.md": "97089e19fe4d8231408671122612aac3f7dc6a1df168655372e9438fb3d18626",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MicrosPanel, MmNutrientRow, MmProgressBar, CalorieHero, MmSegmented, WaterSection, WaterRow, NutritionGoalsSection, NumberEntry, MmOverlays",
+          "14 captures, then 8 more on re-review"
+        ],
+        "not_inspected": [
+          "TalkBack",
+          "device",
+          "text scaling",
+          "reduced motion"
+        ],
+        "referrals": [
+          "micronutrients and coaching: the reference line",
+          "product-designer: marker and row layout"
+        ],
+        "limitations": "Static only; contrast calculated, not sampled."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Which WCAG 2.2 criteria govern status messages, the contrast of a redundant graphic, and label in name?",
+        "reason": "UX-2, UX-3 and UX-10 rest on them.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "Understanding SC 4.1.3 Status Messages",
+            "published_or_updated": "2026-05-11",
+            "accessed": "2026-10-14",
+            "claim": "The result of an action shown without moving focus is a status message."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+            "title": "Understanding SC 1.4.11 Non-text Contrast",
+            "published_or_updated": "2026-09-06",
+            "accessed": "2026-10-14",
+            "claim": "Graphics whose information is also given as text are exempt from 3:1."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html",
+            "title": "Understanding SC 2.5.3 Label in Name",
+            "published_or_updated": "2026-04-05",
+            "accessed": "2026-10-14",
+            "claim": "The accessible name contains the visible label."
+          }
+        ],
+        "summary": "Adds need a status message; the marker is exempt but loses meaning; names should contain the visible label.",
+        "limitations": "Web standards; TalkBack in the WebView unverified."
+      }
+    },
+    {
+      "task": "The nutrient list, reference amounts and bands, units, withholding rules, coverage and the pack mapping.",
+      "role": "micronutrients",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "input_hashes": {
+        "docs/agent-runs/mm305-water-micros/brief.md": "0d9ad461aa5cfe36c79cf65d0b3c5e1666ad5dc95c2b7060a4b821d73893405e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "requirements/food-logging/EPIC.water-sodium-and-micronutrients.MM-305.md": "c5227a5bd8a1761ee8dd57bf27ebc844283677a326f716e316a8bdd01f775b97",
+        "requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md": "5fcbd9125b48db00c2305b44361cf448348047843fcbac281a6bf1ba61fa6d7b",
+        "requirements/macro-targets/STORY.daily-sodium-limit.MM-311.md": "c54530e1f425f9fe7ce2ba91f14200fc52fa84617d8e46f5fe5e9f10eb384d94",
+        "requirements/coach-insights/STORY.sodium-over-the-limit-insight.MM-312.md": "dcabe0c1b0df860d1155229a1b558be9ec8d3994fc30c77e8dc348aaa20cb75d",
+        "requirements/food-logging/STORY.log-water.MM-313.md": "97089e19fe4d8231408671122612aac3f7dc6a1df168655372e9438fb3d18626",
+        "agents/roles/micronutrients.md": "44762f92caa475267547c29158fb7a9c72881670c970b5ce016a22a561022350"
+      },
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "domain/food/micros/*",
+          "MicrosPanel, MmNutrientRow, nutrientAmount, CoachingPolicy, Profile, extract.sql (parts)"
+        ],
+        "not_inspected": [
+          "Settings and water UI",
+          "label parser",
+          "PackMicronutrient"
+        ],
+        "referrals": [
+          "safety: bariatric, ULs",
+          "ux-accessibility: reference wording",
+          "coaching: MM-311 wording"
+        ],
+        "limitations": "NIH ODS and NCBI blocked; Health Canada reproduction of NASEM used."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Are the adult DRI values and bands, units and conversions right, and should one day be compared with an RDA?",
+        "reason": "Health reference values need primary verification.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
+            "title": "DRI tables: reference values for elements",
+            "published_or_updated": "2025-11-19",
+            "accessed": "2026-10-14",
+            "claim": "Adult RDAs and AIs for the minerals match the code; no sodium or potassium UL."
+          },
+          {
+            "url": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-vitamins.html",
+            "title": "DRI tables: reference values for vitamins",
+            "published_or_updated": "2025-11-19",
+            "accessed": "2026-10-14",
+            "claim": "Vitamin RDAs match the code; 1 µg vitamin D = 40 IU."
+          },
+          {
+            "url": "https://www.nationalacademies.org/read/9956/chapter/5",
+            "title": "DRI: Applications in Dietary Assessment, ch. 1",
+            "published_or_updated": "2000",
+            "accessed": "2026-10-14",
+            "claim": "The RDA is a goal for usual intake; intake varies day to day."
+          },
+          {
+            "url": "https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/taxonomies/nutrients.txt",
+            "title": "Open Food Facts nutrients taxonomy",
+            "published_or_updated": null,
+            "accessed": "2026-10-14",
+            "claim": "Vitamin A IU at the retinol factor; folates without DFE."
+          }
+        ],
+        "summary": "Values verified; OFF vitamin A and folate not RAE or DFE; references are for usual intake.",
+        "limitations": "ODS 403; OFF runtime conversion not located."
+      }
+    },
+    {
+      "task": "The sodium insight rule and words, the over-limit wording, the water goal framing, and pressure on a novice or an eating-disorder history.",
+      "role": "coaching",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "input_hashes": {
+        "docs/agent-runs/mm305-water-micros/brief.md": "0d9ad461aa5cfe36c79cf65d0b3c5e1666ad5dc95c2b7060a4b821d73893405e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "requirements/food-logging/EPIC.water-sodium-and-micronutrients.MM-305.md": "c5227a5bd8a1761ee8dd57bf27ebc844283677a326f716e316a8bdd01f775b97",
+        "requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md": "5fcbd9125b48db00c2305b44361cf448348047843fcbac281a6bf1ba61fa6d7b",
+        "requirements/macro-targets/STORY.daily-sodium-limit.MM-311.md": "c54530e1f425f9fe7ce2ba91f14200fc52fa84617d8e46f5fe5e9f10eb384d94",
+        "requirements/coach-insights/STORY.sodium-over-the-limit-insight.MM-312.md": "dcabe0c1b0df860d1155229a1b558be9ec8d3994fc30c77e8dc348aaa20cb75d",
+        "requirements/food-logging/STORY.log-water.MM-313.md": "97089e19fe4d8231408671122612aac3f7dc6a1df168655372e9438fb3d18626",
+        "agents/roles/coaching.md": "a0df7e673a2d8aa16e8c58cf9c14177fb34185dca0db40c3b73607b46c0df48b"
+      },
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "engine InsightRule, findInsights, InsightPriority, InsightRationing, CoachingPolicy",
+          "MicrosPanel, WaterSection, NutritionGoalsSection",
+          "insightCard.test.tsx",
+          "voice-and-wording.md"
+        ],
+        "not_inspected": [
+          "insightText",
+          "selectInsight",
+          "tests"
+        ],
+        "referrals": [
+          "safety: ED, water ceiling",
+          "owner: goal or target"
+        ],
+        "limitations": "Read-only; two captures."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does a source support \"most sodium comes from packaged and restaurant food\"?",
+        "reason": "A health claim in a coach line.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6105a3.htm",
+            "title": "Vital Signs: Food Categories Contributing the Most to Sodium Consumption, US 2007-2008",
+            "published_or_updated": "2012-02-10",
+            "accessed": "2026-10-14",
+            "claim": "65% of sodium from stores, 25% from restaurants."
+          }
+        ],
+        "summary": "Supports the softened wording only loosely; US and dated.",
+        "limitations": "One source."
+      }
+    },
+    {
+      "task": "Withholding in pregnancy, kidney disease and youth; potassium hazards; the sodium and water ranges; upper limits; implied advice.",
+      "role": "safety",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-14",
+      "status": "complete",
+      "inspected_commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "input_hashes": {
+        "docs/agent-runs/mm305-water-micros/brief.md": "0d9ad461aa5cfe36c79cf65d0b3c5e1666ad5dc95c2b7060a4b821d73893405e",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "AGENTS.md": "9c876debf75c59dd8efcaff5791ce8f0255c3e2ff5de89b57729c8b013747f98",
+        "requirements/food-logging/EPIC.water-sodium-and-micronutrients.MM-305.md": "c5227a5bd8a1761ee8dd57bf27ebc844283677a326f716e316a8bdd01f775b97",
+        "requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md": "5fcbd9125b48db00c2305b44361cf448348047843fcbac281a6bf1ba61fa6d7b",
+        "requirements/macro-targets/STORY.daily-sodium-limit.MM-311.md": "c54530e1f425f9fe7ce2ba91f14200fc52fa84617d8e46f5fe5e9f10eb384d94",
+        "requirements/coach-insights/STORY.sodium-over-the-limit-insight.MM-312.md": "dcabe0c1b0df860d1155229a1b558be9ec8d3994fc30c77e8dc348aaa20cb75d",
+        "requirements/food-logging/STORY.log-water.MM-313.md": "97089e19fe4d8231408671122612aac3f7dc6a1df168655372e9438fb3d18626",
+        "agents/roles/safety.md": "2a75216f74052225f1712a0759a0fa78c513e14761a85d89a4d2cdb6688944f7"
+      },
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "ReferenceWithheld, referenceAmount, MicrosPanel, MmNutrientRow, NutritionGoalsSection, NutritionGoals, WaterSection, ScreeningAnswers, CoachingPolicy, docs/evidence.md"
+        ],
+        "not_inspected": [
+          "microsDayOf",
+          "WaterRow",
+          "pipelines"
+        ],
+        "referrals": [
+          "micronutrients: SA-3, SA-9",
+          "coaching: wording",
+          "owner: SA-5, SA-7"
+        ],
+        "limitations": "No clinician sign-off; ODS and NCBI blocked."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Do the sodium and potassium DRIs apply with kidney impairment, is there a UL, and what water intake is hazardous?",
+        "reason": "Proposed health ranges and a hazard question.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.nationalacademies.org/read/25353/chapter/2",
+            "title": "DRIs for Sodium and Potassium (2019), Summary",
+            "published_or_updated": "2019-03",
+            "accessed": "2026-10-14",
+            "claim": "CDRR 2,300 mg; sodium AI 1,500 mg; potassium AIs; no UL; apparently healthy population."
+          },
+          {
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8663108/",
+            "title": "Hyponatraemia associated with oral water intake in adults: a systematic review (BMJ Open 2021)",
+            "published_or_updated": "2021-12-09",
+            "accessed": "2026-10-14",
+            "claim": "Rate-dependent; reported cases at a median of 8 L a day; no safe upper limit set."
+          }
+        ],
+        "summary": "Sodium and potassium figures verified; references assume healthy adults; water risk depends on rate.",
+        "limitations": "Drug interactions unverified."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Energy and macro targets are unchanged; the micronutrients role covers the nutrient facts.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No estimator or trend change; the coverage rule is a counting rule reviewed by micronutrients and UX.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "Not assigned.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch: W3C, NASEM, Health Canada, CDC MMWR, PMC, Open Food Facts on GitHub"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-14",
+      "limitations": "NIH ODS returned 403 and NCBI Bookshelf a browser check; no reviewer could render a story, run a test or reach a device."
+    }
+  ],
+  "unresolved_questions": [
+    "SA-9: may a supplement label be saved as a food of one's own?",
+    "PD-6: a distinct marker for a limit and a reference."
+  ],
+  "decisions": [
+    {
+      "id": "MM310-food-only",
+      "status": "accepted",
+      "summary": "Micros is offered on the Food screen only; elsewhere a remembered Micros shows Grams.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM313-goal-word",
+      "status": "accepted",
+      "summary": "\"Goal\" is kept for the water goal and the Nutrition goals section; the glossary amended.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM313-water-ceiling",
+      "status": "accepted",
+      "summary": "Water goal up to 6 L with a note above 4 L; a kidney subtitle.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM311-sodium-floor",
+      "status": "accepted",
+      "summary": "Sodium limit from 1,500 mg, the Adequate Intake.",
+      "authority": "Product owner, 2026-10-14"
+    },
+    {
+      "id": "MM312-ed-suppressed",
+      "status": "accepted",
+      "summary": "The sodium insight is suppressed for an eating-disorder history (MM-141).",
+      "authority": "Chair, coaching concurring (CO-1)"
+    }
+  ],
+  "pending_work": [
+    "PD-6 marker form",
+    "PD-9 sodium icon and grouped number",
+    "PD-5 fold drink rows past three",
+    "SA-9 owner question",
+    "TalkBack pass",
+    "MM-314 after MM-70"
+  ],
+  "tests": [
+    {
+      "command": "mm check",
+      "commit": "14aa7351c551688d068df8654dcec071cc5bca00",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "All checks passed: requirements, panel, tool tests, type check, 2,248 passed and 4 skipped in the app suite, build, offline; on the branch working tree before its commit."
+    }
+  ],
+  "checkpoint": {
+    "at": null,
+    "writers_stopped": false
+  }
+}

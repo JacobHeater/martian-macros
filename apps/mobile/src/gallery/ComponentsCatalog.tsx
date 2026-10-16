@@ -16,6 +16,7 @@ import { MmDropdown } from '../ui/MmDropdown';
 import { MmFab } from '../ui/MmFab';
 import { MmFooterActions } from '../ui/MmFooterActions';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
+import { MmNutrientRow } from '../ui/MmNutrientRow';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
@@ -70,6 +71,13 @@ export function ComponentsCatalog() {
           <MacroFigure macro="fat" value="70 g" />
         </div>
       </InfoCard>
+      <InfoCard title="Micros">
+        <MmNutrientRow name="Iron" figures="9 mg" note="Reference 18 mg" amount={9} reference={18} />
+        <MmNutrientRow name="Potassium" figures="1,200 mg" note="from 4 of 7 foods · reference 2,600 mg" amount={1200} reference={2600} />
+        <MmNutrientRow name="Vitamin C" figures="140 mg" note="Reference 75 mg" amount={140} reference={75} />
+        <MmNutrientRow name="Vitamin B12" figures="No data yet" />
+        <MmNutrientRow name="Saturated fat" figures="14 g" />
+      </InfoCard>
       <MmSurface kind="compact">
         <MetricFacts
           facts={[
@@ -80,6 +88,7 @@ export function ComponentsCatalog() {
         <StatRow label="Days logged" value="7, all complete" />
         <MmListRow title="Calibration, day 4 of 14." leadingIcon="info" dense flush opens onPress={nothing} />
         <MmProgressBar value={0.6} markers={[0.8, 1]} />
+        <MmProgressBar kind="water" value={0.19} />
       </MmSurface>
       <StepProgress current={2} count={6} />
       <SectionLabel text="Your goal" />

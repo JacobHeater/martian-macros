@@ -3,6 +3,7 @@ import { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
 import type { SqlRow } from '../sql/SqlRow';
 import { day, integer, named, number, optionalNumber, text } from './columns';
+import { microsFromRow } from './microsFromRow';
 import { portionFromRow } from './portionFromRow';
 
 /** The food entry a row of the food log holds. */
@@ -21,5 +22,6 @@ export function foodFromRow(r: SqlRow): FoodEntry {
     fiberG: optionalNumber(r, 'fiber_g'),
     sodiumMg: optionalNumber(r, 'sodium_mg'),
     alcoholG: optionalNumber(r, 'alcohol_g'),
+    micros: microsFromRow(r),
   });
 }

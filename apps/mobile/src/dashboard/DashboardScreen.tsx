@@ -31,6 +31,7 @@ import { ProcessCard } from './ProcessCard';
 import { ReportReadyNotice } from './ReportReadyNotice';
 import { rhythmDays } from './rhythmDays';
 import { WaistRow } from './WaistRow';
+import { WaterRow } from './WaterRow';
 import { WeighInRow } from './WeighInRow';
 import './dashboard.css';
 
@@ -107,6 +108,7 @@ export function DashboardScreen() {
       <ReportReadyNotice />
       <CalorieHero
         intake={intake}
+        entries={entries}
         targets={pause !== undefined ? guide : targetsOn(history, today, { targetsAllowed })?.targets}
         paused={pause !== undefined}
         status={
@@ -188,6 +190,7 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         )}
+        <WaterRow today={today} />
         {current === undefined ? null : (
           <MmListRow
             leadingIcon="calendarCheck"

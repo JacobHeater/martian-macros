@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { atwaterKcal } from '../../domain/atwaterKcal';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
+import { Micronutrient } from '../../domain/food/micros/Micronutrient';
+import { Micronutrients } from '../../domain/food/micros/Micronutrients';
 import { parseNutritionLabel } from '../../domain/food/label/parseNutritionLabel';
 import { normalizeBarcode } from '../../domain/food/normalizeBarcode';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
@@ -10,6 +12,7 @@ import { quantityText } from '../../format/quantityText';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { useApp } from '../../app/useApp';
 import { MmButton } from '../../ui/MmButton';
+import { MmDisclosure } from '../../ui/MmDisclosure';
 import { MmTextField } from '../../ui/MmTextField';
 import { Notice } from '../../ui/Notice';
 import '../food.css';
@@ -26,6 +29,15 @@ interface CustomFoodFormProps {
 /** A stored figure as it is put back in its field: to one decimal place, without a trailing zero. */
 const oneDecimal = (value: number) => quantityText(roundHalfAwayFromZero(value * 10) / 10);
 
+/** The fields of "More nutrients": fiber, then every tracked nutrient, sodium first (MM-309). */
+type Extra = 'fiber' | Micronutrient;
+const extraKeys: readonly Extra[] = ['fiber', ...Micronutrient.values];
+/** Vitamin A and folate name their basis, as a label states them (the panel's MN-7). */
+const basis: Partial<Record<Extra, string>> = { vitaminA: ' RAE', folate: ' DFE' };
+const extraLabel = (key: Extra) =>
+  key === 'fiber' ? 'Fiber g' : `${Micronutrient.label(key)} ${Micronutrient.unit(key)}${basis[key] ?? ''}`;
+const optional = (value: number | undefined) => (value === undefined ? '' : oneDecimal(value));
+
 /**
  * Define a food once: its name, what a serving is and weighs, and its
  * numbers per serving (MM-45). Editing a saved food changes only the food,
@@ -41,6 +53,14 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
   const [carbs, setCarbs] = useState(food === undefined ? '' : oneDecimal(food.perServing.carbsG));
   const [fat, setFat] = useState(food === undefined ? '' : oneDecimal(food.perServing.fatG));
   const [barcode, setBarcode] = useState(food === undefined ? (initialBarcode ?? '') : (food.barcode ?? ''));
+  const [extras, setExtras] = useState<Readonly<Record<Extra, string>>>(
+    () =>
+      Object.fromEntries(
+        extraKeys.map((key) => [key, optional(key === 'fiber' ? food?.fiberG : food?.micros.of(key))]),
+      ) as Record<Extra, string>,
+  );
+  /** Changes when a label read finds extra nutrients, so the fold opens on them. */
+  const [extrasRead, setExtrasRead] = useState(0);
   /** What the last label read said, shown above the numbers. */
   const [labelNote, setLabelNote] = useState<string>();
   const [reading, setReading] = useState(false);
@@ -68,6 +88,14 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
     if (r.proteinG !== undefined) setProtein(quantityText(r.proteinG));
     if (r.carbsG !== undefined) setCarbs(quantityText(r.carbsG));
     if (r.fatG !== undefined) setFat(quantityText(r.fatG));
+    const read: Partial<Record<Extra, number | undefined>> = { fiber: r.fiberG, sodium: r.sodiumMg };
+    for (const n of Micronutrient.added) read[n] = r.micros.of(n);
+    const found = extraKeys.filter((key) => read[key] !== undefined);
+    if (found.length > 0) {
+      setExtras((now) => ({ ...now, ...Object.fromEntries(found.map((key) => [key, quantityText(read[key] as number)])) }));
+      setExtrasRead((n) => n + 1);
+    }
+    const more = found.length === 0 ? '' : ` ${found.length} more ${found.length === 1 ? 'nutrient was' : 'nutrients were'} read.`;
     const missing = [
       ...(r.kcal === undefined ? ['calories'] : []),
       ...(r.proteinG === undefined ? ['protein'] : []),
@@ -77,7 +105,7 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
     ];
     setLabelNote(
       'Read from the label. Check every number against the package' +
-        `${missing.length === 0 ? '.' : `, and fill in ${missing.join(', ')}.`}`,
+        `${missing.length === 0 ? '.' : `, and fill in ${missing.join(', ')}.`}${more}`,
     );
   };
 
@@ -97,6 +125,12 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
   const valid =
     name.trim() !== '' && serving.trim() !== '' && servingGrams !== undefined && energy !== undefined && energy > 0 && barcodeOk;
 
+  /** A typed extra nutrient, or undefined when left blank or not a number zero or above. */
+  const extraValue = (key: Extra) => {
+    const value = parseNumber(extras[key]);
+    return value === undefined || value < 0 ? undefined : value;
+  };
+
   const save = async () => {
     if (energy === undefined) return;
     await services.customFoods.saveCustomFood(
@@ -108,6 +142,8 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         servingGrams,
         perServing: new NutritionTotals({ kcal: energy, proteinG: p, carbsG: c, fatG: f }),
         barcode: gtin,
+        fiberG: extraValue('fiber'),
+        micros: new Micronutrients(Object.fromEntries(Micronutrient.values.map((n) => [n, extraValue(n)]))),
       }),
     );
     onDone();
@@ -161,6 +197,27 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         }
         helperIsWarning={mismatch}
       />
+      <div className="app-gap-small" />
+      <MmDisclosure
+        key={extrasRead}
+        title="More nutrients (optional)"
+        subtitle="Fiber, sodium, vitamins and minerals, for one serving."
+        initiallyExpanded={extrasRead > 0}
+        maintainState
+      >
+        <div className="food-extra-fields">
+          {extraKeys.map((key) => (
+            <MmTextField
+              key={key}
+              label={extraLabel(key)}
+              kind="number"
+              dense
+              value={extras[key]}
+              onChange={(typed) => setExtras((now) => ({ ...now, [key]: typed }))}
+            />
+          ))}
+        </div>
+      </MmDisclosure>
       <div className="app-gap-small" />
       <MmTextField
         label="Barcode (optional)"
