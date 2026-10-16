@@ -98,7 +98,8 @@ field and its hint. Weight events: one sentence. Waist and Strength: the
 section's summary line says what starting them takes; on the Dashboard,
 a waist not measured this week is a row with its field, "Once a week is
 enough" as its line and a secondary Save (MM-301). Train: one line and
-Start. Coach: "Log a weigh-in to get started."
+Start. Coach: "Log a weigh-in to get started." under the Dashboard's own
+weigh-in row, field and hint (MM-340).
 
 **Checked by tests.** `test/gallery/hierarchy.test.tsx` fails a destination
 story that nests a card in a card or in the hero, draws a notice inside a
@@ -332,9 +333,14 @@ Keep the page structure so nothing jumps.
   Never a mascot.
 - **Loading:** reserve layout; show nothing for local reads under about 150 ms;
   beyond that, flat `sunken` skeleton blocks shaped like the content, no
-  shimmer, never fake numbers or fake chart lines.
+  shimmer, never fake numbers or fake chart lines. Until skeletons are built,
+  a screen waiting on its records shows `ScreenLoading`, the app's spinner,
+  and never names an internal ("pause history") (MM-334).
 - **Error:** `surface` with a neutral icon, a `heading` naming what failed, a
-  `body` next step, a retry button. Preserve entered work. A failed read is never
+  `body` next step, a retry button. Preserve entered work. A failed read is
+  `ReadFailedNotice`: headed with what failed, "Nothing you logged has been
+  changed.", Try again, announced as an alert; only what needs the record is
+  taken out (MM-334). Never for a failed save. A failed read is never
   shown as zero or as an empty success. Migration or database errors give the data-safe message from
   the ticket.
 - **Offline-dependent features:** say what needs a connection and that nothing
