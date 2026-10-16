@@ -32,6 +32,8 @@ function Fields() {
             .then((picked) => picked !== undefined && setBirth(picked))
         }
       />
+      {/* With a helper line under it (MM-321). */}
+      <MmPickerField label="Started" valueText="6:02 PM" helper="Set 1 of Back squat" onPress={() => undefined} />
       <MmPickerField
         label="Weigh-in reminder"
         valueText={said}

@@ -114,6 +114,16 @@ export function ComponentsCatalog() {
         selected={unit}
         onChange={setUnit}
       />
+      {/* With icons: an unchosen segment shows its icon, the chosen one its check (MM-321). */}
+      <MmSegmented
+        name="Units, with icons"
+        segments={[
+          { value: 'lb', label: 'Pounds', icon: 'scale' },
+          { value: 'kg', label: 'Kilograms', icon: 'scale' },
+        ]}
+        selected={unit}
+        onChange={setUnit}
+      />
       <MmSlider name="Pace" value={pace} onChange={setPace} divisions={4} label={`${pace}% a week`} />
       <div className="gallery-row">
         <MmChoiceChip label="Chosen" selected onSelect={nothing} />

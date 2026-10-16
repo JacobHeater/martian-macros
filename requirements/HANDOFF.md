@@ -268,8 +268,12 @@ limitations.
   `loadNumber` does this on purpose, so it is a question, not a ticket yet.
 - Batch 4, Settings, packs and shell, is done: 27 stories, register 70 to 28;
   MM-345 fixed, MM-346 and MM-347 ticketed. `storyPackHost` draws downloads.
-- **Next:** batch 5, the rest (28 places, half in the design system's own
-  components); then the design defects MM-333 to MM-347 through the panel. **The owner will do all physical-device testing at the end**
+- Batch 5 is done and **MM-321 is done**: the register is 3 places (207 at the
+  start), each with the reason no story can reach it. MM-349 fixed; MM-348
+  ticketed.
+- **Next:** the design defects found along the way, MM-333 to MM-348 (twelve
+  proposed, each with a skipped test), through Storybook and the panel before
+  they are built. Then the roadmap's M2 work. **The owner will do all physical-device testing at the end**
   (2026-10-16): keep adding to the phone checklist below, do not ask for it.
 - **Phone checklist, to hand the owner when it is long enough** (they agreed to
   run one session): a real barcode on packaging (MM-43); a pack download over

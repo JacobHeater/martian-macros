@@ -1,6 +1,6 @@
 ---
 id: MM-321
-status: in-progress
+status: done
 component: developer-tooling
 related: [MM-237, MM-293, MM-320]
 ---
@@ -92,3 +92,15 @@ no setup, only in the instant after Erase all data. Looking found three defects:
 read "0.0 MB") fixed with its test; MM-346 (an installed, up-to-date pack offered again) and MM-347 (the
 theme error inside the list of rows) ticketed with skipped tests. Next: the rest (the design system's own
 components, About, onboarding, pause, terms, charts).
+
+**Step 6 (2026-10-16): the rest, and done.** 20 stories and catalog entries draw the design system's own
+dialogs, pickers and menus in their remaining states (a time and a date out of range, the year list, the
+menu by keyboard, the clock and time-of-day overlays opened from their screens, a picker with its helper, a
+segmented control with icons, a sparkline with one point) and the last screens (a minor's birth date, the
+training step with body fat and creatine, a failed agreement, About failing and a rule opened, a pause
+managed, extended and used heavily, a lift with one session and one of a deleted exercise). **The register
+is 3 places (207 when it began), each a place no story can reach, with its reason**: the app's entry point,
+Settings in the instant after an erase, and the terms' list of changes, which no version has yet. Looking
+found two more defects: MM-349 (the creatine start written "2026-10-12") fixed with its test; MM-348 (a
+deleted exercise titled with its id) ticketed with a skipped test. The design defects found along the way,
+MM-333 to MM-348 that are still proposed, go through Storybook and the panel as their own work.
