@@ -4,6 +4,7 @@ import { detailLevelLabel } from '../../format/detailLevelLabel';
 import { Fmt } from '../../format/Fmt';
 import { goalModeLabel } from '../../format/goalModeLabel';
 import { waterAmount } from '../../format/waterAmount';
+import { suggestedWaterGoalMl } from '../../domain/water/suggestedWaterGoalMl';
 import { pauseOn } from '../../engine/pauseOn';
 import type { StoryFact } from './StoryFact';
 import { valueOf } from './valueOf';
@@ -40,6 +41,20 @@ export async function storyFacts(
     .filter(([, value]) => value === true)
     .map(([name]) => name);
   const last = weights[weights.length - 1];
+  // The goal in force, worked out as the app does (MM-358): off, their own, suggested, or withheld.
+  const suggested = suggestedWaterGoalMl({
+    sex: setup.profile.sex,
+    weightKg: last?.weightKg,
+    proteinTargetG: targets[targets.length - 1]?.targets.proteinG,
+    trainingDaysPerWeek: setup.trainingDaysPerWeek,
+    screening: setup.screening,
+    units: setup.unitSystem,
+  });
+  let waterGoal: string;
+  if (goals.waterGoalOff) waterGoal = 'Off';
+  else if (goals.waterGoalMl !== undefined) waterGoal = `${waterAmount(goals.waterGoalMl, setup.unitSystem)}, their own`;
+  else if (suggested !== undefined) waterGoal = `${waterAmount(suggested, setup.unitSystem)}, suggested`;
+  else waterGoal = 'None suggested: a care team sets their fluids';
   const paused = pauseOn(pauses, today);
   return [
     ['Person', `${setup.profile.sex === 'male' ? 'Male' : 'Female'}, ${setup.profile.ageOn(today)}`],
@@ -48,7 +63,7 @@ export async function storyFacts(
     ['Units', setup.unitSystem === 'imperial' ? 'Imperial' : 'Metric'],
     ['Detail', detailLevelLabel(detail)],
     ['Macro picture', { bars: 'Grams', donut: 'Split', micros: 'Micros' }[picture]],
-    ['Water goal', goals.waterGoalMl === undefined ? 'Off' : waterAmount(goals.waterGoalMl, setup.unitSystem)],
+    ['Water goal', waterGoal],
     ['Sodium limit', goals.sodiumLimitMg === undefined ? 'Off' : `${Fmt.whole(goals.sodiumLimitMg)} mg`],
     ['Health check', answered.length === 0 ? 'Nothing answered yes' : answered.join(', ')],
     ['Weigh-ins', last === undefined ? 'None' : `${weights.length}, last ${fmt.weight(last.weightKg)} on ${Fmt.shortDay(last.date)}`],
