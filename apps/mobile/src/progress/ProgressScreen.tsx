@@ -12,6 +12,7 @@ import { useLoaded } from '../app/useLoaded';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmSegmented } from '../ui/MmSegmented';
+import { MmSpinner } from '../ui/MmSpinner';
 import { NumberEntry } from '../ui/NumberEntry';
 import { RecompSignalCard } from './RecompSignalCard';
 import { StrengthSection } from './StrengthSection';
@@ -86,7 +87,10 @@ export function ProgressScreen() {
               onChange={(chosen) => setRangeDays(chosen ?? rangeDays)}
             />
           </div>
-          {last === undefined ? (
+          {last === undefined && weights.length > 0 ? (
+            // Weighed, and the trend still being worked out (MM-343).
+            <MmSpinner />
+          ) : last === undefined ? (
             <p className="app-text">Log a weigh-in to start your trend.</p>
           ) : (
             <>
