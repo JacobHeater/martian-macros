@@ -88,6 +88,7 @@ export function ComponentsCatalog() {
         <StatRow label="Days logged" value="7, all complete" />
         <MmListRow title="Calibration, day 4 of 14." leadingIcon="info" dense flush opens onPress={nothing} />
         <MmProgressBar value={0.6} markers={[0.8, 1]} />
+        <MmProgressBar kind="water" value={0.19} />
       </MmSurface>
       <StepProgress current={2} count={6} />
       <SectionLabel text="Your goal" />
