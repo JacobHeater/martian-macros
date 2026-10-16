@@ -280,9 +280,9 @@ limitations.
 - Batch 2, Coach, is done (2026-10-16): 21 stories, register 144 to 109;
   MM-339 and MM-341 fixed with tests, MM-340 and MM-342 ticketed for the panel.
 - Batch 3, Progress and Train, is done: 28 stories, register 109 to 70; MM-343
-  fixed with its test, MM-344 ticketed for the panel. **For the owner:** loads
-  converted to pounds show two decimals ("182.98 lb", the demo stores kg);
-  `loadNumber` does this on purpose, so it is a question, not a ticket yet.
+  fixed with its test, MM-344 ticketed for the panel. Loads converted to
+  pounds read "182.98 lb"; the owner decided a load is said to a tenth, as a
+  scale says a weight (MM-350, fixed with its test).
 - Batch 4, Settings, packs and shell, is done: 27 stories, register 70 to 28;
   MM-345 fixed, MM-346 and MM-347 ticketed. `storyPackHost` draws downloads.
 - Batch 5 is done and **MM-321 is done**: the register is 3 places (207 at the
