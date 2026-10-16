@@ -13,6 +13,7 @@ import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../../state/AppServices';
 import { termsOfUse } from '../../terms/termsOfUse';
 import { fixtureServices } from '../fixtureServices';
+import { announceStoryFacts } from './announceStoryFacts';
 import { demoScenario } from './demoScenario';
 import type { StoryDevice } from './StoryDevice';
 import { StoryOpener } from './StoryOpener';
@@ -20,6 +21,7 @@ import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import type { StoryStores } from './StoryStores';
 import type { StoryTerms } from './StoryTerms';
+import { storyFacts } from './storyFacts';
 import { storyFoods } from './storyFoods';
 import { storyToday } from './storyToday';
 
@@ -70,6 +72,8 @@ export function StoryApp({ palette, scenario = demoScenario, device, stores, ter
           }),
         );
       }
+      // Who this is, beside the story, so no difference between two stories is hidden (MM-356).
+      void storyFacts(repos, storyToday, { stores: stores !== undefined, device: device !== undefined }).then(announceStoryFacts);
       const catalog = await fixtureCatalog();
       const services = { ...fixtureServices(repos, new FixedClock(storyToday)), catalog: constant(catalog) };
       const brought = device === undefined ? services : await device(services);
