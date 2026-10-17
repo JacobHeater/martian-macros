@@ -192,6 +192,8 @@ it('on Food: a bottle and another amount from the header, and a delete, each sai
 });
 
 it('the Water section folds like a meal, its total in the summary', async () => {
+  // With the goal switched off, the summary is the total alone (MM-358).
+  await repos.preferences.saveWaterGoalOff(true);
   await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml: 250, at: new Date(2026, 9, 10, 9) }));
   renderApp(repos, today);
   await openTab('Food');
@@ -334,7 +336,7 @@ it('half a glass is said as a half', async () => {
   expect(await within(water).findByText(/· 1½ of 8 glasses$/)).toBeInTheDocument();
 });
 
-it('the goal reached fills the bar and carries the check mark; no goal, no bar', async () => {
+it('the goal reached fills the bar and carries the check mark; switched off, no bar', async () => {
   await repos.preferences.saveWaterGoal(1500);
   await drink(2250);
   renderApp(repos, today);
@@ -343,7 +345,7 @@ it('the goal reached fills the bar and carries the check mark; no goal, no bar',
   await within(water).findByText('2.25 L · Goal reached');
   await expect.poll(() => waterLevel(water)).toBe('100%');
   expect(water.querySelector('.food-meal-marker')).not.toBeNull();
-  await repos.preferences.saveWaterGoal(undefined);
+  await repos.preferences.saveWaterGoalOff(true);
   await expect.poll(() => water.querySelector('.mm-progress-water')).toBeNull();
   expect(within(water).queryByText(/glass/)).not.toBeInTheDocument();
 });
@@ -363,4 +365,25 @@ it('changing the day draws the bar anew for that day', async () => {
   water = screen.getByRole('region', { name: 'Water' });
   await expect.poll(() => waterLevel(water)).toBe('100%');
   expect(water.querySelector('.mm-progress-water')).not.toBe(before);
+});
+
+// MM-358: the water goal is on by default, suggested for the person.
+it('with no goal set, the Water section fills toward the one suggested for the person', async () => {
+  await drink(1000);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(water.querySelector('.mm-progress-water')).not.toBeNull();
+  expect(within(water).getByText(/^1 L of [\d.]+ L · /)).toBeInTheDocument();
+});
+
+it('MM-358: where a care team sets what is drunk, no goal is suggested and there is no bar', async () => {
+  const setup = await first(repos.setup.watchSetup());
+  await repos.setup.saveSetup(setup!.copyWith({ screening: new ScreeningAnswers({ fluidLimitedByClinician: true }) }));
+  await drink(1000);
+  renderApp(repos, today);
+  await openTab('Food');
+  const water = await screen.findByRole('region', { name: 'Water' });
+  expect(water.querySelector('.mm-progress-water')).toBeNull();
+  expect(within(water).queryByText(/glass/)).not.toBeInTheDocument();
 });

@@ -128,10 +128,10 @@ export const NutritionGoals = screenStory({
   },
 });
 
-/** MM-311: the section as a new installation has it: both off. */
-export const NutritionGoalsOff = screenStory({
+/** MM-311, MM-358: the section as a new installation has it: no sodium limit, the water goal on and suggested. */
+export const NutritionGoalsSuggested = screenStory({
   covers: ['SettingsScreen'],
-  shows: 'Daily water goal',
+  shows: /^Suggested from your protein target and training. Type your own to change it./,
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
@@ -161,6 +161,55 @@ export const NutritionGoalsKidney = screenStory({
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
+  },
+});
+
+/** MM-358, MM-359: a clinician limits what the person drinks: nothing is suggested, and the reason is said. */
+export const WaterGoalCareTeam = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Your clinician limits your fluids.',
+  scenario: demoWith({ screening: { fluidLimitedByClinician: true } }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Daily water goal'));
+  },
+});
+
+/** MM-358: switched on with a clinician's limit: the amount their care team gave them is asked for. */
+export const WaterGoalCareTeamAmount = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Only if your clinician gave you an amount of water to drink./,
+  scenario: demoWith({ screening: { fluidLimitedByClinician: true } }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    const toggle = await within(canvas).findByRole('switch', { name: /^Daily water goal/ });
+    reveal(toggle);
+    await userEvent.click(toggle);
+  },
+});
+
+/** MM-358: their own amount, with the way back to the suggestion. */
+export const WaterGoalOwnAmount = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Use the suggested amount',
+  scenario: demoWith({ waterGoalMl: 3000 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Use the suggested amount'));
+  },
+});
+
+/** MM-358: back from their own amount to the suggestion: the field holds it, with focus on it. */
+export const WaterGoalBackToSuggested = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Suggested from your protein target and training. Type your own to change it./,
+  scenario: demoWith({ waterGoalMl: 3000 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  walk: async (canvas) => {
+    const back = await within(canvas).findByRole('button', { name: /^Use the suggested amount/ });
+    reveal(back);
+    await userEvent.click(back);
+    await within(canvas).findByText(/^Suggested from your protein target/);
   },
 });
 

@@ -34,6 +34,7 @@ CREATE TABLE "setups" (
   "relief_answered_epoch_day" INTEGER NULL,
   "health_check_skip_count" INTEGER NOT NULL DEFAULT 0,
   "creatine_started_epoch_day" INTEGER NULL,
+  "fluid_limited_by_clinician" INTEGER NOT NULL DEFAULT 0 CHECK ("fluid_limited_by_clinician" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (
@@ -137,6 +138,7 @@ CREATE TABLE "user_preferences" (
   "sodium_limit_mg" INTEGER NULL,
   "sodium_limit_since_epoch_day" INTEGER NULL,
   "water_goal_ml" REAL NULL,
+  "water_goal_off" INTEGER NOT NULL DEFAULT 0 CHECK ("water_goal_off" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
