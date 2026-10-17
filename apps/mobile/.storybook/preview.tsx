@@ -26,6 +26,7 @@ const preview: Preview = {
       options: {
         phone: { name: 'Phone', styles: { width: '412px', height: '915px' }, type: 'mobile' },
         smallPhone: { name: 'Small phone', styles: { width: '360px', height: '740px' }, type: 'mobile' },
+        narrowPhone: { name: 'Narrow phone', styles: { width: '320px', height: '640px' }, type: 'mobile' },
       },
     },
   },

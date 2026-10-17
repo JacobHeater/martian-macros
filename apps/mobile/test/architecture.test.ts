@@ -77,6 +77,7 @@ const buttonHomes: readonly string[] = [
   'ui/MmChoiceChip.tsx',
   'ui/MmDisclosure.tsx',
   'ui/MmFab.tsx',
+  'ui/MmGradeBadge.tsx',
   'ui/MmIconButton.tsx',
   'ui/MmListRow.tsx',
   'ui/MmMenuItemRow.tsx',

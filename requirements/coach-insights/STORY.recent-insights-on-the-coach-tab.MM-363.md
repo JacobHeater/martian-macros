@@ -17,8 +17,9 @@ The product owner's (2026-10-17): the Coach tab lists inline insights as well as
 Choices I made without asking (say if any is wrong):
 - **A "Recent insights" section on the Coach tab**, placed in its tiers (MM-256) below the goal and the week's change. It lists the
   inline insights shown in the last 14 days, newest first, grouped by area.
-- **Each row** shows the area icon, the item it was about ("Peanut butter, Tue lunch"), and the insight's line. Tapping it opens the
-  item's screen on that day, scrolled to the item, using the destination-state rules (MM-286).
+- **Folded to its count by default**, as Monthly reports is (the panel's PD-6), so it never pushes the sections below it down.
+- **Each row** shows the area icon, the item it was about ("Peanut butter, snack") as its title, and the day and the insight's line
+  beneath. Tapping it opens the item's screen on that day, scrolled to the item, using the destination-state rules (MM-286).
 - **An insight whose item was deleted or edited** so the rule no longer holds stays listed as it was said, marked "Item since
   changed", and does not link.
 - **One row per rule per item.** A pattern insight that shows for days is listed once, dated the day it first showed, and
@@ -66,4 +67,6 @@ Scenario: Nothing yet
 ```
 
 ## UI/UX
-- To be drawn: Coach screen stories with recent insights, with none, and with an item that has since changed.
+- CoachRecentInsightsFolded, CoachRecentInsights, CoachRecentInsightsNone, in
+  `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`. The section folded, open with an item since changed, and empty.
+  Reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`).

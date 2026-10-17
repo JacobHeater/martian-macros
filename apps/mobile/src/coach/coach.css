@@ -46,3 +46,70 @@
 .coach-recovery-actions {
   margin-top: var(--space-8);
 }
+
+/* The Coach tab's recent insights (MM-363): a changed item says so in words. */
+.coach-recent-changed {
+  font-style: italic;
+}
+
+/* ---- An inline insight (MM-362): the row's own icon and text columns, under the row ---- */
+
+.coach-inline-insight {
+  /* Where the row's icon column starts, how wide it is, the gap to its text, and the row's end padding. */
+  --note-start: 0px;
+  --note-icon: 20px;
+  --note-gap: var(--space-12);
+  --note-end: var(--space-16);
+}
+.coach-inline-insight-row {
+  --note-start: var(--space-16);
+  --note-icon: 24px;
+  --note-gap: var(--space-16);
+}
+.coach-inline-insight-plain {
+  --note-start: var(--space-16);
+}
+.coach-inline-insight .mm-disclosure-toggle {
+  align-items: flex-start;
+  min-height: 48px;
+  padding: var(--space-4) var(--note-end) var(--space-8) var(--note-start);
+}
+.coach-inline-insight .mm-disclosure-chevron {
+  margin-top: 2px;
+}
+.coach-inline-insight-line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  text-align: start;
+}
+.coach-inline-insight-row .coach-inline-insight-line {
+  gap: var(--space-16);
+}
+.coach-inline-insight-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--note-icon);
+  height: 20px;
+  color: var(--info);
+}
+/* Quieter than the row it qualifies (the panel's PD-1): a caption, as the row's own detail lines are. */
+.coach-inline-insight-text {
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.coach-inline-insight-body {
+  padding: 0 var(--note-end) var(--space-8) calc(var(--note-start) + var(--note-icon) + var(--note-gap));
+}
+.coach-inline-insight-label {
+  margin: 0 0 var(--space-4);
+  color: var(--text2);
+  font: var(--type-label);
+}
+.coach-inline-insight-settings {
+  margin: var(--space-4) 0 0 calc(-1 * var(--space-12));
+}

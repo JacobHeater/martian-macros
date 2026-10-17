@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { InlineInsight } from '../coach/InlineInsight';
+import { useInsightPreview } from '../coach/useInsightPreview';
 import type { Workout } from '../domain/training/Workout';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
 import { checkSetTimes } from '../engine/checkSetTimes';
@@ -53,8 +55,10 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   const setup = useLoaded(state.setup);
   const workouts = useLoaded(state.workouts) ?? [];
   const progressions = useLoaded(state.exerciseProgressions);
+  const preview = useInsightPreview();
   const entry = workout.exercises[index];
   if (entry === undefined) return null;
+  const exerciseNote = preview.exerciseNotes?.get(entry.exerciseId);
   const exercise = exercises.get(entry.exerciseId);
   const load = exercise?.load ?? 'addedWeight';
   const units = setup?.unitSystem ?? 'imperial';
@@ -123,6 +127,12 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
         <p className="app-caption train-last-time">Last time: {lastTime.map((s) => setText(s, fmt, load)).join(', ')}</p>
       )}
       {suggestion === undefined ? null : <p className="app-text train-suggestion">{progressionText(suggestion, fmt, load)}</p>}
+      {/* The coach's line about this lift, after the facts it rests on (MM-366): none in the app until built. */}
+      {exerciseNote === undefined ? null : (
+        <div className="train-exercise-insight">
+          <InlineInsight insight={exerciseNote} />
+        </div>
+      )}
       {entry.sets.map((set, s) =>
         s === open ? (
           <SetEditor

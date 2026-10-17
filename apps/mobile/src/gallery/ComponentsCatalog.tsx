@@ -15,6 +15,7 @@ import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmDropdown } from '../ui/MmDropdown';
 import { MmFab } from '../ui/MmFab';
 import { MmFooterActions } from '../ui/MmFooterActions';
+import { MmGradeBadge } from '../ui/MmGradeBadge';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmNutrientRow } from '../ui/MmNutrientRow';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -59,6 +60,12 @@ export function ComponentsCatalog() {
         <MmIconButton icon="settings" label="Settings" onPress={() => undefined} />
       </div>
       <MmSurface>A surface</MmSurface>
+      {/* MM-370: a grade, and the question mark of one that can't be given. */}
+      <div className="gallery-row">
+        <MmGradeBadge letter="B+" label="Grade B plus" />
+        <MmGradeBadge letter="D-" label="Grade D minus" />
+        <MmGradeBadge letter={undefined} label="Soup: can’t be graded. Why?" onExplain={() => undefined} />
+      </div>
       <MmHeroSurface>
         <p style={{ margin: 0, font: 'var(--type-figure-xl)' }}>1,534</p>
         <p style={{ margin: 0, color: 'var(--text2)' }}>kcal left today</p>

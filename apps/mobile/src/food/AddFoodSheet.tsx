@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
+import { useInsightPreview } from '../coach/useInsightPreview';
 import { atwaterKcal } from '../domain/atwaterKcal';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
@@ -43,6 +44,7 @@ import { defaultMeal } from './defaultMeal';
 import { editableNumber } from './editableNumber';
 import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { FoodAmountStep } from './FoodAmountStep';
+import { FoodGrade } from './FoodGrade';
 import { FoodSearchResults } from './FoodSearchResults';
 import { MealChips } from './MealChips';
 import { BarcodeScanStep } from './scan/BarcodeScanStep';
@@ -199,6 +201,12 @@ type Step =
  */
 export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone }: AddFoodSheetProps) {
   const { services, state } = useApp();
+  // A grade beside each food found (MM-370), as the pack's results have: none in the app until grades are built.
+  const { gradeOfFood } = useInsightPreview();
+  const gradeBeside = (name: string) => {
+    const grade = gradeOfFood?.(name);
+    return grade === undefined ? undefined : <FoodGrade grade={grade} subject={name} />;
+  };
   const today = useCell(state.today);
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
@@ -661,6 +669,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                       `${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`
                     }
                     onPress={() => pickCustom(food)}
+                    trailingAction={gradeBeside(food.name)}
                   />
                 ))}
               {recents
@@ -671,6 +680,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                     title={e.name}
                     subtitle={`Your recent food · ${whole(e.kcal)} kcal`}
                     onPress={() => fill(e)}
+                    trailingAction={gradeBeside(e.name)}
                   />
                 ))}
               <FoodSearchResults
