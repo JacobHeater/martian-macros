@@ -137,10 +137,15 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 5 left it: without the fluid limit and the water goal switched off (MM-358, MM-359). */
+const versionFive = currentSchema
+  .replace('  "fluid_limited_by_clinician" INTEGER NOT NULL DEFAULT 0 CHECK ("fluid_limited_by_clinician" IN (0, 1)),\n', '')
+  .replace('  "water_goal_off" INTEGER NOT NULL DEFAULT 0 CHECK ("water_goal_off" IN (0, 1)),\n', '');
+
 const versionThree = (() => {
   const foodEntries = /( {2}"created_at" INTEGER NOT NULL DEFAULT \(CAST\(strftime\('%s', CURRENT_TIMESTAMP\) AS INTEGER\)\)),\n[\s\S]*?\n\);/;
   const customFoods = / {2}"cooked_weight_grams" REAL NULL,\n[\s\S]*?\n\);/;
-  return currentSchema
+  return versionFive
     .replace(foodEntries, '$1\n);')
     .replace(customFoods, '  "cooked_weight_grams" REAL NULL\n);')
     .replace('  "sodium_limit_mg" INTEGER NULL,\n', '')
@@ -215,7 +220,7 @@ it('a version 3 database comes up to date: entries kept with no micronutrients, 
 it('a version 4 database from the build drawn for the panel can switch the sodium limit on', async () => {
   const old = await openSql();
   // Version 4 as 14aa735 left it: today's tables, less the one column.
-  const firstVersionFour = currentSchema.replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '');
+  const firstVersionFour = versionFive.replace('  "sodium_limit_since_epoch_day" INTEGER NULL,\n', '');
   expect(firstVersionFour).not.toContain('sodium_limit_since_epoch_day');
   await AppDatabase.open(old, { version: 4, schema: firstVersionFour });
 

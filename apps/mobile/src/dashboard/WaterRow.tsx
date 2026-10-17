@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
-import { NutritionGoals } from '../domain/NutritionGoals';
 import { WaterServing } from '../domain/water/WaterServing';
 import { waterAmount } from '../format/waterAmount';
 import { logWater } from '../food/logWater';
 import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmListRow } from '../ui/MmListRow';
@@ -22,7 +22,8 @@ export function WaterRow({ today }: { today: CalendarDate }) {
   const overlays = useOverlays();
   const setup = useLoaded(state.setup);
   const entries = useLoaded(state.waterForDay(today)) ?? [];
-  const goal = (useLoaded(state.nutritionGoals) ?? NutritionGoals.none).waterGoalMl;
+  // The goal in force: the person's own, or the one suggested for them (MM-358).
+  const goal = useCell(state.waterGoal)?.ml;
   const units = setup?.unitSystem ?? 'metric';
   const total = entries.reduce((sum, e) => sum + e.ml, 0);
   /** Water added by taps the list has not caught up with, so a quick second tap says the right total. */

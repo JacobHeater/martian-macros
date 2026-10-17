@@ -1,3 +1,5 @@
+import type { WaterGoal } from '../domain/water/WaterGoal';
+import { suggestedWaterGoalMl } from '../domain/water/suggestedWaterGoalMl';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { DayCompleteness } from '../domain/DayCompleteness';
@@ -201,8 +203,15 @@ export class AppState {
   /** Which picture of the macros the hero shows (MM-254): bars or donut, never both. */
   readonly macroPicture: Cell<Loadable<MacroPicture>>;
 
-  /** The sodium limit and the water goal, each off until set (MM-311, MM-313). */
+  /** The sodium limit, off until set, and the water goal as the person set it (MM-311, MM-313, MM-358). */
   readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
+
+  /**
+   * The water goal in force (MM-358): the person's own amount, or the one
+   * suggested for them. Undefined while it is switched off, withheld by the
+   * health check, or still being read.
+   */
+  readonly waterGoal: Cell<WaterGoal | undefined>;
   readonly recentFoods: Cell<Loadable<FoodEntry[]>>;
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
@@ -751,6 +760,24 @@ export class AppState {
         return undefined;
       }
       return history === undefined ? undefined : history[history.length - 1];
+    });
+
+    this.waterGoal = derived<WaterGoal | undefined>(() => {
+      const goals = of(this.nutritionGoals);
+      const setup = of(this.setup);
+      if (goals === undefined || setup === undefined || goals.waterGoalOff) return undefined;
+      const weights = of(this.weights) ?? [];
+      const suggestedMl = suggestedWaterGoalMl({
+        sex: setup.profile.sex,
+        // The latest weigh-in, not the coach's trend: watching the coach would work it out on every food change.
+        weightKg: weights[weights.length - 1]?.weightKg,
+        proteinTargetG: this.currentTargets.value?.targets.proteinG,
+        trainingDaysPerWeek: setup.trainingDaysPerWeek,
+        screening: setup.screening,
+        units: setup.unitSystem,
+      });
+      if (goals.waterGoalMl !== undefined) return { ml: goals.waterGoalMl, suggested: false, suggestedMl };
+      return suggestedMl === undefined ? undefined : { ml: suggestedMl, suggested: true, suggestedMl };
     });
 
     this.strengthTrends = derived<Loadable<readonly StrengthTrend[]>>(() => {

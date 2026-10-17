@@ -13,7 +13,8 @@ type Answer =
   | 'insulinOrSulfonylurea'
   | 'insulinCareTeamConfirmed'
   | 'bariatricSurgery'
-  | 'weightAffectingMedication';
+  | 'weightAffectingMedication'
+  | 'fluidLimitedByClinician';
 
 const answers: readonly Answer[] = [
   'pregnant',
@@ -28,6 +29,7 @@ const answers: readonly Answer[] = [
   'insulinCareTeamConfirmed',
   'bariatricSurgery',
   'weightAffectingMedication',
+  'fluidLimitedByClinician',
 ];
 
 interface HealthStepProps {
@@ -75,6 +77,7 @@ export function HealthStep({ screening, female, onChange, heading = true }: Heal
         : null}
       {item('I have had bariatric surgery', 'bariatricSurgery')}
       {item('A medication I take can change my weight or water retention', 'weightAffectingMedication')}
+      {item('A clinician has told me to limit my fluids', 'fluidLimitedByClinician')}
       <p className="app-caption">
         This app is not medical advice. Talk to your clinician before changing your diet if you have a medical
         condition.

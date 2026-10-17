@@ -57,4 +57,18 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       }
     },
   ],
+  // 5 to 6 (MM-358, MM-359): whether a clinician limits what the person drinks,
+  // and whether the water goal, now on by default, was switched off. Both "no".
+  [
+    5,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN fluid_limited_by_clinician INTEGER NOT NULL DEFAULT 0 ' +
+          'CHECK (fluid_limited_by_clinician IN (0, 1))',
+      );
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN water_goal_off INTEGER NOT NULL DEFAULT 0 CHECK (water_goal_off IN (0, 1))',
+      );
+    },
+  ],
 ]);

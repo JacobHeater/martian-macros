@@ -12,6 +12,7 @@ import { currentSchemaVersion } from '../../src/data/currentSchemaVersion';
  */
 const fingerprints: Readonly<Record<number, string>> = {
   5: '21a162134c2cfebc55a419ba9ba76c026a8cbb859774360ca34061519af6aea7',
+  6: '1f7604f8e1f531f6bc74a1cd6e0564d30b65d679cf8bd39fc1783ff079626d5c',
 };
 
 it('the schema is the one recorded for its version', () => {

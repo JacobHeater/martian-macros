@@ -11,6 +11,7 @@ const names = [
   'insulinCareTeamConfirmed',
   'bariatricSurgery',
   'weightAffectingMedication',
+  'fluidLimitedByClinician',
 ] as const;
 
 type ScreeningAnswersInit = { [name in (typeof names)[number]]?: boolean };
@@ -33,6 +34,9 @@ export class ScreeningAnswers {
   readonly bariatricSurgery: boolean;
   readonly weightAffectingMedication: boolean;
 
+  /** A clinician limits how much the person drinks (MM-359): no water goal is suggested. */
+  readonly fluidLimitedByClinician: boolean;
+
   constructor(init: ScreeningAnswersInit = {}) {
     this.pregnant = init.pregnant ?? false;
     this.breastfeeding = init.breastfeeding ?? false;
@@ -46,6 +50,7 @@ export class ScreeningAnswers {
     this.insulinCareTeamConfirmed = init.insulinCareTeamConfirmed ?? false;
     this.bariatricSurgery = init.bariatricSurgery ?? false;
     this.weightAffectingMedication = init.weightAffectingMedication ?? false;
+    this.fluidLimitedByClinician = init.fluidLimitedByClinician ?? false;
   }
 
   /** Whether every answer is the same as in `other`. */
