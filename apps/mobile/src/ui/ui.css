@@ -953,9 +953,34 @@
   font: var(--type-label);
 }
 /* A badge that explains itself (every grade, and the question mark): the whole slot is the target. */
+/* A letter's band fills it (the owner, 2026-10-17); the letter keeps the meaning, so +/- share their band's fill. */
+.mm-grade-a,
+.mm-grade-b,
+.mm-grade-c,
+.mm-grade-d {
+  border-color: var(--grade-edge);
+  color: var(--on-grade);
+}
+.mm-grade-a {
+  background: var(--grade-a);
+}
+.mm-grade-b {
+  background: var(--grade-b);
+}
+.mm-grade-c {
+  background: var(--grade-c);
+}
+.mm-grade-d {
+  background: var(--grade-d);
+}
 .mm-grade-button {
   position: relative;
   cursor: pointer;
+}
+/* Pressed (MM-267): a ring in the text colour, never a new background, so the fill and its letter stay (MM-376). */
+.mm-grade-button:active,
+.mm-pressed .mm-grade-button {
+  box-shadow: 0 0 0 2px var(--text);
 }
 .mm-grade-unknown {
   border-style: dashed;
@@ -1900,8 +1925,6 @@
 .mm-pressed .mm-segment,
 .mm-disclosure-toggle:active,
 .mm-pressed .mm-disclosure-toggle,
-.mm-grade-button:active,
-.mm-pressed .mm-grade-button,
 .mm-menu-item:active,
 .mm-pressed .mm-menu-item,
 .mm-choice-card:active,

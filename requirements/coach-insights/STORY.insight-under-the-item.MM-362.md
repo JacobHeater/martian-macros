@@ -37,8 +37,12 @@ Choices I made without asking (say if any is wrong):
   rests on", `StatRow` evidence) at row scale, under the row, inside the same list group. The sibling that sets the pattern is
   the easy-to-miss line under a completed day (`EasyToMissLine`). No new card on the canvas (MM-291, MM-318).
 - **Quieter than its row** (the panel's PD-1): the insight icon in the row's icon column, the line in the row's text column as a
-  caption in the secondary text colour, as the row's own detail lines are. Every qualifying item shows its line, so the density
-  comes from the line's weight, not from rationing.
+  caption, as the row's own detail lines are. Every qualifying item shows its line, so the density comes from the line's weight,
+  not from rationing.
+- **In ion** (the product owner, 2026-10-17): the icon and the line take `--ion`, the colour of what the engine works out, so the
+  coach's voice reads apart from the item's own facts. Ion holds 4.5:1 as caption text on canvas and surface in every palette
+  (`design/color-and-theme-system.md` §6). This goes past the colour doc's budget of one ion group per screen, by the owner's
+  call: the doc records the exception.
 - **No dismiss button on the line.** The owner put quieting in Settings. The expanded evidence ends with a button naming the
   kind of insight, "Settings for “Mostly fat”", that opens that kind's switch (MM-364).
 - **In a workout**, the line about a lift comes after "Last time" and the suggestion, before the sets (the panel's PD-5). A new
@@ -73,7 +77,7 @@ Scenario: One per item
 
 Scenario: The evidence is one tap down
   When an inline insight is tapped
-  Then "What this rests on" opens with the item's figures, and for a pattern the days it was worked out from
+  Then "The numbers behind this" opens with the item's figures, and for a pattern the days it was worked out from
 
 Scenario: Never about the day
   Given every inline rule run against every simulated user
@@ -122,5 +126,8 @@ and reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`). All in
 - Out of scope: insights generated at run time, insights sent as notifications, and per-insight dismissal.
 - Schema: one step for the inline insight log (MM-363 reads it).
 - A sideways drag on the line moves its entry's swipe row, so it can delete the food, with Undo (the panel's UX-9, recorded).
+- **"The numbers behind this"** names the disclosure that opens an insight's figures, here and wherever the coach shows its
+  working (the dashboard insight, the stall card, coach confidence). It replaced "What this rests on", which the product
+  owner found ambiguous (2026-10-17).
 - **"One line" means one insight, wrapping** (the product owner, 2026-10-17, asked after the panel's UX-5): the whole
   sentence or two shows at caption size under the item; nothing is cut short.

@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "task_id": "mm375-warm-martian",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "design/ion-insights-grade-fills-warm-martian",
+    "commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Frame purple washout and the brand; research 90s colour schemes; where warmth enters and which doc rules collide; acceptance criteria.",
+      "role": "product",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17",
+      "status": "complete",
+      "inspected_commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1",
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "brief.md",
+          "design/color-and-theme-system.md",
+          "tokens.css",
+          "MM-184",
+          "MM-370",
+          "five Martian renders"
+        ],
+        "not_inspected": [
+          "tokens.test.ts",
+          "flutterTheme.json",
+          "component CSS"
+        ],
+        "referrals": [
+          "product-designer: values and numbers",
+          "ux-accessibility: the drawn result"
+        ],
+        "limitations": "Visual reading of renders; popular-press sources; no figures computed."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Which 90s colour schemes fit a novice fitness app called retro 90s?",
+        "reason": "Owner asked for 90s research.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Dark ground plus one or two flat saturated warm accents (Nickelodeon orange, ACG); not the patterned rainbow side. Sources listed in the report.",
+        "limitations": "Popular-press and encyclopedia sources."
+      }
+    },
+    {
+      "task": "Measure the washout in CIE LCh; research 90s schemes; propose new Martian values with contrast, L* and colour-blind figures; four non-red grade fills.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17",
+      "status": "complete",
+      "inspected_commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1",
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "brief.md",
+          "design/color-and-theme-system.md",
+          "tokens.css",
+          "screen-direction.md",
+          "three Martian renders"
+        ],
+        "not_inspected": [
+          "Workout, Coach and Settings renders"
+        ],
+        "referrals": [
+          "coaching/safety: grade fills and MM-108",
+          "ux-accessibility: Machado simulation",
+          "product: chroma and identity"
+        ],
+        "limitations": "Hand arithmetic, verified afterwards by the chair by computer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Which 90s references should the palette draw from?",
+        "reason": "Owner asked for 90s research.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Nickelodeon lime and orange; Jazz cup teal and purple; Memphis brights. Sources listed in the report.",
+        "limitations": "Some sources unreachable."
+      }
+    },
+    {
+      "task": "The UX guard on the drawn palette, ion insight text and grade fills.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17, two passes",
+      "status": "complete",
+      "inspected_commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1",
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "tokens.css",
+          "coach.css",
+          "MmGradeBadge",
+          "ui.css grade rules",
+          "tokens.test.ts",
+          "shots5 and shots6 renders"
+        ],
+        "not_inspected": [
+          "device",
+          "screen reader",
+          "simulator"
+        ],
+        "referrals": [
+          "coaching/safety: grade fills and MM-108"
+        ],
+        "limitations": "Static renders and source."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "WCAG thresholds already adopted in the repository.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The grade-fill judging question is recorded in MM-370 for when grades are built.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As coaching.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "A visual palette change; no health rule or measurement.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As nutrition.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As nutrition.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Token and CSS changes only.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Owner: Martian's ion and protein share one aqua, so insight lines share protein's colour (P-3, UX-4).",
+    "Coaching/safety: do categorical grade fills read as judging food (MM-108)?"
+  ],
+  "decisions": [
+    {
+      "id": "MM375-violet",
+      "status": "accepted",
+      "summary": "Royal 90s violet neutrals, near-neutral secondary text, tangerine carbs, magenta fat, lime kept.",
+      "authority": "Product owner, 2026-10-17"
+    },
+    {
+      "id": "MM375-guard",
+      "status": "accepted",
+      "summary": "Bug MM-376 fixed; A and B grade fills swapped; text2 toned down; contrast tests carried over.",
+      "authority": "Chair (decision.md)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/ui/gradePressed.test.ts",
+      "result": "passed",
+      "summary": "MM-376 regression test: failed before the fix, passes after.",
+      "commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1",
+      "dirty": true,
+      "exit_code": 0
+    },
+    {
+      "command": "npx vitest run test/tokens.test.ts test/ui",
+      "result": "passed",
+      "summary": "Contrast, ion, macro L* and grade-letter checks in every palette; UI suite.",
+      "commit": "2e5f8b62c2d84627bebeb8a9ced5e79a0120cee1",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-17T23:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-17",
+      "limitations": "No reviewer could run a test or reach a device."
+    }
+  ]
+}

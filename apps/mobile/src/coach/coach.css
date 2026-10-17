@@ -92,14 +92,17 @@
   place-items: center;
   width: var(--note-icon);
   height: 20px;
-  color: var(--info);
+  color: var(--ion);
 }
-/* Quieter than the row it qualifies (the panel's PD-1): a caption, as the row's own detail lines are. */
+/*
+ * Quieter than the row it qualifies (the panel's PD-1): a caption, as the row's own detail lines are. In ion, the
+ * colour of what the engine works out (the owner, 2026-10-17), so the coach's voice reads apart from the item's facts.
+ */
 .coach-inline-insight-text {
   flex: 1;
   min-width: 0;
   padding-top: 2px;
-  color: var(--text2);
+  color: var(--ion);
   font: var(--type-caption);
 }
 .coach-inline-insight-body {
