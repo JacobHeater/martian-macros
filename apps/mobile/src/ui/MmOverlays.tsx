@@ -6,6 +6,7 @@ import { MmDialog } from './MmDialog';
 import { MmIconButton } from './MmIconButton';
 import { MmMenu } from './MmMenu';
 import { MmOption } from './MmOption';
+import { MmPopover } from './MmPopover';
 import { MmSheet } from './MmSheet';
 import { MmTimeOfDayDialog } from './MmTimeOfDayDialog';
 import type { Overlays } from './Overlays';
@@ -154,6 +155,12 @@ export function MmOverlays({ children }: { children: ReactNode }) {
 
       menu({ label, items, anchor }) {
         return ask((finish) => <MmMenu label={label} items={items} anchor={anchor} onDone={finish} />);
+      },
+
+      async popover({ title, message, anchor, label }) {
+        await ask<never>((finish) => (
+          <MmPopover title={title} message={message} anchor={anchor} label={label} onDone={() => finish(undefined)} />
+        ));
       },
 
       snack(message, action) {

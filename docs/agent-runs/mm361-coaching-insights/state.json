@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "task_id": "mm361-coaching-insights",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "design/inline-insights-and-grades",
+    "commit": "33a1385"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Does each new part (inline insight, grade badge, popover, Recent insights, Settings > Coach) look and behave like its siblings; hierarchy; colour; density.",
+      "role": "product-designer",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17, two passes",
+      "status": "complete",
+      "inspected_commit": "33a1385 plus working tree",
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": ["source-inspection", "render-inspection", "task-walkthrough"],
+        "inspected": ["the files listed in brief.md", "21 stories in martian, food/dashboard/workout/settings in all palettes; second pass on the shots2 renders"],
+        "not_inspected": ["device", "rule wording (coaching and safety roles)"],
+        "referrals": ["ux-accessibility: PD-3(a), PD-12", "training: PD-5 double advice", "coaching/safety: Large portion, well-run cut"],
+        "limitations": "Static renders and source; no device; hashes not computed by the reviewer."
+      },
+      "research": { "status": "unnecessary", "question": "", "reason": "Visual-hierarchy judgments on repository rules.", "path": "not-needed", "sources": [], "summary": "None.", "limitations": "None." }
+    },
+    {
+      "task": "The UX guard: four task walkthroughs, accessible names and roles, popover focus, targets, contrast, large text and narrow width, eating-disorder states, Settings > Coach.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17, two passes",
+      "status": "complete",
+      "inspected_commit": "33a1385 plus working tree",
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": ["source-inspection", "render-inspection", "task-walkthrough"],
+        "inspected": ["the files listed in brief.md", "the renders named in the report; second pass on shots2"],
+        "not_inspected": ["TalkBack", "device", "focus return at runtime"],
+        "referrals": ["react-capacitor: focus-return tests", "safety: Large portion with an eating-disorder history"],
+        "limitations": "Static renders and source; WCAG thresholds from memory; hashes not computed by the reviewer."
+      },
+      "research": { "status": "unnecessary", "question": "", "reason": "WCAG 2.2 thresholds applied from memory; flagged for confirmation.", "path": "not-needed", "sources": [], "summary": "None.", "limitations": "Thresholds not re-checked against w3.org in this run." }
+    }
+  ],
+  "omitted_roles": {
+    "chair": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+    "coaching": "Rule wording and thresholds are drafts MM-365 to MM-368 send to these roles before the build; this run is the visual and interaction design.",
+    "nutrition": "As coaching.",
+    "training": "As coaching.",
+    "measurement": "As coaching.",
+    "safety": "As coaching; one bounded question recorded (Large portion), answered conservatively by the chair until the role reviews.",
+    "react-capacitor": "The seam is design-only and is replaced when MM-362 is built."
+  },
+  "unresolved_questions": [
+    "Owner: does 'one line, expandable' (MM-362) mean one insight wrapping (as drawn) or one visual line cut short?",
+    "Safety: is 'Large portion' a restriction cue with an eating-disorder history (left out until answered)?"
+  ],
+  "decisions": [
+    { "id": "MM361-design", "status": "accepted", "summary": "Inline insights, grades and Settings > Coach drawn on the real screens; UX guard PASS after the panel's changes.", "authority": "Chair (decision.md)" },
+    { "id": "MM361-area-switch", "status": "accepted", "summary": "The area's switch lives on its own screen, not its row (MM-364 amended).", "authority": "Chair, product designer agreeing" }
+  ],
+  "pending_work": [],
+  "tests": ["apps/mobile/test/ui/popoverPlacement.test.tsx (MM-372)", "apps/mobile/test/app/largeTextLayout.test.ts (MM-373, MM-374, skipped)"],
+  "checkpoint": { "at": "2026-10-17T00:00:00Z", "writers_stopped": true }
+}

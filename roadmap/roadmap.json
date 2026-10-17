@@ -483,7 +483,9 @@
             "MM-354",
             "MM-356",
             "MM-357",
-            "MM-360"
+            "MM-360",
+            "MM-373",
+            "MM-374"
           ]
         },
         {
@@ -762,7 +764,8 @@
             "MM-365",
             "MM-366",
             "MM-367",
-            "MM-368"
+            "MM-368",
+            "MM-372"
           ]
         },
         {
@@ -1363,7 +1366,9 @@
           "MM-342",
           "MM-351",
           "MM-352",
-          "MM-357"
+          "MM-357",
+          "MM-373",
+          "MM-374"
         ]
       },
       "sequence": [
@@ -1424,7 +1429,9 @@
           "title": "Dark-theme, small-screen, large-text and accessibility verification across all screens",
           "tickets": [
             "MM-91",
-            "MM-106"
+            "MM-106",
+            "MM-373",
+            "MM-374"
           ],
           "milestone": "M2"
         },
@@ -2394,7 +2401,8 @@
           "MM-32",
           "MM-133",
           "MM-168",
-          "MM-312"
+          "MM-312",
+          "MM-372"
         ],
         "remaining": [
           "MM-33",
@@ -2516,7 +2524,8 @@
             "MM-371",
             "MM-365",
             "MM-366",
-            "MM-367"
+            "MM-367",
+            "MM-372"
           ],
           "milestone": "M4"
         },

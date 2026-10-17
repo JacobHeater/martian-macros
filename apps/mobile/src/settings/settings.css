@@ -12,6 +12,10 @@
   display: flex;
   gap: var(--space-12);
 }
+/* The rule an insight's "Coach settings for this tip" opened (MM-364): marked at its start edge. */
+.settings-focused-rule {
+  box-shadow: inset 3px 0 0 var(--info);
+}
 .settings-fields > * {
   flex: 1;
   min-width: 0;

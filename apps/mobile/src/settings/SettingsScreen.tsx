@@ -1,4 +1,5 @@
 import { HowThisWorksScreen } from '../about/HowThisWorksScreen';
+import { useInsightPreview } from '../coach/useInsightPreview';
 import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
 import { DailyActivity } from '../domain/DailyActivity';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
@@ -26,6 +27,7 @@ import { MmSlider } from '../ui/MmSlider';
 import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
+import { CoachSettingsSection } from './CoachSettingsSection';
 import { HealthConnectSection } from './HealthConnectSection';
 import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
@@ -50,6 +52,8 @@ export function SettingsScreen() {
   const detail = useLoaded(state.detailLevel) ?? 'standard';
   const easyToMiss = useLoaded(state.easyToMiss)?.enabled ?? true;
   const termsAccepted = useLoaded(state.termsAcceptance);
+  // Settings > Coach (MM-364): not in the app until its switches are stored.
+  const coachSettings = useInsightPreview().coachSettings === true;
   if (setup === undefined) return <Screen title="Settings">{null}</Screen>;
   const bodyFat = setup.bodyFatPercent;
 
@@ -184,6 +188,7 @@ export function SettingsScreen() {
           />
         </MmListGroup>
       </MmSection>
+      {coachSettings ? <CoachSettingsSection /> : null}
       <NutritionGoalsSection />
       <ProfileSection />
       <RemindersSection />
