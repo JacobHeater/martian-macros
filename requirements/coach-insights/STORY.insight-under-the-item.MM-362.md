@@ -36,8 +36,15 @@ Choices I made without asking (say if any is wrong):
 - **Looks like a sibling.** The line reuses the dashboard insight's parts (the `insight` icon, `MmDisclosure` titled "What this
   rests on", `StatRow` evidence) at row scale, under the row, inside the same list group. The sibling that sets the pattern is
   the easy-to-miss line under a completed day (`EasyToMissLine`). No new card on the canvas (MM-291, MM-318).
-- **No dismiss button on the line.** The owner put quieting in Settings. The expanded evidence ends with a link, "Coach settings
-  for this tip", that opens that rule's switch (MM-364).
+- **Quieter than its row** (the panel's PD-1): the insight icon in the row's icon column, the line in the row's text column as a
+  caption in the secondary text colour, as the row's own detail lines are. Every qualifying item shows its line, so the density
+  comes from the line's weight, not from rationing.
+- **No dismiss button on the line.** The owner put quieting in Settings. The expanded evidence ends with a button naming the
+  kind of insight, "Settings for “Mostly fat”", that opens that kind's switch (MM-364).
+- **In a workout**, the line about a lift comes after "Last time" and the suggestion, before the sets (the panel's PD-5). A new
+  best is not an inline line: the workout's Personal records card already says it (MM-366).
+- **On a list row** (the Dashboard's weigh-in, waist and water), the row and its line are one child of the list group, so the
+  group's hairline falls above the pair (`RowWithInsight`).
 - **While coaching is paused (MM-148)**, no inline insight shows. Safety notices keep their own components and are not inline
   insights.
 - **When it appears**: insights are worked out from local data each time the screen's data changes. A single-item insight can
@@ -101,9 +108,19 @@ Scenario: Every rule has its evidence
 ```
 
 ## UI/UX
-- To be drawn: an `InlineInsight` story (collapsed, expanded, long text at large font) and screen stories for each surface with
-  and without an insight, in the three palettes (MM-293).
+Drawn 2026-10-17 on the real screens, through the design seam `InsightPreview` (the app hands in nothing until this is built),
+and reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`). All in
+`apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`:
+- FoodWithInsights, FoodTwoInsightsInOneMeal, FoodInsightOpen, FoodInsightToSettings. The line under food entries, closed and
+  open, and the way to its switch.
+- FoodLargeText, FoodNarrow. The line at 200% text and on a 320 px phone.
+- FoodWithInsightsEatingDisorder. Only protein's line, with an eating-disorder history.
+- WorkoutWithInsights, WorkoutInsightOpen. The line under a lift.
+- DashboardWithInsights, DashboardLargeText. The line under the weigh-in, waist and water rows.
 
 ## Notes
 - Out of scope: insights generated at run time, insights sent as notifications, and per-insight dismissal.
 - Schema: one step for the inline insight log (MM-363 reads it).
+- A sideways drag on the line moves its entry's swipe row, so it can delete the food, with Undo (the panel's UX-9, recorded).
+- Open for the owner (the panel's UX-5): whether "one line" means one insight (as drawn, wrapping) or one visual line, cut
+  short. The panel recommends wrapping at caption size, so nothing is hidden.

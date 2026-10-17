@@ -931,6 +931,69 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
   animation: mm-fade-in var(--motion-fade) ease-out;
 }
+/* A grade (MM-370): a letter in a neutral outlined badge, in a 48 dp slot of its own. */
+.mm-grade-slot {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-width: 48px;
+  min-height: 48px;
+}
+/* Its size follows the text, so the letter stays inside it at 200% (the panel's second pass). */
+.mm-grade {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  min-height: 1.5rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--outline-strong);
+  border-radius: var(--radius-chip);
+  background: none;
+  color: var(--text);
+  font: var(--type-label);
+}
+/* A badge that explains itself (every grade, and the question mark): the whole slot is the target. */
+.mm-grade-button {
+  position: relative;
+  cursor: pointer;
+}
+.mm-grade-unknown {
+  border-style: dashed;
+  color: var(--text2);
+}
+.mm-grade-button::before {
+  position: absolute;
+  inset: -12px -8px;
+  content: '';
+}
+
+/* A short explanation at its trigger (MM-370), drawn as a menu is. */
+.mm-popover {
+  /* Its width is set where it is placed (MmPopover), so the placement and the drawing agree. */
+  position: fixed;
+  z-index: 101;
+  padding: var(--space-16) var(--space-16) var(--space-4);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-control);
+  background: var(--overlay);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+  color: var(--text);
+  animation: mm-fade-in var(--motion-fade) ease-out;
+}
+.mm-popover-title {
+  margin: 0;
+  font: var(--type-heading);
+}
+.mm-popover-message {
+  margin: var(--space-4) 0 0;
+  color: var(--text2);
+  font: var(--type-body);
+}
+.mm-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: calc(-1 * var(--space-8));
+}
 .mm-menu-item {
   display: flex;
   align-items: center;
@@ -1837,6 +1900,8 @@
 .mm-pressed .mm-segment,
 .mm-disclosure-toggle:active,
 .mm-pressed .mm-disclosure-toggle,
+.mm-grade-button:active,
+.mm-pressed .mm-grade-button,
 .mm-menu-item:active,
 .mm-pressed .mm-menu-item,
 .mm-choice-card:active,

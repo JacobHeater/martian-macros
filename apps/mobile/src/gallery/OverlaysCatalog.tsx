@@ -8,6 +8,7 @@ import { MmDialog } from '../ui/MmDialog';
 import { MmMenu } from '../ui/MmMenu';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmOverlays } from '../ui/MmOverlays';
+import { MmPopover } from '../ui/MmPopover';
 import { MmSheet } from '../ui/MmSheet';
 import { MmTimeOfDayDialog } from '../ui/MmTimeOfDayDialog';
 import { MmTimePicker } from '../ui/MmTimePicker';
@@ -157,6 +158,14 @@ export function OverlaysCatalog({ kind }: { kind: OverlayKind }) {
             { value: 'copy', label: 'Copy to today' },
             { value: 'delete', label: 'Delete' },
           ]}
+          onDone={nothing}
+        />
+      ) : null}
+      {kind === 'popover' ? (
+        <MmPopover
+          title="Can’t be graded"
+          message="This food has no fiber value, which the grade needs. A missing value is never counted as zero."
+          anchor={menuAnchor}
           onDone={nothing}
         />
       ) : null}

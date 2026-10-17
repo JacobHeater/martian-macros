@@ -71,6 +71,15 @@
   color: var(--info);
   font-weight: 600;
 }
+/* On the amount step, the letter with its words; the slot's own room stands in for a margin. */
+.food-amount-grade {
+  display: flex;
+  align-items: center;
+  margin-left: calc(-1 * var(--space-8));
+}
+.food-amount-grade .app-caption {
+  margin: 0;
+}
 .food-entry {
   display: flex;
   align-items: center;

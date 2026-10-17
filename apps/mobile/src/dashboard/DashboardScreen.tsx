@@ -1,4 +1,6 @@
 import { InsightCard } from '../coach/InsightCard';
+import { RowWithInsight } from '../coach/RowWithInsight';
+import { useInsightPreview } from '../coach/useInsightPreview';
 import { ReliefOfferCard } from '../coach/ReliefOfferCard';
 import { UnderEatingNotice } from '../coach/UnderEatingNotice';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
@@ -57,6 +59,8 @@ export function DashboardScreen() {
   const waist = useLoaded(state.waist) ?? [];
   const workouts = useLoaded(state.workouts) ?? [];
   const current = useCell(state.currentTargets);
+  // The coach's lines under the weigh-in, waist and water (MM-367): none in the app until they are built.
+  const rowNotes = useInsightPreview().rowNotes;
 
   // The app shows nothing below its root until the profile is read, and says so there when it fails (AppRoot).
   const setup = Loadable.valueOf(setupState);
@@ -170,16 +174,18 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         ) : (
-          <MmListRow
-            leadingIcon="scale"
-            title={`Trend ${fmt.weight(last.levelKg)}`}
-            subtitle={[
-              `Today ${fmt.weight(todaysWeight.weightKg)}`,
-              ...(weekAgo === undefined ? [] : [`7 days ${fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`]),
-            ].join(' · ')}
-            opens
-            onPress={() => open('progress')}
-          />
+          <RowWithInsight insight={rowNotes?.get('weight')}>
+            <MmListRow
+              leadingIcon="scale"
+              title={`Trend ${fmt.weight(last.levelKg)}`}
+              subtitle={[
+                `Today ${fmt.weight(todaysWeight.weightKg)}`,
+                ...(weekAgo === undefined ? [] : [`7 days ${fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`]),
+              ].join(' · ')}
+              opens
+              onPress={() => open('progress')}
+            />
+          </RowWithInsight>
         )}
         {latestWaist === undefined || !waistCounts ? (
           <WaistRow
@@ -195,15 +201,19 @@ export function DashboardScreen() {
             }}
           />
         ) : (
-          <MmListRow
-            leadingIcon="tape"
-            title={waistAmount(latestWaist.waistCm, fmt)}
-            subtitle={`Waist · ${Fmt.day(latestWaist.date, today)}`}
-            opens
-            onPress={() => open('progress')}
-          />
+          <RowWithInsight insight={rowNotes?.get('waist')}>
+            <MmListRow
+              leadingIcon="tape"
+              title={waistAmount(latestWaist.waistCm, fmt)}
+              subtitle={`Waist · ${Fmt.day(latestWaist.date, today)}`}
+              opens
+              onPress={() => open('progress')}
+            />
+          </RowWithInsight>
         )}
-        <WaterRow today={today} />
+        <RowWithInsight insight={rowNotes?.get('water')}>
+          <WaterRow today={today} />
+        </RowWithInsight>
         {current === undefined ? null : (
           <MmListRow
             leadingIcon="calendarCheck"
