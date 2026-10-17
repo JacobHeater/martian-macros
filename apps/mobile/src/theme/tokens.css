@@ -5,32 +5,44 @@
 
 :root,
 .theme-martian {
-  --canvas: #120b29;
-  --surface: #20143d;
-  --raised: #2c1b4c;
-  --overlay: #382558;
-  --sunken: #180f30;
-  --track: #40305e;
-  --selected: #423261;
-  --outline: #594576;
-  --outline-strong: #a18bbe;
+  /*
+   * MM-375: a royal 90s violet, bluer than the old grape (never plum, which reads maroon), with larger steps between
+   * the levels so cards and the navigation bar stand off the canvas; secondary text near-neutral, not lilac.
+   */
+  --canvas: #110c35;
+  --surface: #1d1752;
+  --raised: #282066;
+  --overlay: #342a78;
+  --sunken: #0c082b;
+  --track: #342d6c;
+  --selected: #3f3684;
+  --outline: #4f4890;
+  --outline-strong: #9d9ad9;
   --text: #fff8e9;
-  --text2: #d8c7ef;
-  --text3: #baa4d3;
+  --text2: #ddd4cc;
+  --text3: #cbc6d6;
   --ember: #c4ff48;
   --on-ember: #172500;
   --ion: #43f5e0;
-  --on-ion: #120b29;
+  --on-ion: #110c35;
   --energy: #fff8e9;
   --protein: #43f5e0;
-  --carbs: #ff80bb;
-  --fat: #9170ed;
+  /* MM-375: the warm voice, a 90s tangerine, and fat out of the neutrals' hue as hot magenta. */
+  --carbs: #ff9a3d;
+  --fat: #e84fae;
   --positive: #c4ff48;
   --caution: #ffd166;
   --info: #85cfff;
   --water: #4f9dff;
   --danger: #ff938e;
-  --on-danger: #120b29;
+  --on-danger: #110c35;
+  /* Food grades (MM-370): one solid fill per letter band, categorical, never red; the letter on it in ink. */
+  --grade-a: #3fd08a;
+  --grade-b: #ffe45e;
+  --grade-c: #a6b4ff;
+  --grade-d: #ff9edb;
+  --on-grade: #110c35;
+  --grade-edge: transparent;
   --radius-group: 12px;
   --radius-nav-indicator: 8px;
   color-scheme: dark;
@@ -63,6 +75,12 @@
   --water: #1e88c8;
   --danger: #ff7a7a;
   --on-danger: #2a0606;
+  --grade-a: #3fc98a;
+  --grade-b: #f7dc5a;
+  --grade-c: #a3b1ff;
+  --grade-d: #f79bd6;
+  --on-grade: #090d15;
+  --grade-edge: transparent;
   --radius-group: 16px;
   --radius-nav-indicator: 999px;
   color-scheme: dark;
@@ -95,6 +113,13 @@
   --water: #1590d8;
   --danger: #b3261e;
   --on-danger: #ffffff;
+  --grade-a: #3dbd7f;
+  --grade-b: #f2d23c;
+  --grade-c: #97a6f2;
+  --grade-d: #ee8fcc;
+  --on-grade: #0c1220;
+  /* The fills are pale against white, so the badge keeps an edge in light. */
+  --grade-edge: #7c88a3;
   --radius-group: 16px;
   --radius-nav-indicator: 999px;
   color-scheme: light;

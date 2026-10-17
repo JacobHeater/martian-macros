@@ -21,7 +21,7 @@ Alongside it, the owner wants every food graded A+ to D- on universal nutrition 
 micronutrient non-goal.
 
 ## Narrative
-- An inline insight is a one-line coach note under the item it is about, with "What this rests on" one tap down. It comes either
+- An inline insight is a one-line coach note under the item it is about, with "The numbers behind this" one tap down. It comes either
   from a pattern the item is part of, or from neutral facts about that one item. Every item that qualifies shows its insight
   (MM-362).
 - Every inline insight shown recently is also listed on the Coach tab, with a way back to its item, so nothing is lost when a line

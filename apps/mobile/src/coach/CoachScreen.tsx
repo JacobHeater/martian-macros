@@ -230,7 +230,7 @@ export function CoachScreen() {
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
         <p className="app-text">{confidenceNextStepText(snapshot.confidence)}</p>
-        <MmDisclosure title="What this rests on">
+        <MmDisclosure title="The numbers behind this">
           <StatRow label="Estimate" value={confidenceLabel(snapshot.confidence.estimate)} />
           <StatRow label="Food log" value={confidenceLabel(snapshot.confidence.foodLog)} />
           <StatRow label="Weigh-ins" value={confidenceLabel(snapshot.confidence.weighIns)} />

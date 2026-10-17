@@ -794,6 +794,13 @@
           "tickets": [
             "MM-307"
           ]
+        },
+        {
+          "workstream": "WS-03",
+          "tickets": [
+            "MM-375",
+            "MM-376"
+          ]
         }
       ]
     }
@@ -1341,7 +1348,8 @@
           "MM-355",
           "MM-354",
           "MM-356",
-          "MM-360"
+          "MM-360",
+          "MM-376"
         ],
         "remaining": [
           "MM-89",
@@ -1368,7 +1376,8 @@
           "MM-352",
           "MM-357",
           "MM-373",
-          "MM-374"
+          "MM-374",
+          "MM-375"
         ]
       },
       "sequence": [
@@ -1592,6 +1601,15 @@
             "MM-324"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 17,
+          "title": "A warmer Martian without the purple washout (MM-375): 90s research, revised tokens, every screen redrawn, the UX guard",
+          "tickets": [
+            "MM-375",
+            "MM-376"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {

@@ -104,7 +104,7 @@ Built: the framework and the first five rules.
   one new insight a day and three a week; a dismissed rule does not return for 28 days. Shown and dismissed insights are stored in
   a new table (schema version 19, `InsightLogRepository`, in memory and in Drift under one contract).
 - **Eating-disorder history**: rules about weight (the stall, weigh-in timing) are left out entirely.
-- **The card** on the dashboard: title, what was observed, "What this rests on" with the figures and the period, and Dismiss.
+- **The card** on the dashboard: title, what was observed, "The numbers behind this" with the figures and the period, and Dismiss.
 - Tests: `insights_test.dart` (engine: each rule, single days, priority, rationing), the repository contract, the migration test,
   and `insight_card_test.dart` (words for every rule, a list of forbidden subjects, shown once and logged, dismissed and not back
   ten days later).

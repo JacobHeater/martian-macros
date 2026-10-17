@@ -158,7 +158,7 @@ export const FoodTwoInsightsInOneMeal = screenStory({
 /** MM-362: the line opened: what it rests on, and the way to its switch. */
 export const FoodInsightOpen = screenStory({
   covers: ['FoodScreen'],
-  shows: 'What this rests on',
+  shows: 'The numbers behind this',
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,

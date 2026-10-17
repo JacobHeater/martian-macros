@@ -14,15 +14,18 @@ interface MmGradeBadgeProps {
 }
 
 /**
- * A short grade in a neutral outlined badge (MM-370), in a 48 dp slot of
- * its own. The letter carries the meaning, never a colour. Without a
+ * A short grade in a badge filled by its letter's band (MM-370), in a 48 dp
+ * slot of its own. The letter carries the meaning, and the fill only
+ * repeats it; nothing is red (MM-108). Without a
  * letter it is a dashed question mark. With `onExplain` the badge is a
  * button whose whole slot is the target, so a letter and a question mark
  * look and behave alike: each says what it means when pressed.
  */
 export function MmGradeBadge({ letter, label, onExplain, expanded = false }: MmGradeBadgeProps) {
   const anchor = useRef<HTMLButtonElement>(null);
-  const kind = letter === undefined ? 'mm-grade mm-grade-unknown' : 'mm-grade';
+  // Filled by its band, A to D (the first letter); a question mark stays a dashed outline.
+  const band = letter?.charAt(0).toLowerCase();
+  const kind = letter === undefined ? 'mm-grade mm-grade-unknown' : `mm-grade mm-grade-${band}`;
   if (onExplain === undefined) {
     return (
       <span className="mm-grade-slot">
