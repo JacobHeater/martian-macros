@@ -238,8 +238,8 @@ history (MM-141).
 - A look at the coaching-insights design in Storybook (`Designs/Coaching
   insights`, 33 stories; panel run `docs/agent-runs/mm361-coaching-insights/`,
   UX guard PASS, PR #178); the merge of PR #177 (spec), which #178 stacks
-  on; the Coach unlock (MM-85), deferred, so nothing is paywalled. Settled:
-  "one line" (MM-362) means the whole insight, wrapping, as drawn.
+  on. Settled: "one line" (MM-362) means the whole insight, wrapping, as
+  drawn; no paywall for any of MM-361 to MM-371 (not behind MM-85).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).

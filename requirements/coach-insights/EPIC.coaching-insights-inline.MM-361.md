@@ -54,7 +54,8 @@ The product owner's (2026-10-17):
   search and add, and rolled up for each meal and day. The entry shows the food's grade, and portion is something its insight
   talks about. **Grades are shown with an eating-disorder history**: the owner chose this after being shown that it conflicts
   with the safeguard on food insights. **A food that can't be graded** shows a question mark, and tapping it explains why.
-- **Paywall: not now.** Nothing here is behind the Coach unlock (MM-85) for now. Whether it should be is still open.
+- **No paywall** (settled 2026-10-17). Inline insights, the Coach tab's list, Settings > Coach and food grades are free
+  for everyone. None of it is behind the Coach unlock (MM-85).
 
 ## Acceptance Criteria (narrative)
 The Epic is done when a food, a set, a weigh-in, the water section and (once MM-250 exists) a night can each show a coach line
