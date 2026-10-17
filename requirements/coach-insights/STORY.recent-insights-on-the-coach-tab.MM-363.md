@@ -1,0 +1,69 @@
+---
+id: MM-363
+status: proposed
+component: coach-insights
+related: [MM-361, MM-362, MM-256, MM-286]
+---
+
+# Story: What the coach said inline, listed on the Coach tab
+
+## Context
+See MM-361. An inline insight lives under its item, so it is gone once the person scrolls past or the day changes. The owner
+chose that the Coach tab lists them too (2026-10-17).
+
+## Decisions
+The product owner's (2026-10-17): the Coach tab lists inline insights as well as showing them inline.
+
+Choices I made without asking (say if any is wrong):
+- **A "Recent insights" section on the Coach tab**, placed in its tiers (MM-256) below the goal and the week's change. It lists the
+  inline insights shown in the last 14 days, newest first, grouped by area.
+- **Each row** shows the area icon, the item it was about ("Peanut butter, Tue lunch"), and the insight's line. Tapping it opens the
+  item's screen on that day, scrolled to the item, using the destination-state rules (MM-286).
+- **An insight whose item was deleted or edited** so the rule no longer holds stays listed as it was said, marked "Item since
+  changed", and does not link.
+- **One row per rule per item.** A pattern insight that shows for days is listed once, dated the day it first showed, and
+  stays one row while it keeps showing.
+- **The same safeguards and switches** as MM-362: nothing is listed that the safeguards or switches would hide today.
+- **The sibling** is the existing Coach tab section list (`MmSection` with list rows, as in `ReportsCard`).
+
+## Description
+The section, fed by the inline insight log from MM-362, with navigation back to the item.
+
+## Acceptance Criteria
+```gherkin
+Scenario: Listed after it is shown
+  Given an inline insight was shown under a food on Tuesday
+  When the Coach tab is opened on Thursday
+  Then "Recent insights" lists it under Food, with the food, the day and the line
+
+Scenario: Back to the item
+  When that row is tapped
+  Then the food log for Tuesday opens with that food in view
+
+Scenario: Older than 14 days
+  Given an inline insight shown 15 days ago
+  Then it is not listed
+
+Scenario: The item changed
+  Given the food was deleted after the insight was shown
+  Then the row says "Item since changed" and does not navigate
+
+Scenario: The item was edited
+  Given the food's amount was edited so the rule no longer holds
+  Then the row still shows the line as it was said, marked "Item since changed", and does not navigate
+
+Scenario: A pattern over several days
+  Given the same pattern insight showed under the same food on each of 5 days
+  Then it is listed once, dated the first of those days
+
+Scenario: A switch turned off
+  Given the food area is switched off in Settings > Coach
+  Then no food insights are listed
+
+Scenario: Nothing yet
+  Given no inline insight in 14 days
+  Then the section says the coach will leave notes under the items it has something to say about
+```
+
+## UI/UX
+- To be drawn: Coach screen stories with recent insights, with none, and with an item that has since changed.

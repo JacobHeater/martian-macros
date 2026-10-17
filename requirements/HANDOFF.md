@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-16, by Claude, Session 30.
+Last updated: 2026-10-17, by Claude, Session 32.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -235,6 +235,9 @@ logging are flagged `otherIntake` and suppressed for an eating-disorder
 history (MM-141).
 
 **Waiting on the product owner.**
+- A read of the coaching-insights spec (MM-361 to MM-371) and its choices
+  made without asking, before any of it is drawn. The open call: the
+  Coach unlock (MM-85), deferred by the owner, so nothing is paywalled.
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -246,6 +249,31 @@ history (MM-141).
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 32: 2026-10-17, Claude (coaching insights inline, specified)
+
+- The owner asked for a new feature, specified only (no code): **coaching
+  insights inline** under the line item they are about, everywhere
+  something is logged. The Coach tab stays. Asked in four rounds with the
+  question tool; the epic is MM-361, with MM-362 to MM-371.
+- **Owner's rulings (2026-10-17), all recorded in MM-361:** two bases, a
+  pattern the item is part of or neutral single-item facts (the latter
+  overrules MM-141's "never one day" for inline only). Every qualifying
+  item shows its insight, not rationed. The Coach tab lists them too.
+  Quieted only by switches under a new **Settings > Coach** page (master,
+  area, rule). The existing safeguards apply. One line, expandable.
+- **Foods graded A+ to D-** (MM-369 spike, MM-370 story): universal, per
+  100 g, on entries, in search, and for each meal and day. A question mark
+  with a popover when it can't be graded. **Shown with an eating-disorder
+  history**: the owner chose this after the conflict with the food-insight
+  safeguard was put to them, and food-composition *insights* stay off for
+  that person. This overrules MM-144's grading non-goal and part of MM-108
+  (MM-371, like MM-306).
+- Rule catalogs in MM-365 to MM-368 are drafts with figures for the
+  panel's nutrition, training, measurement and coaching roles; sleep
+  (MM-368) waits for MM-250.
+- Roadmap: WS-09 steps 10 and 11, WS-08's new last step (grades), all M4.
+  No step advanced: this session added work, it built none.
 
 ## Session 31: 2026-10-16, Claude (the register's design defects through the panel)
 
@@ -330,29 +358,3 @@ limitations.
   run one session): a real barcode on packaging (MM-43); a pack download over
   mobile data (MM-56); the pause and reminder screens on the device (MM-148,
   MM-146); Health Connect import (MM-68).
-
-## Session 29: 2026-10-14 to 15, Claude (water poured into a bar on the water section)
-
-- The owner, with a screenshot of the Water section: "add a visual here to
-  gamify the water and make it easier to accomplish the goal". Asked with
-  options, the owner first chose glasses to fill (dots, one per glass); built
-  and reviewed (`docs/agent-runs/mm326-water-glasses/`). Seeing it, the owner
-  took a **new direction (2026-10-15): a bar across the screen width with
-  fluid animation**, animating when water is added or removed and when the
-  section opens (MM-326).
-- Built: `MmProgressBar` kind `water` (8 px, the emphasized macro bar's
-  weight), `usePoured` (fills from empty when drawn), `MmSection`'s
-  `meter` (under the header, kept folded, drawn anew on opening), tokens
-  `--water` and `--motion-pour`, signature moment 5 "Water pour" in
-  `design/interaction-and-motion.md` (ripples and flattens; no loop, no
-  overshoot), the water colour's figures in the colour doc. The summary says
-  glasses ("24 fl oz of 128 fl oz · 3 of 16 glasses"). Panel: UX guard pass
-  (`docs/agent-runs/mm326-water-bar/`); bugs MM-327 (reduced motion blinked
-  empty) and MM-328 (a day change poured as an add) fixed with regression
-  tests. Capturing the pour mid-motion needs the DevTools protocol (headless
-  `--screenshot` only shows the settled frame).
-- Branch `feature/water-glasses` (PR #161), stacked on #160. **Merging the
-  green stack (#158 to #160) was refused by this session's permission
-  classifier; the owner merges or allows it.** Step 10 of WS-08 (M4) gained
-  MM-326 to MM-328, built. Not looked at on the phone. The owner saw a hard
-  right edge while the bar pours: MM-329 (proposed, small), its test skipped.
