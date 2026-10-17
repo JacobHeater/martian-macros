@@ -1,9 +1,11 @@
+import { useInsightPreview } from '../coach/useInsightPreview';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useAsync } from '../app/useAsync';
 import { useLoaded } from '../app/useLoaded';
 import { MmListRow } from '../ui/MmListRow';
+import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
 
 interface FoodSearchResultsProps {
@@ -20,6 +22,7 @@ interface FoodSearchResultsProps {
 export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSearchResultsProps) {
   const { state } = useApp();
   const catalog = useLoaded(state.foodCatalog);
+  const preview = useInsightPreview();
   const hits = useAsync(
     () => (catalog === undefined ? Promise.resolve(undefined) : catalog.search(query, { limit: 20 })),
     `${catalog?.packs.length ?? -1}:${query}`,
@@ -37,19 +40,24 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
   }
   return (
     <>
-      {hits.map(({ food }) => (
-        <MmListRow
-          key={`${food.packId}-${food.id}`}
-          title={food.brand === undefined ? food.name : `${food.name} · ${food.brand}`}
-          detail={
-            <>
-              <span>{roundHalfAwayFromZero(food.kcal) + 0} kcal per 100 g</span>
-              <FoodTrustMark food={food} />
-            </>
-          }
-          onPress={() => onPick(food)}
-        />
-      ))}
+      {hits.map(({ food }) => {
+        // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
+        const grade = preview.gradeOfFood?.(food.name);
+        return (
+          <MmListRow
+            key={`${food.packId}-${food.id}`}
+            title={food.brand === undefined ? food.name : `${food.name} · ${food.brand}`}
+            detail={
+              <>
+                <span>{roundHalfAwayFromZero(food.kcal) + 0} kcal per 100 g</span>
+                <FoodTrustMark food={food} />
+              </>
+            }
+            onPress={() => onPick(food)}
+            trailingAction={grade === undefined ? undefined : <FoodGrade grade={grade} subject={food.name} />}
+          />
+        );
+      })}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import type { StoryObj } from '@storybook/react-vite';
+import type { InsightPreview } from '../../coach/InsightPreview';
 import type { ThemePreference } from '../../domain/ThemePreference';
 import { StoryApp } from './StoryApp';
 import type { StoryDevice } from './StoryDevice';
@@ -29,15 +30,49 @@ interface ScreenStory {
   unthemed?: boolean;
   /** The demo build, with its notice around every screen (MM-177). */
   demo?: boolean;
+  /** Inline insights, grades and Settings > Coach drawn before they are built (MM-361). */
+  preview?: InsightPreview;
+  /** The phone's text size as a multiple of the default (2 is 200%). */
+  textScale?: number;
+  /** A viewport other than the phone's: `smallPhone` (360 px) or `narrowPhone` (320 px). */
+  viewport?: 'smallPhone' | 'narrowPhone';
 }
 
 /** A story of the whole app brought to one screen, in the palette of the toolbar. */
-export function screenStory({ covers, shows, scenario, device, stores, open, walk, terms, unthemed = false, demo = false }: ScreenStory): StoryObj {
+export function screenStory({
+  covers,
+  shows,
+  scenario,
+  device,
+  stores,
+  open,
+  walk,
+  terms,
+  unthemed = false,
+  demo = false,
+  preview,
+  textScale,
+  viewport,
+}: ScreenStory): StoryObj {
   return {
     parameters: shows === undefined ? { covers } : { covers, shows },
+    ...(viewport === undefined ? {} : { globals: { viewport: { value: viewport, isRotated: false } } }),
     render: (_args, { globals }) => {
       const palette = globals['palette'] as ThemePreference;
-      return <StoryApp key={palette} palette={unthemed ? undefined : palette} scenario={scenario} device={device} stores={stores} terms={terms} demo={demo} open={open} />;
+      return (
+        <StoryApp
+          key={palette}
+          palette={unthemed ? undefined : palette}
+          scenario={scenario}
+          device={device}
+          stores={stores}
+          terms={terms}
+          demo={demo}
+          open={open}
+          preview={preview}
+          textScale={textScale}
+        />
+      );
     },
     ...(walk === undefined ? {} : { play: ({ canvasElement }) => walk(canvasElement) }),
   };

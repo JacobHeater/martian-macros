@@ -19,26 +19,26 @@ coaching roles to check:
 
 | rule | basis | anchored under | fires when | the line (example) |
 |---|---|---|---|---|
-| new best | item | the set | the lift has at least 3 earlier sessions and the set's e1RM beats every earlier one for it | "A new best estimate for this lift: 102 kg, up from 99." |
-| holding steady | pattern | the exercise | e1RM within 1% across the last 4 sessions of that lift | "About the same in your last 4 sessions. Adding one rep at this weight before adding load is a common next step." |
+| holding steady | pattern | the exercise | e1RM within 1% across the last 4 sessions of that lift | "About the same in your last 4 sessions. A small step up in reps or load is a common next step." |
 | volume jump | pattern | the exercise | this week's sets for the lift's main muscle group are ≥ 50% above the previous 4 weeks' average | "14 sets for chest this week against about 9 lately. Big jumps raise soreness; a smaller step is easier to recover from." |
 | strength on a cut | pattern | the exercise | MM-141's "strength holding on a cut", for this lift | "Held through 6 weeks of eating below maintenance. That is what a well-run cut looks like." |
 
-- **"New best" is praise MM-92 allows**: an outcome earned by training, like a personal record.
+- **No "new best" line.** The first draft had one under the set. Drawing it showed the finished workout already has a Personal
+  records card that says the same ("estimated max 234.6 lb, up from 231.8 lb"), so the line was dropped at the design stage
+  (the rule of siblings, MM-318). No inline line sits under a set.
+- **The line comes after "Last time" and the suggestion**, before the sets (the panel's PD-5).
 - **No rule comments on one set's reps or form**, because the app cannot see form.
 - **Training rules show with an eating-disorder history, except "strength on a cut"**, which talks about intake. MM-141
   limits intake insights for that person to protein and logging.
-- **Priority** follows the table's order: new best, volume jump, holding steady, strength on a cut.
+- **Priority** follows the table's order: holding steady, volume jump, strength on a cut.
+- **For the training role**: whether a line about a lift and the progression suggestion (MM-79) on the same card can both give
+  advice (the panel's PD-5 question).
 
 ## Description
 The four rules, their words, evidence and register entries, and their placement in the workout and the exercise's history.
 
 ## Acceptance Criteria
 ```gherkin
-Scenario: A new best
-  Given a bench press set with an e1RM above every earlier bench press set
-  Then the "new best" insight is shown under that set with both figures
-
 Scenario: Holding steady
   Given four bench press sessions with e1RMs of 100, 100.5, 99.8 and 100.2 kg
   Then the "holding steady" insight is shown under the exercise
@@ -51,14 +51,15 @@ Scenario: Volume jump
   Given 14 chest sets this week and an average of 9 over the previous 4 weeks
   Then the "volume jump" insight is shown under the chest exercises with both figures
 
-Scenario: The first sessions of a lift
-  Given a lift's first session
-  Then no "new best" insight is shown under any of its sets
+Scenario: No line under a set
+  Given a set that beats every earlier one for its lift
+  Then no inline insight is shown under it, and the Personal records card says the new best
 
 Scenario: Eating-disorder history
   Given that screening answer is ticked
-  Then "new best", "holding steady" and "volume jump" are shown as usual and "strength on a cut" is not
+  Then "holding steady" and "volume jump" are shown as usual and "strength on a cut" is not
 ```
 
 ## UI/UX
-- To be drawn: a workout with an insight under a set and under an exercise.
+- WorkoutWithInsights, WorkoutInsightOpen, in `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`. The line under the
+  demo's lateral raise, whose history really is flat. Reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`).

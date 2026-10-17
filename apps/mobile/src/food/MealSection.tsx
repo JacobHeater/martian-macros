@@ -1,3 +1,5 @@
+import { InlineInsight } from '../coach/InlineInsight';
+import { useInsightPreview } from '../coach/useInsightPreview';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -18,6 +20,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { copyEntries } from './copyEntries';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FoodEntryTile } from './FoodEntryTile';
+import { FoodGrade } from './FoodGrade';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
 import './food.css';
@@ -48,6 +51,9 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const weightKg = useCell(state.coach)?.trendWeightKg;
   const solid = full && weightKg !== undefined && mealHasSolidProtein({ proteinG: protein, weightKg });
   const label = mealLabel(meal);
+  // Grades (MM-370) and the coach's lines (MM-362): none in the app until they are built.
+  const preview = useInsightPreview();
+  const mealGrade = preview.mealGrades?.get(meal);
 
   /** Deletes `entry` and offers to put it back for a few seconds (MM-48). */
   const remove = (entry: FoodEntry) => {
@@ -78,6 +84,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
       maintainState
       trailing={
         <>
+          {mealGrade === undefined || entries.length === 0 ? null : <FoodGrade grade={mealGrade} subject={label} scope="meal" />}
           {entries.length > 0 && day !== today ? (
             <MmIconButton
               icon="copy"
@@ -94,25 +101,32 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
         </>
       }
     >
-      {entries.map((entry) => (
-        <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
-          <div className="food-meal-entry">
-            <div className="food-entry-open">
-              <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
-                <FoodEntryTile entry={entry} />
-              </MmPressable>
+      {entries.map((entry) => {
+        const grade = preview.entryGrades?.get(entry.name);
+        const note = preview.entryNotes?.get(entry.name);
+        return (
+          <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
+            <div className="food-meal-entry">
+              <div className="food-entry-open">
+                <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
+                  <FoodEntryTile entry={entry} />
+                </MmPressable>
+              </div>
+              {grade === undefined ? null : <FoodGrade grade={grade} subject={entry.name} />}
+              <MmMenuButton<string>
+                icon="more"
+                label={`More actions for ${entry.name}`}
+                items={[{ value: 'delete', label: 'Delete' }]}
+                onSelect={(action) => {
+                  if (action === 'delete') remove(entry);
+                }}
+              />
             </div>
-            <MmMenuButton<string>
-              icon="more"
-              label={`More actions for ${entry.name}`}
-              items={[{ value: 'delete', label: 'Delete' }]}
-              onSelect={(action) => {
-                if (action === 'delete') remove(entry);
-              }}
-            />
-          </div>
-        </MmSwipeToRemove>
-      ))}
+            {/* The coach's line travels with its entry when it is swiped (MM-362). */}
+            {note === undefined ? null : <InlineInsight insight={note} />}
+          </MmSwipeToRemove>
+        );
+      })}
     </MmSection>
   );
 }
