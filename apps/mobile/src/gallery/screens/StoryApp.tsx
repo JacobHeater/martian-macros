@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { App } from '../../app/App';
+import type { InsightPreview } from '../../coach/InsightPreview';
+import { InsightPreviewContext } from '../../coach/InsightPreviewContext';
 import { TermsAcceptance } from '../../domain/TermsAcceptance';
 import type { ThemePreference } from '../../domain/ThemePreference';
 import { FixedClock } from '../../fixtures/FixedClock';
@@ -40,6 +42,10 @@ interface StoryAppProps {
   demo?: boolean | undefined;
   /** Brings the app to the screen the story is about, once it is up. */
   open?: ((stage: StoryStage) => void | Promise<void>) | undefined;
+  /** Inline insights, grades and Settings > Coach to draw before they are built (MM-361); none unless given. */
+  preview?: InsightPreview | undefined;
+  /** The phone's text size, as a multiple of the default (2 is 200%); the default unless given. */
+  textScale?: number | undefined;
 }
 
 /** The fixture pack with the stories' own foods, written in memory and read as the app reads an installed pack. */
@@ -54,8 +60,18 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
  * the screens in a story are the app's own, reached the way the app reaches
  * them, with nothing of the device or the network underneath.
  */
-export function StoryApp({ palette, scenario = demoScenario, device, stores, terms = 'agreed', demo = false, open }: StoryAppProps) {
+export function StoryApp({ palette, scenario = demoScenario, device, stores, terms = 'agreed', demo = false, open, preview = {}, textScale }: StoryAppProps) {
   const [services, setServices] = useState<AppServices>();
+  // Larger text, as the phone's own setting gives it: every type size is in rem. Put back when the story goes.
+  useEffect(() => {
+    if (textScale === undefined) return undefined;
+    const root = document.documentElement.style;
+    const before = root.fontSize;
+    root.fontSize = `${textScale * 100}%`;
+    return () => {
+      root.fontSize = before;
+    };
+  }, [textScale]);
   useEffect(() => {
     let current = true;
     void (async () => {
@@ -84,5 +100,9 @@ export function StoryApp({ palette, scenario = demoScenario, device, stores, ter
     };
   }, [scenario, device, stores, palette, terms]);
   if (services === undefined) return null;
-  return <App services={services} demo={demo}>{open === undefined ? null : <StoryOpener open={open} />}</App>;
+  return (
+    <InsightPreviewContext.Provider value={preview}>
+      <App services={services} demo={demo}>{open === undefined ? null : <StoryOpener open={open} />}</App>
+    </InsightPreviewContext.Provider>
+  );
 }

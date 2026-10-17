@@ -235,9 +235,12 @@ logging are flagged `otherIntake` and suppressed for an eating-disorder
 history (MM-141).
 
 **Waiting on the product owner.**
-- A read of the coaching-insights spec (MM-361 to MM-371) and its choices
-  made without asking, before any of it is drawn. The open call: the
-  Coach unlock (MM-85), deferred by the owner, so nothing is paywalled.
+- A look at the coaching-insights design in Storybook (`Designs/Coaching
+  insights`, 33 stories; panel run `docs/agent-runs/mm361-coaching-insights/`,
+  UX guard PASS), and three calls: whether "one line" (MM-362) means one
+  insight wrapping, as drawn, or one visual line cut short; the merge of
+  PR #177 (spec), which the design PR stacks on; the Coach unlock (MM-85),
+  deferred, so nothing is paywalled.
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -273,7 +276,28 @@ limitations.
   panel's nutrition, training, measurement and coaching roles; sleep
   (MM-368) waits for MM-250.
 - Roadmap: WS-09 steps 10 and 11, WS-08's new last step (grades), all M4.
-  No step advanced: this session added work, it built none.
+- **Then the designs** (owner: "do the designs now"), on
+  `design/inline-insights-and-grades`, stacked on #177 (the merge of #177
+  was refused by the permission check; left for the owner). Drawn on the
+  **real screens** through a design seam, `coach/InsightPreview`: the
+  screens read inline insights, grades, the Coach tab's list and Settings >
+  Coach from a context the app never provides, so nothing shows in the app;
+  screen stories hand in the design's figures (`screenStory`'s `preview`).
+  When MM-362/MM-370 are built, `useInsightPreview` is replaced by engine
+  output. New: `InlineInsight`, `RowWithInsight`, `FoodGrade` over
+  `ui/MmGradeBadge`, `ui/MmPopover` (+ `Overlays.popover`), `FoodDayGradeRow`,
+  `RecentInsightsSection`, `CoachSettingsSection`, `CoachSettingsScreen`,
+  `CoachAreaScreen` (switches held in `InsightSwitchesDraft`, not stored).
+  `screenStory` also takes `textScale` and `viewport` (`narrowPhone`, 320 px).
+- Panel: product designer + UX guard, two passes; guard BLOCKED then PASS.
+  Built from it: caption-size line, every badge explains itself, popover
+  clamped (bug MM-372 + test), day grade out of the app bar into a row,
+  workout line after "Last time", Recent insights folded, one word
+  ("insights", "kinds"), "New best" dropped (Personal records already says
+  it), "Large portion" off with an eating-disorder history. Older bugs the
+  200% stories found: MM-373 (nav labels), MM-374 (Dashboard header, water
+  row), tests skipped with their IDs.
+- No step advanced: design only; MM-372 is done.
 
 ## Session 31: 2026-10-16, Claude (the register's design defects through the panel)
 

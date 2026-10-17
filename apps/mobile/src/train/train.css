@@ -39,6 +39,10 @@
 .train-suggestion {
   margin: 0 0 var(--space-8);
 }
+/* The coach's line about the lift (MM-366), after last time and the suggestion, before the sets. */
+.train-exercise-insight {
+  margin: calc(-1 * var(--space-4)) 0 0;
+}
 .train-set-editor {
   display: flex;
   flex-direction: column;

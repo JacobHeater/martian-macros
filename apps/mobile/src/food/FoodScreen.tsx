@@ -18,6 +18,7 @@ import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
+import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { MealSection } from './MealSection';
 import { useShownDay } from './useShownDay';
 import { WaterSection } from './WaterSection';
@@ -90,6 +91,7 @@ export function FoodScreen() {
         <>
           <div className="food-complete-row">
             <FoodCompletenessRow day={day} entries={entries} />
+            <FoodDayGradeRow />
           </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
           <MmDisclosure title="More about today">

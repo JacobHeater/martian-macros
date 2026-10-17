@@ -71,6 +71,14 @@ export interface Overlays {
   menu<T>(question: { label: string; items: readonly MmMenuItem<T>[]; anchor: MmAnchor }): Promise<MmMenuItem<T> | undefined>;
 
   /**
+   * Explains something in a few words beside what was pressed, at `anchor`
+   * (MM-370), drawn where nothing can clip it. Resolves once it is closed.
+   * `label` is what a screen reader hears for it, when the title reads
+   * badly aloud ("Grade B-" said as "Grade B minus").
+   */
+  popover(explanation: { title: string; message: string; anchor: MmAnchor; label?: string | undefined }): Promise<void>;
+
+  /**
    * Closes the question on top as simply dismissed, as the phone's back
    * button does; with no question up, dismisses a snack that is waiting on
    * its action. False when nothing was showing.

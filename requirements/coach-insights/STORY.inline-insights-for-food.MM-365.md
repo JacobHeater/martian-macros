@@ -22,13 +22,16 @@ Listed in priority order (MM-362): when two fire on one entry, the higher row wi
 
 | rule | priority | basis | fires when | the line (example) | safeguard |
 |---|---|---|---|---|---|
-| large portion | data quality | item | entry ≥ 2× the food's usual serving and ≥ 300 kcal | "About twice the usual serving (2 cups). Worth checking the amount is right." | logging: shown |
+| large portion | data quality | item | entry ≥ 2× the food's usual serving and ≥ 300 kcal | "About twice the usual serving (2 cups). Worth checking the amount is right." | portion: off for ED history (the panel's request, see below) |
 | light on protein | pattern | item | entry ≥ 400 kcal and < 10% of calories from protein | "520 kcal with 9 g of protein. Adding a protein source here makes your minimum easier." | protein: shown |
 | mostly fat | pattern | item | entry ≥ 150 kcal and ≥ 55% of its calories from fat | "Most of this item's calories come from fat (62%). A leaner choice or a smaller portion leaves more room for protein." | composition: off for ED history |
 | salty item | pattern | item | a sodium limit is set and the entry alone is ≥ 40% of it | "This item is about half your sodium limit (1,150 mg of 2,300)." | composition: off for ED history |
 | often logged, low grade | education | pattern | a food graded D+ or below was logged on ≥ 5 of the last 14 days, under the latest entry of it | "Logged on 6 of the last 14 days, and graded D, mostly for its saturated fat and sugar. A higher-graded choice on some of those days is an easy place to start." | composition: off for ED history |
 
 - **Every line is about the item**, never the day's totals (MM-362).
+- **"Large portion" is left out with an eating-disorder history.** At the design review (2026-10-17) both reviewers asked whether
+  a prompt about how much was eaten is a restriction cue. The chair chose the safer reading until the safety role answers: a
+  line that invites a second look at an amount eaten can read as a nudge to eat less.
 - **An estimated entry (MM-150)** gets no composition insight, because its macros are guesses.
 - **MM-125's meal-without-protein insight stays on the dashboard, not inline.** It is offered at most monthly and rules out
   per-meal targets. An unrationed line under every meal header would break both.
@@ -71,9 +74,15 @@ Scenario: Eating-disorder history
   Given that screening answer is ticked and an entry that satisfies "mostly fat" and "light on protein"
   Then the "light on protein" insight is shown and "mostly fat" is not
 
+Scenario: No portion prompt with an eating-disorder history
+  Given that screening answer is ticked and an entry at three times its usual serving
+  Then no "large portion" insight is shown
+
 Scenario: Plain words
   Then no food rule's line calls a food good or bad or names a replacement food
 ```
 
 ## UI/UX
-- To be drawn: the food log with an insight under an entry, several in one meal, and with eating-disorder history.
+- FoodWithInsights, FoodTwoInsightsInOneMeal, FoodInsightOpen, FoodWithInsightsEatingDisorder, in
+  `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`. The owner's example under Peanut butter, two lines in one
+  meal, a line opened, and the eating-disorder view. Reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`).

@@ -35,6 +35,8 @@ import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { LastChangeCard } from './LastChangeCard';
+import { RecentInsightsSection } from './RecentInsightsSection';
+import { useInsightPreview } from './useInsightPreview';
 import { MetabolismSummary } from './MetabolismSummary';
 import { OneThingRow } from './OneThingRow';
 import { RecompReviewCard } from './RecompReviewCard';
@@ -98,6 +100,8 @@ export function CoachScreen() {
   const weights = useCell(state.weights);
   // What the coach works from; any of it unread leaves the coach with nothing to say (MM-340).
   const sources = [weights, useCell(state.weightEvents), useCell(state.intakeDays), useCell(state.targetsHistory), useCell(state.pauses)];
+  // What the coach said inline (MM-363): none in the app until inline insights are built.
+  const recent = useInsightPreview().recent;
 
   if (setup === undefined) return null;
   if (snapshot === undefined) {
@@ -212,6 +216,7 @@ export function CoachScreen() {
         </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />
+      {recent === undefined ? null : <RecentInsightsSection insights={recent} />}
       <StallCard />
       <RecompReviewCard />
       <AdherenceCard />
