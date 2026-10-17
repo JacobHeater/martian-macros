@@ -739,7 +739,9 @@
             "MM-328",
             "MM-329",
             "MM-358",
-            "MM-359"
+            "MM-359",
+            "MM-369",
+            "MM-370"
           ]
         },
         {
@@ -751,7 +753,16 @@
             "MM-32",
             "MM-125",
             "MM-36",
-            "MM-312"
+            "MM-312",
+            "MM-361",
+            "MM-362",
+            "MM-363",
+            "MM-364",
+            "MM-371",
+            "MM-365",
+            "MM-366",
+            "MM-367",
+            "MM-368"
           ]
         },
         {
@@ -2185,7 +2196,9 @@
           "MM-220",
           "MM-221",
           "MM-305",
-          "MM-329"
+          "MM-329",
+          "MM-369",
+          "MM-370"
         ]
       },
       "sequence": [
@@ -2307,6 +2320,15 @@
             "MM-359"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 11,
+          "title": "Food grades A+ to D- (MM-369 spike first, then MM-370): on entries, in search, for each meal and day",
+          "tickets": [
+            "MM-369",
+            "MM-370"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -2389,7 +2411,16 @@
           "MM-147",
           "MM-148",
           "MM-149",
-          "MM-248"
+          "MM-248",
+          "MM-361",
+          "MM-362",
+          "MM-363",
+          "MM-364",
+          "MM-365",
+          "MM-366",
+          "MM-367",
+          "MM-368",
+          "MM-371"
         ]
       },
       "sequence": [
@@ -2471,6 +2502,29 @@
           "title": "The sodium-over-the-limit insight (MM-312)",
           "tickets": [
             "MM-312"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 10,
+          "title": "Coaching insights inline (MM-361): the insight under its item, the Coach tab list, Settings > Coach switches, the overruled grading non-goal, and the first food, workout, body and water rules",
+          "tickets": [
+            "MM-361",
+            "MM-362",
+            "MM-363",
+            "MM-364",
+            "MM-371",
+            "MM-365",
+            "MM-366",
+            "MM-367"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 11,
+          "title": "Inline insights on a night of sleep (MM-368), once MM-250 records nights",
+          "tickets": [
+            "MM-368"
           ],
           "milestone": "M4"
         }
