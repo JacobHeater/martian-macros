@@ -122,5 +122,5 @@ and reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`). All in
 - Out of scope: insights generated at run time, insights sent as notifications, and per-insight dismissal.
 - Schema: one step for the inline insight log (MM-363 reads it).
 - A sideways drag on the line moves its entry's swipe row, so it can delete the food, with Undo (the panel's UX-9, recorded).
-- Open for the owner (the panel's UX-5): whether "one line" means one insight (as drawn, wrapping) or one visual line, cut
-  short. The panel recommends wrapping at caption size, so nothing is hidden.
+- **"One line" means one insight, wrapping** (the product owner, 2026-10-17, asked after the panel's UX-5): the whole
+  sentence or two shows at caption size under the item; nothing is cut short.
