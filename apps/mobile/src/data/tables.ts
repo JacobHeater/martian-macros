@@ -23,4 +23,5 @@ export const tables = [
   'exercise_progressions',
   'water_entries',
   'inline_insight_log',
+  'inline_insight_snoozes',
 ] as const;

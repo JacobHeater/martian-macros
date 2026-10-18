@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "task_id": "mm361-build-design",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "spec/food-insights-and-snooze",
+    "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Sibling match, hierarchy, colour and density of the built lines, the snooze, the message and the Snoozed list, in three palettes.",
+      "role": "product-designer",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection"
+        ],
+        "inspected": [
+          "17 Martian renders and 8 dark/light renders",
+          "InlineInsight.tsx",
+          "SnoozeLength.ts",
+          "useItemInsightContent.ts",
+          "FoodEntryInsight.tsx",
+          "coach.css",
+          "CoachAreaScreen.tsx",
+          "settings.css",
+          "itemInsightText.ts",
+          "itemInsightKinds.ts",
+          "the stories",
+          "the siblings and the design system"
+        ],
+        "not_inspected": [
+          "MmSnack source",
+          "FoodEntryTile",
+          "the snooze repositories",
+          "RecentInsightsSection source",
+          "the snooze dialog from a Dashboard row or a lift",
+          "the opened line in dark and light",
+          "Settings > Coach at 200% and 320 px"
+        ],
+        "referrals": [
+          "ux-accessibility: PD-2, PD-6",
+          "coaching: PD-1 title, PD-4, PD-5",
+          "react-capacitor: options.selected optional"
+        ],
+        "limitations": "No device; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Sibling-matching and hierarchy against the repository's own rules.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The UX guard: four task walkthroughs, names and roles, focus, targets, contrast, 200% and 320 px, the eating-disorder state.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the same renders",
+          "InlineInsight.tsx",
+          "SnoozeLength.ts",
+          "CoachAreaScreen.tsx",
+          "MmOverlays.tsx",
+          "MmDisclosure.tsx",
+          "MmOption.tsx",
+          "MmDialog.tsx",
+          "MmButton.tsx",
+          "itemInsightText.ts",
+          "InsightSnooze.ts",
+          "itemInsightKinds.ts",
+          "tokens.css",
+          "ui.css",
+          "inlineInsights.test.tsx"
+        ],
+        "not_inspected": [
+          "RowWithInsight.tsx",
+          "the snooze repositories",
+          "MmPopover",
+          "FoodGrade",
+          "a device",
+          "TalkBack",
+          "a real-browser focus trace"
+        ],
+        "referrals": [
+          "react-capacitor: UX-1, UX-5",
+          "product-designer: UX-4",
+          "safety and product: UX-6",
+          "measurement: UX-7"
+        ],
+        "limitations": "No device; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "The current normative thresholds for contrast, target size and dialog focus return, and Android's target guidance.",
+        "reason": "The brief's checks name these thresholds.",
+        "path": "direct",
+        "sources": [],
+        "summary": "WCAG 2.2 SC 2.5.8, 1.4.3, 2.4.3 and Android's 48 dp, as listed in the report.",
+        "limitations": "Page summaries by the fetch tool."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The owner's rulings on the snooze are recorded in MM-378; no product question in this review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The words were reviewed in the mm365 and mm367 runs.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As coaching; the guard's UX-6 was closed as the safety role asked on MM-365.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No rule under review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No rule under review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No rule under review; UX-7 is recorded for it.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The fixes are a CSS rule, an optional prop and a focus helper, covered by tests and mm check.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Coaching: lead the portion line with its question (PD-4).",
+    "React-capacitor: the snack's Undo and Dismiss leave the focus on the body (since MM-272; recorded in MM-379)."
+  ],
+  "decisions": [
+    {
+      "id": "DESIGN-pass",
+      "status": "accepted",
+      "summary": "GUARD PASS; the designer passes with PD-1, PD-2, PD-3, all fixed.",
+      "authority": "Chair (decision.md)"
+    },
+    {
+      "id": "DESIGN-focus",
+      "status": "accepted",
+      "summary": "UX-1 fixed as bug MM-379 with a regression test.",
+      "authority": "Chair (decision.md)"
+    },
+    {
+      "id": "DESIGN-names",
+      "status": "accepted",
+      "summary": "Snooze… and Turn back on name their kind and item (UX-5); withheld kinds' snoozes are not listed (UX-6).",
+      "authority": "Chair (decision.md)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/coach test/gallery/stories.test.tsx -t \"Coaching|insight|coach\"",
+      "result": "passed",
+      "summary": "The snooze, the list, the focus and the coaching stories after the fixes.",
+      "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T08:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test, read a PDF, or reach a device."
+    }
+  ]
+}

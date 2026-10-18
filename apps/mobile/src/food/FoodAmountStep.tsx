@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useInsightPreview } from '../coach/useInsightPreview';
+import { gradeOfCatalogFood } from './gradeOfCatalogFood';
+import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CookingFat } from '../domain/food/CookingFat';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
@@ -245,20 +247,18 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   else if (isHand && wholeGrams !== undefined) helper = `About ${wholeGrams} g (estimated)`;
   else if (choice.unit === 'serving' && wholeGrams !== undefined) helper = `${wholeGrams} g`;
 
-  const grade = preview.gradeOfFood?.(food.name);
+  const grade = preview.gradeOfFood?.(food.name) ?? (custom === undefined ? gradeOfCatalogFood(food) : gradeOfCustomFood(custom));
 
   return (
     <div className="food-sheet">
       <h2 className="app-headline">{food.name}</h2>
       {food.brand === undefined ? null : <p className="app-text">{food.brand}</p>}
       <FoodTrustMark food={food} />
-      {/* Its grade (MM-370), said in words beside the letter: none in the app until grades are built. */}
-      {grade === undefined ? null : (
-        <div className="food-amount-grade">
-          <FoodGrade grade={grade} subject={food.name} />
-          <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per 100 g' : 'No grade for this food'}</span>
-        </div>
-      )}
+      {/* Its grade (MM-370), said in words beside the letter. */}
+      <div className="food-amount-grade">
+        <FoodGrade grade={grade} subject={food.name} />
+        <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per 100 g' : 'No grade for this food'}</span>
+      </div>
       <div className="app-gap" />
       <div className="app-row" role="group" aria-label="Amount in">
         {choices.map((c) => (

@@ -6,4 +6,7 @@ import type { WaterEntry } from '../water/WaterEntry';
 export interface WaterReader {
   /** The water logged on `date`, earliest first, then the list after each change. */
   watchWater(date: CalendarDate): Watched<WaterEntry[]>;
+
+  /** The water logged on `since` or later, earliest first, then the list after each change. */
+  watchWaterSince(since: CalendarDate): Watched<WaterEntry[]>;
 }

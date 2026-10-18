@@ -1,0 +1,22 @@
+# Panel decision: the built inline insights, the snooze and the Settings list (MM-362, MM-365, MM-367, MM-378)
+
+- **Facts versus proposals and traceability.** Two read-only reviews of the build's renders and source on `spec/food-insights-and-snooze`: product-designer (6 findings; passes with three changes) and ux-accessibility (7 findings; GUARD PASS with conditions). The renders are the Storybook stories captured at 412×915 in Martian, four of them in dark and light, and `food-narrow` at 320 px after the guard asked.
+- **Coverage.** Every story the brief named was looked at; the source of the line, the snooze, the Settings list and the options dialog read. Not rendered: the snooze dialog and message from a Dashboard row or a lift, the opened line in dark and light, Settings > Coach at 200% or 320 px, the Body area's Snoozed list.
+- **Findings, deduplicated, and their disposition.**
+  - *The opened line's two actions stack on the Dashboard* (PD-1): **fixed**; the action row is a wrapping flex row.
+  - *A length is pre-checked that nothing is set to* (PD-2, UX-4): **fixed**; `Overlays.options` takes no `selected` and the snooze offers four unchecked lengths.
+  - *The Snoozed story saved a second snooze of a kind that does not exist, so the "always" row never drew* (PD-3, UX-2): **fixed**; the story's `shows` is the always row.
+  - *Focus is lost when a snoozed line or a Snoozed row goes* (UX-1): **fixed as bug MM-379** with `focusNeighbourOf` and a regression test that failed before the fix. The snack's own Undo and Dismiss leave the focus the same way since MM-272; recorded in the ticket, not fixed here.
+  - *The 320 px render was not 320 px* (UX-3): **captured** at 320 px after the review: the line wraps under its entry, the icon column holds, the trailing slot (kcal, grade, More) fits; nothing new beyond the known MM-370 proposal to move the calories and grade under a narrow name.
+  - *Every "Snooze…" and "Turn back on" has the same accessible name* (UX-5): **fixed**; each names its kind and item.
+  - *A snooze of a kind withheld for the person's health answers was listed with "Turn back on"* (UX-6): **fixed**; such snoozes are not listed, as the safety role asked on MM-365 (SA-10).
+  - *The portion line repeats its row's figures* (PD-4): **declined for now**; the words were settled at the rules' review; recorded for the coaching role.
+  - *The ticket says "snack" where the app says "snacks"* (PD-5): **fixed** in MM-378.
+  - *The dialog's title runs to two lines* (PD-6): **no change**; the component is the sibling's.
+  - *"Now, smoothed" needs "smoothed" understood* (UX-7): **declined**; "smoothed" is MM-155's term, used on the Progress card.
+  - *Could the body kind's title be shorter* (PD-1's question): **no**; "Waist: no clear change" says what the kind is; the flex row absorbs the length.
+- **Rejected:** none.
+- **Safety blockers:** none. UX-6 closed a listing gap the safety role had named.
+- **Owner decisions:** none asked tonight; the chair's choices are recorded in MM-378 and MM-370 ("say if any is wrong").
+- **Edit owner:** the parent session (chair).
+- **Verification:** `test/coach/inlineInsights.test.tsx` (the snooze, the list, the focus), `test/coach/foodAndBodyInsights.test.tsx`, the Coaching stories; re-captured after the fixes are not in this folder (the fixes are CSS, a prop and a story id; the shots are the pre-fix state the reviewers saw). Not verified on a phone.

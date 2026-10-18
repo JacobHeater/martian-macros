@@ -1,4 +1,5 @@
 import { useInsightPreview } from '../coach/useInsightPreview';
+import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
@@ -42,7 +43,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
     <>
       {hits.map(({ food }) => {
         // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
-        const grade = preview.gradeOfFood?.(food.name);
+        const grade = preview.gradeOfFood?.(food.name) ?? gradeOfCatalogFood(food);
         return (
           <MmListRow
             key={`${food.packId}-${food.id}`}
@@ -54,7 +55,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
               </>
             }
             onPress={() => onPick(food)}
-            trailingAction={grade === undefined ? undefined : <FoodGrade grade={grade} subject={food.name} />}
+            trailingAction={<FoodGrade grade={grade} subject={food.name} />}
           />
         );
       })}

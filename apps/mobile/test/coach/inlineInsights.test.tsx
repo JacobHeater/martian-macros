@@ -1,4 +1,4 @@
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -96,7 +96,7 @@ it('all insights off: the areas say so and keep their own positions', async () =
   const settings = await openSettings();
   await userEvent.click(await settings.findByRole('button', { name: /^Coaching insights/ }));
   await userEvent.click(await layer().findByRole('switch', { name: /^Insights under logged items/ }));
-  expect(await layer().findByText('Off while insights are off')).toBeInTheDocument();
+  expect(await layer().findAllByText('Off while insights are off')).toHaveLength(4);
   await userEvent.click(layer().getByRole('switch', { name: /^Insights under logged items/ }));
   // Back on, training is still off as it was.
   expect(await layer().findByText('Off')).toBeInTheDocument();
@@ -107,4 +107,71 @@ it('while coaching is paused, no line shows', async () => {
   await openLatestWorkout();
   await layer().findByRole('heading', { name: 'Barbell bench press' });
   expect(layer().queryByRole('button', { name: /^Coach:/ })).toBeNull();
+});
+
+it('"Snooze…" quiets that kind on that lift for the length chosen, with Undo (MM-378)', async () => {
+  await openLatestWorkout();
+  await userEvent.click(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ }));
+  await userEvent.click(layer().getByRole('button', { name: /^Snooze… Volume jump for Barbell bench press/ }));
+  const dialog = await screen.findByRole('dialog', { name: /^Snooze “Volume jump” for Barbell bench press/ });
+  await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
+  await expect.poll(() => layer().queryByRole('button', { name: /^Coach:/ })).toBeNull();
+  const snoozed = await first(repos.insightSnoozes.watchInsightSnoozes());
+  expect(snoozed.map((s) => [s.kind, s.subject, s.resumesOn?.epochDay])).toEqual([['volumeJump', 'barbell-bench-press', today.addDays(8).epochDay]]);
+  expect(screen.getByText(/^Snoozed for Barbell bench press until /)).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
+  expect(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ })).toBeInTheDocument();
+});
+
+it('a snoozed kind is listed in its area in Settings > Coach, and "Turn back on" brings it back (MM-378)', async () => {
+  await repos.insightSnoozes.saveInsightSnooze({ kind: 'volumeJump', subject: 'barbell-bench-press', item: 'Barbell bench press', resumesOn: undefined });
+  renderApp(repos, today);
+  const settings = await openSettings();
+  await userEvent.click(await settings.findByRole('button', { name: /^Coaching insights/ }));
+  await userEvent.click(await layer().findByRole('button', { name: /^Training/ }));
+  expect(await layer().findByText('Barbell bench press · until turned back on')).toBeInTheDocument();
+  await userEvent.click(layer().getByRole('button', { name: /^Turn back on Volume jump for Barbell bench press/ }));
+  await expect.poll(async () => (await first(repos.insightSnoozes.watchInsightSnoozes())).length).toBe(0);
+  expect(layer().queryByText('Snoozed')).toBeNull();
+});
+
+it('a snooze that has run out no longer quiets the line (MM-378)', async () => {
+  await repos.insightSnoozes.saveInsightSnooze({ kind: 'volumeJump', subject: 'barbell-bench-press', item: 'Barbell bench press', resumesOn: today });
+  await openLatestWorkout();
+  expect(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ })).toBeInTheDocument();
+});
+
+it('the Coach tab does not list a snoozed insight while it is quiet (MM-378)', async () => {
+  await openLatestWorkout();
+  await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ });
+  await expect.poll(async () => (await first(repos.inlineInsightLog.watchInlineInsightLog({ since: today.addDays(-13) }))).length).toBe(1);
+  await repos.insightSnoozes.saveInsightSnooze({ kind: 'volumeJump', subject: 'barbell-bench-press', item: 'Barbell bench press', resumesOn: today.addDays(8) });
+  cleanup();
+  renderApp(repos, today);
+  await openTab('Coach');
+  expect(await screen.findByText('None in the last 14 days', {}, { timeout: 10000 })).toBeInTheDocument();
+});
+
+
+it('the focus stays on the screen when a snoozed line goes, and when a snooze is turned back on (MM-379)', async () => {
+  await openLatestWorkout();
+  await userEvent.click(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ }));
+  await userEvent.click(layer().getByRole('button', { name: /^Snooze… Volume jump/ }));
+  const dialog = await screen.findByRole('dialog', { name: /^Snooze “Volume jump”/ });
+  await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
+  await expect.poll(() => layer().queryByRole('button', { name: /^Coach:/ })).toBeNull();
+  const card = layer().getByRole('heading', { name: 'Barbell bench press' }).closest('.mm-surface');
+  expect(document.activeElement).not.toBe(document.body);
+  expect(card?.contains(document.activeElement)).toBe(true);
+  cleanup();
+
+  await repos.insightSnoozes.saveInsightSnooze({ kind: 'volumeJump', subject: 'barbell-bench-press', item: 'Barbell bench press', resumesOn: undefined });
+  renderApp(repos, today);
+  const settings = await openSettings();
+  await userEvent.click(await settings.findByRole('button', { name: /^Coaching insights/ }));
+  await userEvent.click(await layer().findByRole('button', { name: /^Training/ }));
+  await userEvent.click(await layer().findByRole('button', { name: /^Turn back on Volume jump/ }));
+  await expect.poll(() => layer().queryByText('Snoozed')).toBeNull();
+  expect(document.activeElement).not.toBe(document.body);
+  expect(layer().getByRole('heading', { name: 'Training insights' }).closest('.app-screen, body')?.contains(document.activeElement)).toBe(true);
 });

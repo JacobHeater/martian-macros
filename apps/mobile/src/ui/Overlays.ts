@@ -30,7 +30,7 @@ export interface Overlays {
    * Asks for one of a short list of options, with the selected one marked
    * in words and with a check, not by color alone.
    */
-  options<T>(question: { title: string; options: readonly MmMenuItem<T>[]; selected: T }): Promise<MmMenuItem<T> | undefined>;
+  options<T>(question: { title: string; options: readonly MmMenuItem<T>[]; selected?: T | undefined }): Promise<MmMenuItem<T> | undefined>;
 
   /** Asks for a calendar day from `first` to `last`; `today` is marked when given. */
   date(question: {

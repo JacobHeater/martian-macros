@@ -13,8 +13,4 @@ export const VolumeJumpRule = {
   usualWeeks: 4,
   /** Of which at least this many had a hard set for the group, so a first block or a missed month says nothing. */
   weeksWithSets: 3,
-  /** Shown on the workouts of its first week (the product owner, 2026-10-17)… */
-  shownForDays: 7,
-  /** …then quiet for this many days, even while it holds. */
-  restDays: 28,
 } as const;

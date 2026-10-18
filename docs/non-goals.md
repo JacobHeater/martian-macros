@@ -89,12 +89,16 @@ should read this list as closely as any feature.
 - **Detail:** MM-136
 - **Reopen if:** A registered dietitian reviews supplement guidance.
 
-### No food scoring, grading, or "clean" and "junk" labels
+### ~~No food scoring or grading~~ (overruled), and no "clean" and "junk" labels
 
 - **Why:** Moral labels on food are associated with disordered eating and
   contradict the app's rule that it states and does not judge.
 - **Detail:** MM-108
-- **Reopen if:** Never.
+- **Grading overruled by the product owner on 2026-10-17** (MM-370, MM-371): every
+  food is graded A+ to D- as a nutrient-profile measure with a published basis
+  (MM-369), never a moral word. "Clean" and "junk" labels, meal plans and
+  prescribed foods stay out, and MM-108's banned words stay banned.
+- **Reopen if:** Never, for the labels.
 
 ### ~~No micronutrient targets~~ (overruled)
 

@@ -26,8 +26,10 @@ Choices I made without asking (say if any is wrong):
   already shows on the item (MM-142's weight-jump explanation) counts as that item's note, so no inline insight is added.
 - **A single-item insight is about the item, never about the day.** "Most of this item's calories come from fat" is allowed.
   "You went over today because of this" is not. MM-141's "not about one day" stays true for days.
-- **Words: a fact, then a general direction.** "Most of this item's calories come from fat (62%). A leaner choice or a smaller
-  portion leaves more room for protein." No specific replacement food is named, which keeps MM-144's "no prescribed foods". The
+- **Words: a fact, then a general direction.** "Most of this food's calories come from fat (76%). A protein food alongside
+  balances the meal." (The first draft said "a leaner choice or a smaller portion"; the owner ruled swap or add, never eat
+  less, 2026-10-18, and the panel found "leaner" and "room" body and budget words.) No specific replacement food is named,
+  which keeps MM-144's "no prescribed foods". The
   owner answered the "how far can advice go" question with grades (MM-370), so this choice is mine. Say if a named alternative
   is wanted.
 - **MM-108 still holds in every inline line**: no "good", "bad", "clean", "junk", "guilt", "earn", "burn off". No praise for eating

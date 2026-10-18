@@ -21,7 +21,7 @@ The product owner's (2026-10-17): every trackable surface, and training is named
   TR-3, CO-1, SA-1).
 - **A pattern line shows in its first week, then rests for 28 days**, even while it still holds, so the coach does not
   repeat itself on every workout (the panel's CO-5). *Superseded 2026-10-18*: the product owner chose a snooze everywhere
-  instead (MM-378); the automatic rest is removed when MM-378 is built.
+  instead (MM-378); the automatic rest was removed when MM-378 was built (2026-10-18).
 - **"Volume jump" is said once a workout**, under the first exercise that mainly trains the muscle group, not under each
   (the panel's CO-6, TR-8).
 - **"Strength on fat loss" comes later**, as MM-377: its "held" needs a tolerance the measurement role has to check, it
@@ -79,9 +79,9 @@ Scenario: Its own weeks
   Given a finished workout 21 days ago
   Then its line is judged on the weeks to that workout, whatever was trained since
 
-Scenario: First week, then rest
+Scenario: Said while it holds
   Given a jump first said 7 days ago that still holds
-  Then no line is shown
+  Then the line is still shown, until snoozed (MM-378)
 
 Scenario: Across a pause
   Given a pause in the five weeks a jump looks at

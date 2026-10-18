@@ -47,6 +47,7 @@ import { allowedItemInsights } from '../engine/allowedItemInsights';
 import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
 import type { InsightSafeguards } from '../engine/InsightSafeguards';
+import type { InsightSnooze } from '../engine/InsightSnooze';
 import type { ItemInsight } from '../engine/ItemInsight';
 import { itemInsightKinds } from '../engine/itemInsightKinds';
 import { InsightRationing } from '../engine/InsightRationing';
@@ -75,6 +76,10 @@ import type { ReportPeriod } from '../engine/ReportPeriod';
 import { reportPeriods } from '../engine/reportPeriods';
 import { selectInsight } from '../engine/selectInsight';
 import { trainingItemInsights } from '../engine/trainingItemInsights';
+import { foodItemInsights } from '../engine/foodItemInsights';
+import { waistWithinNoiseInsights } from '../engine/waistWithinNoiseInsights';
+import { waterFewDaysInsights } from '../engine/waterFewDaysInsights';
+import { WaterFewDaysRule } from '../engine/WaterFewDaysRule';
 import type { StallAssessment } from '../engine/StallAssessment';
 import type { StrengthTrend } from '../engine/StrengthTrend';
 import { summarizeAdherence } from '../engine/summarizeAdherence';
@@ -279,6 +284,12 @@ export class AppState {
 
   /** The inline insights first shown in the last 14 days (MM-363). */
   readonly inlineInsightLog: Cell<Loadable<InlineInsightLogEntry[]>>;
+
+  /** The inline insights snoozed, one kind on one item (MM-378). */
+  readonly insightSnoozes: Cell<Loadable<InsightSnooze[]>>;
+
+  /** The water logged over the days the water insight looks at (MM-367). */
+  private readonly recentWater: Cell<Loadable<WaterEntry[]>>;
 
   /** When the welcome-back screen was last put off (MM-147). */
   readonly returnScreenDismissed: Cell<Loadable<CalendarDate | undefined>>;
@@ -638,37 +649,65 @@ export class AppState {
     });
 
     this.insightSwitches = stream(() => s.preferences.watchInsightSwitches());
+    this.insightSnoozes = stream(() => s.insightSnoozes.watchInsightSnoozes());
+    this.recentWater = stream(() =>
+      s.water.watchWaterSince(this.today.value.addDays(-(WaterFewDaysRule.windowDays + WaterFewDaysRule.usedWithinDays))),
+    );
 
     this.insightSafeguards = derived<InsightSafeguards | undefined>(() => {
       const setup = of(this.setup);
-      if (setup === undefined) return undefined;
+      const policy = this.coach.value?.policy;
+      if (setup === undefined || policy === undefined) return undefined;
       return {
         adult: setup.profile.isAdultOn(this.today.value),
         eatingDisorderHistory: setup.screening.eatingDisorderHistory,
         // Weight cannot be hidden yet (MM-118).
         weightHidden: false,
         paused: this.activePause.value !== undefined,
+        underEating: this.underEatingFinding.value !== undefined,
+        cautions: policy.cautions,
       };
     });
 
     this.itemInsights = derived<ReadonlyMap<string, ItemInsight>>(() => {
       const safeguards = this.insightSafeguards.value;
       const switches = of(this.insightSwitches);
+      const snoozes = of(this.insightSnoozes);
       const workouts = of(this.workouts);
       const pauses = of(this.pauses);
       const exercisesById = this.exercisesById.value;
       const today = this.today.value;
-      if (safeguards === undefined || switches === undefined || workouts === undefined || pauses === undefined) {
+      if (safeguards === undefined || switches === undefined || snoozes === undefined || workouts === undefined || pauses === undefined) {
         return new Map();
       }
+      const setup = of(this.setup);
+      const waist = of(this.waist) ?? [];
+      const water = of(this.recentWater) ?? [];
+      // The food of the last two weeks: an older day's entries get no line.
+      const entries: FoodEntry[] = [];
+      for (let i = 0; i < InsightRationing.patternDays; i++) entries.push(...(of(this.foodForDay(today.addDays(-i))) ?? []));
       let insights: ItemInsight[];
       try {
-        insights = trainingItemInsights({ workouts, exercisesById, pauses, today });
+        insights = [
+          ...foodItemInsights({ entries, proteinMinimumG: this.currentTargets.value?.targets.proteinMinimumG }),
+          ...trainingItemInsights({
+            workouts,
+            exercisesById,
+            pauses,
+            today,
+            trends: of(this.strengthTrends) ?? [],
+            history: of(this.targetsHistory) ?? [],
+            deficitRestartOn: this.coach.value?.deficitRestartOn,
+            progressStalled: this.stallAssessment.value?.status === 'stalled',
+          }),
+          ...waistWithinNoiseInsights({ waist }),
+          ...(setup === undefined ? [] : waterFewDaysInsights({ entries: water, goal: this.waterGoal.value, onboardedOn: setup.onboardedOn, today })),
+        ];
       } catch (error) {
         if (error instanceof ArgumentError) return new Map();
         throw error;
       }
-      return allowedItemInsights({ insights, kinds: itemInsightKinds, safeguards, switches });
+      return allowedItemInsights({ insights, kinds: itemInsightKinds, safeguards, switches, snoozes, today });
     });
 
     this.inlineInsightLog = stream(() => s.inlineInsightLog.watchInlineInsightLog({ since: this.today.value.addDays(-13) }));
