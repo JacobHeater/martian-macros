@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { InlineInsight } from '../coach/InlineInsight';
-import { useExerciseInsight } from '../coach/useExerciseInsight';
+import { useExerciseInsights } from '../coach/useExerciseInsights';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import type { Workout } from '../domain/training/Workout';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
@@ -59,10 +59,11 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   const preview = useInsightPreview();
   const entry = workout.exercises[index];
   const exercise = entry === undefined ? undefined : exercises.get(entry.exerciseId);
-  const coachSays = useExerciseInsight(workout.id, entry?.exerciseId ?? '', exercise?.name ?? '');
+  const coachSays = useExerciseInsights(workout.id, entry?.exerciseId ?? '', exercise?.name ?? '');
   if (entry === undefined) return null;
-  // What the coach says under the lift (MM-366), or a design story's own line.
-  const exerciseNote = preview.exerciseNotes?.get(entry.exerciseId) ?? coachSays;
+  // What the coach says under the lift (MM-366, every line, MM-393), or a design story's own line.
+  const designed = preview.exerciseNotes?.get(entry.exerciseId);
+  const exerciseNotes = designed === undefined ? coachSays : [designed];
   const load = exercise?.load ?? 'addedWeight';
   const units = setup?.unitSystem ?? 'imperial';
   const fmt = new Fmt(units);
@@ -131,9 +132,11 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
       )}
       {suggestion === undefined ? null : <p className="app-text train-suggestion">{progressionText(suggestion, fmt, load)}</p>}
       {/* The coach's line about this lift, after the facts it rests on (MM-366): none in the app until built. */}
-      {exerciseNote === undefined ? null : (
+      {exerciseNotes.length === 0 ? null : (
         <div className="train-exercise-insight">
-          <InlineInsight insight={exerciseNote} />
+          {exerciseNotes.map((note) => (
+            <InlineInsight key={note.rule} insight={note} />
+          ))}
         </div>
       )}
       {entry.sets.map((set, s) =>

@@ -62,7 +62,7 @@ export function InlineInsight({ insight, layout = 'entry', initiallyExpanded = f
     if (chosen === undefined) return;
     const today = state.today.value;
     const resumesOn = SnoozeLength.resumesOn(chosen.value, today);
-    // The line is about to go, and the focus with it: it moves to the item the line was under (MM-379).
+    // The line is about to go, and the focus with it: it moves to the nearest control that stays, the item or a line beside it (MM-379, MM-393).
     focusNeighbourOf(host.current);
     await services.insightSnoozes.saveInsightSnooze({ ...snooze, resumesOn });
     overlays.snack(`Snoozed for ${snooze.item} ${resumesOn === undefined ? 'until turned back on' : `until ${Fmt.shortDay(resumesOn)}`}`, {
