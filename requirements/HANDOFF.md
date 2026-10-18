@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-18, by Claude, Session 34.
+Last updated: 2026-10-18, by Claude, Session 35.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -246,14 +246,28 @@ the panel's lists. The framework's safeguards carry the under-eating
 finding and the policy's cautions beside the eating-disorder history.
 `InsightPreview` is a story override only; `draftInsightKinds.ts` holds
 sleep's drafts (MM-368 waits for MM-250). **The weigh-in time line was
-dropped** (no weigh-in time is stored). **Grades:** the published packs are
-format 1 and carry no sugars or saturated fat, so every pack food shows the
-question mark until a format 2 pack is published (`docs/food-grades.md`);
-the person's own foods that state them are graded now. **MM-377** (strength
+dropped** (no weigh-in time is stored). **Grades are the app's own method
+since Session 35** (MM-380, MM-382, `docs/food-grades.md`): what a food
+gives per calorie, with calories, the macros, fiber and sodium required and
+sugars, saturated fat and ten vitamins and minerals counted when stated, so
+about nine in ten common foods and five in six barcode foods grade today
+and the popover says what was not counted; the published tables of MM-369
+are withdrawn. **MM-377** (strength
 on fat loss) is built on the measurement and nutrition roles' terms
 (`docs/agent-runs/mm377-strength-on-fat-loss/`): fat-loss weeks as of the
 workout, held within 2.5% of the smoothed start, up at 5%, no story (the
 demo's data does not reach it).
+
+**Food packs and downloads (Session 35, MM-383, MM-384).** A third generic
+source, USDA FNDDS 2021-2023, is wired into the pipeline (not yet built: no
+DuckDB here); the app's own reliability score (`foodCatalog/SourceReliabilityRule`)
+orders search results and decides a shared barcode at build time
+(`ReliabilityPolicy`, the default); generic foods with one name keep one
+record; the build fails when a configured source gives nothing and
+`coverage.txt` counts per pack and per source. Any number of packs download
+at once (`state/PackDownloadsController`, one cell per pack), each behind a
+download icon, with a card and a strip line per download.
+`docs/food-packs-data.md` holds the owner's commands.
 
 **Waiting on the product owner.**
 - Coaching insights: no paywall for any of MM-361 to MM-371 (not behind
@@ -264,11 +278,28 @@ demo's data does not reach it).
   history (MM-367); a per-entry "Right as logged" for the portion check and
   empty-state words for the Snoozed list were declined (MM-365, MM-378);
   hide "strength on fat loss" under the low-body-weight caution (MM-377)?
-- Grades: read the Nutri-Score Conditions of Use (March 2025) for clauses on
-  applications and text references, and decide whether to notify Santé
-  publique France (with the attorney, MM-242); rebuild and publish the
-  packs in format 2 (`mm food`) so pack foods get grades; a category column
-  in a later format (`docs/food-grades.md`).
+- Grades (MM-380, "say if any is wrong"): the per-calorie floor on the
+  against side only; the sugars waiver's ramps; energy density to five
+  points; no per-100 g sodium backstop (chips and butter pay little); the
+  fortified-sweetened-cereal cap; protein's weight of 8; no unsaturated-fat
+  positive (walnuts beside chips, olive oil beside cola); recipes ungraded;
+  pack foods graded now without sugars (a cola reads C until the rebuild);
+  and whether showing grades with an eating-disorder history (MM-370) still
+  stands now that every A+ is a vegetable. The Nutri-Score items are gone
+  with the method.
+- Food packs (MM-381, MM-383, `docs/food-packs-data.md`): install DuckDB,
+  run `mm food fetch`, list the FNDDS zip, `mm food build` (fails if a source
+  gives nothing; read `report.txt` and `coverage.txt`), spot-check three
+  FNDDS foods, `mm food package` and publish the release; the fifty-package
+  hand check (MM-51) that would settle freshness against provenance. "Say
+  if any is wrong": the reliability bases (95/90/80/65/40), the build's
+  conflict policy now the score (USDA Branded over Open Food Facts), one
+  name one food with the grade's floor first, FNDDS names as the source
+  states them, the fetch cache keyed by address (MM-388).
+- Downloads (MM-384): both packs started together on a release build with
+  the WebView's memory watched (MM-387 open); MM-386 (the catalog re-open
+  leak) open; whether a finished notice should also clear on leaving the
+  screen.
 - Warmer Martian (MM-375): the owner approved the royal 90s violet and
   kept lime. Open: Martian's ion and protein are the same aqua, so the
   coach's insight lines share protein's colour (panel P-3/UX-4); whether
@@ -282,7 +313,19 @@ demo's data does not reach it).
   line under a lift, opened, and its Settings switch (MM-366, MM-364); a food
   line, snoozed for a week and undone, and the Snoozed list in Settings >
   Coach > Food (MM-378); the Food screen at 320 px with a grade and a line
-  under a long food name (MM-370); a grade's popover and a "?" popover.
+  under a long food name (MM-370); a grade's popover and a "?" popover,
+  including one that says what was not counted (MM-382); both food packs
+  started together from their icons, one cancelled from the strip while the
+  other runs, both installed with matching checksums, the WebView's memory
+  watched (MM-384, MM-387); with gesture navigation, no blank band between
+  the two strip lines nor between the tab bar and the strip (the designer's
+  PD-5); TalkBack on while both packs download and a food is logged, to
+  hear progress spoken at ten-percent steps and a swipe after pressing a
+  pack's icon land on a control (the UX guard's F1, F2); a grade's popover
+  at 200% text on a food missing sugars and most vitamins, to see "Got it"
+  reachable (F3); a search for "oats" after the rebuilt packs install, to
+  see the order by source (MM-383); with TalkBack on, let a pack finish and
+  note whether "… is on your phone." is spoken (the guard's F4 caveat).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -294,6 +337,39 @@ demo's data does not reach it).
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
+
+- The owner withdrew the published grading tables ("not what I asked you to
+  build") and chose, through the question tool: nutrient density per calorie
+  with the vitamins and minerals; calories, macros, fiber and sodium
+  required; the grade unnamed; run end to end. Then by message, no questions:
+  add a food data source with the panel, derive a reliability score and
+  order search by it (the scan ranking the author's), enable concurrent
+  pack downloads, make the download button an icon.
+- **Panel runs:** `docs/agent-runs/mm380-proprietary-grade/` (nutrition,
+  micronutrients, measurement, integrations on the draft method and the
+  pack question; all "build with the listed changes") and
+  `mm383-sources-and-downloads/` (integrations, product, react-capacitor on
+  the source, the score and the downloads; product designer and UX guard on
+  the renders). Every reconciliation is in each run's `decision.md`.
+- **Built:** MM-380 (the method, `docs/food-grades.md`, 61-food calibration
+  set, 23 register rows), MM-382 (the engine, the popover's "not counted"
+  sentences), MM-381 (`docs/food-packs-data.md`), MM-383 (FNDDS wired, the
+  reliability score, search order, the build-time conflict policy, one name
+  one food, the build gate, coverage per source, CC0 terms), MM-384
+  (concurrent downloads, the icon, a card and a strip line per download),
+  MM-385 and MM-388 (bugs found by the panel, fixed with failing-first
+  tests), MM-386 and MM-387 opened (the catalog re-open leak; streaming to
+  the file natively).
+- **Measured** on the published packs with node:sqlite: 89.9% of common
+  foods and 82.8% of barcode foods grade today on the new method.
+- **Not done:** a real pack build (DuckDB not installed; sources not
+  downloaded), so FNDDS and the coverage shares are unmeasured until the
+  owner runs the commands; paging in search (MM-42) as FNDDS enlarges the
+  generic block; an added-sugars column (format 3) that would retire most of
+  the sugars waiver.
+- Roadmap: WS-08 step 12 added (MM-380 to MM-388).
 
 ## Session 34: 2026-10-18, Claude (coaching insights inline, the whole feature, overnight)
 
@@ -374,61 +450,3 @@ limitations.
 - WS-09 step 10: MM-362, MM-364 and MM-366 done; MM-363 in progress (a
   food's entry opening its day comes with MM-365); MM-377 added.
 
-## Session 32: 2026-10-17, Claude (coaching insights inline, specified)
-
-- The owner asked for a new feature, specified only (no code): **coaching
-  insights inline** under the line item they are about, everywhere
-  something is logged. The Coach tab stays. Asked in four rounds with the
-  question tool; the epic is MM-361, with MM-362 to MM-371.
-- **Owner's rulings (2026-10-17), all recorded in MM-361:** two bases, a
-  pattern the item is part of or neutral single-item facts (the latter
-  overrules MM-141's "never one day" for inline only). Every qualifying
-  item shows its insight, not rationed. The Coach tab lists them too.
-  Quieted only by switches under a new **Settings > Coach** page (master,
-  area, rule). The existing safeguards apply. One line, expandable.
-- **Foods graded A+ to D-** (MM-369 spike, MM-370 story): universal, per
-  100 g, on entries, in search, and for each meal and day. A question mark
-  with a popover when it can't be graded. **Shown with an eating-disorder
-  history**: the owner chose this after the conflict with the food-insight
-  safeguard was put to them, and food-composition *insights* stay off for
-  that person. This overrules MM-144's grading non-goal and part of MM-108
-  (MM-371, like MM-306).
-- Rule catalogs in MM-365 to MM-368 are drafts with figures for the
-  panel's nutrition, training, measurement and coaching roles; sleep
-  (MM-368) waits for MM-250.
-- Roadmap: WS-09 steps 10 and 11, WS-08's new last step (grades), all M4.
-- **Then the designs** (owner: "do the designs now"), on
-  `design/inline-insights-and-grades`, stacked on #177 (the merge of #177
-  was refused by the permission check; left for the owner). Drawn on the
-  **real screens** through a design seam, `coach/InsightPreview`: the
-  screens read inline insights, grades, the Coach tab's list and Settings >
-  Coach from a context the app never provides, so nothing shows in the app;
-  screen stories hand in the design's figures (`screenStory`'s `preview`).
-  When MM-362/MM-370 are built, `useInsightPreview` is replaced by engine
-  output. New: `InlineInsight`, `RowWithInsight`, `FoodGrade` over
-  `ui/MmGradeBadge`, `ui/MmPopover` (+ `Overlays.popover`), `FoodDayGradeRow`,
-  `RecentInsightsSection`, `CoachSettingsSection`, `CoachSettingsScreen`,
-  `CoachAreaScreen` (switches held in `InsightSwitchesDraft`, not stored).
-  `screenStory` also takes `textScale` and `viewport` (`narrowPhone`, 320 px).
-- Panel: product designer + UX guard, two passes; guard BLOCKED then PASS.
-  Built from it: caption-size line, every badge explains itself, popover
-  clamped (bug MM-372 + test), day grade out of the app bar into a row,
-  workout line after "Last time", Recent insights folded, one word
-  ("insights", "kinds"), "New best" dropped (Personal records already says
-  it), "Large portion" off with an eating-disorder history. Older bugs the
-  200% stories found: MM-373 (nav labels), MM-374 (Dashboard header, water
-  row), tests skipped with their IDs.
-- No step advanced: design only; MM-372 is done.
-- **Then three owner asks** (branch `design/ion-insights-grade-fills-warm-martian`):
-  the insight text and icon in `--ion`; grade badges filled per band
-  (categorical: A mint, B sunflower, C periwinkle, D orchid; `--grade-*`
-  tokens in every palette, an edge in light); and a **warmer Martian**
-  (MM-375) researched by the product and product-designer roles
-  (`docs/agent-runs/mm375-warm-martian/`). A plum was drawn and rejected
-  ("maroon, not a 90's purple"); the approved neutrals are a royal violet
-  with bigger steps, near-neutral secondary text, tangerine carbs, magenta
-  fat, lime kept. `test/support/flutterTheme.json` updated knowingly for
-  Martian. UX guard BLOCKED (pressed badge lost its letter: bug MM-376 +
-  test) then PASS. The colour doc's contrast tests had never been carried
-  over from Flutter; `tokens.test.ts` now holds text, ion, macro L* and
-  grade letters in every palette.

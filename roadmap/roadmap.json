@@ -743,7 +743,16 @@
             "MM-358",
             "MM-359",
             "MM-369",
-            "MM-370"
+            "MM-370",
+            "MM-380",
+            "MM-381",
+            "MM-382",
+            "MM-383",
+            "MM-384",
+            "MM-385",
+            "MM-386",
+            "MM-387",
+            "MM-388"
           ]
         },
         {
@@ -2203,9 +2212,18 @@
           "MM-358",
           "MM-359",
           "MM-369",
-          "MM-370"
+          "MM-370",
+          "MM-380",
+          "MM-381",
+          "MM-382",
+          "MM-383",
+          "MM-384",
+          "MM-385",
+          "MM-388"
         ],
         "remaining": [
+          "MM-386",
+          "MM-387",
           "MM-37",
           "MM-42",
           "MM-43",
@@ -2355,6 +2373,22 @@
           "tickets": [
             "MM-369",
             "MM-370"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "The grade becomes the app's own method (MM-380 spike, MM-382 build), the packs' data is reviewed (MM-381), a third source and a reliability score order search and scans (MM-383), and packs download together behind an icon (MM-384)",
+          "tickets": [
+            "MM-380",
+            "MM-381",
+            "MM-382",
+            "MM-383",
+            "MM-384",
+            "MM-385",
+            "MM-386",
+            "MM-387",
+            "MM-388"
           ],
           "milestone": "M4"
         }

@@ -108,7 +108,7 @@ import { Loadable } from './Loadable';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
-import { PackDownloadController } from './PackDownloadController';
+import { PackDownloadsController } from './PackDownloadsController';
 import { PackManifestCheck } from './PackManifestCheck';
 import { StreamCell } from './StreamCell';
 import { ValueCell } from './ValueCell';
@@ -363,7 +363,7 @@ export class AppState {
   private readonly packChanges = new ValueCell(0);
 
   /** The one food-pack download (MM-56). Nothing starts by itself. */
-  readonly packDownload: PackDownloadController;
+  readonly packDownloads: PackDownloadsController;
 
   /** The list of packs the host offers, read once when the user asks. */
   readonly packManifest: PackManifestCheck;
@@ -425,7 +425,7 @@ export class AppState {
       void this.packChanges.value;
       return once(() => s.packStore.installed());
     });
-    this.packDownload = new PackDownloadController({
+    this.packDownloads = new PackDownloadsController({
       http: s.packHttp,
       store: s.packStore,
       onInstalled: () => this.packsChanged(),
@@ -969,8 +969,16 @@ export class AppState {
 
   /** Reads again which packs are installed, and the catalog made of them. */
   packsChanged(): void {
-    this.packChanges.put(this.packChanges.peek() + 1);
+    // Two packs installing in one tick re-open the catalog once (MM-384, the panel's F3).
+    if (this.packsChangedQueued) return;
+    this.packsChangedQueued = true;
+    queueMicrotask(() => {
+      this.packsChangedQueued = false;
+      this.packChanges.put(this.packChanges.peek() + 1);
+    });
   }
+
+  private packsChangedQueued = false;
 
   /** Looks at the health platform again: what it has, what is allowed, what has been imported. */
   refreshHealthConnection(): void {

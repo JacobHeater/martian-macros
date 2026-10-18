@@ -6,21 +6,22 @@ import type { CatalogServing } from './CatalogServing';
 import type { CatalogServingLookup } from './CatalogServingLookup';
 import type { FoodPack } from './FoodPack';
 import type { SearchHit } from './SearchHit';
-import { TrustTier } from './TrustTier';
+import { sourceReliability } from './sourceReliability';
 
 /**
- * Reference foods before label foods before "check this" ones, then the
- * better text match (MM-42, MM-153). So a generic "Oats" lists above a
- * branded product that merely matches the word more tightly.
+ * The more reliable source first, then the better text match (MM-42,
+ * MM-153, MM-383). So a generic "Oats" from an analysed database lists
+ * above a crowd-entered product that merely matches the word more tightly.
  */
-function byTrustThenMatch(a: SearchHit, b: SearchHit): number {
-  const byTier = TrustTier.code(a.food.tier) - TrustTier.code(b.food.tier);
-  return byTier !== 0 ? byTier : a.score - b.score;
+function byReliabilityThenMatch(a: SearchHit, b: SearchHit): number {
+  const byScore = sourceReliability(b.food) - sourceReliability(a.food);
+  return byScore !== 0 ? byScore : a.score - b.score;
 }
 
 /**
  * Several installed packs presented as one: search returns one ranked list,
- * and a barcode is looked up in each pack in turn.
+ * and a barcode takes the most reliable record across the packs (MM-383),
+ * the tie going to the pack listed first.
  */
 export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, CatalogServingLookup, CatalogPairLookup {
   readonly packs: readonly FoodPack[];
@@ -34,15 +35,16 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
     for (const pack of this.packs) {
       hits.push(...(await pack.search(query, { limit: limit + offset })));
     }
-    return hits.sort(byTrustThenMatch).slice(offset, offset + limit);
+    return hits.sort(byReliabilityThenMatch).slice(offset, offset + limit);
   }
 
   async byBarcode(gtin14: string): Promise<CatalogFood | undefined> {
+    let best: CatalogFood | undefined;
     for (const pack of this.packs) {
       const food = await pack.byBarcode(gtin14);
-      if (food !== undefined) return food;
+      if (food !== undefined && (best === undefined || sourceReliability(food) > sourceReliability(best))) best = food;
     }
-    return undefined;
+    return best;
   }
 
   async pairOf(food: CatalogFood): Promise<CatalogFood | undefined> {

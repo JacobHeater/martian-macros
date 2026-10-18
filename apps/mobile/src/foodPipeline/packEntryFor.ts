@@ -11,10 +11,15 @@ function tierOf(source: string): readonly [TrustTier, string] {
     case 'usda_foundation':
     case 'usda_sr_legacy':
       return ['reference', 'Analysed food data from USDA FoodData Central.'];
+    case 'usda_fndds':
+      return ['reference', 'Compiled by USDA from analysed foods and recipes for the national dietary survey.'];
     case 'usda_branded':
       return ['label', 'Label data submitted by the manufacturer to USDA.'];
-    default:
+    case 'off':
       return ['checkThis', 'Entered by Open Food Facts contributors and not checked against a package.'];
+    default:
+      // A source the pipeline does not know must not pass as crowd data (MM-383, the panel's IN-3).
+      throw new StateError(`Unknown food source "${source}": add it to packEntryFor before building.`);
   }
 }
 

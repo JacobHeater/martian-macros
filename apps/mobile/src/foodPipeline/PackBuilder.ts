@@ -1,18 +1,20 @@
 import { checkNutrition } from '../domain/food/checkNutrition';
 import { normalizeBarcode } from '../domain/food/normalizeBarcode';
 import type { PackEntry } from '../foodCatalog/PackEntry';
+import { disagreementReason } from '../foodCatalog/disagreementReason';
 import { byName } from '../lang/byName';
 import { compareStrings } from '../lang/compareStrings';
 import { BuildReport } from './BuildReport';
 import type { CandidateFood } from './CandidateFood';
 import type { ConflictPolicy } from './ConflictPolicy';
 import { DropReason } from './DropReason';
+import { GenericPrecedencePolicy } from './GenericPrecedencePolicy';
 import type { PackBuildResult } from './PackBuildResult';
 import { packEntryFor } from './packEntryFor';
 import type { PreparationLink } from './PreparationLink';
 import { preparationLinks } from './preparationLinks';
 
-const disagreement = 'Two sources disagree about this product by more than 10%. Check it against the package.';
+const disagreement = disagreementReason;
 
 function isNewer(candidate: CandidateFood, existing: CandidateFood): boolean {
   if (candidate.versionKey !== existing.versionKey) return candidate.versionKey > existing.versionKey;
@@ -30,25 +32,35 @@ function isNewer(candidate: CandidateFood, existing: CandidateFood): boolean {
  */
 export class PackBuilder {
   readonly policy: ConflictPolicy;
+  readonly precedence: GenericPrecedencePolicy;
   readonly genericPackId: string;
   readonly barcodePackId: string;
 
+  /** The sources the build expects candidates from; one that gives nothing is reported as missing (MM-383). */
+  readonly expectedSources: readonly string[];
+
   constructor({
     policy,
+    precedence = new GenericPrecedencePolicy(),
+    expectedSources = [],
     genericPackId = 'generic',
     barcodePackId = 'barcode_us',
   }: {
     policy: ConflictPolicy;
+    precedence?: GenericPrecedencePolicy;
+    expectedSources?: readonly string[];
     genericPackId?: string;
     barcodePackId?: string;
   }) {
     this.policy = policy;
+    this.precedence = precedence;
+    this.expectedSources = expectedSources;
     this.genericPackId = genericPackId;
     this.barcodePackId = barcodePackId;
   }
 
   async build(candidates: AsyncIterable<CandidateFood> | Iterable<CandidateFood>): Promise<PackBuildResult> {
-    const report = new BuildReport();
+    const report = new BuildReport({ expected: this.expectedSources });
     const generic: CandidateFood[] = [];
     const byBarcode = new Map<string, Map<string, CandidateFood>>();
 
@@ -119,6 +131,23 @@ export class PackBuilder {
       report.countWritten(winner.source);
     }
 
+    // One name, one food: the more reliable source's record is kept (MM-383).
+    const byKey = new Map<string, CandidateFood>();
+    for (const c of generic) {
+      const key = GenericPrecedencePolicy.key(c.name);
+      const held = byKey.get(key);
+      if (held === undefined) {
+        byKey.set(key, c);
+        continue;
+      }
+      const kept = this.precedence.prefer(held, c);
+      const lost = kept === held ? c : held;
+      report.countDropped(lost.source, 'lostDuplicateName');
+      if (GenericPrecedencePolicy.statedInputs(kept) < GenericPrecedencePolicy.statedInputs(lost)) report.duplicateWinnersSparser += 1;
+      byKey.set(key, kept);
+    }
+    generic.length = 0;
+    generic.push(...byKey.values());
     generic.sort((a, b) => {
       const byFoodName = compareStrings(a.name.toLowerCase(), b.name.toLowerCase());
       return byFoodName !== 0 ? byFoodName : compareStrings(a.sourceId, b.sourceId);

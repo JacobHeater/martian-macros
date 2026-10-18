@@ -237,7 +237,8 @@ describe('what is said in words, not by color alone', () => {
 
   it('a download says how far along it is, and cannot be stopped once past that point', () => {
     const { rerender } = render(<DownloadStatusStrip label="Downloading foods" fraction={0.426} onCancel={() => undefined} />);
-    expect(screen.getByRole('status')).toHaveTextContent('Downloading foods, 43 percent');
+    // What a screen reader hears moves in ten-percent steps (MM-384), so 42.6% is spoken as 40.
+    expect(screen.getByRole('status')).toHaveTextContent('Downloading foods, 40 percent');
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
     rerender(<DownloadStatusStrip label="Installing" fraction={1} onCancel={undefined} />);
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();

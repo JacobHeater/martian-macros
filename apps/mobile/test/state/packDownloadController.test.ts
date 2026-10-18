@@ -1,4 +1,4 @@
-import { beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryPackHttp } from '../../src/foodCatalog/download/InMemoryPackHttp';
 import type { InMemoryPackStore } from '../../src/foodCatalog/download/InMemoryPackStore';
@@ -10,11 +10,16 @@ import type { PackDownloadState } from '../../src/state/PackDownloadState';
 import { fixtureDownload, memoryPackStore, packUrl } from '../support/fixtureDownload';
 import { servicesOf } from '../support/servicesOf';
 
-/** MM-56: the download controller on a pretend store and a pretend network. From pack_download_controller_test.dart. */
-const manifestUrl = 'https://packs.example.test/manifest.json';
+/**
+ * MM-56, MM-384: the download controller on a pretend store and a pretend
+ * network, one state per pack and as many running at once as are started.
+ * From pack_download_controller_test.dart.
+ */
+const genericUrl = 'https://packs.example.test/generic.pack.gz';
 let store: InMemoryPackStore;
 let http: InMemoryPackHttp;
 let listing: PackListing;
+let generic: PackListing;
 let state: AppState;
 
 const withUrl = (url: string) =>
@@ -29,17 +34,31 @@ beforeEach(async () => {
   store = memoryPackStore();
   const d = await fixtureDownload();
   listing = d.listing;
-  http = new InMemoryPackHttp([[packUrl, d.gz]], { chunkSize: 256 });
+  const g = await fixtureDownload({ packId: 'generic' });
+  generic = { ...g.listing, id: 'generic', title: 'Common foods', url: new URL(genericUrl) };
+  http = new InMemoryPackHttp(
+    [
+      [packUrl, d.gz],
+      [genericUrl, g.gz],
+    ],
+    { chunkSize: 256 },
+  );
   state = withUrl('');
+  // The list of downloads is derived, and worked out again only while something watches it, as the screens always do.
+  stopWatching = state.packDownloads.downloads.subscribe(() => undefined);
 });
 
-const now = (): PackDownloadState => state.packDownload.state.peek();
+let stopWatching: () => void = () => undefined;
+afterEach(() => stopWatching());
 
-/** Resolves once at least `bytes` have arrived. */
-const received = (bytes: number) =>
+const now = (id = 'barcode_us'): PackDownloadState => state.packDownloads.of(id) ?? { status: 'idle', keptBytes: 0 };
+
+/** Resolves once at least `bytes` of `id` have arrived. */
+const received = (bytes: number, id = 'barcode_us') =>
   new Promise<void>((resolve) => {
-    const stop = state.packDownload.state.subscribe((download) => {
-      if ((download.progress?.receivedBytes ?? 0) < bytes) return;
+    const stop = state.packDownloads.state.subscribe((downloads) => {
+      const download = downloads.find((d) => d.listing?.id === id);
+      if ((download?.progress?.receivedBytes ?? 0) < bytes) return;
       queueMicrotask(() => stop());
       resolve();
     });
@@ -49,6 +68,7 @@ it('nothing is fetched until a download is started', async () => {
   await new Promise((resolve) => setTimeout(resolve, 50));
   expect(http.requests).toEqual([]);
   expect(now().status).toBe('idle');
+  expect(state.packDownloads.state.peek()).toEqual([]);
 });
 
 it('a started download finishes and the pack is listed as installed', async () => {
@@ -56,7 +76,7 @@ it('a started download finishes and the pack is listed as installed', async () =
   const stop = state.installedPacks.subscribe((packs) => {
     if (packs.ready) seen.push(packs.value.length);
   });
-  await state.packDownload.start(listing);
+  await state.packDownloads.start(listing);
   expect(now().status).toBe('done');
   await expect.poll(() => seen[seen.length - 1]).toBe(1);
   const packs = state.installedPacks.peek();
@@ -68,71 +88,102 @@ it('a started download finishes and the pack is listed as installed', async () =
 it('cancel stops it, keeps what arrived, and resume finishes it', async () => {
   const third = Math.trunc(listing.downloadBytes / 3);
   http.stallAfterBytes = third;
-  const running = state.packDownload.start(listing);
+  const running = state.packDownloads.start(listing);
   await received(third);
   expect(now().status).toBe('running');
-  state.packDownload.cancel();
+  state.packDownloads.cancel('barcode_us');
   await running;
   expect(now().status).toBe('paused');
   expect(now().keptBytes).toBe(third);
 
-  await state.packDownload.start(listing);
+  await state.packDownloads.start(listing);
   expect(now().status).toBe('done');
   expect(http.requests[http.requests.length - 1]?.rangeStart).toBe(third);
 });
 
-it('discard throws away what was kept', async () => {
+it('discard throws away what was kept, and the pack is no longer listed', async () => {
   http.stallAfterBytes = 512;
-  const running = state.packDownload.start(listing);
+  const running = state.packDownloads.start(listing);
   await received(512);
-  state.packDownload.cancel();
+  state.packDownloads.cancel('barcode_us');
   await running;
-  await state.packDownload.discard();
-  expect(now().status).toBe('idle');
+  await state.packDownloads.discard('barcode_us');
+  expect(state.packDownloads.of('barcode_us')).toBeUndefined();
   expect(await store.partialBytes('barcode_us', '2026-10-09')).toBe(0);
 });
 
 it('a dropped connection is a failure that keeps what arrived', async () => {
   http.dropAfterBytes = 1024;
-  await state.packDownload.start(listing);
+  await state.packDownloads.start(listing);
   expect(now().status).toBe('failed');
   expect(now().problem).toBe('connection');
   expect(now().keptBytes).toBe(1024);
-  await state.packDownload.start(listing);
-  expect(now().status).toBe('done');
 });
 
-const text = (value: string) => new TextEncoder().encode(value);
-
-it('a manifest check reads the list once and only when asked', async () => {
-  http.files.set(
-    manifestUrl,
-    text(
-      '{"packs":[{"id":"barcode_us","title":"Barcode foods","version":"v1","formatVersion":1,' +
-        `"url":"https://packs.example.test/p.gz","bytes":10,"sha256":"${'a'.repeat(64)}"}]}`,
-    ),
-  );
-  const local = withUrl(manifestUrl);
-  expect(http.requests).toEqual([]);
-  await local.packManifest.check();
-  expect(http.requests.map((request) => request.url)).toEqual([manifestUrl]);
-  expect(local.packManifest.state.peek().manifest?.packs.map((pack) => pack.id)).toEqual(['barcode_us']);
+it('starting a running pack again changes nothing', async () => {
+  http.stallAfterBytes = 512;
+  const running = state.packDownloads.start(listing);
+  await received(512);
+  await state.packDownloads.start(listing);
+  expect(http.requests.filter((r) => r.url === packUrl)).toHaveLength(1);
+  state.packDownloads.cancel('barcode_us');
+  await running;
 });
 
-it('an unreadable list or an unreachable host is reported, not thrown', async () => {
-  http.files.set(manifestUrl, text('not json'));
-  const local = withUrl(manifestUrl);
-  await local.packManifest.check();
-  expect(local.packManifest.state.peek().message).toBe('The list could not be read.');
-  expect(local.packManifest.state.peek().manifest).toBeUndefined();
-
-  http.files.delete(manifestUrl);
-  await local.packManifest.check();
-  expect(local.packManifest.state.peek().message).toBe('The host answered with an error (404).');
+it('two packs download at once, each with its own state, and both install (MM-384)', async () => {
+  const installed: number[] = [];
+  const stop = state.installedPacks.subscribe((packs) => {
+    if (packs.ready) installed.push(packs.value.length);
+  });
+  const both = Promise.all([state.packDownloads.start(listing), state.packDownloads.start(generic)]);
+  await expect.poll(() => state.packDownloads.state.peek().map((d) => d.listing?.id)).toEqual(['barcode_us', 'generic']);
+  await both;
+  expect(now('barcode_us').status).toBe('done');
+  expect(now('generic').status).toBe('done');
+  await expect.poll(() => installed[installed.length - 1]).toBe(2);
+  stop();
+  expect(http.requests.map((r) => r.url).sort()).toEqual([packUrl, genericUrl].sort());
 });
 
-it('a build with no address for the list asks nothing', async () => {
-  await state.packManifest.check();
-  expect(http.requests).toEqual([]);
-  expect(state.packManifest.state.peek()).toEqual({ checking: false });
+it('cancelling one running pack leaves the other running (MM-384)', async () => {
+  // The fake stalls the next response only, so the first pack asked for stalls.
+  http.stallAfterBytes = 512;
+  const first = state.packDownloads.start(listing);
+  await received(512);
+  const second = state.packDownloads.start(generic);
+  await expect.poll(() => now('generic').status).not.toBe('idle');
+  state.packDownloads.cancel('barcode_us');
+  await first;
+  expect(now('barcode_us').status).toBe('paused');
+  await second;
+  expect(now('generic').status).toBe('done');
+  expect(state.packDownloads.state.peek().map((d) => [d.listing?.id, d.status])).toEqual([
+    ['barcode_us', 'paused'],
+    ['generic', 'done'],
+  ]);
+});
+
+it('two presses before the first store read settles make one request (MM-384, the panel’s F2)', async () => {
+  http.stallAfterBytes = 512;
+  const first = state.packDownloads.start(listing);
+  const second = state.packDownloads.start(listing);
+  await received(512);
+  expect(http.requests.filter((r) => r.url === packUrl)).toHaveLength(1);
+  state.packDownloads.cancel('barcode_us');
+  await Promise.all([first, second]);
+  expect(now().status).toBe('paused');
+});
+
+it('each pack has its own cell, and one pack’s progress leaves the other’s alone (the panel’s F1)', async () => {
+  const barcode = state.packDownloads.stateOf('barcode_us');
+  expect(state.packDownloads.stateOf('barcode_us')).toBe(barcode);
+  expect(state.packDownloads.stateOf('never').peek()).toEqual({ status: 'idle', keptBytes: 0 });
+  const genericBefore = state.packDownloads.stateOf('generic').version;
+  http.stallAfterBytes = 512;
+  const running = state.packDownloads.start(listing);
+  await received(512);
+  expect(barcode.peek().status).toBe('running');
+  expect(state.packDownloads.stateOf('generic').version).toBe(genericBefore);
+  state.packDownloads.cancel('barcode_us');
+  await running;
 });

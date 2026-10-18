@@ -4,21 +4,54 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { stderr, stdout } from 'node:process';
 import { capture, run } from './proc.ts';
-import { foodSources } from './foodSource.ts';
+import { type FoodSource, foodSources } from './foodSource.ts';
+
+/** What the cache holds of each source file: the address it came from and the day it arrived (MM-388). */
+interface Downloaded {
+  readonly url: string;
+  readonly downloadedOn: string;
+}
+
+type Downloads = Record<string, Downloaded>;
+
+const downloadsFile = (cache: string) => `${cache}/downloads.json`;
+
+function readDownloads(cache: string): Downloads {
+  const file = downloadsFile(cache);
+  if (!existsSync(file)) return {};
+  try {
+    return JSON.parse(readFileSync(file, 'utf8')) as Downloads;
+  } catch {
+    return {};
+  }
+}
 
 /**
- * Downloads each source into `cache` (reusing what is already there) and
- * unpacks the zip files, then writes `provenance.json` with the date and the
- * versions. Returns a process exit code.
+ * Downloads each source into `cache` and unpacks the zip files, then writes
+ * `provenance.json` with each source's version and the day its file was
+ * downloaded. A file already in the cache is reused only when it came from
+ * the same address: a source pinned to a newer release is fetched again,
+ * and its unpacked folder replaced, so the provenance names a release only
+ * when that release's bytes are in the cache (MM-388, the panel's IN-11).
+ * Returns a process exit code.
  */
-export async function fetchFoodSources(cache: string): Promise<number> {
+export async function fetchFoodSources(
+  cache: string,
+  {
+    sources = foodSources,
+    fetch = globalThis.fetch,
+    today = new Date().toISOString().slice(0, 10),
+  }: { sources?: readonly FoodSource[]; fetch?: typeof globalThis.fetch; today?: string } = {},
+): Promise<number> {
   mkdirSync(cache, { recursive: true });
-  const today = new Date().toISOString().slice(0, 10);
-  for (const source of foodSources) {
+  const downloads = readDownloads(cache);
+  for (const source of sources) {
     const file = `${cache}/${source.fileName}`;
-    if (existsSync(file)) {
-      stdout.write(`reusing ${source.fileName}\n`);
+    const held = downloads[source.fileName];
+    if (existsSync(file) && held?.url === source.url) {
+      stdout.write(`reusing ${source.fileName} (downloaded ${held.downloadedOn})\n`);
     } else {
+      if (existsSync(file)) stdout.write(`${source.fileName} came from another address; downloading again\n`);
       stdout.write(`downloading ${source.url}\n`);
       const temp = `${file}.part`;
       const response = await fetch(source.url);
@@ -28,6 +61,9 @@ export async function fetchFoodSources(cache: string): Promise<number> {
       }
       await pipeline(Readable.fromWeb(response.body as never), createWriteStream(temp));
       renameSync(temp, file);
+      if (source.isZip) rmSync(`${cache}/${source.id}`, { recursive: true, force: true });
+      downloads[source.fileName] = { url: source.url, downloadedOn: today };
+      writeFileSync(downloadsFile(cache), JSON.stringify(downloads, null, 2));
     }
     if (source.isZip && !existsSync(`${cache}/${source.id}`)) {
       const code = await unzip(file, `${cache}/${source.id}`);
@@ -38,7 +74,7 @@ export async function fetchFoodSources(cache: string): Promise<number> {
     `${cache}/provenance.json`,
     JSON.stringify({
       builtOn: today,
-      sources: foodSources.map((source) => `${source.description} (downloaded ${today})`),
+      sources: sources.map((source) => `${source.description} (downloaded ${downloads[source.fileName]?.downloadedOn ?? today})`),
     }),
   );
   stdout.write(`sources ready in ${cache}\n`);
@@ -74,11 +110,12 @@ async function unzip(zip: string, into: string): Promise<number> {
 const webApp = 'apps/mobile';
 
 /**
- * `mm food fetch | build | package` (MM-52).
+ * `mm food fetch | build | package` (MM-52, MM-383).
  *
- *   mm food fetch [--cache DIR]      download the sources (reused if present)
- *   mm food build [--cache DIR] [--out DIR] [--prefer recent|off|usda_branded]
- *                                     extract with DuckDB, then build the packs
+ *   mm food fetch [--cache DIR]      download the sources (reused when from the same address)
+ *   mm food build [--cache DIR] [--out DIR] [--prefer reliability|recent|off|usda_branded]
+ *                                     extract with DuckDB, then build the packs; fails when a
+ *                                     configured source gives nothing
  *   mm food package --base-url https://...   compress the packs and write the
  *                                     manifest to publish (uploads nothing)
  *
@@ -116,7 +153,7 @@ export async function runFood(repoRoot: string, args: readonly string[]): Promis
       );
     }
     case 'build':
-      return build(repoRoot, cache, option('--out') ?? `${cache}/packs`, option('--prefer') ?? 'recent');
+      return build(repoRoot, cache, option('--out') ?? `${cache}/packs`, option('--prefer') ?? 'reliability');
     default:
       stderr.write('Usage: mm food <fetch|build|package> [--cache DIR] [--out DIR]\n');
       return 64;
@@ -159,6 +196,8 @@ async function build(repoRoot: string, cache: string, out: string, prefer: strin
       path(out),
       '--prefer',
       prefer,
+      '--expect',
+      foodSources.map((source) => source.id).join(','),
     ],
     { cwd: `${repoRoot}/${webApp}` },
   );

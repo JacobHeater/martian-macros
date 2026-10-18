@@ -62,8 +62,13 @@ match (across packs); the user's matching recent foods listed above database res
 or grams, macros updating, logged as a cup-or-spoon (serving) or weighed (grams) measurement; "Nothing found" and "no food
 database yet" both offer "Enter manually"; tests with the fixture pack.
 
-Not done: offering "scan its label" when nothing is found (MM-44 unbuilt); the user's saved foods and recipes (MM-45) ranking
-first, only recents do; collapsing branded variants under a generic one (results are a flat list, tier first); tuning ranking
+Since 2026-10-18 (MM-383) the packs' results list by the app's reliability score, then the text match: the order refines
+the tiers and never crosses them, so generic foods still come first. The person's saved foods and recipes (MM-45) and
+recents list above the packs' results (the add sheet draws them first).
+
+Not done: offering "scan its label" when nothing is found (MM-44 unbuilt); collapsing branded variants under a generic one
+(results are a flat list); paging or "More results", which FNDDS's foods as eaten make more pressing (a branded food whose
+name twenty generic foods share is reached by its barcode or by Saved until then); tuning ranking
 against the hundred most common US foods; the 150 ms bound measured on a phone (the pack-level search is timed in the
 food_catalog tests, the UI is not); search results are not paged. Reference-first ordering holds across packs, not within one
 pack's top 20.

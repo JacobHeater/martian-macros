@@ -31,6 +31,10 @@ export class InMemoryPackHttp implements PackHttp {
   /** Answer every request with this status instead of the file. */
   failWithStatus: number | undefined;
 
+  /** As `dropAfterBytes` and `stallAfterBytes`, for one address each, so two packs can behave differently (MM-384). */
+  readonly dropAt = new Map<string, number>();
+  readonly stallAt = new Map<string, number>();
+
   /** Whether the server honours `Range` (a real one does). */
   supportsRange = true;
 
@@ -51,10 +55,14 @@ export class InMemoryPackHttp implements PackHttp {
     if (file === undefined) return Promise.resolve({ statusCode: 404, body: empty, abort: () => undefined });
     const bytes: Uint8Array = file;
     const start = this.supportsRange ? (rangeStart ?? 0) : 0;
-    const drop = this.dropAfterBytes;
-    const stall = this.stallAfterBytes;
-    this.dropAfterBytes = undefined;
-    this.stallAfterBytes = undefined;
+    // A flag set for this address comes first; the one-shot flags apply to whatever is asked for next.
+    const at = url.toString();
+    const drop = this.dropAt.get(at) ?? this.dropAfterBytes;
+    const stall = this.stallAt.get(at) ?? this.stallAfterBytes;
+    if (this.dropAt.has(at)) this.dropAt.delete(at);
+    else this.dropAfterBytes = undefined;
+    if (this.stallAt.has(at)) this.stallAt.delete(at);
+    else this.stallAfterBytes = undefined;
     const chunkSize = this.chunkSize;
     let aborted = false;
     let release: (() => void) | undefined;

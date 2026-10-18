@@ -34,11 +34,16 @@ export class NativePackHttp implements PackHttp {
   }
 
   private arrived(chunk: PackHttpChunk): void {
+    // A chunk for a response nobody reads any more is dropped, not kept (MM-384, the panel's F5).
+    if (this.closed.has(chunk.request)) return;
     const arrivals = this.at(chunk.request);
     arrivals.chunks.push(chunk);
     arrivals.wake?.();
     arrivals.wake = undefined;
   }
+
+  /** Requests whose bodies were read to the end or aborted; chunks for them are dropped. */
+  private readonly closed = new Set<number>();
 
   async get(url: URL, options?: { rangeStart?: number | undefined }): Promise<PackResponse> {
     const start = options?.rangeStart;
@@ -46,7 +51,7 @@ export class NativePackHttp implements PackHttp {
       url: url.toString(),
       ...(start === undefined ? {} : { rangeStart: start }),
     });
-    const { api, arrivals } = this;
+    const { api, arrivals, closed } = this;
     const mine = this.at(request);
     return {
       statusCode: status,
@@ -67,10 +72,14 @@ export class NativePackHttp implements PackHttp {
             }
           } finally {
             arrivals.delete(request);
+            closed.add(request);
           }
         },
       },
       abort: () => {
+        // A response nobody reads must not keep its chunks (MM-384, the panel's F5).
+        arrivals.delete(request);
+        closed.add(request);
         void api.httpAbort({ request }).catch(() => undefined);
       },
     };

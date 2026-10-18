@@ -66,11 +66,11 @@ async function openScreen(url = '') {
 async function downloadingTo(megabytes: number) {
   const packs = await openScreen(manifestUrl);
   await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
-  const download = await packs.findByRole('button', { name: 'Download' });
+  const download = await packs.findByRole('button', { name: /^Download / });
   // Applies to the next answer, which is now the file and not the list.
   http.stallAfterBytes = megabytes * megabyte;
   await userEvent.click(download);
-  await packs.findByText(`${megabytes} MB of 46 MB`);
+  await packs.findByText(new RegExp(`${megabytes} MB of 46 MB`));
   return packs;
 }
 
@@ -103,7 +103,7 @@ it('opening the screen fetches nothing; the list is read when asked, and the dow
 
   // Nothing starts by itself.
   http.stallAfterBytes = megabyte;
-  await userEvent.click(packs.getByRole('button', { name: 'Download' }));
+  await userEvent.click(packs.getByRole('button', { name: /^Download / }));
   await expect.poll(() => http.requests.map((request) => request.url)).toEqual([manifestUrl, packUrl]);
 });
 
@@ -112,42 +112,42 @@ it('an unreachable host is reported and says nothing changed', async () => {
   const packs = await openScreen(manifestUrl);
   await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
   expect(await packs.findByText(/Nothing was changed/)).toBeInTheDocument();
-  expect(packs.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  expect(packs.getByRole('button', { name: /^Try again/ })).toBeInTheDocument();
 });
 
 it('a running download shows how far along it is, and Cancel works', async () => {
   const packs = await downloadingTo(12);
-  expect(packs.getByRole('heading', { name: 'Downloading' })).toBeInTheDocument();
-  await userEvent.click(packs.getByRole('button', { name: 'Cancel' }));
-  expect(await packs.findByRole('heading', { name: 'Paused' })).toBeInTheDocument();
+  expect(packs.getByText(/^Downloading ·/)).toBeInTheDocument();
+  await userEvent.click(packs.getByRole('button', { name: /^Cancel/ }));
+  expect(await packs.findByText(/^Paused ·/)).toBeInTheDocument();
 });
 
 it('a paused download can be resumed or discarded', async () => {
   const packs = await downloadingTo(20);
-  await userEvent.click(packs.getByRole('button', { name: 'Cancel' }));
+  await userEvent.click(packs.getByRole('button', { name: /^Cancel/ }));
   expect(await packs.findByText(/20 MB of 46 MB is kept/)).toBeInTheDocument();
 
   http.stallAfterBytes = 3 * megabyte;
-  await userEvent.click(packs.getByRole('button', { name: 'Resume' }));
-  expect(await packs.findByText('23 MB of 46 MB')).toBeInTheDocument();
+  await userEvent.click(packs.getByRole('button', { name: /^Resume/ }));
+  expect(await packs.findByText(/23 MB of 46 MB/)).toBeInTheDocument();
   // It asked for the rest, from where it stopped.
   expect(http.requests[http.requests.length - 1]?.rangeStart).toBe(20 * megabyte);
 
-  await userEvent.click(packs.getByRole('button', { name: 'Cancel' }));
-  await userEvent.click(await packs.findByRole('button', { name: 'Discard' }));
+  await userEvent.click(packs.getByRole('button', { name: /^Cancel/ }));
+  await userEvent.click(await packs.findByRole('button', { name: /^Discard/ }));
   await expect.poll(() => store.partialBytes('barcode_us', '2026-10-09')).toBe(0);
-  expect(await packs.findByRole('button', { name: 'Download' })).toBeInTheDocument();
+  expect(await packs.findByRole('button', { name: /^Download / })).toBeInTheDocument();
 });
 
 it('a failure says what happened to the old pack', async () => {
   http.files.set(manifestUrl, manifest('c'.repeat(64)));
   const packs = await openScreen(manifestUrl);
   await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
-  await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
+  await userEvent.click(await packs.findByRole('button', { name: /^Download / }));
   expect(await packs.findByText(/thrown away/, undefined, { timeout: 10000 })).toHaveTextContent(
     'Nothing on your phone changed',
   );
-  expect(packs.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  expect(packs.getByRole('button', { name: /^Try again/ })).toBeInTheDocument();
 });
 
 it('while a download runs, every screen shows a strip with Cancel', async () => {
@@ -164,7 +164,7 @@ it('while a download runs, every screen shows a strip with Cancel', async () => 
   // The strip stays on the next screen.
   expect(strip()).toHaveTextContent('Downloading Barcode foods, United States');
 
-  await userEvent.click(within(strip()?.closest('.mm-download-strip') as HTMLElement).getByRole('button', { name: 'Cancel' }));
+  await userEvent.click(within(strip()?.closest('.mm-download-strip') as HTMLElement).getByRole('button', { name: /^Cancel/ }));
   await expect.poll(strip).toBeNull();
   expect(await store.partialBytes('barcode_us', '2026-10-09')).toBe(23 * megabyte);
 });
@@ -184,12 +184,12 @@ it('a downloaded pack is listed, searched, and can be removed', async () => {
   await userEvent.click(settings.getByRole('button', { name: /^Food database/ }));
   const packs = within(topLayer());
   await userEvent.click(await packs.findByRole('button', { name: 'See what is available' }));
-  await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
+  await userEvent.click(await packs.findByRole('button', { name: /^Download / }));
   expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
   expect(await packs.findByText(/^Version 2026-10-09 · /)).toBeInTheDocument();
   expect(packs.queryByRole('button', { name: 'Up to date' })).not.toBeInTheDocument();
 
-  await userEvent.click(packs.getByRole('button', { name: 'Remove' }));
+  await userEvent.click(packs.getByRole('button', { name: /^Remove/ }));
   const sure = await screen.findByRole('dialog', { name: 'Remove this food database?' });
   await userEvent.click(within(sure).getByRole('button', { name: 'Remove' }));
   expect(await packs.findByText('Nothing downloaded yet')).toBeInTheDocument();
@@ -206,7 +206,7 @@ it('MM-346: an up-to-date pack is not offered for download again', async () => {
   await userEvent.click(settings.getByRole('button', { name: /^Food database/ }));
   const packs = within(topLayer());
   await userEvent.click(await packs.findByRole('button', { name: 'See what is available' }));
-  await userEvent.click(await packs.findByRole('button', { name: 'Download' }));
+  await userEvent.click(await packs.findByRole('button', { name: /^Download / }));
   expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
   expect(packs.queryByRole('button', { name: 'Up to date' })).not.toBeInTheDocument();
 });
@@ -239,5 +239,102 @@ it('MM-346: a different version listed than the one on the phone is offered as a
   http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
   const packs = await openScreen(manifestUrl);
   await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
-  expect(await packs.findByRole('button', { name: 'Update' })).toBeEnabled();
+  expect(await packs.findByRole('button', { name: /^Update / })).toBeEnabled();
+});
+
+// MM-384: two packs download at once, each behind its icon, each with its own progress and Cancel.
+it('MM-384: two listed packs download together, and cancelling one leaves the other running', async () => {
+  const genericUrl = 'https://packs.example.test/generic.pack.gz';
+  http.files.set(
+    manifestUrl,
+    new TextEncoder().encode(
+      '{"packs":[{"id":"generic","title":"Common foods","version":"2026-10-09",' +
+        `"formatVersion":1,"url":"${genericUrl}","bytes":${file.length},"sha256":"${fileSha}"},` +
+        '{"id":"barcode_us","title":"Barcode foods, United States","version":"2026-10-09",' +
+        `"formatVersion":1,"url":"${packUrl}","bytes":${file.length},"sha256":"${fileSha}"}]}`,
+    ),
+  );
+  http.files.set(genericUrl, file);
+  const packs = await openScreen(manifestUrl);
+  await userEvent.click(packs.getByRole('button', { name: 'See what is available' }));
+  const common = await packs.findByRole('button', { name: 'Download Common foods' });
+  expect(packs.getByRole('button', { name: 'Download Barcode foods, United States' })).toBeEnabled();
+  http.stallAfterBytes = 10 * megabyte;
+  await userEvent.click(common);
+  await packs.findByText(/10 MB of 46 MB/);
+  http.stallAfterBytes = 20 * megabyte;
+  await userEvent.click(packs.getByRole('button', { name: 'Download Barcode foods, United States' }));
+  await packs.findByText(/20 MB of 46 MB/);
+  // Two cards, two strip lines, each with its own Cancel.
+  expect(packs.getAllByText(/^Downloading ·/)).toHaveLength(2);
+  const strips = document.querySelectorAll('.mm-download-strip [role="status"]');
+  expect([...strips].map((s) => s.textContent)).toEqual([
+    'Downloading Common foods, 20 percent',
+    'Downloading Barcode foods, United States, 40 percent',
+  ]);
+  await userEvent.click(packs.getByRole('button', { name: 'Cancel downloading Common foods' }));
+  expect(await packs.findByText(/^Paused ·/)).toBeInTheDocument();
+  expect(packs.getByText(/^Downloading ·/)).toBeInTheDocument();
+  expect(document.querySelectorAll('.mm-download-strip')).toHaveLength(1);
+  expect(await store.partialBytes('generic', '2026-10-09')).toBe(10 * megabyte);
+});
+
+// MM-385: removing a pack takes its finished download's notice with it.
+it('MM-385: removing a pack takes its finished notice with it', async () => {
+  const d = await fixtureDownload();
+  http = new InMemoryPackHttp([[packUrl, d.gz]]);
+  http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
+  open(manifestUrl);
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Food database/ }));
+  const packs = within(topLayer());
+  await userEvent.click(await packs.findByRole('button', { name: 'See what is available' }));
+  await userEvent.click(await packs.findByRole('button', { name: /^Download / }));
+  expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
+  await userEvent.click(packs.getByRole('button', { name: /^Remove/ }));
+  const sure = await screen.findByRole('dialog', { name: 'Remove this food database?' });
+  await userEvent.click(within(sure).getByRole('button', { name: 'Remove' }));
+  expect(await packs.findByText('Nothing downloaded yet')).toBeInTheDocument();
+  expect(packs.queryByText('Barcode foods, United States is on your phone.')).not.toBeInTheDocument();
+  expect(await packs.findByRole('button', { name: /^Download / })).toBeInTheDocument();
+});
+
+// MM-384, the UX guard's F1: what a screen reader hears moves in ten-percent steps, not every percent.
+it('the strip is spoken at ten-percent steps', async () => {
+  const packs = await downloadingTo(12);
+  const status = () => document.querySelector<HTMLElement>('.mm-download-strip [role="status"]')?.textContent;
+  expect(status()).toBe('Downloading Barcode foods, United States, 20 percent');
+  http.stallAfterBytes = 2 * megabyte;
+  await userEvent.click(packs.getByRole('button', { name: /^Cancel/ }));
+  await packs.findByText(/^Paused ·/);
+  await userEvent.click(packs.getByRole('button', { name: /^Resume/ }));
+  await packs.findByText(/14 MB of 46 MB/);
+  expect(status()).toBe('Downloading Barcode foods, United States, 30 percent');
+});
+
+// MM-384, the UX guard's F2: a control that goes with its card hands focus to a neighbour, never to the page body (MM-379).
+it('focus stays on a control after the icon, Cancel and Remove take their controls away', async () => {
+  const d = await fixtureDownload();
+  http = new InMemoryPackHttp([[packUrl, d.gz]]);
+  http.files.set(manifestUrl, manifest(d.listing.sha256, d.gz.length));
+  open(manifestUrl);
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Food database/ }));
+  const packs = within(topLayer());
+  await userEvent.click(await packs.findByRole('button', { name: 'See what is available' }));
+  http.stallAt.set(packUrl, 512);
+  await userEvent.click(await packs.findByRole('button', { name: /^Download / }));
+  await packs.findByText(/^Downloading ·/);
+  expect(document.activeElement).not.toBe(document.body);
+  expect(document.activeElement?.tagName).toBe('BUTTON');
+  await userEvent.click(packs.getByRole('button', { name: /^Cancel downloading/ }));
+  await packs.findByText(/^Paused ·/);
+  expect(document.activeElement?.tagName).toBe('BUTTON');
+  await userEvent.click(packs.getByRole('button', { name: /^Resume/ }));
+  expect(await packs.findByText('Barcode foods, United States is on your phone.')).toBeInTheDocument();
+  await userEvent.click(packs.getByRole('button', { name: /^Remove/ }));
+  const sure = await screen.findByRole('dialog', { name: 'Remove this food database?' });
+  await userEvent.click(within(sure).getByRole('button', { name: 'Remove' }));
+  await packs.findByText('Nothing downloaded yet');
+  expect(document.activeElement?.tagName).toBe('BUTTON');
 });

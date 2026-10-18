@@ -84,6 +84,10 @@
   color: var(--text3);
   cursor: default;
 }
+/* The action kind: the icon form of the text button, a solid Ember glyph and no plate (MM-384). */
+.mm-icon-button-action:not(:disabled) {
+  color: var(--ember);
+}
 /* The add plate: a quiet plate with the plus in Ember; pressed, hovered or
    focused it fills Ember. Ember is never a tint (MM-276). */
 .mm-icon-button-plate {
@@ -1004,6 +1008,9 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
   color: var(--text);
   animation: mm-fade-in var(--motion-fade) ease-out;
+  /* A long message at large text scrolls inside the bubble, so its button stays reachable (MM-382, the UX guard's F3). */
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
 }
 .mm-popover-title {
   margin: 0;
@@ -1273,12 +1280,22 @@
   min-height: 0;
 }
 
+/* The strip lines, one per running download (MM-384): the safe-area inset once, on the container, a hairline above and between. */
+.mm-download-strips {
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--outline);
+  background: var(--raised);
+}
 .mm-download-strip {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding: var(--space-8) var(--space-8) calc(var(--space-8) + env(safe-area-inset-bottom)) var(--space-16);
+  min-height: 48px;
+  padding: 0 var(--space-8) 0 var(--space-16);
   background: var(--raised);
+}
+.mm-download-strip + .mm-download-strip {
+  border-top: 1px solid var(--outline);
 }
 .mm-download-strip-text {
   display: flex;

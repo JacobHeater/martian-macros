@@ -118,9 +118,10 @@ method, reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`):
 - Design system: `Overlays › Popover`, and the badges in `Components`.
 
 ## Notes
-- MM-369 is done (`docs/food-grades.md`). The method's inputs are sugars, saturated fat, sodium and fiber; the packs
-  published 2026-10-09 are format 1 and carry no sugars or saturated fat, so every pack food shows the question mark
-  naming them until a format 2 pack is published (MM-307). A food of the person's own that states them is graded now.
+- **The method is MM-380's since 2026-10-18** (built as MM-382): the app's own, nutrient density per calorie. It requires
+  calories, the macros, fiber and sodium, which the format 1 packs state for most foods, and counts sugars, saturated fat
+  and the vitamins and minerals when stated, which a format 2 pack would add (MM-381). MM-369's published tables, which
+  needed sugars and saturated fat and so graded no pack food, are withdrawn.
 - At 200% text and on a 320 px phone, the entry's calories, grade and "More actions" leave the name a narrow column ("Peanut /
   butter"), readable and not cut (the panel's UX-11, PD-12). Moving the calories and grade under the name at large text is a
   proposal for when the grades are built, with MM-91's large-text pass.

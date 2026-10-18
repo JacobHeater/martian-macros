@@ -50,7 +50,12 @@ async function rowsOf(path: string) {
   // The Dart extract carries no micronutrients, so every one is unknown.
   expect(dump.micros.flat().every((value) => value === null)).toBe(true);
   const { micros: _micros, ...dartColumns } = dump;
-  return dartColumns;
+  return withoutTerms(dartColumns);
+}
+
+/** The licence and attribution are the app's current words (MM-57, MM-383), not pipeline output; they are compared apart. */
+function withoutTerms<T extends { header: unknown[][] }>(pack: T): T {
+  return { ...pack, header: pack.header.filter(([key]) => key !== 'license' && key !== 'attribution') };
 }
 
 for (const [prefer, policy] of Object.entries(policies) as [keyof typeof recorded, ConflictPolicy][]) {
@@ -63,7 +68,7 @@ for (const [prefer, policy] of Object.entries(policies) as [keyof typeof recorde
     expect(readFileSync(join(dir, 'report.txt'), 'utf8')).toBe(dart.report);
     expect(dart.packs.generic.foods.length).toBe(46);
     expect(dart.packs.barcode_us.foods.length).toBe(96);
-    expect(await rowsOf(join(dir, 'generic.pack'))).toEqual(dart.packs.generic);
-    expect(await rowsOf(join(dir, 'barcode_us.pack'))).toEqual(dart.packs.barcode_us);
+    expect(await rowsOf(join(dir, 'generic.pack'))).toEqual(withoutTerms(dart.packs.generic));
+    expect(await rowsOf(join(dir, 'barcode_us.pack'))).toEqual(withoutTerms(dart.packs.barcode_us));
   });
 }

@@ -1,108 +1,144 @@
-# How a food is graded (MM-369)
+# How a food is graded (MM-380, MM-382)
 
-The spike's report, 2026-10-18. The nutrition role's research is in
-`docs/agent-runs/mm369-grading-method/findings/nutrition.md`; the chair
-measured the coverage and chose where the report leaves a choice.
+The spike's report, 2026-10-18, replacing the one of the same morning that
+had adopted a published label's point tables (MM-369): the product owner
+withdrew that the same day. The method below is the app's own. The panel's
+nutrition, micronutrients, measurement and integrations roles reviewed the
+draft (`docs/agent-runs/mm380-proprietary-grade/`); every figure is a
+judgement, recorded in the evidence register, and held to the calibration set
+below in `apps/mobile/test/engine/foodGrade.test.ts`.
 
 ## The method
 
-Every food is graded for the food itself, per 100 g, with the **point tables of
-the general-foods algorithm published for the Nutri-Score label by Santé
-publique France's Scientific Committee (2023 update)**, read from Open Food
-Facts' implementation (`Nutriscore.pm`) and the German Wikipedia table; the
-official FAQ V11 PDF could not be read by the role and is still to be checked
-against. It was chosen over the Health Star Rating and the UK nutrient profiling
-model because its 2023 revision made the fruit, vegetable and legume component
-purely additive: the one input the pack lacks costs a bounded 0 to 5 points and
-does not change which other components count, where the other two methods gate
-protein on it or need a food category to pick a table.
+Every food is graded for the food itself, from **what it gives per calorie**:
+the same grade for every person, whatever the amount eaten. Protein, fiber and
+the vitamins and minerals the app tracks count for a food; sodium, sugars,
+saturated fat and calories per gram count against it. The score is the points
+for less the points against, and the letter is one of twelve steps.
 
-The score is unfavourable points for energy (kJ), total sugars, saturated fat
-and salt (sodium × 2.5), less favourable points for fiber and, while the
-unfavourable points are under 11, protein. Every threshold is a strict
-"greater than"; no input is rounded. The tables are `FoodGradeRule` in the
-engine and rows in the evidence register.
+| Component | Read per | Counts | Points |
+|---|---|---|---|
+| Protein | 100 kcal | for | 1.5, 3, 4.5, 6, 8, 10, 12.5, 15 g (max 8) |
+| Fiber | 100 kcal | for | 0.7, 1.4, 2.1, 2.8, 3.5, 4.5, 6 g (max 7) |
+| Vitamins and minerals | 100 kcal | for | the mean share of the US Daily Value over the ones stated, each capped at 100%: 2.5, 5, 7.5, 10, 15, 20% (max 6); never more points than the food has nutrients at 5% or more; at most 3 when its counted sugars pass 8 g per 100 kcal |
+| Calories per gram | the food | against | 3, 4, 5, 6, 7.5 kcal/g (max 5) |
+| Sodium | 100 kcal, or 40 kcal for a food under 40 kcal per 100 g | against | 120, 240, 360, 480, 600, 800, 1000, 1500, 2000, 3000, 5000, 8000, 10000, 14000 mg (max 14) |
+| Sugars, when stated | as sodium | against | 3, 6, 9, 12, 16, 20, 25, 30 g (max 8), scaled by the waiver |
+| Saturated fat, when stated | as sodium | against | 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 g (max 6) |
 
-The grades are **not Nutri-Scores** and the app never says they are (the
-trademark position below). They differ from the label in five documented ways:
+A list "for" gives a point per threshold the value reaches; a list "against"
+one per threshold it passes, so a value exactly on a threshold gets the
+benefit of the doubt. What counts for a food is read per 100 kcal whatever its
+calories, so a vegetable's density is its own; what counts against it is read
+per 40 kcal at least, so a broth's label rounding does not become whole points.
 
-1. **No fruit, vegetable and legume share.** Whole fruit grades one to two
-   steps lower than the label would (an apple B-, a banana C+); vegetables and
-   legumes mostly keep their letter.
-2. **One table for every food.** Drinks grade higher than the label's beverage
-   table would (a cola B-); oils, nuts and cheese lower than their own tables
-   would (olive oil D-, almonds C, cheddar D-). The pack has no category to tell
-   them apart; a category column in a later pack format is the fix.
-3. **Twelve steps, no E.** The published letters are A ≤ 0, B 1–2, C 3–10,
-   D 11–18, E ≥ 19. Here: A+ ≤ −6, A −5…−3, A- −2…0, B+ 1, B 2, B- 3, C+ 4–5,
-   C 6–7, C- 8–10, D+ 11–14, D 15–18, D- ≥ 19. B- takes the published C's first
-   point and E is folded into D-. The splits are not equal.
-4. **Alcoholic drinks are not graded**, read as more than 1.2 g of alcohol per
-   100 g (the label's 1.2% by volume, read by weight).
-5. **A missing value is never zero** (MM-310): a food is graded only when it
-   states sugars, saturated fat, sodium and fiber; otherwise the question mark
-   names what is missing.
+**The sugars waiver** stands in for the intrinsic sugars of fruit and dairy,
+which the sources do not tell from added sugars. A watery food (under
+1.5 kcal per gram; the waiver fades out by 2) has its sugars points waived by
+how far its fiber or protein per 100 kcal has climbed a ramp: fully at 1 g of
+fiber or 4.5 g of protein, by half at 0.75 g or 3.4 g, not at all at 0.5 g or
+2.25 g. A sweetened cereal with added fiber, a granola bar, dried fruit, honey
+and chocolate keep their sugars points. A sweetened drink with protein, a
+flavoured yogurt or canned fruit in syrup leak through; an added-sugars column
+in a later pack format closes them.
+
+**The vitamins and minerals** are potassium, calcium, iron, magnesium, zinc and
+vitamins A, C, D, B12 and folate, each against the Daily Value on the US food
+label (21 CFR 101.9(c)(8)(iv)), one reference for everyone; sodium, sugars,
+saturated fat and cholesterol are limits, not amounts to reach, and are not in
+it. The component counts when a food states at least four of the ten (the
+four a US label must state), over the ones stated; a label that states one
+rich nutrient cannot outscore a full profile, because the points are bounded
+by how many nutrients reach 5% of their Daily Value per 100 kcal. A stated
+zero is a small amount (a label may write zero under 2% of the Daily Value)
+and counts as stated. Fortification counts as the label states it.
+
+**The letters**, as the lowest score each step reaches: A+ 16, A 13, A- 10,
+B+ 7, B 5, B- 3, C+ 1, C −1, C- −3, D+ −5, D −8, and D- below. A step is about
+the resolution of the inputs: a label may be 20% off and comply, so
+neighbouring letters are not a ranking to act on, and the calibration test
+holds that 5% on a food's calories moves it at most one step and 20% at most
+two.
+
+**Not graded:** an alcoholic drink (more than 1.2 g of alcohol per 100 g); a
+food under 10 kcal per 100 g (broth, coffee, a diet drink), which has almost
+nothing to grade per calorie; an estimate; an entry whose grams are not known;
+a recipe, whose ingredients carry no fiber or sodium; and a food that does not
+state fiber or sodium, since a missing value is never zero (MM-310).
 
 ## Inputs
 
 | Food | Per 100 g from |
 |---|---|
-| A pack food | its values, which are per 100 g; sugars and saturated fat from its micronutrients |
+| A pack food | its values, which are per 100 g; sugars, saturated fat and the vitamins and minerals from its micronutrients when the pack carries them |
 | A food of the person's own | its serving's values ÷ the serving's grams × 100; no grade without a serving weight |
-| A recipe | not graded yet: its ingredients carry only the four macros |
-| A logged entry | its totals ÷ the grams it was logged as × 100, so the amount eaten does not change it; an estimate is not graded; an entry whose grams are not known (typed totals, a hand portion before the hand model, an entry from before portions were kept) is not graded |
+| A recipe | not graded: its ingredients carry only the four macros |
+| A logged entry | its totals ÷ the grams it was logged as × 100, so the amount eaten does not change it |
 | A meal or a day | the calorie-weighted mean of its graded entries' scores, rounded half up, when they carry at least 70% of its calories; otherwise the question mark says the share |
+
+A graded food says, when its badge is pressed, what its source left unstated
+and so was not counted: sugars, saturated fat, or the vitamins and minerals
+(naming how many of the ten are stated), and when the component was counted
+from fewer than ten.
+
+## The calibration set
+
+Approximate USDA SR Legacy values per 100 g, recollected and checked for
+order, not the pack's own (`apps/mobile/test/support/gradeCalibrationFoods.ts`
+lists every input). The test holds each letter, at least two foods on every
+step, the dry and cooked states of oats within a step, the milks in order,
+grapes at C+ or better, pickles below eggs, and the sensitivity bounds above.
+
+| Letter | Foods |
+|---|---|
+| A+ | spinach, broccoli, white mushrooms, iceberg lettuce |
+| A | celery, Swiss chard, lentils, edamame |
+| A- | canned green beans, nonfat Greek yogurt, firm tofu, canned tuna, skim milk, baked sweet potato |
+| B+ | roasted chicken breast, fortified whole-grain oat cereal, farmed salmon, 80/20 ground beef, whey protein powder, 2% milk |
+| B | apple, avocado, hard-boiled egg, oats cooked in water, whole-wheat bread, banana, protein bar, dry oats |
+| B- | watermelon, whole milk, low-fat fruit yogurt, deli ham, plain whole-milk yogurt, white bread, cooked pasta, fortified sweetened cereal, almonds, dill pickles |
+| C+ | cooked brown rice, cheese pizza, grapes, cooked white rice |
+| C | soy sauce, orange juice, salted peanut butter |
+| C- | walnuts, potato chips, cooked bacon, cheddar, vanilla ice cream |
+| D+ | raisins, 70% dark chocolate, sandwich cookies |
+| D | olive oil, cola, gummy candy, sweetened condensed milk, milk chocolate, honey, lard |
+| D- | salted butter, coconut oil |
+
+What the panel flagged as owned by the method rather than a threshold, and
+disclosed rather than fixed: lean red meat at or above chicken (zinc and B12,
+a feature of every per-calorie micronutrient index); walnuts beside chips (the
+ten nutrients exclude vitamin E and the fats' kind); refined grains a single
+step under whole grains (enrichment); fortified foods earning the component as
+their label states; chips and salted butter paying nothing for sodium per
+calorie while brined foods pay in full; a grade without sugars, saturated fat
+or micronutrients when the pack does not carry them.
 
 ## Coverage
 
-Measured on the packs published 2026-10-09 (`manifest.json`, format version 1):
+Measured on the packs published 2026-10-09 (format 1) with the new method's
+requirements:
 
-| Pack | Foods | Fiber stated | Sodium stated | Both | Sugars or saturated fat stated |
-|---|---|---|---|---|---|
-| Common foods (`generic`) | 8,088 | 7,360 (91.0%) | 7,997 (98.9%) | 7,349 (90.9%) | 0: format 1 has no such columns |
-| Barcode foods, United States (`barcode_us`) | 456,191 | 387,381 (84.9%) | 450,445 (98.7%) | 384,613 (84.3%) | 0 |
+| Pack | Foods | Fiber and sodium stated, 10 kcal or more | Under 10 kcal per 100 g | Fiber stated as 0 |
+|---|---|---|---|---|
+| Common foods (`generic`) | 8,088 | 7,270 (89.9%) | 99 (1.2%) | 3,370 (41.7%, analysed zeros: meat, dairy, oils) |
+| Barcode foods, United States (`barcode_us`) | 456,191 | 377,606 (82.8%) | 23,065 (5.1%) | 138,807 (30.4%) |
 
-So **no pack food can be graded until a format 2 pack is published** (MM-307
-added the sugars and saturated fat columns to the pipeline; the published packs
-predate it). Once it is, the share of foods with a grade will be at most the
-"both" column, less those missing sugars or saturated fat, which the pack build
-report's `coverage.txt` will show. Until then grades appear on the person's own
-foods that state those values (a label read or typed), and every pack food shows
-the question mark naming sugars and saturated fat. The nutrient that most often
-blocks a grade today is saturated fat and sugars, by absence; after the rebuild
-it will be fiber.
+So about nine in ten common foods and five in six barcode foods are graded
+today, without sugars, saturated fat or the vitamins and minerals, and their
+popover says so. The panel's nutrition role pointed out what that means on day
+one: a cola scores 0 and grades C until a format 2 pack states its sugars.
+The owner chose to grade now rather than wait (MM-380); the format 2 rebuild
+with a third source (MM-381, MM-383) is what completes the grades.
 
-**Follow-ups:** rebuild and publish the packs in format 2 (`mm food`); a
-`category` column in a later format for the fruit, vegetable and legume proxy
-and the beverage, fats, cheese and red-meat tables; recipe ingredients carrying
-fiber, sodium and the label micronutrients.
+## Naming
 
-## Licensing and naming
-
-The Nutri-Score logo is a collective mark of Santé publique France (registered
-at EUIPO and INPI); use of the logo needs the owner's consent and is granted to
-registered food businesses under Conditions of Use (March 2025) and a Graphic
-Charter. The app:
-
-- never says "Nutri-Score" on a badge, its accessible name, a popover or a screen
-  title, and never says a food "has Nutri-Score B";
-- draws no five-letter A–E strip, no dark-green-to-red ramp, no logo: one letter
-  with + or −, categorical fills (A mint, B sunflower, C periwinkle, D orchid),
-  no red, no E;
-- names the method once, in the evidence register's "How is a food graded?"
-  entry, with the differences and the statement that the grades are not
-  Nutri-Scores and the app is not registered.
-
-The Conditions of Use PDF was not readable by the role and has not been read
-for clauses on applications or text references; that read, and whether to
-notify Santé publique France, are the product owner's (and the attorney's,
-MM-242) to settle. The role is not a lawyer; the owner's jurisdiction was not
-researched.
+The grade is unnamed: badges and popovers say "Grade B+ for Lunch". The
+method is the app's own and names no outside model as its basis; the
+evidence register's "How is a food graded?" entry describes it, and the
+nutrient-density literature (per-100 kcal indices against Daily Values) is
+cited there as context, not validation. Nothing the app draws resembles a
+published label.
 
 ## What was decided
 
-- The method, the twelve steps and the alcohol threshold as above (the role's
-  recommendation, taken as is).
-- Ship with the deviations disclosed rather than wait for a pack category.
-- Alcohol and missing data read alike in a meal's popover (a share of calories
-  that could be graded).
+Recorded in `docs/agent-runs/mm380-proprietary-grade/decision.md` and MM-380.

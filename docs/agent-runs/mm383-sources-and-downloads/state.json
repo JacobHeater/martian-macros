@@ -1,0 +1,558 @@
+{
+  "schema_version": 1,
+  "task_id": "mm383-sources-and-downloads",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "spike/proprietary-food-grade",
+    "commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "The FNDDS wiring, the thrown error for an unknown source, the generic precedence policy, the coverage rows and the publish gate, the terms text, the reliability score's bases and modifiers, the owner's next commands.",
+      "role": "integrations",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-383",
+          "MM-384",
+          "MM-381",
+          "MM-51",
+          "MM-153",
+          "MM-57",
+          "MM-42",
+          "the pipeline end to end",
+          "the catalog's search and barcode paths",
+          "the format and label code"
+        ],
+        "not_inspected": [
+          "writePackFile.ts",
+          "csvRows*.ts",
+          "the Android plugin",
+          "the download controller and screen",
+          "the published data repository",
+          "tool/test/"
+        ],
+        "referrals": [
+          "product (the scan rule with one barcode pack; FNDDS wording)",
+          "micronutrients (Foundation against SR Legacy completeness)",
+          "privacy-security and the attorney (licence text)",
+          "QA (the build and the zip listing)"
+        ],
+        "limitations": "No command run; the survey zip's layout is a hypothesis until listed."
+      },
+      "research": {
+        "status": "performed",
+        "question": "The FNDDS CSV layout and portion rows; retired codes; what each FDC type is; the label tolerance rule; USDA's citation form.",
+        "reason": "The brief's questions and the earlier run's open hypothesis.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://github.com/JacobHeater/martian-macros/blob/main/docs/agent-runs/mm383-sources-and-downloads/findings/integrations.md",
+            "title": "integrations report, Sources and evidence",
+            "published_or_updated": "2026-10-18",
+            "accessed": "2026-10-18",
+            "claim": "Every source the role opened is listed there with its access date and what it supports."
+          }
+        ],
+        "summary": "The FDC download, API guide, documentation and help pages; the ARS FNDDS pages; 21 CFR 101.9 (LII); search extracts of the FDC data dictionary and the FNDDS documentation. Sources listed in the report.",
+        "limitations": "The data dictionary and the FNDDS PDFs could not be read as text."
+      }
+    },
+    {
+      "task": "The search order against MM-42 and MM-153, what a person sees with FNDDS added, the barcode rule against the build's conflict policy, where the score may appear, the acceptance criteria of both tickets, MM-384's scope against MM-56.",
+      "role": "product",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-383",
+          "MM-384",
+          "MM-42",
+          "MM-153",
+          "MM-56",
+          "MM-51",
+          "MM-57",
+          "MM-43",
+          "MM-381",
+          "the catalog, pipeline, screen and download code as being built",
+          "the register screens"
+        ],
+        "not_inspected": [
+          "foodSource.ts",
+          "extract.sql",
+          "BuildReport.ts",
+          "the native plugin",
+          "the designer's and UX guard's areas"
+        ],
+        "referrals": [
+          "integrations (the barcode rule, the disagreement mark, the name key)",
+          "micronutrients (the precedence key)",
+          "ux-accessibility (Cancel naming, two status lines)",
+          "react-capacitor (the screen per pack)",
+          "chair (the stale register entry)"
+        ],
+        "limitations": "Inputs changed during the review; nothing run or rendered."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The repository answers the product questions.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The controller as per-pack state in cells, two downloads sharing the store and the native adapter, memory of two concurrent base64 streams, the fake's flags, the tests that must exist.",
+      "role": "react-capacitor",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-384",
+          "MM-56",
+          "the controller, state cells, download engine, native adapter and plugin, screen, strip, stories and tests"
+        ],
+        "not_inspected": [
+          "MmDbPlugin.kt",
+          "SqliteFoodPack beyond close",
+          "Capacitor's Android runtime",
+          "the Vite build"
+        ],
+        "referrals": [
+          "ux-accessibility (icon names, two status lines)",
+          "product-designer (the card as a row, the stacked strip)",
+          "integrations (the native seam)",
+          "QA (emulator checks)"
+        ],
+        "limitations": "No test run, no render, no device; two Capacitor runtime claims unverified."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The chair's instruction; the repository's code answers the questions.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "The Capacitor runtime is not in the tree as source."
+      }
+    },
+    {
+      "task": "The download icon on the pack card, two cards and two strip lines, the grade popover's words as laid out, the three palettes, against the nearest siblings.",
+      "role": "product-designer",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "render-inspection",
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the renders under the chair's scratchpad shots8 and shots8b",
+          "the pack screen components and CSS",
+          "the icon and text buttons",
+          "FoodGrade.tsx",
+          "the stories"
+        ],
+        "not_inspected": [
+          "a phone"
+        ],
+        "referrals": [],
+        "limitations": "Renders at 412 by 915 only."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "A design review of renders.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Task walkthroughs, accessible names and targets, focus after the icon goes, the strip lines' status roles and rate, contrast, 200% text and 320 px, the popover's words at length; PASS or BLOCK.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "render-inspection",
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the renders under the chair's scratchpad shots8 and shots8b",
+          "the pack screen components, the strip, the buttons, the controller, the tests, the stories",
+          "FoodGrade.tsx"
+        ],
+        "not_inspected": [
+          "a phone",
+          "renders at 200% text or 320 px"
+        ],
+        "referrals": [],
+        "limitations": "Reasoned from source and CSS where no render exists."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "A UX and accessibility review of renders and source.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs; its synthesis is the tickets, docs/food-packs-data.md and decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training rule.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The grade's run covered the data questions.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "micronutrients",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As nutrition.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No coaching words change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The grade's run covered the measurement questions.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Ordering by provenance is not a health claim; the eating-disorder rules are untouched.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "architecture",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The layers test holds the boundaries; the React role covered the state shape.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "privacy-security",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Two concurrent requests reveal to the host what one does; no new data leaves the phone.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "qa",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The chair ran the tests and rendered the stories.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/qa.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM383-scan-rule",
+      "status": "accepted",
+      "summary": "The build's conflict policy is the reliability score (ReliabilityPolicy, the default); the cross-pack choice stays for a second barcode pack.",
+      "authority": "Chair, on the owner's delegation of the scan ranking"
+    },
+    {
+      "id": "MM384-controller",
+      "status": "accepted",
+      "summary": "One cell per pack with a derived ordered list, a starting guard, coalesced catalog re-opens, per-address stall flags in the fake, a forget on Remove (MM-385).",
+      "authority": "Chair, on the React role's findings"
+    },
+    {
+      "id": "mm383-sources-and-downloads-owner-3",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: the choices listed in MM-383 and MM-384 as 'say if any is wrong'.",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    },
+    {
+      "id": "mm383-sources-and-downloads-owner-4",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: the first pack build and publish (docs/food-packs-data.md); the fifty-package hand check (MM-51).",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    },
+    {
+      "id": "mm383-sources-and-downloads-owner-5",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: MM-386 and MM-387; whether a finished notice clears on leaving the screen.",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/foodPipeline/thirdSource.test.ts test/foodCatalog/sourceReliability.test.ts test/state/packDownloadController.test.ts test/settings/foodDatabase.test.tsx; cd tool; npx vitest run test/foodFetch.test.ts",
+      "result": "passed",
+      "summary": "The third source, the policy, one name one food, the gate, the coverage rows, the scores and order, the scan across packs, two downloads at once, the stale notice, the fetch cache.",
+      "commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T12:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test or reach a device; the chair rendered the stories and ran the tests."
+    }
+  ]
+}
