@@ -46,6 +46,9 @@ Scenario: Licensing is checked
 ```
 
 ## Progress
+- **Superseded 2026-10-18 by MM-380.** The product owner withdrew the published tables the same day: the grade is to be the
+  app's own method, nutrient density per calorie (MM-380, built as MM-382). The report below is kept as the record of what
+  was chosen and why; `docs/food-grades.md` now describes the app's own method.
 - Done 2026-10-18: `docs/food-grades.md`, from the nutrition role's research (`docs/agent-runs/mm369-grading-method/`).
   The method is the general-foods point tables published for the Nutri-Score label (2023 update), on twelve steps, with
   five documented differences (no fruit, vegetable and legume share; one table for every food; twelve steps with no E;

@@ -123,6 +123,13 @@ COPY (
     FROM read_csv('{{cache}}/usda_sr_legacy/food.csv', header = true,
                   all_varchar = true, ignore_errors = true)
     WHERE data_type = 'sr_legacy_food'
+    UNION ALL
+    -- FNDDS 2021-2023 (MM-383): foods as eaten, compiled by USDA for the
+    -- national dietary survey; the same CSV layout and nutrient ids.
+    SELECT 'usda_fndds', fdc_id, description
+    FROM read_csv('{{cache}}/usda_fndds/food.csv', header = true,
+                  all_varchar = true, ignore_errors = true)
+    WHERE data_type = 'survey_fndds_food'
   ),
   nut_all AS (
     SELECT 'usda_foundation' AS source, * FROM read_csv(
@@ -132,6 +139,12 @@ COPY (
     SELECT 'usda_sr_legacy', * FROM read_csv(
       '{{cache}}/usda_sr_legacy/food_nutrient.csv', header = true,
       all_varchar = true, ignore_errors = true)
+    UNION ALL
+    -- The survey download may carry rows of other data types too (the panel's IN-14): only FNDDS foods' rows are read.
+    SELECT 'usda_fndds', n.* FROM read_csv(
+      '{{cache}}/usda_fndds/food_nutrient.csv', header = true,
+      all_varchar = true, ignore_errors = true) n
+    WHERE n.fdc_id IN (SELECT fdc_id FROM fd WHERE source = 'usda_fndds')
   ),
   nut AS (
     SELECT source, fdc_id,
@@ -175,6 +188,16 @@ COPY (
     SELECT 'usda_sr_legacy', * FROM read_csv(
       '{{cache}}/usda_sr_legacy/food_portion.csv', header = true,
       all_varchar = true, ignore_errors = true)
+    UNION ALL
+    -- FNDDS portions (the panel's IN-13): the amount sits in the description, a
+    -- numeric portion code may sit in the modifier (dropped), and a "Quantity
+    -- not specified" portion carries no measure (dropped).
+    SELECT 'usda_fndds', p.* REPLACE (CASE WHEN regexp_matches(p.modifier, '^\d+$') THEN NULL ELSE p.modifier END AS modifier)
+    FROM read_csv(
+      '{{cache}}/usda_fndds/food_portion.csv', header = true,
+      all_varchar = true, ignore_errors = true) p
+    WHERE p.fdc_id IN (SELECT fdc_id FROM fd WHERE source = 'usda_fndds')
+      AND NOT starts_with(lower(coalesce(p.portion_description, '')), 'quantity not specified')
   ),
   portions AS (
     SELECT p.source, p.fdc_id,
