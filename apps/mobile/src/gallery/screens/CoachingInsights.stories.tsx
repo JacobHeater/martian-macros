@@ -496,27 +496,42 @@ export const CoachRecentInsightOpensItem = screenStory({
   },
 });
 
+/** The demo with the chest jump, and its line logged as shown today. */
+const loggedChestJump: StoryScenario = demoWith({
+  then: async (repos, today) => {
+    await extraChestDay(repos, today);
+    const workout = (await valueOf(repos.workouts.watchWorkouts()))[0];
+    if (workout === undefined) return;
+    await repos.inlineInsightLog.recordInlineInsightShown({
+      kind: 'volumeJump',
+      area: 'training',
+      anchor: ItemAnchor.exercise(workout.id, 'barbell-bench-press'),
+      item: 'Barbell bench press',
+      line: chestJump,
+      firstShownOn: today,
+    });
+  },
+});
+
 /** MM-363: what the app logged once the workout's line was shown, listed under Training and leading back to it. */
 export const CoachRecentInsightsLogged = screenStory({
   covers: ['CoachScreen'],
   shows: /^1 in the last 14 days/,
-  scenario: demoWith({
-    then: async (repos, today) => {
-      await extraChestDay(repos, today);
-      const workout = (await valueOf(repos.workouts.watchWorkouts()))[0];
-      if (workout === undefined) return;
-      await repos.inlineInsightLog.recordInlineInsightShown({
-        kind: 'volumeJump',
-        area: 'training',
-        anchor: ItemAnchor.exercise(workout.id, 'barbell-bench-press'),
-        item: 'Barbell bench press',
-        line: chestJump,
-        firstShownOn: today,
-      });
-    },
-  }),
+  scenario: loggedChestJump,
   open: ({ state }) => state.homeTab.put('coach'),
   walk: onCoach,
+});
+
+/** MM-363: a lift's entry pressed opens the workout it was said in, with the line under the bench press. */
+export const CoachRecentInsightOpensWorkout = screenStory({
+  covers: ['CoachScreen', 'WorkoutScreen'],
+  shows: /^8 sets for chest in the 7 days to this workout/,
+  scenario: loggedChestJump,
+  open: ({ state }) => state.homeTab.put('coach'),
+  walk: async (canvas) => {
+    await onCoach(canvas);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Barbell bench press/ }));
+  },
 });
 
 /** MM-363: nothing said inline in 14 days. */
