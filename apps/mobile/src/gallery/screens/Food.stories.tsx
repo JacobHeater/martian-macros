@@ -153,10 +153,10 @@ export const MicrosToday = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
 });
 
-/** MM-310: nothing logged yet; no number is shown. */
+/** MM-310: nothing logged yet; no number is shown, and no line says so (MM-389). */
 export const MicrosEmpty = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Nothing logged yet. Start with breakfast.',
+  shows: 'Micros',
   scenario: async (repos, today) => {
     await firstDayScenario(repos, today);
     await repos.preferences.saveDetailLevel('full');
@@ -468,7 +468,7 @@ export const AddFoodWeighed = screenStory({ covers: ['AddFoodSheet'], shows: 'Pr
 /** MM-321: entered by hand as an estimate: totals only, no amount. */
 export const AddFoodEstimatedTotals = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'Enter calories and macros for this food.',
+  shows: 'Calories',
   open: addFood,
   walk: manuallyAs('Estimate'),
 });
@@ -573,7 +573,7 @@ export const DayCompleteness = screenStory({
   shows: 'Not marked',
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: /(Mark it complete or partial|Press to change)/ }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /(Mark it complete or partial|Counted as a whole day|Left out of your metabolism estimate)/ }));
   },
 });
 

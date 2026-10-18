@@ -90,9 +90,6 @@ export function WorkoutScreen({ workoutId }: { workoutId: number }) {
           </p>
         </InfoCard>
       )}
-      {workout.exercises.length === 0 ? (
-        <p className="app-text train-first">Add the first exercise. Each set is one tap once the first is in.</p>
-      ) : null}
       {workout.exercises.map((exercise, i) => (
         <WorkoutExerciseCard key={`${i}-${exercise.exerciseId}`} workout={workout} index={i} />
       ))}

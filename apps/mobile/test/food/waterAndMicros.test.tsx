@@ -111,7 +111,7 @@ it('a past day with nothing logged never says "today" in the Micros picture', as
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
-  await screen.findByText('Yesterday');
+  await screen.findByRole('heading', { level: 1, name: 'Yesterday' });
   expect(screen.queryByText(/today\./i)).not.toBeInTheDocument();
 });
 
@@ -174,7 +174,7 @@ it('on Food: a bottle and another amount from the header, and a delete, each sai
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
-  await screen.findByText('Yesterday');
+  await screen.findByRole('heading', { level: 1, name: 'Yesterday' });
   let sheet = await openAddWater();
   await userEvent.click(sheet.getByRole('button', { name: /^Bottle, 500\s+ml of water$/ }));
   expect(await screen.findByText('Added 0.5 L: 0.5 L yesterday')).toBeInTheDocument();
@@ -251,7 +251,7 @@ it('a drink added to yesterday shows no time from today, and its actions are tol
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
-  await screen.findByText('Yesterday');
+  await screen.findByRole('heading', { level: 1, name: 'Yesterday' });
   const sheet = await openAddWater();
   await userEvent.click(sheet.getByRole('button', { name: /^Glass, 250\s+ml of water$/ }));
   expect(await screen.findByText('Added later')).toBeInTheDocument();
@@ -361,7 +361,7 @@ it('changing the day draws the bar anew for that day', async () => {
   await expect.poll(() => waterLevel(water)).toBe('50%');
   const before = water.querySelector('.mm-progress-water');
   await userEvent.click(screen.getByRole('button', { name: 'Previous day' }));
-  await screen.findByText('Yesterday');
+  await screen.findByRole('heading', { level: 1, name: 'Yesterday' });
   water = screen.getByRole('region', { name: 'Water' });
   await expect.poll(() => waterLevel(water)).toBe('100%');
   expect(water.querySelector('.mm-progress-water')).not.toBe(before);

@@ -95,13 +95,15 @@ chart (Waist, Strength, Recovery, Reports, "More about this week"); push a
 screen when it is a list that scrolls or has its own actions (a lift's
 history, the weekly volume).
 
-**Empty states.** Food: the four meal headers and one line. Weigh-in: the
+**Empty states.** Food: the four meal headers with their "+", the arc at
+zero and the Add food button; no line says the day is empty (MM-389). Weigh-in: the
 field and its hint. Weight events: one sentence. Waist and Strength: the
 section's summary line says what starting them takes; on the Dashboard,
 a waist not measured this week is a row with its field, "Once a week is
-enough" as its line and a secondary Save (MM-301). Train: one line and
-Start. Coach: "Log a weigh-in to get started." under the Dashboard's own
-weigh-in row, field and hint (MM-340).
+enough" as its line and a secondary Save (MM-301). Train: the one line on why
+strength is watched, and Start. Coach: "The coach starts from your first
+weigh-in." under the Dashboard's own weigh-in row, field and hint (MM-340,
+MM-389). An empty section draws no fold: there is nothing to fold (MM-389).
 
 **Checked by tests.** `test/gallery/hierarchy.test.tsx` fails a destination
 story that nests a card in a card or in the hero, draws a notice inside a
@@ -331,10 +333,9 @@ consequence and offers the safe exit first. No marketing in Settings.
 
 Keep the page structure so nothing jumps.
 
-- **Empty** (no food today): the log surface shows the four meal headers with "+"
-  and, once, a `body` line under the hero: "Nothing logged yet. Start with
-  breakfast." The Ember FAB is the action. No illustration needed; the hero arc at
-  zero is the visual.
+- **Empty** (no food today): the log surface shows the four meal headers with "+".
+  No line narrates it: the hero arc at zero and the empty meals already say the
+  day is empty, and the Ember FAB is the action (owner, 2026-10-18; MM-389).
 - **Empty with illustration** (no weigh-ins, no history): a 120 dp line drawing
   made from the arc and a dot in `text3`, one `heading`, one `body`, one button.
   Never a mascot.

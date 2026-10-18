@@ -13,9 +13,6 @@
 .train-summary {
   margin: 0 0 var(--space-12);
 }
-.train-first {
-  margin: 0 0 var(--space-12);
-}
 .train-clock {
   display: flex;
   align-items: center;

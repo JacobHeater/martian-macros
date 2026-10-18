@@ -198,14 +198,14 @@ export function SettingsScreen() {
           <MmListRow
             leadingIcon="download"
             title="Food database"
-            subtitle="Optional download for barcode scanning. The only thing this app ever fetches."
+            subtitle="Optional download for food search and barcode scanning. The only thing this app ever fetches."
             opens
             onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
           />
           <MmListRow
             leadingIcon="lock"
             title="Stored only on this device"
-            subtitle="Nothing is uploaded. Encrypted backup is coming."
+            subtitle="Nothing is uploaded."
           />
         </MmListGroup>
       </MmSection>

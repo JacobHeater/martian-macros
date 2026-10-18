@@ -60,7 +60,7 @@ export function RecentInsightsSection({ insights }: { insights: readonly RecentI
       initiallyExpanded={false}
     >
       {insights.length === 0 ? (
-        <p className="app-text">The coach leaves an insight under a food, a lift or a reading when it has something to say about it. Each is listed here for 14 days.</p>
+        <p className="app-text">The coach leaves an insight under a food, a lift or a reading when it has something to say about it.</p>
       ) : (
         sorted.map((insight) => (
           <MmListRow

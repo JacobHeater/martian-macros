@@ -234,7 +234,6 @@ it('Estimate has no amount or unit', async () => {
   const sheet = await openSheet();
   await press(sheet, 'Estimate');
   expect(amountField(sheet)).not.toBeInTheDocument();
-  expect(within(sheet).getByText('Enter calories and macros for this food.')).toBeInTheDocument();
   await manual(sheet);
   await save(sheet);
   const p = (await only()).portion;

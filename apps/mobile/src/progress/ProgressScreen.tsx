@@ -91,7 +91,7 @@ export function ProgressScreen() {
             // Weighed, and the trend still being worked out (MM-343).
             <MmSpinner />
           ) : last === undefined ? (
-            <p className="app-text">Log a weigh-in to start your trend.</p>
+            <p className="app-text">No trend yet.</p>
           ) : (
             <>
               <TrendStats trend={trend} fmt={fmt} />

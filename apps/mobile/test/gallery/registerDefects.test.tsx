@@ -78,7 +78,7 @@ it('MM-340: Coach with no weigh-in offers a way to log one', async () => {
   await empty.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   renderApp(empty, today);
   await openTab('Coach');
-  await screen.findByText('Log a weigh-in to get started.');
+  await screen.findByText('The coach starts from your first weigh-in.');
   expect(screen.getByRole('button', { name: /weigh/i })).toBeInTheDocument();
 });
 
