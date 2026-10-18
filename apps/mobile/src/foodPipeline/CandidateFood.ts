@@ -27,7 +27,7 @@ interface CandidateFoodInit {
  * but not yet checked.
  */
 export class CandidateFood {
-  /** `usda_branded`, `usda_foundation`, `usda_sr_legacy` or `off`. */
+  /** `usda_branded`, `usda_foundation`, `usda_sr_legacy`, `usda_fndds` or `off` (MM-383). */
   readonly source: string;
 
   /** The food's id in that source. */

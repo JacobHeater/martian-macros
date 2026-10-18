@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { MmGradeBadge } from '../ui/MmGradeBadge';
 import { useOverlays } from '../ui/useOverlays';
 import type { FoodGradeValue } from '../domain/food/grade/FoodGradeValue';
+import { GradeOmission } from '../domain/food/grade/GradeOmission';
+import { GradeMicronutrient } from '../engine/GradeMicronutrient';
 
 interface FoodGradeProps {
   grade: FoodGradeValue;
@@ -15,16 +17,47 @@ interface FoodGradeProps {
 const spoken = (letter: string) => letter.replace('+', ' plus').replace('-', ' minus');
 
 const meaning = {
-  food: 'A grade for the food itself, per 100 g, from what it contains. The amount you eat does not change it.',
+  food: 'A grade for the food itself, from what it gives per calorie. Protein, fiber, vitamins and minerals count for it; sodium, sugars and saturated fat count against it, and so does a food that packs many calories into little weight. The amount you eat does not change it.',
   meal: 'The grades of this meal’s foods, each counted by its calories.',
   day: 'The grades of this day’s foods, each counted by its calories.',
 } as const;
 
 /**
+ * What a food's source left out and the grade did not count (MM-382):
+ * "Sugars and saturated fat aren’t stated for this food, so they weren’t
+ * counted. Only 2 of the 10 vitamins and minerals the grade looks at are
+ * stated, so they weren’t counted either." A food counted from fewer
+ * than the ten says so: "Vitamins and minerals counted from the 4 stated."
+ */
+function notCountedSentences(grade: { notCounted: readonly GradeOmission[]; statedMicronutrients: number }): string[] {
+  const sentences: string[] = [];
+  const of = GradeMicronutrient.values.length;
+  const label = grade.notCounted.filter((o) => o !== 'micronutrients').map(GradeOmission.label);
+  if (label.length > 0) {
+    const list = label.join(' and ');
+    const verb = label.length === 1 ? 'isn’t' : 'aren’t';
+    const it = label.length === 1 ? 'it wasn’t' : 'they weren’t';
+    sentences.push(`${list.charAt(0).toUpperCase()}${list.slice(1)} ${verb} stated for this food, so ${it} counted.`);
+  }
+  if (grade.notCounted.includes('micronutrients')) {
+    const either = label.length > 0 ? ' either' : '';
+    sentences.push(
+      grade.statedMicronutrients === 0
+        ? `None of the ${of} vitamins and minerals the grade looks at are stated for this food, so they weren’t counted${either}.`
+        : `Only ${grade.statedMicronutrients} of the ${of} vitamins and minerals the grade looks at are stated for this food, so they weren’t counted${either}.`,
+    );
+  } else if (grade.statedMicronutrients < of) {
+    sentences.push(`Vitamins and minerals were counted from the ${grade.statedMicronutrients} that are stated.`);
+  }
+  return sentences;
+}
+
+/**
  * A food's, meal's or day's grade from A+ to D- (MM-370), or a question
  * mark when there can't be one. Pressed, either says in a popover what it
- * means or why there is none. Nothing is red (MM-108). It sits beside what
- * it grades, outside the part of a row that is pressed.
+ * means, and what the food's source left unstated (MM-382), or why there is
+ * none. Nothing is red (MM-108). It sits beside what it grades, outside
+ * the part of a row that is pressed.
  */
 export function FoodGrade({ grade, subject, scope = 'food' }: FoodGradeProps) {
   const overlays = useOverlays();
@@ -37,9 +70,14 @@ export function FoodGrade({ grade, subject, scope = 'food' }: FoodGradeProps) {
       expanded={open}
       onExplain={(anchor) => {
         setOpen(true);
-        const explanation = graded
-          ? { title: `Grade ${grade.letter}`, label: `Grade ${spoken(grade.letter)}`, message: meaning[scope] }
-          : { title: 'Can’t be graded', message: grade.reason };
+        const explanation =
+          grade.kind === 'graded'
+            ? {
+                title: `Grade ${grade.letter}`,
+                label: `Grade ${spoken(grade.letter)}`,
+                message: [meaning[scope], ...(scope === 'food' ? notCountedSentences(grade) : [])].join(' '),
+              }
+            : { title: 'Can’t be graded', message: grade.reason };
         void overlays.popover({ ...explanation, anchor }).then(() => setOpen(false));
       }}
     />

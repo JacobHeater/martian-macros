@@ -14,7 +14,7 @@ the micronutrient non-goal.
 
 ## Decisions
 - **Overruled by the product owner, 2026-10-17.** Grading is in. The concern behind the non-goal is carried into the design: the
-  grade is a nutrient-profile measure with a published basis (MM-369), never a moral word. No "good", "bad", "clean" or "junk"
+  grade is the app's own nutrient-density measure (MM-380, which replaced the published tables MM-369 chose), never a moral word. No "good", "bad", "clean" or "junk"
   appears anywhere. A food that can't be graded says so and is not guessed. The coach's lines stay facts plus a direction
   (MM-362).
 - **Still non-goals**: "clean" and "junk" labels, meal plans and prescribed foods. MM-108's banned words stay banned.

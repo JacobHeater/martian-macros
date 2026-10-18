@@ -57,6 +57,9 @@ export function StatesCatalog() {
       </div>
       <div className="gallery-state-row">
         <State name="Icon"><MmIconButton icon="settings" label="Settings" onPress={nothing} /></State>
+        <State name="Icon action"><MmIconButton icon="download" label="Download Common foods" kind="action" onPress={nothing} /></State>
+        <State name="Icon action pressed" pressed><MmIconButton icon="download" label="Download Common foods" kind="action" onPress={nothing} /></State>
+        <State name="Icon action disabled"><MmIconButton icon="download" label="Download Common foods" kind="action" onPress={undefined} /></State>
         <State name="Pressed" pressed><MmIconButton icon="settings" label="Settings" onPress={nothing} /></State>
         <State name="Disabled"><MmIconButton icon="settings" label="Settings" onPress={undefined} /></State>
         <State name="Add"><MmIconButton icon="plus" kind="add" label="Add" onPress={nothing} /></State>

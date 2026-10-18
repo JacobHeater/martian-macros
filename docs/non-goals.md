@@ -95,8 +95,8 @@ should read this list as closely as any feature.
   contradict the app's rule that it states and does not judge.
 - **Detail:** MM-108
 - **Grading overruled by the product owner on 2026-10-17** (MM-370, MM-371): every
-  food is graded A+ to D- as a nutrient-profile measure with a published basis
-  (MM-369), never a moral word. "Clean" and "junk" labels, meal plans and
+  food is graded A+ to D- on the app's own nutrient-density measure (MM-380,
+  which replaced the published tables MM-369 had chosen), never a moral word. "Clean" and "junk" labels, meal plans and
   prescribed foods stay out, and MM-108's banned words stay banned.
 - **Reopen if:** Never, for the labels.
 
