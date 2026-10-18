@@ -85,5 +85,44 @@ describe('the field border', () => {
         expect(ratio(border, tokens.get(background)!), `${palette} ${background}`).toBeGreaterThanOrEqual(3);
       }
     });
+
+    // design/color-and-theme-system.md §6, carried over from the Flutter tests (MM-375): every text role is readable on
+    // every surface level, and the macros stay at least 10 L* apart so they survive grayscale.
+    it(`gives every text role 4.5:1 on canvas, surface, raised and overlay in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      for (const text of ['text', 'text2', 'text3']) {
+        for (const level of ['canvas', 'surface', 'raised', 'overlay']) {
+          expect(ratio(tokens.get(text)!, tokens.get(level)!), `${palette} ${text} on ${level}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    // MM-362: the coach's insight lines are caption text in ion, so ion is readable on every surface level (UX-7).
+    it(`gives ion 4.5:1 on canvas, surface, raised and overlay in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      for (const level of ['canvas', 'surface', 'raised', 'overlay']) {
+        expect(ratio(tokens.get('ion')!, tokens.get(level)!), `${palette} ion on ${level}`).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    it(`keeps protein, carbs and fat at least 10 L* apart in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      const lightness = (hex: string) => {
+        const y = luminance(hex);
+        return y > 0.008856 ? 116 * Math.cbrt(y) - 16 : 903.3 * y;
+      };
+      const [protein, carbs, fat] = ['protein', 'carbs', 'fat'].map((macro) => lightness(tokens.get(macro)!)) as [number, number, number];
+      expect(Math.abs(protein - carbs), `${palette} protein-carbs`).toBeGreaterThanOrEqual(10);
+      expect(Math.abs(protein - fat), `${palette} protein-fat`).toBeGreaterThanOrEqual(10);
+      expect(Math.abs(carbs - fat), `${palette} carbs-fat`).toBeGreaterThanOrEqual(10);
+    });
+
+    // MM-370: the letter carries a grade's meaning, so it holds 4.5:1 on its band's fill.
+    it(`gives every grade letter 4.5:1 on its fill in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      for (const band of ['a', 'b', 'c', 'd']) {
+        expect(ratio(tokens.get('on-grade')!, tokens.get(`grade-${band}`)!), `${palette} ${band}`).toBeGreaterThanOrEqual(4.5);
+      }
+    });
   }
 });

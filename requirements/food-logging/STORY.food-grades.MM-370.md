@@ -25,8 +25,16 @@ Choices I made without asking (say if any is wrong):
 - **A meal's and a day's grade** is the calorie-weighted average of the graded entries' scores, turned back into a letter. It
   shows a question mark when graded entries carry less than 70% of the calories, the same threshold as the fiber rule (MM-126).
   The popover then says what share could be graded.
-- **No red, and no traffic-light colours.** MM-108 forbids red for intake. The grade is a letter in a neutral outlined badge
-  (`MmGradeBadge`, a design-system component) that grows with the text. A dashed question mark means no grade.
+- **Colour fills, no red** (the product owner asked for fills, 2026-10-17, and left the colours to the author). Each letter band
+  has a solid fill, with the letter in ink on it: A mint, B sunflower, C periwinkle, D orchid (`--grade-a` to `--grade-d`,
+  `--on-grade`). Categorical, not a green-to-orange ramp: a ramp read as a traffic light, and its yellow-green B looked like
+  the lime action. A and B were swapped at the UX guard's review so the best grade does not wear the caution gold. The letter
+  keeps the meaning: + and - share their band's fill, and the fill only repeats what the letter says. Every letter holds 4.5:1
+  on its fill in every palette (`test/tokens.test.ts`). In light the fills are pale against white, so the badge keeps an edge
+  (`--grade-edge`). Pressed, a badge keeps its fill and letter (MM-376). A dashed question mark, with no fill, means no grade.
+  The badge (`MmGradeBadge`) grows with the text. Values and colour-blind figures: `design/color-and-theme-system.md` §1.
+- **Open for the coaching and safety roles** (asked by two reviewers): whether any coloured grade fill reads as judging food
+  (MM-108), and whether categorical fills avoid that better than a single-hue ramp.
 - **Every badge explains itself** (the panel's PD-3): a letter and a question mark are both buttons in a 48 dp slot, outside the
   pressed part of their row, and both open a popover. A letter's says what the grade means ("A grade for the food itself, per
   100 g … The amount you eat does not change it", or for a meal or a day, "each counted by its calories"). A question mark's

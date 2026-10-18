@@ -235,11 +235,15 @@ logging are flagged `otherIntake` and suppressed for an eating-disorder
 history (MM-141).
 
 **Waiting on the product owner.**
-- A look at the coaching-insights design in Storybook (`Designs/Coaching
-  insights`, 33 stories; panel run `docs/agent-runs/mm361-coaching-insights/`,
-  UX guard PASS, PR #178); the merge of PR #177 (spec), which #178 stacks
-  on. Settled: "one line" (MM-362) means the whole insight, wrapping, as
-  drawn; no paywall for any of MM-361 to MM-371 (not behind MM-85).
+- Coaching insights: specs (#177) and designs (#178) are merged. Settled:
+  "one line" (MM-362) means the whole insight, wrapping, as drawn; no
+  paywall for any of MM-361 to MM-371 (not behind MM-85).
+- Warmer Martian (MM-375): the owner approved the royal 90s violet and
+  kept lime. Open: Martian's ion and protein are the same aqua, so the
+  coach's insight lines share protein's colour (panel P-3/UX-4); whether
+  categorical grade fills read as judging food (coaching/safety, MM-370).
+- Phone checklist: Martian at low brightness, whether cards and the
+  navigation bar still stand off the canvas (MM-375, UX-6).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -297,6 +301,19 @@ limitations.
   200% stories found: MM-373 (nav labels), MM-374 (Dashboard header, water
   row), tests skipped with their IDs.
 - No step advanced: design only; MM-372 is done.
+- **Then three owner asks** (branch `design/ion-insights-grade-fills-warm-martian`):
+  the insight text and icon in `--ion`; grade badges filled per band
+  (categorical: A mint, B sunflower, C periwinkle, D orchid; `--grade-*`
+  tokens in every palette, an edge in light); and a **warmer Martian**
+  (MM-375) researched by the product and product-designer roles
+  (`docs/agent-runs/mm375-warm-martian/`). A plum was drawn and rejected
+  ("maroon, not a 90's purple"); the approved neutrals are a royal violet
+  with bigger steps, near-neutral secondary text, tangerine carbs, magenta
+  fat, lime kept. `test/support/flutterTheme.json` updated knowingly for
+  Martian. UX guard BLOCKED (pressed badge lost its letter: bug MM-376 +
+  test) then PASS. The colour doc's contrast tests had never been carried
+  over from Flutter; `tokens.test.ts` now holds text, ion, macro L* and
+  grade letters in every palette.
 
 ## Session 31: 2026-10-16, Claude (the register's design defects through the panel)
 

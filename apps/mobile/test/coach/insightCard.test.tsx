@@ -149,7 +149,7 @@ describe('on the dashboard', () => {
     renderApp(repos, today);
     await screen.findByRole('button', { name: 'Dismiss' });
     expect(card()).toHaveTextContent('about 30 g short');
-    await userEvent.click(screen.getByRole('button', { name: /What this rests on/ }));
+    await userEvent.click(screen.getByRole('button', { name: /The numbers behind this/ }));
     expect(await screen.findByText('Days at or above the minimum')).toBeInTheDocument();
     const log = await first(repos.insightLog.watchInsightLog());
     expect(log).toHaveLength(1);

@@ -40,7 +40,7 @@ export function InsightCard() {
       }
     >
       <p className="app-text">{body}</p>
-      <MmDisclosure title="What this rests on">
+      <MmDisclosure title="The numbers behind this">
         {evidence.map(([label, value]) => (
           <StatRow key={label} label={label} value={value} />
         ))}
