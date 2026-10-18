@@ -51,6 +51,11 @@ disciplined palette and precise motion.
   non-redundant status.
 - **Charts:** the shared grammar only; no decorative sparklines.
 - **Copy:** one direct sentence beats three explaining the same thing.
+- **No narration (MM-389):** no line says what the layout already shows ("Nothing
+  logged yet" over empty meals), tells a person to press what is plainly pressable
+  ("Press to change", "Start with breakfast"), restates a heading or label, or
+  promises a feature to come. An empty state earns a line only when it carries a
+  meaning the layout does not.
 - **One implementation per control (MM-163):** a screen never uses a raw Material
   control (button, field, dropdown, switch, card, chip, dialog, progress bar). It uses
   the design-system component, which takes meaning and never a color, radius or

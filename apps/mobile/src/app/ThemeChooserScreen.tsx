@@ -45,9 +45,8 @@ export function ThemeChooserScreen() {
 
   return (
     <Screen roomy>
-      <h1 className="app-headline">Make it your planet.</h1>
-      <h2 className="app-headline">Choose your theme</h2>
-      <p className="app-text">Martian is our retro original. Try a look below; you can change it anytime in Settings.</p>
+      <h1 className="app-headline">Choose your theme</h1>
+      <p className="app-text">You can change it later in Settings.</p>
       <div className="app-gap" />
       {themeChoices.map((choice) => (
         <ChoiceCard
@@ -61,7 +60,7 @@ export function ThemeChooserScreen() {
           }}
         />
       ))}
-      <h3 className="app-subhead">A little color preview</h3>
+      <h2 className="app-subhead">Preview</h2>
       {MacroKind.values.map((macro) => (
         <div key={macro} className="app-stack-item">
           <MacroBar grams={65} target={100} macro={macro} />

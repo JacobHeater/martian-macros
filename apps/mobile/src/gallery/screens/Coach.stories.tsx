@@ -111,7 +111,7 @@ export const CoachFirstDay = screenStory({
 /** MM-321: no weigh-in kept (each one deleted): nothing for the coach to work from. */
 export const CoachNoWeighIn = screenStory({
   covers: ['CoachScreen'],
-  shows: 'Log a weigh-in to get started.',
+  shows: 'The coach starts from your first weigh-in.',
   scenario: async (repos, today) => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   },

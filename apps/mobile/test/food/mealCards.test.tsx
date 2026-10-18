@@ -74,7 +74,7 @@ it('shows the bars or the donut, never both, and remembers which', async () => {
 // MM-315: the day's explanation names the macro picture as the switch does, the split (MM-290).
 it('the explanation under the day says Split, never share', async () => {
   await openFood({ populated: true });
-  await userEvent.click(screen.getByRole('button', { name: /^More about today/ }));
+  await userEvent.click(screen.getByRole('button', { name: /^More about this day/ }));
   const text = body().textContent ?? '';
   expect(text).toContain('The Split picture counts protein and carbs');
   expect(text.toLowerCase()).not.toContain('share picture');

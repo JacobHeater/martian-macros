@@ -99,8 +99,9 @@ export function CalorieHero({
 
   return (
     <MmHeroSurface>
-      <h2 className="mm-visually-hidden">Calories today</h2>
-      <HorizonArc progress={progress} label={`${figure} ${caption}`} />
+      <h2 className="mm-visually-hidden">Calories</h2>
+      {/* Where the figure is plain text the arc is not spoken too; inside a press it is the spoken figure (MM-389). */}
+      <HorizonArc progress={progress} label={onPress === undefined ? undefined : `${figure} ${caption}`} />
       {onPress === undefined ? (
         <>
           <p className="food-hero-figure">{figure}</p>

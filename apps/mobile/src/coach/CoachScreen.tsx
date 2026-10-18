@@ -118,7 +118,7 @@ export function CoachScreen() {
         <WeighInRow
           fmt={fmt}
           lastTrendKg={undefined}
-          note="Log a weigh-in to get started."
+          note="The coach starts from your first weigh-in."
           onSaveWeight={async (kg) => {
             await services.weights.saveWeight(today, kg);
             overlays.snack(`Saved ${fmt.weight(kg)} for today`, {
@@ -214,7 +214,6 @@ export function CoachScreen() {
             }
           />
           {detail === undefined ? null : <p className="app-caption coach-pace-detail">{detail}</p>}
-          <StatRow label="Next check-in" value={Fmt.day(nextCheckIn(setup, current), today)} />
         </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />

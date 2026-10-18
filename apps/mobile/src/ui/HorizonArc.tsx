@@ -10,8 +10,8 @@ const height = width * 0.18 + inset * 2;
 interface HorizonArcProps {
   /** Eaten over target; past 1 the dot hollows. */
   progress: number;
-  /** What the arc says, for a screen reader (the arc itself is drawn). */
-  label: string;
+  /** What the arc says, for a screen reader; without one the arc is decoration and not spoken (MM-389). */
+  label?: string | undefined;
 }
 
 /**
@@ -40,7 +40,7 @@ export function HorizonArc({ progress, label }: HorizonArcProps) {
   const shown = clamp(progress, 0, 1);
   const [dotX, dotY] = at(shown);
   return (
-    <svg className="mm-horizon" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
+    <svg className="mm-horizon" viewBox={`0 0 ${width} ${height}`} {...(label === undefined ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label })}>
       <path className="mm-horizon-track" d={arcTo(1)} strokeWidth={stroke} />
       {shown > 0 ? <path className="mm-horizon-fill" d={arcTo(shown)} strokeWidth={stroke} /> : null}
       <circle className="mm-horizon-glow" cx={dotX} cy={dotY} r={dotRadius + 4} />

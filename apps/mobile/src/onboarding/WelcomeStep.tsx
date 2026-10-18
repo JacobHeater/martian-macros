@@ -39,7 +39,7 @@ export function WelcomeStep({ onStart }: { onStart: () => void }) {
       <h1 className="app-figure">Martian Macros</h1>
       <p className="app-lead">Coaching for fat loss and muscle gain that adapts to your body, not a formula.</p>
       <div className="app-gap-large" />
-      <HorizonArc progress={progress} label="A body travelling along a horizon" />
+      <HorizonArc progress={progress} />
       <div className="app-gap" />
       <p className="app-text app-muted">
         A few questions first. It takes about two minutes, and everything stays on this phone.

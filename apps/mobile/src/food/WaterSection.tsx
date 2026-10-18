@@ -113,7 +113,8 @@ export function WaterSection({ day }: { day: CalendarDate }) {
           <MmProgressBar key={loaded === undefined ? 'loading' : day.toString()} kind="water" value={loaded === undefined ? 0 : total / goal} />
         )
       }
-      collapsible
+      // No drinks yet, nothing to fold (MM-389).
+      collapsible={entries.length > 0}
       maintainState
       trailing={<MmIconButton icon="plus" kind="add" label="Add water" onPress={() => void add()} />}
     >
