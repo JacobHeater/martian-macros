@@ -15,7 +15,7 @@ the UX guard at the build's design review (`docs/agent-runs/mm361-build-design/`
 The snack's own Undo and Dismiss leave the focus the same way, since MM-272; that is older and is not fixed here.
 
 ## Description
-Before a snoozed line or a Snoozed row goes, the focus moves to a stable neighbour: the item the line was under, or what is
+Before a snoozed line or a Snoozed row goes, the focus moves to a stable neighbour: the item the line was under or another line about it (MM-393), or what is
 left of the Settings screen.
 
 ## Acceptance Criteria

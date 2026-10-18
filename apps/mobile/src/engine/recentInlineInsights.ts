@@ -30,7 +30,7 @@ export function recentInlineInsights({
   snoozes?: readonly InsightSnooze[];
   today: CalendarDate;
   /** What items carry now, by item key (`allowedItemInsights`). */
-  current: ReadonlyMap<string, ItemInsight>;
+  current: ReadonlyMap<string, readonly ItemInsight[]>;
 }): { entry: InlineInsightLogEntry; changed: boolean }[] {
   if (!safeguards.adult || safeguards.paused || !switches.all) return [];
   const byId = new Map(kinds.map((kind) => [kind.id, kind]));
@@ -40,6 +40,6 @@ export function recentInlineInsights({
     if (kind === undefined || ItemInsightKind.withheld(kind, safeguards)) return [];
     if (switches.offAreas.has(kind.area) || switches.offKinds.has(kind.id)) return [];
     if (quiet.has(InsightSnooze.key(entry.kind, snoozeSubjectOf(entry)))) return [];
-    return [{ entry, changed: current.get(ItemAnchor.key(entry.anchor))?.kind !== entry.kind }];
+    return [{ entry, changed: !(current.get(ItemAnchor.key(entry.anchor)) ?? []).some((i) => i.kind === entry.kind) }];
   });
 }

@@ -276,11 +276,11 @@ export class AppState {
   readonly insightSafeguards: Cell<InsightSafeguards | undefined>;
 
   /**
-   * The inline insights to show, one per item, by the item's key
-   * (`ItemAnchor.key`) (MM-362). Empty until what they rest on has loaded,
+   * The inline insights to show, every one that holds on an item, the higher
+   * priority first, by the item's key (`ItemAnchor.key`) (MM-362, MM-393). Empty until what they rest on has loaded,
    * and when a logged set cannot be worked out (weekly volume says so).
    */
-  readonly itemInsights: Cell<ReadonlyMap<string, ItemInsight>>;
+  readonly itemInsights: Cell<ReadonlyMap<string, readonly ItemInsight[]>>;
 
   /** The inline insights first shown in the last 14 days (MM-363). */
   readonly inlineInsightLog: Cell<Loadable<InlineInsightLogEntry[]>>;
@@ -669,7 +669,7 @@ export class AppState {
       };
     });
 
-    this.itemInsights = derived<ReadonlyMap<string, ItemInsight>>(() => {
+    this.itemInsights = derived<ReadonlyMap<string, readonly ItemInsight[]>>(() => {
       const safeguards = this.insightSafeguards.value;
       const switches = of(this.insightSwitches);
       const snoozes = of(this.insightSnoozes);

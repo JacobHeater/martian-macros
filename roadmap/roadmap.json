@@ -777,7 +777,8 @@
             "MM-372",
             "MM-377",
             "MM-378",
-            "MM-379"
+            "MM-379",
+            "MM-393"
           ]
         },
         {
@@ -815,7 +816,8 @@
             "MM-389",
             "MM-390",
             "MM-391",
-            "MM-392"
+            "MM-392",
+            "MM-394"
           ]
         }
       ]
@@ -1367,7 +1369,8 @@
           "MM-360",
           "MM-376",
           "MM-389",
-          "MM-390"
+          "MM-390",
+          "MM-394"
         ],
         "remaining": [
           "MM-89",
@@ -1639,6 +1642,14 @@
             "MM-390",
             "MM-391",
             "MM-392"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 19,
+          "title": "Story walks wait five seconds, so a covered run on a slower machine passes (MM-394)",
+          "tickets": [
+            "MM-394"
           ],
           "milestone": "M4"
         }
@@ -2486,7 +2497,8 @@
           "MM-365",
           "MM-371",
           "MM-379",
-          "MM-377"
+          "MM-377",
+          "MM-393"
         ],
         "remaining": [
           "MM-33",
@@ -2614,6 +2626,14 @@
           "title": "Inline insights on a night of sleep (MM-368), once MM-250 records nights",
           "tickets": [
             "MM-368"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "Every rule that holds on an item shows its own line under it, the higher priority first (MM-393)",
+          "tickets": [
+            "MM-393"
           ],
           "milestone": "M4"
         }

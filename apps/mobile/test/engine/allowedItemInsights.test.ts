@@ -27,7 +27,7 @@ const today = CalendarDate.of(2026, 10, 18);
 const insight = (kind: string, anchor: ItemAnchor): ItemInsight => ({ kind, anchor, subject: anchor.id, basis: 'item', figures: {} });
 
 const shown = (insights: readonly ItemInsight[], safeguards = adult, switches = InsightSwitches.allOn, snoozes: readonly InsightSnooze[] = []) =>
-  [...allowedItemInsights({ insights, kinds, safeguards, switches, snoozes, today }).values()].map((i) => i.kind).sort();
+  [...allowedItemInsights({ insights, kinds, safeguards, switches, snoozes, today }).values()].flat().map((i) => i.kind).sort();
 
 const everyKind = [
   insight('lightProtein', { kind: 'foodEntry', id: '1' }),
@@ -36,13 +36,14 @@ const everyKind = [
   insight('volumeJump', bench),
 ];
 
-describe('allowedItemInsights (MM-362, MM-364)', () => {
+describe('allowedItemInsights (MM-362, MM-364, MM-393)', () => {
   it('shows every qualifying item, each its own', () => {
     const three = ['1', '2', '3'].map((id) => insight('mostlyFat', { kind: 'foodEntry', id }));
     expect(allowedItemInsights({ insights: three, kinds, safeguards: adult, switches: InsightSwitches.allOn, today }).size).toBe(3);
   });
 
-  it('shows one per item: the higher priority wins', () => {
+  // MM-393: one rule never hides another; the owner saw a portion check hide a protein line.
+  it('shows every rule that holds on an item, the higher priority first', () => {
     const map = allowedItemInsights({
       insights: [insight('steady', bench), insight('volumeJump', bench)],
       kinds,
@@ -50,10 +51,10 @@ describe('allowedItemInsights (MM-362, MM-364)', () => {
       switches: InsightSwitches.allOn,
       today,
     });
-    expect(map.get(ItemAnchor.key(bench))?.kind).toBe('volumeJump');
+    expect(map.get(ItemAnchor.key(bench))?.map((i) => i.kind)).toEqual(['volumeJump', 'steady']);
   });
 
-  it('settles a tie of priority by the catalog order', () => {
+  it('orders a tie of priority by the catalog', () => {
     const map = allowedItemInsights({
       insights: [insight('mostlyFat', peanutButter), insight('lightProtein', peanutButter)],
       kinds,
@@ -61,7 +62,7 @@ describe('allowedItemInsights (MM-362, MM-364)', () => {
       switches: InsightSwitches.allOn,
       today,
     });
-    expect(map.get(ItemAnchor.key(peanutButter))?.kind).toBe('lightProtein');
+    expect(map.get(ItemAnchor.key(peanutButter))?.map((i) => i.kind)).toEqual(['lightProtein', 'mostlyFat']);
   });
 
   it('with an eating-disorder history, leaves out weight and food composition, and keeps protein and training', () => {
