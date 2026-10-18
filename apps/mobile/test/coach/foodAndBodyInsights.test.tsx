@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -109,4 +109,61 @@ it('the water row says when water was logged on few of the last 14 days', async 
   }
   renderApp(repos, today);
   expect(await screen.findByText(/^Water logged on 4 of the last 14 days/)).toBeInTheDocument();
+});
+
+// MM-393: biscuits logged as three servings, light on protein. The owner saw the portion check and not the
+// protein line under the same entry: every rule that holds on an item gets its own line, the higher priority first.
+const biscuits = () =>
+  repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today,
+      meal: 'breakfast',
+      name: 'Biscuits',
+      kcal: 780,
+      proteinG: 12,
+      carbsG: 78,
+      fatG: 45,
+      source: 'labelServing',
+      portion: {
+        method: 'labelServing',
+        basis: 'calculated',
+        quantity: 3,
+        unit: 'serving',
+        reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 260, proteinG: 4, carbsG: 26, fatG: 15 }), servingGrams: 66 },
+      },
+    }),
+  );
+
+it('a food that two rules hold on shows both lines under it, the higher priority first', async () => {
+  await biscuits();
+  renderApp(repos, today);
+  await openTab('Food');
+  const portion = await screen.findByRole('button', { name: /^Coach: Logged as 3 servings \(780 kcal\)/ });
+  const protein = screen.getByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ });
+  expect(portion.compareDocumentPosition(protein) & Node.DOCUMENT_POSITION_FOLLOWING, 'the portion check comes first').toBeTruthy();
+  expect(portion.closest('.mm-swipe'), 'both lines sit under the one entry').toBe(protein.closest('.mm-swipe'));
+});
+
+it('snoozing one of two lines under a food leaves the other (MM-393, MM-378)', async () => {
+  await biscuits();
+  await repos.insightSnoozes.saveInsightSnooze({ kind: 'portionCheck', subject: 'Biscuits', item: 'Biscuits, breakfast', resumesOn: undefined });
+  renderApp(repos, today);
+  await openTab('Food');
+  expect(await screen.findByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /^Coach: Logged as/ })).toBeNull();
+});
+
+// The UX guard's UX-2 on MM-393: snoozing the second of two lines leaves the focus on the first, not the page.
+it('snoozing the second of two lines puts the focus on the first', async () => {
+  await biscuits();
+  renderApp(repos, today);
+  await openTab('Food');
+  const protein = await screen.findByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ });
+  await userEvent.click(protein);
+  await userEvent.click(screen.getByRole('button', { name: /^Snooze… Light on protein for Biscuits/ }));
+  const dialog = await screen.findByRole('dialog', { name: /^Snooze “Light on protein” for Biscuits/ });
+  await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
+  await expect.poll(() => screen.queryByRole('button', { name: /^Coach: 12 g of protein/ })).toBeNull();
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Coach: Logged as 3 servings/ }));
 });

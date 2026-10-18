@@ -20,9 +20,10 @@ Choices I made without asking (say if any is wrong):
 - **A separate record, `ItemInsight`**: the rule, the item it is anchored to (an entry, meal, exercise, set, reading or night,
   by kind and id), its basis (`item` or `pattern`), the figures, and for a pattern the period it rests on. It sits beside
   MM-141's `Insight` and does not replace it. The dashboard card is unchanged.
-- **One insight per item at most.** When two rules fire on the same item, the higher priority wins, using MM-141's order
+- **Every rule that holds shows** (the owner overruled "one insight per item at most", 2026-10-18; MM-393). When two
+  rules fire on the same item, both show, one line each, the higher priority first, using MM-141's order
   (safety, data quality, coaching, pattern, education). Each area's catalog lists its rules in priority order, with a
-  priority column, so ties are settled by the table. Every qualifying item still shows its one line. A note another ticket
+  priority column, so ties are ordered by the table. Every qualifying item shows its lines. A note another ticket
   already shows on the item (MM-142's weight-jump explanation) counts as that item's note, so no inline insight is added.
 - **A single-item insight is about the item, never about the day.** "Most of this item's calories come from fat" is allowed.
   "You went over today because of this" is not. MM-141's "not about one day" stays true for days.
@@ -74,9 +75,9 @@ Scenario: Every qualifying item shows
   Given three logged foods that each satisfy a rule
   Then each of the three shows its own insight
 
-Scenario: One per item
+Scenario: Every rule on an item
   Given two rules fire on the same food
-  Then only the higher-priority insight is shown under it
+  Then both insights are shown under it, the higher priority first (MM-393)
 
 Scenario: The evidence is one tap down
   When an inline insight is tapped
@@ -141,14 +142,14 @@ and reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`). All in
   (area, title, example, priority, and whether it is about weight or held back with an eating-disorder history),
   `itemInsightKinds` (the kinds the app has: a drafted kind joins only once its domain roles have checked it), and
   `allowedItemInsights`: the safeguards (under 18, paused, eating-disorder history, hidden weight), the switches, and
-  one per item by priority then catalog order. Hidden weight is an input the filter honours; it is always off until
+  every allowed kind per item, ordered by priority then catalog order (MM-393). Hidden weight is an input the filter honours; it is always off until
   MM-118 is built.
 - The log of inline insights shown: `inline_insight_log` (schema version 7), one row per kind per item, keeping the first
   day and the words as said (`SqlInlineInsightLogRepository`, `InMemoryInlineInsightLogRepository`, one contract). An
   `InlineInsight` logs itself once drawn.
 - The design seam `InsightPreview` stays for what is not built: grades (MM-370) and the lines of kinds not checked yet.
   The app hands it nothing, so each screen shows what the app works out.
-- Tests: `test/engine/allowedItemInsights.test.ts` (every qualifying item, one per item, eating-disorder history, under
+- Tests: `test/engine/allowedItemInsights.test.ts` (every qualifying item, every kind on an item in order, eating-disorder history, under
   18, hidden weight, paused, switched off), `test/coach/inlineInsights.test.tsx` (under its item, the numbers one tap
   down, paused), `test/format/itemInsightText.test.ts` (forbidden words and subjects), `test/engine/itemInsightEvidence.test.ts`
   (every kind has its evidence row).

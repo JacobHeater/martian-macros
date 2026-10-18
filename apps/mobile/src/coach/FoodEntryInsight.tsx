@@ -2,7 +2,7 @@ import type { FoodEntry } from '../domain/FoodEntry';
 import { mealLabel } from '../format/mealLabel';
 import { InlineInsight } from './InlineInsight';
 import type { InlineInsightContent } from './InlineInsightContent';
-import { useItemInsightContent } from './useItemInsightContent';
+import { useItemInsightContents } from './useItemInsightContents';
 
 interface FoodEntryInsightProps {
   entry: FoodEntry;
@@ -10,9 +10,15 @@ interface FoodEntryInsightProps {
   preview?: InlineInsightContent | undefined;
 }
 
-/** The coach's line under a logged food (MM-365), when it has one. */
+/** The coach's lines under a logged food (MM-365), one per rule that holds, the higher priority first (MM-393). */
 export function FoodEntryInsight({ entry, preview }: FoodEntryInsightProps) {
-  const own = useItemInsightContent({ kind: 'foodEntry', id: `${entry.id}` }, `${entry.name}, ${mealLabel(entry.meal).toLowerCase()}`);
-  const insight = preview ?? own;
-  return insight === undefined ? null : <InlineInsight insight={insight} />;
+  const own = useItemInsightContents({ kind: 'foodEntry', id: `${entry.id}` }, `${entry.name}, ${mealLabel(entry.meal).toLowerCase()}`);
+  const insights = preview === undefined ? own : [preview];
+  return (
+    <>
+      {insights.map((insight) => (
+        <InlineInsight key={insight.rule} insight={insight} />
+      ))}
+    </>
+  );
 }

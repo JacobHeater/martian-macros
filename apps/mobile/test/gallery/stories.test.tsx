@@ -5,6 +5,15 @@ import { join } from 'node:path';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 import preview from '../../.storybook/preview';
+import { configure, getConfig } from 'storybook/test';
+
+/**
+ * MM-394: a walk waits up to five seconds for what it presses, as `pressNamed`
+ * does. The default second was too short under coverage (`npm run unseen`),
+ * where a workout takes about 1.3 s to draw, so three walks failed on a
+ * slower machine though nothing was wrong with them.
+ */
+configure({ asyncUtilTimeout: 5000 });
 
 /**
  * MM-237: Storybook is the design register, so a story that does not draw,
@@ -96,4 +105,9 @@ describe('the register', () => {
     );
     expect(unknown).toEqual([]);
   });
+});
+
+// MM-394: the walks' wait stays long enough for a covered run.
+it('a story walk waits at least five seconds for what it presses', () => {
+  expect(getConfig().asyncUtilTimeout).toBeGreaterThanOrEqual(5000);
 });
