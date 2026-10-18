@@ -15,6 +15,7 @@ import { MmButton } from '../ui/MmButton';
 import { MmFab } from '../ui/MmFab';
 import { useOverlays } from '../ui/useOverlays';
 import { destinations } from './destinations';
+import { Fmt } from '../format/Fmt';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
@@ -31,11 +32,13 @@ export function HomeShell() {
   const current = useCell(state.homeTab);
   const overlays = useOverlays();
   const shownDay = useShownDay();
+  const today = useCell(state.today);
   useTargetChangeSummaries();
   return (
     <div className="app-frame">
       <MmAppBar
-        title={current === 'food' ? 'Today' : HomeDestination.label(current)}
+        // On Food the heading is the day shown, as its stepper says (MM-390).
+        title={current === 'food' ? Fmt.day(shownDay, today) : HomeDestination.label(current)}
         titleContent={current === 'food' ? <FoodDayHeader /> : undefined}
         actions={
           <>

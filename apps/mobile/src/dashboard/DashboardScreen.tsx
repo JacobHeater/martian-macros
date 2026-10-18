@@ -231,7 +231,6 @@ export function DashboardScreen() {
         <MmListRow
           leadingIcon="train"
           title={trainedThisWeek === 1 ? '1 workout this week' : `${trainedThisWeek} workouts this week`}
-          subtitle="Training"
           opens
           onPress={() => open('train')}
         />

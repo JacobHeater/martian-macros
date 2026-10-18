@@ -69,9 +69,6 @@ export function FoodScreen() {
       <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
       <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
       {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
-      {entries.length === 0 ? (
-        <p className="app-text app-muted food-line">Nothing logged yet. Start with breakfast.</p>
-      ) : null}
       {entries.length === 0 && yesterday.length > 0 ? (
         <div className="app-stack-item">
           <MmButton
@@ -94,7 +91,7 @@ export function FoodScreen() {
             <FoodDayGradeRow entries={entries} />
           </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
-          <MmDisclosure title="More about today">
+          <MmDisclosure title="More about this day">
             <p className="app-caption">
               Partial days are left out of your metabolism estimate instead of being read as under-eating.
             </p>

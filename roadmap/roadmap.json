@@ -811,7 +811,11 @@
           "workstream": "WS-03",
           "tickets": [
             "MM-375",
-            "MM-376"
+            "MM-376",
+            "MM-389",
+            "MM-390",
+            "MM-391",
+            "MM-392"
           ]
         }
       ]
@@ -1361,7 +1365,9 @@
           "MM-354",
           "MM-356",
           "MM-360",
-          "MM-376"
+          "MM-376",
+          "MM-389",
+          "MM-390"
         ],
         "remaining": [
           "MM-89",
@@ -1389,7 +1395,9 @@
           "MM-357",
           "MM-373",
           "MM-374",
-          "MM-375"
+          "MM-375",
+          "MM-391",
+          "MM-392"
         ]
       },
       "sequence": [
@@ -1620,6 +1628,17 @@
           "tickets": [
             "MM-375",
             "MM-376"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 18,
+          "title": "No line narrates the layout and no fold sits over nothing (MM-389), a past day never heard as today (MM-390), one way into the check-in on Coach (MM-391), an unmarked day saying its consequence (MM-392)",
+          "tickets": [
+            "MM-389",
+            "MM-390",
+            "MM-391",
+            "MM-392"
           ],
           "milestone": "M4"
         }

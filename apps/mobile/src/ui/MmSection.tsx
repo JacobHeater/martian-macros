@@ -50,6 +50,12 @@ export function MmSection({
   children,
 }: MmSectionProps) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
+  // A section with nothing to fold forgets an old fold, so its first rows are not hidden (MM-389).
+  const [couldFold, setCouldFold] = useState(collapsible);
+  if (couldFold !== collapsible) {
+    setCouldFold(collapsible);
+    if (!collapsible) setExpanded(initiallyExpanded);
+  }
   /** How many times the section has been opened, which draws the meter anew. */
   const [opened, setOpened] = useState(0);
   const toggle = () => {

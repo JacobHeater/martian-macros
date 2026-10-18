@@ -463,7 +463,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         </>
       );
     }
-    if (form.source === 'quickAdd') return <p className="app-caption">Enter calories and macros for this food.</p>;
+    if (form.source === 'quickAdd') return null;
     const units = unitsOffered(form.source);
     const unit = form.unit;
     const empty = form.quantity.trim() === '';

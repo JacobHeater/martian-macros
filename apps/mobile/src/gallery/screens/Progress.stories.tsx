@@ -73,7 +73,7 @@ const setUpOnly: StoryScenario = async (repos, today) => {
 /** MM-321: no weigh-in yet: the trend waits for one. */
 export const ProgressNoWeighIn = screenStory({
   covers: ['ProgressScreen'],
-  shows: 'Log a weigh-in to start your trend.',
+  shows: 'No trend yet.',
   scenario: setUpOnly,
   open: onProgress,
 });

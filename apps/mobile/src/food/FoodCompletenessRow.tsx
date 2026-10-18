@@ -56,8 +56,8 @@ export function FoodCompletenessRow({ day, entries }: FoodCompletenessRowProps) 
         completeness === 'unmarked'
           ? 'Mark it complete or partial.'
           : completeness === 'complete'
-            ? 'Counted as a whole day. Press to change.'
-            : 'Left out of your metabolism estimate. Press to change.'
+            ? 'Counted as a whole day.'
+            : 'Left out of your metabolism estimate.'
       }
       opens
       onPress={() => void ask()}

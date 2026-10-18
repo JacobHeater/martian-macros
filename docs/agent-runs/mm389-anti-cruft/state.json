@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "mm389-anti-cruft",
+  "audit_mode": "domain",
+  "baseline": {
+    "branch": "main",
+    "commit": "6646354"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "The whole app's user-visible copy against the anti-cruft policy, and the directions that prescribe filler.",
+      "role": "product",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "6646354",
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "apps/mobile/src screens",
+          "design/anti-cruft-and-anti-slop.md",
+          "design/screen-direction.md"
+        ],
+        "not_inspected": [
+          "renders",
+          "a phone",
+          "TalkBack"
+        ],
+        "referrals": [],
+        "limitations": "Nothing rendered or run by the role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The repository's own policy answers the question.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The same audit for comprehension and accessibility, then the change as the UX guard.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "6646354",
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "apps/mobile/src screens",
+          "design/anti-cruft-and-anti-slop.md",
+          "design/screen-direction.md"
+        ],
+        "not_inspected": [
+          "renders",
+          "a phone",
+          "TalkBack"
+        ],
+        "referrals": [],
+        "limitations": "Nothing rendered or run by the role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The repository's own policy answers the question.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "The change: the empty Food screen without its line, folds only over content, the theme chooser, MM-391 and MM-392.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "6646354",
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "apps/mobile/src screens",
+          "design/anti-cruft-and-anti-slop.md",
+          "design/screen-direction.md"
+        ],
+        "not_inspected": [
+          "renders",
+          "a phone",
+          "TalkBack"
+        ],
+        "referrals": [],
+        "limitations": "Nothing rendered or run by the role."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "The repository's own policy answers the question.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ]
+}

@@ -81,8 +81,7 @@ export function TrainScreen() {
         <>
           {finished.length === 0 ? (
             <p className="app-lead train-intro">
-              Log your training here, set by set. Strength is one of the three things the app watches, with your
-              weight trend and your waist.
+              Strength is one of the three things the app watches, with your weight trend and your waist.
             </p>
           ) : null}
           <MmButton label="Start workout" expand onPress={() => void start()} />

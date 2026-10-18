@@ -175,7 +175,7 @@ export const NewWorkoutAddsExercise = screenStory({
 /** MM-321: a new workout with nothing in it yet. */
 export const NewWorkoutEmpty = screenStory({
   covers: ['WorkoutScreen'],
-  shows: 'Add the first exercise. Each set is one tap once the first is in.',
+  shows: 'Add exercise',
   scenario: firstDayScenario,
   open: async (stage) => {
     const controller = new WorkoutController({ workouts: stage.services.workouts, clock: stage.services.clock });

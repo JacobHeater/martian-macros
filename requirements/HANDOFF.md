@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-18, by Claude, Session 35.
+Last updated: 2026-10-18, by Claude, Session 36.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -325,7 +325,11 @@ download icon, with a card and a strip line per download.
   at 200% text on a food missing sugars and most vitamins, to see "Got it"
   reachable (F3); a search for "oats" after the rebuilt packs install, to
   see the order by source (MM-383); with TalkBack on, let a pack finish and
-  note whether "… is on your phone." is spoken (the guard's F4 caveat).
+  note whether "… is on your phone." is spoken (the guard's F4 caveat);
+  the empty Food screen in the three palettes with no line under the hero
+  and no fold arrows on empty meals, then TalkBack on Food to hear the
+  calorie figure once and "Yesterday" as the heading on a past day
+  (MM-389, MM-390).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -337,6 +341,28 @@ download icon, with a card and a strip line per download.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 36: 2026-10-18, Claude (anti-cruft: lines that narrate the layout)
+
+- The owner, on the empty Food screen: "Nothing logged yet. Start with
+  breakfast." is cruft that fills white space, AI slop; have the UX and
+  Product roles inspect the app. The line was prescribed by
+  `design/screen-direction.md`, now corrected; the anti-cruft doc gains a
+  "No narration" limit.
+- **Panel run:** `docs/agent-runs/mm389-anti-cruft/` (product and UX audits
+  of the whole app; the product designer PASS and the UX guard PASS after
+  its one blocking finding on a test was fixed).
+- **Built:** MM-389 (seventeen narrating lines cut or rewritten, folds over
+  empty sections gone, a stale fold forgotten, the arc no longer spoken twice),
+  MM-390 (a past day heard as today in three places). Opened: MM-391 (one
+  route to the check-in on Coach) and MM-392 (the unmarked day's subtitle,
+  pending the coaching and safety roles).
+- **Say if any is wrong:** Train keeps its one reason line; Progress says
+  "No trend yet."; "Encrypted backup is coming" removed from Settings.
+- Incident: a scratch worktree linked to `apps/mobile/node_modules` was
+  removed with git, which deleted part of the real install through the
+  link; `npm ci` restored it. Nothing in the repository was affected.
+- Roadmap: WS-03 step 18 added (MM-389 to MM-392).
 
 ## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
 
@@ -411,42 +437,3 @@ limitations.
 - **MM-377 built** last: `strengthOnFatLossInsights`, `deficitStartOn` (the
   deficit count now starts from it), 13 engine tests on the measurement
   role's numbers. Not done: MM-368 (sleep; waits for MM-250).
-
-## Session 33: 2026-10-17, Claude (coaching insights inline, built with the first kind)
-
-- PR #179 (warmer Martian, grade fills, ion insights) was green and merged.
-- The owner asked to start the build on the recommendation: the framework,
-  Settings > Coach and the Coach tab list first, with the workout catalog
-  checked by the panel. Branch `feat/inline-insights-framework`.
-- **Panel on MM-366** (`docs/agent-runs/mm366-workout-rules/`): training,
-  coaching and safety, all "build with the listed changes". "Holding steady"
-  repeated or contradicted the progression suggestion and pushed on a cut;
-  "strength on a cut" was undefined and praised the diet; the volume baseline
-  did not exist. **Owner's rulings:** drop holding steady; a pattern line
-  shows in its first week then rests 28 days; volume jump once a workout;
-  strength on fat loss later (MM-377, new).
-- **Built:** `ItemInsight`, `ItemInsightKind`, `itemInsightKinds`,
-  `allowedItemInsights` (safeguards, switches, one per item); schema version
-  7 (the switches in `user_preferences`, `inline_insight_log`); the
-  repositories with contracts; AppState's `insightSwitches`,
-  `insightSafeguards`, `itemInsights`, `inlineInsightLog`; Settings > Coach on
-  stored switches (`InsightSwitchesDraft` gone; an area is listed once it has
-  a kind); the Coach tab list from the log, a lift's entry opening its
-  workout; `volumeJumpInsights` with `VolumeJumpRule` and `countHardSets`
-  (weekly volume now counts with it); evidence rows and a test that a kind
-  without one fails.
-- Stories: the workout stories draw the line the app works out (the demo
-  plus one chest day); CoachRecentInsightsLogged lists it from the log;
-  CoachSettingsEveryArea draws every area with the drafts.
-- **Food insights Q&A (2026-10-18), recorded in MM-365 and MM-378:** the first
-  food set is mostly fat, light on protein and large portion (salty item out;
-  low grade after grades); swap or add, never eat less; logged foods only;
-  every qualifying line every time, with a **snooze** for one kind on one item
-  (1 day, 1 week, 1 month, always), inside the opened line, Undo after, and a
-  Snoozed list per area in Settings > Coach. The snooze applies to workouts
-  too and replaces volume jump's automatic rest. Next: MM-378 drawn in
-  Storybook for the designer and UX guard; MM-365's set to the nutrition,
-  coaching and safety roles.
-- WS-09 step 10: MM-362, MM-364 and MM-366 done; MM-363 in progress (a
-  food's entry opening its day comes with MM-365); MM-377 added.
-

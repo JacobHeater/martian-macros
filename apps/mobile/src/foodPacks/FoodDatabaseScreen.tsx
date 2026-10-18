@@ -123,8 +123,8 @@ export function FoodDatabaseScreen() {
   return (
     <Screen title="Food database">
       <p className="app-text app-muted">
-        Barcode scanning needs a database of foods. It is a separate download, and nothing is downloaded unless you
-        choose to.
+        Food search and barcode scanning need a food database. It is stored on this phone and used without a
+        connection, and nothing downloads unless you choose.
       </p>
       <GroupHeader text="On this phone" />
       <div ref={installedList}>
