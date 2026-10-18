@@ -46,8 +46,9 @@ Scenario: Settings
   And a selection is applied immediately and persists
 
 Scenario: Readable retro colors
-  Then Martian uses deep grape surfaces, cream text and acid-lime actions
-  And cyan, pink and violet macros remain distinguishable in grayscale
+  # Superseded in part by MM-375 (2026-10-17): the surfaces are a royal 90s violet and the macros cyan, tangerine and magenta.
+  Then Martian uses deep violet surfaces, cream text and acid-lime actions
+  And cyan, tangerine and magenta macros remain distinguishable in grayscale
   And text, control and macro contrasts meet the existing design thresholds
   And primary actions do not acquire a glow
 

@@ -18,7 +18,7 @@ interface InlineInsightProps {
 /**
  * One line from the coach under the item it is about (MM-362): the
  * insight's mark in the row's icon column, the line in its text column,
- * and "What this rests on" one tap down, as the dashboard's insight opens
+ * and "The numbers behind this" one tap down, as the dashboard's insight opens
  * its evidence (MM-141). It is drawn inside the row's own slot, never as a
  * card of its own (MM-291). There is no dismiss: the evidence ends with
  * the way to this rule's switch (MM-364).
@@ -40,7 +40,7 @@ export function InlineInsight({ insight, layout = 'entry', initiallyExpanded = f
         }
       >
         <div className="coach-inline-insight-body">
-          <p className="coach-inline-insight-label">What this rests on</p>
+          <p className="coach-inline-insight-label">The numbers behind this</p>
           {insight.evidence.map(([label, value]) => (
             <StatRow key={label} label={label} value={value} />
           ))}

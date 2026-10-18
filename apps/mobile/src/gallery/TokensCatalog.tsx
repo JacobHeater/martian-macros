@@ -3,7 +3,8 @@ import './gallery.css';
 const COLORS = [
   'canvas', 'surface', 'raised', 'overlay', 'sunken', 'track', 'selected', 'outline', 'outline-strong',
   'text', 'text2', 'text3', 'ember', 'on-ember', 'ion', 'on-ion', 'energy', 'protein', 'carbs', 'fat',
-  'positive', 'caution', 'info', 'danger', 'on-danger',
+  'positive', 'caution', 'info', 'danger', 'on-danger', 'water',
+  'grade-a', 'grade-b', 'grade-c', 'grade-d', 'on-grade',
 ] as const;
 
 const TYPE = ['figure-xl', 'figure', 'title', 'heading', 'body', 'label', 'caption'] as const;

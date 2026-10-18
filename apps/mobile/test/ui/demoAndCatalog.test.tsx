@@ -46,7 +46,8 @@ describe('the catalog', () => {
         <BarsCatalog />
       </div>,
     );
-    expect(view.container.querySelectorAll('.gallery-swatch')).toHaveLength(25);
+    // The 25 recorded colours, water, and the four grade fills with their ink (MM-370).
+    expect(view.container.querySelectorAll('.gallery-swatch')).toHaveLength(31);
     for (const kind of ['.mm-button', '.mm-field', '.mm-surface', '.mm-list-row', '.mm-progress', '.chart-plot']) {
       expect(view.container.querySelectorAll(kind).length, kind).toBeGreaterThanOrEqual(1);
     }

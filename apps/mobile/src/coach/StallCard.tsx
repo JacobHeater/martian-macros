@@ -33,7 +33,7 @@ export function StallCard() {
           </ul>
         </>
       )}
-      <MmDisclosure title="What this rests on">
+      <MmDisclosure title="The numbers behind this">
         <StatRow label="Period" value={`Last ${stall.windowDays} days`} />
         <StatRow label="Fully logged days" value={`${stall.usableFoodDays}`} />
         <StatRow label="Weigh-ins" value={`${stall.weighIns}`} />
