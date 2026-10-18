@@ -1,3 +1,4 @@
+import type { Caution } from '../domain/Caution';
 import type { InsightArea } from '../domain/InsightArea';
 import type { InsightPriority } from './InsightPriority';
 import type { InsightSafeguards } from './InsightSafeguards';
@@ -8,7 +9,7 @@ import type { InsightSafeguards } from './InsightSafeguards';
  * by (MM-364).
  */
 export interface ItemInsightKind {
-  /** Stable: switches are stored by it. */
+  /** Stable: switches and snoozes are stored by it. */
   readonly id: string;
   readonly area: InsightArea;
   readonly title: string;
@@ -17,18 +18,28 @@ export interface ItemInsightKind {
   readonly priority: InsightPriority;
   /** Mentions weight, so never shown with weight hidden or an eating-disorder history. */
   readonly aboutWeight?: boolean;
-  /** About food composition or intake other than protein and logging (MM-141), so never shown with an eating-disorder history. */
+  /**
+   * About food composition, a portion, the body, or intake other than
+   * protein and logging (MM-141), so never shown with an eating-disorder
+   * history.
+   */
   readonly notWithEatingDisorderHistory?: boolean;
+  /** Not shown while the under-eating finding holds (MM-114; the panel's SA-4). */
+  readonly notWhileUnderEating?: boolean;
+  /** Not shown for a person with any of these cautions in their coaching policy. */
+  readonly notWithCautions?: readonly Caution[];
 }
 
 export const ItemInsightKind = {
   /**
-   * Left out for the person's health answers: never shown, and never offered
-   * as a switch (MM-364).
+   * Left out for the person's health answers or state: never shown, and
+   * never offered as a switch (MM-364).
    */
   withheld(kind: ItemInsightKind, safeguards: InsightSafeguards): boolean {
     const weight = kind.aboutWeight === true;
     if (safeguards.eatingDisorderHistory && (weight || kind.notWithEatingDisorderHistory === true)) return true;
-    return safeguards.weightHidden && weight;
+    if (safeguards.weightHidden && weight) return true;
+    if (safeguards.underEating && kind.notWhileUnderEating === true) return true;
+    return (kind.notWithCautions ?? []).some((caution) => safeguards.cautions.has(caution));
   },
 } as const;

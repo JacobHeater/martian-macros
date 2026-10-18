@@ -17,6 +17,14 @@ export class InMemoryWaterRepository implements WaterRepository {
     );
   }
 
+  watchWaterSince(since: CalendarDate): Watched<WaterEntry[]> {
+    return this.entries.watchAs((all) =>
+      all
+        .filter((e) => !e.date.isBefore(since))
+        .sort((a, b) => a.date.compareTo(b.date) || a.at.getTime() - b.at.getTime() || a.id - b.id),
+    );
+  }
+
   async addWater(entry: WaterEntry): Promise<number> {
     const id = this.nextId++;
     this.entries.value = [...this.entries.value, new WaterEntry({ id, date: entry.date, ml: entry.ml, at: entry.at })];

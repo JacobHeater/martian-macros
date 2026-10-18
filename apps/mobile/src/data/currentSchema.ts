@@ -286,6 +286,13 @@ CREATE TABLE "inline_insight_log" (
   "first_epoch_day" INTEGER NOT NULL,
   UNIQUE ("kind", "anchor_kind", "anchor_id")
 );
+CREATE TABLE "inline_insight_snoozes" (
+  "kind" TEXT NOT NULL,
+  "subject" TEXT NOT NULL,
+  "item" TEXT NOT NULL,
+  "resumes_epoch_day" INTEGER NULL,
+  PRIMARY KEY ("kind", "subject")
+);
 CREATE TABLE "exercise_progressions" (
   "exercise_id" TEXT NOT NULL,
   "reps_low" INTEGER NOT NULL,

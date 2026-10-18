@@ -12,9 +12,6 @@ import { VolumeJumpRule } from './VolumeJumpRule';
 /** The days a volume jump looks back over: this week and the usual weeks before it. */
 const basisDays = 7 * (VolumeJumpRule.usualWeeks + 1);
 
-/** A jump that held this many days before a workout or fewer, and at least `shownForDays`, keeps it quiet. */
-const quietDays = VolumeJumpRule.shownForDays + VolumeJumpRule.restDays - 1;
-
 /**
  * The "volume jump" insights under `workout`'s exercises (MM-366): for each
  * muscle group that one of its exercises mainly trains, whether the hard
@@ -25,9 +22,9 @@ const quietDays = VolumeJumpRule.shownForDays + VolumeJumpRule.restDays - 1;
  * held then (the panel's TR-5). A workout in progress counts the finished
  * workouts before it. The insight sits under the first exercise of the
  * workout that mainly trains the group, once (the product owner,
- * 2026-10-17). It is shown on the workouts of the jump's first week, then
- * rests (`VolumeJumpRule.restDays`). Nothing is said when a pause falls in
- * the weeks it looks at, since a comeback is not a jump (the panel's SA-4).
+ * 2026-10-17), on every workout while it holds; the person snoozes it
+ * (MM-378). Nothing is said when a pause falls in the weeks it looks at,
+ * since a comeback is not a jump (the panel's SA-4).
  */
 export function volumeJumpInsights({
   workout,
@@ -41,11 +38,10 @@ export function volumeJumpInsights({
   pauses: readonly Pause[];
 }): ItemInsight[] {
   const ref = workout.date;
-  // The oldest day a judgement reaches: the start of the basis of the oldest day that can keep it quiet.
-  const from = ref.addDays(-quietDays - basisDays + 1);
+  const from = ref.addDays(1 - basisDays);
   if (pausedDaysBetween(pauses, ref.addDays(1 - basisDays), ref) > 0) return [];
 
-  // Each finished workout's hard sets by group, for the days any judgement here can reach.
+  // Each finished workout's hard sets by group, over the weeks looked at.
   const days: { date: CalendarDate; totals: ReadonlyMap<MuscleGroup, number> }[] = [];
   for (const other of workouts) {
     if (other.inProgress || other.date.isBefore(from) || other.date.isAfter(ref)) continue;
@@ -77,20 +73,10 @@ export function volumeJumpInsights({
     placed.add(group);
     const jump = jumpOn(group, ref);
     if (jump === undefined) continue;
-    // Resting: the jump already held on a training day between its first week and the end of its rest.
-    const resting = days.some((day) => {
-      const age = day.date.daysUntil(ref);
-      return (
-        age >= VolumeJumpRule.shownForDays &&
-        age <= quietDays &&
-        (day.totals.get(group) ?? 0) > 0 &&
-        jumpOn(group, day.date) !== undefined
-      );
-    });
-    if (resting) continue;
     found.push({
       kind: 'volumeJump',
       anchor: ItemAnchor.exercise(workout.id, entry.exerciseId),
+      subject: entry.exerciseId,
       basis: 'pattern',
       figures: {
         group: MuscleGroup.values.indexOf(group),

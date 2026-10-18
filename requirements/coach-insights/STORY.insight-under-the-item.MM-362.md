@@ -26,8 +26,10 @@ Choices I made without asking (say if any is wrong):
   already shows on the item (MM-142's weight-jump explanation) counts as that item's note, so no inline insight is added.
 - **A single-item insight is about the item, never about the day.** "Most of this item's calories come from fat" is allowed.
   "You went over today because of this" is not. MM-141's "not about one day" stays true for days.
-- **Words: a fact, then a general direction.** "Most of this item's calories come from fat (62%). A leaner choice or a smaller
-  portion leaves more room for protein." No specific replacement food is named, which keeps MM-144's "no prescribed foods". The
+- **Words: a fact, then a general direction.** "Most of this food's calories come from fat (76%). A protein food alongside
+  balances the meal." (The first draft said "a leaner choice or a smaller portion"; the owner ruled swap or add, never eat
+  less, 2026-10-18, and the panel found "leaner" and "room" body and budget words.) No specific replacement food is named,
+  which keeps MM-144's "no prescribed foods". The
   owner answered the "how far can advice go" question with grades (MM-370), so this choice is mine. Say if a named alternative
   is wanted.
 - **MM-108 still holds in every inline line**: no "good", "bad", "clean", "junk", "guilt", "earn", "burn off". No praise for eating
@@ -43,7 +45,8 @@ Choices I made without asking (say if any is wrong):
   coach's voice reads apart from the item's own facts. Ion holds 4.5:1 as caption text on canvas and surface in every palette
   (`design/color-and-theme-system.md` §6). This goes past the colour doc's budget of one ion group per screen, by the owner's
   call: the doc records the exception.
-- **No dismiss button on the line.** The owner put quieting in Settings. The expanded evidence ends with a button naming the
+- **No dismiss button on the closed line** (superseded in part, 2026-10-18: the opened line offers "Snooze…" for that item,
+  MM-378). The owner put quieting in Settings. The expanded evidence ends with a button naming the
   kind of insight, "Settings for “Mostly fat”", that opens that kind's switch (MM-364).
 - **In a workout**, the line about a lift comes after "Last time" and the suggestion, before the sets (the panel's PD-5). A new
   best is not an inline line: the workout's Personal records card already says it (MM-366).

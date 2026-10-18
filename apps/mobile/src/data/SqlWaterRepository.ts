@@ -29,6 +29,20 @@ export class SqlWaterRepository implements WaterRepository {
     );
   }
 
+  watchWaterSince(since: CalendarDate): Watched<WaterEntry[]> {
+    return this.db.watch(['water_entries'], async (db) =>
+      (await db.select('SELECT * FROM water_entries WHERE epoch_day >= ? ORDER BY epoch_day, at_ms, id', [since.epochDay])).map(
+        (r) =>
+          new WaterEntry({
+            id: integer(r, 'id'),
+            date: day(r, 'epoch_day'),
+            ml: number(r, 'ml'),
+            at: moment(r, 'at_ms'),
+          }),
+      ),
+    );
+  }
+
   addWater(entry: WaterEntry): Promise<number> {
     return this.db.write(['water_entries'], (db) =>
       insert(db, 'water_entries', { epoch_day: entry.date.epochDay, ml: entry.ml, at_ms: entry.at.getTime() }),

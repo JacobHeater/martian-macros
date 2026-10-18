@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-17, by Claude, Session 33.
+Last updated: 2026-10-18, by Claude, Session 34.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -234,20 +234,41 @@ surgery and under 19. Insight rules about intake other than protein and
 logging are flagged `otherIntake` and suppressed for an eating-disorder
 history (MM-141).
 
-**Coaching insights inline (MM-361).** The framework is built (MM-362, MM-363,
-MM-364) with one kind, training's "volume jump" (MM-366). A drafted kind
-joins `engine/itemInsightKinds.ts` only after its domain roles check it
-(`docs/agent-runs/mm366-workout-rules/` is the pattern), with its evidence
-rows. Next: the food catalog (MM-365) through nutrition, coaching and
-safety; the grading spike (MM-369); MM-377 through measurement and
-nutrition. `InsightPreview` is now only for what is not built (grades, and
-the lines of unchecked kinds); `gallery/screens/draftInsightKinds.ts` holds
-the drafts the Settings stories draw.
+**Coaching insights inline (MM-361), built 2026-10-18.** The framework
+(MM-362, MM-363, MM-364), the snooze (MM-378), the kinds the panel has
+checked (food: portion check, light on protein, mostly fat, MM-365; training:
+volume jump, MM-366; body: waist no clear change, and water logged on few
+days, MM-367) and the food grades (MM-369, MM-370, MM-371) are on main. A
+kind joins `engine/itemInsightKinds.ts` only after its domain roles check it
+(`docs/agent-runs/mm365-food-rules/`, `mm366-workout-rules/`,
+`mm367-body-water-rules/`), with its evidence rows; the words test forbids
+the panel's lists. The framework's safeguards carry the under-eating
+finding and the policy's cautions beside the eating-disorder history.
+`InsightPreview` is a story override only; `draftInsightKinds.ts` holds
+sleep's drafts (MM-368 waits for MM-250). **The weigh-in time line was
+dropped** (no weigh-in time is stored). **Grades:** the published packs are
+format 1 and carry no sugars or saturated fat, so every pack food shows the
+question mark until a format 2 pack is published (`docs/food-grades.md`);
+the person's own foods that state them are graded now. **MM-377** (strength
+on fat loss) is built on the measurement and nutrition roles' terms
+(`docs/agent-runs/mm377-strength-on-fat-loss/`): fat-loss weeks as of the
+workout, held within 2.5% of the smoothed start, up at 5%, no story (the
+demo's data does not reach it).
 
 **Waiting on the product owner.**
 - Coaching insights: no paywall for any of MM-361 to MM-371 (not behind
-  MM-85). Open: hide "strength on fat loss" under the low-body-weight
-  caution (MM-377, the panel's SA-6)?
+  MM-85). Open, each recorded as "say if any is wrong" in its ticket:
+  "mostly fat" keeps the total-fat trigger so the peanut-butter example
+  fires (nutrition's saturated-fat alternative would drop nuts, nut butters,
+  oils and avocado, MM-365); the waist line is hidden with an eating-disorder
+  history (MM-367); a per-entry "Right as logged" for the portion check and
+  empty-state words for the Snoozed list were declined (MM-365, MM-378);
+  hide "strength on fat loss" under the low-body-weight caution (MM-377)?
+- Grades: read the Nutri-Score Conditions of Use (March 2025) for clauses on
+  applications and text references, and decide whether to notify Santé
+  publique France (with the attorney, MM-242); rebuild and publish the
+  packs in format 2 (`mm food`) so pack foods get grades; a category column
+  in a later format (`docs/food-grades.md`).
 - Warmer Martian (MM-375): the owner approved the royal 90s violet and
   kept lime. Open: Martian's ion and protein are the same aqua, so the
   coach's insight lines share protein's colour (panel P-3/UX-4); whether
@@ -258,7 +279,10 @@ the drafts the Settings stories draw.
   (MM-56); the pause and reminder screens on the device (MM-148, MM-146);
   Health Connect import (MM-68); Martian at low brightness, whether cards and
   the navigation bar still stand off the canvas (MM-375, UX-6); a volume jump
-  line under a lift, opened, and its Settings switch (MM-366, MM-364).
+  line under a lift, opened, and its Settings switch (MM-366, MM-364); a food
+  line, snoozed for a week and undone, and the Snoozed list in Settings >
+  Coach > Food (MM-378); the Food screen at 320 px with a grade and a line
+  under a long food name (MM-370); a grade's popover and a "?" popover.
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -270,6 +294,47 @@ the drafts the Settings stories draw.
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 34: 2026-10-18, Claude (coaching insights inline, the whole feature, overnight)
+
+- The owner asked for the whole feature on main by morning, with the
+  requirements, designs and panel sessions done, and left. Every decision a
+  reviewer handed to the owner was taken by the chair and recorded in the
+  ticket as "say if any is wrong".
+- **Owner's Q&A first** (recorded in MM-365, MM-378): the first food set;
+  swap or add, never eat less; logged foods only; every line every time with
+  a **snooze** (a day, a week, a month, until turned back on; inside the
+  opened line; Undo; a Snoozed list per area).
+- **Panel sessions:** MM-365 (nutrition, coaching, safety), MM-367
+  (measurement, coaching, safety), MM-369 (nutrition research), MM-377
+  (measurement, nutrition), and the build's design review (product designer,
+  UX guard: PASS). Every run has brief, findings, decision, handoff and
+  state. Measurement said "do not build MM-367 as drafted": the weigh-in time
+  line went (no time stored), the waist line uses the shared 28-day answer and
+  is said only when a reading moved, the water line is about logging and is
+  gated on a suggested goal.
+- **Built:** the snooze (schema version 8, `inline_insight_snoozes`; the
+  subject of every insight; volume jump's automatic rest removed); the food
+  rules with `usualServing` and the safeguards' under-eating finding and
+  cautions; the waist and water rules with a multi-day water reader; the
+  grade engine (`FoodGradeRule`, `nutrientProfileScore`, `gradeOfNutrition`,
+  `gradeOfCatalogFood`, `gradeOfCustomFood`, `gradeOfFoodEntry`,
+  `gradeOfMeal`; the grade types in `domain/food/grade/`) on every entry,
+  meal, day, search result, the amount step and the add sheet; MM-371's
+  docs; evidence rows for every rule, figure and the ten `WaistRule` values
+  owed since MM-155.
+- **Design review outcomes:** the opened line's actions share a row; no
+  length pre-checked (`Overlays.options.selected` optional); the Snoozed
+  story draws the always row; **bug MM-379** (focus lost when a snoozed line
+  or row goes) fixed with `ui/focusNeighbourOf` and its test; "Snooze…" and
+  "Turn back on" name their kind and item; withheld kinds' snoozes are not
+  listed. The grade badge's name now leads with the grade ("Grade C for
+  Peanut butter") so a row's name is never the start of its badge's.
+- **Coverage measured** on the published packs with node:sqlite: see
+  `docs/food-grades.md`.
+- **MM-377 built** last: `strengthOnFatLossInsights`, `deficitStartOn` (the
+  deficit count now starts from it), 13 engine tests on the measurement
+  role's numbers. Not done: MM-368 (sleep; waits for MM-250).
 
 ## Session 33: 2026-10-17, Claude (coaching insights inline, built with the first kind)
 
@@ -297,6 +362,15 @@ limitations.
 - Stories: the workout stories draw the line the app works out (the demo
   plus one chest day); CoachRecentInsightsLogged lists it from the log;
   CoachSettingsEveryArea draws every area with the drafts.
+- **Food insights Q&A (2026-10-18), recorded in MM-365 and MM-378:** the first
+  food set is mostly fat, light on protein and large portion (salty item out;
+  low grade after grades); swap or add, never eat less; logged foods only;
+  every qualifying line every time, with a **snooze** for one kind on one item
+  (1 day, 1 week, 1 month, always), inside the opened line, Undo after, and a
+  Snoozed list per area in Settings > Coach. The snooze applies to workouts
+  too and replaces volume jump's automatic rest. Next: MM-378 drawn in
+  Storybook for the designer and UX guard; MM-365's set to the nutrition,
+  coaching and safety roles.
 - WS-09 step 10: MM-362, MM-364 and MM-366 done; MM-363 in progress (a
   food's entry opening its day comes with MM-365); MM-377 added.
 
@@ -358,54 +432,3 @@ limitations.
   test) then PASS. The colour doc's contrast tests had never been carried
   over from Flutter; `tokens.test.ts` now holds text, ion, macro L* and
   grade letters in every palette.
-
-## Session 31: 2026-10-16, Claude (the register's design defects through the panel)
-
-- The owner: a load is said to a tenth, as a scale says a weight (MM-350, PR
-  #169). They want the Storybook path continued: the design defects found by
-  the register, and any backfill still needed.
-- **Batch A, waiting, failed and empty states (MM-333, MM-334, MM-340), done.**
-  Drawn, reviewed by the product designer and the UX guard, their changes
-  built. One pattern for a failed read, `ReadFailedNotice` (screen-direction's
-  Error state, now written there); waiting is `ScreenLoading`. MM-334 as
-  written clashed with MM-183: a failed pause read keeps the day but withholds
-  its targets, and the ticket now says so. The UX guard found Coach would spin
-  for good when any record it works from failed; fixed with its test.
-- **Batch B, sheets and Settings (MM-337, MM-338, MM-346, MM-347), done**, the
-  same way. A notice on a sheet or dialog is a `sunken` well in every palette
-  (the designer rejected a Light-only hairline); a failed change of the look
-  is a snack with Try again; a pack at the listed version is not offered
-  again. `storyPackHost` takes `listed` and `installed`. The panel's
-  follow-ups are ticketed: MM-351 (a lookup's result is not announced), MM-352
-  (the food database's rows have no icons).
-- **MM-335, the Dashboard history, done.** "Days shown" then sections, each
-  summary saying what the days add. Today, until marked complete, is an open
-  dot off the line, left out of the averages and of the axis scale. A header
-  that opens a tab is a button inside its heading, described by its summary
-  and "Opens …" (`MmSection opens`). The owner chose a protein icon: a shaker
-  bottle, drawn for the app (`ShakerBottleOutlined`, the one custom glyph).
-  The recovery line outside its section was its own bug, MM-353, fixed.
-- **MM-344 and MM-348, strength on Progress, done.** Each recent lift is a row
-  ("Est. max 319.7 lb · +16.8 lb in 4 weeks") opening its history, where its
-  chart lives; "Lift histories" is a list group with its own waiting and
-  failure. A deleted exercise is "Deleted exercise · last logged Oct 11",
-  never its id. MM-355 ("1 logged sessions") fixed on the way.
-- **MM-354, the owner's split donut, done.** The split is always a centred
-  donut, its figures beneath it; with nothing logged, a whole `--track` ring
-  and "Log food with protein, carbs or fat to see the split.", as tall as the
-  figures so the hero does not grow with the first food.
-- **The owner saw "Entry Menu" without the water bar** (the demo person had no
-  goal). Two decisions followed. Storybook gained a "Person" panel (MM-356,
-  #175): each screen story's facts, read from its data. An audit of all 249
-  screen stories with it is MM-357 (metric for no reason in 12, six goal
-  amounts), still to fix. The water goal is now on by default (MM-358): a
-  personal formula the owner chose from the panel's research (base by sex,
-  + 7 mL per g of protein above 0.8 g/kg, + 500 mL x training days / 7,
-  capped at 120 fl oz; withheld for kidney disease, bariatric surgery and a
-  new health-check answer, "A clinician has told me to limit my fluids",
-  MM-359). The coefficients are judgement, recorded in docs/evidence.md; a
-  dietitian or clinician should review the bounds before release. Schema
-  version 6.
-- Still for the panel: MM-336, MM-342, MM-329, MM-351, MM-352.
-  Not built: loading skeletons (the designer recorded the spinner as a known
-  deviation, needing its own ticket).

@@ -1,6 +1,7 @@
 import { InsightCard } from '../coach/InsightCard';
 import { RowWithInsight } from '../coach/RowWithInsight';
 import { useInsightPreview } from '../coach/useInsightPreview';
+import { useItemInsightContent } from '../coach/useItemInsightContent';
 import { ReliefOfferCard } from '../coach/ReliefOfferCard';
 import { UnderEatingNotice } from '../coach/UnderEatingNotice';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
@@ -61,6 +62,10 @@ export function DashboardScreen() {
   const current = useCell(state.currentTargets);
   // The coach's lines under the weigh-in, waist and water (MM-367): none in the app until they are built.
   const rowNotes = useInsightPreview().rowNotes;
+  // The coach's lines under the waist and water rows (MM-367), unless a design story hands in its own.
+  const latestWaistDay = (useLoaded(state.waist) ?? []).reduce<number | undefined>((last, w) => Math.max(last ?? 0, w.date.epochDay), undefined);
+  const waistNote = rowNotes?.get('waist') ?? useItemInsightContent({ kind: 'waist', id: `${latestWaistDay ?? 0}` }, 'Waist');
+  const waterNote = rowNotes?.get('water') ?? useItemInsightContent({ kind: 'water', id: `${useCell(state.today).epochDay}` }, 'Water');
 
   // The app shows nothing below its root until the profile is read, and says so there when it fails (AppRoot).
   const setup = Loadable.valueOf(setupState);
@@ -201,7 +206,7 @@ export function DashboardScreen() {
             }}
           />
         ) : (
-          <RowWithInsight insight={rowNotes?.get('waist')}>
+          <RowWithInsight insight={waistNote}>
             <MmListRow
               leadingIcon="tape"
               title={waistAmount(latestWaist.waistCm, fmt)}
@@ -211,7 +216,7 @@ export function DashboardScreen() {
             />
           </RowWithInsight>
         )}
-        <RowWithInsight insight={rowNotes?.get('water')}>
+        <RowWithInsight insight={waterNote}>
           <WaterRow today={today} />
         </RowWithInsight>
         {current === undefined ? null : (

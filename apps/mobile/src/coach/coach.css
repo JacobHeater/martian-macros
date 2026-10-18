@@ -114,5 +114,8 @@
   font: var(--type-label);
 }
 .coach-inline-insight-settings {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-8);
   margin: var(--space-4) 0 0 calc(-1 * var(--space-12));
 }

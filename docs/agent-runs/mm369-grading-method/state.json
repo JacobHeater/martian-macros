@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "task_id": "mm369-grading-method",
+  "audit_mode": "domain",
+  "baseline": {
+    "branch": "spec/food-insights-and-snooze",
+    "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "The grading method, its twelve-step mapping, its inputs and when a grade is impossible, and its licensing terms.",
+      "role": "nutrition",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-369",
+          "MM-370",
+          "MM-371",
+          "MM-361",
+          "MM-310",
+          "MM-307",
+          "CatalogFood.ts",
+          "PackMicros.ts",
+          "PackMicronutrient.ts",
+          "CustomFood.ts",
+          "RecipeIngredient.ts",
+          "Micronutrient.ts",
+          "the portion types",
+          "FoodEntry.ts",
+          "FoodGrade.tsx",
+          "extract.sql",
+          "evidenceRegister.test.ts",
+          "docs/evidence.md"
+        ],
+        "not_inspected": [
+          "the SQL repositories",
+          "the pack build report and coverage.txt (the chair measured coverage)",
+          "MM-365",
+          "USDA food.csv columns"
+        ],
+        "referrals": [
+          "coaching and safety: the grades' presentation and the eating-disorder decision",
+          "food-database: a category column; recipe ingredients' micros",
+          "the chair: the official FAQ V11 and the Conditions of Use PDFs"
+        ],
+        "limitations": "No device; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Which published nutrient-profiling method fits the pack's inputs; the exact 2023 tables; scope exclusions; trademark and conditions of use; HSR and UK NPM structure; validation evidence.",
+        "reason": "A proposed nutrition rule for every food.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Nutri-Score 2023 general-foods tables (via Open Food Facts and Wikipedia; official PDFs unreadable); the FVL component is purely additive since 2023; the logo is a collective mark; EPIC cohort associations for the predecessor score. Sources listed in the report.",
+        "limitations": "Every PDF and DOCX returned binary; several HTML pages blocked."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs; its synthesis is docs/food-grades.md and decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The grades' presentation was reviewed in docs/agent-runs/mm361-coaching-insights/; the open question on judging food is recorded in MM-370.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As coaching.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training rule.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No body figure.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product-designer",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The badge and popover were drawn and passed earlier.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "ux-accessibility",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As product-designer.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No code under review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Owner and attorney: read the Conditions of Use (March 2025) for clauses on applications and text references; whether to notify Santé publique France.",
+    "Owner: a category column in a later pack format (fruit, vegetable and legume proxy; beverage, fats, cheese and red-meat tables).",
+    "Owner: rebuild and publish the packs in format 2 so pack foods can be graded."
+  ],
+  "decisions": [
+    {
+      "id": "MM369-method",
+      "status": "accepted",
+      "summary": "The Nutri-Score 2023 general-foods point tables, applied to every food per 100 g, on twelve steps, with five documented deviations; the grades are not Nutri-Scores.",
+      "authority": "Chair (docs/food-grades.md)"
+    },
+    {
+      "id": "MM369-ship",
+      "status": "accepted",
+      "summary": "Ship with the deviations disclosed rather than wait for a pack category; alcohol read by weight at 1.2 g per 100 g.",
+      "authority": "Chair (docs/food-grades.md)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/engine/foodGrade.test.ts test/engine/foodGradeEvidence.test.ts",
+      "result": "passed",
+      "summary": "The points, the twelve steps, missing values, alcohol, every input kind, the roll-ups and the register rows.",
+      "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T08:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test, read a PDF, or reach a device."
+    }
+  ]
+}

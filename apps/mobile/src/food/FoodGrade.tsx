@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MmGradeBadge } from '../ui/MmGradeBadge';
 import { useOverlays } from '../ui/useOverlays';
-import type { FoodGradeValue } from './FoodGradeValue';
+import type { FoodGradeValue } from '../domain/food/grade/FoodGradeValue';
 
 interface FoodGradeProps {
   grade: FoodGradeValue;
@@ -33,7 +33,7 @@ export function FoodGrade({ grade, subject, scope = 'food' }: FoodGradeProps) {
   return (
     <MmGradeBadge
       letter={graded ? grade.letter : undefined}
-      label={graded ? `${subject}: grade ${spoken(grade.letter)}` : `${subject}: can’t be graded. Why?`}
+      label={graded ? `Grade ${spoken(grade.letter)} for ${subject}` : `No grade for ${subject}. Why?`}
       expanded={open}
       onExplain={(anchor) => {
         setOpen(true);

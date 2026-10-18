@@ -1,6 +1,6 @@
 ---
 id: MM-377
-status: proposed
+status: done
 component: coach-insights
 related: [MM-361, MM-362, MM-366, MM-141, MM-77, MM-79, MM-92, MM-117, MM-118]
 ---
@@ -33,7 +33,26 @@ Choices I made without asking (say if any is wrong), from the panel's findings:
 - **No direction beside the progression suggestion**: on a workout in progress the line states the fact only (TR-3).
 - **Not shown with an eating-disorder history**, as MM-141 limits intake insights for that person (SA-6). Whether also
   under the low-body-weight caution is for the product owner (SA-6).
-- Shown once when the 6 weeks are reached, then rested as MM-366's lines are.
+- Shown on every workout while it holds, until snoozed (MM-378); the weeks figure is live ("through 9 weeks").
+
+The panel's measurement and nutrition roles reviewed this (`docs/agent-runs/mm377-strength-on-fat-loss/`, both "build
+with the listed changes"). Choices I made without asking (say if any is wrong), from their findings:
+- **The weeks are fat-loss weeks, not recomp weeks** (NU-2, ME-10): every targets record of the run is in fat-loss mode; a
+  mode change inside the window breaks it. Recomp gets no line.
+- **The basis is taken as of the workout's date** (NU-1, ME-5): the run of deficit targets in force then (`deficitStartOn`,
+  with the restart a 14-day gap or a 7-day pause set, MM-147, MM-148), not "a two-week gap in targets", which targets never
+  have. A maintenance week ends the run; the line can come back 6 weeks into the next run (NU-5).
+- **Held is 2.5% below the smoothed value at the start, gone up is 5% above** (ME-2, ME-3): one effective rep, and two;
+  about 0.75 and 1.5 times the noise of the comparison, so falling (MM-117's 5%), held and up sit on one scale.
+- **The baseline is the latest session within 7 days either side of the start** (ME-1), so a person who began logging with
+  the diet has one; **both ends rest on at least 2 sessions** and **4 sessions on distinct days with no gap over 28 days**
+  lie between (ME-4).
+- **No intake requirement** (NU-3): logged intake cannot establish a deficit (food records under-report by 11–41%). But the
+  line is not said while progress is assessed as stalled: "your fat-loss goal" means little then.
+- **Not shown while under-eating, nor with the underweight or low-body-weight cautions** (NU-6, SA-6), as well as the
+  eating-disorder history.
+- **The numbers show the band** (ME-6): the smoothed estimate at the start, now, and the value counted as held down to.
+- **Declined**: the mixed-RIR guard (ME-8), recorded as a limitation; a recomp variant (NU-2).
 
 ## Description
 The rule, its words and evidence rows, and its line under the lift.
@@ -59,5 +78,18 @@ Scenario: Eating-disorder history
 ```
 
 ## Notes
-- Needs the measurement role's check of the tolerance and the smoothing, and the nutrition role's view on planned versus
-  eaten weeks, before it is built.
+- A best set logged with reps in reserve at one end and without at the other moves the estimate by about 5% with the same
+  performance (the panel's ME-8); not guarded. The line claims nothing about muscle or lean mass: strength held does not
+  show lean mass was kept (Murphy and Koehler 2022), and the words test forbids the words.
+
+## Progress
+- Built 2026-10-18. Engine: `strengthOnFatLossInsights`, `StrengthOnFatLossRule`, `deficitStartOn` (which
+  `consecutiveDeficitWeeks` now counts from). Kind `strengthOnFatLoss`; words in `format/itemInsightText.ts`.
+- Tests: `test/engine/strengthOnFatLossInsights.test.ts` (held with a bad day absorbed, not held, gone up at 5%, no or a
+  lone baseline, a 29-day gap, distinct days, judged on the workout's own date, in progress, a restart, a maintenance week,
+  recomp, a goal switch, a stall, a bodyweight lift, pounds, a deload), `test/format/itemInsightText.test.ts` (no muscle,
+  mass, eating, kcal or weight in the words), `test/engine/itemInsightEvidence.test.ts`.
+- Evidence register: `strengthOnFatLoss`, `StrengthOnFatLossRule.*`, `deficitStartOn`, `GapRule.deficitBreakDays`,
+  `PauseRule.deficitBreakDays`, `estimatedOneRepMax`, `buildStrengthTrends.smoothing`.
+- No story: the demo's lifts are not on six weeks of fat-loss targets with a flat strength; the line reuses the reviewed
+  `InlineInsight`, and its states are covered by the workout stories.

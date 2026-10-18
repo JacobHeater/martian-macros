@@ -1,19 +1,21 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
-import type { InlineInsightContent } from '../../coach/InlineInsightContent';
 import type { InsightPreview } from '../../coach/InsightPreview';
 import type { RecentInsight } from '../../coach/RecentInsight';
 import { FoodEntry } from '../../domain/FoodEntry';
+import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
+import type { Portion } from '../../domain/food/portion/Portion';
 import { InsightSwitches } from '../../domain/InsightSwitches';
 import type { Meal } from '../../domain/Meal';
 import { Workout } from '../../domain/training/Workout';
 import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../domain/training/WorkoutSet';
+import { FoodGradeRule } from '../../engine/FoodGradeRule';
 import { ItemAnchor } from '../../engine/ItemAnchor';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
-import type { FoodGradeLetter } from '../../food/FoodGradeLetter';
-import type { FoodGradeValue } from '../../food/FoodGradeValue';
+import { FoodGradeLetter } from '../../domain/food/grade/FoodGradeLetter';
+import type { FoodGradeValue } from '../../domain/food/grade/FoodGradeValue';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { CoachAreaScreen } from '../../settings/CoachAreaScreen';
 import { CoachSettingsScreen } from '../../settings/CoachSettingsScreen';
@@ -40,53 +42,19 @@ import { valueOf } from './valueOf';
 const meta = { title: 'Designs/Coaching insights', ...screensMeta } satisfies Meta;
 export default meta;
 
-const graded = (letter: FoodGradeLetter): FoodGradeValue => ({ kind: 'graded', letter });
+/** The design's own letter, with the top score of its step as its score (MM-369). */
+const graded = (letter: FoodGradeLetter): FoodGradeValue => ({
+  kind: 'graded',
+  letter,
+  score: FoodGradeRule.letterSteps[FoodGradeLetter.values.indexOf(letter)] ?? 19,
+});
 
 // ---- Food: the owner's example, a food high in fat, with the coach's line under it ----
-
-const peanutButter: InlineInsightContent = {
-  line: 'Most of this item’s calories come from fat (76%). A smaller portion or a leaner spread leaves more room for protein.',
-  evidence: [
-    ['Calories', '190 kcal'],
-    ['From fat', '144 kcal (76%)'],
-    ['Protein', '7 g'],
-  ],
-  area: 'food',
-  rule: 'Mostly fat',
-};
-
-const pasta: InlineInsightContent = {
-  line: '640 kcal with 14 g of protein. Adding a protein source here makes your minimum easier.',
-  evidence: [
-    ['Calories', '640 kcal'],
-    ['Protein', '14 g (9% of calories)'],
-    ['Your protein minimum', '140 g a day'],
-  ],
-  area: 'food',
-  rule: 'Light on protein',
-};
-
-const garlicBread: InlineInsightContent = {
-  line: 'About twice the usual serving (4 slices). Worth checking the amount is right.',
-  evidence: [
-    ['Logged', '4 slices, 350 kcal'],
-    ['Usual serving', '2 slices'],
-  ],
-  area: 'food',
-  rule: 'Large portion',
-};
 
 const soupReason =
   'It was entered by its totals, with no fiber or sugar value. The grade needs both, and a missing value is never counted as zero.';
 
 const foodPreview: InsightPreview = {
-  // Food's kinds are drafts, so its Settings screen is drawn with them.
-  kinds: draftInsightKinds,
-  entryNotes: new Map([
-    ['Peanut butter', peanutButter],
-    ['Pasta with cream sauce', pasta],
-    ['Garlic bread', garlicBread],
-  ]),
   entryGrades: new Map<string, FoodGradeValue>([
     ['Demo oats and yogurt', graded('B+')],
     ['Demo chicken and rice', graded('B')],
@@ -117,15 +85,24 @@ const foodPreview: InsightPreview = {
  * With an eating-disorder history the grades stay (the owner's call); the lines about fat and about a
  * large portion go (MM-362, and the panel's request on portions), and protein's stays.
  */
-const foodPreviewEatingDisorder: InsightPreview = { ...foodPreview, entryNotes: new Map([['Pasta with cream sauce', pasta]]) };
-
-/** Yesterday's demo day with a lunch, a snack and a typed soup that the insights and grades are about. */
+/**
+ * Yesterday's demo day with a lunch, a snack and a typed soup that the
+ * insights and grades are about. The app works the lines out itself
+ * (MM-365): the pasta is light on protein, the peanut butter mostly fat,
+ * and the garlic bread, logged as 4 servings, gets the portion check.
+ */
 const extraFoods: StoryScenario = async (repos, today) => {
   const date = today.addDays(-1);
-  const add = (meal: Meal, name: string, kcal: number, proteinG: number, carbsG: number, fatG: number, source: FoodEntry['source']) =>
-    repos.food.addFood(new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source }));
+  const add = (meal: Meal, name: string, kcal: number, proteinG: number, carbsG: number, fatG: number, source: FoodEntry['source'], portion?: Portion) =>
+    repos.food.addFood(new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source, portion }));
   await add('lunch', 'Pasta with cream sauce', 640, 14, 70, 32, 'weighed');
-  await add('lunch', 'Garlic bread', 350, 8, 40, 17, 'labelServing');
+  await add('lunch', 'Garlic bread', 350, 8, 40, 17, 'labelServing', {
+    method: 'labelServing',
+    basis: 'calculated',
+    quantity: 4,
+    unit: 'serving',
+    reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 87.5, proteinG: 2, carbsG: 10, fatG: 4.25 }), servingDescription: '1 slice', servingGrams: 30 },
+  });
   await add('snack', 'Peanut butter', 190, 7, 7, 16, 'labelServing');
   await add('snack', 'Homemade soup', 220, 9, 30, 6, 'quickAdd');
 };
@@ -145,21 +122,21 @@ const revealed = (name: string | RegExp, role = 'button') => async (canvas: HTML
 /** MM-362, MM-370: the coach's lines under three foods, every entry, meal and the day graded. */
 export const FoodWithInsights = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this item’s calories come from fat/,
+  shows: /^Most of this food’s calories come from fat/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this item/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
 });
 
 /** MM-365: lunch with two lines, one under each of its foods. */
 export const FoodTwoInsightsInOneMeal = screenStory({
   covers: ['FoodScreen'],
-  shows: /^About twice the usual serving/,
+  shows: /^Logged as 4 servings/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: 640 kcal with 14 g/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: 14 g of protein in 640 kcal/)(canvas)),
 });
 
 /** MM-362: the line opened: what it rests on, and the way to its switch. */
@@ -170,8 +147,49 @@ export const FoodInsightOpen = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this item/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
     reveal(await within(canvas).findByRole('button', { name: 'Settings for “Mostly fat”' }));
+  },
+});
+
+/** MM-378: the opened line ends with the way to its switch and "Snooze…". */
+export const FoodInsightSnooze = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^Snooze…/,
+  scenario: demoWith({ then: extraFoods }),
+  preview: foodPreview,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    reveal(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
+  },
+});
+
+/** MM-378: the lengths offered: a day, a week, a month, or until turned back on. */
+export const FoodInsightSnoozeLengths = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Until I turn it back on',
+  scenario: demoWith({ then: extraFoods }),
+  preview: foodPreview,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
+  },
+});
+
+/** MM-378: snoozed for a week: the line is gone from under its food, and the message offers Undo. */
+export const FoodInsightSnoozed = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^Snoozed for Peanut butter/,
+  scenario: demoWith({ then: extraFoods }),
+  preview: foodPreview,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
+    const dialog = await within(canvas).findByRole('dialog', { name: /^Snooze “Mostly fat”/ });
+    await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
   },
 });
 
@@ -183,7 +201,7 @@ export const FoodInsightToSettings = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this item/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Settings for “Mostly fat”' }));
   },
 });
@@ -196,7 +214,7 @@ export const FoodGradeMeaning = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed('Peanut butter: grade C')(canvas));
+    await userEvent.click(await revealed('Grade C for Peanut butter')(canvas));
   },
 });
 
@@ -208,19 +226,19 @@ export const FoodDayGradeMeaning = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed('This day: grade B minus')(canvas));
+    await userEvent.click(await revealed('Grade B minus for This day')(canvas));
   },
 });
 
 /** MM-362, MM-370 (the panel's UX-4): the food log at 200% text, the line under Peanut butter in view. */
 export const FoodLargeText = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this item’s calories come from fat/,
+  shows: /^Most of this food’s calories come from fat/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   textScale: 2,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this item/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
 });
 
 /** MM-372 (the panel's UX-1, UX-4): the Snacks question mark at 200% text: the popover inside both edges. */
@@ -232,19 +250,19 @@ export const FoodMealGradeWhyLargeText = screenStory({
   textScale: 2,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed('Snacks: can’t be graded. Why?')(canvas));
+    await userEvent.click(await revealed('No grade for Snacks. Why?')(canvas));
   },
 });
 
 /** The panel's UX-4: the food log on a 320 px phone: the entry's calories, grade and More beside a narrow name. */
 export const FoodNarrow = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this item’s calories come from fat/,
+  shows: /^Most of this food’s calories come from fat/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   viewport: 'narrowPhone',
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this item/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
 });
 
 /** MM-370: a food that can't be graded: the question mark opens why. */
@@ -255,7 +273,7 @@ export const FoodGradeWhy = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed('Homemade soup: can’t be graded. Why?')(canvas));
+    await userEvent.click(await revealed('No grade for Homemade soup. Why?')(canvas));
   },
 });
 
@@ -267,18 +285,18 @@ export const FoodMealGradeWhy = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed('Snacks: can’t be graded. Why?')(canvas));
+    await userEvent.click(await revealed('No grade for Snacks. Why?')(canvas));
   },
 });
 
 /** MM-362, MM-370: eating-disorder history: grades as for anyone, no line about fat, protein's line kept. */
 export const FoodWithInsightsEatingDisorder = screenStory({
   covers: ['FoodScreen'],
-  shows: /^640 kcal with 14 g of protein/,
+  shows: /^14 g of protein in 640 kcal/,
   scenario: demoWith({ screening: { eatingDisorderHistory: true }, then: extraFoods }),
-  preview: foodPreviewEatingDisorder,
+  preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: 640 kcal with 14 g/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: 14 g of protein in 640 kcal/)(canvas)),
 });
 
 /** A grade for every food in the pack, from its name: the design's own letters, and one the method can't grade. */
@@ -311,8 +329,7 @@ export const AmountStepWithGrade = screenStory({
   preview: { gradeOfFood },
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' }),
   walk: async (canvas) => {
-    // The row, not its grade beside it ("Chicken breast, cooked: grade A").
-    await userEvent.click(await within(canvas).findByRole('button', { name: /^Chicken breast, cooked(?!: grade)/ }, { timeout: 10000 }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Chicken breast, cooked/ }, { timeout: 10000 }));
   },
 });
 
@@ -376,87 +393,62 @@ const chestJump =
   '8 sets for chest in the 7 days to this workout. Your usual is about 2 a week. A jump this big can bring more ' +
   'soreness; adding sets more slowly is easier to recover from.';
 
-// ---- The Dashboard: the weigh-in, the waist and water ----
+// ---- The Dashboard: the waist and water ----
 
-/** The demo with water on 5 of the last 14 days, so the water line says what the data shows. */
-const fewWaterDays: StoryScenario = async (repos, today) => {
-  await new DemoSeed(today).replace({ ...repos, water: undefined });
+/**
+ * The demo with a waist that moved a centimetre on a reading while the
+ * smoothed answer is no clear change, and water on 4 of the 14 days before
+ * today, so both lines are what the app works out (MM-367).
+ */
+const waistAndWater: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace({ ...repos, water: undefined, waist: undefined });
+  const triple = (daysAgo: number, cm: number) => repos.waist.saveWaist(today.addDays(-daysAgo), cm, { readings: [cm - 0.2, cm, cm + 0.3] });
+  await triple(28, 92.0);
+  await triple(21, 92.2);
+  await triple(14, 91.8);
+  await triple(7, 92.0);
+  await repos.waist.saveWaist(today, 93.0, { readings: [93.0] });
   for (const daysAgo of [0, 2, 5, 9, 12]) {
     const date = today.addDays(-daysAgo);
     await repos.water.addWater(new WaterEntry({ id: 0, date, ml: 500, at: new Date(date.year, date.month - 1, date.day, 9) }));
   }
 };
 
-const dashboardPreview: InsightPreview = {
-  rowNotes: new Map([
-    [
-      'weight',
-      {
-        line: 'Weighed later than usual. Weighing at the same time each day makes the trend steadier.',
-        evidence: [
-          ['Today', '11:40 AM'],
-          ['Usually', 'about 7:00 AM'],
-          ['Weigh-ins it rests on', '14 in the last 14 days'],
-        ],
-        area: 'body',
-        rule: 'Unusual weigh-in time',
-      },
-    ],
-    [
-      'waist',
-      {
-        line: 'Within the usual day-to-day difference of a tape, so not a change yet.',
-        evidence: [
-          ['Today', '35.8 in'],
-          ['A week ago', '35.9 in'],
-          ['A tape’s usual difference', 'about 0.4 in'],
-        ],
-        area: 'body',
-        rule: 'Within the noise',
-      },
-    ],
-    [
-      'water',
-      {
-        line: 'Water logged on 5 of the last 14 days. A glass with each meal is an easy habit to log.',
-        evidence: [
-          ['Days with water', '5 of 14'],
-          ['Your goal', 'on'],
-        ],
-        area: 'water',
-        rule: 'Water on few days',
-      },
-    ],
-  ]),
-};
-
-/** MM-367: a line under each of the three rows, inside their list group. */
+/** MM-367: a line under the waist and water rows, inside their list group. */
 export const DashboardWithInsights = screenStory({
   covers: ['DashboardScreen'],
-  shows: /^Weighed later than usual/,
-  scenario: fewWaterDays,
-  preview: dashboardPreview,
-  walk: async (canvas) => void (await revealed(/^Coach: Within the usual day-to-day difference/)(canvas)),
+  shows: /^Water logged on 4 of the last 14 days/,
+  scenario: waistAndWater,
+  walk: async (canvas) => void (await revealed(/^Coach: About the same as 4 weeks ago/)(canvas)),
+});
+
+/** MM-367: the waist line opened: the smoothed figures and what a change has to pass. */
+export const DashboardWaistInsightOpen = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'A change has to pass',
+  scenario: waistAndWater,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed(/^Coach: About the same as 4 weeks ago/)(canvas));
+  },
 });
 
 /** The panel's UX-4: the same rows at 200% text. */
 export const DashboardLargeText = screenStory({
   covers: ['DashboardScreen'],
-  shows: /^Weighed later than usual/,
-  scenario: fewWaterDays,
-  preview: dashboardPreview,
+  shows: /^Water logged on 4 of the last 14 days/,
+  scenario: waistAndWater,
   textScale: 2,
-  walk: async (canvas) => void (await revealed(/^Coach: Weighed later than usual/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Water logged on 4/)(canvas)),
 });
 
 // ---- The Coach tab: what was said inline ----
 
 const recent: readonly RecentInsight[] = [
-  { area: 'food', item: 'Peanut butter, snack', day: storyToday.addDays(-1), line: peanutButter.line },
-  { area: 'food', item: 'Pasta with cream sauce, lunch', day: storyToday.addDays(-1), line: pasta.line },
-  { area: 'food', item: 'Granola bar, snack', day: storyToday.addDays(-6), line: garlicBread.line.replace('4 slices', '2 bars'), changed: true },
+  { area: 'food', item: 'Peanut butter, snack', day: storyToday.addDays(-1), line: 'Most of this food’s calories come from fat (76%). A protein food alongside balances the meal.' },
+  { area: 'food', item: 'Pasta with cream sauce, lunch', day: storyToday.addDays(-1), line: '14 g of protein in 640 kcal. A protein food alongside is the easiest way to add some.' },
+  { area: 'food', item: 'Granola bar, snack', day: storyToday.addDays(-6), line: 'Logged as 4 servings (480 kcal); one serving is 40 g. Right as logged? If not, the amount can be edited.', changed: true },
   { area: 'training', item: 'Barbell bench press', day: storyToday, line: chestJump },
-  { area: 'body', item: 'Weigh-in', day: storyToday, line: 'Weighed later than usual. Weighing at the same time each day makes the trend steadier.' },
+  { area: 'body', item: 'Waist', day: storyToday, line: 'About the same as 4 weeks ago. A difference under 0.75 in is within what a tape can tell.' },
 ];
 
 /** Opens the folded Recent insights section and brings it into view. */
@@ -629,6 +621,18 @@ export const CoachSettingsFoodWhileAllOff = screenStory({
   preview: drafts,
   open: async ({ navigator, services }) => {
     await services.preferences.saveInsightSwitches(InsightSwitches.withAll(InsightSwitches.allOn, false));
+    void navigator.push(() => <CoachAreaScreen area="food" />);
+  },
+});
+
+/** MM-378: what is snoozed in an area, one for a time and one for always, each with the way back on. */
+export const CoachSettingsFoodSnoozed = screenStory({
+  covers: ['CoachAreaScreen'],
+  shows: /^Garlic bread · until turned back on/,
+  preview: drafts,
+  open: async ({ navigator, services, today }) => {
+    await services.insightSnoozes.saveInsightSnooze({ kind: 'mostlyFat', subject: 'Peanut butter', item: 'Peanut butter', resumesOn: today.addDays(8) });
+    await services.insightSnoozes.saveInsightSnooze({ kind: 'portionCheck', subject: 'Garlic bread', item: 'Garlic bread', resumesOn: undefined });
     void navigator.push(() => <CoachAreaScreen area="food" />);
   },
 });

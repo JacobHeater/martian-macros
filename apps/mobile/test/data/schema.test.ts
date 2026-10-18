@@ -53,6 +53,8 @@ const tablesAddedSince: readonly string[] = [
   'water_entries',
   // Version 7 (MM-363): the inline insights shown.
   'inline_insight_log',
+  // Version 8 (MM-378): the inline insights snoozed.
+  'inline_insight_snoozes',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

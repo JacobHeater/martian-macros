@@ -137,8 +137,11 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 7 left it: without the snoozed inline insights (MM-378). */
+const versionSeven = currentSchema.replace(/CREATE TABLE "inline_insight_snoozes" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 6 left it: without the switches of Settings > Coach and the inline insight log (MM-363, MM-364). */
-const versionSix = currentSchema
+const versionSix = versionSeven
   .replace('  "inline_insights_off" INTEGER NOT NULL DEFAULT 0 CHECK ("inline_insights_off" IN (0, 1)),\n', '')
   .replace("  \"inline_insight_areas_off\" TEXT NOT NULL DEFAULT '',\n", '')
   .replace("  \"inline_insight_kinds_off\" TEXT NOT NULL DEFAULT '',\n", '')
@@ -252,4 +255,13 @@ it('a version 6 database comes up to date with every inline insight on and none 
   expect([...switches.offAreas, ...switches.offKinds]).toEqual([]);
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
   expect(await first(repos.inlineInsightLog.watchInlineInsightLog({ since: day.addDays(-30) }))).toEqual([]);
+});
+
+it('a version 7 database comes up to date with nothing snoozed', async () => {
+  expect(versionSeven).not.toContain('inline_insight_snoozes');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 7, schema: versionSeven });
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await first(repos.insightSnoozes.watchInsightSnoozes())).toEqual([]);
 });

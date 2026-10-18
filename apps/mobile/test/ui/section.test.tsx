@@ -48,7 +48,7 @@ describe('a section', () => {
         <p>Rice</p>
       </MmSection>,
     );
-    await userEvent.click(screen.getByRole('button', { name: /^Lunch/ }));
+    await userEvent.click(screen.getByRole('button', { name: /^Lunch(?!:)/ }));
     expect(screen.getByText('Rice')).not.toBeVisible();
   });
 

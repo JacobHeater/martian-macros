@@ -9,4 +9,4 @@
  * `currentSchema` to the new shape (a new install is created from it), and
  * add the step that takes an existing database there to `migrationSteps`.
  */
-export const currentSchemaVersion = 7;
+export const currentSchemaVersion = 8;
