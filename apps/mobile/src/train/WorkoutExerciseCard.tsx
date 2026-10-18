@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { InlineInsight } from '../coach/InlineInsight';
+import { useExerciseInsight } from '../coach/useExerciseInsight';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import type { Workout } from '../domain/training/Workout';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
@@ -57,9 +58,11 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   const progressions = useLoaded(state.exerciseProgressions);
   const preview = useInsightPreview();
   const entry = workout.exercises[index];
+  const exercise = entry === undefined ? undefined : exercises.get(entry.exerciseId);
+  const coachSays = useExerciseInsight(workout.id, entry?.exerciseId ?? '', exercise?.name ?? '');
   if (entry === undefined) return null;
-  const exerciseNote = preview.exerciseNotes?.get(entry.exerciseId);
-  const exercise = exercises.get(entry.exerciseId);
+  // What the coach says under the lift (MM-366), or a design story's own line.
+  const exerciseNote = preview.exerciseNotes?.get(entry.exerciseId) ?? coachSays;
   const load = exercise?.load ?? 'addedWeight';
   const units = setup?.unitSystem ?? 'imperial';
   const fmt = new Fmt(units);

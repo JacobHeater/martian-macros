@@ -174,6 +174,23 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchThemePreference())).toBe('light');
     });
 
+    it('starts with every inline insight on (MM-364)', async () => {
+      const switches = await first(repo.watchInsightSwitches());
+      expect(switches.all).toBe(true);
+      expect([...switches.offAreas]).toEqual([]);
+      expect([...switches.offKinds]).toEqual([]);
+    });
+
+    it('keeps the inline insight switches as saved, and the rest as they were (MM-364)', async () => {
+      await repo.saveThemePreference('dark');
+      await repo.saveInsightSwitches({ all: false, offAreas: new Set(['training', 'food']), offKinds: new Set(['volumeJump']) });
+      const switches = await first(repo.watchInsightSwitches());
+      expect(switches.all).toBe(false);
+      expect([...switches.offAreas].sort()).toEqual(['food', 'training']);
+      expect([...switches.offKinds]).toEqual(['volumeJump']);
+      expect(await first(repo.watchThemePreference())).toBe('dark');
+    });
+
     it('emits the current choice first, then each change', async () => {
       await expectChangeEmits(repo.watchThemePreference(), {
         before: 'unselected',

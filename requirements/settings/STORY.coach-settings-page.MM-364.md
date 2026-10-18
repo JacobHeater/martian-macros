@@ -1,6 +1,6 @@
 ---
 id: MM-364
-status: proposed
+status: done
 component: settings
 related: [MM-361, MM-362, MM-80, MM-259, MM-148]
 ---
@@ -36,7 +36,9 @@ Choices I made without asking (say if any is wrong):
   view and puts the focus on its switch (the panel's UX-2).
 - **Safeguarded kinds are not offered.** A kind hidden by the eating-disorder safeguard or hidden weight is listed as "Not shown
   for your health answers", with no switch. It is never presented as something to turn on.
-- **Sleep is listed only once MM-250 exists.**
+- **An area is listed once it has a kind of insight** (decided at the build, 2026-10-17): a row for an area with no
+  kinds would open an empty screen. So only Training is listed at first, and Sleep joins after MM-250 and MM-368.
+- **Switches are stored by the kind's id**, not its title, so a reworded title keeps its switch.
 - **Stored on the device** with the other preferences, and erased with everything else.
 - **The dashboard insight card (MM-141) and safety notices are not affected** by these switches.
 
@@ -85,3 +87,14 @@ In `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`, reviewed by t
 - CoachSettingsFood, CoachSettingsFoodOff, CoachSettingsFoodWhileAllOff, CoachSettingsTraining. Area screens.
 - CoachSettingsFoodEatingDisorder. Kinds left out for health answers, with no switch.
 - FoodInsightToSettings. Opened from an insight.
+
+## Progress
+- Built 2026-10-17. Stored in `user_preferences` (schema version 7: `inline_insights_off`, `inline_insight_areas_off`,
+  `inline_insight_kinds_off`), read and written through `PreferencesRepository` (one contract, both stores), erased with
+  everything else. `InsightSwitchesDraft` is gone.
+- The Settings section shows once the app has a kind of inline insight. The design's stories still draw every area with
+  the drafted kinds (`draftInsightKinds`), handed in as a preview.
+- Tests: `test/coach/inlineInsights.test.tsx` (opened from an insight with the kind named and its switch focused; an area
+  off hides its lines and stays off after a restart; all off and back on keeps each area's position),
+  `test/contracts/preferencesRepositoryContract.ts`, `test/data/upgrade.test.ts` (a version 6 database comes up with
+  everything on), `test/engine/allowedItemInsights.test.ts` (one kind off).

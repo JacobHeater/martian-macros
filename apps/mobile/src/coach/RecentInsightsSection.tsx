@@ -1,10 +1,12 @@
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useNavigator } from '../app/useNavigator';
 import type { InsightArea } from '../domain/InsightArea';
 import { Fmt } from '../format/Fmt';
 import type { HomeDestination } from '../state/HomeDestination';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
+import { WorkoutScreen } from '../train/WorkoutScreen';
 import { insightAreaIcon } from './insightAreaIcon';
 import type { RecentInsight } from './RecentInsight';
 import './coach.css';
@@ -30,11 +32,18 @@ const home: Record<InsightArea, HomeDestination> = {
  */
 export function RecentInsightsSection({ insights }: { insights: readonly RecentInsight[] }) {
   const { state } = useApp();
+  const navigator = useNavigator();
   const today = useCell(state.today);
   const sorted = [...insights].sort(
     (a, b) => areaOrder.indexOf(a.area) - areaOrder.indexOf(b.area) || b.day.epochDay - a.day.epochDay,
   );
   const open = (insight: RecentInsight) => {
+    // A lift's insight opens the workout it was said in.
+    if (insight.workoutId !== undefined) {
+      const workoutId = insight.workoutId;
+      void navigator.push(() => <WorkoutScreen workoutId={workoutId} />);
+      return;
+    }
     state.selectedDay.put(insight.area !== 'food' || insight.day === today ? undefined : insight.day);
     state.homeTab.put(home[insight.area]);
   };

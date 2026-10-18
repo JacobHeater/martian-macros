@@ -15,6 +15,7 @@ import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
+import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -25,6 +26,7 @@ import { InMemoryDataEraser } from './InMemoryDataEraser';
 import { InMemoryDayMarkRepository } from './InMemoryDayMarkRepository';
 import { InMemoryExerciseProgressionRepository } from './InMemoryExerciseProgressionRepository';
 import { InMemoryFoodRepository } from './InMemoryFoodRepository';
+import { InMemoryInlineInsightLogRepository } from './InMemoryInlineInsightLogRepository';
 import { InMemoryInsightLogRepository } from './InMemoryInsightLogRepository';
 import { InMemoryIntakeReader } from './InMemoryIntakeReader';
 import { InMemoryPauseRepository } from './InMemoryPauseRepository';
@@ -57,6 +59,7 @@ export class InMemoryRepositories {
   readonly targets: TargetsHistoryRepository;
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;
+  readonly inlineInsightLog: InlineInsightLogRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -78,6 +81,7 @@ export class InMemoryRepositories {
     const targets = new InMemoryTargetsHistoryRepository();
     const preferences = new InMemoryPreferencesRepository();
     const insightLog = new InMemoryInsightLogRepository();
+    const inlineInsightLog = new InMemoryInlineInsightLogRepository();
     const pauses = new InMemoryPauseRepository();
     const reminders = new InMemoryReminderRepository();
     const recovery = new InMemoryRecoveryCheckInRepository();
@@ -98,6 +102,7 @@ export class InMemoryRepositories {
     this.targets = targets;
     this.preferences = preferences;
     this.insightLog = insightLog;
+    this.inlineInsightLog = inlineInsightLog;
     this.pauses = pauses;
     this.reminders = reminders;
     this.recovery = recovery;
@@ -117,6 +122,7 @@ export class InMemoryRepositories {
       () => targets.clear(),
       () => preferences.clear(),
       () => insightLog.clear(),
+      () => inlineInsightLog.clear(),
       () => pauses.clear(),
       () => reminders.clear(),
       () => recovery.clear(),

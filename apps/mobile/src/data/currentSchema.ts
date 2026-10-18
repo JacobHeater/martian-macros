@@ -139,6 +139,9 @@ CREATE TABLE "user_preferences" (
   "sodium_limit_since_epoch_day" INTEGER NULL,
   "water_goal_ml" REAL NULL,
   "water_goal_off" INTEGER NOT NULL DEFAULT 0 CHECK ("water_goal_off" IN (0, 1)),
+  "inline_insights_off" INTEGER NOT NULL DEFAULT 0 CHECK ("inline_insights_off" IN (0, 1)),
+  "inline_insight_areas_off" TEXT NOT NULL DEFAULT '',
+  "inline_insight_kinds_off" TEXT NOT NULL DEFAULT '',
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -271,6 +274,17 @@ CREATE TABLE "water_entries" (
   "epoch_day" INTEGER NOT NULL,
   "ml" REAL NOT NULL CHECK("ml" > 0.0 AND "ml" <= 3000.0),
   "at_ms" INTEGER NOT NULL
+);
+CREATE TABLE "inline_insight_log" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "kind" TEXT NOT NULL,
+  "area" TEXT NOT NULL,
+  "anchor_kind" TEXT NOT NULL,
+  "anchor_id" TEXT NOT NULL,
+  "item" TEXT NOT NULL,
+  "line" TEXT NOT NULL,
+  "first_epoch_day" INTEGER NOT NULL,
+  UNIQUE ("kind", "anchor_kind", "anchor_id")
 );
 CREATE TABLE "exercise_progressions" (
   "exercise_id" TEXT NOT NULL,

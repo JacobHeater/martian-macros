@@ -1,8 +1,8 @@
 ---
 id: MM-361
-status: proposed
+status: in-progress
 component: coach-insights
-related: [MM-137, MM-141, MM-108, MM-144, MM-11, MM-118, MM-148, MM-143, MM-85, MM-250, MM-362, MM-363, MM-364, MM-365, MM-366, MM-367, MM-368, MM-369, MM-370, MM-371]
+related: [MM-137, MM-141, MM-108, MM-144, MM-11, MM-118, MM-148, MM-143, MM-85, MM-250, MM-362, MM-363, MM-364, MM-365, MM-366, MM-367, MM-368, MM-369, MM-370, MM-371, MM-377]
 ---
 
 # Epic: Coaching insights inline, under the thing they are about
@@ -58,7 +58,7 @@ The product owner's (2026-10-17):
   for everyone. None of it is behind the Coach unlock (MM-85).
 
 ## Acceptance Criteria (narrative)
-The Epic is done when a food, a set, a weigh-in, the water section and (once MM-250 exists) a night can each show a coach line
+The Epic is done when a food, an exercise, a weigh-in, the water section and (once MM-250 exists) a night can each show a coach line
 underneath them, written in the product's voice, traceable to a named rule and its evidence. When every logged food and every
 food in search shows a grade, or a question mark that says why not. When the Coach tab lists what the coach said inline over the
 last fourteen days, and each entry leads back to its item. When a person can turn any rule, any area, or all of it off in
@@ -73,3 +73,11 @@ food composition.
   eating-disorder history. Then the product-designer and UX-accessibility panel review, before anything is built.
 - The rule catalogs in MM-365 to MM-368 are drafts with figures for the panel's coaching, nutrition and training roles to
   check before they are built.
+
+## Progress
+- 2026-10-17: the framework is built (MM-362), with Settings > Coach (MM-364) and the Coach tab's list (MM-363). The first
+  kind is training's "volume jump" (MM-366), after the panel's training, coaching and safety roles checked the workout
+  catalog (`docs/agent-runs/mm366-workout-rules/`). "Holding steady" was dropped and "strength on fat loss" moved to
+  MM-377. The food, body, water and sleep catalogs (MM-365, MM-367, MM-368) wait for their domain review; grades wait for
+  the spike (MM-369).
+- "A set" in the narrative became "an exercise": no line sits under a set (MM-366).

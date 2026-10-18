@@ -11,4 +11,6 @@ export interface RecentInsight {
   readonly line: string;
   /** The item was deleted or edited since, so the row no longer leads back to it. */
   readonly changed?: boolean;
+  /** The workout it was said in, which the row opens. */
+  readonly workoutId?: number | undefined;
 }

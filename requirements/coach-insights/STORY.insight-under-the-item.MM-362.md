@@ -1,6 +1,6 @@
 ---
 id: MM-362
-status: proposed
+status: done
 component: coach-insights
 related: [MM-361, MM-141, MM-108, MM-11, MM-118, MM-148, MM-143, MM-92, MM-363, MM-364, MM-365, MM-366, MM-367, MM-368]
 ---
@@ -131,3 +131,21 @@ and reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`). All in
   owner found ambiguous (2026-10-17).
 - **"One line" means one insight, wrapping** (the product owner, 2026-10-17, asked after the panel's UX-5): the whole
   sentence or two shows at caption size under the item; nothing is cut short.
+
+## Progress
+- Built 2026-10-17 with the first kind (MM-366).
+- Engine: `ItemInsight` (the kind, the item as `ItemAnchor`, the basis, the figures and the period), `ItemInsightKind`
+  (area, title, example, priority, and whether it is about weight or held back with an eating-disorder history),
+  `itemInsightKinds` (the kinds the app has: a drafted kind joins only once its domain roles have checked it), and
+  `allowedItemInsights`: the safeguards (under 18, paused, eating-disorder history, hidden weight), the switches, and
+  one per item by priority then catalog order. Hidden weight is an input the filter honours; it is always off until
+  MM-118 is built.
+- The log of inline insights shown: `inline_insight_log` (schema version 7), one row per kind per item, keeping the first
+  day and the words as said (`SqlInlineInsightLogRepository`, `InMemoryInlineInsightLogRepository`, one contract). An
+  `InlineInsight` logs itself once drawn.
+- The design seam `InsightPreview` stays for what is not built: grades (MM-370) and the lines of kinds not checked yet.
+  The app hands it nothing, so each screen shows what the app works out.
+- Tests: `test/engine/allowedItemInsights.test.ts` (every qualifying item, one per item, eating-disorder history, under
+  18, hidden weight, paused, switched off), `test/coach/inlineInsights.test.tsx` (under its item, the numbers one tap
+  down, paused), `test/format/itemInsightText.test.ts` (forbidden words and subjects), `test/engine/itemInsightEvidence.test.ts`
+  (every kind has its evidence row).
