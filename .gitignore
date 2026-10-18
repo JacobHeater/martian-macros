@@ -23,3 +23,6 @@ config/*.local.json
 
 # CI watch runtime state (MM-209): local to one machine, never committed
 .mm/
+
+# The tool's test runner cache (created by running vitest inside tool/).
+tool/node_modules/
