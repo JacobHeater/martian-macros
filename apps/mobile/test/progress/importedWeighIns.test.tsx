@@ -74,7 +74,7 @@ it('the trend is made from the imported weigh-ins', async () => {
   const chart = await screen.findByRole('img', { name: /^Weight trend over the last 30 days\./ });
   expect(chart).toHaveAccessibleName(/from 10 weigh-ins\.$/);
   expect(chart.querySelectorAll('.chart-weigh-in')).toHaveLength(10);
-  expect(screen.queryByText('Log a weigh-in to start your trend.')).not.toBeInTheDocument();
+  expect(screen.queryByText('No trend yet.')).not.toBeInTheDocument();
 });
 
 it('typing a value for today overrules the import, which is kept', async () => {

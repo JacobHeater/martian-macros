@@ -42,7 +42,6 @@ export function AvailablePackCard({ listing }: { listing: PackListing }) {
         <p className="app-text">
           {megabytes(listing.downloadBytes)} to download · version {listing.version}
         </p>
-        <p className="app-text app-muted">It is stored on this phone and used without a connection.</p>
       </InfoCard>
     </div>
   );
