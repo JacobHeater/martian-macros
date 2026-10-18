@@ -1,4 +1,5 @@
 import type { InsightArea } from '../domain/InsightArea';
+import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
 
 /**
  * What an inline insight says (MM-362): its one line, the figures it rests
@@ -11,4 +12,6 @@ export interface InlineInsightContent {
   readonly area: InsightArea;
   /** The rule's title as Settings > Coach lists it. */
   readonly rule: string;
+  /** What to log once it is shown, for the Coach tab (MM-363); a design's own lines have none. */
+  readonly logged?: Omit<InlineInsightLogEntry, 'firstShownOn'>;
 }

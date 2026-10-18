@@ -1,25 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { inlineInsightRules } from '../coach/inlineInsightRules';
 import { insightAreaIcon } from '../coach/insightAreaIcon';
 import { insightAreaLabel } from '../coach/insightAreaLabel';
+import { useInsightKinds } from '../coach/useInsightKinds';
 import type { InsightArea } from '../domain/InsightArea';
+import { InsightSwitches } from '../domain/InsightSwitches';
+import { ItemInsightKind } from '../engine/ItemInsightKind';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
-import { InsightSwitchesDraft } from './InsightSwitchesDraft';
-import { useInsightSwitches } from './useInsightSwitches';
 import './settings.css';
 
 interface CoachAreaScreenProps {
   area: InsightArea;
-  /** The kind to bring into view, when opened from one of its insights. */
+  /** The title of the kind to bring into view, when opened from one of its insights. */
   focus?: string | undefined;
-  /** The switches shared with Settings > Coach; its own when opened from an insight. */
-  draft?: InsightSwitchesDraft;
 }
 
 /**
@@ -30,15 +29,15 @@ interface CoachAreaScreenProps {
  * offered as something to turn on. Opened from an insight, the kind it
  * came from is named, brought into view and given the focus.
  */
-export function CoachAreaScreen({ area, focus, draft }: CoachAreaScreenProps) {
-  const { state } = useApp();
-  const setup = useLoaded(state.setup);
-  const [switches] = useState(() => draft ?? new InsightSwitchesDraft());
-  const on = useInsightSwitches(switches);
+export function CoachAreaScreen({ area, focus }: CoachAreaScreenProps) {
+  const { services, state } = useApp();
+  const kinds = useInsightKinds();
+  const on = useLoaded(state.insightSwitches) ?? InsightSwitches.allOn;
+  const safeguards = useCell(state.insightSafeguards);
   const focused = useRef<HTMLDivElement>(null);
   const label = insightAreaLabel(area);
-  const eatingDisorderHistory = setup?.screening.eatingDisorderHistory === true;
   const areaOn = !on.offAreas.has(area);
+  const save = (switches: InsightSwitches) => void services.preferences.saveInsightSwitches(switches);
 
   // The kind an insight opened is brought into view with the focus on its switch (a test's document has no scrolling).
   useEffect(() => {
@@ -60,34 +59,34 @@ export function CoachAreaScreen({ area, focus, draft }: CoachAreaScreenProps) {
           title={`${label} insights`}
           subtitle={areaState}
           value={areaOn}
-          onChange={(value) => switches.setArea(area, value)}
+          onChange={(value) => save(InsightSwitches.withArea(on, area, value))}
         />
       </MmListGroup>
       <MmSection icon="insight" title="Kinds of insight">
         <MmListGroup>
-          {inlineInsightRules
-            .filter((rule) => rule.area === area)
-            .map((rule) => {
-              const opened = rule.title === focus;
+          {kinds
+            .filter((kind) => kind.area === area)
+            .map((kind) => {
+              const opened = kind.title === focus;
               // Named in the row's own words, so a screen reader hears it with the switch (the panel's UX-12).
               const said = (text: string) => (opened ? `The insight you opened is this kind. ${text}` : text);
               const row =
-                eatingDisorderHistory && rule.notWithEatingDisorderHistory === true ? (
-                  <MmListRow title={rule.title} subtitle={said('Not shown for your health answers.')} />
+                safeguards !== undefined && ItemInsightKind.withheld(kind, safeguards) ? (
+                  <MmListRow title={kind.title} subtitle={said('Not shown for your health answers.')} />
                 ) : (
                   <MmSwitchRow
-                    title={rule.title}
-                    subtitle={said(`“${rule.example}”`)}
-                    value={!on.offRules.has(rule.title)}
-                    onChange={(value) => switches.setRule(rule.title, value)}
+                    title={kind.title}
+                    subtitle={said(`“${kind.example}”`)}
+                    value={!on.offKinds.has(kind.id)}
+                    onChange={(value) => save(InsightSwitches.withKind(on, kind.id, value))}
                   />
                 );
               return opened ? (
-                <div key={rule.title} ref={focused} className="settings-focused-rule">
+                <div key={kind.id} ref={focused} className="settings-focused-rule">
                   {row}
                 </div>
               ) : (
-                <div key={rule.title}>{row}</div>
+                <div key={kind.id}>{row}</div>
               );
             })}
         </MmListGroup>

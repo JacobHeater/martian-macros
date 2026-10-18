@@ -26,6 +26,7 @@ async function opened() {
 const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
+  // Version 7 (MM-364): the switches of Settings > Coach.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -34,6 +35,9 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'sodium_limit_since_epoch_day',
     'water_goal_ml',
     'water_goal_off',
+    'inline_insights_off',
+    'inline_insight_areas_off',
+    'inline_insight_kinds_off',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks.
   setups: ['fluid_limited_by_clinician'],
@@ -47,6 +51,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
 const tablesAddedSince: readonly string[] = [
   // Version 4 (MM-313): the water log.
   'water_entries',
+  // Version 7 (MM-363): the inline insights shown.
+  'inline_insight_log',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

@@ -4,7 +4,12 @@ import type { InlineInsightContent } from '../../coach/InlineInsightContent';
 import type { InsightPreview } from '../../coach/InsightPreview';
 import type { RecentInsight } from '../../coach/RecentInsight';
 import { FoodEntry } from '../../domain/FoodEntry';
+import { InsightSwitches } from '../../domain/InsightSwitches';
 import type { Meal } from '../../domain/Meal';
+import { Workout } from '../../domain/training/Workout';
+import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
+import { WorkoutSet } from '../../domain/training/WorkoutSet';
+import { ItemAnchor } from '../../engine/ItemAnchor';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import type { FoodGradeLetter } from '../../food/FoodGradeLetter';
@@ -12,10 +17,10 @@ import type { FoodGradeValue } from '../../food/FoodGradeValue';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { CoachAreaScreen } from '../../settings/CoachAreaScreen';
 import { CoachSettingsScreen } from '../../settings/CoachSettingsScreen';
-import { InsightSwitchesDraft } from '../../settings/InsightSwitchesDraft';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import { WorkoutScreen } from '../../train/WorkoutScreen';
 import { demoWith } from './demoWith';
+import { draftInsightKinds } from './draftInsightKinds';
 import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
@@ -75,6 +80,8 @@ const soupReason =
   'It was entered by its totals, with no fiber or sugar value. The grade needs both, and a missing value is never counted as zero.';
 
 const foodPreview: InsightPreview = {
+  // Food's kinds are drafts, so its Settings screen is drawn with them.
+  kinds: draftInsightKinds,
   entryNotes: new Map([
     ['Peanut butter', peanutButter],
     ['Pasta with cream sauce', pasta],
@@ -309,20 +316,31 @@ export const AmountStepWithGrade = screenStory({
   },
 });
 
-// ---- Training: a set and an exercise ----
+// ---- Training: an exercise ----
 
-/** The demo's lateral raise is the same 20 × 8 kg every week, so "holding steady" is what its history shows. */
-const lateralRaise: InlineInsightContent = {
-  line: 'About the same in your last 4 sessions. A small step up in reps or load is a common next step.',
-  evidence: [
-    ['Last 4 sessions', '20 × 17.6 lb each time'],
-    ['Change in estimated best', 'none'],
-  ],
-  area: 'training',
-  rule: 'Holding steady',
+/**
+ * The demo trains once a week with two hard sets of bench press. One more
+ * chest day this week, six sets two days ago, is a jump the app works out
+ * itself (MM-366): 8 sets against about 2.
+ */
+const extraChestDay: StoryScenario = async (repos, today) => {
+  const date = today.addDays(-2);
+  const startedAt = new Date(date.year, date.month - 1, date.day, 18);
+  await repos.workouts.saveWorkout(
+    new Workout({
+      id: 0,
+      date,
+      startedAt,
+      endedAt: new Date(startedAt.getTime() + 40 * 60 * 1000),
+      exercises: [
+        new WorkoutExercise({
+          exerciseId: 'barbell-bench-press',
+          sets: Array.from({ length: 6 }, () => new WorkoutSet({ reps: 8, loadKg: 60, rir: 2 })),
+        }),
+      ],
+    }),
+  );
 };
-
-const workoutPreview: InsightPreview = { exerciseNotes: new Map([['dumbbell-lateral-raise', lateralRaise]]) };
 
 const lastWorkout = async (stage: StoryStage) => {
   const workout = (await valueOf(stage.services.workouts.watchWorkouts()))[0];
@@ -330,27 +348,33 @@ const lastWorkout = async (stage: StoryStage) => {
 };
 
 /**
- * MM-366: a line under the lateral raise, the last exercise. A new best is
- * not an inline line: the workout's Personal records card already says it.
+ * MM-366: "volume jump" under the bench press, the first chest exercise,
+ * once. A new best is not an inline line: the workout's Personal records
+ * card already says it.
  */
 export const WorkoutWithInsights = screenStory({
   covers: ['WorkoutScreen'],
-  shows: /^About the same in your last 4 sessions/,
-  preview: workoutPreview,
+  shows: /^8 sets for chest in the 7 days to this workout/,
+  scenario: demoWith({ then: extraChestDay }),
   open: lastWorkout,
-  walk: async (canvas) => void (await revealed(/^Coach: About the same in your last 4 sessions/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: 8 sets for chest/)(canvas)),
 });
 
 /** MM-366: the line opened. */
 export const WorkoutInsightOpen = screenStory({
   covers: ['WorkoutScreen'],
-  shows: 'Change in estimated best',
-  preview: workoutPreview,
+  shows: 'Usual week, the 4 weeks before',
+  scenario: demoWith({ then: extraChestDay }),
   open: lastWorkout,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: About the same in your last 4 sessions/)(canvas));
+    await userEvent.click(await revealed(/^Coach: 8 sets for chest/)(canvas));
   },
 });
+
+/** The line the workout stories show, for the Coach tab's list. */
+const chestJump =
+  '8 sets for chest in the 7 days to this workout. Your usual is about 2 a week. A jump this big can bring more ' +
+  'soreness; adding sets more slowly is easier to recover from.';
 
 // ---- The Dashboard: the weigh-in, the waist and water ----
 
@@ -431,7 +455,7 @@ const recent: readonly RecentInsight[] = [
   { area: 'food', item: 'Peanut butter, snack', day: storyToday.addDays(-1), line: peanutButter.line },
   { area: 'food', item: 'Pasta with cream sauce, lunch', day: storyToday.addDays(-1), line: pasta.line },
   { area: 'food', item: 'Granola bar, snack', day: storyToday.addDays(-6), line: garlicBread.line.replace('4 slices', '2 bars'), changed: true },
-  { area: 'training', item: 'Dumbbell lateral raise', day: storyToday, line: lateralRaise.line },
+  { area: 'training', item: 'Barbell bench press', day: storyToday, line: chestJump },
   { area: 'body', item: 'Weigh-in', day: storyToday, line: 'Weighed later than usual. Weighing at the same time each day makes the trend steadier.' },
 ];
 
@@ -472,6 +496,44 @@ export const CoachRecentInsightOpensItem = screenStory({
   },
 });
 
+/** The demo with the chest jump, and its line logged as shown today. */
+const loggedChestJump: StoryScenario = demoWith({
+  then: async (repos, today) => {
+    await extraChestDay(repos, today);
+    const workout = (await valueOf(repos.workouts.watchWorkouts()))[0];
+    if (workout === undefined) return;
+    await repos.inlineInsightLog.recordInlineInsightShown({
+      kind: 'volumeJump',
+      area: 'training',
+      anchor: ItemAnchor.exercise(workout.id, 'barbell-bench-press'),
+      item: 'Barbell bench press',
+      line: chestJump,
+      firstShownOn: today,
+    });
+  },
+});
+
+/** MM-363: what the app logged once the workout's line was shown, listed under Training and leading back to it. */
+export const CoachRecentInsightsLogged = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^1 in the last 14 days/,
+  scenario: loggedChestJump,
+  open: ({ state }) => state.homeTab.put('coach'),
+  walk: onCoach,
+});
+
+/** MM-363: a lift's entry pressed opens the workout it was said in, with the line under the bench press. */
+export const CoachRecentInsightOpensWorkout = screenStory({
+  covers: ['CoachScreen', 'WorkoutScreen'],
+  shows: /^8 sets for chest in the 7 days to this workout/,
+  scenario: loggedChestJump,
+  open: ({ state }) => state.homeTab.put('coach'),
+  walk: async (canvas) => {
+    await onCoach(canvas);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Barbell bench press/ }));
+  },
+});
+
 /** MM-363: nothing said inline in 14 days. */
 export const CoachRecentInsightsNone = screenStory({
   covers: ['CoachScreen'],
@@ -487,7 +549,6 @@ export const CoachRecentInsightsNone = screenStory({
 export const SettingsCoachSection = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Coaching insights',
-  preview: { coachSettings: true },
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => void (await revealed(/^Coaching insights/)(canvas)),
 });
@@ -496,17 +557,27 @@ export const SettingsCoachSection = screenStory({
 export const SettingsOpensCoachingInsights = screenStory({
   covers: ['SettingsScreen', 'CoachSettingsScreen'],
   shows: 'Insights under logged items',
-  preview: { coachSettings: true },
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
   walk: async (canvas) => {
     await userEvent.click(await revealed(/^Coaching insights/)(canvas));
   },
 });
 
-/** MM-364: the master switch and the areas, everything on. */
+/** The design of every area, with the kinds drafted for those not built yet. */
+const drafts = { kinds: draftInsightKinds };
+
+/** MM-364: the master switch and the areas the app has kinds for, everything on. */
 export const CoachSettings = screenStory({
   covers: ['CoachSettingsScreen'],
   shows: 'Insights under logged items',
+  open: ({ navigator }) => void navigator.push(() => <CoachSettingsScreen />),
+});
+
+/** MM-364 (design): every area, as it will be once each has its kinds. */
+export const CoachSettingsEveryArea = screenStory({
+  covers: ['CoachSettingsScreen'],
+  shows: 'Water',
+  preview: drafts,
   open: ({ navigator }) => void navigator.push(() => <CoachSettingsScreen />),
 });
 
@@ -514,6 +585,7 @@ export const CoachSettings = screenStory({
 export const CoachSettingsOpensFood = screenStory({
   covers: ['CoachSettingsScreen', 'CoachAreaScreen'],
   shows: 'Kinds of insight',
+  preview: drafts,
   open: ({ navigator }) => void navigator.push(() => <CoachSettingsScreen />),
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Food/ }));
@@ -524,6 +596,7 @@ export const CoachSettingsOpensFood = screenStory({
 export const CoachSettingsAllOff = screenStory({
   covers: ['CoachSettingsScreen'],
   shows: 'Off while insights are off',
+  preview: drafts,
   open: ({ navigator }) => void navigator.push(() => <CoachSettingsScreen />),
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('switch', { name: /^Insights under logged items/ }));
@@ -534,6 +607,7 @@ export const CoachSettingsAllOff = screenStory({
 export const CoachSettingsFood = screenStory({
   covers: ['CoachAreaScreen'],
   shows: 'Kinds of insight',
+  preview: drafts,
   open: ({ navigator }) => void navigator.push(() => <CoachAreaScreen area="food" />),
 });
 
@@ -541,37 +615,36 @@ export const CoachSettingsFood = screenStory({
 export const CoachSettingsFoodOff = screenStory({
   covers: ['CoachAreaScreen'],
   shows: /^Off\. The kinds below take effect/,
+  preview: drafts,
   open: ({ navigator }) => void navigator.push(() => <CoachAreaScreen area="food" />),
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('switch', { name: /^Food insights/ }));
   },
 });
 
-/** Every insight switched off, for the story of an area opened in that state. */
-const allOff = () => {
-  const draft = new InsightSwitchesDraft();
-  draft.setAll(false);
-  return draft;
-};
-
 /** MM-364 (the panel's UX-7, PD-8): an area opened while everything is off: its switch says so. */
 export const CoachSettingsFoodWhileAllOff = screenStory({
   covers: ['CoachAreaScreen'],
   shows: /^Off while all insights are off/,
-  open: ({ navigator }) => void navigator.push(() => <CoachAreaScreen area="food" draft={allOff()} />),
+  preview: drafts,
+  open: async ({ navigator, services }) => {
+    await services.preferences.saveInsightSwitches(InsightSwitches.withAll(InsightSwitches.allOn, false));
+    void navigator.push(() => <CoachAreaScreen area="food" />);
+  },
 });
 
 /** MM-364: with an eating-disorder history, the kinds left out are listed without a switch. */
 export const CoachSettingsFoodEatingDisorder = screenStory({
   covers: ['CoachAreaScreen'],
   shows: 'Not shown for your health answers.',
+  preview: drafts,
   scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
   open: ({ navigator }) => void navigator.push(() => <CoachAreaScreen area="food" />),
 });
 
-/** MM-364: training's rules. */
+/** MM-364: training's kinds, as the app has them. */
 export const CoachSettingsTraining = screenStory({
   covers: ['CoachAreaScreen'],
-  shows: 'Holding steady',
+  shows: 'Volume jump',
   open: ({ navigator }) => void navigator.push(() => <CoachAreaScreen area="training" />),
 });

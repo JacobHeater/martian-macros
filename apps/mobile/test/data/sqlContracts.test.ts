@@ -8,6 +8,7 @@ import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContrac
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
 import { healthSampleStoreContract } from '../contracts/healthSampleStoreContract';
+import { inlineInsightLogRepositoryContract } from '../contracts/inlineInsightLogRepositoryContract';
 import { insightLogRepositoryContract } from '../contracts/insightLogRepositoryContract';
 import { intakeReaderContract } from '../contracts/intakeReaderContract';
 import { pauseRepositoryContract } from '../contracts/pauseRepositoryContract';
@@ -40,6 +41,7 @@ customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);
 dayMarkRepositoryContract('SQLite', async () => (await open()).dayMarks);
 targetsHistoryRepositoryContract('SQLite', async () => (await open()).targets);
 insightLogRepositoryContract('SQLite', async () => (await open()).insightLog);
+inlineInsightLogRepositoryContract('SQLite', async () => (await open()).inlineInsightLog);
 pauseRepositoryContract('SQLite', async () => (await open()).pauses);
 reminderRepositoryContract('SQLite', async () => (await open()).reminders);
 recoveryCheckInRepositoryContract('SQLite', async () => (await open()).recovery);
