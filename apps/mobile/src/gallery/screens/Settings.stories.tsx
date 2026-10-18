@@ -314,6 +314,17 @@ export const HealthConnectNothingYet = screenStory({
   },
 });
 
+/** MM-395: steps the phone counted itself come with no app name: the row says how many, never the package. */
+export const HealthConnectUnnamedSource = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Allowed. 3 readings.',
+  device: healthPlatform({ allowed: ['steps'], stepsUnnamed: true }),
+  open: settings,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Steps'));
+  },
+});
+
 /** MM-320 (the panel's UX-8): every kind allowed; nothing left to offer. */
 export const HealthConnectAllAllowed = screenStory({
   covers: ['SettingsScreen'],

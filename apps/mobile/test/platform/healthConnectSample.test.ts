@@ -28,8 +28,9 @@ describe('healthConnectSample', () => {
     expect(sample?.sourceName).toBe('Bathroom scale');
   });
 
-  it('a source with no name is shown by its id', () => {
-    expect(healthConnectSample(record('weight', 82.4, { sourceName: '' }))?.sourceName).toBe('com.example.scale');
+  // MM-395: a package id is never a name; no name stays none.
+  it('a source with no name keeps no name, never its id', () => {
+    expect(healthConnectSample(record('weight', 82.4, { sourceName: '' }))?.sourceName).toBe('');
   });
 
   it('a height in meters is kept in centimeters', () => {
