@@ -1,5 +1,5 @@
 import { HowThisWorksScreen } from '../about/HowThisWorksScreen';
-import { useInsightPreview } from '../coach/useInsightPreview';
+import { useInsightKinds } from '../coach/useInsightKinds';
 import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
 import { DailyActivity } from '../domain/DailyActivity';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
@@ -52,8 +52,8 @@ export function SettingsScreen() {
   const detail = useLoaded(state.detailLevel) ?? 'standard';
   const easyToMiss = useLoaded(state.easyToMiss)?.enabled ?? true;
   const termsAccepted = useLoaded(state.termsAcceptance);
-  // Settings > Coach (MM-364): not in the app until its switches are stored.
-  const coachSettings = useInsightPreview().coachSettings === true;
+  // Settings > Coach (MM-364), once there is a kind of inline insight to switch.
+  const coachSettings = useInsightKinds().length > 0;
   if (setup === undefined) return <Screen title="Settings">{null}</Screen>;
   const bodyFat = setup.bodyFatPercent;
 

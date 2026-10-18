@@ -59,6 +59,7 @@ export async function openAppServices(): Promise<AppServices> {
     targets: repositories.targets,
     preferences: repositories.preferences,
     insightLog: repositories.insightLog,
+    inlineInsightLog: repositories.inlineInsightLog,
     pauses: repositories.pauses,
     reminders: repositories.reminders,
     recovery: repositories.recovery,

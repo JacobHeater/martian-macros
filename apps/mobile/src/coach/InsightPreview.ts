@@ -1,14 +1,15 @@
 import type { Meal } from '../domain/Meal';
+import type { ItemInsightKind } from '../engine/ItemInsightKind';
 import type { FoodGradeValue } from '../food/FoodGradeValue';
 import type { InlineInsightContent } from './InlineInsightContent';
 import type { RecentInsight } from './RecentInsight';
 
 /**
- * What the screens draw of inline insights (MM-362), grades (MM-370), the
- * Coach tab's list (MM-363) and Settings > Coach (MM-364) until those are
- * built. The design gate draws them first (MM-293), so for now only a
- * design story hands any of this in; the app hands in nothing and shows
- * none of it. Items are named as the stories name them.
+ * What a design story draws in place of what the app works out (MM-293):
+ * grades (MM-370), which are not built, and inline insights (MM-362), the
+ * Coach tab's list (MM-363) and Settings > Coach (MM-364) for kinds the app
+ * does not have yet. The app hands in nothing, so each screen shows what
+ * it works out itself. Items are named as the stories name them.
  */
 export interface InsightPreview {
   /** Under a logged food, by the entry's name. */
@@ -19,12 +20,12 @@ export interface InsightPreview {
   readonly dayGrade?: FoodGradeValue;
   /** A food's grade in search and on the amount step, from the food's name. */
   readonly gradeOfFood?: (name: string) => FoodGradeValue | undefined;
-  /** Under an exercise of a workout, by the exercise's id. */
+  /** Under an exercise of a workout, by the exercise's id, in place of what the app works out. */
   readonly exerciseNotes?: ReadonlyMap<string, InlineInsightContent>;
   /** Under the Dashboard's weigh-in, waist and water rows. */
   readonly rowNotes?: ReadonlyMap<'weight' | 'waist' | 'water', InlineInsightContent>;
-  /** The Coach tab's recent insights; the section shows whenever this is given, empty or not. */
+  /** The Coach tab's recent insights, in place of what the app logged; the section shows whenever this is given. */
   readonly recent?: readonly RecentInsight[];
-  /** Settings shows its Coach section. */
-  readonly coachSettings?: boolean;
+  /** The kinds Settings > Coach lists, in place of the app's own (`itemInsightKinds`). */
+  readonly kinds?: readonly ItemInsightKind[];
 }

@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
+import { InsightSwitches } from '../domain/InsightSwitches';
 import type { MacroPicture } from '../domain/MacroPicture';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
@@ -20,6 +21,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly recoverySkipped = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly terms = new ObservableValue<TermsAcceptance | undefined>(undefined);
   private readonly goals = new ObservableValue(NutritionGoals.none);
+  private readonly switches = new ObservableValue(InsightSwitches.allOn);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -108,6 +110,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.goals.value = new NutritionGoals({ sodiumLimitMg, sodiumLimitSince, waterGoalMl, waterGoalOff: off });
   }
 
+  watchInsightSwitches(): Watched<InsightSwitches> {
+    return this.switches.watch();
+  }
+
+  async saveInsightSwitches(switches: InsightSwitches): Promise<void> {
+    this.switches.value = switches;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.theme.value = 'unselected';
@@ -119,5 +129,6 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.recoverySkipped.value = undefined;
     this.terms.value = undefined;
     this.goals.value = NutritionGoals.none;
+    this.switches.value = InsightSwitches.allOn;
   }
 }

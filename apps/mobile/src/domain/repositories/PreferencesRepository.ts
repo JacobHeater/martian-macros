@@ -2,6 +2,8 @@ import type { DetailLevelReader } from './DetailLevelReader';
 import type { DetailLevelWriter } from './DetailLevelWriter';
 import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
+import type { InsightSwitchesReader } from './InsightSwitchesReader';
+import type { InsightSwitchesWriter } from './InsightSwitchesWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
 import type { NutritionGoalsReader } from './NutritionGoalsReader';
@@ -39,4 +41,6 @@ export interface PreferencesRepository
     TermsAcceptanceReader,
     TermsAcceptanceWriter,
     NutritionGoalsReader,
-    NutritionGoalsWriter {}
+    NutritionGoalsWriter,
+    InsightSwitchesReader,
+    InsightSwitchesWriter {}

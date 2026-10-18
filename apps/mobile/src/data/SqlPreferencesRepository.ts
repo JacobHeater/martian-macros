@@ -1,6 +1,8 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
+import { InsightArea } from '../domain/InsightArea';
+import type { InsightSwitches } from '../domain/InsightSwitches';
 import { MacroPicture } from '../domain/MacroPicture';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
@@ -9,7 +11,7 @@ import { ThemePreference } from '../domain/ThemePreference';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, orNull } from './columns';
+import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, orNull, text } from './columns';
 import { upsert } from './upsert';
 import type { Values } from './Values';
 
@@ -144,6 +146,27 @@ export class SqlPreferencesRepository implements PreferencesRepository {
     return this.save({
       terms_accepted_version: acceptance.version,
       terms_accepted_epoch_day: acceptance.acceptedOn.epochDay,
+    });
+  }
+
+  watchInsightSwitches(): Watched<InsightSwitches> {
+    return this.watch((row) => {
+      if (row === undefined) return { all: true, offAreas: new Set(), offKinds: new Set() };
+      // Each list is names joined by commas. An area no longer known is dropped; a kind's id is kept as it was.
+      const list = (column: string) => text(row, column).split(',').filter((name) => name !== '');
+      return {
+        all: !flag(row, 'inline_insights_off'),
+        offAreas: new Set(list('inline_insight_areas_off').filter((name): name is InsightArea => (InsightArea.values as readonly string[]).includes(name))),
+        offKinds: new Set(list('inline_insight_kinds_off')),
+      };
+    });
+  }
+
+  saveInsightSwitches(switches: InsightSwitches): Promise<void> {
+    return this.save({
+      inline_insights_off: asFlag(!switches.all),
+      inline_insight_areas_off: [...switches.offAreas].sort().join(','),
+      inline_insight_kinds_off: [...switches.offKinds].sort().join(','),
     });
   }
 }

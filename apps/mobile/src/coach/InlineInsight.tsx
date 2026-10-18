@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useApp } from '../app/useApp';
 import { useNavigator } from '../app/useNavigator';
 import { CoachAreaScreen } from '../settings/CoachAreaScreen';
 import { MmButton } from '../ui/MmButton';
@@ -21,10 +23,18 @@ interface InlineInsightProps {
  * and "The numbers behind this" one tap down, as the dashboard's insight opens
  * its evidence (MM-141). It is drawn inside the row's own slot, never as a
  * card of its own (MM-291). There is no dismiss: the evidence ends with
- * the way to this rule's switch (MM-364).
+ * the way to this rule's switch (MM-364). Once drawn, it is logged for the
+ * Coach tab (MM-363); a kind keeps the day it first showed under an item.
  */
 export function InlineInsight({ insight, layout = 'entry', initiallyExpanded = false }: InlineInsightProps) {
+  const { services, state } = useApp();
   const navigator = useNavigator();
+  const logged = insight.logged;
+  // Logged once per kind and item: drawn again with the same insight, it logs nothing new.
+  useEffect(() => {
+    if (logged === undefined) return;
+    void services.inlineInsightLog.recordInlineInsightShown({ ...logged, firstShownOn: state.today.value });
+  }, [services, state, logged?.kind, logged?.anchor.kind, logged?.anchor.id]);
   return (
     <div className={`coach-inline-insight coach-inline-insight-${layout}`}>
       <MmDisclosure

@@ -2,6 +2,8 @@ import type { WaterGoal } from '../domain/water/WaterGoal';
 import { suggestedWaterGoalMl } from '../domain/water/suggestedWaterGoalMl';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
+import { ArgumentError } from '../lang/ArgumentError';
+import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
@@ -41,7 +43,12 @@ import { findInsights } from '../engine/findInsights';
 import type { SodiumPattern } from '../engine/SodiumPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
 import { findUnderEating } from '../engine/findUnderEating';
+import { allowedItemInsights } from '../engine/allowedItemInsights';
+import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
+import type { InsightSafeguards } from '../engine/InsightSafeguards';
+import type { ItemInsight } from '../engine/ItemInsight';
+import { itemInsightKinds } from '../engine/itemInsightKinds';
 import { InsightRationing } from '../engine/InsightRationing';
 import type { InsightSelection } from '../engine/InsightSelection';
 import type { LoggingStreak } from '../engine/LoggingStreak';
@@ -67,6 +74,7 @@ import { ReminderRule } from '../engine/ReminderRule';
 import type { ReportPeriod } from '../engine/ReportPeriod';
 import { reportPeriods } from '../engine/reportPeriods';
 import { selectInsight } from '../engine/selectInsight';
+import { trainingItemInsights } from '../engine/trainingItemInsights';
 import type { StallAssessment } from '../engine/StallAssessment';
 import type { StrengthTrend } from '../engine/StrengthTrend';
 import { summarizeAdherence } from '../engine/summarizeAdherence';
@@ -255,6 +263,22 @@ export class AppState {
    * shown.
    */
   readonly insightSelection: Cell<InsightSelection | undefined>;
+
+  /** The switches of Settings > Coach (MM-364). */
+  readonly insightSwitches: Cell<Loadable<InsightSwitches>>;
+
+  /** What the person's answers and state allow of inline insights (MM-362); undefined until setup has loaded. */
+  readonly insightSafeguards: Cell<InsightSafeguards | undefined>;
+
+  /**
+   * The inline insights to show, one per item, by the item's key
+   * (`ItemAnchor.key`) (MM-362). Empty until what they rest on has loaded,
+   * and when a logged set cannot be worked out (weekly volume says so).
+   */
+  readonly itemInsights: Cell<ReadonlyMap<string, ItemInsight>>;
+
+  /** The inline insights first shown in the last 14 days (MM-363). */
+  readonly inlineInsightLog: Cell<Loadable<InlineInsightLogEntry[]>>;
 
   /** When the welcome-back screen was last put off (MM-147). */
   readonly returnScreenDismissed: Cell<Loadable<CalendarDate | undefined>>;
@@ -612,6 +636,42 @@ export class AppState {
         today,
       });
     });
+
+    this.insightSwitches = stream(() => s.preferences.watchInsightSwitches());
+
+    this.insightSafeguards = derived<InsightSafeguards | undefined>(() => {
+      const setup = of(this.setup);
+      if (setup === undefined) return undefined;
+      return {
+        adult: setup.profile.isAdultOn(this.today.value),
+        eatingDisorderHistory: setup.screening.eatingDisorderHistory,
+        // Weight cannot be hidden yet (MM-118).
+        weightHidden: false,
+        paused: this.activePause.value !== undefined,
+      };
+    });
+
+    this.itemInsights = derived<ReadonlyMap<string, ItemInsight>>(() => {
+      const safeguards = this.insightSafeguards.value;
+      const switches = of(this.insightSwitches);
+      const workouts = of(this.workouts);
+      const pauses = of(this.pauses);
+      const exercisesById = this.exercisesById.value;
+      const today = this.today.value;
+      if (safeguards === undefined || switches === undefined || workouts === undefined || pauses === undefined) {
+        return new Map();
+      }
+      let insights: ItemInsight[];
+      try {
+        insights = trainingItemInsights({ workouts, exercisesById, pauses, today });
+      } catch (error) {
+        if (error instanceof ArgumentError) return new Map();
+        throw error;
+      }
+      return allowedItemInsights({ insights, kinds: itemInsightKinds, safeguards, switches });
+    });
+
+    this.inlineInsightLog = stream(() => s.inlineInsightLog.watchInlineInsightLog({ since: this.today.value.addDays(-13) }));
 
     this.returnScreenDismissed = stream(() => s.preferences.watchReturnScreenDismissedOn());
 

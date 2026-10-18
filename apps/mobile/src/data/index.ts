@@ -22,6 +22,7 @@ export * from './SqlDayMarkRepository';
 export * from './SqlExerciseProgressionRepository';
 export * from './SqlFoodRepository';
 export * from './SqlHealthSampleStore';
+export * from './SqlInlineInsightLogRepository';
 export * from './SqlInsightLogRepository';
 export * from './SqlIntakeReader';
 export * from './SqlPauseRepository';
