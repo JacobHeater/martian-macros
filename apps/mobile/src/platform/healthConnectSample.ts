@@ -38,6 +38,7 @@ export function healthConnectSample(record: MmHealthRecord): HealthSample | unde
     start: new Date(record.startMs),
     end: spans ? new Date(record.endMs) : undefined,
     sourceId: record.sourceId,
-    sourceName: record.sourceName === '' ? record.sourceId : record.sourceName,
+    // No name stays none: a package id is never shown as one (MM-395).
+    sourceName: record.sourceName,
   };
 }
