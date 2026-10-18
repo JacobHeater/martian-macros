@@ -1,4 +1,5 @@
 import { byStartThenId } from './byStartThenId';
+import { healthSourceName } from './healthSourceName';
 import type { DayWeighIn } from './DayWeighIn';
 import type { HealthSample } from './HealthSample';
 
@@ -39,7 +40,8 @@ export function dailyWeighIns(
     const all = byDay.get(midnight) ?? [];
     const fromPrimary = all.filter((sample) => sample.sourceId === primarySourceId);
     const group = (fromPrimary.length === 0 ? all : fromPrimary).sort(byStartThenId);
-    const names = new Set(group.map((sample) => sample.sourceName));
+    // An unnamed source is '' here, said as Health Connect (MM-395).
+    const names = new Set(group.map((sample) => healthSourceName(sample) ?? ''));
     const day = new Date(midnight);
 
     const first = group.find((sample) => sample.start.getHours() >= 4 && sample.start.getHours() < 12);
@@ -48,7 +50,7 @@ export function dailyWeighIns(
         day,
         kg: first.value,
         basis: 'firstMorning',
-        sourceName: first.sourceName,
+        sourceName: healthSourceName(first) ?? '',
         readings: group.length,
         at: first.start,
       });

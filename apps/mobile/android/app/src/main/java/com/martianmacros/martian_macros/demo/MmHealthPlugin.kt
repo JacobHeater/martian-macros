@@ -1,5 +1,6 @@
 package com.martianmacros.martian_macros.demo
 
+import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -113,13 +114,27 @@ class MmHealthPlugin : Plugin() {
         }
     }
 
+    /**
+     * The name a person knows the app that wrote a record by ("Google Fit"),
+     * or "" when the package is not an app on the phone, as with what the
+     * phone records itself; the adapter then never shows the package (MM-395).
+     * Health apps are visible to this one through the manifest's query for
+     * the permissions-rationale intent they declare.
+     */
+    private fun appName(packageName: String): String = try {
+        val packages = context.packageManager
+        packages.getApplicationLabel(packages.getApplicationInfo(packageName, 0)).toString()
+    } catch (_: PackageManager.NameNotFoundException) {
+        ""
+    }
+
     /** A record as the adapter receives it, its value still in the platform's unit. */
     private fun raw(name: String, record: Record): JSObject {
         val json = JSObject()
             .put("id", record.metadata.id)
             .put("type", name)
             .put("sourceId", record.metadata.dataOrigin.packageName)
-            .put("sourceName", "")
+            .put("sourceName", appName(record.metadata.dataOrigin.packageName))
         when (record) {
             is WeightRecord -> json.put("value", record.weight.inKilograms).at(record.time)
             is BodyFatRecord -> json.put("value", record.percentage.value).at(record.time)

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { healthSourceName } from '../healthIngest/healthSourceName';
 import { healthDataTypeLabel } from '../format/healthDataTypeLabel';
 import { healthDataTypePurpose } from '../format/healthDataTypePurpose';
 import { useApp } from '../app/useApp';
@@ -14,9 +15,10 @@ import { healthDataTypeIcon } from './healthDataTypeIcon';
 
 function count(samples: readonly HealthSample[]): string {
   if (samples.length === 0) return 'Allowed. Nothing to read yet.';
-  const sources = [...new Set(samples.map((sample) => sample.sourceName))];
+  // A source the platform did not name is counted, never shown by its package id (MM-395).
+  const sources = [...new Set(samples.flatMap((sample) => healthSourceName(sample) ?? []))];
   const readings = samples.length === 1 ? '1 reading' : `${samples.length} readings`;
-  return `Allowed. ${readings} from ${sources.join(', ')}.`;
+  return sources.length === 0 ? `Allowed. ${readings}.` : `Allowed. ${readings} from ${sources.join(', ')}.`;
 }
 
 /**

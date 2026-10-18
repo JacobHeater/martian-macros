@@ -23,7 +23,8 @@ export interface HealthSample {
 
   /**
    * The app or device that wrote it, as the platform identifies it, and
-   * its name as shown to the user.
+   * its name as shown to the user, or '' when the platform gives none
+   * (MM-395; `healthSourceName` reads it).
    */
   readonly sourceId: string;
   readonly sourceName: string;
