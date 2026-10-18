@@ -28,7 +28,7 @@ export const draftInsightKinds: readonly ItemInsightKind[] = [
     id: 'mostlyFat',
     area: 'food',
     title: 'Mostly fat',
-    example: 'Most of this item’s calories come from fat (62%). A leaner choice or a smaller portion leaves more room for protein.',
+    example: 'Most of this item’s calories come from fat (62%). A leaner choice leaves more room for protein.',
     priority: 'pattern',
     notWithEatingDisorderHistory: true,
   },

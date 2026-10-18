@@ -297,6 +297,15 @@ limitations.
 - Stories: the workout stories draw the line the app works out (the demo
   plus one chest day); CoachRecentInsightsLogged lists it from the log;
   CoachSettingsEveryArea draws every area with the drafts.
+- **Food insights Q&A (2026-10-18), recorded in MM-365 and MM-378:** the first
+  food set is mostly fat, light on protein and large portion (salty item out;
+  low grade after grades); swap or add, never eat less; logged foods only;
+  every qualifying line every time, with a **snooze** for one kind on one item
+  (1 day, 1 week, 1 month, always), inside the opened line, Undo after, and a
+  Snoozed list per area in Settings > Coach. The snooze applies to workouts
+  too and replaces volume jump's automatic rest. Next: MM-378 drawn in
+  Storybook for the designer and UX guard; MM-365's set to the nutrition,
+  coaching and safety roles.
 - WS-09 step 10: MM-362, MM-364 and MM-366 done; MM-363 in progress (a
   food's entry opening its day comes with MM-365); MM-377 added.
 

@@ -2,7 +2,7 @@
 id: MM-365
 status: proposed
 component: coach-insights
-related: [MM-361, MM-362, MM-370, MM-125, MM-121, MM-305, MM-312, MM-108, MM-11]
+related: [MM-361, MM-362, MM-378, MM-370, MM-125, MM-121, MM-305, MM-312, MM-108, MM-11]
 ---
 
 # Story: The first inline insights on food entries and meals
@@ -15,6 +15,14 @@ under it about what could improve.
 The product owner's (2026-10-17): single-item neutral facts and pattern-backed insights both apply to food. Grades show on the
 entry (MM-370), and the insight may refer to the grade and to the portion.
 
+The product owner's (2026-10-18, through the question tool):
+- **The first food set is "mostly fat", "light on protein" and "large portion"**, for the panel's nutrition, coaching and
+  safety roles to check. "Salty item" is left out of it; "often logged, low grade" waits for grades (MM-369, MM-370).
+- **Swap or add, never eat less.** No food line suggests a smaller portion: "Most of this item's calories come from fat
+  (62%). A leaner choice leaves more room for protein." "Large portion" asks only whether the amount was entered right.
+- **Under logged foods only.** Search and the amount step show the grade, once grades are built, and no line.
+- **Every qualifying entry shows its line, every time, and can be snoozed** for that food (MM-378).
+
 Choices I made without asking (say if any is wrong). **The catalog and every figure in it is a draft** for the panel's
 nutrition and coaching roles to check:
 
@@ -24,9 +32,10 @@ Listed in priority order (MM-362): when two fire on one entry, the higher row wi
 |---|---|---|---|---|---|
 | large portion | data quality | item | entry ≥ 2× the food's usual serving and ≥ 300 kcal | "About twice the usual serving (2 cups). Worth checking the amount is right." | portion: off for ED history (the panel's request, see below) |
 | light on protein | pattern | item | entry ≥ 400 kcal and < 10% of calories from protein | "520 kcal with 9 g of protein. Adding a protein source here makes your minimum easier." | protein: shown |
-| mostly fat | pattern | item | entry ≥ 150 kcal and ≥ 55% of its calories from fat | "Most of this item's calories come from fat (62%). A leaner choice or a smaller portion leaves more room for protein." | composition: off for ED history |
-| salty item | pattern | item | a sodium limit is set and the entry alone is ≥ 40% of it | "This item is about half your sodium limit (1,150 mg of 2,300)." | composition: off for ED history |
-| often logged, low grade | education | pattern | a food graded D+ or below was logged on ≥ 5 of the last 14 days, under the latest entry of it | "Logged on 6 of the last 14 days, and graded D, mostly for its saturated fat and sugar. A higher-graded choice on some of those days is an easy place to start." | composition: off for ED history |
+| mostly fat | pattern | item | entry ≥ 150 kcal and ≥ 55% of its calories from fat | "Most of this item's calories come from fat (62%). A leaner choice leaves more room for protein." | composition: off for ED history |
+
+Not in the first set (the product owner, 2026-10-18): "salty item" (a sodium limit is set and the entry alone is ≥ 40% of it)
+and "often logged, low grade" (after MM-370).
 
 - **Every line is about the item**, never the day's totals (MM-362).
 - **"Large portion" is left out with an eating-disorder history.** At the design review (2026-10-17) both reviewers asked whether
@@ -37,7 +46,7 @@ Listed in priority order (MM-362): when two fire on one entry, the higher row wi
   per-meal targets. An unrationed line under every meal header would break both.
 
 ## Description
-The five rules in the inline catalog, their words, evidence rows and evidence-register entries, and their placement in the food
+The three rules of the first set in the inline catalog, their words, evidence rows and evidence-register entries, and their placement in the food
 log.
 
 ## Acceptance Criteria
@@ -53,14 +62,6 @@ Scenario: Small items are left alone
 Scenario: Protein
   Given an entry of 520 kcal with 9 g of protein
   Then the "light on protein" insight states both figures
-
-Scenario: Salt only with a limit
-  Given no sodium limit is set
-  Then no "salty item" insight is shown, whatever the entry's sodium
-
-Scenario: A pattern under the food
-  Given a food graded D logged on 6 of the last 14 days
-  Then today's entry of that food shows the "often logged, low grade" insight with 6 of 14
 
 Scenario: Two rules on one entry
   Given an entry of 600 kcal, 70% from fat, with 8 g of protein
@@ -79,7 +80,11 @@ Scenario: No portion prompt with an eating-disorder history
   Then no "large portion" insight is shown
 
 Scenario: Plain words
-  Then no food rule's line calls a food good or bad or names a replacement food
+  Then no food rule's line calls a food good or bad, names a replacement food, or suggests eating less of it
+
+Scenario: Logged foods only
+  When food search or the amount step is shown
+  Then no insight line is drawn there
 ```
 
 ## UI/UX
