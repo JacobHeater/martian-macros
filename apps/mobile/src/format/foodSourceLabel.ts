@@ -6,6 +6,8 @@ export function foodSourceLabel(food: CatalogFood): string {
     case 'usda_foundation':
     case 'usda_sr_legacy':
       return 'USDA, lab-analyzed';
+    case 'usda_fndds':
+      return 'USDA, survey foods as eaten';
     case 'usda_branded':
       return 'Manufacturer label (USDA)';
     case 'off':

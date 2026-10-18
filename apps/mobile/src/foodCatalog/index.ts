@@ -37,3 +37,5 @@ export * from './SqliteFoodPack';
 export * from './TrustTier';
 export * from './UnsupportedPackVersion';
 export * from './writeFoodPack';
+export * from './SourceReliabilityRule';
+export * from './sourceReliability';

@@ -1,0 +1,146 @@
+# Review: measurement
+
+Handed back as text by the read-only role (Claude Code subagent, claude-fable-5-1) on 2026-10-18; written to this file by the chair verbatim.
+
+## Scope and traceability
+- Role: measurement & adaptive systems (`agents/roles/measurement.md`), read-only. Reviewer: Claude Code subagent (claude-fable-5-1), run `docs/agent-runs/mm380-proprietary-grade/`, 2026-10-18.
+- Subject: `requirements/food-logging/SPIKE.a-food-grade-of-our-own.MM-380.md` (the draft table under Decisions, lines 31–47). Also read: `requirements/food-logging/STORY.the-grade-is-the-apps-own.MM-382.md`, `requirements/food-logging/STORY.food-grades.MM-370.md`, `requirements/food-logging/STORY.micros-on-the-nutrition-card.MM-310.md`, `docs/agent-runs/mm380-proprietary-grade/brief.md`, `docs/food-grades.md`, `docs/evidence.md` (foodGrade rows, lines 273–288).
+- Engine inspected: `apps/mobile/src/engine/FoodGradeRule.ts`, `nutrientProfileScore.ts`, `gradeLetterOf.ts`, `gradeOfNutrition.ts`, `gradeOfMeal.ts`, `gradeOfFoodEntry.ts`, `gradeOfCustomFood.ts`, `GradeNutrition.ts`; `apps/mobile/src/food/gradeOfCatalogFood.ts`; `apps/mobile/src/lang/roundHalfAwayFromZero.ts`; `apps/mobile/src/domain/food/grade/FoodGradeLetter.ts`; `apps/mobile/src/domain/food/micros/{referenceAmount,Micronutrient}.ts`; `apps/mobile/src/foodCatalog/{CatalogFood,PackMicros}.ts`; `apps/mobile/src/foodPipeline/node/extract.sql` (fiber/sodium/sugars lines 24–25, 63, 84–85, 143–144, 197); `apps/mobile/test/engine/foodGrade.test.ts`.
+- Commit: branch `spike/proprietary-food-grade` at `42ce258`; MM-380/381/382 and the run directory are untracked working-tree files. Input SHA-256: not computable by this reviewer (no shell); the chair records them.
+- Protocol and contract read in full; all four configuration files present.
+
+## Existing facts versus proposals
+Repository facts (built, MM-369/370):
+- Points are counted strictly above each threshold: `nutrientProfileScore.ts:4` (`value > t`). The draft's letters are stated as "≥" and it does not say which convention the components use.
+- Letters are read as "the first step whose top the score does not pass" with lower = better: `gradeLetterOf.ts:6`; `FoodGradeRule.letterSteps` (`FoodGradeRule.ts:38`). The draft inverts the sign (higher = better), so this function and the boundary test (`foodGrade.test.ts:42–48`) must flip, not only the numbers.
+- A meal/day is the calorie-weighted mean of entries' scores, `roundHalfAwayFromZero` (`gradeOfMeal.ts:28–30`), 70% coverage (`FoodGradeRule.ts:31`, `gradeOfMeal.ts:18`). The ticket calls this "rounded half up"; the code rounds half away from zero. Under the old scale this never mattered for a letter in practice; under the new scale negatives are half the range (see ME-9).
+- Required inputs today are sugars, saturated fat, sodium and fiber (`gradeOfNutrition.ts:8–13`); the draft keeps sodium and fiber required and makes sugars and saturated fat optional.
+- The pack extract reads fiber from USDA nutrient 1079 by `max(CASE …)` (`extract.sql:24,143`), so an absent nutrient is NULL, not 0; Open Food Facts rows are `try_cast(fiber_100g …)` (`extract.sql:84`), NULL when blank, 0 when the source says 0. Sugars are `coalesce(sugars_g, sugars_nlea_g)` (`extract.sql:63,197`).
+- `CatalogFood.fiberG`/`sodiumMg` are `number | undefined` (`CatalogFood.ts:38–39`); undefined means not stated (MM-310).
+- The reference amounts in the app are sex/age DRIs (`referenceAmount.ts`); the draft uses US Daily Values as a universal reference for the micro component. The DV figures are not in the repository yet.
+
+Approved requirements: twelve steps, universal, computed not stored, question mark with reason, 70% coverage (MM-370); a missing value is never zero (MM-310). Owner constraints for this spike: per-calorie basis, micros count, required set, optional refinements, twelve steps, no published basis.
+
+Proposals (mine) are in Findings and labelled as such. Every food figure below is an approximate recollection of a USDA SR Legacy entry, used to exercise the arithmetic; none was retrieved from FoodData Central tonight. Findings about mechanism survive ±20% on those inputs; findings about a particular food's letter do not, and I say which is which.
+
+## Audit coverage
+Mode: `change` (the draft method against the built engine, its tests and the pack's data shape).
+- Inspected: the engine files and test above (source inspection, every line); the three tickets; the pipeline's nutrient extraction; the micro facts and reference amounts. All calculations are by hand; no code was run.
+- Not inspected: `apps/mobile/src/food/FoodGrade.tsx` (popover words), the stories, `foodGradeEvidence.test.ts`, `tool/src/foodSource.ts` (no fiber/null handling found by search), the pack build report, MM-381 and its sources (integrations' scope).
+- Absent implementation: nothing of the draft exists in code yet; the Daily Value table, the micro mean, the energy-density component, the waiver and the 10 kcal floor are all new.
+- Referrals: nutrition (what the waiver, the energy-density component and the nut/condiment outcomes should be), micronutrients (the micro mean's denominator, the DV table), integrations (zero-vs-null by source in the packs).
+- Blocked verification: no runtime; no pack statistics (bounded requests in Verification).
+
+## Novice mobile experience
+Not assigned.
+
+## Findings
+
+### ME-1 — The calibration set cannot reproduce the draft letters, and it does not exercise the cut points
+- Domain: measurement. Class: documentation or requirement gap (MM-380 AC "A calibration set is recorded … their inputs"); the letters themselves are an unverified hypothesis until inputs are listed. Severity: high (MM-382 makes these letters a test). Confidence: high.
+- Observed: MM-380 lines 45–47 list 27 foods (not "about 34") and letters, with no inputs. Recomputing with approximate USDA values, I match 21 of them and cannot settle three without the chair's inputs: lean beef is A- (score 11: 95%-lean ground, 171 kcal, 26.1 g protein → 15.3 g/100 kcal → 8 points; zinc/B12 lift the micro mean to ~11% → 4; saturated fat 1.7 g/100 kcal → 1) or B (score 6 for an 85%-lean sirloin at 250 kcal: protein 10.0 g/100 kcal → 5 if strict, 6 if ≥); cola is D (−7) with 10.6 g sugars at 42 kcal (25.2 g/100 kcal, above 25 → 7 points) or D+ (−6) with 10.4 g; cheddar is C- (−3) with 24.9 g protein at 403 kcal (6.2 g/100 kcal → 4 points) or D+ with a lower-protein entry.
+- Step occupancy of the 27 (my scores): A+ 2 (18, 17), A 1 (14), A- 3 (11, 10, 10), B+ 2 (9, 9), B 5 (6, 6, 6, 5, lean beef), B- 2 (3, 3), C+ 3 (2, 2, 1), C 1 (0), C- 1 (−3), D+ 4 (−4, −5, cheddar, cola), D 1 (−8), D- 2 (−10, −12). Four steps are held by one food. Of the eleven cut points (16, 13, 10, 7, 5, 3, 1, −1, −3, −6, −9), six have a food sitting on them (10, 5, 3, 1, −3 and perhaps −6) and five have none (16, 13, 7, −1, −9). A test on this set would pass after a cut moved by a point without any food changing letter.
+- Remediation: list the inputs per 100 g (kcal, protein, fiber, sodium, sugars, saturated fat and the ten micros) with the source id, in the report and as fixtures in the test; grow the set to at least three foods per step with one food on each cut and one a point below it. Candidates from my arithmetic (approximate, to be confirmed on real inputs): mushrooms 17 and iceberg lettuce 16 (A+ cut), edamame 14, skim milk 10, 2% milk 7 (B+ cut), 1% milk 8–9, almonds 1, olives −2, bacon −3, jerky 0, walnuts −4, grapes −6/−7, raisins −7, honey −9 (D cut), pickles 2, sauerkraut 7, chard 11, cucumber 10, soy sauce 4. Several of those are themselves defects (ME-3 to ME-6) and belong in the set precisely because they are.
+- Verification: source inspection and hand calculation; no run.
+
+### ME-2 — The instrument's resolution is about one step; the middle steps are two points wide
+- Domain: measurement. Class: evidence-supported domain concern. Severity: high (the most visible nutrition claim, drawn at twelve levels). Confidence: high on the mechanism, medium on the exact magnitudes.
+- Evidence: a US label may understate calories by up to 20% and overstate a naturally occurring nutrient by up to 25% (actual ≥ 80% of declared) and still comply (21 CFR 101.9(g)(4)–(5)); calories are rounded to 5 kcal up to 50 and 10 above (101.9(c)(1)); fiber, sugars and protein to 1 g and to 0 under 0.5 g (101.9(c)(6)–(7)); sodium to 5 mg up to 140 mg (101.9(c)(4)). Between laboratories, protein varies 2.8–6.4% CV, fat 5.4–54%, dietary fiber 23–84% (Hollman & Katan 1988, six foods, 19 labs; old, but no later source read tonight contradicts it and Foundation Foods now publishes per-sample values for that reason).
+- Calculation: every per-calorie component shares the kcal denominator, so a calorie error moves them all in the same direction. The successive-threshold ratios are: protein 2, 1.5, 1.33, 1.33, 1.25, 1.25, 1.2; fiber 2, 1.5, 1.33, 1.25, 1.29, 1.33; sodium 2, 1.5, 1.33, 1.25, 1.33, 1.25, 1.5; sugars 2, 1.5, 1.33, 1.33, 1.25, 1.25, 1.2; saturated fat 1.67, 1.4, 1.29, 1.22, 1.18; micros 2, 1.5, 1.33, 1.5, 1.33; energy density 1.375, 1.27, 1.21, 1.18, 1.2, 1.25. Above the first two thresholds, a ±20% move (ln 1.2 = 0.18) against a mean spacing of ln 1.3 = 0.26 crosses a threshold with probability about 0.7 per active component. With three to five active components the expected shift is 2–3.5 points; the compliant worst case for protein per labelled calorie is 1.25 / (1/1.2) = 1.5×, two protein thresholds. The steps B+, B, B-, C+, C, C- are two points wide (7, 5, 3, 1, −1, −3). So two foods one step apart are within the inputs' error, and a food can move two steps on compliant label data. Example within the set: egg's protein is 8.13 g/100 kcal against the 8 threshold (a 2% change flips a point); tofu's micro mean 7.4% against 7.5 and protein 12.0 against 12.5; lentils' protein 7.78 against 8.
+- Proposals: (a) the register and `docs/food-grades.md` say a step is about the resolution of the inputs, and neighbouring letters are not a ranking a person should act on; (b) a test property: for every calibration food, ±5% on kcal (label rounding at 100 kcal) moves the letter at most one step, and ±20% at most two; (c) an alternative the owner may prefer: equal three-point steps, A+ ≥ 17, A ≥ 14, A- ≥ 11, B+ ≥ 8, B ≥ 5, B- ≥ 2, C+ ≥ −1, C ≥ −4, C- ≥ −7, D+ ≥ −10, D ≥ −13, D- below, which puts olive oil (−8) at C- and butter (−12) at D, so the bottom compresses; the practical range of the "against" side is only about 0 to −12, which is why the draft's bottom steps are narrow. I would keep the draft's cuts and take (a) and (b); the three-point list is for the owner to decline knowingly.
+
+### ME-3 — Below about 50 kcal per 100 g the per-calorie multiplier amplifies label rounding into whole points, and the 10 kcal floor is a cliff
+- Domain: measurement. Class: evidence-supported domain concern. Severity: high. Confidence: high (mechanism), medium (the food examples).
+- Calculation: the multiplier is 100/kcal: 2.9× at broccoli's 34 kcal, 4.3× at spinach's 23, 8.3× at 12 kcal, 10× at the floor. A 5 mg sodium rounding at 12 kcal is 42 mg/100 kcal, a third of the first sodium step; a label "0 g" fiber that is really 0.49 g per 240 g serving is 0.2 g/100 g, which at 12 kcal is 1.7 g/100 kcal: two fiber points and the sugars waiver, lost or gained by a rounding rule. Chard (19 kcal, 213 mg sodium per 100 g, 9% of the DV) takes 7 of the 8 sodium points (1,121 mg/100 kcal); celery (14 kcal, 80 mg) 4; spinach (23 kcal, 79 mg) 2; potato chips (536 kcal, 525 mg) 0, because 98 mg/100 kcal is under the first step. Adding 10 g of oil to 100 g of vegetable broth (12 kcal, 250 mg sodium: 2,083 mg/100 kcal, 8 points, score −6, D+) raises it to 102 kcal, 245 mg/100 kcal, 2 points: the grade rises by six points, two to three steps, for adding fat. At the floor: 9.9 kcal shows a question mark; 10 kcal shows a full grade at 10× amplification.
+- Proposal (figures): floor the denominator at 50 kcal — amounts are read per 100 kcal, or per 200 g when the food has under 50 kcal per 100 g — for every component alike. Then the multiplier is at most 2×, a 5 mg rounding is at most 10 mg/100 kcal, and the oil-on-broth gain falls from 6 points to 2. Effects on the set: broccoli 14 (A), spinach 13 (A), chard 8 (B+), lettuce 5 (B), cucumber 2 (C+), broth −2 (C-), pickles still 8 sodium points, and nothing above 50 kcal/100 g changes. This is still a per-calorie basis for every food above 50 kcal per 100 g; below it, it is the owner's constraint at the margin and I hand it up. If declined, the narrower fix is to cap sodium's per-calorie points for foods under 50 kcal at 4 and keep the floor; but that leaves the fiber and sugars amplification and the floor's cliff. With the 50 kcal floor the 10 kcal floor is less load-bearing and can stay as drafted (strictly under 10 → question mark; at 10 → graded), tested at 9.99 and 10.
+
+### ME-4 — The sugars waiver is a cliff switched by the least reliable input
+- Domain: measurement (shape); nutrition (what it stands for). Class: evidence-supported domain concern. Severity: high. Confidence: high.
+- Observed: the waiver turns up to 8 points off at fiber ≥ 1.5 g or protein ≥ 6 g per 100 kcal. Fiber is the nutrient with 23–84% between-laboratory CV and a "0 under 0.5 g" label rule (sources above). Examples: whole milk (61 kcal, 3.15 g protein → 5.16 g/100 kcal) pays 2 sugars points; 2% milk (50 kcal, 3.3 g → 6.6) pays none; an ultra-filtered whole milk with 3.7 g protein (6.07) pays none: a 0.5 g protein difference on the label is worth 2 points. Grapes (69 kcal, 0.9 g fiber → 1.3 g/100 kcal, 15.5 g sugars → 22.5) are not waived and take 7 sugars points, score −6 or −7, the step of cola and chips; watermelon (30 kcal, 0.4 g fiber → 1.33) takes 6, score about −3; cantaloupe (34 kcal, 0.9 g → 2.6) is waived and lands near A-. A whey shake with 6+ g protein per 100 kcal has any amount of sugar waived.
+- Proposal: make the waiver continuous. Two shapes, for the nutrition role to choose between: (a) a ramp, sugars points × clamp((6 − protein)/3, 0, 1) × clamp((1.5 − fiber)/0.75, 0, 1), rounded half up: whole milk 2 × 0.28 → 1 point, grapes 7 × 0.27 → 2 (score −1, C), watermelon 6 × 0.23 → 1; (b) an allowance, counted sugars = sugars − 2 × protein − 4 × fiber (g per 100 kcal), floored at 0: whole milk 8.3 − 10.3 → 0, grapes 22.5 − 2.1 − 5.2 = 15.2 → 4 points, orange juice 18.7 − 1.6 − 1.8 = 15.3 → 4 (draft 5), a sweetened low-fat fruit yogurt at 100 kcal with 4 g protein and 16 g sugars 16 − 8 = 8 → 2 (draft 4), chocolate milk (83 kcal, 3.2 g protein, 9.5 g sugars) 11.4 − 7.7 = 3.7 → 1 (draft 3). Either removes the cliff; (a) stays closest to the draft's intent. Test at exactly 1.5 and 6 and at 1.49 and 5.99 whichever is chosen.
+
+### ME-5 — Energy density counts the same thing twice and alone decides the bottom for nuts; dilution invariance fails by its band
+- Domain: measurement; nutrition for the outcome. Class: evidence-supported domain concern. Severity: medium. Confidence: medium.
+- Calculation: foods with high kcal/g are exactly those whose per-calorie multiplier is small (0.15–0.2×), so "for" points are already hard to earn; the 7-point energy-density component then charges again. Walnuts (654 kcal): protein 2.3 g/100 kcal → 1, fiber 1.0 → 1, saturated fat 0.93 → 0, sodium 0, micros ~1.5% → 0, energy density 6.54 → 6; score −4, D+, with chips and ice cream, with six of the six "against" points from energy density. Almonds: 6 for, 5 against, C+ with white bread. Oats dry (389 kcal) B- (3) and oats cooked in water (71 kcal) B (6): identical food, three points apart by energy density alone; dry pasta and rice likewise lose 3 to their cooked state. MM-382's dilution scenario ("the same protein, fiber and sodium points") is true and incomplete: the letter does move.
+- Proposal: cap the component at 4 points (2, 3, 4, 5 kcal/g) so it can say "concentrated" without outranking fiber: walnuts −2 (C-), almonds 2 (C+), butter and oil still bottom via saturated fat (butter −10, oil −6 → D). Or interpolate linearly from 0 at 2 kcal/g to 4 at 6 kcal/g. Whether nuts belong at C- or higher is nutrition's call; the measurement point is that one collinear component should not carry as many points as fiber. Hold in a test: on dilution with water every per-calorie component's points are unchanged and the energy-density points never rise, and the grade never falls.
+
+### ME-6 — Symmetric caps let a brine net out: soy sauce grades B-
+- Domain: measurement; nutrition. Class: evidence-supported domain concern. Severity: medium. Confidence: medium (inputs approximate; mechanism certain).
+- Calculation: soy sauce, 53 kcal, 8.1 g protein (15.4 g/100 kcal → 8 points), 0.8 g fiber (1.5 → 2), micros from iron and magnesium ~5.6% → 2, sodium 5,500 mg (10,377 mg/100 kcal → the maximum 8). Score 12 − 8 = 4, B-, with oats. Protein's maximum (8) equals sodium's (8), so any salty protein-bearing liquid cancels its sodium. Pickles (11 kcal) similarly reach C+ (2) through fiber 7 and micros 2 against sodium 8.
+- Proposal: extend the sodium scale past 1,500 so the extreme is not flat: 2,500, 4,000, 6,000, 10,000 mg/100 kcal (max 12): soy sauce 12 − 12 = 0 (C), pickles −2 (C-). An alternative the nutrition role may prefer is a letter cap for foods over some per-100 g sodium, but that is a per-gram rule and a product decision. With ME-3's 50 kcal floor soy sauce is unchanged (53 kcal) and pickles read per 200 g (2,400 → still 8), so ME-3 does not solve this one.
+
+### ME-7 — The threshold convention is unstated; the draft's own letters are "≥" and the engine's points are ">"
+- Domain: measurement. Class: documentation or requirement gap. Severity: medium (label-shaped data lands on round numbers). Confidence: high.
+- Observed: `nutrientProfileScore.ts:4` counts strictly above; MM-380 says only "one per threshold passed". Values at or next to equality in the set: egg protein 8.13 (8), 1% milk 8.02 (8), sirloin 10.0 (10), lentils 7.78 (8), apple fiber 4.6 (4.5), tofu micros 7.4 (7.5). A label "100 cal, 8 g protein" is exactly 8.
+- Proposal: one stated rule for every list (I would take "≥" for the "for" lists and ">" for the "against" lists, so equality gives the benefit of the doubt; a single rule everywhere is also fine), written in `FoodGradeRule`'s comment and held by a test that asserts the point at `t` and at `t ± 0.001` for every threshold of every list.
+
+### ME-8 — The micro mean's denominator is ambiguous, and the "five stated" minimum biases barcode foods down by up to two steps
+- Domain: measurement (bias); micronutrients and integrations (the rule and the data). Class: evidence-supported domain concern. Severity: medium. Confidence: medium (the Branded coverage is from the label rules, not measured on the pack).
+- Observed: MM-380 line 34: "mean … over the ten … counted when at least five are stated". Over the ten with unstated as 0 contradicts MM-310; over the stated rewards a label that lists only its rich nutrients. The US label requires calcium, iron, potassium and vitamin D and leaves vitamins A and C voluntary (101.9(c)(8)), so a typical Branded food states four and never earns the component, while the same food from the generic pack earns up to 6 points: nonfat Greek yogurt A- (11) from the generic pack, B+ (8) scanned.
+- Proposal: pin the denominator as "over the stated" (MM-310), set the minimum at the label's four so barcode foods are not systematically two steps under generic ones, and have the popover say how many were counted. Bounded verification (chair or integrations): the share of `barcode_us` foods stating ≥ 4, ≥ 5 and all ten of the reference micros, and the same for `generic`.
+
+### ME-9 — The roll-up's rounding and the letter function change meaning with the sign flip
+- Domain: measurement. Class: reproducible implementation defect once the sign flips (today's code is correct for today's scale). Severity: low. Confidence: high.
+- Observed: `gradeOfMeal.ts:29` uses `roundHalfAwayFromZero`; MM-370 and MM-380 say "rounded half up". For a meal mean of −2.5 these give −3 (C-) and −2 (C). Under the draft, negative means are half the scale, and 0 sits at the C/C+ boundary. `gradeLetterOf.ts:6` reads steps as tops with lower = better; the draft's steps are bottoms with higher = better; the boundary test at `foodGrade.test.ts:43–44` encodes the old direction.
+- Proposal: choose half up (`Math.floor(x + 0.5)`) or half to even, say it in the ticket, and test −2.5, −0.5, 0.5 and 2.5. Rewrite `gradeLetterOf` as "the highest step whose bottom the score reaches" and test every cut and the point below it.
+
+### ME-10 — A stated 0 and an unstated value are the same number only for some sources
+- Domain: measurement; integrations. Class: unverified hypothesis requiring investigation. Severity: low. Confidence: medium.
+- Observed: for USDA Branded, fiber is label-mandatory, so a 0 is a declared 0 (actual under 0.5 g per serving); for Open Food Facts a 0 may be a declared 0 or a blank filled by a contributor. The engine cannot tell them apart. The cost is bounded by ME-3's amplification: at 400 kcal/100 g a hidden 0.49 g per 30 g serving is 0.4 g/100 kcal (no point); at 12 kcal with a 240 g serving it is 1.7 g/100 kcal (two points and the waiver).
+- Bounded verification request (chair/integrations): in the current packs, the count of foods with fiber exactly 0 by source, and the share of foods under 10 and under 50 kcal per 100 g, so the size of ME-3 and ME-10 is measured rather than argued.
+
+### ME-11 — The floor does not dent coverage (positive, hold it in a test)
+- Domain: measurement. Class: design note, no defect. Severity: low. Confidence: high.
+- Foods under 10 kcal per 100 g carry almost no calories, so `gradeOfMeal`'s coverage (`gradeOfMeal.ts:16–18`) is barely affected: three black coffees at 5 kcal in a 2,000 kcal day are 0.75%. Two beers (43 kcal/100 g, ungraded by alcohol) at 300 kcal are 15%: still graded. Add a test: a day of 1,800 graded kcal plus a 5 kcal ungradable coffee and a 300 kcal ungradable beer is graded; with a further 400 kcal ungradable it is not.
+
+## Sources and evidence
+- 21 CFR § 101.9 Nutrition labeling of food, Cornell Legal Information Institute mirror, https://www.law.cornell.edu/cfr/text/21/101.9, publication date null (no amendment date shown), accessed 2026-10-18. Supports: calorie rounding to 5/10 kcal; fat and saturated fat to 0.5 g under 5 g; sodium to 5 mg (5–140 mg) and 10 mg above; carbohydrate, fiber, sugars, protein to 1 g with 0 under 0.5 g; vitamin/mineral %DV to 2/5/10%; Class II nutrients (naturally occurring vitamins, minerals, protein, fiber) must be at least 80% of declared; calories, sugars, fats, cholesterol, sodium may not exceed declared by more than 20%; "reasonable excesses"/"reasonable deficiencies" within GMP. Applicability: US labels, which the barcode pack and typed labels follow. Limitation: the eCFR itself redirected to a block page; the LII text is a mirror. The last 32k characters of the page were not read.
+- Hollman P.C.H., Katan M.B., "Bias and error in the determination of common macronutrients in foods: interlaboratory trial", Journal of the American Dietetic Association 88(5):556–563, 1988, record at https://agris.fao.org/search/en/records/65dfb3d30f3e94b9e5db7f41, accessed 2026-10-18. Supports: between-laboratory CV protein 2.8–6.4%, total fat 5.4–54%, available carbohydrate 9–27%, total dietary fiber 23–84%, six foods, 19 laboratories. Limitation: 1988 methods; magnitudes may be smaller today, the ranking (fiber least reproducible) is what the finding uses. Interpretation (mine): fiber is the wrong input to switch 8 points on a single threshold.
+- Search results not opened (FoodData Central Foundation Foods documentation; National Academies CV appendix) are not cited for any claim.
+- `docs/evidence.md` foodGrade rows (lines 273–288) describe the method being replaced; nothing there supports a draft figure.
+
+## Research
+Status: performed, directly, with WebFetch and WebSearch on this surface. Questions: (1) what error a compliant US label may carry and how values are rounded (trigger: the score's step widths are set in points and the brief asks for sensitivity to label error); (2) what is known about analytical variability in nutrient databases (trigger: the waiver and fiber component rest on fiber). One fetch failed (eCFR redirect) and was replaced by the LII mirror. No repository code or health data was sent anywhere; queries were generic.
+
+## Confidence and limitations
+Medium overall. High on mechanisms (amplification, cliffs, collinearity, rounding direction, convention), which follow from the draft's arithmetic. Medium on any named food's letter: inputs are approximate USDA recollections, not retrieved; the chair's inputs are unlisted, so disagreements (lean beef, cola, cheddar) may be input differences. No code was run; nothing in the pack was measured. Single reviewer, self-reviewed.
+
+## Acceptance criteria and edge cases
+Existing (MM-382): "The calibration set" is untestable until inputs are listed (ME-1); "Per calorie, not per gram" is true but incomplete (ME-5); "Too few calories" needs the boundary stated (ME-3); "Vitamins and minerals" needs the denominator stated (ME-8). Proposed tests, all pure and cheap:
+1. Calibration fixtures with inputs and source ids; ≥ 3 foods per step; a food on every cut and one a point below; boundary foods marked as such.
+2. Monotonicity: raising protein, fiber or any reference micro (kcal fixed) never lowers the score; raising sodium, sugars, saturated fat or kcal/g never raises it.
+3. Dilution: scaling every per-100 g value by f in (0.1, 1) leaves every per-calorie component's points unchanged, energy-density points non-increasing, the grade never lower, until the floor; at the floor exactly, graded; just under, the question mark with its reason.
+4. Step order: letters strictly ordered in score; `gradeLetterOf(cut)` is the step and `gradeLetterOf(cut − 1)` the next lower, for all eleven cuts; every step reachable.
+5. Threshold convention at `t` and `t ± 0.001` for every list (ME-7).
+6. Waiver (or ramp) at 1.5/6 and just under.
+7. Micros: four stated vs five (or the chosen minimum); the mean's denominator; a 100% cap (vitamin C in broccoli is 262% of DV per 100 kcal and must read 100).
+8. Roll-up: −2.5 and 2.5 under the chosen rounding; coverage with sub-10-kcal and alcoholic entries (ME-11).
+9. Sensitivity: ±5% on kcal moves each calibration food at most one step; ±20% at most two (ME-2).
+10. Sign flip: the old boundary test replaced, not edited around.
+
+## Dependencies
+- nutrition: ME-4's waiver shape, ME-5's energy-density cap and the nut outcome, ME-6's condiment rule; challenge: is a continuous waiver acceptable as a stand-in for intrinsic sugars, and which shape.
+- micronutrients: ME-8's denominator and minimum; the DV table's provenance (not in the repository).
+- integrations: ME-8 and ME-10 pack measurements; zero-vs-null by source.
+- Interfaces: `GradeNutrition` gains the ten micros and loses required sugars/saturated fat; `FoodGradeValue` may need a "not counted" list for the popover; `gradeLetterOf` and `FoodGradeRule.letterSteps` change direction.
+
+## Safety concerns
+None found beyond misleading certainty: twelve steps over a two-point middle band present finer precision than the inputs carry (ME-2). Not clinical clearance.
+
+## Unresolved product decisions
+1. Denominator floor at 50 kcal per 100 g (ME-3) — touches the owner's per-calorie constraint only below 50 kcal; alternatives: cap sodium points for low-calorie foods, or accept the amplification and document it. Owner.
+2. A continuous sugars waiver (ME-4): ramp or allowance, or the cliff as drafted. Owner, on nutrition's advice.
+3. Step width (ME-2): keep the draft's cuts with the resolution stated, or three-point steps. Owner.
+4. Energy density capped at 4 points (ME-5). Owner, on nutrition's advice.
+5. Micro mean over the stated with a minimum of four (ME-8). Owner, on micronutrients' advice.
+6. Rounding rule for the roll-up and the threshold convention (ME-7, ME-9): the chair may take these as "say if any is wrong".
+
+## Verification
+Nothing run. Source inspection of the files listed; hand calculation of about 45 foods on approximate inputs. Requested of the edit owner: the pack statistics in ME-8 and ME-10, and the tests in Acceptance criteria run after the build. Existing `foodGrade.test.ts` was read, not executed.
+
+## Targeted challenges
+None yet.
+
+---
+
+**Verdict: build with the listed changes.** The per-calorie method is sound as an instrument above about 50 kcal per 100 g once its thresholds have a stated convention and a reproducible calibration set; below that, and at the sugars waiver, the draft turns label rounding and the least reproducible nutrient into whole letters. Required before the test holds letters: ME-1 (inputs and a fuller set), ME-7 (convention), ME-9 (rounding and direction). Recommended for the method: ME-3 (50 kcal floor), ME-4 (continuous waiver), ME-5 (energy-density cap), ME-6 (extended sodium scale), ME-8 (denominator and minimum). Owner decisions handed up: the six listed above.

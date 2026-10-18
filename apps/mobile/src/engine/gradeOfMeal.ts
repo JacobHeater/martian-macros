@@ -4,8 +4,10 @@ import { FoodGradeRule } from './FoodGradeRule';
 import { gradeLetterOf } from './gradeLetterOf';
 
 /**
- * A meal's or a day's grade (MM-370): the calorie-weighted mean of its
- * graded entries' scores, rounded half up, turned back into a letter.
+ * A meal's or a day's grade (MM-370, MM-382): the calorie-weighted mean of
+ * its graded entries' scores, rounded half up (−2.5 is −2, the panel's
+ * ME-9), turned back into a letter. It names nothing as not counted and
+ * states no vitamins and minerals: those are each food's own.
  * A question mark when graded entries carry less than
  * `FoodGradeRule.rollupCoverage` of the calories, saying what share could
  * be graded; an entry that can't be graded counts as not covered.
@@ -26,6 +28,6 @@ export function gradeOfMeal(entries: readonly { kcal: number; grade: FoodGradeVa
     };
   }
   const mean = graded.reduce((sum, e) => sum + e.kcal * (e.grade.kind === 'graded' ? e.grade.score : 0), 0) / covered;
-  const score = roundHalfAwayFromZero(mean);
-  return { kind: 'graded', letter: gradeLetterOf(score), score };
+  const score = Math.floor(mean + 0.5) + 0;
+  return { kind: 'graded', letter: gradeLetterOf(score), score, notCounted: [], statedMicronutrients: 0 };
 }

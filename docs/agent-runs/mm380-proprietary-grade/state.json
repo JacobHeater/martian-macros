@@ -1,0 +1,583 @@
+{
+  "schema_version": 1,
+  "task_id": "mm380-proprietary-grade",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "spike/proprietary-food-grade",
+    "commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "The draft method's components, bases, thresholds, the sugars waiver, energy density, low-calorie foods, the twelve cut points against the calibration set, the literature as context, the evidence rows.",
+      "role": "nutrition",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-380",
+          "MM-382",
+          "MM-370",
+          "MM-381",
+          "MM-307",
+          "MM-310",
+          "MM-108",
+          "the eight grade engine files",
+          "the catalog, custom and entry adapters",
+          "the register"
+        ],
+        "not_inspected": [
+          "the SQL repositories",
+          "extract.sql",
+          "the stories",
+          "the coaching lines that mention grades"
+        ],
+        "referrals": [
+          "micronutrients (fortification, the cap, the minimum stated)",
+          "measurement (threshold equality, the floor, the spread)",
+          "integrations (added sugars)",
+          "safety (the universal grade and clinician restrictions; the eating-disorder decision)",
+          "coaching (the popover's words)"
+        ],
+        "limitations": "No command run; food values from memory, not the pack's."
+      },
+      "research": {
+        "status": "performed",
+        "question": "NRF9.3's design and the 100 kcal versus 100 g evidence; added versus total sugars; the FDA Daily Values; saturated-fat evidence; SAIN,LIM's split basis.",
+        "reason": "Proposed nutrition rules and a change to figures.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://github.com/JacobHeater/martian-macros/blob/main/docs/agent-runs/mm380-proprietary-grade/findings/nutrition.md",
+            "title": "nutrition report, Sources and evidence",
+            "published_or_updated": "2026-10-18",
+            "accessed": "2026-10-18",
+            "claim": "Every source the role opened is listed there with its access date and what it supports."
+          }
+        ],
+        "summary": "Drewnowski 2009 (negatives per 100 g), Fulgoni 2009 (NRF9.3), Darmon 2005, Corriveau 2025 (free versus total sugars), Hooper 2020 (saturated fat), the FDA Daily Values. Sources listed in the report.",
+        "limitations": "PubMed and a Cambridge PDF unreadable; abstracts only for several."
+      }
+    },
+    {
+      "task": "The vitamins-and-minerals component: the Daily Values as the universal reference, the cap, the mean, the minimum stated, fortification, sodium's exclusion, the popover sentence; for MM-381, which sources carry which of the thirteen nutrients.",
+      "role": "micronutrients",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/micronutrients.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-380",
+          "MM-381",
+          "MM-382",
+          "MM-370",
+          "MM-310",
+          "MM-307",
+          "the engine's grade files as being built",
+          "the micronutrient domain",
+          "the pipeline's candidate and plausibility code",
+          "extract.sql",
+          "the calibration fixture"
+        ],
+        "not_inspected": [
+          "gradeOfMeal.ts",
+          "the label parser",
+          "the stories",
+          "BuildReport.countStated"
+        ],
+        "referrals": [
+          "measurement (threshold proximity)",
+          "nutrition (fortification and the sugars waiver)",
+          "integrations (FNDDS, generic dedup, licence)"
+        ],
+        "limitations": "No build has ever run, so every coverage statement is an expectation."
+      },
+      "research": {
+        "status": "performed",
+        "question": "The Daily Values and mandatory label nutrients; the NRF cap and basis; FNDDS and source coverage.",
+        "reason": "A proposed rule for every food.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://github.com/JacobHeater/martian-macros/blob/main/docs/agent-runs/mm380-proprietary-grade/findings/micronutrients.md",
+            "title": "micronutrients report, Sources and evidence",
+            "published_or_updated": "2026-10-18",
+            "accessed": "2026-10-18",
+            "claim": "Every source the role opened is listed there with its access date and what it supports."
+          }
+        ],
+        "summary": "21 CFR 101.9 (LII), the FDA Daily Values page, the FDC documentation pages, the ARS FNDDS pages, Drewnowski 2024. Sources listed in the report.",
+        "limitations": "PDFs unreadable; several government pages blocked."
+      }
+    },
+    {
+      "task": "The score as an instrument: sensitivity to label error, ties and spread, the per-calorie extremes, the floor, the waiver's discontinuities, the roll-up, what the calibration test should hold.",
+      "role": "measurement",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-380",
+          "MM-382",
+          "MM-370",
+          "MM-310",
+          "the eight grade engine files",
+          "the extract's nutrient lines",
+          "the existing grade test"
+        ],
+        "not_inspected": [
+          "FoodGrade.tsx",
+          "the stories",
+          "foodGradeEvidence.test.ts",
+          "the pack build report"
+        ],
+        "referrals": [
+          "nutrition (the waiver's shape, the energy-density cap, condiments)",
+          "micronutrients (the denominator, the DV table)",
+          "integrations (zero versus null by source)"
+        ],
+        "limitations": "No runtime; no pack statistics (the chair measured them)."
+      },
+      "research": {
+        "status": "performed",
+        "question": "The error a compliant US label may carry and its rounding; analytical variability in nutrient databases.",
+        "reason": "The score's step widths against label error.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://github.com/JacobHeater/martian-macros/blob/main/docs/agent-runs/mm380-proprietary-grade/findings/measurement.md",
+            "title": "measurement report, Sources and evidence",
+            "published_or_updated": "2026-10-18",
+            "accessed": "2026-10-18",
+            "claim": "Every source the role opened is listed there with its access date and what it supports."
+          }
+        ],
+        "summary": "21 CFR 101.9 (LII mirror); Hollman and Katan 1988 (between-laboratory variability).",
+        "limitations": "The eCFR itself was blocked; one 1988 interlaboratory trial."
+      }
+    },
+    {
+      "task": "MM-381: what the current sources carry of the thirteen nutrients; candidate sources with licence, format, size, coverage and cadence; the recommendation; a category column; the owner's next commands.",
+      "role": "integrations",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-381",
+          "MM-380",
+          "MM-307",
+          "MM-51",
+          "MM-52",
+          "MM-55",
+          "MM-57",
+          "MM-49",
+          "the pipeline end to end from foodSource.ts to the pack header",
+          "the catalog's food shape"
+        ],
+        "not_inspected": [
+          "readExtract.ts",
+          "csvRows*.ts",
+          "the Android MmPacks plugin",
+          "the published data repository",
+          "the engine beyond GradeNutrition.ts"
+        ],
+        "referrals": [
+          "micronutrients (the five-of-ten minimum against labels)",
+          "nutrition (a category column)",
+          "privacy-security and the attorney (licence text)",
+          "QA (the build and the zip listing)"
+        ],
+        "limitations": "No command run; every per-nutrient share is a hypothesis until a build."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What each source defines of the thirteen nutrients; licence, format, size and cadence of FNDDS, Experimental and the Canadian Nutrient File; USDA's public-domain statement; current release dates.",
+        "reason": "The owner's question on more robust packs.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://github.com/JacobHeater/martian-macros/blob/main/docs/agent-runs/mm380-proprietary-grade/findings/integrations.md",
+            "title": "integrations report, Sources and evidence",
+            "published_or_updated": "2026-10-18",
+            "accessed": "2026-10-18",
+            "claim": "Every source the role opened is listed there with its access date and what it supports."
+          }
+        ],
+        "summary": "The FDC download, documentation, FAQ and home pages; the Experimental and Branded documentation; the NHANES FNDDS nutrient list; the ARS FNDDS pages; the Open Food Facts data page; the Canadian open-data record. Sources listed in the report.",
+        "limitations": "The FDC data dictionary and the FNDDS PDFs could not be read; the survey zip's file names are confirmed by the first build."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs; its synthesis is docs/food-grades.md, docs/food-packs-data.md and decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training rule.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The grades' presentation was reviewed under MM-361 and MM-370 and is unchanged.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As coaching; the eating-disorder decision is flagged to the owner in MM-380.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The owner fixed the scope through the question tool.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product-designer",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No new screen; the popover words are checked at the build (the mm383 run).",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "ux-accessibility",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As product-designer.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "architecture",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No boundary change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No React change beyond the popover words.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "privacy-security",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No data leaves the device.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "qa",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The chair ran the tests.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/qa.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM380-method",
+      "status": "accepted",
+      "summary": "The app's own per-calorie method as in docs/food-grades.md, reconciled across the four roles (decision.md).",
+      "authority": "Chair, within the owner's constraints of 2026-10-18"
+    },
+    {
+      "id": "MM381-source",
+      "status": "accepted",
+      "summary": "FNDDS 2021-2023 added as a third generic source (MM-383); Experimental Foods and the Canadian Nutrient File declined; the first build is the owner's.",
+      "authority": "Chair, on the owner's instruction to add a source"
+    },
+    {
+      "id": "mm380-proprietary-grade-owner-3",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: the chair's choices listed in MM-380 as 'say if any is wrong' (the against-side floor, the waiver's ramps, energy density to five points, no sodium backstop, the fortified-cereal cap, protein's weight, no unsaturated-fat positive, recipes ungraded, pack foods graded now without sugars).",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    },
+    {
+      "id": "mm380-proprietary-grade-owner-4",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: whether showing grades with an eating-disorder history (MM-370) stands on the new method, where every A+ is a vegetable.",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    },
+    {
+      "id": "mm380-proprietary-grade-owner-5",
+      "status": "accepted",
+      "summary": "Handed to the owner through the tickets and the handoff: Owner: run the pack build and publish (docs/food-packs-data.md).",
+      "authority": "Chair, recorded as \"say if any is wrong\""
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/engine/foodGrade.test.ts test/engine/foodGradeEvidence.test.ts test/food/foodGradePopover.test.tsx",
+      "result": "passed",
+      "summary": "The calibration set, the properties, every threshold and cut, the roll-up, the register rows, the popover's sentences.",
+      "commit": "42ce25814bda6ed18510b7d73cdafc32b643fe49",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T11:30:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test, read a PDF, or reach a device; the chair ran the tests and measured the packs."
+    }
+  ]
+}

@@ -475,13 +475,13 @@ export const FoodDatabaseAvailable = screenStory({
 
 const download = async (canvas: HTMLElement) => {
   await pressAnywhere('See what is available')(canvas);
-  await pressAnywhere('Download')(canvas);
+  await pressAnywhere(/^Download Barcode foods/)(canvas);
 };
 
 /** MM-321: halfway down a slow connection, with Cancel. */
 export const FoodDatabaseDownloading = screenStory({
   covers: ['FoodDatabaseScreen'],
-  shows: 'Downloading',
+  shows: /^Downloading ·/,
   device: storyPackHost({ stall: true }),
   open: openFoodDatabase,
   walk: download,
@@ -490,14 +490,14 @@ export const FoodDatabaseDownloading = screenStory({
 /** MM-321: a download cancelled halfway: kept, to resume or discard. */
 export const FoodDatabasePaused = screenStory({
   covers: ['FoodDatabaseScreen'],
-  shows: 'Paused',
+  shows: /^Paused ·/,
   device: storyPackHost({ stall: true }),
   open: openFoodDatabase,
   walk: async (canvas) => {
     await download(canvas);
-    await within(canvas.ownerDocument.body).findByText('Downloading', undefined, { timeout: 8000 });
+    await within(canvas.ownerDocument.body).findByText(/^Downloading ·/, undefined, { timeout: 8000 });
     // The card's Cancel, not the strip's.
-    const [cancel] = within(canvas.ownerDocument.body).getAllByRole('button', { name: 'Cancel' });
+    const [cancel] = within(canvas.ownerDocument.body).getAllByRole('button', { name: /^Cancel downloading/ });
     if (cancel !== undefined) await userEvent.click(cancel);
   },
 });
@@ -524,7 +524,7 @@ export const FoodDatabaseInstalled = screenStory({
 export const FoodDatabaseUpToDate = screenStory({
   covers: ['FoodDatabaseScreen'],
   shows: 'Nothing new to download',
-  device: storyPackHost({ installed: '2026-10-09' }),
+  device: storyPackHost({ installed: '2026-10-09', only: 'barcode_us' }),
   open: openFoodDatabase,
   walk: pressAnywhere('See what is available'),
 });
@@ -532,8 +532,8 @@ export const FoodDatabaseUpToDate = screenStory({
 /** MM-346: a newer version listed than the one on the phone: it is offered as an update. */
 export const FoodDatabaseUpdate = screenStory({
   covers: ['FoodDatabaseScreen'],
-  shows: 'Update',
-  device: storyPackHost({ installed: '2026-10-09', listed: '2026-10-16' }),
+  shows: /version 2026-10-16/,
+  device: storyPackHost({ installed: '2026-10-09', listed: '2026-10-16', only: 'barcode_us' }),
   open: openFoodDatabase,
   walk: pressAnywhere('See what is available'),
 });
@@ -546,7 +546,65 @@ export const DownloadUnderTheDashboard = screenStory({
   open: openFoodDatabase,
   walk: async (canvas) => {
     await download(canvas);
-    await within(canvas.ownerDocument.body).findByText('Downloading', undefined, { timeout: 8000 });
+    await within(canvas.ownerDocument.body).findByText(/^Downloading ·/, undefined, { timeout: 8000 });
+    await pressAnywhere('Back')(canvas);
+  },
+});
+
+/** MM-384: both packs downloading at once, each with its own card, and a strip line for each. */
+export const FoodDatabaseTwoDownloading = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: /^Downloading Common foods/,
+  device: storyPackHost({ stall: true }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await pressAnywhere('See what is available')(canvas);
+    await pressAnywhere(/^Download Common foods/)(canvas);
+    await pressAnywhere(/^Download Barcode foods/)(canvas);
+    await within(canvas.ownerDocument.body).findAllByText(/^Downloading Barcode foods/, undefined, { timeout: 8000 });
+  },
+});
+
+/** MM-384: one pack on the phone while the other is still coming down. */
+export const FoodDatabaseOneDone = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Common foods is on your phone.',
+  device: storyPackHost({ stall: 'barcode_us' }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await pressAnywhere('See what is available')(canvas);
+    await pressAnywhere(/^Download Barcode foods/)(canvas);
+    await within(canvas.ownerDocument.body).findAllByText(/^Downloading Barcode foods/, undefined, { timeout: 8000 });
+    // The host stalls only the barcode pack; the common foods come down whole.
+    await pressAnywhere(/^Download Common foods/)(canvas);
+    await within(canvas.ownerDocument.body).findByText('Common foods is on your phone.', undefined, { timeout: 8000 });
+  },
+});
+
+/** MM-385: removing an installed pack asks first, and the finished notice goes with the pack. */
+export const FoodDatabaseRemoving = screenStory({
+  covers: ['FoodDatabaseScreen'],
+  shows: 'Remove this food database?',
+  device: storyPackHost({ only: 'barcode_us' }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await download(canvas);
+    await within(canvas.ownerDocument.body).findByText('Barcode foods, United States is on your phone.', undefined, { timeout: 8000 });
+    await pressAnywhere(/^Remove/)(canvas);
+  },
+});
+
+/** MM-384: two downloads going on under the Dashboard: two strip lines, each with its Cancel. */
+export const TwoDownloadsUnderTheDashboard = screenStory({
+  covers: ['FoodDatabaseScreen', 'DashboardScreen'],
+  shows: /^Downloading Common foods/,
+  device: storyPackHost({ stall: true }),
+  open: openFoodDatabase,
+  walk: async (canvas) => {
+    await pressAnywhere('See what is available')(canvas);
+    await pressAnywhere(/^Download Common foods/)(canvas);
+    await pressAnywhere(/^Download Barcode foods/)(canvas);
+    await within(canvas.ownerDocument.body).findAllByText(/^Downloading Barcode foods/, undefined, { timeout: 8000 });
     await pressAnywhere('Back')(canvas);
   },
 });

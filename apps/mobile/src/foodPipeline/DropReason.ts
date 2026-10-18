@@ -11,6 +11,8 @@ const values = [
   'supersededVersion',
   /** Lost to another source's record for the same barcode. */
   'lostConflict',
+  /** A generic food another, more reliable source lists under the same name (MM-383). */
+  'lostDuplicateName',
 ] as const;
 
 /**

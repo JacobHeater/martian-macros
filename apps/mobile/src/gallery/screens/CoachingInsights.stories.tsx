@@ -46,13 +46,15 @@ export default meta;
 const graded = (letter: FoodGradeLetter): FoodGradeValue => ({
   kind: 'graded',
   letter,
-  score: FoodGradeRule.letterSteps[FoodGradeLetter.values.indexOf(letter)] ?? 19,
+  score: FoodGradeRule.letterSteps[FoodGradeLetter.values.indexOf(letter)] ?? -12,
+  notCounted: [],
+  statedMicronutrients: 10,
 });
 
 // ---- Food: the owner's example, a food high in fat, with the coach's line under it ----
 
 const soupReason =
-  'It was entered by its totals, with no fiber or sugar value. The grade needs both, and a missing value is never counted as zero.';
+  'It was entered by its totals, with no fiber or sodium value. The grade needs both, and a missing value is never counted as zero.';
 
 const foodPreview: InsightPreview = {
   entryGrades: new Map<string, FoodGradeValue>([
@@ -209,9 +211,27 @@ export const FoodInsightToSettings = screenStory({
 /** MM-370: a graded food pressed says what its grade means. */
 export const FoodGradeMeaning = screenStory({
   covers: ['FoodScreen'],
-  shows: /^A grade for the food itself, per 100 g/,
+  shows: /^A grade for the food itself, from what it gives per calorie/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed('Grade C for Peanut butter')(canvas));
+  },
+});
+
+/** MM-382: a graded food whose source left sugars, saturated fat and most vitamins and minerals unstated: the popover at its longest. */
+export const FoodGradeNotCounted = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Only 2 of the 10 vitamins and minerals/,
+  scenario: demoWith({ then: extraFoods }),
+  preview: {
+    ...foodPreview,
+    entryGrades: new Map<string, FoodGradeValue>([
+      ...(foodPreview.entryGrades ?? new Map<string, FoodGradeValue>()),
+      ['Peanut butter', { kind: 'graded', letter: 'C', score: -1, notCounted: ['sugars', 'saturatedFat', 'micronutrients'], statedMicronutrients: 2 }],
+    ]),
+  },
   open: yesterdaysFood,
   walk: async (canvas) => {
     await userEvent.click(await revealed('Grade C for Peanut butter')(canvas));
@@ -325,7 +345,7 @@ export const SearchWithGrades = screenStory({
 /** MM-370: the amount step says the grade in words beside its letter. */
 export const AmountStepWithGrade = screenStory({
   covers: ['FoodAmountStep'],
-  shows: 'Grade for the food itself, per 100 g',
+  shows: 'Grade for the food itself, per calorie',
   preview: { gradeOfFood },
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' }),
   walk: async (canvas) => {

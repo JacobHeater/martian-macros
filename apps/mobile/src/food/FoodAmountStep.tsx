@@ -257,7 +257,7 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
       {/* Its grade (MM-370), said in words beside the letter. */}
       <div className="food-amount-grade">
         <FoodGrade grade={grade} subject={food.name} />
-        <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per 100 g' : 'No grade for this food'}</span>
+        <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</span>
       </div>
       <div className="app-gap" />
       <div className="app-row" role="group" aria-label="Amount in">

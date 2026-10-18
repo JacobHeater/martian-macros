@@ -1,0 +1,29 @@
+# Panel decision: a third source and the reliability score (MM-383); packs downloading together behind an icon (MM-384)
+
+- **Facts versus proposals and traceability.** Five read-only reports at 42ce258 plus the working tree: integrations, product and react-capacitor on the drafted tickets; the product designer and the UX guard on the renders of the build (`shots8`, `shots8b` under the chair's scratchpad, 412×915, three palettes). The chair built, rendered, ran the tests and wrote this record; the product role notes the inputs moved during its read, and says so.
+- **Coverage.** The pipeline end to end, the catalog's search and barcode paths, the download controller, engine, native adapter and plugin, the screen, strip, stories and tests, the licences. Not read by any role: the FNDDS zip itself (no download here), a phone, renders at 200% text or 320 px. No role ran a test; the chair did.
+- **Verdicts.** Integrations, product, react-capacitor, product-designer: build with the listed changes. UX guard: BLOCK on one finding (F1), fixed; second pass requested on the final renders.
+- **Findings and disposition.**
+  - *The scan rule as drafted cannot fire: the pack keeps one record per barcode and the build's policy gave every shared barcode to Open Food Facts* (IN-16, P-1): **accepted**: `ReliabilityPolicy` is the build's default (the higher base wins; a disagreement still marks "check this"; recency within a source); MM-51's rule superseded and its table to be re-measured; `byBarcode` keeps the cross-pack choice for a second barcode pack.
+  - *The fetch cache reuses a file from an older pin and dates it today* (IN-11): **accepted** as a bug, MM-388, fixed with a failing-first test: the cache records each file's address and day.
+  - *A source that matches nothing vanishes from the report* (IN-12): **accepted**: the build expects every configured source and fails when one reads or writes nothing; a reference source's nutrient under 90% is marked LOW.
+  - *FNDDS portions and narrowed reads* (IN-13, IN-14): **accepted** in the extract; confirmed by the first build.
+  - *One name one food: the higher base may be the sparser record; no tie rule* (IN-15, P-6): **accepted**: the grade's floor first, then the base, then the source order and the id; the report counts sparser winners.
+  - *The −15 has no carrier but a sentence; the in-flight code exempted Open Food Facts* (IN-17, P-4): **accepted**: one shared constant, the penalty for every marked record.
+  - *The bases' "why" cells overstate* (IN-18): **accepted** in the register rows and the ticket's table.
+  - *Terms text* (IN-19): **accepted**: CC0 with USDA's citation; the Open Food Facts reading stays with MM-57.
+  - *Search order against MM-42 and MM-153; the score never shown; criteria that test the change* (P-2, P-3, P-5): **accepted**: the order refines the tiers and never crosses them (a test holds the bands); the figures live only in the register; the scenarios rewritten.
+  - *FNDDS wording, a purpose line per pack* (IN-21, F7): names as the source states them; a purpose line per known pack id on the offer card.
+  - *Per-pack cells with a derived list; a starting guard; coalesced catalog re-opens; per-address stall flags; renamed tests* (F1, F2, F3, F7, F8 of the React role): **accepted**, built.
+  - *The stale finished notice after Remove* (F6 of the React role): **accepted** as a bug, MM-385, fixed with a failing-first test.
+  - *The catalog re-open leak; the unbounded native-to-JS stream* (F3, F4 of the React role): **opened** as MM-386 and MM-387; the phone checklist carries both packs together with the WebView's memory watched.
+  - *The native adapter's leaked arrivals* (F5 of the React role): **accepted**, fixed in the adapter.
+  - *The icon mid-card in the text colour; the card headed by the phase; the repeated host paragraph; the strip's height, inset and hairline; Resume as a filled button; two missing stories; the popover's words* (PD-1 to PD-12): **accepted**: the icon in the title row as a solid Ember glyph (a new `action` kind), the card headed by the pack's name with "Downloading · 12 MB of 46 MB", the disclosure once above the cards, 48 px strip lines with hairlines and the inset once on the container, Resume and Try again secondary, the two stories, "a food that packs many calories into little weight". Declined or deferred: the tab bar's inset collapsing while the strip shows; clearing a finished notice on leaving the screen.
+  - *The strip announces every percent* (the guard's F1, blocking): **accepted**: ten-percent steps and the phase words; the criterion and the tests changed.
+  - *Focus falls to the page when the icon, Cancel or Remove takes its control away* (F2): **accepted**: `focusNeighbourOf` at the three sites, tested.
+  - *The popover cannot scroll at large text* (F3): **accepted**: a height cap and scrolling on the bubble.
+  - *A finished download is not announced* (F4): **accepted**: the finished and failed notices are statuses.
+  - *A snack after cancelling from another screen; one summary line for several downloads* (F5, F6, D4): **declined for now**, recorded for the owner.
+- **Owner decisions taken by the chair ("say if any is wrong", recorded in MM-383 and MM-384):** the reliability bases; the build's conflict policy; the precedence key; FNDDS wording; the fetch cache; the icon's place and colour; the purpose line; the disclosure once; the ten-percent announcement; secondary Resume; the declined items above.
+- **Edit owner:** the parent session (chair).
+- **Verification:** `test/foodPipeline/thirdSource.test.ts`, `test/foodCatalog/sourceReliability.test.ts`, `test/state/packDownloadController.test.ts`, `test/settings/foodDatabase.test.tsx`, `tool/test/foodFetch.test.ts`, the Settings and Coaching-insights stories; `mm check` before the pull request. Not verified on a phone; the pack build not run.
