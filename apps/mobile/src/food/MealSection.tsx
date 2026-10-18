@@ -1,5 +1,7 @@
-import { InlineInsight } from '../coach/InlineInsight';
+import { FoodEntryInsight } from '../coach/FoodEntryInsight';
 import { useInsightPreview } from '../coach/useInsightPreview';
+import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
+import { gradeOfMeal } from '../engine/gradeOfMeal';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { FoodEntry } from '../domain/FoodEntry';
@@ -53,7 +55,10 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const label = mealLabel(meal);
   // Grades (MM-370) and the coach's lines (MM-362): none in the app until they are built.
   const preview = useInsightPreview();
-  const mealGrade = preview.mealGrades?.get(meal);
+  const hand = useCell(state.handSize);
+  // Each entry's grade and the meal's (MM-370), unless a design story hands in its own.
+  const gradeOf = (entry: FoodEntry) => preview.entryGrades?.get(entry.name) ?? gradeOfFoodEntry(entry, { hand });
+  const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');
 
   /** Deletes `entry` and offers to put it back for a few seconds (MM-48). */
   const remove = (entry: FoodEntry) => {
@@ -102,7 +107,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
       }
     >
       {entries.map((entry) => {
-        const grade = preview.entryGrades?.get(entry.name);
+        const grade = gradeOf(entry);
         const note = preview.entryNotes?.get(entry.name);
         return (
           <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
@@ -123,7 +128,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
               />
             </div>
             {/* The coach's line travels with its entry when it is swiped (MM-362). */}
-            {note === undefined ? null : <InlineInsight insight={note} />}
+            <FoodEntryInsight entry={entry} preview={note} />
           </MmSwipeToRemove>
         );
       })}

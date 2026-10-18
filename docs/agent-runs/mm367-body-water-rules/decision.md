@@ -1,0 +1,22 @@
+# Panel decision: the body and water insight rules (MM-367)
+
+- **Facts versus proposals and traceability.** Three read-only reviews of the drafted MM-367 catalog at f2e8dfe: measurement (11 findings; "do not build as drafted"), coaching (8), safety (10), the latter two "build with the listed changes". Facts are the code and tickets they cite.
+- **Coverage.** Source inspection and web research; nothing run or rendered. Not inspected by any reviewer: the Progress screen, `WeighInRow`, the water contract suite, renders.
+- **Findings, deduplicated.**
+  - *No weigh-in time exists; a typing time would say something false* (ME-1, SA-3, CO-6, CO-4): **the weigh-in time line is dropped.** A connected-scale version (ME-1 b) is recorded for the owner.
+  - *"Within the noise" compares two readings, against MM-155; the preview shows the wrong figure* (ME-4): **accepted**; the rule calls `waistChangeOf` on the shared 28-day answer and the stories changed.
+  - *A within-noise line under every reading is noise itself* (ME-5, SA-9, CO-3): **accepted** (ME-5 ii); said only when the raw reading moved by the noise or more; no "yet"; the Progress card's words.
+  - *The water line prescribes drinking and fires for everyone* (CO-1, CO-2, SA-7, ME-8): **accepted**; a logging line, gated on a suggested goal, 14 days in use and water logged in the 60 days before.
+  - *The water line on a clinician-set goal* (SA-5): **accepted**; no line while the suggestion is withheld.
+  - *The water line with an eating-disorder history* (SA-6): **accepted**, hidden.
+  - *The waist line with an eating-disorder history* (SA-1): **hidden**, the owner may show it.
+  - *The snooze has no item for a row* (CO-5, SA-8): **accepted**; the row is the item (MM-378).
+  - *No water range reader* (ME-7): **accepted**; `watchWaterSince`.
+  - *MM-142 precedence has no hook* (ME-9, CO-8): **deferred** to MM-142.
+  - *WaistRule rows owed* (ME-6, ME-11, SA-10): **accepted**; ten rows plus the two kinds and `WaterFewDaysRule.*`.
+  - *Zone offset of imported times* (ME-10): **moot** with the time line dropped.
+- **Rejected:** none.
+- **Safety blockers:** SA-3 and SA-5 were blocking; both resolved.
+- **Owner decisions:** none asked tonight; the chair's choices are recorded in MM-367 as "say if any is wrong".
+- **Edit owner:** the parent session (chair), on `spec/food-insights-and-snooze`.
+- **Verification:** `test/engine/bodyAndWaterInsights.test.ts` (9), `test/coach/foodAndBodyInsights.test.tsx` (the water row), `test/engine/allowedItemInsights.test.ts`, `test/engine/itemInsightEvidence.test.ts`; the Dashboard stories draw both lines from seeded data. Not verified on a phone.

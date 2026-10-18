@@ -1,0 +1,26 @@
+# Panel decision: strength held on a fat-loss goal (MM-377)
+
+- **Facts versus proposals and traceability.** Two read-only reviews of MM-377 at f2e8dfe: measurement (12 findings) and nutrition (7), both "build with the listed changes", on top of the mm366 run's training, coaching and safety findings on the draft.
+- **Coverage.** Source inspection, arithmetic and web research; nothing run. Not inspected by either: `StrengthHistoryScreen`, `pauseDeficitRestartOn`, `GapRule`, renders.
+- **Findings, deduplicated, and their disposition.**
+  - *The basis is misdescribed and must be taken as of the workout* (NU-1, ME-5): **accepted**; `deficitStartOn` with the restart date, as of the workout's date.
+  - *Recomp counts as fat loss* (NU-2, ME-10): **accepted**; fat-loss mode only, a mode change breaks the window.
+  - *The baseline point* (ME-1): **accepted**; the latest session within 7 days either side of the start.
+  - *The tolerance* (ME-2): **accepted**; 2.5% relative on the smoothed values; 0% rejected as a coin flip.
+  - *Gone up* (ME-3): **accepted**; 5%.
+  - *Both ends smoothed; distinct days; 28 days* (ME-4): **accepted**.
+  - *No intake requirement; a stall guard* (NU-3): **accepted both**.
+  - *The words claim nothing about muscle* (NU-4): **accepted**; the words test forbids the list.
+  - *The band in the numbers* (ME-6): **accepted**.
+  - *Pounds* (ME-7): **accepted**; a test in pounds.
+  - *Mixed RIR* (ME-8): **declined**, recorded as a limitation in the ticket.
+  - *"Shown once, then rested" is stale* (ME-9): **fixed**; the snooze.
+  - *Register rows* (ME-11, NU-7): **accepted**, including the upstream rows TR-11 asked for.
+  - *Deloads fail safe* (ME-12): **recorded** in the test.
+  - *Under-eating and low body weight withhold* (NU-6): **accepted**.
+  - *Beside a relief offer* (NU-5): **shown**, as nutrition leaned.
+- **Rejected:** a recomp variant (NU-2 alternative); 0% and 5% as the held tolerance.
+- **Safety blockers:** none new.
+- **Owner decisions:** none asked; the chair's choices are recorded in MM-377 as "say if any is wrong".
+- **Edit owner:** the parent session (chair).
+- **Verification:** `test/engine/strengthOnFatLossInsights.test.ts` (13), the words and evidence tests. No story: the demo's data does not reach the rule. Not verified on a phone.

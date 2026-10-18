@@ -1,6 +1,6 @@
 ---
 id: MM-371
-status: proposed
+status: done
 component: coach-insights
 related: [MM-144, MM-108, MM-306, MM-361, MM-370]
 ---
@@ -41,3 +41,8 @@ Scenario: The voice test still bites
   Given a string "Grade D: junk"
   Then the banned-word test fails on "junk" and not on the grade
 ```
+
+## Progress
+- Done 2026-10-18: `docs/non-goals.md` and MM-144 mark the grading part overruled by the product owner on 2026-10-17, naming
+  MM-370 and MM-371, with the reasoning kept and the labels still out; MM-108 notes that grade letters are allowed and its
+  banned words are not. `test/voice.test.ts` shows "Grade D" passing and "Grade D: junk" failing on "junk".

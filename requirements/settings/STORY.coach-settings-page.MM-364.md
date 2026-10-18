@@ -93,8 +93,10 @@ In `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`, reviewed by t
 - Built 2026-10-17. Stored in `user_preferences` (schema version 7: `inline_insights_off`, `inline_insight_areas_off`,
   `inline_insight_kinds_off`), read and written through `PreferencesRepository` (one contract, both stores), erased with
   everything else. `InsightSwitchesDraft` is gone.
-- The Settings section shows once the app has a kind of inline insight. The design's stories still draw every area with
-  the drafted kinds (`draftInsightKinds`), handed in as a preview.
+- The Settings section shows once the app has a kind of inline insight. The design's stories draw the app's kinds plus
+  sleep's drafts (`draftInsightKinds`), handed in as a preview.
+- 2026-10-18: Food, Body and Water joined Training (MM-365, MM-367). Each area's screen lists what is snoozed in it with
+  "Turn back on" (MM-378).
 - Tests: `test/coach/inlineInsights.test.tsx` (opened from an insight with the kind named and its switch focused; an area
   off hides its lines and stays off after a restart; all off and back on keeps each area's position),
   `test/contracts/preferencesRepositoryContract.ts`, `test/data/upgrade.test.ts` (a version 6 database comes up with

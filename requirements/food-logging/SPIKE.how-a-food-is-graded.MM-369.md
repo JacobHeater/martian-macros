@@ -1,6 +1,6 @@
 ---
 id: MM-369
-status: proposed
+status: done
 component: food-logging
 related: [MM-361, MM-370, MM-371, MM-305, MM-307, MM-310, MM-49]
 ---
@@ -44,3 +44,15 @@ Scenario: Coverage is known
 Scenario: Licensing is checked
   Then the report says whether the method or its marks have usage terms, and how the app complies
 ```
+
+## Progress
+- Done 2026-10-18: `docs/food-grades.md`, from the nutrition role's research (`docs/agent-runs/mm369-grading-method/`).
+  The method is the general-foods point tables published for the Nutri-Score label (2023 update), on twelve steps, with
+  five documented differences (no fruit, vegetable and legume share; one table for every food; twelve steps with no E;
+  alcohol read by weight; missing is never zero). The required inputs are sugars, saturated fat, sodium and fiber.
+- Coverage, measured on the packs published 2026-10-09: 90.9% of common foods and 84.3% of barcode foods state fiber and
+  sodium, but the packs are format 1 and carry no sugars or saturated fat, so no pack food is graded until a format 2 pack
+  is published (MM-307). The owner's own foods that state those values are graded now.
+- Licensing: the grades are not Nutri-Scores and the app never says they are; the method is named once in the evidence
+  register with the differences. The Conditions of Use were not readable by the role; reading them, and whether to notify
+  Santé publique France, are for the owner and the attorney (MM-242).

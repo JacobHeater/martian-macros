@@ -1,0 +1,22 @@
+# Panel decision: the first food insight rules (MM-365)
+
+- **Facts versus proposals and traceability.** Three read-only reviews of the drafted MM-365 catalog at f2e8dfe: nutrition (10 findings), coaching (9), safety (11), each "build with the listed changes". Facts are the code and tickets they cite; every change below was a reviewer's proposal until accepted here, or the owner's ruling of 2026-10-18.
+- **Coverage.** Source inspection and web research by all three; nothing run or rendered. Not inspected by any reviewer: the real pack's coverage of saturated fat, the SQL food repository, renders. Referrals left open: none blocking; the pipeline category column (NU-2 b, NU-5) is a follow-up.
+- **Findings, deduplicated.**
+  - *"Mostly fat" fires on protein-dense whole foods* (NU-1): **accepted**, a protein guard at 20% of calories.
+  - *It still fires on nuts, oils and avocado* (NU-2, SA-8): **the owner's example kept**; the saturated-fat alternative recorded for the owner. The direction became additive ("A protein food alongside balances the meal"), true for nuts and oil too (SA-8, CO-1).
+  - *The protein line pushes protein where the app caps or declines it* (NU-3, SA-7, CO-3): **accepted**; a minimum must be in force and the kind is withheld with the kidney and bariatric cautions.
+  - *No definition of the shares; blank macros misfire* (NU-4): **accepted**; macros must explain 75% of the energy, the fat share is capped, estimates get nothing (CO-6).
+  - *No computable usual serving* (NU-5, NU-6): **accepted**; `usualServing` by origin, serving-counted entries only, 2 servings and 300 kcal, or 10 servings.
+  - *Words* (CO-1, CO-2, CO-4, SA-9): **accepted**; no "leaner", "room", "item", "source", "minimum" in a line; the title "Portion check"; protein first.
+  - *Under-eating, pregnancy, breastfeeding, underweight* (SA-4, SA-5, SA-6): **accepted**; the safeguards carry the under-eating finding and the policy's cautions.
+  - *Eating-disorder handling* (SA-1, SA-2): **kept as drafted**, now settled rather than provisional.
+  - *A per-entry "Right as logged"* (CO-4) and *a fact-only repeat showing* (CO-5): **declined** for now; the owner ruled one mechanism, the snooze.
+  - *Snooze words* (CO-7): **accepted in part**: "Until I turn it back on"; one form for the end in the message and Settings; "Turn back on" with Undo. The empty-state words declined.
+  - *Register rows* (NU-9, SA-11, CO-9): **accepted**; `FoodInsightRule.*`, the three kinds and `usualServing`.
+  - *Ticket inconsistencies* (NU-10, CO-8): **fixed** in MM-362 and MM-365.
+- **Rejected:** none outright. The saturated-fat trigger (NU-2 a) and a food category in the pack (NU-2 b) wait for the owner and a pipeline ticket.
+- **Safety blockers:** SA-4 and SA-7 were blocking; both resolved.
+- **Owner decisions (2026-10-18, through the interactive prompt):** the first set; swap or add, never eat less; logged foods only; every time with a snooze.
+- **Edit owner:** the parent session (chair), on `spec/food-insights-and-snooze`.
+- **Verification:** `test/engine/foodItemInsights.test.ts` (12), `test/coach/foodAndBodyInsights.test.tsx` (5), `test/engine/allowedItemInsights.test.ts` (15), `test/format/itemInsightText.test.ts`, `test/engine/itemInsightEvidence.test.ts`; the Food stories draw the lines the app works out. Not verified on a phone.

@@ -33,6 +33,14 @@ export function waterRepositoryContract(name: string, create: () => WaterReposit
       expect((await first(repo.watchWater(d2))).map((e) => e.ml)).toEqual([330]);
     });
 
+    it('gives the days since a date their drinks, earliest first (MM-367)', async () => {
+      await repo.addWater(drink(d2, 330, 9));
+      await repo.addWater(drink(d1, 500, 16));
+      await repo.addWater(drink(d1, 250, 8));
+      expect((await first(repo.watchWaterSince(d1))).map((e) => [e.date.day, e.ml])).toEqual([[1, 250], [1, 500], [2, 330]]);
+      expect((await first(repo.watchWaterSince(d2))).map((e) => e.ml)).toEqual([330]);
+    });
+
     it('ids are distinct and a removal takes only its own entry', async () => {
       const a = await repo.addWater(drink(d1, 250, 8));
       const b = await repo.addWater(drink(d1, 250, 9));

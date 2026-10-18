@@ -81,3 +81,8 @@ food composition.
   MM-377. The food, body, water and sleep catalogs (MM-365, MM-367, MM-368) wait for their domain review; grades wait for
   the spike (MM-369).
 - "A set" in the narrative became "an exercise": no line sits under a set (MM-366).
+- 2026-10-18: the food set (MM-365: mostly fat, light on protein, the portion check), the waist and water lines (MM-367;
+  the weigh-in time line was dropped) and the snooze (MM-378) are built, each after its panel review
+  (`docs/agent-runs/mm365-food-rules/`, `mm367-body-water-rules/`). The epic's narrative now holds for a food, an exercise,
+  a waist reading and the water section; a weigh-in gets no inline line (MM-142 keeps the weight jump), and a night waits
+  for MM-250.

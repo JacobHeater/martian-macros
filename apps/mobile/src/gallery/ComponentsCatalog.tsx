@@ -64,7 +64,7 @@ export function ComponentsCatalog() {
       <div className="gallery-row">
         <MmGradeBadge letter="B+" label="Grade B plus" />
         <MmGradeBadge letter="D-" label="Grade D minus" />
-        <MmGradeBadge letter={undefined} label="Soup: can’t be graded. Why?" onExplain={() => undefined} />
+        <MmGradeBadge letter={undefined} label="No grade for Soup. Why?" onExplain={() => undefined} />
       </div>
       <MmHeroSurface>
         <p style={{ margin: 0, font: 'var(--type-figure-xl)' }}>1,534</p>

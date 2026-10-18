@@ -24,6 +24,7 @@ export * from './SqlFoodRepository';
 export * from './SqlHealthSampleStore';
 export * from './SqlInlineInsightLogRepository';
 export * from './SqlInsightLogRepository';
+export * from './SqlInsightSnoozeRepository';
 export * from './SqlIntakeReader';
 export * from './SqlPauseRepository';
 export * from './SqlPreferencesRepository';

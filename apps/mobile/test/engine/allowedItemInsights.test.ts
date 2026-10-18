@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InsightSwitches } from '../../src/domain/InsightSwitches';
 import { allowedItemInsights } from '../../src/engine/allowedItemInsights';
 import type { InsightSafeguards } from '../../src/engine/InsightSafeguards';
+import type { InsightSnooze } from '../../src/engine/InsightSnooze';
 import { ItemAnchor } from '../../src/engine/ItemAnchor';
 import type { ItemInsight } from '../../src/engine/ItemInsight';
 import type { ItemInsightKind } from '../../src/engine/ItemInsightKind';
@@ -13,16 +15,19 @@ const kinds: readonly ItemInsightKind[] = [
   { id: 'weighInTime', area: 'body', title: 'Unusual weigh-in time', example: '', priority: 'dataQuality', aboutWeight: true },
   { id: 'volumeJump', area: 'training', title: 'Volume jump', example: '', priority: 'safety' },
   { id: 'steady', area: 'training', title: 'Steady', example: '', priority: 'pattern' },
+  { id: 'portion', area: 'food', title: 'Portion', example: '', priority: 'dataQuality', notWhileUnderEating: true, notWithCautions: ['underweight'] },
+  { id: 'protein', area: 'food', title: 'Protein', example: '', priority: 'pattern', notWithCautions: ['bariatricSurgery', 'chronicKidneyDisease'] },
 ];
 
-const adult: InsightSafeguards = { adult: true, eatingDisorderHistory: false, weightHidden: false, paused: false };
+const adult: InsightSafeguards = { adult: true, eatingDisorderHistory: false, weightHidden: false, paused: false, underEating: false, cautions: new Set() };
 const peanutButter = { kind: 'foodEntry', id: '7' } as const;
 const bench = ItemAnchor.exercise(3, 'barbell-bench-press');
 const weighIn = { kind: 'weighIn', id: '2026-10-17' } as const;
-const insight = (kind: string, anchor: ItemAnchor): ItemInsight => ({ kind, anchor, basis: 'item', figures: {} });
+const today = CalendarDate.of(2026, 10, 18);
+const insight = (kind: string, anchor: ItemAnchor): ItemInsight => ({ kind, anchor, subject: anchor.id, basis: 'item', figures: {} });
 
-const shown = (insights: readonly ItemInsight[], safeguards = adult, switches = InsightSwitches.allOn) =>
-  [...allowedItemInsights({ insights, kinds, safeguards, switches }).values()].map((i) => i.kind).sort();
+const shown = (insights: readonly ItemInsight[], safeguards = adult, switches = InsightSwitches.allOn, snoozes: readonly InsightSnooze[] = []) =>
+  [...allowedItemInsights({ insights, kinds, safeguards, switches, snoozes, today }).values()].map((i) => i.kind).sort();
 
 const everyKind = [
   insight('lightProtein', { kind: 'foodEntry', id: '1' }),
@@ -34,7 +39,7 @@ const everyKind = [
 describe('allowedItemInsights (MM-362, MM-364)', () => {
   it('shows every qualifying item, each its own', () => {
     const three = ['1', '2', '3'].map((id) => insight('mostlyFat', { kind: 'foodEntry', id }));
-    expect(allowedItemInsights({ insights: three, kinds, safeguards: adult, switches: InsightSwitches.allOn }).size).toBe(3);
+    expect(allowedItemInsights({ insights: three, kinds, safeguards: adult, switches: InsightSwitches.allOn, today }).size).toBe(3);
   });
 
   it('shows one per item: the higher priority wins', () => {
@@ -43,6 +48,7 @@ describe('allowedItemInsights (MM-362, MM-364)', () => {
       kinds,
       safeguards: adult,
       switches: InsightSwitches.allOn,
+      today,
     });
     expect(map.get(ItemAnchor.key(bench))?.kind).toBe('volumeJump');
   });
@@ -53,6 +59,7 @@ describe('allowedItemInsights (MM-362, MM-364)', () => {
       kinds,
       safeguards: adult,
       switches: InsightSwitches.allOn,
+      today,
     });
     expect(map.get(ItemAnchor.key(peanutButter))?.kind).toBe('lightProtein');
   });
@@ -87,6 +94,32 @@ describe('allowedItemInsights (MM-362, MM-364)', () => {
 
   it('leaves out an area switched off', () => {
     expect(shown(everyKind, adult, { ...InsightSwitches.allOn, offAreas: new Set(['food']) })).toEqual(['volumeJump', 'weighInTime']);
+  });
+
+  it('leaves out a kind snoozed on its item, and keeps it on other items (MM-378)', () => {
+    const snoozed: InsightSnooze = { kind: 'mostlyFat', subject: peanutButter.id, item: 'Peanut butter', resumesOn: today.addDays(2) };
+    const two = [insight('mostlyFat', peanutButter), insight('mostlyFat', { kind: 'foodEntry', id: '8' })];
+    expect(shown(two, adult, InsightSwitches.allOn, [snoozed])).toEqual(['mostlyFat']);
+    expect(shown([insight('lightProtein', peanutButter)], adult, InsightSwitches.allOn, [snoozed])).toEqual(['lightProtein']);
+  });
+
+  it('a snooze that has run out no longer quiets; one for always does (MM-378)', () => {
+    const over: InsightSnooze = { kind: 'mostlyFat', subject: peanutButter.id, item: 'Peanut butter', resumesOn: today };
+    const always: InsightSnooze = { ...over, resumesOn: undefined };
+    expect(shown([insight('mostlyFat', peanutButter)], adult, InsightSwitches.allOn, [over])).toEqual(['mostlyFat']);
+    expect(shown([insight('mostlyFat', peanutButter)], adult, InsightSwitches.allOn, [always])).toEqual([]);
+  });
+
+  it('while the under-eating finding holds, leaves out what is flagged for it (MM-365)', () => {
+    const two = [insight('portion', peanutButter), insight('protein', { kind: 'foodEntry', id: '2' })];
+    expect(shown(two, { ...adult, underEating: true })).toEqual(['protein']);
+  });
+
+  it('leaves out a kind flagged for one of the person’s cautions (MM-365)', () => {
+    const two = [insight('portion', peanutButter), insight('protein', { kind: 'foodEntry', id: '2' })];
+    expect(shown(two, { ...adult, cautions: new Set(['chronicKidneyDisease']) })).toEqual(['portion']);
+    expect(shown(two, { ...adult, cautions: new Set(['underweight']) })).toEqual(['protein']);
+    expect(shown(two, { ...adult, cautions: new Set(['pcos']) })).toEqual(['portion', 'protein']);
   });
 
   it('leaves out a kind the catalog does not have', () => {
