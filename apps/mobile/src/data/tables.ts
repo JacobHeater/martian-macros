@@ -22,4 +22,5 @@ export const tables = [
   'health_import_tokens',
   'exercise_progressions',
   'water_entries',
+  'inline_insight_log',
 ] as const;

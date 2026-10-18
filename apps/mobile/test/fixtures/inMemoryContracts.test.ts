@@ -5,6 +5,7 @@ import { dataEraserContract } from '../contracts/dataEraserContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
+import { inlineInsightLogRepositoryContract } from '../contracts/inlineInsightLogRepositoryContract';
 import { insightLogRepositoryContract } from '../contracts/insightLogRepositoryContract';
 import { intakeReaderContract } from '../contracts/intakeReaderContract';
 import { pauseRepositoryContract } from '../contracts/pauseRepositoryContract';
@@ -34,6 +35,7 @@ customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().custo
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
+inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories().inlineInsightLog);
 pauseRepositoryContract('In-memory', () => new InMemoryRepositories().pauses);
 reminderRepositoryContract('In-memory', () => new InMemoryRepositories().reminders);
 recoveryCheckInRepositoryContract('In-memory', () => new InMemoryRepositories().recovery);

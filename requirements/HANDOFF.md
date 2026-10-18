@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-17, by Claude, Session 32.
+Last updated: 2026-10-17, by Claude, Session 33.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -234,16 +234,31 @@ surgery and under 19. Insight rules about intake other than protein and
 logging are flagged `otherIntake` and suppressed for an eating-disorder
 history (MM-141).
 
+**Coaching insights inline (MM-361).** The framework is built (MM-362, MM-363,
+MM-364) with one kind, training's "volume jump" (MM-366). A drafted kind
+joins `engine/itemInsightKinds.ts` only after its domain roles check it
+(`docs/agent-runs/mm366-workout-rules/` is the pattern), with its evidence
+rows. Next: the food catalog (MM-365) through nutrition, coaching and
+safety; the grading spike (MM-369); MM-377 through measurement and
+nutrition. `InsightPreview` is now only for what is not built (grades, and
+the lines of unchecked kinds); `gallery/screens/draftInsightKinds.ts` holds
+the drafts the Settings stories draw.
+
 **Waiting on the product owner.**
-- Coaching insights: specs (#177) and designs (#178) are merged. Settled:
-  "one line" (MM-362) means the whole insight, wrapping, as drawn; no
-  paywall for any of MM-361 to MM-371 (not behind MM-85).
+- Coaching insights: no paywall for any of MM-361 to MM-371 (not behind
+  MM-85). Open: hide "strength on fat loss" under the low-body-weight
+  caution (MM-377, the panel's SA-6)?
 - Warmer Martian (MM-375): the owner approved the royal 90s violet and
   kept lime. Open: Martian's ion and protein are the same aqua, so the
   coach's insight lines share protein's colour (panel P-3/UX-4); whether
   categorical grade fills read as judging food (coaching/safety, MM-370).
-- Phone checklist: Martian at low brightness, whether cards and the
-  navigation bar still stand off the canvas (MM-375, UX-6).
+- **Phone checklist, to hand the owner when it is long enough** (they will do
+  all physical-device testing at the end, 2026-10-16: keep adding, do not ask):
+  a real barcode on packaging (MM-43); a pack download over mobile data
+  (MM-56); the pause and reminder screens on the device (MM-148, MM-146);
+  Health Connect import (MM-68); Martian at low brightness, whether cards and
+  the navigation bar still stand off the canvas (MM-375, UX-6); a volume jump
+  line under a lift, opened, and its Settings switch (MM-366, MM-364).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -255,6 +270,35 @@ history (MM-141).
 **Not verified anywhere.** iOS has never been built or run, and the shell
 has no iOS project yet. Phone checks listed above. Tickets record
 limitations.
+
+## Session 33: 2026-10-17, Claude (coaching insights inline, built with the first kind)
+
+- PR #179 (warmer Martian, grade fills, ion insights) was green and merged.
+- The owner asked to start the build on the recommendation: the framework,
+  Settings > Coach and the Coach tab list first, with the workout catalog
+  checked by the panel. Branch `feat/inline-insights-framework`.
+- **Panel on MM-366** (`docs/agent-runs/mm366-workout-rules/`): training,
+  coaching and safety, all "build with the listed changes". "Holding steady"
+  repeated or contradicted the progression suggestion and pushed on a cut;
+  "strength on a cut" was undefined and praised the diet; the volume baseline
+  did not exist. **Owner's rulings:** drop holding steady; a pattern line
+  shows in its first week then rests 28 days; volume jump once a workout;
+  strength on fat loss later (MM-377, new).
+- **Built:** `ItemInsight`, `ItemInsightKind`, `itemInsightKinds`,
+  `allowedItemInsights` (safeguards, switches, one per item); schema version
+  7 (the switches in `user_preferences`, `inline_insight_log`); the
+  repositories with contracts; AppState's `insightSwitches`,
+  `insightSafeguards`, `itemInsights`, `inlineInsightLog`; Settings > Coach on
+  stored switches (`InsightSwitchesDraft` gone; an area is listed once it has
+  a kind); the Coach tab list from the log, a lift's entry opening its
+  workout; `volumeJumpInsights` with `VolumeJumpRule` and `countHardSets`
+  (weekly volume now counts with it); evidence rows and a test that a kind
+  without one fails.
+- Stories: the workout stories draw the line the app works out (the demo
+  plus one chest day); CoachRecentInsightsLogged lists it from the log;
+  CoachSettingsEveryArea draws every area with the drafts.
+- WS-09 step 10: MM-362, MM-364 and MM-366 done; MM-363 in progress (a
+  food's entry opening its day comes with MM-365); MM-377 added.
 
 ## Session 32: 2026-10-17, Claude (coaching insights inline, specified)
 
@@ -365,36 +409,3 @@ limitations.
 - Still for the panel: MM-336, MM-342, MM-329, MM-351, MM-352.
   Not built: loading skeletons (the designer recorded the spinner as a known
   deviation, needing its own ticket).
-
-## Session 30: 2026-10-15, Claude (the Storybook register: Food and Dashboard)
-
-- PRs #159 to #161 had merged into each other's branches, not main (a stacked
-  PR only retargets when its base branch is deleted); #162 lands them on main.
-  When merging a stack, retarget the next PR to main before merging it.
-  Merged branches were deleted, local and remote.
-- **The owner chose the Storybook register (MM-321) as the focus**, in batches by
-  screen, and a batched phone session for device-only checks. Batch 1, Food and
-  Dashboard, is done: 37 stories, register 207 to 144. `screenStory`'s
-  `stores` (`waitingRead`, `failingRead`) draws loading and failed reads.
-- Looking at the new stories found nine defects: MM-330 to MM-332 fixed with
-  tests; MM-333 to MM-338 are design defects with skipped tests, for Storybook
-  and the panel before they are built.
-- Batch 2, Coach, is done (2026-10-16): 21 stories, register 144 to 109;
-  MM-339 and MM-341 fixed with tests, MM-340 and MM-342 ticketed for the panel.
-- Batch 3, Progress and Train, is done: 28 stories, register 109 to 70; MM-343
-  fixed with its test, MM-344 ticketed for the panel. Loads converted to
-  pounds read "182.98 lb"; the owner decided a load is said to a tenth, as a
-  scale says a weight (MM-350, fixed with its test).
-- Batch 4, Settings, packs and shell, is done: 27 stories, register 70 to 28;
-  MM-345 fixed, MM-346 and MM-347 ticketed. `storyPackHost` draws downloads.
-- Batch 5 is done and **MM-321 is done**: the register is 3 places (207 at the
-  start), each with the reason no story can reach it. MM-349 fixed; MM-348
-  ticketed.
-- **Next:** the design defects found along the way, MM-333 to MM-348 (twelve
-  proposed, each with a skipped test), through Storybook and the panel before
-  they are built. Then the roadmap's M2 work. **The owner will do all physical-device testing at the end**
-  (2026-10-16): keep adding to the phone checklist below, do not ask for it.
-- **Phone checklist, to hand the owner when it is long enough** (they agreed to
-  run one session): a real barcode on packaging (MM-43); a pack download over
-  mobile data (MM-56); the pause and reminder screens on the device (MM-148,
-  MM-146); Health Connect import (MM-68).

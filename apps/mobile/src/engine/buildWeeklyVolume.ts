@@ -2,8 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { Exercise } from '../domain/training/Exercise';
 import { MuscleGroup } from '../domain/training/MuscleGroup';
 import type { Workout } from '../domain/training/Workout';
-import { WorkoutSet } from '../domain/training/WorkoutSet';
-import { ArgumentError } from '../lang/ArgumentError';
+import { countHardSets } from './countHardSets';
 import { MuscleVolume } from './MuscleVolume';
 import type { WeeklyVolume } from './WeeklyVolume';
 
@@ -25,33 +24,10 @@ export function buildWeeklyVolume({
   for (const workout of workouts) {
     const age = workout.date.daysUntil(today);
     if (workout.inProgress || age < 0 || age >= 14) continue;
-    const totals = age < 7 ? current : previous;
-    for (const entry of workout.exercises) {
-      let hardSets = 0;
-      for (const set of entry.sets) {
-        if (
-          set.reps < 1 ||
-          !Number.isFinite(set.loadKg) ||
-          (set.rir !== undefined && (set.rir < 0 || set.rir > WorkoutSet.maxRir))
-        ) {
-          throw new ArgumentError('Invalid set: Invalid reps, load or RIR.');
-        }
-        if (set.rir === undefined || set.rir <= 4) hardSets++;
-      }
-      const exercise = byId.get(entry.exerciseId);
-      if (exercise === undefined) {
-        if (age < 7) {
-          unmappedCurrent += hardSets;
-        } else {
-          unmappedPrevious += hardSets;
-        }
-        continue;
-      }
-      totals.set(exercise.primary, (totals.get(exercise.primary) ?? 0) + hardSets);
-      for (const secondary of new Set(exercise.secondary)) {
-        if (secondary === exercise.primary) continue;
-        totals.set(secondary, (totals.get(secondary) ?? 0) + hardSets * 0.5);
-      }
+    if (age < 7) {
+      unmappedCurrent += countHardSets(workout, byId, current);
+    } else {
+      unmappedPrevious += countHardSets(workout, byId, previous);
     }
   }
   return {

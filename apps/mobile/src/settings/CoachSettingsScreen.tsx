@@ -1,40 +1,40 @@
-import { useState } from 'react';
 import { Screen } from '../app/Screen';
+import { useApp } from '../app/useApp';
+import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { inlineInsightRules } from '../coach/inlineInsightRules';
 import { insightAreaIcon } from '../coach/insightAreaIcon';
 import { insightAreaLabel } from '../coach/insightAreaLabel';
-import type { InsightArea } from '../domain/InsightArea';
+import { useInsightKinds } from '../coach/useInsightKinds';
+import { InsightArea } from '../domain/InsightArea';
+import { InsightSwitches } from '../domain/InsightSwitches';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { CoachAreaScreen } from './CoachAreaScreen';
-import { InsightSwitchesDraft } from './InsightSwitchesDraft';
-import { useInsightSwitches } from './useInsightSwitches';
-
-/** The areas offered; sleep joins once a night of sleep is recorded (MM-250). */
-const areas: readonly InsightArea[] = ['food', 'training', 'body', 'water'];
 
 /**
  * Settings > Coach > Coaching insights (MM-364): one switch for every
- * insight under a logged item, then a row for each area that opens its
- * rules. Turning everything off keeps each area's and rule's position, so
- * turning it back on restores them. The dashboard's insight and the safety
- * notices are not switched here.
+ * insight under a logged item, then a row for each area that has kinds of
+ * insight, opening its kinds. Turning everything off keeps each area's and
+ * kind's position, so turning it back on restores them. The dashboard's
+ * insight and the safety notices are not switched here.
  */
-export function CoachSettingsScreen({ draft }: { draft?: InsightSwitchesDraft }) {
+export function CoachSettingsScreen() {
+  const { services, state } = useApp();
   const navigator = useNavigator();
-  const [switches] = useState(() => draft ?? new InsightSwitchesDraft());
-  const on = useInsightSwitches(switches);
+  const kinds = useInsightKinds();
+  const on = useLoaded(state.insightSwitches) ?? InsightSwitches.allOn;
+  const areas = InsightArea.values.filter((area) => kinds.some((kind) => kind.area === area));
+  const save = (switches: InsightSwitches) => void services.preferences.saveInsightSwitches(switches);
 
   const areaState = (area: InsightArea) => {
     if (!on.all) return 'Off while insights are off';
     if (on.offAreas.has(area)) return 'Off';
-    const rules = inlineInsightRules.filter((rule) => rule.area === area);
-    const offRules = rules.filter((rule) => on.offRules.has(rule.title)).length;
-    const kinds = rules.length === 1 ? 'kind' : 'kinds';
-    return offRules === 0 ? `On · ${rules.length} ${kinds}` : `On · ${rules.length - offRules} of ${rules.length} ${kinds}`;
+    const ofArea = kinds.filter((kind) => kind.area === area);
+    const offKinds = ofArea.filter((kind) => on.offKinds.has(kind.id)).length;
+    const word = ofArea.length === 1 ? 'kind' : 'kinds';
+    return offKinds === 0 ? `On · ${ofArea.length} ${word}` : `On · ${ofArea.length - offKinds} of ${ofArea.length} ${word}`;
   };
 
   return (
@@ -45,7 +45,7 @@ export function CoachSettingsScreen({ draft }: { draft?: InsightSwitchesDraft })
           title="Insights under logged items"
           subtitle="Short insights from the coach under a food, a lift or a reading. The Coach tab works either way."
           value={on.all}
-          onChange={(value) => switches.setAll(value)}
+          onChange={(value) => save(InsightSwitches.withAll(on, value))}
         />
       </MmListGroup>
       <MmSection icon="tune" title="By area">
@@ -57,7 +57,7 @@ export function CoachSettingsScreen({ draft }: { draft?: InsightSwitchesDraft })
               title={insightAreaLabel(area)}
               subtitle={areaState(area)}
               opens
-              onPress={() => void navigator.push(() => <CoachAreaScreen area={area} draft={switches} />)}
+              onPress={() => void navigator.push(() => <CoachAreaScreen area={area} />)}
             />
           ))}
         </MmListGroup>

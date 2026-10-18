@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "task_id": "mm366-workout-rules",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/inline-insights-framework",
+    "commit": "684f8707b629985052e091c7a99763f1eb25b135"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Triggers, figures, session and week definitions, evidence, and the PD-5 question for the drafted workout rules.",
+      "role": "training",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17",
+      "status": "complete",
+      "inspected_commit": "684f8707b629985052e091c7a99763f1eb25b135",
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-366",
+          "MM-362",
+          "MM-141",
+          "MM-79",
+          "MM-78",
+          "MM-77",
+          "docs/evidence.md",
+          "estimatedOneRepMax.ts",
+          "buildStrengthTrends.ts",
+          "buildWeeklyVolume.ts",
+          "suggestProgression.ts",
+          "consecutiveDeficitWeeks.ts",
+          "WorkoutExerciseCard.tsx",
+          "DemoSeed.ts"
+        ],
+        "not_inspected": [
+          "tests",
+          "StrengthHistoryScreen.tsx",
+          "WeeklyVolumeScreen.tsx",
+          "MM-108"
+        ],
+        "referrals": [
+          "coaching: wording",
+          "safety: deficit praise and bodyweight figures",
+          "measurement: held tolerance",
+          "nutrition: planned versus eaten"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is a 1% e1RM band above RIR noise; is a 50% set jump evidenced; does strength hold in deficit?",
+        "reason": "Numeric thresholds and health-adjacent claims.",
+        "path": "direct",
+        "sources": [],
+        "summary": "RIR error about one rep (Halperin 2022); ACWR contested (Impellizzeri 2020); strength generally held in deficit (Murphy and Koehler 2022). Sources listed in the report.",
+        "limitations": "Abstracts and partial full texts."
+      }
+    },
+    {
+      "task": "Words, the fact-then-direction shape, MM-108, praise for eating below maintenance, repetition, and PD-5.",
+      "role": "coaching",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17",
+      "status": "complete",
+      "inspected_commit": "684f8707b629985052e091c7a99763f1eb25b135",
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-366",
+          "MM-362",
+          "MM-361",
+          "MM-141",
+          "MM-108",
+          "MM-79",
+          "MM-92",
+          "progressionText.ts",
+          "suggestProgression.ts",
+          "WorkoutExerciseCard.tsx",
+          "voice.test.ts"
+        ],
+        "not_inspected": [
+          "training figures",
+          "CoachingPolicy beyond a glance",
+          "exercise history screen",
+          "renders"
+        ],
+        "referrals": [
+          "training: CO-1 option and floors",
+          "safety: exclusion",
+          "measurement: deficit from partial logs"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does repeating the same in-app message reduce attention?",
+        "reason": "CO-5.",
+        "path": "direct",
+        "sources": [],
+        "summary": "No direct evidence; CO-5 rests on the product rules.",
+        "limitations": "Search listings only."
+      }
+    },
+    {
+      "task": "Eating-disorder history, under 18, pause, overreaching, pain guidance and the volume cue.",
+      "role": "safety",
+      "reviewer": "Claude Opus 5.5, read-only subagent of the parent session acting as chair, 2026-10-17",
+      "status": "complete",
+      "inspected_commit": "684f8707b629985052e091c7a99763f1eb25b135",
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-366",
+          "MM-362",
+          "MM-141",
+          "MM-79",
+          "MM-116",
+          "MM-117",
+          "MM-118",
+          "CoachingPolicy.ts",
+          "AppRoot.tsx",
+          "AppState.ts",
+          "findInsights.ts",
+          "RecoveryCard.tsx"
+        ],
+        "not_inspected": [
+          "e1RM and volume code",
+          "tests",
+          "MM-108"
+        ],
+        "referrals": [
+          "training: SA-1 and SA-5",
+          "coaching: SA-6 words",
+          "product: SA-3 and SA-6 options"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is there a basis for claiming harm from a sudden jump in weekly sets?",
+        "reason": "A proposed health rule.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Workload-spike injury literature contested; soreness framing defensible. Sources listed in the report.",
+        "limitations": "One source retrieved in full."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No intake rule was built; planned versus eaten weeks is referred to it in MM-377.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No estimate tolerance was built; the held tolerance is referred to it in MM-377.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product-designer",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The design passed in docs/agent-runs/mm361-coaching-insights/; no new visual part.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "ux-accessibility",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As product-designer: the line reuses the reviewed InlineInsight.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No code under review; the build is covered by tests and mm check.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Measurement: the held tolerance for strength on fat loss (MM-377).",
+    "Nutrition: planned fat-loss weeks or eaten (MM-377).",
+    "Product owner: hide strength on fat loss under the low-body-weight caution (MM-377, SA-6)?"
+  ],
+  "decisions": [
+    {
+      "id": "MM366-steady",
+      "status": "accepted",
+      "summary": "Holding steady dropped: the MM-79 suggestion covers a stalled lift.",
+      "authority": "Product owner, 2026-10-17"
+    },
+    {
+      "id": "MM366-repeat",
+      "status": "accepted",
+      "summary": "A pattern line shows in its first week, then rests 28 days.",
+      "authority": "Product owner, 2026-10-17"
+    },
+    {
+      "id": "MM366-once",
+      "status": "accepted",
+      "summary": "Volume jump once a workout, under the first exercise mainly training the group.",
+      "authority": "Product owner, 2026-10-17"
+    },
+    {
+      "id": "MM366-cut",
+      "status": "accepted",
+      "summary": "Strength on fat loss later, as MM-377.",
+      "authority": "Product owner, 2026-10-17"
+    },
+    {
+      "id": "MM366-volume",
+      "status": "accepted",
+      "summary": "Volume jump as specified by TR-4, TR-5, SA-4 and SA-5, with soreness-only words.",
+      "authority": "Chair (decision.md)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/engine/volumeJumpInsights.test.ts test/engine/allowedItemInsights.test.ts test/coach/inlineInsights.test.tsx test/format/itemInsightText.test.ts test/engine/itemInsightEvidence.test.ts",
+      "result": "passed",
+      "summary": "The rule, the filter, the screens, the words and the evidence rows.",
+      "commit": "684f8707b629985052e091c7a99763f1eb25b135",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-17T23:59:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-17",
+      "limitations": "No reviewer could run a test or reach a device."
+    }
+  ]
+}

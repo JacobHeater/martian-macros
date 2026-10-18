@@ -765,7 +765,8 @@
             "MM-366",
             "MM-367",
             "MM-368",
-            "MM-372"
+            "MM-372",
+            "MM-377"
           ]
         },
         {
@@ -2420,7 +2421,10 @@
           "MM-133",
           "MM-168",
           "MM-312",
-          "MM-372"
+          "MM-372",
+          "MM-362",
+          "MM-364",
+          "MM-366"
         ],
         "remaining": [
           "MM-33",
@@ -2439,14 +2443,12 @@
           "MM-149",
           "MM-248",
           "MM-361",
-          "MM-362",
           "MM-363",
-          "MM-364",
           "MM-365",
-          "MM-366",
           "MM-367",
           "MM-368",
-          "MM-371"
+          "MM-371",
+          "MM-377"
         ]
       },
       "sequence": [
@@ -2533,7 +2535,7 @@
         },
         {
           "step": 10,
-          "title": "Coaching insights inline (MM-361): the insight under its item, the Coach tab list, Settings > Coach switches, the overruled grading non-goal, and the first food, workout, body and water rules",
+          "title": "Coaching insights inline (MM-361): the insight under its item, the Coach tab list, Settings > Coach switches, the overruled grading non-goal, and the first food, workout, body and water rules (training's volume jump first; strength on fat loss after, MM-377)",
           "tickets": [
             "MM-361",
             "MM-362",
@@ -2543,7 +2545,8 @@
             "MM-365",
             "MM-366",
             "MM-367",
-            "MM-372"
+            "MM-372",
+            "MM-377"
           ],
           "milestone": "M4"
         },

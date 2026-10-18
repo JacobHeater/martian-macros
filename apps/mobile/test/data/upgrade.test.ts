@@ -137,8 +137,15 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 6 left it: without the switches of Settings > Coach and the inline insight log (MM-363, MM-364). */
+const versionSix = currentSchema
+  .replace('  "inline_insights_off" INTEGER NOT NULL DEFAULT 0 CHECK ("inline_insights_off" IN (0, 1)),\n', '')
+  .replace("  \"inline_insight_areas_off\" TEXT NOT NULL DEFAULT '',\n", '')
+  .replace("  \"inline_insight_kinds_off\" TEXT NOT NULL DEFAULT '',\n", '')
+  .replace(/CREATE TABLE "inline_insight_log" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 5 left it: without the fluid limit and the water goal switched off (MM-358, MM-359). */
-const versionFive = currentSchema
+const versionFive = versionSix
   .replace('  "fluid_limited_by_clinician" INTEGER NOT NULL DEFAULT 0 CHECK ("fluid_limited_by_clinician" IN (0, 1)),\n', '')
   .replace('  "water_goal_off" INTEGER NOT NULL DEFAULT 0 CHECK ("water_goal_off" IN (0, 1)),\n', '');
 
@@ -230,4 +237,19 @@ it('a version 4 database from the build drawn for the panel can switch the sodiu
   const goals = await first(repos.preferences.watchNutritionGoals());
   expect(goals.sodiumLimitMg).toBe(2300);
   expect(goals.sodiumLimitSince).toBe(day);
+});
+
+it('a version 6 database comes up to date with every inline insight on and none logged', async () => {
+  expect(versionSix).not.toContain('inline_insight');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 6, schema: versionSix });
+  await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  const switches = await first(repos.preferences.watchInsightSwitches());
+  expect(switches.all).toBe(true);
+  expect([...switches.offAreas, ...switches.offKinds]).toEqual([]);
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  expect(await first(repos.inlineInsightLog.watchInlineInsightLog({ since: day.addDays(-30) }))).toEqual([]);
 });

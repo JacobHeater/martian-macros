@@ -71,4 +71,29 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 6 to 7 (MM-363, MM-364): the switches of Settings > Coach, all on, and the
+  // log of inline insights shown.
+  [
+    6,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN inline_insights_off INTEGER NOT NULL DEFAULT 0 ' +
+          'CHECK (inline_insights_off IN (0, 1))',
+      );
+      await db.execute("ALTER TABLE user_preferences ADD COLUMN inline_insight_areas_off TEXT NOT NULL DEFAULT ''");
+      await db.execute("ALTER TABLE user_preferences ADD COLUMN inline_insight_kinds_off TEXT NOT NULL DEFAULT ''");
+      await db.execute(
+        'CREATE TABLE "inline_insight_log" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"kind" TEXT NOT NULL, ' +
+          '"area" TEXT NOT NULL, ' +
+          '"anchor_kind" TEXT NOT NULL, ' +
+          '"anchor_id" TEXT NOT NULL, ' +
+          '"item" TEXT NOT NULL, ' +
+          '"line" TEXT NOT NULL, ' +
+          '"first_epoch_day" INTEGER NOT NULL, ' +
+          'UNIQUE ("kind", "anchor_kind", "anchor_id"))',
+      );
+    },
+  ],
 ]);

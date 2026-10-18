@@ -1,6 +1,6 @@
 ---
 id: MM-363
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-361, MM-362, MM-256, MM-286]
 ---
@@ -70,3 +70,13 @@ Scenario: Nothing yet
 - CoachRecentInsightsFolded, CoachRecentInsights, CoachRecentInsightsNone, in
   `apps/mobile/src/gallery/screens/CoachingInsights.stories.tsx`. The section folded, open with an item since changed, and empty.
   Reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`).
+
+## Progress
+- Built 2026-10-17 for the kinds the app has (training's "volume jump", MM-366). The section shows once the app has a kind
+  of inline insight. It reads `inline_insight_log` (MM-362) for the last 14 days, applies today's safeguards and
+  switches, and marks an entry "Item since changed" when its item no longer carries that kind (deleted, or edited so it
+  no longer holds) (`recentInlineInsights`).
+- A lift's entry opens the workout it was said in. Opening a food's day scrolled to the food (the scenarios above) comes
+  with the first food kind (MM-365).
+- Tests: `test/coach/inlineInsights.test.tsx` (listed under Training once shown, leading back to the workout); the
+  story CoachRecentInsightsLogged draws the list from the log.
