@@ -11,17 +11,21 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * kind the app reads (MM-320): `allowed` are permitted, the rest are offered.
  * `refuses` are turned down when asked; `unreadable` fails every read;
  * `empty` are on the platform with nothing in them (a reading added and deleted).
+ * `stepsUnnamed` has the steps counted by the phone itself, which the
+ * platform names by a package id and no app name (MM-395).
  */
 export function healthPlatform({
   allowed = [],
   refuses = [],
   unreadable = false,
   empty = [],
+  stepsUnnamed = false,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
   unreadable?: boolean;
   empty?: readonly HealthDataType[];
+  stepsUnnamed?: boolean;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
@@ -39,7 +43,12 @@ export function healthPlatform({
       id: `${type}-${day}`,
       value: values[type],
       start: morning(day),
-      source: type === 'steps' || type === 'workout' ? 'watch' : 'scale',
+      source:
+        type === 'steps' && stepsUnnamed
+          ? 'com.android.healthconnect.phone.j07164f9d1f553234a69c64d'
+          : type === 'steps' || type === 'workout'
+            ? 'watch'
+            : 'scale',
     })),
   );
   const kept = events.filter((event) => !empty.includes(event.type));

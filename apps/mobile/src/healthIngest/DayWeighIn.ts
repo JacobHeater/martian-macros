@@ -11,8 +11,9 @@ export interface DayWeighIn {
   readonly basis: WeighInBasis;
 
   /**
-   * The source of the readings it was chosen among: one name, or "several
-   * sources" for a middle value taken across more than one.
+   * The source of the readings it was chosen among: one name, "several
+   * sources" for a middle value taken across more than one, or '' when the
+   * platform named none (said as Health Connect, MM-395).
    */
   readonly sourceName: string;
 

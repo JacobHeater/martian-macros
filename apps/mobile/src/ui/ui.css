@@ -455,6 +455,8 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  /* A word longer than the line (a name, an address) breaks rather than running out of the card (MM-395). */
+  overflow-wrap: anywhere;
 }
 .mm-list-row-title {
   font: var(--type-body);

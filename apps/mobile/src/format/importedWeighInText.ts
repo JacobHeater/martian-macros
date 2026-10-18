@@ -7,11 +7,13 @@ import { clockTimeText } from './clockTimeText';
  * from Bathroom scale."
  */
 export function importedWeighInText(weighIn: DayWeighIn): string {
+  // A source the platform did not name is said as where it was read from (MM-395).
+  const source = weighIn.sourceName === '' ? 'Health Connect' : weighIn.sourceName;
   const at = weighIn.at;
   if (weighIn.basis === 'firstMorning' && at !== undefined) {
-    return `From ${weighIn.sourceName} at ${clockTimeText(at)}.`;
+    return `From ${source} at ${clockTimeText(at)}.`;
   }
   return weighIn.readings === 1
-    ? `From ${weighIn.sourceName}.`
-    : `The middle of ${weighIn.readings} readings from ${weighIn.sourceName}.`;
+    ? `From ${source}.`
+    : `The middle of ${weighIn.readings} readings from ${source}.`;
 }
