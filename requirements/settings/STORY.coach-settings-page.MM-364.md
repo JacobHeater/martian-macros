@@ -41,6 +41,7 @@ Choices I made without asking (say if any is wrong):
 - **Switches are stored by the kind's id**, not its title, so a reworded title keeps its switch.
 - **Stored on the device** with the other preferences, and erased with everything else.
 - **The dashboard insight card (MM-141) and safety notices are not affected** by these switches.
+- **Each area's screen lists what is snoozed** in it, each with "Turn back on" (the product owner, 2026-10-18, MM-378).
 
 ## Description
 The Settings section and row, the Coach settings screen, an area screen, stored switches, and the filter that MM-362 reads.

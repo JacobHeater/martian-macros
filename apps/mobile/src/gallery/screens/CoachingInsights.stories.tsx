@@ -45,7 +45,7 @@ const graded = (letter: FoodGradeLetter): FoodGradeValue => ({ kind: 'graded', l
 // ---- Food: the owner's example, a food high in fat, with the coach's line under it ----
 
 const peanutButter: InlineInsightContent = {
-  line: 'Most of this item’s calories come from fat (76%). A smaller portion or a leaner spread leaves more room for protein.',
+  line: 'Most of this item’s calories come from fat (76%). A leaner spread leaves more room for protein.',
   evidence: [
     ['Calories', '190 kcal'],
     ['From fat', '144 kcal (76%)'],

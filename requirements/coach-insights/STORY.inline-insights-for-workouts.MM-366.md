@@ -20,7 +20,8 @@ The product owner's (2026-10-17): every trackable surface, and training is named
   contradicted it, and on fat loss it pushed for more where MM-79 says holding strength is the aim (the panel's TR-2,
   TR-3, CO-1, SA-1).
 - **A pattern line shows in its first week, then rests for 28 days**, even while it still holds, so the coach does not
-  repeat itself on every workout (the panel's CO-5).
+  repeat itself on every workout (the panel's CO-5). *Superseded 2026-10-18*: the product owner chose a snooze everywhere
+  instead (MM-378); the automatic rest is removed when MM-378 is built.
 - **"Volume jump" is said once a workout**, under the first exercise that mainly trains the muscle group, not under each
   (the panel's CO-6, TR-8).
 - **"Strength on fat loss" comes later**, as MM-377: its "held" needs a tolerance the measurement role has to check, it
