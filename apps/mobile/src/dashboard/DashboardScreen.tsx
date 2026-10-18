@@ -1,7 +1,7 @@
 import { InsightCard } from '../coach/InsightCard';
 import { RowWithInsight } from '../coach/RowWithInsight';
 import { useInsightPreview } from '../coach/useInsightPreview';
-import { useItemInsightContent } from '../coach/useItemInsightContent';
+import { useItemInsightContents } from '../coach/useItemInsightContents';
 import { ReliefOfferCard } from '../coach/ReliefOfferCard';
 import { UnderEatingNotice } from '../coach/UnderEatingNotice';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
@@ -64,8 +64,14 @@ export function DashboardScreen() {
   const rowNotes = useInsightPreview().rowNotes;
   // The coach's lines under the waist and water rows (MM-367), unless a design story hands in its own.
   const latestWaistDay = (useLoaded(state.waist) ?? []).reduce<number | undefined>((last, w) => Math.max(last ?? 0, w.date.epochDay), undefined);
-  const waistNote = rowNotes?.get('waist') ?? useItemInsightContent({ kind: 'waist', id: `${latestWaistDay ?? 0}` }, 'Waist');
-  const waterNote = rowNotes?.get('water') ?? useItemInsightContent({ kind: 'water', id: `${useCell(state.today).epochDay}` }, 'Water');
+  const waistOwn = useItemInsightContents({ kind: 'waist', id: `${latestWaistDay ?? 0}` }, 'Waist');
+  const waterOwn = useItemInsightContents({ kind: 'water', id: `${useCell(state.today).epochDay}` }, 'Water');
+  const designedRow = (row: 'weight' | 'waist' | 'water') => {
+    const note = rowNotes?.get(row);
+    return note === undefined ? undefined : [note];
+  };
+  const waistNotes = designedRow('waist') ?? waistOwn;
+  const waterNotes = designedRow('water') ?? waterOwn;
 
   // The app shows nothing below its root until the profile is read, and says so there when it fails (AppRoot).
   const setup = Loadable.valueOf(setupState);
@@ -179,7 +185,7 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         ) : (
-          <RowWithInsight insight={rowNotes?.get('weight')}>
+          <RowWithInsight insights={designedRow('weight') ?? []}>
             <MmListRow
               leadingIcon="scale"
               title={`Trend ${fmt.weight(last.levelKg)}`}
@@ -206,7 +212,7 @@ export function DashboardScreen() {
             }}
           />
         ) : (
-          <RowWithInsight insight={waistNote}>
+          <RowWithInsight insights={waistNotes}>
             <MmListRow
               leadingIcon="tape"
               title={waistAmount(latestWaist.waistCm, fmt)}
@@ -216,7 +222,7 @@ export function DashboardScreen() {
             />
           </RowWithInsight>
         )}
-        <RowWithInsight insight={waterNote}>
+        <RowWithInsight insights={waterNotes}>
           <WaterRow today={today} />
         </RowWithInsight>
         {current === undefined ? null : (

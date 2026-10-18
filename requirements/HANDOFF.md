@@ -329,7 +329,9 @@ download icon, with a card and a strip line per download.
   the empty Food screen in the three palettes with no line under the hero
   and no fold arrows on empty meals, then TalkBack on Food to hear the
   calorie figure once and "Yesterday" as the heading on a past day
-  (MM-389, MM-390).
+  (MM-389, MM-390); a food logged as several servings and light on
+  protein, to see both coach lines under it, and the three-line case
+  (MM-393).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -363,6 +365,17 @@ limitations.
   removed with git, which deleted part of the real install through the
   link; `npm ci` restored it. Nothing in the repository was affected.
 - Roadmap: WS-03 step 18 added (MM-389 to MM-392).
+- **Then, by message:** the owner logged biscuits and saw only the portion
+  check, not the protein line that also held: "It should show multiple."
+  MM-362's "one insight per item" (a choice recorded for the owner to
+  overrule) is gone. MM-393: every rule that holds on an item shows its own
+  line, the higher priority first, under foods, lifts and the Dashboard's
+  rows. Reviewed in `docs/agent-runs/mm393-several-insights/`, where both roles
+  passed it. WS-09 step 12.
+- **Found while verifying:** three workout stories failed `npm run unseen`
+  (the covered story run in `mm check`) on main itself on this machine: their
+  walks waited the default second. MM-394 sets five seconds for every walk
+  in the story suite, as `pressNamed` already did. WS-03 step 19.
 
 ## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
 

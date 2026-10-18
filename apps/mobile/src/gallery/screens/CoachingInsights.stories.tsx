@@ -141,6 +141,78 @@ export const FoodTwoInsightsInOneMeal = screenStory({
   walk: async (canvas) => void (await revealed(/^Coach: 14 g of protein in 640 kcal/)(canvas)),
 });
 
+/**
+ * MM-393: biscuits logged as three servings, light on protein. Both rules hold on the one entry, so both
+ * lines show under it, the portion check (data quality) before the protein line (pattern).
+ */
+const biscuits: StoryScenario = async (repos, today) => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'breakfast',
+      name: 'Biscuits',
+      kcal: 780,
+      proteinG: 12,
+      carbsG: 78,
+      fatG: 45,
+      source: 'labelServing',
+      portion: {
+        method: 'labelServing',
+        basis: 'calculated',
+        quantity: 3,
+        unit: 'serving',
+        reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 260, proteinG: 4, carbsG: 26, fatG: 15 }), servingDescription: '1 biscuit', servingGrams: 66 },
+      },
+    }),
+  );
+};
+
+/** MM-393: two rules hold on one food, and each says its own line under it. */
+export const FoodTwoInsightsOnOneEntry = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^12 g of protein in 780 kcal/,
+  scenario: demoWith({ then: biscuits }),
+  open: yesterdaysFood,
+  walk: async (canvas) => void (await revealed(/^Coach: Logged as 3 servings/)(canvas)),
+});
+
+/**
+ * MM-393, the worst case the panel asked to see: croissants logged as four servings, mostly fat and light on
+ * protein, so all three food rules hold and three lines stack under the one entry.
+ */
+const croissants: StoryScenario = async (repos, today) => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'breakfast',
+      name: 'Croissants',
+      kcal: 920,
+      proteinG: 16,
+      carbsG: 84,
+      fatG: 58,
+      source: 'labelServing',
+      portion: {
+        method: 'labelServing',
+        basis: 'calculated',
+        quantity: 4,
+        unit: 'serving',
+        reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 230, proteinG: 4, carbsG: 21, fatG: 14.5 }), servingDescription: '1 croissant', servingGrams: 57 },
+      },
+    }),
+  );
+};
+
+/** MM-393: three rules hold on one food: three lines, the portion check first. */
+export const FoodThreeInsightsOnOneEntry = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^Most of this food’s calories come from fat \(57%\)/,
+  scenario: demoWith({ then: croissants }),
+  open: yesterdaysFood,
+  walk: async (canvas) => void (await revealed(/^Coach: Logged as 4 servings/)(canvas)),
+});
+
 /** MM-362: the line opened: what it rests on, and the way to its switch. */
 export const FoodInsightOpen = screenStory({
   covers: ['FoodScreen'],
