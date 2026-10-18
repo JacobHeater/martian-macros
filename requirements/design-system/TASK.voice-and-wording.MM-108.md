@@ -50,6 +50,8 @@ Scenario: Checked automatically where possible
 ```
 
 ## Notes
+- **Grade letters are allowed** (MM-371, 2026-10-17): a food's grade from A+ to D- (MM-370) is a nutrient-profile measure, not a
+  moral word; "Grade D" may be said, "junk" may not. The banned-word test lets letters through and still fails on every banned word.
 - All user-facing text is currently written inline in screen files. Collecting it (Flutter's localization files) makes this checkable
   and is a prerequisite for ever translating the app. Worth doing as part of this.
 

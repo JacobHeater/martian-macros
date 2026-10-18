@@ -96,4 +96,18 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 7 to 8 (MM-378): the inline insights snoozed, one kind on one item.
+  [
+    7,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "inline_insight_snoozes" (' +
+          '"kind" TEXT NOT NULL, ' +
+          '"subject" TEXT NOT NULL, ' +
+          '"item" TEXT NOT NULL, ' +
+          '"resumes_epoch_day" INTEGER NULL, ' +
+          'PRIMARY KEY ("kind", "subject"))',
+      );
+    },
+  ],
 ]);

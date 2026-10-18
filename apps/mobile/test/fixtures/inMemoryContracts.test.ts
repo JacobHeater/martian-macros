@@ -7,6 +7,7 @@ import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProg
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
 import { inlineInsightLogRepositoryContract } from '../contracts/inlineInsightLogRepositoryContract';
 import { insightLogRepositoryContract } from '../contracts/insightLogRepositoryContract';
+import { insightSnoozeRepositoryContract } from '../contracts/insightSnoozeRepositoryContract';
 import { intakeReaderContract } from '../contracts/intakeReaderContract';
 import { pauseRepositoryContract } from '../contracts/pauseRepositoryContract';
 import { preferencesRepositoryContract } from '../contracts/preferencesRepositoryContract';
@@ -36,6 +37,7 @@ dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
 inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories().inlineInsightLog);
+insightSnoozeRepositoryContract('In-memory', () => new InMemoryRepositories().insightSnoozes);
 pauseRepositoryContract('In-memory', () => new InMemoryRepositories().pauses);
 reminderRepositoryContract('In-memory', () => new InMemoryRepositories().reminders);
 recoveryCheckInRepositoryContract('In-memory', () => new InMemoryRepositories().recovery);

@@ -10,6 +10,8 @@ export interface ItemInsight {
   /** The id of the kind of insight (`ItemInsightKind.id`) that produced it. */
   readonly kind: string;
   readonly anchor: ItemAnchor;
+  /** The item a snooze of this kind is quiet on (MM-378): a food's name, an exercise's id. */
+  readonly subject: string;
   /** About the item alone, or about a pattern the item is part of. */
   readonly basis: 'item' | 'pattern';
   /** The observed numbers, by name, shown as "The numbers behind this". */

@@ -14,4 +14,6 @@ export interface InlineInsightContent {
   readonly rule: string;
   /** What to log once it is shown, for the Coach tab (MM-363); a design's own lines have none. */
   readonly logged?: Omit<InlineInsightLogEntry, 'firstShownOn'>;
+  /** What a snooze of it quiets (MM-378): the kind on this item, and the item's name for the Snoozed list. */
+  readonly snooze?: { readonly kind: string; readonly subject: string; readonly item: string };
 }

@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "task_id": "mm367-body-water-rules",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "spec/food-insights-and-snooze",
+    "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Whether a weigh-in time exists; the 3 h and median figures; the waist noise test; the water window; evidence rows.",
+      "role": "measurement",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-367",
+          "MM-361",
+          "MM-362",
+          "MM-366",
+          "MM-378",
+          "MM-142",
+          "MM-118",
+          "MM-301",
+          "MM-155",
+          "MM-71",
+          "MM-313",
+          "MM-358",
+          "MM-359",
+          "WeightObservation.ts",
+          "SqlWeightRepository.ts",
+          "currentSchema.ts",
+          "mergeWeighIns.ts",
+          "the health ingest",
+          "waistNoiseOf.ts",
+          "waistChangeOf.ts",
+          "WaistRule.ts",
+          "the water domain and repositories",
+          "the inline framework",
+          "docs/evidence.md"
+        ],
+        "not_inspected": [
+          "ProgressScreen",
+          "WeighInRow and WaistRow",
+          "the water contract suite",
+          "renders"
+        ],
+        "referrals": [
+          "coaching: ME-5 cadence and words",
+          "safety: waist with hidden weight; the fluid-limit guard",
+          "architecture: a water range reader",
+          "integrations: zone offset"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does time of day change a weigh-in enough to matter; does an import carry a time; what is the error of a self-measured waist?",
+        "reason": "Proposed health rules with numeric thresholds.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Direction only for diurnal variation (Dittmar 2002); Health Connect weight is an instantaneous record; self-measured waist error about 1.9 cm at home (Barrios 2016; Verweij 2013). Sources listed in the report.",
+        "limitations": "The WeightRecord class reference could not be retrieved."
+      }
+    },
+    {
+      "task": "The words, nagging under a daily weigh-in, \"not a change yet\", the water habit advice.",
+      "role": "coaching",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-367",
+          "MM-362",
+          "MM-378",
+          "MM-142",
+          "MM-141",
+          "MM-361",
+          "MM-365",
+          "MM-108",
+          "MM-118",
+          "MM-301",
+          "MM-155",
+          "MM-313",
+          "MM-358",
+          "MM-359",
+          "the Dashboard rows",
+          "WaterSection.tsx",
+          "WeightObservation.ts",
+          "the water domain",
+          "waistNoiseOf.ts",
+          "waistChangeOf.ts",
+          "waistSummary.ts",
+          "the inline framework",
+          "the stories"
+        ],
+        "not_inspected": [
+          "the Progress waist card",
+          "Settings > Coach screens",
+          "renders"
+        ],
+        "referrals": [
+          "measurement: CO-6, CO-3 basis",
+          "safety: CO-1, the fluid limit",
+          "product-designer and ux-accessibility: titles and the Snoozed list"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does a consistent weigh-in time steady a trend; do meal-anchored plans build a water habit; does daily weighing with feedback raise negative affect?",
+        "reason": "The draft's behaviour-change claims.",
+        "path": "direct",
+        "sources": [],
+        "summary": "No study on weigh-in time; one small trial against the water-habit claim (Rodger 2023); no harm on average from daily weighing in one RCT (Steinberg 2014). Sources listed in the report.",
+        "limitations": "Snippets mostly."
+      }
+    },
+    {
+      "task": "Eating-disorder history and hidden weight for the body lines; fluid on a clinician-limited person; the snooze.",
+      "role": "safety",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-367",
+          "MM-362",
+          "MM-142",
+          "MM-141",
+          "MM-378",
+          "MM-118",
+          "MM-359",
+          "MM-11",
+          "MM-358",
+          "MM-313",
+          "MM-364",
+          "MM-92",
+          "ItemInsightKind.ts",
+          "allowedItemInsights.ts",
+          "InsightSafeguards.ts",
+          "AppState.ts",
+          "currentSchema.ts",
+          "WeightObservation.ts",
+          "WeighInRow.tsx",
+          "waistSummary.ts",
+          "suggestedWaterGoalMl.ts",
+          "WaterGoal.ts",
+          "NutritionGoalsSection.tsx",
+          "WaterSection.tsx",
+          "CoachingPolicy.ts"
+        ],
+        "not_inspected": [
+          "WaterRow.tsx",
+          "WaistObservation.ts",
+          "the Health Connect ingest",
+          "the inline tests",
+          "renders"
+        ],
+        "referrals": [
+          "measurement: SA-3, SA-9",
+          "coaching: SA-4, SA-6, SA-7, SA-9 words",
+          "product: SA-1, SA-4 c, SA-6"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is excess fluid an eating-disorder behaviour; does salient weighing worsen mood; is drink-to-thirst the consensus?",
+        "reason": "Proposed health rules.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Water loading and appetite-suppressing drinking are reported (Krogulska 2019; Hart 2011); self-weighing associates with worse affect in some groups (Pacanowski 2015). Sources listed in the report.",
+        "limitations": "PubMed and Springer blocked."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No intake rule; the water line is about logging.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training rule.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product-designer",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The Dashboard lines were drawn and passed in docs/agent-runs/mm361-coaching-insights/; the reworded lines are reviewed in docs/agent-runs/mm361-build-design/.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "ux-accessibility",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As product-designer.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No code under review; the build is covered by tests and mm check.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Owner: a weigh-in time line scoped to connected scales with a known time (ME-1 b), if wanted later.",
+    "Owner: whether to show the neutral waist line to a person with an eating-disorder history (SA-1); hidden for now."
+  ],
+  "decisions": [
+    {
+      "id": "MM367-time",
+      "status": "accepted",
+      "summary": "The weigh-in time line is dropped: no weigh-in time is stored, and a typing time could say something false about a reading.",
+      "authority": "Chair (decision.md), from ME-1, SA-3, CO-6"
+    },
+    {
+      "id": "MM367-waist",
+      "status": "accepted",
+      "summary": "The waist line uses the shared 28-day answer and is said only when the raw reading moved by the noise or more; the Progress card's words; off with an eating-disorder history.",
+      "authority": "Chair (decision.md), from ME-4, ME-5, CO-3, SA-1"
+    },
+    {
+      "id": "MM367-water",
+      "status": "accepted",
+      "summary": "The water line is about logging; needs a suggested goal, 14 days in use, water logged in the 60 days before; off with an eating-disorder history.",
+      "authority": "Chair (decision.md), from CO-1, CO-2, ME-8, SA-5, SA-6"
+    },
+    {
+      "id": "MM367-snooze-item",
+      "status": "accepted",
+      "summary": "A Dashboard row is one item for a snooze (MM-378).",
+      "authority": "Chair (decision.md), from CO-5, SA-8"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/engine/bodyAndWaterInsights.test.ts test/coach/foodAndBodyInsights.test.tsx test/engine/itemInsightEvidence.test.ts",
+      "result": "passed",
+      "summary": "The rules, the Dashboard rows and the evidence rows.",
+      "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T06:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test, read a PDF, or reach a device."
+    }
+  ]
+}

@@ -91,7 +91,7 @@ export function FoodScreen() {
         <>
           <div className="food-complete-row">
             <FoodCompletenessRow day={day} entries={entries} />
-            <FoodDayGradeRow />
+            <FoodDayGradeRow entries={entries} />
           </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
           <MmDisclosure title="More about today">

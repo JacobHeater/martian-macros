@@ -113,3 +113,10 @@ describe('no text uses', () => {
     });
   }
 });
+
+// MM-371: a grade letter is allowed; a banned word beside it is still caught.
+it('a grade letter passes and a banned word beside it does not', () => {
+  const hits = (text: string) => banned.filter((word) => text.toLowerCase().includes(word));
+  expect(hits('Grade D')).toEqual([]);
+  expect(hits('Grade D: junk')).toEqual(['junk']);
+});

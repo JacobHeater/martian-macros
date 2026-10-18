@@ -86,7 +86,7 @@ export class DemoSeed {
     eraser: DataEraser;
     setup: SetupWriter;
     weights: WeightWriter;
-    waist: WaistWriter;
+    waist?: WaistWriter | undefined;
     food: FoodEntryWriter;
     dayMarks: DayMarkWriter;
     targets: TargetsHistoryWriter;
@@ -103,7 +103,7 @@ export class DemoSeed {
       if (i % 7 === 0) {
         const week = Math.trunc(i / 7);
         const fourWeeks = Math.trunc(i / 28);
-        await waist.saveWaist(date, 94 - i * 0.045);
+        if (waist !== undefined) await waist.saveWaist(date, 94 - i * 0.045);
         await recovery.saveRecoveryCheckIn(
           new RecoveryCheckIn({
             date,

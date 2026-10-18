@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "task_id": "mm365-food-rules",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "spec/food-insights-and-snooze",
+    "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Thresholds, what \"usual serving\" can be computed from, whole foods the fat rule catches, the protein rule against the minimum, evidence rows.",
+      "role": "nutrition",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-365",
+          "MM-362",
+          "MM-378",
+          "MM-141",
+          "MM-144",
+          "MM-108",
+          "MM-125",
+          "MM-121",
+          "MM-150",
+          "MM-167",
+          "MM-370",
+          "MM-369",
+          "FoodEntry.ts",
+          "Portion.ts and the portion folder",
+          "CustomFood.ts",
+          "HandModel.ts",
+          "estimateMeal.ts",
+          "CatalogServing*.ts",
+          "extract.sql",
+          "FoodAmountStep.tsx",
+          "AddFoodSheet.tsx",
+          "ProteinTargets.ts",
+          "SafetyBounds.ts",
+          "findInsights.ts",
+          "the inline framework",
+          "docs/evidence.md"
+        ],
+        "not_inspected": [
+          "energyAgreesWithMacros tolerance",
+          "the SQL food repository",
+          "the real pack coverage of saturated fat",
+          "renders"
+        ],
+        "referrals": [
+          "safety: NU-3, NU-6, NU-2",
+          "coaching: NU-1, NU-2, NU-7 words",
+          "data: NU-5",
+          "food pipeline: NU-2 b, NU-5"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is a per-item fat share a recognised test; is 10% protein at 400 kcal anchored; does a usual serving exist; are energy-density bands primary-sourced?",
+        "reason": "Proposed nutrition rules on whole foods.",
+        "path": "direct",
+        "sources": [],
+        "summary": "AMDRs are daily ranges; FDA reference amounts underlie label servings; nuts associate with lower mortality; portion-error evidence runs against the premise. Sources listed in the report.",
+        "limitations": "Several PDFs and PubMed pages blocked."
+      }
+    },
+    {
+      "task": "The words (fact, then swap or add), MM-108, nagging under daily foods, the snooze words.",
+      "role": "coaching",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-365",
+          "MM-362",
+          "MM-378",
+          "MM-141",
+          "MM-363",
+          "MM-364",
+          "MM-108",
+          "MM-121",
+          "MM-125",
+          "MM-370",
+          "insightText.ts",
+          "itemInsightText.ts",
+          "ProteinTargets.ts",
+          "DailyTargets.ts",
+          "targetsOn.ts",
+          "FoodEntry.ts",
+          "Portion.ts",
+          "MealSection.tsx",
+          "InlineInsight.tsx",
+          "CoachAreaScreen.tsx",
+          "the stories",
+          "voice.test.ts"
+        ],
+        "not_inspected": [
+          "thresholds (nutrition)",
+          "policy beyond the filter (safety)",
+          "the amount step and search",
+          "renders"
+        ],
+        "referrals": [
+          "nutrition: usual serving, caps",
+          "safety: CO-3, CO-4",
+          "product-designer and ux-accessibility: CO-5, CO-7"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does nutrient feedback in logging apps raise eating concern; does \"add\" framing beat \"restrict\"?",
+        "reason": "The every-time default and the owner's swap-or-add rule.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Cross-sectional association in students (Simpson and Mazzeo 2017); a one-month RCT showed no increase in risk in a low-risk sample (Hahn 2021). No evidence on item-level feedback.",
+        "limitations": "Abstracts only."
+      }
+    },
+    {
+      "task": "Eating-disorder history, under-18, hidden weight, under-eating, cautions, whether any line judges a food, the snooze.",
+      "role": "safety",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-18",
+      "status": "complete",
+      "inspected_commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [
+          "source-inspection"
+        ],
+        "inspected": [
+          "MM-365",
+          "MM-362",
+          "MM-378",
+          "MM-141",
+          "MM-108",
+          "MM-11",
+          "MM-112",
+          "MM-114",
+          "MM-118",
+          "MM-92",
+          "MM-150",
+          "MM-370",
+          "ItemInsightKind.ts",
+          "allowedItemInsights.ts",
+          "InsightSafeguards.ts",
+          "AppState.ts",
+          "findInsights.ts",
+          "CoachingPolicy.ts",
+          "cautionMessage.ts",
+          "EasyToMissLine.tsx",
+          "UnderEatingNotice.tsx"
+        ],
+        "not_inspected": [
+          "ProteinTargets.ts",
+          "findUnderEating",
+          "the entry row macros",
+          "renders"
+        ],
+        "referrals": [
+          "nutrition: SA-3, SA-7, SA-8",
+          "coaching: SA-8, SA-9",
+          "product: SA-3, SA-5, SA-6"
+        ],
+        "limitations": "Source and requirement inspection only; hashes not computed by the reviewer."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does fat-composition feedback matter with an eating-disorder history; what does the evidence say about tracking apps and disordered eating; fat guidance in pregnancy?",
+        "reason": "Proposed health rules and their safeguards.",
+        "path": "direct",
+        "sources": [],
+        "summary": "Fat avoidance persists after weight restoration (Schebendach 2011, 2017); tracking-app associations are cross-sectional (Anderberg 2025; Wallace 2026); PERILIP recommends oily fish, eggs and nuts in pregnancy (Koletzko 2007). Sources listed in the report.",
+        "limitations": "Abstracts mostly; PubMed blocked."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No training rule.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No body figure is computed by these rules.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "product-designer",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The lines were drawn and passed in docs/agent-runs/mm361-coaching-insights/; the reworded lines and the snooze are reviewed in docs/agent-runs/mm361-build-design/.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "ux-accessibility",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As product-designer.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No code under review; the build is covered by tests and mm check.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [
+    "Owner: keep the total-fat trigger for \"mostly fat\" (the peanut-butter example fires) or take nutrition's saturated-fat test (NU-2), which stops nuts, nut butters, oils and avocado firing.",
+    "Owner: a per-entry \"Right as logged\" acknowledgement for the portion check (CO-4), declined for now.",
+    "Owner: empty-state words for the Snoozed section naming \"Snooze…\" (CO-7), declined for now."
+  ],
+  "decisions": [
+    {
+      "id": "MM365-set",
+      "status": "accepted",
+      "summary": "Mostly fat, light on protein and the portion check; swap or add, never eat less; logged foods only; every qualifying line, snoozable.",
+      "authority": "Product owner, 2026-10-18"
+    },
+    {
+      "id": "MM365-guards",
+      "status": "accepted",
+      "summary": "Protein guard on mostly fat (NU-1); minimum in force and no kidney or bariatric for the protein line (NU-3, SA-7); macros must explain the energy (NU-4); usual serving by origin (NU-5); under-eating and cautions withheld (SA-4, SA-5, SA-6).",
+      "authority": "Chair (decision.md)"
+    },
+    {
+      "id": "MM365-words",
+      "status": "accepted",
+      "summary": "Additive directions; \"Portion check\" title; protein-first protein line; the forbidden list extended.",
+      "authority": "Chair (decision.md)"
+    },
+    {
+      "id": "MM365-fat-trigger",
+      "status": "accepted",
+      "summary": "Total-fat share kept so the owner's example stands; the saturated-fat alternative recorded for the owner.",
+      "authority": "Chair (decision.md), pending the owner"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx vitest run test/engine/foodItemInsights.test.ts test/coach/foodAndBodyInsights.test.tsx test/engine/allowedItemInsights.test.ts test/format/itemInsightText.test.ts test/engine/itemInsightEvidence.test.ts",
+      "result": "passed",
+      "summary": "The rules, the screens, the filter, the words and the evidence rows.",
+      "commit": "f2e8dfe6589e7a56e088b0cc3b9c8ebf05c54380",
+      "dirty": true,
+      "exit_code": 0
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-18T06:00:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-18",
+      "limitations": "No reviewer could run a test, read a PDF, or reach a device."
+    }
+  ]
+}

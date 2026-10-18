@@ -1,6 +1,6 @@
 import type { Meal } from '../domain/Meal';
 import type { ItemInsightKind } from '../engine/ItemInsightKind';
-import type { FoodGradeValue } from '../food/FoodGradeValue';
+import type { FoodGradeValue } from '../domain/food/grade/FoodGradeValue';
 import type { InlineInsightContent } from './InlineInsightContent';
 import type { RecentInsight } from './RecentInsight';
 

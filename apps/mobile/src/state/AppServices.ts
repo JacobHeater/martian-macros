@@ -19,6 +19,7 @@ import type { WeightEventRepository } from '../domain/repositories/WeightEventRe
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
 import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepository';
+import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { PackHttp } from '../foodCatalog/download/PackHttp';
@@ -51,6 +52,7 @@ export interface AppServices {
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
+  readonly insightSnoozes: InsightSnoozeRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;

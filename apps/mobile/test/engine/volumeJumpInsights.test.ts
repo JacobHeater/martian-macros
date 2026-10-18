@@ -80,13 +80,13 @@ describe('volumeJumpInsights (MM-366)', () => {
     expect(jumps(then, [...usualWeeks(old, [9, 9, 9, 9]), ...since])).toHaveLength(1);
   });
 
-  it('is shown in its first week, then rests', () => {
+  it('is said on every workout while it holds, with the lift as the item a snooze quiets (MM-378)', () => {
     const first = ref.addDays(-7);
-    const firstWeek = session(first, [[bench, 14]]);
-    const history = [firstWeek, ...usualWeeks(first, [9, 9, 9, 9])];
+    const history = [session(first, [[bench, 14]]), ...usualWeeks(first, [9, 9, 9, 9])];
     expect(jumps(session(first.addDays(3), [[bench, 1]]), history)).toHaveLength(1);
-    // Still a jump a week on (20 sets against about 10), but its week has passed.
-    expect(jumps(session(ref, [[bench, 20]]), history)).toEqual([]);
+    // Still a jump a week on (20 sets against about 10): still said.
+    const [later] = jumps(session(ref, [[bench, 20]]), history);
+    expect(later?.subject).toBe(bench);
   });
 
   it('says nothing when a pause falls in the weeks it looks at', () => {

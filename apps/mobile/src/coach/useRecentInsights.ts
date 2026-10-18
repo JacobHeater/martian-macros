@@ -17,9 +17,11 @@ export function useRecentInsights(): readonly RecentInsight[] | undefined {
   const safeguards = useCell(state.insightSafeguards);
   const switches = useLoaded(state.insightSwitches);
   const current = useCell(state.itemInsights);
+  const snoozes = useLoaded(state.insightSnoozes) ?? [];
+  const today = useCell(state.today);
   if (kinds.length === 0) return undefined;
   if (log === undefined || safeguards === undefined || switches === undefined) return [];
-  return recentInlineInsights({ log, kinds, safeguards, switches, current }).map(({ entry, changed }) => ({
+  return recentInlineInsights({ log, kinds, safeguards, switches, current, snoozes, today }).map(({ entry, changed }) => ({
     area: entry.area,
     item: entry.item,
     day: entry.firstShownOn,

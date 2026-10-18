@@ -81,11 +81,11 @@ const food = (init: {
 it('a saved food is logged in any amount', async () => {
   const sheet = await open();
   await createBar(sheet);
-  expect(within(sheet).getByRole('button', { name: /^Protein bar/ })).toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: /^Protein bar(?!:)/ })).toBeInTheDocument();
   await press(sheet, 'Back');
   await typeIn(sheet, 'Search foods', 'protein');
   expect(await within(sheet).findByText('Your food · 1 bar · 120 kcal')).toBeInTheDocument();
-  await press(sheet, /^Protein bar/);
+  await press(sheet, /^Protein bar(?!:)/);
   await press(sheet, 'Grams');
   await typeIn(sheet, /^Amount/, '45');
   expect(within(sheet).getByText(/180 kcal/)).toBeInTheDocument();
@@ -113,7 +113,7 @@ it('editing a saved food does not rewrite what was logged', async () => {
   await expect.poll(() => screen.queryByRole('dialog')).toBeNull();
   sheet = await openAddFood();
   await press(sheet, 'Saved');
-  await press(sheet, /^Protein bar/);
+  await press(sheet, /^Protein bar(?!:)/);
   await typeIn(sheet, 'Calories', '150');
   await press(sheet, 'Save food');
   await expect.poll(async () => (await saved())[0]?.perServing.kcal).toBe(150);

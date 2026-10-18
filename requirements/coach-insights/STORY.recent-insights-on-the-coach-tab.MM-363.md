@@ -1,6 +1,6 @@
 ---
 id: MM-363
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-361, MM-362, MM-256, MM-286]
 ---
@@ -76,7 +76,8 @@ Scenario: Nothing yet
   of inline insight. It reads `inline_insight_log` (MM-362) for the last 14 days, applies today's safeguards and
   switches, and marks an entry "Item since changed" when its item no longer carries that kind (deleted, or edited so it
   no longer holds) (`recentInlineInsights`).
-- A lift's entry opens the workout it was said in. Opening a food's day scrolled to the food (the scenarios above) comes
-  with the first food kind (MM-365).
+- A lift's entry opens the workout it was said in; a food's entry opens that day on Food (the destination-state rules,
+  MM-286); a snoozed line is not listed while it is quiet (MM-378). 2026-10-18: the food, waist and water kinds joined
+  (MM-365, MM-367). Scrolling to the food itself is not done: the Food screen has no scroll-to-entry; its day is opened.
 - Tests: `test/coach/inlineInsights.test.tsx` (listed under Training once shown, leading back to the workout); the
   story CoachRecentInsightsLogged draws the list from the log.

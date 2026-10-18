@@ -1,6 +1,6 @@
 ---
 id: MM-370
-status: proposed
+status: done
 component: food-logging
 related: [MM-361, MM-369, MM-371, MM-365, MM-108, MM-144, MM-11, MM-310, MM-126]
 ---
@@ -44,8 +44,9 @@ Choices I made without asking (say if any is wrong):
   source, with words: "Grade for the food itself, per 100 g".
 - **The day's grade is a row after the completeness row**, "Grade for the day · Counted by calories", built as that row is. It
   was first drawn in the app bar beside the completeness mark, and on a 320 px phone it overlapped the settings button.
-- **Names a screen reader hears**: "Lunch: grade C", "Peanut butter: grade C", "Homemade soup: can't be graded. Why?". The
-  popover is labelled "Grade C minus", not "Grade C-".
+- **Names a screen reader hears**: "Grade C for Lunch", "Grade C for Peanut butter", "No grade for Homemade soup. Why?" (the
+  design said "Lunch: grade C"; at the build the grade went first, so a row's own name is never the start of its badge's and a
+  test or a screen reader's search for the row finds one control). The popover is labelled "Grade C minus", not "Grade C-".
 - **Custom foods and recipes are graded** when their nutrients allow it. An estimated entry (MM-150) shows a question mark
   ("Estimated, so not graded").
 - **The grade is computed, not stored**, so improving the method regrades everything.
@@ -117,9 +118,25 @@ method, reviewed by the panel (`docs/agent-runs/mm361-coaching-insights/`):
 - Design system: `Overlays › Popover`, and the badges in `Components`.
 
 ## Notes
-- Blocked by MM-369.
+- MM-369 is done (`docs/food-grades.md`). The method's inputs are sugars, saturated fat, sodium and fiber; the packs
+  published 2026-10-09 are format 1 and carry no sugars or saturated fat, so every pack food shows the question mark
+  naming them until a format 2 pack is published (MM-307). A food of the person's own that states them is graded now.
 - At 200% text and on a 320 px phone, the entry's calories, grade and "More actions" leave the name a narrow column ("Peanut /
   butter"), readable and not cut (the panel's UX-11, PD-12). Moving the calories and grade under the name at large text is a
   proposal for when the grades are built, with MM-91's large-text pass.
 - The day's grade row sits on the canvas with its sibling, the completeness row, which already does (the panel's PD-13). If
   MM-291 is to hold for that pair, both go in one list group together.
+
+## Progress
+- Built 2026-10-18. Engine: `FoodGradeRule`, `nutrientProfileScore`, `gradeLetterOf`, `gradeOfNutrition` (the grade or the
+  reason), `gradeOfCatalogFood`, `gradeOfCustomFood` (a recipe is not graded), `gradeOfFoodEntry` (per 100 g from the
+  entry's totals and grams; an estimate or unknown grams is not graded), `gradeOfMeal` (a meal or a day, calorie-weighted,
+  70% coverage). The grade types moved to `domain/food/grade/`; a graded value carries its score for the roll-ups.
+- Screens: every entry, meal and the day on Food, every search result, the amount step and the own and recent foods in the
+  add sheet draw the app's grade; a design story may still hand in its own through `InsightPreview`.
+- Tests: `test/engine/foodGrade.test.ts` (the points, the twelve steps, missing values, alcohol, a pack food, an own food, a
+  recipe, an entry at two amounts, an estimate, unknown grams, meal roll-ups and coverage), `test/engine/foodGradeEvidence.test.ts`
+  (every figure has a register row and the "How is a food graded?" entry names them).
+- Evidence register: `foodGrade`, `FoodGradeRule.*`, `foodGrade.fvlOmitted`, `foodGrade.oneTableForAll`, `foodGrade.requiredNutrients`.
+- Not done: scrolling the How-this-works screen to the grade entry from a badge (the badge's popover says what the grade is;
+  the register entry is under Settings > About as every entry is).

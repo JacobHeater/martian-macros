@@ -1,4 +1,9 @@
+import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
 import { useInsightPreview } from '../coach/useInsightPreview';
+import type { FoodEntry } from '../domain/FoodEntry';
+import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
+import { gradeOfMeal } from '../engine/gradeOfMeal';
 import { MmListRow } from '../ui/MmListRow';
 import { FoodGrade } from './FoodGrade';
 
@@ -7,10 +12,13 @@ import { FoodGrade } from './FoodGrade';
  * sibling for a fact about the whole day, built as that row is so their
  * icons and words line up: the words say what the letter is, and the
  * letter says more when pressed. Not in the app bar, which has no room for
- * it on a narrow phone. None in the app until grades are built.
+ * it on a narrow phone. Nothing for a day with no food.
  */
-export function FoodDayGradeRow() {
-  const dayGrade = useInsightPreview().dayGrade;
+export function FoodDayGradeRow({ entries }: { entries: readonly FoodEntry[] }) {
+  const { state } = useApp();
+  const hand = useCell(state.handSize);
+  const dayGrade =
+    useInsightPreview().dayGrade ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOfFoodEntry(entry, { hand }) })), 'day');
   if (dayGrade === undefined) return null;
   return (
     <MmListRow

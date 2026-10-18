@@ -17,6 +17,7 @@ export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
 export * from './InMemoryInlineInsightLogRepository';
 export * from './InMemoryInsightLogRepository';
+export * from './InMemoryInsightSnoozeRepository';
 export * from './InMemoryIntakeReader';
 export * from './InMemoryPauseRepository';
 export * from './InMemoryPreferencesRepository';
