@@ -14,6 +14,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { EditHeightSheet } from './EditHeightSheet';
+import { useSettingsSection } from './useSettingsSection';
 import { HealthCheckScreen } from './HealthCheckScreen';
 
 const tickedCount = (s: ScreeningAnswers) =>
@@ -37,6 +38,8 @@ const tickedCount = (s: ScreeningAnswers) =>
  * health check, each correctable (MM-83). Every change issues new targets at once.
  */
 export function ProfileSection() {
+  // Folds in place, closed until opened (MM-398).
+  const fold = useSettingsSection('profile');
   const { services, state } = useApp();
   const navigator = useNavigator();
   const overlays = useOverlays();
@@ -124,7 +127,7 @@ export function ProfileSection() {
     ));
 
   return (
-    <MmSection icon="person" title="You">
+    <MmSection icon="person" title="You" {...fold}>
       <MmListGroup>
         <MmListRow
           leadingIcon="person"

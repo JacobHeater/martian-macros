@@ -68,6 +68,11 @@ export function packEntryFor(
       carbsG: stated(food.carbsG, 'carbohydrate', food),
       fatG: stated(food.fatG, 'fat', food),
       fiberG: food.fiberG,
+      // A negative or impossible amount is no amount (the panel's IN-3).
+      sugarAlcoholsG:
+        food.sugarAlcoholsG === undefined || food.sugarAlcoholsG < 0 || food.sugarAlcoholsG > (food.carbsG ?? 0)
+          ? undefined
+          : food.sugarAlcoholsG,
       sodiumMg: food.sodiumMg,
       alcoholG: food.alcoholG,
       micros: plausibleMicros(food),

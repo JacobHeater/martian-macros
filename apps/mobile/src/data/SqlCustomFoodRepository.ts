@@ -56,6 +56,7 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
             cookedWeightGrams: optionalNumber(r, 'cooked_weight_grams'),
             ingredients: byRecipe.get(integer(r, 'id')) ?? [],
             fiberG: optionalNumber(r, 'fiber_g'),
+            sugarAlcoholsG: optionalNumber(r, 'sugar_alcohols_g'),
             micros: microsFromRow(r),
           }),
       );
@@ -77,6 +78,7 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
         servings: orNull(food.servings),
         cooked_weight_grams: orNull(food.cookedWeightGrams),
         fiber_g: orNull(food.fiberG),
+        sugar_alcohols_g: orNull(food.sugarAlcoholsG),
         sodium_mg: orNull(food.micros.of('sodium')),
         ...microsValues(food.micros),
       };

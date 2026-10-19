@@ -25,6 +25,12 @@ body,
   margin: 0;
 }
 
+/* The page never scrolls: each screen's body does, inside a frame that stays put (MM-400). */
+html,
+body {
+  overflow: hidden;
+}
+
 body {
   background: var(--canvas);
   color: var(--text);

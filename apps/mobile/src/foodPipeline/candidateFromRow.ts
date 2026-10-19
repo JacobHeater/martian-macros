@@ -4,6 +4,7 @@ import { FormatError } from '../lang/FormatError';
 import { tryParseDouble } from '../lang/tryParseDouble';
 import { tryParseInt } from '../lang/tryParseInt';
 import { CandidateFood } from './CandidateFood';
+import { usLabelCarbs } from './usLabelCarbs';
 
 function servingsIn(json: string): CatalogServing[] {
   const decoded: unknown = JSON.parse(json);
@@ -38,6 +39,15 @@ export function candidateFromRow(header: readonly string[], row: readonly string
   if (name === undefined) throw new FormatError('A candidate row has no "name".');
 
   const servingsJson = text('servings');
+  // A carbohydrate figure that may be an EU label's is made a US total, so net carbs take fiber once (MM-397).
+  const carbsG = usLabelCarbs({
+    label: text('carbs_label') === 'unknown' ? 'unknown' : 'us',
+    kcal: number('kcal'),
+    proteinG: number('protein'),
+    carbsG: number('carbs'),
+    fatG: number('fat'),
+    fiberG: number('fiber'),
+  });
   return new CandidateFood({
     source: required('source'),
     sourceId: required('source_id'),
@@ -47,9 +57,10 @@ export function candidateFromRow(header: readonly string[], row: readonly string
     rawBarcode: text('gtin'),
     kcal: number('kcal'),
     proteinG: number('protein'),
-    carbsG: number('carbs'),
+    carbsG,
     fatG: number('fat'),
     fiberG: number('fiber'),
+    sugarAlcoholsG: number('sugar_alcohols'),
     sodiumMg: number('sodium_mg'),
     alcoholG: number('alcohol'),
     micros: Object.fromEntries(

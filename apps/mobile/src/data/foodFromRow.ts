@@ -20,6 +20,7 @@ export function foodFromRow(r: SqlRow): FoodEntry {
     source: named(QuantitySource.values, r, 'quantity_source'),
     portion: portionFromRow(r),
     fiberG: optionalNumber(r, 'fiber_g'),
+    sugarAlcoholsG: optionalNumber(r, 'sugar_alcohols_g'),
     sodiumMg: optionalNumber(r, 'sodium_mg'),
     alcoholG: optionalNumber(r, 'alcohol_g'),
     micros: microsFromRow(r),

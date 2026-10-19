@@ -62,7 +62,7 @@ export const ThemeChooser = screenStory({
 
 export const Welcome = screenStory({
   covers: ['OnboardingScreen', 'WelcomeStep'],
-  shows: 'Get started',
+  shows: 'Begin',
   scenario: newInstallScenario,
 });
 
@@ -154,10 +154,10 @@ export const HomeOpensSettings = screenStory({
   walk: pressAnywhere('Settings'),
 });
 
-/** MM-321: under eighteen: correcting the date of birth opens Settings. */
+/** MM-321: under eighteen: correcting the date of birth opens Settings at "You" (MM-398). */
 export const AdultsOnlyOpensSettings = screenStory({
   covers: ['AdultsOnlyScreen', 'SettingsScreen'],
-  shows: 'Today’s setup',
+  shows: 'Date of birth',
   scenario: minorScenario,
   walk: pressAnywhere('Correct date of birth'),
 });

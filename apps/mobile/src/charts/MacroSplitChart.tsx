@@ -10,6 +10,8 @@ interface MacroSplitChartProps {
   isPreview?: boolean;
   /** Inside the hero: the ring and its figures, without the caption about how the split is counted. */
   compact?: boolean;
+  /** Carbs counted net of fiber and sugar alcohols, and named so (MM-396). */
+  netCarbs?: boolean;
 }
 
 const size = 112;
@@ -34,8 +36,12 @@ function sector(from: number, to: number): string {
 }
 
 /** The 4/4/9 energy split of logged macros, not percentages of target grams. */
-export function MacroSplitChart({ intake, isPreview = false, compact = false }: MacroSplitChartProps) {
-  const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
+export function MacroSplitChart({ intake, isPreview = false, compact = false, netCarbs = false }: MacroSplitChartProps) {
+  const grams: Readonly<Record<MacroKind, number>> = {
+    protein: intake.proteinG,
+    carbs: netCarbs ? intake.netCarbsG : intake.carbsG,
+    fat: intake.fatG,
+  };
   const energy = (macro: MacroKind) => grams[macro] * (macro === 'fat' ? 9 : 4);
   const total = MacroKind.values.reduce((sum, macro) => sum + energy(macro), 0);
   // Less than half a calorie rounds to none: no split to show, never "0 g · 100%" (MM-331). The ring is
@@ -57,7 +63,7 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false }: 
   const figures = (macro: MacroKind) => `${Fmt.grams(grams[macro])} · ${share(macro)}`;
   const label =
     `${isPreview ? 'Food preview' : 'Logged'} macronutrient energy split. ` +
-    `${MacroKind.values.map((macro) => `${MacroKind.label(macro)}: ${figures(macro)}`).join('. ')}.`;
+    `${MacroKind.values.map((macro) => `${MacroKind.label(macro, { netCarbs })}: ${figures(macro)}`).join('. ')}.`;
 
   const shown = MacroKind.values.filter((macro) => energy(macro) > 0);
   // The space between sectors, as a fraction of a turn at the middle of the ring.
@@ -80,7 +86,7 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false }: 
         <ul className="chart-split-list">
           {MacroKind.values.map((macro) => (
             <li key={macro} className={`chart-split-item chart-text-${macro}`}>
-              <span>{MacroKind.label(macro)}</span>
+              <span>{MacroKind.label(macro, { netCarbs })}</span>
               <span>{figures(macro)}</span>
             </li>
           ))}
@@ -88,8 +94,8 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false }: 
       </div>
       {compact ? null : (
         <p className="chart-caption">
-          {Fmt.kcal(total)} from {isPreview ? 'food' : 'recorded'} macros · protein/carbs 4 kcal/g, fat 9 kcal/g. Alcohol
-          and other calorie differences are not part of this split.
+          {Fmt.kcal(total)} from {isPreview ? 'food' : 'recorded'} macros · protein/{netCarbs ? 'net carbs' : 'carbs'} 4 kcal/g,
+          fat 9 kcal/g. Alcohol{netCarbs ? ', fiber, sugar alcohols' : ''} and other calorie differences are not part of this split.
         </p>
       )}
     </div>

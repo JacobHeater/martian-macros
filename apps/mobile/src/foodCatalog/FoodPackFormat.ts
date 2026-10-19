@@ -1,11 +1,12 @@
 /**
  * The layout of a pack file. One place, read by the reader and written by
  * the writer (and the pipeline). Format 1 is the layout the Dart app wrote;
- * format 2 adds the micronutrient columns (MM-307), and a format 1 pack
- * stays readable, its foods without them.
+ * format 2 adds the micronutrient columns (MM-307); format 3 adds sugar
+ * alcohols (MM-397). An older pack stays readable, its foods without what
+ * it lacks.
  */
 export const FoodPackFormat = {
-  version: 2,
+  version: 3,
 
   /** The oldest format the reader still opens. */
   oldestReadable: 1,
@@ -48,7 +49,8 @@ CREATE TABLE foods (
   folate_ug INTEGER,
   sugars_g INTEGER,
   saturated_fat_g INTEGER,
-  cholesterol_mg INTEGER
+  cholesterol_mg INTEGER,
+  sugar_alcohols INTEGER
 );
 CREATE TABLE servings (
   food_id INTEGER NOT NULL,

@@ -17,6 +17,7 @@ function withId(f: CustomFood, id: number): CustomFood {
     cookedWeightGrams: f.cookedWeightGrams,
     ingredients: f.ingredients,
     fiberG: f.fiberG,
+    sugarAlcoholsG: f.sugarAlcoholsG,
     micros: f.micros,
   });
 }

@@ -6,6 +6,8 @@ import type { InsightSwitchesReader } from './InsightSwitchesReader';
 import type { InsightSwitchesWriter } from './InsightSwitchesWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
+import type { NetCarbsReader } from './NetCarbsReader';
+import type { NetCarbsWriter } from './NetCarbsWriter';
 import type { NutritionGoalsReader } from './NutritionGoalsReader';
 import type { NutritionGoalsWriter } from './NutritionGoalsWriter';
 import type { PreferencesReader } from './PreferencesReader';
@@ -32,6 +34,8 @@ export interface PreferencesRepository
     DetailLevelWriter,
     MacroPictureReader,
     MacroPictureWriter,
+    NetCarbsReader,
+    NetCarbsWriter,
     UnderEatingNoticeReader,
     UnderEatingNoticeWriter,
     ReturnScreenReader,

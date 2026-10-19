@@ -752,7 +752,9 @@
             "MM-385",
             "MM-386",
             "MM-387",
-            "MM-388"
+            "MM-388",
+            "MM-396",
+            "MM-397"
           ]
         },
         {
@@ -818,7 +820,12 @@
             "MM-390",
             "MM-391",
             "MM-392",
-            "MM-394"
+            "MM-394",
+            "MM-398",
+            "MM-399",
+            "MM-400",
+            "MM-401",
+            "MM-402"
           ]
         }
       ]
@@ -1371,7 +1378,12 @@
           "MM-376",
           "MM-389",
           "MM-390",
-          "MM-394"
+          "MM-394",
+          "MM-398",
+          "MM-399",
+          "MM-400",
+          "MM-401",
+          "MM-402"
         ],
         "remaining": [
           "MM-89",
@@ -1651,6 +1663,18 @@
           "title": "Story walks wait five seconds, so a covered run on a slower machine passes (MM-394)",
           "tickets": [
             "MM-394"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 20,
+          "title": "Settings as an accordion (MM-398), folding headings that stay headings (MM-399), a page that never scrolls the frame (MM-400), a guard on filler (MM-401), one rhythm of spacing (MM-402)",
+          "tickets": [
+            "MM-398",
+            "MM-399",
+            "MM-400",
+            "MM-401",
+            "MM-402"
           ],
           "milestone": "M4"
         }
@@ -2250,7 +2274,9 @@
           "MM-383",
           "MM-384",
           "MM-385",
-          "MM-388"
+          "MM-388",
+          "MM-396",
+          "MM-397"
         ],
         "remaining": [
           "MM-386",
@@ -2420,6 +2446,15 @@
             "MM-386",
             "MM-387",
             "MM-388"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 13,
+          "title": "Net carbs, on by default and everywhere carbs show (MM-396), with sugar alcohols carried as a nutrient through packs, labels and saved foods (MM-397)",
+          "tickets": [
+            "MM-396",
+            "MM-397"
           ],
           "milestone": "M4"
         }

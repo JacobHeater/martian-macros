@@ -3,6 +3,7 @@ import { useInsightKinds } from '../coach/useInsightKinds';
 import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
 import { DailyActivity } from '../domain/DailyActivity';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { useNetCarbs } from '../food/useNetCarbs';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UnitSystem } from '../domain/UnitSystem';
 import { dailyActivityLabel } from '../format/dailyActivityLabel';
@@ -33,6 +34,8 @@ import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
+import { SettingsOpenSectionContext } from './SettingsOpenSectionContext';
+import type { SettingsSectionId } from './SettingsSectionId';
 import './settings.css';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -42,19 +45,24 @@ const unitLabels: Readonly<Record<UnitSystem, string>> = { imperial: 'lb / in', 
 /**
  * Everything the user set up and can change (MM-259): sections of rows in
  * the order of use, every row with its icon, the choosers one tap away,
- * and the one destructive action last in a section of its own.
+ * and the one destructive action last in a section of its own. Each
+ * section opens and closes in place and starts closed (MM-398), unless a
+ * way into Settings about one row asks for its section with `open`.
  */
-export function SettingsScreen() {
+export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
   const { services, state } = useApp();
   const navigator = useNavigator();
   const overlays = useOverlays();
   const setup = useLoaded(state.setup);
   const detail = useLoaded(state.detailLevel) ?? 'standard';
   const easyToMiss = useLoaded(state.easyToMiss)?.enabled ?? true;
+  const netCarbs = useNetCarbs();
   const termsAccepted = useLoaded(state.termsAcceptance);
   // Settings > Coach (MM-364), once there is a kind of inline insight to switch.
   const coachSettings = useInsightKinds().length > 0;
   if (setup === undefined) return <Screen title="Settings">{null}</Screen>;
+  // This screen's own sections fold as the section components' do (useSettingsSection).
+  const fold = (id: SettingsSectionId) => ({ collapsible: true, initiallyExpanded: open === id, maintainState: true });
   const bodyFat = setup.bodyFatPercent;
 
   const erase = async () => {
@@ -116,146 +124,160 @@ export function SettingsScreen() {
 
   return (
     <Screen title="Settings">
-      <MmSection icon="calendarCheck" title="Today’s setup">
-        <MmListGroup>
-          <MmListRow
-            leadingIcon="walk"
-            title="Daily activity"
-            subtitle={dailyActivityLabel(setup.dailyActivity)}
-            trailingAction={<MmIconButton icon="edit" label="Change daily activity" opens="listbox" onPress={chooseActivity} />}
-          />
-          <MmListRow
-            leadingIcon="school"
-            title="Experience"
-            subtitle={trainingStatusLabel(setup.trainingStatus)}
-            trailingAction={<MmIconButton icon="edit" label="Change experience" opens="listbox" onPress={chooseExperience} />}
-          />
-          <MmListRow
-            leadingIcon="calendar"
-            title={`Training days per week: ${setup.trainingDaysPerWeek}`}
-            detail={
-              <MmSlider
-                name="Training days per week"
-                value={setup.trainingDaysPerWeek}
-                max={7}
-                divisions={7}
-                label={`${setup.trainingDaysPerWeek} days`}
-                onChange={(days) =>
-                  void services.setup.saveSetup(setup.copyWith({ trainingDaysPerWeek: roundHalfAwayFromZero(days) }))
-                }
-              />
-            }
-          />
-          <MmSwitchRow
-            leadingIcon="percent"
-            title="Body fat estimate"
-            subtitle={bodyFat === undefined ? 'Estimated by the app. Turn on to enter a recent measurement.' : `About ${whole(bodyFat)}%, your measurement.`}
-            value={bodyFat !== undefined}
-            onChange={(on) => void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: on ? 25 : undefined }))}
-          />
-          {bodyFat === undefined ? null : (
-            <MmSliderRow
-              name="Body fat percent"
-              value={clamp(bodyFat, 5, 55)}
-              min={5}
-              max={55}
-              divisions={50}
-              label={`${whole(bodyFat)}%`}
-              onChange={(percent) =>
-                void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: roundHalfAwayFromZero(percent) + 0 }))
+      <SettingsOpenSectionContext.Provider value={open}>
+        <MmSection icon="calendarCheck" title="Today’s setup" {...fold('todaysSetup')}>
+          <MmListGroup>
+            <MmListRow
+              leadingIcon="walk"
+              title="Daily activity"
+              subtitle={dailyActivityLabel(setup.dailyActivity)}
+              trailingAction={<MmIconButton icon="edit" label="Change daily activity" opens="listbox" onPress={chooseActivity} />}
+            />
+            <MmListRow
+              leadingIcon="school"
+              title="Experience"
+              subtitle={trainingStatusLabel(setup.trainingStatus)}
+              trailingAction={<MmIconButton icon="edit" label="Change experience" opens="listbox" onPress={chooseExperience} />}
+            />
+            <MmListRow
+              leadingIcon="calendar"
+              title={`Training days per week: ${setup.trainingDaysPerWeek}`}
+              detail={
+                <MmSlider
+                  name="Training days per week"
+                  value={setup.trainingDaysPerWeek}
+                  max={7}
+                  divisions={7}
+                  label={`${setup.trainingDaysPerWeek} days`}
+                  onChange={(days) =>
+                    void services.setup.saveSetup(setup.copyWith({ trainingDaysPerWeek: roundHalfAwayFromZero(days) }))
+                  }
+                />
               }
             />
-          )}
-          <MmListRow
-            leadingIcon="tune"
-            title="Nutrition detail"
-            subtitle={`${detailLevelLabel(detail)}: ${detailLevelDescription(detail)} Changes what is shown, never what is stored.`}
-            trailingAction={<MmIconButton icon="edit" label="Change nutrition detail" opens="listbox" onPress={chooseDetail} />}
-          />
-          <MmSwitchRow
-            leadingIcon="insight"
-            title="Easy-to-miss reminder"
-            subtitle="A line under a completed day that names things people often forget to log."
-            value={easyToMiss}
-            onChange={(on) => void services.preferences.saveEasyToMissEnabled(on)}
-          />
-          <MmListRow
-            leadingIcon="pause"
-            title="Pause"
-            subtitle="For a holiday, an illness or an injury."
-            opens
-            onPress={() => void navigator.push(() => <PauseScreen />)}
-          />
-        </MmListGroup>
-      </MmSection>
-      {coachSettings ? <CoachSettingsSection /> : null}
-      <NutritionGoalsSection />
-      <ProfileSection />
-      <RemindersSection />
-      <HealthConnectSection />
-      <MmSection icon="lock" title="Data">
-        <MmListGroup>
-          <MmListRow
-            leadingIcon="download"
-            title="Food database"
-            subtitle="Optional download for food search and barcode scanning. The only thing this app ever fetches."
-            opens
-            onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
-          />
-          <MmListRow
-            leadingIcon="lock"
-            title="Stored only on this device"
-            subtitle="Nothing is uploaded."
-          />
-        </MmListGroup>
-      </MmSection>
-      <MmSection icon="palette" title="Appearance">
-        <MmListGroup>
-          <ThemeSettings />
-          <MmListRow
-            leadingIcon="ruler"
-            title="Units"
-            subtitle={unitLabels[setup.unitSystem]}
-            trailingAction={<MmIconButton icon="edit" label="Change units" opens="listbox" onPress={chooseUnits} />}
-          />
-        </MmListGroup>
-      </MmSection>
-      <MmSection icon="info" title="About">
-        <MmListGroup>
-          <MmListRow
-            leadingIcon="info"
-            title="How this works"
-            subtitle="Where each number comes from, and how sure we are."
-            opens
-            onPress={() => void navigator.push(() => <HowThisWorksScreen />)}
-          />
-          <MmListRow
-            leadingIcon="shield"
-            title="Not medical advice"
-            subtitle="A general wellness app, not a medical device. It does not diagnose or treat anything."
-          />
-          <MmListRow
-            leadingIcon="document"
-            title="Terms of use"
-            subtitle={
-              `Version ${termsOfUse.version}` +
-              (termsAccepted === undefined ? '' : `, agreed ${Fmt.longDate(termsAccepted.acceptedOn)}`)
-            }
-            opens
-            onPress={() => void navigator.push(() => <TermsScreen />)}
-          />
-        </MmListGroup>
-      </MmSection>
-      <MmSection icon="delete" title="Erase">
-        <MmListGroup>
-          <MmListRow
-            leadingIcon="delete"
-            danger
-            title="Erase all data and start over"
-            onPress={() => void erase()}
-          />
-        </MmListGroup>
-      </MmSection>
+            <MmSwitchRow
+              leadingIcon="percent"
+              title="Body fat estimate"
+              subtitle={bodyFat === undefined ? 'Estimated by the app. Turn on to enter a recent measurement.' : `About ${whole(bodyFat)}%, your measurement.`}
+              value={bodyFat !== undefined}
+              onChange={(on) => void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: on ? 25 : undefined }))}
+            />
+            {bodyFat === undefined ? null : (
+              <MmSliderRow
+                name="Body fat percent"
+                value={clamp(bodyFat, 5, 55)}
+                min={5}
+                max={55}
+                divisions={50}
+                label={`${whole(bodyFat)}%`}
+                onChange={(percent) =>
+                  void services.setup.saveSetup(setup.copyWith({ bodyFatPercent: roundHalfAwayFromZero(percent) + 0 }))
+                }
+              />
+            )}
+            <MmListRow
+              leadingIcon="tune"
+              title="Nutrition detail"
+              subtitle={`${detailLevelLabel(detail)}: ${detailLevelDescription(detail)} Changes what is shown, never what is stored.`}
+              trailingAction={<MmIconButton icon="edit" label="Change nutrition detail" opens="listbox" onPress={chooseDetail} />}
+            />
+            <MmSwitchRow
+              leadingIcon="food"
+              title="Net carbs"
+              subtitle={
+                (netCarbs
+                  ? 'Carbs less fiber and sugar alcohols, against the same carb target. Changes what is shown, never what is stored.'
+                  : 'Total carbs, as on the label.') +
+                (DetailLevel.showsCarbsAndFat(detail) ? '' : ' Shown at Standard or Full nutrition detail.')
+              }
+              value={netCarbs}
+              onChange={(on) => void services.preferences.saveNetCarbs(on)}
+            />
+            <MmSwitchRow
+              leadingIcon="insight"
+              title="Easy-to-miss reminder"
+              subtitle="A line under a completed day that names things people often forget to log."
+              value={easyToMiss}
+              onChange={(on) => void services.preferences.saveEasyToMissEnabled(on)}
+            />
+            <MmListRow
+              leadingIcon="pause"
+              title="Pause"
+              subtitle="For a holiday, an illness or an injury."
+              opens
+              onPress={() => void navigator.push(() => <PauseScreen />)}
+            />
+          </MmListGroup>
+        </MmSection>
+        {coachSettings ? <CoachSettingsSection /> : null}
+        <NutritionGoalsSection />
+        <ProfileSection />
+        <RemindersSection />
+        <HealthConnectSection />
+        <MmSection icon="lock" title="Data" {...fold('data')}>
+          <MmListGroup>
+            <MmListRow
+              leadingIcon="download"
+              title="Food database"
+              subtitle="Optional download for food search and barcode scanning. The only thing this app ever fetches."
+              opens
+              onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
+            />
+            <MmListRow
+              leadingIcon="lock"
+              title="Stored only on this device"
+              subtitle="Nothing is uploaded."
+            />
+          </MmListGroup>
+        </MmSection>
+        <MmSection icon="palette" title="Appearance" {...fold('appearance')}>
+          <MmListGroup>
+            <ThemeSettings />
+            <MmListRow
+              leadingIcon="ruler"
+              title="Units"
+              subtitle={unitLabels[setup.unitSystem]}
+              trailingAction={<MmIconButton icon="edit" label="Change units" opens="listbox" onPress={chooseUnits} />}
+            />
+          </MmListGroup>
+        </MmSection>
+        <MmSection icon="info" title="About" {...fold('about')}>
+          <MmListGroup>
+            <MmListRow
+              leadingIcon="info"
+              title="How this works"
+              subtitle="Where each number comes from, and how sure we are."
+              opens
+              onPress={() => void navigator.push(() => <HowThisWorksScreen />)}
+            />
+            <MmListRow
+              leadingIcon="shield"
+              title="Not medical advice"
+              subtitle="A general wellness app, not a medical device. It does not diagnose or treat anything."
+            />
+            <MmListRow
+              leadingIcon="document"
+              title="Terms of use"
+              subtitle={
+                `Version ${termsOfUse.version}` +
+                (termsAccepted === undefined ? '' : `, agreed ${Fmt.longDate(termsAccepted.acceptedOn)}`)
+              }
+              opens
+              onPress={() => void navigator.push(() => <TermsScreen />)}
+            />
+          </MmListGroup>
+        </MmSection>
+        <MmSection icon="delete" title="Erase" {...fold('erase')}>
+          <MmListGroup>
+            <MmListRow
+              leadingIcon="delete"
+              danger
+              title="Erase all data and start over"
+              onPress={() => void erase()}
+            />
+          </MmListGroup>
+        </MmSection>
+      </SettingsOpenSectionContext.Provider>
       <p className="app-caption settings-about">Martian Macros · {services.environment}</p>
     </Screen>
   );

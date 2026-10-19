@@ -22,7 +22,7 @@ it('a 170 cm woman at 50 kg is offered maintenance and lean gain only, and told 
   renderApp(repos, today);
   const press = (name: string | RegExp) => userEvent.click(screen.getByRole('button', { name }));
   const type = (label: string, text: string) => userEvent.type(screen.getByRole('textbox', { name: label }), text);
-  await userEvent.click(await screen.findByRole('button', { name: 'Get started' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Begin' }));
   await press('Female');
   await press('Next');
   await press(/Choose a date/);

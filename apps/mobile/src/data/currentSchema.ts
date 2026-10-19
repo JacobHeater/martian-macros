@@ -88,7 +88,8 @@ CREATE TABLE "food_entries" (
   "folate_ug" REAL NULL,
   "sugars_g" REAL NULL,
   "saturated_fat_g" REAL NULL,
-  "cholesterol_mg" REAL NULL
+  "cholesterol_mg" REAL NULL,
+  "sugar_alcohols_g" REAL NULL
 );
 CREATE TABLE "day_marks" (
   "epoch_day" INTEGER NOT NULL,
@@ -142,6 +143,7 @@ CREATE TABLE "user_preferences" (
   "inline_insights_off" INTEGER NOT NULL DEFAULT 0 CHECK ("inline_insights_off" IN (0, 1)),
   "inline_insight_areas_off" TEXT NOT NULL DEFAULT '',
   "inline_insight_kinds_off" TEXT NOT NULL DEFAULT '',
+  "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -176,7 +178,8 @@ CREATE TABLE "custom_foods" (
   "folate_ug" REAL NULL,
   "sugars_g" REAL NULL,
   "saturated_fat_g" REAL NULL,
-  "cholesterol_mg" REAL NULL
+  "cholesterol_mg" REAL NULL,
+  "sugar_alcohols_g" REAL NULL
 );
 CREATE TABLE "recipe_ingredients" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

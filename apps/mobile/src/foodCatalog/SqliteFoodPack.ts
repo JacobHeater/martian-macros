@@ -127,10 +127,11 @@ export class SqliteFoodPack implements FoodPack {
     return this.db.close();
   }
 
-  /** The columns a food is read from: format 2 adds the micronutrients (MM-307). */
+  /** The columns a food is read from: format 2 adds the micronutrients (MM-307), format 3 sugar alcohols (MM-397). */
   private get columns(): string {
     if (this.header.formatVersion < 2) return formatOneColumns;
-    return [formatOneColumns, ...PackMicronutrient.values.map((n) => `f.${PackMicronutrient.column(n)}`)].join(', ');
+    const micros = [formatOneColumns, ...PackMicronutrient.values.map((n) => `f.${PackMicronutrient.column(n)}`)];
+    return (this.header.formatVersion < 3 ? micros : [...micros, 'f.sugar_alcohols']).join(', ');
   }
 
   /** The micronutrient columns a format 2 pack has; a format 1 pack has none (MM-307). */
@@ -162,6 +163,7 @@ export class SqliteFoodPack implements FoodPack {
       fatG: scaled('fat'),
       micros: this.microsOf(scaledIfStated),
       fiberG: scaledIfStated('fiber'),
+      sugarAlcoholsG: this.header.formatVersion < 3 ? undefined : scaledIfStated('sugar_alcohols'),
       sodiumMg: scaledIfStated('sodium_mg'),
       alcoholG: scaledIfStated('alcohol'),
       preparation: PreparationState.fromCode(number(row['preparation'], 'preparation')),
