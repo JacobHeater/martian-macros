@@ -47,8 +47,13 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
-/** A covered run on this machine starves a test for seconds, so every wait here is long (MM-394). */
-const slowly = { timeout: 10000 };
+/**
+ * A covered run on the owner's 2016 MacBook starves a test for seconds (the
+ * file takes 35 s there against 8 s alone), so every wait here is long and a
+ * test that walks two pages has a minute (MM-394).
+ */
+const slowly = { timeout: 15000 };
+const twoPages = 60000;
 
 /** The rows of foods named yogurt: the fixture's Greek yogurt and the twenty-six added. */
 const yogurtRows = () => screen.queryAllByRole('button', { name: /^(Yogurt, flavor|Greek yogurt)/ });
@@ -75,7 +80,7 @@ it('twenty results and "More results", then every match, the first new row focus
   expect(screen.queryByRole('button', { name: 'More results' })).not.toBeInTheDocument();
   expect(screen.getByText('7 more results, every match listed.')).toHaveAttribute('role', 'status');
   expect(document.activeElement).toBe(yogurtRows()[20]);
-});
+}, twoPages);
 
 it('exactly a page of matches never offers more', async () => {
   // Nineteen beside the fixture's one: twenty matches, one page.
@@ -88,11 +93,12 @@ it('a new query starts over at one page, with the offer back', async () => {
   const field = await searched('yogurt', yogurts(26));
   await userEvent.click(await screen.findByRole('button', { name: 'More results' }, slowly));
   await waitFor(() => expect(yogurtRows()).toHaveLength(27), slowly);
-  await userEvent.type(field, '{backspace}{backspace}');
+  // Slowly, so each key settles and searches on its own, as on a slow phone.
+  await userEvent.setup({ delay: 300 }).type(field, '{backspace}{backspace}');
   expect(field.value).toBe('yogu');
   await waitFor(() => expect(yogurtRows()).toHaveLength(20), slowly);
   expect(await screen.findByRole('button', { name: 'More results' }, slowly)).toBeInTheDocument();
-});
+}, twoPages);
 
 it('a search with a page or less never offers more', async () => {
   renderApp(repos, today, { change: withCatalog(await fixtureCatalog()) });
