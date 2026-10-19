@@ -12,8 +12,9 @@ For cross-domain development reviews, use the tool-neutral
 Reviewers are read-only; one designated owner edits canonical files. Native
 delegation and sequential fallback do not supersede the working agreements here.
 
-> **The app is a React HTML5 app in a thin native Android shell (MM-228,
-> decided by the product owner on 2026-10-12).** The Flutter app it replaced
+> **The app is a React HTML5 app in a thin native shell (MM-228,
+> decided by the product owner on 2026-10-12): Android, and since
+> 2026-10-19 iOS as well (MM-403, built on the owner's Mac).** The Flutter app it replaced
 > was removed with MM-232's final step; the old Dart sources remain in git
 > history, and the requirements describe the product as built in
 > `apps/mobile/`. The web is never a product: the app runs from files inside

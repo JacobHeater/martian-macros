@@ -19,6 +19,7 @@ import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
+import { onIos } from './onIos';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
@@ -680,4 +681,87 @@ export const ReminderTimeOpens = screenStory({
   },
   open: settingsAt('reminders'),
   walk: pressAnywhere(/^At 7:00/),
+});
+
+/** MM-69: a phone whose Apple Health is off: nothing to connect, said by the platform's name. */
+export const AppleHealthNotOnThisPhone = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Apple Health is not on this phone',
+  device: onIos(),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Apple Health is not on this phone'));
+  },
+});
+
+/** MM-69: Apple Health on an iPhone and nothing asked for yet: each kind "not asked yet", never "not allowed". */
+export const AppleHealthNoneAsked = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Not asked yet/,
+  device: onIos(healthPlatform()),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-69: weight and steps asked for and read; the rest offered; "Read from Apple Health now". */
+export const AppleHealthSomeAsked = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Read from Apple Health now',
+  device: onIos(healthPlatform({ allowed: ['weight', 'steps'] })),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-69: weight asked for with nothing found: Apple Health never says it was refused, so the row says where to check. */
+export const AppleHealthNothingFound = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Nothing found in Apple Health yet/,
+  device: onIos(healthPlatform({ allowed: ['weight'], empty: ['weight'] })),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-69: Apple Health could not be read: a snack says so, and nothing kept changes. */
+export const AppleHealthReadFailed = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /could not be read just now/,
+  device: onIos(healthPlatform({ allowed: ['weight'], unreadable: true })),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const read = await within(canvas).findByRole('button', { name: 'Read from Apple Health now' });
+    reveal(read);
+    await userEvent.click(read);
+  },
+});
+
+/** MM-69 (the panel's PD-5): a kind asked for and read; its row stops being a button, so a snack says what was read. */
+export const AppleHealthAsking = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Weight read from Apple Health.',
+  device: onIos(healthPlatform()),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+  },
+});
+
+/** MM-69 (the panel's F3): "Read from Apple Health now" says when it is done, of what was asked for. */
+export const AppleHealthReadDone = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Everything asked for is up to date/,
+  device: onIos(healthPlatform({ allowed: ['weight'] })),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const read = await within(canvas).findByRole('button', { name: 'Read from Apple Health now' });
+    reveal(read);
+    await userEvent.click(read);
+  },
 });

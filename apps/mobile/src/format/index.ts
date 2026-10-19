@@ -23,6 +23,7 @@ export * from './goalModeBlurb';
 export * from './goalModeLabel';
 export * from './healthDataTypeLabel';
 export * from './healthDataTypePurpose';
+export * from './healthPlatformName';
 export * from './importedWeighInText';
 export * from './insightText';
 export * from './loadNumber';

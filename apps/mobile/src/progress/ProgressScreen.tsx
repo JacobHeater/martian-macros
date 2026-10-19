@@ -69,7 +69,7 @@ export function ProgressScreen() {
           hint={
             importedToday === undefined
               ? 'First thing in the morning, after the bathroom.'
-              : `${importedWeighInText(importedToday)} Type a value to use yours instead.`
+              : `${importedWeighInText(importedToday, services.platform)} Type a value to use yours instead.`
           }
           onSave={(value) => services.weights.saveWeight(today, fmt.weightToKg(value))}
         />

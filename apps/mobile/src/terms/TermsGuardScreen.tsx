@@ -70,12 +70,18 @@ export function TermsGuardScreen({ previous }: TermsGuardScreenProps) {
           {hasRecords
             ? 'Your records are still on this phone, and your answer here does not remove them.'
             : 'Nothing about you has been entered or saved.'}{' '}
-          You can read the terms again whenever you like.
+          You can read the terms again whenever you like
+          {services.platform === 'ios' ? ', or go back to the Home Screen; the app will ask again when you open it' : ''}.
         </p>
         <div className="app-gap" />
         <MmButton label="Read the terms again" expand onPress={() => setDeclined(false)} />
-        <div className="app-gap-small" />
-        <MmButton label="Close the app" kind="secondary" expand onPress={leaveApp} />
+        {/* iOS has no call that puts an app away, and an app may not quit itself (MM-403). */}
+        {services.platform === 'ios' ? null : (
+          <>
+            <div className="app-gap-small" />
+            <MmButton label="Close the app" kind="secondary" expand onPress={leaveApp} />
+          </>
+        )}
         {hasRecords ? (
           <>
             <div className="app-gap-small" />
@@ -123,7 +129,7 @@ export function TermsGuardScreen({ previous }: TermsGuardScreenProps) {
           </ul>
         </>
       ) : null}
-      <TermsText />
+      <TermsText platform={services.platform} />
     </Screen>
   );
 }

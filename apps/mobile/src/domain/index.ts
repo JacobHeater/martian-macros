@@ -80,6 +80,7 @@ export * from './integration/FoodItem';
 export * from './integration/FoodSearch';
 export * from './integration/NotFound';
 export * from './integration/Outcome';
+export * from './integration/Platform';
 export * from './integration/ReminderScheduler';
 export * from './integration/RestSignal';
 export * from './integration/Succeeded';

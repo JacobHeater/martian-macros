@@ -78,6 +78,7 @@ WS-04 step 3 and 6, WS-05 to WS-13.
 3. **Integration seams (MM-162).** M0. `Clock`, `FoodSearch`/`FoodBarcodeLookup`,
    `BackupStorage`, `EntitlementReader` and the harness.
 , MM-246).** M0. Placed 2026-10-13.
+5. **The phone's storage on iOS (MM-404).** M4. `MmDb` over the system SQLite (FTS5 is in it) and `MmPacks` in Swift, in the iOS shell of MM-403, behind the seams MM-231 and MM-56 already have; nothing above the plugins changes.
 
 ## Done enough to unblock others
 MM-160 and MM-161 are done: new files follow the rules and all persistence is
@@ -96,6 +97,7 @@ files during the engine split: do the split first.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-229 (A walking skeleton of the React app); MM-230 (Carry the engine and the rules over under test, done); MM-231 (One SQLite seam for the TypeScript app, done); MM-232 (Rebuild the screens in React, done); MM-233 (Derived state could be worked out from one new value and one old, done); MM-228 (The app becomes a React HTML5 app in a native shell); MM-246 (the engineering rules are checked in TypeScript, done).
 - Placed 2026-10-13 in step 4: MM-261 (the architecture check let a raw control live outside its component inside src/ui; the map of control kind to component is now enforced, done).
 - Placed 2026-10-13 in step 4: MM-278 (composites still write controls and a component takes a colour; the checker learns what a composite is). Done the same day: `buttonHomes`, a derived composite, a brace-aware scanner, and no `color`, `className` or `style` prop.
+- Added 2026-10-19 (step 5): MM-404 (the phone's storage on iOS: MmDb and MmPacks in Swift).
 
 ## Notes for whoever builds it
 - Liskov is proved by tests, not asserted: write the contract suite before the
