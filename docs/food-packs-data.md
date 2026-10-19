@@ -1,4 +1,4 @@
-# Food packs with fuller data (MM-381, MM-383)
+# Food packs with fuller data (MM-381, MM-383, MM-409)
 
 The spike's report, 2026-10-18, from the panel's integrations and
 micronutrients roles (`docs/agent-runs/mm380-proprietary-grade/findings/`,
@@ -58,6 +58,24 @@ Measured on the published packs (format 1) against the grade's needs
   SR, it has no barcodes, and it needs a second schema mapping and a third
   licence line. Revisit for a Canadian launch. The UK and Australian tables
   likewise.
+
+## A wider Open Food Facts cut, measured (MM-409, 2026-10-19)
+
+The owner asked for more food in search. The export was read whole with
+DuckDB 1.5.6 (`strict_mode = false`; the 2026-10-09 read had skipped about
+250,000 rows): 4,848,211 rows.
+
+| Cut | Products | With a name, energy and the three macros |
+|---|---|---|
+| Tagged United States (today's rule) | 987,217 | 184,356 (the MM-51 spike counted 98,880 under the skipping parser) |
+| Tagged United States, energy only in kJ or the name only in another field | | +6: not worth a rule |
+| GS1 United States or Canada prefix, not tagged United States or Canada | 195,691 | 68,358, but 24,614 of them tagged France, 7,096 Ireland, 6,547 United Kingdom, 5,255 Italy, 4,025 Spain; only 256 carry no country at all. The prefix says who owns the company prefix, not where the product is sold: **declined** |
+| Tagged Canada and not United States | | 110,340, names often French, the fortification Canada's: **declined for a US launch**, a candidate for a Canadian one, by barcode lookup first |
+| Any country | | 2,431,617: a world pack would be five times the US one, mostly in other languages |
+
+So the widening the data supports is the whole US-tagged set, read without
+skipping, plus FNDDS in the generic pack and the refreshed USDA Branded
+release. Restaurant menus stay the gap no open source fills.
 
 ## The build
 
