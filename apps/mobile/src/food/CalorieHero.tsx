@@ -18,6 +18,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MicrosPanel } from './MicrosPanel';
+import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 interface CalorieHeroProps {
@@ -89,7 +90,13 @@ export function CalorieHero({
   let progress = 0;
   if (t !== undefined && t.kcal > 0) progress = paused ? clamp(intake.kcal / t.kcal, 0, 1) : intake.kcal / t.kcal;
 
-  const grams: Readonly<Record<MacroKind, number>> = { protein: intake.proteinG, carbs: intake.carbsG, fat: intake.fatG };
+  // Carbs net of fiber and sugar alcohols while that is on, against the same target, read as net (MM-396).
+  const netCarbs = useNetCarbs();
+  const grams: Readonly<Record<MacroKind, number>> = {
+    protein: intake.proteinG,
+    carbs: netCarbs ? intake.netCarbsG : intake.carbsG,
+    fat: intake.fatG,
+  };
   const target: Readonly<Record<MacroKind, number | undefined>> = { protein: t?.proteinG, carbs: t?.carbsG, fat: t?.fatG };
   // The split of calories needs all three macros; at Simple detail only the bars are offered.
   const switchable = DetailLevel.showsCarbsAndFat(level);
@@ -134,7 +141,7 @@ export function CalorieHero({
         <MicrosPanel entries={entries} setup={setup} today={today} goals={goals} />
       ) : chosen === 'donut' ? (
         <div className="food-hero-split">
-          <MacroSplitChart intake={intake} compact />
+          <MacroSplitChart intake={intake} compact netCarbs={netCarbs} />
         </div>
       ) : (
         <div className="food-hero-macros">
@@ -146,6 +153,7 @@ export function CalorieHero({
               target={target[macro]}
               minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
               emphasized={macro === 'protein'}
+              netCarbs={netCarbs}
             />
           ))}
         </div>

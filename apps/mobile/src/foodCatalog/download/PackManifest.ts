@@ -1,4 +1,5 @@
 import { FormatError } from '../../lang/FormatError';
+import { FoodPackFormat } from '../FoodPackFormat';
 import type { PackListing } from './PackListing';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -56,7 +57,9 @@ export class PackManifest {
 
   /**
    * Throws `FormatError` for a manifest that is not well formed, so a
-   * broken file is reported and never half-read.
+   * broken file is reported and never half-read. A pack in a newer format
+   * than this app reads is left out: offered, it would download and then be
+   * refused (MM-397, the panel's IN-6).
    */
   static parse(json: string): PackManifest {
     let decoded: unknown;
@@ -68,7 +71,8 @@ export class PackManifest {
     if (!isRecord(decoded) || !Array.isArray(decoded['packs'])) {
       throw new FormatError('The manifest has no "packs" list.');
     }
-    return new PackManifest((decoded['packs'] as unknown[]).map(listing));
+    const listings = (decoded['packs'] as unknown[]).map(listing);
+    return new PackManifest(listings.filter((pack) => pack.formatVersion <= FoodPackFormat.version));
   }
 
   pack(id: string): PackListing | undefined {

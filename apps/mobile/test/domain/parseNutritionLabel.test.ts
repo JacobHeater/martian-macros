@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { parseNutritionLabel } from '../../src/domain';
 
 /** MM-44: reading the US Nutrition Facts layout from recognised text. */
@@ -103,4 +103,27 @@ it('added sugars are not taken for the total', () => {
 
 it('vitamin D in IU is converted to micrograms', () => {
   expect(parseNutritionLabel('Vitamin D 100 IU').micros.of('vitaminD')).toBe(2.5);
+});
+
+// MM-397: sugar alcohols, read only with grams, never mistaken for sugars or for ethanol.
+describe('sugar alcohols', () => {
+  const panel = (line: string) =>
+    parseNutritionLabel(`Nutrition Facts\nCalories 200\nTotal Fat 7g\nTotal Carbohydrate 24g\nDietary Fiber 9g\nTotal Sugars 1g\nIncludes 0g Added Sugars\n${line}\nProtein 20g`);
+
+  it('reads "Sugar Alcohol 10g", and leaves sugars as they are', () => {
+    const r = panel('Sugar Alcohol 10g');
+    expect(r.sugarAlcoholsG).toBe(10);
+    expect(r.micros.of('sugars')).toBe(1);
+  });
+
+  it('reads a polyol printed by its own name', () => {
+    expect(panel('Erythritol 8g').sugarAlcoholsG).toBe(8);
+    expect(panel('Polyols 6g').sugarAlcoholsG).toBe(6);
+  });
+
+  it('reads nothing from a label without them, and never takes alcohol or allulose', () => {
+    expect(panel('').sugarAlcoholsG).toBeUndefined();
+    expect(panel('Alcohol 14g').sugarAlcoholsG).toBeUndefined();
+    expect(panel('Allulose 5g').sugarAlcoholsG).toBeUndefined();
+  });
 });

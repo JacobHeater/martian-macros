@@ -5,6 +5,12 @@ import { CalendarDate } from '../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../src/fixtures/typicalSetup';
 import type { SystemBars } from '../src/platform/SystemBars';
+
+/** Settings' sections start closed (MM-398): opens Appearance, once, to reach its row. */
+async function openAppearance(): Promise<void> {
+  const header = await screen.findByRole('button', { name: /^Appearance/ });
+  if (header.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
+}
 import { renderApp } from './support/renderApp';
 
 /** MM-229, MM-232: the shell of the app, for someone who is set up. */
@@ -52,6 +58,7 @@ describe('the theme', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
     expect(screen.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
     // The look is a row that opens the chooser (MM-259); the value in force is marked.
+    await openAppearance();
     await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
     const dialog = await screen.findByRole('dialog', { name: 'Appearance' });
     const choices = within(dialog).getAllByRole('option');
@@ -83,7 +90,8 @@ describe('the theme', () => {
     });
     await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
     const choose = async (name: string) => {
-      await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
+      await openAppearance();
+    await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
       await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name }));
     };
     await choose('Martian');
@@ -114,6 +122,7 @@ describe("the phone's bars", () => {
     expect(told.at(-1)).toBe(true);
 
     await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await openAppearance();
     await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
     await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name: 'Light' }));
     await screen.findByText('Light', { selector: '.mm-list-row-subtitle' });

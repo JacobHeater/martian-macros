@@ -14,6 +14,7 @@ interface CandidateFoodInit {
   carbsG?: number | undefined;
   fatG?: number | undefined;
   fiberG?: number | undefined;
+  sugarAlcoholsG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
   micros?: PackMicros;
@@ -43,6 +44,8 @@ export class CandidateFood {
   readonly carbsG: number | undefined;
   readonly fatG: number | undefined;
   readonly fiberG: number | undefined;
+  /** Sugar alcohols per 100 g, when the source states them (MM-397). */
+  readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
@@ -71,6 +74,7 @@ export class CandidateFood {
     this.carbsG = init.carbsG;
     this.fatG = init.fatG;
     this.fiberG = init.fiberG;
+    this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.sodiumMg = init.sodiumMg;
     this.alcoholG = init.alcoholG;
     this.micros = init.micros ?? {};

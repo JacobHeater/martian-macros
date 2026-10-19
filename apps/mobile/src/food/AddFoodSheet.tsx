@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
+import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
@@ -204,6 +205,7 @@ type Step =
 export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone }: AddFoodSheetProps) {
   const { services, state } = useApp();
   const { gradeOfFood } = useInsightPreview();
+  const netCarbs = useNetCarbs();
   const today = useCell(state.today);
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
@@ -387,6 +389,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       source: logged?.method ?? form.source,
       portion: logged,
       fiberG: scaledExtra(entry?.fiberG),
+      sugarAlcoholsG: scaledExtra(entry?.sugarAlcoholsG),
       sodiumMg: scaledExtra(entry?.sodiumMg),
       alcoholG,
       // The micronutrients scale with the amount, as fiber and sodium do (MM-308).
@@ -613,6 +616,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           <p className="food-label food-label-spaced">Macro split</p>
           <MacroSplitChart
             isPreview
+            netCarbs={netCarbs}
             intake={
               new IntakeDay({
                 date: day,

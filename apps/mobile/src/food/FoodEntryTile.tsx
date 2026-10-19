@@ -9,6 +9,7 @@ import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { MmIcon } from '../ui/MmIcon';
 import { methodIcon } from './methodIcon';
+import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -21,7 +22,8 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 export function FoodEntryTile({ entry }: { entry: FoodEntry }) {
   const { state } = useApp();
   const level = useLoaded(state.detailLevel) ?? 'standard';
-  const extras = DetailLevel.showsExtras(level) ? extraNutrientsLine(entry) : undefined;
+  const netCarbs = useNetCarbs();
+  const extras = DetailLevel.showsExtras(level) ? extraNutrientsLine(entry, netCarbs) : undefined;
   const method = quantitySourceLabel(entry.source);
   const portion = portionSummary(entry);
   const how = portion.startsWith(method) ? portion : `${method} · ${portion}`;
@@ -34,7 +36,7 @@ export function FoodEntryTile({ entry }: { entry: FoodEntry }) {
         <span className="food-entry-name">{entry.name}</span>
         <span className="food-entry-line">
           {DetailLevel.showsCarbsAndFat(level)
-            ? `P ${whole(entry.proteinG)} · C ${whole(entry.carbsG)} · F ${whole(entry.fatG)}`
+            ? `P ${whole(entry.proteinG)} · C ${whole(netCarbs ? entry.netCarbsG : entry.carbsG)} · F ${whole(entry.fatG)}`
             : `P ${whole(entry.proteinG)}`}
         </span>
         {extras === undefined ? null : <span className="food-entry-line food-entry-extras">{extras}</span>}

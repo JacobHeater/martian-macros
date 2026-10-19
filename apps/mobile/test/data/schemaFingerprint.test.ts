@@ -15,6 +15,7 @@ const fingerprints: Readonly<Record<number, string>> = {
   6: '1f7604f8e1f531f6bc74a1cd6e0564d30b65d679cf8bd39fc1783ff079626d5c',
   7: 'b5f5c969f0c69723ef9e9852f9f5ffd12d94b8edd3f61120a4c032d4c001108a',
   8: '4a0569a2ece9857339f453896f9d7e8b93d1de669281ea90a03ec705d6d04afe',
+  9: '3e6e67178bea1ea3b8da22a6c8a6d9f1870a7a534463367561eba1376aa6e8f7',
 };
 
 it('the schema is the one recorded for its version', () => {

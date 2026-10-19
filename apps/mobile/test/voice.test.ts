@@ -114,6 +114,38 @@ describe('no text uses', () => {
   }
 });
 
+/**
+ * MM-401: filler. Lines that narrate what the screen already shows, tell a
+ * person to press what is plainly pressable, promise what is coming, or
+ * cheer them on (design/anti-cruft-and-anti-slop.md, "No narration"). The
+ * owner caught each of these on a phone; none comes back.
+ */
+const filler = [
+  /nothing logged yet/i,
+  /\bstart with (breakfast|lunch|dinner|a snack|your|the first)\b/i,
+  /\b(press|tap|click) (here )?to (change|edit|open)\b/i,
+  /\btype your own\b/i,
+  /\byour own amount\b/i,
+  /\b(is|are) coming(?: soon)?(?:\.|$)/i,
+  /\bcoming soon\b/i,
+  /\bget(ting)? started\b/i,
+  /\blet['’]s\b/i,
+  /\bhere you can\b/i,
+  /\bthis is where\b/i,
+  /\bmake it your\b/i,
+  /\ba little (color|colour) preview\b/i,
+  /\byou['’]re (doing )?(great|awesome|amazing)\b/i,
+  /\byour journey\b/i,
+];
+
+describe('no text is filler', () => {
+  for (const pattern of filler) {
+    it(String(pattern), () => {
+      expect(all.filter(([, text]) => pattern.test(text)).map(([file, text]) => `${file}: "${text}"`)).toEqual([]);
+    });
+  }
+});
+
 // MM-371: a grade letter is allowed; a banned word beside it is still caught.
 it('a grade letter passes and a banned word beside it does not', () => {
   const hits = (text: string) => banned.filter((word) => text.toLowerCase().includes(word));

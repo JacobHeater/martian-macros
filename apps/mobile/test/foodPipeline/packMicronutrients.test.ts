@@ -72,13 +72,29 @@ it('a format 1 pack still opens; its foods have no micronutrients', async () => 
   const db = await WasmSqlDatabase.open();
   await writeFoodPack(db, { ...FixturePack.header, packId: 'generic' }, generic);
   for (const n of PackMicronutrient.values) await db.execute(`ALTER TABLE foods DROP COLUMN ${PackMicronutrient.column(n)}`);
+  await db.execute('ALTER TABLE foods DROP COLUMN sugar_alcohols');
   await db.execute('PRAGMA user_version = 1');
   const pack = await SqliteFoodPack.open(db);
   expect(pack.header.formatVersion).toBe(1);
   const hit = (await pack.search('banana'))[0];
   expect(hit?.food.sodiumMg).toBe(1);
   expect(hit?.food.micros).toEqual({});
-  expect(FoodPackFormat.version).toBe(2);
+  expect(FoodPackFormat.version).toBe(3);
+});
+
+// MM-397: format 3 carries sugar alcohols; a format 2 pack opens with its micronutrients and none.
+it('a format 3 pack carries sugar alcohols, and a format 2 pack opens without them', async () => {
+  const sweet = new CandidateFood({ ...banana({ potassium: 358 }), sugarAlcoholsG: 4 });
+  expect((await readBack(sweet)).sugarAlcoholsG).toBe(4);
+  const { generic } = await new PackBuilder({ policy: new PreferredSourcePolicy('usda_foundation') }).build([sweet]);
+  const db = await WasmSqlDatabase.open();
+  await writeFoodPack(db, { ...FixturePack.header, packId: 'generic' }, generic);
+  await db.execute('ALTER TABLE foods DROP COLUMN sugar_alcohols');
+  await db.execute('PRAGMA user_version = 2');
+  const pack = await SqliteFoodPack.open(db);
+  const hit = (await pack.search('banana'))[0];
+  expect(hit?.food.sugarAlcoholsG).toBeUndefined();
+  expect(hit?.food.micros.potassium).toBe(358);
 });
 
 it('the build report counts the foods stating each nutrient', async () => {

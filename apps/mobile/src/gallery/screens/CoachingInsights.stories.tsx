@@ -633,7 +633,7 @@ export const CoachRecentInsightsNone = screenStory({
 export const SettingsCoachSection = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Coaching insights',
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="coach" />),
   walk: async (canvas) => void (await revealed(/^Coaching insights/)(canvas)),
 });
 
@@ -641,7 +641,7 @@ export const SettingsCoachSection = screenStory({
 export const SettingsOpensCoachingInsights = screenStory({
   covers: ['SettingsScreen', 'CoachSettingsScreen'],
   shows: 'Insights under logged items',
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="coach" />),
   walk: async (canvas) => {
     await userEvent.click(await revealed(/^Coaching insights/)(canvas));
   },

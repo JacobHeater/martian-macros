@@ -8,6 +8,7 @@ interface LabelReadingInit {
   carbsG?: number | undefined;
   fatG?: number | undefined;
   fiberG?: number | undefined;
+  sugarAlcoholsG?: number | undefined;
   sodiumMg?: number | undefined;
   micros?: Micronutrients;
 }
@@ -26,6 +27,8 @@ export class LabelReading {
   readonly carbsG: number | undefined;
   readonly fatG: number | undefined;
   readonly fiberG: number | undefined;
+  /** Sugar alcohols, when the label prints them in grams (MM-397). */
+  readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
 
   /**
@@ -42,6 +45,7 @@ export class LabelReading {
     this.carbsG = init.carbsG;
     this.fatG = init.fatG;
     this.fiberG = init.fiberG;
+    this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.sodiumMg = init.sodiumMg;
     this.micros = init.micros ?? Micronutrients.none;
   }

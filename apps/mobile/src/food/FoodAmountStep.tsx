@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
+import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
@@ -174,6 +175,10 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   const extra = (per100g: number | undefined) =>
     per100g === undefined || grams === undefined ? undefined : (per100g * grams) / 100;
 
+  // Carbs net of the fiber and sugar alcohols the food states, for the amount chosen (MM-396).
+  const netCarbs = useNetCarbs();
+  const netCarbsG = (carbsG: number) => Math.max(0, carbsG - (extra(food.fiberG) ?? 0) - (extra(food.sugarAlcoholsG) ?? 0));
+
   const log = async () => {
     if (totals === undefined) return;
     await services.food.addFood(
@@ -188,6 +193,7 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         fatG: totals.fatG,
         source: method(),
         fiberG: extra(food.fiberG),
+        sugarAlcoholsG: extra(food.sugarAlcoholsG),
         sodiumMg: extra(food.sodiumMg),
         alcoholG: extra(food.alcoholG),
         micros: grams === undefined ? undefined : microsOfPackFood(food).times(grams / 100),
@@ -295,7 +301,8 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         {totals === undefined
           ? 'Enter an amount to see the totals.'
           : `${isHand ? 'Estimated: ' : ''}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein · ` +
-            `${n(totals.carbsG)} g carbs · ${n(totals.fatG)} g fat`}
+            `${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
+            `${n(totals.fatG)} g fat`}
       </p>
       {note === undefined ? null : <Notice kind="info" text={note} />}
       {offersOil ? (
@@ -324,9 +331,11 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
                 kcal: totals.kcal + (oilTotals?.kcal ?? 0),
                 proteinG: totals.proteinG + (oilTotals?.proteinG ?? 0),
                 carbsG: totals.carbsG + (oilTotals?.carbsG ?? 0),
+                netCarbsG: netCarbsG(totals.carbsG) + (oilTotals?.carbsG ?? 0),
                 fatG: totals.fatG + (oilTotals?.fatG ?? 0),
               })
             }
+            netCarbs={netCarbs}
           />
         </>
       )}

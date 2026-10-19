@@ -52,7 +52,7 @@ it('manual split updates using food energy, not calories or targets', async () =
   await typeIn(sheet, /^Calories/, '2000');
   expect(sectors(sheet)).toEqual([400, 600, 450]);
   expect(macroLine(sheet, 'Protein')).toBe('100 g · 27.6%');
-  expect(macroLine(sheet, 'Carbs')).toBe('150 g · 41.4%');
+  expect(macroLine(sheet, 'Net carbs')).toBe('150 g · 41.4%');
   expect(macroLine(sheet, 'Fat')).toBe('50 g · 31.0%');
 
   await typeIn(sheet, 'Protein g', '50');

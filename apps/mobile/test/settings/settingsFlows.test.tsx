@@ -96,7 +96,7 @@ it('the detail of nutrition shown can be changed, and says what each shows', asy
   const settings = await open();
   await chooseFromOptions('Change nutrition detail', 'Full');
   await expect.poll(() => first(repos.preferences.watchDetailLevel())).toBe('full');
-  expect(settings.getByText(/Changes what is shown, never what is stored\./)).toBeInTheDocument();
+  expect(settings.getByText(/^Full: .*Changes what is shown, never what is stored\./)).toBeInTheDocument();
 });
 
 it('the easy-to-miss line can be turned off', async () => {
@@ -125,7 +125,7 @@ it('confirming erases everything and returns to initial setup', async () => {
   expect(await repos.setup.loadSetup()).toBeUndefined();
   expect(await first(repos.weights.watchWeights())).toEqual([]);
   await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
 });
 
 it('the build is named, and the gallery is gone to Storybook (MM-237)', async () => {

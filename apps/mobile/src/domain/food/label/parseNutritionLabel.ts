@@ -24,6 +24,13 @@ export function parseNutritionLabel(text: string): LabelReading {
     carbsG: numberAfter(t, String.raw`total\s*carb\w*\.?`),
     proteinG: numberAfter(t, String.raw`protein`),
     fiberG: numberAfter(t, String.raw`(?:dietary\s*)?fiber`),
+    // "Sugar Alcohol", or a single polyol by its name (21 CFR 101.9(c)(6)(iv)), only with grams; never a bare
+    // "alcohol", which is ethanol, and never allulose, which is not a sugar alcohol (MM-397).
+    sugarAlcoholsG: amountAfter(
+      t,
+      String.raw`(?:sugar\s*alcohols?|polyols?|erythritol|xylitol|sorbitol|maltitol|mannitol|isomalt|lactitol)`,
+      'g',
+    ),
     sodiumMg: numberAfter(t, String.raw`sodium`),
     micros: new Micronutrients(
       Object.fromEntries(lines.map(([nutrient, label, unit]) => [nutrient, amountAfter(t, label, unit)])),

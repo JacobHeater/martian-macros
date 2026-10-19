@@ -333,7 +333,15 @@ download icon, with a card and a strip line per download.
   protein, to see both coach lines under it, and the three-line case
   (MM-393); Settings > Health Connect after steps are read: the Steps row
   names the app (or only counts the readings) and wraps inside the card,
-  never a package id (MM-395).
+  never a package id (MM-395); with Net carbs on (the default), a food with
+  fiber and sugar alcohols shows net in the bars, the Split and its row, and
+  switched off in Settings > Today's setup shows the total (MM-396); a label
+  with "Sugar Alcohol" read into a saved food (MM-397); Settings opening
+  closed, each section opening in place, and "Correct date of birth" landing
+  on "You" (MM-398); TalkBack's heading navigation through Settings and the
+  Food screen's meals (MM-399); every tab scrolled to its end with the app
+  bar and the navigation bar staying put (MM-400); the spacing around "More
+  about this week" and between Settings' headers (MM-402).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -382,6 +390,20 @@ limitations.
   com.android.healthconnect.phone.j0716…" and ran out of the card. MM-395: the
   plugin names a source by its app label; no name is counted, never shown
   as the package; list rows wrap long words. WS-11 step 11.
+- **Then, on branch `feat/net-carbs`, by message, all on one branch at the
+  owner's word:** net carbs, on by default and everywhere carbs show, net =
+  total − fiber − sugar alcohols (MM-396); sugar alcohols carried through
+  pack format 3, the label reader, saved foods and the phone's store
+  (schema 9), with an EU label's carbohydrate made a US total at build time
+  (MM-397); Settings as an accordion, closed by default (MM-398); a folding
+  section's heading moved outside its button (MM-399); the page that
+  scrolled the frame away, found by measuring a story at 2,500 px on a
+  915 px screen (MM-400); "Your own amount." and a filler guard in the
+  voice test (MM-401); one spacing rhythm around folding groups (MM-402).
+  Reviewed in `docs/agent-runs/mm396-net-carbs/`. The first pack build in
+  format 3 is the owner's; format 3 packs must not be published before the
+  app that reads them (an older app now skips them). WS-08 step 13, WS-03
+  step 20.
 
 ## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
 
