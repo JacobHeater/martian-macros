@@ -51,9 +51,14 @@ test('nothing to choose says how to get a simulator, and a wrong name lists what
   assert.match(chooseSimulator(simulatorsOf(listed), 'iPhone 4') as string, /not found.*iPhone 17 Pro Max/);
 });
 
-test('a simulator build needs no signing team', () => {
+test('a simulator build needs no signing team, and carries the identity as build settings (MM-8)', () => {
   const args = xcodebuildArgs({ release: false });
   assert.ok(args.includes('CODE_SIGNING_ALLOWED=NO'));
+  assert.ok(args.includes('MM_IDENTITY_SUFFIX=.dev'));
+  assert.ok(args.includes('MM_DISPLAY_NAME=Martian Macros Dev'));
+  const prod = xcodebuildArgs({ release: true, identity: 'prod' });
+  assert.ok(prod.includes('MM_IDENTITY_SUFFIX='));
+  assert.ok(prod.includes('MM_DISPLAY_NAME=Martian Macros'));
   assert.ok(args.includes('iphonesimulator'));
   assert.equal(args[args.indexOf('-configuration') + 1], 'Debug');
   assert.equal(xcodebuildArgs({ release: true })[xcodebuildArgs({ release: true }).indexOf('-configuration') + 1], 'Release');

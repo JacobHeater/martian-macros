@@ -3,12 +3,11 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
 import { webBuildEnv } from './android.ts';
+import { appIdOf, displayNameOf, identityOf, iosSuffixOf, type Identity } from './identity.ts';
 import { capture, run } from './proc.ts';
 
 const webApp = 'apps/mobile';
 const iosProject = `${webApp}/ios/App`;
-// Apple allows no underscore in a bundle id, so the iOS DEMO identity differs from Android's by a hyphen (MM-403).
-const appId = 'com.martianmacros.martian-macros.demo';
 
 /** Whether `id` names a simulator (its UDID), as against an Android device. */
 export function isSimulatorId(id: string): boolean {
@@ -64,8 +63,12 @@ export function chooseSimulator(simulators: readonly Simulator[], wanted: string
   return simulators.find((simulator) => simulator.state === 'Booted') ?? simulators[0]!;
 }
 
-/** The `xcodebuild` arguments for a simulator build, which needs no signing team. */
-export function xcodebuildArgs({ release }: { release: boolean }): string[] {
+/**
+ * The `xcodebuild` arguments for a simulator build, which needs no signing
+ * team. The identity is two build settings the project reads (MM-8): the
+ * suffix on `com.martianmacros`, and the name on the Home Screen.
+ */
+export function xcodebuildArgs({ release, identity = 'dev' }: { release: boolean; identity?: Identity }): string[] {
   return [
     'xcodebuild',
     '-project',
@@ -81,6 +84,8 @@ export function xcodebuildArgs({ release }: { release: boolean }): string[] {
     '-derivedDataPath',
     'build',
     'CODE_SIGNING_ALLOWED=NO',
+    `MM_IDENTITY_SUFFIX=${iosSuffixOf(identity)}`,
+    `MM_DISPLAY_NAME=${displayNameOf(identity)}`,
     'build',
   ];
 }
@@ -105,9 +110,15 @@ export async function runIosBuild(repoRoot: string, args: readonly string[], { s
     stderr.write('An iOS build needs a Mac with Xcode.\n');
     return 69;
   }
-  const synced = await run(['npm', 'run', 'ios'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed }) });
+  // `--env prod|dev|demo` chooses the identity (MM-8); the dev twin unless said.
+  const identity = identityOf(args);
+  if (identity !== 'prod' && identity !== 'dev' && identity !== 'demo') {
+    stderr.write(`${identity}\n`);
+    return 64;
+  }
+  const synced = await run(['npm', 'run', 'ios'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed, identity }) });
   if (synced !== 0) return synced;
-  return run(xcodebuildArgs({ release: args.includes('--release') }), { cwd: `${repoRoot}/${iosProject}` });
+  return run(xcodebuildArgs({ release: args.includes('--release'), identity }), { cwd: `${repoRoot}/${iosProject}` });
 }
 
 /** Boots `simulator` if it is not running, shows its window, and waits until it answers. */
@@ -160,13 +171,19 @@ export async function runIosApp(repoRoot: string, args: readonly string[]): Prom
     stderr.write(`${error instanceof Error ? error.message : error}\n`);
     return 69;
   }
-  const built = await runIosBuild(repoRoot, []);
+  const identity = identityOf(args);
+  if (identity !== 'prod' && identity !== 'dev' && identity !== 'demo') {
+    stderr.write(`${identity}\n`);
+    return 64;
+  }
+  // `--seed` is the demo's alone (MM-177); the build refuses it for any other identity.
+  const built = await runIosBuild(repoRoot, args.filter((arg) => arg !== '--seed'), { seed: args.includes('--seed') });
   if (built !== 0) return built;
   const ready = await ensureBooted(simulator);
   if (ready !== 0) return ready;
   const installed = await run(['xcrun', 'simctl', 'install', simulator.udid, builtApp(repoRoot, false)]);
   if (installed !== 0) return installed;
-  return run(['xcrun', 'simctl', 'launch', simulator.udid, appId]);
+  return run(['xcrun', 'simctl', 'launch', simulator.udid, appIdOf(identity)]);
 }
 
 /**

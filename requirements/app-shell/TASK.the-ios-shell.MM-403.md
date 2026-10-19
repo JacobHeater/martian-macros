@@ -21,13 +21,11 @@ Sequoia 15.8 and Xcode 26.3, the newest Xcode that runs on it (26.4 and
 later need macOS 26). The owner asked for the iOS work to start.
 
 ## Decisions (made with the product owner, 2026-10-19)
-- **The DEMO identity, as on Android**: name "Martian Macros DEMO"; the
-  bundle id is `com.martianmacros.martian-macros.demo` (the owner,
-  2026-10-19, once Xcode's automatic signing was refused: Apple allows
-  only letters, digits, hyphens and periods in a bundle id, so Android's
-  underscore becomes a hyphen, and the real identity will be
-  `com.martianmacros.martian-macros`). The switch of identities stays
-  MM-228's.
+- **The DEMO identity, as on Android**, at first; then, the same day, the
+  owner unified the ids across both platforms once Xcode's automatic
+  signing refused the underscore Android allowed (Apple allows only
+  letters, digits, hyphens and periods, Android no hyphens): the real app
+  is `com.martianmacros`, the twins `.dev` and `.demo` (MM-8).
 - **No iOS build in CI yet.** iOS is checked on the Mac. A macOS runner is
   billed at about ten times a Linux minute; add one once the shell is
   stable.

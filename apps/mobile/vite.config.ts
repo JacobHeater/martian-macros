@@ -14,13 +14,25 @@ const manifestUrl =
   ] ??
   '';
 
+// Which identity the shell around this build has (MM-8): the real app, the
+// dev twin beside it, or the seeded demo. Only the demo may seed itself,
+// and only the demo has its own database name. A build with none given is
+// the dev one, which is also what a browser is.
+const identity = process.env['MM_IDENTITY'] ?? 'dev';
+if (!['prod', 'dev', 'demo'].includes(identity)) throw new Error(`MM_IDENTITY must be prod, dev or demo, not "${identity}".`);
+
 // A build made by `mm demo --seed` replaces the demo app's data with the
 // synthetic scenario on every launch (MM-177). Never set for a normal build.
 const demoSeed = process.env['MM_DEMO_SEED'] === '1';
+if (demoSeed && identity !== 'demo') throw new Error('Only the demo identity may seed itself (MM-177).');
 
 export default defineConfig({
   base: './',
-  define: { __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl), __MM_DEMO_SEED__: demoSeed },
+  define: {
+    __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl),
+    __MM_DEMO_SEED__: demoSeed,
+    __MM_IDENTITY__: JSON.stringify(identity),
+  },
   plugins: [react()],
   build: { target: 'es2022', sourcemap: true },
   // The evidence register is one file, docs/evidence.md at the top of the

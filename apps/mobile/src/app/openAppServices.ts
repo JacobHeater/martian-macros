@@ -1,4 +1,6 @@
 import { SqlRepositories } from '../data/SqlRepositories';
+import { AppIdentity } from './AppIdentity';
+import { databaseNameFor } from './databaseNameFor';
 import { SystemClock } from '../domain/integration/SystemClock';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
@@ -37,10 +39,12 @@ import { once } from '../state/once';
  */
 export async function openAppServices(): Promise<AppServices> {
   const native = runningNatively();
-  // This shell is only ever the demo identity until the switch (MM-228),
-  // so its database carries the name the Flutter demo used.
+  // The database is named for the identity the shell has (MM-8): the demo's
+  // keeps the name it always had, so a seed can never touch another's.
   const repositories = await SqlRepositories.open(
-    native ? await NativeSqlDatabase.open({ name: 'martian_macros_demo' }, mmDb) : await WasmSqlDatabase.open(),
+    native
+      ? await NativeSqlDatabase.open({ name: databaseNameFor(AppIdentity.of(__MM_IDENTITY__)) }, mmDb)
+      : await WasmSqlDatabase.open(),
   );
   const packStore = native
     ? new NativePackStore({ api: mmPacks, db: mmDb })

@@ -36,6 +36,8 @@ export function liveRunPlan(args: readonly string[]): LiveRunPlan | string {
     capRunEnv: (base) => Object.fromEntries(Object.entries(base).filter(([name]) => name.toLowerCase() !== 'nodefaultcurrentdirectoryinexepath')),
     capRun: (device) => [
       'npx', 'cap', 'run', 'android',
+      // Live reload is development, so it is the dev twin (MM-8).
+      '--flavor', 'dev',
       '--target', device,
       '--live-reload', '--host', 'localhost', '--port', `${port}`,
       '--forwardPorts', `${port}:${port}`,
