@@ -422,6 +422,17 @@ no iOS app yet (the owner's call). Phone checks listed above.
   step 7 (MM-69) started. Each plugin ticket stays in progress until its
   phone check; the hotspot `HS-ios-shell` serializes edits to the Xcode
   project.
+- **The identities (MM-8, the same day, a second pull request).** Apple
+  refused the underscore in the demo bundle id when the owner chose a team,
+  so the owner unified the ids: `com.martianmacros`, `.dev`, `.demo` on
+  both platforms (Android flavors on namespace `com.martianmacros`, the
+  Kotlin package moved there; iOS `MM_IDENTITY_SUFFIX` and
+  `MM_DISPLAY_NAME` build settings, the project's own values being the
+  real app). The web bundle takes `MM_IDENTITY`; the demo alone may seed.
+  `mm run`/`mm build` are the dev twin unless `--env prod`; `mm demo` the
+  demo; `mm run --ios --env prod|dev|demo`. `DemoConfiguration` retired.
+  The owner's iPhone gets the real app, fresh; the earlier DEMO installs
+  (under the old ids) stay until removed.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to

@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace = "com.martianmacros.martian_macros.demo"
+    namespace = "com.martianmacros"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.martianmacros.martian_macros.demo"
+        applicationId "com.martianmacros"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -15,6 +15,36 @@ android {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    // The three identities (MM-8, MM-177): the real app, a development twin
+    // beside it, and the seeded demo, each its own app ID and sandbox. A
+    // flavor changes only the id and the name; everything else is the same
+    // build. `mm run` and `mm build` pass the one that matches `--env`.
+    flavorDimensions = ["identity"]
+    productFlavors {
+        prod {
+            dimension "identity"
+            resValue "string", "app_name", "Martian Macros"
+            resValue "string", "title_activity_main", "Martian Macros"
+            resValue "string", "package_name", "com.martianmacros"
+            resValue "string", "custom_url_scheme", "com.martianmacros"
+        }
+        dev {
+            dimension "identity"
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "Martian Macros Dev"
+            resValue "string", "title_activity_main", "Martian Macros Dev"
+            resValue "string", "package_name", "com.martianmacros.dev"
+            resValue "string", "custom_url_scheme", "com.martianmacros.dev"
+        }
+        demo {
+            dimension "identity"
+            applicationIdSuffix ".demo"
+            resValue "string", "app_name", "Martian Macros DEMO"
+            resValue "string", "title_activity_main", "Martian Macros DEMO"
+            resValue "string", "package_name", "com.martianmacros.demo"
+            resValue "string", "custom_url_scheme", "com.martianmacros.demo"
         }
     }
     buildTypes {

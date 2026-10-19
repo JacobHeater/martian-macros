@@ -1,4 +1,4 @@
-package com.martianmacros.martian_macros.demo
+package com.martianmacros
 
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResult

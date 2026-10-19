@@ -225,9 +225,10 @@ writes a raw control. One file is on its baseline (`data/columns.ts`).
   Android SDK; iOS builds need a Mac with Xcode 26.3 or newer (MM-403), and
   a phone a signing team (`docs/ios-signing.md`).
 - Per-environment build values live in `config/<env>.json` (the food-pack
-  manifest address); the web build reads them at build time. Native flavors
-  come later, when the dev and prod app IDs need to install side by side
-  (MM-228).
+  manifest address); the web build reads them at build time. The three
+  identities (MM-8) are Android product flavors and iOS build settings:
+  `com.martianmacros`, `.dev` and `.demo`, each its own sandbox, so a
+  development build never replaces the real app's data.
 
 ## Roadmap
 

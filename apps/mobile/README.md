@@ -19,9 +19,10 @@ the repository's checks. From this folder:
 ## The Android shell
 
 `android/` is a Capacitor project that shows the built app in a web view.
-Until the switch it has the demo identity only
-(`com.martianmacros.martian_macros.demo`), so it cannot share the normal
-app's storage. Cloud backup is off.
+Its three product flavors are the three identities (MM-8): `prod`
+(`com.martianmacros`, "Martian Macros"), `dev` (`.dev`, "Martian Macros
+Dev") and `demo` (`.demo`, "Martian Macros DEMO"), each its own sandbox;
+nothing but the id and the name differs. Cloud backup is off.
 
 To build and install it, with `JAVA_HOME` set to Android Studio's `jbr`
 folder and `ANDROID_HOME` to the SDK:
@@ -39,9 +40,10 @@ on Java 25.
 
 ## The iOS shell
 
-`ios/` is the same app in a Capacitor iOS project (MM-403), under its own
-demo identity `com.martianmacros.martian-macros.demo` (Apple allows no
-underscore in a bundle id), with Swift Package Manager (`ios/App/CapApp-SPM/Package.swift`
+`ios/` is the same app in a Capacitor iOS project (MM-403) under the same
+three identities (MM-8): the bundle id is `com.martianmacros` plus the
+build setting `MM_IDENTITY_SUFFIX`, the Home Screen name `MM_DISPLAY_NAME`;
+`mm` passes both, and Xcode's own Run is the real app. Swift Package Manager (`ios/App/CapApp-SPM/Package.swift`
 is written by `cap sync`, never by hand). The plugins are Swift classes in
 `ios/App/App/Plugins/`, registered from `MainViewController`, one for each
 Kotlin plugin: `MmDb` over the system SQLite (MM-404), `MmPacks` (MM-404),
