@@ -93,31 +93,30 @@ winners stated fewer of the grade's inputs than their loser, the FNDDS
 portion text, the Open Food Facts micronutrient shares, and the pack size
 with thirteen integer columns over 464k rows.
 
-## The owner's next commands
+## The build of 2026-10-19 (done, release published)
 
-PowerShell, from the repository root:
+Run on the owner's Mac (zsh, DuckDB 1.5.6) after three fixes to the
+extract (MM-409): `./mm food fetch` (4.6 GB cached), `./mm food build`,
+`./mm food package --base-url https://github.com/JacobHeater/martian-macros-food-data/releases/download/2026-10-19/`
+(the trailing slash keeps the tag in the URLs), then
+`gh release create 2026-10-19 … --latest` with the two packs, `manifest.json`,
+`report.txt` and `coverage.txt`. The app's manifest URL
+(`releases/latest/download/manifest.json`) serves it.
 
-1. Install the DuckDB command-line tool (https://duckdb.org/install) and
-   confirm `duckdb --version` in a plain PowerShell.
-2. `.\mm food fetch` (about 0.43 GB Branded, 0.2 GB FNDDS, 0.9 GB Open Food
-   Facts, small Foundation and SR Legacy). Files from the older pins are
-   downloaded again; `provenance.json` names each file's real download day.
-3. List the survey zip before building: `tar -tvf .food_cache\usda_fndds.zip`,
-   and `Get-Content .food_cache\usda_fndds\food.csv -TotalCount 3` and the
-   same for `food_portion.csv`, to confirm the `survey_fndds_food` data type
-   and the columns.
-4. `.\mm food build`. It fails if a configured source gave nothing. Read
-   `.food_cache\packs\report.txt` (every source listed; the duplicate and
-   conflict counts) and `coverage.txt` (per pack and per source; a
-   reference source's nutrient marked LOW means an id or a unit slipped).
-5. Spot-check three FNDDS foods' names and servings in `generic.pack` (the
-   chair used node:sqlite for the measurements above).
-6. `.\mm food package --base-url <the release's download URL>`; publish the
-   release in `martian-macros-food-data` with `report.txt`, `coverage.txt`
-   and the FNDDS attribution line ("U.S. Department of Agriculture,
-   Agricultural Research Service. 2024. USDA Food and Nutrient Database for
-   Dietary Studies 2021-2023."); rewrite the coverage table in
-   `docs/food-grades.md` and MM-51's size table from the files; `.\mm check`.
+| Pack | Foods | By source | gzip |
+|---|---|---|---|
+| `generic` | 13,285 | SR Legacy 7,700, FNDDS 5,315, Foundation 270 | 1.5 MB |
+| `barcode_us` | 520,988 | USDA Branded 399,950, Open Food Facts 121,038 | 53.8 MB |
+
+Measured at the build: FNDDS states all thirteen nutrients for every food
+(5,129 of 5,315 fully gradeable); `lostDuplicateName` 242 (101 of them FNDDS
+names SR Legacy already had), `lostConflict` 42,656 (Open Food Facts records
+beaten by USDA Branded on a shared barcode under the reliability policy);
+51 duplicate winners stated fewer of the grade's inputs than their loser;
+FNDDS portion text reads as "1 item, any size", "1 cup"; Open Food Facts
+states potassium for 52%, calcium 52%, vitamin D 38% and vitamin C 14% of its
+foods (`coverage.txt`). The coverage table in `docs/food-grades.md` and
+MM-51's sizes are rewritten from the files.
 
 Later formats: a category column (fruit, vegetable, legume, drink, oil,
 cheese), an added-sugars column (USDA nutrient 1235, Open Food Facts
