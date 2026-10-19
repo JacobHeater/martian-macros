@@ -1,4 +1,4 @@
-# Food packs with fuller data (MM-381, MM-383)
+# Food packs with fuller data (MM-381, MM-383, MM-409)
 
 The spike's report, 2026-10-18, from the panel's integrations and
 micronutrients roles (`docs/agent-runs/mm380-proprietary-grade/findings/`,
@@ -59,6 +59,24 @@ Measured on the published packs (format 1) against the grade's needs
   licence line. Revisit for a Canadian launch. The UK and Australian tables
   likewise.
 
+## A wider Open Food Facts cut, measured (MM-409, 2026-10-19)
+
+The owner asked for more food in search. The export was read whole with
+DuckDB 1.5.6 (`strict_mode = false`; the 2026-10-09 read had skipped about
+250,000 rows): 4,848,211 rows.
+
+| Cut | Products | With a name, energy and the three macros |
+|---|---|---|
+| Tagged United States (today's rule) | 987,217 | 184,356 (the MM-51 spike counted 98,880 under the skipping parser) |
+| Tagged United States, energy only in kJ or the name only in another field | | +6: not worth a rule |
+| GS1 United States or Canada prefix, not tagged United States or Canada | 195,691 | 68,358, but 24,614 of them tagged France, 7,096 Ireland, 6,547 United Kingdom, 5,255 Italy, 4,025 Spain; only 256 carry no country at all. The prefix says who owns the company prefix, not where the product is sold: **declined** |
+| Tagged Canada and not United States | | 110,340, names often French, the fortification Canada's: **declined for a US launch**, a candidate for a Canadian one, by barcode lookup first |
+| Any country | | 2,431,617: a world pack would be five times the US one, mostly in other languages |
+
+So the widening the data supports is the whole US-tagged set, read without
+skipping, plus FNDDS in the generic pack and the refreshed USDA Branded
+release. Restaurant menus stay the gap no open source fills.
+
 ## The build
 
 Done in MM-383: the FNDDS source entry and the refreshed Foundation and
@@ -75,31 +93,30 @@ winners stated fewer of the grade's inputs than their loser, the FNDDS
 portion text, the Open Food Facts micronutrient shares, and the pack size
 with thirteen integer columns over 464k rows.
 
-## The owner's next commands
+## The build of 2026-10-19 (done, release published)
 
-PowerShell, from the repository root:
+Run on the owner's Mac (zsh, DuckDB 1.5.6) after three fixes to the
+extract (MM-409): `./mm food fetch` (4.6 GB cached), `./mm food build`,
+`./mm food package --base-url https://github.com/JacobHeater/martian-macros-food-data/releases/download/2026-10-19/`
+(the trailing slash keeps the tag in the URLs), then
+`gh release create 2026-10-19 … --latest` with the two packs, `manifest.json`,
+`report.txt` and `coverage.txt`. The app's manifest URL
+(`releases/latest/download/manifest.json`) serves it.
 
-1. Install the DuckDB command-line tool (https://duckdb.org/install) and
-   confirm `duckdb --version` in a plain PowerShell.
-2. `.\mm food fetch` (about 0.43 GB Branded, 0.2 GB FNDDS, 0.9 GB Open Food
-   Facts, small Foundation and SR Legacy). Files from the older pins are
-   downloaded again; `provenance.json` names each file's real download day.
-3. List the survey zip before building: `tar -tvf .food_cache\usda_fndds.zip`,
-   and `Get-Content .food_cache\usda_fndds\food.csv -TotalCount 3` and the
-   same for `food_portion.csv`, to confirm the `survey_fndds_food` data type
-   and the columns.
-4. `.\mm food build`. It fails if a configured source gave nothing. Read
-   `.food_cache\packs\report.txt` (every source listed; the duplicate and
-   conflict counts) and `coverage.txt` (per pack and per source; a
-   reference source's nutrient marked LOW means an id or a unit slipped).
-5. Spot-check three FNDDS foods' names and servings in `generic.pack` (the
-   chair used node:sqlite for the measurements above).
-6. `.\mm food package --base-url <the release's download URL>`; publish the
-   release in `martian-macros-food-data` with `report.txt`, `coverage.txt`
-   and the FNDDS attribution line ("U.S. Department of Agriculture,
-   Agricultural Research Service. 2024. USDA Food and Nutrient Database for
-   Dietary Studies 2021-2023."); rewrite the coverage table in
-   `docs/food-grades.md` and MM-51's size table from the files; `.\mm check`.
+| Pack | Foods | By source | gzip |
+|---|---|---|---|
+| `generic` | 13,285 | SR Legacy 7,700, FNDDS 5,315, Foundation 270 | 1.5 MB |
+| `barcode_us` | 520,988 | USDA Branded 399,950, Open Food Facts 121,038 | 53.8 MB |
+
+Measured at the build: FNDDS states all thirteen nutrients for every food
+(5,129 of 5,315 fully gradeable); `lostDuplicateName` 242 (101 of them FNDDS
+names SR Legacy already had), `lostConflict` 42,656 (Open Food Facts records
+beaten by USDA Branded on a shared barcode under the reliability policy);
+51 duplicate winners stated fewer of the grade's inputs than their loser;
+FNDDS portion text reads as "1 item, any size", "1 cup"; Open Food Facts
+states potassium for 52%, calcium 52%, vitamin D 38% and vitamin C 14% of its
+foods (`coverage.txt`). The coverage table in `docs/food-grades.md` and
+MM-51's sizes are rewritten from the files.
 
 Later formats: a category column (fruit, vegetable, legume, drink, oil,
 cheese), an added-sugars column (USDA nutrient 1235, Open Food Facts

@@ -86,7 +86,10 @@ downloadable pack.
    preparation state and raw/cooked pair links, density, fiber, sodium,
    alcohol, source, trust tier and its reason.
 4. **Pipeline and trust tiers (MM-52, MM-153).** M2. The tier is computed
-   here; its display is WS-08's.
+   here; its display is WS-08's. MM-409 (2026-10-19, done): the build failed
+   on the current Open Food Facts export (`brands` renamed `brands_en`) and
+   on DuckDB 1.5's strict parser; fixed, with the export's header kept
+   beside a test.
 5. **Licensing and attribution (MM-57).** M2. Before any pack is published.
 6. **Download and update (MM-56).** M2.
 
@@ -102,7 +105,8 @@ Everything. Its only contact with existing code is the validation function in
 `apps/mobile/src/domain`, which WS-08 also calls; define it in step 2 and both use it.
 
 ## Requirement sources
-- Built: MM-53 (nutrition checks), MM-54 (barcode normalization), MM-52 (the pipeline).
+- Built: MM-53 (nutrition checks), MM-54 (barcode normalization), MM-52 (the pipeline), MM-409 (the build on the current
+  export and DuckDB).
 - In progress: MM-51 (spike: the 50-product hand check and the pantry test need a person), MM-55 (format and reader built;
   real packs published to the data repository), MM-56 (download, resume, checksum, status strip and cancel built and tried on the
   emulator; the bundled generic pack, the onboarding offer, backup exclusion and slow-network testing are open), MM-153 (source and
