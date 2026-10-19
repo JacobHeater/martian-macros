@@ -15,6 +15,7 @@ interface CatalogFoodInit {
   tierReason: string;
   brand?: string | undefined;
   fiberG?: number | undefined;
+  sugarAlcoholsG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
   micros?: PackMicros;
@@ -36,6 +37,8 @@ export class CatalogFood {
   readonly carbsG: number;
   readonly fatG: number;
   readonly fiberG: number | undefined;
+  /** Sugar alcohols per 100 g, when the source states them (MM-397). */
+  readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
@@ -73,6 +76,7 @@ export class CatalogFood {
     this.tierReason = init.tierReason;
     this.brand = init.brand;
     this.fiberG = init.fiberG;
+    this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.sodiumMg = init.sodiumMg;
     this.alcoholG = init.alcoholG;
     this.micros = init.micros ?? {};

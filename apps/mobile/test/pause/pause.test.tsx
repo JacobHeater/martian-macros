@@ -8,6 +8,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
+import { openSettings } from '../support/openSettings';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 import { topLayer } from '../support/topLayer';
@@ -36,8 +37,9 @@ const shell = () => screen.findByRole('navigation', { name: 'Destinations' });
 async function openPause(): Promise<void> {
   renderApp(repos, today);
   await shell();
-  await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
-  await userEvent.click(await screen.findByRole('button', { name: /^Pause/ }));
+  // Settings' sections start closed (MM-398); the helper opens them.
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Pause/ }));
   await within(topLayer()).findByRole('heading', { name: 'Pause' });
 }
 

@@ -26,6 +26,7 @@ export function entriesCopiedTo(
         source: e.source,
         portion: e.portion,
         fiberG: e.fiberG,
+        sugarAlcoholsG: e.sugarAlcoholsG,
         sodiumMg: e.sodiumMg,
         alcoholG: e.alcoholG,
         micros: e.micros,

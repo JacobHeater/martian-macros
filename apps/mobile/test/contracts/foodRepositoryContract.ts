@@ -218,6 +218,7 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
           fatG: 1,
           source: 'weighed',
           fiberG: 16,
+          sugarAlcoholsG: 3,
           sodiumMg: 4,
         }),
       );
@@ -228,9 +229,14 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       expect(lentils.fiberG).toBe(16);
       expect(lentils.sodiumMg).toBe(4);
       expect(lentils.alcoholG).toBeUndefined();
-      expect(lentils.netCarbsG).toBe(24);
-      expect(found(byName, 'Plain').fiberG).toBeUndefined();
-      expect(found(byName, 'Plain').netCarbsG).toBeUndefined();
+      // MM-397: sugar alcohols are kept, and net carbs take them with fiber (MM-396).
+      expect(lentils.sugarAlcoholsG).toBe(3);
+      expect(lentils.netCarbsG).toBe(21);
+      const plain = found(byName, 'Plain');
+      expect(plain.fiberG).toBeUndefined();
+      expect(plain.sugarAlcoholsG).toBeUndefined();
+      // What is not stated is not subtracted.
+      expect(plain.netCarbsG).toBe(plain.carbsG);
     });
 
     // MM-308: every micronutrient given is kept, and the rest stay unknown.

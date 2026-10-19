@@ -4,6 +4,8 @@
   height: 100%;
 }
 .app-body {
+  /* What is positioned inside (visually hidden words, popovers) stays inside the scroll, never lengthening the page (MM-400). */
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -92,6 +94,10 @@
 .app-stack-item {
   margin-bottom: var(--space-12);
 }
+/* A disclosure on the screen's body is a group like a section: 24 px from its neighbours, as margins add (MM-402). */
+.app-body > .mm-disclosure {
+  margin-block: var(--space-12);
+}
 .app-row-end {
   justify-content: flex-end;
 }
@@ -111,6 +117,8 @@
 .app-centered-page {
   height: 100%;
   padding: var(--space-24);
+  /* Scrolls itself at large text, the page not scrolling (MM-400); centred only while it fits. */
+  overflow-y: auto;
 }
 .app-centered-middle {
   align-items: center;

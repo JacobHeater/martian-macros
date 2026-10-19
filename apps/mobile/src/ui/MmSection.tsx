@@ -64,8 +64,8 @@ export function MmSection({
   };
   const id = useId();
   const open = !collapsible || expanded;
-  // A header that opens something is a button inside the heading, so the heading stays one (MM-335).
-  const Title = onPress === undefined ? 'h2' : 'span';
+  // A header that opens or folds is a button inside the heading, so the heading stays one (MM-335, MM-399).
+  const Title = onPress === undefined && !collapsible ? 'h2' : 'span';
   const words = (
     <span className="mm-section-words">
       <Title className="mm-section-title" id={`${id}-title`}>
@@ -115,20 +115,23 @@ export function MmSection({
     );
   } else if (collapsible) {
     header = (
-      <MmPressable expanded={expanded} controls={`${id}-body`} onPress={toggle}>
-        <span className="mm-section-head-body">
-          {head}
-          <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
-            <MmIcon name="chevronDown" size={16} />
+      // Named by its title alone, as the plain heading is; the button inside also carries the summary.
+      <h2 className="mm-section-heading" aria-labelledby={`${id}-title`}>
+        <MmPressable expanded={expanded} controls={`${id}-body`} onPress={toggle}>
+          <span className="mm-section-head-body">
+            {head}
+            <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
+              <MmIcon name="chevronDown" size={16} />
+            </span>
           </span>
-        </span>
-      </MmPressable>
+        </MmPressable>
+      </h2>
     );
   } else {
     header = <span className="mm-section-head-body">{head}</span>;
   }
   return (
-    <section className="mm-section" aria-labelledby={`${id}-title`}>
+    <section className={`mm-section${open ? '' : ' mm-section-closed'}`} aria-labelledby={`${id}-title`}>
       <div className="mm-section-head">
         <div className="mm-section-head-main">{header}</div>
         {trailing}

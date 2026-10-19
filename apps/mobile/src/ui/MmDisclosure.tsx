@@ -42,7 +42,7 @@ export function MmDisclosure({
           <MmIcon name="chevronDown" size={16} />
         </span>
       </button>
-      <div id={id} hidden={!expanded}>
+      <div id={id} className="mm-disclosure-body" hidden={!expanded}>
         {expanded || maintainState ? children : null}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MacroSplitChart } from '../../charts/MacroSplitChart';
+import { useNetCarbs } from '../useNetCarbs';
 import type { CalendarDate } from '../../domain/CalendarDate';
 import { estimateMeal } from '../../domain/food/estimate/estimateMeal';
 import { MealKind } from '../../domain/food/estimate/MealKind';
@@ -38,6 +39,7 @@ interface EstimateMealStepProps {
 export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initialSize = 'regular' }: EstimateMealStepProps) {
   const { services, state } = useApp();
   const maintenance = useCell(state.coach)?.tdee.kcal;
+  const netCarbs = useNetCarbs();
   const [name, setName] = useState('');
   const [size, setSize] = useState<MealSize>(initialSize);
   const [kind, setKind] = useState<MealKind>('balanced');
@@ -111,6 +113,7 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initial
           <p className="food-label food-label-spaced">Estimated macro split</p>
           <MacroSplitChart
             isPreview
+            netCarbs={netCarbs}
             intake={
               new IntakeDay({
                 date: day,

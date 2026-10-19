@@ -26,7 +26,7 @@ async function opened() {
 const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
-  // Version 7 (MM-364): the switches of Settings > Coach.
+  // Version 7 (MM-364): the switches of Settings > Coach. Version 9 (MM-396): net carbs.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -38,13 +38,14 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'inline_insights_off',
     'inline_insight_areas_off',
     'inline_insight_kinds_off',
+    'net_carbs',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks.
   setups: ['fluid_limited_by_clinician'],
-  // Version 4 (MM-308): the micronutrients a food log entry keeps.
-  food_entries: Micronutrient.added.map((n) => Micronutrient.column(n)),
+  // Version 4 (MM-308): the micronutrients a food log entry keeps. Version 9 (MM-397): sugar alcohols.
+  food_entries: [...Micronutrient.added.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
-  custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n))],
+  custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
 };
 
 /** The tables added since the Dart database's last version. */

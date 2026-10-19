@@ -26,7 +26,7 @@ it('with nothing set, the goal is on and its amount is suggested for the person'
   renderApp(repos, today);
   const settings = await openSettings();
   expect(await settings.findByRole('switch', { name: /^Daily water goal/ })).toBeChecked();
-  expect(settings.getByText(/^Suggested from your protein target and training. Type your own to change it./)).toBeInTheDocument();
+  expect(settings.getByText(/^Suggested from your protein target and training./)).toBeInTheDocument();
   expect(settings.getByRole('textbox', { name: /^Daily water goal, / })).not.toHaveValue('');
 });
 
@@ -35,9 +35,10 @@ it('an amount typed is their own, and "Use suggested" returns to the suggestion'
   await repos.preferences.saveWaterGoal(3500);
   renderApp(repos, today);
   const settings = await openSettings();
-  expect(await settings.findByText(/^Your own amount./)).toBeInTheDocument();
+  // An amount the person typed needs no note: the hint is the range alone (MM-401).
+  expect(await settings.findByText(/^17 to 202 fl oz.$/)).toBeInTheDocument();
   await userEvent.click(settings.getByRole('button', { name: /^Use the suggested amount/ }));
-  expect(await settings.findByText(/^Suggested from your protein target and training. Type your own to change it./)).toBeInTheDocument();
+  expect(await settings.findByText(/^Suggested from your protein target and training./)).toBeInTheDocument();
   expect((await first(repos.preferences.watchNutritionGoals())).waterGoalMl).toBeUndefined();
   // The row goes once pressed; focus is on the field, now holding the suggestion (the panel's UX-3).
   await expect.poll(() => document.activeElement?.getAttribute('aria-label')).toBe('Daily water goal, fluid ounces');

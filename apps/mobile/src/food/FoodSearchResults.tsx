@@ -34,7 +34,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
     return (
       <p className="app-text food-no-hits">
         {catalog.packs.length === 0
-          ? 'No food database is on this phone yet. You can download one in Settings, or enter the food yourself.'
+          ? 'No food database is on this phone yet. You can download one in Settings, under Data, or enter the food yourself.'
           : `Nothing found for "${query.trim()}".`}
       </p>
     );

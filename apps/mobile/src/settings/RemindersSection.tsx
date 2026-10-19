@@ -11,6 +11,7 @@ import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
+import { useSettingsSection } from './useSettingsSection';
 import { useOverlays } from '../ui/useOverlays';
 
 const time = (minuteOfDay: number) => clockTimeText(new Date(2000, 0, 1, Math.trunc(minuteOfDay / 60), minuteOfDay % 60));
@@ -20,6 +21,8 @@ const time = (minuteOfDay: number) => clockTimeText(new Date(2000, 0, 1, Math.tr
  * the user turns it on, and the phone's permission is asked for only then.
  */
 export function RemindersSection() {
+  // Folds in place, closed until opened (MM-398).
+  const fold = useSettingsSection('reminders');
   const { services, state } = useApp();
   const overlays = useOverlays();
   const settings = useCell(state.reminderSettings);
@@ -59,7 +62,7 @@ export function RemindersSection() {
   };
 
   return (
-    <MmSection icon="bell" title="Reminders">
+    <MmSection icon="bell" title="Reminders" {...fold}>
       <MmListGroup>
         {settings.map((setting) => (
           <div key={setting.kind}>

@@ -6,6 +6,7 @@ import { reveal } from './reveal';
 import { failingWrite } from './failingWrite';
 import { demoWith } from './demoWith';
 import { SettingsScreen } from '../../settings/SettingsScreen';
+import type { SettingsSectionId } from '../../settings/SettingsSectionId';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
@@ -37,19 +38,34 @@ export const Settings = screenStory({
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
 });
 
+/** MM-396: Today's setup opened: the Net carbs switch, on, under Nutrition detail. */
+export const NetCarbsSwitch = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Carbs less fiber and sugar alcohols, against the same carb target./,
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="todaysSetup" />),
+});
+
+/** MM-396: switched off, the row says what is shown instead. */
+export const NetCarbsSwitchedOff = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Total carbs, as on the label.',
+  scenario: demoWith({ then: async (repos) => repos.preferences.saveNetCarbs(false) }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="todaysSetup" />),
+});
+
 /** MM-240: both sliders, each in a row at the row's inset. */
 export const MeasuredBodyFat = screenStory({
   covers: ['SettingsScreen'],
   shows: /About 22%/,
   scenario: measuredBodyFatScenario,
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="todaysSetup" />),
 });
 
 export const EditHeight = screenStory({
   covers: ['EditHeightSheet'],
   shows: 'Height',
   open: ({ navigator, overlays }) => {
-    void navigator.push(() => <SettingsScreen />);
+    void navigator.push(() => <SettingsScreen open="profile" />);
     void overlays.sheet<void>('Height', (close) => (
       <EditHeightSheet initialCm={180} imperial onSave={() => close()} />
     ));
@@ -60,7 +76,7 @@ export const EditHeight = screenStory({
 export const ChangeDailyActivity = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Chosen',
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="todaysSetup" />),
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Change daily activity' }));
   },
@@ -71,7 +87,7 @@ export const DateOfBirth = screenStory({
   covers: ['SettingsScreen'],
   shows: 'January 1, 1996',
   open: ({ navigator, overlays }) => {
-    void navigator.push(() => <SettingsScreen />);
+    void navigator.push(() => <SettingsScreen open="profile" />);
     void overlays.date({
       helpText: 'Date of birth',
       initial: CalendarDate.of(1996, 1, 1),
@@ -122,7 +138,7 @@ export const NutritionGoals = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Daily sodium limit',
   scenario: demoWith({ sodiumLimitMg: 2300, waterGoalMl: 2000 }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
   },
@@ -131,8 +147,8 @@ export const NutritionGoals = screenStory({
 /** MM-311, MM-358: the section as a new installation has it: no sodium limit, the water goal on and suggested. */
 export const NutritionGoalsSuggested = screenStory({
   covers: ['SettingsScreen'],
-  shows: /^Suggested from your protein target and training. Type your own to change it./,
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  shows: /^Suggested from your protein target and training./,
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
   },
@@ -143,7 +159,7 @@ export const SodiumLimitRefused = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Daily sodium limit',
   scenario: demoWith({ sodiumLimitMg: 2300 }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     const field = await within(canvas).findByRole('textbox', { name: 'Daily sodium limit, milligrams' });
     await userEvent.clear(field);
@@ -158,7 +174,7 @@ export const NutritionGoalsKidney = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Daily water goal',
   scenario: demoWith({ screening: { chronicKidneyDisease: true } }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
   },
@@ -169,7 +185,7 @@ export const WaterGoalCareTeam = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Your clinician limits your fluids.',
   scenario: demoWith({ screening: { fluidLimitedByClinician: true } }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
   },
@@ -180,7 +196,7 @@ export const WaterGoalCareTeamAmount = screenStory({
   covers: ['SettingsScreen'],
   shows: /^Only if your clinician gave you an amount of water to drink./,
   scenario: demoWith({ screening: { fluidLimitedByClinician: true } }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     const toggle = await within(canvas).findByRole('switch', { name: /^Daily water goal/ });
     reveal(toggle);
@@ -193,7 +209,7 @@ export const WaterGoalOwnAmount = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Use the suggested amount',
   scenario: demoWith({ waterGoalMl: 3000 }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Use the suggested amount'));
   },
@@ -202,9 +218,9 @@ export const WaterGoalOwnAmount = screenStory({
 /** MM-358: back from their own amount to the suggestion: the field holds it, with focus on it. */
 export const WaterGoalBackToSuggested = screenStory({
   covers: ['SettingsScreen'],
-  shows: /^Suggested from your protein target and training. Type your own to change it./,
+  shows: /^Suggested from your protein target and training./,
   scenario: demoWith({ waterGoalMl: 3000 }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     const back = await within(canvas).findByRole('button', { name: /^Use the suggested amount/ });
     reveal(back);
@@ -218,20 +234,23 @@ export const WaterGoalHigh = screenStory({
   covers: ['SettingsScreen'],
   shows: /More than most people need/,
   scenario: demoWith({ units: 'metric', waterGoalMl: 5000 }),
-  open: ({ navigator }) => void navigator.push(() => <SettingsScreen />),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/More than most people need/));
   },
 });
 
-const settings = ({ navigator }: Parameters<NonNullable<Parameters<typeof screenStory>[0]['open']>>[0]) =>
-  void navigator.push(() => <SettingsScreen />);
+/** Settings with one section open (MM-398): the stories about a row open the section it is in. */
+const settingsAt =
+  (open: SettingsSectionId) =>
+  ({ navigator }: Parameters<NonNullable<Parameters<typeof screenStory>[0]['open']>>[0]) =>
+    void navigator.push(() => <SettingsScreen open={open} />);
 
 /** MM-320: a phone without Health Connect: one row says so. */
 export const HealthConnectAbsent = screenStory({
   covers: ['SettingsScreen'],
   shows: /Health Connect is not on this phone/,
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/Health Connect is not on this phone/));
   },
@@ -242,7 +261,7 @@ export const HealthConnectNoneAllowed = screenStory({
   covers: ['SettingsScreen'],
   shows: /The app only reads/,
   device: healthPlatform(),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
   },
@@ -253,7 +272,7 @@ export const HealthConnectSomeAllowed = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Read from Health Connect now',
   device: healthPlatform({ allowed: ['weight', 'steps'] }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
   },
@@ -271,7 +290,7 @@ export const HealthConnectWoman = screenStory({
     },
   }),
   device: healthPlatform(),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Menstruation'));
   },
@@ -282,7 +301,7 @@ export const HealthConnectRefused = screenStory({
   covers: ['SettingsScreen'],
   shows: /Weight was not allowed/,
   device: healthPlatform({ refuses: ['weight'] }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
     reveal(weight);
@@ -295,7 +314,7 @@ export const HealthConnectReadFailed = screenStory({
   covers: ['SettingsScreen'],
   shows: /could not be read just now/,
   device: healthPlatform({ allowed: ['weight'], unreadable: true }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     const read = await within(canvas).findByRole('button', { name: 'Read from Health Connect now' });
     reveal(read);
@@ -308,7 +327,7 @@ export const HealthConnectNothingYet = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Allowed. Nothing to read yet.',
   device: healthPlatform({ allowed: ['weight'], empty: ['weight'] }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
   },
@@ -319,7 +338,7 @@ export const HealthConnectUnnamedSource = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Allowed. 3 readings.',
   device: healthPlatform({ allowed: ['steps'], stepsUnnamed: true }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Steps'));
   },
@@ -330,7 +349,7 @@ export const HealthConnectAllAllowed = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Read from Health Connect now',
   device: healthPlatform({ allowed: ['weight', 'bodyFat', 'leanMass', 'height', 'workout', 'steps'] }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
   },
@@ -341,7 +360,7 @@ export const HealthConnectAllowing = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Weight allowed.',
   device: healthPlatform(),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
     reveal(weight);
@@ -354,7 +373,7 @@ export const HealthConnectReadDone = screenStory({
   covers: ['SettingsScreen'],
   shows: /Everything allowed is up to date/,
   device: healthPlatform({ allowed: ['weight'] }),
-  open: settings,
+  open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     const read = await within(canvas).findByRole('button', { name: 'Read from Health Connect now' });
     reveal(read);
@@ -364,7 +383,6 @@ export const HealthConnectReadDone = screenStory({
 
 // ---- MM-321: Settings and the food packs, in the states no story drew ----
 
-const openSettingsScreen = ({ navigator }: StoryStage) => void navigator.push(() => <SettingsScreen />);
 const openFoodDatabase = ({ navigator }: StoryStage) => void navigator.push(() => <FoodDatabaseScreen />);
 
 /** Presses the button named `name` anywhere on the page (sheets sit outside the canvas), once it is there. */
@@ -379,35 +397,35 @@ export const SettingsOpensFoodDatabase = screenStory({
   covers: ['SettingsScreen', 'FoodDatabaseScreen'],
   shows: 'See what is available',
   device: storyPackHost(),
-  open: openSettingsScreen,
+  open: settingsAt('data'),
   walk: pressAnywhere(/^Food database/),
 });
 
 export const SettingsOpensHowThisWorks = screenStory({
   covers: ['SettingsScreen', 'HowThisWorksScreen'],
   shows: 'How this works',
-  open: openSettingsScreen,
+  open: settingsAt('about'),
   walk: pressAnywhere(/^How this works/),
 });
 
 export const SettingsOpensPause = screenStory({
   covers: ['SettingsScreen', 'PauseScreen'],
   shows: 'Reason',
-  open: openSettingsScreen,
+  open: settingsAt('todaysSetup'),
   walk: pressAnywhere(/^Pause/),
 });
 
 export const SettingsOpensTerms = screenStory({
   covers: ['SettingsScreen', 'TermsScreen'],
   shows: 'Terms of use',
-  open: openSettingsScreen,
+  open: settingsAt('about'),
   walk: pressAnywhere(/^Terms of use/),
 });
 
 export const SettingsOpensHealthCheck = screenStory({
   covers: ['SettingsScreen', 'HealthCheckScreen'],
   shows: 'Health check',
-  open: openSettingsScreen,
+  open: settingsAt('profile'),
   walk: pressAnywhere(/^Health check/),
 });
 
@@ -415,21 +433,21 @@ export const SettingsOpensHealthCheck = screenStory({
 export const ChangeExperience = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Experience',
-  open: openSettingsScreen,
+  open: settingsAt('todaysSetup'),
   walk: pressAnywhere('Change experience'),
 });
 
 export const ChangeNutritionDetail = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Nutrition detail',
-  open: openSettingsScreen,
+  open: settingsAt('todaysSetup'),
   walk: pressAnywhere('Change nutrition detail'),
 });
 
 export const ChangeUnits = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Units',
-  open: openSettingsScreen,
+  open: settingsAt('appearance'),
   walk: pressAnywhere('Change units'),
 });
 
@@ -438,7 +456,7 @@ export const ChangeHeightMetric = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Centimetres',
   scenario: demoWith({ units: 'metric' }),
-  open: openSettingsScreen,
+  open: settingsAt('profile'),
   walk: pressAnywhere(/^Height/),
 });
 
@@ -450,7 +468,7 @@ export const ReminderOn = screenStory({
     await new DemoSeed(today).replace(repos);
     await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
   },
-  open: openSettingsScreen,
+  open: settingsAt('reminders'),
 });
 
 /** MM-321: a new look chosen, and the save failing: it says so and keeps the old one. */
@@ -458,7 +476,7 @@ export const ChangeAppearanceFails = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Your appearance could not be saved. Nothing was changed.',
   stores: failingWrite('preferences', 'saveThemePreference'),
-  open: openSettingsScreen,
+  open: settingsAt('appearance'),
   walk: async (canvas) => {
     await pressAnywhere('Change appearance')(canvas);
     // An option by its role: in Light the row's own subtitle also says "Light".
@@ -660,6 +678,6 @@ export const ReminderTimeOpens = screenStory({
     await new DemoSeed(today).replace(repos);
     await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
   },
-  open: openSettingsScreen,
+  open: settingsAt('reminders'),
   walk: pressAnywhere(/^At 7:00/),
 });

@@ -15,6 +15,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { NumberEntry } from '../ui/NumberEntry';
+import { useSettingsSection } from './useSettingsSection';
 import { useOverlays } from '../ui/useOverlays';
 
 /** Litres to at most two decimals, for the water goal's field. */
@@ -31,6 +32,8 @@ const sodiumRange = 'A whole number from 1,500 to 6,000 mg.';
  * carries a plain note (SA-5).
  */
 export function NutritionGoalsSection() {
+  // Folds in place, closed until opened (MM-398).
+  const fold = useSettingsSection('nutritionGoals');
   const { services, state } = useApp();
   const overlays = useOverlays();
   const today = useCell(state.today);
@@ -53,13 +56,13 @@ export function NutritionGoalsSection() {
   // On unless switched off; where nothing is suggested, only once an amount is set.
   const waterOn = !goals.waterGoalOff && (careTeam === undefined || goals.waterGoalMl !== undefined || setting);
   // Read with the field, not beside it (the panel's UX-2); a limit is never asked for as a goal to fill (SA S-1).
-  let amountNote: string;
+  // No line narrates the field: an amount the person typed needs no note (MM-401).
+  let amountNote: string | undefined;
   if (careTeam !== undefined) {
     amountNote = `Only if your ${who} gave you an amount of water to drink. This counts plain water only, not other drinks or food.`;
-  } else if (water?.suggested === true) amountNote = 'Suggested from your protein target and training. Type your own to change it.';
-  else amountNote = 'Your own amount.';
+  } else if (water?.suggested === true) amountNote = 'Suggested from your protein target and training.';
   const amountField = `Daily water goal, ${imperial ? 'fluid ounces' : 'litres'}`;
-  const waterRange = imperial ? 'From 17 to 202 fl oz.' : 'From 0.5 to 6 L.';
+  const waterRange = imperial ? '17 to 202 fl oz.' : '0.5 to 6 L.';
   // With an eating-disorder history the note comes sooner, at the cap of a suggestion (the panel's safety S-4).
   const highAt = screening?.eatingDisorderHistory === true ? NutritionGoals.highWaterGoalEatingDisorderMl : NutritionGoals.highWaterGoalMl;
   const high = water !== undefined && water.ml > highAt;
@@ -74,7 +77,7 @@ export function NutritionGoalsSection() {
     : `Shown in Micros on the Food screen at Full nutrition detail (yours is ${detailLevelLabel(detail)}).`;
 
   return (
-    <MmSection icon="flag" title="Nutrition goals">
+    <MmSection icon="flag" title="Nutrition goals" {...fold}>
       <MmListGroup>
         <MmSwitchRow
           leadingIcon="tune"
@@ -136,7 +139,9 @@ export function NutritionGoalsSection() {
                 title={amountField}
                 unit={imperial ? 'fl oz' : 'L'}
                 initial={water === undefined ? undefined : imperial ? String(roundHalfAwayFromZero(WaterUnits.mlToFlOz(water.ml))) : litres(water.ml)}
-                hint={`${amountNote} ${high ? `More than most people need; spread it through the day. ${waterRange}` : waterRange}`}
+                hint={[amountNote, high ? 'More than most people need; spread it through the day.' : undefined, waterRange]
+                  .filter((part) => part !== undefined)
+                  .join(' ')}
                 refusal="That goal is out of range."
                 saves="water goal"
                 saveKind="secondary"

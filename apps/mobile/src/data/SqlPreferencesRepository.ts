@@ -80,6 +80,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
     return this.save({ macro_picture: picture });
   }
 
+  watchNetCarbs(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? true : flag(row, 'net_carbs')));
+  }
+
+  saveNetCarbs(on: boolean): Promise<void> {
+    return this.save({ net_carbs: asFlag(on) });
+  }
+
   watchUnderEatingDismissedOn(): Watched<CalendarDate | undefined> {
     return this.watch((row) => (row === undefined ? undefined : optionalDay(row, 'under_eating_dismissed_epoch_day')));
   }

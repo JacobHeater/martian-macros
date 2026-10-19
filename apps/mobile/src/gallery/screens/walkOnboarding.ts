@@ -10,7 +10,7 @@ export async function walkOnboarding(canvas: HTMLElement, upTo: number): Promise
   const next = () => press('Next');
   const type = async (label: string, text: string) => userEvent.type(await app.findByRole('textbox', { name: label }), text);
 
-  await press('Get started');
+  await press('Begin');
   if (upTo === 1) return;
   await press('Male');
   await next();

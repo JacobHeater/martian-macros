@@ -16,6 +16,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly easyToMiss = new ObservableValue(new EasyToMissPreference());
   private readonly detail = new ObservableValue<DetailLevel>('standard');
   private readonly picture = new ObservableValue<MacroPicture>('bars');
+  private readonly netCarbs = new ObservableValue(true);
   private readonly underEatingDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly returnDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly recoverySkipped = new ObservableValue<CalendarDate | undefined>(undefined);
@@ -53,6 +54,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
 
   watchMacroPicture(): Watched<MacroPicture> {
     return this.picture.watch();
+  }
+
+  watchNetCarbs(): Watched<boolean> {
+    return this.netCarbs.watch();
+  }
+
+  async saveNetCarbs(on: boolean): Promise<void> {
+    this.netCarbs.value = on;
   }
 
   async saveMacroPicture(picture: MacroPicture): Promise<void> {

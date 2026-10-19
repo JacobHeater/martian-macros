@@ -46,7 +46,7 @@ export function WelcomeStep({ onStart }: { onStart: () => void }) {
       </p>
       <div className="onboarding-welcome-bottom" />
       <div className="app-row app-row-end">
-        <MmButton label="Get started" onPress={onStart} />
+        <MmButton label="Begin" onPress={onStart} />
       </div>
     </div>
   );

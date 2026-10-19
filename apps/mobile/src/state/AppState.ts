@@ -216,6 +216,9 @@ export class AppState {
   /** Which picture of the macros the hero shows (MM-254): bars or donut, never both. */
   readonly macroPicture: Cell<Loadable<MacroPicture>>;
 
+  /** Whether carbohydrate is shown as net of fiber and sugar alcohols (MM-396); on until switched off. */
+  readonly netCarbs: Cell<Loadable<boolean>>;
+
   /** The sodium limit, off until set, and the water goal as the person set it (MM-311, MM-313, MM-358). */
   readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
 
@@ -485,6 +488,7 @@ export class AppState {
     });
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
+    this.netCarbs = stream(() => s.preferences.watchNetCarbs());
     this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
