@@ -116,6 +116,7 @@ trend line.
 9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories. **Built 2026-10-13** in one pull request: the direction in design/screen-direction.md, the panel pass in docs/agent-runs/mm253-hierarchy, the six destinations in tiers with MmSection, MmRhythmStrip and the icon set, the checkable rule in test/gallery/hierarchy.test.tsx, and the three bugs the panel found (MM-283 to MM-285). The step is done.
 11. **What the hierarchy panel left for later (MM-286 to MM-289).** M2. Destinations keep their state across tabs (MM-286), Progress with one figure and the lifts as rows (MM-287), the Ember budget for text actions, an owner decision (MM-288), a demo seed that shows every mark (MM-289).
 10. **Own the full visual experience (MM-262; MM-263 to MM-282 less MM-278).** M2. The owner's rule of 2026-10-13: nothing native shows. Custom date, time and select pickers; checkbox and slider drawn by us; a pressed state on every control; menus never clipped; focus trapped in overlays; a story for every component and state; tokens honoured; the written system. From the component walk in docs/agent-runs/mm253-components. **Built 2026-10-13**, the same day, in one pull request: the step is done.
+20. **The iOS shell (MM-403).** M4. Started 2026-10-19 on the owner's Mac (macOS Sequoia, Xcode 26.3): the Capacitor iOS project under the DEMO identity with Swift Package Manager, the plugins registered from `MainViewController` as `MainActivity` registers the Kotlin ones, `AppServices.platform`, the terms declined on iOS without "Close the app", `mm build ios`, `mm run --ios`, `mm simulator` and the simulator in `mm screenshot`. The plugins themselves are MM-404 (WS-14), MM-405 (WS-09), MM-406 (WS-08) and MM-69 (WS-11).
 
 ## Done enough to unblock others
 MM-104, MM-108 and MM-99 are done: existing screens use library components
@@ -143,6 +144,7 @@ conflicts with this one.
 - Placed 2026-10-13 (left by the hierarchy panel, step 11): MM-286, MM-287, MM-288, MM-289.
 - Placed 2026-10-13 in step 1: MM-260 (the date dialog's chevron and flat surface; the phone's date control follows the palette and the dialog floats).
 - Placed 2026-10-13 (the component walk): MM-262 (epic), MM-263 date picker, MM-264 time picker, MM-265 select, MM-266 checkbox and slider, MM-267 pressed states, MM-268 menus, MM-271 overlays, MM-272 snack, MM-273 stories, MM-274 tokens, MM-275 focus ring, MM-276 Ember tint and glyph, MM-277 sheet and cards, MM-279 field errors, MM-280 destructive kind, MM-281 48 dp, MM-282 the document.
+- Added 2026-10-19 (step 20): MM-403 (the iOS shell); MM-407 (the health section stopped folding when it became platform-aware, found by the panel and fixed the same day, done).
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.

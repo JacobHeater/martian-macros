@@ -79,6 +79,23 @@ describe('a new installation', () => {
     await press('Read the terms again');
     expect(await screen.findByRole('button', { name: 'I agree' })).toBeInTheDocument();
   });
+
+  it('not now on an iPhone offers no way to close the app, and says the app can be left from the Home Screen (MM-403)', async () => {
+    open((services) => ({ ...services, platform: 'ios' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Not now' }));
+    expect(await screen.findByRole('heading', { name: 'That is fine' })).toBeInTheDocument();
+    expect(screen.getByText(/or go back to the Home Screen; the app will ask again when you open it\./)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Close the app' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Read the terms again' })).toBeInTheDocument();
+    expect(await accepted()).toBeUndefined();
+  });
+
+  it('on an iPhone the terms name Apple Health, never Health Connect (MM-403)', async () => {
+    open((services) => ({ ...services, platform: 'ios' }));
+    await screen.findByRole('heading', { name: 'Before you start' });
+    expect(screen.getAllByText(/Apple Health/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Health Connect|ML Kit/)).not.toBeInTheDocument();
+  });
 });
 
 describe('once agreed', () => {

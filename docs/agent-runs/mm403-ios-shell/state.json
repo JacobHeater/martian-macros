@@ -1,0 +1,636 @@
+{
+  "schema_version": 1,
+  "task_id": "mm403-ios-shell",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/ios-shell",
+    "commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis in decision.md, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "docs/agent-runs/mm403-ios-shell/brief.md": "5f8e297561fbd1026fc98eb20c3046047ddc1b9295526a5032a12bf57efc50f4"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "runtime-reproduction",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "apps/mobile/ios/App (built and run on the iPhone 17 Pro Max simulator, iOS 26.3.1)",
+          "tool/src/ios.ts",
+          "git show 08c11cf of the old HealthConnectSection.tsx"
+        ],
+        "not_inspected": [
+          "a phone",
+          "VoiceOver",
+          "a browser render of the stories"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; sequential self-review is not independent review."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The owner's decisions and the platform's documented behavior settle the scope; reviewers research their own claims.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The two iOS-only differences as drawn in their stories: the terms declined on iOS, and the Apple Health section of Settings in five states; hierarchy, the check mark's meaning, subtitle and caption weight, consistency with the Android sibling and the Reminders layout.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "input_hashes": {
+        "apps/mobile/src/gallery/screens/Settings.stories.tsx": "b918ae6eaa6a736b48767917c309396b09b2eb78254ce9496945264b77701985",
+        "apps/mobile/src/gallery/screens/FirstRun.stories.tsx": "1bf2c704ce8b749c43091b4416ca6ef44799e31c748add837b0449e1cb79a0ef",
+        "apps/mobile/src/gallery/screens/onIos.ts": "dab6daf8236bf694c5086a211624d0d290247e40aea47192cc9e781f7919634b",
+        "apps/mobile/src/settings/HealthPlatformSection.tsx": "0741a5e52508c8560d4c428df515a153710d43b5913e401cb9a447d30515a99b",
+        "apps/mobile/src/terms/TermsGuardScreen.tsx": "6b1af6466d4006cb09851d8a2bc8df56debbf1597d78c0b810ec457b96b3a22d",
+        "apps/mobile/src/terms/termsOfUse.ts": "e94066e6f8a52adcabc38a06dedcb7d46fb90aa8c3717e69b652e4d1eb66df31",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "apps/mobile/src/settings/HealthPlatformSection.tsx",
+          "apps/mobile/src/terms/TermsGuardScreen.tsx",
+          "apps/mobile/src/terms/termsOfUse.ts",
+          "the AppleHealth* and TermsNotNowOnIos stories",
+          "the Android siblings and docs/agent-runs/mm320-health-connect",
+          "MM-403, MM-69, MM-68, MM-242, MM-398",
+          "design/screen-direction.md, design/anti-cruft-and-anti-slop.md"
+        ],
+        "not_inspected": [
+          "a browser render of the stories",
+          "a phone",
+          "VoiceOver",
+          "the Swift plugins",
+          "the mm tool"
+        ],
+        "referrals": [
+          "ux-accessibility: snack length, 'Not asked yet' as an action, the check for a reader",
+          "chair: git show for PD-1; the simulator's Health labels for PD-2"
+        ],
+        "limitations": "Source inspection only; line counts estimated from tokens; whether PD-1 was a regression was settled by the chair."
+      },
+      "research": {
+        "status": "performed",
+        "question": "What does Apple currently document as the path to an app's Health read permissions, and the label at each step?",
+        "reason": "The row, snack and caption name a path a novice must follow after Apple's sheet.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://support.apple.com/guide/security/sec88be9900f/web",
+            "title": "support.apple.com/guide/security/sec88be9900f/web",
+            "published_or_updated": "2026-01-28",
+            "accessed": "2026-10-19",
+            "claim": "Settings > Health > Data Access & Devices reviews and revokes app access; apps cannot tell whether read access was granted."
+          },
+          {
+            "url": "https://support.apple.com/en-asia/guide/iphone/iph27f6325b2/13.0/ios",
+            "title": "support.apple.com/en-asia/guide/iphone/iph27f6325b2/13.0/ios",
+            "published_or_updated": null,
+            "accessed": "2026-10-19",
+            "claim": "Health app > profile > Privacy > Apps toggles per app (iOS 13 edition)."
+          },
+          {
+            "url": "https://www.apple.com/legal/privacy/data/en/health-app/",
+            "title": "www.apple.com/legal/privacy/data/en/health-app/",
+            "published_or_updated": "2026-09-14",
+            "accessed": "2026-10-19",
+            "claim": "Third-party access is revoked in Settings > Health."
+          }
+        ],
+        "summary": "Apple documents Settings > Health > Data Access & Devices and the Health app's profile > Privacy > Apps; neither names a Sharing tab.",
+        "limitations": "The current iPhone User Guide page did not render; version-specific labels unverified."
+      }
+    },
+    {
+      "task": "The UX guard (MM-293): a walkthrough of both depth targets from the source of the stories and components; what a novice is told after Apple's sheet; the snack, check mark and caption for a screen reader; the route out of the declined terms; the four iOS paragraphs of the terms, surveyed.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "input_hashes": {
+        "apps/mobile/src/gallery/screens/Settings.stories.tsx": "b918ae6eaa6a736b48767917c309396b09b2eb78254ce9496945264b77701985",
+        "apps/mobile/src/gallery/screens/FirstRun.stories.tsx": "1bf2c704ce8b749c43091b4416ca6ef44799e31c748add837b0449e1cb79a0ef",
+        "apps/mobile/src/gallery/screens/onIos.ts": "dab6daf8236bf694c5086a211624d0d290247e40aea47192cc9e781f7919634b",
+        "apps/mobile/src/settings/HealthPlatformSection.tsx": "0741a5e52508c8560d4c428df515a153710d43b5913e401cb9a447d30515a99b",
+        "apps/mobile/src/terms/TermsGuardScreen.tsx": "6b1af6466d4006cb09851d8a2bc8df56debbf1597d78c0b810ec457b96b3a22d",
+        "apps/mobile/src/terms/termsOfUse.ts": "e94066e6f8a52adcabc38a06dedcb7d46fb90aa8c3717e69b652e4d1eb66df31",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "both components, their stories and tests",
+          "the design-system parts (MmListRow, MmIcon, MmSection, MmButton, MmOverlays)",
+          "the Settings accordion (useSettingsSection, RemindersSection)",
+          "MM-403, MM-69, MM-68, MM-242, MM-406",
+          "the four iOS paragraphs of the terms (surveyed)"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "a phone",
+          "VoiceOver and Switch Control",
+          "text scaling and contrast",
+          "the Swift plugins",
+          "the mm tool"
+        ],
+        "referrals": [
+          "react-capacitor: opening the app's Settings page from the row; MmScanner's in-memory read",
+          "product-designer: the check's weight and the subtitle's length",
+          "the attorney: any change to the terms' words"
+        ],
+        "limitations": "Walkthroughs from source, never a frame; VoiceOver behaviour after Apple's sheet is a hypothesis."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does HealthKit hide read refusals from the app, and what route does Apple document to an app's Health permissions?",
+        "reason": "The copy's premise and the recovery path are platform facts.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://developer.apple.com/tutorials/data/documentation/healthkit/hkhealthstore/authorizationstatus(for:).json",
+            "title": "developer.apple.com/documentation/healthkit/hkhealthstore/authorizationstatus(fo",
+            "published_or_updated": null,
+            "accessed": "2026-10-19",
+            "claim": "An app cannot determine whether read permission was granted; it appears as no data."
+          },
+          {
+            "url": "https://support.apple.com/en-us/104997",
+            "title": "support.apple.com/en-us/104997",
+            "published_or_updated": "2026-03-10",
+            "accessed": "2026-10-19",
+            "claim": "Summary tab > profile picture > Privacy > Apps."
+          },
+          {
+            "url": "https://support.apple.com/108779",
+            "title": "support.apple.com/108779",
+            "published_or_updated": "2026-09-14",
+            "accessed": "2026-10-19",
+            "claim": "Profile > Privacy > Apps."
+          },
+          {
+            "url": "https://www.apple.com/legal/privacy/data/en/health-app/",
+            "title": "www.apple.com/legal/privacy/data/en/health-app/",
+            "published_or_updated": "2026-09-14",
+            "accessed": "2026-10-19",
+            "claim": "Settings > Health revokes third-party access; the Sharing tab is for people and providers."
+          }
+        ],
+        "summary": "Confirmed: an app cannot tell whether read permission was granted. Apple documents the Health app's profile > Privacy > Apps and the Settings app; the Sharing tab is for people and providers.",
+        "limitations": "Apple's User Guide pages for iOS 15 to 18 did not render; third-party guides only for version labels."
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No exercise, training or strength behavior changes: the iOS shell carries the same app.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "No exercise, training or strength behavior changes: the iOS shell carries the same app."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No exercise, training or strength behavior changes: the iOS shell carries the same app.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No energy, macro or body-composition behavior changes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "No energy, macro or body-composition behavior changes."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No energy, macro or body-composition behavior changes.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No coaching, adherence or reminder wording changes; reminders on iOS (MM-405) schedule the same plan.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "No coaching, adherence or reminder wording changes; reminders on iOS (MM-405) schedule the same plan."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No coaching, adherence or reminder wording changes; reminders on iOS (MM-405) schedule the same plan.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No estimation or adaptive behavior changes; an imported weigh-in is handled as before, only the platform's name differs.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "No estimation or adaptive behavior changes; an imported weigh-in is handled as before, only the platform's name differs."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No estimation or adaptive behavior changes; an imported weigh-in is handled as before, only the platform's name differs.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No safety wording, limit or escalation changes; the terms differ only in the platform's and the reader's names.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "No safety wording, limit or escalation changes; the terms differ only in the platform's and the reader's names."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No safety wording, limit or escalation changes; the terms differ only in the platform's and the reader's names.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "product",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The scope is the owner's decisions of 2026-10-19, recorded in MM-403 and MM-69; the product-designer and UX guard review how they are said.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/product.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "The scope is the owner's decisions of 2026-10-19, recorded in MM-403 and MM-69; the product-designer and UX guard review how they are said."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The scope is the owner's decisions of 2026-10-19, recorded in MM-403 and MM-69; the product-designer and UX guard review how they are said.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "architecture",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The Swift plugins sit behind the existing interfaces (MmDbApi, MmPacksApi, MmRemindersApi, MmScannerApi, MmHealthApi); the one new seam, AppServices.platform, follows the pattern of environment. Reviewed by the chair against test/architecture.test.ts and test/layers.test.ts.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/architecture.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "The Swift plugins sit behind the existing interfaces (MmDbApi, MmPacksApi, MmRemindersApi, MmScannerApi, MmHealthApi); the one new seam, AppServices.platform, follows the pattern of environment. Reviewed by the chair against test/architecture.test.ts and test/layers.test.ts."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The Swift plugins sit behind the existing interfaces (MmDbApi, MmPacksApi, MmRemindersApi, MmScannerApi, MmHealthApi); the one new seam, AppServices.platform, follows the pattern of environment. Reviewed by the chair against test/architecture.test.ts and test/layers.test.ts.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The chair built and ran the shell on the simulator (recorded in tests[]); a read-only review of the Swift is the handoff's to ask for when the owner's phone is signed.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "The chair built and ran the shell on the simulator (recorded in tests[]); a read-only review of the Swift is the handoff's to ask for when the owner's phone is signed."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The chair built and ran the shell on the simulator (recorded in tests[]); a read-only review of the Swift is the handoff's to ask for when the owner's phone is signed.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "integrations",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "HealthKit's semantics (no refusal reported, anchored queries as the change token) are recorded as decisions in MM-69, made with the owner; the plugin is verified on the simulator and the device check is on the owner's checklist.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/integrations.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "HealthKit's semantics (no refusal reported, anchored queries as the change token) are recorded as decisions in MM-69, made with the owner; the plugin is verified on the simulator and the device check is on the owner's checklist."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "HealthKit's semantics (no refusal reported, anchored queries as the change token) are recorded as decisions in MM-69, made with the owner; the plugin is verified on the simulator and the device check is on the owner's checklist.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "privacy-security",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Nothing new leaves the device: the same one HTTP fetch, read-only health access, files under Application Support excluded from backup, purpose strings in Info.plist. No new data flow to review.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/privacy-security.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "Nothing new leaves the device: the same one HTTP fetch, read-only health access, files under Application Support excluded from backup, purpose strings in Info.plist. No new data flow to review."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Nothing new leaves the device: the same one HTTP fetch, read-only health access, files under Application Support excluded from backup, purpose strings in Info.plist. No new data flow to review.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Omitted for this change.",
+      "role": "qa",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Verification is the chair's and is recorded in tests[]; the acceptance criteria of MM-403 to MM-406 trace to the tests named in decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/qa.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything: the role was omitted"
+        ],
+        "referrals": [],
+        "limitations": "Verification is the chair's and is recorded in tests[]; the acceptance criteria of MM-403 to MM-406 trace to the tests named in decision.md."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Verification is the chair's and is recorded in tests[]; the acceptance criteria of MM-403 to MM-406 trace to the tests named in decision.md.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (panel-product-designer, panel-ux-accessibility) on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-19",
+      "limitations": "No browser automation in this session, so no Storybook capture; the stories are read from source."
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "PD-1/F4: the health section folds again; MM-407 with its regression tests.",
+      "authority": "chair, under MM-398"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "PD-2/F1: the recovery route is Settings, Health, Data Access & Devices, in one form everywhere, covering 'to allow it' as well; phone check on the owner's checklist.",
+      "authority": "chair, recorded in MM-69; the owner may choose a Settings-opening row instead"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "PD-3: the caption's general sentence removed; the uncertainty stays in the row and the snack.",
+      "authority": "chair, under design/anti-cruft-and-anti-slop.md"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "PD-4/F3: 'Everything asked for is up to date.' on iOS, with a test and the story AppleHealthReadDone.",
+      "authority": "chair, under MM-69's owner decision"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "PD-5 in part: stories AppleHealthAsking and AppleHealthReadDone added; the asking-failed snack and 'every kind asked' not drawn, with the reason in decision.md.",
+      "authority": "chair"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "PD-6/F5: 'phone' in the section, the shell being iPhone only; story renamed AppleHealthNotOnThisPhone.",
+      "authority": "chair, under MM-403"
+    },
+    {
+      "id": "D7",
+      "status": "rejected",
+      "summary": "PD-7: no 'Asked.' state word on asked rows; the guard passed the rows as they are.",
+      "authority": "chair"
+    },
+    {
+      "id": "D8",
+      "status": "accepted",
+      "summary": "F2: '… or go back to the Home Screen; the app will ask again when you open it.'; MM-403's criterion reworded.",
+      "authority": "chair; Android's second clause is an owner question"
+    },
+    {
+      "id": "D9",
+      "status": "accepted",
+      "summary": "F6: accepted as a phone-checklist item (VoiceOver after Apple's sheet and after 'Not now'); nothing to change in source now.",
+      "authority": "chair"
+    },
+    {
+      "id": "D10",
+      "status": "accepted",
+      "summary": "F7: MM-69's UI/UX section says Apple's sheet cannot be drawn and both outcomes are.",
+      "authority": "chair"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit (apps/mobile)",
+      "commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "No type errors."
+    },
+    {
+      "command": "npx vitest run test/settings/appleHealth.test.tsx test/settings/healthConnect.test.tsx test/settings/settingsAccordion.test.tsx test/app/termsOfUse.test.tsx test/terms/termsText.test.ts",
+      "commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "5 files, 59 tests passed, after the panel's edits."
+    },
+    {
+      "command": "./mm req",
+      "commit": "08c11cfa75af74df97c938d9d9ee5f85185e0de6",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "405 tickets, all valid."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-19T18:30:00Z",
+    "writers_stopped": true
+  }
+}

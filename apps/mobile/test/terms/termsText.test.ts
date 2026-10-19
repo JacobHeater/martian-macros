@@ -72,3 +72,27 @@ describe('what the terms never say', () => {
     }
   });
 });
+
+describe('on an iPhone (MM-403)', () => {
+  const ios = termsOfUse.sectionsOn('ios').flatMap((section) => [section.heading, ...section.paragraphs]).join(' ');
+
+  it('name Apple Health and Apple’s own reader, and nothing of Health Connect or ML Kit', () => {
+    expect(ios).toContain('anything you let the app read from Apple Health');
+    expect(ios).toContain('Apple Health is optional.');
+    expect(ios).toContain('never writes to Apple Health');
+    expect(ios).toContain('read on the phone by software that is part of iOS');
+    expect(ios).not.toMatch(/Health Connect|ML Kit|Google/);
+    expect(ios).not.toMatch(/nothing (is|ever) (uploaded|leaves)|never leaves?/i);
+  });
+
+  it('say everything else as on Android, section for section', () => {
+    const android = termsOfUse.sectionsOn('android');
+    const iphone = termsOfUse.sectionsOn('ios');
+    expect(iphone.map((section) => section.heading)).toEqual(android.map((section) => section.heading));
+    const differing = android.flatMap((section, at) =>
+      section.paragraphs.filter((paragraph, index) => paragraph !== iphone[at]!.paragraphs[index]),
+    );
+    expect(differing).toHaveLength(4);
+    expect(termsOfUse.sections).toEqual(android);
+  });
+});

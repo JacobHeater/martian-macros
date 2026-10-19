@@ -14,6 +14,7 @@ the repository's checks. From this folder:
 | `npm run dev` | Serves the app for development |
 | `npm run check` | Type check, tests, build, and the offline check |
 | `npm run android` | Builds the app and copies it into the Android shell |
+| `npm run ios` | Builds the app and copies it into the iOS shell |
 
 ## The Android shell
 
@@ -36,6 +37,22 @@ Name the device with `-s` every time. The Gradle wrapper is 9.3.1, the same
 as the Flutter project's, because the wrapper Capacitor generates cannot run
 on Java 25.
 
+## The iOS shell
+
+`ios/` is the same app in a Capacitor iOS project (MM-403), under its own
+demo identity `com.martianmacros.martian-macros.demo` (Apple allows no
+underscore in a bundle id), with Swift Package Manager (`ios/App/CapApp-SPM/Package.swift`
+is written by `cap sync`, never by hand). The plugins are Swift classes in
+`ios/App/App/Plugins/`, registered from `MainViewController`, one for each
+Kotlin plugin: `MmDb` over the system SQLite (MM-404), `MmPacks` (MM-404),
+`MmReminders` (MM-405), `MmScanner` (MM-406) and `MmHealth` over HealthKit
+(MM-69). The app's files live under `Library/Application Support`, kept out
+of backups.
+
+From the repository root, `mm build ios` builds for the simulator and
+`mm run --ios` installs and launches there; no signing is needed. A phone
+needs a team chosen in Xcode once: `docs/ios-signing.md`.
+
 ## Layout
 
 | Path | Holds |
@@ -54,7 +71,7 @@ on Java 25.
 | `src/data/` | The user's database and every repository over it, through `SqlDatabase`, carried over from `packages/data`. Passes the same contract suites as the fixtures |
 | `src/format/` | What the user reads: numbers, dates, units and the fixed wording of every label and sentence, carried over from the Flutter app. The only place imperial units exist |
 | `src/state/` | `AppState`: everything the screens show that is worked out from what is stored, as cells that follow the repositories. No React and no browser in it. From the Flutter app's providers |
-| `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it |
+| `src/platform/` | What the phone provides, each behind an interface of ours with the Capacitor adapter beside it; `runningOn` says which platform, for the few screens that differ (MM-403) |
 | `src/gallery/` | Every token and component as built; open the app with `?gallery` |
 | `test/` | Tests carried over from Dart, in the folder of what they test; `test/contracts/` holds the suites every implementation of an interface must pass; and tests about the whole app or the build |
 

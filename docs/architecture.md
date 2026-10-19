@@ -222,7 +222,8 @@ writes a raw control. One file is on its baseline (`data/columns.ts`).
   launched by `mm.ps1`, `mm.cmd`, and `mm`, so there is one implementation
   for every OS.
 - Node 22.18+ is the one toolchain; Android builds also need a JDK and the
-  Android SDK.
+  Android SDK; iOS builds need a Mac with Xcode 26.3 or newer (MM-403), and
+  a phone a signing team (`docs/ios-signing.md`).
 - Per-environment build values live in `config/<env>.json` (the food-pack
   manifest address); the web build reads them at build time. Native flavors
   come later, when the dev and prod app IDs need to install side by side

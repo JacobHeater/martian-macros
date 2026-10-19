@@ -24,6 +24,8 @@ One-time setup:
 3. `mm doctor` to verify.
 
 Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
+iOS builds need a Mac with Xcode 26.3 or newer (MM-403); a phone needs a
+signing team, see [docs/ios-signing.md](docs/ios-signing.md).
 
 ## Commands
 
@@ -35,10 +37,13 @@ Android builds also need a JDK (21) and the Android SDK (`ANDROID_HOME`).
 | `mm web` | The web check alone |
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
 | `mm run [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator |
+| `mm run --ios [-d UDID]` | Builds, installs and launches on an iPhone simulator (`MM_SIMULATOR` sets the default) |
 | `mm demo [--seed] -d <Android device ID>` | The isolated DEMO app on an exact device; `--seed` starts it from the demo scenario on every launch |
-| `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given |
+| `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given; a simulator by its UDID |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
+| `mm simulator [name \| udid]` | Starts an iPhone simulator and waits for it (`mm simulator list` to list) |
 | `mm build android [--release]` | Builds the web app, syncs the shell and assembles the APK |
+| `mm build ios [--release]` | Builds the web app, syncs the iOS shell and builds it for the simulator (no signing) |
 | `mm food fetch\|build\|package` | Builds the food packs (MM-52); `build` needs DuckDB on PATH |
 | `mm storybook [build]` | The design register: every token, icon, component and screen as built, in a browser (MM-237) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
@@ -78,7 +83,7 @@ or `mm build` never seeds.
 ## Layout
 
 ```
-apps/mobile/           The app: React + TypeScript (src/), its tests (test/) and the Android shell (android/)
+apps/mobile/           The app: React + TypeScript (src/), its tests (test/) and the native shells (android/, ios/)
 tool/               The mm task runner: TypeScript run by Node, zero dependencies
 config/             Per-environment build values (the food-pack manifest address)
 requirements/       Every epic, story, task, bug and spike, as files (start with its README)

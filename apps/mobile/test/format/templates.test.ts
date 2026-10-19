@@ -333,13 +333,13 @@ describe('quiet lines', () => {
   it('an imported weigh-in says where it came from and why it counts', () => {
     const at = new Date(2026, 9, 5, 6, 42);
     const weighIn = { day: at, kg: 80, sourceName: 'Bathroom scale' };
-    expect(importedWeighInText({ ...weighIn, basis: 'firstMorning', readings: 2, at })).toBe(
+    expect(importedWeighInText({ ...weighIn, basis: 'firstMorning', readings: 2, at }, 'android')).toBe(
       'From Bathroom scale at 6:42 AM.',
     );
-    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 3 })).toBe(
+    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 3 }, 'android')).toBe(
       'The middle of 3 readings from Bathroom scale.',
     );
-    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 1 })).toBe('From Bathroom scale.');
+    expect(importedWeighInText({ ...weighIn, basis: 'medianOfDay', readings: 1 }, 'android')).toBe('From Bathroom scale.');
   });
 });
 

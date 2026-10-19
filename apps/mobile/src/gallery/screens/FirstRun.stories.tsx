@@ -9,6 +9,7 @@ import { userEvent, within } from 'storybook/test';
 import { HealthRecheckScreen } from '../../app/HealthRecheckScreen';
 import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
 import { newInstallScenario } from './newInstallScenario';
+import { onIos } from './onIos';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import { storyToday } from './storyToday';
@@ -34,6 +35,16 @@ export const TermsNotNow = screenStory({
   covers: ['TermsGuardScreen'],
   shows: 'That is fine',
   scenario: newInstallScenario,
+  terms: 'unanswered',
+  walk: press('Not now'),
+});
+
+/** MM-403: on an iPhone the page cannot offer to close the app; it says to go back to the Home Screen, and that the app asks again. */
+export const TermsNotNowOnIos = screenStory({
+  covers: ['TermsGuardScreen'],
+  shows: /go back to the Home Screen; the app will ask again/,
+  scenario: newInstallScenario,
+  device: onIos(),
   terms: 'unanswered',
   walk: press('Not now'),
 });

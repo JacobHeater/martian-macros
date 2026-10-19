@@ -12,7 +12,7 @@ import './terms.css';
  * Nothing here changes the agreement.
  */
 export function TermsScreen() {
-  const { state } = useApp();
+  const { services, state } = useApp();
   const accepted = useLoaded(state.termsAcceptance);
   return (
     <Screen title="Terms of use" roomy>
@@ -20,7 +20,7 @@ export function TermsScreen() {
         Version {termsOfUse.version}, in effect from {Fmt.longDate(termsOfUse.effectiveOn)}.
         {accepted === undefined ? '' : ` You agreed on ${Fmt.longDate(accepted.acceptedOn)}.`}
       </p>
-      <TermsText />
+      <TermsText platform={services.platform} />
     </Screen>
   );
 }
