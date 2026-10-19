@@ -47,6 +47,9 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
+/** A covered run on this machine starves a test for seconds, so every wait here is long (MM-394). */
+const slowly = { timeout: 10000 };
+
 /** The rows of foods named yogurt: the fixture's Greek yogurt and the twenty-six added. */
 const yogurtRows = () => screen.queryAllByRole('button', { name: /^(Yogurt, flavor|Greek yogurt)/ });
 
@@ -63,12 +66,12 @@ const searched = async (text: string, extra: PackEntry[] = []) => {
 it('twenty results and "More results", then every match, the first new row focused and announced, and no more offer', async () => {
   // Twenty-six yogurts beside the fixture's one: twenty-seven matches, two pages.
   await searched('yogurt', yogurts(26));
-  const more = await screen.findByRole('button', { name: 'More results' });
+  const more = await screen.findByRole('button', { name: 'More results' }, slowly);
   expect(yogurtRows()).toHaveLength(20);
   expect(screen.queryByText(/more results,|more results\./)).not.toBeInTheDocument();
 
   await userEvent.click(more);
-  await waitFor(() => expect(yogurtRows()).toHaveLength(27));
+  await waitFor(() => expect(yogurtRows()).toHaveLength(27), slowly);
   expect(screen.queryByRole('button', { name: 'More results' })).not.toBeInTheDocument();
   expect(screen.getByText('7 more results, every match listed.')).toHaveAttribute('role', 'status');
   expect(document.activeElement).toBe(yogurtRows()[20]);
@@ -77,18 +80,18 @@ it('twenty results and "More results", then every match, the first new row focus
 it('exactly a page of matches never offers more', async () => {
   // Nineteen beside the fixture's one: twenty matches, one page.
   await searched('yogurt', yogurts(19));
-  await waitFor(() => expect(yogurtRows()).toHaveLength(20));
+  await waitFor(() => expect(yogurtRows()).toHaveLength(20), slowly);
   expect(screen.queryByRole('button', { name: 'More results' })).not.toBeInTheDocument();
 });
 
 it('a new query starts over at one page, with the offer back', async () => {
   const field = await searched('yogurt', yogurts(26));
-  await userEvent.click(await screen.findByRole('button', { name: 'More results' }));
-  await waitFor(() => expect(yogurtRows()).toHaveLength(27));
+  await userEvent.click(await screen.findByRole('button', { name: 'More results' }, slowly));
+  await waitFor(() => expect(yogurtRows()).toHaveLength(27), slowly);
   await userEvent.type(field, '{backspace}{backspace}');
   expect(field.value).toBe('yogu');
-  await waitFor(() => expect(yogurtRows()).toHaveLength(20), { timeout: 3000 });
-  expect(await screen.findByRole('button', { name: 'More results' })).toBeInTheDocument();
+  await waitFor(() => expect(yogurtRows()).toHaveLength(20), slowly);
+  expect(await screen.findByRole('button', { name: 'More results' }, slowly)).toBeInTheDocument();
 });
 
 it('a search with a page or less never offers more', async () => {
@@ -96,6 +99,6 @@ it('a search with a page or less never offers more', async () => {
   await openTab('Food');
   const sheet = await openAddFood();
   await userEvent.type(sheet.querySelector('input') as HTMLInputElement, 'chicken');
-  expect(await screen.findByText('Chicken breast, cooked')).toBeInTheDocument();
+  expect(await screen.findByText('Chicken breast, cooked', {}, slowly)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'More results' })).not.toBeInTheDocument();
 });
