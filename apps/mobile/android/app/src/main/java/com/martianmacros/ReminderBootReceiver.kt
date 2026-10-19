@@ -1,4 +1,4 @@
-package com.martianmacros.martian_macros.demo
+package com.martianmacros
 
 import android.content.BroadcastReceiver
 import android.content.Context

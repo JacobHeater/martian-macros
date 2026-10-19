@@ -12,7 +12,7 @@ test('the default port is 5173, for the server and the device alike', () => {
   assert.equal(plan.port, 5173);
   assert.deepEqual(plan.devServer, ['npx', 'vite', '--host', '127.0.0.1', '--port', '5173', '--strictPort']);
   assert.deepEqual(plan.capRun('emulator-5554'), [
-    'npx', 'cap', 'run', 'android', '--target', 'emulator-5554',
+    'npx', 'cap', 'run', 'android', '--flavor', 'dev', '--target', 'emulator-5554',
     '--live-reload', '--host', 'localhost', '--port', '5173', '--forwardPorts', '5173:5173',
   ]);
 });

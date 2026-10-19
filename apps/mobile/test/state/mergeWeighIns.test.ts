@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { WeightObservation } from '../../src/domain/WeightObservation';
 import type { DayWeighIn } from '../../src/healthIngest/DayWeighIn';
-import { DemoConfiguration } from '../../src/state/DemoConfiguration';
 import { mergeWeighIns } from '../../src/state/mergeWeighIns';
-import { StateError } from '../../src/lang/StateError';
 
 /** MM-68 and MM-71: imported weigh-ins become the app's weigh-ins, and a typed value overrules them. */
 describe('merging', () => {
@@ -46,33 +44,5 @@ describe('merging', () => {
 
   it('with nothing imported it is what was typed', () => {
     expect(merged([typed(1, 82)], [])).toEqual([[1, 82]]);
-  });
-});
-
-describe('demo configuration', () => {
-  it('normal dev/prod configurations never select demo storage', () => {
-    for (const environment of ['dev', 'prod']) {
-      for (const isAndroid of [false, true]) {
-        const config = new DemoConfiguration({ demoApp: false, isAndroid, environment, seed: false });
-        expect(config.isDemo).toBe(false);
-        expect(config.databaseName).toBe('martian_macros');
-        expect(config.seed).toBe(false);
-      }
-    }
-  });
-
-  it('demo storage is distinct and guarded by Android identity and dev env', () => {
-    const config = new DemoConfiguration({ demoApp: true, isAndroid: true, environment: 'dev', seed: true });
-    expect(config.databaseName).toBe('martian_macros_demo');
-    const refused: readonly (readonly [boolean, boolean, string, boolean])[] = [
-      [false, true, 'dev', true],
-      [false, true, 'prod', true],
-      [true, true, 'prod', true],
-      [true, true, 'prod', false],
-      [true, false, 'dev', true],
-    ];
-    for (const [demoApp, isAndroid, environment, seed] of refused) {
-      expect(() => new DemoConfiguration({ demoApp, isAndroid, environment, seed })).toThrow(StateError);
-    }
   });
 });

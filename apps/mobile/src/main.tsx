@@ -16,8 +16,9 @@ const systemBars = new CapacitorSystemBars();
 openAppServices()
   .then(async (services) => {
     // A build made by `mm demo --seed` starts from the demo scenario every
-    // time, and says so on every screen (MM-177).
-    const demo = await seedDemo({ services, asked: __MM_DEMO_SEED__, native: runningNatively() });
+    // time, and says so on every screen (MM-177). Only the demo identity
+    // may: the build refuses the flag on any other (MM-8), and so does this.
+    const demo = await seedDemo({ services, asked: __MM_DEMO_SEED__ && __MM_IDENTITY__ === 'demo', native: runningNatively() });
     root.render(
       <StrictMode>
         <App services={services} systemBars={systemBars} demo={demo} />

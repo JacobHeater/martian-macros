@@ -1,10 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// Until the React app replaces the Flutter one (MM-228) it installs only
-// under the demo identity, so it can never share the normal app's sandbox.
+// The real identity (MM-8). The dev and demo twins add ".dev" and ".demo"
+// in each shell's own build (the Android flavors, the iOS build settings),
+// not here: this is what Capacitor's CLI reads, and it is not the build.
 const config: CapacitorConfig = {
-  appId: 'com.martianmacros.martian_macros.demo',
-  appName: 'Martian Macros DEMO',
+  appId: 'com.martianmacros',
+  appName: 'Martian Macros',
   webDir: 'dist',
 };
 

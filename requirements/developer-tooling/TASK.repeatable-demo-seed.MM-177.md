@@ -41,7 +41,9 @@ Scenario: No implicit production seed
 - Implemented `mm demo --seed -d <exact Android ID>` with fixed development
   defines and explicit connected Android selection (phone or emulator).
 - Android builds derive the `.demo` package ID and DEMO launcher name from the
-  same `MM_DEMO_APP` define used by Dart. Normal native build modes and iOS
+  same `MM_DEMO_APP` define used by Dart. (Since MM-8, 2026-10-19, the demo
+  is the `demo` flavor, `com.martianmacros.demo`, on both platforms, and the
+  web bundle's `MM_IDENTITY`; the seed is refused for any other identity.) Normal native build modes and iOS
   configuration are unchanged; no flavors or schema changes are introduced.
 - Startup rejects non-Android/production demo and seed-without-demo configs
   before storage opens. It uses a separate `martian_macros_demo` database and
