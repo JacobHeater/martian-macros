@@ -534,7 +534,8 @@
             "MM-52",
             "MM-153",
             "MM-57",
-            "MM-56"
+            "MM-56",
+            "MM-409"
           ]
         },
         {
@@ -1764,7 +1765,8 @@
           "MM-52",
           "MM-53",
           "MM-54",
-          "MM-307"
+          "MM-307",
+          "MM-409"
         ],
         "remaining": [
           "MM-50",
@@ -1806,7 +1808,8 @@
           "title": "The pipeline, with trust tiers computed in it",
           "tickets": [
             "MM-52",
-            "MM-153"
+            "MM-153",
+            "MM-409"
           ],
           "milestone": "M2"
         },

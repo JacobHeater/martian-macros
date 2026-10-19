@@ -84,7 +84,7 @@ COPY (
   UNION ALL
 
   -- Open Food Facts: products sold in the United States.
-  SELECT 'off', code, 'barcode', product_name, nullif(brands, ''), code,
+  SELECT 'off', code, 'barcode', product_name, nullif(brands_en, ''), code,
     try_cast("energy-kcal_100g" AS DOUBLE),
     try_cast(proteins_100g AS DOUBLE),
     try_cast(carbohydrates_100g AS DOUBLE),
@@ -114,8 +114,11 @@ COPY (
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
     try_cast(polyols_100g AS DOUBLE),
     CASE WHEN regexp_full_match(countries_tags, 'en:(united-states|canada)(,en:(united-states|canada))*') THEN 'us' ELSE 'unknown' END
+  -- The export's brand column is `brands_en` since 2026 (MM-409); `strict_mode`
+  -- off, because DuckDB 1.5 otherwise stops at the first row that is not
+  -- standard CSV, where 1.1 skipped about 250,000 rows under `ignore_errors`.
   FROM read_csv('{{cache}}/off.csv.gz', delim = chr(9), header = true, quote = '',
-                all_varchar = true, ignore_errors = true, sample_size = -1)
+                all_varchar = true, ignore_errors = true, sample_size = -1, strict_mode = false)
   WHERE countries_tags LIKE '%en:united-states%'
 
   ORDER BY source, source_id
@@ -151,9 +154,14 @@ COPY (
       all_varchar = true, ignore_errors = true)
     UNION ALL
     -- The survey download may carry rows of other data types too (the panel's IN-14): only FNDDS foods' rows are read.
-    SELECT 'usda_fndds', n.* FROM read_csv(
+    -- Its nutrient_id column holds the legacy nutrient number (208 for energy, 203 for protein), not the FoodData
+    -- Central id the other files use (MM-409); the survey's own nutrient.csv maps one to the other.
+    SELECT 'usda_fndds', n.* REPLACE (coalesce(fn.id, n.nutrient_id) AS nutrient_id) FROM read_csv(
       '{{cache}}/usda_fndds/food_nutrient.csv', header = true,
       all_varchar = true, ignore_errors = true) n
+    LEFT JOIN read_csv('{{cache}}/usda_fndds/nutrient.csv', header = true,
+      all_varchar = true, ignore_errors = true) fn
+      ON regexp_replace(fn.nutrient_nbr, '[.]0+$', '') = n.nutrient_id
     WHERE n.fdc_id IN (SELECT fdc_id FROM fd WHERE source = 'usda_fndds')
   ),
   nut AS (
