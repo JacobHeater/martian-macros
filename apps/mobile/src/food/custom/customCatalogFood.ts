@@ -22,6 +22,7 @@ export function customCatalogFood(food: CustomFood): CatalogFood {
     fatG: food.perServing.fatG * scale,
     // Fiber, sodium and the micronutrients follow the same scale (MM-309).
     fiberG: perHundred(food.fiberG),
+    sugarAlcoholsG: perHundred(food.sugarAlcoholsG),
     sodiumMg: perHundred(food.micros.of('sodium')),
     micros: Object.fromEntries(
       PackMicronutrient.values

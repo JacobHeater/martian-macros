@@ -110,4 +110,13 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 8 to 9 (MM-396, MM-397): carbs shown as net unless switched off; sugar alcohols on logged and saved foods.
+  [
+    8,
+    async (db) => {
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN net_carbs INTEGER NOT NULL DEFAULT 1 CHECK (net_carbs IN (0, 1))');
+      await db.execute('ALTER TABLE food_entries ADD COLUMN sugar_alcohols_g REAL NULL');
+      await db.execute('ALTER TABLE custom_foods ADD COLUMN sugar_alcohols_g REAL NULL');
+    },
+  ],
 ]);

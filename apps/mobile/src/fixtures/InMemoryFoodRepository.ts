@@ -37,6 +37,7 @@ export class InMemoryFoodRepository implements FoodRepository {
         source: entry.source,
         portion: entry.portion,
         fiberG: entry.fiberG,
+        sugarAlcoholsG: entry.sugarAlcoholsG,
         sodiumMg: entry.sodiumMg,
         alcoholG: entry.alcoholG,
         micros: entry.micros,

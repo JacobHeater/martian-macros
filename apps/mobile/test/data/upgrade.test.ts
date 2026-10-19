@@ -137,8 +137,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 8 left it: without net carbs and sugar alcohols (MM-396, MM-397). */
+const versionEight = currentSchema
+  .replace('  "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),\n', '')
+  .split('  "cholesterol_mg" REAL NULL,\n  "sugar_alcohols_g" REAL NULL\n);')
+  .join('  "cholesterol_mg" REAL NULL\n);');
+
 /** The schema as version 7 left it: without the snoozed inline insights (MM-378). */
-const versionSeven = currentSchema.replace(/CREATE TABLE "inline_insight_snoozes" \([\s\S]*?\n\);\n/, '');
+const versionSeven = versionEight.replace(/CREATE TABLE "inline_insight_snoozes" \([\s\S]*?\n\);\n/, '');
 
 /** The schema as version 6 left it: without the switches of Settings > Coach and the inline insight log (MM-363, MM-364). */
 const versionSix = versionSeven
@@ -264,4 +270,20 @@ it('a version 7 database comes up to date with nothing snoozed', async () => {
   const sql = await openSql({ bytes: await old.exportBytes() });
   const repos = await SqlRepositories.open(sql);
   expect(await first(repos.insightSnoozes.watchInsightSnoozes())).toEqual([]);
+});
+
+// MM-396, MM-397: a version 8 database gains net carbs, on, and sugar alcohols on logged and saved foods;
+// what was logged is kept, with no sugar-alcohol value.
+it('a version 8 database comes up to date with net carbs on and its entries kept', async () => {
+  expect(versionEight).not.toContain('net_carbs');
+  expect(versionEight).not.toContain('sugar_alcohols_g');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 8, schema: versionEight });
+  await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await columnsOf(sql, 'food_entries')).toContain('sugar_alcohols_g');
+  expect(await columnsOf(sql, 'custom_foods')).toContain('sugar_alcohols_g');
+  expect(await first(repos.preferences.watchNetCarbs())).toBe(true);
 });

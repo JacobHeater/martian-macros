@@ -11,6 +11,8 @@ interface MacroBarProps {
   target?: number | undefined;
   minimum?: number | undefined;
   emphasized?: boolean;
+  /** Carbs shown net of fiber and sugar alcohols, and named so (MM-396). */
+  netCarbs?: boolean;
 }
 
 /**
@@ -19,7 +21,7 @@ interface MacroBarProps {
  * cue. An emphasized macro (protein) gets a thicker bar and a stronger
  * value.
  */
-export function MacroBar({ macro, grams, target, minimum, emphasized = false }: MacroBarProps) {
+export function MacroBar({ macro, grams, target, minimum, emphasized = false, netCarbs = false }: MacroBarProps) {
   const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
   const value = target === undefined || target <= 0 ? 0 : clamp(grams / target, 0, 1);
   let figures: string;
@@ -33,7 +35,7 @@ export function MacroBar({ macro, grams, target, minimum, emphasized = false }: 
   return (
     <div className="mm-macro-bar">
       <div className="mm-macro-bar-head">
-        <span className="mm-macro-bar-name">{MacroKind.label(macro)}</span>
+        <span className="mm-macro-bar-name">{MacroKind.label(macro, { netCarbs })}</span>
         <span className={`mm-macro-bar-figures${emphasized ? ' mm-macro-bar-emphasized' : ''}`}>{figures}</span>
       </div>
       <MmProgressBar value={value} markers={markers} kind={macro} weight={emphasized ? 'regular' : 'quiet'} />

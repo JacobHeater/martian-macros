@@ -127,7 +127,7 @@ describe('a workout in a line', () => {
 });
 
 describe('what was eaten', () => {
-  const entry = (portion?: Portion, extras: { fiberG?: number; sodiumMg?: number; alcoholG?: number } = {}) =>
+  const entry = (portion?: Portion, extras: { fiberG?: number; sugarAlcoholsG?: number; sodiumMg?: number; alcoholG?: number } = {}) =>
     new FoodEntry({
       id: 1,
       date: day,
@@ -186,11 +186,18 @@ describe('what was eaten', () => {
   });
 
   it('the extra nutrients are only the ones the source stated', () => {
-    expect(extraNutrientsLine(entry())).toBeUndefined();
-    expect(extraNutrientsLine(entry(undefined, { fiberG: 4.5, sodiumMg: 349.5, alcoholG: 0 }))).toBe(
+    expect(extraNutrientsLine(entry(), true)).toBeUndefined();
+    expect(extraNutrientsLine(entry(undefined, { fiberG: 4.5, sodiumMg: 349.5, alcoholG: 0 }), false)).toBe(
       'Fiber 5 g · Net carbs 18 g · Sodium 350 mg',
     );
-    expect(extraNutrientsLine(entry(undefined, { alcoholG: 10.6 }))).toBe('Alcohol 11 g');
+    expect(extraNutrientsLine(entry(undefined, { alcoholG: 10.6 }), true)).toBe('Alcohol 11 g');
+  });
+
+  // MM-396, the designer's PD-1: while carbs are shown net, the line gives the total, so no entry shows net twice.
+  it('the extra line gives the carbohydrate figure the entry is not shown as', () => {
+    const bar = entry(undefined, { fiberG: 9, sugarAlcoholsG: 10 });
+    expect(extraNutrientsLine(bar, true)).toBe(`Fiber 9 g · Sugar alcohols 10 g · Total carbs ${Math.round(bar.carbsG)} g`);
+    expect(extraNutrientsLine(bar, false)).toBe(`Fiber 9 g · Sugar alcohols 10 g · Net carbs ${Math.round(bar.netCarbsG)} g`);
   });
 });
 

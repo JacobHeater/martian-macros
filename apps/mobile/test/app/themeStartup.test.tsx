@@ -48,20 +48,20 @@ function handFed() {
 it('fresh install starts in Martian, accepts it and never asks again', async () => {
   const view = renderApp(repos, today);
   expect(await screen.findByRole('heading', { name: 'Choose your theme' })).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Begin' })).not.toBeInTheDocument();
   expect(palette()).toBe('theme-martian');
   const choices = [...document.querySelectorAll('.mm-choice-card-label')].map((label) => label.firstChild?.textContent);
   expect(choices).toEqual(['Martian', 'Light', 'Dark', 'System']);
   expect(screen.getByRole('button', { pressed: true })).toHaveTextContent(/^Martian/);
 
   await continueOn();
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
   expect(await stored()).toBe('martian');
   expect(palette()).toBe('theme-martian');
 
   view.unmount();
   renderApp(repos, today);
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Choose your theme' })).not.toBeInTheDocument();
   expect(palette()).toBe('theme-martian');
 });
@@ -89,7 +89,7 @@ it('choices preview immediately but are not saved before Continue', async () => 
 
   await userEvent.click(screen.getByRole('button', { name: /^Light/ }));
   await continueOn();
-  await screen.findByRole('button', { name: 'Get started' });
+  await screen.findByRole('button', { name: 'Begin' });
   expect(palette()).toBe('theme-light');
   expect(await stored()).toBe('light');
 });
@@ -102,7 +102,7 @@ describe.each([
   it('skips the chooser even without setup', async () => {
     await repos.preferences.saveThemePreference(preference);
     renderApp(repos, today);
-    expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Choose your theme' })).not.toBeInTheDocument();
     expect(palette()).toBe(expected);
   });
@@ -120,7 +120,7 @@ describe.each([
     expect(screen.queryByRole('heading', { name: 'Choose your theme' })).not.toBeInTheDocument();
 
     theme.tell(preference);
-    expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
     expect(palette()).toBe(expected);
   });
 });
@@ -143,16 +143,16 @@ it('theme loading blocks onboarding and a load failure offers retry', async () =
       }),
   });
   expect(await screen.findByRole('progressbar')).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Begin' })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Choose your theme' })).not.toBeInTheDocument();
 
   theme.fail(new Error('theme read unavailable'));
   expect(await screen.findByText('Could not load your theme preference')).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Begin' })).not.toBeInTheDocument();
 
   failed = true;
   await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
 });
 
 it('failed Continue keeps preview and selection, retry persists them', async () => {
@@ -172,13 +172,13 @@ it('failed Continue keeps preview and selection, retry persists them', async () 
   await userEvent.click(screen.getByRole('button', { name: /^Dark/ }));
   await continueOn();
   expect(await screen.findByText('Could not save your theme. Please try again.')).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Begin' })).not.toBeInTheDocument();
   expect(palette()).toBe('theme-dark');
   expect(await stored()).toBe('unselected');
 
   fail = false;
   await continueOn();
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
   expect(calls).toBe(2);
   expect(await stored()).toBe('dark');
 });
@@ -198,6 +198,6 @@ it('MM-185: preview stays selected until storage emits the saved choice', async 
   expect(within(screen.getByRole('button', { pressed: true })).getByText('Light')).toBeInTheDocument();
 
   theme.tell('light');
-  expect(await screen.findByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Begin' })).toBeInTheDocument();
   expect(palette()).toBe('theme-light');
 });

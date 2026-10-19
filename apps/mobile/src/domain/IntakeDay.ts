@@ -6,6 +6,8 @@ interface IntakeDayInit {
   kcal: number;
   proteinG: number;
   carbsG: number;
+  /** Carbohydrate less stated fiber and sugar alcohols (MM-396); the total when not given. */
+  netCarbsG?: number;
   fatG: number;
   completeness?: DayCompleteness;
   relativeSigma?: number;
@@ -18,7 +20,14 @@ export class IntakeDay {
   readonly date: CalendarDate;
   readonly kcal: number;
   readonly proteinG: number;
+  /** Total carbohydrate: what the engine and the calories rest on. */
   readonly carbsG: number;
+  /**
+   * Carbohydrate less the fiber and sugar alcohols stated for each food,
+   * each food's net never below zero (MM-396). For what is shown, never for
+   * the engine.
+   */
+  readonly netCarbsG: number;
   readonly fatG: number;
   readonly completeness: DayCompleteness;
 
@@ -45,6 +54,7 @@ export class IntakeDay {
     this.kcal = init.kcal;
     this.proteinG = init.proteinG;
     this.carbsG = init.carbsG;
+    this.netCarbsG = init.netCarbsG ?? init.carbsG;
     this.fatG = init.fatG;
     this.completeness = init.completeness ?? 'unmarked';
     this.relativeSigma = init.relativeSigma ?? 0.1;

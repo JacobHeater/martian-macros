@@ -111,6 +111,8 @@ export * from './repositories/DetailLevelReader';
 export * from './repositories/DetailLevelWriter';
 export * from './repositories/EasyToMissReader';
 export * from './repositories/EasyToMissWriter';
+export * from './repositories/NetCarbsReader';
+export * from './repositories/NetCarbsWriter';
 export * from './repositories/ExerciseProgressionReader';
 export * from './repositories/ExerciseProgressionRepository';
 export * from './repositories/ExerciseProgressionWriter';

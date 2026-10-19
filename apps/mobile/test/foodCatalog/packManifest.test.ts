@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PackDownloadProgress } from '../../src/foodCatalog/download/PackDownloadProgress';
 import { PackManifest } from '../../src/foodCatalog/download/PackManifest';
+import { FoodPackFormat } from '../../src/foodCatalog/FoodPackFormat';
 import { FormatError } from '../../src/lang/FormatError';
 
 describe('manifest', () => {
@@ -8,6 +9,13 @@ describe('manifest', () => {
   const json = ({ url = 'https://x.test/p.gz', hash = sha }: { url?: string; hash?: string } = {}) => `
 {"packs":[{"id":"barcode_us","title":"Barcode foods","version":"2026-10-09",
 "formatVersion":1,"url":"${url}","bytes":48000000,"sha256":"${hash}"}]}`;
+
+  // MM-397, the panel's IN-6: a pack this app cannot open is never offered.
+  it('leaves out a pack in a newer format than the app reads', () => {
+    const newer = json().replace('"formatVersion":1', `"formatVersion":${FoodPackFormat.version + 1}`);
+    expect(PackManifest.parse(newer).packs).toEqual([]);
+    expect(PackManifest.parse(json()).packs).toHaveLength(1);
+  });
 
   it('parses a listing', () => {
     const m = PackManifest.parse(json());

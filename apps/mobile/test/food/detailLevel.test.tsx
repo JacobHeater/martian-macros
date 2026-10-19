@@ -43,8 +43,9 @@ async function openFood(): Promise<void> {
 
 it('Standard shows the macros and no extras', async () => {
   await openFood();
-  expect(screen.getAllByText('Carbs').length).toBeGreaterThan(0);
-  expect(screen.getByText(/P 18 · C 40 · F 1/)).toBeInTheDocument();
+  // Carbs are shown net by default (MM-396): 40 g less 16 g fiber.
+  expect(screen.getAllByText('Net carbs').length).toBeGreaterThan(0);
+  expect(screen.getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
   expect(document.querySelector('.food-entry-extras')).toBeNull();
 });
 
@@ -52,7 +53,8 @@ it('Full reveals what was stored all along', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
   const extras = await screen.findByText(/Fiber 16 g/);
-  expect(extras).toHaveTextContent('Net carbs 24 g');
+  // Net is the entry's own figure, so the line gives the total (MM-396, the designer's PD-1).
+  expect(extras).toHaveTextContent('Total carbs 40 g');
   expect(extras).toHaveTextContent('Sodium 4 mg');
 });
 

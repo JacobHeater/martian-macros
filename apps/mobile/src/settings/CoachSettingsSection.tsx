@@ -2,6 +2,7 @@ import { useNavigator } from '../app/useNavigator';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
+import { useSettingsSection } from './useSettingsSection';
 import { CoachSettingsScreen } from './CoachSettingsScreen';
 
 /**
@@ -9,9 +10,11 @@ import { CoachSettingsScreen } from './CoachSettingsScreen';
  * insights' switches, as Pause opens its screen from Today's setup.
  */
 export function CoachSettingsSection() {
+  // Folds in place, closed until opened (MM-398).
+  const fold = useSettingsSection('coach');
   const navigator = useNavigator();
   return (
-    <MmSection icon="coach" title="Coach">
+    <MmSection icon="coach" title="Coach" {...fold}>
       <MmListGroup>
         <MmListRow
           leadingIcon="insight"

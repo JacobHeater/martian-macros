@@ -11,6 +11,11 @@
 -- cholesterol_mg; Open Food Facts states grams, converted here), servings (JSON [{"d": text, "g": grams}]),
 -- version_key (orders versions of one product within a source; highest wins),
 -- updated_at (when the source last changed the record, seconds since 1970).
+-- The barcode file adds sugar_alcohols (USDA Branded's nutrient 1086, Open
+-- Food Facts' polyols_100g; MM-397) and carbs_label: 'us' where the
+-- carbohydrate is surely a US label's total, 'unknown' for an Open Food Facts
+-- product also sold outside the US and Canada, whose figure may be an EU
+-- label's available carbohydrate (the panel's NU-1; usLabelCarbs decides).
 -- All nutrients are per 100 g.
 
 COPY (
@@ -38,10 +43,11 @@ COPY (
       max(CASE WHEN nutrient_id = '2000' THEN try_cast(amount AS DOUBLE) END) AS sugars_g,
       max(CASE WHEN nutrient_id = '1063' THEN try_cast(amount AS DOUBLE) END) AS sugars_nlea_g,
       max(CASE WHEN nutrient_id = '1258' THEN try_cast(amount AS DOUBLE) END) AS saturated_fat_g,
+      max(CASE WHEN nutrient_id = '1086' THEN try_cast(amount AS DOUBLE) END) AS sugar_alcohols,
       max(CASE WHEN nutrient_id = '1253' THEN try_cast(amount AS DOUBLE) END) AS cholesterol_mg
     FROM read_csv('{{cache}}/usda_branded/food_nutrient.csv', header = true,
                   all_varchar = true, ignore_errors = true)
-    WHERE nutrient_id IN ('1008', '1003', '1005', '1004', '1079', '1093', '1018',
+    WHERE nutrient_id IN ('1086', '1008', '1003', '1005', '1004', '1079', '1093', '1018',
                           '1092', '1087', '1089', '1090', '1095', '1106', '1162', '1114', '1110', '1178', '1190', '2000', '1063', '1258', '1253')
     GROUP BY fdc_id
   ),
@@ -68,7 +74,9 @@ COPY (
                         'g': try_cast(bf.serving_size AS DOUBLE)}])
     END AS servings,
     try_cast(bf.fdc_id AS BIGINT) AS version_key,
-    CAST(epoch(try_cast(bf.modified_date AS DATE)) AS BIGINT) AS updated_at
+    CAST(epoch(try_cast(bf.modified_date AS DATE)) AS BIGINT) AS updated_at,
+    nut.sugar_alcohols,
+    'us' AS carbs_label
   FROM bf
   JOIN fd USING (fdc_id)
   LEFT JOIN nut USING (fdc_id)
@@ -103,7 +111,9 @@ COPY (
          THEN to_json([{'d': serving_size, 'g': try_cast(serving_quantity AS DOUBLE)}])
     END,
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
-    coalesce(try_cast(last_modified_t AS BIGINT), 0)
+    coalesce(try_cast(last_modified_t AS BIGINT), 0),
+    try_cast(polyols_100g AS DOUBLE),
+    CASE WHEN regexp_full_match(countries_tags, 'en:(united-states|canada)(,en:(united-states|canada))*') THEN 'us' ELSE 'unknown' END
   FROM read_csv('{{cache}}/off.csv.gz', delim = chr(9), header = true, quote = '',
                 all_varchar = true, ignore_errors = true, sample_size = -1)
   WHERE countries_tags LIKE '%en:united-states%'

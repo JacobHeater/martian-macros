@@ -28,7 +28,8 @@ export function AdultsOnlyScreen() {
           label="Correct date of birth"
           kind="secondary"
           expand
-          onPress={() => void navigator.push(() => <SettingsScreen />)}
+          // The date of birth is under "You": that section opens (MM-398, the UX role's UX-2).
+          onPress={() => void navigator.push(() => <SettingsScreen open="profile" />)}
         />
       </div>
     </Screen>

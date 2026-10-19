@@ -21,6 +21,7 @@ const valuesOf = (entry: FoodEntry): Values => ({
   fat_g: entry.fatG,
   quantity_source: entry.source,
   fiber_g: orNull(entry.fiberG),
+  sugar_alcohols_g: orNull(entry.sugarAlcoholsG),
   sodium_mg: orNull(entry.sodiumMg),
   alcohol_g: orNull(entry.alcoholG),
   ...microsValues(entry.micros),

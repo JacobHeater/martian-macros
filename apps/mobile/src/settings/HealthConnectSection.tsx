@@ -11,6 +11,7 @@ import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
+import { useSettingsSection } from './useSettingsSection';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
 
 function count(samples: readonly HealthSample[]): string {
@@ -30,6 +31,8 @@ function count(samples: readonly HealthSample[]): string {
  * app only reads.
  */
 export function HealthConnectSection() {
+  // Folds in place, closed until opened (MM-398).
+  const fold = useSettingsSection('healthConnect');
   const { services, state } = useApp();
   const overlays = useOverlays();
   const connection = useLoaded(state.healthConnection);
@@ -38,7 +41,7 @@ export function HealthConnectSection() {
   if (connection === undefined || setup === undefined) return null;
   if (connection.available.size === 0) {
     return (
-      <MmSection icon="health" title="Health Connect">
+      <MmSection icon="health" title="Health Connect" {...fold}>
         <MmListGroup>
           <MmListRow
             leadingIcon="sync"
@@ -92,7 +95,7 @@ export function HealthConnectSection() {
       (type !== 'menstruation' || setup.profile.sex === 'female'),
   );
   return (
-    <MmSection icon="health" title="Health Connect">
+    <MmSection icon="health" title="Health Connect" {...fold}>
       <MmListGroup>
         {offered.map((type) => {
           const permitted = connection.permitted.has(type);

@@ -14,6 +14,7 @@ export function intakeDayFrom(
   let kcal = 0;
   let protein = 0;
   let carbs = 0;
+  let netCarbs = 0;
   let fat = 0;
   let weighed = 0;
   let estimated = 0;
@@ -21,6 +22,7 @@ export function intakeDayFrom(
     kcal += e.kcal;
     protein += e.proteinG;
     carbs += e.carbsG;
+    netCarbs += e.netCarbsG;
     fat += e.fatG;
     if (e.source === 'weighed') weighed += e.kcal;
     if (e.source === 'quickAdd') estimated += e.kcal;
@@ -30,6 +32,7 @@ export function intakeDayFrom(
     kcal,
     proteinG: protein,
     carbsG: carbs,
+    netCarbsG: netCarbs,
     fatG: fat,
     completeness,
     relativeSigma: dailyRelativeSigma(all.map((e) => [e.kcal, e.source] as const)),

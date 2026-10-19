@@ -567,6 +567,14 @@ export const AddFoodAmountRoundsToZero = screenStory({
   },
 });
 
+/** MM-396: net carbs switched off: the bars say Carbs, the total. */
+export const FoodTotalCarbs = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Carbs',
+  scenario: demoWith({ then: async (repos) => repos.preferences.saveNetCarbs(false) }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
 /** MM-321: "Is this day fully logged?" pressed: the three answers. */
 export const DayCompleteness = screenStory({
   covers: ['FoodScreen'],

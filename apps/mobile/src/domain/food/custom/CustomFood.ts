@@ -15,6 +15,7 @@ interface CustomFoodInit {
   cookedWeightGrams?: number | undefined;
   ingredients?: readonly RecipeIngredient[];
   fiberG?: number | undefined;
+  sugarAlcoholsG?: number | undefined;
   micros?: Micronutrients;
 }
 
@@ -53,6 +54,9 @@ export class CustomFood {
   /** Fiber per serving, when the label or the user stated it (MM-309). */
   readonly fiberG: number | undefined;
 
+  /** Sugar alcohols per serving, when stated (MM-397). */
+  readonly sugarAlcoholsG: number | undefined;
+
   /** Sodium and the micronutrients per serving, when stated (MM-309); a recipe has none. */
   readonly micros: Micronutrients;
 
@@ -68,6 +72,7 @@ export class CustomFood {
     this.cookedWeightGrams = init.cookedWeightGrams;
     this.ingredients = init.ingredients ?? [];
     this.fiberG = init.fiberG;
+    this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.micros = init.micros ?? Micronutrients.none;
   }
 }

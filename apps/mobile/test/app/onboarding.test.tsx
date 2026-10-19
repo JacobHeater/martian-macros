@@ -16,7 +16,7 @@ async function begin() {
   const repos = new InMemoryRepositories();
   await repos.preferences.saveThemePreference('martian');
   renderApp(repos, today);
-  await userEvent.click(await screen.findByRole('button', { name: 'Get started' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Begin' }));
   return repos;
 }
 

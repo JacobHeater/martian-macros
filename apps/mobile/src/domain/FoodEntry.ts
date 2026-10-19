@@ -16,6 +16,7 @@ interface FoodEntryInit {
   source: QuantitySource;
   portion?: Portion | undefined;
   fiberG?: number | undefined;
+  sugarAlcoholsG?: number | undefined;
   sodiumMg?: number | undefined;
   alcoholG?: number | undefined;
   /** Sodium may be given here or as `sodiumMg`; `sodiumMg` wins. */
@@ -47,6 +48,8 @@ export class FoodEntry {
    * shown at Full detail (MM-49). Undefined means not known, never zero.
    */
   readonly fiberG: number | undefined;
+  /** Sugar alcohols as stated (MM-397); undefined when not stated. */
+  readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
@@ -68,6 +71,7 @@ export class FoodEntry {
     this.source = init.source;
     this.portion = init.portion;
     this.fiberG = init.fiberG;
+    this.sugarAlcoholsG = init.sugarAlcoholsG;
     const micros = init.micros ?? Micronutrients.none;
     this.sodiumMg = init.sodiumMg ?? micros.of('sodium');
     this.micros = micros.with('sodium', this.sodiumMg);
@@ -79,9 +83,12 @@ export class FoodEntry {
     return 7 * (this.alcoholG ?? 0);
   }
 
-  /** Carbohydrate less fiber, or undefined when fiber is not known. */
-  get netCarbsG(): number | undefined {
-    const fiber = this.fiberG;
-    return fiber === undefined ? undefined : Math.max(0, this.carbsG - fiber);
+  /**
+   * Carbohydrate less the fiber and sugar alcohols stated for it (MM-396):
+   * what is not stated is not subtracted, and labels round each line on its
+   * own, so it never goes below zero.
+   */
+  get netCarbsG(): number {
+    return Math.max(0, this.carbsG - (this.fiberG ?? 0) - (this.sugarAlcoholsG ?? 0));
   }
 }
