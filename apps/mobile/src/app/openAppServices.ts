@@ -16,6 +16,7 @@ import { NativeHealthSource } from '../platform/NativeHealthSource';
 import { NativeReminderScheduler } from '../platform/NativeReminderScheduler';
 import { NoCamera } from '../platform/NoCamera';
 import { runningNatively } from '../platform/runningNatively';
+import { runningOn } from '../platform/runningOn';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
@@ -88,5 +89,6 @@ export async function openAppServices(): Promise<AppServices> {
     healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
+    platform: runningOn(),
   };
 }

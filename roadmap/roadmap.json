@@ -15,7 +15,8 @@
     "code": [
       "apps/mobile/src",
       "apps/mobile/android",
-      "tool/src"
+      "tool/src",
+      "apps/mobile/ios"
     ]
   },
   "conventions": {
@@ -280,6 +281,18 @@
         "WS-08"
       ],
       "rule": "MM-161 replaces MmStore with role interfaces. Until it lands, do not add methods to MmStore; after it lands, new persistence is a new narrow interface plus implementations."
+    },
+    {
+      "id": "HS-ios-shell",
+      "surface": "apps/mobile/ios/App/App.xcodeproj/project.pbxproj, apps/mobile/ios/App/App/MainViewController.swift, apps/mobile/ios/App/App/Info.plist",
+      "workstreams": [
+        "WS-03",
+        "WS-14",
+        "WS-09",
+        "WS-08",
+        "WS-11"
+      ],
+      "rule": "Serialize. One branch at a time adds Swift files to the project and keys to Info.plist; a plugin is registered in MainViewController in the same change as its Swift file. CapApp-SPM/Package.swift is written by cap sync, never by hand."
     }
   ],
   "milestones": [
@@ -754,7 +767,8 @@
             "MM-387",
             "MM-388",
             "MM-396",
-            "MM-397"
+            "MM-397",
+            "MM-406"
           ]
         },
         {
@@ -780,7 +794,8 @@
             "MM-377",
             "MM-378",
             "MM-379",
-            "MM-393"
+            "MM-393",
+            "MM-405"
           ]
         },
         {
@@ -825,7 +840,15 @@
             "MM-399",
             "MM-400",
             "MM-401",
-            "MM-402"
+            "MM-402",
+            "MM-403",
+            "MM-407"
+          ]
+        },
+        {
+          "workstream": "WS-14",
+          "tickets": [
+            "MM-404"
           ]
         }
       ]
@@ -885,7 +908,8 @@
         ],
         "remaining": [
           "MM-159",
-          "MM-228"
+          "MM-228",
+          "MM-404"
         ]
       },
       "sequence": [
@@ -927,6 +951,14 @@
             "MM-261",
             "MM-278"
           ]
+        },
+        {
+          "step": 5,
+          "title": "The phone's storage on iOS (MM-404): MmDb over the system SQLite and MmPacks in Swift, behind the seams of MM-231 and MM-56",
+          "tickets": [
+            "MM-404"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -1383,7 +1415,8 @@
           "MM-399",
           "MM-400",
           "MM-401",
-          "MM-402"
+          "MM-402",
+          "MM-407"
         ],
         "remaining": [
           "MM-89",
@@ -1413,7 +1446,8 @@
           "MM-374",
           "MM-375",
           "MM-391",
-          "MM-392"
+          "MM-392",
+          "MM-403"
         ]
       },
       "sequence": [
@@ -1674,7 +1708,16 @@
             "MM-399",
             "MM-400",
             "MM-401",
-            "MM-402"
+            "MM-402",
+            "MM-407"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 20,
+          "title": "The iOS shell (MM-403): the Capacitor iOS project under the DEMO identity, the Swift plugins registered as the Kotlin ones are, the platform as a service, the terms declined on iOS, mm build ios and mm run --ios",
+          "tickets": [
+            "MM-403"
           ],
           "milestone": "M4"
         }
@@ -2301,7 +2344,8 @@
           "MM-220",
           "MM-221",
           "MM-305",
-          "MM-329"
+          "MM-329",
+          "MM-406"
         ]
       },
       "sequence": [
@@ -2457,6 +2501,14 @@
             "MM-397"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 13,
+          "title": "The camera on iOS (MM-406): a barcode read live with AVFoundation and a label read with Vision, on the device",
+          "tickets": [
+            "MM-406"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {
@@ -2553,7 +2605,8 @@
           "MM-149",
           "MM-248",
           "MM-361",
-          "MM-368"
+          "MM-368",
+          "MM-405"
         ]
       },
       "sequence": [
@@ -2670,6 +2723,14 @@
           "title": "Every rule that holds on an item shows its own line under it, the higher priority first (MM-393)",
           "tickets": [
             "MM-393"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 13,
+          "title": "Reminders on iOS (MM-405): the plugin over UNUserNotificationCenter, the plan as exactly what is pending",
+          "tickets": [
+            "MM-405"
           ],
           "milestone": "M4"
         }
@@ -2922,7 +2983,7 @@
         },
         {
           "step": 7,
-          "title": "Import from HealthKit (needs the Mac)",
+          "title": "Import from Apple Health (MM-69), on the Mac: the Swift plugin behind the same interface, the Settings section in the platform's own name",
           "tickets": [
             "MM-69"
           ],
@@ -4079,6 +4140,54 @@
         "MM-311"
       ],
       "reason": "The sodium insight reads the sodium limit preference and the coverage rule of the Micros view."
+    },
+    {
+      "from": "WS-03",
+      "to": "WS-14",
+      "type": "integration-risk",
+      "scope": [
+        5
+      ],
+      "satisfiedBy": [
+        "MM-403"
+      ],
+      "reason": "An iOS plugin lives in the iOS shell MM-403 creates (the Xcode project, MainViewController's registration, Info.plist): build it after MM-403, in the HS-ios-shell lane. Not a workstream order: WS-03 as a whole waits on nothing here."
+    },
+    {
+      "from": "WS-03",
+      "to": "WS-09",
+      "type": "integration-risk",
+      "scope": [
+        13
+      ],
+      "satisfiedBy": [
+        "MM-403"
+      ],
+      "reason": "An iOS plugin lives in the iOS shell MM-403 creates (the Xcode project, MainViewController's registration, Info.plist): build it after MM-403, in the HS-ios-shell lane. Not a workstream order: WS-03 as a whole waits on nothing here."
+    },
+    {
+      "from": "WS-03",
+      "to": "WS-08",
+      "type": "integration-risk",
+      "scope": [
+        13
+      ],
+      "satisfiedBy": [
+        "MM-403"
+      ],
+      "reason": "An iOS plugin lives in the iOS shell MM-403 creates (the Xcode project, MainViewController's registration, Info.plist): build it after MM-403, in the HS-ios-shell lane. Not a workstream order: WS-03 as a whole waits on nothing here."
+    },
+    {
+      "from": "WS-03",
+      "to": "WS-11",
+      "type": "integration-risk",
+      "scope": [
+        7
+      ],
+      "satisfiedBy": [
+        "MM-403"
+      ],
+      "reason": "An iOS plugin lives in the iOS shell MM-403 creates (the Xcode project, MainViewController's registration, Info.plist): build it after MM-403, in the HS-ios-shell lane. Not a workstream order: WS-03 as a whole waits on nothing here."
     }
   ],
   "parallelGroups": [

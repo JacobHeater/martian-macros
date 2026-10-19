@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { Platform } from '../domain/integration/Platform';
 import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
 import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
@@ -90,6 +91,9 @@ export interface AppServices {
 
   /** Which build this is: "dev" or "prod". The development group of Settings shows only in "dev". */
   readonly environment: string;
+
+  /** Which platform the app is on (MM-403): a screen asks only where the platforms differ. */
+  readonly platform: Platform;
 
   /** How the end of a rest is signalled (MM-191). */
   readonly restSignal: RestSignal;

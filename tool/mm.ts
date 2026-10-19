@@ -1,9 +1,11 @@
+import { rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
 import { runEmulator, runApp, runBuild, runClean, runDemo, runScreenshot } from './src/android.ts';
 import { runCi } from './src/ci/ciCommand.ts';
 import { runFood } from './src/food.ts';
+import { cleanIos, isSimulatorId, runIosApp, runIosBuild, runSimulator, simulatorScreenshot, temporaryScreenshot } from './src/ios.ts';
 import { runPanel } from './src/panelCommand.ts';
 import { run } from './src/proc.ts';
 import { runRequirements } from './src/requirements.ts';
@@ -65,6 +67,31 @@ async function doctor(): Promise<number> {
   return 0;
 }
 
+/** `mm screenshot`: a simulator by its UDID goes through simctl, anything else through adb (MM-238, MM-403). */
+async function screenshot(args: readonly string[]): Promise<number> {
+  const device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  if (device === undefined || !isSimulatorId(device)) return runScreenshot(args);
+  const out = args.filter((arg, at) => !arg.startsWith('-') && args[at - 1] !== '-d');
+  const stamp = new Date().toISOString().slice(0, 19).replaceAll(/[-:]/g, '').replace('T', '-');
+  const clipboard = args.includes('--clipboard');
+  const keepFile = out[0] !== undefined || !clipboard;
+  const path = resolve(out[0] ?? (keepFile ? `mm-screenshot-${stamp}.png` : temporaryScreenshot(stamp)));
+  const taken = await simulatorScreenshot(device, path);
+  if (taken !== 0) return taken;
+  if (!clipboard) {
+    stdout.write(`${device} -> ${path}\n`);
+    return 0;
+  }
+  const copied = await run(['osascript', '-e', `set the clipboard to (read (POSIX file "${path}") as «class PNGf»)`]);
+  if (copied !== 0) {
+    stderr.write(`The image could not be put on the clipboard. It is kept at ${path}\n`);
+    return 1;
+  }
+  if (!keepFile) rmSync(path, { force: true });
+  stdout.write(`${device} -> ${keepFile ? `${path} and the clipboard` : 'the clipboard'}\n`);
+  return 0;
+}
+
 const commands: Record<string, [string, Command]> = {
   doctor: ['Check the toolchain', doctor],
   bootstrap: ['Install the exact dependencies from the lock file, and opt this machine out of Capacitor telemetry', bootstrap],
@@ -77,12 +104,16 @@ const commands: Record<string, [string, Command]> = {
   ci: ['Watch pull request checks without waiting: mm ci help', (a) => runCi(repoRoot, a)],
   roadmap: ['Write roadmap/progress.html, the progress page: mm roadmap [--check] [--no-open]', (a) => runRoadmapReport(repoRoot, a)],
   food: ['Build the food packs: mm food fetch | build | package', (a) => runFood(repoRoot, a)],
-  run: ['Build, install and launch on a device: mm run [-d DEVICE] [--env phone] [--live [--port N]] (--live: hot reload from the dev server)', (a) => runApp(repoRoot, a)],
+  run: ['Build, install and launch on a device: mm run [-d DEVICE] [--env phone] [--live [--port N]] (--live: hot reload from the dev server); mm run --ios [-d UDID] for a simulator', (a) => (a.includes('--ios') ? runIosApp(repoRoot, a) : runApp(repoRoot, a))],
   demo: ['The isolated demo app on an exact device: mm demo [--seed] -d <device ID>', (a) => runDemo(repoRoot, a)],
   emulator: ['Start an emulator: mm emulator [id] [--cold] | list', (a) => runEmulator(repoRoot, a)],
-  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238)', (a) => runScreenshot(a)],
-  build: ['Build the Android app: mm build android [--release]', (a) => runBuild(repoRoot, a)],
-  clean: ['Remove build outputs and caches', () => runClean(repoRoot)],
+  simulator: ['Start an iPhone simulator: mm simulator [name | udid] | list (MM-403)', (a) => runSimulator(a)],
+  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238); a simulator by its UDID', (a) => screenshot(a)],
+  build: ['Build the app: mm build android [--release] | mm build ios [--release] (a simulator build)', (a) => (a[0] === 'ios' ? runIosBuild(repoRoot, a) : runBuild(repoRoot, a))],
+  clean: ['Remove build outputs and caches', () => {
+    cleanIos(repoRoot);
+    return runClean(repoRoot);
+  }],
 };
 
 function help(): void {

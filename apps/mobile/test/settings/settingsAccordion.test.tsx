@@ -25,7 +25,9 @@ const header = (name: string) => within(topLayer()).getByRole('button', { name: 
 it('opens with every section closed: each header shows and none of their rows', async () => {
   renderApp(repos, today);
   const settings = await openSettings({ closed: true });
-  for (const name of ['Today’s setup', 'Nutrition goals', 'You', 'Reminders', 'Data', 'Appearance', 'About', 'Erase']) {
+  // Health Connect is drawn once the platform has answered, so it is waited for (MM-407).
+  await settings.findByRole('heading', { level: 2, name: 'Health Connect' });
+  for (const name of ['Today’s setup', 'Nutrition goals', 'You', 'Reminders', 'Health Connect', 'Data', 'Appearance', 'About', 'Erase']) {
     expect(settings.getByRole('heading', { level: 2, name })).toBeInTheDocument();
     expect(header(name)).toHaveAttribute('aria-expanded', 'false');
   }
