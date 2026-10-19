@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
@@ -6,6 +7,7 @@ import { useApp } from '../app/useApp';
 import { useAsync } from '../app/useAsync';
 import { useDebounced } from '../app/useDebounced';
 import { useLoaded } from '../app/useLoaded';
+import { MmButton } from '../ui/MmButton';
 import { MmListRow } from '../ui/MmListRow';
 import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
@@ -20,22 +22,39 @@ interface FoodSearchResultsProps {
 /** How long the typing pauses before the packs are searched again (MM-408). */
 const pauseMs = 150;
 
+/** How many results a page holds; "More results" asks for the next (MM-410). */
+const pageSize = 20;
+
 /**
  * Foods from the installed packs that match `query`, as the user types
  * (MM-42). Searching is on the phone and needs no network. The packs are
  * asked once the typing pauses, and the last answer stays on screen until
  * the next arrives, so the list never empties between keystrokes (MM-408).
+ * The first twenty come first; "More results" lengthens the list by twenty
+ * while there are more (one more than the page is asked for, so the offer
+ * is never empty); the first new row takes focus and a status says how many
+ * joined (MM-410).
  */
 export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSearchResultsProps) {
   const { state } = useApp();
   const catalog = useLoaded(state.foodCatalog);
   const preview = useInsightPreview();
   const settled = useDebounced(query, pauseMs);
-  const hits = useAsync(
-    () => (catalog === undefined ? Promise.resolve(undefined) : catalog.search(settled, { limit: 20 })),
-    `${catalog?.packs.length ?? -1}:${settled}`,
+  // How many pages were asked for, of the query they were asked for: a new query starts at one.
+  const [pages, setPages] = useState({ query: settled, count: 1 });
+  const count = pages.query === settled ? pages.count : 1;
+  const limit = pageSize * count;
+  const answer = useAsync(
+    () =>
+      catalog === undefined
+        ? Promise.resolve(undefined)
+        : catalog.search(settled, { limit: limit + 1 }).then((found) => ({ found, limit })),
+    `${catalog?.packs.length ?? -1}:${settled}:${limit}`,
     { keep: true },
   );
+  const hits = answer?.found.slice(0, answer.limit);
+  // The row a press added first, once its page has arrived; none on the first page or while it is pending.
+  const firstNew = count > 1 && answer?.limit === limit ? limit - pageSize : -1;
   if (catalog === undefined || hits === undefined) return null;
   if (hits.length === 0) {
     if (alsoFound && catalog.packs.length > 0) return null;
@@ -49,7 +68,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
   }
   return (
     <>
-      {hits.map(({ food }) => {
+      {hits.map(({ food }, at) => {
         // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
         const grade = preview.gradeOfFood?.(food.name) ?? gradeOfCatalogFood(food);
         return (
@@ -63,10 +82,19 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
               </>
             }
             onPress={() => onPick(food)}
+            autoFocus={at === firstNew}
             trailingAction={<FoodGrade grade={grade} subject={food.name} />}
           />
         );
       })}
+      {answer !== undefined && firstNew >= 0 ? (
+        <span className="mm-visually-hidden" role="status">
+          {`${hits.length - firstNew} more results${answer.found.length > answer.limit ? '' : ', every match listed'}.`}
+        </span>
+      ) : null}
+      {answer !== undefined && answer.found.length > answer.limit ? (
+        <MmButton label="More results" kind="text" expand onPress={() => setPages({ query: settled, count: answer.limit / pageSize + 1 })} />
+      ) : null}
     </>
   );
 }
