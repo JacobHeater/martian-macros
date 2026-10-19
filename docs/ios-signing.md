@@ -15,7 +15,8 @@ once, by the owner, in Xcode; it is never committed.
    **App** target, then **Signing & Capabilities**.
 4. Tick **Automatically manage signing** and choose your **Team**.
    Xcode creates the signing certificate and the provisioning profile for
-   `com.martianmacros.martian_macros.demo` and shows the HealthKit
+   `com.martianmacros.martian-macros.demo` (Apple allows no underscore in a
+   bundle id, so it differs from Android's by a hyphen) and shows the HealthKit
    capability the project already declares (`App/App.entitlements`).
    A "Provisioning profile doesn't include the HealthKit entitlement"
    message means the team is not in the paid program yet.

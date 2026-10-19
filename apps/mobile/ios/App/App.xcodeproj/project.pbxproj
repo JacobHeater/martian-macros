@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		179E1563D1DB84AC72AD1138 /* MmDbPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CDA8CA892DF8932B302BA5 /* MmDbPlugin.swift */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
+		43E3EB63AD8DB1A14ABA67C9 /* MmPacksPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124862888A68C4664628B91E /* MmPacksPlugin.swift */; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
@@ -15,19 +17,20 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
-		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
-		E59ABD9DABED1276F49AF68F /* MmFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA06207BA58848900AD095C4 /* MmFiles.swift */; };
-		179E1563D1DB84AC72AD1138 /* MmDbPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CDA8CA892DF8932B302BA5 /* MmDbPlugin.swift */; };
-		43E3EB63AD8DB1A14ABA67C9 /* MmPacksPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124862888A68C4664628B91E /* MmPacksPlugin.swift */; };
-		B44B4F6F08E88F76DAAF4F39 /* MmRemindersPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276EE51C3F8EFC39216D45D4 /* MmRemindersPlugin.swift */; };
-		A22DA04077393E9F8E2AC990 /* MmScannerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF83D1E04ACAF4531482287 /* MmScannerPlugin.swift */; };
-		F3AA4D9DE8D5822D84CEB169 /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B16D53D58543CB6CFE59FD4B /* ScanViewController.swift */; };
-		823CA1D3841FD07B756A57C8 /* MmHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */; };
 		7D696CB11E8A73D0EE30D33F /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728ACC88D22733C255E5992B /* MainViewController.swift */; };
+		823CA1D3841FD07B756A57C8 /* MmHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */; };
+		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		A22DA04077393E9F8E2AC990 /* MmScannerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF83D1E04ACAF4531482287 /* MmScannerPlugin.swift */; };
+		B44B4F6F08E88F76DAAF4F39 /* MmRemindersPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276EE51C3F8EFC39216D45D4 /* MmRemindersPlugin.swift */; };
+		E59ABD9DABED1276F49AF68F /* MmFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA06207BA58848900AD095C4 /* MmFiles.swift */; };
+		F3AA4D9DE8D5822D84CEB169 /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B16D53D58543CB6CFE59FD4B /* ScanViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		124862888A68C4664628B91E /* MmPacksPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmPacksPlugin.swift; sourceTree = "<group>"; };
+		276EE51C3F8EFC39216D45D4 /* MmRemindersPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmRemindersPlugin.swift; sourceTree = "<group>"; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		3822E16D1D7E05C3A9A4F101 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -36,17 +39,14 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
-		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		DA06207BA58848900AD095C4 /* MmFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmFiles.swift; sourceTree = "<group>"; };
-		F6CDA8CA892DF8932B302BA5 /* MmDbPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmDbPlugin.swift; sourceTree = "<group>"; };
-		124862888A68C4664628B91E /* MmPacksPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmPacksPlugin.swift; sourceTree = "<group>"; };
-		276EE51C3F8EFC39216D45D4 /* MmRemindersPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmRemindersPlugin.swift; sourceTree = "<group>"; };
 		6BF83D1E04ACAF4531482287 /* MmScannerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmScannerPlugin.swift; sourceTree = "<group>"; };
+		728ACC88D22733C255E5992B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		B16D53D58543CB6CFE59FD4B /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmHealthPlugin.swift; sourceTree = "<group>"; };
-		728ACC88D22733C255E5992B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
-		3822E16D1D7E05C3A9A4F101 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
-		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		DA06207BA58848900AD095C4 /* MmFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmFiles.swift; sourceTree = "<group>"; };
+		F6CDA8CA892DF8932B302BA5 /* MmDbPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmDbPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -352,7 +352,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
-				PRODUCT_BUNDLE_IDENTIFIER = com.martianmacros.martian_macros.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.martianmacros.martian-macros.demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
@@ -374,7 +374,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.martianmacros.martian_macros.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.martianmacros.martian-macros.demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
