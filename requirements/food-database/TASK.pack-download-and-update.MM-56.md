@@ -66,3 +66,6 @@ Scenario: Skipped
 - **Real-network test** with the app's own download code (`DartPackHttp`, `PackDownload`) against that host: the manifest was read (HTTP 200); GitHub answers range requests with 206; a download was cancelled at 8,389,375 bytes, **resumed from that byte** and finished; the SHA-256 matched; the 140 MB pack unpacked, opened, searched ("chicken noodle soup" found) and a barcode lookup found a known product. Total resume time 1.4 s on this connection.
 - The Food database screen now credits Open Food Facts (ODbL) and USDA FoodData Central and names the data repository.
 - **Still not verified**: nothing has run on the Android emulator or a phone; slow or flaky mobile connections are untested; the licensing of the published files has not been read by a qualified person (MM-57), and the files are public now.
+
+## Release 2026-10-19
+The manifest at `releases/latest/download/manifest.json` now lists format 3 packs: `barcode_us` 53.8 MB gzip (520,988 foods) and `generic` 1.5 MB (13,285). A phone with the 2026-10-09 packs installed sees the newer version through the usual update path; not yet tried on a phone.

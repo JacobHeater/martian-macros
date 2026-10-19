@@ -115,20 +115,25 @@ or micronutrients when the pack does not carry them.
 
 ## Coverage
 
-Measured on the packs published 2026-10-09 (format 1) with the new method's
-requirements:
+Measured on the packs built 2026-10-19 (format 3; USDA Foundation, SR Legacy
+and FNDDS in `generic`, USDA Branded and Open Food Facts in `barcode_us`)
+with the method's requirements:
 
-| Pack | Foods | Fiber and sodium stated, 10 kcal or more | Under 10 kcal per 100 g | Fiber stated as 0 |
-|---|---|---|---|---|
-| Common foods (`generic`) | 8,088 | 7,270 (89.9%) | 99 (1.2%) | 3,370 (41.7%, analysed zeros: meat, dairy, oils) |
-| Barcode foods, United States (`barcode_us`) | 456,191 | 377,606 (82.8%) | 23,065 (5.1%) | 138,807 (30.4%) |
+| Pack | Foods | Fiber and sodium stated, 10 kcal or more | Under 10 kcal per 100 g | Fiber stated as 0 | Sugars and saturated fat stated too |
+|---|---|---|---|---|---|
+| Common foods (`generic`) | 13,285 | 12,441 (93.6%) | 195 (1.5%) | 4,549 (34.2%, analysed zeros: meat, dairy, oils) | 10,938 (82.3%) |
+| Barcode foods, United States (`barcode_us`) | 520,988 | 418,241 (80.3%) | 24,944 (4.8%) | 151,572 (29.1%) | 401,745 (77.1%) |
 
-So about nine in ten common foods and five in six barcode foods are graded
-today, without sugars, saturated fat or the vitamins and minerals, and their
-popover says so. The panel's nutrition role pointed out what that means on day
-one: a cola scores 0 and grades C until a format 2 pack states its sugars.
-The owner chose to grade now rather than wait (MM-380); the format 2 rebuild
-with a third source (MM-381, MM-383) is what completes the grades.
+So more than nine in ten common foods and four in five barcode foods are
+graded, and most of those with their sugars and saturated fat as well: the
+format 3 packs carry the thirteen MM-307 nutrients where the source states
+them (`coverage.txt` in the release has every share per source; FNDDS states
+all of them for every food). The 2026-10-09 packs (format 1) graded 7,270 of
+8,088 common foods and 377,606 of 456,191 barcode foods, without sugars,
+saturated fat or the vitamins and minerals; a cola scored 0 and graded C
+until this rebuild. The owner chose to grade then rather than wait (MM-380);
+the rebuild with a third source (MM-381, MM-383, MM-409) is what completes
+the grades.
 
 ## Naming
 
