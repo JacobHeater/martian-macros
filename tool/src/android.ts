@@ -2,6 +2,7 @@ import { existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
+import { apkPathOf, appIdOf, gradleTaskOf, identityOf, type Identity } from './identity.ts';
 import { liveRunPlan } from './liveRunPlan.ts';
 import { capture, run, start } from './proc.ts';
 
@@ -161,43 +162,56 @@ export async function runEmulator(repoRoot: string, args: readonly string[]): Pr
  * the build is to start from the demo scenario on every launch (MM-177).
  * The variable is never left over from the caller's shell.
  */
-export function webBuildEnv(base: NodeJS.ProcessEnv, { seed }: { seed: boolean }): NodeJS.ProcessEnv {
-  const { MM_DEMO_SEED: _ignored, ...rest } = base;
-  return seed ? { ...rest, MM_DEMO_SEED: '1' } : rest;
+export function webBuildEnv(base: NodeJS.ProcessEnv, { seed, identity = 'dev' }: { seed: boolean; identity?: Identity }): NodeJS.ProcessEnv {
+  const { MM_DEMO_SEED: _ignored, MM_IDENTITY: _alsoIgnored, ...rest } = base;
+  return { ...rest, MM_IDENTITY: identity, ...(seed ? { MM_DEMO_SEED: '1' } : {}) };
 }
 
-/** Builds the web app and syncs it into the Android shell. */
-async function sync(repoRoot: string, { seed }: { seed: boolean }): Promise<number> {
-  return run(['npm', 'run', 'android'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed }) });
+/** Builds the web app for `identity` and syncs it into the Android shell. */
+async function sync(repoRoot: string, { seed, identity }: { seed: boolean; identity: Identity }): Promise<number> {
+  return run(['npm', 'run', 'android'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed, identity }) });
 }
 
-/** `mm build android [--release]`: the web app, the sync and the APK. */
+/**
+ * `mm build android [--release] [--env prod|dev]`: the web app, the sync
+ * and the flavor's APK (MM-8). The dev twin unless `--env prod`; the demo
+ * is `mm demo`'s.
+ */
 export async function runBuild(
   repoRoot: string,
   args: readonly string[],
-  { seed = false }: { seed?: boolean } = {},
+  { seed = false, identity }: { seed?: boolean; identity?: Identity } = {},
 ): Promise<number> {
   if (args[0] !== 'android') {
-    stderr.write('Usage: mm build android [--release]\n');
+    stderr.write('Usage: mm build android [--release] [--env prod|dev]\n');
     return 64;
   }
-  const synced = await sync(repoRoot, { seed });
+  const chosen = identity ?? identityOf(args);
+  if (typeof chosen === 'string' && !['prod', 'dev', 'demo'].includes(chosen)) {
+    stderr.write(`${chosen}\n`);
+    return 64;
+  }
+  const who = chosen as Identity;
+  const synced = await sync(repoRoot, { seed, identity: who });
   if (synced !== 0) return synced;
-  const task = args.includes('--release') ? 'assembleRelease' : 'assembleDebug';
+  const release = args.includes('--release');
   const androidRoot = `${repoRoot}/${androidDir}`;
-  return run([gradle(androidRoot), task], { cwd: androidRoot, env: gradleEnv() });
+  return run([gradle(androidRoot), gradleTaskOf(who, { release })], { cwd: androidRoot, env: gradleEnv() });
 }
 
-const appId = 'com.martianmacros.martian_macros.demo';
-
-/** Builds, installs and launches the app on `device` (or the one device). */
-async function installAndLaunch(repoRoot: string, device: string, { seed = false }: { seed?: boolean } = {}): Promise<number> {
-  const built = await runBuild(repoRoot, ['android'], { seed });
+/** Builds, installs and launches `identity` on `device` (or the one device). */
+async function installAndLaunch(
+  repoRoot: string,
+  device: string,
+  { seed = false, identity }: { seed?: boolean; identity: Identity },
+): Promise<number> {
+  const built = await runBuild(repoRoot, ['android'], { seed, identity });
   if (built !== 0) return built;
-  const apk = `${repoRoot}/${androidDir}/app/build/outputs/apk/debug/app-debug.apk`;
+  const apk = `${repoRoot}/${androidDir}/${apkPathOf(identity, { release: false })}`;
   const installed = await run([adbPath(), '-s', device, 'install', '-r', apk]);
   if (installed !== 0) return installed;
-  return run([adbPath(), '-s', device, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`]);
+  // The activity's class keeps the package the code is in; the app id differs by flavor.
+  return run([adbPath(), '-s', device, 'shell', 'am', 'start', '-n', `${appIdOf(identity)}/com.martianmacros.MainActivity`]);
 }
 
 /**
@@ -321,7 +335,9 @@ export async function runApp(repoRoot: string, args: readonly string[]): Promise
   if (args.includes('--live')) return runLive(repoRoot, args);
   const device = await chosenDevice(args);
   if (typeof device === 'number') return device;
-  return installAndLaunch(repoRoot, device);
+  // `--env prod` is the real app; `dev`, `phone` and nothing are the dev twin (MM-8).
+  const identity = identityOf(args) as Identity;
+  return installAndLaunch(repoRoot, device, { identity });
 }
 
 /**
@@ -347,7 +363,7 @@ export async function runDemo(repoRoot: string, args: readonly string[]): Promis
   stdout.write(
     `Starting Martian Macros DEMO (.demo)${seed ? ', seeded with the demo scenario on every launch' : ''}: only its isolated sandbox is touched. The normal app is untouched.\n`,
   );
-  return installAndLaunch(repoRoot, device, { seed });
+  return installAndLaunch(repoRoot, device, { seed, identity: 'demo' });
 }
 
 /**
