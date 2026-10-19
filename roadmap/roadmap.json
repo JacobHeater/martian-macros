@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-13",
+  "asOf": "2026-10-19",
   "generatedFrom": {
     "requirements": "requirements/ (287 tickets, MM-1 to MM-289; 170 done, 51 in-progress, 66 proposed)",
     "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
@@ -590,7 +590,8 @@
             "MM-218",
             "MM-219",
             "MM-220",
-            "MM-221"
+            "MM-221",
+            "MM-408"
           ]
         },
         {
@@ -2319,7 +2320,8 @@
           "MM-385",
           "MM-388",
           "MM-396",
-          "MM-397"
+          "MM-397",
+          "MM-408"
         ],
         "remaining": [
           "MM-386",
@@ -2389,7 +2391,8 @@
             "MM-203",
             "MM-204",
             "MM-216",
-            "MM-217"
+            "MM-217",
+            "MM-408"
           ],
           "milestone": "M2"
         },
