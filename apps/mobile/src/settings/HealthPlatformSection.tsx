@@ -4,6 +4,7 @@ import type { HealthSample } from '../healthIngest/HealthSample';
 import { healthSourceName } from '../healthIngest/healthSourceName';
 import { healthDataTypeLabel } from '../format/healthDataTypeLabel';
 import { healthDataTypePurpose } from '../format/healthDataTypePurpose';
+import { healthPlatformName } from '../format/healthPlatformName';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { MmIcon } from '../ui/MmIcon';
@@ -11,41 +12,61 @@ import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
-import { useSettingsSection } from './useSettingsSection';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
+import { useSettingsSection } from './useSettingsSection';
 
-function count(samples: readonly HealthSample[]): string {
-  if (samples.length === 0) return 'Allowed. Nothing to read yet.';
+/**
+ * Where an iPhone's owner allows, checks or withdraws what an app reads
+ * from Apple Health: the route Apple documents, said the same way wherever
+ * the app names it (MM-69, the panel's F1), since Apple Health does not
+ * tell the app which kinds were allowed.
+ */
+const healthPath = 'Settings, Health, Data Access & Devices';
+
+/** The row's and the snack's one sentence for a kind asked for with nothing found. */
+const whereToCheck = `To allow it, or to check, open ${healthPath}.`;
+
+function count(samples: readonly HealthSample[], { name, ios }: { name: string; ios: boolean }): string {
+  // Apple Health never says a kind was refused: nothing found may be nothing shared (MM-69).
+  if (samples.length === 0) return ios ? `Nothing found in ${name} yet. ${whereToCheck}` : 'Allowed. Nothing to read yet.';
   // A source the platform did not name is counted, never shown by its package id (MM-395).
   const sources = [...new Set(samples.flatMap((sample) => healthSourceName(sample) ?? []))];
   const readings = samples.length === 1 ? '1 reading' : `${samples.length} readings`;
-  return sources.length === 0 ? `Allowed. ${readings}.` : `Allowed. ${readings} from ${sources.join(', ')}.`;
+  const counted = sources.length === 0 ? `${readings}.` : `${readings} from ${sources.join(', ')}.`;
+  return ios ? counted : `Allowed. ${counted}`;
 }
 
 /**
- * The Health Connect section of Settings (MM-68), laid out as Reminders is
- * (MM-320, rule 9): one card of rows, a row for each kind of reading with
- * what it is for and "Read from Health Connect now" last, and the note as a
+ * The health platform's section of Settings (MM-68, MM-69), laid out as
+ * Reminders is (MM-320, rule 9): one card of rows, a row for each kind of
+ * reading with what it is for and "Read from … now" last, and the note as a
  * caption under the card. Connecting is offered, never required: each kind
  * is allowed by itself, and refusing one does not block the others. The
  * app only reads.
+ *
+ * On Android the platform is Health Connect and says which kinds are
+ * allowed. On an iPhone it is Apple Health, which never tells an app that
+ * reading a kind was refused: a kind asked for counts as connected, and a
+ * row says what was read or that nothing was found yet and where to check.
  */
-export function HealthConnectSection() {
-  // Folds in place, closed until opened (MM-398).
-  const fold = useSettingsSection('healthConnect');
+export function HealthPlatformSection() {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const connection = useLoaded(state.healthConnection);
   const setup = useLoaded(state.setup);
   const [reading, setReading] = useState(false);
+  // Folds like every other section (MM-398); dropped once and found by the panel (MM-407).
+  const fold = useSettingsSection('healthConnect');
+  const ios = services.platform === 'ios';
+  const name = healthPlatformName(services.platform);
   if (connection === undefined || setup === undefined) return null;
   if (connection.available.size === 0) {
     return (
-      <MmSection icon="health" title="Health Connect" {...fold}>
+      <MmSection icon="health" title={name} {...fold}>
         <MmListGroup>
           <MmListRow
             leadingIcon="sync"
-            title="Health Connect is not on this phone"
+            title={`${name} is not on this phone`}
             subtitle="Nothing to connect. Everything in the app works without it."
           />
         </MmListGroup>
@@ -60,7 +81,7 @@ export function HealthConnectSection() {
   const read = async (allowed?: HealthDataType): Promise<boolean> => {
     if (await state.syncHealth()) return true;
     // An allowing whose first read fails still says it was allowed (the panel's UX-11).
-    const first = allowed === undefined ? 'Health Connect' : `${healthDataTypeLabel(allowed)} allowed, but Health Connect`;
+    const first = allowed === undefined ? name : `${healthDataTypeLabel(allowed)} ${ios ? 'asked for' : 'allowed'}, but ${name}`;
     overlays.snack(`${first} could not be read just now. Nothing was changed.`);
     return false;
   };
@@ -69,7 +90,8 @@ export function HealthConnectSection() {
   const readNow = async () => {
     setReading(true);
     try {
-      if (await read()) overlays.snack('Read from Health Connect. Everything allowed is up to date.');
+      // On an iPhone what was asked for is all the app knows of (MM-69, the panel's F3).
+      if (await read()) overlays.snack(`Read from ${name}. Everything ${ios ? 'asked for' : 'allowed'} is up to date.`);
     } finally {
       setReading(false);
     }
@@ -78,14 +100,20 @@ export function HealthConnectSection() {
   const allow = async (type: HealthDataType) => {
     const after = await services.healthSource.requestPermission(new Set([type]));
     state.refreshHealthConnection();
-    if (after.has(type)) {
-      // The row stops being a button, so what happened is said (the panel's UX-3).
-      if (await read(type)) overlays.snack(`${healthDataTypeLabel(type)} allowed.`);
-    } else {
-      overlays.snack(
-        `${healthDataTypeLabel(type)} was not allowed. You can allow it here, or in Health Connect, whenever you like.`,
-      );
+    const label = healthDataTypeLabel(type);
+    if (!after.has(type)) {
+      overlays.snack(`${label} was not allowed. You can allow it here, or in ${name}, whenever you like.`);
+      return;
     }
+    // The row stops being a button, so what happened is said (the panel's UX-3).
+    if (!(await read(type))) return;
+    if (!ios) {
+      overlays.snack(`${label} allowed.`);
+      return;
+    }
+    // Apple Health has been asked; only readings prove it was allowed (MM-69).
+    const found = (await services.healthSamples.samples(type)).length > 0;
+    overlays.snack(found ? `${label} read from ${name}.` : `Nothing found in ${name} for ${label} yet. ${whereToCheck}`);
   };
 
   const offered = HealthDataType.values.filter(
@@ -95,20 +123,24 @@ export function HealthConnectSection() {
       (type !== 'menstruation' || setup.profile.sex === 'female'),
   );
   return (
-    <MmSection icon="health" title="Health Connect" {...fold}>
+    <MmSection icon="health" title={name} {...fold}>
       <MmListGroup>
         {offered.map((type) => {
           const permitted = connection.permitted.has(type);
+          const samples = connection.imported.get(type) ?? [];
           return (
             <MmListRow
               key={type}
               leadingIcon={healthDataTypeIcon[type]}
               title={healthDataTypeLabel(type)}
               subtitle={
-                permitted ? count(connection.imported.get(type) ?? []) : `Not allowed. ${healthDataTypePurpose(type)}`
+                permitted
+                  ? count(samples, { name, ios })
+                  : `${ios ? 'Not asked yet' : 'Not allowed'}. ${healthDataTypePurpose(type)}`
               }
               // The subtitle says "Allowed"; the check is not heard twice (the panel's UX-7).
-              trailing={permitted ? <MmIcon name="check" /> : undefined}
+              // On an iPhone the check stands only for a kind that was read, since nothing else proves it was allowed.
+              trailing={permitted && (!ios || samples.length > 0) ? <MmIcon name="check" /> : undefined}
               opens={!permitted}
               onPress={permitted ? undefined : () => void allow(type)}
             />
@@ -117,7 +149,7 @@ export function HealthConnectSection() {
         {connection.permitted.size === 0 ? null : (
           <MmListRow
             leadingIcon="sync"
-            title="Read from Health Connect now"
+            title={`Read from ${name} now`}
             subtitle={reading ? 'Reading…' : undefined}
             // Stays a button while it reads, so focus stays on it; a second press waits for the first.
             onPress={() => {
@@ -129,8 +161,8 @@ export function HealthConnectSection() {
       <p className="app-caption settings-note">
         The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in
         counts for a day: the first of the morning, or the middle of the day’s readings. A value you type for a day is
-        used instead. To stop, take the permission away in Health Connect: what was read is kept until you erase your
-        data.
+        used instead. To stop, take the permission away in {ios ? healthPath : name}: what was read is kept until you
+        erase your data.
       </p>
     </MmSection>
   );

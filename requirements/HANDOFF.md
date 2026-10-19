@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-18, by Claude, Session 36.
+Last updated: 2026-10-19, by Claude, Session 37.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -350,9 +350,82 @@ download icon, with a card and a strip line per download.
   so the new pickers can be felt on glass (`mm run --env phone`, then
   Settings → Profile → Date of birth, and a reminder's time).
 
-**Not verified anywhere.** iOS has never been built or run, and the shell
-has no iOS project yet. Phone checks listed above. Tickets record
-limitations.
+**iOS (MM-403, 2026-10-19).** The app builds and runs in an iOS shell
+(`apps/mobile/ios`, Capacitor with Swift Package Manager, the DEMO
+identity) with Swift twins of the five Kotlin plugins, verified on the
+iPhone 17 Pro Max simulator: the native database written and read
+(MM-404), the shell launched by `mm run --ios`. **Not verified anywhere:**
+a physical iPhone (needs the owner's team in Xcode, `docs/ios-signing.md`),
+Apple Health readings on a device (MM-69), the camera (MM-406), a reminder
+at its time (MM-405), a pack download over the network on iOS. CI builds
+no iOS app yet (the owner's call). Phone checks listed above.
+
+## Session 37: 2026-10-19, Claude (the iOS shell: five plugins in Swift, on the owner's Mac)
+
+- The owner's 2016 MacBook Pro was brought to macOS Sequoia 15.8 and Xcode
+  26.3 (the newest that runs on it; 26.4+ needs macOS 26), and the owner
+  asked for iOS: all five plugins in one effort, the DEMO identity (on iOS
+  `com.martianmacros.martian-macros.demo`: Apple refused the underscore
+  when the owner chose a team in Xcode), no iOS
+  job in CI yet, the simulator first and the phone once a team is chosen
+  in Xcode (`docs/ios-signing.md`, written for the owner).
+- **Built (MM-403, MM-404, MM-405, MM-406, MM-69 in progress):**
+  `apps/mobile/ios/` (`npx cap add ios --packagemanager SPM`; CapApp-SPM's
+  `Package.swift` is `cap sync`'s, never hand-edited); `MainViewController`
+  registers `MmDb` (system SQLite, FTS5 in it), `MmPacks` (URLSession
+  streamed as `packHttpChunk` events, gzip through Compression, SHA-256
+  through CryptoKit, files under Library/Application Support excluded from
+  backup), `MmReminders` (UNUserNotificationCenter, the plan as exactly
+  what is pending), `MmScanner` (AVFoundation live scan with Cancel, Vision
+  on a photo kept in memory) and `MmHealth` (HealthKit; the anchored
+  query's anchor is the change token; "permitted" is the set of kinds asked
+  for, since HealthKit never reports a read refusal). `Info.plist` carries
+  the camera and Health purpose strings; portrait, iPhone only;
+  `App.entitlements` declares HealthKit.
+- **The app knows its platform** through `AppServices.platform`
+  (`runningOn`, Capacitor's `getPlatform`); fixtures say `android`, a
+  story says `onIos(...)`. The three places that differ: the terms declined
+  on iOS (no "Close the app": "go back to the Home Screen; the app will ask
+  again when you open it"), `HealthPlatformSection` (the Health Connect
+  section renamed, "Apple Health" on iOS, "Not asked yet" rows, the route
+  Settings, Health, Data Access & Devices in one form, the check only for a
+  kind that was read), and the terms' four paragraphs by platform
+  (`termsOfUse.sectionsOn`, no ML Kit on iOS; still the attorney's draft).
+- **Storybook first, then the panel (MM-293):** seven `AppleHealth*`
+  stories and `TermsNotNowOnIos`; the product designer and the UX guard
+  reviewed from source (no browser capture possible in the session):
+  `docs/agent-runs/mm403-ios-shell`. UX guard: pass. Accepted: the route
+  Apple documents, the caption shortened, "asked for" never "allowed" on
+  iOS, "phone" not "device", the Home Screen sentence, two more stories.
+  **MM-407** (bug, done): the rewrite had dropped the section's fold
+  (`useSettingsSection`); back, with the section in the accordion test.
+  Owner questions in the run's `handoff.md`: a row that opens Settings
+  instead of a path in words; Android's declined page saying the app asks
+  again.
+- **The tool:** `mm build ios [--release]` (simulator, no signing),
+  `mm run --ios [-d UDID]`, `mm simulator [name | udid | list]`,
+  `mm screenshot -d UDID` through simctl, `mm clean` removes the iOS
+  build; `MM_SIMULATOR` names the default. Tests in `tool/test/simulators.test.ts`.
+- **Verified:** the shell builds and launches on the iPhone 17 Pro Max
+  simulator (iOS 26.3.1); a demo-seeded build wrote the whole seed through
+  `MmDb` (schema version 9, 281 food entries, 71 weigh-ins, integrity ok)
+  into `Library/Application Support/databases/martian_macros_demo`, marked
+  excluded from backup, and a plain build opened the same file. `mm check`:
+  all checks passed (2,869 web tests). **Not verified:** anything on a
+  phone; a pack download on iOS; a reminder at its time; the camera (the
+  simulator has none, so only the refusal path runs); a Health reading
+  imported (the simulator's Health app cannot be driven from the command
+  line); the stories in a browser, in any palette, which the owner's
+  `mm storybook` look covers.
+- **Roadmap:** WS-03 step 20 (MM-403, MM-407 built), WS-14 step 5
+  (MM-404), WS-09 step 13 (MM-405), WS-08 step 13 (MM-406) added; WS-11
+  step 7 (MM-69) started. Each plugin ticket stays in progress until its
+  phone check; the hotspot `HS-ios-shell` serializes edits to the Xcode
+  project.
+- Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
+  JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
+  DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to
+  another account on that Mac, so `brew install` fails there.
 
 ## Session 36: 2026-10-18, Claude (anti-cruft: lines that narrate the layout)
 
@@ -437,44 +510,3 @@ limitations.
   generic block; an added-sugars column (format 3) that would retire most of
   the sugars waiver.
 - Roadmap: WS-08 step 12 added (MM-380 to MM-388).
-
-## Session 34: 2026-10-18, Claude (coaching insights inline, the whole feature, overnight)
-
-- The owner asked for the whole feature on main by morning, with the
-  requirements, designs and panel sessions done, and left. Every decision a
-  reviewer handed to the owner was taken by the chair and recorded in the
-  ticket as "say if any is wrong".
-- **Owner's Q&A first** (recorded in MM-365, MM-378): the first food set;
-  swap or add, never eat less; logged foods only; every line every time with
-  a **snooze** (a day, a week, a month, until turned back on; inside the
-  opened line; Undo; a Snoozed list per area).
-- **Panel sessions:** MM-365 (nutrition, coaching, safety), MM-367
-  (measurement, coaching, safety), MM-369 (nutrition research), MM-377
-  (measurement, nutrition), and the build's design review (product designer,
-  UX guard: PASS). Every run has brief, findings, decision, handoff and
-  state. Measurement said "do not build MM-367 as drafted": the weigh-in time
-  line went (no time stored), the waist line uses the shared 28-day answer and
-  is said only when a reading moved, the water line is about logging and is
-  gated on a suggested goal.
-- **Built:** the snooze (schema version 8, `inline_insight_snoozes`; the
-  subject of every insight; volume jump's automatic rest removed); the food
-  rules with `usualServing` and the safeguards' under-eating finding and
-  cautions; the waist and water rules with a multi-day water reader; the
-  grade engine (`FoodGradeRule`, `nutrientProfileScore`, `gradeOfNutrition`,
-  `gradeOfCatalogFood`, `gradeOfCustomFood`, `gradeOfFoodEntry`,
-  `gradeOfMeal`; the grade types in `domain/food/grade/`) on every entry,
-  meal, day, search result, the amount step and the add sheet; MM-371's
-  docs; evidence rows for every rule, figure and the ten `WaistRule` values
-  owed since MM-155.
-- **Design review outcomes:** the opened line's actions share a row; no
-  length pre-checked (`Overlays.options.selected` optional); the Snoozed
-  story draws the always row; **bug MM-379** (focus lost when a snoozed line
-  or row goes) fixed with `ui/focusNeighbourOf` and its test; "Snooze…" and
-  "Turn back on" name their kind and item; withheld kinds' snoozes are not
-  listed. The grade badge's name now leads with the grade ("Grade C for
-  Peanut butter") so a row's name is never the start of its badge's.
-- **Coverage measured** on the published packs with node:sqlite: see
-  `docs/food-grades.md`.
-- **MM-377 built** last: `strengthOnFatLossInsights`, `deficitStartOn` (the
-  deficit count now starts from it), 13 engine tests on the measurement
-  role's numbers. Not done: MM-368 (sleep; waits for MM-250).

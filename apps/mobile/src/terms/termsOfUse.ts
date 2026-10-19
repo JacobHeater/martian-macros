@@ -1,4 +1,6 @@
 import { CalendarDate } from '../domain/CalendarDate';
+import type { Platform } from '../domain/integration/Platform';
+import { healthPlatformName } from '../format/healthPlatformName';
 import type { TermsSection } from './TermsSection';
 
 /**
@@ -15,26 +17,15 @@ import type { TermsSection } from './TermsSection';
  * Change the app and this text together, and raise `version` whenever a
  * change matters to the person, so the app asks them again.
  */
-export const termsOfUse = {
-  /** Raised when the terms change in a way that matters. The app asks again when this differs from what was agreed to. */
-  version: 1,
-
-  effectiveOn: CalendarDate.of(2026, 10, 12),
-
-  /** What changed in each version after the first, in a sentence or two each, for someone who agreed to an earlier one. */
-  changes: new Map<number, readonly string[]>(),
-
-  /** The few things that matter most, said first and plainly. The full terms say more. */
-  summary: [
-    'Martian Macros is a general wellness app, not a medical device. It is not medical advice, and it does not diagnose or treat anything.',
-    'Its numbers are estimates worked out from what you log, and they can be off.',
-    'If you are pregnant or breastfeeding, have a medical condition, take medicine that affects your weight or blood sugar, or have a history of an eating disorder, talk to your clinician before changing how you eat.',
-    'The app cannot help in an emergency. If you think you may have a medical emergency, call 911.',
-    'You stay in charge: the app recommends and explains, and what you eat and how you train is your decision.',
-    'The app is for adults 18 and over.',
-  ],
-
-  sections: [
+/**
+ * The full terms for the platform the app is on (MM-403): the health platform
+ * and the camera's reader are named for what they are there. Every statement
+ * holds on that platform; nothing else differs.
+ */
+function sectionsOn(platform: Platform): readonly TermsSection[] {
+  const ios = platform === 'ios';
+  const health = healthPlatformName(platform);
+  return [
     {
       heading: '1. This agreement',
       paragraphs: [
@@ -93,11 +84,13 @@ export const termsOfUse = {
     {
       heading: '9. Your records',
       paragraphs: [
-        'Everything you enter (your profile, date of birth, health answers, weigh-ins, measurements, food log, workouts and check-ins) and anything you let the app read from Health Connect is kept in a database inside this app on this phone.',
+        `Everything you enter (your profile, date of birth, health answers, weigh-ins, measurements, food log, workouts and check-ins) and anything you let the app read from ${health} is kept in a database inside this app on this phone.`,
         'There is no account. We run no server that receives your records, so we cannot see, recover, correct or delete them for you. The app does not send your records anywhere.',
         'If you choose to download the food database, your phone contacts GitHub to fetch a file. GitHub sees your IP address, which file was requested, when, and basic technical details your phone sends with any download. Nothing about you or your records is sent, and nothing is downloaded unless you ask for it.',
-        'Health Connect is optional. If you allow it, the app reads only the kinds of data you allow, and never writes to Health Connect. What it reads is copied into the app on this phone and stays there until you erase it, even if you later take the permission away.',
-        'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component (ML Kit). Google says that component sends Google technical details about itself, such as the phone’s model, the app’s version, and performance and error codes. It is not given your records.',
+        `${health} is optional. If you allow it, the app reads only the kinds of data you allow, and never writes to ${health}. What it reads is copied into the app on this phone and stays there until you erase it, even if you later take the permission away.`,
+        ios
+          ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept.'
+          : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component (ML Kit). Google says that component sends Google technical details about itself, such as the phone’s model, the app’s version, and performance and error codes. It is not given your records.',
         'Reminders you turn on are scheduled by the phone itself. No message service is involved.',
       ],
     },
@@ -113,7 +106,9 @@ export const termsOfUse = {
       heading: '11. Food data and other people’s software',
       paragraphs: [
         'Food data comes from Open Food Facts, under the Open Database License, and from USDA FoodData Central. It is gathered by volunteers and public bodies and may be wrong. It is offered to you under its own licences, which these terms do not change.',
-        'The app contains open-source software and Google’s ML Kit, each under its own licence or terms. Those apply to those parts.',
+        ios
+          ? 'The app contains open-source software, each part under its own licence or terms. Those apply to those parts.'
+          : 'The app contains open-source software and Google’s ML Kit, each under its own licence or terms. Those apply to those parts.',
       ],
     },
     {
@@ -146,5 +141,31 @@ export const termsOfUse = {
         'You can stop using the app at any time by uninstalling it. Section 10 says how to erase your records first.',
       ],
     },
-  ] as readonly TermsSection[],
+  ];
+}
+
+export const termsOfUse = {
+  /** Raised when the terms change in a way that matters. The app asks again when this differs from what was agreed to. */
+  version: 1,
+
+  effectiveOn: CalendarDate.of(2026, 10, 12),
+
+  /** What changed in each version after the first, in a sentence or two each, for someone who agreed to an earlier one. */
+  changes: new Map<number, readonly string[]>(),
+
+  /** The few things that matter most, said first and plainly. The full terms say more. */
+  summary: [
+    'Martian Macros is a general wellness app, not a medical device. It is not medical advice, and it does not diagnose or treat anything.',
+    'Its numbers are estimates worked out from what you log, and they can be off.',
+    'If you are pregnant or breastfeeding, have a medical condition, take medicine that affects your weight or blood sugar, or have a history of an eating disorder, talk to your clinician before changing how you eat.',
+    'The app cannot help in an emergency. If you think you may have a medical emergency, call 911.',
+    'You stay in charge: the app recommends and explains, and what you eat and how you train is your decision.',
+    'The app is for adults 18 and over.',
+  ],
+
+  /** The sections for the platform the app is on. */
+  sectionsOn,
+
+  /** The sections as on an Android phone, which is how a browser draws the app. */
+  sections: sectionsOn('android'),
 } as const;

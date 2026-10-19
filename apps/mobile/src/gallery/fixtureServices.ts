@@ -34,6 +34,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     healthSource: FakeHealthSource.fromJson('{"sources": [], "events": []}'),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),
     environment: 'dev',
+    // The app as on an Android phone, unless a story or a test is about an iPhone (`onIos`, MM-403).
+    platform: 'android',
     clock,
     setup: repos.setup,
     weights: repos.weights,

@@ -109,6 +109,7 @@ and WS-09 steps 1 and 8.
 8. **Label scanning; live lookup (MM-44, MM-58).** M4.
 9. **The Food screen and Add food hierarchy (MM-224) (MM-180, MM-213, MM-223, MM-225, MM-226, MM-227, MM-218, MM-219, MM-220, MM-221).** M2. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
+13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -136,6 +137,7 @@ workstream's.
   non-goal overruled), MM-308 (the log keeps micronutrients), MM-309 (labels and own foods), MM-310 (the Micros segment),
   MM-311 (the sodium limit), MM-313 (water).
 - Built 2026-10-14: MM-325 (version 5: the sodium limit's column for a phone that ran the first version 4).
+- Added 2026-10-19 (step 13): MM-406 (the camera on iOS).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

@@ -29,7 +29,7 @@ import { MmSliderRow } from '../ui/MmSliderRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { CoachSettingsSection } from './CoachSettingsSection';
-import { HealthConnectSection } from './HealthConnectSection';
+import { HealthPlatformSection } from './HealthPlatformSection';
 import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
 import { RemindersSection } from './RemindersSection';
@@ -213,7 +213,7 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
         <NutritionGoalsSection />
         <ProfileSection />
         <RemindersSection />
-        <HealthConnectSection />
+        <HealthPlatformSection />
         <MmSection icon="lock" title="Data" {...fold('data')}>
           <MmListGroup>
             <MmListRow

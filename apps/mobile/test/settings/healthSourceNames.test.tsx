@@ -44,8 +44,10 @@ it('readings from a source with no name say how many, never the package', async 
 
 it('a weigh-in from a source with no name says Health Connect, never the package', () => {
   const weighIn = { day: new Date(2026, 9, 4), kg: 82, readings: 1, basis: 'medianOfDay' as const, sourceName: '' };
-  expect(importedWeighInText(weighIn)).toBe('From Health Connect.');
-  expect(importedWeighInText({ ...weighIn, readings: 3 })).toBe('The middle of 3 readings from Health Connect.');
+  expect(importedWeighInText(weighIn, 'android')).toBe('From Health Connect.');
+  expect(importedWeighInText({ ...weighIn, readings: 3 }, 'android')).toBe('The middle of 3 readings from Health Connect.');
+  // On an iPhone the platform is named by its own name (MM-69).
+  expect(importedWeighInText(weighIn, 'ios')).toBe('From Apple Health.');
 });
 
 it('a list row breaks a word too long for its line', () => {
