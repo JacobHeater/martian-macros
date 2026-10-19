@@ -1,0 +1,7 @@
+# Chair's record: "More results" (MM-410)
+
+- **Scope.** The brief froze the two stories, the component, its host and the ticket on the working tree of `feat/more-results`; two read-only reviews ran in parallel from the same brief, neither seeing the other. No browser capture was possible on the owner's Mac in this session, so both walked the stories from source and said so.
+- **Reports.** `product-designer.md` (PD-1 to PD-5, one medium) and `ux-accessibility.md` (F1 to F5, one high; verdict pass, no blocking finding).
+- **Edits after the reviews (the chair as edit owner).** `FoodSearchResults.tsx`: the packs asked for one more than the page, the offer only while there are more, the first new row's `autoFocus`, a visually hidden `role="status"` with the delta. `MmListRow.tsx`: an `autoFocus` prop on the pressable row. `searchMoreResults.test.tsx`: four cases (two pages with focus and the status; exactly a page; a new query starts over; one page or less). MM-410 rewritten with the decisions and criteria; MM-411 proposed.
+- **Verification.** `npx tsc --noEmit` clean; the four tests pass; the 349 story walks passed before the F1/F2 edits and are rerun by `mm check` on the final tree (recorded in the repository handoff and the pull request).
+- **Limitations.** The chair implements and reviews sequentially; the reviewers did not see the edited tree. No render in any palette, no device, no assistive technology.

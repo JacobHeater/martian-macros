@@ -21,6 +21,8 @@ interface MmListRowProps {
    */
   trailingAction?: ReactNode;
   onPress?: (() => void) | undefined;
+  /** Takes focus when it first draws: the first row a "more" control added, so a reader goes on from it (MM-410). */
+  autoFocus?: boolean;
   dense?: boolean;
   /** No horizontal padding, for use inside a padded surface. */
   flush?: boolean;
@@ -43,6 +45,7 @@ export function MmListRow({
   opens = false,
   trailingAction,
   onPress,
+  autoFocus = false,
   dense = false,
   flush = false,
   entry,
@@ -93,7 +96,7 @@ export function MmListRow({
         {onPress === undefined ? (
           <div className="mm-list-row-main">{body}</div>
         ) : (
-          <button type="button" className="mm-list-row-main mm-list-row-button" onClick={onPress}>
+          <button type="button" className="mm-list-row-main mm-list-row-button" onClick={onPress} autoFocus={autoFocus}>
             {body}
           </button>
         )}
@@ -104,7 +107,7 @@ export function MmListRow({
   return onPress === undefined ? (
     <div className={className}>{body}</div>
   ) : (
-    <button type="button" className={`${className} mm-list-row-button`} onClick={onPress}>
+    <button type="button" className={`${className} mm-list-row-button`} onClick={onPress} autoFocus={autoFocus}>
       {body}
     </button>
   );
