@@ -442,15 +442,21 @@ no iOS app yet (the owner's call). Phone checks listed above.
   `test/food/searchSettles.test.tsx` over a counted, holdable catalog; hook
   tests beside it. MM-42's "within 150 ms" now reads "after the last
   keystroke".
-- **The owner on the food signal (2026-10-19, not a ticket yet):** two
-  sources feel thin beside MyFitnessPal and MyNetDiary; a couple more large
-  sources wanted. What stands: five sources are configured (Foundation, SR
-  Legacy, Branded, FNDDS, Open Food Facts US) but the published packs are
-  still the 2026-10-09 build without FNDDS and in format 1;
-  `docs/food-packs-data.md` holds the owner's build steps. The gap to the
-  rivals is mostly their user-submitted entries and restaurant menus, which
-  no open source offers at that size; the answer given to the owner is in
-  the session's chat, and the next step is theirs to pick.
+- **The food search's scope (the owner, 2026-10-19: "do whatever it takes";
+  a fourth pull request).** Two sources felt thin beside MyFitnessPal and
+  MyNetDiary. Done: the MM-383 build was run on the Mac and **release
+  2026-10-19 of martian-macros-food-data is live** (format 3; `generic`
+  13,285 foods with FNDDS's 5,315 dishes as eaten; `barcode_us` 520,988,
+  Open Food Facts up from about 90,000 to 121,038 because the export is now
+  read whole). **MM-409** (bug, done): the build failed on the export's
+  renamed `brands_en`, on DuckDB 1.5's strict parser, and on FNDDS keying
+  nutrients by legacy number; the export's header is kept beside a test.
+  Measured and declined (`docs/food-packs-data.md`): a GS1-prefix cut
+  (68,358 complete products, mostly tagged France, Ireland, the UK) and a
+  Canada-only cut (110,340). Restaurant menus remain the gap no open source
+  fills; a licensing read of MenuStat or a paid API is the owner's call.
+  Next: "More results" in search (MM-42's open item), since the top twenty
+  now hide FNDDS's dishes behind their many variants.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to

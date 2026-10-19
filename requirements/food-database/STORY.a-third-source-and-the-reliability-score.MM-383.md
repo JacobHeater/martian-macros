@@ -164,3 +164,6 @@ the Food database screen names the USDA data types (FoodDatabase in `Settings.st
 - The offer card's purpose line is keyed by pack id (`AvailablePackCard.tsx`): a pack published under a new id needs its line.
 - Not done: a real build and publish (the owner's, `docs/food-packs-data.md`); MM-51's result table re-measured on the new
   policy; the fifty-package hand check (MM-51) that would settle freshness against provenance.
+
+## Built and published (2026-10-19)
+The build ran on the owner's Mac after MM-409's three fixes to the extract, and release 2026-10-19 of martian-macros-food-data is live with FNDDS in `generic` (5,315 of 5,432 foods written; 101 lost to an SR Legacy name, 13 to the energy check) and the measurements `docs/food-packs-data.md` lists.
