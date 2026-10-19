@@ -433,6 +433,24 @@ no iOS app yet (the owner's call). Phone checks listed above.
   demo; `mm run --ios --env prod|dev|demo`. `DemoConfiguration` retired.
   The owner's iPhone gets the real app, fresh; the earlier DEMO installs
   (under the old ids) stay until removed.
+- **MM-408 (bug, done; a third pull request).** The owner saw the search
+  results flash blank on every keystroke on the phone. The packs were asked
+  on every key and the list was keyed on the raw query, so it emptied until
+  each answer. Now `useDebounced` (new, `src/app/`) asks once the typing has
+  paused 150 ms (the first keystroke at once) and `useAsync`'s new `keep`
+  holds the last answer until the next arrives. Regression test
+  `test/food/searchSettles.test.tsx` over a counted, holdable catalog; hook
+  tests beside it. MM-42's "within 150 ms" now reads "after the last
+  keystroke".
+- **The owner on the food signal (2026-10-19, not a ticket yet):** two
+  sources feel thin beside MyFitnessPal and MyNetDiary; a couple more large
+  sources wanted. What stands: five sources are configured (Foundation, SR
+  Legacy, Branded, FNDDS, Open Food Facts US) but the published packs are
+  still the 2026-10-09 build without FNDDS and in format 1;
+  `docs/food-packs-data.md` holds the owner's build steps. The gap to the
+  rivals is mostly their user-submitted entries and restaurant menus, which
+  no open source offers at that size; the answer given to the owner is in
+  the session's chat, and the next step is theirs to pick.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to

@@ -2,7 +2,7 @@
 id: MM-42
 status: in-progress
 component: food-logging
-related: [MM-37, MM-38, MM-45, MM-50, MM-55, MM-167]
+related: [MM-37, MM-38, MM-45, MM-50, MM-55, MM-167, MM-408]
 ---
 
 # Story: Find a food by searching
@@ -17,7 +17,9 @@ See MM-37 and MM-50. Search is the fallback after recents, and the place where b
 
 Choices I made without asking (say if any is wrong):
 - **Search runs on the device**, against the bundled and downloaded food packs (MM-55). It works with no network.
-- **Results appear as the user types**, within 150 ms of a keystroke on a mid-range phone.
+- **Results appear as the user types**, within 150 ms of a keystroke on a mid-range phone. Since MM-408 (2026-10-19): the
+  packs are searched once the typing has paused for 150 ms (the first keystroke at once), and the last results stay on
+  screen until the next arrive, so the list never empties between keystrokes.
 - **The user's own saved foods and recents rank above database results** when they match.
 - **Choosing a result opens an amount step**: the food's own servings ("1 cup, chopped", "1 breast") and grams, with the macros updating
   as the amount changes. Logging records how it was measured.
@@ -65,6 +67,9 @@ database yet" both offer "Enter manually"; tests with the fixture pack.
 Since 2026-10-18 (MM-383) the packs' results list by the app's reliability score, then the text match: the order refines
 the tiers and never crosses them, so generic foods still come first. The person's saved foods and recipes (MM-45) and
 recents list above the packs' results (the add sheet draws them first).
+
+Since 2026-10-19 (MM-408) the packs are asked once the typing pauses, and the results stay on screen until the next answer:
+the list no longer flashes blank on every keystroke.
 
 Not done: offering "scan its label" when nothing is found (MM-44 unbuilt); collapsing branded variants under a generic one
 (results are a flat list); paging or "More results", which FNDDS's foods as eaten make more pressing (a branded food whose
