@@ -13,20 +13,26 @@ once, by the owner, in Xcode; it is never committed.
    team appears under it once the Developer Program membership is active.
 3. In the project navigator select **App** (the blue icon), then the
    **App** target, then **Signing & Capabilities**.
-4. Tick **Automatically manage signing** and choose your **Team**.
-   Xcode creates the signing certificate and the provisioning profile for
+4. Plug the iPhone in with a data cable, unlock it, and tap Trust when it
+   asks. On the phone, Settings, Privacy & Security, Developer Mode: turn
+   it on and restart when iOS asks (iOS 16 and later). Pick the phone as
+   the run destination at the top of Xcode. Apple generates a development
+   profile only for registered devices, so the phone comes first: without
+   one, Xcode says "Your team has no devices from which to generate a
+   provisioning profile". (A device can also be added by UDID under
+   Devices at https://developer.apple.com/account/.)
+5. Tick **Automatically manage signing** and choose your **Team**, then
+   press **Try Again** if Status shows a warning. Xcode registers the
+   phone, creates the signing certificate and the provisioning profile for
    `com.martianmacros.martian-macros.demo` (Apple allows no underscore in a
-   bundle id, so it differs from Android's by a hyphen) and shows the HealthKit
-   capability the project already declares (`App/App.entitlements`).
-   A "Provisioning profile doesn't include the HealthKit entitlement"
-   message means the team is not in the paid program yet.
-5. Plug the iPhone in, unlock it, and trust the Mac when it asks. On the
-   phone, Settings, Privacy & Security, Developer Mode: turn it on and
-   restart when iOS asks (iOS 16 and later).
-6. Pick the phone as the run destination at the top of Xcode and press
-   Run. The first time, iOS refuses to open the app until the developer is
-   trusted: Settings, General, VPN & Device Management, your Apple ID,
-   Trust.
+   bundle id, so it differs from Android's by a hyphen) and shows the
+   HealthKit capability the project already declares
+   (`App/App.entitlements`). A "Provisioning profile doesn't include the
+   HealthKit entitlement" message means the team is not in the paid
+   program yet.
+6. Press Run. The first time, iOS refuses to open the app until the
+   developer is trusted: Settings, General, VPN & Device Management, your
+   Apple ID, Trust.
 
 The team id ends up in `project.pbxproj` as `DEVELOPMENT_TEAM`. It is
 yours, not the repository's: `git checkout apps/mobile/ios/App/App.xcodeproj`
