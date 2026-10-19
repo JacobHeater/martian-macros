@@ -39,8 +39,9 @@ on Java 25.
 
 ## The iOS shell
 
-`ios/` is the same app in a Capacitor iOS project (MM-403), under the same
-demo identity, with Swift Package Manager (`ios/App/CapApp-SPM/Package.swift`
+`ios/` is the same app in a Capacitor iOS project (MM-403), under its own
+demo identity `com.martianmacros.martian-macros.demo` (Apple allows no
+underscore in a bundle id), with Swift Package Manager (`ios/App/CapApp-SPM/Package.swift`
 is written by `cap sync`, never by hand). The plugins are Swift classes in
 `ios/App/App/Plugins/`, registered from `MainViewController`, one for each
 Kotlin plugin: `MmDb` over the system SQLite (MM-404), `MmPacks` (MM-404),

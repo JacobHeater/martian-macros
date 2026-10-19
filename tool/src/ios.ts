@@ -7,7 +7,8 @@ import { capture, run } from './proc.ts';
 
 const webApp = 'apps/mobile';
 const iosProject = `${webApp}/ios/App`;
-const appId = 'com.martianmacros.martian_macros.demo';
+// Apple allows no underscore in a bundle id, so the iOS DEMO identity differs from Android's by a hyphen (MM-403).
+const appId = 'com.martianmacros.martian-macros.demo';
 
 /** Whether `id` names a simulator (its UDID), as against an Android device. */
 export function isSimulatorId(id: string): boolean {

@@ -364,7 +364,9 @@ no iOS app yet (the owner's call). Phone checks listed above.
 
 - The owner's 2016 MacBook Pro was brought to macOS Sequoia 15.8 and Xcode
   26.3 (the newest that runs on it; 26.4+ needs macOS 26), and the owner
-  asked for iOS: all five plugins in one effort, the DEMO identity, no iOS
+  asked for iOS: all five plugins in one effort, the DEMO identity (on iOS
+  `com.martianmacros.martian-macros.demo`: Apple refused the underscore
+  when the owner chose a team in Xcode), no iOS
   job in CI yet, the simulator first and the phone once a team is chosen
   in Xcode (`docs/ios-signing.md`, written for the owner).
 - **Built (MM-403, MM-404, MM-405, MM-406, MM-69 in progress):**
