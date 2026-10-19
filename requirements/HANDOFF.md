@@ -455,8 +455,18 @@ no iOS app yet (the owner's call). Phone checks listed above.
   (68,358 complete products, mostly tagged France, Ireland, the UK) and a
   Canada-only cut (110,340). Restaurant menus remain the gap no open source
   fills; a licensing read of MenuStat or a paid API is the owner's call.
-  Next: "More results" in search (MM-42's open item), since the top twenty
-  now hide FNDDS's dishes behind their many variants.
+  **MM-410 (done; a fifth pull request):** "More results" at the end of the
+  search list lengthens it by twenty while there are more (one more than the
+  page is asked for, so the offer is never empty); the first new row takes
+  focus and a hidden status says how many joined. Storybook first, then the
+  panel (`docs/agent-runs/mm410-more-results`): the UX guard passed it, F1
+  (focus and announcement) and F2 (exactly a page) fixed before the build;
+  the designer kept the text kind (PD-1). **MM-411** proposed from F3 (a
+  failed page says so). Owner questions in the run's `handoff.md`: "More
+  results" or "More foods"; the second page's latency on the phone (a
+  spinner only if perceptible); whether the search rows sit 16 dp further in
+  than the field (pre-existing). Stories `AddFoodMoreResults`,
+  `AddFoodMoreResultsShown` for the owner's look in the three palettes.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to

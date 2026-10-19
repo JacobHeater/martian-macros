@@ -24,4 +24,24 @@ export const storyFoods: readonly PackEntry[] = [
       tierReason: 'Its calories and macros disagree by more than 20%.',
     }),
   },
+  // Twenty-five yogurts, so a search for "yogurt" has more than one page of results (MM-410).
+  ...['plain', 'vanilla', 'strawberry', 'blueberry', 'peach', 'cherry', 'raspberry', 'lemon', 'coffee', 'honey', 'mango', 'coconut', 'key lime']
+    .flatMap((flavor) => [`Yogurt, ${flavor}, whole milk`, `Yogurt, ${flavor}, low fat`])
+    .slice(0, 25)
+    .map((name, at) => ({
+      food: new CatalogFood({
+        id: 1002 + at,
+        packId: FixturePack.packId,
+        name,
+        kcal: name.endsWith('whole milk') ? 97 : 75,
+        proteinG: 4,
+        carbsG: name.endsWith('whole milk') ? 11 : 12,
+        fatG: name.endsWith('whole milk') ? 4 : 1,
+        preparation: 'unspecified',
+        source: 'fixture',
+        sourceId: `story-${1002 + at}`,
+        tier: 'reference',
+        tierReason: 'Invented for the stories.',
+      }),
+    })),
 ];

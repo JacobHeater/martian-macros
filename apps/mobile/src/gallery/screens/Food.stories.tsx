@@ -513,6 +513,28 @@ export const AddFoodOwnAndRecent = screenStory({
   },
 });
 
+/** MM-410: a search with more than a page of results ends in "More results". */
+export const AddFoodMoreResults = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'More results',
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+  },
+});
+
+/** MM-410: after "More results", every match is listed and the button is gone. */
+export const AddFoodMoreResultsShown = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Greek yogurt, plain nonfat',
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'More results' }, { timeout: 10000 }));
+    await waitFor(() => expect(within(canvas).queryByRole('button', { name: 'More results' })).toBeNull(), { timeout: 10000 });
+  },
+});
+
 /** MM-321: a search that finds nothing. */
 export const AddFoodNothingFound = screenStory({
   covers: ['AddFoodSheet'],

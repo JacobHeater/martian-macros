@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "task_id": "mm410-more-results",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/more-results",
+    "commit": "2747fa913db189e9d8d9d6208214582836208a81"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis in decision.md, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "2747fa913db189e9d8d9d6208214582836208a81",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm410-more-results/brief.md": "d99ca9801b6f6a18633a742e179c8e8b8afa119ac52ffdb402d1f3fffcc754b6",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "cd8e0a7385302d9460f5364855c11c6865c6a08cdcbe6661159486106119bba5",
+        "apps/mobile/src/gallery/screens/storyFoods.ts": "0dac29fa7712d977f38f350da6edfff0820aa8627d6c76603e9e3c05774ba45b",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "9d7d7aae378422867a6114edb123938e1cc1e446a9d4563d860a821806b39b73",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "c4a2497183f90a9885f6ce790a97163981e86ed5d986db4cc0a4f56c26372516",
+        "apps/mobile/src/ui/MmButton.tsx": "8ed8753b93d89b62fd289404c7954405893835b6709a098727daf9ed0055458c",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "requirements/food-logging/STORY.see-more-than-the-first-twenty-results.MM-410.md": "c43367a1b043316f3bf24eb4dbda06da6dec745fce11259843a84a92e608cae0",
+        "design/screen-direction.md": "58ad14436817f71f5c85a415d72d8e38aa27d633fc4a113924788e8e216a22ce",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results",
+          "runtime-reproduction"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "apps/mobile/src/food/FoodSearchResults.tsx (edited after the reviews)",
+          "apps/mobile/src/ui/MmListRow.tsx (autoFocus added)",
+          "apps/mobile/test/food/searchMoreResults.test.tsx (run)",
+          "the 349 story walks (run)"
+        ],
+        "not_inspected": [
+          "a browser render of the stories",
+          "a phone",
+          "VoiceOver or TalkBack"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; sequential self-review is not independent review. The reviews were of the tree before the chair's edits; the edits are the dispositions in decision.md, re-tested, not re-reviewed."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The reviewers researched their own claims (WCAG 2.2 SC 4.1.3 and 2.4.3; Baymard's load-more findings).",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The 'More results' control as drawn in its two stories: weight and kind beside 'Enter manually', the seam, the end, the label, states missing.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "2747fa913db189e9d8d9d6208214582836208a81",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm410-more-results/brief.md": "d99ca9801b6f6a18633a742e179c8e8b8afa119ac52ffdb402d1f3fffcc754b6",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "cd8e0a7385302d9460f5364855c11c6865c6a08cdcbe6661159486106119bba5",
+        "apps/mobile/src/gallery/screens/storyFoods.ts": "0dac29fa7712d977f38f350da6edfff0820aa8627d6c76603e9e3c05774ba45b",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "9d7d7aae378422867a6114edb123938e1cc1e446a9d4563d860a821806b39b73",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "c4a2497183f90a9885f6ce790a97163981e86ed5d986db4cc0a4f56c26372516",
+        "apps/mobile/src/ui/MmButton.tsx": "8ed8753b93d89b62fd289404c7954405893835b6709a098727daf9ed0055458c",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "requirements/food-logging/STORY.see-more-than-the-first-twenty-results.MM-410.md": "c43367a1b043316f3bf24eb4dbda06da6dec745fce11259843a84a92e608cae0",
+        "design/screen-direction.md": "58ad14436817f71f5c85a415d72d8e38aa27d633fc4a113924788e8e216a22ce",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "Food.stories.tsx:440-546",
+          "storyFoods.ts",
+          "FoodSearchResults.tsx",
+          "AddFoodSheet.tsx:600-730",
+          "MmButton.tsx",
+          "MmListRow.tsx",
+          "MmSheet.tsx",
+          "MmSpinner.tsx",
+          "ui.css, food.css, app.css",
+          "MM-410, MM-42, MM-408",
+          "design/screen-direction.md, design/anti-cruft-and-anti-slop.md"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "ranking (MM-42)",
+          "pack data (MM-409)",
+          "contrast of Ember text on --raised in Light",
+          "text scaling"
+        ],
+        "referrals": [
+          "ux-accessibility: focus after the button is removed, live announcement, spinner semantics",
+          "react-capacitor or QA: second-page latency on the phone"
+        ],
+        "limitations": "Source inspection only; one reviewer; no rendered palettes."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is a single load-more control at the end of a mobile list, with the loaded rows kept, a recognised pattern, and what does the evidence say about end and loading signals?",
+        "reason": "The brief asks whether a novice reads that the list went on; PD-1 leans on convention.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.smashingmagazine.com/2016/03/pagination-infinite-scrolling-load-more-buttons/",
+            "title": "Infinite Scrolling, Pagination Or 'Load More' Buttons? Usability Findings In eCommerce (Baymard Institute)",
+            "published_or_updated": "2016-03-01",
+            "accessed": "2026-10-19",
+            "claim": "A load-more button at the end of the list with the loaded items staying solved the usability issues seen with pagination; for mobile, one large button after about 15-30 items; never infinite scroll for search results."
+          }
+        ],
+        "summary": "The pattern and page size are supported; nothing on busy or end signals.",
+        "limitations": "2016, e-commerce, one source."
+      }
+    },
+    {
+      "task": "The same two stories for a novice on a phone, with a screen reader and at large text: comprehension that the list went on, focus when the button vanishes, a loading state, the label, missing states.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "2747fa913db189e9d8d9d6208214582836208a81",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm410-more-results/brief.md": "d99ca9801b6f6a18633a742e179c8e8b8afa119ac52ffdb402d1f3fffcc754b6",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "cd8e0a7385302d9460f5364855c11c6865c6a08cdcbe6661159486106119bba5",
+        "apps/mobile/src/gallery/screens/storyFoods.ts": "0dac29fa7712d977f38f350da6edfff0820aa8627d6c76603e9e3c05774ba45b",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "9d7d7aae378422867a6114edb123938e1cc1e446a9d4563d860a821806b39b73",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "c4a2497183f90a9885f6ce790a97163981e86ed5d986db4cc0a4f56c26372516",
+        "apps/mobile/src/ui/MmButton.tsx": "8ed8753b93d89b62fd289404c7954405893835b6709a098727daf9ed0055458c",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "requirements/food-logging/STORY.see-more-than-the-first-twenty-results.MM-410.md": "c43367a1b043316f3bf24eb4dbda06da6dec745fce11259843a84a92e608cae0",
+        "design/screen-direction.md": "58ad14436817f71f5c85a415d72d8e38aa27d633fc4a113924788e8e216a22ce",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "FoodSearchResults.tsx",
+          "AddFoodSheet.tsx:640-725",
+          "MmButton.tsx",
+          "MmListRow.tsx",
+          "useAsync.ts",
+          "ui.css pressed/focus rules",
+          "Food.stories.tsx:516-536",
+          "searchMoreResults.test.tsx, searchSettles.test.tsx",
+          "MM-410, MM-42, MM-408",
+          "design/screen-direction.md, design/anti-cruft-and-anti-slop.md"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "a device",
+          "assistive technology",
+          "FoodGrade/FoodTrustMark internals",
+          "the amount step"
+        ],
+        "referrals": [
+          "product-designer: one kind for both buttons; Ember contrast on --raised",
+          "react-capacitor: a ref or autofocus on MmListRow",
+          "QA: second-page latency; the new-query test"
+        ],
+        "limitations": "No browser or device; assistive-technology behaviour inferred from DOM removal."
+      },
+      "research": {
+        "status": "performed",
+        "question": "When 'More results' adds rows and may remove itself, what does current normative guidance ask for so a screen-reader user learns the result and keeps a place?",
+        "reason": "F1 is a factual claim about accessibility convention.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "Understanding SC 4.1.3: Status Messages (WCAG 2.2)",
+            "published_or_updated": "2026-05-11",
+            "accessed": "2026-10-19",
+            "claim": "A brief text about a search outcome is a status message that must be programmatically determinable without moving focus."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html",
+            "title": "Understanding SC 2.4.3: Focus Order (WCAG 2.2)",
+            "published_or_updated": "2026-03-09",
+            "accessed": "2026-10-19",
+            "claim": "Inserted content should follow its trigger in the focus order; neither page prescribes where focus goes when the focused element is removed."
+          }
+        ],
+        "summary": "Announce the delta as a status; move focus to the first new row.",
+        "limitations": "Focus-loss behaviour is inference, confidence medium."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (panel-product-designer, panel-ux-accessibility) on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-19",
+      "limitations": "No browser automation in this session, so no Storybook capture; the stories are read from source."
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "Q1",
+      "question": "'More results' or 'More foods' (PD-4)?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q2",
+      "question": "Second-page latency on the phone with the 2026-10-19 packs; a spinner in the slot only if perceptible (PD-2, F3).",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q3",
+      "question": "Do the search rows sit 16 dp further in than the field and the buttons (PD-5, needs a render)?",
+      "owner": "product owner",
+      "status": "open"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "F1: the first new row takes focus (MmListRow autoFocus) and a visually hidden polite status says how many rows joined and whether every match is listed.",
+      "authority": "chair, under WCAG 2.2 SC 4.1.3 and 2.4.3 as the guard cited"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "F2/PD-3: the packs are asked for one more than the page; the offer shows only while there are more, so exactly a page never offers more and the silent end cannot occur. PD-3's caption is therefore not drawn.",
+      "authority": "chair"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "F4: a test for 'A new query starts over', and one for exactly a page.",
+      "authority": "chair"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "PD-1/F5: the text kind stays; MM-410's Decisions say the Ember word marks the continuation and the outline the exit.",
+      "authority": "chair, under design/screen-direction.md rule 6 and 9"
+    },
+    {
+      "id": "D5",
+      "status": "deferred",
+      "summary": "PD-2/F3 (loading): no spinner; the read is local and measured at 16 ms on a laptop (MM-51); the phone measurement is the owner's (Q2). Built only if perceptible.",
+      "authority": "chair, under design/screen-direction.md 'Loading'"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "F3 (failure): a proposed ticket, MM-411, a failed page of results says so; not built with MM-410 (useAsync swallows errors; rare on local SQLite).",
+      "authority": "chair"
+    },
+    {
+      "id": "D7",
+      "status": "deferred",
+      "summary": "PD-4: 'More results' stays; 'More foods' is the owner's call (Q1).",
+      "authority": "product owner"
+    },
+    {
+      "id": "D8",
+      "status": "deferred",
+      "summary": "PD-5: the rows' padding inside the padded sheet, pre-existing, needs a render (Q3).",
+      "authority": "product owner"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit",
+      "result": "clean",
+      "commit": "working tree of feat/more-results"
+    },
+    {
+      "command": "npx vitest run test/food/searchMoreResults.test.tsx",
+      "result": "4 passed",
+      "commit": "working tree of feat/more-results"
+    },
+    {
+      "command": "npx vitest run test/gallery/stories.test.tsx --project screens",
+      "result": "349 passed (before the F1/F2 edits; rerun by mm check)",
+      "commit": "working tree of feat/more-results"
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-19",
+    "phase": "complete",
+    "next": "mm check on the final tree, then the pull request"
+  }
+}
