@@ -212,8 +212,8 @@ export function CoachScreen() {
             value={
               current.targets.weeklyRateFraction === 0 ? 'Hold weight' : Fmt.percentPerWeek(current.targets.weeklyRateFraction)
             }
+            detail={detail}
           />
-          {detail === undefined ? null : <p className="app-caption coach-pace-detail">{detail}</p>}
         </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />

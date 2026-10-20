@@ -144,6 +144,12 @@
   min-width: 0;
   margin: 0;
   font: var(--type-title);
+  /* A one-word title at 200% text breaks inside the word rather than over the bar's action (MM-374), hyphenated as the navigation labels are. */
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.mm-app-bar > :not(.mm-app-bar-title) {
+  flex-shrink: 0;
 }
 
 .mm-navigation-bar {
@@ -167,6 +173,16 @@
   font: var(--type-nav);
   cursor: pointer;
   transition: background var(--motion-fast);
+}
+/* The label stays inside its destination at any text size: it wraps, breaking a word if it must (MM-373). */
+.mm-nav-label {
+  display: block;
+  max-width: 100%;
+  padding: 0 var(--space-4);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-align: center;
+  line-height: 1.15;
 }
 .mm-nav-indicator {
   display: grid;
@@ -494,11 +510,20 @@
 .mm-list-row-with-action {
   padding: 0;
 }
+/* At large text the action's words wrap inside the button and the row stays one row (MM-374); the action takes at most half, so the words keep the rest. */
+.mm-list-row-with-action > .mm-button {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 50%;
+  white-space: normal;
+  text-align: center;
+}
 .mm-list-row-main {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: var(--space-12);
+  /* The same gap as a row without an action, so every row's words start on one column (MM-324). */
+  gap: var(--space-16);
   min-width: 0;
   min-height: inherit;
   padding: var(--space-8) var(--space-16);
@@ -1053,6 +1078,7 @@
   display: flex;
   gap: var(--space-12);
   padding: var(--space-12);
+  border: 1px solid var(--outline);
   border-radius: var(--radius-control);
   background: var(--surface);
 }
@@ -1060,6 +1086,11 @@
 .mm-sheet .mm-notice,
 .mm-dialog .mm-notice {
   background: var(--sunken);
+}
+/* A well of the sheet keeps no rim: a sunken surface with a light edge would read as raised (MM-352, the panel's PD-1). */
+.mm-sheet .mm-notice-info,
+.mm-dialog .mm-notice-info {
+  border-color: transparent;
 }
 .mm-notice-caution {
   border: 1px solid var(--caution);
@@ -1163,7 +1194,20 @@
 .mm-stat-label {
   color: var(--text2);
 }
+/* What a figure is measured against, under the row, so the value column keeps figures (MM-342): the caption role, as a row's subtitle. */
+.mm-stat-detail {
+  flex-basis: 100%;
+  margin: calc(-1 * var(--space-4)) 0 0;
+  padding-bottom: var(--space-4);
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.mm-stat-row-with-detail {
+  flex-wrap: wrap;
+}
 .mm-stat-value {
+  /* At the end of its line even when large text wraps it under the label (MM-342, the UX guard's F3). */
+  margin-inline-start: auto;
   font-size: 1rem;
   font-weight: 600;
   text-align: end;

@@ -8,6 +8,7 @@ import { userEvent, within } from 'storybook/test';
 import { RecoveryCheckIn as RecoveryAnswers } from '../../domain/RecoveryCheckIn';
 import { ExplanationLine } from '../../engine/ExplanationLine';
 import { TargetsExplanation } from '../../engine/TargetsExplanation';
+import { FoodEntry } from '../../domain/FoodEntry';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { creatineScenario } from './creatineScenario';
 import { failingRead } from './failingRead';
@@ -343,6 +344,37 @@ export const CoachStalledOverTarget = screenStory({
   shows: 'Options',
   scenario: stalledScenario(2350),
   open: onCoach,
+});
+
+/** MM-342: the week's intake with every part of its detail: the target, the distance, and what it rests on. */
+export const CoachFewDaysEstimated = screenStory({
+  covers: ['CoachScreen'],
+  shows: /rests on 3 days · mostly estimated/,
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-70), healthCheckConfirmedOn: today }));
+    await repos.targets.saveTargets(
+      storyTargets(today.addDays(-60), { kcal: 2100, proteinG: 160, proteinMinimumG: 130, carbsG: 220, tdeeSigmaKcal: 150, tdeeStatus: 'updated' }),
+    );
+    for (let i = 0; i <= 50; i++) await repos.weights.saveWeight(today.addDays(-i), 82);
+    // Only three of the last seven days complete, every one of them estimated.
+    for (let i = 1; i <= 7; i++) {
+      const day = today.addDays(-i);
+      await repos.food.addFood(
+        new FoodEntry({ id: 0, date: day, meal: 'dinner', name: 'Demo day of food', kcal: 2350, proteinG: 150, carbsG: 220, fatG: 70, source: 'quickAdd' }),
+      );
+      await repos.dayMarks.setCompleteness(day, i <= 3 ? 'complete' : 'partial');
+    }
+  },
+  open: onCoach,
+});
+
+/** MM-342, MM-91: Coach at 200% text; a stat row's detail wraps under its figure. */
+export const CoachLargeText = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your last 7 days',
+  scenario: stalledScenario(2350),
+  open: onCoach,
+  textScale: 2,
 });
 
 /** MM-321: logs far below what the scale says was eaten: the estimate is held at a safe limit. */

@@ -110,10 +110,17 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
         kind="secondary"
         onPress={digits.trim() === '' ? undefined : () => void lookup({ digits, symbology: 'gtin14' })}
       />
+      {/* A status region that exists before its text, so what a lookup found is announced, politely and without moving focus (MM-351). */}
+      <div role="status" aria-live="polite">
+        {message === undefined ? null : (
+          <>
+            <div className="app-gap-small" />
+            <Notice text={message} />
+          </>
+        )}
+      </div>
       {message === undefined ? null : (
         <>
-          <div className="app-gap-small" />
-          <Notice text={message} />
           <div className="app-gap-small" />
           {unknownGtin === undefined ? null : (
             <>

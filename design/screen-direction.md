@@ -293,7 +293,7 @@ One component, three structures, no colored fills:
 
 | Kind | Structure | Use |
 |---|---|---|
-| Info | `surface`, `info` icon, `body` text, no border | Calibration, settling, explanations |
+| Info | `surface`, `info` icon, `body` text, a 1 dp `outline` hairline on the canvas, as the list groups beside it; none as a well of a sheet or dialog (MM-352) | Calibration, settling, explanations |
 | Caution | `surface`, `caution` icon, `caution` 1 dp border, label word "Heads up" | Health/safety guidance |
 | Required safeguard | As caution, 1.5 dp border, bold lead sentence, an action button | Screening results, floors, limits |
 

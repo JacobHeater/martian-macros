@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "task_id": "m2-design-bugs",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/m2",
+    "commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-design-bugs/brief.md": "43d020c106a36e2007626332109b672e345bcf4dc71499aee846250c56c285d4",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/ui/ui.css": "559eebc13c41996daa4fd0d3e2a411d8b9659d73f04a3363fa94e22d0395119c",
+        "apps/mobile/src/food/food.css": "682d8ed8343a73af65b7b51dbd473070ad71fee1068c8d045bfbd8b0f915aee6",
+        "apps/mobile/src/food/CalorieHero.tsx": "6b3997bde2e4c81735e5eee518850a6e58952c9d99cf1ebd45f2fff0f2f96508",
+        "apps/mobile/src/food/FoodScreen.tsx": "c4ae92913acd0b55a522d7ce235687e22f30347fece683d65d12281334799317",
+        "apps/mobile/src/food/FiberLine.tsx": "0f73dbf7b013aec85a7a1b0e5dea14eb0f996d030f72280549451fe54a3c2516",
+        "apps/mobile/src/ui/StatRow.tsx": "4a813c880807663005933755aa84d5699ec32f84efd6e5d3ed48c6951fa97b91",
+        "apps/mobile/src/format/adherenceLines.ts": "359bd6626bc05c8bfcee3ce07d365f89681f3105e0598fab6f4efbf822a6027f",
+        "apps/mobile/src/coach/AdherenceCard.tsx": "e0dc95a47e714006ce549076fee55695c66f3071474b4223f24b859a9e051030",
+        "apps/mobile/src/ui/Notice.tsx": "d66cb7e915e55c9d79c373c29f81a9bd8e16a3c96c96dac3534f99cced253365",
+        "apps/mobile/src/food/scan/BarcodeScanStep.tsx": "0837e8f164d8fd262833bd42b9559a1304efc2f0060124752796031c978271ea",
+        "apps/mobile/src/foodPacks/FoodDatabaseScreen.tsx": "11de63dbaa805689f4e82f954e87e52e8f176fcf215a661b1fc1ad231fa3b241",
+        "apps/mobile/src/ui/MmNavigationBar.tsx": "fa6117e25890c59ab71c29c88a17016b21fc69d038598a46c6a2dde8735f8441",
+        "apps/mobile/src/ui/MmAppBar.tsx": "e65e6603036c490992501e4fc60a602942476129668ab5d34344fb841390bae3",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "the edited tree after the reviews",
+          "the batch's tests, run"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "a device",
+          "assistive technology"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; sequential self-review is not independent review; the reviewers did not see the edited tree."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The findings rest on the repository's own rules and tokens.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The seven fixes as drawn in their stories: siblings, words, undrawn states, the app-wide notice hairline.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-design-bugs/brief.md": "43d020c106a36e2007626332109b672e345bcf4dc71499aee846250c56c285d4",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/ui/ui.css": "559eebc13c41996daa4fd0d3e2a411d8b9659d73f04a3363fa94e22d0395119c",
+        "apps/mobile/src/food/food.css": "682d8ed8343a73af65b7b51dbd473070ad71fee1068c8d045bfbd8b0f915aee6",
+        "apps/mobile/src/food/CalorieHero.tsx": "6b3997bde2e4c81735e5eee518850a6e58952c9d99cf1ebd45f2fff0f2f96508",
+        "apps/mobile/src/food/FoodScreen.tsx": "c4ae92913acd0b55a522d7ce235687e22f30347fece683d65d12281334799317",
+        "apps/mobile/src/food/FiberLine.tsx": "0f73dbf7b013aec85a7a1b0e5dea14eb0f996d030f72280549451fe54a3c2516",
+        "apps/mobile/src/ui/StatRow.tsx": "4a813c880807663005933755aa84d5699ec32f84efd6e5d3ed48c6951fa97b91",
+        "apps/mobile/src/format/adherenceLines.ts": "359bd6626bc05c8bfcee3ce07d365f89681f3105e0598fab6f4efbf822a6027f",
+        "apps/mobile/src/coach/AdherenceCard.tsx": "e0dc95a47e714006ce549076fee55695c66f3071474b4223f24b859a9e051030",
+        "apps/mobile/src/ui/Notice.tsx": "d66cb7e915e55c9d79c373c29f81a9bd8e16a3c96c96dac3534f99cced253365",
+        "apps/mobile/src/food/scan/BarcodeScanStep.tsx": "0837e8f164d8fd262833bd42b9559a1304efc2f0060124752796031c978271ea",
+        "apps/mobile/src/foodPacks/FoodDatabaseScreen.tsx": "11de63dbaa805689f4e82f954e87e52e8f176fcf215a661b1fc1ad231fa3b241",
+        "apps/mobile/src/ui/MmNavigationBar.tsx": "fa6117e25890c59ab71c29c88a17016b21fc69d038598a46c6a2dde8735f8441",
+        "apps/mobile/src/ui/MmAppBar.tsx": "e65e6603036c490992501e4fc60a602942476129668ab5d34344fb841390bae3",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the components, stylesheet, tokens, stories, tests and tickets of the seven fixes",
+          "every Notice and StatRow call site",
+          "design/screen-direction.md, anti-cruft-and-anti-slop.md, color-and-theme-system.md"
+        ],
+        "not_inspected": [
+          "a render in any palette",
+          "the in-memory preferences' default detail level",
+          "the engine's numbers"
+        ],
+        "referrals": [
+          "ux-accessibility: MM-351 semantics, hyphenated labels",
+          "nutrition/coaching: whether the hero's figure includes alcohol"
+        ],
+        "limitations": "Source inspection only; one reviewer; no rendered palettes."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The findings rest on the repository's own rules and tokens.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The same fixes for a novice with a screen reader and at 200% text: reading order, the stat row, the live status against an alert, the hairline's contrast, the 200% rules.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-design-bugs/brief.md": "43d020c106a36e2007626332109b672e345bcf4dc71499aee846250c56c285d4",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/ui/ui.css": "559eebc13c41996daa4fd0d3e2a411d8b9659d73f04a3363fa94e22d0395119c",
+        "apps/mobile/src/food/food.css": "682d8ed8343a73af65b7b51dbd473070ad71fee1068c8d045bfbd8b0f915aee6",
+        "apps/mobile/src/food/CalorieHero.tsx": "6b3997bde2e4c81735e5eee518850a6e58952c9d99cf1ebd45f2fff0f2f96508",
+        "apps/mobile/src/food/FoodScreen.tsx": "c4ae92913acd0b55a522d7ce235687e22f30347fece683d65d12281334799317",
+        "apps/mobile/src/food/FiberLine.tsx": "0f73dbf7b013aec85a7a1b0e5dea14eb0f996d030f72280549451fe54a3c2516",
+        "apps/mobile/src/ui/StatRow.tsx": "4a813c880807663005933755aa84d5699ec32f84efd6e5d3ed48c6951fa97b91",
+        "apps/mobile/src/format/adherenceLines.ts": "359bd6626bc05c8bfcee3ce07d365f89681f3105e0598fab6f4efbf822a6027f",
+        "apps/mobile/src/coach/AdherenceCard.tsx": "e0dc95a47e714006ce549076fee55695c66f3071474b4223f24b859a9e051030",
+        "apps/mobile/src/ui/Notice.tsx": "d66cb7e915e55c9d79c373c29f81a9bd8e16a3c96c96dac3534f99cced253365",
+        "apps/mobile/src/food/scan/BarcodeScanStep.tsx": "0837e8f164d8fd262833bd42b9559a1304efc2f0060124752796031c978271ea",
+        "apps/mobile/src/foodPacks/FoodDatabaseScreen.tsx": "11de63dbaa805689f4e82f954e87e52e8f176fcf215a661b1fc1ad231fa3b241",
+        "apps/mobile/src/ui/MmNavigationBar.tsx": "fa6117e25890c59ab71c29c88a17016b21fc69d038598a46c6a2dde8735f8441",
+        "apps/mobile/src/ui/MmAppBar.tsx": "e65e6603036c490992501e4fc60a602942476129668ab5d34344fb841390bae3",
+        "apps/mobile/src/ui/MmListRow.tsx": "edcd6e04bc389e937adeed24985c2d7f9a79c41d3be6d23922f4c12039b350c5",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the components, stylesheet, tokens, stories, tests and tickets of the seven fixes",
+          "HomeShell, FoodDayHeader, intakeDayFrom, FoodEntry"
+        ],
+        "not_inspected": [
+          "a render",
+          "a device",
+          "assistive technology",
+          "MicrosPanel, MacroSplitChart",
+          "Train and Progress"
+        ],
+        "referrals": [
+          "react-capacitor: a persistent live container",
+          "product-designer: F3, F5, F6, F7, F8",
+          "coaching: F9, F10",
+          "qa: device checks F1, F4"
+        ],
+        "limitations": "No render, device or AT; layout statements are arithmetic on the stylesheet."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Is status the right live role against alert; is a region inserted with its content announced; does the hairline fall under WCAG 1.4.11?",
+        "reason": "Three normative claims behind F1 and F6.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/TR/wai-aria-1.2/",
+            "title": "WAI-ARIA 1.2",
+            "published_or_updated": "2023-06-06",
+            "accessed": "2026-10-19",
+            "claim": "status is advisory information with implicit polite live; alert is important, time-sensitive information."
+          },
+          {
+            "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Guides/Live_regions",
+            "title": "ARIA live regions (MDN)",
+            "published_or_updated": "2026-09-11",
+            "accessed": "2026-10-19",
+            "claim": "Establish the live region before updating its content; the injected-with-content exception is role=alert."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+            "title": "Understanding SC 1.4.11 Non-text Contrast (WCAG 2.2)",
+            "published_or_updated": "2026-09-06",
+            "accessed": "2026-10-19",
+            "claim": "A boundary is required only when there is no other visual way to identify a control; decorative graphics are excluded."
+          }
+        ],
+        "summary": "status is right; the region must pre-exist; the hairline needs no 3:1.",
+        "limitations": "MDN is vendor documentation; the device check decides F1."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-19",
+      "limitations": "No browser automation; stories read from source."
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "Q1",
+      "question": "The notice's corner radius: 12 px or the groups' 16 px (PD-2)?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q2",
+      "question": "Device checks: the scan notice announced on TalkBack and VoiceOver (F1); a stat row one stop or three (F4).",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q3",
+      "question": "The renders by eye in the three palettes of the stories decision.md lists.",
+      "owner": "product owner",
+      "status": "open"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "F1: a status region from first paint in the scan step; Notice's live prop withdrawn.",
+      "authority": "chair, under ARIA 1.2 and MDN as the guard cited"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "F2: MM-413 proposed with a skipped guard.",
+      "authority": "chair"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "PD-1/F5: hairline on the canvas, none as an info well of a sheet or dialog; the direction document updated.",
+      "authority": "chair, under design/color-and-theme-system.md"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "PD-3/F9: HeroFactLine rows shaped like the macro heads; the alcohol row says 'in the total'.",
+      "authority": "chair, under rule 9; the hero's sum confirmed in intakeDayFrom"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "PD-4: FoodWithAlcohol at Full detail.",
+      "authority": "chair, under MM-292"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "PD-5/F3: StatRow detail the one home, caption role, value at the end of its line; CoachLargeText.",
+      "authority": "chair, under rule 9"
+    },
+    {
+      "id": "D7",
+      "status": "accepted",
+      "summary": "PD-6/F10: 'against a 2,100 kcal target'; Days logged a figure with its detail; CoachFewDaysEstimated.",
+      "authority": "chair, within MM-149's facts-only rule"
+    },
+    {
+      "id": "D8",
+      "status": "accepted",
+      "summary": "F7/F8: hyphens on the title; the action at most half the row.",
+      "authority": "chair"
+    },
+    {
+      "id": "D9",
+      "status": "accepted",
+      "summary": "PD-7: info for the empty database row.",
+      "authority": "chair, under rule 2"
+    },
+    {
+      "id": "D10",
+      "status": "deferred",
+      "summary": "PD-2: the notice's radius, the owner's word (Q1).",
+      "authority": "product owner"
+    },
+    {
+      "id": "D11",
+      "status": "rejected",
+      "summary": "PD-9: the pack card keeps its persistent status wrapper, the pattern F1 asks for.",
+      "authority": "chair"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit",
+      "result": "clean",
+      "commit": "working tree of feat/m2"
+    },
+    {
+      "command": "npx vitest run test/coach/adherenceSummary.test.tsx test/gallery/registerDefects.test.tsx test/app/largeTextLayout.test.ts test/ui/listRowColumn.test.ts test/food/scanAnnounced.test.tsx test/settings/foodDatabase.test.tsx",
+      "result": "passed (one skipped: MM-413)",
+      "commit": "working tree of feat/m2"
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-19",
+    "phase": "complete",
+    "next": "story walks and mm check before the pull request"
+  }
+}

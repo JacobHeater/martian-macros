@@ -16,8 +16,8 @@ export function AdherenceCard() {
   if (summary === undefined || floor === undefined) return null;
   return (
     <MmSection icon="checklist" title="Your last 7 days">
-      {adherenceLines(summary, { floorKcal: floor }).map(([label, value]) => (
-        <StatRow key={label} label={label} value={value} />
+      {adherenceLines(summary, { floorKcal: floor }).map(({ label, value, detail }) => (
+        <StatRow key={label} label={label} value={value} detail={detail} />
       ))}
       <p className="app-caption">
         The seven days to yesterday. Days you did not log are not counted against anything.

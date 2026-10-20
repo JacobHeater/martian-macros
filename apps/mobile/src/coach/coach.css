@@ -4,10 +4,6 @@
 .coach-range {
   color: var(--ion);
 }
-.coach-pace-detail {
-  margin: 0;
-  text-align: end;
-}
 .coach-flag {
   margin-top: var(--space-8);
 }
