@@ -11,6 +11,7 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
@@ -42,6 +43,7 @@ import { SqlRecoveryCheckInRepository } from './SqlRecoveryCheckInRepository';
 import { SqlReminderRepository } from './SqlReminderRepository';
 import { SqlSetupRepository } from './SqlSetupRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
+import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlWaistRepository } from './SqlWaistRepository';
 import { SqlWaterRepository } from './SqlWaterRepository';
 import { SqlWeightEventRepository } from './SqlWeightEventRepository';
@@ -59,6 +61,7 @@ export class SqlRepositories {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  readonly flowDays: MenstruationRepository;
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
@@ -85,6 +88,7 @@ export class SqlRepositories {
     this.weights = new SqlWeightRepository(db);
     this.weightEvents = new SqlWeightEventRepository(db);
     this.waist = new SqlWaistRepository(db);
+    this.flowDays = new SqlMenstruationRepository(db);
     this.water = new SqlWaterRepository(db);
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);

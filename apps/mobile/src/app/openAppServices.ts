@@ -60,6 +60,7 @@ export async function openAppServices(): Promise<AppServices> {
     weights: repositories.weights,
     weightEvents: repositories.weightEvents,
     waist: repositories.waist,
+    flowDays: repositories.flowDays,
     water: repositories.water,
     food: repositories.food,
     customFoods: repositories.customFoods,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CalendarDate, type DayCompleteness, IntakeDay, type WeightObservation } from '../../src/domain';
+import { CalendarDate, type DayCompleteness, IntakeDay, WaistObservation, type WeightObservation } from '../../src/domain';
 import {
   DailyTargets,
   findInsights,
@@ -9,6 +9,7 @@ import {
   selectInsight,
   StallAssessment,
   TargetsRecord,
+  WeightTrendPoint,
 } from '../../src/engine';
 import { expectClose } from '../support/expectClose';
 import { upTo } from '../support/upTo';
@@ -62,18 +63,60 @@ const weighed = (count: number): WeightObservation[] => [
   { date: through.addDays(-40), weightKg: 86 },
 ];
 
+/** A flat trend over the fortnight, each point `sigmaKg` uncertain, moving `changeKg` in all. */
+const trend = (changeKg = 0, sigmaKg = 0.2): WeightTrendPoint[] =>
+  upTo(14).map(
+    (i) =>
+      new WeightTrendPoint({
+        date: through.addDays(-13 + i),
+        levelKg: 85 + (changeKg * i) / 13,
+        slopeKgPerDay: changeKg / 13,
+        waterKg: 0,
+        levelVariance: sigmaKg * sigmaKg,
+        slopeVariance: 0,
+        observed: true,
+        rejected: false,
+      }),
+  );
+
+const waistOn = (entries: readonly (readonly [daysAgo: number, cm: number])[]) =>
+  entries.map(([daysAgo, cm]) => new WaistObservation({ date: through.addDays(-daysAgo), waistCm: cm }));
+
+/** Six weeks of tape, two centimetres down over the last fortnight once smoothed. */
+const tapeDown: readonly (readonly [number, number])[] = [
+  [40, 93.0],
+  [27, 92.6],
+  [20, 92.2],
+  [13, 91.0],
+  [6, 90.4],
+  [1, 90.0],
+];
+
 const find = ({
   intake,
   weighIns = 14,
   stall,
   limited = false,
-}: { intake?: IntakeDay[]; weighIns?: number; stall?: StallAssessment; limited?: boolean } = {}) =>
+  history = [targets()],
+  trend: points = [],
+  waist = [],
+}: {
+  intake?: IntakeDay[];
+  weighIns?: number;
+  stall?: StallAssessment;
+  limited?: boolean;
+  history?: TargetsRecord[];
+  trend?: WeightTrendPoint[];
+  waist?: WaistObservation[];
+} = {}) =>
   findInsights({
     through,
     intake: intake ?? days(0, 14),
     weights: weighed(weighIns),
-    history: [targets()],
+    history,
     stall,
+    trend: points,
+    waist,
     limitToProteinAndLogging: limited,
   });
 
@@ -163,8 +206,82 @@ describe('the catalog', () => {
     ]);
   });
 
-  it('with an eating-disorder history nothing is about weight', () => {
-    const all = find({ intake: days(0, 14, { protein: 90 }), weighIns: 3, stall: stalled, limited: true });
+  // `through` is a Saturday, so days 0, 6, 7 and 13 ago are the weekend days.
+  const weekendDays = [0, 6, 7, 13];
+  const daysAgo = (d: IntakeDay) => d.date.daysUntil(through);
+  const week = (changes: (daysAgo: number) => Parameters<typeof day>[1]) => upTo(14).map((i) => day(i, changes(i)));
+
+  it('weekends a fifth of the target above weekdays', () => {
+    const i = only(find({ intake: week((d) => ({ kcal: weekendDays.includes(d) ? 2600 : 2100 })) }));
+    expect(i.rule).toBe('weekendHigher');
+    expect(i.figures['weekendDays']).toBe(4);
+    expect(i.figures['weekdayDays']).toBe(10);
+    expect(i.figures['weekendAverageKcal']).toBe(2600);
+    expect(i.figures['weekdayAverageKcal']).toBe(2100);
+    expect(i.figures['targetKcal']).toBe(2100);
+  });
+
+  it('a smaller weekend excess says nothing', () => {
+    expect(find({ intake: week((d) => ({ kcal: weekendDays.includes(d) ? 2400 : 2100 })) })).toEqual([]);
+  });
+
+  it('one weekend day is not a pattern', () => {
+    const intake = week((d) => ({ kcal: d === 0 ? 3200 : 2100 })).filter((d) => !weekendDays.slice(1).includes(daysAgo(d)));
+    expect(find({ intake }).map((i) => i.rule)).not.toContain('weekendHigher');
+  });
+
+  it('the waist down beyond its noise while the trend held', () => {
+    const waist = waistOn(tapeDown);
+    const i = only(find({ trend: trend(0), waist }));
+    expect(i.rule).toBe('waistAgainstWeight');
+    expect(i.figures['waistToCm']).toBeLessThan(i.figures['waistFromCm'] as number);
+    expect(i.figures['weightChangeKg']).toBe(0);
+    expect(find({ trend: trend(-1.5), waist }), 'the scale moved too').toEqual([]);
+    expect(find({ trend: trend(0), waist: waistOn([[13, 91.0], [1, 90.9]]) }), 'within the noise').toEqual([]);
+  });
+
+  it('in recomp the recomp signal says it instead', () => {
+    const recomp = new TargetsRecord({
+      effectiveFrom: through.addDays(-60),
+      mode: 'recomp',
+      tdeeKcal: 2700,
+      tdeeSigmaKcal: 200,
+      tdeeStatus: 'updated',
+      targets: new DailyTargets({ kcal: 2400, proteinG: 160, proteinMinimumG: 130, fatG: 70, carbsG: 250, weeklyRateFraction: -0.002 }),
+    });
+    expect(find({ history: [recomp], trend: trend(0), waist: waistOn(tapeDown) })).toEqual([]);
+  });
+
+  it('the same weekday highest in both weeks', () => {
+    const i = only(find({ intake: week((d) => ({ kcal: d === 2 || d === 9 ? 2700 : 2100 })) }));
+    expect(i.rule).toBe('consistentDay');
+    expect(i.figures['weekday']).toBe(through.addDays(-2).weekday);
+    expect(i.figures['unlogged']).toBe(0);
+    expect(i.figures['averageKcal']).toBe(2700);
+  });
+
+  it('the same weekday unlogged in both weeks', () => {
+    const intake = week(() => ({})).filter((d) => ![3, 10].includes(daysAgo(d)));
+    const i = only(find({ intake }));
+    expect(i.rule).toBe('consistentDay');
+    expect(i.figures['weekday']).toBe(through.addDays(-3).weekday);
+    expect(i.figures['unlogged']).toBe(1);
+  });
+
+  it('a highest day that moves about is not consistent', () => {
+    expect(find({ intake: week((d) => ({ kcal: d === 2 || d === 10 ? 2700 : 2100 })) })).toEqual([]);
+  });
+
+  it('with an eating-disorder history nothing is about weight, or about intake other than protein', () => {
+    const waist = waistOn(tapeDown);
+    const all = find({
+      intake: week((d) => ({ protein: 90, kcal: weekendDays.includes(d) ? 2600 : d === 2 || d === 9 ? 2500 : 2100 })),
+      weighIns: 3,
+      stall: stalled,
+      trend: trend(0),
+      waist,
+      limited: true,
+    });
     expect(all.map((i) => i.rule)).toEqual(['proteinShort']);
   });
 });

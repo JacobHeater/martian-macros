@@ -118,3 +118,19 @@ came from, the conversion is written the same way everywhere.
 | A sealed class and its cases | A class per case with a `kind`, and a union type of them |
 | A record `(a, b)` | A readonly tuple `[a, b]` |
 | `/// doc comment` | `/** doc comment */`, the same words |
+
+## App icon and splash
+
+The masters live in `design/`: `app-icon.png` (square, the art filling the
+frame), `loading-screen.png` (portrait) and `landscape-loading-screen.png`.
+Every platform icon and splash is generated from them, never edited by hand:
+
+```sh
+python3 scripts/app-icons.py
+```
+
+That writes the iOS 1024 px icon and its 2732 px splash (shown aspect-fit by
+the launch storyboard on the art's own sky colour), the Android launcher,
+round and adaptive foreground at each density (the adaptive background colour
+taken from the art's corner) and the portrait and landscape splashes at each
+density, and the web shell's favicon in `public/`.

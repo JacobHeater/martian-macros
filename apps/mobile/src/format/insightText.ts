@@ -2,9 +2,11 @@ import { Meal } from '../domain';
 import type { Insight } from '../engine';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { StateError } from '../lang/StateError';
+import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { Fmt } from './Fmt';
 import { mealLabel } from './mealLabel';
 import { stallText } from './stallText';
+import { weekdayLabel } from './weekdayLabel';
 
 type Evidence = readonly (readonly [label: string, value: string])[];
 
@@ -86,6 +88,60 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
           period,
           ['Days under the minimum', `${n('missedDays')}`],
           [`Of those, with almost none at ${meal}`, `${n('lowDays')}`],
+        ],
+      ];
+    }
+    case 'weekendHigher': {
+      const weekend = n('weekendAverageKcal');
+      const weekday = n('weekdayAverageKcal');
+      return [
+        'Weekends run higher than weekdays',
+        `Over the last two weeks your weekend days averaged about ${Fmt.whole(weekend)} kcal ` +
+          `and your weekdays about ${Fmt.whole(weekday)}, against a target of ${Fmt.whole(n('targetKcal'))}. ` +
+          'A plan that expects the weekend is easier to follow than one that does not; the week as a whole is what counts.',
+        [
+          period,
+          ['Weekend days (fully logged)', `${n('weekendDays')}`],
+          ['Weekday days (fully logged)', `${n('weekdayDays')}`],
+          ['Weekend average', `${Fmt.whole(weekend)} kcal`],
+          ['Weekday average', `${Fmt.whole(weekday)} kcal`],
+          ['Target', `${Fmt.whole(n('targetKcal'))} kcal`],
+        ],
+      ];
+    }
+    case 'waistAgainstWeight': {
+      const from = i.figures['waistFromCm'] ?? 0;
+      const to = i.figures['waistToCm'] ?? 0;
+      const delta = to - from;
+      const down = `${delta < 0 ? '−' : '+'}${toStringAsFixed(fmt.lengthFromCm(Math.abs(delta)), 1)} ${fmt.lengthUnit}`;
+      return [
+        'Your waist is down while the scale held',
+        `Over the last two weeks your waist went from ${fmt.length(from)} to ${fmt.length(to)} ` +
+          `while your trend weight moved ${fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)}. ` +
+          'A smaller waist at a steady weight is fat going and muscle or water staying; the tape sees what the scale cannot.',
+        [
+          period,
+          ['Waist then', fmt.length(from)],
+          ['Waist now', fmt.length(to)],
+          ['Waist change', down],
+          ['Trend weight change', fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)],
+        ],
+      ];
+    }
+    case 'consistentDay': {
+      const day = weekdayLabel(n('weekday'));
+      const unlogged = n('unlogged') === 1;
+      return [
+        unlogged ? `${day} goes unlogged` : `${day} is your highest day`,
+        unlogged
+          ? `${day} was the day without a log in both of the last two weeks. A day the coach cannot see is left out of the estimate; ` +
+            'if it is a day that is hard to log, a rough estimate of the whole day still counts.'
+          : `${day} was your highest day in both of the last two weeks, about ${Fmt.whole(n('averageKcal'))} kcal. ` +
+            'Nothing to change; it is worth knowing which day the week leans on.',
+        [
+          period,
+          ['Weeks', `${n('weeks')}`],
+          ...(unlogged ? [] : [[`${day} average`, `${Fmt.whole(n('averageKcal'))} kcal`] as const]),
         ],
       ];
     }

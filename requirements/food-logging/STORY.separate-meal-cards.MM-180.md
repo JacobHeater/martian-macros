@@ -1,6 +1,6 @@
 ---
 id: MM-180
-status: in-progress
+status: done
 component: food-logging
 related: [MM-179, MM-125]
 ---
@@ -72,3 +72,8 @@ to food entry, unchanged expansion after Add, vector sizes, accessible
 touch targets and hover colors. Existing edit/delete/portion flows retain
 their assertions and scroll explicitly for the larger layout. Integrated
 `mm check` passed; seeded cards were inspected on the Android emulator.
+
+## Progress (2026-10-20, feat/m2)
+Closed: everything the Decisions ask for is built and tested in the TypeScript app (`MealSection`, the Food screen's per-meal
+cards with their own disclosure, subtotal, protein marker, copy and Add), and the stories draw each state. Nothing remained
+open in the progress above; the ticket had only not been marked done.

@@ -63,5 +63,9 @@ export function explanationLineText(line: ExplanationLine): string {
       return 'No explanation was recorded for these targets.';
     case 'requestedBreak':
       return `A maintenance week you chose to take (${size}).`;
+    case 'paceChange':
+      return `You chose a different pace (${size}).`;
+    case 'trainingLapse':
+      return `The surplus paused for want of training (${size}).`;
   }
 }

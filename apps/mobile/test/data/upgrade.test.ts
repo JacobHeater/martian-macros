@@ -137,8 +137,19 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 10 left it: without exact targets, the label note, easing into maintenance, the pace change day, the maintenance anchor and correction (MM-123, MM-128, MM-130). */
+const versionTen = currentSchema
+  .replace('  "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),\n', '')
+  .replace('  "label_note_dismissed_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),\n', '')
+  .replace('  "pace_changed_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "maintenance_anchor_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "maintenance_correction_from_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "requested_loss_fraction" REAL NULL,\n  PRIMARY KEY ("effective_epoch_day")', '  PRIMARY KEY ("effective_epoch_day")')
+  .replace(/CREATE TABLE "menstruation_days" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 9 left it: without the day of the last backup (MM-63). */
-const versionNine = currentSchema.replace('  "last_backup_epoch_day" INTEGER NULL,\n', '');
+const versionNine = versionTen.replace('  "last_backup_epoch_day" INTEGER NULL,\n', '');
 
 /** The schema as version 8 left it: without net carbs and sugar alcohols (MM-396, MM-397). */
 const versionEight = versionNine

@@ -11,9 +11,16 @@ import { Units } from '../domain/Units';
 import type { UnitSystem } from '../domain/UnitSystem';
 import { UserSetup } from '../domain/UserSetup';
 import { BodyFatEstimate } from '../engine/BodyFatEstimate';
+import { describePaces } from '../engine/describePaces';
 import { deurenbergBodyFat } from '../engine/deurenbergBodyFat';
+import type { FatLossPace } from '../engine/FatLossPace';
+import { FatLossPace as Paces } from '../engine/FatLossPace';
+import { initialTdeePrior } from '../engine/initialTdeePrior';
+import { mifflinStJeorKcal } from '../engine/mifflinStJeorKcal';
+import { TargetInputs } from '../engine/TargetInputs';
 import { recommendMode } from '../engine/recommendMode';
 import { Fmt } from '../format/Fmt';
+import { trainsNotYet } from '../format/trainsNotYet';
 import { parseNumber } from '../format/parseNumber';
 import { useApp } from '../app/useApp';
 import { MmButton } from '../ui/MmButton';
@@ -28,9 +35,15 @@ import type { MeasurementsTyped } from './MeasurementsTyped';
 import { SexStep } from './SexStep';
 import { TrainingStep } from './TrainingStep';
 import { WelcomeStep } from './WelcomeStep';
+import { WhatToExpectStep } from './WhatToExpectStep';
+import { whatToExpectPoints } from '../format/whatToExpectPoints';
+import { ReminderRule } from '../engine/ReminderRule';
+import { ReminderSetting } from '../domain/ReminderSetting';
+import { reminderCountFrom } from '../engine/reminderCountFrom';
+import { minuteOfDayNow } from '../state/minuteOfDayNow';
 import './onboarding.css';
 
-const stepCount = 7;
+const stepCount = 8;
 const nothingTyped: MeasurementsTyped = { feet: '', inches: '', cm: '', weight: '' };
 
 /**
@@ -56,6 +69,9 @@ export function OnboardingScreen() {
   const [creatineStartedOn, setCreatineStartedOn] = useState<CalendarDate>();
   const [screening, setScreening] = useState(new ScreeningAnswers());
   const [mode, setMode] = useState<GoalMode>();
+  const [pace, setPace] = useState<FatLossPace>();
+  const [gainAcknowledged, setGainAcknowledged] = useState(false);
+  const [remind, setRemind] = useState(false);
 
   // The numbers the typed measurements mean, in what is stored.
   const fmt = new Fmt(units);
@@ -93,11 +109,37 @@ export function OnboardingScreen() {
       ? undefined
       : recommendMode({ sex, bodyFatPercent: bodyFatEstimate.percent, trainingStatus: status, policy });
 
+  // The paces of fat loss as they would apply from the starting estimate of expenditure (MM-128).
+  let paces: ReturnType<typeof describePaces> | undefined;
+  if (profile !== undefined && policy !== undefined && bodyFatEstimate !== undefined && weightKg !== undefined && policy.targetsAllowed) {
+    const bmrKcal = mifflinStJeorKcal({ sex: profile.sex, weightKg, heightCm: profile.heightCm, ageYears: profile.ageOn(today) });
+    paces = describePaces(
+      new TargetInputs({
+        sex: profile.sex,
+        heightCm: profile.heightCm,
+        trendWeightKg: weightKg,
+        bodyFat: bodyFatEstimate,
+        mode: 'fatLoss',
+        trainingStatus: status,
+        trainingDaysPerWeek: trainingDays,
+        policy,
+        tdeeKcal: initialTdeePrior({ bmrKcal, dailyActivity: activity, trainingDaysPerWeek: trainingDays }).kcal,
+        bmrKcal,
+      }),
+    );
+  }
+
   let canContinue = true;
   if (step === 0) canContinue = sex !== undefined;
   else if (step === 1) canContinue = birthDate !== undefined && !isMinor;
   else if (step === 2) canContinue = profile !== undefined && weightKg !== undefined && weightKg >= 30 && weightKg <= 350;
-  else if (step === 6) canContinue = policy !== undefined && recommendation !== undefined;
+  else if (step === 6) {
+    // Lean gain without training needs one acknowledgement before it is saved (MM-134).
+    const chosenGoal = mode ?? recommendation?.mode;
+    const notTraining = trainsNotYet({ trainingDaysPerWeek: trainingDays, trainingStatus: status });
+    canContinue =
+      policy !== undefined && recommendation !== undefined && !(notTraining && chosenGoal === 'leanGain' && !gainAcknowledged);
+  }
 
   const pickBirthDate = async () => {
     const now = services.clock.now();
@@ -140,8 +182,23 @@ export function OnboardingScreen() {
         unitSystem: units,
         bodyFatPercent: bodyFat,
         creatineStartedOn,
+        // A pace chosen for a cut (MM-128); the default pace is stored as none, as before.
+        requestedLossFraction:
+          chosen === 'fatLoss' && pace !== undefined && pace !== Paces.default ? Paces.fraction(pace) : undefined,
       }),
     );
+    // The weigh-in reminder, offered once on the last step (MM-146, MM-158).
+    if (remind && (await services.reminderScheduler.requestPermission())) {
+      const minuteOfDay = ReminderRule.defaultMinuteOfDay('weighIn');
+      await services.reminders.saveReminder(
+        new ReminderSetting({
+          kind: 'weighIn',
+          minuteOfDay,
+          enabled: true,
+          countFrom: reminderCountFrom({ today, minuteNow: minuteOfDayNow(services.clock), minuteOfDay }),
+        }),
+      );
+    }
   };
 
   if (!welcomed) {
@@ -211,9 +268,45 @@ export function OnboardingScreen() {
     );
   } else if (step === 5) {
     body = <HealthStep screening={screening} female={sex === 'female'} onChange={setScreening} />;
+  } else if (step === 7 && policy !== undefined && recommendation !== undefined && weightKg !== undefined && sex !== undefined) {
+    // What the first month will look like (MM-158), from the goal and pace chosen.
+    const chosenGoal = policy.allowedModes.has(mode ?? recommendation.mode) ? (mode ?? recommendation.mode) : recommendation.mode;
+    const paceFraction =
+      chosenGoal === 'fatLoss'
+        ? (paces?.find((p) => p.pace === (pace ?? Paces.default))?.achievedFraction ?? Paces.fraction(pace ?? Paces.default))
+        : chosenGoal === 'leanGain'
+          ? 0.0025
+          : 0;
+    body = (
+      <WhatToExpectStep
+        points={whatToExpectPoints({
+          goal: chosenGoal,
+          paceFraction,
+          weightKg,
+          sex,
+          menstruates: sex === 'female' && !screening.menopause,
+          fmt,
+        })}
+        remind={remind}
+        onRemind={setRemind}
+      />
+    );
   } else if (policy !== undefined && recommendation !== undefined) {
     body = (
-      <GoalStep policy={policy} recommendation={recommendation} selected={mode ?? recommendation.mode} onMode={setMode} />
+      <GoalStep
+        policy={policy}
+        recommendation={recommendation}
+        selected={mode ?? recommendation.mode}
+        onMode={setMode}
+        paces={paces}
+        pace={pace}
+        onPace={setPace}
+        weightKg={weightKg}
+        fmt={fmt}
+        notTraining={trainsNotYet({ trainingDaysPerWeek: trainingDays, trainingStatus: status })}
+        acknowledged={gainAcknowledged}
+        onAcknowledge={() => setGainAcknowledged(true)}
+      />
     );
   }
 

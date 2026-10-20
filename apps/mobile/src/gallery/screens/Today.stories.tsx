@@ -4,13 +4,16 @@ import { userEvent, within } from 'storybook/test';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import { maintenanceScenario } from './maintenanceScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { pausedScenario } from './pausedScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
+import { weekShapeScenario } from './weekShapeScenario';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -245,5 +248,55 @@ export const ReportReady = screenStory({
   },
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Open the report' }));
+  },
+});
+
+/** MM-141: the weekend rule, in the person's own averages against the target, with the numbers one tap down. */
+export const InsightWeekendHigher = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Weekends run higher than weekdays',
+  scenario: weekShapeScenario('weekend'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Weekends run higher than weekdays'));
+  },
+});
+
+/** MM-141: one weekday the highest day in both weeks: stated, no action. */
+export const InsightHighestDay = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /is your highest day$/,
+  scenario: weekShapeScenario('highestDay'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/is your highest day$/));
+  },
+});
+
+/** MM-141: one weekday unlogged in both weeks: a day the coach cannot see. */
+export const InsightUnloggedDay = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /goes unlogged$/,
+  scenario: weekShapeScenario('unloggedDay'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/goes unlogged$/));
+  },
+});
+
+/** MM-141: the waist down beyond its noise while the trend held, at maintenance. */
+export const InsightWaistAgainstWeight = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Your waist is down while the scale held',
+  scenario: waistDownScenario,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Your waist is down while the scale held'));
+  },
+});
+
+/** MM-130: the first fortnight after a cut: under the weigh-in, why the scale rises, said before it does. */
+export const WeighInAfterCut = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/^Expect the scale to rise/));
   },
 });

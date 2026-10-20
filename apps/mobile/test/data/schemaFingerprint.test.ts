@@ -18,6 +18,7 @@ const fingerprints: Readonly<Record<number, string>> = {
   9: '3e6e67178bea1ea3b8da22a6c8a6d9f1870a7a534463367561eba1376aa6e8f7',
   // MM-63: the day the last backup was made.
   10: 'c6a2ec1fff0b8639470370e149a37fbda26d6649c1aeefb4ba7b1c7c019064ff',
+  11: '20dea0d256c34b6fbd7abe7c05195385d75ef4e7a32f75802db4bb93d87d8b3d',
 };
 
 it('the schema is the one recorded for its version', () => {

@@ -31,6 +31,8 @@ interface MmTextFieldProps {
   describedBy?: string | undefined;
   /** The keyboard's action key does this ("Done"), when the value can be acted on (MM-296). */
   onSubmit?: (() => void) | undefined;
+  /** Takes focus when it appears: for a field that is the next useful thing after a control went away (MM-413). */
+  autoFocus?: boolean;
 }
 
 /** The app's text input. */
@@ -50,6 +52,7 @@ export function MmTextField({
   dense = false,
   describedBy: describedByOutside,
   onSubmit,
+  autoFocus = false,
 }: MmTextFieldProps) {
   const id = useId();
   const helperId = `${id}-helper`;
@@ -75,6 +78,7 @@ export function MmTextField({
         <input
           id={id}
           className="mm-field-input"
+          autoFocus={autoFocus}
           type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
           inputMode={kind === 'number' ? 'decimal' : 'text'}
           autoCapitalize={kind === 'text' ? 'sentences' : 'none'}

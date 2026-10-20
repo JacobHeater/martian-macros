@@ -103,9 +103,9 @@ it('protein shows the minimum and target as separate marks', async () => {
     foods: [food('Protein-rich day', 700, today, 135)],
   });
   await openFood();
-  const figures = await screen.findByText(/135 g · min 128 · target 160/);
+  const figures = await screen.findByText(/135 g · min 130 · target 160/);
   const markers = figures.closest('.mm-macro-bar')?.querySelectorAll<HTMLElement>('.mm-progress-marker') ?? [];
-  expect([...markers].map((marker) => marker.dataset['at'])).toEqual(['0.8', '1']);
+  expect([...markers].map((marker) => marker.dataset['at'])).toEqual(['0.8125', '1']);
 });
 
 it('a past day is measured against the targets of that day', async () => {

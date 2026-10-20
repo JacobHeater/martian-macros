@@ -68,7 +68,11 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
       const scanned = await services.barcodeScanner.scan();
       if (scanned !== undefined) await lookup(scanned);
     } catch {
+      // Said from the status region, and the button stays in place (disabled) while
+      // focus moves to the digits, the next useful control (MM-413).
       setCameraUnavailable(true);
+      setUnknownGtin(undefined);
+      setMessage('The camera is not available. Allow camera access in your phone settings to scan, or type the digits below.');
     }
   };
 
@@ -77,25 +81,18 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
       <h2 className="app-headline">Scan a barcode</h2>
       <p className="app-caption">The camera reads the barcode on this phone. Nothing is uploaded.</p>
       <div className="app-gap-small" />
-      {cameraUnavailable ? (
-        <Notice
-          text={
-            'The camera is not available. Allow camera access in ' +
-            'your phone settings to scan, or type the digits below.'
-          }
-        />
-      ) : (
-        // One primary action (MM-337): once a code is unknown, reading its label is the next step.
-        <MmButton
-          label="Scan with the camera"
-          icon="barcode"
-          kind={unknownGtin === undefined ? 'primary' : 'secondary'}
-          expand
-          onPress={() => void scan()}
-        />
-      )}
+      {/* One primary action (MM-337): once a code is unknown, reading its label is the next step. A camera that cannot be used leaves the button in place, off (MM-413). */}
+      <MmButton
+        label="Scan with the camera"
+        icon="barcode"
+        kind={unknownGtin === undefined && !cameraUnavailable ? 'primary' : 'secondary'}
+        expand
+        onPress={cameraUnavailable ? undefined : () => void scan()}
+      />
       <div className="app-gap-small" />
       <MmTextField
+        key={cameraUnavailable ? 'digits-focused' : 'digits'}
+        autoFocus={cameraUnavailable}
         label="Or type the digits"
         kind="number"
         value={digits}

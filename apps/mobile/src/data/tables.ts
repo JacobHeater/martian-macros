@@ -24,4 +24,5 @@ export const tables = [
   'water_entries',
   'inline_insight_log',
   'inline_insight_snoozes',
+  'menstruation_days',
 ] as const;

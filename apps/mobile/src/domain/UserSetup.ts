@@ -23,13 +23,17 @@ interface UserSetupInit {
   creatineStartedOn?: CalendarDate | undefined;
   maintenanceWeekFrom?: CalendarDate | undefined;
   reliefAnsweredOn?: CalendarDate | undefined;
+  paceChangedOn?: CalendarDate | undefined;
+  maintenanceAnchorOn?: CalendarDate | undefined;
+  maintenanceCorrectionFrom?: CalendarDate | undefined;
 }
 
 /**
- * What `copyWith` may change. A key that is absent keeps the value. The four
+ * What `copyWith` may change. A key that is absent keeps the value. The six
  * that can be cleared (`bodyFatPercent`, `requestedLossFraction`,
- * `healthCheckConfirmedOn`, `creatineStartedOn`) are cleared by giving the
- * key with `undefined`.
+ * `healthCheckConfirmedOn`, `creatineStartedOn`, `maintenanceAnchorOn`,
+ * `maintenanceCorrectionFrom`) are cleared by giving the key with
+ * `undefined`.
  */
 interface UserSetupChanges {
   profile?: Profile;
@@ -47,6 +51,9 @@ interface UserSetupChanges {
   creatineStartedOn?: CalendarDate | undefined;
   maintenanceWeekFrom?: CalendarDate;
   reliefAnsweredOn?: CalendarDate;
+  paceChangedOn?: CalendarDate;
+  maintenanceAnchorOn?: CalendarDate | undefined;
+  maintenanceCorrectionFrom?: CalendarDate | undefined;
 }
 
 /** Everything the user tells us at onboarding (and may edit later). */
@@ -101,6 +108,25 @@ export class UserSetup {
    */
   readonly reliefAnsweredOn: CalendarDate | undefined;
 
+  /**
+   * The day the fat-loss pace was last chosen (MM-128). A pace change acts
+   * at once, like a change of goal, so targets issued before it are redone.
+   */
+  readonly paceChangedOn: CalendarDate | undefined;
+
+  /**
+   * The day whose trend weight is the maintenance anchor (MM-130), set when
+   * the user accepts a new weight after drifting out of the band. Without
+   * it the anchor is the trend weight 14 days after maintenance began.
+   */
+  readonly maintenanceAnchorOn: CalendarDate | undefined;
+
+  /**
+   * The day the user chose to correct back toward the anchor (MM-130): a
+   * gentle pace in the needed direction until the trend is back in the band.
+   */
+  readonly maintenanceCorrectionFrom: CalendarDate | undefined;
+
   constructor(init: UserSetupInit) {
     this.profile = init.profile;
     this.screening = init.screening;
@@ -118,6 +144,9 @@ export class UserSetup {
     this.creatineStartedOn = init.creatineStartedOn;
     this.maintenanceWeekFrom = init.maintenanceWeekFrom;
     this.reliefAnsweredOn = init.reliefAnsweredOn;
+    this.paceChangedOn = init.paceChangedOn;
+    this.maintenanceAnchorOn = init.maintenanceAnchorOn;
+    this.maintenanceCorrectionFrom = init.maintenanceCorrectionFrom;
   }
 
   healthCheckDueOn(today: CalendarDate): boolean {
@@ -145,6 +174,10 @@ export class UserSetup {
       creatineStartedOn: 'creatineStartedOn' in changes ? changes.creatineStartedOn : this.creatineStartedOn,
       maintenanceWeekFrom: changes.maintenanceWeekFrom ?? this.maintenanceWeekFrom,
       reliefAnsweredOn: changes.reliefAnsweredOn ?? this.reliefAnsweredOn,
+      paceChangedOn: changes.paceChangedOn ?? this.paceChangedOn,
+      maintenanceAnchorOn: 'maintenanceAnchorOn' in changes ? changes.maintenanceAnchorOn : this.maintenanceAnchorOn,
+      maintenanceCorrectionFrom:
+        'maintenanceCorrectionFrom' in changes ? changes.maintenanceCorrectionFrom : this.maintenanceCorrectionFrom,
     });
   }
 }

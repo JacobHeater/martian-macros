@@ -20,6 +20,8 @@ import { WaistEntryCard } from './WaistEntryCard';
 import { onboardingCreatine } from './onboardingCreatine';
 import { saveWaistReadings } from './saveWaistReadings';
 import { WeightEventsCard } from './WeightEventsCard';
+import { PeriodDaysCard } from './PeriodDaysCard';
+import { cycleWindows } from '../engine/cycleWindows';
 import './progress.css';
 
 /**
@@ -36,6 +38,7 @@ export function ProgressScreen() {
   const waist = useLoaded(state.waist) ?? [];
   const trend = useCell(state.coach)?.trend ?? [];
   const weightEvents = useLoaded(state.weightEvents) ?? [];
+  const flowDays = useLoaded(state.flowDays) ?? [];
   const typed = useLoaded(state.typedWeights) ?? [];
   const imported = useLoaded(state.importedWeighIns) ?? [];
   if (setup === undefined) return null;
@@ -103,6 +106,7 @@ export function ProgressScreen() {
                 rangeDays={rangeDays}
                 fmt={fmt}
                 weightEvents={chartEvents}
+                cycleWindows={cycleWindows(flowDays)}
                 label={
                   `Weight trend over the last ${rangeDays} days. Trend weight ${fmt.weight(last.levelKg)}, ` +
                   `from ${weights.length} weigh-in${weights.length === 1 ? '' : 's'}.`
@@ -114,7 +118,8 @@ export function ProgressScreen() {
               <MmDisclosure title="How to read this">
                 <p className="app-caption">
                   Dots are weigh-ins. The line is your trend with water swings filtered out. Dashed markers show
-                  recorded weight events.
+                  recorded weight events. A shaded stretch is the days around a period start, where the band is wider
+                  on purpose.
                 </p>
               </MmDisclosure>
             </>
@@ -122,6 +127,7 @@ export function ProgressScreen() {
         </div>
       </MmHeroSurface>
       <WeightEventsCard />
+      <PeriodDaysCard />
       <WaistEntryCard
         key={`waist-${setup.unitSystem}`}
         unit={fmt.imperial ? 'inches' : 'centimeters'}

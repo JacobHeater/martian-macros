@@ -56,4 +56,4 @@ Scenario: Only allowed goals are offered
 ## Notes (built and partly verified)
 - `_weeklyRate` and `computeTargets` in `targets.dart` (tests in `targets_test.dart`); `_changeGoal` in `coach_screen.dart`.
 - **The change-goal sheet has no test and was not exercised on a device** (MM-93). The engine's handling of a goal change is tested.
-- Not built: choosing a fat-loss pace.
+- Choosing a fat-loss pace: built by MM-128 (2026-10-19): Gentle, Standard and Faster on the Coach tab and in onboarding, with what each costs.

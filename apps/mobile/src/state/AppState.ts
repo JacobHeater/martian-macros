@@ -28,12 +28,21 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
 import type { UserSetup } from '../domain/UserSetup';
+import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
 import type { AdherenceSummary } from '../engine/AdherenceSummary';
 import { analyze } from '../engine/analyze';
+import { assessMaintenance } from '../engine/assessMaintenance';
+import { assessTrainingLapse } from '../engine/assessTrainingLapse';
+import type { TrainingLapse } from '../engine/TrainingLapse';
+import { trainingSuspended } from '../engine/trainingSuspended';
+import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import { assessStall } from '../engine/assessStall';
+import { describePaces } from '../engine/describePaces';
+import type { PaceOption } from '../engine/PaceOption';
+import { TargetInputs } from '../engine/TargetInputs';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
 import { buildStrengthTrends } from '../engine/buildStrengthTrends';
 import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
@@ -201,6 +210,8 @@ export class AppState {
   /** Intake for anything that judges a day: paused days are left out. */
   readonly judgedIntake: Cell<readonly IntakeDay[] | undefined>;
   readonly waist: Cell<Loadable<WaistObservation[]>>;
+  /** The days marked with menstrual flow (MM-20). */
+  readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
 
   /** The user's own foods and recipes, by name (MM-45). */
@@ -220,6 +231,12 @@ export class AppState {
 
   /** Whether carbohydrate is shown as net of fiber and sugar alcohols (MM-396); on until switched off. */
   readonly netCarbs: Cell<Loadable<boolean>>;
+  /** Targets shown exact, unrounded (MM-123); off by default. */
+  readonly exactTargets: Cell<Loadable<boolean>>;
+  /** The day the line about label accuracy was dismissed (MM-123). */
+  readonly labelNoteDismissedOn: Cell<Loadable<CalendarDate | undefined>>;
+  /** Leaving a deficit in two steps (MM-130); off by default. */
+  readonly easeIntoMaintenance: Cell<Loadable<boolean>>;
 
   /** The sodium limit, off until set, and the water goal as the person set it (MM-311, MM-313, MM-358). */
   readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
@@ -234,6 +251,8 @@ export class AppState {
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
   readonly coach: Cell<CoachSnapshot | undefined>;
+  /** The three fat-loss paces as they would apply today (MM-128); undefined until the coach exists. */
+  readonly paceOptions: Cell<readonly PaceOption[] | undefined>;
 
   /**
    * The guide shown in place of targets on a paused day (MM-148):
@@ -249,6 +268,10 @@ export class AppState {
    * it is (MM-140); undefined until the coach has what it needs to look.
    */
   readonly stallAssessment: Cell<StallAssessment | undefined>;
+  /** Where the person stands at maintenance (MM-130); undefined when the targets in force are not maintenance. */
+  readonly maintenance: Cell<MaintenanceStatus | undefined>;
+  /** Whether training has lapsed against a goal that needs it (MM-134). */
+  readonly trainingLapse: Cell<TrainingLapse | undefined>;
 
   /** Protein by meal for each of the days insights look at (MM-125). */
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
@@ -482,6 +505,7 @@ export class AppState {
       return withoutPausedDays(intake, pauses, { keepComplete: false });
     });
     this.waist = stream(() => s.waist.watchWaist());
+    this.flowDays = stream(() => s.flowDays.watchFlowDays());
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
@@ -492,6 +516,9 @@ export class AppState {
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
     this.netCarbs = stream(() => s.preferences.watchNetCarbs());
+    this.exactTargets = stream(() => s.preferences.watchExactTargets());
+    this.labelNoteDismissedOn = stream(() => s.preferences.watchLabelNoteDismissedOn());
+    this.easeIntoMaintenance = stream(() => s.preferences.watchEaseIntoMaintenance());
     this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
@@ -502,6 +529,8 @@ export class AppState {
       const intake = of(this.intakeDays);
       const history = of(this.targetsHistory);
       const pauses = of(this.pauses);
+      // Period days widen the trend's noise around each start (MM-19, MM-20); none until read, as with no marked days.
+      const flowDays = of(this.flowDays) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -513,7 +542,7 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, today });
     });
 
     this.maintenanceGuide = derived(() => {
@@ -542,6 +571,22 @@ export class AppState {
       });
     });
 
+    this.trainingLapse = derived<TrainingLapse | undefined>(() => {
+      const setup = of(this.setup);
+      const workouts = of(this.workouts);
+      const pauses = of(this.pauses);
+      if (setup === undefined || workouts === undefined || pauses === undefined) return undefined;
+      return assessTrainingLapse({ setup, workouts, pauses, today: this.today.value });
+    });
+
+    this.maintenance = derived<MaintenanceStatus | undefined>(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (setup === undefined || snapshot === undefined || history === undefined) return undefined;
+      return assessMaintenance({ setup, history, trend: snapshot.trend, today: this.today.value });
+    });
+
     this.stallAssessment = derived(() => {
       const setup = of(this.setup);
       const snapshot = this.coach.value;
@@ -550,6 +595,7 @@ export class AppState {
       const history = of(this.targetsHistory);
       const waist = of(this.waist) ?? [];
       const weightEvents = of(this.weightEvents) ?? [];
+      const workouts = of(this.workouts) ?? [];
       const paused = this.pauseWithin(14);
       if (
         setup === undefined ||
@@ -562,7 +608,20 @@ export class AppState {
       ) {
         return undefined;
       }
-      return assessStall({ setup, snapshot, history, intake, weights, waist, weightEvents, today: this.today.value });
+      // With period days marked, the stall is judged over 21 days, not 28 (MM-140).
+      const hasCycleData = (of(this.flowDays) ?? []).length > 0;
+      return assessStall({
+        setup,
+        snapshot,
+        history,
+        intake,
+        weights,
+        waist,
+        weightEvents,
+        workouts,
+        hasCycleData,
+        today: this.today.value,
+      });
     });
 
     this.mealProtein = derived<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>(() => {
@@ -650,6 +709,8 @@ export class AppState {
           stall: this.stallAssessment.value,
           mealProtein: this.mealProtein.value,
           sodium: this.sodiumPattern.value,
+          trend: coach.trend,
+          waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
         }),
         log,
@@ -870,6 +931,28 @@ export class AppState {
       return history === undefined ? undefined : history[history.length - 1];
     });
 
+    this.paceOptions = derived<readonly PaceOption[] | undefined>(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const current = this.currentTargets.value;
+      if (setup === undefined || snapshot === undefined || !snapshot.policy.targetsAllowed) return undefined;
+      return describePaces(
+        new TargetInputs({
+          sex: setup.profile.sex,
+          heightCm: setup.profile.heightCm,
+          trendWeightKg: snapshot.trendWeightKg,
+          bodyFat: snapshot.bodyFat,
+          mode: 'fatLoss',
+          trainingStatus: setup.trainingStatus,
+          trainingDaysPerWeek: setup.trainingDaysPerWeek,
+          policy: snapshot.policy,
+          tdeeKcal: snapshot.tdee.kcal,
+          bmrKcal: snapshot.bmrKcal,
+          safetyBodyFatPercent: current?.safetyBodyFatPercent,
+        }),
+      );
+    });
+
     this.waterGoal = derived<WaterGoal | undefined>(() => {
       const goals = of(this.nutritionGoals);
       const setup = of(this.setup);
@@ -1084,6 +1167,13 @@ export class AppState {
       coach: this.coach,
       history: () => of(this.targetsHistory),
       pauses: () => of(this.pauses) ?? [],
+      easeIntoMaintenance: () => of(this.easeIntoMaintenance),
+      trainingLapsed: () => {
+        const setup = of(this.setup);
+        const workouts = of(this.workouts);
+        if (setup === undefined || workouts === undefined) return undefined;
+        return trainingSuspended({ setup, workouts, today: this.today.value });
+      },
       today: this.today,
       targets: this.services.targets,
       setups: this.services.setup,

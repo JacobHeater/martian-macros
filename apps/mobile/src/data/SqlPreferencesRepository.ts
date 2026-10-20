@@ -122,6 +122,30 @@ export class SqlPreferencesRepository implements PreferencesRepository {
     return this.save({ last_backup_epoch_day: day.epochDay });
   }
 
+  watchExactTargets(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? false : flag(row, 'exact_targets')));
+  }
+
+  saveExactTargets(on: boolean): Promise<void> {
+    return this.save({ exact_targets: asFlag(on) });
+  }
+
+  watchLabelNoteDismissedOn(): Watched<CalendarDate | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalDay(row, 'label_note_dismissed_epoch_day')));
+  }
+
+  saveLabelNoteDismissedOn(day: CalendarDate): Promise<void> {
+    return this.save({ label_note_dismissed_epoch_day: day.epochDay });
+  }
+
+  watchEaseIntoMaintenance(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? false : flag(row, 'ease_into_maintenance')));
+  }
+
+  saveEaseIntoMaintenance(on: boolean): Promise<void> {
+    return this.save({ ease_into_maintenance: asFlag(on) });
+  }
+
   watchNutritionGoals(): Watched<NutritionGoals> {
     return this.watch((row) =>
       row === undefined

@@ -7,6 +7,10 @@ const values = [
   'healthRule',
   'underweightRule',
   'bodyFatCorrection',
+  /** The user chose a different fat-loss pace (MM-128). */
+  'paceChange',
+  /** The training-days setting went to zero on a gain (MM-134). */
+  'trainingLapse',
 ] as const;
 
 /**

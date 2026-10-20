@@ -191,3 +191,8 @@
 .chart-mini-dot {
   fill: var(--info);
 }
+
+/* The days around a period start (MM-20): a quiet shade under everything, explaining the wider band. */
+.chart-cycle {
+  fill: color-mix(in srgb, var(--ion) 14%, transparent);
+}

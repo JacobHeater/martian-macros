@@ -51,6 +51,9 @@ function setupFrom(r: SqlRow): UserSetup {
     creatineStartedOn: optionalDay(r, 'creatine_started_epoch_day'),
     maintenanceWeekFrom: optionalDay(r, 'maintenance_week_from_epoch_day'),
     reliefAnsweredOn: optionalDay(r, 'relief_answered_epoch_day'),
+    paceChangedOn: optionalDay(r, 'pace_changed_epoch_day'),
+    maintenanceAnchorOn: optionalDay(r, 'maintenance_anchor_epoch_day'),
+    maintenanceCorrectionFrom: optionalDay(r, 'maintenance_correction_from_epoch_day'),
   });
 }
 
@@ -110,6 +113,9 @@ export class SqlSetupRepository implements SetupRepository {
         creatine_started_epoch_day: orNull(setup.creatineStartedOn?.epochDay),
         maintenance_week_from_epoch_day: orNull(setup.maintenanceWeekFrom?.epochDay),
         relief_answered_epoch_day: orNull(setup.reliefAnsweredOn?.epochDay),
+        pace_changed_epoch_day: orNull(setup.paceChangedOn?.epochDay),
+        maintenance_anchor_epoch_day: orNull(setup.maintenanceAnchorOn?.epochDay),
+        maintenance_correction_from_epoch_day: orNull(setup.maintenanceCorrectionFrom?.epochDay),
       }),
     );
   }
