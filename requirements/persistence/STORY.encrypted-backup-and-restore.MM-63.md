@@ -1,6 +1,6 @@
 ---
 id: MM-63
-status: in-progress
+status: done
 component: persistence
 related: [MM-59, MM-61, MM-62, MM-64, MM-65]
 ---
@@ -84,3 +84,8 @@ Built 2026-10-19: `src/backup/` (the file format, the cipher behind an interface
 - **The passphrase**: at least 12 characters (the file can be attacked offline for as long as anyone holds it; a few words reach it; NIST SP 800-63B-4's 15 is for a single-factor login, and Argon2id carries the rest), with the helper "A few words you will remember are easiest." The warning stands before the first field in body type and names the act: "Keep it somewhere safe." (F5, PD-4). Shown on request (F3, NIST: offer to display the secret), `current-password` when opening so a password manager can offer it. The mismatch is said once the second is long enough to be wrong (F2). Enter continues when ready (F4). The sheet is labelled with its headline (F10).
 - **While it works the row stays a button**, its subtitle "Backing up…" or "Opening the backup…", said by a status region too; a second press waits (F6, PD-3, as the health section's read does). A failed backup says a fixed sentence (F9, PD-5).
 - **Open for the owner:** on Android the chooser only says the file was handed to another app; "Last backup" records the day all the same (PD-7). A fresh phone must be onboarded before Settings is reachable, so a restore entry at the welcome step is a flow question (Q1). The passphrase word joins the glossary.
+
+## Closed 2026-10-20
+The product owner settled the last open part (MM-64): the share sheet and the document picker are the only way a backup leaves or comes
+back, with no provider connectors; the file stays `.mmbackup`; there is no export for reading the data outside the app. Still to be done on
+a phone, as for every native path: a backup saved through the share sheet and restored through the picker on each platform.
