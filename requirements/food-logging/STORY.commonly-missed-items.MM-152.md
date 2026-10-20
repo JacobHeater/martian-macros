@@ -110,7 +110,7 @@ Built: **the user's usual cooking fat.** Once a spoon is chosen under "Cooked wi
 chips like the "Amount in" chips above: Oil, Butter, Ghee, Coconut oil (`CookingFatKind`, each with its USDA numbers per 100 g and
 its spoon weights), the person's usual one preselected, with a caption saying what it adds ("Adds butter as its own entry: about
 34 kcal · 4 g fat"). The fat chosen is logged under its own name ("Butter", "Cooking oil") and becomes the usual
-(`usual_cooking_fat` on the preferences, schema 15, `CookingFatReader`/`Writer`, oil until chosen), so the next time it is one tap.
+(`usual_cooking_fat` on the preferences, schema 14, `CookingFatReader`/`Writer`, oil until chosen), so the next time it is one tap.
 Tests: `test/domain/cookingFat.test.ts`, the preferences contract, `test/food/rawOrCooked.test.tsx` ("butter chosen as the fat is
 logged as butter and remembered as the usual"). Story: `AddFoodAmountCookedWithOil`.
 

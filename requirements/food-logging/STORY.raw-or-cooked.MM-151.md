@@ -107,7 +107,7 @@ Built: the choice is remembered **per food, from the whole log**. The food repos
 (`lastLoggedFrom(packId, foodIds)`: the most recent entry logged from any of the foods, however long ago; SQLite and memory, in the
 contract), and the Add food sheet asks it when a food with a pair is picked: if that entry was weighed (grams or ounces) as the
 other state, the amount step starts on it. A state logged thirty foods ago is no longer forgotten. The entry now stores the state
-it was logged in (`preparation`, schema 15, MM-167), and the row says it: "Weighed · 200 g raw · calculated from 365 kcal per
+it was logged in (`preparation`, schema 14, MM-167), and the row says it: "Weighed · 200 g raw · calculated from 365 kcal per
 100 g"; a packaged food's row says "as packaged", so the rule "the entry says which state it is" is on screen, not only in the
 data. Tests: `test/food/rawOrCooked.test.tsx` (remembered past the recent foods; the state on the entry and the row; a cup
 records the serving weight it was converted with), the food repository contract. Stories: `AddFoodAmountRememberedRaw`,
