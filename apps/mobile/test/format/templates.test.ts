@@ -246,6 +246,7 @@ describe('why targets changed', () => {
       'Your calorie floor is 1,500 kcal; the target would otherwise be 1,380 kcal.',
     );
     expect(explanationLineText(new ExplanationLine('userHold', 0))).toBe('You kept last week’s targets for now (0).');
+    expect(explanationLineText(new ExplanationLine('paceChange', 180))).toBe('You chose a different pace (+180).');
   });
 
   it('what would change them next, in order of what matters most', () => {

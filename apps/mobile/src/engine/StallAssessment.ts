@@ -16,6 +16,7 @@ interface StallAssessmentInit {
   averageTargetKcal?: number | undefined;
   waistChangeCm?: number | undefined;
   maskedByEvent?: boolean;
+  maskedByTraining?: boolean;
   expectedChangeKcal?: number | undefined;
   atFloor?: boolean;
   estimateLow?: boolean;
@@ -51,6 +52,9 @@ export class StallAssessment {
   /** A passing weight event falls in the last days of the window. */
   readonly maskedByEvent: boolean;
 
+  /** Training started, or started again after a month off, in the last days of the window. */
+  readonly maskedByTraining: boolean;
+
   /**
    * The change to the calorie target expected at the next check-in under
    * the estimate diagnosis (negative is a reduction); undefined when none.
@@ -77,6 +81,7 @@ export class StallAssessment {
     this.averageTargetKcal = init.averageTargetKcal;
     this.waistChangeCm = init.waistChangeCm;
     this.maskedByEvent = init.maskedByEvent ?? false;
+    this.maskedByTraining = init.maskedByTraining ?? false;
     this.expectedChangeKcal = init.expectedChangeKcal;
     this.atFloor = init.atFloor ?? false;
     this.estimateLow = init.estimateLow ?? false;

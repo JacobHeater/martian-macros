@@ -35,6 +35,9 @@ CREATE TABLE "setups" (
   "health_check_skip_count" INTEGER NOT NULL DEFAULT 0,
   "creatine_started_epoch_day" INTEGER NULL,
   "fluid_limited_by_clinician" INTEGER NOT NULL DEFAULT 0 CHECK ("fluid_limited_by_clinician" IN (0, 1)),
+  "pace_changed_epoch_day" INTEGER NULL,
+  "maintenance_anchor_epoch_day" INTEGER NULL,
+  "maintenance_correction_from_epoch_day" INTEGER NULL,
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (
@@ -122,6 +125,7 @@ CREATE TABLE "targets_history" (
   "profile_revision" INTEGER NOT NULL DEFAULT 0,
   "safety_body_fat_percent" REAL NULL,
   "tdee_status" TEXT NOT NULL,
+  "requested_loss_fraction" REAL NULL,
   PRIMARY KEY ("effective_epoch_day")
 );
 CREATE TABLE "user_preferences" (
@@ -145,6 +149,9 @@ CREATE TABLE "user_preferences" (
   "inline_insight_kinds_off" TEXT NOT NULL DEFAULT '',
   "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),
   "last_backup_epoch_day" INTEGER NULL,
+  "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),
+  "label_note_dismissed_epoch_day" INTEGER NULL,
+  "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -289,6 +296,10 @@ CREATE TABLE "inline_insight_log" (
   "line" TEXT NOT NULL,
   "first_epoch_day" INTEGER NOT NULL,
   UNIQUE ("kind", "anchor_kind", "anchor_id")
+);
+CREATE TABLE "menstruation_days" (
+  "epoch_day" INTEGER NOT NULL,
+  PRIMARY KEY ("epoch_day")
 );
 CREATE TABLE "inline_insight_snoozes" (
   "kind" TEXT NOT NULL,

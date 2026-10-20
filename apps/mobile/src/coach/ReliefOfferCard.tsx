@@ -43,7 +43,8 @@ export function ReliefOfferCard() {
                 kind={suggestsBreak ? 'secondary' : 'primary'}
                 onPress={() =>
                   void services.setup.saveSetup(
-                    setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today }),
+                    // A pace change acts at once (MM-128), and a slower pace only raises the target.
+                    setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today, paceChangedOn: today }),
                   )
                 }
               />

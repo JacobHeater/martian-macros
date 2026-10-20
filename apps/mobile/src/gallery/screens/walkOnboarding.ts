@@ -2,7 +2,7 @@ import { userEvent, within } from 'storybook/test';
 
 /**
  * Walks a new installation's onboarding as a person would, stopping on
- * step `upTo` (1 is biological sex, 7 is the goal).
+ * step `upTo` (1 is biological sex, 7 is the goal, 8 is what to expect).
  */
 export async function walkOnboarding(canvas: HTMLElement, upTo: number): Promise<void> {
   const app = within(canvas);
@@ -23,6 +23,6 @@ export async function walkOnboarding(canvas: HTMLElement, upTo: number): Promise
   await type('Inches', '11');
   await type('lb', '200');
   await next();
-  // Activity, training, health: each has an answer already.
+  // Activity, training, health: each has an answer already; the goal is recommended.
   for (let step = 4; step < upTo; step += 1) await next();
 }

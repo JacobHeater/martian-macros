@@ -1,5 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { MenstruationDay } from '../domain/MenstruationDay';
+import { CycleRule } from './CycleRule';
+import { cycleWindows } from './cycleWindows';
 
 /**
  * Returns a weight-noise multiplier per date that widens measurement noise
@@ -10,15 +12,17 @@ import type { MenstruationDay } from '../domain/MenstruationDay';
  */
 export function cycleNoiseMultiplier(
   flowDays: Iterable<MenstruationDay>,
-  { daysBefore = 5, daysAfter = 2, multiplier = 1.6 }: { daysBefore?: number; daysAfter?: number; multiplier?: number } = {},
+  {
+    daysBefore = CycleRule.daysBefore,
+    daysAfter = CycleRule.daysAfter,
+    multiplier = CycleRule.multiplier,
+  }: { daysBefore?: number; daysAfter?: number; multiplier?: number } = {},
 ): (date: CalendarDate) => number {
-  const flow = new Set<number>();
-  for (const d of flowDays) flow.add(d.date.epochDay);
-  const starts = [...flow].filter((day) => !flow.has(day - 1));
-  if (starts.length === 0) return () => 1;
+  const windows = cycleWindows(flowDays, { daysBefore, daysAfter });
+  if (windows.length === 0) return () => 1;
   const widened = new Set<number>();
-  for (const start of starts) {
-    for (let d = start - daysBefore; d <= start + daysAfter; d++) widened.add(d);
+  for (const { from, to } of windows) {
+    for (let d = from.epochDay; d <= to.epochDay; d++) widened.add(d);
   }
   return (date) => (widened.has(date.epochDay) ? multiplier : 1);
 }

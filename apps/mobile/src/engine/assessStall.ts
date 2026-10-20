@@ -4,6 +4,7 @@ import type { UserSetup } from '../domain/UserSetup';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
+import type { Workout } from '../domain/training/Workout';
 import { clamp } from '../lang/clamp';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { effectiveWeightEvents } from './effectiveWeightEvents';
@@ -14,6 +15,7 @@ import type { StallNotAssessedReason } from './StallNotAssessedReason';
 import { StallRule } from './StallRule';
 import { summarizeAdherence } from './summarizeAdherence';
 import type { TargetsRecord } from './TargetsRecord';
+import { trainingStartOn } from './trainingStartOn';
 import { waistChangeOf } from './waistChangeOf';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
@@ -24,7 +26,8 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * A stall is defined against the goal, not against zero: over the window the
  * trend moved less than a third of the intended pace, and the shortfall is
  * larger than the slope's own uncertainty. The diagnosis is the first that
- * applies of: thin data, masked by water, intake off target, and the
+ * applies of: thin data, masked by water (the waist down, a passing event,
+ * or training started in the last days), intake off target, and the
  * estimate being wrong. Nothing here changes a target.
  */
 export function assessStall({
@@ -36,6 +39,7 @@ export function assessStall({
   today,
   waist = [],
   weightEvents = [],
+  workouts = [],
   hasCycleData = false,
 }: {
   setup: UserSetup;
@@ -46,6 +50,8 @@ export function assessStall({
   today: CalendarDate;
   waist?: readonly WaistObservation[];
   weightEvents?: readonly WeightEvent[];
+  /** The training log, for training that started in the last days of the window. */
+  workouts?: readonly Workout[];
   hasCycleData?: boolean;
 }): StallAssessment {
   const window =
@@ -124,11 +130,13 @@ export function assessStall({
   const maskedByEvent = effectiveWeightEvents(weightEvents).some(
     (e) => !e.date.isAfter(today) && e.date.daysUntil(today) <= StallRule.maskingEventDays,
   );
+  const trainingStart = trainingStartOn(workouts, { asOf: today, gapDays: StallRule.trainingRestartGapDays });
+  const maskedByTraining = trainingStart !== undefined && trainingStart.daysUntil(today) <= StallRule.maskingEventDays;
 
   let diagnosis: StallDiagnosis;
   if (summary.completeDays < StallRule.minimumFoodDays || summary.weighIns < StallRule.minimumWeighIns) {
     diagnosis = 'data';
-  } else if (maskedByEvent || (!gaining && waistOverWindow?.direction === 'down')) {
+  } else if (maskedByEvent || maskedByTraining || (!gaining && waistOverWindow?.direction === 'down')) {
     diagnosis = 'masked';
   } else if (summary.standing === (gaining ? 'below' : 'above')) {
     diagnosis = 'intake';
@@ -162,6 +170,7 @@ export function assessStall({
     averageTargetKcal: summary.averageTargetKcal,
     waistChangeCm: waistChange,
     maskedByEvent,
+    maskedByTraining,
     expectedChangeKcal: expectedChange,
     atFloor,
     estimateLow:

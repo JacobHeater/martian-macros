@@ -34,7 +34,7 @@ async function acceptDate() {
 it('onboarding requires sex and birth date, then creates a plan', async () => {
   const repos = await begin();
   expect(heading('Biological sex')).toBeInTheDocument();
-  expect(screen.getByRole('img', { name: 'Step 1 of 7' })).toBeInTheDocument();
+  expect(screen.getByRole('img', { name: 'Step 1 of 8' })).toBeInTheDocument();
   expect(next(), 'nothing chosen yet').toBeDisabled();
   await press('Male');
   expect(next()).toBeEnabled();
@@ -68,6 +68,11 @@ it('onboarding requires sex and birth date, then creates a plan', async () => {
   await userEvent.click(next()); // health
 
   expect(screen.getByText('Recommended')).toBeInTheDocument();
+  await userEvent.click(next()); // the goal
+
+  // What the first month looks like (MM-158), then the app.
+  expect(heading('What to expect')).toBeInTheDocument();
+  expect(screen.getByText(/These are the plan’s aims, not promises/)).toBeInTheDocument();
   await press('Start');
 
   // Lands on the main shell with targets already issued.

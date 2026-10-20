@@ -18,7 +18,9 @@ import { firstDayScenario } from './firstDayScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
 import { reveal } from './reveal';
+import { maintenanceScenario } from './maintenanceScenario';
 import { stalledScenario } from './stalledScenario';
+import { storyWorkout } from './storyWorkout';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { storyTargets } from './storyTargets';
@@ -166,6 +168,46 @@ export const ChooseGoal = screenStory({
   walk: pressOnCoach('Change goal'),
 });
 
+/** MM-158: "What to expect", reread from the Coach tab: the plan's aims and what the scale does that is not progress. */
+export const WhatToExpectReread = screenStory({
+  covers: ['CoachScreen', 'WhatToExpectScreen'],
+  shows: /^Your plan aims for/,
+  open: onCoach,
+  walk: pressOnCoach(/^What to expect/),
+});
+
+/** MM-130: four days after a twelve-week cut: what the scale will do, and how long a pause is sensible. */
+export const MaintenanceAfterCut = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  open: onCoach,
+});
+
+/** MM-130: six weeks in, the anchor read from the trend two weeks in, and the trend within its band. */
+export const MaintenanceHolding = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Within the band: holding.',
+  scenario: maintenanceScenario({ daysAgo: 42 }),
+  open: onCoach,
+});
+
+/** MM-130: drifted above the band for two weeks: the coach asks, and changes nothing until answered. */
+export const MaintenanceDrifted = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your weight has moved',
+  scenario: maintenanceScenario({ daysAgo: 60, driftKg: 2.5 }),
+  open: onCoach,
+});
+
+/** MM-128: "Change pace": the three paces with what each costs this person today, the default marked. */
+export const ChoosePace = screenStory({
+  covers: ['CoachScreen', 'PaceSheet'],
+  shows: 'Choose a pace',
+  open: onCoach,
+  walk: pressOnCoach('Change pace'),
+});
+
 /** MM-321: a new goal with a deficit is confirmed against the health check first. */
 export const ChooseGoalRecheck = screenStory({
   covers: ['CoachScreen', 'HealthRecheckScreen'],
@@ -208,6 +250,19 @@ export const CoachStalled = screenStory({
   covers: ['CoachScreen'],
   shows: 'Progress has slowed',
   scenario: stalledScenario(),
+  open: onCoach,
+});
+
+/** MM-140: the same flat month, training started eight days ago: the stall is put down to water in new muscle, not to the plan. */
+export const CoachStalledAfterStartingTraining = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^You started training in the last 10 days/,
+  scenario: async (repos, today) => {
+    await stalledScenario()(repos, today);
+    for (const daysAgo of [8, 5, 2]) {
+      await repos.workouts.saveWorkout(storyWorkout(today.addDays(-daysAgo), [['back-squat', 5, 80], ['barbell-bench-press', 5, 60]]));
+    }
+  },
   open: onCoach,
 });
 

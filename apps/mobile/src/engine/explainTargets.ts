@@ -23,6 +23,10 @@ function reasonFor(trigger: ExplanationTrigger): ExplanationReason {
       return 'underweightRule';
     case 'bodyFatCorrection':
       return 'bodyFatEstimate';
+    case 'paceChange':
+      return 'paceChange';
+    case 'trainingLapse':
+      return 'trainingLapse';
     default:
       return 'paceAndWeight';
   }
@@ -71,7 +75,9 @@ export function explainTargets({
         ? 'requestedBreak'
         : targets.flags.has('dietBreak')
           ? 'dietBreak'
-          : reasonFor(trigger),
+          : targets.flags.has('trainingLapsed') && !(previous.targets.flags.has('trainingLapsed'))
+            ? 'trainingLapse'
+            : reasonFor(trigger),
       rest,
     );
     add('stepLimit', trace.limitedKcal - trace.formulaKcal);

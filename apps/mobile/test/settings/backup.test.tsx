@@ -5,6 +5,7 @@ import { BackupFile } from '../../src/backup/BackupFile';
 import { SodiumBackupCipher } from '../../src/backup/SodiumBackupCipher';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { currentSchemaVersion } from '../../src/data/currentSchemaVersion';
 import { FakeBackupPlatform } from '../../src/backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
@@ -83,13 +84,13 @@ it('backs up: a passphrase typed twice, a sealed file handed to the phone, and t
   await waitFor(() => expect(backup.saved).toHaveLength(1), slowly);
   expect(backup.saved[0]?.name).toBe('martian-macros-2026-10-19.mmbackup');
   const header = BackupFile.header(backup.saved[0]!.file);
-  expect(header.schemaVersion).toBe(10);
+  expect(header.schemaVersion).toBe(currentSchemaVersion);
   expect(await screen.findByText('Backup saved.', {}, slowly)).toBeInTheDocument();
   await waitFor(() => expect(within(topLayer()).getByText('October 19, 2026')).toBeInTheDocument(), slowly);
 }, 60000);
 
 it('restores: a wrong passphrase is said and asked again; the right one shows what the backup holds and what it replaces', async () => {
-  backup.toPick = await BackupFile.write(await snapshotWithOneWeighIn(), 'correct horse battery', { schemaVersion: 10, createdOn: '2026-10-12' }, new SodiumBackupCipher());
+  backup.toPick = await BackupFile.write(await snapshotWithOneWeighIn(), 'correct horse battery', { schemaVersion: currentSchemaVersion, createdOn: '2026-10-12' }, new SodiumBackupCipher());
   render();
   const settings = await openSettings();
   await userEvent.click(settings.getByRole('button', { name: /^Restore from a backup/ }));

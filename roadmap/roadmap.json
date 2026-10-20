@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-19",
+  "asOf": "2026-10-20",
   "generatedFrom": {
     "requirements": "requirements/ (287 tickets, MM-1 to MM-289; 170 done, 51 in-progress, 66 proposed)",
     "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
@@ -1909,13 +1909,13 @@
           "MM-82",
           "MM-83",
           "MM-112",
-          "MM-164"
+          "MM-164",
+          "MM-134",
+          "MM-158"
         ],
         "remaining": [
           "MM-80",
-          "MM-113",
-          "MM-134",
-          "MM-158"
+          "MM-113"
         ]
       },
       "sequence": [
@@ -2021,16 +2021,16 @@
           "MM-138",
           "MM-139",
           "MM-143",
-          "MM-144"
+          "MM-144",
+          "MM-123",
+          "MM-128",
+          "MM-130"
         ],
         "remaining": [
           "MM-119",
           "MM-122",
-          "MM-123",
           "MM-124",
-          "MM-128",
           "MM-129",
-          "MM-130",
           "MM-137"
         ]
       },
@@ -2157,14 +2157,14 @@
         "built": [
           "MM-16",
           "MM-17",
-          "MM-21"
+          "MM-21",
+          "MM-20",
+          "MM-136"
         ],
         "remaining": [
           "MM-15",
-          "MM-20",
           "MM-34",
           "MM-118",
-          "MM-136",
           "MM-142",
           "MM-154",
           "MM-155",
@@ -2341,7 +2341,9 @@
           "MM-219",
           "MM-220",
           "MM-221",
-          "MM-411"
+          "MM-411",
+          "MM-180",
+          "MM-413"
         ],
         "remaining": [
           "MM-386",
@@ -2360,11 +2362,9 @@
           "MM-151",
           "MM-152",
           "MM-167",
-          "MM-180",
           "MM-305",
           "MM-329",
-          "MM-406",
-          "MM-413"
+          "MM-406"
         ]
       },
       "sequence": [
@@ -2612,7 +2612,9 @@
           "MM-393",
           "MM-149",
           "MM-147",
-          "MM-114"
+          "MM-114",
+          "MM-140",
+          "MM-141"
         ],
         "remaining": [
           "MM-33",
@@ -2621,8 +2623,6 @@
           "MM-116",
           "MM-117",
           "MM-125",
-          "MM-140",
-          "MM-141",
           "MM-145",
           "MM-146",
           "MM-148",

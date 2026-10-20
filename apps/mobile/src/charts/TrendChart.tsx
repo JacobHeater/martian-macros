@@ -15,6 +15,8 @@ interface TrendChartProps {
   rangeDays: number;
   fmt: Fmt;
   weightEvents?: readonly WeightEvent[];
+  /** The spans the trend widens its noise over around each period start (MM-20), shaded so the wider band is explained. */
+  cycleWindows?: readonly { from: CalendarDate; to: CalendarDate }[];
   /** What the chart says, for a screen reader (the chart itself is drawn). */
   label: string;
 }
@@ -28,10 +30,11 @@ const plotHeight = height - bottom - 4;
 
 /**
  * The weight trend: the estimated trend as a line, two standard deviations
- * either side as a band, each weigh-in as a dot, and a dashed line on each
- * day a weight event was noted.
+ * either side as a band, each weigh-in as a dot, a dashed line on each
+ * day a weight event was noted, and a quiet shade over the days around a
+ * period start, where the band is wider by design (MM-20).
  */
-export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents = [], label }: TrendChartProps) {
+export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents = [], cycleWindows = [], label }: TrendChartProps) {
   const start = today.addDays(1 - rangeDays);
   const points = trend.filter((p) => !p.date.isBefore(start));
   if (points.length === 0) return <p className="chart-empty chart-empty-tall">No weigh-ins in this range.</p>;
@@ -53,6 +56,10 @@ export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents
   const along = (sigmas: number) => points.map((p) => [x(dayOf(p.date)), y(at(p, sigmas))] as const);
   const band = `${linePath(along(2))}${linePath([...along(-2)].reverse()).replace('M', 'L')}Z`;
   const events = weightEvents.filter((event) => !event.date.isBefore(start) && !event.date.isAfter(today));
+  const last = today.addDays(-1);
+  const shaded = cycleWindows
+    .map(({ from, to }) => ({ from: from.isBefore(start) ? start : from, to: to.isAfter(last) ? last : to }))
+    .filter(({ from, to }) => !to.isBefore(from));
   const gridValues = [1, 2, 3].map((step) => low + ((high - low) / 4) * step);
 
   return (
@@ -69,6 +76,17 @@ export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents
         <text key={day} className="chart-axis" x={x(day)} y={height - 6} textAnchor={i === 0 ? 'start' : 'middle'}>
           {Fmt.shortDay(start.addDays(roundHalfAwayFromZero(day)))}
         </text>
+      ))}
+      {shaded.map(({ from, to }) => (
+        <rect
+          key={`cycle-${from.epochDay}`}
+          className="chart-cycle"
+          data-from={dayOf(from)}
+          x={x(dayOf(from))}
+          y={4}
+          width={Math.max(2, x(dayOf(to)) - x(dayOf(from)))}
+          height={plotHeight}
+        />
       ))}
       {events.map((event) => (
         <line

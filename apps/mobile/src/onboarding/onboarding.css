@@ -22,3 +22,11 @@
 .onboarding-spacer {
   flex: 1;
 }
+
+/* What to expect (MM-158): a short list, each point one or two lines. */
+.onboarding-expect {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: var(--space-8);
+}

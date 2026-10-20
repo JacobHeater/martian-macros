@@ -1,6 +1,6 @@
 ---
 id: MM-123
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-41, MM-92, MM-98, MM-107, MM-108, MM-121, MM-124, MM-149, MM-153]
 ---
@@ -93,3 +93,22 @@ engine's `adherence_summary_test.dart`.
 
 Not built: display rounding of targets, the band drawn on the calorie bar, "on target" wording on the day's card, the dismissible
 line about label accuracy, and the exact-targets setting. No screen's daily figures have changed.
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **Display rounding**: `displayTargets` (format) rounds calories to the nearest 25 kcal and grams to the nearest 5 g for every
+  screen that shows a target: the calorie hero (Today, Food, Coach), its macro bars, and the Coach's "Your targets" rows. Stored
+  and computed values are untouched; the explanation of a weekly change keeps exact figures, since its lines add up.
+- **The band, drawn and said**: the hero's arc carries the on-target zone as a wider, quiet band under the track (`HorizonArc`
+  `band`), and the caption adds "· on target" when the day is inside the band (`intakeStandingOf`, judged on the exact target). A
+  day under the calorie floor is never on target (MM-114). Carbohydrate and fat are not judged anywhere.
+- **Wording**: the caption keeps the app's existing "kcal left of 2,475" and "kcal over 2,475" (not the ticket's "to go"); the
+  band is the change, the words were already right. Say if "to go" is wanted.
+- **The label line**: once, under the day's figures on Food, "Food labels and portions are only accurate to within about 10 to
+  20%. Close counts as exact." ("as good as" would break the voice rule against "good") with Got it; dismissed for good
+  (`label_note_dismissed_epoch_day`, schema 11).
+- **Exact targets**: Settings > Coach > "Exact targets", off by default (`exact_targets`, schema 11); on, nothing is rounded and
+  the band is unchanged.
+- Tests: `displayTargets.test.ts`, `calorieBand.test.tsx` (each acceptance scenario, the arc's zone, the line dismissed),
+  `coachSwitches.test.tsx`; the parity test records the rounded protein minimum. Story: `FoodOnTarget`.
+- The weekly average against target is the adherence summary's (MM-149), already the primary number on the Coach.

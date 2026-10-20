@@ -1,5 +1,8 @@
 import { InsightCard } from '../coach/InsightCard';
 import { RowWithInsight } from '../coach/RowWithInsight';
+import type { InlineInsightContent } from '../coach/InlineInsightContent';
+import { MaintenanceRule } from '../engine/MaintenanceRule';
+import { reboundText } from '../format/reboundText';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { useItemInsightContents } from '../coach/useItemInsightContents';
 import { ReliefOfferCard } from '../coach/ReliefOfferCard';
@@ -66,6 +69,7 @@ export function DashboardScreen() {
   const latestWaistDay = (useLoaded(state.waist) ?? []).reduce<number | undefined>((last, w) => Math.max(last ?? 0, w.date.epochDay), undefined);
   const waistOwn = useItemInsightContents({ kind: 'waist', id: `${latestWaistDay ?? 0}` }, 'Waist');
   const waterOwn = useItemInsightContents({ kind: 'water', id: `${useCell(state.today).epochDay}` }, 'Water');
+  const maintenance = useCell(state.maintenance);
   const designedRow = (row: 'weight' | 'waist' | 'water') => {
     const note = rowNotes?.get(row);
     return note === undefined ? undefined : [note];
@@ -93,6 +97,23 @@ export function DashboardScreen() {
   const history = historyState.value;
   const weights = weightsState.value;
   const fmt = new Fmt(setup.unitSystem);
+  // Under the weigh-in for two weeks after a cut (MM-130): why the scale rises, before it does.
+  const weightOwn: InlineInsightContent[] =
+    maintenance !== undefined &&
+    maintenance.fromDeficitWeeks > 0 &&
+    maintenance.startedOn.daysUntil(today) < MaintenanceRule.reboundNoteDays
+      ? [
+          {
+            line: reboundText(fmt),
+            evidence: [
+              ['Maintenance began', Fmt.day(maintenance.startedOn, today)],
+              ['The cut before it', `${maintenance.fromDeficitWeeks} weeks`],
+            ],
+            area: 'body',
+            rule: 'Leaving a deficit',
+          },
+        ]
+      : [];
   const targetsAllowed = CoachingPolicy.derive({
     profile: setup.profile,
     screening: setup.screening,
@@ -185,7 +206,7 @@ export function DashboardScreen() {
             onPress={() => open('progress')}
           />
         ) : (
-          <RowWithInsight insights={designedRow('weight') ?? []}>
+          <RowWithInsight insights={designedRow('weight') ?? weightOwn}>
             <MmListRow
               leadingIcon="scale"
               title={`Trend ${fmt.weight(last.levelKg)}`}

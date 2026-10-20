@@ -25,6 +25,14 @@ export function stallText(a: StallAssessment, fmt: Fmt): readonly [body: string,
       ];
     case 'masked': {
       const waist = a.waistChangeCm;
+      if (a.maskedByTraining && !a.maskedByEvent) {
+        return [
+          `You started training in the last ${StallRule.maskingEventDays} days. ` +
+            'New training holds water in the muscles for a while, which can ' +
+            'hide fat loss on the scale. The scale usually catches up. Nothing to change.',
+          [],
+        ];
+      }
       if (!a.maskedByEvent && waist !== undefined) {
         const down = `${toStringAsFixed(fmt.lengthFromCm(Math.abs(waist)), 1)} ${fmt.lengthUnit}`;
         return [

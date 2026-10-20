@@ -57,6 +57,23 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchDetailLevel())).toBe('full');
     });
 
+    // MM-123: exact targets and the label note; MM-130: easing into maintenance.
+    it('targets are rounded and the label note shown until changed', async () => {
+      expect(await first(repo.watchExactTargets())).toBe(false);
+      expect(await first(repo.watchLabelNoteDismissedOn())).toBeUndefined();
+      expect(await first(repo.watchEaseIntoMaintenance())).toBe(false);
+      const day = CalendarDate.of(2026, 10, 10);
+      await repo.saveExactTargets(true);
+      await repo.saveLabelNoteDismissedOn(day);
+      await repo.saveEaseIntoMaintenance(true);
+      expect(await first(repo.watchExactTargets())).toBe(true);
+      expect(await first(repo.watchLabelNoteDismissedOn())).toBe(day);
+      expect(await first(repo.watchEaseIntoMaintenance())).toBe(true);
+      await repo.saveExactTargets(false);
+      expect(await first(repo.watchExactTargets())).toBe(false);
+      expect(await first(repo.watchLabelNoteDismissedOn()), 'the other columns stay').toBe(day);
+    });
+
     // MM-254: the macro picture, bars or donut, remembered per person.
     it('the macro picture is bars until changed, and each choice is kept', async () => {
       expect(await first(repo.watchMacroPicture())).toBe('bars');

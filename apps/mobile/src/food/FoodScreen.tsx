@@ -13,6 +13,7 @@ import { MmDisclosure } from '../ui/MmDisclosure';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { CalorieHero } from './CalorieHero';
+import { LabelAccuracyNote } from './LabelAccuracyNote';
 import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
@@ -81,6 +82,8 @@ export function FoodScreen() {
           </>
         }
       />
+      {/* Once, under the figures, until dismissed (MM-123): close is as good as exact. */}
+      {targets === undefined || paused ? null : <LabelAccuracyNote />}
       {entries.length === 0 && yesterday.length > 0 ? (
         <div className="app-stack-item">
           <MmButton

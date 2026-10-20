@@ -26,7 +26,8 @@ describe('every message of every kind, as Dart printed it', () => {
 
   it.each([
     ['caution', all(Caution.values, cautionMessage)],
-    ['targetFlag', all(TargetFlag.values, targetFlagMessage)],
+    // The flags added since the Flutter app (MM-128, MM-130, MM-134) have no Dart words to match.
+    ['targetFlag', all(TargetFlag.values.filter((flag) => flag in dart.labels.targetFlag), targetFlagMessage)],
     ['modeReason', all(ModeReason.values, modeReasonExplanation)],
     ['weightEvent', all(WeightEventType.values, weightEventLabel)],
     ['mealSize', all(MealSize.values, mealSizeLabel)],

@@ -119,11 +119,30 @@ export const HealthCheck = screenStory({
   walk: (canvas) => walkOnboarding(canvas, 6),
 });
 
+/** MM-128: under a chosen fat-loss goal, the three paces with what each would cost from the starting estimate. */
+export const GoalPaces = screenStory({
+  covers: ['GoalStep'],
+  shows: 'How fast',
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 7);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Fat loss/ }));
+  },
+});
+
 export const Goal = screenStory({
   covers: ['GoalStep'],
   shows: 'Your plan',
   scenario: newInstallScenario,
   walk: (canvas) => walkOnboarding(canvas, 7),
+});
+
+/** MM-158: the last step, what the first month will look like, every figure the person's own, and the weigh-in reminder offered once. */
+export const WhatToExpect = screenStory({
+  covers: ['WhatToExpectStep'],
+  shows: 'What to expect',
+  scenario: newInstallScenario,
+  walk: (canvas) => walkOnboarding(canvas, 8),
 });
 
 export const AdultsOnly = screenStory({

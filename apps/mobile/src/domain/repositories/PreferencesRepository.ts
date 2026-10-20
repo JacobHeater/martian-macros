@@ -1,10 +1,16 @@
 import type { DetailLevelReader } from './DetailLevelReader';
 import type { DetailLevelWriter } from './DetailLevelWriter';
+import type { EaseIntoMaintenanceReader } from './EaseIntoMaintenanceReader';
+import type { EaseIntoMaintenanceWriter } from './EaseIntoMaintenanceWriter';
 import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
+import type { ExactTargetsReader } from './ExactTargetsReader';
+import type { ExactTargetsWriter } from './ExactTargetsWriter';
 import type { InsightSwitchesReader } from './InsightSwitchesReader';
 import type { InsightSwitchesWriter } from './InsightSwitchesWriter';
 import type { LastBackupReader } from './LastBackupReader';
+import type { LabelNoteReader } from './LabelNoteReader';
+import type { LabelNoteWriter } from './LabelNoteWriter';
 import type { LastBackupWriter } from './LastBackupWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
@@ -51,4 +57,10 @@ export interface PreferencesRepository
     InsightSwitchesReader,
     InsightSwitchesWriter,
     LastBackupReader,
-    LastBackupWriter {}
+    LastBackupWriter,
+    ExactTargetsReader,
+    ExactTargetsWriter,
+    LabelNoteReader,
+    LabelNoteWriter,
+    EaseIntoMaintenanceReader,
+    EaseIntoMaintenanceWriter {}

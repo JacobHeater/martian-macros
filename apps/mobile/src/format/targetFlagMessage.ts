@@ -21,6 +21,18 @@ const messages: Readonly<Record<TargetFlag, string>> = {
   modeNotAllowed:
     'Your chosen goal isn’t available with your health check, so the ' + 'app is holding you at maintenance.',
   proteinCapped: 'Protein is capped because of your health check.',
+  deficitCapped:
+    'Your deficit is capped at 35% of your expenditure. A share of body weight can ask for more than a body your ' +
+    'size spends in a day; the pace shown is the one this gives.',
+  easingIn:
+    'Halfway to maintenance, as you chose: the second step comes in a week. A matter of comfort; it changes nothing about ' +
+    'your metabolism.',
+  maintenanceCorrection:
+    'A gentle pace back toward the weight you are holding, as you chose. Targets return to maintenance once the trend is back ' +
+    'in its band.',
+  trainingLapsed:
+    'The surplus is paused: no workout has been logged for three weeks (or no training days are set), and without ' +
+    'training extra calories are stored as fat. Lean-gain targets return at the check-in after you log a workout.',
 };
 
 /** What a flag on the targets means, in a sentence or two. */

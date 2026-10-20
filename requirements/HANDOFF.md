@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-19, by Claude, Session 37.
+Last updated: 2026-10-20, by Claude, Session 38.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -360,6 +360,60 @@ Apple Health readings on a device (MM-69), the camera (MM-406), a reminder
 at its time (MM-405), a pack download over the network on iOS. CI builds
 no iOS app yet (the owner's call). Phone checks listed above.
 
+## Session 38: 2026-10-19 to 20, Claude (M2 closed up on one branch: backup, coaching rules, targets, period days, training, what to expect, the icon)
+
+- The owner asked for backup and restore in M2 and to "get started on M2 and
+  close up all the tickets there on a single branch" (`feat/m2`); mid-session
+  the owner added the app icon and two loading screens. Every owner-open
+  decision in this session was taken under that instruction and recorded on
+  the ticket as "say if wrong"; nothing was asked.
+- **Commits on the branch so far:** the seven M2 design bugs through the
+  panel (`44cb4b6`), backup and restore with the noisy-logger rule
+  (`dc14797`), the Add food sheet and the week's summary (`842d3f8`), and
+  this session's uncommitted batch below (committed once `mm check` is
+  green).
+- **Built this session, M2 tickets closed:** MM-141 (three more insight
+  rules: weekend higher, waist against weight, consistent day; every rule
+  against six simulated people for banned words; register rows for every
+  rule and threshold), MM-140 (training start masks a stall; the
+  closed-loop "estimate was high" scenario; "a gentler pace" is a button;
+  cycle data shortens the window), MM-123 (targets rounded to 25 kcal and
+  5 g, the on-target band drawn on the arc and said in the caption, the
+  label-accuracy line once, Exact targets in Settings), MM-128 (Gentle,
+  Standard, Faster with what each costs today, the 35% deficit cap, a pace
+  change at once built on the estimate the targets rest on, in onboarding
+  and on the Coach), MM-130 (the maintenance anchor and band, the drift
+  question, the rebound said before it happens, the pause before another
+  cut, Ease into maintenance), MM-20 (period days on Progress, the trend
+  widened and the chart shaded), MM-134 (the training notes, the lean-gain
+  acknowledgement, lapse notices, the surplus suspended), MM-158 ("What to
+  expect", onboarding step 8 and reread from the Coach, the weigh-in
+  reminder offered there), MM-180 and MM-136 (closed: built and tested),
+  MM-413 (the camera failure announced, focus kept). Schema 11: exact
+  targets, the label note, easing in, the pace change day, the maintenance
+  anchor and correction, the pace on each targets record, the
+  `menstruation_days` table.
+- **The icon and splash (owner's art):** `apps/mobile/design/` holds the
+  masters; `scripts/app-icons.py` (pure Python) writes every iOS, Android
+  and web icon and splash; the launch storyboard shows the splash whole on
+  the art's sky colour. See the app's README.
+- **Where M2 stands:** 128 of 156 tickets done. Left, with why: MM-135,
+  MM-51, MM-57, MM-288 wait on the owner or on people; MM-63/MM-64 wait on
+  the owner's choice of storage providers; MM-155 (the protocol drawing,
+  the waist chart, the monthly report's figure), MM-142 (the weight-jump
+  explanation), WS-08's food tickets (MM-42, 43, 49, 150, 151, 152, 167:
+  each with a short "not built" list in its progress), MM-55/MM-56/MM-153
+  (phone timings, a real device run, licensing), WS-15 sleep (three
+  stories), WS-03 (MM-91, 106, 286, 287, 289, 304, 357) are buildable and
+  next on this branch.
+- **Owner questions recorded on tickets:** "kcal left" kept over the
+  ticket's "to go" (MM-123); the example deficits reflect the engine's
+  energy density, not 7,400 kcal/kg (MM-128); strength-on-a-cut lives under
+  the lift, not the dashboard (MM-141); a check-in now waits for the
+  training log and preferences to load (CheckIn).
+- Roadmap: WS-09 step 3, WS-06 steps 4 to 6, WS-07 steps 2 and 3, WS-05
+  steps 3 and 4, WS-08 steps 5 and 9 advanced to built.
+
 ## Session 37: 2026-10-19, Claude (the iOS shell: five plugins in Swift, on the owner's Mac)
 
 - The owner's 2016 MacBook Pro was brought to macOS Sequoia 15.8 and Xcode
@@ -552,36 +606,3 @@ no iOS app yet (the owner's call). Phone checks listed above.
   format 3 is the owner's; format 3 packs must not be published before the
   app that reads them (an older app now skips them). WS-08 step 13, WS-03
   step 20.
-
-## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
-
-- The owner withdrew the published grading tables ("not what I asked you to
-  build") and chose, through the question tool: nutrient density per calorie
-  with the vitamins and minerals; calories, macros, fiber and sodium
-  required; the grade unnamed; run end to end. Then by message, no questions:
-  add a food data source with the panel, derive a reliability score and
-  order search by it (the scan ranking the author's), enable concurrent
-  pack downloads, make the download button an icon.
-- **Panel runs:** `docs/agent-runs/mm380-proprietary-grade/` (nutrition,
-  micronutrients, measurement, integrations on the draft method and the
-  pack question; all "build with the listed changes") and
-  `mm383-sources-and-downloads/` (integrations, product, react-capacitor on
-  the source, the score and the downloads; product designer and UX guard on
-  the renders). Every reconciliation is in each run's `decision.md`.
-- **Built:** MM-380 (the method, `docs/food-grades.md`, 61-food calibration
-  set, 23 register rows), MM-382 (the engine, the popover's "not counted"
-  sentences), MM-381 (`docs/food-packs-data.md`), MM-383 (FNDDS wired, the
-  reliability score, search order, the build-time conflict policy, one name
-  one food, the build gate, coverage per source, CC0 terms), MM-384
-  (concurrent downloads, the icon, a card and a strip line per download),
-  MM-385 and MM-388 (bugs found by the panel, fixed with failing-first
-  tests), MM-386 and MM-387 opened (the catalog re-open leak; streaming to
-  the file natively).
-- **Measured** on the published packs with node:sqlite: 89.9% of common
-  foods and 82.8% of barcode foods grade today on the new method.
-- **Not done:** a real pack build (DuckDB not installed; sources not
-  downloaded), so FNDDS and the coverage shares are unmeasured until the
-  owner runs the commands; paging in search (MM-42) as FNDDS enlarges the
-  generic block; an added-sugars column (format 3) that would retire most of
-  the sugars waiver.
-- Roadmap: WS-08 step 12 added (MM-380 to MM-388).

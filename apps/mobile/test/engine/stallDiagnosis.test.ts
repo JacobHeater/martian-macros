@@ -11,6 +11,7 @@ import {
   type WeightEvent,
   type WeightObservation,
 } from '../../src/domain';
+import type { Workout } from '../../src/domain/training/Workout';
 import {
   assessStall,
   BodyFatEstimate,
@@ -24,6 +25,7 @@ import {
 } from '../../src/engine';
 import { expectClose } from '../support/expectClose';
 import { upTo } from '../support/upTo';
+import { workoutOn } from '../support/workoutOn';
 import { trendOf } from './support/trendPoints';
 
 /** MM-140: when progress stalls, which kind of stall it is. */
@@ -134,6 +136,7 @@ const assess = ({
   weights,
   waist = [],
   events = [],
+  workouts = [],
 }: {
   sex?: BiologicalSex;
   snap?: CoachSnapshot;
@@ -142,6 +145,7 @@ const assess = ({
   weights?: WeightObservation[];
   waist?: WaistObservation[];
   events?: WeightEvent[];
+  workouts?: Workout[];
 } = {}) =>
   assessStall({
     setup: setupFor(sex),
@@ -151,6 +155,7 @@ const assess = ({
     weights: weights ?? weighed(),
     waist,
     weightEvents: events,
+    workouts,
     today,
   });
 
@@ -225,6 +230,31 @@ it('masked by a recent passing event', () => {
   const a = assess({ events: [{ date: today.addDays(-4), type: 'largeOrSaltyMeal' }] });
   expect(a.diagnosis).toBe('masked');
   expect(a.maskedByEvent).toBe(true);
+});
+
+const lifted = (daysAgo: number) => workoutOn(today.addDays(-daysAgo), [['squat', 5, 100]]);
+
+it('masked by training that started in the last ten days', () => {
+  const a = assess({ workouts: [lifted(8), lifted(5), lifted(2)] });
+  expect(a.diagnosis).toBe('masked');
+  expect(a.maskedByTraining).toBe(true);
+  expect(a.maskedByEvent).toBe(false);
+});
+
+it('training that has gone on for weeks masks nothing', () => {
+  const a = assess({ workouts: [lifted(40), lifted(30), lifted(20), lifted(12), lifted(5), lifted(2)] });
+  expect(a.diagnosis).toBe('estimate');
+  expect(a.maskedByTraining).toBe(false);
+});
+
+it('training taken up again after a month off is a start', () => {
+  const a = assess({ workouts: [lifted(60), lifted(50), lifted(6), lifted(3)] });
+  expect(a.maskedByTraining).toBe(true);
+});
+
+it('a workout still in progress is not yet a day trained', () => {
+  const open = { ...lifted(3), endedAt: undefined } as unknown as Workout;
+  expect(assess({ workouts: [open] }).maskedByTraining).toBe(false);
 });
 
 it('intake above target: both figures are stated', () => {

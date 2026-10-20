@@ -9,15 +9,20 @@ import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
 import { currentTargetRulesVersion } from './currentTargetRulesVersion';
 import type { DailyTargets } from './DailyTargets';
 import { explainTargets } from './explainTargets';
+import { FatLossPace } from './FatLossPace';
 import type { ExplanationTrigger } from './ExplanationTrigger';
 import { latestEndedPause } from './latestEndedPause';
 import { lossSafetyRaiseKcal } from './lossSafetyRaiseKcal';
+import { assessMaintenanceDrift } from './assessMaintenanceDrift';
+import { maintenanceAnchorOf } from './maintenanceAnchorOf';
+import { MaintenanceRule } from './MaintenanceRule';
 import { pauseOn } from './pauseOn';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
 import { safetyBodyFatDeadbandPercent } from './safetyBodyFatConstants';
 import { safetyBodyFatPercent } from './safetyBodyFatPercent';
 import { TargetInputs } from './TargetInputs';
 import { TargetsRecord } from './TargetsRecord';
+import { TdeeEstimate } from './TdeeEstimate';
 
 /**
  * Decides whether targets change today. Returns the new record, or
@@ -32,6 +37,14 @@ import { TargetsRecord } from './TargetsRecord';
  * - A maintenance week the user asked for: immediate (MM-117).
  * - Never during a pause, and not at a weekly check-in until
  *   `checkInIntervalDays` after one ends (MM-148).
+ * - A pace change: immediate, built on the estimate the current targets
+ *   rest on (MM-128).
+ * - At maintenance (MM-130): once the anchor is set, targets change only
+ *   when the expenditure estimate moved beyond its own uncertainty, never
+ *   for drift inside the band; drifted out for two weeks, nothing changes
+ *   until the user answers; a correction they chose runs a gentle pace back
+ *   toward the anchor. Leaving a deficit with the two-step option on stops
+ *   halfway for a week.
  */
 export function nextTargets({
   setup,
@@ -39,12 +52,18 @@ export function nextTargets({
   history,
   today,
   pauses = [],
+  easeIntoMaintenance = false,
+  trainingLapsed = false,
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
   history: readonly TargetsRecord[];
   today: CalendarDate;
   pauses?: readonly Pause[];
+  /** The person's choice to leave a deficit in two steps (MM-130). */
+  easeIntoMaintenance?: boolean;
+  /** On lean gain, training has lapsed (`trainingSuspended`, MM-134): the surplus is replaced by maintenance. */
+  trainingLapsed?: boolean;
 }): TargetsRecord | undefined {
   if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return undefined;
 
@@ -58,13 +77,38 @@ export function nextTargets({
     safetyRaiseKcal = 0,
     breakRequested = false,
     trigger = 'checkIn',
+    restingOn,
+    correctionRateFraction,
+    easeFromKcal,
   }: {
     previous?: DailyTargets;
     deficitWeeks?: number;
     safetyRaiseKcal?: number;
     breakRequested?: boolean;
     trigger?: ExplanationTrigger;
+    /** The expenditure estimate to build on instead of today's, when only the pace changed (MM-128). */
+    restingOn?: number;
+    /** A gentle pace back toward the maintenance anchor (MM-130). */
+    correctionRateFraction?: number;
+    /** The target before leaving a deficit, for the first of two steps (MM-130). */
+    easeFromKcal?: number | undefined;
   } = {}): TargetsRecord => {
+    // The estimate these targets rest on: today's, or the one the current targets were built on.
+    const tdee =
+      restingOn === undefined
+        ? snapshot.tdee
+        : new TdeeEstimate({
+            kcal: restingOn,
+            sigmaKcal: snapshot.tdee.sigmaKcal,
+            status: snapshot.tdee.status,
+            usableIntakeDays: snapshot.tdee.usableIntakeDays,
+            excludedPartialDays: snapshot.tdee.excludedPartialDays,
+            weighIns: snapshot.tdee.weighIns,
+            windowStart: snapshot.tdee.windowStart,
+            clampedToBounds: snapshot.tdee.clampedToBounds,
+            settlingUntil: snapshot.tdee.settlingUntil,
+            styleRestartOn: snapshot.tdee.styleRestartOn,
+          });
     const traced = computeTargetsTraced(
       new TargetInputs({
         sex: setup.profile.sex,
@@ -75,7 +119,7 @@ export function nextTargets({
         trainingStatus: setup.trainingStatus,
         trainingDaysPerWeek: setup.trainingDaysPerWeek,
         policy: snapshot.policy,
-        tdeeKcal: snapshot.tdee.kcal,
+        tdeeKcal: tdee.kcal,
         bmrKcal: snapshot.bmrKcal,
         previous,
         consecutiveDeficitWeeks: deficitWeeks,
@@ -83,6 +127,9 @@ export function nextTargets({
         safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal,
         breakRequested,
+        correctionRateFraction,
+        easeFromKcal,
+        trainingLapsed,
       }),
     );
     const targets = traced.targets;
@@ -95,10 +142,11 @@ export function nextTargets({
       // also moves the user's goal there, so it does not resume by itself
       // when the reason goes away.
       mode: forcedToMaintenance ? 'maintenance' : setup.goalMode,
-      tdeeKcal: snapshot.tdee.kcal,
-      tdeeSigmaKcal: snapshot.tdee.sigmaKcal,
-      tdeeStatus: snapshot.tdee.status,
+      tdeeKcal: tdee.kcal,
+      tdeeSigmaKcal: tdee.sigmaKcal,
+      tdeeStatus: tdee.status,
       safetyBodyFatPercent: safetyBf,
+      requestedLossFraction: setup.requestedLossFraction,
       targets,
       summarySeen: false,
       explanation: explainTargets({
@@ -112,7 +160,7 @@ export function nextTargets({
         previous: last,
         targets,
         trace: traced.trace,
-        tdee: snapshot.tdee,
+        tdee,
         confidence: snapshot.confidence,
       }),
     });
@@ -131,7 +179,40 @@ export function nextTargets({
     (last.targets.flags.has('underweightMaintenance') || last.targets.flags.has('modeNotAllowed')) &&
     !snapshot.policy.allowedModes.has(setup.goalMode);
   if (last.mode !== setup.goalMode && !heldAtMaintenance) {
+    // Leaving a deficit goes straight to maintenance at the measured
+    // expenditure, in one step (MM-130); or in two, a week apart, when the
+    // person chose to ease into it.
+    const leavingDeficit = setup.goalMode === 'maintenance' && last.targets.weeklyRateFraction < 0;
+    return build({ trigger: 'goalChange', easeFromKcal: leavingDeficit && easeIntoMaintenance ? last.targets.kcal : undefined });
+  }
+
+  // No training days set on a gain: the surplus pauses at once, with the reason (MM-134).
+  if (
+    setup.goalMode === 'leanGain' &&
+    trainingLapsed &&
+    setup.trainingDaysPerWeek === 0 &&
+    !last.targets.flags.has('trainingLapsed')
+  ) {
+    return build({ previous: last.targets, trigger: 'trainingLapse' });
+  }
+
+  // The second of the two steps out of a deficit, a week after the first (MM-130).
+  if (last.targets.flags.has('easingIn') && last.effectiveFrom.daysUntil(today) >= MaintenanceRule.easeInStepDays) {
     return build({ trigger: 'goalChange' });
+  }
+
+  // A pace chosen since the current targets applies at once, like a change
+  // of goal, with no step limit (MM-128). It is built on the expenditure
+  // estimate the current targets rest on, so only the pace moves the target:
+  // the estimate's own movement waits for the check-in, as it always does,
+  // and a gentler pace never lowers the target (MM-117).
+  const paceOf = (fraction: number | undefined) => fraction ?? FatLossPace.fraction(FatLossPace.default);
+  if (
+    setup.goalMode === 'fatLoss' &&
+    last.mode === 'fatLoss' &&
+    Math.abs(paceOf(last.requestedLossFraction) - paceOf(setup.requestedLossFraction)) > 1e-9
+  ) {
+    return build({ deficitWeeks: deficitWeeks(), trigger: 'paceChange', restingOn: last.tdeeKcal });
   }
 
   // A corrected sex, date of birth, height or health check: the old targets
@@ -195,6 +276,30 @@ export function nextTargets({
   if (setup.onboardedOn.daysUntil(today) < calibrationDays) return undefined;
   if (snapshot.tdee.status === 'held' || snapshot.confidence.level === 'learning') {
     return undefined;
+  }
+
+  // Maintaining (MM-130): judged against the anchor, once there is one.
+  if (setup.goalMode === 'maintenance' && last.mode === 'maintenance') {
+    const anchor = maintenanceAnchorOf({ history, trend: snapshot.trend, today, acceptedOn: setup.maintenanceAnchorOn });
+    const drift = anchor === undefined ? undefined : assessMaintenanceDrift({ anchor, trend: snapshot.trend, today });
+    if (anchor !== undefined && drift !== undefined) {
+      const correctionFrom = setup.maintenanceCorrectionFrom;
+      const correcting = correctionFrom !== undefined && !today.isBefore(correctionFrom);
+      if (correcting && Math.abs(drift.deviationKg) > anchor.halfWidthKg * MaintenanceRule.correctionDoneFraction) {
+        // Back toward the anchor at a gentle pace, in the needed direction.
+        const rate = -Math.sign(drift.deviationKg) * MaintenanceRule.correctionFraction;
+        return build({ previous: last.targets, correctionRateFraction: rate });
+      }
+      if (drift.status === 'out' && !correcting) {
+        // Out for two weeks: the coach asks, and changes nothing until answered.
+        return undefined;
+      }
+      // Inside the band (or back in it), targets move only when the
+      // estimate moved beyond its own uncertainty, never for drift.
+      if (!last.targets.flags.has('maintenanceCorrection') && Math.abs(snapshot.tdee.kcal - last.tdeeKcal) <= snapshot.tdee.sigmaKcal) {
+        return undefined;
+      }
+    }
   }
 
   const next = build({ previous: last.targets, deficitWeeks: deficitWeeks() });

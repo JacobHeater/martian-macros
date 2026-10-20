@@ -1510,6 +1510,12 @@
 .mm-horizon-track {
   stroke: var(--track);
 }
+/* The on-target zone (MM-123): a wider, quiet band the track runs through; square ends so it reads as a stretch, not a second arc. */
+.mm-horizon-band {
+  fill: none;
+  stroke: color-mix(in srgb, var(--energy) 22%, transparent);
+  stroke-linecap: butt;
+}
 .mm-horizon-fill,
 .mm-horizon-ring {
   stroke: var(--energy);

@@ -12,6 +12,7 @@ import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import { onTargetScenario } from './onTargetScenario';
 import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
 import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
@@ -52,6 +53,14 @@ export const NothingLogged = screenStory({
   covers: ['FoodScreen'],
   shows: 'Add food',
   scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-123: a day inside the band, the larger of 5% and 100 kcal either side: the arc shows the zone and the caption says on target. */
+export const FoodOnTarget = screenStory({
+  covers: ['FoodScreen'],
+  shows: /kcal left of 2,[0-9]{3} · on target/,
+  scenario: onTargetScenario,
   open: ({ state }) => state.homeTab.put('food'),
 });
 

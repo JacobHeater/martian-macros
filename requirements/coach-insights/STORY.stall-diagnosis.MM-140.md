@@ -1,6 +1,6 @@
 ---
 id: MM-140
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-137, MM-17, MM-19, MM-21, MM-23, MM-24, MM-27, MM-28, MM-32, MM-108, MM-123, MM-131, MM-133, MM-135, MM-136, MM-138, MM-139, MM-149]
 ---
@@ -128,3 +128,26 @@ Not built, or approximate:
   slightly slower to call a stall.
 - The simulated "accurate logger whose expenditure is 300 kcal below the estimate" scenario is tested with a constructed snapshot,
   not through the closed-loop simulator.
+
+## Progress (2026-10-19, feat/m2)
+- **The start of training masks a stall**: `trainingStartOn` finds the latest finished workout with no finished workout in the 28
+  days before it (`StallRule.trainingRestartGapDays`); a start within the last 10 days (`maskingEventDays`) is the masked diagnosis,
+  with its own sentence ("You started training in the last 10 days. New training holds water in the muscles for a while…"). A
+  workout still in progress does not count. Story: `CoachStalledAfterStartingTraining`.
+- **Pauses** (MM-148) now exist: the stall is not assessed within 14 days of a pause (`AppState.stallAssessment`), and paused days
+  are left out of the intake the engine reads, so the "not built" note above is closed.
+- **The closed-loop simulator scenario**: `insightsSimulation.test.ts` runs an accurate logger eating exactly a 2,200 target built
+  on a 2,500 estimate with a true expenditure of 2,200 for five weeks and gets the estimate diagnosis with a coming change of
+  −100 kcal (the weekly limit); the same person with a true expenditure 600 above the target is no stall.
+- Evidence rows for every `StallRule` threshold (MM-143).
+
+- **"A gentler pace" is now an action** (MM-128, same day): the option on the stall card is a button that opens the choice of
+  pace, with what each costs today. "Keep the target" and the maintenance-break and walking options stay text.
+
+- **Cycle data** (MM-20, same day): with period days marked, a female profile's stall is judged over 21 days, not 28
+  (`hasCycleData`). A cycle window as a masking cause is the trend filter's job, which it does by widening the noise over those
+  days, so the slope's uncertainty grows and a stall is slower to call there; no second rule was added. Closing the ticket.
+
+Not in M2, left to their tickets: shaping the week as an action (MM-124), the maintenance break as an action (MM-135), and the
+closed-loop simulator for the masked and intake branches. Shaping the week (MM-124) and the maintenance break (MM-135) are not in M2,
+so those options stay text. The slope's uncertainty still ignores the correlation between the window's two ends.

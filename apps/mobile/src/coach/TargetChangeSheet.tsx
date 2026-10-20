@@ -8,6 +8,8 @@ import { useCell } from '../app/useCell';
 import { StatRow } from '../ui/StatRow';
 import { explanationLineText } from '../format/explanationLineText';
 import { Fmt } from '../format/Fmt';
+import { reboundText } from '../format/reboundText';
+import { useLoaded } from '../app/useLoaded';
 import { whatWouldChangeIt } from '../format/whatWouldChangeIt';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { MmButton } from '../ui/MmButton';
@@ -48,6 +50,10 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
   const week = useCell(state.adherenceSummary);
   const floor = useCell(state.coach)?.calorieFloorKcal;
   const underEatingNotice = useCell(state.underEatingNotice) !== undefined;
+  const units = useLoaded(state.setup)?.unitSystem ?? 'metric';
+  // Leaving a deficit (MM-130): the scale's rise is explained before it happens.
+  const leftDeficit =
+    previous !== undefined && previous.targets.weeklyRateFraction < 0 && current.mode === 'maintenance' && current.targets.weeklyRateFraction === 0;
   const explanation = current.explanation;
   const t = current.targets;
   const p = previous?.targets;
@@ -67,6 +73,7 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
       <div className="app-gap-small" />
       <SectionLabel text="What changed" />
       <p className="app-text">{changes.join('. ')}</p>
+      {leftDeficit ? <p className="app-text">{reboundText(new Fmt(units))}</p> : null}
       {week === undefined || floor === undefined ? null : (
         <>
           <div className="app-gap-small" />

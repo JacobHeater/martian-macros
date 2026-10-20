@@ -24,6 +24,9 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly goals = new ObservableValue(NutritionGoals.none);
   private readonly switches = new ObservableValue(InsightSwitches.allOn);
   private readonly lastBackup = new ObservableValue<CalendarDate | undefined>(undefined);
+  private readonly exactTargets = new ObservableValue(false);
+  private readonly labelNoteDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
+  private readonly easeIntoMaintenance = new ObservableValue(false);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -128,8 +131,35 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.switches.value = switches;
   }
 
+  watchExactTargets(): Watched<boolean> {
+    return this.exactTargets.watch();
+  }
+
+  async saveExactTargets(on: boolean): Promise<void> {
+    this.exactTargets.value = on;
+  }
+
+  watchLabelNoteDismissedOn(): Watched<CalendarDate | undefined> {
+    return this.labelNoteDismissed.watch();
+  }
+
+  async saveLabelNoteDismissedOn(day: CalendarDate): Promise<void> {
+    this.labelNoteDismissed.value = day;
+  }
+
+  watchEaseIntoMaintenance(): Watched<boolean> {
+    return this.easeIntoMaintenance.watch();
+  }
+
+  async saveEaseIntoMaintenance(on: boolean): Promise<void> {
+    this.easeIntoMaintenance.value = on;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
+    this.exactTargets.value = false;
+    this.labelNoteDismissed.value = undefined;
+    this.easeIntoMaintenance.value = false;
     this.theme.value = 'unselected';
     this.easyToMiss.value = new EasyToMissPreference();
     this.detail.value = 'standard';

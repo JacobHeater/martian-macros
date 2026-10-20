@@ -23,6 +23,9 @@ interface TargetInputsInit {
   safetyBodyFatPercent?: number | undefined;
   safetyRaiseKcal?: number;
   breakRequested?: boolean;
+  correctionRateFraction?: number | undefined;
+  easeFromKcal?: number | undefined;
+  trainingLapsed?: boolean;
 }
 
 export class TargetInputs {
@@ -71,6 +74,24 @@ export class TargetInputs {
    */
   readonly breakRequested: boolean;
 
+  /**
+   * At maintenance, a temporary pace back toward the anchor after drifting
+   * out of the band (MM-130): signed, a share of body weight a week.
+   */
+  readonly correctionRateFraction: number | undefined;
+
+  /**
+   * Leaving a deficit in two steps (MM-130): the calorie target before the
+   * change, so this set of targets stops halfway to maintenance.
+   */
+  readonly easeFromKcal: number | undefined;
+
+  /**
+   * On lean gain, training has lapsed (MM-134): no workout for three weeks,
+   * or no training days set. The surplus is replaced by maintenance.
+   */
+  readonly trainingLapsed: boolean;
+
   constructor(init: TargetInputsInit) {
     this.sex = init.sex;
     this.heightCm = init.heightCm;
@@ -88,6 +109,9 @@ export class TargetInputs {
     this.requestedLossFraction = init.requestedLossFraction;
     this.safetyBodyFatPercent = init.safetyBodyFatPercent;
     this.safetyRaiseKcal = init.safetyRaiseKcal ?? 0;
+    this.correctionRateFraction = init.correctionRateFraction;
+    this.easeFromKcal = init.easeFromKcal;
+    this.trainingLapsed = init.trainingLapsed ?? false;
     this.breakRequested = init.breakRequested ?? false;
   }
 }

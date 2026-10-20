@@ -16,6 +16,10 @@ interface CheckInInputs {
   readonly coach: Cell<CoachSnapshot | undefined>;
   readonly history: () => readonly TargetsRecord[] | undefined;
   readonly pauses: () => readonly Pause[];
+  /** The person's choice to leave a deficit in two steps (MM-130); undefined until the preference is read. */
+  readonly easeIntoMaintenance?: () => boolean | undefined;
+  /** On lean gain, whether training has lapsed (MM-134); undefined until the training log is read. */
+  readonly trainingLapsed?: () => boolean | undefined;
   readonly today: Cell<CalendarDate>;
   readonly targets: TargetsHistoryRepository;
   readonly setups: SetupRepository;
@@ -44,7 +48,13 @@ export class CheckIn {
       const pauses = inputs.pauses();
       const today = inputs.today.value;
       if (setup === undefined || snapshot === undefined || history === undefined) return undefined;
-      return nextTargets({ setup, snapshot, history, today, pauses });
+      // Nothing is decided before everything it rests on is read: a check-in
+      // made before the training log or the preferences arrived would be
+      // made from the wrong facts, and the day would then be taken.
+      const easeIntoMaintenance = inputs.easeIntoMaintenance === undefined ? false : inputs.easeIntoMaintenance();
+      const trainingLapsed = inputs.trainingLapsed === undefined ? false : inputs.trainingLapsed();
+      if (easeIntoMaintenance === undefined || trainingLapsed === undefined) return undefined;
+      return nextTargets({ setup, snapshot, history, today, pauses, easeIntoMaintenance, trainingLapsed });
     });
   }
 

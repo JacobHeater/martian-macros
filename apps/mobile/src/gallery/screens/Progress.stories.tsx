@@ -31,6 +31,24 @@ export const Progress = screenStory({
   open: ({ state }) => state.homeTab.put('progress'),
 });
 
+/** MM-20: a female profile's period days, the last two weeks as chips, a period marked and the chart shaded around its start. */
+export const PeriodDays = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Period days',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ sex: 'female', onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today }));
+    for (let i = 0; i <= 45; i++) {
+      const premenstrual = i >= 11 && i <= 13;
+      await repos.weights.saveWeight(today.addDays(-i), 64 - i * 0.02 + (premenstrual ? 0.9 : 0) + (i % 3) * 0.1);
+    }
+    for (let i = 10; i >= 6; i--) await repos.flowDays.markFlowDay(today.addDays(-i));
+  },
+  open: ({ state }) => state.homeTab.put('progress'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('heading', { name: 'Period days' }));
+  },
+});
+
 export const AddWeightEvent = screenStory({
   covers: ['WeightEventEntrySheet'],
   shows: 'Add a weight event',

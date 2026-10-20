@@ -19,11 +19,13 @@ const record = (
     safetyBodyFatPercent,
     profileRevision = 0,
     explanation,
+    requestedLossFraction,
   }: {
     flags?: ReadonlySet<TargetFlag>;
     safetyBodyFatPercent?: number;
     profileRevision?: number;
     explanation?: TargetsExplanation;
+    requestedLossFraction?: number;
   } = {},
 ) =>
   new TargetsRecord({
@@ -35,6 +37,7 @@ const record = (
     safetyBodyFatPercent,
     profileRevision,
     explanation,
+    requestedLossFraction,
     targets: new DailyTargets({
       kcal,
       proteinG: 160,
@@ -142,6 +145,15 @@ export function targetsHistoryRepositoryContract(
       expect(r.tdeeStatus).toBe('held');
       expect(r.mode).toBe('fatLoss');
       expect(r.targets.flags).toEqual(new Set([firstFlag, lastFlag]));
+    });
+
+    // MM-128: the pace a record of targets was asked for; undefined for the default, or on older records.
+    it('keeps the pace the targets were asked for', async () => {
+      await repo.saveTargets(record(d1, 2200));
+      await repo.saveTargets(record(d2, 2300, { requestedLossFraction: 0.005 }));
+      const history = await first(repo.watchTargetsHistory());
+      expect(history[0]?.requestedLossFraction).toBeUndefined();
+      expect(history[1]?.requestedLossFraction).toBe(0.005);
     });
 
     it('emits the current list first, then each change', async () => {

@@ -126,4 +126,23 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE user_preferences ADD COLUMN last_backup_epoch_day INTEGER NULL');
     },
   ],
+  // 10 to 11 (MM-123, MM-128, MM-130): exact targets and the label note; the day a pace was chosen; the maintenance anchor and correction.
+  [
+    10,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN exact_targets INTEGER NOT NULL DEFAULT 0 CHECK (exact_targets IN (0, 1))',
+      );
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN label_note_dismissed_epoch_day INTEGER NULL');
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN ease_into_maintenance INTEGER NOT NULL DEFAULT 0 CHECK (ease_into_maintenance IN (0, 1))',
+      );
+      await db.execute('ALTER TABLE setups ADD COLUMN pace_changed_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE setups ADD COLUMN maintenance_anchor_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE setups ADD COLUMN maintenance_correction_from_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE targets_history ADD COLUMN requested_loss_fraction REAL NULL');
+      // MM-20: the days marked with menstrual flow.
+      await db.execute('CREATE TABLE "menstruation_days" ("epoch_day" INTEGER NOT NULL, PRIMARY KEY ("epoch_day"))');
+    },
+  ],
 ]);

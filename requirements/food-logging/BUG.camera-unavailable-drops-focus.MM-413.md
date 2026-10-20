@@ -1,6 +1,6 @@
 ---
 id: MM-413
-status: proposed
+status: done
 component: food-logging
 related: [MM-351, MM-43, MM-337]
 ---
@@ -28,3 +28,9 @@ Scenario: No camera
 
 ## Notes
 Guarded by "MM-413" in `apps/mobile/test/food/scanAnnounced.test.tsx`, skipped with this ticket's ID until the fix lands.
+
+## Progress (2026-10-20, feat/m2)
+Fixed: the camera failure is said from the status region that exists before its text (the same region MM-351 uses for a
+lookup), the "Scan with the camera" button stays in place, off, and focus moves to "Or type the digits", the next useful
+control (`MmTextField` gained `autoFocus` for a field that is the next thing after a control went away). The guarded test in
+`scanAnnounced.test.tsx` now runs. The `ScanNoCamera` story draws the state.
