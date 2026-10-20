@@ -14,6 +14,7 @@ import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
 import { weekShapeScenario } from './weekShapeScenario';
+import { weightJumpScenario } from './weightJumpScenario';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -312,4 +313,46 @@ export const WeighInAfterCut = screenStory({
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/^Expect the scale to rise/));
   },
+});
+
+// ---- MM-142: when the scale jumps, what probably did it, under the weigh-in ----
+
+/** MM-142: today's reading 1.3 kg above a flat trend after a 340 g carbohydrate day and a workout: both named, with their figures. */
+export const WeighInJump = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /above your trend\./,
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+});
+
+/** MM-142: the figures behind the explanation, one tap down, and the way to its switch. */
+export const WeighInJumpFigures = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Usual carbohydrate',
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+  walk: async (canvas) => {
+    const line = await within(canvas).findByRole('button', { name: /^Coach: Today’s weigh-in is/ });
+    reveal(line);
+    await userEvent.click(line);
+  },
+});
+
+/** MM-142: the same jump after two ordinary days: nothing in the log explains it, and a weight event is offered. */
+export const WeighInJumpNothingInLog = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /Nothing in your log explains this\./,
+  scenario: weightJumpScenario(),
+});
+
+/** MM-142: a reading 1.3 kg below the trend the morning after an illness event: likely water, and it will probably come back. */
+export const WeighInLowAfterIllness = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /below your trend\./,
+  scenario: weightJumpScenario({ todayKg: 80.7, illnessYesterday: true }),
+});
+
+/** MM-142: yesterday 2,900 kcal over target: said plainly, with the most of it that could be fat, the rest water and food. */
+export const WeighInOvershoot = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /against a [\d,]+ kcal target\./,
+  scenario: weightJumpScenario({ yesterdaysKcal: 5100 }),
 });

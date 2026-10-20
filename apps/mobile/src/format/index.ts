@@ -99,3 +99,5 @@ export * from './weightEventLabel';
 export * from './whatWouldChangeIt';
 export * from './workoutSummaryText';
 export * from './waistProtocolText';
+export * from './weightJumpCauseText';
+export * from './weightJumpText';

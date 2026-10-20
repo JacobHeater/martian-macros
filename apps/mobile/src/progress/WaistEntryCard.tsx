@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { waistProtocolText } from '../format/waistProtocolText';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
 import { MmButton } from '../ui/MmButton';
+import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmSection } from '../ui/MmSection';
 import { MmTextField } from '../ui/MmTextField';
+import { WaistProtocolFigure } from '../ui/WaistProtocolFigure';
 import { useOverlays } from '../ui/useOverlays';
 import './progress.css';
 
@@ -14,18 +15,34 @@ interface WaistEntryCardProps {
   summary: string | undefined;
   /** Today's waist as recorded ("36 in"), when it is (MM-304): the section says that saving again replaces it. */
   recordedToday?: string | undefined;
+  /** How many measurements there are: the protocol is drawn in full for the first three (MM-155). */
+  entries: number;
+  /** The waist over time, drawn under the entry once there is one (MM-155). */
+  chart?: ReactNode;
   /** Saves one reading or three, in the user's unit. If it fails, the section says "That value looks off". */
   onSave: (readings: readonly number[]) => Promise<void>;
 }
 
 const places = ['1st', '2nd', '3rd'] as const;
 
+/** How many measurements the protocol is drawn in full for; from then on it is one tap down. */
+const protocolShownFor = 3;
+
+const steps = [
+  'First thing in the morning, after the bathroom, before eating.',
+  'Standing, relaxed, at the end of a normal breath out.',
+  'Tape level with the navel, snug and not pressing in.',
+  'The same tape each time. Once a week is enough.',
+] as const;
+
 /**
  * The waist section (MM-155, MM-257): folded to its one line, it opens to
- * how to measure, three fields of which the middle reading is kept (or one
- * for a quick entry), and Save as a quiet action.
+ * how to measure (drawn and in words for the first three measurements,
+ * then under "How to measure"), three fields of which the middle reading
+ * is kept (or one for a quick entry), Save as a quiet action, and the
+ * chart of the record so far.
  */
-export function WaistEntryCard({ unit, summary, recordedToday, onSave }: WaistEntryCardProps) {
+export function WaistEntryCard({ unit, summary, recordedToday, entries, chart, onSave }: WaistEntryCardProps) {
   const overlays = useOverlays();
   const [readings, setReadings] = useState<readonly string[]>(['', '', '']);
   // After a save, the line saying what is recorded takes focus once it shows the new value (the panel's F5).
@@ -57,6 +74,18 @@ export function WaistEntryCard({ unit, summary, recordedToday, onSave }: WaistEn
     note =
       'One reading is kept as it is. It is noisier than the middle of three, so a change takes longer to show.';
   }
+  const protocol = (
+    <div className="progress-waist-protocol">
+      <WaistProtocolFigure />
+      <ol className="progress-waist-steps">
+        {steps.map((step) => (
+          <li key={step} className="app-caption progress-waist-step">
+            {step}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
   return (
     <MmSection
       icon="tape"
@@ -69,7 +98,13 @@ export function WaistEntryCard({ unit, summary, recordedToday, onSave }: WaistEn
       {recordedToday === undefined ? null : (
         <p ref={recordedLine} tabIndex={-1} className="app-caption progress-waist-today">Today’s waist is recorded: {recordedToday}. Saving again replaces it.</p>
       )}
-      <p className="app-caption progress-waist-how">{waistProtocolText}</p>
+      {entries < protocolShownFor ? (
+        protocol
+      ) : (
+        <MmDisclosure title="How to measure" subtitle="Morning, relaxed, tape level with the navel">
+          {protocol}
+        </MmDisclosure>
+      )}
       <div className="progress-waist-fields">
         {places.map((place, i) => (
           // Short enough to fit three across a phone; the unit is said once, under the fields.
@@ -88,6 +123,7 @@ export function WaistEntryCard({ unit, summary, recordedToday, onSave }: WaistEn
         <p className="app-caption progress-waist-note">{note}</p>
         <MmButton label="Save" kind="secondary" onPress={ready ? () => void save() : undefined} />
       </div>
+      {chart}
     </MmSection>
   );
 }

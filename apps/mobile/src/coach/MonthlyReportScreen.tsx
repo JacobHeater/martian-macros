@@ -27,8 +27,8 @@ export function MonthlyReportScreen({ index }: { index: number }) {
   }
   const fmt = new Fmt(setup.unitSystem);
   const words = new MonthlyReportText(report, fmt, today);
-  const rows = (pairs: readonly (readonly [string, string])[]) =>
-    pairs.map(([label, value]) => <StatRow key={label} label={label} value={value} />);
+  const rows = (pairs: readonly (readonly [label: string, value: string, detail?: string])[]) =>
+    pairs.map(([label, value, detail]) => <StatRow key={label} label={label} value={value} detail={detail} />);
   const review = report.recompReview;
   const lifts = words.lifts;
   const changes = words.targetChanges;

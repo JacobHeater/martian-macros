@@ -22,12 +22,39 @@
 .progress-waist {
   display: contents;
 }
-.progress-waist-how {
-  margin: 0 0 var(--space-12);
-}
 .progress-waist-today {
   margin: 0 0 var(--space-12);
   color: var(--text2);
+}
+/* How to measure (MM-155): the figure beside its steps, the steps as captions with their own marks. */
+.progress-waist-protocol {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  margin: 0 0 var(--space-12);
+}
+/* The steps are a sequence, so they carry numerals (the panel's PD-11), in the caption's own colour. */
+.progress-waist-steps {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 0 var(--space-16);
+  list-style: decimal;
+  color: var(--text2);
+}
+.progress-waist-step {
+  margin: 0 0 var(--space-4);
+}
+.progress-waist-chart-title {
+  margin: 0;
+  color: var(--text2);
+  font: var(--type-label);
+}
+/* The waist over time (MM-155): a head like the trend's, the chart, and its one line of how to read it. */
+.progress-waist-chart {
+  margin-top: var(--space-16);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--outline);
 }
 .progress-waist-fields {
   display: flex;
@@ -46,6 +73,18 @@
 .progress-waist-note {
   flex: 1;
   margin: 0;
+}
+/* The reading under the chart (MM-142): the caption, then the coach's line, both at the hero's content edge, as the
+   captions and "How to read this" beside them are (the panel's PD-3). */
+.progress-weigh-in-note {
+  margin-top: var(--space-8);
+}
+.progress-weigh-in-note .coach-inline-insight {
+  --note-start: 0px;
+  --note-end: 0px;
+}
+.progress-weigh-in-picked {
+  margin: 0 0 var(--space-4);
 }
 .progress-sheet {
   display: flex;

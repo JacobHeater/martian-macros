@@ -26,6 +26,8 @@ import { useNavigator } from '../app/useNavigator';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseScreen } from '../pause/PauseScreen';
 import { saveWaistReadings } from '../progress/saveWaistReadings';
+import { useWeightJump } from '../progress/useWeightJump';
+import { weightJumpContent } from '../progress/weightJumpContent';
 import { ReminderPausedNotice } from '../reminders/ReminderPausedNotice';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
@@ -81,6 +83,8 @@ export function DashboardScreen() {
     if (justSaved === 'weight' && weighedToday) setJustSaved(undefined);
     if (justSaved === 'waist' && waistSavedToday) setJustSaved(undefined);
   }, [justSaved, weighedToday, waistSavedToday]);
+  // Why today's weigh-in is far from the trend, when it is (MM-142), under the row once it is saved.
+  const jump = useWeightJump(weighedToday ? savedOn : undefined);
   const designedRow = (row: 'weight' | 'waist' | 'water') => {
     const note = rowNotes?.get(row);
     return note === undefined ? undefined : [note];
@@ -109,22 +113,22 @@ export function DashboardScreen() {
   const weights = weightsState.value;
   const fmt = new Fmt(setup.unitSystem);
   // Under the weigh-in for two weeks after a cut (MM-130): why the scale rises, before it does.
-  const weightOwn: InlineInsightContent[] =
+  const weightOwn: InlineInsightContent[] = jump === undefined ? [] : [weightJumpContent(jump, fmt, today, 'dashboard')];
+  if (
     maintenance !== undefined &&
     maintenance.fromDeficitWeeks > 0 &&
     maintenance.startedOn.daysUntil(today) < MaintenanceRule.reboundNoteDays
-      ? [
-          {
-            line: reboundText(fmt),
-            evidence: [
-              ['Maintenance began', Fmt.day(maintenance.startedOn, today)],
-              ['The cut before it', `${maintenance.fromDeficitWeeks} weeks`],
-            ],
-            area: 'body',
-            rule: 'Leaving a deficit',
-          },
-        ]
-      : [];
+  ) {
+    weightOwn.push({
+      line: reboundText(fmt),
+      evidence: [
+        ['Maintenance began', Fmt.day(maintenance.startedOn, today)],
+        ['The cut before it', `${maintenance.fromDeficitWeeks} weeks`],
+      ],
+      area: 'body',
+      rule: 'Leaving a deficit',
+    });
+  }
   const targetsAllowed = CoachingPolicy.derive({
     profile: setup.profile,
     screening: setup.screening,

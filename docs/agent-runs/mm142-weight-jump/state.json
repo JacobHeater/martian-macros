@@ -1,0 +1,514 @@
+{
+  "schema_version": 1,
+  "task_id": "mm142-weight-jump",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/m2",
+    "commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "3d9057238e5957bba72fde6ad5e44e1ec1dd23405b36a1456fb82a07ed2bf8f6",
+        "apps/mobile/src/progress/ProgressScreen.tsx": "a66f09d28c1f62a5eab28e9c79d3d2837e3058d1d7b58ea4da2a8819e37b956d",
+        "apps/mobile/src/progress/WeighInNote.tsx": "c18e5af2836d0eff46cb8e3dc1f6f9474b04a982b0f74de202fbf4e94de685f2",
+        "apps/mobile/src/progress/WaistEntryCard.tsx": "086c3ef5c88d8896b0968ac3f829c914a5056a3b3510726b626c145765f4d5e4",
+        "apps/mobile/src/charts/TrendChart.tsx": "2533f33d63f57b15c551916e2ecf7c9aaa9faf9c4ba42694ffe3879cf2f4edde",
+        "apps/mobile/src/charts/WaistChart.tsx": "7edd4153843a65fa9db0e2a21fafdc02633ab12d872dd735625ce6f2dd12ca29",
+        "apps/mobile/src/ui/WaistProtocolFigure.tsx": "fdcf0ecf050c7173aa73ab7778765353b50d78c306218753f48cdbaa53b29115",
+        "apps/mobile/src/format/weightJumpText.ts": "136f7ac7283727412e30f04ba0dbd27bacdd504abc8e430ca4d86ceb28918def",
+        "apps/mobile/src/format/weightJumpCauseText.ts": "43f7b8d71e612329391e4f80368c404a351dd6a2a68cd2c6fe98778d2d3cbad6",
+        "apps/mobile/src/format/MonthlyReportText.ts": "5384c9f72b447fb7700c458bfd37454bd2ae96f86d46c07c4130bbf09344b3ad",
+        "apps/mobile/src/coach/InlineInsight.tsx": "9f6a200d7dfaffec2849116a9cef45797ab7391f8ccd09fd5ca278c9167b231b",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "requirements/coach-insights/STORY.explain-a-weight-jump.MM-142.md": "785b760e7bf566e6345505105a3116b89d600c69ffb240da10c793c20a35e515",
+        "requirements/body-measurements/STORY.measurement-protocol-and-noise.MM-155.md": "be310a2efee5156eee8b43ac955c66a2671ef319b2d4d935c8fed755694425a6"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "the edited tree after the reviews",
+          "the batch's tests, run"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "a device",
+          "assistive technology"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; sequential self-review is not independent review; the reviewers did not see the edited tree. Hashes are of the tree after the edits."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The dispositions rest on the repository's own rules and the two reports.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The design parts of MM-142 and MM-155 as drawn in their stories: siblings, hierarchy, colour of meaning, the drawing, the chart, the report line.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "3d9057238e5957bba72fde6ad5e44e1ec1dd23405b36a1456fb82a07ed2bf8f6",
+        "apps/mobile/src/progress/ProgressScreen.tsx": "a66f09d28c1f62a5eab28e9c79d3d2837e3058d1d7b58ea4da2a8819e37b956d",
+        "apps/mobile/src/progress/WeighInNote.tsx": "c18e5af2836d0eff46cb8e3dc1f6f9474b04a982b0f74de202fbf4e94de685f2",
+        "apps/mobile/src/progress/WaistEntryCard.tsx": "086c3ef5c88d8896b0968ac3f829c914a5056a3b3510726b626c145765f4d5e4",
+        "apps/mobile/src/charts/TrendChart.tsx": "2533f33d63f57b15c551916e2ecf7c9aaa9faf9c4ba42694ffe3879cf2f4edde",
+        "apps/mobile/src/charts/WaistChart.tsx": "7edd4153843a65fa9db0e2a21fafdc02633ab12d872dd735625ce6f2dd12ca29",
+        "apps/mobile/src/ui/WaistProtocolFigure.tsx": "fdcf0ecf050c7173aa73ab7778765353b50d78c306218753f48cdbaa53b29115",
+        "apps/mobile/src/format/weightJumpText.ts": "136f7ac7283727412e30f04ba0dbd27bacdd504abc8e430ca4d86ceb28918def",
+        "apps/mobile/src/format/weightJumpCauseText.ts": "43f7b8d71e612329391e4f80368c404a351dd6a2a68cd2c6fe98778d2d3cbad6",
+        "apps/mobile/src/format/MonthlyReportText.ts": "5384c9f72b447fb7700c458bfd37454bd2ae96f86d46c07c4130bbf09344b3ad",
+        "apps/mobile/src/coach/InlineInsight.tsx": "9f6a200d7dfaffec2849116a9cef45797ab7391f8ccd09fd5ca278c9167b231b",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "requirements/coach-insights/STORY.explain-a-weight-jump.MM-142.md": "785b760e7bf566e6345505105a3116b89d600c69ffb240da10c793c20a35e515",
+        "requirements/body-measurements/STORY.measurement-protocol-and-noise.MM-155.md": "be310a2efee5156eee8b43ac955c66a2671ef319b2d4d935c8fed755694425a6"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the components, stylesheets, tokens, stories, tests and tickets of both features",
+          "the direction documents"
+        ],
+        "not_inspected": [
+          "a render in any palette",
+          "the engine's thresholds",
+          "MM-367's waist and water lines",
+          "screenStory and unseen mechanics"
+        ],
+        "referrals": [
+          "coaching-safety: the arithmetic in the closed line (PD-1)",
+          "measurement: a middle of fewer than three (PD-8)",
+          "ux-accessibility: the picked dot without Ion (PD-5); a visible cue (PD-14)"
+        ],
+        "limitations": "Source inspection only; one reviewer; no render; the tree reviewed is the one before the chair's edits."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Every finding rests on the repository's own direction and step records.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "A bounded question on multi-line 12 px secondary text is stated in the report, not researched."
+      }
+    },
+    {
+      "task": "The same features for a novice with a screen reader, a keyboard and 200% text: the line's length, the Settings route, the pointer-only pick, the figure's alternative, the chart with few entries.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/dashboard/DashboardScreen.tsx": "3d9057238e5957bba72fde6ad5e44e1ec1dd23405b36a1456fb82a07ed2bf8f6",
+        "apps/mobile/src/progress/ProgressScreen.tsx": "a66f09d28c1f62a5eab28e9c79d3d2837e3058d1d7b58ea4da2a8819e37b956d",
+        "apps/mobile/src/progress/WeighInNote.tsx": "c18e5af2836d0eff46cb8e3dc1f6f9474b04a982b0f74de202fbf4e94de685f2",
+        "apps/mobile/src/progress/WaistEntryCard.tsx": "086c3ef5c88d8896b0968ac3f829c914a5056a3b3510726b626c145765f4d5e4",
+        "apps/mobile/src/charts/TrendChart.tsx": "2533f33d63f57b15c551916e2ecf7c9aaa9faf9c4ba42694ffe3879cf2f4edde",
+        "apps/mobile/src/charts/WaistChart.tsx": "7edd4153843a65fa9db0e2a21fafdc02633ab12d872dd735625ce6f2dd12ca29",
+        "apps/mobile/src/ui/WaistProtocolFigure.tsx": "fdcf0ecf050c7173aa73ab7778765353b50d78c306218753f48cdbaa53b29115",
+        "apps/mobile/src/format/weightJumpText.ts": "136f7ac7283727412e30f04ba0dbd27bacdd504abc8e430ca4d86ceb28918def",
+        "apps/mobile/src/format/weightJumpCauseText.ts": "43f7b8d71e612329391e4f80368c404a351dd6a2a68cd2c6fe98778d2d3cbad6",
+        "apps/mobile/src/format/MonthlyReportText.ts": "5384c9f72b447fb7700c458bfd37454bd2ae96f86d46c07c4130bbf09344b3ad",
+        "apps/mobile/src/coach/InlineInsight.tsx": "9f6a200d7dfaffec2849116a9cef45797ab7391f8ccd09fd5ca278c9167b231b",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "requirements/coach-insights/STORY.explain-a-weight-jump.MM-142.md": "785b760e7bf566e6345505105a3116b89d600c69ffb240da10c793c20a35e515",
+        "requirements/body-measurements/STORY.measurement-protocol-and-noise.MM-155.md": "be310a2efee5156eee8b43ac955c66a2671ef319b2d4d935c8fed755694425a6"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the components, stylesheets, tokens, stories, tests and tickets of both features",
+          "InlineInsight, CoachAreaScreen, itemInsightKinds",
+          "tokens.css"
+        ],
+        "not_inspected": [
+          "a render",
+          "a device",
+          "assistive technology",
+          "the engine's thresholds",
+          "the Coach tab"
+        ],
+        "referrals": [
+          "product-designer: the closed line's weight; the waist chart colour",
+          "coaching/measurement: the arithmetic in the line; a two-entry line",
+          "react-capacitor: UX-1, UX-3, UX-11, UX-12",
+          "safety: a per-reading line with no off switch",
+          "qa: 200% renders, TalkBack on the chart, iOS text scale"
+        ],
+        "limitations": "No render, device or AT; layout statements are arithmetic on the stylesheet; the tree reviewed is the one before the chair's edits."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Does a pointer-only chart pick need a keyboard path; do 5.7 px dots with a 27 px active column meet target-size guidance; is an SVG alternative that repeats adjacent text correct?",
+        "reason": "The brief's open question and two normative claims behind UX-3, UX-8 and UX-10.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html",
+            "title": "Understanding SC 2.1.1 Keyboard (WCAG 2.2)",
+            "published_or_updated": "2026-05-11",
+            "accessed": "2026-10-20",
+            "claim": "All functionality operable through a keyboard interface (Level A); a comparable keyboard alternative elsewhere conforms; pointer-only handlers alone fail (F54)."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+            "title": "Understanding SC 2.5.8 Target Size (Minimum) (WCAG 2.2)",
+            "published_or_updated": "2026-05-11",
+            "accessed": "2026-10-20",
+            "claim": "24x24 CSS px (AA) with exceptions including essential dense data visualisations; enlarge the active area."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content.html",
+            "title": "Understanding SC 1.1.1 Non-text Content (WCAG 2.2)",
+            "published_or_updated": "2026-09-06",
+            "accessed": "2026-10-20",
+            "claim": "A short alternative serving the equivalent purpose; adjacent text may carry the information."
+          }
+        ],
+        "summary": "A keyboard path is required or an equivalent elsewhere; the dots fall under the dense-data exception; the alternative should say what the drawing adds.",
+        "limitations": "Normative standards, not population research; WebView text scaling (UX-12) not researched."
+      }
+    },
+    {
+      "task": "Not assigned this round: training omitted review of MM-142 and MM-155's design parts.",
+      "role": "training",
+      "reviewer": "none; omitted by the chair, 2026-10-20",
+      "status": "omitted",
+      "omission_reason": "training omitted: no training behaviour changes in this round; the workout cause is a date match on finished workouts, not exercise science.",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9"
+      },
+      "report": "findings/training.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned this round: nutrition omitted review of MM-142 and MM-155's design parts.",
+      "role": "nutrition",
+      "reviewer": "none; omitted by the chair, 2026-10-20",
+      "status": "omitted",
+      "omission_reason": "nutrition omitted: the carbohydrate and sodium thresholds are product judgement recorded in docs/evidence.md and are out of this design round; one round, design parts only.",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9"
+      },
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned this round: coaching omitted review of MM-142 and MM-155's design parts.",
+      "role": "coaching",
+      "reviewer": "none; omitted by the chair, 2026-10-20",
+      "status": "omitted",
+      "omission_reason": "coaching omitted: the words were checked by the voice test and by the UX guard; the chair answered the one coaching question (the arithmetic in the figures) under MM-142 and MM-108.",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9"
+      },
+      "report": "findings/coaching.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned this round: measurement omitted review of MM-142 and MM-155's design parts.",
+      "role": "measurement",
+      "reviewer": "none; omitted by the chair, 2026-10-20",
+      "status": "omitted",
+      "omission_reason": "measurement omitted: the noise threshold reuses the trend model\u2019s water sigma and the waist chart reuses waistChangeOf\u2019s smoothing; the chair answered the one measurement question (dots alone under three entries).",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9"
+      },
+      "report": "findings/measurement.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned this round: safety omitted review of MM-142 and MM-155's design parts.",
+      "role": "safety",
+      "reviewer": "none; omitted by the chair, 2026-10-20",
+      "status": "omitted",
+      "omission_reason": "safety omitted: no new intake or weight rule; the explanation is withheld under 18, with an eating-disorder history and with weight hidden, and the UX guard\u2019s safety note is answered in MM-142.",
+      "inspected_commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm142-weight-jump/brief.md": "6d861e489afb0014433cbb0943fdf7837c902062e877e62e3f4997ceb960c6b9"
+      },
+      "report": "findings/safety.md",
+      "coverage": {
+        "methods": [],
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-20",
+      "limitations": "No browser automation; stories read from source."
+    }
+  ],
+  "unresolved_questions": [
+    "Q1: PD-10: the Waist section's fields and range control sit in the section on the canvas (since MM-257); on a surface instead? (owner: product owner)",
+    "Q2: PD-13: the measurement colour is the carbohydrate hue, used where no macros are shown; where is the exception recorded? (owner: product owner)",
+    "Q3: The app's first drawing of a person (WaistProtocolFigure): the owner's look; and the renders by eye of the named stories in the three palettes. (owner: product owner)",
+    "Q4: Device checks: a TalkBack/VoiceOver double-tap on the trend chart (UX-3b); whether iOS scales rem type with the system text size (UX-12). (owner: product owner)"
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "PD-1/UX-2: the closed line is the distance and the likely causes; the arithmetic is the last of the figures, once.",
+      "authority": "chair, answering the coaching request under MM-142's 'once' and MM-108"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "UX-1: the Settings button only for a line of a listed kind; MM-418 for the rebound note's share; the line's switch is MM-118's weight display and the safeguards.",
+      "authority": "chair"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "PD-2/UX-5: a picked, explained reading is said once.",
+      "authority": "chair"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "UX-3/UX-8: arrow keys pick weigh-ins on the focused chart; the note is a live region; the readings list is the fuller answer, not built.",
+      "authority": "chair, under WCAG 2.2 SC 2.1.1 as the guard cited"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "PD-14/UX-4: one clause in 'How to read this'.",
+      "authority": "chair"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "UX-6: the offer names Weight events on Progress.",
+      "authority": "chair"
+    },
+    {
+      "id": "D7",
+      "status": "accepted",
+      "summary": "PD-8/UX-7: dots alone under three waist measurements; the caption says the line comes from the third.",
+      "authority": "chair, answering the measurement request: the change function's fallback at an end is not a line worth drawing"
+    },
+    {
+      "id": "D8",
+      "status": "accepted",
+      "summary": "PD-3, PD-4: the note at the hero's edge, under the band sentence.",
+      "authority": "chair, under rule 9"
+    },
+    {
+      "id": "D9",
+      "status": "accepted",
+      "summary": "PD-5, PD-6, PD-7: the picked dot and the figure's tape in the text colour; a larger navel and visible tape ends.",
+      "authority": "chair, under design/color-and-theme-system.md's meaning of Ion"
+    },
+    {
+      "id": "D10",
+      "status": "accepted",
+      "summary": "PD-9, PD-11 (markers), PD-12, UX-10, UX-11: a label sub-head, numbered steps, the report's detail, the shorter alternative, dead CSS removed.",
+      "authority": "chair"
+    },
+    {
+      "id": "D11",
+      "status": "pending",
+      "summary": "PD-10: controls in a section on the canvas; the owner's word (Q1).",
+      "authority": "product owner"
+    },
+    {
+      "id": "D12",
+      "status": "pending",
+      "summary": "PD-13: the measurement colour (Q2).",
+      "authority": "product owner"
+    },
+    {
+      "id": "D13",
+      "status": "rejected",
+      "summary": "PD-11 (wording): the Dashboard row keeps its one-line hint (MM-301); the drawing belongs to the Progress entry (UX-9), said in MM-155.",
+      "authority": "chair"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit",
+      "commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "Typecheck clean on the working tree of wt/measure after the review edits."
+    },
+    {
+      "command": "npx vitest run test/engine test/format test/voice.test.ts test/architecture.test.ts test/layers.test.ts",
+      "commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "79 files, 1015 tests passed after the review edits."
+    },
+    {
+      "command": "npx vitest run test/coach/inlineInsights.test.tsx test/dashboard/weightJump.test.tsx test/progress/weightJumpChart.test.tsx test/progress/waistProtocol.test.tsx test/charts/waistChart.test.tsx test/format/reportTooFewDays.test.ts",
+      "commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "The suites changed by the review edits pass; the volume-jump line keeps its Settings route and the weigh-in's line has none (MM-418)."
+    },
+    {
+      "command": "npx vitest run; npm run unseen",
+      "commit": "24130eca7dd7f33b9ac79a9b412d485229a77d15",
+      "dirty": true,
+      "exit_code": null,
+      "result": "not-run",
+      "summary": "The whole suite and the unseen check are run before the commit and recorded in the ticket's handback; the machine is shared with other agents' runs."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-20T05:32:07Z",
+    "writers_stopped": true
+  }
+}

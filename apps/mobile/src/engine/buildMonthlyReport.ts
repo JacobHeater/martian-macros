@@ -18,6 +18,7 @@ import { ReportPeriod } from './ReportPeriod';
 import type { ReportTargetChange } from './ReportTargetChange';
 import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
+import { waistChangeOf } from './waistChangeOf';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
 /**
@@ -104,7 +105,6 @@ export function buildMonthlyReport({
     if (targetDays > 0) averageProteinTarget = targetSum / targetDays;
   }
 
-  const waists = waist.filter((w) => inPeriod(w.date)).sort((a, b) => a.date.compareTo(b.date));
   const inMonth = sorted.filter((r) => inPeriod(r.effectiveFrom));
 
   let estimate: ReportEstimate | undefined;
@@ -190,8 +190,6 @@ export function buildMonthlyReport({
     });
   }
 
-  const firstWaist = waists[0];
-  const lastWaist = waists[waists.length - 1];
   return new MonthlyReport({
     period,
     recompReview,
@@ -204,8 +202,8 @@ export function buildMonthlyReport({
     intendedChangeKg: intended,
     averageProteinG: averageProtein,
     averageProteinTargetG: averageProteinTarget,
-    waistFromCm: waists.length >= 2 ? firstWaist?.waistCm : undefined,
-    waistToCm: waists.length >= 2 ? lastWaist?.waistCm : undefined,
+    // The waist over the month by the one rule (MM-155): the latest three entries against the three nearest its start.
+    waistChange: waistChangeOf({ waist, asOf: period.to, days: ReportPeriod.days }),
     estimate,
     estimateGap: gap,
     targetChanges,

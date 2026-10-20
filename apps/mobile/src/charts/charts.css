@@ -62,6 +62,22 @@
 .chart-weigh-in {
   fill: var(--text2);
 }
+/* The weigh-in the person chose (MM-142): larger, in the strongest neutral (a measurement, never Ion, which is the
+   engine's: the panel's PD-5), ringed with the canvas so it stands off the line. */
+.chart-weigh-in-picked {
+  fill: var(--text);
+  stroke: var(--canvas);
+  stroke-width: 1.5;
+}
+.chart-trend-pickable {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.chart-trend-pickable:focus-visible {
+  outline: 2px solid var(--ion);
+  outline-offset: 2px;
+  border-radius: var(--space-4);
+}
 .chart-event {
   stroke: var(--caution);
   stroke-width: 1;
@@ -191,4 +207,9 @@
 /* The days around a period start (MM-20): a quiet shade under everything, explaining the wider band. */
 .chart-cycle {
   fill: color-mix(in srgb, var(--ion) 14%, transparent);
+}
+
+/* The waist (MM-155): the measurement colour for dots and line, its noise as a band of the same, quiet. */
+.chart-waist-band {
+  fill: color-mix(in srgb, currentColor 14%, transparent);
 }
