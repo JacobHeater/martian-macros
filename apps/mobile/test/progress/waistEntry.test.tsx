@@ -46,7 +46,8 @@ async function type(readings: readonly string[]): Promise<void> {
 
 const saveButton = () => card.querySelector<HTMLButtonElement>('.progress-waist-save button') as HTMLButtonElement;
 const canSave = () => !saveButton().disabled;
-const note = () => card.querySelector('.progress-waist-note')?.textContent ?? '';
+// The note is the entry row's subtitle since MM-416.
+const note = () => card.querySelector('.mm-list-row-entry .mm-list-row-subtitle')?.textContent ?? '';
 const stored = () => first(repos.waist.watchWaist());
 
 async function save(): Promise<void> {

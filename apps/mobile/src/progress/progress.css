@@ -52,9 +52,7 @@
 }
 /* The waist over time (MM-155): a head like the trend's, the chart, and its one line of how to read it. */
 .progress-waist-chart {
-  margin-top: var(--space-16);
-  padding-top: var(--space-16);
-  border-top: 1px solid var(--outline);
+  margin: 0;
 }
 .progress-waist-fields {
   display: flex;
@@ -68,11 +66,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-12);
-  margin: var(--space-8) 0;
-}
-.progress-waist-note {
-  flex: 1;
-  margin: 0;
+  margin: var(--space-8) 0 0;
 }
 /* The reading under the chart (MM-142): the caption, then the coach's line, both at the hero's content edge, as the
    captions and "How to read this" beside them are (the panel's PD-3). */
@@ -114,9 +108,5 @@
   display: flex;
   align-items: center;
   gap: var(--space-12);
-  margin: var(--space-8) 0;
-}
-.progress-sleep-note {
-  flex: 1;
-  margin: 0;
+  margin: var(--space-8) 0 0;
 }

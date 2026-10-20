@@ -73,3 +73,28 @@ describe('every destination', () => {
     expect(hierarchyProblems(view.container)).toEqual([]);
   });
 });
+
+/**
+ * MM-416: the Progress sections that hold an entry, drawn open, so the rule is checked where the controls show:
+ * Sleep and Waist each keep their fields and Save on a surface.
+ */
+const openEntries = ['SleepNotRecorded', 'SleepFromWatch', 'SleepMistyped', 'ProgressWaistFirstMeasurements'];
+const entryStories = Object.entries(modules).flatMap(([path, module]) =>
+  Object.entries(composeStories(module, preview) as unknown as Record<string, ComposedStory>)
+    .filter(([name]) => openEntries.includes(name))
+    .map(([name, Story]) => ({ id: `${path.replace('../../src/gallery/screens/', '')} › ${name}`, Story })),
+);
+
+describe('every open entry on Progress', () => {
+  it('has its story', () => {
+    expect(entryStories.length).toBe(openEntries.length);
+  });
+
+  it.each(entryStories)('$id keeps its fields on a surface', async ({ Story }) => {
+    const view = render(<Story />);
+    await Story.play?.({ canvasElement: view.container });
+    const shows = Story.parameters['shows'] as string | RegExp;
+    expect((await screen.findAllByText(shows)).length).toBeGreaterThan(0);
+    expect(hierarchyProblems(view.container).filter((problem) => problem.includes('bare'))).toEqual([]);
+  });
+});

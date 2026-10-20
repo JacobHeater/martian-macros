@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { SleepNight } from '../domain/SleepNight';
 import { durationFieldsOf } from '../format/durationFieldsOf';
@@ -10,6 +10,8 @@ import { Loadable } from '../state/Loadable';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { MmButton } from '../ui/MmButton';
+import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmDurationField } from '../ui/MmDurationField';
 import { MmSection } from '../ui/MmSection';
@@ -36,6 +38,7 @@ export function SleepNightCard() {
   const loaded = useCell(state.sleepNights);
   const [picked, setPicked] = useState<CalendarDate>(today);
   const [typed, setTyped] = useState<{ hours: string; minutes: string }>();
+  const chipsRef = useRef<HTMLDivElement>(null);
   // A read that went wrong is said, never shown as no nights (MM-334).
   if (Loadable.hasFailed(loaded)) {
     return (
@@ -70,6 +73,8 @@ export function SleepNightCard() {
     try {
       await services.sleep.saveSleepNight(new SleepNight({ date: picked, minutesAsleep: toSave, source: 'typed' }));
       setTyped(undefined);
+      // Focus to the night just saved, the next thing to choose; not dropped to the page (the MM-416 review).
+      chipsRef.current?.querySelector<HTMLElement>('button[aria-pressed="true"], button')?.focus();
       // Said where the action was taken, and aloud (the panel's F2).
       overlays.snack(`Saved: ${night}, ${sleepDurationText(toSave)}.`);
     } catch {
@@ -100,31 +105,41 @@ export function SleepNightCard() {
         Hours asleep, not hours in bed. Each night goes under the morning it ended, so last night is the one that ended
         today.
       </p>
-      <div className="progress-sleep-nights" role="group" aria-label="Nights, the last two weeks">
-        {recent.map((date) => (
-          <MmChoiceChip
-            key={date.epochDay}
-            label={byDay.has(date) ? `${label(date)} · ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}` : label(date)}
-            selected={date === picked}
-            onSelect={() => {
-              setPicked(date);
-              setTyped(undefined);
-            }}
-          />
-        ))}
-      </div>
-      <MmDurationField
-        name={night}
-        hours={shown.hours}
-        minutes={shown.minutes}
-        error={parsed.error}
-        onSubmit={ready === undefined ? undefined : () => void save(ready)}
-        onChange={(h, m) => setTyped({ hours: h, minutes: m })}
-      />
-      <div className="progress-sleep-save">
-        <p className="app-caption progress-sleep-note">{note}</p>
-        <MmButton label="Save" name="Save night" kind="secondary" onPress={ready === undefined ? undefined : () => void save(ready)} />
-      </div>
+
+      <MmListGroup>
+        <MmListRow
+          title={night}
+          subtitle={note}
+          entry={
+            <>
+              <div ref={chipsRef} className="progress-sleep-nights" role="group" aria-label="Nights, the last two weeks">
+                {recent.map((date) => (
+                  <MmChoiceChip
+                    key={date.epochDay}
+                    label={byDay.has(date) ? `${label(date)} · ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}` : label(date)}
+                    selected={date === picked}
+                    onSelect={() => {
+                      setPicked(date);
+                      setTyped(undefined);
+                    }}
+                  />
+                ))}
+              </div>
+              <MmDurationField
+                name={night}
+                hours={shown.hours}
+                minutes={shown.minutes}
+                error={parsed.error}
+                onSubmit={ready === undefined ? undefined : () => void save(ready)}
+                onChange={(h, m) => setTyped({ hours: h, minutes: m })}
+              />
+              <div className="progress-sleep-save">
+                <MmButton label="Save" name="Save night" kind="secondary" onPress={ready === undefined ? undefined : () => void save(ready)} />
+              </div>
+            </>
+          }
+        />
+      </MmListGroup>
     </MmSection>
   );
 }
