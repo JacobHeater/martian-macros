@@ -32,27 +32,29 @@ const stories = Object.entries(modules).flatMap(([path, module]) =>
 );
 
 describe('the rules', () => {
-  it('fail a card in a card, a notice in a card, two macro pictures and two primaries', () => {
+  it('fail a card in a card, a notice in a card, two macro pictures, two primaries and two figures', () => {
     const root = document.createElement('div');
     root.innerHTML =
       '<section class="mm-surface"><section class="mm-surface"></section></section>' +
       '<section class="mm-surface"><div class="mm-notice"></div></section>' +
       '<div class="mm-macro-bar"></div><svg class="chart-split-ring"></svg>' +
-      '<button class="mm-button mm-button-primary"></button><button class="mm-fab"></button>' +
-      '<section class="mm-section"><div class="mm-field"></div></section>';
+      '<button class="mm-button mm-button-primary"></button><button class="mm-fab"></button><button class="mm-button mm-button-lead"></button>' +
+      '<section class="mm-section"><div class="mm-field"></div></section>' +
+      '<section class="mm-hero"><p class="food-hero-figure"></p><p class="chart-stat-figure"></p></section>';
     expect(hierarchyProblems(root)).toEqual([
       'a card is nested in a card or in the hero (rule 1)',
       'a notice is drawn inside a card, the hero or a list group (rule 1)',
       'the macro bars and the macro donut are shown at once (rule 4)',
-      '2 primary actions are shown; one is the limit (rule 6)',
+      '3 primary actions are shown; one is the limit (rule 6)',
       '1 field(s) sit bare on the canvas (rule 1)',
+      '2 figures are drawn in the hero; one is the limit (rule 1)',
     ]);
   });
 
   it('pass a hero, sections, rows and one primary', () => {
     const root = document.createElement('div');
     root.innerHTML =
-      '<section class="mm-hero"><div class="mm-macro-bar"></div></section>' +
+      '<section class="mm-hero"><p class="food-hero-figure"></p><div class="mm-macro-bar"></div></section>' +
       '<section class="mm-section"><div class="mm-list-group"><div class="mm-list-row"><div class="mm-field"></div></div></div></section>' +
       '<div class="mm-notice"></div><button class="mm-button mm-button-primary"></button>';
     expect(hierarchyProblems(root)).toEqual([]);

@@ -1,6 +1,6 @@
 ---
 id: MM-91
-status: proposed
+status: done
 component: app-shell
 related: [MM-89, MM-17, MM-93, MM-102, MM-105, MM-106]
 ---
@@ -42,3 +42,15 @@ Scenario: Kept that way
 ## Notes
 - Contrast for body text should meet WCAG AA (4.5:1). The Material 3 palette usually does; the custom notice and badge colors are the
   ones to check.
+
+## Progress (2026-10-20, feat/m2)
+Closing the ticket:
+- **Dark theme and the three palettes**: every story is drawn in Light, Dark and Martian in the register; contrast is held by
+  token pairs (`tokens.test.ts`), including the chart's line, band and dots and the notice colours.
+- **Large text**: the `*LargeText` stories (Dashboard, Not weighed today, Food, Progress, Coach) at 200%, and the rules that let
+  the bar, labels and row actions wrap (`largeTextLayout.test.ts`).
+- **Small screens**: the design width is 412 dp (screen direction rule 7, the owner's call); at 360 dp nothing may be lost, as the
+  checklist says.
+- **Kept that way**: the stories are the screenshot register (the owner's Storybook rule replaces golden tests).
+Not verified: the phone's own largest text size (Android scales fonts only through text zoom; iOS unchecked), listed in the
+accessibility checklist's by-hand pass.

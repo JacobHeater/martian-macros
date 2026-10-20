@@ -25,6 +25,7 @@ export function MetabolismSummary({ snapshot, calibrating }: MetabolismSummaryPr
   if (needDays <= 0 && needWeighIns <= 0) needs.push(calibrating ? 'two full weeks of data' : 'a little more consistent data');
   return (
     <MmDisclosure
+      remember="coach.metabolism"
       title="Your metabolism estimate"
       subtitle={
         measured && tdee.clampedToBounds

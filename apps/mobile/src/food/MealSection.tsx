@@ -88,6 +88,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
       // An empty meal has nothing to fold, so it draws no fold (MM-389).
       collapsible={entries.length > 0}
       maintainState
+      remember={`food.meal.${meal}`}
       trailing={
         <>
           {mealGrade === undefined || entries.length === 0 ? null : <FoodGrade grade={mealGrade} subject={label} scope="meal" />}

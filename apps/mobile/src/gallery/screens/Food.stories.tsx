@@ -50,6 +50,22 @@ export const Food = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
 });
 
+/** MM-91: Food on a 360 px phone: the hero's macro rows, the meals' headers with their actions, an entry's method, grade and More inside the width. */
+export const FoodSmallPhone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  open: ({ state }) => state.homeTab.put('food'),
+  viewport: 'smallPhone',
+});
+
+/** MM-91: Food at 200% text: the day's heading and stepper, the meal headers and entries wrap, the floating action stays reachable. */
+export const FoodLargeText = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  open: ({ state }) => state.homeTab.put('food'),
+  textScale: 2,
+});
+
 export const NothingLogged = screenStory({
   covers: ['FoodScreen'],
   shows: 'Add food',

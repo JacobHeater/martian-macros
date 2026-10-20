@@ -50,6 +50,14 @@ export const Coach = screenStory({
   open: ({ state }) => state.homeTab.put('coach'),
 });
 
+/** MM-91: Coach on a 360 px phone: the hero, its warnings and the goal in the first viewport, the text actions beside their rows. */
+export const CoachSmallPhone = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your metabolism',
+  open: ({ state }) => state.homeTab.put('coach'),
+  viewport: 'smallPhone',
+});
+
 /** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
 export const CheckInDue = screenStory({
   covers: ['CoachScreen'],

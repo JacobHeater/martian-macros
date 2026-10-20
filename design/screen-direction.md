@@ -62,7 +62,13 @@ in here.
    actions, a menu, a header action or rows. Train keeps "Start workout";
    "Repeat last workout" is a text action. Save for a value already saved
    waits until the value changes; a disabled primary is never parked in a
-   hero.
+   hero. A text action is in the text colour at the heading weight, never
+   Ember (MM-288, option (a), 2026-10-20); the one Ember text is the lead
+   action (`MmButton lead`), the screen's primary where it stands in the app
+   bar and cannot be a fill: the Dashboard's Add food once the day is
+   weighed. Before the weigh-in the row's Save is the Dashboard's primary and
+   Add food is a text action. The budget is written in
+   `anti-cruft-and-anti-slop.md`, "Hard limits".
 7. **Progressive disclosure is the default** (`anti-cruft` section 7): a
    screen answers today's question in the first viewport (412 by 915;
    smaller phones are not designed for, the owner's call of 2026-10-14).

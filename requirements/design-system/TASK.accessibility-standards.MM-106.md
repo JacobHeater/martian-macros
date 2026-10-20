@@ -1,6 +1,6 @@
 ---
 id: MM-106
-status: proposed
+status: done
 component: design-system
 related: [MM-101, MM-102, MM-103, MM-104, MM-91]
 ---
@@ -48,3 +48,18 @@ Scenario: Without swiping
 ## Notes
 - The automated matchers catch the mechanical failures. They do not tell you whether the app makes sense by ear; the by-hand pass is the
   real test.
+
+## Progress (2026-10-20, feat/m2)
+Built, closing the ticket as far as a machine can; the by-hand pass is listed and owed:
+- **The rules and the checklist**: `design/accessibility-checklist.md` (WCAG 2.1 AA as decided here), section 2 saying exactly
+  what each automated check can and cannot say, section 3 the checklist for a new screen, section 4 the screen-reader and
+  text-size pass on a phone, not done.
+- **Automated**: `test/gallery/accessibility.test.tsx` on every destination story (every drawn control named as a reader
+  computes it; notices with icon and words; macro bars with name and figures; the current destination `aria-current`; a chosen
+  segment's check mark (bug MM-437: the compact control said its choice by colour alone, and Ember on the selected fill fell
+  under 4.5:1 in Light); a swipe row's More actions button; charts named), `test/ui/targets.test.ts`,
+  `test/ui/reducedMotion.test.ts`, `test/app/largeTextLayout.test.ts`, `test/tokens.test.ts`.
+- **Not verified**: TalkBack and VoiceOver by hand (section 4); the phone's own largest text size on Android and iOS; anything
+  inside a folded section, which the destination check does not open. The acceptance scenario "Screen reader, by hand" is
+  therefore open in that respect; the ticket closes on the rules and their checks, as the owner's M2 asks. Say if it should stay
+  open for the by-hand pass.

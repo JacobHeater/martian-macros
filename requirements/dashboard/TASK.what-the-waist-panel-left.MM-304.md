@@ -1,7 +1,7 @@
 ---
 id: MM-304
 component: dashboard
-status: proposed
+status: done
 related: [MM-301, MM-155, MM-272]
 ---
 
@@ -51,3 +51,19 @@ Scenario: Saying how to correct today's waist
   Given today's waist is recorded
   Then Progress' waist section says that saving again replaces it
 ```
+
+## Progress (2026-10-20, feat/m2)
+Built, closing the ticket:
+- **Focus after a save in place**: on the Dashboard, the row that replaces the weigh-in or the waist field takes focus once it
+  exists (the flag waits for the store, the panel's F3); on Progress, after a waist save, focus goes to the line saying what is
+  recorded (F5).
+- **"Open Progress" from the waist's confirmation** opens Progress at its Waist section, unfolded, header focused
+  (`ProgressReveal`); from the weigh-in's, at the top.
+- **Correcting today's waist**: Progress' Waist section says "Today's waist is recorded: 36 in. Saving again replaces it." once
+  one is.
+- **One wording** for how to measure, on the Dashboard and in Progress (`waistProtocolText`).
+- Tests in `dashboard.test.tsx` and `waistEntry.test.tsx`. Stories: `Screens/Progress` Progress At Waist and the Today waist
+  stories.
+The owner's three questions, decided here under the blanket instruction (say if wrong): both fields stay stacked while both ask
+(PD-3); action snacks stay until dismissed, as MM-272 rules (UX-1 option B not taken); one wording before the first waist, as
+above (PD-4).

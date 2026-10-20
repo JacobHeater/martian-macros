@@ -15,6 +15,7 @@ import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
 
 /**
@@ -30,6 +31,22 @@ export const Progress = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Weight trend',
   open: ({ state }) => state.homeTab.put('progress'),
+});
+
+/** MM-91: Progress on a 360 px phone: the weigh-in, the figure and the chart inside the width, the range switch beside its heading. */
+export const ProgressSmallPhone = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Weight trend',
+  open: ({ state }) => state.homeTab.put('progress'),
+  viewport: 'smallPhone',
+});
+
+/** MM-91: Progress at 200% text: the one figure and its line, the chart's caption and the sections' lines wrap, nothing clips. */
+export const ProgressLargeText = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Weight trend',
+  open: ({ state }) => state.homeTab.put('progress'),
+  textScale: 2,
 });
 
 /** MM-20: a female profile's period days, the last two weeks as chips, a period marked and the chart shaded around its start. */
@@ -192,6 +209,33 @@ export const ProgressWeightEventsFailed = screenStory({
   shows: 'Could not load weight events.',
   stores: failingRead('weightEvents', 'watchWeightEvents'),
   open: onProgress,
+});
+
+// ---- MM-304: what the waist panel left ----
+
+/** MM-304: the demo measured the waist this morning: the Waist section, open, says so and that saving again replaces it. */
+export const WaistRecordedToday = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Today’s waist is recorded: /,
+  open: onProgress,
+  walk: async (canvas) => {
+    await pressNamed(/^Waist/)(canvas);
+    reveal(await within(canvas).findByText(/^Today’s waist is recorded: /));
+  },
+});
+
+/** MM-304: the waist saved on the Dashboard, then "Open Progress" on its confirmation: the Waist section, open, its header in hand. */
+export const ProgressAtWaist = screenStory({
+  covers: ['DashboardScreen', 'ProgressScreen'],
+  shows: /^Today’s waist is recorded: /,
+  scenario: waistDueScenario,
+  walk: async (canvas) => {
+    const field = await within(canvas).findByRole('textbox', { name: 'Today’s waist, inches' });
+    reveal(field);
+    await userEvent.type(field, '36{Enter}');
+    await pressNamed('Open Progress')(canvas.ownerDocument.body);
+    reveal(await within(canvas).findByText(/^Today’s waist is recorded: /));
+  },
 });
 
 /** MM-321: lifts logged, none of them in the last 90 days. */

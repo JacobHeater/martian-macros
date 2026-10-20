@@ -45,6 +45,19 @@ disciplined palette and precise motion.
 - **Color budget per screen:** one Ember element; one Ion group (line plus band);
   macro colors only where macros are shown. Gradients only in the three allowed
   places ([color doc §8](color-and-theme-system.md)).
+  **The Ember budget, decided (MM-288, 2026-10-20; option (a) of the two the
+  panel put, chosen by the agent under the owner's blanket delegation: say if
+  wrong).** The one Ember element is the screen's primary action: a fill
+  (`MmButton primary`, the floating action), or, where the primary stands in
+  the app bar and cannot be a fill, Ember text (`MmButton lead`, the
+  Dashboard's Add food once the day is weighed). Every other action is a text
+  action in `--text` at the heading weight (`MmButton text`, the icon action
+  kind likewise), never Ember. The current location in the navigation bar, a
+  selection's check and a switch's on-state are the Ember of state, not of
+  action, and sit outside the count. `test/gallery/hierarchy.test.tsx` fails a
+  destination story with more than one Ember action. Option (b), "one Ember
+  fill plus Ember text actions", was not taken: it spends the top rung of the
+  emphasis ladder on secondary actions (Coach showed five in Ember at once).
 - **Space signature budget:** one arc, one hairline cluster, one limb glow per
   screen; the starfield only on onboarding welcome and the unlock screen.
 - **Badges and chips:** chips for choices; a badge only for a meaningful,

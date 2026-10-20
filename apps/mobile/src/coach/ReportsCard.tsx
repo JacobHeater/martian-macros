@@ -26,6 +26,7 @@ export function ReportsCard() {
       title="Monthly reports"
       summary={`${periods.length} ${periods.length === 1 ? 'report' : 'reports'}, newest ${Fmt.shortDay(latest!.from)} – ${Fmt.shortDay(latest!.to)}`}
       collapsible
+      remember={`coach.reports.${latest?.index ?? 0}`}
       initiallyExpanded={fresh}
     >
       {[...periods].reverse().map((period) => (

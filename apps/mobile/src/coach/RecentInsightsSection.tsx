@@ -57,6 +57,7 @@ export function RecentInsightsSection({ insights }: { insights: readonly RecentI
           : `${insights.length} in the last 14 days, under the items they were about`
       }
       collapsible
+      remember="coach.recent-insights"
       initiallyExpanded={false}
     >
       {insights.length === 0 ? (

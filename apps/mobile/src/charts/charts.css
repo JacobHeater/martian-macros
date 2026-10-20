@@ -90,22 +90,18 @@
   color: var(--text);
   font: var(--type-body);
 }
+/* The hero's one figure (MM-287) and the week's change as one line beneath it. */
 .chart-stats {
-  display: flex;
-  gap: var(--space-8);
   margin: 0;
 }
-.chart-stat {
-  flex: 1;
-  min-width: 0;
+.chart-stat-figure {
+  margin: 0;
+  font: var(--type-figure);
+  font-variant-numeric: tabular-nums;
 }
-.chart-stat-label {
+.chart-stat-line {
+  margin: var(--space-4) 0 0;
   color: var(--text2);
-  font: var(--type-label);
-}
-.chart-stat-value {
-  margin: 0;
-  font: var(--type-title);
 }
 /* The donut always centred, its figures beneath it (MM-354). */
 .chart-split {

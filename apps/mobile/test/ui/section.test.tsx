@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import type { MmFolds } from '../../src/ui/MmFolds';
+import { MmFoldsContext } from '../../src/ui/MmFoldsContext';
 import { MmRhythmStrip } from '../../src/ui/MmRhythmStrip';
 import { MmSection } from '../../src/ui/MmSection';
 import { declarationsOf, rules } from '../support/stylesheetRules';
@@ -50,6 +52,30 @@ describe('a section', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: /^Lunch(?!:)/ }));
     expect(screen.getByText('Rice')).not.toBeVisible();
+  });
+
+  it('with a remember key, its fold is read from and written to the app’s folds (MM-286)', async () => {
+    const kept = new Map<string, boolean>([['progress.waist', true]]);
+    const folds: MmFolds = { get: (key) => kept.get(key), set: (key, expanded) => void kept.set(key, expanded) };
+    const { unmount } = render(
+      <MmFoldsContext.Provider value={folds}>
+        <MmSection icon="tape" title="Waist" collapsible initiallyExpanded={false} remember="progress.waist">
+          <p>Three fields</p>
+        </MmSection>
+      </MmFoldsContext.Provider>,
+    );
+    // Left open last time: open now, although it starts folded by default.
+    expect(screen.getByRole('button', { name: /^Waist/ })).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.click(screen.getByRole('button', { name: /^Waist/ }));
+    expect(kept.get('progress.waist')).toBe(false);
+    unmount();
+    // Without the app's folds, a section is on its own and starts as told.
+    render(
+      <MmSection icon="tape" title="Waist" collapsible initiallyExpanded={false} remember="progress.waist">
+        <p>Three fields</p>
+      </MmSection>,
+    );
+    expect(screen.getByRole('button', { name: /^Waist/ })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('opening something else, the header is a button named by the title alone', async () => {

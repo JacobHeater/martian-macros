@@ -127,6 +127,7 @@ import { PackDownloadsController } from './PackDownloadsController';
 import { PackManifestCheck } from './PackManifestCheck';
 import { OnlineLookup } from './OnlineLookup';
 import { StreamCell } from './StreamCell';
+import type { ProgressReveal } from './ProgressReveal';
 import { ValueCell } from './ValueCell';
 
 const stream = <T>(open: () => Watched<T>) => new StreamCell(open);
@@ -170,6 +171,18 @@ export class AppState {
 
   /** Which destination is showing. The app starts on the dashboard. */
   readonly homeTab = new ValueCell<HomeDestination>('dashboard');
+
+  /** Every remembered fold (MM-286), by the key its section or disclosure gives, as it was left. */
+  readonly folds = new ValueCell<ReadonlyMap<string, boolean>>(new Map());
+
+  /** How far each destination was scrolled when it was left (MM-286), so a return finds it there. */
+  readonly destinationScroll = new ValueCell<ReadonlyMap<HomeDestination, number>>(new Map());
+
+  /** The range chosen on the Progress trend (MM-286): 30 or 90 days, kept across visits. */
+  readonly progressRangeDays = new ValueCell(30);
+
+  /** What Progress brings into view when it next shows (MM-304): the Waist section from the waist's confirmation. */
+  readonly progressReveal = new ValueCell<ProgressReveal | undefined>(undefined);
 
   /** Whether the repeat health check was put off for this launch (MM-112). */
   readonly healthRecheckDismissed = new ValueCell(false);

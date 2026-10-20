@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { InsightCard } from '../coach/InsightCard';
 import { RowWithInsight } from '../coach/RowWithInsight';
 import type { InlineInsightContent } from '../coach/InlineInsightContent';
@@ -70,6 +71,16 @@ export function DashboardScreen() {
   const waistOwn = useItemInsightContents({ kind: 'waist', id: `${latestWaistDay ?? 0}` }, 'Waist');
   const waterOwn = useItemInsightContents({ kind: 'water', id: `${useCell(state.today).epochDay}` }, 'Water');
   const maintenance = useCell(state.maintenance);
+  // After a save in place, focus moves to the row that takes the entry's place (MM-304, UX-5), once.
+  const [justSaved, setJustSaved] = useState<'weight' | 'waist'>();
+  const savedOn = useCell(state.today);
+  const weighedToday = (useLoaded(state.weights) ?? []).some((w) => w.date === savedOn);
+  const waistSavedToday = (useLoaded(state.waist) ?? []).some((w) => w.date === savedOn);
+  useEffect(() => {
+    // Cleared only once the replacing row exists: with a slow store it mounts after the save's own commit (the panel's F3).
+    if (justSaved === 'weight' && weighedToday) setJustSaved(undefined);
+    if (justSaved === 'waist' && waistSavedToday) setJustSaved(undefined);
+  }, [justSaved, weighedToday, waistSavedToday]);
   const designedRow = (row: 'weight' | 'waist' | 'water') => {
     const note = rowNotes?.get(row);
     return note === undefined ? undefined : [note];
@@ -130,9 +141,21 @@ export function DashboardScreen() {
   // A measurement counts for a week, as it does for the weekly reminder (MM-301).
   const waistCounts =
     latestWaist !== undefined && latestWaist.date.daysUntil(today) < ReminderRule.measurementEveryDays;
-  // A save on the Dashboard is confirmed with what was typed, and offers where it is kept (MM-294, MM-301).
-  const confirm = (message: string) =>
-    overlays.snack(message, { label: 'Open Progress', onAction: () => open('progress') });
+  // A save on the Dashboard is confirmed with what was typed, and offers where it is kept (MM-294, MM-301):
+  // the weigh-in's opens Progress at the top, the waist's at its Waist section, unfolded (MM-304).
+  const confirm = (message: string, shows?: 'waist') =>
+    overlays.snack(message, {
+      label: 'Open Progress',
+      onAction: () => {
+        if (shows === 'waist') {
+          state.folds.put(new Map(state.folds.peek()).set('progress.waist', true));
+          state.progressReveal.put('waist');
+        } else {
+          state.destinationScroll.put(new Map(state.destinationScroll.peek()).set('progress', 0));
+        }
+        open('progress');
+      },
+    });
   const trainedThisWeek = workouts.filter(
     (workout) => !workout.inProgress && today.daysUntil(workout.date) > -7 && !workout.date.isAfter(today),
   ).length;
@@ -193,6 +216,7 @@ export function DashboardScreen() {
             fmt={fmt}
             lastTrendKg={last?.levelKg}
             onSaveWeight={async (kg) => {
+              setJustSaved('weight');
               await services.weights.saveWeight(today, kg);
               confirm(`Saved ${fmt.weight(kg)} for today`);
             }}
@@ -203,12 +227,14 @@ export function DashboardScreen() {
             title={fmt.weight(todaysWeight.weightKg)}
             subtitle="Today’s weigh-in · the trend starts tomorrow"
             opens
+            autoFocus={justSaved === 'weight'}
             onPress={() => open('progress')}
           />
         ) : (
           <RowWithInsight insights={designedRow('weight') ?? weightOwn}>
             <MmListRow
               leadingIcon="scale"
+              autoFocus={justSaved === 'weight'}
               title={`Trend ${fmt.weight(last.levelKg)}`}
               subtitle={[
                 `Today ${fmt.weight(todaysWeight.weightKg)}`,
@@ -228,14 +254,16 @@ export function DashboardScreen() {
                 : `Last ${waistAmount(latestWaist.waistCm, fmt)} · ${Fmt.day(latestWaist.date, today)}`
             }
             onSaveWaist={async (cm) => {
+              setJustSaved('waist');
               await saveWaistReadings(services.waist, today, [cm]);
-              confirm(`Waist saved: ${waistAmount(cm, fmt)}`);
+              confirm(`Waist saved: ${waistAmount(cm, fmt)}`, 'waist');
             }}
           />
         ) : (
           <RowWithInsight insights={waistNotes}>
             <MmListRow
               leadingIcon="tape"
+              autoFocus={justSaved === 'waist'}
               title={waistAmount(latestWaist.waistCm, fmt)}
               subtitle={`Waist · ${Fmt.day(latestWaist.date, today)}`}
               opens
@@ -263,7 +291,7 @@ export function DashboardScreen() {
         />
         <ProcessCard />
       </MmListGroup>
-      <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back">
+      <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
         <DashboardMetrics />
       </MmDisclosure>
     </>
