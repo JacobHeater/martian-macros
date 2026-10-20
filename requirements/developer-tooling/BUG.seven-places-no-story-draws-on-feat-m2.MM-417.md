@@ -1,6 +1,6 @@
 ---
 id: MM-417
-status: proposed
+status: done
 component: developer-tooling
 related: [MM-321, MM-292, MM-134, MM-130, MM-158]
 ---
@@ -42,3 +42,9 @@ The guard is the existing check itself (`scripts/check-unseen.mjs` over
 `test/gallery/stories.test.tsx` under coverage), which fails today with
 exactly these seven lines; no other test is needed. Not fixed by the sleep
 lane: the screens belong to other workstreams in flight on feat/m2.
+
+## Progress (2026-10-20, feat/m2)
+Fixed by drawing each state, with no register entry. The places came from Session 38's MM-130 and MM-134 work, which added
+markup without a story for every state. Stories: `ChooseGoalNotTraining`, `ChangeSheetLeavingDeficit`,
+`MaintenanceDrifting`, `MaintenanceCorrecting` (Coach), `TrainFirstTime` (Train), `GoalLeanGainNotTraining` (first run).
+The guard is `npm run unseen` in `mm check`.
