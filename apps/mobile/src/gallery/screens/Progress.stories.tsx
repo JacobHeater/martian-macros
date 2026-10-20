@@ -434,10 +434,10 @@ export const ProgressPickedWeighIn = screenStory({
   walk: pickDot(0),
 });
 
-/** MM-142: today's dot tapped: the reading said, then its explanation. */
+/** MM-142: today's dot tapped: the reading said once in the caption, the distance and its explanation in the line. */
 export const ProgressPickedJump = screenStory({
   covers: ['ProgressScreen'],
-  shows: /^Today: [\d.]+ (lb|kg), \+/,
+  shows: /^Today: [\d.]+ (lb|kg)\.$/,
   scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
   open: onProgress,
   walk: pickDot(29),
