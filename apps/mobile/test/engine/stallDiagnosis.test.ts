@@ -11,6 +11,7 @@ import {
   type WeightEvent,
   type WeightObservation,
 } from '../../src/domain';
+import type { Workout } from '../../src/domain/training/Workout';
 import {
   assessStall,
   BodyFatEstimate,
@@ -18,12 +19,14 @@ import {
   CoachSnapshot,
   type ConfidenceLevel,
   DailyTargets,
+  type SleepAverage,
   summarizeAdherence,
   TargetsRecord,
   TdeeEstimate,
 } from '../../src/engine';
 import { expectClose } from '../support/expectClose';
 import { upTo } from '../support/upTo';
+import { workoutOn } from '../support/workoutOn';
 import { trendOf } from './support/trendPoints';
 
 /** MM-140: when progress stalls, which kind of stall it is. */
@@ -134,6 +137,8 @@ const assess = ({
   weights,
   waist = [],
   events = [],
+  workouts = [],
+  sleepAverage,
 }: {
   sex?: BiologicalSex;
   snap?: CoachSnapshot;
@@ -142,6 +147,8 @@ const assess = ({
   weights?: WeightObservation[];
   waist?: WaistObservation[];
   events?: WeightEvent[];
+  workouts?: Workout[];
+  sleepAverage?: SleepAverage;
 } = {}) =>
   assessStall({
     setup: setupFor(sex),
@@ -151,6 +158,8 @@ const assess = ({
     weights: weights ?? weighed(),
     waist,
     weightEvents: events,
+    workouts,
+    sleepAverage,
     today,
   });
 
@@ -185,6 +194,18 @@ it('not assessed within two weeks of starting creatine', () => {
 it('maintenance has no pace to fall short of', () => {
   const a = assess({ history: [record({ rate: 0 })] });
   expect(a.notAssessedReason).toBe('noPaceToMeet');
+});
+
+// MM-252: sleep that averaged short is recorded beside the diagnosis, whichever it is.
+it('short sleep over the window is noted on a stall, and not when sleep was not short', () => {
+  const short: SleepAverage = { averageMinutes: 330, nights: 12, from: today.addDays(-13), to: today };
+  const noted = assess({ sleepAverage: short });
+  expect(noted.status).toBe('stalled');
+  expect(noted.shortSleepAverageMinutes).toBe(330);
+  expect(noted.shortSleepNights).toBe(12);
+  expect(assess({ intake: ate(2100, 7), sleepAverage: short }).shortSleepAverageMinutes, 'on the data diagnosis too').toBe(330);
+  expect(assess({ sleepAverage: { ...short, averageMinutes: 420 } }).shortSleepAverageMinutes).toBeUndefined();
+  expect(assess().shortSleepNights).toBe(0);
 });
 
 it('thin data: the log is too thin to tell', () => {
@@ -225,6 +246,31 @@ it('masked by a recent passing event', () => {
   const a = assess({ events: [{ date: today.addDays(-4), type: 'largeOrSaltyMeal' }] });
   expect(a.diagnosis).toBe('masked');
   expect(a.maskedByEvent).toBe(true);
+});
+
+const lifted = (daysAgo: number) => workoutOn(today.addDays(-daysAgo), [['squat', 5, 100]]);
+
+it('masked by training that started in the last ten days', () => {
+  const a = assess({ workouts: [lifted(8), lifted(5), lifted(2)] });
+  expect(a.diagnosis).toBe('masked');
+  expect(a.maskedByTraining).toBe(true);
+  expect(a.maskedByEvent).toBe(false);
+});
+
+it('training that has gone on for weeks masks nothing', () => {
+  const a = assess({ workouts: [lifted(40), lifted(30), lifted(20), lifted(12), lifted(5), lifted(2)] });
+  expect(a.diagnosis).toBe('estimate');
+  expect(a.maskedByTraining).toBe(false);
+});
+
+it('training taken up again after a month off is a start', () => {
+  const a = assess({ workouts: [lifted(60), lifted(50), lifted(6), lifted(3)] });
+  expect(a.maskedByTraining).toBe(true);
+});
+
+it('a workout still in progress is not yet a day trained', () => {
+  const open = { ...lifted(3), endedAt: undefined } as unknown as Workout;
+  expect(assess({ workouts: [open] }).maskedByTraining).toBe(false);
 });
 
 it('intake above target: both figures are stated', () => {

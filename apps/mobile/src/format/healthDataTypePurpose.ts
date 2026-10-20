@@ -8,6 +8,7 @@ const purposes: Readonly<Record<HealthDataType, string>> = {
   workout: 'When you trained, and for how long.',
   menstruation: 'To allow for water weight around your period.',
   steps: 'For context only. Never used to work out your calories.',
+  sleep: 'Hours asleep each night, so the coach can tell when sleep runs short.',
 };
 
 /** What the app wants it for, in a sentence, said before it is asked for. */

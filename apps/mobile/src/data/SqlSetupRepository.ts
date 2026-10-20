@@ -36,6 +36,7 @@ function setupFrom(r: SqlRow): UserSetup {
       bariatricSurgery: flag(r, 'bariatric_surgery'),
       weightAffectingMedication: flag(r, 'weight_affecting_medication'),
       fluidLimitedByClinician: flag(r, 'fluid_limited_by_clinician'),
+      sleepDisorder: flag(r, 'sleep_disorder'),
     }),
     trainingStatus: named(TrainingStatus.values, r, 'training_status'),
     trainingDaysPerWeek: integer(r, 'training_days_per_week'),
@@ -51,6 +52,9 @@ function setupFrom(r: SqlRow): UserSetup {
     creatineStartedOn: optionalDay(r, 'creatine_started_epoch_day'),
     maintenanceWeekFrom: optionalDay(r, 'maintenance_week_from_epoch_day'),
     reliefAnsweredOn: optionalDay(r, 'relief_answered_epoch_day'),
+    paceChangedOn: optionalDay(r, 'pace_changed_epoch_day'),
+    maintenanceAnchorOn: optionalDay(r, 'maintenance_anchor_epoch_day'),
+    maintenanceCorrectionFrom: optionalDay(r, 'maintenance_correction_from_epoch_day'),
   });
 }
 
@@ -105,11 +109,15 @@ export class SqlSetupRepository implements SetupRepository {
         bariatric_surgery: asFlag(s.bariatricSurgery),
         weight_affecting_medication: asFlag(s.weightAffectingMedication),
         fluid_limited_by_clinician: asFlag(s.fluidLimitedByClinician),
+        sleep_disorder: asFlag(s.sleepDisorder),
         health_check_confirmed_epoch_day: orNull(setup.healthCheckConfirmedOn?.epochDay),
         health_check_skip_count: setup.healthCheckSkipCount,
         creatine_started_epoch_day: orNull(setup.creatineStartedOn?.epochDay),
         maintenance_week_from_epoch_day: orNull(setup.maintenanceWeekFrom?.epochDay),
         relief_answered_epoch_day: orNull(setup.reliefAnsweredOn?.epochDay),
+        pace_changed_epoch_day: orNull(setup.paceChangedOn?.epochDay),
+        maintenance_anchor_epoch_day: orNull(setup.maintenanceAnchorOn?.epochDay),
+        maintenance_correction_from_epoch_day: orNull(setup.maintenanceCorrectionFrom?.epochDay),
       }),
     );
   }

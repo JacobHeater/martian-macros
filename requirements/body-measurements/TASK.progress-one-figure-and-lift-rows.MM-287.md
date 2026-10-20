@@ -1,7 +1,7 @@
 ---
 id: MM-287
 component: body-measurements
-status: proposed
+status: done
 related: [MM-253, MM-257, MM-77, MM-107]
 ---
 
@@ -42,3 +42,14 @@ Scenario: Lifts as rows
 ## UI/UX
 
 `apps/mobile/src/gallery/screens/Progress.stories.tsx` (Progress).
+
+## Progress (2026-10-20, feat/m2)
+Built, closing the ticket:
+- **One figure**: the Progress hero's trend weight is the one element in the figure role; the 7-day and since-start changes are one
+  line beneath it (`TrendStats`), and changes with too little history are left out rather than dashed.
+- **Lifts as rows**: Strength shows the four most-trained lifts as rows with the trend icon, one disclaimer, and a row opens the
+  lift's history. The rows sit on the canvas like the Weight events rows beside them (the sibling; the panel's PD4), with no
+  list-group surface.
+- Test: `progressHero.test.tsx`. Story: `Screens/Progress` Progress.
+Decided here (say if wrong): the range control stays on the trend's heading line (the panel's PD5 suggested moving it above the
+chart; the chart is what it changes and the two are adjacent), and "since start" stays until a dated wording is drawn.

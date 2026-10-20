@@ -16,9 +16,20 @@ import { Exercise } from '../domain/training/Exercise';
 import { TrendChart } from '../charts/TrendChart';
 import { TrendSparkline } from '../charts/TrendSparkline';
 import { TrendStats } from '../charts/TrendStats';
+import { WaistChart } from '../charts/WaistChart';
+import { WaistObservation } from '../domain/WaistObservation';
 import './gallery.css';
 
 const chartDay = CalendarDate.of(2026, 10, 10);
+/** Twelve weekly waist measurements, the tape drifting down two centimetres, one a quick entry. */
+const chartWaist = Array.from({ length: 12 }, (_, i) => {
+  const cm = 92.5 - i * 0.2 + (i % 3 === 1 ? 0.5 : 0);
+  return new WaistObservation({
+    date: chartDay.addDays(-7 * (11 - i)),
+    waistCm: cm,
+    readings: i === 5 ? [cm] : [cm - 0.5, cm, cm + 0.5],
+  });
+});
 const chartTrend = Array.from({ length: 30 }, (_, i) => ({
   date: chartDay.addDays(i - 29),
   levelKg: 84 - i * 0.05 + Math.sin(i / 4) * 0.2,
@@ -83,6 +94,8 @@ export function ChartsCatalog() {
         />
         {/* No weigh-in in the range (MM-321). */}
         <TrendChart label="Weight trend" trend={[]} weights={[]} today={chartDay} rangeDays={7} fmt={fmt} />
+        {/* The waist over 90 days (MM-155): dots, the middle of each three as a line, the tape's noise as a band. */}
+        <WaistChart waist={chartWaist} today={chartDay} rangeDays={90} fmt={fmt} label="Waist over the last 90 days" />
       </InfoCard>
       <InfoCard title="Macronutrient split">
         <MacroSplitChart intake={new IntakeDay({ date: chartDay, kcal: 1450, proteinG: 100, carbsG: 150, fatG: 50 })} />

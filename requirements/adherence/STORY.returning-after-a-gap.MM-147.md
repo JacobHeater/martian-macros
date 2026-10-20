@@ -1,6 +1,6 @@
 ---
 id: MM-147
-status: in-progress
+status: done
 component: adherence
 related: [MM-145, MM-16, MM-18, MM-23, MM-24, MM-31, MM-92, MM-98, MM-108, MM-112, MM-135, MM-139, MM-146, MM-148]
 ---
@@ -113,3 +113,6 @@ the trend chart drawing the gap dashed; streaks and the monthly report (neither 
 loaded, so an old stretch with food but no weigh-ins can read as a gap for the deficit count.
 
 **Note (2026-10-12, MM-242).** Someone returning after a gap whose app was updated in between can meet changed terms of use before this screen (MM-242). That screen says nothing about time away. "One screen is shown before the dashboard" holds for the return itself, not for the terms.
+
+## Built 2026-10-19
+Confidence is at most Fair while a gap sits inside the estimator's window (`assessCoachConfidence`, `lastGapEndedOn` from the analysis's gaps; the next step "wait for stability"), so "After the weigh-in" holds. Decided: the estimator's own minimum of data after a return stands in for the fixed seven days (it holds targets longer, from the last measured expenditure through `gapPrior`, with the weight-change rescale and the deficit-count restart already built). Not built, and left for the owner: re-confirming the goal after a 90-day gap (the health check is re-asked by MM-112); the trend chart drawing the gap dashed (MM-17); streaks and the monthly report (MM-92, MM-33); the lapsing simulator user (MM-30).

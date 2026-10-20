@@ -119,4 +119,93 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE custom_foods ADD COLUMN sugar_alcohols_g REAL NULL');
     },
   ],
+  // 9 to 10 (MM-63): the day the last backup was made.
+  [
+    9,
+    async (db) => {
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN last_backup_epoch_day INTEGER NULL');
+    },
+  ],
+  // 10 to 11 (MM-123, MM-128, MM-130): exact targets and the label note; the day a pace was chosen; the maintenance anchor and correction.
+  [
+    10,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN exact_targets INTEGER NOT NULL DEFAULT 0 CHECK (exact_targets IN (0, 1))',
+      );
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN label_note_dismissed_epoch_day INTEGER NULL');
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN ease_into_maintenance INTEGER NOT NULL DEFAULT 0 CHECK (ease_into_maintenance IN (0, 1))',
+      );
+      await db.execute('ALTER TABLE setups ADD COLUMN pace_changed_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE setups ADD COLUMN maintenance_anchor_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE setups ADD COLUMN maintenance_correction_from_epoch_day INTEGER NULL');
+      await db.execute('ALTER TABLE targets_history ADD COLUMN requested_loss_fraction REAL NULL');
+      // MM-20: the days marked with menstrual flow.
+      await db.execute('CREATE TABLE "menstruation_days" ("epoch_day" INTEGER NOT NULL, PRIMARY KEY ("epoch_day"))');
+    },
+  ],
+  // 11 to 12 (MM-58): whether unknown foods may be looked up online, and the foods found online, kept on the phone.
+  [
+    11,
+    async (db) => {
+      await db.execute(
+        "ALTER TABLE user_preferences ADD COLUMN online_lookup TEXT NOT NULL DEFAULT 'ask' CHECK (\"online_lookup\" IN ('ask', 'always', 'never'))",
+      );
+      await db.execute(
+        'CREATE TABLE "online_foods" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"gtin" TEXT NULL, ' +
+          '"name" TEXT NOT NULL, ' +
+          '"brand" TEXT NULL, ' +
+          '"kcal" REAL NOT NULL CHECK("kcal" >= 0.0), ' +
+          '"protein_g" REAL NOT NULL CHECK("protein_g" >= 0.0), ' +
+          '"carbs_g" REAL NOT NULL CHECK("carbs_g" >= 0.0), ' +
+          '"fat_g" REAL NOT NULL CHECK("fat_g" >= 0.0), ' +
+          '"fiber_g" REAL NULL, ' +
+          '"sugar_alcohols_g" REAL NULL, ' +
+          '"sodium_mg" REAL NULL, ' +
+          '"alcohol_g" REAL NULL, ' +
+          '"micros" TEXT NOT NULL DEFAULT \'{}\', ' +
+          '"servings" TEXT NOT NULL DEFAULT \'[]\', ' +
+          '"source" TEXT NOT NULL, ' +
+          '"source_id" TEXT NULL, ' +
+          '"tier" INTEGER NOT NULL, ' +
+          '"tier_reason" TEXT NOT NULL' +
+          ')',
+      );
+      await db.execute('CREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" ("gtin")');
+    },
+  ],
+  // 12 to 13 (MM-250, MM-251): a diagnosed sleep disorder in the health check, and the nights of sleep.
+  [
+    12,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN sleep_disorder INTEGER NOT NULL DEFAULT 0 CHECK (sleep_disorder IN (0, 1))',
+      );
+      await db.execute(
+        'CREATE TABLE "sleep_nights" (' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"minutes_asleep" REAL NOT NULL CHECK("minutes_asleep" > 0.0 AND "minutes_asleep" <= 1440.0), ' +
+          '"source" TEXT NOT NULL CHECK("source" IN (\'typed\', \'imported\')), ' +
+          '"source_name" TEXT NULL, ' +
+          'PRIMARY KEY ("epoch_day"))',
+      );
+    },
+  ],
+  // 13 to 14 (MM-167, MM-151, MM-152): the state a food was logged in and the
+  // conversion that made its unit grams, both unknown for what is already
+  // logged; and the fat the person usually cooks with, oil until chosen.
+  [
+    13,
+    async (db) => {
+      await db.execute('ALTER TABLE food_entries ADD COLUMN preparation TEXT NULL');
+      await db.execute('ALTER TABLE food_entries ADD COLUMN conversion_kind TEXT NULL');
+      await db.execute(
+        'ALTER TABLE food_entries ADD COLUMN conversion_factor REAL NULL CHECK (conversion_factor IS NULL OR conversion_factor > 0.0)',
+      );
+      await db.execute("ALTER TABLE user_preferences ADD COLUMN usual_cooking_fat TEXT NOT NULL DEFAULT 'oil'");
+    },
+  ],
 ]);

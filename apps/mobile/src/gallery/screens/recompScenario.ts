@@ -14,7 +14,7 @@ import { storyWorkout } from './storyWorkout';
  */
 export const recompScenario: StoryScenario = async (repos, today) => {
   await repos.setup.saveSetup(
-    typicalSetup({ onboardedOn: today.addDays(-100), goalMode: 'recomp', healthCheckConfirmedOn: today }).copyWith({ unitSystem: 'metric' }),
+    typicalSetup({ onboardedOn: today.addDays(-100), goalMode: 'recomp', healthCheckConfirmedOn: today }),
   );
   for (let d = 100; d >= 0; d--) await repos.weights.saveWeight(today.addDays(-d), 82 + (d % 2 === 0 ? 0.2 : -0.2));
   for (let d = 84; d >= 0; d -= 7) {

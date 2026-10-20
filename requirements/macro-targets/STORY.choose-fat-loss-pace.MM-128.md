@@ -1,6 +1,6 @@
 ---
 id: MM-128
-status: proposed
+status: done
 component: macro-targets
 related: [MM-119, MM-25, MM-28, MM-36, MM-111, MM-112, MM-115, MM-117, MM-132, MM-138, MM-143, MM-158]
 ---
@@ -92,3 +92,32 @@ Scenario: Recomp
 - Priority: should-have, early. It completes MM-25, which records "not built: choosing a fat-loss pace".
 - The same sheet is the natural home for the projected time to a goal weight (MM-36); a range, never a date.
 - Every threshold here is an entry in the evidence register (MM-143).
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **Three named paces** (`FatLossPace`: Gentle 0.5%, Standard 0.75% default, Faster 1.0%), described for this person today by
+  `describePaces`, which runs each through the real target calculation with no step limit: the daily deficit, the target that
+  results, the pace the deficit actually delivers, what limited it (the calorie floor, the deficit cap, the body-fat limit), and
+  whether the deficit is above what the body fat can supply by Alpert's model (a note, never enforced). Gentle is always offered;
+  Standard when the body-fat limit (MM-28) allows 0.75%; Faster when it allows 1% and the cautious body-fat figure (MM-132) is
+  25% (men) or 35% (women) or more; a caution from the health check or age (MM-111, MM-112) leaves only Gentle. Each withheld
+  pace is listed with its reason and cannot be chosen.
+- **The deficit cap**: `PaceRule.maxDeficitFractionOfExpenditure` (35%) in `computeTargetsTraced`, with the flag `deficitCapped`
+  and its message; the pace recorded on the targets is the one the capped deficit gives, so "Intended pace" stays honest.
+- **Where it is chosen**: the Coach tab's "Your targets" has a Pace row with "Change pace" (fat loss only; recomp and the other
+  goals have none), opening `PaceSheet`; onboarding's plan step shows the paces under a chosen fat-loss goal, costed from the
+  starting estimate of expenditure. The stall card's "gentler pace" option opens the same sheet (MM-140).
+- **A pace change acts at once and is not step-limited**, like a change of goal: `nextTargets` issues new targets when the setup's
+  pace differs from the one the current targets were asked for (`TargetsRecord.requestedLossFraction`, schema 11), built on the
+  expenditure estimate those targets rest on, so only the pace moves the target and a gentler pace never lowers it (MM-117).
+  The relief offer's slower pace now applies the same way. `UserSetup.paceChangedOn` records the day.
+- Evidence rows for every threshold (MM-143). Tests: `paces.test.ts` (every acceptance scenario), `paceSheet.test.tsx`,
+  the contract tests for the new column. Stories: `ChoosePace` (Coach), `GoalPaces` (onboarding).
+
+Decided here (say if wrong):
+- The ticket's example deficits (about 530, 800 and 1,050 kcal for a 100 kg man at 30% body fat) assumed 7,400 kcal per kilogram
+  lost; the engine's energy density for a trained person at that body fat (MM-26) gives about 600, 900 and, capped at 35% of a
+  3,000 kcal expenditure, 1,050. The ratios between the paces are what the test holds.
+- The consequence sentences avoid "most people" (MM-108's comparison rule), so Standard reads "Training usually carries on as
+  normal at this pace."
+- The projected time to a goal weight (MM-36) is not on this sheet; MM-36 is not in M2.

@@ -3,6 +3,7 @@ import AccessibilityNewOutlined from '@mui/icons-material/AccessibilityNewOutlin
 import AddOutlined from '@mui/icons-material/AddOutlined';
 import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
 import BackHandOutlined from '@mui/icons-material/BackHandOutlined';
+import BedtimeOutlined from '@mui/icons-material/BedtimeOutlined';
 import BoltOutlined from '@mui/icons-material/BoltOutlined';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import CheckCircleOutlined from '@mui/icons-material/CheckCircleOutlined';
@@ -155,4 +156,5 @@ export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   water: WaterDropOutlined,
   // Drawn for the app: Material has no shaker (MM-335).
   protein: ShakerBottleOutlined,
+  sleep: BedtimeOutlined,
 };

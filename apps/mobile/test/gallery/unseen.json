@@ -6,9 +6,5 @@
   {
     "place": "src/settings/SettingsScreen.tsx: if (setup === undefined) return <Screen title=\"Settings\">{null}</Screen>;",
     "reason": "Shown only in the instant after Erase all data clears the setup, before onboarding takes over the root; no story can hold that instant (MM-321, reviewed 2026-10-16)."
-  },
-  {
-    "place": "src/terms/TermsGuardScreen.tsx: <>",
-    "reason": "What changed in the terms since the version agreed to: no version lists changes yet (termsOfUse.changes is empty), so it shows only once a second version does (MM-321, MM-242, reviewed 2026-10-16)."
   }
 ]

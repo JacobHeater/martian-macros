@@ -7,6 +7,7 @@ import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
 import type { NutritionGoals } from '../domain/NutritionGoals';
@@ -28,12 +29,22 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
 import type { UserSetup } from '../domain/UserSetup';
+import type { MenstruationDay } from '../domain/MenstruationDay';
+import type { SleepNight } from '../domain/SleepNight';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
 import type { AdherenceSummary } from '../engine/AdherenceSummary';
 import { analyze } from '../engine/analyze';
+import { assessMaintenance } from '../engine/assessMaintenance';
+import { assessTrainingLapse } from '../engine/assessTrainingLapse';
+import type { TrainingLapse } from '../engine/TrainingLapse';
+import { trainingSuspended } from '../engine/trainingSuspended';
+import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import { assessStall } from '../engine/assessStall';
+import { describePaces } from '../engine/describePaces';
+import type { PaceOption } from '../engine/PaceOption';
+import { TargetInputs } from '../engine/TargetInputs';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
 import { buildStrengthTrends } from '../engine/buildStrengthTrends';
 import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
@@ -80,6 +91,8 @@ import { foodItemInsights } from '../engine/foodItemInsights';
 import { waistWithinNoiseInsights } from '../engine/waistWithinNoiseInsights';
 import { waterFewDaysInsights } from '../engine/waterFewDaysInsights';
 import { WaterFewDaysRule } from '../engine/WaterFewDaysRule';
+import type { SleepAverage } from '../engine/SleepAverage';
+import { sleepAverageOf } from '../engine/sleepAverageOf';
 import type { StallAssessment } from '../engine/StallAssessment';
 import type { StrengthTrend } from '../engine/StrengthTrend';
 import { summarizeAdherence } from '../engine/summarizeAdherence';
@@ -95,6 +108,8 @@ import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthImporter } from '../healthIngest/HealthImporter';
+import type { NightOfSleep } from '../healthIngest/NightOfSleep';
+import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
@@ -105,12 +120,15 @@ import { DerivedCell } from './DerivedCell';
 import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
+import { mergeSleepNights } from './mergeSleepNights';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
 import { PackDownloadsController } from './PackDownloadsController';
 import { PackManifestCheck } from './PackManifestCheck';
+import { OnlineLookup } from './OnlineLookup';
 import { StreamCell } from './StreamCell';
+import type { ProgressReveal } from './ProgressReveal';
 import { ValueCell } from './ValueCell';
 
 const stream = <T>(open: () => Watched<T>) => new StreamCell(open);
@@ -146,12 +164,26 @@ export class AppState {
 
   /** The agreement to the terms of use, if there is one (MM-242). */
   readonly termsAcceptance: StreamCell<TermsAcceptance | undefined>;
+  /** When the last backup was made on this phone, if ever (MM-63). */
+  readonly lastBackupOn: StreamCell<CalendarDate | undefined>;
 
   /** A look being tried on the theme chooser before it is kept (MM-184). */
   readonly themePreview = new ValueCell<ThemePreference | undefined>(undefined);
 
   /** Which destination is showing. The app starts on the dashboard. */
   readonly homeTab = new ValueCell<HomeDestination>('dashboard');
+
+  /** Every remembered fold (MM-286), by the key its section or disclosure gives, as it was left. */
+  readonly folds = new ValueCell<ReadonlyMap<string, boolean>>(new Map());
+
+  /** How far each destination was scrolled when it was left (MM-286), so a return finds it there. */
+  readonly destinationScroll = new ValueCell<ReadonlyMap<HomeDestination, number>>(new Map());
+
+  /** The range chosen on the Progress trend (MM-286): 30 or 90 days, kept across visits. */
+  readonly progressRangeDays = new ValueCell(30);
+
+  /** What Progress brings into view when it next shows (MM-304): the Waist section from the waist's confirmation. */
+  readonly progressReveal = new ValueCell<ProgressReveal | undefined>(undefined);
 
   /** Whether the repeat health check was put off for this launch (MM-112). */
   readonly healthRecheckDismissed = new ValueCell(false);
@@ -199,6 +231,20 @@ export class AppState {
   /** Intake for anything that judges a day: paused days are left out. */
   readonly judgedIntake: Cell<readonly IntakeDay[] | undefined>;
   readonly waist: Cell<Loadable<WaistObservation[]>>;
+
+  /** The nights of sleep the person typed, and nothing imported (MM-250). */
+  readonly typedSleep: Cell<Loadable<SleepNight[]>>;
+
+  /** The imported sleep that counts for each night (MM-250), from what has been read and kept. Empty when nothing has been imported. */
+  readonly importedSleep: Cell<Loadable<NightOfSleep[]>>;
+
+  /** The nights the app works from: typed over imported, oldest first (MM-250). */
+  readonly sleepNights: Cell<Loadable<SleepNight[]>>;
+
+  /** The fourteen-night average (MM-252); undefined before the nights are read, or with none in the window. */
+  readonly sleepAverage: Cell<SleepAverage | undefined>;
+  /** The days marked with menstrual flow (MM-20). */
+  readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
 
   /** The user's own foods and recipes, by name (MM-45). */
@@ -218,6 +264,14 @@ export class AppState {
 
   /** Whether carbohydrate is shown as net of fiber and sugar alcohols (MM-396); on until switched off. */
   readonly netCarbs: Cell<Loadable<boolean>>;
+  /** The fat the person usually cooks with (MM-152); oil until one is chosen. */
+  readonly usualCookingFat: Cell<Loadable<CookingFatKind>>;
+  /** Targets shown exact, unrounded (MM-123); off by default. */
+  readonly exactTargets: Cell<Loadable<boolean>>;
+  /** The day the line about label accuracy was dismissed (MM-123). */
+  readonly labelNoteDismissedOn: Cell<Loadable<CalendarDate | undefined>>;
+  /** Leaving a deficit in two steps (MM-130); off by default. */
+  readonly easeIntoMaintenance: Cell<Loadable<boolean>>;
 
   /** The sodium limit, off until set, and the water goal as the person set it (MM-311, MM-313, MM-358). */
   readonly nutritionGoals: Cell<Loadable<NutritionGoals>>;
@@ -232,6 +286,8 @@ export class AppState {
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
   readonly coach: Cell<CoachSnapshot | undefined>;
+  /** The three fat-loss paces as they would apply today (MM-128); undefined until the coach exists. */
+  readonly paceOptions: Cell<readonly PaceOption[] | undefined>;
 
   /**
    * The guide shown in place of targets on a paused day (MM-148):
@@ -247,6 +303,10 @@ export class AppState {
    * it is (MM-140); undefined until the coach has what it needs to look.
    */
   readonly stallAssessment: Cell<StallAssessment | undefined>;
+  /** Where the person stands at maintenance (MM-130); undefined when the targets in force are not maintenance. */
+  readonly maintenance: Cell<MaintenanceStatus | undefined>;
+  /** Whether training has lapsed against a goal that needs it (MM-134). */
+  readonly trainingLapse: Cell<TrainingLapse | undefined>;
 
   /** Protein by meal for each of the days insights look at (MM-125). */
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
@@ -371,6 +431,9 @@ export class AppState {
   /** The list of packs the host offers, read once when the user asks. */
   readonly packManifest: PackManifestCheck;
 
+  /** Looking a food up online, if allowed (MM-58). */
+  readonly onlineLookup: OnlineLookup;
+
   /** Each lift's estimated strength over time. Failed when a logged set cannot be worked out. */
   readonly strengthTrends: Cell<Loadable<readonly StrengthTrend[]>>;
 
@@ -419,6 +482,7 @@ export class AppState {
     this.setup = stream(() => s.setup.watchSetup());
     this.themePreference = stream(() => s.preferences.watchThemePreference());
     this.termsAcceptance = stream(() => s.preferences.watchTermsAcceptance());
+    this.lastBackupOn = stream(() => s.preferences.watchLastBackupOn());
     this.foodCatalog = stream(() => {
       // Read here so that an install or a removal makes this ask again.
       void this.packChanges.value;
@@ -434,6 +498,13 @@ export class AppState {
       onInstalled: () => this.packsChanged(),
     });
     this.packManifest = new PackManifestCheck({ http: s.packHttp, url: s.packManifestUrl });
+    this.onlineLookup = new OnlineLookup({
+      sources: s.onlineSources,
+      cache: s.onlineFoods,
+      consent: s.preferences,
+      // A food kept is a food the catalog now has: whoever searched asks again.
+      onKept: () => this.packsChanged(),
+    });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
@@ -479,6 +550,21 @@ export class AppState {
       return withoutPausedDays(intake, pauses, { keepComplete: false });
     });
     this.waist = stream(() => s.waist.watchWaist());
+    this.typedSleep = stream(() => s.sleep.watchSleepNights());
+    this.importedSleep = stream(() => this.importedSamples('sleep', nightlySleep));
+    this.sleepNights = derived(() => {
+      const typed = this.typedSleep.value;
+      const imported = of(this.importedSleep) ?? [];
+      const today = this.today.value;
+      // A read that went wrong stays wrong here, so whoever shows the nights can say so.
+      if (!typed.ready) return typed;
+      return Loadable.of(mergeSleepNights({ typed: typed.value, imported, today }));
+    });
+    this.sleepAverage = derived(() => {
+      const nights = of(this.sleepNights);
+      return nights === undefined ? undefined : sleepAverageOf({ nights, through: this.today.value });
+    });
+    this.flowDays = stream(() => s.flowDays.watchFlowDays());
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
@@ -489,6 +575,10 @@ export class AppState {
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
     this.netCarbs = stream(() => s.preferences.watchNetCarbs());
+    this.usualCookingFat = stream(() => s.preferences.watchUsualCookingFat());
+    this.exactTargets = stream(() => s.preferences.watchExactTargets());
+    this.labelNoteDismissedOn = stream(() => s.preferences.watchLabelNoteDismissedOn());
+    this.easeIntoMaintenance = stream(() => s.preferences.watchEaseIntoMaintenance());
     this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
 
@@ -499,6 +589,8 @@ export class AppState {
       const intake = of(this.intakeDays);
       const history = of(this.targetsHistory);
       const pauses = of(this.pauses);
+      // Period days widen the trend's noise around each start (MM-19, MM-20); none until read, as with no marked days.
+      const flowDays = of(this.flowDays) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -510,7 +602,7 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, today });
     });
 
     this.maintenanceGuide = derived(() => {
@@ -534,7 +626,25 @@ export class AppState {
         weights,
         history: snapshot.policy.targetsAllowed ? (history ?? []) : [],
         floorKcal: snapshot.calorieFloorKcal,
+        // The week's workouts, the fifth fact, now that the training log exists (MM-149).
+        workouts: of(this.workouts),
       });
+    });
+
+    this.trainingLapse = derived<TrainingLapse | undefined>(() => {
+      const setup = of(this.setup);
+      const workouts = of(this.workouts);
+      const pauses = of(this.pauses);
+      if (setup === undefined || workouts === undefined || pauses === undefined) return undefined;
+      return assessTrainingLapse({ setup, workouts, pauses, today: this.today.value });
+    });
+
+    this.maintenance = derived<MaintenanceStatus | undefined>(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (setup === undefined || snapshot === undefined || history === undefined) return undefined;
+      return assessMaintenance({ setup, history, trend: snapshot.trend, today: this.today.value });
     });
 
     this.stallAssessment = derived(() => {
@@ -545,6 +655,7 @@ export class AppState {
       const history = of(this.targetsHistory);
       const waist = of(this.waist) ?? [];
       const weightEvents = of(this.weightEvents) ?? [];
+      const workouts = of(this.workouts) ?? [];
       const paused = this.pauseWithin(14);
       if (
         setup === undefined ||
@@ -557,7 +668,21 @@ export class AppState {
       ) {
         return undefined;
       }
-      return assessStall({ setup, snapshot, history, intake, weights, waist, weightEvents, today: this.today.value });
+      // With period days marked, the stall is judged over 21 days, not 28 (MM-140).
+      const hasCycleData = (of(this.flowDays) ?? []).length > 0;
+      return assessStall({
+        setup,
+        snapshot,
+        history,
+        intake,
+        weights,
+        waist,
+        weightEvents,
+        workouts,
+        hasCycleData,
+        sleepAverage: this.sleepAverage.value,
+        today: this.today.value,
+      });
     });
 
     this.mealProtein = derived<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>(() => {
@@ -645,7 +770,10 @@ export class AppState {
           stall: this.stallAssessment.value,
           mealProtein: this.mealProtein.value,
           sodium: this.sodiumPattern.value,
+          trend: coach.trend,
+          waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
+          sleepAverage: this.sleepAverage.value,
         }),
         log,
         today,
@@ -803,6 +931,8 @@ export class AppState {
         today,
         deficitRestartOn: snapshot.deficitRestartOn,
         pauses,
+        // Short sleep from the record is a signal of its own (MM-252).
+        sleepAverage: this.sleepAverage.value,
       });
     });
 
@@ -863,6 +993,28 @@ export class AppState {
         return undefined;
       }
       return history === undefined ? undefined : history[history.length - 1];
+    });
+
+    this.paceOptions = derived<readonly PaceOption[] | undefined>(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const current = this.currentTargets.value;
+      if (setup === undefined || snapshot === undefined || !snapshot.policy.targetsAllowed) return undefined;
+      return describePaces(
+        new TargetInputs({
+          sex: setup.profile.sex,
+          heightCm: setup.profile.heightCm,
+          trendWeightKg: snapshot.trendWeightKg,
+          bodyFat: snapshot.bodyFat,
+          mode: 'fatLoss',
+          trainingStatus: setup.trainingStatus,
+          trainingDaysPerWeek: setup.trainingDaysPerWeek,
+          policy: snapshot.policy,
+          tdeeKcal: snapshot.tdee.kcal,
+          bmrKcal: snapshot.bmrKcal,
+          safetyBodyFatPercent: current?.safetyBodyFatPercent,
+        }),
+      );
     });
 
     this.waterGoal = derived<WaterGoal | undefined>(() => {
@@ -1046,6 +1198,13 @@ export class AppState {
     }
   }
 
+  /** Reads the nights of sleep again, typed and imported, after a read went wrong (MM-250). */
+  retrySleep(): void {
+    for (const cell of [this.typedSleep, this.importedSleep]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
   /** Reads the pauses again, after a read went wrong (MM-334). */
   retryPauses(): void {
     if (this.pauses instanceof StreamCell) this.pauses.retry();
@@ -1079,6 +1238,15 @@ export class AppState {
       coach: this.coach,
       history: () => of(this.targetsHistory),
       pauses: () => of(this.pauses) ?? [],
+      easeIntoMaintenance: () => of(this.easeIntoMaintenance),
+      trainingLapsed: () => {
+        const setup = of(this.setup);
+        const workouts = of(this.workouts);
+        if (setup === undefined || workouts === undefined) return undefined;
+        return trainingSuspended({ setup, workouts, today: this.today.value });
+      },
+      // A record that could not be read is no record: the check-in is not held up for it.
+      sleepNights: () => (Loadable.hasFailed(this.sleepNights.value) ? [] : of(this.sleepNights)),
       today: this.today,
       targets: this.services.targets,
       setups: this.services.setup,
@@ -1093,6 +1261,32 @@ export class AppState {
   /** Call after an import from the health platform, so what was imported is read again. */
   healthImported(): void {
     this.imports.put(this.imports.value + 1);
+  }
+
+  /**
+   * What has been read and kept of `type`, as `derive` makes it, read again
+   * after every import (MM-68, MM-250).
+   */
+  private importedSamples<T>(type: HealthDataType, derive: (samples: HealthSample[]) => T): Watched<T> {
+    // Read here so that an import makes this ask again.
+    void this.imports.value;
+    const store = this.services.healthSamples;
+    return {
+      subscribe: (listener, onError) => {
+        let stopped = false;
+        store.samples(type).then(
+          (samples) => {
+            if (!stopped) listener(derive(samples));
+          },
+          (error: unknown) => {
+            if (!stopped) onError?.(error);
+          },
+        );
+        return () => {
+          stopped = true;
+        };
+      },
+    };
   }
 
   /**

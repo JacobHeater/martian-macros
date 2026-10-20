@@ -32,7 +32,7 @@ export function MmSegmented<T>({ name, segments, selected, onChange, compact = f
               else if (allowEmpty) onChange(undefined);
             }}
           >
-            {chosen && !compact ? <MmIcon name="check" size={16} /> : null}
+            {chosen ? <MmIcon name="check" size={16} /> : null}
             {!chosen && segment.icon !== undefined ? <MmIcon name={segment.icon} size={16} /> : null}
             {segment.label}
           </button>

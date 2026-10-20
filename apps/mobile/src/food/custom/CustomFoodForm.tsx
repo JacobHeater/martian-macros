@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { atwaterKcal } from '../../domain/atwaterKcal';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { Micronutrient } from '../../domain/food/micros/Micronutrient';
@@ -22,6 +22,8 @@ interface CustomFoodFormProps {
   food?: CustomFood | undefined;
   /** A barcode to save the food against, from a scan that found nothing. */
   initialBarcode?: string | undefined;
+  /** A database food copied to be corrected ("Fix this food", MM-153): the form starts from it and saves a new food. */
+  draft?: CustomFood | undefined;
   /** Called after saving or when the user backs out. */
   onDone: () => void;
 }
@@ -47,22 +49,24 @@ const optional = (value: number | undefined) => (value === undefined ? '' : oneD
  * numbers per serving (MM-45). Editing a saved food changes only the food,
  * never entries already logged from it.
  */
-export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormProps) {
+export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFoodFormProps) {
+  const start = food ?? draft;
+  const ids = useId();
   const { services } = useApp();
-  const [name, setName] = useState(food?.name ?? '');
-  const [serving, setServing] = useState(food?.servingDescription ?? '1 serving');
-  const [grams, setGrams] = useState(food?.servingGrams === undefined ? '' : quantityText(food.servingGrams));
-  const [kcal, setKcal] = useState(food === undefined ? '' : oneDecimal(food.perServing.kcal));
-  const [protein, setProtein] = useState(food === undefined ? '' : oneDecimal(food.perServing.proteinG));
-  const [carbs, setCarbs] = useState(food === undefined ? '' : oneDecimal(food.perServing.carbsG));
-  const [fat, setFat] = useState(food === undefined ? '' : oneDecimal(food.perServing.fatG));
-  const [barcode, setBarcode] = useState(food === undefined ? (initialBarcode ?? '') : (food.barcode ?? ''));
+  const [name, setName] = useState(start?.name ?? '');
+  const [serving, setServing] = useState(start?.servingDescription ?? '1 serving');
+  const [grams, setGrams] = useState(start?.servingGrams === undefined ? '' : quantityText(start.servingGrams));
+  const [kcal, setKcal] = useState(start === undefined ? '' : oneDecimal(start.perServing.kcal));
+  const [protein, setProtein] = useState(start === undefined ? '' : oneDecimal(start.perServing.proteinG));
+  const [carbs, setCarbs] = useState(start === undefined ? '' : oneDecimal(start.perServing.carbsG));
+  const [fat, setFat] = useState(start === undefined ? '' : oneDecimal(start.perServing.fatG));
+  const [barcode, setBarcode] = useState(start === undefined ? (initialBarcode ?? '') : (start.barcode ?? ''));
   const [extras, setExtras] = useState<Readonly<Record<Extra, string>>>(
     () =>
       Object.fromEntries(
         extraKeys.map((key) => [
           key,
-          optional(key === 'fiber' ? food?.fiberG : key === 'sugarAlcohols' ? food?.sugarAlcoholsG : food?.micros.of(key)),
+          optional(key === 'fiber' ? start?.fiberG : key === 'sugarAlcohols' ? start?.sugarAlcoholsG : start?.micros.of(key)),
         ]),
       ) as Record<Extra, string>,
   );
@@ -160,7 +164,13 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
   const whole = roundHalfAwayFromZero(fromMacros) + 0;
   return (
     <div className="food-sheet">
-      <h2 className="app-headline">{food === undefined ? 'Save your own food' : 'Edit your food'}</h2>
+      <h2 className="app-headline">{food !== undefined ? 'Edit your food' : draft !== undefined ? 'Fix this food' : 'Save your own food'}</h2>
+      {draft !== undefined && food === undefined ? (
+        <p className="app-caption">
+          Correct what differs from the package. Your copy is what you find from now on, and the food database is not
+          changed. Nothing is uploaded.
+        </p>
+      ) : null}
       {food === undefined ? (
         <>
           <MmButton
@@ -201,7 +211,7 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         onChange={setKcal}
         hint={fromMacros > 0 ? `${whole} from macros` : undefined}
         helper={
-          mismatch ? `Macros add up to ${whole} kcal. Double-check the label.` : 'Leave blank to calculate from macros.'
+          mismatch ? `Macros add up to ${whole} kcal; the ${kcal.trim()} typed is kept. Double-check the label.` : 'Leave blank to calculate from macros.'
         }
         helperIsWarning={mismatch}
       />
@@ -236,7 +246,19 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         helperIsWarning={!barcodeOk}
       />
       <div className="app-gap" />
-      <MmButton label="Save food" expand onPress={valid ? () => void save() : undefined} />
+      {valid ? null : (
+        // An action that is off says what is still needed (MM-220).
+        <p id={`${ids}-needed`} className="app-caption food-still-needed">
+          {`Still needed: ${[
+            ...(name.trim() === '' ? ['a name'] : []),
+            ...(serving.trim() === '' ? ['what one serving is'] : []),
+            ...(servingGrams === undefined ? ['its weight in grams'] : []),
+            ...(energy === undefined || energy <= 0 ? ['calories above zero (typed, or from the macros)'] : []),
+            ...(barcodeOk ? [] : ['a valid barcode, or none']),
+          ].join(', ')}.`}
+        </p>
+      )}
+      <MmButton label="Save food" expand onPress={valid ? () => void save() : undefined} describedBy={valid ? undefined : `${ids}-needed`} />
       <MmButton label="Cancel" kind="text" onPress={onDone} />
     </div>
   );

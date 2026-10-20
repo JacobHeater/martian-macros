@@ -1,6 +1,6 @@
 ---
 id: MM-173
-status: proposed
+status: done
 component: adaptive-coach
 related: [MM-27, MM-150, MM-23, MM-30, MM-149, MM-114]
 ---
@@ -25,7 +25,10 @@ what it should be, which slows a cut and looks to the user like a stall.
 Found while adding the simulated user MM-150 asked for. It was written up as "a finding" in that ticket and not filed as a bug. It is one.
 
 ## Decisions
-None made. This needs the product owner, because every fix trades against the protection MM-27 was built for. The options:
+**Option 2, taken 2026-10-19 under the owner's instruction to close the beta's tickets** (the ticket's own recommendation; the owner may
+overrule it, the rule being one function). The threshold widens with the window's own spread, read from its top alone, so a noisy but
+honest logger keeps their low days while a steady logger's half day is still caught. Both simulated users hold: the noisy one's bias is
+under 100 kcal, the partial logger's stays above -150 kcal. The options were:
 
 1. **Leave it, and rely on the user marking days complete.** A day marked complete is always used. This is the current behaviour; it
    helps only those who mark their days.
@@ -56,3 +59,13 @@ Scenario: The original protection holds
   It is written to the first scenario and **skipped**, naming this ticket, because it fails today (about 160 kcal). It is to be
   un-skipped by the change that fixes this. The 20% case beside it runs and passes.
 - The same rule now decides which days the adherence summary and the under-eating notice count, so the fix touches three things.
+
+## Fix (2026-10-19)
+`usableIntakeDays` keeps the fixed rule (65% of the 75th percentile) and lowers the threshold when the window's top is wide: the
+spread is read as a standard deviation from the 90th percentile against the 75th (0.607 sigma apart for a normal spread), the middle
+as the 75th less 0.674 sigma, and the threshold is the lower of the fixed one and the middle less 2.5 sigma, with at least seven
+candidate days. Half-logged days sit below the median, so a third of them move neither the 75th nor the 90th percentile, which is
+why the first attempt (the median against the 75th) regressed MM-27 to -161 kcal and this one does not. Regression test:
+`apps/mobile/test/engine/tdeeEstimator.test.ts`, "stays unbiased when a noisy logger has days 30% apart (MM-173)", now running
+beside "excludes unmarked partial days instead of reading them as fasting" (MM-27); the adherence summary and the under-eating notice
+share the rule and their tests pass.

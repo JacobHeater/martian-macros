@@ -9,6 +9,8 @@ interface ReadFailedNoticeProps {
   /** Said after the reassurance: what to do if trying again does not help. */
   otherwise?: string;
   onRetry: () => void;
+  /** Whether a retry is under way: the action is then inert and says so (MM-411). */
+  pending?: boolean;
 }
 
 /**
@@ -17,14 +19,14 @@ interface ReadFailedNoticeProps {
  * and a retry. Announced when it appears. Only for a read: a failed save
  * says what was not saved instead.
  */
-export function ReadFailedNotice({ title, consequence, otherwise, onRetry }: ReadFailedNoticeProps) {
+export function ReadFailedNotice({ title, consequence, otherwise, onRetry, pending = false }: ReadFailedNoticeProps) {
   const body = [consequence, 'Nothing you logged has been changed.', otherwise].filter((part) => part !== undefined);
   return (
     <div className="app-stack-item" role="alert">
       <Notice
         title={title}
         text={body.join(' ')}
-        action={<MmButton label="Try again" kind="secondary" onPress={onRetry} />}
+        action={<MmButton label={pending ? 'Trying…' : 'Try again'} kind="secondary" onPress={pending ? undefined : onRetry} />}
       />
     </div>
   );

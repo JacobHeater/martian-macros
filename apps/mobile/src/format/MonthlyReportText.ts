@@ -1,11 +1,12 @@
 import type { CalendarDate } from '../domain';
-import { calibrationDays, type MonthlyReport, ReportPeriod } from '../engine';
+import { calibrationDays, type MeasuredChange, type MonthlyReport, ReportPeriod } from '../engine';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { explanationLineText } from './explanationLineText';
 import { Fmt } from './Fmt';
+import { waistAmount } from './waistAmount';
 import { wholeDaysLogged } from './wholeDaysLogged';
 
-type Pairs = (readonly [label: string, value: string])[];
+type Pairs = (readonly [label: string, value: string, detail?: string])[];
 
 /**
  * The fixed words of the monthly report (MM-33). Facts and the reasons for
@@ -69,8 +70,7 @@ export class MonthlyReportText {
     const { report, fmt } = this;
     const trend = report.trendChangeKg;
     const intended = report.intendedChangeKg;
-    const from = report.waistFromCm;
-    const to = report.waistToCm;
+    const waist = report.waistChange;
     const lines: Pairs = [
       [
         'Trend weight',
@@ -79,14 +79,17 @@ export class MonthlyReportText {
           : `${fmt.weightDelta(trend)}${intended === undefined ? '' : `, against ${fmt.weightDelta(intended)} intended`}`,
       ],
     ];
-    if (from !== undefined && to !== undefined) {
-      lines.push([
-        'Waist',
-        `${fmt.length(from)} to ${fmt.length(to)} ` +
-          `(${to - from < 0 ? '−' : '+'}` +
-          `${toStringAsFixed(fmt.lengthFromCm(Math.abs(to - from)), 1)} ` +
-          `${fmt.lengthUnit})`,
-      ]);
+    // The waist by the one rule every feature uses (MM-155): the value a figure or three words, what it rests on as the
+    // row's detail (the panel's PD-12); no clear change is a result, said with the threshold.
+    if (waist !== undefined) {
+      const ends = `${waistAmount(waist.fromCm, fmt)} to ${waistAmount(waist.toCm, fmt)}`;
+      const said: Readonly<Record<MeasuredChange, readonly [value: string, detail: string]>> = {
+        down: [`Down ${waistAmount(waist.changeCm, fmt)}`, ends],
+        up: [`Up ${waistAmount(waist.changeCm, fmt)}`, ends],
+        noClearChange: ['No clear change', `${ends}; a difference under ${waistAmount(waist.thresholdCm, fmt)} is within what a tape can tell`],
+      };
+      const [value, detail] = said[waist.direction];
+      lines.push(['Waist', value, detail]);
     }
     return lines;
   }

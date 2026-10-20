@@ -1,4 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
+import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { InsightSwitches } from '../domain/InsightSwitches';
@@ -23,6 +25,12 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly terms = new ObservableValue<TermsAcceptance | undefined>(undefined);
   private readonly goals = new ObservableValue(NutritionGoals.none);
   private readonly switches = new ObservableValue(InsightSwitches.allOn);
+  private readonly lastBackup = new ObservableValue<CalendarDate | undefined>(undefined);
+  private readonly exactTargets = new ObservableValue(false);
+  private readonly onlineLookup = new ObservableValue<OnlineLookupChoice>('ask');
+  private readonly labelNoteDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
+  private readonly easeIntoMaintenance = new ObservableValue(false);
+  private readonly usualCookingFat = new ObservableValue<CookingFatKind>('oil');
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -127,8 +135,53 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.switches.value = switches;
   }
 
+  watchOnlineLookup(): Watched<OnlineLookupChoice> {
+    return this.onlineLookup.watch();
+  }
+
+  async saveOnlineLookup(choice: OnlineLookupChoice): Promise<void> {
+    this.onlineLookup.value = choice;
+  }
+
+  watchExactTargets(): Watched<boolean> {
+    return this.exactTargets.watch();
+  }
+
+  async saveExactTargets(on: boolean): Promise<void> {
+    this.exactTargets.value = on;
+  }
+
+  watchLabelNoteDismissedOn(): Watched<CalendarDate | undefined> {
+    return this.labelNoteDismissed.watch();
+  }
+
+  async saveLabelNoteDismissedOn(day: CalendarDate): Promise<void> {
+    this.labelNoteDismissed.value = day;
+  }
+
+  watchEaseIntoMaintenance(): Watched<boolean> {
+    return this.easeIntoMaintenance.watch();
+  }
+
+  async saveEaseIntoMaintenance(on: boolean): Promise<void> {
+    this.easeIntoMaintenance.value = on;
+  }
+
+  watchUsualCookingFat(): Watched<CookingFatKind> {
+    return this.usualCookingFat.watch();
+  }
+
+  async saveUsualCookingFat(kind: CookingFatKind): Promise<void> {
+    this.usualCookingFat.value = kind;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
+    this.usualCookingFat.value = 'oil';
+    this.exactTargets.value = false;
+    this.onlineLookup.value = 'ask';
+    this.labelNoteDismissed.value = undefined;
+    this.easeIntoMaintenance.value = false;
     this.theme.value = 'unselected';
     this.easyToMiss.value = new EasyToMissPreference();
     this.detail.value = 'standard';
@@ -139,5 +192,13 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.terms.value = undefined;
     this.goals.value = NutritionGoals.none;
     this.switches.value = InsightSwitches.allOn;
+  }
+
+  watchLastBackupOn(): Watched<CalendarDate | undefined> {
+    return this.lastBackup.watch();
+  }
+
+  async saveLastBackupOn(day: CalendarDate): Promise<void> {
+    this.lastBackup.value = day;
   }
 }

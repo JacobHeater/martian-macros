@@ -21,12 +21,18 @@ interface MmTextFieldProps {
   error?: string | undefined;
   /** A unit shown after the value. */
   suffix?: string | undefined;
+  /** For a passphrase: whether it is being chosen or recalled, so a password manager offers the right thing (MM-63). */
+  secret?: 'new' | 'existing';
+  /** For a passphrase: shown as typed, on the person's request (NIST SP 800-63B: offer to display the secret). */
+  revealed?: boolean;
   kind?: MmTextFieldKind;
   dense?: boolean;
   /** The id of words outside the field that also describe it (a hint drawn across a row, MM-295). */
   describedBy?: string | undefined;
   /** The keyboard's action key does this ("Done"), when the value can be acted on (MM-296). */
   onSubmit?: (() => void) | undefined;
+  /** Takes focus when it appears: for a field that is the next useful thing after a control went away (MM-413). */
+  autoFocus?: boolean;
 }
 
 /** The app's text input. */
@@ -40,10 +46,13 @@ export function MmTextField({
   helperIsWarning = false,
   error,
   suffix,
+  secret = 'new',
+  revealed = false,
   kind = 'text',
   dense = false,
   describedBy: describedByOutside,
   onSubmit,
+  autoFocus = false,
 }: MmTextFieldProps) {
   const id = useId();
   const helperId = `${id}-helper`;
@@ -69,10 +78,11 @@ export function MmTextField({
         <input
           id={id}
           className="mm-field-input"
-          type="text"
+          autoFocus={autoFocus}
+          type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
           inputMode={kind === 'number' ? 'decimal' : 'text'}
           autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
-          autoComplete="off"
+          autoComplete={kind === 'passphrase' ? (secret === 'existing' ? 'current-password' : 'new-password') : 'off'}
           aria-label={spoken}
           aria-invalid={error === undefined ? undefined : true}
           aria-describedby={describedBy === '' ? undefined : describedBy}

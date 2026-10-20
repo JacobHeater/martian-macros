@@ -25,5 +25,8 @@ export function portionValues(portion: Portion | undefined): Values {
     origin_food_id: orNull(portion?.origin?.foodId),
     origin_source: orNull(portion?.origin?.source),
     origin_source_id: orNull(portion?.origin?.sourceId),
+    preparation: orNull(portion?.preparation),
+    conversion_kind: orNull(portion?.conversion?.kind),
+    conversion_factor: orNull(portion?.conversion?.gramsPerUnit),
   };
 }

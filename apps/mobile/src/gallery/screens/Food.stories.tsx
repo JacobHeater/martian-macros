@@ -1,17 +1,23 @@
 import type { Meta } from '@storybook/react-vite';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
+import { Micronutrients } from '../../domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
+import { FixturePack } from '../../foodCatalog/FixturePack';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
-import type { UnitSystem } from '../../domain/UnitSystem';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import { onTargetScenario } from './onTargetScenario';
+import { onlineFoods } from './onlineFoods';
+import { storyPackHost } from './storyPackHost';
+import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
+import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
@@ -46,10 +52,34 @@ export const Food = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
 });
 
+/** MM-91: Food on a 360 px phone: the hero's macro rows, the meals' headers with their actions, an entry's method, grade and More inside the width. */
+export const FoodSmallPhone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  open: ({ state }) => state.homeTab.put('food'),
+  viewport: 'smallPhone',
+});
+
+/** MM-91: Food at 200% text: the day's heading and stepper, the meal headers and entries wrap, the floating action stays reachable. */
+export const FoodLargeText = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  open: ({ state }) => state.homeTab.put('food'),
+  textScale: 2,
+});
+
 export const NothingLogged = screenStory({
   covers: ['FoodScreen'],
   shows: 'Add food',
   scenario: firstDayScenario,
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-123: a day inside the band, the larger of 5% and 100 kcal either side: the arc shows the zone and the caption says on target. */
+export const FoodOnTarget = screenStory({
+  covers: ['FoodScreen'],
+  shows: /kcal left of 2,[0-9]{3} · on target/,
+  scenario: onTargetScenario,
   open: ({ state }) => state.homeTab.put('food'),
 });
 
@@ -287,11 +317,16 @@ export const WaterNone = screenStory({
   },
 });
 
-/** MM-313, MM-318: a goal of 1.5 L in metric, and a day past it. */
+/** MM-313, MM-318: a day past the goal suggested for the demo person (MM-357): a bottle more than the demo's day. */
 export const WaterGoalReached = screenStory({
   covers: ['FoodScreen'],
   shows: /Goal reached/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
+  scenario: demoWith({
+    then: async (repos, today) => {
+      const yesterday = today.addDays(-1);
+      await repos.water.addWater(new WaterEntry({ id: 0, date: yesterday, ml: 1500, at: new Date(yesterday.year, yesterday.month - 1, yesterday.day, 21) }));
+    },
+  }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/Goal reached/));
@@ -308,11 +343,12 @@ export const WaterAddSheet = screenStory({
   walk: addWater,
 });
 
-/** MM-318: the sheet in metric with another amount typed. */
+/** MM-318: the sheet in metric with another amount typed; the one water story about units (MM-357). */
 export const WaterOtherAmount = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'Up to 3,000 ml at a time.',
   scenario: demoWith({ units: 'metric' }),
+  about: ['units'],
   open: yesterdaysFood,
   walk: async (canvas) => {
     await addWater(canvas);
@@ -334,12 +370,11 @@ export const WaterOtherOpen = screenStory({
 export const WaterOtherRefused = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'That is more than one drink can be.',
-  scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     await addWater(canvas);
     const body = canvas.ownerDocument.body;
-    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '5000');
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, fluid ounces' }), '170');
     await userEvent.click(within(body).getByRole('button', { name: 'Save water' }));
   },
 });
@@ -356,29 +391,24 @@ export const WaterRemoved = screenStory({
   },
 });
 
-/** MM-318 (the panel's PD-2): a goal of 2 L and nothing yet: the header says the goal alone. */
+/** MM-318 (the panel's PD-2): the first day, the goal suggested and nothing yet: the header says the goal alone. */
 export const WaterGoalSetNone = screenStory({
   covers: ['FoodScreen'],
-  shows: /Goal 2 L/,
-  scenario: async (repos, today) => {
-    await firstDayScenario(repos, today);
-    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'metric' }));
-    await repos.preferences.saveWaterGoal(2000);
-  },
+  shows: /^Goal \d+ fl oz/,
+  scenario: firstDayScenario,
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/Goal 2 L/));
+    reveal(await within(canvas).findByText(/^Goal \d+ fl oz/));
   },
 });
 
-/** MM-318 (the panel's PD-2): a goal of 2.5 L and part of it drunk. */
+/** MM-318 (the panel's PD-2): the demo person's goal and part of it drunk. */
 export const WaterGoalPartway = screenStory({
   covers: ['FoodScreen'],
-  shows: /of 2.5 L/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
+  shows: /fl oz of \d+ fl oz/,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/of 2.5 L/));
+    reveal(await within(canvas).findByText(/fl oz of \d+ fl oz/));
   },
 });
 
@@ -386,7 +416,6 @@ export const WaterGoalPartway = screenStory({
 export const WaterEdit = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'Edit water',
-  scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     const [drink] = await within(canvas).findAllByRole('button', { name: /^Edit .* of water/ });
@@ -398,15 +427,14 @@ export const WaterEdit = screenStory({
 });
 
 /**
- * MM-326: the first day in `units` with a water goal of `goalMl` and these
- * drinks today, an hour apart from 7 AM, on the Food screen.
+ * MM-326: the first day with the goal suggested for the person (96 fl oz,
+ * 12 glasses, from the day's own targets; MM-357) and these drinks today,
+ * an hour apart from 7 AM, on the Food screen.
  */
 const waterToday =
-  (units: UnitSystem, goalMl: number, drinksMl: readonly number[]): StoryScenario =>
+  (drinksMl: readonly number[]): StoryScenario =>
   async (repos, today) => {
     await firstDayScenario(repos, today);
-    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: units }));
-    await repos.preferences.saveWaterGoal(goalMl);
     for (const [i, ml] of drinksMl.entries()) {
       const at = new Date(today.year, today.month - 1, today.day, 7 + i);
       await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at }));
@@ -415,38 +443,38 @@ const waterToday =
 
 const eightFlOz = WaterUnits.flOzToMl(8);
 
-/** MM-326: a gallon's goal and three glasses: the water poured a little way into its bar. */
+/** MM-326: three glasses of the twelve suggested: the water poured a little way into its bar. */
 export const WaterBar = screenStory({
   covers: ['FoodScreen'],
-  shows: /3 of 16 glasses/,
-  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  shows: /3 of 12 glasses/,
+  scenario: waterToday([eightFlOz, eightFlOz, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+    reveal(await within(canvas).findByText(/3 of 12 glasses/));
   },
 });
 
 /** MM-326: the section folded: the drinks hide and the bar stays. */
 export const WaterBarFolded = screenStory({
   covers: ['FoodScreen'],
-  shows: /3 of 16 glasses/,
-  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  shows: /3 of 12 glasses/,
+  scenario: waterToday([eightFlOz, eightFlOz, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
     const header = await within(canvas).findByRole('button', { name: /^Water/, expanded: true });
     await userEvent.click(header);
-    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+    reveal(await within(canvas).findByText(/3 of 12 glasses/));
   },
 });
 
-/** MM-326: most of a 2.5 L goal, a past day, beside the meals. */
+/** MM-326: most of the suggested goal, beside the meals. */
 export const WaterBarNearlyThere = screenStory({
   covers: ['FoodScreen'],
-  shows: /9 of 10 glasses/,
-  scenario: waterToday('metric', 2500, [500, 500, 500, 500, 250]),
+  shows: /11 of 12 glasses/,
+  scenario: waterToday([eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/9 of 10 glasses/));
+    reveal(await within(canvas).findByText(/11 of 12 glasses/));
   },
 });
 
@@ -470,7 +498,7 @@ export const AddFoodEstimatedTotals = screenStory({
   covers: ['AddFoodSheet'],
   shows: 'Calories',
   open: addFood,
-  walk: manuallyAs('Estimate'),
+  walk: manuallyAs('Estimated totals'),
 });
 
 /** The demo with one food and one recipe of the person's own (MM-45). */
@@ -532,6 +560,107 @@ export const AddFoodMoreResultsShown = screenStory({
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
     await userEvent.click(await within(canvas).findByRole('button', { name: 'More results' }, { timeout: 10000 }));
     await waitFor(() => expect(within(canvas).queryByRole('button', { name: 'More results' })).toBeNull(), { timeout: 10000 });
+  },
+});
+
+/** MM-411: the food database could not be read; the search says so, with a way to try again, never "Nothing found". */
+export const AddFoodSearchFailed = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Could not read the food database',
+  device: async (services) => {
+    const failing = Object.create(await valueOf(services.catalog)) as FoodCatalog;
+    Object.defineProperty(failing, 'search', { value: () => Promise.reject(new Error('disk I/O error')) });
+    return { ...services, catalog: constant(failing) };
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'oats');
+  },
+});
+
+/** MM-218: the typed form with its numbers in, two servings, and calories typed against the macros: what it logs, and which figure is kept. */
+export const AddFoodManuallyTwoServings = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Logs 800 kcal/,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Enter manually' }, { timeout: 10000 }));
+    const sheet = within(canvas);
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Food name' }), 'Granola');
+    const servings = sheet.getByRole('textbox', { name: 'Servings eaten' });
+    await userEvent.clear(servings);
+    await userEvent.type(servings, '2');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Protein g' }), '20');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Carbs g' }), '30');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Fat g' }), '10');
+    await userEvent.type(sheet.getByRole('textbox', { name: /^Calories/ }), '400');
+  },
+});
+
+/** MM-221: an entry calculated from a label serving: the numbers it rests on, and the day control that moves it. */
+export const EditFoodPerServing = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Per serving: /,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'snack',
+        name: 'Protein bar',
+        kcal: 398,
+        proteinG: 40,
+        carbsG: 30,
+        fatG: 12,
+        source: 'labelServing',
+        portion: {
+          method: 'labelServing',
+          basis: 'calculated',
+          quantity: 2,
+          unit: 'serving',
+          reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 199, proteinG: 20, carbsG: 15, fatG: 6 }), servingUnit: 'serving' },
+        },
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Protein bar' }, { timeout: 10000 }));
+  },
+});
+
+/** MM-221: the entry moved to yesterday: the snack says where it went. */
+export const EditFoodMoved = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Moved to Yesterday.',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'snack', name: 'Protein bar', kcal: 398, proteinG: 40, carbsG: 30, fatG: 12, source: 'labelServing' }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Protein bar' }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit food' }, { timeout: 10000 });
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Previous day' }));
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Save changes' }));
+  },
+});
+
+/** MM-218: a hand portion of a found food logs an estimate, and the line says so. */
+export const AddFoodAmountHand = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Logs an estimate: /,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken');
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Chicken breast, cooked/ }, { timeout: 10000 }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Palm/ }, { timeout: 10000 }));
+    const amount = await within(canvas).findByRole('textbox', { name: /^(How many|Amount)/ });
+    await userEvent.clear(amount);
+    await userEvent.type(amount, '2');
   },
 });
 
@@ -607,12 +736,13 @@ export const DayCompleteness = screenStory({
   },
 });
 
-/** MM-321: a glass of wine today: the alcohol's energy said on its own line. */
+/** MM-321, MM-336: a glass of wine today at Full detail: the alcohol's energy and the fiber as rows of the hero. */
 export const FoodWithAlcohol = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Alcohol: /,
+  shows: 'Alcohol',
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
+    await repos.preferences.saveDetailLevel('full');
     await repos.food.addFood(
       new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Red wine', kcal: 125, proteinG: 0, carbsG: 4, fatG: 0, source: 'weighed', alcoholG: 15.6 }),
     );
@@ -738,7 +868,7 @@ export const AddFoodAmountCheckThis = screenStory({
 /** MM-321: an entry kept from before amounts were recorded, opened to change: it asks how it was measured. */
 export const EditFoodWithoutAmount = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'This entry was logged without an amount. Choose how it was measured to add one.',
+  shows: 'This entry was logged without an amount. To add one, choose how it was measured.',
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
     await repos.food.addFood(
@@ -783,4 +913,358 @@ export const AddFoodWithAlcohol = screenStory({
     await press('Enter manually')(canvas);
     await press('Includes alcohol?')(canvas);
   },
+});
+
+/** MM-58: the first unknown code on a phone that can ask online: the question, saying only the barcode number is sent and to whom. */
+const typeUnknownCode = async (canvas: HTMLElement) => {
+  await press('Scan')(canvas);
+  await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Or type the digits' }), '4006381333931');
+  await press('Look up')(canvas);
+};
+
+export const ScanAsksOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: 'Just for now',
+  device: onlineFoods(),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+/** MM-58: allowed once, the product a service knows comes to its amount step, marked as found online. */
+export const ScanFoundOnline = screenStory({
+  covers: ['BarcodeScanStep', 'FoodAmountStep'],
+  shows: /Found online/,
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeUnknownCode(canvas);
+    await press('Just for now')(canvas);
+  },
+});
+
+/** MM-58: never: no request, and the label is offered as before. */
+export const ScanNeverOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: 'Read the label',
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeUnknownCode(canvas);
+    await press('Never')(canvas);
+  },
+});
+
+/** MM-58: always allowed, and no service knows the code either. */
+export const ScanNotFoundOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: /not in the food database on this phone or online/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ entries: [] }),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+/** MM-58: always allowed, with no connection: said, and the label offered. */
+export const ScanOnlineUnavailable = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: /could not be reached/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ down: true }),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+const typeSearch = (words: string) => async (canvas: HTMLElement) => {
+  await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), words);
+};
+
+/** MM-58: searching never asks online by itself: the action under the phone's results. */
+export const SearchOnlineOffered = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Search online',
+  device: onlineFoods(),
+  open: addFood,
+  walk: typeSearch('peanut noodle'),
+});
+
+/** MM-58: the first online search asks, saying only the words typed are sent. */
+export const SearchOnlineAsks = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /Only the words you typed are sent/,
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('peanut noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: what a service found, listed under the phone's results with where each came from. */
+export const SearchOnlineFound = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Found online',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('peanut noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: what a service found, beside the phone's own results, on a phone with a pack installed (the panel's F16). */
+export const SearchOnlineBesidePack = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Found online',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: async (services) => onlineFoods()(await storyPackHost({ installed: '2026-10-09' })(services)),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: a service that found nothing says so. */
+export const SearchOnlineNothing = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /Nothing found online for/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ entries: [] }),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('quinoa')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: no connection when searching online: said, with a way to try again. */
+export const SearchOnlineUnavailable = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Try again',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ down: true }),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('quinoa')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+// ---- WS-08 M2 close (MM-167, MM-151, MM-152, MM-49, MM-150): the amount step and the form, every new state ----
+
+/** The demo with 200 g of raw rice weighed yesterday from the pack, so the switch remembers raw (MM-151). */
+const withRawRiceWeighed: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'dinner',
+      name: 'White rice, raw',
+      kcal: 730,
+      proteinG: 14,
+      carbsG: 160,
+      fatG: 1.4,
+      source: 'weighed',
+      portion: {
+        method: 'weighed',
+        basis: 'calculated',
+        quantity: 200,
+        unit: 'gram',
+        reference: { basis: 'per100g', nutrition: new NutritionTotals({ kcal: 365, proteinG: 7, carbsG: 80, fatG: 0.7 }) },
+        origin: { packId: FixturePack.packId, foodId: 3, source: 'fixture' },
+        preparation: 'raw',
+      },
+    }),
+  );
+};
+
+/** MM-152: a cooked food with a teaspoon of fat chosen: which fat, the usual one first, and the Logs line naming the second entry. */
+export const AddFoodAmountCookedWithOil = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Which fat',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, cooked' }),
+  walk: async (canvas) => {
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: '1 tsp' }));
+  },
+});
+
+/** MM-151: white rice opened again after it was last weighed raw: the switch starts on Raw, by weight, from the whole log. */
+export const AddFoodAmountRememberedRaw = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^Logs 365 kcal/,
+  scenario: withRawRiceWeighed,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, cooked' }),
+  walk: press(/^White rice, cooked/),
+});
+
+/** MM-167, MM-151: the row of a food weighed raw says so: "200 g raw · calculated from 365 kcal per 100 g". */
+export const FoodWeighedRaw = screenStory({
+  covers: ['FoodScreen'],
+  shows: /200 g raw · calculated from 365 kcal per 100 g/,
+  scenario: withRawRiceWeighed,
+  open: ({ state, today }) => {
+    state.homeTab.put('food');
+    state.selectedDay.put(today.addDays(-1));
+  },
+});
+
+/** MM-151, MM-167: a packaged food's row says "as packaged" after its serving (the panel's PD-3). */
+export const FoodAsPackaged = screenStory({
+  covers: ['FoodScreen'],
+  shows: /1 × 1 bar \(60 g\), as packaged · calculated from 380 kcal per 100 g/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'snack',
+        name: 'Protein bar, chocolate (Test Brand)',
+        kcal: 228,
+        proteinG: 19.8,
+        carbsG: 21,
+        fatG: 7.2,
+        source: 'labelServing',
+        portion: {
+          method: 'labelServing',
+          basis: 'calculated',
+          quantity: 1,
+          unit: 'serving',
+          reference: {
+            basis: 'per100g',
+            nutrition: new NutritionTotals({ kcal: 380, proteinG: 33, carbsG: 35, fatG: 12 }),
+            servingDescription: '1 bar',
+            servingGrams: 60,
+            servingUnit: 'serving',
+          },
+          origin: { packId: FixturePack.packId, foodId: 24, source: 'fixture' },
+          preparation: 'packaged',
+          conversion: { kind: 'servingWeight', gramsPerUnit: 60 },
+        },
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-49: Simple detail on the amount step: calories and protein, no split; the whole food is logged. */
+export const AddFoodAmountSimple = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^Logs \d+ kcal · \d+ g protein$/,
+  scenario: demoWith({ detail: 'simple' }),
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' }),
+  walk: press(/^Chicken breast, cooked/),
+});
+
+/** MM-49: Simple detail on the typed form: calories and protein only. */
+export const AddFoodManuallySimple = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Protein g',
+  scenario: demoWith({ detail: 'simple' }),
+  open: addFood,
+  walk: press('Enter manually'),
+});
+
+/** MM-49: Full detail on the typed form: the label's other lines, two to a line as a saved food's are. */
+export const AddFoodManuallyFull = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'More from the label (optional)',
+  scenario: demoWith({ detail: 'full' }),
+  open: addFood,
+  walk: press('Enter manually'),
+});
+
+/** MM-49: at Full detail a row shows the sugars and saturated fat its source stated (format 3 packs carry them). */
+export const FoodFullLabelLines = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Sugars 15 g · Saturated fat 3 g/,
+  scenario: demoWith({
+    detail: 'full',
+    then: async (repos, today) => {
+      await repos.food.addFood(
+        new FoodEntry({
+          id: 0,
+          date: today,
+          meal: 'snack',
+          name: 'Greek yogurt, vanilla',
+          kcal: 150,
+          proteinG: 12,
+          carbsG: 17,
+          fatG: 4,
+          source: 'labelServing',
+          fiberG: 0,
+          sodiumMg: 60,
+          micros: new Micronutrients({ sugars: 15, saturatedFat: 3 }),
+        }),
+      );
+    },
+  }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-150: an estimated meal found again among recent foods keeps its mark. */
+export const AddFoodRecentEstimate = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Your recent food · estimated · 900 kcal',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today.addDays(-2),
+        meal: 'dinner',
+        name: 'Thai place, usual',
+        kcal: 900,
+        proteinG: 45,
+        carbsG: 112,
+        fatG: 30,
+        source: 'quickAdd',
+        portion: { method: 'quickAdd', basis: 'enteredTotals' },
+      }),
+    );
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'thai');
+  },
+});
+
+/** MM-153: "Fix this food" on a database food: the person's own copy, prefilled at its first serving, to correct and keep. */
+export const FixThisFood = screenStory({
+  covers: ['AddFoodSheet', 'FoodAmountStep', 'MyFoodsStep'],
+  shows: /Your copy is what you find from now on/,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'protein bar' }),
+  walk: async (canvas) => {
+    await press(/^Protein bar, chocolate/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Fix this food' }, { timeout: 10000 }));
+  },
+});
+
+/** MM-417 follow-up: nothing logged today, a day logged yesterday: Food offers to copy it. */
+export const FoodCopyYesterday = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy yesterday',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
+    await repos.weights.saveWeight(today, 82);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'breakfast', name: 'Oatmeal', kcal: 300, proteinG: 10, carbsG: 54, fatG: 6, source: 'weighed' }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
 });

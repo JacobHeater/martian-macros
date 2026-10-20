@@ -4,6 +4,7 @@ import type { ReportEstimateGap } from './ReportEstimateGap';
 import type { ReportLift } from './ReportLift';
 import type { ReportPeriod } from './ReportPeriod';
 import type { ReportTargetChange } from './ReportTargetChange';
+import type { WaistChange } from './WaistChange';
 
 interface MonthlyReportInit {
   period: ReportPeriod;
@@ -15,8 +16,7 @@ interface MonthlyReportInit {
   intendedChangeKg?: number | undefined;
   averageProteinG?: number | undefined;
   averageProteinTargetG?: number | undefined;
-  waistFromCm?: number | undefined;
-  waistToCm?: number | undefined;
+  waistChange?: WaistChange | undefined;
   estimate?: ReportEstimate | undefined;
   estimateGap?: ReportEstimateGap | undefined;
   workouts?: number;
@@ -55,9 +55,12 @@ export class MonthlyReport {
   readonly averageProteinG: number | undefined;
   readonly averageProteinTargetG: number | undefined;
 
-  /** First and last waist measurement of the month; undefined with fewer than two. */
-  readonly waistFromCm: number | undefined;
-  readonly waistToCm: number | undefined;
+  /**
+   * Whether the waist changed over the month, by the one rule every feature
+   * uses (MM-155): smoothed ends, judged against the tape's noise. Undefined
+   * without a measurement at both ends.
+   */
+  readonly waistChange: WaistChange | undefined;
 
   /**
    * The expenditure estimate the month ended on, or undefined with
@@ -94,8 +97,7 @@ export class MonthlyReport {
     this.intendedChangeKg = init.intendedChangeKg;
     this.averageProteinG = init.averageProteinG;
     this.averageProteinTargetG = init.averageProteinTargetG;
-    this.waistFromCm = init.waistFromCm;
-    this.waistToCm = init.waistToCm;
+    this.waistChange = init.waistChange;
     this.estimate = init.estimate;
     this.estimateGap = init.estimateGap;
     this.workouts = init.workouts ?? 0;

@@ -1,6 +1,6 @@
 ---
 id: MM-136
-status: in-progress
+status: done
 component: weight-trend
 related: [MM-15, MM-17, MM-18, MM-19, MM-20, MM-23, MM-30, MM-61, MM-131, MM-139, MM-142, MM-148]
 ---
@@ -124,3 +124,11 @@ Scenario: Reporting a later creatine change
   rise also moves the trend less when declared than when unmarked.
 - Validation currently covers deterministic scenarios, not population-level event calibration. MM-139's synthetic population checks
   for confidence/next-step boundaries remain separate.
+
+## Progress (2026-10-20, feat/m2)
+Closed: every acceptance scenario is held by a ported test in the TypeScript app: the declared creatine step and its
+undeclared control, the travel rise, the retrospective event and the settling (`weightEventSimulation.test.ts`); the
+two-per-fortnight limit, the noise windows and the onboarding creatine deduplicated against an explicit event
+(`weightEventEffects.test.ts`); the paused reductions (`weightEventTargets.test.ts`); the Progress rows, the empty section
+and the entry sheet (`weightEvents.test.tsx`); the chart's dashed marks (`TrendChart`); the onboarding creatine date
+(`onboardingCreatine`). The stall (MM-140) and the weight-jump explanation (MM-142) read the same events.

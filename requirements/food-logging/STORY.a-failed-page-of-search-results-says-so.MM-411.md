@@ -1,6 +1,6 @@
 ---
 id: MM-411
-status: proposed
+status: done
 component: food-logging
 related: [MM-410, MM-42, MM-334]
 ---
@@ -37,3 +37,9 @@ Scenario: The first page fails
 `useAsync` would need to give the failure back (today it swallows it), or the
 search would take its own read state. A rare path on local SQLite, which is
 why it is proposed rather than built with MM-410.
+
+## Build (2026-10-19)
+The search's read catches a failure and shows `ReadFailedNotice` ("Could not read the food database. Search results are not shown until it can.") with Try again, which asks once more; never "Nothing found". The first page and the next pages share the path. Story `AddFoodSearchFailed`; regression test `apps/mobile/test/food/addFoodSays.test.tsx` (MM-411).
+
+## After the panel (2026-10-19)
+A repeat failure is announced again (the notice remounts per attempt) and Try again is inert as "Trying…" while it tries (F6); the test covers two failures then success.

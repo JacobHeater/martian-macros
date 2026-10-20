@@ -1,6 +1,6 @@
 ---
 id: MM-55
-status: in-progress
+status: done
 component: food-database
 related: [MM-50, MM-42, MM-43, MM-46, MM-49, MM-52, MM-56]
 ---
@@ -66,3 +66,12 @@ Scenario: A newer format
 ## Progress (second increment)
 - The format gained `source_id` (the food's id in its source), so a pack entry can be traced back; the format is not yet released, so the version stays 1. The pipeline (MM-52) now writes real packs in this format: a 140 MB barcode pack and a 2.5 MB generic pack, both readable by `SqliteFoodPack`.
 
+
+## Progress (2026-10-20, feat/m2)
+Closing the ticket. The format is at version 3 (`FoodPackFormat`, MM-307, MM-397), written by the pipeline (MM-52) and read
+by `SqliteFoodPack`; the published packs (2026-10-19) are read on the phone; the app logs from packs (WS-08), so "the log
+outlives the pack" is exercised by the food flows' tests (an entry copies its nutrients); several packs rank as one by the
+reliability score, not by each pack's own relevance (MM-383); and since MM-58 a pack need not be a file: the foods found
+online answer through the same `FoodPack` interface. What stays as recorded: the fixture pack is test data, and the timings
+on a mid-range phone with a million products are unmeasured (the packs hold about 534,000 foods; the laptop figures are in
+MM-51). Those are acceptance-pass measurements for the owner, not code.

@@ -14,11 +14,15 @@ const allowed: Record<string, readonly string[]> = {
   sql: ['lang'],
   foodCatalog: ['lang', 'sql'],
   foodPipeline: ['lang', 'domain', 'foodCatalog', 'sql'],
+  // Foods looked up online (MM-58): the services behind the domain's JSON seam, mapped with the pipeline's own rules.
+  foodOnline: ['lang', 'domain', 'foodCatalog', 'foodPipeline'],
   fixtures: ['lang', 'domain', 'engine', 'healthIngest'],
   data: ['lang', 'domain', 'engine', 'healthIngest', 'sql'],
   format: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog'],
   platform: ['lang', 'domain', 'healthIngest'],
-  state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'platform'],
+  // The backup's format, cipher and the phone's part of it (MM-63): over the database connection and the plugin's API.
+  backup: ['lang', 'domain', 'sql', 'platform'],
+  state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'foodOnline', 'platform', 'backup'],
 };
 
 /**

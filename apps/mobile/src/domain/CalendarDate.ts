@@ -72,6 +72,18 @@ export class CalendarDate {
     return this.utc.getUTCDate();
   }
 
+  /** The day of the week, Sunday as 0 through Saturday as 6. */
+  get weekday(): number {
+    // 1970-01-01 was a Thursday.
+    return (((this.epochDay % 7) + 7) % 7 + 4) % 7;
+  }
+
+  /** Saturday or Sunday. */
+  get isWeekend(): boolean {
+    const weekday = this.weekday;
+    return weekday === 0 || weekday === 6;
+  }
+
   addDays(days: number): CalendarDate {
     return CalendarDate.fromEpochDay(this.epochDay + days);
   }

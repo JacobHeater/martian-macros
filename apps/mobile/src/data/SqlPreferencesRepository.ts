@@ -1,4 +1,6 @@
+import { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
 import type { CalendarDate } from '../domain/CalendarDate';
+import { CookingFatKind } from '../domain/food/CookingFatKind';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { InsightArea } from '../domain/InsightArea';
@@ -72,6 +74,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
     return this.save({ detail_level: level });
   }
 
+  watchUsualCookingFat(): Watched<CookingFatKind> {
+    return this.watch((row) => (row === undefined ? 'oil' : named(CookingFatKind.values, row, 'usual_cooking_fat')));
+  }
+
+  saveUsualCookingFat(kind: CookingFatKind): Promise<void> {
+    return this.save({ usual_cooking_fat: kind });
+  }
+
   watchMacroPicture(): Watched<MacroPicture> {
     return this.watch((row) => (row === undefined ? 'bars' : named(MacroPicture.values, row, 'macro_picture')));
   }
@@ -112,6 +122,46 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveRecoveryCheckInSkippedOn(day: CalendarDate): Promise<void> {
     return this.save({ recovery_check_in_skipped_epoch_day: day.epochDay });
+  }
+
+  watchLastBackupOn(): Watched<CalendarDate | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalDay(row, 'last_backup_epoch_day')));
+  }
+
+  saveLastBackupOn(day: CalendarDate): Promise<void> {
+    return this.save({ last_backup_epoch_day: day.epochDay });
+  }
+
+  watchExactTargets(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? false : flag(row, 'exact_targets')));
+  }
+
+  saveExactTargets(on: boolean): Promise<void> {
+    return this.save({ exact_targets: asFlag(on) });
+  }
+
+  watchLabelNoteDismissedOn(): Watched<CalendarDate | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalDay(row, 'label_note_dismissed_epoch_day')));
+  }
+
+  saveLabelNoteDismissedOn(day: CalendarDate): Promise<void> {
+    return this.save({ label_note_dismissed_epoch_day: day.epochDay });
+  }
+
+  watchOnlineLookup(): Watched<OnlineLookupChoice> {
+    return this.watch((row) => (row === undefined ? 'ask' : OnlineLookupChoice.of(String(row['online_lookup'] ?? 'ask'))));
+  }
+
+  saveOnlineLookup(choice: OnlineLookupChoice): Promise<void> {
+    return this.save({ online_lookup: choice });
+  }
+
+  watchEaseIntoMaintenance(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? false : flag(row, 'ease_into_maintenance')));
+  }
+
+  saveEaseIntoMaintenance(on: boolean): Promise<void> {
+    return this.save({ ease_into_maintenance: asFlag(on) });
   }
 
   watchNutritionGoals(): Watched<NutritionGoals> {

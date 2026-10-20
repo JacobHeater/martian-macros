@@ -51,3 +51,5 @@ one; the test is the memory of this guide.
   worthwhile (it also makes every rule here checkable in one place and is the
   prerequisite for translation) and is tracked in MM-108; it has not been done.
 - "Consistent terms" and "uncertainty shown" are reviewed by people, not tests.
+
+- **passphrase**: the secret that seals a backup (MM-63); a few words with spaces are fine. Never "password" (the phone's own lock, in the terms), "key" or "PIN".

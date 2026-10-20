@@ -1,7 +1,7 @@
 ---
 id: MM-286
 component: app-shell
-status: proposed
+status: done
 related: [MM-253, MM-256, MM-257, MM-99, MM-90]
 ---
 
@@ -50,3 +50,17 @@ Scenario: The primary action is reached first
 ## UI/UX
 
 No new story; the Progress and Food stories as they are.
+
+## Progress (2026-10-20, feat/m2)
+Built, closing the ticket:
+- **Folds kept** (`MmFolds`, `MmFoldsContext`, `useFold`): a section or a disclosure that gives a `remember` key finds its fold as
+  it was left; the app provides one store for the run. A fold the app opens because something fell due beats a fold the person
+  closed earlier: the recovery section's key carries how many check-ins are due, the reports' the newest report, Strength
+  whether there are recent lifts (the panel's F4).
+- **The range kept**: Progress' 30d/90d lives in the state (`progressRangeDays`), not the screen.
+- **The scroll kept** (`useKeptScroll`): put back on return as soon as the content is tall enough, left alone once the person
+  scrolls or a section brings itself into view; kept however the destination was left, through the bar, a row or a snack
+  (the panel's PD7).
+- **The primary first**: on Food the floating action is the first focus stop after the app bar.
+- Tests: `destinationsKeepState.test.tsx` (each acceptance scenario, and leaving through a row), `foldDue.test.tsx`.
+- Reviewed by the panel (`docs/agent-runs/ws03-m2-close/`); outcomes there.

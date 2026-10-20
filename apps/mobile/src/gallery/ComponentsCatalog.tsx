@@ -38,6 +38,7 @@ import { Notice } from '../ui/Notice';
 import { NumberEntry } from '../ui/NumberEntry';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
+import { WaistProtocolFigure } from '../ui/WaistProtocolFigure';
 import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
 import { StepProgress } from '../ui/StepProgress';
@@ -147,6 +148,10 @@ export function ComponentsCatalog() {
       <MmSection icon="tape" title="Waist" summary="Latest: 34.2 in on Oct 5." collapsible initiallyExpanded={false}>
         <p style={{ margin: 0, color: 'var(--text2)' }}>Three fields and Save, once opened.</p>
       </MmSection>
+      {/* How to measure the waist, drawn (MM-155): shown for the first three measurements and from "How to measure" after. */}
+      <div className="gallery-row">
+        <WaistProtocolFigure />
+      </div>
       <MmRhythmStrip
         name="Last seven days"
         days={['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'].map((letter, i) => ({

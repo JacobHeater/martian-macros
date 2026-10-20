@@ -1,6 +1,6 @@
 ---
 id: MM-153
-status: in-progress
+status: done
 component: food-database
 related: [MM-50, MM-42, MM-43, MM-44, MM-45, MM-51, MM-52, MM-53, MM-55, MM-57, MM-58, MM-123, MM-139, MM-150, MM-151]
 ---
@@ -103,3 +103,36 @@ Done: the tier and its reason are computed in the pipeline and stored in the pac
 Not done, because the screens they belong on do not exist yet (MM-42, MM-43): ranking by tier in search, the amount-step display,
 hiding lower-tier duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the pipeline rules still
 provisional in `pack_entry_for.dart` (near-tolerance, missing fields, older than five years). The ticket stays in progress.
+
+## Progress (2026-10-20, feat/m2)
+Done, the amount-step display: the source in words and the tier mark (with its reason for "Check this") were already on the amount
+step (`FoodTrustMark`); it now also states what the source gives, "Per 100 g: 130 kcal · 3 g protein · 28 g carbs · 0 g fat",
+under the amount, built like the edit sheet's "Per serving:" caption (MM-221), and the rounded-to-zero note stands beside it.
+Tested in `test/food/rawOrCooked.test.tsx`; stories `AddFoodAmount`, `AddFoodAmountBranded`, `AddFoodAmountRoundsToZero`.
+Search ranking by tier within relevance exists (`sourceReliability`). Still not done, in the food-database lane: hiding lower-tier
+duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the provisional pipeline rules. The ticket stays
+in progress for those.
+
+
+## Progress (2026-10-20, feat/m2, closing)
+The rest of the ticket:
+- **"Check this" for community data, by the ticket's own rule** (`communityCheckThisReason`, thresholds in
+  `CommunityReviewRule` with evidence rows): an Open Food Facts record that passes the energy check only in its last third
+  (more than 10% and 20 kcal from what the macros imply), leaves out fiber or sodium, or was last changed more than five
+  years before the data it came with is "Check this" with that reason; one that is complete and comfortably consistent is
+  "Label" ("Copied from the package by Open Food Facts contributors; complete and consistent, though nobody checked it.").
+  A disagreement between sources still marks it, as before. The build dates the data by its newest record, so the same
+  export always builds the same pack. The Dart parity test records the departure (Dart marked every community record
+  "Check this"). Test: `test/foodPipeline/communityTier.test.ts`, including the 14% acceptance scenario.
+- **One barcode, two sources**: the more reliable record wins, in the build (MM-383) and across packs (`FoodCatalog`), so a
+  maker's label beats a community record.
+- **"Fix this food"** (`copyOfPackFood`): a text action on the amount step of any database food copies it into the person's
+  own foods at its first serving, with the barcode it was scanned by; the form says the copy is what they find from now on,
+  that the database is not changed and that nothing is uploaded. Their own foods come first on a scan and in search, so the
+  copy is what that barcode returns. Test: `test/food/fixThisFood.test.tsx` (no request made, even with online lookup on).
+  Story: `FixThisFood`.
+- **The standing line**: How this works, "How far can a food's numbers be trusted?" (labels may be 20% off; the coach copes
+  as long as logging is consistent; the three marks and their reasons; nothing is called verified).
+- Not done here, and not needed for the acceptance criteria: the published packs of 2026-10-19 carry the old community tiers
+  until the next build (`mm food build`), while foods found online (MM-58) are judged by the new rule at once. Feeding the
+  tier into the coach's confidence stays "not in the first version", as decided.

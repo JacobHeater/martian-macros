@@ -8,6 +8,7 @@ import { userEvent, within } from 'storybook/test';
 import { RecoveryCheckIn as RecoveryAnswers } from '../../domain/RecoveryCheckIn';
 import { ExplanationLine } from '../../engine/ExplanationLine';
 import { TargetsExplanation } from '../../engine/TargetsExplanation';
+import { FoodEntry } from '../../domain/FoodEntry';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { creatineScenario } from './creatineScenario';
 import { failingRead } from './failingRead';
@@ -16,8 +17,13 @@ import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
+import { shortSleepScenario } from './shortSleepScenario';
+import { breakOfferScenario } from './breakOfferScenario';
+import { onBreakScenario } from './onBreakScenario';
 import { reveal } from './reveal';
+import { maintenanceScenario } from './maintenanceScenario';
 import { stalledScenario } from './stalledScenario';
+import { storyWorkout } from './storyWorkout';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { storyTargets } from './storyTargets';
@@ -44,6 +50,14 @@ export const Coach = screenStory({
   covers: ['CoachScreen'],
   shows: 'Your metabolism',
   open: ({ state }) => state.homeTab.put('coach'),
+});
+
+/** MM-91: Coach on a 360 px phone: the hero, its warnings and the goal in the first viewport, the text actions beside their rows. */
+export const CoachSmallPhone = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your metabolism',
+  open: ({ state }) => state.homeTab.put('coach'),
+  viewport: 'smallPhone',
 });
 
 /** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
@@ -165,6 +179,46 @@ export const ChooseGoal = screenStory({
   walk: pressOnCoach('Change goal'),
 });
 
+/** MM-158: "What to expect", reread from the Coach tab: the plan's aims and what the scale does that is not progress. */
+export const WhatToExpectReread = screenStory({
+  covers: ['CoachScreen', 'WhatToExpectScreen'],
+  shows: /^Your plan aims for/,
+  open: onCoach,
+  walk: pressOnCoach(/^What to expect/),
+});
+
+/** MM-130: four days after a twelve-week cut: what the scale will do, and how long a pause is sensible. */
+export const MaintenanceAfterCut = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  open: onCoach,
+});
+
+/** MM-130: six weeks in, the anchor read from the trend two weeks in, and the trend within its band. */
+export const MaintenanceHolding = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Within the band: holding.',
+  scenario: maintenanceScenario({ daysAgo: 42 }),
+  open: onCoach,
+});
+
+/** MM-130: drifted above the band for two weeks: the coach asks, and changes nothing until answered. */
+export const MaintenanceDrifted = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your weight has moved',
+  scenario: maintenanceScenario({ daysAgo: 60, driftKg: 2.5 }),
+  open: onCoach,
+});
+
+/** MM-128: "Change pace": the three paces with what each costs this person today, the default marked. */
+export const ChoosePace = screenStory({
+  covers: ['CoachScreen', 'PaceSheet'],
+  shows: 'Choose a pace',
+  open: onCoach,
+  walk: pressOnCoach('Change pace'),
+});
+
 /** MM-321: a new goal with a deficit is confirmed against the health check first. */
 export const ChooseGoalRecheck = screenStory({
   covers: ['CoachScreen', 'HealthRecheckScreen'],
@@ -210,6 +264,19 @@ export const CoachStalled = screenStory({
   open: onCoach,
 });
 
+/** MM-140: the same flat month, training started eight days ago: the stall is put down to water in new muscle, not to the plan. */
+export const CoachStalledAfterStartingTraining = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^You started training in the last 10 days/,
+  scenario: async (repos, today) => {
+    await stalledScenario()(repos, today);
+    for (const daysAgo of [8, 5, 2]) {
+      await repos.workouts.saveWorkout(storyWorkout(today.addDays(-daysAgo), [['back-squat', 5, 80], ['barbell-bench-press', 5, 60]]));
+    }
+  },
+  open: onCoach,
+});
+
 /** MM-321: a measured estimate that left two partial days out. */
 export const CoachMeasuredWithPartialDays = screenStory({
   covers: ['CoachScreen'],
@@ -234,6 +301,42 @@ export const CoachReliefOffer = screenStory({
   shows: 'Two hard weeks in a row',
   scenario: reliefScenario,
   open: onCoach,
+});
+
+/**
+ * MM-135: twelve unbroken weeks of a cut with recovery fine: the same card as the relief offer, with the
+ * calendar, offering the two-week break or carrying on; no slower pace, since the answer here is a rest.
+ */
+export const CoachBreakOffer = screenStory({
+  covers: ['CoachScreen'],
+  shows: '12 weeks in a deficit',
+  scenario: breakOfferScenario,
+  open: onCoach,
+});
+
+/** MM-135: the first week of the break the person chose: targets at maintenance, the next check-in two weeks out. */
+export const CoachOnChosenBreak = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^This is the two-week break you chose/,
+  scenario: onBreakScenario('requestedBreak'),
+  open: onCoach,
+});
+
+/** MM-135: the break the app planned at twenty weeks, the safety floor, in its first week. */
+export const CoachOnPlannedBreak = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^You’ve been in a deficit for 20 weeks/,
+  scenario: onBreakScenario('dietBreak'),
+  open: onCoach,
+});
+
+/** MM-135 (the panel's UX-6): the relief card's three buttons at 200% text, "Carry on" on its own line. */
+export const CoachReliefOfferLargeText = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Two hard weeks in a row',
+  scenario: reliefScenario,
+  open: onCoach,
+  textScale: 2,
 });
 
 /** MM-321: twelve weeks of recomposition: the review is due on Coach. */
@@ -345,6 +448,37 @@ export const CoachStalledOverTarget = screenStory({
   open: onCoach,
 });
 
+/** MM-342: the week's intake with every part of its detail: the target, the distance, and what it rests on. */
+export const CoachFewDaysEstimated = screenStory({
+  covers: ['CoachScreen'],
+  shows: /rests on 3 days · mostly estimated/,
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-70), healthCheckConfirmedOn: today }));
+    await repos.targets.saveTargets(
+      storyTargets(today.addDays(-60), { kcal: 2100, proteinG: 160, proteinMinimumG: 130, carbsG: 220, tdeeSigmaKcal: 150, tdeeStatus: 'updated' }),
+    );
+    for (let i = 0; i <= 50; i++) await repos.weights.saveWeight(today.addDays(-i), 82);
+    // Only three of the last seven days complete, every one of them estimated.
+    for (let i = 1; i <= 7; i++) {
+      const day = today.addDays(-i);
+      await repos.food.addFood(
+        new FoodEntry({ id: 0, date: day, meal: 'dinner', name: 'Demo day of food', kcal: 2350, proteinG: 150, carbsG: 220, fatG: 70, source: 'quickAdd' }),
+      );
+      await repos.dayMarks.setCompleteness(day, i <= 3 ? 'complete' : 'partial');
+    }
+  },
+  open: onCoach,
+});
+
+/** MM-342, MM-91: Coach at 200% text; a stat row's detail wraps under its figure. */
+export const CoachLargeText = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your last 7 days',
+  scenario: stalledScenario(2350),
+  open: onCoach,
+  textScale: 2,
+});
+
 /** MM-321: logs far below what the scale says was eaten: the estimate is held at a safe limit. */
 export const CoachEstimateHeld = screenStory({
   covers: ['CoachScreen'],
@@ -385,4 +519,115 @@ export const PauseHeavyUse = screenStory({
     }
   },
   open: ({ navigator }) => void navigator.push(() => <PauseScreen />),
+});
+
+// ---- MM-252: the coach reads sleep ----
+
+/** MM-252: a fortnight of short nights with hunger and energy fine: the offer of its own, the one sentence the evidence supports, and the gentler pace one press away. */
+export const CoachShortSleep = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Two weeks of short sleep',
+  scenario: shortSleepScenario,
+  open: onCoach,
+});
+
+/** MM-252: the sleep line in "How you are holding up": the fourteen-night average and the nights, no score. */
+export const CoachSleepLine = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Sleep, last 14 nights',
+  scenario: shortSleepScenario,
+  open: onCoach,
+  walk: pressOnCoach(/^How you are holding up/),
+});
+
+/** MM-252: the check-in with no night recorded: typical hours start empty, and nothing is said of an average. */
+export const RecoveryCheckInNoNights = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'Typical hours of sleep (optional)',
+  scenario: firstDayScenario,
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+});
+
+/** MM-252: why the targets changed, with sleep that averaged short named before anything about the log. */
+export const WhyYourTargetsShortSleep = screenStory({
+  covers: ['TargetChangeSheet'],
+  shows: /^Your sleep averaged 5 h 30 m over the last 12 nights\./,
+  scenario: explainedScenario(
+    new TargetsExplanation({
+      lines: [new ExplanationLine('expenditureEstimate', -80, { from: 2700, to: 2620 }), new ExplanationLine('paceAndWeight', -20)],
+      newKcal: 2300,
+      previousKcal: 2400,
+      estimateStatus: 'updated',
+      usableIntakeDays: 24,
+      excludedPartialDays: 2,
+      weighIns: 16,
+      shortSleepAverageMinutes: 330,
+      shortSleepNights: 12,
+    }),
+  ),
+  open: openWhy,
+});
+
+/** MM-252: the check-in with more than a day typed: refused under the field, and Save waits. */
+export const RecoveryCheckInMistyped = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'Up to 24 hours.',
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+  walk: async (canvas) => {
+    const hours = await within(canvas).findByRole('textbox', { name: 'Typical hours of sleep, Hours' });
+    await userEvent.clear(hours);
+    await userEvent.type(hours, '25');
+  },
+});
+
+/** MM-252: the nights could not be read: the sleep line says so, never "Not recorded". */
+export const CoachSleepReadFailed = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Not read',
+  scenario: shortSleepScenario,
+  stores: failingRead('sleep', 'watchSleepNights'),
+  open: onCoach,
+  walk: pressOnCoach(/^How you are holding up/),
+});
+
+// ---- MM-417: places of MM-130 and MM-134 no story drew ----
+
+/** MM-134: "Change goal" for someone who does not lift yet: each goal says what it rests on, and what training means here. */
+export const ChooseGoalNotTraining = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Training here means/,
+  scenario: demoWith({
+    then: async (repos) => {
+      const setup = await repos.setup.loadSetup();
+      if (setup !== undefined) await repos.setup.saveSetup(setup.copyWith({ trainingDaysPerWeek: 0 }));
+    },
+  }),
+  open: onCoach,
+  walk: pressOnCoach('Change goal'),
+});
+
+/** MM-130: "See why" on the change that ended a cut: the scale's rise said before it happens. */
+export const ChangeSheetLeavingDeficit = screenStory({
+  covers: ['CoachScreen', 'TargetChangeSheet'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  open: onCoach,
+  walk: pressOnCoach('See why'),
+});
+
+/** MM-130: outside the band for a few days, not yet the fourteen the coach waits: said, and nothing asked. */
+export const MaintenanceDrifting = screenStory({
+  covers: ['CoachScreen'],
+  shows: /the band for \d+ days?\. At 14 the coach will ask what you want\./,
+  scenario: maintenanceScenario({ daysAgo: 30, driftKg: 2.5 }),
+  open: onCoach,
+});
+
+/** MM-130: drifted, and "Correct back" chosen: a gentle pace toward the anchor, until the trend is back. */
+export const MaintenanceCorrecting = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Correcting back toward/,
+  scenario: maintenanceScenario({ daysAgo: 60, driftKg: 2.5 }),
+  open: onCoach,
+  walk: pressOnCoach('Correct back'),
 });

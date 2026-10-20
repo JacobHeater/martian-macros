@@ -6,10 +6,11 @@ import { currentSchemaVersion as current } from '../../src/data/currentSchemaVer
 import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { SleepNight } from '../../src/domain/SleepNight';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { StateError } from '../../src/lang/StateError';
 import { SqlFailure } from '../../src/sql/SqlFailure';
-import type { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
+import { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
 import { first } from '../support/first';
 import { openSql } from './support/openRepositories';
 
@@ -41,7 +42,7 @@ const columnsOf = async (sql: WasmSqlDatabase, table: string) =>
 
 async function expectDataIntact(sql: WasmSqlDatabase): Promise<void> {
   // Read with the current repositories: an added column does not disturb them.
-  const repos = new SqlRepositories(await AppDatabase.open(sql, { version: Number(await versionOf(sql)) }));
+  const repos = new SqlRepositories(await AppDatabase.open(sql, { version: Number(await versionOf(sql)) }), (bytes) => WasmSqlDatabase.open({ bytes }));
   expect((await repos.setup.loadSetup())?.profile.sex).toBe('female');
   expect((await first(repos.weights.watchWeights())).map((w) => [w.date, w.weightKg])).toEqual([[day, 80]]);
 }
@@ -137,8 +138,44 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/**
+ * The schema as version 13 left it: the current shape without the state a
+ * food was logged in, the conversion to grams and the usual cooking fat
+ * (MM-167, MM-151, MM-152).
+ */
+const versionThirteen = currentSchema
+  .replace('  "preparation" TEXT NULL,\n', '')
+  .replace('  "conversion_kind" TEXT NULL,\n', '')
+  .split('  "sugar_alcohols_g" REAL NULL,\n  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)\n);')
+  .join('  "sugar_alcohols_g" REAL NULL\n);')
+  .replace("  \"usual_cooking_fat\" TEXT NOT NULL DEFAULT 'oil',\n", '');
+
+/** The schema as version 12 left it: without the sleep-disorder answer and the nights of sleep (MM-250, MM-251). */
+const versionTwelve = versionThirteen
+  .replace('  "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),\n', '')
+  .replace(/CREATE TABLE "sleep_nights" \([\s\S]*?\n\);\n/, '');
+
+/** The schema as version 11 left it: without the online lookup choice and the foods found online (MM-58). */
+const versionEleven = versionTwelve
+  .replace(`  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),\n`, '')
+  .replace(/CREATE TABLE "online_foods" \([\s\S]*?\n\);\nCREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" \("gtin"\);\n/, '');
+
+/** The schema as version 10 left it: without exact targets, the label note, easing into maintenance, the pace change day, the maintenance anchor and correction (MM-123, MM-128, MM-130). */
+const versionTen = versionEleven
+  .replace('  "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),\n', '')
+  .replace('  "label_note_dismissed_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),\n', '')
+  .replace('  "pace_changed_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "maintenance_anchor_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "maintenance_correction_from_epoch_day" INTEGER NULL,\n', '')
+  .replace('  "requested_loss_fraction" REAL NULL,\n  PRIMARY KEY ("effective_epoch_day")', '  PRIMARY KEY ("effective_epoch_day")')
+  .replace(/CREATE TABLE "menstruation_days" \([\s\S]*?\n\);\n/, '');
+
+/** The schema as version 9 left it: without the day of the last backup (MM-63). */
+const versionNine = versionTen.replace('  "last_backup_epoch_day" INTEGER NULL,\n', '');
+
 /** The schema as version 8 left it: without net carbs and sugar alcohols (MM-396, MM-397). */
-const versionEight = currentSchema
+const versionEight = versionNine
   .replace('  "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),\n', '')
   .split('  "cholesterol_mg" REAL NULL,\n  "sugar_alcohols_g" REAL NULL\n);')
   .join('  "cholesterol_mg" REAL NULL\n);');
@@ -286,4 +323,79 @@ it('a version 8 database comes up to date with net carbs on and its entries kept
   expect(await columnsOf(sql, 'food_entries')).toContain('sugar_alcohols_g');
   expect(await columnsOf(sql, 'custom_foods')).toContain('sugar_alcohols_g');
   expect(await first(repos.preferences.watchNetCarbs())).toBe(true);
+});
+
+it('a version 11 database comes up to date asking before any online lookup, with nothing found online yet (MM-58)', async () => {
+  expect(versionEleven).not.toContain('online_lookup');
+  expect(versionEleven).not.toContain('online_foods');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 11, schema: versionEleven });
+  await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await first(repos.preferences.watchOnlineLookup())).toBe('ask');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  expect(await columnsOf(sql, 'online_foods')).toContain('gtin');
+  expect(await sql.select('SELECT count(*) AS n FROM online_foods')).toEqual([{ n: 0 }]);
+});
+
+// MM-250, MM-251: a version 12 database gains the sleep-disorder answer, "no", and an empty record of nights;
+// its setup and weigh-ins are kept.
+it('a version 12 database comes up to date with no sleep disorder and no nights recorded', async () => {
+  expect(versionTwelve).not.toContain('sleep_disorder');
+  expect(versionTwelve).not.toContain('sleep_nights');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 12, schema: versionTwelve });
+  // Written as version 12 wrote them: today's repositories know the new column.
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'setups')).toContain('sleep_disorder');
+  expect((await repos.setup.loadSetup())?.screening.sleepDisorder).toBe(false);
+  expect(await first(repos.sleep.watchSleepNights())).toEqual([]);
+  await repos.sleep.saveSleepNight(new SleepNight({ date: day, minutesAsleep: 440, source: 'typed' }));
+  expect((await first(repos.sleep.watchSleepNights())).map((n) => n.minutesAsleep)).toEqual([440]);
+});
+
+// MM-167, MM-151, MM-152: a version 13 database comes up to date. What was logged keeps its
+// totals, method and portion with no state or conversion invented, and the usual fat is oil.
+it('a version 13 database comes up to date: entries kept with no preparation or conversion, the usual fat oil', async () => {
+  expect(versionThirteen).not.toContain('preparation');
+  expect(versionThirteen).not.toContain('conversion_');
+  expect(versionThirteen).not.toContain('usual_cooking_fat');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 13, schema: versionThirteen });
+  await old.execute(
+    'INSERT INTO food_entries (epoch_day, meal, name, kcal, protein_g, carbs_g, fat_g, quantity_source, ' +
+      'portion_quantity, portion_unit, nutrition_basis, reference_basis, reference_kcal, reference_protein_g, reference_carbs_g, reference_fat_g, ' +
+      'origin_pack_id, origin_food_id, origin_source) ' +
+      "VALUES (?, 'dinner', 'White rice, raw', 730, 14, 160, 1.4, 'weighed', 200, 'gram', 'calculated', 'per100g', 365, 7, 80, 0.7, 'fixture', 3, 'fixture')",
+    [day.epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, detail_level) VALUES (1, 'dark', 'full')");
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await columnsOf(sql, 'food_entries')).toEqual(expect.arrayContaining(['preparation', 'conversion_kind', 'conversion_factor']));
+  const [rice] = await first(repos.food.watchFood(day));
+  expect(rice?.kcal).toBe(730);
+  expect(rice?.portion?.quantity).toBe(200);
+  expect(rice?.portion?.reference?.nutrition.kcal).toBe(365);
+  expect(rice?.portion?.origin?.foodId).toBe(3);
+  expect(rice?.portion?.preparation, 'nothing is invented').toBeUndefined();
+  expect(rice?.portion?.conversion).toBeUndefined();
+  expect(await repos.food.lastLoggedFrom('fixture', [3, 4]).then((e) => e?.name)).toBe('White rice, raw');
+  expect(await first(repos.preferences.watchUsualCookingFat())).toBe('oil');
+  expect(await first(repos.preferences.watchDetailLevel())).toBe('full');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
 });

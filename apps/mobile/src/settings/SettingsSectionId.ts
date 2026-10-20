@@ -7,6 +7,7 @@ export type SettingsSectionId =
   | 'reminders'
   | 'healthConnect'
   | 'data'
+  | 'backup'
   | 'appearance'
   | 'about'
   | 'erase';

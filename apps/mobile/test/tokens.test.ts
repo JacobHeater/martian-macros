@@ -117,6 +117,28 @@ describe('the field border', () => {
       expect(Math.abs(carbs - fat), `${palette} carbs-fat`).toBeGreaterThanOrEqual(10);
     });
 
+    // MM-106: Ember carries the one primary action: its label on its fill, and as the lead text action and the
+    // current destination on the canvas and the surface; the semantic colours are text and icons on every level.
+    it(`gives Ember's label, Ember as text and the semantic colours their contrast in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      expect(ratio(tokens.get('on-ember')!, tokens.get('ember')!), `${palette} on-ember on ember`).toBeGreaterThanOrEqual(4.5);
+      expect(ratio(tokens.get('on-danger')!, tokens.get('danger')!), `${palette} on-danger on danger`).toBeGreaterThanOrEqual(4.5);
+      for (const level of ['canvas', 'surface', 'raised']) {
+        expect(ratio(tokens.get('ember')!, tokens.get(level)!), `${palette} ember on ${level}`).toBeGreaterThanOrEqual(4.5);
+        for (const meaning of ['caution', 'info', 'danger', 'positive']) {
+          expect(ratio(tokens.get(meaning)!, tokens.get(level)!), `${palette} ${meaning} on ${level}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+      // A field sits on sunken, a chosen chip on selected: the text stays readable there.
+      for (const level of ['sunken', 'selected']) {
+        expect(ratio(tokens.get('text')!, tokens.get(level)!), `${palette} text on ${level}`).toBeGreaterThanOrEqual(4.5);
+      }
+      // The macro bars and the water bar are graphics: 3:1 against their track.
+      for (const fill of ['protein', 'carbs', 'fat', 'water']) {
+        expect(ratio(tokens.get(fill)!, tokens.get('track')!), `${palette} ${fill} on track`).toBeGreaterThanOrEqual(3);
+      }
+    });
+
     // MM-370: the letter carries a grade's meaning, so it holds 4.5:1 on its band's fill.
     it(`gives every grade letter 4.5:1 on its fill in ${palette}`, () => {
       const tokens = cssBlock(`.theme-${palette}`);

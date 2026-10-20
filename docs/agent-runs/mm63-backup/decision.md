@@ -1,0 +1,27 @@
+# Panel decision: Backup and restore in Settings (MM-63, MM-64)
+
+- **Facts versus proposals and traceability.** The owner moved backup and restore into the closed beta (2026-10-19). The section was drawn in Storybook and built on `feat/m2`; two read-only reviews of the working tree (baseline `main` 39f315c): the product designer and the UX guard, each from the brief and the stories read from source (no browser on the owner's Mac in this session). The chair (the parent session) edited, ran the tests and wrote this record. The brief's path for MM-65 was wrong (`SPIKE.icloud-and-device-backup-rules.MM-65.md` is the file); both reviewers found it.
+- **Verdicts.** UX guard: **pass, no blocking finding**, two high (F1, F8). Product designer: nine findings, one high (PD-1, the same fact as F8).
+- **Consolidated coverage.** Inspected: the section, the sheet, the words, the Settings screen and its sibling sections and sheets, the design-system parts, the stylesheet, the four stories, the flow test; both reviewers walked both depth targets. Not inspected by anyone: a render in any palette, a device, the native share sheet and picker, the cryptography and the plugins (tested, not reviewed), providers.
+- **Findings and disposition** (deduplicated by cause):
+  - *Settings never says the records are not in the phone's own cloud backup, which MM-65 decided* (F8 high, PD-1 high): **accepted.** The caption's first sentence says it; the test asserts it; the stories draw it.
+  - *The confirmation does not announce its message* (F1 high): **accepted**, in the design system: `MmDialog` names its body as its description, for every confirm in the app (the Erase dialog too). The test checks the attribute.
+  - *A new section beside Data with Data's icon and sentence* (PD-2 medium): **the section stays, with the reason written** into MM-63 (the header a tester scans for; Data's rows are about storing and fetching, these about moving); the icon is `document`, the duplicate sentence is gone.
+  - *Busy states undrawn and against the sibling* (PD-3 medium, F6 medium): **accepted.** The row stays a button while it works, its subtitle says so, a status region says so for a reader, a second press waits (as the health section's read does); stories `SettingsBackingUp`, `SettingsBackupMismatch`, `SettingsRestoreAsks` join the four. A labelled spinner in a row is not drawn: no row in the app carries one and the subtitle is the sibling's pattern; recorded.
+  - *The warning after the decision it informs, in the quietest type* (F5, PD-4 medium): **accepted.** Before the first field, in body type, naming the act: "Keep it somewhere safe."
+  - *The mismatch fires from the first keystroke* (F2 medium): **accepted.** Said once the second is long enough to be wrong or diverges.
+  - *Hidden entry with no Show option* (F3 medium): **accepted.** A Show/Hide toggle on the passphrase kind; `current-password` when opening.
+  - *Enter does nothing* (F4 medium): **accepted.** Enter continues when ready. The keyboard-over-buttons check is the owner's, on a phone.
+  - *The restore message's shape and dates* (F7, PD-8): **accepted.** The loss first, then what the backup holds, as two paragraphs; zero counts left out; dates with the year.
+  - *A raw error string* (F9, PD-5): **accepted.** A fixed sentence.
+  - *The sheet labelled with its field's word* (F10): **accepted**, the headline.
+  - *"Passphrase" right but unexplained* (F11, PD-9): **accepted.** The helper names a few words; the glossary gains the entry; "password" stays the phone's own lock.
+  - *The minimum length* (the guard's chair request): **12 characters**, the chair deciding for the privacy role: the file can be attacked offline; Argon2id at interactive limits and a few words carry it; NIST's 15 is a login's.
+  - *"Last backup" on Android's "handed on"* (PD-7): **the owner's word** (handoff); recorded all the same meanwhile.
+  - *A restore entry at the welcome step for a fresh phone* (PD-2's Q1): **the owner's word** (handoff); today a fresh phone is onboarded first and the restore replaces the setup, which works.
+  - *Restore not drawn as danger* (PD-6): kept, the reason written into MM-63.
+- **Targeted challenges.** None run: the reports agree on every shared finding (F8/PD-1, F6/PD-3, F5/PD-4, F7/PD-8, F9/PD-5, F11/PD-9).
+- **Safety and privacy.** Neither reviewer found a concern; the copy's claims match the built posture (sealed before saved; nothing fetched; iCloud never named).
+- **Owner decisions.** PD-7, Q1, the renders of the seven stories in the three palettes, the device checks (share sheet, picker, keyboard).
+- **Edit owner:** the parent session (chair).
+- **Verification.** `npx tsc --noEmit` clean; `test/settings/backup.test.tsx` (3) and `test/backup/restoreWords.test.ts` (2) pass after the edits; the backup file and restore tests pass; every story walk is rerun; `mm check` on the final tree before the pull request.

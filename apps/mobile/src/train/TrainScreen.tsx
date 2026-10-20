@@ -110,6 +110,7 @@ export function TrainScreen() {
           summary={group.workouts.length === 1 ? '1 workout' : `${group.workouts.length} workouts`}
           collapsible={index > 1}
           initiallyExpanded={index <= 2}
+          remember={`train.group.${group.title}`}
         >
           {group.workouts.map(row)}
         </MmSection>

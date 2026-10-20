@@ -54,6 +54,15 @@ export class InMemoryFoodRepository implements FoodRepository {
     this.entries.value = this.entries.value.filter((e) => e.id !== id);
   }
 
+  async lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
+    const all = this.entries.value;
+    for (let i = all.length - 1; i >= 0; i--) {
+      const origin = all[i]?.portion?.origin;
+      if (origin !== undefined && origin.packId === packId && foodIds.includes(origin.foodId)) return all[i];
+    }
+    return undefined;
+  }
+
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {
     return this.entries.watchAs((all) => {
       const newestFirst = [...all].reverse().slice(0, 200);

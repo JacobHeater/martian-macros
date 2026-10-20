@@ -1,6 +1,6 @@
 ---
 id: MM-142
-status: proposed
+status: done
 component: coach-insights
 related: [MM-137, MM-15, MM-16, MM-17, MM-18, MM-19, MM-20, MM-75, MM-108, MM-118, MM-127, MM-130, MM-136, MM-141, MM-158]
 ---
@@ -87,6 +87,86 @@ Scenario: Hidden numbers
   Given the weight display is Trend only or Hidden
   Then no per-reading explanation is shown
 ```
+
+## UI/UX
+- Under the weigh-in — apps/mobile/src/gallery/screens/Today.stories.tsx (Stories: WeighInJump, WeighInJumpFigures,
+  WeighInJumpNothingInLog, WeighInLowAfterIllness, WeighInOvershoot). The coach's line under the trend row once today's
+  weigh-in is saved, its figures one tap down, as the rebound note (MM-130).
+- At the point on the chart — apps/mobile/src/gallery/screens/Progress.stories.tsx (Stories: ProgressWeightJump,
+  ProgressPickedWeighIn, ProgressPickedJump). The latest reading explained under the chart; a tapped dot said with its
+  distance from the trend.
+
+## Progress (2026-10-20, feat/m2)
+Built, no schema change:
+- **The engine function** (`explainWeightJump`, pure): from a reading, the trend, the intake days, the food entries of
+  the last sixteen days, workouts, period days, weight events and the targets history to a `WeightJumpExplanation`:
+  the reading, the trend on its day, the threshold, up to three `WeightJumpCause`s in a fixed order, and the energy
+  the difference would have cost as fat (`fatMassKcalPerKg`, 9,440 kcal/kg). A reading is explained from one standard
+  deviation of the trend model's water noise (0.6% of the trend weight, `WeightJumpRule.noiseFraction`), above or
+  below. Thresholds in `WeightJumpRule.ts`, each with a row in `docs/evidence.md` under "Why did the scale jump?".
+- **The causes found**, in the order listed when several hold: a weight event noted in the last three days (today
+  included); a day's carbohydrate 30% or more above the 14-day usual (yesterday or the day before, the larger excess
+  named; the usual needs five logged days); sodium likewise, judged only on days where 70% of the calories state it
+  (`SodiumDay.minimumCoverage`, the fiber rule's, MM-126), so a missing value is never zero; yesterday's calories
+  outside the target band in force (`CalorieBand`), with the surplus over the expenditure estimate and the most fat it
+  could store; alcohol logged on either day; a finished workout on either day; the reading inside a cycle window
+  (`cycleWindows`, MM-20); the reading inside the settling window after a change of targets (`settlingWindows`, ten
+  days). For a reading **below** the trend the carbohydrate, sodium and calorie rules are mirrored (30% under the
+  usual; under the band, and only for a day marked complete, since a partial day under target proves nothing).
+- **The words** (`weightJumpText`, `weightJumpCauseText`). The line: "Today’s weigh-in is 1.1 kg above your trend.
+  Likely cause: carbohydrate yesterday, 340 g against your usual 230 g." With nothing found: "Nothing in your log
+  explains this. Day-to-day changes this size are normal and usually water. If something happened, such as illness,
+  travel or a salty meal, add it as a weight event in Progress." (on Progress: "add it under Weight events below").
+  Below the trend: "This is most likely water and will probably come back." The arithmetic is among the figures one
+  tap down, once: "For this to be fat: about 10,400 kcal over your expenditure yesterday". After a day over target
+  the figures carry the honest variant instead: "Over target by 3,000 kcal", "Fat this could have stored: at most
+  about 0.3 kg", "The rest of the difference: water and food still being digested"; or "None: still under your
+  expenditure". Causes are "likely", never certain (MM-108); the voice test covers the words.
+- **Where it shows**: on the Dashboard under the trend row once today's weigh-in is saved, as the coach's line with
+  "The numbers behind this" one tap down (the same `InlineInsight` the rebound note uses, MM-130); on Progress under
+  the trend chart and its band sentence, for the latest weigh-in in range when it is far from the trend, and for any
+  weigh-in picked on the chart: a tap on its dot or near it anywhere down the plot, or, with the chart focused, the
+  arrow keys (Home and End to the first and last). The picked dot is drawn larger in the text colour, ringed with the
+  canvas. A picked reading inside the noise is said as a caption ("Mon, Sep 21: 82.1 kg, +0.1 kg from the trend, inside
+  the day-to-day noise."); one with an explanation is said once, the caption carrying the reading ("Today: 83.3 kg.")
+  and the line the distance. The note sits in a region that is announced, so a keyboard pick is heard. "How to read
+  this" says a dot can be tapped or reached with the arrow keys. Changing the range forgets the pick.
+- **Kept back** (`weightJumpWithheld`) under 18, with an eating-disorder history (nothing about weight or the body,
+  MM-141), or when weight is hidden: the `weightHidden` safeguard flag that MM-118's setting will set. The setting
+  itself is not built (MM-118, M4), so "Trend only or Hidden" cannot yet be chosen; the gate is in place and tested.
+- A line of the app's own has no switch and so no "Settings for" button: MM-418, found by the panel here and fixed with it.
+- Tests: `test/engine/weightJump.test.ts` (the seven scenarios' engine half and the mirrored rules, 23 tests),
+  `test/format/weightJumpText.test.ts` (the words), `test/dashboard/weightJump.test.tsx` (the row, the figures, the
+  inside-noise case, nothing in the log, below after illness, the eating-disorder gate), `test/progress/weightJumpChart.test.tsx`
+  (the latest reading, a picked dot, the range forgetting the pick).
+- Stories: the nine under UI/UX above. Panel review (one round): `docs/agent-runs/mm142-weight-jump/`.
+
+Decided here (say if wrong):
+- **The "logged after 9 pm" cause is left out.** Food entries carry a day and a meal, never a clock time, so the app
+  cannot judge it; a cause it cannot judge is not claimed. The scenario "Several causes" is met with the carbohydrate,
+  the workout and alcohol instead.
+- **Order of likelihood is fixed by kind**, not by the size of each signal: what the person noted themselves first
+  (their own account), then yesterday's food (carbohydrate, sodium, calories, alcohol), then a workout, the cycle, a
+  change of targets. Ranking by size would compare grams with milligrams with days.
+- **The weight-event offer is in words**, "add it as a weight event in Progress", not a button in the line: the inline
+  insight has no action slot, and the Add button has one home, the Weight events section on Progress (rule 4).
+- **A reading below the trend is explained too**, as the ticket decided, with the mirrored rules: a day well under the
+  usual carbohydrate, or under the target band and marked complete.
+- **The surplus that could be fat is counted over the expenditure estimate**, not over the target: a day 300 kcal over
+  target and still under expenditure stores none, and the line says so.
+- **The sibling named**: the rebound note under the same row (`reboundText`, MM-130) for the Dashboard; the chart's
+  caption and "How to read this" disclosure for Progress. Both are `InlineInsight`, the design system's one home for
+  the coach's line under an item (MM-362).
+- **The arithmetic sentence lives in the figures, not the closed line** (the panel, PD-1 and UX-2: the line under a
+  two-line row was five to eleven caption lines). "Carries the arithmetic line once" is read as once per explanation:
+  it is the last of the figures, and after an overshoot the figures say the most that could be fat and that the rest
+  is water and food. The line keeps the distance, the likely causes, the honest "nothing in your log" and its offer,
+  and for a low reading that it will probably come back.
+- **The pick on the chart is a tap or the arrow keys**; the chart stays `role="img"` and takes focus when it can be
+  picked. The latest reading is explained without any of that. A list of recent weigh-ins (the direction's "readings
+  list") would be the fuller answer and is not built here.
+- **No switch for the line** (the panel's UX-1 and its safety note): it is not an insight (MM-141) and has no kind; it
+  goes with the weight display (MM-118) and the safeguards. So it offers no "Settings for" (MM-418).
 
 ## Notes
 - Priority: should-have. It is the single most direct piece of education the app can give, at the moment the user is most receptive.

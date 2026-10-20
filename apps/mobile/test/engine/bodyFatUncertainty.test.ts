@@ -35,7 +35,8 @@ const targetsFor = (estimate: BodyFatEstimate, safety?: number) =>
       mode: 'fatLoss',
       trainingStatus: 'intermediate',
       policy: policy(),
-      tdeeKcal: 3000,
+      // Enough expenditure that the 35% deficit cap (MM-128) never binds at 1% a week.
+      tdeeKcal: 3400,
       bmrKcal: 1900,
       requestedLossFraction: 0.01,
       safetyBodyFatPercent: safety,

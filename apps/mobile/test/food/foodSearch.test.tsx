@@ -72,7 +72,7 @@ it('a food can be logged by palm, recorded as a hand portion', async () => {
   await press(sheet, 'Palms');
   // MM-217: a hand portion is never presented as exact.
   expect(within(sheet).getByText(/\(estimated\)/)).toBeInTheDocument();
-  expect(within(sheet).getByTestId('amount-macros').textContent?.startsWith('Estimated: ')).toBe(true);
+  expect(within(sheet).getByTestId('amount-macros').textContent?.startsWith('Logs an estimate: ')).toBe(true);
   await press(sheet, 'Log it');
   const entry = await only();
   expect(entry?.source).toBe('palm');

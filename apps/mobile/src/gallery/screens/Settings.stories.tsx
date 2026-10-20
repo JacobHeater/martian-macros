@@ -8,9 +8,11 @@ import { demoWith } from './demoWith';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import type { SettingsSectionId } from '../../settings/SettingsSectionId';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
+import { FoodSourcesScreen } from '../../foodPacks/FoodSourcesScreen';
+import { onlineFoods } from './onlineFoods';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
-import { userEvent, within } from 'storybook/test';
+import { screen, userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
@@ -21,6 +23,14 @@ import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
 import { onIos } from './onIos';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
+import { BackupFile } from '../../backup/BackupFile';
+import { SodiumBackupCipher } from '../../backup/SodiumBackupCipher';
+import { FakeBackupPlatform } from '../../backup/FakeBackupPlatform';
+import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
+import { SqlRepositories } from '../../data/SqlRepositories';
+import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
+import { typicalSetup } from '../../fixtures/typicalSetup';
+import { storyToday } from './storyToday';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 
@@ -111,6 +121,21 @@ export const FoodDatabase = screenStory({
   open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
 });
 
+/** MM-57, MM-58: where the food data comes from, its licences, and what the app sends online, on a phone that can ask Open Food Facts with a pack installed. */
+export const FoodSources = screenStory({
+  covers: ['FoodSourcesScreen'],
+  shows: 'Food data sources',
+  device: async (services) => onlineFoods()(await storyPackHost({ installed: '2026-10-09' })(services)),
+  open: ({ navigator }) => void navigator.push(() => <FoodSourcesScreen />),
+});
+
+/** MM-58: the same screen in a build with no online source and nothing downloaded: nothing is ever sent. */
+export const FoodSourcesNoneOnline = screenStory({
+  covers: ['FoodSourcesScreen'],
+  shows: /no online source, so nothing is ever sent/,
+  open: ({ navigator }) => void navigator.push(() => <FoodSourcesScreen />),
+});
+
 /** MM-242: the terms, to read again, with the day they were agreed to. */
 export const TermsOfUse = screenStory({
   covers: ['TermsScreen'],
@@ -139,6 +164,7 @@ export const NutritionGoals = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Daily sodium limit',
   scenario: demoWith({ sodiumLimitMg: 2300, waterGoalMl: 2000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
@@ -210,6 +236,7 @@ export const WaterGoalOwnAmount = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Use the suggested amount',
   scenario: demoWith({ waterGoalMl: 3000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Use the suggested amount'));
@@ -221,6 +248,7 @@ export const WaterGoalBackToSuggested = screenStory({
   covers: ['SettingsScreen'],
   shows: /^Suggested from your protein target and training./,
   scenario: demoWith({ waterGoalMl: 3000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     const back = await within(canvas).findByRole('button', { name: /^Use the suggested amount/ });
@@ -230,11 +258,12 @@ export const WaterGoalBackToSuggested = screenStory({
   },
 });
 
-/** MM-313: a goal above 4 L carries a plain note (owner, 2026-10-14; the panel's SA-5). */
+/** MM-313: a goal above 4 L (169 fl oz) carries a plain note (owner, 2026-10-14; the panel's SA-5). Only the goal differs (MM-357). */
 export const WaterGoalHigh = screenStory({
   covers: ['SettingsScreen'],
   shows: /More than most people need/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 5000 }),
+  scenario: demoWith({ waterGoalMl: 5000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/More than most people need/));
@@ -409,6 +438,103 @@ export const SettingsOpensHowThisWorks = screenStory({
   walk: pressAnywhere(/^How this works/),
 });
 
+/** MM-63: Settings > Backup before any backup was made. */
+export const SettingsBackupNever = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Back up now',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});
+
+/** MM-63: a backup was made; its day is shown. */
+export const SettingsBackedUp = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Last backup/,
+  scenario: demoWith({ then: async (repos, today) => repos.preferences.saveLastBackupOn(today.addDays(-3)) }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});
+
+/** MM-63: the passphrase asked for a new backup, twice, with its warning. */
+export const SettingsBackupPassphrase = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: /If you lose it/,
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+  },
+});
+
+/** MM-63: the passphrase of a backup being restored, after a wrong one. */
+export const SettingsRestorePassphraseWrong = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: 'That passphrase does not open this backup.',
+  device: async (services) => {
+    const backup = new FakeBackupPlatform();
+    backup.toPick = await BackupFile.write(new Uint8Array([1, 2, 3]), 'the right one', { schemaVersion: 10, createdOn: '2026-10-12' }, new SodiumBackupCipher());
+    return { ...services, backup };
+  },
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Restore from a backup/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'The backup’s passphrase' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'the wrong one');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Open' }));
+  },
+});
+
+/** MM-63: the two passphrases differ once the second is long enough to be wrong. */
+export const SettingsBackupMismatch = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: 'The two do not match.',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'A passphrase for this backup' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.type(within(sheet).getByLabelText('Passphrase again'), 'correct horse batterx');
+  },
+});
+
+/** MM-63: sealing the backup, which takes about a second: the row says so and stays a button. */
+export const SettingsBackingUp = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Backing up…',
+  device: async (services) => ({ ...services, backup: new FakeBackupPlatform(() => new Promise<Uint8Array>(() => undefined)) }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'A passphrase for this backup' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.type(within(sheet).getByLabelText('Passphrase again'), 'correct horse battery');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Back up' }));
+  },
+});
+
+/** MM-63: the right passphrase; what the backup holds and what a restore replaces, asked before anything changes. */
+export const SettingsRestoreAsks = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Restore this backup?',
+  device: async (services) => {
+    const backup = new FakeBackupPlatform();
+    const db = await WasmSqlDatabase.open();
+    const sql = await SqlRepositories.open(db);
+    await sql.setup.saveSetup(typicalSetup({ onboardedOn: storyToday.addDays(-40), healthCheckConfirmedOn: storyToday }));
+    await sql.weights.saveWeight(storyToday.addDays(-9), 82.4);
+    await sql.weights.saveWeight(storyToday.addDays(-8), 82.1);
+    backup.toPick = await BackupFile.write(await db.exportBytes(), 'correct horse battery', { schemaVersion: 10, createdOn: storyToday.addDays(-8).toString() }, new SodiumBackupCipher());
+    const restorer = new FakeDataRestorer();
+    restorer.toDescribe = { weighIns: 2, foodDays: 0, workouts: 0, customFoods: 0, from: storyToday.addDays(-9), to: storyToday.addDays(-8), hasSetup: true };
+    restorer.here = { weighIns: 71, foodDays: 58, workouts: 12, customFoods: 3, from: storyToday.addDays(-70), to: storyToday, hasSetup: true };
+    return { ...services, backup, restorer };
+  },
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Restore from a backup/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'The backup’s passphrase' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Open' }));
+  },
+});
+
 export const SettingsOpensPause = screenStory({
   covers: ['SettingsScreen', 'PauseScreen'],
   shows: 'Reason',
@@ -457,6 +583,7 @@ export const ChangeHeightMetric = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Centimetres',
   scenario: demoWith({ units: 'metric' }),
+  about: ['units'],
   open: settingsAt('profile'),
   walk: pressAnywhere(/^Height/),
 });
@@ -764,4 +891,32 @@ export const AppleHealthReadDone = screenStory({
     reveal(read);
     await userEvent.click(read);
   },
+});
+
+/** MM-58: Settings, Data, with the online lookup row a build with a source shows, and its choice. */
+export const SettingsOnlineLookup = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Look foods up online',
+  device: onlineFoods(),
+  open: settingsAt('data'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Look foods up online'));
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Change online lookup' }));
+  },
+});
+
+/** MM-57: Settings, Data, opens where the food data comes from. */
+export const SettingsOpensFoodSources = screenStory({
+  covers: ['SettingsScreen', 'FoodSourcesScreen'],
+  shows: 'The sources',
+  open: settingsAt('data'),
+  walk: pressAnywhere(/^Food data sources/),
+});
+
+/** MM-57: the Food database screen cites its sources with a row that opens them. */
+export const FoodDatabaseOpensSources = screenStory({
+  covers: ['FoodDatabaseScreen', 'FoodSourcesScreen'],
+  shows: 'The sources',
+  open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
+  walk: pressAnywhere(/^Food data sources/),
 });

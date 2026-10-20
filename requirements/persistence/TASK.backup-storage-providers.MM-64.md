@@ -1,6 +1,6 @@
 ---
 id: MM-64
-status: proposed
+status: in-progress
 component: persistence
 related: [MM-59, MM-63, MM-65]
 ---
@@ -46,3 +46,9 @@ Scenario: Only ciphertext leaves the device
 ## Notes
 - Each provider needs a developer registration and its own review (Google's OAuth verification in particular). Check whether the app-data
   scopes avoid the heavier "restricted scope" review before committing to an order.
+
+## Milestone
+Moved from M3 into M2 on 2026-10-19 by the product owner: the closed beta's testers must be able to keep their data across phones.
+
+## Progress (2026-10-19)
+Built with MM-63: the share sheet and the document picker, behind `BackupPlatform` (snapshot, open a copy, save, pick), with a fake for tests and stories. Not built: Google Drive, Dropbox, OneDrive and WebDAV or S3. Each needs a developer registration and the owner's account (Google's OAuth verification in particular), so they wait on the owner; the interface they would implement is `BackupPlatform.save` and a listing to come. Only ciphertext ever leaves the device: `BackupFile.write` seals before `save`.

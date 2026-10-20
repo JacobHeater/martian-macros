@@ -1,6 +1,6 @@
 ---
 id: MM-155
-status: in-progress
+status: done
 component: body-measurements
 related: [MM-154, MM-21, MM-32, MM-34, MM-93, MM-107, MM-129, MM-133, MM-140, MM-146, MM-156]
 ---
@@ -125,11 +125,46 @@ More choices I made without asking:
 - **A second entry on the same day replaces the first**, as before. The ticket's "a second entry within three days replaces
   nothing and is stored" holds across days; the card says weekly is enough from the first entry.
 
-Not built:
-- **The protocol drawing**, shown the first three times.
-- **The chart** (entries as dots, a smoothed line, the noise band; 90 days and a year).
-- The monthly report still shows the month's first and last measurement (MM-33).
-- Widening the noise inside a cycle window (the ticket calls it optional).
+## Progress (2026-10-20, feat/m2)
+Built, no schema change:
+- **The protocol drawing** (`WaistProtocolFigure`, a design-system SVG: a standing torso, relaxed, the tape the heaviest
+  line, level at the navel, in the text colours only (the panel's PD-6: no colour of meaning); no bitmap; `role="img"`
+  named for what the drawing adds, "Drawing: where the tape sits, level around the waist at the navel") beside the
+  four steps as a numbered list of captions, in the waist card on Progress. It is shown in full while the person has
+  fewer than three measurements, and from the third it is one tap down under "How to measure" in the same card, so it
+  is available after. The Dashboard's one-field waist row keeps its one-line hint (MM-301); the drawing belongs to the
+  Progress entry (the panel's UX-9).
+- **The chart** (`WaistChart`, in `TrendChart`'s language and size): each measurement a dot in the measurement
+  colour, a line through the middle of each three neighbouring entries (what `waistChangeOf` compares), and a band
+  of the noise figure either side (`waistNoiseOf`; half as wide again around a single reading). Under three
+  measurements there is no middle of three, so the chart is dots alone and its caption says the line comes from the
+  third (the panel's PD-8, UX-7). Under the entry in the waist card, with a sub-head ("Waist over time", in the label
+  type, under the section's heading) beside a compact 90d/1y control, and one caption. With no measurement in range it
+  says so; with none at all there is no chart.
+- **The monthly report's waist line** comes from the one change function: the value "Down 2.5 cm", "Up …" or "No clear
+  change", with what it rests on as the row's detail ("92 cm to 89.5 cm"; "92.5 cm to 91.5 cm; a difference under
+  1.5 cm is within what a tape can tell"), over the report's 28 days as of its last day. The month's first and last
+  single readings are no longer compared.
+- Tests: `test/charts/waistChart.test.tsx`, `test/progress/waistProtocol.test.tsx`, `test/engine/monthlyReport.test.ts`
+  (the waist cases). Stories: `Progress.stories.tsx` (`ProgressWaistFirstMeasurements`, `ProgressWaistChart`,
+  `ProgressWaistHowToMeasure`, `ProgressWaistYear`, `ProgressWaistNoneInRange`); the figure in `Design
+  system/Components`, the chart in `Design system/Charts`. Panel review (one round, with MM-142):
+  `docs/agent-runs/mm142-weight-jump/`.
+
+Decided here (say if wrong):
+- **"The first three times" is counted by the measurements saved**, not by how often the card was opened: the drawing
+  shows until three entries exist. That needs no table or column (nothing counts views), and the three entries are the
+  three times the person measured.
+- **The chart is inside the waist card**, under the entry, not a section of its own: the card is the waist's one home
+  (rule 4), as the hero holds both the weigh-in and the trend chart. Its sibling is the hero's trend block (a head
+  with a compact `MmSegmented`, the chart, a caption).
+- **The smoothed line is the middle of each three neighbouring entries**, over the whole record so the line does not
+  bend at the range's edge, which is the same smoothing the change function applies to each end.
+- **The band's colour is the line's own at 14%**, as the trend's band is the trend line's.
+- **The section's fields and the new range control sit in the section, on the canvas**, as the waist fields have since
+  MM-257 and as the Weight events section's add button does; the panel (PD-10) asks whether MM-291 wants them on a
+  surface. Left for the owner; not changed here.
+- Not done: widening the waist noise inside a cycle window (the ticket calls it optional).
 
 ## Notes
 - Priority: must-have before MM-32, MM-133 and MM-140's "masked" branch.

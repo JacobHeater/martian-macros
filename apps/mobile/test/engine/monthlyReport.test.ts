@@ -178,18 +178,35 @@ describe('what the month holds', () => {
     expect(r.averageProteinTargetG).toBe(160);
   });
 
-  it('waist change needs two measurements', () => {
-    expect(
-      report({ waist: [new WaistObservation({ date: start.addDays(3), waistCm: 100 })] }).waistFromCm,
-    ).toBeUndefined();
+  // MM-155: the waist by the one rule every feature uses, not the month's first and last reading.
+  it('waist change needs a measurement at both ends of the month', () => {
+    expect(report({ waist: [new WaistObservation({ date: start.addDays(3), waistCm: 100 })] }).waistChange).toBeUndefined();
     const r = report({
       waist: [
         new WaistObservation({ date: start.addDays(2), waistCm: 100 }),
         new WaistObservation({ date: start.addDays(26), waistCm: 97.5 }),
       ],
     });
-    expect(r.waistFromCm).toBe(100);
-    expect(r.waistToCm).toBe(97.5);
+    expect(r.waistChange?.direction).toBe('down');
+    expect(r.waistChange?.fromCm).toBe(100);
+    expect(r.waistChange?.toCm).toBe(97.5);
+  });
+
+  it('a waist difference inside the tape’s noise is no clear change, and the ends are smoothed', () => {
+    const r = report({
+      waist: [
+        new WaistObservation({ date: start.addDays(-5), waistCm: 93 }),
+        new WaistObservation({ date: start.addDays(2), waistCm: 92 }),
+        new WaistObservation({ date: start.addDays(9), waistCm: 92.5 }),
+        new WaistObservation({ date: start.addDays(16), waistCm: 91.5 }),
+        new WaistObservation({ date: start.addDays(23), waistCm: 92 }),
+        new WaistObservation({ date: start.addDays(27), waistCm: 91 }),
+      ],
+    });
+    expect(r.waistChange?.direction).toBe('noClearChange');
+    expect(r.waistChange?.fromCm).toBe(92.5);
+    expect(r.waistChange?.toCm).toBe(91.5);
+    expectClose(r.waistChange?.thresholdCm, 1.4, 1e-9);
   });
 });
 

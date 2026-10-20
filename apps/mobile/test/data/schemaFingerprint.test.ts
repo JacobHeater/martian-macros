@@ -16,6 +16,15 @@ const fingerprints: Readonly<Record<number, string>> = {
   7: 'b5f5c969f0c69723ef9e9852f9f5ffd12d94b8edd3f61120a4c032d4c001108a',
   8: '4a0569a2ece9857339f453896f9d7e8b93d1de669281ea90a03ec705d6d04afe',
   9: '3e6e67178bea1ea3b8da22a6c8a6d9f1870a7a534463367561eba1376aa6e8f7',
+  // MM-63: the day the last backup was made.
+  10: 'c6a2ec1fff0b8639470370e149a37fbda26d6649c1aeefb4ba7b1c7c019064ff',
+  11: '20dea0d256c34b6fbd7abe7c05195385d75ef4e7a32f75802db4bb93d87d8b3d',
+  // MM-58: the online lookup choice and the foods found online.
+  12: 'b8898dd0ad77f654de3c3184350e8db5680fe5063ba2b34e052d19a7e35feec3',
+  // MM-250, MM-251: the nights of sleep and the sleep-disorder answer.
+  13: '8c338155e56e604938a2dea2c4af79515f5991f2ddc5ea2e3f7bda1b7232fce2',
+  // MM-167, MM-151, MM-152: the state a food was logged in, the conversion to grams, the usual cooking fat.
+  14: '6ea4e17738f9d1c856ead90d9c7486da11d53a22bc7f40ccf73672afe1e6f420',
 };
 
 it('the schema is the one recorded for its version', () => {

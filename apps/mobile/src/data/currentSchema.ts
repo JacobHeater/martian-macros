@@ -35,6 +35,10 @@ CREATE TABLE "setups" (
   "health_check_skip_count" INTEGER NOT NULL DEFAULT 0,
   "creatine_started_epoch_day" INTEGER NULL,
   "fluid_limited_by_clinician" INTEGER NOT NULL DEFAULT 0 CHECK ("fluid_limited_by_clinician" IN (0, 1)),
+  "pace_changed_epoch_day" INTEGER NULL,
+  "maintenance_anchor_epoch_day" INTEGER NULL,
+  "maintenance_correction_from_epoch_day" INTEGER NULL,
+  "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (
@@ -89,7 +93,10 @@ CREATE TABLE "food_entries" (
   "sugars_g" REAL NULL,
   "saturated_fat_g" REAL NULL,
   "cholesterol_mg" REAL NULL,
-  "sugar_alcohols_g" REAL NULL
+  "sugar_alcohols_g" REAL NULL,
+  "preparation" TEXT NULL,
+  "conversion_kind" TEXT NULL,
+  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)
 );
 CREATE TABLE "day_marks" (
   "epoch_day" INTEGER NOT NULL,
@@ -122,6 +129,7 @@ CREATE TABLE "targets_history" (
   "profile_revision" INTEGER NOT NULL DEFAULT 0,
   "safety_body_fat_percent" REAL NULL,
   "tdee_status" TEXT NOT NULL,
+  "requested_loss_fraction" REAL NULL,
   PRIMARY KEY ("effective_epoch_day")
 );
 CREATE TABLE "user_preferences" (
@@ -144,6 +152,12 @@ CREATE TABLE "user_preferences" (
   "inline_insight_areas_off" TEXT NOT NULL DEFAULT '',
   "inline_insight_kinds_off" TEXT NOT NULL DEFAULT '',
   "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),
+  "last_backup_epoch_day" INTEGER NULL,
+  "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),
+  "label_note_dismissed_epoch_day" INTEGER NULL,
+  "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),
+  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
+  "usual_cooking_fat" TEXT NOT NULL DEFAULT 'oil',
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -289,6 +303,31 @@ CREATE TABLE "inline_insight_log" (
   "first_epoch_day" INTEGER NOT NULL,
   UNIQUE ("kind", "anchor_kind", "anchor_id")
 );
+CREATE TABLE "menstruation_days" (
+  "epoch_day" INTEGER NOT NULL,
+  PRIMARY KEY ("epoch_day")
+);
+CREATE TABLE "online_foods" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "gtin" TEXT NULL,
+  "name" TEXT NOT NULL,
+  "brand" TEXT NULL,
+  "kcal" REAL NOT NULL CHECK("kcal" >= 0.0),
+  "protein_g" REAL NOT NULL CHECK("protein_g" >= 0.0),
+  "carbs_g" REAL NOT NULL CHECK("carbs_g" >= 0.0),
+  "fat_g" REAL NOT NULL CHECK("fat_g" >= 0.0),
+  "fiber_g" REAL NULL,
+  "sugar_alcohols_g" REAL NULL,
+  "sodium_mg" REAL NULL,
+  "alcohol_g" REAL NULL,
+  "micros" TEXT NOT NULL DEFAULT '{}',
+  "servings" TEXT NOT NULL DEFAULT '[]',
+  "source" TEXT NOT NULL,
+  "source_id" TEXT NULL,
+  "tier" INTEGER NOT NULL,
+  "tier_reason" TEXT NOT NULL
+);
+CREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" ("gtin");
 CREATE TABLE "inline_insight_snoozes" (
   "kind" TEXT NOT NULL,
   "subject" TEXT NOT NULL,
@@ -304,5 +343,12 @@ CREATE TABLE "exercise_progressions" (
   PRIMARY KEY ("exercise_id"),
   CHECK (reps_low >= 1 AND reps_low < reps_high),
   CHECK (load_step_kg IS NULL OR load_step_kg > 0)
+);
+CREATE TABLE "sleep_nights" (
+  "epoch_day" INTEGER NOT NULL,
+  "minutes_asleep" REAL NOT NULL CHECK("minutes_asleep" > 0.0 AND "minutes_asleep" <= 1440.0),
+  "source" TEXT NOT NULL CHECK("source" IN ('typed', 'imported')),
+  "source_name" TEXT NULL,
+  PRIMARY KEY ("epoch_day")
 );
 `;

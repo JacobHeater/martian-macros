@@ -1,6 +1,6 @@
 ---
 id: MM-373
-status: proposed
+status: done
 component: app-shell
 related: [MM-91, MM-106, MM-361]
 ---
@@ -31,3 +31,6 @@ Scenario: Large text
   Layout cannot be measured in the test's document, so the test is the place the browser check will go. Until then the
   guard is the 200% stories, looked at in the three palettes.
 - Not fixed in the design pass for MM-361: it changes every screen and belongs with MM-91.
+
+## Fix (2026-10-19)
+Each label is its own `.mm-nav-label`: full width of its destination, wrapping and breaking a word if it must (`overflow-wrap: anywhere`, `hyphens: auto`), centred, on a destination with `min-width: 0`. The test's document lays out nothing, so `apps/mobile/test/app/largeTextLayout.test.ts` reads the rules that make the layout hold; the 200% stories remain the check by eye (MM-91).

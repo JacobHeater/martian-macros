@@ -47,6 +47,11 @@ const every = [
   insight('stall'),
   insight('proteinByMeal', { meal: 0, missedDays: 10, lowDays: 8 }),
   insight('sodiumOverLimit', { overDays: 5, judgedDays: 8, leftOutDays: 6, limitMg: 2300 }),
+  insight('weekendHigher', { weekdayDays: 10, weekendDays: 4, weekdayAverageKcal: 2100, weekendAverageKcal: 2600, targetKcal: 2100 }),
+  insight('waistAgainstWeight', { waistFromCm: 92.4, waistToCm: 90.4, weightChangeKg: 0 }),
+  insight('consistentDay', { weekday: 6, unlogged: 0, weeks: 2, averageKcal: 2700 }),
+  insight('consistentDay', { weekday: 1, unlogged: 1, weeks: 2 }),
+  insight('shortSleep', { averageMinutes: 340, nights: 12 }),
 ] as const;
 
 it('every rule in the catalog has words', () => {
@@ -72,6 +77,30 @@ it('the protein-by-meal insight names the meal and grades itself', () => {
   expect(body).toContain('may help slightly');
   expect(body).toContain('your daily total matters much more');
   expect(evidence).toContainEqual(['Days under the minimum', '10']);
+});
+
+// MM-141: the three rules about the shape of the week and the tape, in the user's numbers.
+it('the weekend insight states both averages against the target', () => {
+  const [title, body, evidence] = insightText(every[7], fmt);
+  expect(title).toBe('Weekends run higher than weekdays');
+  expect(body).toContain('weekend days averaged about 2,600 kcal and your weekdays about 2,100, against a target of 2,100');
+  expect(evidence).toContainEqual(['Weekend average', '2,600 kcal']);
+});
+
+it('the waist insight states the tape and the scale', () => {
+  const [title, body, evidence] = insightText(every[8], fmt);
+  expect(title).toBe('Your waist is down while the scale held');
+  expect(body).toContain('from 92.4 cm to 90.4 cm');
+  expect(evidence).toContainEqual(['Waist change', '−2.0 cm']);
+});
+
+it('the consistent day names the weekday, highest or unlogged', () => {
+  const [highest, highestBody] = insightText(every[9], fmt);
+  expect(highest).toBe('Saturday is your highest day');
+  expect(highestBody).toContain('about 2,700 kcal');
+  const [unlogged, unloggedBody] = insightText(every[10], fmt);
+  expect(unlogged).toBe('Monday goes unlogged');
+  expect(unloggedBody).toContain('a rough estimate of the whole day still counts');
 });
 
 // MM-312: the sodium insight names its denominator and the days left out (the panel's CO-2).

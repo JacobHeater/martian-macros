@@ -62,7 +62,13 @@ in here.
    actions, a menu, a header action or rows. Train keeps "Start workout";
    "Repeat last workout" is a text action. Save for a value already saved
    waits until the value changes; a disabled primary is never parked in a
-   hero.
+   hero. A text action is in the text colour at the heading weight, never
+   Ember (MM-288, option (a), 2026-10-20); the one Ember text is the lead
+   action (`MmButton lead`), the screen's primary where it stands in the app
+   bar and cannot be a fill: the Dashboard's Add food once the day is
+   weighed. Before the weigh-in the row's Save is the Dashboard's primary and
+   Add food is a text action. The budget is written in
+   `anti-cruft-and-anti-slop.md`, "Hard limits".
 7. **Progressive disclosure is the default** (`anti-cruft` section 7): a
    screen answers today's question in the first viewport (412 by 915;
    smaller phones are not designed for, the owner's call of 2026-10-14).
@@ -293,7 +299,7 @@ One component, three structures, no colored fills:
 
 | Kind | Structure | Use |
 |---|---|---|
-| Info | `surface`, `info` icon, `body` text, no border | Calibration, settling, explanations |
+| Info | `surface`, `info` icon, `body` text, a 1 dp `outline` hairline on the canvas, as the list groups beside it; none as a well of a sheet or dialog (MM-352) | Calibration, settling, explanations |
 | Caution | `surface`, `caution` icon, `caution` 1 dp border, label word "Heads up" | Health/safety guidance |
 | Required safeguard | As caution, 1.5 dp border, bold lead sentence, an action button | Screening results, floors, limits |
 

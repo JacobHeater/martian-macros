@@ -10,4 +10,5 @@ export const healthDataTypeIcon: Record<HealthDataType, MmIconName> = {
   workout: 'train',
   menstruation: 'calendar',
   steps: 'walk',
+  sleep: 'sleep',
 };

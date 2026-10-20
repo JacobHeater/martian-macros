@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CookingFatKind } from '../../src/domain/food/CookingFatKind';
 import { DetailLevel } from '../../src/domain/food/detail/DetailLevel';
 import { MacroPicture } from '../../src/domain/MacroPicture';
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
@@ -55,6 +56,23 @@ export function preferencesRepositoryContract(
       }
       await repo.saveThemePreference('dark');
       expect(await first(repo.watchDetailLevel())).toBe('full');
+    });
+
+    // MM-123: exact targets and the label note; MM-130: easing into maintenance.
+    it('targets are rounded and the label note shown until changed', async () => {
+      expect(await first(repo.watchExactTargets())).toBe(false);
+      expect(await first(repo.watchLabelNoteDismissedOn())).toBeUndefined();
+      expect(await first(repo.watchEaseIntoMaintenance())).toBe(false);
+      const day = CalendarDate.of(2026, 10, 10);
+      await repo.saveExactTargets(true);
+      await repo.saveLabelNoteDismissedOn(day);
+      await repo.saveEaseIntoMaintenance(true);
+      expect(await first(repo.watchExactTargets())).toBe(true);
+      expect(await first(repo.watchLabelNoteDismissedOn())).toBe(day);
+      expect(await first(repo.watchEaseIntoMaintenance())).toBe(true);
+      await repo.saveExactTargets(false);
+      expect(await first(repo.watchExactTargets())).toBe(false);
+      expect(await first(repo.watchLabelNoteDismissedOn()), 'the other columns stay').toBe(day);
     });
 
     // MM-254: the macro picture, bars or donut, remembered per person.
@@ -189,6 +207,30 @@ export function preferencesRepositoryContract(
       expect([...switches.offAreas].sort()).toEqual(['food', 'training']);
       expect([...switches.offKinds]).toEqual(['volumeJump']);
       expect(await first(repo.watchThemePreference())).toBe('dark');
+    });
+
+    it('asks before any online lookup until the person chooses, and keeps the choice (MM-58)', async () => {
+      expect(await first(repo.watchOnlineLookup())).toBe('ask');
+      await repo.saveOnlineLookup('never');
+      expect(await first(repo.watchOnlineLookup())).toBe('never');
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchOnlineLookup()), 'other preferences leave it alone').toBe('never');
+      await repo.saveOnlineLookup('always');
+      expect(await first(repo.watchOnlineLookup())).toBe('always');
+    });
+
+    // MM-152: the fat the person usually cooks with, oil until one is chosen.
+    it('the usual cooking fat is oil until chosen, and each choice is kept apart from the rest', async () => {
+      expect(await first(repo.watchUsualCookingFat())).toBe('oil');
+      for (const kind of CookingFatKind.values) {
+        await repo.saveUsualCookingFat(kind);
+        expect(await first(repo.watchUsualCookingFat())).toBe(kind);
+      }
+      await repo.saveUsualCookingFat('butter');
+      await repo.saveDetailLevel('full');
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchUsualCookingFat()), 'other preferences leave it alone').toBe('butter');
+      expect(await first(repo.watchDetailLevel())).toBe('full');
     });
 
     it('emits the current choice first, then each change', async () => {

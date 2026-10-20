@@ -21,6 +21,28 @@ const rules = {
    * (MM-125). Advice about reaching the total, not about timing.
    */
   proteinByMeal: { priority: 'education', aboutWeight: false, otherIntake: false },
+  // The three below came later (2026-10-19) and sit after the panel-ordered rules above; sorting is by priority first.
+  /**
+   * Weekend days average a fifth of the target or more above weekdays
+   * (MM-141), from the same whole days the adherence summary uses.
+   */
+  weekendHigher: { priority: 'pattern', aboutWeight: false, otherIntake: true },
+  /**
+   * The waist is down beyond its noise while the trend weight held, in any
+   * goal (MM-141; the recomp signal's cousin, MM-32).
+   */
+  waistAgainstWeight: { priority: 'pattern', aboutWeight: true, otherIntake: false },
+  /**
+   * One weekday was the highest, or the unlogged, day in both of the last
+   * two weeks (MM-141). Stated, with no action.
+   */
+  consistentDay: { priority: 'pattern', aboutWeight: false, otherIntake: true },
+  /**
+   * Sleep averaged under six hours over the last fourteen recorded nights
+   * (MM-252): what the evidence says, in one sentence, and the gentler pace
+   * on offer. Rationed like the rest, so at most once a fortnight.
+   */
+  shortSleep: { priority: 'coaching', aboutWeight: false, otherIntake: false },
 } as const satisfies Record<string, { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean }>;
 
 /**

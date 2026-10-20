@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { MacroSplitChart } from '../../charts/MacroSplitChart';
 import { useNetCarbs } from '../useNetCarbs';
 import type { CalendarDate } from '../../domain/CalendarDate';
@@ -28,6 +28,8 @@ interface EstimateMealStepProps {
   onBack: () => void;
   /** Called once the estimate is logged. */
   onDone: () => void;
+  /** The typed form, offered when there is nothing to estimate from yet (MM-220). */
+  onManual: () => void;
   initialSize?: MealSize;
 }
 
@@ -36,7 +38,8 @@ interface EstimateMealStepProps {
  * (MM-150). It makes an ordinary entry measured by estimate, with the
  * uncertainty that carries.
  */
-export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initialSize = 'regular' }: EstimateMealStepProps) {
+export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManual, initialSize = 'regular' }: EstimateMealStepProps) {
+  const ids = useId();
   const { services, state } = useApp();
   const maintenance = useCell(state.coach)?.tdee.kcal;
   const netCarbs = useNetCarbs();
@@ -76,16 +79,25 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initial
         For a restaurant, a friend’s cooking or a buffet. Restaurant meals usually have more than they look. A rough
         entry beats a missing one.
       </p>
-      <p className="food-label food-label-spaced">How big was it?</p>
       {maintenance === undefined ? (
-        <Notice
-          text={
-            'Sizes are scaled to your own energy needs, which the app ' +
-            'works out after your first weigh-in. Until then, enter the ' +
-            'food by hand.'
-          }
-        />
-      ) : (
+        // Nothing to estimate from yet: the one thing that can be done is offered, and the rest is not drawn (MM-220).
+        <>
+          <Notice
+            text={
+              'Sizes are scaled to your own energy needs, which the app ' +
+              'works out after your first weigh-in. Until then, enter a rough guess by hand: ' +
+              'choose "Estimated totals" and type the calories you think it had.'
+            }
+          />
+          <div className="app-gap" />
+          <MmButton label="Enter manually" kind="secondary" expand onPress={onManual} />
+          <MmButton label="Back" kind="text" onPress={onBack} />
+        </>
+      ) : null}
+      {maintenance === undefined ? null : (
+      <>
+      <p className="food-label food-label-spaced">How big was it?</p>
+      {(
         <div className="app-row" role="group" aria-label="How big was it?">
           {MealSize.values.map((choice) => (
             <MmChoiceChip
@@ -110,6 +122,11 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initial
       </div>
       {totals === undefined ? null : (
         <>
+          {/* What the estimate will record, in the sheet's one wording (MM-218). */}
+          <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="estimate-totals">
+            Logs about {Fmt.whole(totals.kcal)} kcal · {Fmt.whole(totals.proteinG)} g protein · {Fmt.whole(totals.carbsG)} g carbs ·{' '}
+            {Fmt.whole(totals.fatG)} g fat
+          </p>
           <p className="food-label food-label-spaced">Estimated macro split</p>
           <MacroSplitChart
             isPreview
@@ -131,8 +148,10 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, initial
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
       <div className="app-gap" />
-      <MmButton label="Log the estimate" expand onPress={maintenance === undefined ? undefined : () => void log()} />
+      <MmButton label="Log the estimate" expand onPress={() => void log()} describedBy={totals === undefined ? undefined : `${ids}-logs`} />
       <MmButton label="Back" kind="text" onPress={onBack} />
+      </>
+      )}
     </div>
   );
 }

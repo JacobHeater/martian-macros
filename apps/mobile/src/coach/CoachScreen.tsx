@@ -4,14 +4,23 @@ import { intakeDayFrom } from '../domain/intakeDayFrom';
 import type { UserSetup } from '../domain/UserSetup';
 import { calibrationDays } from '../engine/coachConstants';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
+import { breakInForce } from '../engine/breakInForce';
+import { MaintenanceRule } from '../engine/MaintenanceRule';
 import { nextCheckIn } from '../engine/nextCheckIn';
 import { TdeeEstimator } from '../engine/TdeeEstimator';
 import { cautionMessage } from '../format/cautionMessage';
 import { confidenceLabel } from '../format/confidenceLabel';
 import { confidenceNextStepText } from '../format/confidenceNextStepText';
 import { Fmt } from '../format/Fmt';
+import { displayTargets } from '../format/displayTargets';
+import { FatLossPace } from '../engine/FatLossPace';
+import { paceName } from '../format/paceName';
+import { reboundText } from '../format/reboundText';
 import { goalModeBlurb } from '../format/goalModeBlurb';
 import { goalModeLabel } from '../format/goalModeLabel';
+import { trainingGoalNote } from '../format/trainingGoalNote';
+import { trainingMeaning } from '../format/trainingMeaning';
+import { trainsNotYet } from '../format/trainsNotYet';
 import { targetFlagMessage } from '../format/targetFlagMessage';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { Loadable } from '../state/Loadable';
@@ -27,6 +36,7 @@ import { ChoiceCard } from '../ui/ChoiceCard';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { Notice } from '../ui/Notice';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
@@ -35,6 +45,7 @@ import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { LastChangeCard } from './LastChangeCard';
+import { MaintenanceCard } from './MaintenanceCard';
 import { RecentInsightsSection } from './RecentInsightsSection';
 import { useInsightPreview } from './useInsightPreview';
 import { useRecentInsights } from './useRecentInsights';
@@ -46,7 +57,10 @@ import { ReliefOfferCard } from './ReliefOfferCard';
 import { ReportsCard } from './ReportsCard';
 import { StallCard } from './StallCard';
 import { TargetsHistoryScreen } from './TargetsHistoryScreen';
+import { TrainingLapseNotice } from './TrainingLapseNotice';
 import { UnderEatingNotice } from './UnderEatingNotice';
+import { WhatToExpectScreen } from './WhatToExpectScreen';
+import { usePaceSheet } from './usePaceSheet';
 import './coach.css';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -90,9 +104,11 @@ export function CoachScreen() {
   const { services, state } = useApp();
   const navigator = useNavigator();
   const overlays = useOverlays();
+  const openPaceSheet = usePaceSheet();
   const setup = useLoaded(state.setup);
   const snapshot = useCell(state.coach);
   const current = useCell(state.currentTargets);
+  const exactTargets = useLoaded(state.exactTargets) ?? false;
   const today = useCell(state.today);
   const pause = useCell(state.activePause);
   const guide = useCell(state.maintenanceGuide);
@@ -132,25 +148,41 @@ export function CoachScreen() {
   }
   const fmt = new Fmt(setup.unitSystem);
 
+  // Someone who does not train yet sees what a gain or recomp rests on (MM-134).
+  const notTraining = trainsNotYet(setup);
   const changeGoal = async () => {
     const chosen = await overlays.sheet<GoalMode>('Choose a goal', (close) => (
       <div className="coach-sheet">
         <h2 className="app-headline">Choose a goal</h2>
         {GoalMode.values
           .filter((mode) => snapshot.policy.allowedModes.has(mode))
-          .map((mode) => (
-            <ChoiceCard
-              key={mode}
-              label={goalModeLabel(mode)}
-              detail={goalModeBlurb(mode)}
-              selected={mode === setup.goalMode}
-              badge={mode === snapshot.recommendation.mode ? 'Recommended' : undefined}
-              onPress={() => close(mode)}
-            />
-          ))}
+          .map((mode) => {
+            const note = notTraining ? trainingGoalNote(mode) : undefined;
+            return (
+              <ChoiceCard
+                key={mode}
+                label={goalModeLabel(mode)}
+                detail={note === undefined ? goalModeBlurb(mode) : `${goalModeBlurb(mode)} ${note}`}
+                selected={mode === setup.goalMode}
+                badge={mode === snapshot.recommendation.mode ? 'Recommended' : undefined}
+                onPress={() => close(mode)}
+              />
+            );
+          })}
+        {notTraining ? <p className="app-caption">{trainingMeaning}</p> : null}
       </div>
     ));
     if (chosen === undefined || chosen === setup.goalMode) return;
+    if (chosen === 'leanGain' && notTraining) {
+      // A surplus without training is the one case where the app would knowingly add fat: one acknowledgement.
+      const acknowledged = await overlays.confirm({
+        title: 'Lean gain without training',
+        message: `${trainingGoalNote('leanGain') ?? ''} Without workouts logged, the surplus pauses after three weeks.`,
+        confirmLabel: 'I understand, choose Lean gain',
+        cancelLabel: 'Not now',
+      });
+      if (!acknowledged) return;
+    }
     if (chosen === 'fatLoss' || chosen === 'recomp') {
       // A deficit is confirmed against the health check before it is kept.
       await navigator.push<boolean>((close) => (
@@ -162,6 +194,11 @@ export function CoachScreen() {
   };
 
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
+  // A diet break brings the water back as leaving a cut does (MM-130): said under the break's notice while it does (MM-135, the panel's UX-5).
+  const runningBreak = breakInForce(history, today);
+  const breakRebound = runningBreak !== undefined && runningBreak.startedOn.daysUntil(today) < MaintenanceRule.reboundNoteDays;
+  // Rounded as every screen shows them, unless the person asked for exact ones (MM-123).
+  const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
   return (
     <>
@@ -173,6 +210,7 @@ export function CoachScreen() {
       ))}
       <PauseBanner />
       <UnderEatingNotice />
+      <TrainingLapseNotice />
       <ReliefOfferCard />
       {current === undefined ? null : (
         <>
@@ -191,6 +229,11 @@ export function CoachScreen() {
               <Notice kind="caution" text={targetFlagMessage(flag)} />
             </div>
           ))}
+          {breakRebound ? (
+            <div className="app-stack-item">
+              <Notice text={reboundText(fmt)} />
+            </div>
+          ) : null}
         </>
       )}
       {/* The goal first, under the figures and the warnings (MM-299). */}
@@ -200,23 +243,41 @@ export function CoachScreen() {
         trailing={<MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />}
       >
         <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
+        {/* What the first month looks like, reread any time (MM-158). */}
+        <MmListRow
+          leadingIcon="info"
+          title="What to expect"
+          subtitle="The plan’s aims, what the scale does that is not progress, and when targets first move."
+          dense
+          flush
+          opens
+          onPress={() => void navigator.push(() => <WhatToExpectScreen />)}
+        />
       </MmSection>
       <OneThingRow />
       {current === undefined ? null : (
         <MmSection icon="tune" title="Your targets">
-          {current.targets.proteinMinimumG === undefined ? null : (
-            <StatRow label="Protein minimum" value={Fmt.grams(current.targets.proteinMinimumG)} />
+          {shownTargets?.proteinMinimumG === undefined ? null : (
+            <StatRow label="Protein minimum" value={Fmt.grams(shownTargets.proteinMinimumG)} />
           )}
           <StatRow
             label="Intended pace"
             value={
               current.targets.weeklyRateFraction === 0 ? 'Hold weight' : Fmt.percentPerWeek(current.targets.weeklyRateFraction)
             }
+            detail={detail}
           />
-          {detail === undefined ? null : <p className="app-caption coach-pace-detail">{detail}</p>}
+          {/* The pace is the person's to choose on a cut (MM-128); recomp and the other goals have none. */}
+          {setup.goalMode === 'fatLoss' && openPaceSheet !== undefined ? (
+            <div className="coach-pace-row">
+              <StatRow label="Pace" value={paceName(FatLossPace.of(setup.requestedLossFraction) ?? FatLossPace.default)} />
+              <MmButton label="Change pace" kind="text" onPress={() => void openPaceSheet()} />
+            </div>
+          ) : null}
         </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />
+      <MaintenanceCard />
       {recent === undefined ? null : <RecentInsightsSection insights={recent} />}
       <StallCard />
       <RecompReviewCard />
@@ -231,7 +292,7 @@ export function CoachScreen() {
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
         <p className="app-text">{confidenceNextStepText(snapshot.confidence)}</p>
-        <MmDisclosure title="The numbers behind this">
+        <MmDisclosure title="The numbers behind this" remember="coach.confidence-numbers">
           <StatRow label="Estimate" value={confidenceLabel(snapshot.confidence.estimate)} />
           <StatRow label="Food log" value={confidenceLabel(snapshot.confidence.foodLog)} />
           <StatRow label="Weigh-ins" value={confidenceLabel(snapshot.confidence.weighIns)} />

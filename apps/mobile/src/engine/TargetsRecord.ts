@@ -17,6 +17,7 @@ interface TargetsRecordInit {
   targetRulesVersion?: number;
   explanation?: TargetsExplanation | undefined;
   summarySeen?: boolean;
+  requestedLossFraction?: number | undefined;
 }
 
 /** Targets in force from `effectiveFrom`, with the TDEE they were based on. */
@@ -59,6 +60,13 @@ export class TargetsRecord {
    */
   readonly summarySeen: boolean;
 
+  /**
+   * The fat-loss pace these targets were asked for, as the setup held it
+   * (MM-128); undefined for the default pace, or on records made before it
+   * was kept. A setup asking for another pace gets new targets at once.
+   */
+  readonly requestedLossFraction: number | undefined;
+
   constructor(init: TargetsRecordInit) {
     this.effectiveFrom = init.effectiveFrom;
     this.targets = init.targets;
@@ -67,6 +75,7 @@ export class TargetsRecord {
     this.tdeeSigmaKcal = init.tdeeSigmaKcal;
     this.tdeeStatus = init.tdeeStatus;
     this.safetyBodyFatPercent = init.safetyBodyFatPercent;
+    this.requestedLossFraction = init.requestedLossFraction;
     this.profileRevision = init.profileRevision ?? 0;
     this.targetRulesVersion = init.targetRulesVersion ?? currentTargetRulesVersion;
     this.explanation = init.explanation;

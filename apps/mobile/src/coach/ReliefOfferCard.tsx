@@ -7,10 +7,15 @@ import { MmButton } from '../ui/MmButton';
 import { Notice } from '../ui/Notice';
 
 /**
- * The offer to ease a deficit when recovery is failing (MM-117): a
- * maintenance week now, a slower pace from the next check-in, or carry on.
- * Never an automatic change. Carrying on is one tap and free of comment.
- * Empty when no offer is due.
+ * The offer to ease a deficit (MM-117, MM-135): a two-week break at
+ * maintenance now, a slower pace from the next check-in, or carry on. Two
+ * things bring it, told apart by the title and icon: recovery is failing
+ * (the heart), or the deficit has run twelve unbroken weeks (the calendar);
+ * the slower pace is offered with the first only. Short sleep over a
+ * fortnight of recorded nights is a recovery signal of its own (MM-252). Never an automatic
+ * change. Carrying on is one tap and free of comment, on its own line under
+ * the choices (the panel's PD-2: three buttons wrapped by overflow). Empty
+ * when no offer is due.
  */
 export function ReliefOfferCard() {
   const { services, state } = useApp();
@@ -20,40 +25,45 @@ export function ReliefOfferCard() {
   if (offer === undefined || setup === undefined) return null;
   const words = reliefOfferText(offer);
   const slower = offer.slowerPace;
-  const suggestsBreak = offer.suggestion === 'maintenanceWeek';
-  const text = [words.body, words.suggestion, ...(words.sleep === undefined ? [] : [words.sleep])].join('\n\n');
+  const suggestsBreak = offer.suggestion === 'break';
+  const text = [words.body, words.suggestion, words.sleep].filter((part) => part !== undefined && part !== '').join('\n\n');
   return (
     <div className="app-stack-item">
       <Notice
-        icon="heart"
+        icon={offer.reason === 'longDeficit' ? 'calendar' : 'heart'}
         title={words.title}
         text={text}
         action={
-          <div className="app-row">
-            <MmButton
-              label="Take a maintenance week"
-              kind={suggestsBreak ? 'primary' : 'secondary'}
-              onPress={() =>
-                void services.setup.saveSetup(setup.copyWith({ maintenanceWeekFrom: today, reliefAnsweredOn: today }))
-              }
-            />
-            {slower === undefined ? null : (
+          <>
+            <div className="app-row">
               <MmButton
-                label={`Slow to ${paceLabel(slower)}`}
-                kind={suggestsBreak ? 'secondary' : 'primary'}
+                label="Take a two-week break"
+                kind={suggestsBreak ? 'primary' : 'secondary'}
                 onPress={() =>
-                  void services.setup.saveSetup(
-                    setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today }),
-                  )
+                  void services.setup.saveSetup(setup.copyWith({ maintenanceWeekFrom: today, reliefAnsweredOn: today }))
                 }
               />
-            )}
-            <MmButton
-              label="Carry on"
-              kind="text"
-              onPress={() => void services.setup.saveSetup(setup.copyWith({ reliefAnsweredOn: today }))}
-            />
-          </div>
+              {slower === undefined ? null : (
+                <MmButton
+                  label={`Slow to ${paceLabel(slower)}`}
+                  kind={suggestsBreak ? 'secondary' : 'primary'}
+                  onPress={() =>
+                    void services.setup.saveSetup(
+                      // A pace change acts at once (MM-128), and a slower pace only raises the target.
+                      setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today, paceChangedOn: today }),
+                    )
+                  }
+                />
+              )}
+            </div>
+            <div className="app-row">
+              <MmButton
+                label="Carry on"
+                kind="text"
+                onPress={() => void services.setup.saveSetup(setup.copyWith({ reliefAnsweredOn: today }))}
+              />
+            </div>
+          </>
         }
       />
     </div>

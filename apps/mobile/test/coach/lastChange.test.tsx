@@ -82,6 +82,9 @@ it('an ordinary change shows old and new, then the account', async () => {
   expect(sheet.getByText(/Calories 2,400 → 2,325\. Protein target unchanged/)).toBeInTheDocument();
   expect(sheet.getByText(/Carbohydrate 255 → 240 g/)).toBeInTheDocument();
   expect(sheet.getByText('Why')).toBeInTheDocument();
+  // The week the check-in read, as its five facts, beside the reasons (MM-149).
+  expect(sheet.getByText('Your last 7 days')).toBeInTheDocument();
+  expect(sheet.getByText('Weigh-ins')).toBeInTheDocument();
   expect(sheet.getByText(/Your expenditure is 2,860 kcal a day, down from 2,950 \(−90\)/)).toBeInTheDocument();
   expect(
     sheet.getByText(/Weekly changes are limited, so 15 kcal of the decrease is held for next week/),

@@ -1,6 +1,6 @@
 ---
 id: MM-134
-status: proposed
+status: done
 component: adaptive-coach
 related: [MM-10, MM-12, MM-22, MM-25, MM-74, MM-75, MM-78, MM-82, MM-113, MM-121, MM-129, MM-133, MM-138]
 ---
@@ -85,3 +85,23 @@ Scenario: Cardio only
 - Priority: the goal-sheet notes are must-have and cheap; the lapse rules wait for the training log (MM-75).
 - A user on weight-loss medication gets the training note with different wording (MM-113).
 - The protein target for a user who does not lift is lower (MM-121); changing training days changes it at the next check-in.
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **At goal selection** (onboarding's plan step and the Coach's "Choose a goal"): with training days at 0 or "not lifting yet",
+  Lean gain and Recomp carry the note "This goal works through resistance training. Without it, a surplus is stored as fat.",
+  and what training means here is said once (`trainingMeaning`: each major muscle group, hard sets, twice a week; a minimum,
+  not a program). Choosing Lean gain then needs one acknowledgement (a dialog on the Coach; "I understand" under the card in
+  onboarding, without which Next stays off). Recomp needs none.
+- **Training lapses** (`assessTrainingLapse`, `TrainingRule`): with the log in use, no finished workout for 14 days is a notice on
+  the Coach (cut: "Lifting is what tells your body to keep muscle while you lose weight. Nothing about your targets changes."; gain:
+  the surplus pauses at 21). At 21 days on lean gain, or with training days set to 0, the surplus is suspended: `nextTargets`
+  builds maintenance flagged `trainingLapsed` with the reason (`trainingSuspended`; the training-days case applies at once, the
+  log case at the check-in), and lean-gain targets return at the check-in after a workout is logged. A pause (MM-148) silences the
+  notices and the suspension stands without comment. A workout still in progress is not a day trained.
+- **Imported sessions**: the training log holds only strength workouts (imported runs never become workouts), so "cardio only"
+  cannot sustain a gain by construction; no separate rule was needed.
+- Evidence rows (MM-143). Tests: `trainingLapse.test.ts` (engine), `trainingLapse.test.tsx` (each acceptance scenario through
+  the app). Stories: the existing goal stories draw the notes for the demo person; `ChooseGoal` covers the sheet.
+
+Not done: the different wording for a user on weight-loss medication belongs to MM-113.

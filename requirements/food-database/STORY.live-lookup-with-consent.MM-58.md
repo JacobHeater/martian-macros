@@ -1,6 +1,6 @@
 ---
 id: MM-58
-status: proposed
+status: done
 component: food-database
 related: [MM-50, MM-43, MM-44, MM-56, MM-95]
 ---
@@ -50,3 +50,61 @@ Scenario: A bad online entry
 
 ## Notes
 - Follow Open Food Facts' API etiquette: a descriptive User-Agent and their rate limits.
+
+## Progress (2026-10-20, feat/m2)
+Built, closing the ticket. The owner asked on 2026-10-20 for a food-data solution with additional sources; the live lookup is
+how the app reaches beyond its packs, so the ticket joined M2.
+- **Two online sources behind one interface** (`OnlineFoodSource`, in a new `foodOnline` layer): **Open Food Facts** over its
+  public API (`OpenFoodFactsSource`: one product by barcode, or a name search on request; requests spaced to its published
+  limits of 15 product reads and 10 searches a minute and carrying the app's User-Agent, as its etiquette asks) and **USDA
+  FoodData Central** over its API (`UsdaFoodDataCentralSource`: a barcode is a search of the Branded foods for its digits,
+  matched exactly on the normalized code; a name search asks every data type). FoodData Central needs a key the build is given
+  (`MM_FDC_API_KEY`, from the environment or the git-ignored `config/prod.local.json`); a build without one has Open Food
+  Facts alone. Each answer is mapped onto the pipeline's own candidate (`offCandidate`, `fdcCandidate`: the same nutrient ids,
+  unit conversions, US-label carbohydrate rule and refused vitamins as the pack build's extract) and passes the same nutrition
+  checks (MM-53) and trust tiers (`packEntryFor`), so a food found online is judged exactly as one in a pack. The request is
+  made through the shell's own HTTP stack (`CapacitorJsonHttp` behind `JsonHttp`, a domain seam with an in-memory fixture).
+- **Consent** (`OnlineLookupChoice`: ask, always, never; `user_preferences.online_lookup`, schema 12): the first unknown
+  barcode with a source to ask shows the question in the scan step's own notice, "Look this up online? Only the barcode
+  number is sent to Open Food Facts…, nothing about you. For now means until you close the app; always means every food
+  not on this phone is looked up without asking. You can change this in Settings, under Data." with Just for now
+  (primary), Always (secondary) and Never (text), stacked like the step's own buttons. Never means no request, ever; it
+  says once that online lookup is off and where to change it, and the label is offered as before. The choice is also in
+  Settings, Data, "Look foods up online" (a listbox like Units), and a build with no source shows no such row.
+- **Order on a scan**: the person's own foods, the installed packs, then online if allowed. Every source is asked at once; the
+  most reliable answer wins (`sourceReliability`, as between packs); not found only when a source said so, "could not be
+  reached" when none answered. The product found opens the same amount step as a pack's, marked "found online".
+- **Kept on the phone** (`OnlineFoodCache`: `online_foods` table, schema 12, SQL and in-memory under one contract): a food
+  found online is a record of the catalog's "online" pack from then on, so the next scan of that barcode needs no connection,
+  and it is searched with the packs. Erased with everything else; copied by the backup, like every table.
+- **Search online, on request** (`OnlineSearchResults`): a "Search online" action under the phone's results, never as the
+  person types (Open Food Facts asks that search not be used that way); the first time it asks the same question, saying the
+  words typed are what is sent; what is found is listed under "Found online" with each food's source and tier, and the one
+  picked is kept.
+- **Said in the terms** (section 9, version 2, with the change note shown to someone who agreed to version 1) and on the new
+  Settings screen "Food data sources" (MM-57).
+- Tests: `openFoodFactsSource.test.ts`, `usdaFoodDataCentralSource.test.ts` (mapping from real answers of 2026-10-20, not
+  found, failed checks, unreachable, spacing), `onlineFoodCacheContract.ts` (both implementations), `onlineLookup.test.ts`
+  (consent, every source asked, the most reliable kept), `scanOnline.test.tsx` (each acceptance scenario: asked first, never,
+  found and remembered offline, a bad entry not offered), `searchOnline.test.tsx`, `foodSources.test.tsx`, schema 12 upgrade.
+  Stories: ScanAsksOnline, ScanFoundOnline, ScanNeverOnline, ScanNotFoundOnline, ScanOnlineUnavailable, SearchOnlineOffered,
+  SearchOnlineAsks, SearchOnlineFound, SearchOnlineNothing, SearchOnlineUnavailable, FoodSources, SettingsOnlineLookup.
+
+Decided here (say if wrong):
+- **USDA FoodData Central is the second online source**, not only Open Food Facts as the ticket names: it is public domain,
+  needs only a free key, and its Branded set is the pack's main source, so a product launched since the pack was built is
+  found there with label figures rather than crowd ones. The key is the owner's to obtain (api.data.gov); until it is set,
+  the build asks Open Food Facts alone.
+- **A name search online exists too**, on request only: the ticket is about barcodes, but a food with no barcode (a
+  restaurant dish, a new generic) is the other gap in the packs, and the same consent covers it with the same words.
+- **The User-Agent names the repository**, not a person: Open Food Facts asks for a contact, and the app has no account or
+  person to name.
+- **"Just for now" lasts for this run of the app**, not for one lookup: asking again on the next scan of the same session
+  would be nagging. The UX review (F1) found "Just this once" did not describe that, so the words now say what it does;
+  the duration is still this ticket's choice.
+- **Reviewed by the panel** (product-designer and UX-accessibility, `docs/agent-runs/mm58-online-lookup/`): one blocking
+  finding (two primary actions while the question is asked, MM-435) and the should-fix items were fixed in the same
+  session; every finding's outcome is in `outcomes.md`. Not verified: how TalkBack and VoiceOver announce the status
+  region and where focus lands after an answer, which needs a device.
+- Not built: the online answer is not written back to a pack, and nothing is contributed to Open Food Facts (MM-44 lists
+  that as undecided).

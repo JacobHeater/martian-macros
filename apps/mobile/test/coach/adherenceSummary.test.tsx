@@ -24,7 +24,7 @@ const summary = ({
   logged?: number;
   complete?: number;
   intake?: number | undefined;
-  target?: number;
+  target?: number | undefined;
   standing?: IntakeStanding | undefined;
   estimated?: boolean;
 } = {}) =>
@@ -42,32 +42,48 @@ const summary = ({
   });
 
 const intakeLine = (s: AdherenceSummary) =>
-  adherenceLines(s, { floorKcal: 1500 }).find(([label]) => label === 'Average intake')?.[1] ?? '';
+  adherenceLines(s, { floorKcal: 1500 }).find((line) => line.label === 'Average intake') ?? { label: '', value: '' };
 
-it('a typical week states each fact', () => {
+it('a typical week states each fact: a figure, and what it is measured against under it (MM-342)', () => {
   expect(adherenceLines(summary(), { floorKcal: 1500 })).toEqual([
-    ['Days logged', '6, 5 complete'],
-    ['Weigh-ins', '6'],
-    ['Average intake', '2,180 kcal against 2,100: on target'],
-    ['Protein minimum met', '4 of 5 days'],
+    { label: 'Days logged', value: '6', detail: '5 complete' },
+    { label: 'Weigh-ins', value: '6' },
+    { label: 'Average intake', value: '2,180 kcal', detail: 'against a 2,100 kcal target: on target' },
+    { label: 'Protein minimum met', value: '4 of 5 days' },
   ]);
 });
 
 it('over and under read the same apart from the direction', () => {
-  expect(intakeLine(summary({ intake: 2350, standing: 'above' }))).toBe('2,350 kcal against 2,100: 250 over');
-  expect(intakeLine(summary({ intake: 1850, standing: 'below' }))).toBe('1,850 kcal against 2,100: 250 under');
+  expect(intakeLine(summary({ intake: 2350, standing: 'above' }))).toEqual({ label: 'Average intake', value: '2,350 kcal', detail: 'against a 2,100 kcal target: 250 over' });
+  expect(intakeLine(summary({ intake: 1850, standing: 'below' }))).toEqual({ label: 'Average intake', value: '1,850 kcal', detail: 'against a 2,100 kcal target: 250 under' });
 });
 
 it('below the floor is never on target or under target', () => {
   const line = intakeLine(summary({ intake: 1050, target: 1900, standing: 'belowFloor' }));
-  expect(line).toContain("below the app's minimum of 1,500");
-  expect(line).not.toContain('on target');
-  expect(line).not.toContain('under');
+  expect(line.detail).toContain("below the app's minimum of 1,500");
+  expect(line.detail).not.toContain('on target');
+  expect(line.detail).not.toContain('under');
 });
 
-it('few days and estimates are said', () => {
-  expect(intakeLine(summary({ complete: 2 }))).toMatch(/rests on 2 days$/);
-  expect(intakeLine(summary({ estimated: true }))).toMatch(/mostly estimated$/);
+it('few days and estimates are said in the detail, and the figure stays a figure', () => {
+  expect(intakeLine(summary({ complete: 2 })).detail).toMatch(/rests on 2 days$/);
+  expect(intakeLine(summary({ estimated: true })).detail).toMatch(/mostly estimated$/);
+  expect(intakeLine(summary({ complete: 2 })).value).toBe('2,180 kcal');
+});
+
+it('the week\'s workouts are the fifth fact once the training log is read, and left out when it is not (MM-149)', () => {
+  const s = summary();
+  expect(adherenceLines(s, { floorKcal: 1500 }).find((line) => line.label === 'Workouts')).toBeUndefined();
+  const withWorkouts = new AdherenceSummary({ ...s, workouts: 3 });
+  expect(adherenceLines(withWorkouts, { floorKcal: 1500 }).find((line) => line.label === 'Workouts')).toEqual({ label: 'Workouts', value: '3' });
+});
+
+it('an average below the floor points to the notice about those days while it is showing (MM-114, MM-149)', () => {
+  const low = summary({ intake: 1050, target: 1900, standing: 'belowFloor' });
+  expect(adherenceLines(low, { floorKcal: 1500, underEatingNotice: true }).find((line) => line.label === 'Average intake')?.detail).toMatch(
+    /below the app's minimum of 1,500; see the notice about your logged days/,
+  );
+  expect(adherenceLines(low, { floorKcal: 1500 }).find((line) => line.label === 'Average intake')?.detail).not.toMatch(/see the notice/);
 });
 
 it('no percentage, grade or score anywhere', () => {
@@ -77,7 +93,7 @@ it('no percentage, grade or score anywhere', () => {
     summary({ logged: 0, complete: 0, intake: undefined, standing: undefined }),
   ]) {
     const all = adherenceLines(s, { floorKcal: 1500 })
-      .map(([label, value]) => `${label} ${value}`)
+      .map(({ label, value, detail }) => `${label} ${value} ${detail ?? ''}`)
       .join(' ')
       .toLowerCase();
     for (const word of ['%', 'score', 'grade', 'adherence', 'great', 'good']) expect(all, word).not.toContain(word);
@@ -100,7 +116,7 @@ it('the Coach screen shows the card from stored days', async () => {
   renderApp(repos, today);
   await openTab('Coach');
   const card = (await screen.findByRole('heading', { name: 'Your last 7 days' })).closest('.mm-section');
-  expect(card).toHaveTextContent('5, all complete');
+  expect(card).toHaveTextContent(/Days logged\s*5\s*all complete/);
   expect(card).toHaveTextContent(/Weigh-ins\s*7/);
   expect(card).toHaveTextContent('2,100 kcal');
 });

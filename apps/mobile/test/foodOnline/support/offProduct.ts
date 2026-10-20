@@ -1,0 +1,33 @@
+/** An Open Food Facts v2 product answer, cut from the real one for 0737628064502 on 2026-10-20 (the fields the app asks for). */
+export const offProduct = {
+  code: '0737628064502',
+  product: {
+    brands: 'Simply Asia, Thai Kitchen',
+    code: '0737628064502',
+    countries_tags: ['en:france', 'en:united-states'],
+    last_modified_t: 1792288131,
+    nutrition_data_per: '100g',
+    product_name: 'Thai peanut noodle kit includes stir-fry rice noodles & thai peanut seasoning',
+    serving_quantity: '52',
+    serving_size: '1/3 package (52 g)',
+    nutriments: {
+      'energy-kcal_100g': 385,
+      'energy-kj_100g': 1672.82,
+      proteins_100g: 9.62,
+      carbohydrates_100g: 71.15,
+      fat_100g: 7.69,
+      fiber_100g: 1.9,
+      sodium_100g: 0.288,
+      salt_100g: 0.72,
+      sugars_100g: 13.46,
+      'saturated-fat_100g': 1.92,
+      cholesterol_100g: 0,
+      calcium_100g: 0.038,
+      iron_100g: 0.00069,
+      'vitamin-a_100g': 0.0001155,
+      'vitamin-c_100g': 0,
+    },
+  },
+  status: 1,
+  status_verbose: 'product found',
+};

@@ -4,10 +4,6 @@
 .coach-range {
   color: var(--ion);
 }
-.coach-pace-detail {
-  margin: 0;
-  text-align: end;
-}
 .coach-flag {
   margin-top: var(--space-8);
 }
@@ -118,4 +114,15 @@
   flex-wrap: wrap;
   column-gap: var(--space-8);
   margin: var(--space-4) 0 0 calc(-1 * var(--space-12));
+}
+
+/* The pace row (MM-128): the stat and its text action on one line. */
+.coach-pace-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+.coach-pace-row > :first-child {
+  flex: 1;
 }

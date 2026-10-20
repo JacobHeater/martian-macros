@@ -1,6 +1,6 @@
 ---
 id: MM-150
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-27, MM-38, MM-40, MM-42, MM-45, MM-46, MM-139, MM-141, MM-149, MM-153, MM-167]
 ---
@@ -118,3 +118,21 @@ day of several estimated meals; each is 40% uncertain): no bias and honest uncer
 about 160 kcal high, because the unmarked-partial-day rule (MM-27: a day under 65% of the window's 75th-percentile intake is treated
 as partial) starts dropping honest low days. Days marked complete are always used, so marking days complete is the protection. Whether
 the rule should be softer for estimate-heavy logging is a decision for the owner; it is not changed here.
+
+## Progress (2026-10-20, feat/m2)
+Built: **reuse from recents keeps the estimate mark.** A recent estimated meal's row under a search reads "Your recent food ·
+estimated · 900 kcal", and picking it refills the form as "Estimated totals", ready to log, so an estimate is never mistaken for a
+measured food on its way back in. Tested in `test/food/estimateMeal.test.tsx`; story `AddFoodRecentEstimate`. The rest of the M2
+scope was already built (the sheet, the sizes, the kinds, the 40% uncertainty, the day that still counts, the simulator check).
+
+Noted, with their own tickets: the adherence summary saying intake was mostly estimated (MM-149), confidence lowered by it (MM-139)
+and the insight above half (MM-141) are the coach's; the "Estimate-heavy day check" is the same question for MM-139. Decided here
+(say if wrong): the recent-food chips shown before a search stay names only; the mark is on the row, where there is room for it.
+
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+The recent-food chips carry the mark too (UX-7): "Thai place, usual · estimated", so the one-tap path says what it is before
+the tap. The earlier decision to leave the chips as names only is reversed.
+
+## UI/UX
+- A recent estimate — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodRecentEstimate). The row's
+  "estimated" between the kind and the calories.

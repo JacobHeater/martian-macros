@@ -74,3 +74,24 @@ The product owner asked whether the fifty pantry barcodes could be sourced onlin
 ## Re-measured 2026-10-19 (MM-409; status stays in-progress)
 The export of 2026-10-19 read whole with DuckDB 1.5.6 (`strict_mode = false`): 4,848,211 rows. The 2026-10-09 read had skipped about 250,000 rows that are not standard CSV, which is where the gap to the Parquet's count came from. Products tagged United States: 987,217; with a name, energy and the three macros: **184,356** (against 98,880 before). A cut by GS1 United States or Canada prefix without the country tag would add 68,358 complete products, but they are tagged France, Ireland, the United Kingdom, Italy and Spain for the most part and only 256 carry no country, so the prefix was declined as a rule. Canada-only products with complete macros: 110,340, declined for a US launch. Energy stated only in kilojoules, or a name only in another field: six products, no rule. Queries and the table are in `docs/food-packs-data.md`. The hand check and the pantry test are still open.
 **Pack sizes on 2026-10-19** (format 3, the thirteen MM-307 nutrients and sugar alcohols as integer columns): `barcode_us` 520,988 foods, 171 MB as SQLite, 53.8 MB gzip (the 2026-10-09 pack: 456,191 foods, 46.7 MB gzip); `generic` 13,285 foods (5,315 of them FNDDS), 4.9 MB as SQLite, 1.5 MB gzip (was 8,088 and 0.76 MB). The barcode pack stays a download and the generic pack stays small enough to bundle.
+
+## Additional sources, decided 2026-10-20 (feat/m2; status stays in-progress as the owner said)
+The owner asked for a food-data solution "including additional sources". Candidates read on 2026-10-20 and the decision on each:
+- **Open Food Facts, live, by barcode and by name** (MM-58): **added**, as the app's online source when the person allows it. It
+  is the same database as the pack's, read at the moment of the scan, so a product added or corrected since the pack was built
+  is found; its API allows 15 product reads and 10 searches a minute per address and asks for a named User-Agent, both honoured.
+- **USDA FoodData Central, live** (MM-58): **added** as a second online source, in builds given a key (free from api.data.gov;
+  1,000 requests an hour). Its Branded set is the pack's main source and refreshes monthly where the download is twice a year,
+  and it answers generic foods by name. Public domain, confirmed from USDA's own words (MM-57).
+- **MenuStat** (NYC Department of Health, the hundred largest US chains' menus): **declined**. Its public listing carries no
+  licence ("No license information was provided"), and the data is a historical snapshot current through 2018. Restaurant
+  menus stay the gap no open source fills; FNDDS's foods as eaten (added 2026-10-19) are the generic stand-in.
+- **Canadian Nutrient File, UK CoFID, Australian AFCD**: **declined for a US launch**, as `docs/food-packs-data.md` records
+  (fortification differs, no barcodes, mostly descended from USDA SR, a third licence line each); a Canadian launch revisits.
+- **OpenNutrition** (a 2025 compilation of USDA, CNF, FRIDA and AUSNUT): **declined**: derived from sources the app already
+  reads or declined, with a licence this session could not confirm from its own pages.
+- **FoodData Central's April 2026 releases are the newest** (its download page, 2026-10-20): the pins are current, so no
+  rebuild of the packs was due; the next FDC release (expected 2026-10 or later) is the next rebuild.
+The spike's hand check (question 3) and pantry test (question 7) still need real packages, as recorded above; with the live
+lookup, an unknown barcode in a real pantry is now looked up rather than lost, which is the practical answer to coverage until
+the test is run.

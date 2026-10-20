@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import {
   CalendarDate,
-  type IntakeDay,
+  IntakeDay,
   Profile,
   ScreeningAnswers,
   UserSetup,
@@ -144,4 +144,26 @@ it('bariatric surgery prevents issuing targets', () => {
   const s = setup({ onboardedOn: start, screening: new ScreeningAnswers({ bariatricSurgery: true }) });
   const snapshot = snapshotAfter(35, s);
   expect(nextTargets({ setup: s, snapshot, history: [], today: start })).toBeUndefined();
+});
+
+// MM-114: days the person confirmed as complete at far below the floor do inform the expenditure estimate (MM-27), and
+// the target still never goes below the floor or falls faster than the step limit: nothing is cut because of those days.
+it('confirmed low days never pull the target below the floor (MM-114)', () => {
+  const s = setup({ onboardedOn: start });
+  const user = new SyntheticUser({ seed: 11, start, baseTdeeKcal: 2600, startWeightKg: 80, bodyFatPercent: 22, skipWeighInProbability: 0.1 });
+  const weights: WeightObservation[] = [];
+  const intake: IntakeDay[] = [];
+  for (let d = 0; d < 42; d++) {
+    const day = user.liveDay(1000);
+    if (day.weight !== undefined) weights.push(day.weight);
+    if (day.intake !== undefined) intake.push(new IntakeDay({ ...day.intake, completeness: 'complete' }));
+  }
+  const snapshot = analyze({ setup: s, weights, intake, today: start.addDays(42) });
+  expect(snapshot).toBeDefined();
+  const first = deficitStartingOn(start);
+  const next = nextTargets({ setup: s, snapshot: snapshot as CoachSnapshot, history: [first], today: start.addDays(42) });
+  expect(next).toBeDefined();
+  expect(next?.targets.kcal).toBeGreaterThanOrEqual((snapshot as CoachSnapshot).calorieFloorKcal - 1e-9);
+  // And no faster than a weekly step, whatever the low days say about expenditure (MM-26's limit, well under 300 kcal).
+  expect(next?.targets.kcal).toBeGreaterThanOrEqual(first.targets.kcal - 300);
 });
