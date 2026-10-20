@@ -91,11 +91,15 @@ should see corrected limits).
 4. **Thresholds under uncertainty (MM-132).** M1.
 5. **Underweight guard (MM-111).** M1. Land it before WS-05 step 2, which
    extends the same function.
-6. **Diet-break policy (MM-135).** M2. A product-owner decision first; the
-   spike lists five questions and the panel's proposed answers.
+6. **Diet-break policy (MM-135).** M2. Decided by the owner on 2026-10-13 and
+   built 2026-10-20: offered at twelve weeks and on failing recovery signals,
+   planned at twenty, two weeks long, seven days at or above maintenance
+   reset the count.
 7. **Joint model spike (MM-35).** M4. Only after step 2 has shown what the
    two-step model can and cannot do with a glycogen term.
 8. **The partial-day rule for estimate-heavy logging (MM-173).** M2. Placed 2026-10-13.
+9. **The one-week break choice (MM-432).** M3. Needs a `setups` column, so it
+   waits on the schema lane; placed 2026-10-20 when MM-135 stopped at it.
 
 ## Done enough to unblock others
 MM-120, MM-131, MM-115 and MM-132 are done, the full engine suite passes, and
@@ -115,11 +119,12 @@ is changing.
 ## Requirement sources
 - Built: MM-18, MM-19 (trend filter, cycle noise); MM-23, MM-24, MM-25, MM-26,
   MM-27, MM-28 (estimate, check-in, goals, partition, partial days, limits);
-  MM-30 (simulator); MM-31 (diet break as built); MM-120, MM-131 (reference
-  weight, settling after a phase change); MM-115 (raise when loss outruns the
-  limit); MM-111 (underweight guard); MM-132 (body-fat thresholds under
-  uncertainty).
-- Remaining: MM-135, MM-35. Epics: MM-22, MM-110.
+  MM-30 (simulator); MM-31 (diet break as first built); MM-135 (the diet
+  break as decided: offered at twelve, planned at twenty); MM-120, MM-131
+  (reference weight, settling after a phase change); MM-115 (raise when loss
+  outruns the limit); MM-111 (underweight guard); MM-132 (body-fat thresholds
+  under uncertainty).
+- Remaining: MM-35, MM-432 (the one-week break choice). Epics: MM-22, MM-110.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-173 (Honest low days from a noisy logger are dropped as partial, and the estimate drifts high).
 
 ## Notes for whoever builds it

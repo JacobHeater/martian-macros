@@ -115,10 +115,14 @@ Rows: assessCoachConfidence, confidenceGoodEstimateSigmaKcal, confidenceLearning
 ### When does the app slow or stop a deficit?
 
 A deficit is not offered below a body mass index of 18.5, and loss is limited to
-the gentlest pace below 20. After a long unbroken deficit the app plans a
-maintenance break. Goals are also limited by your health check.
+the gentlest pace below 20. After twelve unbroken weeks of deficit the app offers
+a two-week break at maintenance, and offers one whenever your weekly check-ins
+say recovery is failing; at twenty weeks it plans the break itself. A break is a
+rest from dieting that many people find makes the next weeks easier; the app does
+not claim it does anything to your metabolism. Goals are also limited by your
+health check.
 
-Rows: underweightBmi, lowWeightCautionBmi, lowWeightMaxLossFraction, SafetyBounds.maxContinuousDeficitWeeks
+Rows: underweightBmi, lowWeightCautionBmi, lowWeightMaxLossFraction, DietBreakRule.offerFromWeeks, DietBreakRule.forceFromWeeks, DietBreakRule.breakWeeks, DietBreakRule.resetDays
 
 ### How sure is the app about my body fat?
 
@@ -188,7 +192,10 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `SafetyBounds.absoluteFloorKcal` | 1,500 men, 1,200 women | engine SafetyBounds.ts | The lowest target ever issued | NIH minimum-intake guidance, as cited in the code | moderate | Adults with obesity under supervised and unsupervised programs | No |
 | `SafetyBounds.energyAvailabilityThresholdPercent` | 15% men, 25% women | engine SafetyBounds.ts | Whether the energy-availability floor applies | Product judgement: low-energy-availability harm concentrates in lean users | judgement | None directly | No |
 | `SafetyBounds.calorieFloorKcal` | The largest of the absolute floor, resting energy, and for lean users the energy-availability floor | engine SafetyBounds.ts | The calorie floor | Product judgement combining the rows above | judgement | None directly | No |
-| `SafetyBounds.maxContinuousDeficitWeeks` | 16 weeks | engine SafetyBounds.ts | When a maintenance break is forced | MATADOR (Byrne 2018) as cited in MM-31 supports intermittent dieting; the 16 weeks is product judgement | judgement | Men with obesity (MATADOR); the figure is not from it | No |
+| `DietBreakRule.offerFromWeeks` | 12 whole weeks of unbroken deficit | engine DietBreakRule.ts | When the coach offers a two-week break at maintenance (MM-135), beside the offer the recovery signals bring (MM-117) | The product owner, 2026-10-13 (MM-135), from the panel's recommendation. Breaks did not improve body composition in resistance-trained people (ICECAP, Peos 2021; one-week breaks every three weeks) but lowered hunger in a secondary analysis; alternating two-week breaks gave more fat loss and less adaptation in men with obesity (MATADOR, Byrne 2018, n = 51). Twelve weeks is judgement: no trial tested a single offer at this point | judgement | Trained adults (ICECAP), men with obesity (MATADOR); the interval is from neither | No |
+| `DietBreakRule.forceFromWeeks` | 20 whole weeks of unbroken deficit | engine DietBreakRule.ts | When the app plans the break itself, offer or no offer: a safety floor on unbroken dieting (MM-135) | The product owner, 2026-10-13 (MM-135): a cap kept as a backstop, longer than the offer, replacing MM-31's forced week at 16. No trial sets a longest safe deficit; the figure is product judgement | judgement | None directly | No |
+| `DietBreakRule.breakWeeks` | 2 weeks at maintenance | engine DietBreakRule.ts | How long a break is, chosen or planned (MM-135) | MATADOR's breaks were two weeks (Byrne 2018); a one-week break is partly consumed by the glycogen rebound and the engine's blind period (MM-131). The panel's recommendation, decided here (MM-135); a one-week choice waits on MM-432 | judgement | Men with obesity (MATADOR); applied to everyone | No |
+| `DietBreakRule.resetDays` | 7 consecutive days of targets at or above maintenance | engine DietBreakRule.ts | What ends the unbroken run of deficit weeks, however it came about (MM-135): a break, a maintenance week, a change of goal; a pause of 7 days (MM-148) and a gap of 14 (MM-147) keep their own rules | Product judgement (MM-135, the panel's recommendation): a stretch shorter than a week is a wobble, not a rest; targets, not eaten intake, since the engine does not react to intake | judgement | None | No |
 | `SafetyBounds.maxWeeklyTargetChangeKcal` | 100 kcal | engine SafetyBounds.ts | The largest ordinary weekly change in the target | Product judgement for stability | judgement | None | No |
 | `SafetyBounds.maxWeeklyTargetChangeFraction` | 5% of the target | engine SafetyBounds.ts | The same, for small targets | Product judgement for stability | judgement | None | No |
 | `SafetyBounds.maxWeeklyTargetChange` | The smaller of the two above | engine SafetyBounds.ts | The weekly step limit | Product judgement | judgement | None | No |
