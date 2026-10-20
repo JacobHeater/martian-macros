@@ -1,6 +1,6 @@
 ---
 id: MM-57
-status: proposed
+status: in-progress
 component: food-database
 related: [MM-50, MM-51, MM-52, MM-56, MM-95]
 ---
@@ -47,3 +47,22 @@ Open Food Facts' terms of use (fetched 2026-10-09) state ODbL for the database, 
 - On the product owner's instruction the packs are **published publicly** in [martian-macros-food-data](https://github.com/JacobHeater/martian-macros-food-data) (release 2026-10-09) **before any review**. The repository has the official ODbL 1.0 text as its LICENSE, a README stating that the licensing is provisional and unreviewed, an ATTRIBUTION file crediting Open Food Facts and USDA FoodData Central, no product images, and release notes naming the source versions and the pipeline commit. Each pack's header carries a provisional license and attribution text.
 - The app's Food database screen credits both sources and links the repository. A data-sources screen with links to each license, as the acceptance criteria ask, is not built.
 - **Open and for a qualified reader**: whether publishing the merged packs under ODbL meets Open Food Facts' terms (attribution form, share-alike scope for a merged database, the Database Contents License for individual records); which license governs the Hugging Face copy (the page tags both agpl-3.0 and odbl; the files used here came from Open Food Facts' own export); USDA's public-domain statement, which I could not read this session; and whether the app counts as a produced work. The ticket stays proposed until someone qualified has read it.
+
+## Progress (2026-10-20, feat/m2; status in-progress, a qualified reader still owed)
+- **USDA's status is now read from USDA's own words** (its API guide, fetched 2026-10-20): "USDA FoodData Central data are
+  in the public domain and they are not copyrighted. No permission is needed for their use, but we request that users list
+  FoodData Central as the source of the data", with the citation "U.S. Department of Agriculture, Agricultural Research
+  Service. FoodData Central, 2019. fdc.nal.usda.gov." That closes the spike's open point on USDA; the app names FoodData
+  Central as the source wherever it names Open Food Facts.
+- **A data-sources screen is built** (Settings, Data, "Food data sources", `FoodSourcesScreen`): each source with its
+  licence and address (USDA FoodData Central, public domain; Open Food Facts, Open Database License 1.0 and the Database
+  Contents License, images not used), the packs on the phone, the published files' repository, the online lookup's sources
+  and what is sent to them (MM-58), and the attribution text. Addresses are shown as text: the app has no component that opens
+  a browser, and the owner's rule keeps native surfaces out (a decision to revisit if a reviewer asks for live links).
+- **The online sources** (MM-58) fall under the same licences: a product fetched from Open Food Facts is ODbL/DbCL data, a
+  food from FoodData Central public domain; the screen says so. Open Food Facts' API etiquette (a named User-Agent, its rate
+  limits) is followed in code (`OnlineSourceRule`).
+- **Still open, and for a qualified reader**: whether publishing the merged packs under ODbL meets Open Food Facts' terms
+  (attribution form, share-alike scope, the Database Contents License for records); which licence governs the Hugging Face
+  copy (unused here); whether the app is a produced work. The screen says the reading has not been reviewed by a lawyer.
+  The ticket cannot be done by an agent: its last acceptance scenario needs a person qualified to read it.

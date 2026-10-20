@@ -32,6 +32,8 @@ import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { Watched } from '../lang/Watched';
+import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
+import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
 import type { BarcodeScanner } from '../platform/BarcodeScanner';
 import type { LabelTextReader } from '../platform/LabelTextReader';
 
@@ -86,6 +88,12 @@ export interface AppServices {
    * Empty means this build offers no downloads and makes no request.
    */
   readonly packManifestUrl: string;
+
+  /** The web services that may be asked for a food the phone does not have, if the person allows it (MM-58). None in a build without them. */
+  readonly onlineSources: readonly OnlineFoodSource[];
+
+  /** Foods found online, kept on the phone (MM-58). */
+  readonly onlineFoods: OnlineFoodCache;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
 

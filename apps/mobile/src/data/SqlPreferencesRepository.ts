@@ -1,3 +1,4 @@
+import { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
@@ -136,6 +137,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveLabelNoteDismissedOn(day: CalendarDate): Promise<void> {
     return this.save({ label_note_dismissed_epoch_day: day.epochDay });
+  }
+
+  watchOnlineLookup(): Watched<OnlineLookupChoice> {
+    return this.watch((row) => (row === undefined ? 'ask' : OnlineLookupChoice.of(String(row['online_lookup'] ?? 'ask'))));
+  }
+
+  saveOnlineLookup(choice: OnlineLookupChoice): Promise<void> {
+    return this.save({ online_lookup: choice });
   }
 
   watchEaseIntoMaintenance(): Watched<boolean> {

@@ -13,6 +13,7 @@ import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { onTargetScenario } from './onTargetScenario';
+import { onlineFoods } from './onlineFoods';
 import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
 import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
@@ -895,5 +896,138 @@ export const AddFoodWithAlcohol = screenStory({
   walk: async (canvas) => {
     await press('Enter manually')(canvas);
     await press('Includes alcohol?')(canvas);
+  },
+});
+
+/** MM-58: the first unknown code on a phone that can ask online: the question, saying only the barcode number is sent and to whom. */
+const typeUnknownCode = async (canvas: HTMLElement) => {
+  await press('Scan')(canvas);
+  await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Or type the digits' }), '4006381333931');
+  await press('Look up')(canvas);
+};
+
+export const ScanAsksOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: 'Just this once',
+  device: onlineFoods(),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+/** MM-58: allowed once, the product a service knows comes to its amount step, marked as found online. */
+export const ScanFoundOnline = screenStory({
+  covers: ['BarcodeScanStep', 'FoodAmountStep'],
+  shows: /found online/,
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeUnknownCode(canvas);
+    await press('Just this once')(canvas);
+  },
+});
+
+/** MM-58: never: no request, and the label is offered as before. */
+export const ScanNeverOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: 'Read the label',
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeUnknownCode(canvas);
+    await press('Never')(canvas);
+  },
+});
+
+/** MM-58: always allowed, and no service knows the code either. */
+export const ScanNotFoundOnline = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: /not in the food database on this phone or online/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ entries: [] }),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+/** MM-58: always allowed, with no connection: said, and the label offered. */
+export const ScanOnlineUnavailable = screenStory({
+  covers: ['BarcodeScanStep'],
+  shows: /could not be reached/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ down: true }),
+  open: addFood,
+  walk: typeUnknownCode,
+});
+
+const typeSearch = (words: string) => async (canvas: HTMLElement) => {
+  await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), words);
+};
+
+/** MM-58: searching never asks online by itself: the action under the phone's results. */
+export const SearchOnlineOffered = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Search online',
+  device: onlineFoods(),
+  open: addFood,
+  walk: typeSearch('peanut noodle'),
+});
+
+/** MM-58: the first online search asks, saying only the words typed are sent. */
+export const SearchOnlineAsks = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /Only the words you typed are sent/,
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('peanut noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: what a service found, listed under the phone's results with where each came from. */
+export const SearchOnlineFound = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Found online',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods(),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('peanut noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: a service that found nothing says so. */
+export const SearchOnlineNothing = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /Nothing found online for/,
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ entries: [] }),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('quinoa')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: no connection when searching online: said, with a way to try again. */
+export const SearchOnlineUnavailable = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Try again',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: onlineFoods({ down: true }),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('quinoa')(canvas);
+    await press('Search online')(canvas);
   },
 });

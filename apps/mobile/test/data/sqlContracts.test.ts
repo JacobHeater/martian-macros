@@ -25,7 +25,10 @@ import { weightEventRepositoryContract } from '../contracts/weightEventRepositor
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
 import { first } from '../support/first';
-import { openRepositories as open } from './support/openRepositories';
+import { openRepositories as open, openSql } from './support/openRepositories';
+import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
+import { SqlOnlineFoodCache } from '../../src/foodCatalog/online/SqlOnlineFoodCache';
+import { AppDatabase } from '../../src/data/AppDatabase';
 
 /**
  * Runs every repository contract against the database's implementations.
@@ -37,6 +40,11 @@ weightRepositoryContract('SQLite', async () => (await open()).weights);
 weightEventRepositoryContract('SQLite', async () => (await open()).weightEvents);
 waistRepositoryContract('SQLite', async () => (await open()).waist);
 menstruationRepositoryContract('SQLite', async () => (await open()).flowDays);
+onlineFoodCacheContract('SQLite', async () => {
+  const sql = await openSql();
+  await AppDatabase.open(sql);
+  return new SqlOnlineFoodCache(sql);
+});
 waterRepositoryContract('SQLite', async () => (await open()).water);
 preferencesRepositoryContract('SQLite', async () => (await open()).preferences);
 foodRepositoryContract('SQLite', async () => (await open()).food);

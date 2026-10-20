@@ -13,6 +13,10 @@ import { NativePackHttp } from '../foodCatalog/download/native/NativePackHttp';
 import { NativePackStore } from '../foodCatalog/download/native/NativePackStore';
 import { openInstalledCatalog } from '../foodCatalog/download/openInstalledCatalog';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import { SqlOnlineFoodCache } from '../foodCatalog/online/SqlOnlineFoodCache';
+import { OpenFoodFactsSource } from '../foodOnline/OpenFoodFactsSource';
+import { UsdaFoodDataCentralSource } from '../foodOnline/UsdaFoodDataCentralSource';
+import { CapacitorJsonHttp } from '../platform/CapacitorJsonHttp';
 import { constant } from '../lang/constant';
 import { mmHealth } from '../platform/mmHealth';
 import { mmReminders } from '../platform/mmReminders';
@@ -54,6 +58,8 @@ export async function openAppServices(): Promise<AppServices> {
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
+  const onlineHttp = new CapacitorJsonHttp();
+  const onlineFoods = new SqlOnlineFoodCache(sql);
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
@@ -85,12 +91,20 @@ export async function openAppServices(): Promise<AppServices> {
     // subscription, which the app asks for when one is installed or
     // removed. A browser has none. No camera plugin is in the shell yet
     // (MM-232, step 5).
-    catalog: native ? once(() => openInstalledCatalog(packStore)) : constant(new FoodCatalog([])),
+    catalog: native ? once(() => openInstalledCatalog(packStore, [onlineFoods])) : constant(new FoodCatalog([onlineFoods])),
     packStore,
     packHttp: native ? new NativePackHttp(mmPacks) : new InMemoryPackHttp(),
     // Where to read the list of packs on offer, set for each build (MM-56).
     // A browser build offers no downloads and makes no request.
     packManifestUrl: native ? __MM_FOOD_PACK_MANIFEST_URL__ : '',
+    // The services an unknown food may be looked up at, only when the person allows it (MM-58): Open Food
+    // Facts needs no key; FoodData Central only when the build was given one. A browser has them too, so the
+    // dev server can be tried, but a story or a test never (fixtureServices).
+    onlineSources: [
+      new OpenFoodFactsSource({ http: onlineHttp }),
+      ...(__MM_FDC_API_KEY__ === '' ? [] : [new UsdaFoodDataCentralSource({ http: onlineHttp, apiKey: __MM_FDC_API_KEY__ })]),
+    ],
+    onlineFoods,
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),

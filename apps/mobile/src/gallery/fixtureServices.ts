@@ -4,6 +4,7 @@ import type { InMemoryRepositories } from '../fixtures/InMemoryRepositories';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoodCache';
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
 import { FakeHealthSource } from '../healthIngest/testing/FakeHealthSource';
@@ -20,8 +21,12 @@ import type { AppServices } from '../state/AppServices';
 export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock): AppServices {
   // Never the device's camera, and no food pack unless one is brought.
   const camera = new NoCamera();
+  const onlineFoods = new InMemoryOnlineFoodCache();
   return {
-    catalog: constant(new FoodCatalog([])),
+    catalog: constant(new FoodCatalog([onlineFoods])),
+    // Never a web service: no source to ask, unless a story or a test brings one (MM-58).
+    onlineSources: [],
+    onlineFoods,
     // Never the network: nothing to fetch, and nowhere to fetch a list from.
     packStore: new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes })),
     packHttp: new InMemoryPackHttp(),

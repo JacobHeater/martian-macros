@@ -18,6 +18,8 @@ import type { NetCarbsReader } from './NetCarbsReader';
 import type { NetCarbsWriter } from './NetCarbsWriter';
 import type { NutritionGoalsReader } from './NutritionGoalsReader';
 import type { NutritionGoalsWriter } from './NutritionGoalsWriter';
+import type { OnlineLookupReader } from './OnlineLookupReader';
+import type { OnlineLookupWriter } from './OnlineLookupWriter';
 import type { PreferencesReader } from './PreferencesReader';
 import type { PreferencesWriter } from './PreferencesWriter';
 import type { RecoverySkipReader } from './RecoverySkipReader';
@@ -63,4 +65,6 @@ export interface PreferencesRepository
     LabelNoteReader,
     LabelNoteWriter,
     EaseIntoMaintenanceReader,
-    EaseIntoMaintenanceWriter {}
+    EaseIntoMaintenanceWriter,
+    OnlineLookupReader,
+    OnlineLookupWriter {}

@@ -1,6 +1,12 @@
 import { HowThisWorksScreen } from '../about/HowThisWorksScreen';
 import { useInsightKinds } from '../coach/useInsightKinds';
 import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
+import { FoodSourcesScreen } from '../foodPacks/FoodSourcesScreen';
+import { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
+import { onlineLookupChoiceLabel } from '../format/onlineLookupChoiceLabel';
+import { onlineSourceNames } from '../format/onlineSourceNames';
+import { useCell } from '../app/useCell';
+import { Loadable } from '../state/Loadable';
 import { DailyActivity } from '../domain/DailyActivity';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { useNetCarbs } from '../food/useNetCarbs';
@@ -110,6 +116,20 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
       })
       .then((chosen) => {
         if (chosen !== undefined) void services.preferences.saveDetailLevel(chosen.value);
+      });
+
+  // Whether unknown foods may be looked up online (MM-58): the same choice the scan step asks, kept here.
+  const onlineChoice = Loadable.valueOf(useCell(state.onlineLookup.choice)) ?? 'ask';
+  const onlineSources = state.onlineLookup.sourceIds;
+  const chooseOnlineLookup = () =>
+    void overlays
+      .options<OnlineLookupChoice>({
+        title: 'Look foods up online',
+        options: OnlineLookupChoice.values.map((value) => ({ value, label: onlineLookupChoiceLabel(value) })),
+        selected: onlineChoice,
+      })
+      .then((chosen) => {
+        if (chosen !== undefined) void state.onlineLookup.choose(chosen.value);
       });
 
   const chooseUnits = () =>
@@ -224,10 +244,25 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
               opens
               onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
             />
+            {onlineSources.length === 0 ? null : (
+              <MmListRow
+                leadingIcon="search"
+                title="Look foods up online"
+                subtitle={`${onlineLookupChoiceLabel(onlineChoice)}. When a food is not on this phone, only the barcode or your search words go to ${onlineSourceNames(onlineSources)}.`}
+                trailingAction={<MmIconButton icon="edit" label="Change online lookup" opens="listbox" onPress={chooseOnlineLookup} />}
+              />
+            )}
+            <MmListRow
+              leadingIcon="document"
+              title="Food data sources"
+              subtitle="Where the foods come from, their licences, and what the app sends online."
+              opens
+              onPress={() => void navigator.push(() => <FoodSourcesScreen />)}
+            />
             <MmListRow
               leadingIcon="lock"
-              title="Stored only on this device"
-              subtitle="Nothing is uploaded."
+              title="Your records stay on this device"
+              subtitle="Nothing about you is uploaded. Only a barcode or search words ever go online, and only if you allow it."
             />
           </MmListGroup>
         </MmSection>

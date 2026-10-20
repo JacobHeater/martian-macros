@@ -152,6 +152,7 @@ CREATE TABLE "user_preferences" (
   "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),
   "label_note_dismissed_epoch_day" INTEGER NULL,
   "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),
+  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -301,6 +302,27 @@ CREATE TABLE "menstruation_days" (
   "epoch_day" INTEGER NOT NULL,
   PRIMARY KEY ("epoch_day")
 );
+CREATE TABLE "online_foods" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "gtin" TEXT NULL,
+  "name" TEXT NOT NULL,
+  "brand" TEXT NULL,
+  "kcal" REAL NOT NULL CHECK("kcal" >= 0.0),
+  "protein_g" REAL NOT NULL CHECK("protein_g" >= 0.0),
+  "carbs_g" REAL NOT NULL CHECK("carbs_g" >= 0.0),
+  "fat_g" REAL NOT NULL CHECK("fat_g" >= 0.0),
+  "fiber_g" REAL NULL,
+  "sugar_alcohols_g" REAL NULL,
+  "sodium_mg" REAL NULL,
+  "alcohol_g" REAL NULL,
+  "micros" TEXT NOT NULL DEFAULT '{}',
+  "servings" TEXT NOT NULL DEFAULT '[]',
+  "source" TEXT NOT NULL,
+  "source_id" TEXT NULL,
+  "tier" INTEGER NOT NULL,
+  "tier_reason" TEXT NOT NULL
+);
+CREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" ("gtin");
 CREATE TABLE "inline_insight_snoozes" (
   "kind" TEXT NOT NULL,
   "subject" TEXT NOT NULL,

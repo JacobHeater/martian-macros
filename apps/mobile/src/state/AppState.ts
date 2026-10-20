@@ -119,6 +119,7 @@ import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
 import { PackDownloadsController } from './PackDownloadsController';
 import { PackManifestCheck } from './PackManifestCheck';
+import { OnlineLookup } from './OnlineLookup';
 import { StreamCell } from './StreamCell';
 import { ValueCell } from './ValueCell';
 
@@ -396,6 +397,9 @@ export class AppState {
   /** The list of packs the host offers, read once when the user asks. */
   readonly packManifest: PackManifestCheck;
 
+  /** Looking a food up online, if allowed (MM-58). */
+  readonly onlineLookup: OnlineLookup;
+
   /** Each lift's estimated strength over time. Failed when a logged set cannot be worked out. */
   readonly strengthTrends: Cell<Loadable<readonly StrengthTrend[]>>;
 
@@ -460,6 +464,13 @@ export class AppState {
       onInstalled: () => this.packsChanged(),
     });
     this.packManifest = new PackManifestCheck({ http: s.packHttp, url: s.packManifestUrl });
+    this.onlineLookup = new OnlineLookup({
+      sources: s.onlineSources,
+      cache: s.onlineFoods,
+      consent: s.preferences,
+      // A food kept is a food the catalog now has: whoever searched asks again.
+      onKept: () => this.packsChanged(),
+    });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.

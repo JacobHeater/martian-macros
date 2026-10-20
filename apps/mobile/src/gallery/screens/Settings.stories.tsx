@@ -8,6 +8,8 @@ import { demoWith } from './demoWith';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import type { SettingsSectionId } from '../../settings/SettingsSectionId';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
+import { FoodSourcesScreen } from '../../foodPacks/FoodSourcesScreen';
+import { onlineFoods } from './onlineFoods';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
 import { screen, userEvent, within } from 'storybook/test';
@@ -117,6 +119,21 @@ export const FoodDatabase = screenStory({
   covers: ['FoodDatabaseScreen'],
   shows: 'Food database',
   open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
+});
+
+/** MM-57, MM-58: where the food data comes from, its licences, and what the app sends online, on a phone that can ask Open Food Facts with a pack installed. */
+export const FoodSources = screenStory({
+  covers: ['FoodSourcesScreen'],
+  shows: 'Food data sources',
+  device: async (services) => onlineFoods()(await storyPackHost({ installed: '2026-10-09' })(services)),
+  open: ({ navigator }) => void navigator.push(() => <FoodSourcesScreen />),
+});
+
+/** MM-58: the same screen in a build with no online source and nothing downloaded: nothing is ever sent. */
+export const FoodSourcesNoneOnline = screenStory({
+  covers: ['FoodSourcesScreen'],
+  shows: /no online source, so nothing is ever sent/,
+  open: ({ navigator }) => void navigator.push(() => <FoodSourcesScreen />),
 });
 
 /** MM-242: the terms, to read again, with the day they were agreed to. */
@@ -868,5 +885,17 @@ export const AppleHealthReadDone = screenStory({
     const read = await within(canvas).findByRole('button', { name: 'Read from Apple Health now' });
     reveal(read);
     await userEvent.click(read);
+  },
+});
+
+/** MM-58: Settings, Data, with the online lookup row a build with a source shows, and its choice. */
+export const SettingsOnlineLookup = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Look foods up online',
+  device: onlineFoods(),
+  open: settingsAt('data'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Look foods up online'));
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Change online lookup' }));
   },
 });
