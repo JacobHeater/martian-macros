@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { atwaterKcal } from '../../domain/atwaterKcal';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { Micronutrient } from '../../domain/food/micros/Micronutrient';
@@ -48,6 +48,7 @@ const optional = (value: number | undefined) => (value === undefined ? '' : oneD
  * never entries already logged from it.
  */
 export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormProps) {
+  const ids = useId();
   const { services } = useApp();
   const [name, setName] = useState(food?.name ?? '');
   const [serving, setServing] = useState(food?.servingDescription ?? '1 serving');
@@ -201,7 +202,7 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         onChange={setKcal}
         hint={fromMacros > 0 ? `${whole} from macros` : undefined}
         helper={
-          mismatch ? `Macros add up to ${whole} kcal. Double-check the label.` : 'Leave blank to calculate from macros.'
+          mismatch ? `Macros add up to ${whole} kcal; the ${kcal.trim()} typed is kept. Double-check the label.` : 'Leave blank to calculate from macros.'
         }
         helperIsWarning={mismatch}
       />
@@ -236,7 +237,19 @@ export function CustomFoodForm({ food, initialBarcode, onDone }: CustomFoodFormP
         helperIsWarning={!barcodeOk}
       />
       <div className="app-gap" />
-      <MmButton label="Save food" expand onPress={valid ? () => void save() : undefined} />
+      {valid ? null : (
+        // An action that is off says what is still needed (MM-220).
+        <p id={`${ids}-needed`} className="app-caption food-still-needed">
+          {`Still needed: ${[
+            ...(name.trim() === '' ? ['a name'] : []),
+            ...(serving.trim() === '' ? ['what one serving is'] : []),
+            ...(servingGrams === undefined ? ['its weight in grams'] : []),
+            ...(energy === undefined || energy <= 0 ? ['calories above zero (typed, or from the macros)'] : []),
+            ...(barcodeOk ? [] : ['a valid barcode, or none']),
+          ].join(', ')}.`}
+        </p>
+      )}
+      <MmButton label="Save food" expand onPress={valid ? () => void save() : undefined} describedBy={valid ? undefined : `${ids}-needed`} />
       <MmButton label="Cancel" kind="text" onPress={onDone} />
     </div>
   );

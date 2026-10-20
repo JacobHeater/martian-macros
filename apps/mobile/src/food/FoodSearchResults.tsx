@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
+import type { SearchHit } from '../foodCatalog/SearchHit';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useAsync } from '../app/useAsync';
@@ -9,6 +10,7 @@ import { useDebounced } from '../app/useDebounced';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmListRow } from '../ui/MmListRow';
+import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
 
@@ -44,18 +46,35 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
   const [pages, setPages] = useState({ query: settled, count: 1 });
   const count = pages.query === settled ? pages.count : 1;
   const limit = pageSize * count;
+  // A read that fails is said, never shown as nothing found (MM-411); Try again asks once more.
+  const [attempt, setAttempt] = useState(0);
   const answer = useAsync(
     () =>
       catalog === undefined
         ? Promise.resolve(undefined)
-        : catalog.search(settled, { limit: limit + 1 }).then((found) => ({ found, limit })),
-    `${catalog?.packs.length ?? -1}:${settled}:${limit}`,
+        : catalog
+            .search(settled, { limit: limit + 1 })
+            .then((found) => ({ found, limit, failed: false, attempt }))
+            .catch(() => ({ found: [] as SearchHit[], limit, failed: true, attempt })),
+    `${catalog?.packs.length ?? -1}:${settled}:${limit}:${attempt}`,
     { keep: true },
   );
   const hits = answer?.found.slice(0, answer.limit);
   // The row a press added first, once its page has arrived; none on the first page or while it is pending.
   const firstNew = count > 1 && answer?.limit === limit ? limit - pageSize : -1;
   if (catalog === undefined || hits === undefined) return null;
+  if (answer?.failed) {
+    // Keyed on the attempt, so a repeat failure is announced again; inert while trying (MM-411).
+    return (
+      <ReadFailedNotice
+        key={answer.attempt}
+        title="Could not read the food database"
+        consequence="Search results are not shown until it can."
+        pending={answer.attempt !== attempt}
+        onRetry={() => setAttempt((was) => was + 1)}
+      />
+    );
+  }
   if (hits.length === 0) {
     if (alsoFound && catalog.packs.length > 0) return null;
     return (
@@ -82,6 +101,8 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
               </>
             }
             onPress={() => onPick(food)}
+            // A found food goes on to its amount step, where a recent food fills the form in place (MM-219).
+            opens
             autoFocus={at === firstNew}
             trailingAction={<FoodGrade grade={grade} subject={food.name} />}
           />

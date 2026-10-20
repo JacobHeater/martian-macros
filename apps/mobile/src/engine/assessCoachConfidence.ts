@@ -26,6 +26,7 @@ export function assessCoachConfidence({
   trend,
   history,
   lastWeightEventOn,
+  lastGapEndedOn,
 }: {
   estimate: TdeeEstimate;
   asOf: CalendarDate;
@@ -33,6 +34,8 @@ export function assessCoachConfidence({
   trend: Iterable<WeightTrendPoint>;
   history: readonly TargetsRecord[];
   lastWeightEventOn?: CalendarDate | undefined;
+  /** The last day of the most recent gap (MM-147): confidence is at most Fair until the window has refilled past it. */
+  lastGapEndedOn?: CalendarDate | undefined;
 }): CoachConfidence {
   const estimator = new TdeeEstimator();
   const start = asOf.addDays(1 - estimator.windowDays);
@@ -68,9 +71,11 @@ export function assessCoachConfidence({
   const recentStyleRestart = restart !== undefined && !restart.isBefore(recentStart) && !restart.isAfter(asOf);
   const recentWeightEvent =
     lastWeightEventOn !== undefined && !lastWeightEventOn.isBefore(recentStart) && !lastWeightEventOn.isAfter(asOf);
+  // A gap inside the estimator's window: the window has not refilled, so the coach is at most Fair (MM-147).
+  const recentGap = lastGapEndedOn !== undefined && !lastGapEndedOn.isBefore(start) && !lastGapEndedOn.isAfter(asOf);
   const stabilityLevel: ConfidenceLevel = estimate.clampedToBounds
     ? 'learning'
-    : recentPhaseChange || recentStyleRestart || recentWeightEvent
+    : recentPhaseChange || recentStyleRestart || recentWeightEvent || recentGap
       ? 'fair'
       : 'good';
 

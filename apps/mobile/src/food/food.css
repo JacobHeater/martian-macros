@@ -215,3 +215,9 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-8);
 }
+
+/* What keeps an action off, under the totals (MM-220); the numbers an edited entry rests on (MM-221). */
+.food-still-needed,
+.food-reference-line {
+  margin: var(--space-4) 0 0;
+}

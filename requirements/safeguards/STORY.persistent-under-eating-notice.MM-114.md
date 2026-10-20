@@ -1,6 +1,6 @@
 ---
 id: MM-114
-status: in-progress
+status: done
 component: safeguards
 related: [MM-110, MM-11, MM-27, MM-28, MM-29, MM-40, MM-92, MM-108, MM-113, MM-149]
 ---
@@ -108,3 +108,8 @@ Open, and needing the owner or MM-29:
 
 ## Decision (2026-10-13)
 - **No helpline until a clinician has reviewed one** (MM-29). The notice keeps pointing to a doctor, a registered dietitian or someone trusted, and names no organisation or number. Confirmed by the product owner.
+
+## Closed 2026-10-19
+- **"Targets are untouched" is now proved by a test**: `apps/mobile/test/engine/nextTargetsSafety.test.ts`, "confirmed low days never pull the target below the floor (MM-114)": six weeks of days confirmed complete at 1,000 kcal inform the expenditure estimate, as MM-27 decided, and the issued target stays at or above the floor and within a weekly step. Decided: confirmed-low days are not withheld from the estimator; the floor and the step are the protection, and the notice is the response.
+- **The adherence summary points to this notice** while it is showing: "below the app's minimum of 1,500; see the notice about your logged days" (MM-149).
+- **Still the owner's or MM-29's**: the support line's wording for a person with the eating-disorder-history answer has not been through the professional review; it stays as written until MM-29.

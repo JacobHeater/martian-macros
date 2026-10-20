@@ -5,7 +5,7 @@ import { Fmt } from './Fmt';
 
 const daysWord = (count: number) => (count === 1 ? 'day' : 'days');
 
-function intakeLine(s: AdherenceSummary, floorKcal: number): AdherenceLine {
+function intakeLine(s: AdherenceSummary, floorKcal: number, underEatingNotice: boolean): AdherenceLine {
   const intake = s.averageIntakeKcal;
   if (intake === undefined) return { label: 'Average intake', value: 'No complete days' };
   const target = s.averageTargetKcal;
@@ -31,7 +31,8 @@ function intakeLine(s: AdherenceSummary, floorKcal: number): AdherenceLine {
       standing = `${distance()} under`;
       break;
     case 'belowFloor':
-      standing = `below the app's minimum of ${Fmt.whole(floorKcal)}`;
+      // Never "under target": its own words, and a pointer to the notice about those days when it is showing (MM-114).
+      standing = `below the app's minimum of ${Fmt.whole(floorKcal)}${underEatingNotice ? '; see the notice about your logged days' : ''}`;
       break;
   }
   const notes: string[] = [];
@@ -49,7 +50,10 @@ function intakeLine(s: AdherenceSummary, floorKcal: number): AdherenceLine {
  * are worded the same way; below the app's minimum is its own wording and
  * is never "under target".
  */
-export function adherenceLines(s: AdherenceSummary, { floorKcal }: { floorKcal: number }): AdherenceLine[] {
+export function adherenceLines(
+  s: AdherenceSummary,
+  { floorKcal, underEatingNotice = false }: { floorKcal: number; underEatingNotice?: boolean },
+): AdherenceLine[] {
   const days: AdherenceLine =
     s.daysLogged === 0
       ? { label: 'Days logged', value: 'None' }
@@ -57,8 +61,9 @@ export function adherenceLines(s: AdherenceSummary, { floorKcal }: { floorKcal: 
   const lines: AdherenceLine[] = [
     days,
     { label: 'Weigh-ins', value: `${s.weighIns}` },
-    intakeLine(s, floorKcal),
+    intakeLine(s, floorKcal, underEatingNotice),
   ];
+  if (s.workouts !== undefined) lines.push({ label: 'Workouts', value: `${s.workouts}` });
   const protein = s.proteinDays;
   if (protein !== undefined) {
     lines.push({ label: 'Protein minimum met', value: `${protein} of ${s.completeDays} ${daysWord(s.completeDays)}` });

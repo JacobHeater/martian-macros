@@ -1,0 +1,26 @@
+# Panel decision: the Add food sheet says what it does (MM-218, MM-219, MM-220, MM-221, MM-411)
+
+- **Facts versus proposals and traceability.** Four stories from the MM-212 walkthrough, each marked "nothing here is decided", and MM-411 from the MM-410 review, were built on `feat/m2` under the owner's instruction to close the beta's tickets; the chair took the owner's open questions and wrote each decision into its ticket for the owner to overrule. Two read-only reviews of the working tree (baseline `main` 39f315c): the product designer and the UX guard, each from the brief and the stories read from source (no browser on the owner's Mac in this session). The chair edited, ran the tests and wrote this record.
+- **Verdicts.** UX guard: **pass, no blocking finding**, twelve findings, none high. Product designer: twelve findings, one high (PD-1).
+- **Consolidated coverage.** Inspected: the sheet, both steps, the results, the custom form, the tile, the labels, the design-system parts, the stylesheets, the Food stories, the batch's test, the earlier run's reports, the tickets and the direction documents. Not inspected by anyone: a render in any palette, a device, a screen reader, the keyboard open, search ranking, the packs, the camera, the backup.
+- **Findings and disposition** (deduplicated by cause):
+  - *With more than one serving the calorie caution and the Logs line name different figures as logged* (PD-1 high, F2 medium): **accepted.** The caution names the kept basis ("Macros add up to 290 kcal per serving; the 400 typed is kept.") and the Logs line alone says what is logged; the test covers two servings.
+  - *"Totals only" is not the domain's word and the row calls the method "Estimate"* (PD-2, F12): **accepted**, one word everywhere: "Estimated totals" (MM-167's own phrase) on the chip, the tile and the portion line; the way in stays "Estimate a meal". The chair answered the measurement question: such an entry is stored at the estimate's uncertainty, which the week's "mostly estimated" and the estimator's weighting read, so the word says what the numbers are treated as. The numbers under it are "Nutrition for everything eaten".
+  - *The Logs line is not bound to the action, and should not be live* (F1): **accepted.** `MmButton` gains `describedBy`; the finishing action in all three steps carries the Logs line. Not live, as the guard advised.
+  - *The Still needed caption is not tied to the inert button; its place and punctuation* (F3, PD-6, PD-7, F9): **accepted.** The caption is the action's description, sits after the gap beside the action in both forms, reads "(typed, or from the macros)"; the empty name field has its own helper.
+  - *"Logged on" is not bound to the stepper and a day change is not heard* (F4): **accepted.** `DayStepper` takes a name (a group) and the day is a status.
+  - *Try again gives no sign on a repeat failure, nothing while trying* (F6): **accepted.** Inert "Trying…" while pending; the alert remounts per attempt; a third scenario in the test.
+  - *With nothing to estimate from, the route offered needs the numbers the person lacks* (F7, PD-11): **accepted.** The notice names the route: "Estimated totals" and a guessed figure.
+  - *The amount step explains an inert action in heading weight* (PD-8): **accepted**, the caption pattern.
+  - *The servings bracket is missing on a calculated edit* (PD-9, F10): **accepted.**
+  - *A found own food's row carries no chevron* (PD-5): **accepted.**
+  - *States no story draws* (PD-4, F11): **accepted.** `AddFoodManuallyTwoServings`, `AddFoodAmountHand`, `EditFoodPerServing`, `EditFoodMoved`. The chair's answer: a snack's words are a state the phone shows, so one is drawn.
+  - *`EditFoodWithoutAmount`'s old sentence* (PD-3): fixed before the report arrived.
+  - *The chevron is visual only* (F8): no change required, as the guard said.
+  - *Under results two of the four ways in are offered* (PD-12): the reason written (one secondary per state); Scan and Saved under results are the owner's call.
+  - *The day stepper's title weight* (PD-10) and *focus after in-sheet swaps* (F5): the owner's calls and device check.
+- **Targeted challenges.** None run: the reports agree on every shared finding (PD-1/F2, PD-2/F12, PD-6/F3, PD-7/F9, PD-9/F10, PD-4/F11, PD-11/F7).
+- **Safety and privacy.** Neither reviewer found a concern; F2 could have left a person believing a smaller figure was logged than was, and is fixed.
+- **Owner decisions.** PD-10, PD-12, F5; the owner's overrule of the chair's decisions in each ticket; the renders of the Add food stories in the three palettes.
+- **Edit owner:** the parent session (chair).
+- **Verification.** `npx tsc --noEmit` clean; `test/food/addFoodSays.test.tsx` (7) and the food folder pass after the edits; every story walk is rerun; `mm check` on the final tree before the pull request.

@@ -232,7 +232,8 @@ it('cupped hands are a count of an estimated portion', async () => {
 
 it('Estimate has no amount or unit', async () => {
   const sheet = await openSheet();
-  await press(sheet, 'Estimate');
+  // The method is 'Estimated totals' since MM-219; the way in called Estimate is another control.
+  await press(sheet, 'Estimated totals');
   expect(amountField(sheet)).not.toBeInTheDocument();
   await manual(sheet);
   await save(sheet);
