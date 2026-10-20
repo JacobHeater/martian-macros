@@ -17,6 +17,7 @@ import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
+import { shortSleepScenario } from './shortSleepScenario';
 import { reveal } from './reveal';
 import { maintenanceScenario } from './maintenanceScenario';
 import { stalledScenario } from './stalledScenario';
@@ -472,4 +473,51 @@ export const PauseHeavyUse = screenStory({
     }
   },
   open: ({ navigator }) => void navigator.push(() => <PauseScreen />),
+});
+
+// ---- MM-252: the coach reads sleep ----
+
+/** MM-252: a fortnight of short nights with hunger and energy fine: the offer of its own, the one sentence the evidence supports, and the gentler pace one press away. */
+export const CoachShortSleep = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Two weeks of short sleep',
+  scenario: shortSleepScenario,
+  open: onCoach,
+});
+
+/** MM-252: the sleep line in "How you are holding up": the fourteen-night average and the nights, no score. */
+export const CoachSleepLine = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Sleep, last 14 nights',
+  scenario: shortSleepScenario,
+  open: onCoach,
+  walk: pressOnCoach(/^How you are holding up/),
+});
+
+/** MM-252: the check-in with no night recorded: typical hours start empty, and nothing is said of an average. */
+export const RecoveryCheckInNoNights = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'Typical hours of sleep (optional)',
+  scenario: firstDayScenario,
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+});
+
+/** MM-252: why the targets changed, with sleep that averaged short named before anything about the log. */
+export const WhyYourTargetsShortSleep = screenStory({
+  covers: ['TargetChangeSheet'],
+  shows: /^Your sleep averaged 5 h 30 m over the last 12 nights\./,
+  scenario: explainedScenario(
+    new TargetsExplanation({
+      lines: [new ExplanationLine('expenditureEstimate', -80, { from: 2700, to: 2620 }), new ExplanationLine('paceAndWeight', -20)],
+      newKcal: 2300,
+      previousKcal: 2400,
+      estimateStatus: 'updated',
+      usableIntakeDays: 24,
+      excludedPartialDays: 2,
+      weighIns: 16,
+      shortSleepAverageMinutes: 330,
+      shortSleepNights: 12,
+    }),
+  ),
+  open: openWhy,
 });

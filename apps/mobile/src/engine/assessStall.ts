@@ -9,6 +9,8 @@ import { clamp } from '../lang/clamp';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { effectiveWeightEvents } from './effectiveWeightEvents';
 import { SafetyBounds } from './SafetyBounds';
+import { shortSleep } from './shortSleep';
+import type { SleepAverage } from './SleepAverage';
 import { StallAssessment } from './StallAssessment';
 import type { StallDiagnosis } from './StallDiagnosis';
 import type { StallNotAssessedReason } from './StallNotAssessedReason';
@@ -28,7 +30,9 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * larger than the slope's own uncertainty. The diagnosis is the first that
  * applies of: thin data, masked by water (the waist down, a passing event,
  * or training started in the last days), intake off target, and the
- * estimate being wrong. Nothing here changes a target.
+ * estimate being wrong. Sleep that averaged short is recorded beside the
+ * diagnosis (MM-252), whichever it is, as a cause the person can act on.
+ * Nothing here changes a target.
  */
 export function assessStall({
   setup,
@@ -41,6 +45,7 @@ export function assessStall({
   weightEvents = [],
   workouts = [],
   hasCycleData = false,
+  sleepAverage,
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
@@ -53,6 +58,8 @@ export function assessStall({
   /** The training log, for training that started in the last days of the window. */
   workouts?: readonly Workout[];
   hasCycleData?: boolean;
+  /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
+  sleepAverage?: SleepAverage | undefined;
 }): StallAssessment {
   const window =
     setup.profile.sex === 'female' && !hasCycleData ? StallRule.windowDaysWithoutCycleData : StallRule.windowDays;
@@ -175,5 +182,7 @@ export function assessStall({
     atFloor,
     estimateLow:
       diagnosis === 'estimate' && !gaining && snapshot.tdee.kcal < StallRule.lowEstimateRestingMultiple * snapshot.bmrKcal,
+    shortSleepAverageMinutes: shortSleep(sleepAverage) ? sleepAverage?.averageMinutes : undefined,
+    shortSleepNights: shortSleep(sleepAverage) ? sleepAverage?.nights : undefined,
   });
 }

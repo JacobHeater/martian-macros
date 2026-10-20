@@ -5,6 +5,8 @@ import { StateError } from '../lang/StateError';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { Fmt } from './Fmt';
 import { mealLabel } from './mealLabel';
+import { shortSleepText } from './shortSleepText';
+import { sleepDurationText } from './sleepDurationText';
 import { stallText } from './stallText';
 import { weekdayLabel } from './weekdayLabel';
 
@@ -142,6 +144,19 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
           period,
           ['Weeks', `${n('weeks')}`],
           ...(unlogged ? [] : [[`${day} average`, `${Fmt.whole(n('averageKcal'))} kcal`] as const]),
+        ],
+      ];
+    }
+    case 'shortSleep': {
+      const averageMinutes = i.figures['averageMinutes'] ?? 0;
+      const nights = n('nights');
+      return [
+        `Your sleep averaged ${sleepDurationText(averageMinutes)} this fortnight`,
+        `${shortSleepText({ averageMinutes, nights })} The gentler pace is on offer on the Coach screen; nothing changes unless you choose it.`,
+        [
+          ['Period', `Last ${i.basisDays} nights`],
+          ['Nights recorded', `${nights}`],
+          ['Average', sleepDurationText(averageMinutes)],
         ],
       ];
     }

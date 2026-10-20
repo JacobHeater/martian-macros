@@ -16,6 +16,7 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -51,6 +52,8 @@ export interface AppServices {
   readonly waist: WaistRepository;
   /** The days marked with menstrual flow (MM-20). */
   readonly flowDays: MenstruationRepository;
+  /** The nights of sleep the person typed (MM-250); imported nights come through `healthSamples`. */
+  readonly sleep: SleepRepository;
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;

@@ -19,6 +19,7 @@ import {
   CoachSnapshot,
   type ConfidenceLevel,
   DailyTargets,
+  type SleepAverage,
   summarizeAdherence,
   TargetsRecord,
   TdeeEstimate,
@@ -137,6 +138,7 @@ const assess = ({
   waist = [],
   events = [],
   workouts = [],
+  sleepAverage,
 }: {
   sex?: BiologicalSex;
   snap?: CoachSnapshot;
@@ -146,6 +148,7 @@ const assess = ({
   waist?: WaistObservation[];
   events?: WeightEvent[];
   workouts?: Workout[];
+  sleepAverage?: SleepAverage;
 } = {}) =>
   assessStall({
     setup: setupFor(sex),
@@ -156,6 +159,7 @@ const assess = ({
     waist,
     weightEvents: events,
     workouts,
+    sleepAverage,
     today,
   });
 
@@ -190,6 +194,18 @@ it('not assessed within two weeks of starting creatine', () => {
 it('maintenance has no pace to fall short of', () => {
   const a = assess({ history: [record({ rate: 0 })] });
   expect(a.notAssessedReason).toBe('noPaceToMeet');
+});
+
+// MM-252: sleep that averaged short is recorded beside the diagnosis, whichever it is.
+it('short sleep over the window is noted on a stall, and not when sleep was not short', () => {
+  const short: SleepAverage = { averageMinutes: 330, nights: 12, from: today.addDays(-13), to: today };
+  const noted = assess({ sleepAverage: short });
+  expect(noted.status).toBe('stalled');
+  expect(noted.shortSleepAverageMinutes).toBe(330);
+  expect(noted.shortSleepNights).toBe(12);
+  expect(assess({ intake: ate(2100, 7), sleepAverage: short }).shortSleepAverageMinutes, 'on the data diagnosis too').toBe(330);
+  expect(assess({ sleepAverage: { ...short, averageMinutes: 420 } }).shortSleepAverageMinutes).toBeUndefined();
+  expect(assess().shortSleepNights).toBe(0);
 });
 
 it('thin data: the log is too thin to tell', () => {

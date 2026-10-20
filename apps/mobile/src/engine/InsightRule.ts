@@ -37,6 +37,12 @@ const rules = {
    * two weeks (MM-141). Stated, with no action.
    */
   consistentDay: { priority: 'pattern', aboutWeight: false, otherIntake: true },
+  /**
+   * Sleep averaged under six hours over the last fourteen recorded nights
+   * (MM-252): what the evidence says, in one sentence, and the gentler pace
+   * on offer. Rationed like the rest, so at most once a fortnight.
+   */
+  shortSleep: { priority: 'coaching', aboutWeight: false, otherIntake: false },
 } as const satisfies Record<string, { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean }>;
 
 /**

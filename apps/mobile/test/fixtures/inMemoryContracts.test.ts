@@ -14,6 +14,7 @@ import { preferencesRepositoryContract } from '../contracts/preferencesRepositor
 import { recoveryCheckInRepositoryContract } from '../contracts/recoveryCheckInRepositoryContract';
 import { reminderRepositoryContract } from '../contracts/reminderRepositoryContract';
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
+import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
@@ -34,6 +35,7 @@ weightEventRepositoryContract('In-memory', () => new InMemoryRepositories().weig
 waistRepositoryContract('In-memory', () => new InMemoryRepositories().waist);
 menstruationRepositoryContract('In-memory', () => new InMemoryRepositories().flowDays);
 onlineFoodCacheContract('In-memory', () => new InMemoryOnlineFoodCache());
+sleepRepositoryContract('In-memory', () => new InMemoryRepositories().sleep);
 waterRepositoryContract('In-memory', () => new InMemoryRepositories().water);
 preferencesRepositoryContract('In-memory', () => new InMemoryRepositories().preferences);
 foodRepositoryContract('In-memory', () => new InMemoryRepositories().food);

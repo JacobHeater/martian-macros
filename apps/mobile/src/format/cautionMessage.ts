@@ -37,6 +37,9 @@ const messages: Readonly<Record<Caution, string>> = {
   weightAffectingMedication:
     'Some medications can change weight or water retention. Your trend may ' +
     'move for reasons other than food; keep your clinician informed.',
+  sleepDisorder:
+    'Sleep disorders change how a deficit works for you; keep your care team ' +
+    'in the loop. The app changes none of your numbers for this.',
 };
 
 /** What the app says about a caution raised by the health check. */

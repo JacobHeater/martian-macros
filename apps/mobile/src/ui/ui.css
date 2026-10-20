@@ -2091,3 +2091,14 @@
     box-shadow: 0 0 0 4px var(--selected);
   }
 }
+
+/* A duration as hours and minutes (MM-250): two dense fields across, each taking half. */
+.mm-duration-field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+.mm-duration-field > * {
+  flex: 1;
+  min-width: 0;
+}

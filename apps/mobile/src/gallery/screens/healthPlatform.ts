@@ -35,18 +35,22 @@ export function healthPlatform({
     workout: 50,
     menstruation: 1,
     steps: 8400,
+    sleep: 412,
   };
+  // A night of sleep spans the evening before to the morning it is kept against.
+  const evening = (daysBefore: number) => `${storyToday.addDays(-daysBefore - 1).toString()}T23:10:00`;
   const events = [1, 2, 3].flatMap((day) =>
     HealthDataType.values.map((type) => ({
       op: 'add',
       type,
       id: `${type}-${day}`,
       value: values[type],
-      start: morning(day),
+      start: type === 'sleep' ? evening(day) : morning(day),
+      ...(type === 'sleep' ? { end: morning(day) } : {}),
       source:
         type === 'steps' && stepsUnnamed
           ? 'com.android.healthconnect.phone.j07164f9d1f553234a69c64d'
-          : type === 'steps' || type === 'workout'
+          : type === 'steps' || type === 'workout' || type === 'sleep'
             ? 'watch'
             : 'scale',
     })),

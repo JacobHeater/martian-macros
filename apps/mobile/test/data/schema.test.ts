@@ -47,11 +47,13 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'online_lookup',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
+  // Version 13 (MM-251): a diagnosed sleep disorder.
   setups: [
     'fluid_limited_by_clinician',
     'pace_changed_epoch_day',
     'maintenance_anchor_epoch_day',
     'maintenance_correction_from_epoch_day',
+    'sleep_disorder',
   ],
   // Version 11 (MM-128): the pace each record of targets was asked for.
   targets_history: ['requested_loss_fraction'],
@@ -73,6 +75,8 @@ const tablesAddedSince: readonly string[] = [
   'menstruation_days',
   // Version 12 (MM-58): the foods found online, kept on the phone.
   'online_foods',
+  // Version 13 (MM-250): the nights of sleep.
+  'sleep_nights',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

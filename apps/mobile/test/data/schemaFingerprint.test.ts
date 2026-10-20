@@ -21,6 +21,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   11: '20dea0d256c34b6fbd7abe7c05195385d75ef4e7a32f75802db4bb93d87d8b3d',
   // MM-58: the online lookup choice and the foods found online.
   12: 'b8898dd0ad77f654de3c3184350e8db5680fe5063ba2b34e052d19a7e35feec3',
+  // MM-250, MM-251: the nights of sleep and the sleep-disorder answer.
+  13: '8c338155e56e604938a2dea2c4af79515f5991f2ddc5ea2e3f7bda1b7232fce2',
 };
 
 it('the schema is the one recorded for its version', () => {

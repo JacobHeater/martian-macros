@@ -220,6 +220,8 @@ export function OnboardingScreen() {
         insulinCareTeamConfirmed: screening.insulinCareTeamConfirmed,
         bariatricSurgery: screening.bariatricSurgery,
         weightAffectingMedication: screening.weightAffectingMedication,
+        fluidLimitedByClinician: screening.fluidLimitedByClinician,
+        sleepDisorder: screening.sleepDisorder,
       }),
     );
   };

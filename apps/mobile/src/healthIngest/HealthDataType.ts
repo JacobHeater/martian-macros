@@ -16,6 +16,11 @@ const values = [
    * expenditure estimate.
    */
   'steps',
+  /**
+   * A session of sleep (MM-250): its value is the minutes asleep in it, its
+   * span when it began and ended. Several in a night are summed by the app.
+   */
+  'sleep',
 ] as const;
 
 /**

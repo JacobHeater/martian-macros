@@ -20,6 +20,7 @@ import { pauseOn } from './pauseOn';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
 import { safetyBodyFatDeadbandPercent } from './safetyBodyFatConstants';
 import { safetyBodyFatPercent } from './safetyBodyFatPercent';
+import type { SleepAverage } from './SleepAverage';
 import { TargetInputs } from './TargetInputs';
 import { TargetsRecord } from './TargetsRecord';
 import { TdeeEstimate } from './TdeeEstimate';
@@ -54,6 +55,7 @@ export function nextTargets({
   pauses = [],
   easeIntoMaintenance = false,
   trainingLapsed = false,
+  sleepAverage,
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
@@ -64,6 +66,8 @@ export function nextTargets({
   easeIntoMaintenance?: boolean;
   /** On lean gain, training has lapsed (`trainingSuspended`, MM-134): the surplus is replaced by maintenance. */
   trainingLapsed?: boolean;
+  /** The fourteen-night average from the nights recorded (MM-250), noted in the explanation when short (MM-252). */
+  sleepAverage?: SleepAverage | undefined;
 }): TargetsRecord | undefined {
   if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return undefined;
 
@@ -162,6 +166,7 @@ export function nextTargets({
         trace: traced.trace,
         tdee,
         confidence: snapshot.confidence,
+        sleepAverage,
       }),
     });
   };

@@ -38,7 +38,21 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         ("workout", HKObjectType.workoutType()),
         ("menstruation", HKCategoryType(.menstrualFlow)),
         ("steps", HKQuantityType(.stepCount)),
+        ("sleep", HKCategoryType(.sleepAnalysis)),
     ]
+
+    /// The sleep analysis values that are sleep (MM-250): not in bed, not awake. The staged values exist from iOS 16; before it every asleep segment is unspecified.
+    private static var asleepValues: Set<Int> {
+        var values: Set<Int> = [HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue]
+        if #available(iOS 16.0, *) {
+            values.formUnion([
+                HKCategoryValueSleepAnalysis.asleepCore.rawValue,
+                HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
+                HKCategoryValueSleepAnalysis.asleepREM.rawValue,
+            ])
+        }
+        return values
+    }
 
     private static func type(named name: String) -> HKSampleType? { types.first { $0.name == name }?.type }
 
@@ -102,6 +116,10 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             // A day marked as no flow is not a day of flow.
             if category.value == HKCategoryValueMenstrualFlow.none.rawValue { return nil }
             json["value"] = Double(category.value)
+        } else if let category = sample as? HKCategorySample, name == "sleep" {
+            // Each asleep segment is one reading of its minutes; the app sums a night's (MM-250). In bed and awake are not sleep.
+            if !Self.asleepValues.contains(category.value) { return nil }
+            json["value"] = sample.endDate.timeIntervalSince(sample.startDate) / 60
         } else if !(sample is HKWorkout) || name != "workout" {
             return nil
         }

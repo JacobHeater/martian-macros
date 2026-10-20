@@ -11,6 +11,7 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -42,6 +43,7 @@ import { SqlPreferencesRepository } from './SqlPreferencesRepository';
 import { SqlRecoveryCheckInRepository } from './SqlRecoveryCheckInRepository';
 import { SqlReminderRepository } from './SqlReminderRepository';
 import { SqlSetupRepository } from './SqlSetupRepository';
+import { SqlSleepRepository } from './SqlSleepRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlWaistRepository } from './SqlWaistRepository';
@@ -62,6 +64,8 @@ export class SqlRepositories {
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
   readonly flowDays: MenstruationRepository;
+  /** The nights of sleep the person typed, or imported nights kept beside them (MM-250). */
+  readonly sleep: SleepRepository;
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
@@ -89,6 +93,7 @@ export class SqlRepositories {
     this.weightEvents = new SqlWeightEventRepository(db);
     this.waist = new SqlWaistRepository(db);
     this.flowDays = new SqlMenstruationRepository(db);
+    this.sleep = new SqlSleepRepository(db);
     this.water = new SqlWaterRepository(db);
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);

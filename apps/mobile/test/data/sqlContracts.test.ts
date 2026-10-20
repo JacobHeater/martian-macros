@@ -17,6 +17,7 @@ import { preferencesRepositoryContract } from '../contracts/preferencesRepositor
 import { recoveryCheckInRepositoryContract } from '../contracts/recoveryCheckInRepositoryContract';
 import { reminderRepositoryContract } from '../contracts/reminderRepositoryContract';
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
+import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
@@ -45,6 +46,7 @@ onlineFoodCacheContract('SQLite', async () => {
   await AppDatabase.open(sql);
   return new SqlOnlineFoodCache(sql);
 });
+sleepRepositoryContract('SQLite', async () => (await open()).sleep);
 waterRepositoryContract('SQLite', async () => (await open()).water);
 preferencesRepositoryContract('SQLite', async () => (await open()).preferences);
 foodRepositoryContract('SQLite', async () => (await open()).food);

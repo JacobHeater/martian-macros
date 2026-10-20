@@ -1,5 +1,7 @@
 import { ScreeningAnswers } from '../domain/ScreeningAnswers';
+import { cautionMessage } from '../format/cautionMessage';
 import { MmCheckRow } from '../ui/MmCheckRow';
+import { Notice } from '../ui/Notice';
 
 type Answer =
   | 'pregnant'
@@ -14,7 +16,8 @@ type Answer =
   | 'insulinCareTeamConfirmed'
   | 'bariatricSurgery'
   | 'weightAffectingMedication'
-  | 'fluidLimitedByClinician';
+  | 'fluidLimitedByClinician'
+  | 'sleepDisorder';
 
 const answers: readonly Answer[] = [
   'pregnant',
@@ -30,6 +33,7 @@ const answers: readonly Answer[] = [
   'bariatricSurgery',
   'weightAffectingMedication',
   'fluidLimitedByClinician',
+  'sleepDisorder',
 ];
 
 interface HealthStepProps {
@@ -78,6 +82,9 @@ export function HealthStep({ screening, female, onChange, heading = true }: Heal
       {item('I have had bariatric surgery', 'bariatricSurgery')}
       {item('A medication I take can change my weight or water retention', 'weightAffectingMedication')}
       {item('A clinician has told me to limit my fluids', 'fluidLimitedByClinician')}
+      {item('A diagnosed sleep disorder (sleep apnea, insomnia, a shift-work or other circadian disorder)', 'sleepDisorder')}
+      {/* Refer-only (MM-251): the caution here and on Coach, and nothing in the numbers. */}
+      {s.sleepDisorder ? <Notice kind="caution" text={cautionMessage('sleepDisorder')} /> : null}
       <p className="app-caption">
         This app is not medical advice. Talk to your clinician before changing your diet if you have a medical
         condition.

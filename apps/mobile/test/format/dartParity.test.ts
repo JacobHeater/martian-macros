@@ -173,8 +173,9 @@ describe('every label of every kind', () => {
     ['dailyActivity', all(DailyActivity.values, dailyActivityLabel)],
     ['dailyActivityDetail', all(DailyActivity.values, dailyActivityDetail)],
     ['packDownloadProblem', all(PackDownloadProblem.values, packDownloadProblemText)],
-    ['healthDataType', all(HealthDataType.values, healthDataTypeLabel)],
-    ['healthDataTypePurpose', all(HealthDataType.values, healthDataTypePurpose)],
+    // The kind added since the Flutter app (MM-250, sleep) has no Dart words to match.
+    ['healthDataType', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataType), healthDataTypeLabel)],
+    ['healthDataTypePurpose', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataTypePurpose), healthDataTypePurpose)],
     ['confidence', all(ConfidenceLevel.values, confidenceLabel)],
     ['reminder', all(ReminderKind.values, reminderLabel)],
     ['reminderSentWhen', all(ReminderKind.values, reminderSentWhen)],

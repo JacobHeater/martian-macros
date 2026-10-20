@@ -17,6 +17,7 @@ import {
   DailyTargets,
   findReliefOffer,
   nextTargets,
+  type SleepAverage,
   slowerPace,
   TargetFlag,
   TargetsRecord,
@@ -77,14 +78,19 @@ const offer = ({
   checkIns,
   history,
   pauses = [],
-}: { user?: UserSetup; checkIns?: RecoveryCheckIn[]; history?: TargetsRecord[]; pauses?: Pause[] } = {}) =>
+  sleepAverage,
+}: { user?: UserSetup; checkIns?: RecoveryCheckIn[]; history?: TargetsRecord[]; pauses?: Pause[]; sleepAverage?: SleepAverage } = {}) =>
   findReliefOffer({
     setup: user ?? setup(),
     checkIns: checkIns ?? [hard(8), hard(1)],
     history: history ?? [record(21)],
     today,
     pauses,
+    sleepAverage,
   });
+
+/** The fourteen-night average from the record (MM-250). */
+const slept = (averageMinutes: number, nights = 14): SleepAverage => ({ averageMinutes, nights, from: today.addDays(-13), to: today });
 
 it('two hard check-ins running on a deficit make the offer', () => {
   expect(offer()).toBeDefined();
@@ -260,5 +266,39 @@ describe('a maintenance week the user takes', () => {
   it('cannot be held back like an ordinary reduction', () => {
     expect(TargetFlag.values).toContain('requestedBreak');
     expect(canHoldReduction([...history, firstOfBreak()])).toBe(false);
+  });
+});
+
+// MM-252: short sleep from the record is a signal of its own, beside the check-ins.
+describe('short sleep as a signal of its own', () => {
+  it('an average under six hours over fourteen nights makes the offer with hunger and energy fine', () => {
+    const o = offer({ checkIns: [fine(8), fine(1)], sleepAverage: slept(330) });
+    expect(o?.signals).toEqual(['shortSleep']);
+    expect(o?.shortSleep).toBe(true);
+    expect(o?.sleepAverage?.averageMinutes).toBe(330);
+    expect(o?.suggestion).toBe('slowerPace');
+    expect(o?.slowerPace).toBe(0.005);
+  });
+
+  it('both signals are named when the check-ins were hard too', () => {
+    const o = offer({ sleepAverage: slept(330) });
+    expect(o?.signals).toEqual(['hardCheckIns', 'shortSleep']);
+  });
+
+  it('six hours or more, or too few nights, is no signal; the hours typed at hard check-ins are then only a line', () => {
+    expect(offer({ checkIns: [fine(8), fine(1)], sleepAverage: slept(360) })).toBeUndefined();
+    expect(offer({ checkIns: [fine(8), fine(1)], sleepAverage: slept(300, 6) })).toBeUndefined();
+    const typedOnly = offer({ checkIns: [hard(8, 5), hard(1, 5.5)] });
+    expect(typedOnly?.signals).toEqual(['hardCheckIns']);
+    expect(typedOnly?.shortSleep).toBe(true);
+    expect(typedOnly?.sleepAverage).toBeUndefined();
+    // With a record of enough nights that are not short, the typed hours do not say otherwise.
+    expect(offer({ checkIns: [hard(8, 5), hard(1, 5.5)], sleepAverage: slept(430) })?.shortSleep).toBe(false);
+  });
+
+  it('is still only ever an offer: a pause, a quiet period, or no deficit keeps it away', () => {
+    expect(offer({ checkIns: [], sleepAverage: slept(330), user: setup({ answeredOn: today.addDays(-5) }) })).toBeUndefined();
+    expect(offer({ checkIns: [], sleepAverage: slept(330), history: [record(21, 0)] })).toBeUndefined();
+    expect(offer({ checkIns: [], sleepAverage: slept(330), user: setup({ goal: 'maintenance' }) })).toBeUndefined();
   });
 });

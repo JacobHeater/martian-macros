@@ -50,6 +50,14 @@ describe('healthConnectSample', () => {
     expect(sample?.end).toEqual(new Date(at + 45 * 60000));
   });
 
+  // MM-250: a sleep session is its minutes asleep, as the plugin summed them from the stages, or its span without stages.
+  it('a sleep session keeps the minutes the plugin summed, or its span when it gave none', () => {
+    const night = record('sleep', 395, { startMs: at - 8 * 3600000, endMs: at });
+    expect(healthConnectSample(night)?.value).toBe(395);
+    expect(healthConnectSample(night)?.end?.getTime()).toBe(at);
+    expect(healthConnectSample(record('sleep', undefined, { startMs: at - 7.5 * 3600000, endMs: at }))?.value).toBe(450);
+  });
+
   it('a day of menstrual flow is kept as 1, whatever the platform says', () => {
     expect(healthConnectSample(record('menstruation', 3))?.value).toBe(1);
   });

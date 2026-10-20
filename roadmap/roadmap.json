@@ -3244,7 +3244,7 @@
       "file": "ws-15-sleep.md",
       "intent": "Sleep as a first-class signal: a nightly record from a wearable or by hand, sleep disorders in the health check, and a coach that reads it (MM-249, the owner's decision of 2026-10-13).",
       "recommendedOrder": 15,
-      "status": "not-started",
+      "status": "partially-built",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3270,12 +3270,13 @@
         "HS-onboarding-screen"
       ],
       "sourceRequirements": {
-        "built": [],
-        "remaining": [
-          "MM-249",
+        "built": [
           "MM-250",
           "MM-251",
           "MM-252"
+        ],
+        "remaining": [
+          "MM-249"
         ]
       },
       "sequence": [
@@ -3305,7 +3306,7 @@
         }
       ],
       "gate": null,
-      "notes": "Added 2026-10-13 on the owner's decision that sleep is first class; the earlier \"emerging\" grading in MM-116 is overruled with the evidence in MM-249."
+      "notes": "Added 2026-10-13 on the owner's decision that sleep is first class; the earlier \"emerging\" grading in MM-116 is overruled with the evidence in MM-249. MM-250, MM-251 and MM-252 built 2026-10-20 on feat/m2; the epic MM-249 stays open for the panel pass in grading mode and the owner's decision on a target change."
     }
   ],
   "dependencyEdges": [
