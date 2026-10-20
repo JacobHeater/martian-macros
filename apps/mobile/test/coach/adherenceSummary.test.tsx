@@ -71,6 +71,21 @@ it('few days and estimates are said in the detail, and the figure stays a figure
   expect(intakeLine(summary({ complete: 2 })).value).toBe('2,180 kcal');
 });
 
+it('the week\'s workouts are the fifth fact once the training log is read, and left out when it is not (MM-149)', () => {
+  const s = summary();
+  expect(adherenceLines(s, { floorKcal: 1500 }).find((line) => line.label === 'Workouts')).toBeUndefined();
+  const withWorkouts = new AdherenceSummary({ ...s, workouts: 3 });
+  expect(adherenceLines(withWorkouts, { floorKcal: 1500 }).find((line) => line.label === 'Workouts')).toEqual({ label: 'Workouts', value: '3' });
+});
+
+it('an average below the floor points to the notice about those days while it is showing (MM-114, MM-149)', () => {
+  const low = summary({ intake: 1050, target: 1900, standing: 'belowFloor' });
+  expect(adherenceLines(low, { floorKcal: 1500, underEatingNotice: true }).find((line) => line.label === 'Average intake')?.detail).toMatch(
+    /below the app's minimum of 1,500; see the notice about your logged days/,
+  );
+  expect(adherenceLines(low, { floorKcal: 1500 }).find((line) => line.label === 'Average intake')?.detail).not.toMatch(/see the notice/);
+});
+
 it('no percentage, grade or score anywhere', () => {
   for (const s of [
     summary(),

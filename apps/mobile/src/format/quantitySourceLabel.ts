@@ -7,7 +7,8 @@ const labels: Readonly<Record<QuantitySource, string>> = {
   palm: 'Palm',
   cuppedHand: 'Cupped hand',
   thumb: 'Thumb',
-  quickAdd: 'Estimate',
+  // Estimated totals typed with no amount (MM-167): told from 'Estimate a meal', the way in, by its full name (MM-219).
+  quickAdd: 'Estimated totals',
 };
 
 export const quantitySourceLabel = (source: QuantitySource): string => labels[source];

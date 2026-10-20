@@ -62,12 +62,14 @@ const assess = ({
   weighIns = 25,
   history = [],
   weightEventOn,
+  gapEndedOn,
 }: {
   tdee?: TdeeEstimate;
   foods?: number;
   weighIns?: number;
   history?: readonly TargetsRecord[];
   weightEventOn?: CalendarDate;
+  gapEndedOn?: CalendarDate;
 } = {}) =>
   assessCoachConfidence({
     estimate: tdee ?? estimate(),
@@ -76,6 +78,7 @@ const assess = ({
     trend: trendDays(weighIns),
     history,
     lastWeightEventOn: weightEventOn,
+    lastGapEndedOn: gapEndedOn,
   });
 
 it('good measurements and complete recent data produce Good', () => {
@@ -130,6 +133,15 @@ it('a recent phase change makes stability Fair', () => {
   expect(confidence.level).toBe('fair');
   expect(confidence.stability).toBe('fair');
   expect(confidence.nextStep).toBe('waitForStability');
+});
+
+it('a gap inside the window makes stability Fair until the window has refilled past it (MM-147)', () => {
+  const afterGap = assess({ gapEndedOn: asOf.addDays(-10) });
+  expect(afterGap.stability).toBe('fair');
+  expect(afterGap.level).toBe('fair');
+  expect(afterGap.nextStep).toBe('waitForStability');
+  // A gap that ended before the window began has left it.
+  expect(assess({ gapEndedOn: asOf.addDays(-40) }).stability).toBe('good');
 });
 
 it('a recent style restart makes stability Fair', () => {

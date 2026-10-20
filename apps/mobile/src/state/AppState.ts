@@ -537,6 +537,8 @@ export class AppState {
         weights,
         history: snapshot.policy.targetsAllowed ? (history ?? []) : [],
         floorKcal: snapshot.calorieFloorKcal,
+        // The week's workouts, the fifth fact, now that the training log exists (MM-149).
+        workouts: of(this.workouts),
       });
     });
 

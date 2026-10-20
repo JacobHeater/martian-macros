@@ -1,6 +1,6 @@
 ---
 id: MM-218
-status: proposed
+status: done
 component: food-logging
 related: [MM-38, MM-150, MM-151, MM-167, MM-212]
 ---
@@ -90,3 +90,16 @@ Scenario: One wording
   `add_food_estimate_dark`.
 - This is analysis of the built screen. Nobody was observed using it, and it
   says nothing about how many people would get it wrong.
+
+## Decisions and build (2026-10-19, the owner's instruction to close the beta's tickets)
+- **One wording across the sheet**: a line beginning "Logs" (the amount step: "Logs 105 kcal · …", or "Logs an estimate: …" for a hand portion; the typed form: "Logs 290 kcal · 20 g protein · …", with the servings in brackets when more than one multiplies per-serving numbers; the estimate: "Logs about 520 kcal · …"). It shows whenever the totals can be known, before and after the action is enabled.
+- **Calories left blank** log the figure from the macros, and the line says that figure. **A typed figure that disagrees** with the macros keeps the typed one, and the caution says so: "Macros add up to 290 kcal; the 400 kcal typed will be logged. Double-check the label."
+- **Open items decided here**: the default under "Label serving" stays "Everything I ate" (MM-167 decision 3) and is not asked each time; a quantity typed beside entered totals stays as it is. The owner may overrule either.
+- Cooking oil's second entry (F-13) is unchanged: it is said by the oil control itself, outside this sheet's totals.
+- Regression test: `apps/mobile/test/food/addFoodSays.test.tsx` (the typed form, the amount step, the estimate).
+
+## After the panel (2026-10-19, `docs/agent-runs/m2-add-food`)
+- The calorie caution names the kept basis and never a second logged figure (the designer's PD-1, the guard's F2): "Macros add up to 290 kcal per serving; the 400 typed is kept. Double-check the label." The Logs line alone says what is logged, with the servings in brackets on either path (PD-9, F10).
+- The finishing action carries the Logs line as its description, so a reader landing on it hears what it will record (F1); the line itself is not live, since a value that changes on every keystroke would be noise.
+- The amount step's missing amount is said in the caption pattern, not in heading weight (PD-8).
+- Stories `AddFoodManuallyTwoServings` and `AddFoodAmountHand` draw the two-serving form with its caution and the hand portion's "Logs an estimate" (PD-4, F11).

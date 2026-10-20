@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
@@ -12,6 +12,8 @@ import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
+import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
@@ -470,7 +472,7 @@ export const AddFoodEstimatedTotals = screenStory({
   covers: ['AddFoodSheet'],
   shows: 'Calories',
   open: addFood,
-  walk: manuallyAs('Estimate'),
+  walk: manuallyAs('Estimated totals'),
 });
 
 /** The demo with one food and one recipe of the person's own (MM-45). */
@@ -532,6 +534,107 @@ export const AddFoodMoreResultsShown = screenStory({
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
     await userEvent.click(await within(canvas).findByRole('button', { name: 'More results' }, { timeout: 10000 }));
     await waitFor(() => expect(within(canvas).queryByRole('button', { name: 'More results' })).toBeNull(), { timeout: 10000 });
+  },
+});
+
+/** MM-411: the food database could not be read; the search says so, with a way to try again, never "Nothing found". */
+export const AddFoodSearchFailed = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Could not read the food database',
+  device: async (services) => {
+    const failing = Object.create(await valueOf(services.catalog)) as FoodCatalog;
+    Object.defineProperty(failing, 'search', { value: () => Promise.reject(new Error('disk I/O error')) });
+    return { ...services, catalog: constant(failing) };
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'oats');
+  },
+});
+
+/** MM-218: the typed form with its numbers in, two servings, and calories typed against the macros: what it logs, and which figure is kept. */
+export const AddFoodManuallyTwoServings = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Logs 800 kcal/,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Enter manually' }, { timeout: 10000 }));
+    const sheet = within(canvas);
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Food name' }), 'Granola');
+    const servings = sheet.getByRole('textbox', { name: 'Servings eaten' });
+    await userEvent.clear(servings);
+    await userEvent.type(servings, '2');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Protein g' }), '20');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Carbs g' }), '30');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Fat g' }), '10');
+    await userEvent.type(sheet.getByRole('textbox', { name: /^Calories/ }), '400');
+  },
+});
+
+/** MM-221: an entry calculated from a label serving: the numbers it rests on, and the day control that moves it. */
+export const EditFoodPerServing = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Per serving: /,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'snack',
+        name: 'Protein bar',
+        kcal: 398,
+        proteinG: 40,
+        carbsG: 30,
+        fatG: 12,
+        source: 'labelServing',
+        portion: {
+          method: 'labelServing',
+          basis: 'calculated',
+          quantity: 2,
+          unit: 'serving',
+          reference: { basis: 'perServing', nutrition: new NutritionTotals({ kcal: 199, proteinG: 20, carbsG: 15, fatG: 6 }), servingUnit: 'serving' },
+        },
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Protein bar' }, { timeout: 10000 }));
+  },
+});
+
+/** MM-221: the entry moved to yesterday: the snack says where it went. */
+export const EditFoodMoved = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Moved to Yesterday.',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'snack', name: 'Protein bar', kcal: 398, proteinG: 40, carbsG: 30, fatG: 12, source: 'labelServing' }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Edit Protein bar' }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit food' }, { timeout: 10000 });
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Previous day' }));
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Save changes' }));
+  },
+});
+
+/** MM-218: a hand portion of a found food logs an estimate, and the line says so. */
+export const AddFoodAmountHand = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Logs an estimate: /,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken');
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Chicken breast, cooked/ }, { timeout: 10000 }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Palm/ }, { timeout: 10000 }));
+    const amount = await within(canvas).findByRole('textbox', { name: /^(How many|Amount)/ });
+    await userEvent.clear(amount);
+    await userEvent.type(amount, '2');
   },
 });
 
@@ -739,7 +842,7 @@ export const AddFoodAmountCheckThis = screenStory({
 /** MM-321: an entry kept from before amounts were recorded, opened to change: it asks how it was measured. */
 export const EditFoodWithoutAmount = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'This entry was logged without an amount. Choose how it was measured to add one.',
+  shows: 'This entry was logged without an amount. To add one, choose how it was measured.',
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
     await repos.food.addFood(

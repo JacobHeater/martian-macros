@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
@@ -37,6 +37,7 @@ import { useLoaded } from '../app/useLoaded';
 import { DayStepper } from '../ui/DayStepper';
 import { MmActionChip } from '../ui/MmActionChip';
 import { MmButton } from '../ui/MmButton';
+import { useOverlays } from '../ui/useOverlays';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
 import { MmTextField } from '../ui/MmTextField';
@@ -207,6 +208,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const { gradeOfFood } = useInsightPreview();
   const netCarbs = useNetCarbs();
   const today = useCell(state.today);
+  const overlays = useOverlays();
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
   const customFoods = useLoaded(state.customFoods) ?? [];
@@ -275,6 +277,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     totals.kcal > 0 &&
     (calc !== undefined || (p >= 0 && c >= 0 && f >= 0));
 
+  /** How many servings multiply per-serving numbers, said in the Logs line; on either path (MM-218). */
+  const servingsLogged = (form.unit === 'serving' || perServingRef !== undefined) && amount !== undefined && amount !== 1 ? amount : undefined;
+  const ids = useId();
+  /** What keeps the action off, in the person's words (MM-220). */
+  const stillNeeded: string[] = [
+    ...(form.name.trim() === '' ? ['a name'] : []),
+    ...(!amountOk ? ['an amount'] : []),
+    ...(totals === undefined || totals.kcal <= 0 ? ['calories above zero (typed, or from the macros)'] : []),
+    ...(calc === undefined && (p < 0 || c < 0 || f < 0) ? ['macros that are not negative'] : []),
+  ];
   const mismatch =
     typedKcal !== undefined &&
     fromMacros !== 0 &&
@@ -400,6 +412,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     });
     await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
     onDone();
+    // An entry moved to another day leaves this day's list; say where it went (MM-221).
+    if (entry !== undefined && entry.date !== day) overlays.snack(`Moved to ${Fmt.day(day, today)}.`);
   };
 
   const pick = async (food: CatalogFood) => {
@@ -432,6 +446,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         day={firstDay}
         meal={meal}
         initialSize={estimateSize ?? 'regular'}
+        onManual={() => setStep({ at: 'manual' })}
         onBack={choices}
         onDone={onDone}
       />
@@ -462,7 +477,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       return (
         <>
           <div className="app-gap-small" />
-          <Notice text="This entry was logged without an amount. Choose how it was measured to add one." />
+          <Notice text="This entry was logged without an amount. To add one, choose how it was measured." />
         </>
       );
     }
@@ -520,13 +535,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             <MmChoiceChip
               key={source}
               label={quantitySourceLabel(source)}
-              selected={form.source === source}
+              // An old entry without an amount has no method chosen until the person chooses one (MM-221).
+              selected={!form.legacy && form.source === source}
               onSelect={() => selectMethod(source)}
             />
           ))}
         </div>
         {amountFields()}
-        <p className="food-label food-label-spaced">{perServing ? 'Nutrition per serving' : 'Nutrition for this amount'}</p>
+        <p className="food-label food-label-spaced">
+          {perServing ? 'Nutrition per serving' : form.source === 'quickAdd' ? 'Nutrition for everything eaten' : 'Nutrition for this amount'}
+        </p>
         <div className="food-fields">
           <MmTextField label="Protein g" kind="number" dense value={form.protein} onChange={(protein) => set({ protein })} />
           <MmTextField label="Carbs g" kind="number" dense value={form.carbs} onChange={(carbs) => set({ carbs })} />
@@ -554,7 +572,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           hint={fromMacros > 0 ? `${whole(fromMacros)} from macros` : undefined}
           helper={
             mismatch
-              ? `Macros add up to ${whole(fromMacros)} kcal. Double-check the label.`
+              // The kept basis, never a second "logged" figure beside the Logs line (the panel's PD-1, F2).
+              ? `Macros add up to ${whole(fromMacros)} kcal${perServing ? ' per serving' : ''}; the ${whole(typedKcal ?? 0)} typed is kept. Double-check the label.`
               : 'Leave blank to calculate from macros.'
           }
           helperIsWarning={mismatch}
@@ -593,6 +612,12 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           helperIsWarning={amount === undefined}
           onChange={(quantity) => set({ quantity })}
         />
+        {/* The numbers the entry rests on, in the terms they were typed (MM-221). */}
+        <p className="app-caption food-reference-line">
+          {reference.basis === 'perServing' ? 'Per serving' : reference.basis === 'per100g' ? 'Per 100 g' : 'Per 100 ml'}:{' '}
+          {whole(reference.nutrition.kcal)} kcal · {whole(reference.nutrition.proteinG)} g protein · {whole(reference.nutrition.carbsG)} g
+          carbs · {whole(reference.nutrition.fatG)} g fat
+        </p>
         <MmButton
           label={unit === 'serving' ? 'Edit nutrition per serving' : 'Enter the totals myself'}
           kind="text"
@@ -609,7 +634,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const formFields = () => (
     <>
       <div className="app-gap-small" />
-      <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} />
+      <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
       {calc === undefined ? typedFields() : calculatedFields(calc)}
       {totals !== undefined && totals.proteinG >= 0 && totals.carbsG >= 0 && totals.fatG >= 0 ? (
         <>
@@ -631,14 +656,26 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       ) : null}
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
-      {totals !== undefined && (form.basis === 'calculated' || calc !== undefined) ? (
-        <p className="app-subhead food-totals" data-testid="logged-totals">
+      {/* What will be recorded, in every state the action is enabled, and before it is (MM-218): one wording across the sheet. */}
+      {totals !== undefined ? (
+        <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="logged-totals">
           Logs {whole(totals.kcal)} kcal · {whole(totals.proteinG)} g protein · {whole(totals.carbsG)} g carbs ·{' '}
           {whole(totals.fatG)} g fat
+          {servingsLogged !== undefined ? ` (${editableNumber(servingsLogged)} servings)` : ''}
         </p>
       ) : null}
       <div className="app-gap" />
-      <MmButton label={isEditing ? 'Save changes' : 'Log it'} expand onPress={valid ? () => void save() : undefined} />
+      {valid ? null : (
+        // An action that is off says what is still needed, beside it (MM-220).
+        <p id={`${ids}-needed`} className="app-caption food-still-needed">{`Still needed: ${stillNeeded.join(', ')}.`}</p>
+      )}
+      <MmButton
+        label={isEditing ? 'Save changes' : 'Log it'}
+        expand
+        onPress={valid ? () => void save() : undefined}
+        // The action carries what it will record and what keeps it off, for a reader landing on it (the guard's F1, F3).
+        describedBy={[totals === undefined ? undefined : `${ids}-logs`, valid ? undefined : `${ids}-needed`].filter((id) => id !== undefined).join(' ') || undefined}
+      />
     </>
   );
 
@@ -655,12 +692,19 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         </div>
       ) : null}
       {isEditing ? (
-        <DayStepper
-          label={Fmt.day(day, today)}
-          onPrevious={() => setDay(day.addDays(-1))}
-          onNext={day.isBefore(today) ? () => setDay(day.addDays(1)) : undefined}
-          onLabelPress={undefined}
-        />
+        <>
+          {/* The same control as the Food screen's day header, so it says what it does here: it moves the entry (MM-221). */}
+          <p className="food-label" aria-hidden="true">
+            Logged on
+          </p>
+          <DayStepper
+            name="Logged on"
+            label={Fmt.day(day, today)}
+            onPrevious={() => setDay(day.addDays(-1))}
+            onNext={day.isBefore(today) ? () => setDay(day.addDays(1)) : undefined}
+            onLabelPress={undefined}
+          />
+        </>
       ) : null}
       {searching ? (
         <>
@@ -676,6 +720,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                       `${food.kind === 'recipe' ? 'Your recipe' : 'Your food'} · ` +
                       `${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`
                     }
+                    opens
                     onPress={() => pickCustom(food)}
                     trailingAction={gradeBeside(food.name)}
                   />
@@ -718,6 +763,10 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               setStep({ at: 'manual' });
             }}
           />
+          {query === '' ? null : (
+            // Not found, or not worth finding: the estimate stays in reach from the results (MM-219).
+            <MmButton label="Estimate a meal" kind="text" expand onPress={() => setStep({ at: 'estimating' })} />
+          )}
         </>
       ) : (
         <>

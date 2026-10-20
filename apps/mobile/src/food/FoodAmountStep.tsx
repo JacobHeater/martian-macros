@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
@@ -84,6 +84,7 @@ const choiceLabel = (choice: AmountChoice) => {
  * how it was measured.
  */
 export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, onBack, onDone, custom, alternate }: FoodAmountStepProps) {
+  const ids = useId();
   const { services, state } = useApp();
   const preview = useInsightPreview();
   const hand = useCell(state.handSize);
@@ -297,13 +298,17 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         helper={helper}
         helperIsWarning={invalid}
       />
-      <p className="app-subhead food-totals" data-testid="amount-macros">
-        {totals === undefined
-          ? 'Enter an amount to see the totals.'
-          : `${isHand ? 'Estimated: ' : ''}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein · ` +
+      {totals === undefined ? (
+        <p id={`${ids}-needed`} className="app-caption food-still-needed" data-testid="amount-macros">
+          Still needed: an amount above zero.
+        </p>
+      ) : (
+        <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="amount-macros">
+          {`${isHand ? 'Logs an estimate: ' : 'Logs '}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein · ` +
             `${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
             `${n(totals.fatG)} g fat`}
-      </p>
+        </p>
+      )}
       {note === undefined ? null : <Notice kind="info" text={note} />}
       {offersOil ? (
         <>
@@ -342,7 +347,7 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
       <div className="app-gap" />
-      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} />
+      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
       <MmButton label="Back to search" kind="text" onPress={onBack} />
     </div>
   );

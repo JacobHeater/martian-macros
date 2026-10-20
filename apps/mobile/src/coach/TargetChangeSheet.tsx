@@ -2,6 +2,10 @@ import type { TargetsExplanation } from '../engine/TargetsExplanation';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 import { ExplanationLine } from '../engine/ExplanationLine';
 import { confidenceLabel } from '../format/confidenceLabel';
+import { adherenceLines } from '../format/adherenceLines';
+import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
+import { StatRow } from '../ui/StatRow';
 import { explanationLineText } from '../format/explanationLineText';
 import { Fmt } from '../format/Fmt';
 import { whatWouldChangeIt } from '../format/whatWouldChangeIt';
@@ -39,6 +43,11 @@ function change(label: string, before: number | undefined, after: number, unit: 
  * that add up), what it was based on, and what would change it (MM-138).
  */
 export function TargetChangeSheet({ current, previous, onHold }: TargetChangeSheetProps) {
+  const { state } = useApp();
+  // The week the check-in read, as five facts beside its reasons (MM-149): the person and the coach look at one account.
+  const week = useCell(state.adherenceSummary);
+  const floor = useCell(state.coach)?.calorieFloorKcal;
+  const underEatingNotice = useCell(state.underEatingNotice) !== undefined;
   const explanation = current.explanation;
   const t = current.targets;
   const p = previous?.targets;
@@ -58,6 +67,15 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
       <div className="app-gap-small" />
       <SectionLabel text="What changed" />
       <p className="app-text">{changes.join('. ')}</p>
+      {week === undefined || floor === undefined ? null : (
+        <>
+          <div className="app-gap-small" />
+          <SectionLabel text="Your last 7 days" />
+          {adherenceLines(week, { floorKcal: floor, underEatingNotice }).map(({ label, value, detail }) => (
+            <StatRow key={label} label={label} value={value} detail={detail} />
+          ))}
+        </>
+      )}
       <div className="app-gap-small" />
       <SectionLabel text="Why" />
       {explanation === undefined ? (

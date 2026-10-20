@@ -197,6 +197,7 @@ export function analyze({
       lastWeightEventOn: latestOf(
         creatineEvents.filter((event) => !event.date.isAfter(asOf)).map((event) => event.date),
       ),
+      lastGapEndedOn: latestOf(gaps.filter((gap) => !gap.to.isAfter(asOf)).map((gap) => gap.to)),
     }),
     recommendation: recommendMode({
       sex: profile.sex,

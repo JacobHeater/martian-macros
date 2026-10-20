@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
+import type { Workout } from '../domain/training/Workout';
 import type { WeightObservation } from '../domain/WeightObservation';
 import { AdherenceSummary } from './AdherenceSummary';
 import { intakeStandingOf } from './intakeStandingOf';
@@ -20,6 +21,7 @@ export function summarizeAdherence({
   weights,
   history,
   floorKcal,
+  workouts,
   days = 7,
 }: {
   through: CalendarDate;
@@ -27,6 +29,8 @@ export function summarizeAdherence({
   weights: readonly WeightObservation[];
   history: readonly TargetsRecord[];
   floorKcal?: number | undefined;
+  /** The training log's workouts; undefined when the log is not read, so the fact is left out rather than said as zero. */
+  workouts?: readonly Workout[] | undefined;
   days?: number;
 }): AdherenceSummary {
   const from = through.addDays(1 - days);
@@ -79,6 +83,7 @@ export function summarizeAdherence({
     daysLogged: logged,
     completeDays: complete.length,
     weighIns: weights.filter((w) => inWeek(w.date)).length,
+    workouts: workouts === undefined ? undefined : workouts.filter((w) => !w.inProgress && inWeek(w.date)).length,
     averageIntakeKcal: averageIntake,
     averageTargetKcal: averageTarget,
     standing:

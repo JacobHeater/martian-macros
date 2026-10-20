@@ -1,6 +1,6 @@
 ---
 id: MM-149
-status: in-progress
+status: done
 component: adherence
 related: [MM-145, MM-27, MM-33, MM-40, MM-41, MM-92, MM-98, MM-108, MM-114, MM-121, MM-123, MM-124, MM-139, MM-140, MM-141, MM-150]
 ---
@@ -99,3 +99,6 @@ words. Tests: `adherence_summary_test.dart` in the engine and in the app.
 Not built: workouts (no training log yet), the summary beside the check-in summary (MM-138) and in the monthly report (MM-33), the
 pointer to the under-eating notice (MM-114), and higher days judged against their own targets (MM-124). The week is the seven days to
 yesterday, not the seven days before each check-in. The stall diagnosis and confidence do not read it yet (MM-140, MM-139).
+
+## Built 2026-10-19
+The week's workouts are the fifth fact once the training log is read (left out, not said as zero, when it is not); an average below the floor points to the notice about those days while it is showing (MM-114); the five facts stand beside the check-in's reasons in "Why your targets are what they are" (MM-138), as "Your last 7 days". Decided: the week is the seven days to yesterday, which is what the check-in reads. Left to their own tickets: higher days against their own targets (MM-124, M4); the monthly report's month (MM-33); the stall diagnosis and confidence reading the summary's figures (MM-140, MM-139). Tests: `test/coach/adherenceSummary.test.tsx`, `test/coach/lastChange.test.tsx`.
