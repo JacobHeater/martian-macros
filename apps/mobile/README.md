@@ -52,7 +52,10 @@ Kotlin plugin: `MmDb` over the system SQLite (MM-404), `MmPacks` (MM-404),
 of backups.
 
 From the repository root, `mm build ios` builds for the simulator and
-`mm run --ios` installs and launches there; no signing is needed. A phone
+`mm run --ios` installs and launches there; no signing is needed.
+`mm run --ios --phone` builds signed and opens the real app on the iPhone
+plugged in (MM-412; the team from `MM_APPLE_TEAM` or the project's own
+uncommitted line). A phone
 needs a team chosen in Xcode once: `docs/ios-signing.md`.
 
 ## Layout
