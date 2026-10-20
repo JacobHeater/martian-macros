@@ -27,15 +27,25 @@ describe('every message of every kind, as Dart printed it', () => {
   it.each([
     // The caution added since the Flutter app (MM-251, a sleep disorder) has no Dart words to match.
     ['caution', all(Caution.values.filter((caution) => caution in dart.labels.caution), cautionMessage)],
-    // The flags added since the Flutter app (MM-128, MM-130, MM-134) have no Dart words to match.
-    ['targetFlag', all(TargetFlag.values.filter((flag) => flag in dart.labels.targetFlag), targetFlagMessage)],
+    // The flags added since the Flutter app (MM-128, MM-130, MM-134) have no Dart words to match, and the two
+    // break flags departed with MM-135 (2026-10-20): the break is two weeks, planned at twenty weeks not sixteen,
+    // and the words make no claim about recovery or metabolism.
+    [
+      'targetFlag',
+      all(
+        TargetFlag.values.filter((flag) => flag in dart.labels.targetFlag && flag !== 'dietBreak' && flag !== 'requestedBreak'),
+        targetFlagMessage,
+      ),
+    ],
     ['modeReason', all(ModeReason.values, modeReasonExplanation)],
     ['weightEvent', all(WeightEventType.values, weightEventLabel)],
     ['mealSize', all(MealSize.values, mealSizeLabel)],
     ['mealKind', all(MealKind.values, mealKindLabel)],
     ['mealKindShort', all(MealKind.values, mealKindShortLabel)],
   ] as const)('%s', (kind, ours) => {
-    expect(ours).toEqual(dart.labels[kind]);
+    const { dietBreak: _dietBreak, requestedBreak: _requestedBreak, ...recorded } =
+      kind === 'targetFlag' ? dart.labels.targetFlag : { dietBreak: undefined, requestedBreak: undefined, ...dart.labels[kind] };
+    expect(ours).toEqual(recorded);
   });
 });
 

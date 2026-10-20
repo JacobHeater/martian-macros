@@ -3,6 +3,7 @@ import type { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { GoalMode } from '../domain/GoalMode';
 import type { TrainingStatus } from '../domain/TrainingStatus';
 import type { BodyFatEstimate } from './BodyFatEstimate';
+import type { BreakFlag } from './breakInForce';
 import type { DailyTargets } from './DailyTargets';
 
 interface TargetInputsInit {
@@ -23,6 +24,7 @@ interface TargetInputsInit {
   safetyBodyFatPercent?: number | undefined;
   safetyRaiseKcal?: number;
   breakRequested?: boolean;
+  continuingBreak?: BreakFlag | undefined;
   correctionRateFraction?: number | undefined;
   easeFromKcal?: number | undefined;
   trainingLapsed?: boolean;
@@ -75,6 +77,13 @@ export class TargetInputs {
   readonly breakRequested: boolean;
 
   /**
+   * A diet break the current targets began has not run its length
+   * (`breakInForce`, MM-135): this set stays at maintenance and carries the
+   * same flag, so targets reissued inside a break do not end it.
+   */
+  readonly continuingBreak: BreakFlag | undefined;
+
+  /**
    * At maintenance, a temporary pace back toward the anchor after drifting
    * out of the band (MM-130): signed, a share of body weight a week.
    */
@@ -113,5 +122,6 @@ export class TargetInputs {
     this.easeFromKcal = init.easeFromKcal;
     this.trainingLapsed = init.trainingLapsed ?? false;
     this.breakRequested = init.breakRequested ?? false;
+    this.continuingBreak = init.continuingBreak;
   }
 }

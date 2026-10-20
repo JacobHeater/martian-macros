@@ -2,6 +2,7 @@ import type { GoalMode } from '../domain/GoalMode';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import { clamp } from '../lang/clamp';
 import { DailyTargets } from './DailyTargets';
+import { DietBreakRule } from './DietBreakRule';
 import { energyDensityKcalPerKg } from './energyDensityKcalPerKg';
 import { leanFractionOfChange } from './leanFractionOfChange';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
@@ -32,10 +33,15 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
     rate = 0;
     flags.add('trainingLapsed');
   }
+  // A diet break (MM-135): the one the user chose, the one already running,
+  // or the one the app plans at the cap. Each is maintenance for its length.
   if (rate < 0 && i.breakRequested) {
     rate = 0;
     flags.add('requestedBreak');
-  } else if (rate < 0 && i.consecutiveDeficitWeeks >= SafetyBounds.maxContinuousDeficitWeeks) {
+  } else if (rate < 0 && i.continuingBreak !== undefined) {
+    rate = 0;
+    flags.add(i.continuingBreak);
+  } else if (rate < 0 && i.consecutiveDeficitWeeks >= DietBreakRule.forceFromWeeks) {
     rate = 0;
     flags.add('dietBreak');
   }

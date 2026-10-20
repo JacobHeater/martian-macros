@@ -7,6 +7,7 @@ import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
 import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { Fmt } from '../../src/format/Fmt';
 import { paceLabel } from '../../src/format/paceLabel';
 import { first } from '../support/first';
 import { renderApp } from '../support/renderApp';
@@ -17,7 +18,11 @@ import { dashboardLoaded } from '../support/dashboardLoaded';
 const today = CalendarDate.of(2026, 10, 5);
 let repos: InMemoryRepositories;
 
-async function seed({ goal = 'fatLoss', hardWeeks = 2 }: { goal?: GoalMode; hardWeeks?: number } = {}): Promise<void> {
+async function seed({
+  goal = 'fatLoss',
+  hardWeeks = 2,
+  deficitDays = 3,
+}: { goal?: GoalMode; hardWeeks?: number; deficitDays?: number } = {}): Promise<void> {
   repos = new InMemoryRepositories();
   await repos.preferences.saveThemePreference('martian');
   await repos.setup.saveSetup(
@@ -25,7 +30,7 @@ async function seed({ goal = 'fatLoss', hardWeeks = 2 }: { goal?: GoalMode; hard
   );
   await repos.weights.saveWeight(today, 82);
   await repos.targets.saveTargets(
-    targetsFrom(today.addDays(-3), {
+    targetsFrom(today.addDays(-deficitDays), {
       mode: goal,
       kcal: 2000,
       proteinG: 160,
@@ -72,9 +77,28 @@ it('two hard weeks on a cut bring the offer, with its reasons', async () => {
   expect(offer()).not.toBeNull();
   expect(offer()).toHaveTextContent('The coach would');
   expect(offer()).toHaveTextContent('appears to shift loss');
-  expect(screen.getByRole('button', { name: 'Take a maintenance week' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Take a two-week break' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Slow to 0.5% a week' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
+});
+
+/** MM-135: twelve unbroken weeks bring the offer with no recovery check-in answered, and without the slower pace. */
+it('twelve weeks in a deficit bring the break offer, a break or carry on', async () => {
+  await seed({ hardWeeks: 0, deficitDays: 90 });
+  await open();
+  expect(offer()).toBeNull();
+  const long = screen.getByText('12 weeks in a deficit').closest('.mm-notice');
+  expect(long).toHaveTextContent('at 20 weeks it plans a break itself');
+  expect(long?.textContent?.toLowerCase()).not.toMatch(/metabol|good/);
+  expect(screen.getByRole('button', { name: 'Take a two-week break' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /^Slow to/ })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
+});
+
+it('eleven weeks in a deficit bring nothing', async () => {
+  await seed({ hardWeeks: 0, deficitDays: 83 });
+  await open();
+  expect(screen.queryByText(/weeks in a deficit$/)).toBeNull();
 });
 
 it('it never suggests eating less or moving more', async () => {
@@ -122,10 +146,10 @@ it('Carry on changes nothing and the offer goes', async () => {
   expect(now[now.length - 1]?.targets.kcal).toBe(before[before.length - 1]?.targets.kcal);
 });
 
-it('a maintenance week puts targets at maintenance at once', async () => {
+it('a break puts targets at maintenance at once, for two weeks', async () => {
   await seed();
   const before = await open();
-  await userEvent.click(screen.getByRole('button', { name: 'Take a maintenance week' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Take a two-week break' }));
   await expect.poll(offer).toBeNull();
   expect((await repos.setup.loadSetup())?.maintenanceWeekFrom).toBe(today);
   await expect.poll(async () => (await history()).length).toBe(before.length + 1);
@@ -135,6 +159,8 @@ it('a maintenance week puts targets at maintenance at once', async () => {
   expect(last?.targets.flags.has('requestedBreak')).toBe(true);
   expect(last?.targets.weeklyRateFraction).toBe(0);
   expect(last?.targets.kcal ?? 0).toBeGreaterThan(before[before.length - 1]?.targets.kcal ?? 0);
+  // The dashboard's next check-in is the break's length away, not a week.
+  expect(screen.getByText(Fmt.day(today.addDays(14), today))).toBeInTheDocument();
 });
 
 it('a slower pace is stored, and never a lower target', async () => {

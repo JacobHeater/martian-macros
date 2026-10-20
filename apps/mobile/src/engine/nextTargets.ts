@@ -3,10 +3,12 @@ import type { Pause } from '../domain/Pause';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
 import { calibrationDays, checkInIntervalDays } from './coachConstants';
+import { breakInForce, type BreakFlag } from './breakInForce';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { computeTargetsTraced } from './computeTargetsTraced';
 import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
 import { currentTargetRulesVersion } from './currentTargetRulesVersion';
+import { DietBreakRule } from './DietBreakRule';
 import type { DailyTargets } from './DailyTargets';
 import { explainTargets } from './explainTargets';
 import { FatLossPace } from './FatLossPace';
@@ -35,7 +37,9 @@ import { TdeeEstimate } from './TdeeEstimate';
  * - Otherwise at most every `checkInIntervalDays`. Adaptive changes wait
  *   out the calibration period and a holding estimator; a raise for a
  *   too-fast loss (MM-115) does not.
- * - A maintenance week the user asked for: immediate (MM-117).
+ * - A diet break the user asked for: immediate (MM-117, MM-135). A break,
+ *   chosen or planned at the cap, holds for its length, and the deficit
+ *   then resumes at once, unthrottled, like a change of goal.
  * - Never during a pause, and not at a weekly check-in until
  *   `checkInIntervalDays` after one ends (MM-148).
  * - A pace change: immediate, built on the estimate the current targets
@@ -74,12 +78,15 @@ export function nextTargets({
   const last = history[history.length - 1];
   const lastSafetyBf = last?.safetyBodyFatPercent;
   const safetyBf = safetyBodyFatPercent(snapshot.bodyFat, { previous: lastSafetyBf });
+  // A diet break still running: targets reissued inside it stay on it (MM-135).
+  const running = breakInForce(history, today);
 
   const build = ({
     previous,
     deficitWeeks = 0,
     safetyRaiseKcal = 0,
     breakRequested = false,
+    continuingBreak = running?.flag,
     trigger = 'checkIn',
     restingOn,
     correctionRateFraction,
@@ -89,6 +96,7 @@ export function nextTargets({
     deficitWeeks?: number;
     safetyRaiseKcal?: number;
     breakRequested?: boolean;
+    continuingBreak?: BreakFlag | undefined;
     trigger?: ExplanationTrigger;
     /** The expenditure estimate to build on instead of today's, when only the pace changed (MM-128). */
     restingOn?: number;
@@ -131,6 +139,7 @@ export function nextTargets({
         safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal,
         breakRequested,
+        continuingBreak,
         correctionRateFraction,
         easeFromKcal,
         trainingLapsed,
@@ -241,9 +250,9 @@ export function nextTargets({
     return build({ previous: last.targets, deficitWeeks: deficitWeeks(), trigger: 'appRuleUpdate' });
   }
 
-  // A maintenance week the user asked for starts at once (MM-117). It is a
-  // set of targets like any other, so the next check-in is a week later,
-  // and being at maintenance it ends the unbroken deficit.
+  // A diet break the user asked for starts at once (MM-117, MM-135): a set
+  // of targets like any other, at maintenance for the break's length, which
+  // ends the unbroken deficit.
   const breakFrom = setup.maintenanceWeekFrom;
   if (
     breakFrom !== undefined &&
@@ -255,9 +264,17 @@ export function nextTargets({
   }
 
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return undefined;
+  // A diet break holds for its length (MM-135)...
+  if (running !== undefined) return undefined;
   const ended = latestEndedPause(pauses, today);
   if (ended !== undefined && ended.resumesOn.daysUntil(today) < checkInIntervalDays) {
     return undefined;
+  }
+  // ...and the deficit then resumes at once, as it would after a change of
+  // goal, not 100 kcal a week: a planned return is neither a noisy week nor
+  // a spiral. The count starts again from these targets.
+  if (last.targets.flags.has('dietBreak') || last.targets.flags.has('requestedBreak')) {
+    return build({ trigger: 'breakEnded' });
   }
 
   // Losing faster than the safe pace is not noise, so this runs through
@@ -274,7 +291,10 @@ export function nextTargets({
   // underweight range, MM-111) ends at this check-in, calibration or not.
   const deficitNoLongerAllowed =
     last.targets.weeklyRateFraction < 0 && !snapshot.policy.allowedModes.has(setup.goalMode);
-  if (raise > 0 || deficitNoLongerAllowed) {
+  // So does the break the app plans at the cap (MM-135): a safety floor
+  // does not wait for the estimate to settle.
+  const capReached = last.targets.weeklyRateFraction < 0 && deficitWeeks() >= DietBreakRule.forceFromWeeks;
+  if (raise > 0 || deficitNoLongerAllowed || capReached) {
     return build({ previous: last.targets, deficitWeeks: deficitWeeks(), safetyRaiseKcal: raise });
   }
 

@@ -11,6 +11,8 @@ const values = [
   'paceChange',
   /** The training-days setting went to zero on a gain (MM-134). */
   'trainingLapse',
+  /** A diet break ran its length and the deficit resumed (MM-135). */
+  'breakEnded',
 ] as const;
 
 /**

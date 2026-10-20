@@ -11,11 +11,13 @@ import {
 } from '../../src/domain';
 import {
   analyze,
+  breakInForce,
   canHoldReduction,
   type CoachSnapshot,
   consecutiveDeficitWeeks,
   DailyTargets,
   findReliefOffer,
+  nextCheckIn,
   nextTargets,
   type SleepAverage,
   slowerPace,
@@ -92,8 +94,8 @@ const offer = ({
 /** The fourteen-night average from the record (MM-250). */
 const slept = (averageMinutes: number, nights = 14): SleepAverage => ({ averageMinutes, nights, from: today.addDays(-13), to: today });
 
-it('two hard check-ins running on a deficit make the offer', () => {
-  expect(offer()).toBeDefined();
+it('two hard check-ins running on a deficit make the offer, for the recovery signals', () => {
+  expect(offer()?.reason).toBe('recoverySignals');
 });
 
 it('one hard check-in does not', () => {
@@ -129,7 +131,7 @@ it('is made on recomp, with no slower pace to offer', () => {
   const found = offer({ user: setup({ goal: 'recomp' }) });
   expect(found).toBeDefined();
   expect(found?.slowerPace).toBeUndefined();
-  expect(found?.suggestion).toBe('maintenanceWeek');
+  expect(found?.suggestion).toBe('break');
 });
 
 it('after any answer it is quiet for three weeks', () => {
@@ -151,18 +153,18 @@ describe('what the coach would pick', () => {
     expect(found?.slowerPace).toBe(0.005);
   });
 
-  it('eight weeks in, the maintenance week', () => {
+  it('eight weeks in, the break', () => {
     const found = offer({ history: [record(63)] });
     expect(found?.deficitWeeks).toBe(9);
-    expect(found?.suggestion).toBe('maintenanceWeek');
+    expect(found?.suggestion).toBe('break');
     expect(found?.slowerPace, 'still offered').toBe(0.005);
   });
 
-  it('already at the gentlest pace, the maintenance week', () => {
+  it('already at the gentlest pace, the break', () => {
     const found = offer({ user: setup({ pace: 0.005 }) });
     expect(found).toBeDefined();
     expect(found?.slowerPace).toBeUndefined();
-    expect(found?.suggestion).toBe('maintenanceWeek');
+    expect(found?.suggestion).toBe('break');
   });
 });
 
@@ -191,7 +193,55 @@ it('short sleep adds a line and is never a trigger', () => {
   expect(offer({ checkIns: [sleepless(8), sleepless(1)] })).toBeUndefined();
 });
 
-describe('a maintenance week the user takes', () => {
+/** MM-135: the second trigger, twelve unbroken weeks of deficit, with the recovery signals fine. */
+describe('the offer at twelve weeks', () => {
+  const calm = [fine(8), fine(1)];
+
+  it('is made at twelve whole weeks of unbroken deficit, and not before', () => {
+    expect(offer({ checkIns: calm, history: [record(83)] }), 'eleven weeks and six days').toBeUndefined();
+    const found = offer({ checkIns: calm, history: [record(84)] });
+    expect(found?.reason).toBe('longDeficit');
+    expect(found?.deficitWeeks).toBe(12);
+    expect(found?.suggestion).toBe('break');
+    expect(found?.slowerPace, 'a rest, not a pace').toBeUndefined();
+    expect(found?.shortSleep).toBe(false);
+  });
+
+  it('needs no check-ins at all', () => {
+    expect(offer({ checkIns: [], history: [record(84)] })?.reason).toBe('longDeficit');
+  });
+
+  it('gives way to the recovery signals when both hold', () => {
+    const found = offer({ history: [record(84)] });
+    expect(found?.reason).toBe('recoverySignals');
+    expect(found?.slowerPace).toBe(0.005);
+  });
+
+  it('is quiet for three weeks after an answer, like the other', () => {
+    expect(offer({ checkIns: calm, history: [record(84)], user: setup({ answeredOn: today.addDays(-20) }) })).toBeUndefined();
+    expect(offer({ checkIns: calm, history: [record(84)], user: setup({ answeredOn: today.addDays(-21) }) })).toBeDefined();
+  });
+
+  it('counts from the restart a gap or a pause set', () => {
+    expect(
+      findReliefOffer({ setup: setup(), checkIns: calm, history: [record(84)], today, deficitRestartOn: today.addDays(-70) }),
+    ).toBeUndefined();
+  });
+
+  it('is not made at maintenance, on another goal, or during a pause', () => {
+    expect(offer({ checkIns: calm, history: [record(84), record(2, 0)] })).toBeUndefined();
+    expect(offer({ checkIns: calm, history: [record(84)], user: setup({ goal: 'maintenance' }) })).toBeUndefined();
+    expect(
+      offer({
+        checkIns: calm,
+        history: [record(84)],
+        pauses: [new Pause({ from: today.addDays(-1), to: today.addDays(3), reason: 'travel' })],
+      }),
+    ).toBeUndefined();
+  });
+});
+
+describe('the break the user takes', () => {
   const start = today.addDays(-70);
   const user = new UserSetup({
     profile: man(),
@@ -234,9 +284,10 @@ describe('a maintenance week the user takes', () => {
     expect(next.explanation?.lines.map((l) => l.reason)).toContain('requestedBreak');
   });
 
-  it('is issued once, and holds for the week', () => {
+  it('is issued once, and holds for its two weeks', () => {
     const first = firstOfBreak();
-    for (let day = 0; day < 7; day++) {
+    expect(nextCheckIn(taken(), first)).toBe(today.addDays(14));
+    for (let day = 0; day < 14; day++) {
       expect(
         nextTargets({
           setup: taken(),
@@ -249,18 +300,40 @@ describe('a maintenance week the user takes', () => {
     }
   });
 
-  it('ends the unbroken deficit, and the deficit resumes after it', () => {
+  it('ends the unbroken deficit, and the deficit resumes after it at once, not 100 kcal a week', () => {
     const first = firstOfBreak();
-    const after = today.addDays(7);
+    const after = today.addDays(14);
     expect(consecutiveDeficitWeeks([...history, first], after)).toBe(0);
     const resumed = nextTargets({
       setup: taken(),
       snapshot: snapshotOn(after),
       history: [...history, first],
       today: after,
-    });
-    expect(resumed?.targets.weeklyRateFraction).toBeLessThan(0);
-    expect(resumed?.targets.flags).not.toContain('requestedBreak');
+    }) as TargetsRecord;
+    expect(resumed.targets.weeklyRateFraction).toBeLessThan(0);
+    expect(resumed.targets.flags).not.toContain('requestedBreak');
+    expect(resumed.targets.flags).not.toContain('rateLimited');
+    expect(first.targets.kcal - resumed.targets.kcal).toBeGreaterThan(100);
+    expect(resumed.explanation?.lines.map((l) => l.reason)).toContain('breakEnded');
+    expect(consecutiveDeficitWeeks([...history, first, resumed], after.addDays(21))).toBe(3);
+  });
+
+  it('targets reissued inside the break stay on it', () => {
+    const first = firstOfBreak();
+    const inside = today.addDays(3);
+    // A corrected profile issues targets at once; they carry the break on.
+    const corrected = taken().copyWith({ profileRevision: 1 });
+    const reissued = nextTargets({
+      setup: corrected,
+      snapshot: snapshotOn(inside),
+      history: [...history, first],
+      today: inside,
+    }) as TargetsRecord;
+    expect(reissued.targets.flags).toContain('requestedBreak');
+    expect(reissued.targets.weeklyRateFraction).toBe(0);
+    // The break is counted from its first day, so the reissue does not stretch it.
+    expect(breakInForce([...history, first, reissued], today.addDays(13))?.startedOn).toBe(today);
+    expect(breakInForce([...history, first, reissued], today.addDays(14))).toBeUndefined();
   });
 
   it('cannot be held back like an ordinary reduction', () => {

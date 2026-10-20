@@ -99,7 +99,7 @@ export class UserSetup {
   /** When the user started taking creatine, if they currently take it (MM-136). */
   readonly creatineStartedOn: CalendarDate | undefined;
 
-  /** The day the user last chose to take a maintenance week early (MM-117). */
+  /** The day the user last chose to take a diet break (MM-117, MM-135): two weeks at maintenance from it. */
   readonly maintenanceWeekFrom: CalendarDate | undefined;
 
   /**

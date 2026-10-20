@@ -7,7 +7,6 @@ import type { ProteinTargets } from './ProteinTargets';
 
 /** Energy availability floor, kcal per kg fat-free mass per day. */
 const minEnergyAvailabilityKcalPerKgFfm = 30;
-const maxContinuousDeficitWeeks = 16;
 const maxWeeklyTargetChangeKcal = 100;
 const maxWeeklyTargetChangeFraction = 0.05;
 
@@ -52,7 +51,6 @@ function referenceWeightKg({ weightKg, heightCm }: { weightKg: number; heightCm:
  */
 export const SafetyBounds = {
   minEnergyAvailabilityKcalPerKgFfm,
-  maxContinuousDeficitWeeks,
   maxWeeklyTargetChangeKcal,
   maxWeeklyTargetChangeFraction,
   excessWeightFraction,
