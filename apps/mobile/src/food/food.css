@@ -185,15 +185,6 @@
 .food-totals {
   margin: var(--space-12) 0 0;
 }
-.food-recents {
-  display: flex;
-  gap: var(--space-8);
-  overflow-x: auto;
-  padding-bottom: var(--space-4);
-}
-.food-recents > * {
-  flex: none;
-}
 .food-ingredient-adder {
   margin-top: var(--space-12);
 }

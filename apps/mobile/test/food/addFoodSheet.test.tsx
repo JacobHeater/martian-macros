@@ -69,7 +69,7 @@ it('discovery and manual entry are separate steps', async () => {
 
   expect(search()).toBeInTheDocument();
   expect(inSheet.getByText('Recent foods')).toBeInTheDocument();
-  expect(inSheet.getByRole('button', { name: 'Oats with milk' })).toBeInTheDocument();
+  expect(inSheet.getByRole('button', { name: /^Oats with milk/ })).toBeInTheDocument();
   expect(inSheet.getByRole('button', { name: 'Enter manually' })).toBeInTheDocument();
   expect(name()).not.toBeInTheDocument();
   expect(inSheet.queryByRole('textbox', { name: 'Protein g' })).not.toBeInTheDocument();
@@ -95,7 +95,7 @@ it('discovery and manual entry are separate steps', async () => {
   expect(name()).toHaveValue('Homemade soup');
 
   await press(sheet, 'Back to food choices');
-  await press(sheet, 'Oats with milk');
+  await press(sheet, /^Oats with milk/);
   expect(name()).toHaveValue('Oats with milk');
 
   await press(sheet, 'Back to food choices');
