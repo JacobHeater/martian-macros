@@ -33,6 +33,7 @@ import { parseNumber } from '../format/parseNumber';
 import { portionUnitChipLabel } from '../format/portionUnitChipLabel';
 import { portionUnitOf } from '../format/portionUnitOf';
 import { quantitySourceLabel } from '../format/quantitySourceLabel';
+import { referenceBasisLabel } from '../format/referenceBasisLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -269,8 +270,12 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const a = parseNumber(form.alcohol) ?? 0;
   const fromMacros = atwaterKcal({ proteinG: p, carbsG: c, fatG: f, alcoholG: a });
   const typedKcal = parseNumber(form.kcal);
-  /** Calories as typed, or derived from macros when left blank. */
-  const energy = typedKcal ?? (fromMacros > 0 ? fromMacros : undefined);
+  /**
+   * Calories as typed, or derived from macros when left blank. At Simple
+   * detail the macros that would derive them are not asked, so calories are
+   * typed, and no caution compares them with what is not there (MM-428).
+   */
+  const energy = typedKcal ?? (showsCarbsAndFat && fromMacros > 0 ? fromMacros : undefined);
   const amount = parseQuantity(form.quantity);
   const calc = form.calcRef;
   const amountRequired = calc !== undefined || (!form.legacy && form.source !== 'quickAdd');
@@ -314,10 +319,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const stillNeeded: string[] = [
     ...(form.name.trim() === '' ? ['a name'] : []),
     ...(!amountOk ? ['an amount'] : []),
-    ...(totals === undefined || totals.kcal <= 0 ? ['calories above zero (typed, or from the macros)'] : []),
+    ...(totals === undefined || totals.kcal <= 0 ? [showsCarbsAndFat ? 'calories above zero (typed, or from the macros)' : 'calories above zero'] : []),
     ...(calc === undefined && (p < 0 || c < 0 || f < 0) ? ['macros that are not negative'] : []),
   ];
   const mismatch =
+    showsCarbsAndFat &&
     typedKcal !== undefined &&
     fromMacros !== 0 &&
     !macrosMatchEnergy({ kcal: typedKcal, proteinG: p, carbsG: c, fatG: f, alcoholG: a });
@@ -605,10 +611,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             </>
           ) : null}
         </div>
+        {showsCarbsAndFat ? null : (
+          // What Simple leaves out is said, so a zero seen later at Standard is no surprise (the panel's UX-5).
+          <p className="app-caption food-reference-line">Carbs and fat are not asked at Simple detail and are logged as 0.</p>
+        )}
         {DetailLevel.showsExtras(level) ? (
           <>
-            {/* Full detail takes the label's other lines too, two to a line as a saved food's are (MM-309). */}
-            <p className="food-label food-label-spaced">Also on the label</p>
+            {/* Full detail takes the label's other lines too, two to a line as a saved food's are (MM-309), unfolded because Full asked for them. */}
+            <p className="food-label food-label-spaced">More from the label (optional)</p>
             <div className="food-extra-fields">
               <MmTextField label="Fiber g" kind="number" dense value={form.fiber} onChange={(fiber) => set({ fiber })} />
               <MmTextField label="Sugars g" kind="number" dense value={form.sugars} onChange={(sugars) => set({ sugars })} />
@@ -642,12 +652,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           label={perServing ? 'Calories per serving' : 'Calories'}
           kind="number"
           value={form.kcal}
-          hint={fromMacros > 0 ? `${whole(fromMacros)} from macros` : undefined}
+          hint={showsCarbsAndFat && fromMacros > 0 ? `${whole(fromMacros)} from macros` : undefined}
           helper={
             mismatch
               // The kept basis, never a second "logged" figure beside the Logs line (the panel's PD-1, F2).
               ? `Macros add up to ${whole(fromMacros)} kcal${perServing ? ' per serving' : ''}; the ${whole(typedKcal ?? 0)} typed is kept. Double-check the label.`
-              : 'Leave blank to calculate from macros.'
+              : showsCarbsAndFat
+                ? 'Leave blank to calculate from macros.'
+                : 'As the label states them.'
           }
           helperIsWarning={mismatch}
           onChange={(kcal) => set({ kcal })}
@@ -687,9 +699,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         />
         {/* The numbers the entry rests on, in the terms they were typed (MM-221). */}
         <p className="app-caption food-reference-line">
-          {reference.basis === 'perServing' ? 'Per serving' : reference.basis === 'per100g' ? 'Per 100 g' : 'Per 100 ml'}:{' '}
-          {whole(reference.nutrition.kcal)} kcal · {whole(reference.nutrition.proteinG)} g protein · {whole(reference.nutrition.carbsG)} g
-          carbs · {whole(reference.nutrition.fatG)} g fat
+          {referenceBasisLabel(reference.basis)}: {whole(reference.nutrition.kcal)} kcal · {whole(reference.nutrition.proteinG)} g protein
+          {showsCarbsAndFat ? ` · ${whole(reference.nutrition.carbsG)} g carbs · ${whole(reference.nutrition.fatG)} g fat` : ''}
         </p>
         <MmButton
           label={unit === 'serving' ? 'Edit nutrition per serving' : 'Enter the totals myself'}
@@ -824,7 +835,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               <p className="food-label food-label-spaced">Recent foods</p>
               <div className="food-recents">
                 {recents.map((e) => (
-                  <MmActionChip key={e.id} label={e.name} onPress={() => fill(e)} />
+                  // An estimate keeps its mark where the one-tap path is (MM-150).
+                  <MmActionChip key={e.id} label={e.source === 'quickAdd' ? `${e.name} · estimated` : e.name} onPress={() => fill(e)} />
                 ))}
               </div>
             </>

@@ -84,6 +84,9 @@ it('an estimated meal in recents keeps its estimated mark', async () => {
   renderApp(repos, today);
   await openTab('Food');
   const sheet = await openAddFood();
+  // The one-tap chip carries the mark too (the panel's UX-7).
+  expect(within(sheet).getByRole('button', { name: 'Thai place, usual · estimated' })).toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: 'Thai curry, weighed' })).toBeInTheDocument();
   await typeIn(sheet, 'Search foods', 'thai');
   expect(within(sheet).getByText('Your recent food · estimated · 900 kcal')).toBeInTheDocument();
   expect(within(sheet).getByText('Your recent food · 600 kcal')).toBeInTheDocument();

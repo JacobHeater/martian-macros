@@ -54,6 +54,7 @@ export * from './portionSummary';
 export * from './portionUnitChipLabel';
 export * from './portionUnitOf';
 export * from './preparationLabel';
+export * from './referenceBasisLabel';
 export * from './progressionSettingsText';
 export * from './progressionText';
 export * from './quantitySourceLabel';

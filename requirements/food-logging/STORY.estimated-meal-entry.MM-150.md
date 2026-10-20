@@ -129,3 +129,10 @@ Noted, with their own tickets: the adherence summary saying intake was mostly es
 and the insight above half (MM-141) are the coach's; the "Estimate-heavy day check" is the same question for MM-139. Decided here
 (say if wrong): the recent-food chips shown before a search stay names only; the mark is on the row, where there is room for it.
 
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+The recent-food chips carry the mark too (UX-7): "Thai place, usual · estimated", so the one-tap path says what it is before
+the tap. The earlier decision to leave the chips as names only is reversed.
+
+## UI/UX
+- A recent estimate — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodRecentEstimate). The row's
+  "estimated" between the kind and the calories.
