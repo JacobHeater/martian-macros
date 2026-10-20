@@ -1,3 +1,5 @@
+import type { CookingFatReader } from './CookingFatReader';
+import type { CookingFatWriter } from './CookingFatWriter';
 import type { DetailLevelReader } from './DetailLevelReader';
 import type { DetailLevelWriter } from './DetailLevelWriter';
 import type { EaseIntoMaintenanceReader } from './EaseIntoMaintenanceReader';
@@ -67,4 +69,6 @@ export interface PreferencesRepository
     EaseIntoMaintenanceReader,
     EaseIntoMaintenanceWriter,
     OnlineLookupReader,
-    OnlineLookupWriter {}
+    OnlineLookupWriter,
+    CookingFatReader,
+    CookingFatWriter {}

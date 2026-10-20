@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import type { FoodCatalog } from '../../src/foodCatalog/FoodCatalog';
@@ -32,9 +33,12 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
+/** Searches and picks the pack's result called `name`, never the recent-food row of the same name. */
 async function search(sheet: HTMLElement, query: string, name: RegExp): Promise<void> {
   await typeIn(sheet, 'Search foods', query);
-  await userEvent.click((await within(sheet).findAllByRole('button', { name }))[0] as HTMLElement);
+  const results = await within(sheet).findAllByRole('button', { name });
+  const fromPack = results.find((result) => !/Your recent food/.test(result.textContent ?? '')) ?? results[0];
+  await userEvent.click(fromPack as HTMLElement);
   await within(sheet).findByRole('button', { name: 'Log it' });
 }
 
@@ -124,4 +128,77 @@ it('no switch for a serving, or for a food with one state', async () => {
   await search(sheet, 'banana', /Banana/);
   await press(sheet, 'Grams');
   expect(within(sheet).queryByText('Weighed as'), 'one state only').not.toBeInTheDocument();
+});
+
+// MM-151: remembered per food, from the whole log, not only the last twenty recent foods.
+it('the state last used is remembered past the recent foods', async () => {
+  let sheet = await pick('white rice', rice);
+  await press(sheet, 'Grams');
+  await press(sheet, 'Raw');
+  await log(sheet);
+  for (let i = 0; i < 25; i++) {
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'snack', name: `Other food ${i}`, kcal: 50, proteinG: 1, carbsG: 1, fatG: 1, source: 'weighed' }),
+    );
+  }
+  sheet = await openAddFood();
+  await search(sheet, 'white rice', rice);
+  expect(within(sheet).getByText('Weighed as')).toBeInTheDocument();
+  expect(totals(sheet)).toContain('365 kcal ·');
+});
+
+// MM-167: the state the food was logged in rides with the entry, and the portion line says it.
+it('an entry records whether it was weighed raw or cooked, and the row says so', async () => {
+  const sheet = await pick('white rice', rice);
+  await press(sheet, 'Grams');
+  await typeIn(sheet, /^Amount/, '200');
+  await press(sheet, 'Raw');
+  await log(sheet);
+  const entry = (await logged())[0];
+  expect(entry?.portion?.preparation).toBe('raw');
+  expect(entry?.portion?.conversion, 'a weight needs no conversion').toBeUndefined();
+  expect(await screen.findByText('Weighed · 200 g raw · calculated from 365 kcal per 100 g')).toBeInTheDocument();
+});
+
+it('a cup of rice records the serving weight it was converted with', async () => {
+  const sheet = await pick('white rice', rice);
+  await log(sheet);
+  const entry = (await logged())[0];
+  expect(entry?.portion?.preparation).toBe('cooked');
+  expect(entry?.portion?.conversion).toEqual({ kind: 'servingWeight', gramsPerUnit: 158 });
+});
+
+// MM-153: the amount step shows what the source states, per 100 g, and nothing invented.
+it('the amount step states the numbers per 100 g beside the source and tier', async () => {
+  const sheet = await pick('white rice', rice);
+  expect(within(sheet).getByText('Per 100 g: 130 kcal · 3 g protein · 28 g carbs · 0 g fat')).toBeInTheDocument();
+});
+
+// MM-152: the fat chosen is logged and becomes the usual one.
+it('butter chosen as the fat is logged as butter and remembered as the usual', async () => {
+  let sheet = await pick('white rice', rice);
+  await press(sheet, '1 tsp');
+  expect(within(sheet).getByRole('button', { name: 'Oil', pressed: true })).toBeInTheDocument();
+  await press(sheet, 'Butter');
+  expect(within(sheet).getByText(/^Adds butter as its own entry: about 34 kcal · 4 g fat$/)).toBeInTheDocument();
+  await log(sheet, 2);
+  const butter = (await logged()).find((e) => e.name === 'Butter');
+  expectClose(butter?.kcal ?? 0, 33.7, 0.1);
+  expectClose(butter?.fatG ?? 0, 3.81, 0.01);
+  expect(await first(repos.preferences.watchUsualCookingFat())).toBe('butter');
+  sheet = await openAddFood();
+  await search(sheet, 'white rice', rice);
+  await press(sheet, '1 tbsp');
+  expect(within(sheet).getByRole('button', { name: 'Butter', pressed: true })).toBeInTheDocument();
+});
+
+// MM-49: Simple detail says calories and protein on the amount step too; the food is logged whole.
+it('at Simple detail the amount step says calories and protein, and logs the whole food', async () => {
+  await repos.preferences.saveDetailLevel('simple');
+  const sheet = await pick('white rice', rice);
+  expect(totals(sheet)).toBe('Logs 205 kcal · 4 g protein');
+  expect(within(sheet).queryByText('Macro split')).not.toBeInTheDocument();
+  await log(sheet);
+  const entry = (await logged())[0];
+  expectClose(entry?.carbsG ?? 0, (28 * 158) / 100, 0.01);
 });

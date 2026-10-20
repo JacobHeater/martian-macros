@@ -194,4 +194,18 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 13 to 14 (MM-167, MM-151, MM-152): the state a food was logged in and the
+  // conversion that made its unit grams, both unknown for what is already
+  // logged; and the fat the person usually cooks with, oil until chosen.
+  [
+    13,
+    async (db) => {
+      await db.execute('ALTER TABLE food_entries ADD COLUMN preparation TEXT NULL');
+      await db.execute('ALTER TABLE food_entries ADD COLUMN conversion_kind TEXT NULL');
+      await db.execute(
+        'ALTER TABLE food_entries ADD COLUMN conversion_factor REAL NULL CHECK (conversion_factor IS NULL OR conversion_factor > 0.0)',
+      );
+      await db.execute("ALTER TABLE user_preferences ADD COLUMN usual_cooking_fat TEXT NOT NULL DEFAULT 'oil'");
+    },
+  ],
 ]);

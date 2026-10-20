@@ -1,6 +1,6 @@
 ---
 id: MM-152
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-23, MM-27, MM-39, MM-40, MM-108, MM-114, MM-127, MM-140, MM-151]
 ---
@@ -104,3 +104,23 @@ choosing one logs a second entry, "Cooking oil" (4.5 g or 13.5 g of fat, about 4
 dismissed" (the control is optional and defaults to No each time, so there is nothing to dismiss), and "cooked" is judged from the
 pack's preparation state because the pack has no category for pan-fried or roasted foods, so rice, which is not usually cooked in
 oil, is offered it too.
+
+## Progress (2026-10-20, feat/m2)
+Built: **the user's usual cooking fat.** Once a spoon is chosen under "Cooked with oil?", the amount step shows which fat, as choice
+chips like the "Amount in" chips above: Oil, Butter, Ghee, Coconut oil (`CookingFatKind`, each with its USDA numbers per 100 g and
+its spoon weights), the person's usual one preselected, with a caption saying what it adds ("Adds butter as its own entry: about
+34 kcal · 4 g fat"). The fat chosen is logged under its own name ("Butter", "Cooking oil") and becomes the usual
+(`usual_cooking_fat` on the preferences, schema 15, `CookingFatReader`/`Writer`, oil until chosen), so the next time it is one tap.
+Tests: `test/domain/cookingFat.test.ts`, the preferences contract, `test/food/rawOrCooked.test.tsx` ("butter chosen as the fat is
+logged as butter and remembered as the usual"). Story: `AddFoodAmountCookedWithOil`.
+
+Already true, recorded here: the line is suppressed while the under-eating notice is active (MM-114 is built; tested in
+`easyToMiss.test.tsx`), and a word searched from the line lists the person's own recent foods above the pack's results, so "the
+user's own recent ones first" holds.
+
+Decided here (say if wrong): the usual fat is learned where it is used, on the amount step, with no Settings control (Settings is
+another lane's this round, and a control there would be a second home for one choice); "off for this food once dismissed" is not
+built, because the control defaults to No and asks nothing, so there is nothing to dismiss; add-food filtered to a *kind* of item
+stays a word searched, since the pack has no categories (the food-database lane); "cooked" is still judged from the pack's state,
+so rice is offered oil too; the fade stays by calendar days since onboarding, the simplest reading of "days of use".
+

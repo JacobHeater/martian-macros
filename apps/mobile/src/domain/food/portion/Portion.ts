@@ -1,7 +1,9 @@
 import type { QuantitySource } from '../../QuantitySource';
+import type { Conversion } from './Conversion';
 import type { FoodOrigin } from './FoodOrigin';
 import type { NutritionBasis } from './NutritionBasis';
 import type { PortionUnit } from './PortionUnit';
+import type { Preparation } from './Preparation';
 import type { ReferenceNutrition } from './ReferenceNutrition';
 
 /**
@@ -29,6 +31,18 @@ export interface Portion {
 
   /** The food it was logged from, when it came from a pack or a saved food. */
   readonly origin?: FoodOrigin | undefined;
+
+  /**
+   * The state the food was in when it was logged (MM-151): raw or dry,
+   * cooked, or as packaged. Undefined when the food states none.
+   */
+  readonly preparation?: Preparation | undefined;
+
+  /**
+   * How the unit became grams when the totals were calculated: a serving's
+   * weight, a density or the hand model. None for a weight, or typed totals.
+   */
+  readonly conversion?: Conversion | undefined;
 
   /**
    * For a hand portion, the grams the hand model implied when it was logged

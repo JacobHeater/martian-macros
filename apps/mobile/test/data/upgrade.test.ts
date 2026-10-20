@@ -138,12 +138,23 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/**
+ * The schema as version 13 left it: the current shape without the state a
+ * food was logged in, the conversion to grams and the usual cooking fat
+ * (MM-167, MM-151, MM-152).
+ */
+const versionThirteen = currentSchema
+  .replace('  "preparation" TEXT NULL,\n', '')
+  .replace('  "conversion_kind" TEXT NULL,\n', '')
+  .split('  "sugar_alcohols_g" REAL NULL,\n  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)\n);')
+  .join('  "sugar_alcohols_g" REAL NULL\n);')
+  .replace("  \"usual_cooking_fat\" TEXT NOT NULL DEFAULT 'oil',\n", '');
+
 /** The schema as version 12 left it: without the sleep-disorder answer and the nights of sleep (MM-250, MM-251). */
-const versionTwelve = currentSchema
+const versionTwelve = versionThirteen
   .replace('  "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),\n', '')
   .replace(/CREATE TABLE "sleep_nights" \([\s\S]*?\n\);\n/, '');
 
-/** The schema as version 10 left it: without exact targets, the label note, easing into maintenance, the pace change day, the maintenance anchor and correction (MM-123, MM-128, MM-130). */
 /** The schema as version 11 left it: without the online lookup choice and the foods found online (MM-58). */
 const versionEleven = versionTwelve
   .replace(`  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),\n`, '')
@@ -353,4 +364,38 @@ it('a version 12 database comes up to date with no sleep disorder and no nights 
   expect(await first(repos.sleep.watchSleepNights())).toEqual([]);
   await repos.sleep.saveSleepNight(new SleepNight({ date: day, minutesAsleep: 440, source: 'typed' }));
   expect((await first(repos.sleep.watchSleepNights())).map((n) => n.minutesAsleep)).toEqual([440]);
+});
+
+// MM-167, MM-151, MM-152: a version 13 database comes up to date. What was logged keeps its
+// totals, method and portion with no state or conversion invented, and the usual fat is oil.
+it('a version 13 database comes up to date: entries kept with no preparation or conversion, the usual fat oil', async () => {
+  expect(versionThirteen).not.toContain('preparation');
+  expect(versionThirteen).not.toContain('conversion_');
+  expect(versionThirteen).not.toContain('usual_cooking_fat');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 13, schema: versionThirteen });
+  await old.execute(
+    'INSERT INTO food_entries (epoch_day, meal, name, kcal, protein_g, carbs_g, fat_g, quantity_source, ' +
+      'portion_quantity, portion_unit, nutrition_basis, reference_basis, reference_kcal, reference_protein_g, reference_carbs_g, reference_fat_g, ' +
+      'origin_pack_id, origin_food_id, origin_source) ' +
+      "VALUES (?, 'dinner', 'White rice, raw', 730, 14, 160, 1.4, 'weighed', 200, 'gram', 'calculated', 'per100g', 365, 7, 80, 0.7, 'fixture', 3, 'fixture')",
+    [day.epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, detail_level) VALUES (1, 'dark', 'full')");
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await columnsOf(sql, 'food_entries')).toEqual(expect.arrayContaining(['preparation', 'conversion_kind', 'conversion_factor']));
+  const [rice] = await first(repos.food.watchFood(day));
+  expect(rice?.kcal).toBe(730);
+  expect(rice?.portion?.quantity).toBe(200);
+  expect(rice?.portion?.reference?.nutrition.kcal).toBe(365);
+  expect(rice?.portion?.origin?.foodId).toBe(3);
+  expect(rice?.portion?.preparation, 'nothing is invented').toBeUndefined();
+  expect(rice?.portion?.conversion).toBeUndefined();
+  expect(await repos.food.lastLoggedFrom('fixture', [3, 4]).then((e) => e?.name)).toBe('White rice, raw');
+  expect(await first(repos.preferences.watchUsualCookingFat())).toBe('oil');
+  expect(await first(repos.preferences.watchDetailLevel())).toBe('full');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
 });

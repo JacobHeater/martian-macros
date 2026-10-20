@@ -1,8 +1,11 @@
+import type { Conversion } from '../domain/food/portion/Conversion';
+import { ConversionKind } from '../domain/food/portion/ConversionKind';
 import type { FoodOrigin } from '../domain/food/portion/FoodOrigin';
 import { NutritionBasis } from '../domain/food/portion/NutritionBasis';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import type { Portion } from '../domain/food/portion/Portion';
 import { PortionUnit } from '../domain/food/portion/PortionUnit';
+import { Preparation } from '../domain/food/portion/Preparation';
 import { ReferenceBasis } from '../domain/food/portion/ReferenceBasis';
 import type { ReferenceNutrition } from '../domain/food/portion/ReferenceNutrition';
 import { QuantitySource } from '../domain/QuantitySource';
@@ -37,6 +40,10 @@ export function portionFromRow(r: SqlRow): Portion | undefined {
     packId === undefined || foodId === undefined || source === undefined
       ? undefined
       : { packId, foodId, source, sourceId: optionalText(r, 'origin_source_id') };
+  const conversionKind = optionalNamed(ConversionKind.values, r, 'conversion_kind');
+  const gramsPerUnit = optionalNumber(r, 'conversion_factor');
+  const conversion: Conversion | undefined =
+    conversionKind === undefined || gramsPerUnit === undefined ? undefined : { kind: conversionKind, gramsPerUnit };
   return {
     method: named(QuantitySource.values, r, 'quantity_source'),
     basis,
@@ -46,5 +53,7 @@ export function portionFromRow(r: SqlRow): Portion | undefined {
     impliedGrams: optionalNumber(r, 'implied_grams'),
     handModelVersion: optionalInteger(r, 'hand_model_version'),
     origin,
+    preparation: optionalNamed(Preparation.values, r, 'preparation'),
+    conversion,
   };
 }

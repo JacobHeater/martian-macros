@@ -7,8 +7,11 @@ import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
 import { atwaterKcal } from '../domain/atwaterKcal';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { MealSize } from '../domain/food/estimate/MealSize';
+import { Micronutrients } from '../domain/food/micros/Micronutrients';
 import { HandModel } from '../domain/food/hand/HandModel';
+import { conversionFor } from '../domain/food/portion/conversionFor';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import type { NutritionBasis } from '../domain/food/portion/NutritionBasis';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
@@ -77,6 +80,11 @@ interface Form {
   readonly carbs: string;
   readonly fat: string;
   readonly alcohol: string;
+  /** What else the label states (MM-49): typed at Full detail, kept at every level. */
+  readonly fiber: string;
+  readonly sodium: string;
+  readonly sugars: string;
+  readonly saturatedFat: string;
   readonly quantity: string;
   readonly source: QuantitySource;
   readonly unit: PortionUnit | undefined;
@@ -100,6 +108,10 @@ const blank: Form = {
   carbs: '',
   fat: '',
   alcohol: '',
+  fiber: '',
+  sodium: '',
+  sugars: '',
+  saturatedFat: '',
   quantity: '1',
   source: 'labelServing',
   unit: 'serving',
@@ -113,6 +125,17 @@ const blank: Form = {
 
 const alcoholPerKcal = (e: FoodEntry) => (e.alcoholG !== undefined && e.kcal > 0 ? e.alcoholG / e.kcal : undefined);
 
+/** The entry's fiber, sodium, sugars and saturated fat as the form's fields, each divided by `servings`. */
+function extrasOf(e: FoodEntry, servings: number): Pick<Form, 'fiber' | 'sodium' | 'sugars' | 'saturatedFat'> {
+  const each = (value: number | undefined) => (value === undefined ? '' : editableNumber(value / servings));
+  return {
+    fiber: each(e.fiberG),
+    sodium: each(e.sodiumMg),
+    sugars: each(e.micros.of('sugars')),
+    saturatedFat: each(e.micros.of('saturatedFat')),
+  };
+}
+
 /** The form refilled from an entry: a recent food logged again, or one being corrected. */
 function filledFrom(e: FoodEntry): Form {
   const portion = e.portion;
@@ -124,6 +147,7 @@ function filledFrom(e: FoodEntry): Form {
     carbs: editableNumber(e.carbsG),
     fat: editableNumber(e.fatG),
     alcohol: e.alcoholG === undefined ? '' : editableNumber(e.alcoholG),
+    ...extrasOf(e, 1),
     source: e.source,
     basis: 'enteredTotals',
   };
@@ -133,6 +157,7 @@ function filledFrom(e: FoodEntry): Form {
       const servings = portion.quantity;
       form = {
         ...form,
+        ...extrasOf(e, servings),
         calcRef: {
           basis: 'perServing',
           servingUnit: 'serving',
@@ -196,6 +221,7 @@ type Step =
       readonly food: CatalogFood;
       readonly servings: readonly CatalogServing[];
       readonly alternate?: CatalogFood | undefined;
+      readonly startOnAlternate?: boolean | undefined;
       readonly custom?: CustomFood | undefined;
     };
 
@@ -213,6 +239,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
   const customFoods = useLoaded(state.customFoods) ?? [];
+  // The form shows the fields for the chosen level and stores what it holds (MM-49).
+  const level = useLoaded(state.detailLevel) ?? 'standard';
+  const showsCarbsAndFat = DetailLevel.showsCarbsAndFat(level);
   // A grade beside each food found (MM-370), as the pack's results have: a saved food's own, a recent food's as it was logged.
   const gradeBeside = (name: string) => {
     const own = customFoods.find((food) => food.name === name);
@@ -321,6 +350,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     return 'householdMeasure';
   };
 
+  /**
+   * An edited entry keeps the nutrients beyond the macros its source
+   * stated, scaled by how much its energy changed (they scale with the
+   * amount).
+   */
+  const scaledExtra = (value: number | undefined) => {
+    if (value === undefined || entry === undefined || totals === undefined) return undefined;
+    return entry.kcal <= 0 ? value : (value * totals.kcal) / entry.kcal;
+  };
+
   /** Edits nutrition per serving for servings, or totals for other amounts. */
   const enterTotalsMyself = () => {
     const alcohol =
@@ -328,6 +367,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     const source = calcMethod();
     const servings = source === 'labelServing' ? amount : 1.0;
     const each = (value: number) => editableNumber(value / (servings ?? 1));
+    const extra = (value: number | undefined) => (value === undefined ? '' : each(value));
     set({
       source,
       ...(totals === undefined
@@ -338,6 +378,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             carbs: each(totals.carbsG),
             fat: each(totals.fatG),
             alcohol: alcohol === undefined ? '' : each(alcohol),
+            // The label's other lines follow the amount, as the macros do.
+            fiber: extra(scaledExtra(entry?.fiberG)),
+            sodium: extra(scaledExtra(entry?.sodiumMg)),
+            sugars: extra(scaledExtra(entry?.micros.of('sugars'))),
+            saturatedFat: extra(scaledExtra(entry?.micros.of('saturatedFat'))),
           }),
       calcRef: undefined,
       calcAlcoholPerKcal: undefined,
@@ -357,6 +402,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         unit,
         reference: calc,
         origin: entry?.portion?.origin,
+        preparation: entry?.portion?.preparation,
+        conversion: unit === undefined ? undefined : conversionFor(unit, calc, { hand }),
         impliedGrams: byHand ? gramsFor(amount ?? 0, unit, calc, { hand }) : undefined,
         handModelVersion: byHand ? HandModel.version : undefined,
       };
@@ -371,15 +418,6 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     };
   };
 
-  /**
-   * An edited entry keeps the nutrients beyond the macros its source
-   * stated, scaled by how much its energy changed (they scale with the
-   * amount).
-   */
-  const scaledExtra = (value: number | undefined) => {
-    if (value === undefined || entry === undefined || totals === undefined) return undefined;
-    return entry.kcal <= 0 ? value : (value * totals.kcal) / entry.kcal;
-  };
 
   const save = async () => {
     if (totals === undefined) return;
@@ -390,6 +428,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       alcoholG =
         form.calcAlcoholPerKcal === undefined ? scaledExtra(entry?.alcoholG) : totals.kcal * form.calcAlcoholPerKcal;
     }
+    // The micronutrients scale with the amount, as fiber and sodium do (MM-308).
+    const scaledMicros = entry === undefined ? Micronutrients.none : entry.micros.times(entry.kcal <= 0 ? 1 : totals.kcal / entry.kcal);
+    /** A typed label line, times the servings when the numbers are per serving; blank is unknown, never zero. */
+    const typed = (text: string) => {
+      const value = parseNumber(text);
+      return value === undefined || value < 0 ? undefined : value * (form.basis === 'calculated' ? (amount ?? 1) : 1);
+    };
     const saved = new FoodEntry({
       id: entry?.id ?? 0,
       date: day,
@@ -401,15 +446,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       fatG: totals.fatG,
       source: logged?.method ?? form.source,
       portion: logged,
-      fiberG: scaledExtra(entry?.fiberG),
+      fiberG: calc === undefined ? typed(form.fiber) : scaledExtra(entry?.fiberG),
       sugarAlcoholsG: scaledExtra(entry?.sugarAlcoholsG),
-      sodiumMg: scaledExtra(entry?.sodiumMg),
+      sodiumMg: calc === undefined ? typed(form.sodium) : scaledExtra(entry?.sodiumMg),
       alcoholG,
-      // The micronutrients scale with the amount, as fiber and sodium do (MM-308).
       micros:
-        entry === undefined || totals === undefined
-          ? undefined
-          : entry.micros.times(entry.kcal <= 0 ? 1 : totals.kcal / entry.kcal),
+        calc === undefined
+          ? scaledMicros.with('sugars', typed(form.sugars)).with('saturatedFat', typed(form.saturatedFat))
+          : scaledMicros,
     });
     await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
     onDone();
@@ -420,7 +464,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const pick = async (food: CatalogFood) => {
     const [alternate, servings] =
       catalog === undefined ? [undefined, []] : await Promise.all([catalog.pairOf(food), catalog.servingsOf(food)]);
-    setStep({ at: 'amount', food, servings, alternate });
+    // The state this food was last weighed in, however long ago, is where the switch starts (MM-151).
+    const last = alternate === undefined ? undefined : await services.food.lastLoggedFrom(food.packId, [food.id, alternate.id]);
+    const startOnAlternate =
+      last?.portion?.unit !== undefined && PortionUnit.isWeight(last.portion.unit) && last.portion.origin?.foodId === alternate?.id;
+    setStep({ at: 'amount', food, servings, alternate, startOnAlternate });
   };
   const pickCustom = (custom: CustomFood) =>
     setStep({ at: 'amount', food: customCatalogFood(custom), servings: [], custom });
@@ -431,6 +479,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       <FoodAmountStep
         food={step.food}
         alternate={step.alternate}
+        startOnAlternate={step.startOnAlternate}
         servings={step.servings}
         custom={step.custom}
         day={firstDay}
@@ -548,9 +597,32 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         </p>
         <div className="food-fields">
           <MmTextField label="Protein g" kind="number" dense value={form.protein} onChange={(protein) => set({ protein })} />
-          <MmTextField label="Carbs g" kind="number" dense value={form.carbs} onChange={(carbs) => set({ carbs })} />
-          <MmTextField label="Fat g" kind="number" dense value={form.fat} onChange={(fat) => set({ fat })} />
+          {/* Simple detail asks for calories and protein only (MM-49); what is typed at another level is kept. */}
+          {showsCarbsAndFat ? (
+            <>
+              <MmTextField label="Carbs g" kind="number" dense value={form.carbs} onChange={(carbs) => set({ carbs })} />
+              <MmTextField label="Fat g" kind="number" dense value={form.fat} onChange={(fat) => set({ fat })} />
+            </>
+          ) : null}
         </div>
+        {DetailLevel.showsExtras(level) ? (
+          <>
+            {/* Full detail takes the label's other lines too, two to a line as a saved food's are (MM-309). */}
+            <p className="food-label food-label-spaced">Also on the label</p>
+            <div className="food-extra-fields">
+              <MmTextField label="Fiber g" kind="number" dense value={form.fiber} onChange={(fiber) => set({ fiber })} />
+              <MmTextField label="Sugars g" kind="number" dense value={form.sugars} onChange={(sugars) => set({ sugars })} />
+              <MmTextField
+                label="Saturated fat g"
+                kind="number"
+                dense
+                value={form.saturatedFat}
+                onChange={(saturatedFat) => set({ saturatedFat })}
+              />
+              <MmTextField label="Sodium mg" kind="number" dense value={form.sodium} onChange={(sodium) => set({ sodium })} />
+            </div>
+          </>
+        ) : null}
         <div className="app-gap-small" />
         {askAlcohol || form.alcohol !== '' ? (
           <>
@@ -637,7 +709,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       <div className="app-gap-small" />
       <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
       {calc === undefined ? typedFields() : calculatedFields(calc)}
-      {totals !== undefined && totals.proteinG >= 0 && totals.carbsG >= 0 && totals.fatG >= 0 ? (
+      {/* The split needs all three macros; Simple detail does not draw it (MM-49), as on the hero. */}
+      {totals !== undefined && showsCarbsAndFat && totals.proteinG >= 0 && totals.carbsG >= 0 && totals.fatG >= 0 ? (
         <>
           <p className="food-label food-label-spaced">Macro split</p>
           <MacroSplitChart
@@ -660,8 +733,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       {/* What will be recorded, in every state the action is enabled, and before it is (MM-218): one wording across the sheet. */}
       {totals !== undefined ? (
         <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="logged-totals">
-          Logs {whole(totals.kcal)} kcal · {whole(totals.proteinG)} g protein · {whole(totals.carbsG)} g carbs ·{' '}
-          {whole(totals.fatG)} g fat
+          Logs {whole(totals.kcal)} kcal · {whole(totals.proteinG)} g protein
+          {showsCarbsAndFat ? ` · ${whole(totals.carbsG)} g carbs · ${whole(totals.fatG)} g fat` : ''}
           {servingsLogged !== undefined ? ` (${editableNumber(servingsLogged)} servings)` : ''}
         </p>
       ) : null}
@@ -732,7 +805,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                   <MmListRow
                     key={`recent-${e.id}`}
                     title={e.name}
-                    subtitle={`Your recent food · ${whole(e.kcal)} kcal`}
+                    // An estimated meal keeps its mark when it comes back from recents (MM-150).
+                    subtitle={`Your recent food · ${e.source === 'quickAdd' ? 'estimated · ' : ''}${whole(e.kcal)} kcal`}
                     onPress={() => fill(e)}
                     trailingAction={gradeBeside(e.name)}
                   />

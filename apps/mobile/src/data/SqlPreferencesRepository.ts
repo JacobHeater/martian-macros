@@ -1,5 +1,6 @@
 import { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
 import type { CalendarDate } from '../domain/CalendarDate';
+import { CookingFatKind } from '../domain/food/CookingFatKind';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { InsightArea } from '../domain/InsightArea';
@@ -71,6 +72,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveDetailLevel(level: DetailLevel): Promise<void> {
     return this.save({ detail_level: level });
+  }
+
+  watchUsualCookingFat(): Watched<CookingFatKind> {
+    return this.watch((row) => (row === undefined ? 'oil' : named(CookingFatKind.values, row, 'usual_cooking_fat')));
+  }
+
+  saveUsualCookingFat(kind: CookingFatKind): Promise<void> {
+    return this.save({ usual_cooking_fat: kind });
   }
 
   watchMacroPicture(): Watched<MacroPicture> {

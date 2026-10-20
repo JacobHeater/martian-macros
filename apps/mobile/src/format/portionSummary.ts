@@ -1,6 +1,7 @@
 import { type FoodEntry, gramsFor, PortionUnit, type ReferenceNutrition } from '../domain';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { portionUnitOf } from './portionUnitOf';
+import { preparationLabel } from './preparationLabel';
 import { quantitySourceLabel } from './quantitySourceLabel';
 import { quantityText } from './quantityText';
 
@@ -20,8 +21,9 @@ function calculatedFrom(reference: ReferenceNutrition): string {
 
 /**
  * A readable line for what was eaten and how the totals came about
- * (MM-167). An entry logged before portions were recorded says so and
- * invents nothing.
+ * (MM-167), with the state the food was weighed in where it is known
+ * (MM-151): "200 g raw", "1.5 × 1 bar (40 g), as packaged". An entry
+ * logged before portions were recorded says so and invents nothing.
  */
 export function portionSummary(entry: FoodEntry): string {
   const portion = entry.portion;
@@ -36,9 +38,13 @@ export function portionSummary(entry: FoodEntry): string {
   const hand = PortionUnit.isHand(unit);
   const grams = hand ? portion.impliedGrams : reference === undefined ? undefined : gramsFor(quantity, unit, reference);
   const weight = grams === undefined || PortionUnit.isWeight(unit) ? '' : ` (${whole(grams)} g)`;
+  const preparation = portion.preparation;
+  let state = '';
+  if (preparation === 'packaged') state = `, ${preparationLabel(preparation)}`;
+  else if (preparation !== undefined) state = ` ${preparationLabel(preparation)}`;
   let how: string;
   if (hand) how = 'estimated';
   else if (portion.basis === 'enteredTotals') how = 'totals entered by you';
   else how = reference === undefined ? 'calculated' : calculatedFrom(reference);
-  return `${amount}${weight} · ${how}`;
+  return `${amount}${weight}${state} · ${how}`;
 }

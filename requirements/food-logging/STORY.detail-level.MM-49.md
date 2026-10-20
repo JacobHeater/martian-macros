@@ -1,6 +1,6 @@
 ---
 id: MM-49
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-38, MM-41, MM-46, MM-55]
 ---
@@ -54,3 +54,24 @@ preference and food repository contracts (memory and Drift), the migration test,
 
 Not built: sugars and saturated fat (the packs do not carry them), the Today summary and the add-food form following the level
 (only entry rows do), and the energy check already counts alcohol and fiber (MM-53) so needed no change. Not seen on the emulator.
+
+## Progress (2026-10-20, feat/m2)
+Built, the rest of the ticket:
+- **The add-food form follows the level.** At Simple the typed form asks for Protein g and Calories only; at Standard the macros; at
+  Full a group "Also on the label" takes Fiber g, Sugars g, Saturated fat g and Sodium mg, two to a line like a saved food's extra
+  nutrients (MM-309). What is typed is stored at every level and shown at the levels that show it; a field left blank stays
+  unknown, never zero; per-serving numbers multiply by the servings eaten, as the macros do; an edit brings them back per serving.
+  The Logs line and the macro split follow the level on the form and on the amount step ("Logs 205 kcal · 4 g protein" at
+  Simple, no split, as on the hero), and the whole food is still logged.
+- **The Today summary** (the hero on the Dashboard, Food and Coach, MM-187) already followed the level: protein alone at Simple,
+  no Split; Micros at Full. Recorded here as checked.
+- **Sugars and saturated fat** are shown at Full on the rows ("Sugars 15 g · Saturated fat 3 g" beside fiber and sodium), stored
+  all along from format 3 packs and now from the form.
+Tests: `test/food/detailLevel.test.tsx` (Simple form, Full form and storage, two servings and the edit, pack sugars revealed at
+Full), `test/food/rawOrCooked.test.tsx` (the amount step at Simple). Stories: `AddFoodManuallySimple`, `AddFoodManuallyFull`,
+`AddFoodAmountSimple`, `FoodFullLabelLines`.
+
+Decided here (say if wrong): at Simple a typed entry has only what was typed (calories and protein; carbohydrate and fat 0), as the
+ticket's "a typed entry has only what was typed" reads; the Full form's extra lines are the four US labels state that the app
+keeps (fiber, sugars, saturated fat, sodium), not every micronutrient; alcohol keeps its own "Includes alcohol?" way in (MM-127).
+

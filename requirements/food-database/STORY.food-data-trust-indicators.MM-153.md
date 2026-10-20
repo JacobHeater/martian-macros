@@ -103,3 +103,13 @@ Done: the tier and its reason are computed in the pipeline and stored in the pac
 Not done, because the screens they belong on do not exist yet (MM-42, MM-43): ranking by tier in search, the amount-step display,
 hiding lower-tier duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the pipeline rules still
 provisional in `pack_entry_for.dart` (near-tolerance, missing fields, older than five years). The ticket stays in progress.
+
+## Progress (2026-10-20, feat/m2)
+Done, the amount-step display: the source in words and the tier mark (with its reason for "Check this") were already on the amount
+step (`FoodTrustMark`); it now also states what the source gives, "Per 100 g: 130 kcal · 3 g protein · 28 g carbs · 0 g fat",
+under the amount, built like the edit sheet's "Per serving:" caption (MM-221), and the rounded-to-zero note stands beside it.
+Tested in `test/food/rawOrCooked.test.tsx`; stories `AddFoodAmount`, `AddFoodAmountBranded`, `AddFoodAmountRoundsToZero`.
+Search ranking by tier within relevance exists (`sourceReliability`). Still not done, in the food-database lane: hiding lower-tier
+duplicates of one barcode, "Fix this food" (MM-45), the "How this works" line, and the provisional pipeline rules. The ticket stays
+in progress for those.
+

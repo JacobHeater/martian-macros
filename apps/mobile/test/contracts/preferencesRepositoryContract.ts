@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CookingFatKind } from '../../src/domain/food/CookingFatKind';
 import { DetailLevel } from '../../src/domain/food/detail/DetailLevel';
 import { MacroPicture } from '../../src/domain/MacroPicture';
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
@@ -216,6 +217,20 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchOnlineLookup()), 'other preferences leave it alone').toBe('never');
       await repo.saveOnlineLookup('always');
       expect(await first(repo.watchOnlineLookup())).toBe('always');
+    });
+
+    // MM-152: the fat the person usually cooks with, oil until one is chosen.
+    it('the usual cooking fat is oil until chosen, and each choice is kept apart from the rest', async () => {
+      expect(await first(repo.watchUsualCookingFat())).toBe('oil');
+      for (const kind of CookingFatKind.values) {
+        await repo.saveUsualCookingFat(kind);
+        expect(await first(repo.watchUsualCookingFat())).toBe(kind);
+      }
+      await repo.saveUsualCookingFat('butter');
+      await repo.saveDetailLevel('full');
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchUsualCookingFat()), 'other preferences leave it alone').toBe('butter');
+      expect(await first(repo.watchDetailLevel())).toBe('full');
     });
 
     it('emits the current choice first, then each change', async () => {
