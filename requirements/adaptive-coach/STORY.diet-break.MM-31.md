@@ -2,7 +2,7 @@
 id: MM-31
 status: done
 component: adaptive-coach
-related: [MM-22, MM-24, MM-28, MM-36, MM-115, MM-135]
+related: [MM-22, MM-24, MM-28, MM-36, MM-115, MM-135, MM-432]
 ---
 
 # Story: A maintenance break after sixteen weeks of deficit
@@ -49,3 +49,12 @@ Scenario: Resuming
 - No closed-loop test runs long enough to reach a break and resume.
 - Follow-ups: MM-115 exempts safety raises, including this break, from the step limit. MM-135 reopens whether the break should be forced,
   at what interval and for how long, since the evidence for breaks is mixed and the original decision said "recommended".
+
+## Superseded in part (2026-10-20, MM-135)
+The product owner decided on 2026-10-13 (MM-135) and the engine changed on 2026-10-20: **the forced week at sixteen is
+gone.** The break is *offered* at twelve unbroken weeks and whenever recovery is failing (MM-117), and *planned by the
+app* only at twenty, as a safety floor; it is two weeks, not one; it is exempt from the step limit at both ends (the
+open note above is settled); and the unbroken run ends only at seven consecutive days of targets at or above maintenance
+(`DietBreakRule`, `deficitStartOn`, `breakInForce`). Still true from this ticket: recomp counts as a deficit, the flag is
+`dietBreak`, and the count restarts after the break. The "Counting" scenario still holds (the maintenance week at day 21
+lasts seven days). The "The break" and "Resuming" scenarios read with twenty for sixteen and two weeks for one.
