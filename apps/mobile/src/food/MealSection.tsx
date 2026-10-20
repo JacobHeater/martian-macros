@@ -22,6 +22,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { copyEntries } from './copyEntries';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FoodEntryTile } from './FoodEntryTile';
+import { foodEntryLinesId } from './foodEntryLinesId';
 import { FoodGrade } from './FoodGrade';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
@@ -115,7 +116,11 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
           <MmSwipeToRemove key={entry.id} onRemove={() => remove(entry)}>
             <div className="food-meal-entry">
               <div className="food-entry-open">
-                <MmPressable label={`Edit ${entry.name}`} onPress={() => void showAddFoodSheet(overlays, day, { entry })}>
+                <MmPressable
+                  label={`Edit ${entry.name}`}
+                  describedBy={foodEntryLinesId(entry)}
+                  onPress={() => void showAddFoodSheet(overlays, day, { entry })}
+                >
                   <FoodEntryTile entry={entry} />
                 </MmPressable>
               </div>

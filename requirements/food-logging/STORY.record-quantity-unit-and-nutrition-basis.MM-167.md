@@ -322,3 +322,13 @@ branded or barcode food. Still with other tickets: hand portions stay a count wi
 model is wired there; the published packs' pairs and states wait on the pipeline run (MM-151, the food-database lane). The
 encrypted backup (MM-63, built) copies every table, so the new columns ride along.
 
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+- A pack food whose state is "packaged" logs its serving as a **label serving**, whatever source string the pack gives
+  (the fixture pack's packaged foods were household measures until now). The rule "a label serving of a packaged product is
+  recorded as a label serving" now reads the pack's own state.
+- The basis caption has one spelling everywhere (`referenceBasisLabel`: "Per 100 g", "Per 100 mL", "Per serving"), and
+  follows the detail level (MM-49).
+
+## UI/UX
+- The portion line with the state — apps/mobile/src/gallery/screens/Food.stories.tsx (Stories: FoodWeighedRaw, FoodAsPackaged).
+- What the source states, on the amount step — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmount).

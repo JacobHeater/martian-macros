@@ -118,3 +118,13 @@ once"): a serving logged in between does not change which state the switch start
 gives the published packs their states and pairs, and "default to the state people weigh" in search ordering (the search results
 and the catalog are another lane's). Yield factors stay out, as decided.
 
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+- **The remembered start says why** (UX-6, PD-8): the consequence caption ends "Starts on raw, as last time." when the
+  switch began on the other state because of the log.
+- **"as packaged" is drawn and tested** (PD-3): story `FoodAsPackaged`; a packaged pack food's serving is now recorded as a
+  label serving (MM-167's rule), whatever its source string.
+
+## UI/UX
+- Weighed as, remembered — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmountRememberedRaw). Starting on
+  Raw by grams because the log says so, with the caption saying as much.
+- The row says the state — apps/mobile/src/gallery/screens/Food.stories.tsx (Stories: FoodWeighedRaw, FoodAsPackaged).

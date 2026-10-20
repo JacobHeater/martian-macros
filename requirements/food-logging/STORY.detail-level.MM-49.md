@@ -75,3 +75,24 @@ Decided here (say if wrong): at Simple a typed entry has only what was typed (ca
 ticket's "a typed entry has only what was typed" reads; the Full form's extra lines are the four US labels state that the app
 keeps (fiber, sugars, saturated fat, sodium), not every micronutrient; alcohol keeps its own "Includes alcohol?" way in (MM-127).
 
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+- **MM-428** (PD-1, UX-4): at Simple the calorie caution and the "from macros" hint no longer fire on the macro that is not
+  asked for, and calories are required. Fixed with its regression test.
+- **Simple says what it leaves out** (UX-5): "Carbs and fat are not asked at Simple detail and are logged as 0." under the
+  fields, so the zero seen later at Standard is no surprise. Storing them as unknown would need carbohydrate and fat to be
+  nullable on an entry and everything that sums them to cope; decided here to keep 0 and say so (say if wrong).
+- **The group is "More from the label (optional)"** (PD-9, UX-9): the Micros card already heads sugars, saturated fat and
+  cholesterol "Also on the label", and the four lines here are optional, as the estimate step's "Name (optional)" says it.
+- **The group is unfolded** where the saved-food form folds the same grid behind "More nutrients (optional)" (PD-4, rule 9):
+  written reason: here the person chose Full detail, which is the request for these lines; on the saved-food form every
+  level sees them, so they fold. Sibling named: `food-extra-fields` (MM-309).
+- **The source's line follows the level** (PD-5, UX-10): "Per 100 g: 130 kcal · 3 g protein" at Simple, on the amount step
+  and the edit sheet alike, with one spelling of the basis (`referenceBasisLabel`, PD-6: "Per 100 mL" everywhere).
+
+## UI/UX
+- Simple, the typed form — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodManuallySimple). Protein and
+  Calories only, with the line saying what is left out.
+- Full, the typed form — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodManuallyFull). "More from the label
+  (optional)", two to a line like a saved food's extra nutrients.
+- Simple, the amount step — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmountSimple).
+- Full, a row with sugars and saturated fat — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: FoodFullLabelLines).

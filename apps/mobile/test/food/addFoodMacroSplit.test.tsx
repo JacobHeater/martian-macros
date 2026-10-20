@@ -116,22 +116,21 @@ it('meal estimate preview changes with meal kind and size', async () => {
   expect(total()).toBeGreaterThan(before);
 });
 
-it('cooking oil and preparation are reflected in the food preview', async () => {
+it('the split is the food\'s own: cooking oil is its own entry, and raw changes the food (the WS-08 panel, MM-152)', async () => {
   const sheet = await open();
   await pickFromSearch(sheet, 'white rice', /^White rice, cooked/);
   await press(sheet, 'Grams');
   const [protein, carbs, fat] = sectors(sheet);
   await press(sheet, '1 tsp');
-  const withOil = sectors(sheet);
-  expectClose(withOil[2] ?? 0, (fat ?? 0) + 4.5 * 9, 1e-9);
-  expect(withOil[0]).toBe(protein);
-  expect(withOil[1]).toBe(carbs);
+  // The oil is logged beside the rice, so the rice's split does not take it in.
+  expect(sectors(sheet)).toEqual([protein, carbs, fat]);
+  expect(within(sheet).getByText(/as its own entry: about \d+ kcal/)).toBeInTheDocument();
 
   await press(sheet, 'Raw');
-  // Raw food does not log cooking oil.
   const raw = sectors(sheet);
   expect(raw[0]).toBe(28);
   expect(raw[1]).toBe(320);
   expectClose(raw[2] ?? 0, 6.3, 1e-9);
-  expect(screen.queryByRole('group', { name: 'Cooked with oil?' })).not.toBeInTheDocument();
+  // Raw rice is still cooked in something: the question stays.
+  expect(within(sheet).getByText('Cooked with oil?')).toBeInTheDocument();
 });

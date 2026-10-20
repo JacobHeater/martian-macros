@@ -124,3 +124,17 @@ built, because the control defaults to No and asks nothing, so there is nothing 
 stays a word searched, since the pack has no categories (the food-database lane); "cooked" is still judged from the pack's state,
 so rice is offered oil too; the fade stays by calendar days since onboarding, the simplest reading of "days of use".
 
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+- **The question stays while the weight is switched to raw** (UX-1, PD-10): "Cooked with oil?" is offered for a generic food
+  that is cooked *or has a cooked form*, so weighing rice raw and frying it in butter logs both. Decided here (say if wrong).
+- **The Logs line names the second entry** (UX-2, PD-2): "Logs 730 kcal · … · 1 g fat. Plus butter as its own entry: about
+  34 kcal · 4 g fat." The control sits above the line, so everything that changes what is logged precedes the summary; the
+  macro split is the food's own, since the fat is its own entry. The earlier caption under the chips is gone: one place says it.
+- **"Which fat" has a visible label** (UX-3), like "Weighed as" and "Cooked with oil?".
+- Open for the owner: the question's word is "oil" while the chips offer butter and ghee (PD-7; "Cooked in oil or butter?" is
+  the alternative); and whether the control should be withheld for an eating-disorder history as the easy-to-miss line is
+  (the UX reviewer's safety question). Neither is changed here: the control asks what went into the food, not for more.
+
+## UI/UX
+- Cooked with oil, which fat — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmountCookedWithOil). The chip
+  row below the spoon, built like "Amount in"; the Logs line naming both entries.

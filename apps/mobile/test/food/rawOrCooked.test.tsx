@@ -78,7 +78,7 @@ it('rice weighed cooked can be switched to raw, with both shown', async () => {
   expect(entry?.portion?.reference?.nutrition.kcal).toBe(365);
 });
 
-it('the state last used is preselected next time', async () => {
+it('the state last used is preselected next time, and the step says why', async () => {
   let sheet = await pick('white rice', rice);
   await press(sheet, 'Grams');
   await press(sheet, 'Raw');
@@ -88,6 +88,7 @@ it('the state last used is preselected next time', async () => {
   // 100 g of the raw entry (365 kcal), not the cooked one (130).
   expect(within(sheet).getByText('Weighed as')).toBeInTheDocument();
   expect(totals(sheet)).toContain('365 kcal ·');
+  expect(within(sheet).getByText(/Starts on raw, as last time\.$/)).toBeInTheDocument();
 });
 
 it('a cooked food can add its cooking oil as a second entry', async () => {
@@ -180,7 +181,8 @@ it('butter chosen as the fat is logged as butter and remembered as the usual', a
   await press(sheet, '1 tsp');
   expect(within(sheet).getByRole('button', { name: 'Oil', pressed: true })).toBeInTheDocument();
   await press(sheet, 'Butter');
-  expect(within(sheet).getByText(/^Adds butter as its own entry: about 34 kcal · 4 g fat$/)).toBeInTheDocument();
+  // The Logs line names everything Log it does (the panel's UX-2).
+  expect(totals(sheet)).toMatch(/^Logs 205 kcal · 4 g protein · .*0 g fat\. Plus butter as its own entry: about 34 kcal · 4 g fat\.$/);
   await log(sheet, 2);
   const butter = (await logged()).find((e) => e.name === 'Butter');
   expectClose(butter?.kcal ?? 0, 33.7, 0.1);
@@ -201,4 +203,44 @@ it('at Simple detail the amount step says calories and protein, and logs the who
   await log(sheet);
   const entry = (await logged())[0];
   expectClose(entry?.carbsG ?? 0, (28 * 158) / 100, 0.01);
+});
+
+// The panel's UX-1: the state switch never takes the fat question away; rice weighed raw is still fried.
+it('rice weighed raw can still add the butter it was cooked in, and both are logged', async () => {
+  const sheet = await pick('white rice', rice);
+  await press(sheet, 'Grams');
+  await typeIn(sheet, /^Amount/, '200');
+  await press(sheet, 'Raw');
+  expect(within(sheet).getByText('Cooked with oil?')).toBeInTheDocument();
+  await press(sheet, '1 tsp');
+  await press(sheet, 'Butter');
+  expect(totals(sheet)).toMatch(/^Logs 730 kcal · 14 g protein · .*1 g fat\. Plus butter as its own entry: about 34 kcal · 4 g fat\.$/);
+  await log(sheet, 2);
+  const entries = await logged();
+  expect(entries.map((e) => e.name).sort()).toEqual(['Butter', 'White rice, raw']);
+});
+
+it('the raw food of a pair, picked from search, is offered the fat question too', async () => {
+  const sheet = await pick('white rice', /^White rice, raw/);
+  await press(sheet, 'Grams');
+  expect(within(sheet).getByText('Cooked with oil?')).toBeInTheDocument();
+});
+
+// MM-49, the panel's UX-10: at Simple the source's line and the fat line say calories and protein too.
+it('at Simple detail the reference line and the fat line follow the level', async () => {
+  await repos.preferences.saveDetailLevel('simple');
+  const sheet = await pick('white rice', rice);
+  expect(within(sheet).getByText('Per 100 g: 130 kcal · 3 g protein')).toBeInTheDocument();
+  await press(sheet, '1 tsp');
+  expect(totals(sheet)).toBe('Logs 205 kcal · 4 g protein. Plus cooking oil as its own entry: about 40 kcal.');
+});
+
+// MM-151, MM-167, the panel's PD-3: a packaged food's row says so, and its serving is a label serving.
+it('a packaged food logged by its serving says "as packaged" on its row', async () => {
+  const sheet = await pick('protein bar', /^Protein bar, chocolate/);
+  await log(sheet);
+  const entry = (await logged())[0];
+  expect(entry?.source).toBe('labelServing');
+  expect(entry?.portion?.preparation).toBe('packaged');
+  expect(await screen.findByText('Label serving · 1 × 1 bar (60 g), as packaged · calculated from 380 kcal per 100 g')).toBeInTheDocument();
 });

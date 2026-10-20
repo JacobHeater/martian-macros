@@ -1092,7 +1092,7 @@ const withRawRiceWeighed: StoryScenario = async (repos, today) => {
   );
 };
 
-/** MM-152: a cooked food with a teaspoon of fat chosen: which fat, the usual one first, and what it adds. */
+/** MM-152: a cooked food with a teaspoon of fat chosen: which fat, the usual one first, and the Logs line naming the second entry. */
 export const AddFoodAmountCookedWithOil = screenStory({
   covers: ['FoodAmountStep'],
   shows: 'Which fat',
@@ -1123,6 +1123,45 @@ export const FoodWeighedRaw = screenStory({
   },
 });
 
+/** MM-151, MM-167: a packaged food's row says "as packaged" after its serving (the panel's PD-3). */
+export const FoodAsPackaged = screenStory({
+  covers: ['FoodScreen'],
+  shows: /1 × 1 bar \(60 g\), as packaged · calculated from 380 kcal per 100 g/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today,
+        meal: 'snack',
+        name: 'Protein bar, chocolate (Test Brand)',
+        kcal: 228,
+        proteinG: 19.8,
+        carbsG: 21,
+        fatG: 7.2,
+        source: 'labelServing',
+        portion: {
+          method: 'labelServing',
+          basis: 'calculated',
+          quantity: 1,
+          unit: 'serving',
+          reference: {
+            basis: 'per100g',
+            nutrition: new NutritionTotals({ kcal: 380, proteinG: 33, carbsG: 35, fatG: 12 }),
+            servingDescription: '1 bar',
+            servingGrams: 60,
+            servingUnit: 'serving',
+          },
+          origin: { packId: FixturePack.packId, foodId: 24, source: 'fixture' },
+          preparation: 'packaged',
+          conversion: { kind: 'servingWeight', gramsPerUnit: 60 },
+        },
+      }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
 /** MM-49: Simple detail on the amount step: calories and protein, no split; the whole food is logged. */
 export const AddFoodAmountSimple = screenStory({
   covers: ['FoodAmountStep'],
@@ -1144,7 +1183,7 @@ export const AddFoodManuallySimple = screenStory({
 /** MM-49: Full detail on the typed form: the label's other lines, two to a line as a saved food's are. */
 export const AddFoodManuallyFull = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'Also on the label',
+  shows: 'More from the label (optional)',
   scenario: demoWith({ detail: 'full' }),
   open: addFood,
   walk: press('Enter manually'),
