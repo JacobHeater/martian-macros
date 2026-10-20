@@ -50,7 +50,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
     {
       heading: '4. When to talk to a clinician first',
       paragraphs: [
-        'Talk to a doctor or registered dietitian before you use the app’s targets if you: are pregnant or breastfeeding; have or have had an eating disorder; have kidney disease; have diabetes, especially if you use insulin or a sulfonylurea; have a thyroid condition or PCOS; are in perimenopause or menopause; have had weight-loss surgery; take testosterone, anabolic steroids, or any medicine that changes your weight or appetite; have a diagnosed sleep disorder such as sleep apnea; are underweight; are 65 or older; or are under a doctor’s care for any other condition.',
+        'Talk to a doctor or registered dietitian before you use the app’s targets if you: are pregnant or breastfeeding; have or have had an eating disorder; have kidney disease; have diabetes, especially if you use insulin or a sulfonylurea; have a thyroid condition or PCOS; are in perimenopause or menopause; have had weight-loss surgery; take testosterone, anabolic steroids, or any medicine that changes your weight or appetite; have sleep apnea or another sleep disorder; are underweight; are 65 or older; or are under a doctor’s care for any other condition.',
         'The app asks about some of these and limits what it will suggest. Those limits are not medical clearance, and the questions do not cover everything.',
       ],
     },

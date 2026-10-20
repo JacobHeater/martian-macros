@@ -84,7 +84,7 @@ Scenario: Registered
 - The average is taken through today (last night ended this morning), everywhere, so the person reads one figure.
 - The sleep-only offer suggests the slower pace when there is one and the maintenance week otherwise, as the hard-weeks offer does; "both signals" keeps the hard-weeks title and adds the sleep sentence.
 - "Shown at most once a fortnight" for the insight is the catalog's existing rationing: it stays while it holds and is quiet for 28 days once dismissed; no sleep-specific clock was added.
-- The sleep line lives in "How you are holding up" (recovery is where sleep belongs), as a `StatRow` like those of "Your targets" and "Body"; the folded line carries the figure so it is read without opening.
+- The sleep line lives in "How you are holding up" (recovery is where sleep belongs), as a `StatRow` like those of "Your targets" and "Body"; the folded line carries the figure so it is read without opening, except while the check-in is due, when the line is the check-in's call alone (the panel's PD-10).
 - The explanation's sleep note is a sentence beside the lines, not an `ExplanationLine`: it moved no kilocalories, and the lines must add up to the change.
 - The check-in's typical hours are refused the same way as a night on Progress (one `parseDurationFields`), said under the field with Save held, instead of being dropped at save as before (the panel's F7); the average is rounded to the minute before it fills the fields (MM-415).
 - The sleep line says "Not read" when the nights could not be read, with where to try again (Progress), never "Not recorded" (the panel's F4).

@@ -51,6 +51,7 @@ const every = [
   insight('waistAgainstWeight', { waistFromCm: 92.4, waistToCm: 90.4, weightChangeKg: 0 }),
   insight('consistentDay', { weekday: 6, unlogged: 0, weeks: 2, averageKcal: 2700 }),
   insight('consistentDay', { weekday: 1, unlogged: 1, weeks: 2 }),
+  insight('shortSleep', { averageMinutes: 340, nights: 12 }),
 ] as const;
 
 it('every rule in the catalog has words', () => {
