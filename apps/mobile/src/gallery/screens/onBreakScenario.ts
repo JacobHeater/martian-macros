@@ -1,4 +1,4 @@
-import type { BreakFlag } from '../../engine/breakInForce';
+import type { BreakFlag } from '../../engine/BreakFlag';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import type { StoryScenario } from './StoryScenario';
 import { storyTargets } from './storyTargets';
