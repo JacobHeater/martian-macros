@@ -319,3 +319,32 @@ export const TermsAgreeFails = screenStory({
   stores: failingWrite('preferences', 'saveTermsAcceptance'),
   walk: pressAnywhere('I agree'),
 });
+
+/**
+ * MM-134, MM-417: the goal step for someone not lifting yet, Lean gain chosen: what training means here, and the one
+ * acknowledgement a surplus without training asks for. A lighter person, so Lean gain is among the goals offered.
+ */
+export const GoalLeanGainNotTraining = screenStory({
+  covers: ['GoalStep'],
+  shows: /^Training here means/,
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    const app = within(canvas);
+    const press = async (name: string | RegExp) => userEvent.click(await app.findByRole('button', { name }, { timeout: 5000 }));
+    await press('Begin');
+    await press('Male');
+    await press('Next');
+    await press(/Choose a date/);
+    await userEvent.click(await within(await app.findByRole('dialog')).findByRole('button', { name: 'OK' }));
+    await press('Next');
+    await userEvent.type(await app.findByRole('textbox', { name: 'Feet' }), '5');
+    await userEvent.type(await app.findByRole('textbox', { name: 'Inches' }), '11');
+    await userEvent.type(await app.findByRole('textbox', { name: 'lb' }), '150');
+    await press('Next');
+    await press('Next');
+    await press('Not lifting yet');
+    await press('Next');
+    await press('Next');
+    await press(/^Lean gain/);
+  },
+});

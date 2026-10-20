@@ -551,3 +551,45 @@ export const CoachSleepReadFailed = screenStory({
   open: onCoach,
   walk: pressOnCoach(/^How you are holding up/),
 });
+
+// ---- MM-417: places of MM-130 and MM-134 no story drew ----
+
+/** MM-134: "Change goal" for someone who does not lift yet: each goal says what it rests on, and what training means here. */
+export const ChooseGoalNotTraining = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Training here means/,
+  scenario: demoWith({
+    then: async (repos) => {
+      const setup = await repos.setup.loadSetup();
+      if (setup !== undefined) await repos.setup.saveSetup(setup.copyWith({ trainingDaysPerWeek: 0 }));
+    },
+  }),
+  open: onCoach,
+  walk: pressOnCoach('Change goal'),
+});
+
+/** MM-130: "See why" on the change that ended a cut: the scale's rise said before it happens. */
+export const ChangeSheetLeavingDeficit = screenStory({
+  covers: ['CoachScreen', 'TargetChangeSheet'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  open: onCoach,
+  walk: pressOnCoach('See why'),
+});
+
+/** MM-130: outside the band for a few days, not yet the fourteen the coach waits: said, and nothing asked. */
+export const MaintenanceDrifting = screenStory({
+  covers: ['CoachScreen'],
+  shows: /the band for \d+ days?\. At 14 the coach will ask what you want\./,
+  scenario: maintenanceScenario({ daysAgo: 30, driftKg: 2.5 }),
+  open: onCoach,
+});
+
+/** MM-130: drifted, and "Correct back" chosen: a gentle pace toward the anchor, until the trend is back. */
+export const MaintenanceCorrecting = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Correcting back toward/,
+  scenario: maintenanceScenario({ daysAgo: 60, driftKg: 2.5 }),
+  open: onCoach,
+  walk: pressOnCoach('Correct back'),
+});
