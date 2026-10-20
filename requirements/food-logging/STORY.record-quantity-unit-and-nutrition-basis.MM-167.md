@@ -303,7 +303,7 @@ Built, the last of the persistence and the screens that read it:
 - **The conversion record is stored.** A `Portion` carries an optional `Conversion`: its kind (`servingWeight`, `density`, `handModel`)
   and the grams one unit came to, computed by `conversionFor` in the domain from the same branches as `gramsFor`, so the stored
   record and the stored grams cannot disagree. A weight records none (it is exact); typed totals record none. The hand model's
-  version keeps its own column. Schema version 15 adds `conversion_kind` and `conversion_factor` to `food_entries`
+  version keeps its own column. Schema version 14 adds `conversion_kind` and `conversion_factor` to `food_entries`
   (migration step 14 to 15); the SQL and in-memory repositories and the shared contract read and write them.
 - **The raw or cooked state is stored** (`preparation`: raw, cooked or packaged, from the pack's state; nothing for a food that
   states none) in the same schema version, and the portion line says it: "Weighed · 200 g raw · calculated from 365 kcal per
