@@ -16,7 +16,7 @@ export function FoodTrustMark({ food }: { food: CatalogFood }) {
     <span className="food-trust">
       <span>
         {foodSourceLabel(food)} · <span className={doubtful ? 'food-trust-doubtful' : undefined}>{trustTierLabel(food.tier)}</span>
-        {food.packId === onlinePackId ? ' · found online' : null}
+        {food.packId === onlinePackId ? ' · Found online' : null}
       </span>
       {doubtful ? <span>{food.tierReason}</span> : null}
     </span>

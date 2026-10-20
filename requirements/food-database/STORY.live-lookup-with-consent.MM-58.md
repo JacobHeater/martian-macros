@@ -66,8 +66,10 @@ how the app reaches beyond its packs, so the ticket joined M2.
   made through the shell's own HTTP stack (`CapacitorJsonHttp` behind `JsonHttp`, a domain seam with an in-memory fixture).
 - **Consent** (`OnlineLookupChoice`: ask, always, never; `user_preferences.online_lookup`, schema 12): the first unknown
   barcode with a source to ask shows the question in the scan step's own notice, "Look this up online? Only the barcode
-  number is sent to Open Food Facts…, nothing about you. You can change this in Settings." with Just this once (this run
-  of the app), Always and Never. Never means no request, ever, and the label is offered as before. The choice is also in
+  number is sent to Open Food Facts…, nothing about you. For now means until you close the app; always means every food
+  not on this phone is looked up without asking. You can change this in Settings, under Data." with Just for now
+  (primary), Always (secondary) and Never (text), stacked like the step's own buttons. Never means no request, ever; it
+  says once that online lookup is off and where to change it, and the label is offered as before. The choice is also in
   Settings, Data, "Look foods up online" (a listbox like Units), and a build with no source shows no such row.
 - **Order on a scan**: the person's own foods, the installed packs, then online if allowed. Every source is asked at once; the
   most reliable answer wins (`sourceReliability`, as between packs); not found only when a source said so, "could not be
@@ -97,7 +99,12 @@ Decided here (say if wrong):
   restaurant dish, a new generic) is the other gap in the packs, and the same consent covers it with the same words.
 - **The User-Agent names the repository**, not a person: Open Food Facts asks for a contact, and the app has no account or
   person to name.
-- **"Just this once" lasts for this run of the app**, not for one lookup: asking again on the next scan of the same session
-  would be nagging.
+- **"Just for now" lasts for this run of the app**, not for one lookup: asking again on the next scan of the same session
+  would be nagging. The UX review (F1) found "Just this once" did not describe that, so the words now say what it does;
+  the duration is still this ticket's choice.
+- **Reviewed by the panel** (product-designer and UX-accessibility, `docs/agent-runs/mm58-online-lookup/`): one blocking
+  finding (two primary actions while the question is asked, MM-435) and the should-fix items were fixed in the same
+  session; every finding's outcome is in `outcomes.md`. Not verified: how TalkBack and VoiceOver announce the status
+  region and where focus lands after an answer, which needs a device.
 - Not built: the online answer is not written back to a pack, and nothing is contributed to Open Food Facts (MM-44 lists
   that as undecided).

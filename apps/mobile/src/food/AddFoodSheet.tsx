@@ -50,6 +50,7 @@ import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { FoodAmountStep } from './FoodAmountStep';
 import { FoodGrade } from './FoodGrade';
 import { FoodSearchResults } from './FoodSearchResults';
+import { OnlineSearchResults } from './online/OnlineSearchResults';
 import { MealChips } from './MealChips';
 import { BarcodeScanStep } from './scan/BarcodeScanStep';
 import './food.css';
@@ -741,6 +742,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                 onPick={(food) => void pick(food)}
                 alsoFound={customFoods.some((food) => matches(food.name)) || recents.some((e) => matches(e.name))}
               />
+              {/* Beside the phone's results, never inside them, so it keeps its state while they settle (MM-58). */}
+              <OnlineSearchResults query={query} onPick={(food) => void pick(food)} />
             </>
           ) : recents.length > 0 ? (
             <>

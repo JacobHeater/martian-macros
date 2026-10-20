@@ -42,20 +42,30 @@ async function scanUnknown() {
 
 it('the first unknown barcode asks, saying only the barcode number is sent and to whom, before any request', async () => {
   const sheet = await scanUnknown();
-  const ask = await within(sheet).findByRole('group', { name: 'Look this up online?' });
+  const ask = await within(sheet).findByRole('group', { name: 'Online lookup' });
   expect(ask).toHaveTextContent('Only the barcode number is sent to Open Food Facts, nothing about you');
+  expect(ask).toHaveTextContent('For now means until you close the app');
   expect(source.asked, 'nothing sent before an answer').toEqual([]);
-  expect(within(ask).getByRole('button', { name: 'Just this once' })).toBeInTheDocument();
+  expect(within(ask).getByRole('button', { name: 'Just for now' })).toBeInTheDocument();
   expect(within(ask).getByRole('button', { name: 'Always' })).toBeInTheDocument();
   expect(within(ask).getByRole('button', { name: 'Never' })).toBeInTheDocument();
+  // The status region says why the question came (the panel's F3).
+  expect(within(sheet).getByRole('status')).toHaveTextContent(/not in the food database on this phone\. A question follows/);
 });
 
-it('just this once looks it up, offers the product found with where it came from, and keeps the choice as ask', async () => {
+it('MM-435: one primary action while the question is asked, and while a lookup runs', async () => {
   const sheet = await scanUnknown();
-  await press(sheet, 'Just this once');
+  await within(sheet).findByRole('group', { name: 'Online lookup' });
+  expect(sheet.querySelectorAll('.mm-button-primary').length).toBe(1);
+  expect(within(sheet).getByRole('button', { name: 'Just for now' })).toHaveClass('mm-button-primary');
+});
+
+it('just for now looks it up, offers the product found with where it came from, and keeps the choice as ask', async () => {
+  const sheet = await scanUnknown();
+  await press(sheet, 'Just for now');
   await screen.findByRole('heading', { name: /Thai peanut noodle kit/ }, { timeout: 5000 });
   expect(source.asked).toEqual([onlineGtin]);
-  expect(screen.getByText(/found online/)).toBeInTheDocument();
+  expect(screen.getByText(/Found online/)).toBeInTheDocument();
   expect(await first(repos.preferences.watchOnlineLookup())).toBe('ask');
 });
 
@@ -66,10 +76,11 @@ it('always is kept, and the next unknown code is looked up without asking', asyn
   expect(await first(repos.preferences.watchOnlineLookup())).toBe('always');
 });
 
-it('never makes no request and offers the label instead', async () => {
+it('never makes no request, says once what changed and where, and offers the label instead', async () => {
   const sheet = await scanUnknown();
   await press(sheet, 'Never');
-  await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/not in the food database on this phone/));
+  await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/Online lookup is off\. You can change that in Settings, under Data\./));
+  expect(within(sheet).getByRole('status')).toHaveTextContent(/not in the food database on this phone/);
   expect(within(sheet).getByRole('button', { name: 'Read the label' })).toBeInTheDocument();
   expect(source.asked).toEqual([]);
   expect(await first(repos.preferences.watchOnlineLookup())).toBe('never');
@@ -79,7 +90,8 @@ it('never makes no request and offers the label instead', async () => {
   await typeIn(sheet, 'Or type the digits', digits);
   await press(sheet, 'Look up');
   await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/not in the food database on this phone/));
-  expect(within(sheet).queryByRole('group', { name: 'Look this up online?' })).toBeNull();
+  expect(within(sheet).getByRole('status')).not.toHaveTextContent(/Online lookup is off/);
+  expect(within(sheet).queryByRole('group', { name: 'Online lookup' })).toBeNull();
   expect(source.asked).toEqual([]);
 });
 
@@ -97,7 +109,7 @@ it('a product found online is found again with no connection', async () => {
   expect(source.asked, 'the second scan needed no request').toEqual([onlineGtin]);
 });
 
-it('a code no service knows, and a service that cannot be reached, each say so and offer the label', async () => {
+it('a code no service knows, and a service that cannot be reached, each say so and offer the label, with Try again', async () => {
   await repos.preferences.saveOnlineLookup('always');
   source.entries.length = 0;
   const sheet = await scanUnknown();
@@ -105,6 +117,11 @@ it('a code no service knows, and a service that cannot be reached, each say so a
   expect(within(sheet).getByRole('button', { name: 'Read the label' })).toBeInTheDocument();
   source.failWith(new Unavailable('No connection.'));
   await press(sheet, 'Look up');
-  await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/could not be reached/));
+  await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/The online food services could not be reached\./));
   expect(within(sheet).getByRole('button', { name: 'Read the label' })).toBeInTheDocument();
+  // Back online, Try again finds nothing again, with no retyping.
+  source.recover();
+  await press(sheet, 'Try again');
+  await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/not in the food database on this phone or online/));
+  expect(within(sheet).queryByRole('button', { name: 'Try again' })).toBeNull();
 });

@@ -221,15 +221,6 @@
 .food-reference-line {
   margin: var(--space-4) 0 0;
 }
-
-/* The question before an online lookup (MM-58): one primary answer, the two standing ones beside each other. */
-.food-online-ask-row {
-  display: flex;
-  gap: var(--space-8);
-}
-.food-online-ask-row > * {
-  flex: 1;
-}
 .food-online-searching {
   align-items: center;
   gap: var(--space-8);

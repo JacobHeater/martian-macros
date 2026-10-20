@@ -84,10 +84,14 @@ it('a build with no download address says so and fetches nothing', async () => {
   expect(http.requests).toEqual([]);
 });
 
-it('the sources are credited on the screen', async () => {
+it('the sources are credited one tap away, on the Food data sources screen (MM-57)', async () => {
   const packs = await openScreen();
-  expect(packs.getByText(/Open Food Facts/)).toHaveTextContent('Open Database License');
-  expect(packs.getByText(/USDA FoodData Central/)).toBeInTheDocument();
+  expect(packs.getByText(/Open Food Facts and USDA FoodData Central/)).toBeInTheDocument();
+  await userEvent.click(packs.getByRole('button', { name: /^Food data sources/ }));
+  const sources = within(topLayer());
+  await sources.findByRole('heading', { name: 'Food data sources' });
+  expect(sources.getAllByText(/Open Database License/).length).toBeGreaterThan(0);
+  expect(sources.getAllByText(/USDA FoodData Central/).length).toBeGreaterThan(0);
 });
 
 it('opening the screen fetches nothing; the list is read when asked, and the download waits for its own button', async () => {
