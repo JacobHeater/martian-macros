@@ -9,6 +9,7 @@ import { useLoaded } from '../../app/useLoaded';
 import { MmButton } from '../../ui/MmButton';
 import { MmTextField } from '../../ui/MmTextField';
 import { Notice } from '../../ui/Notice';
+import { OnlineLookupAsk } from '../online/OnlineLookupAsk';
 import '../food.css';
 
 interface BarcodeScanStepProps {
@@ -25,8 +26,9 @@ interface BarcodeScanStepProps {
 
 /**
  * Scan a packaged food's barcode, or type its digits (MM-43). A product
- * found in the installed packs is handed to `onFound`; otherwise the step
- * says it is not there and offers `onManual`.
+ * found in the installed packs is handed to `onFound`; otherwise, if the
+ * person allows it, the code is looked up online (MM-58), and failing that
+ * the step says it is not there and offers the label or `onManual`.
  */
 export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual, onBack }: BarcodeScanStepProps) {
   const { services, state } = useApp();
@@ -37,6 +39,38 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
   const [message, setMessage] = useState<string>();
   const [unknownGtin, setUnknownGtin] = useState<string>();
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
+  // A code the packs do not have, waiting on the person's answer to looking it up online (MM-58).
+  const [asking, setAsking] = useState<string>();
+  const [lookingUp, setLookingUp] = useState(false);
+  const online = state.onlineLookup;
+  // Read so the step is drawn again when the choice changes.
+  useCell(online.choice);
+  useCell(online.allowedOnce);
+
+  const notOnPhone = (gtin: string) => {
+    setUnknownGtin(gtin);
+    setMessage('This product is not in the food database on this phone. You can read its label or enter it yourself.');
+  };
+
+  /** Asks the services for `gtin`, now that it is allowed (MM-58). */
+  const lookUpOnline = async (gtin: string) => {
+    setAsking(undefined);
+    setLookingUp(true);
+    setUnknownGtin(undefined);
+    setMessage('Looking it up online…');
+    const result = await online.byBarcode(gtin);
+    setLookingUp(false);
+    if (result.kind === 'found') {
+      onFound(result.food);
+      return;
+    }
+    setUnknownGtin(gtin);
+    setMessage(
+      result.kind === 'unavailable'
+        ? 'The online food services could not be reached. You can read the label or enter it yourself, or try again when you have a connection.'
+        : 'This product is not in the food database on this phone or online. You can read its label or enter it yourself.',
+    );
+  };
 
   const lookup = async (scanned: ScannedBarcode) => {
     const gtin = normalizeBarcode(scanned.digits, {
@@ -53,14 +87,20 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
       return;
     }
     const food = await catalog?.byBarcode(gtin);
-    if (food === undefined) {
-      setUnknownGtin(gtin);
-      setMessage(
-        'This product is not in the food database on this phone. You can read its label or enter it yourself.',
-      );
+    if (food !== undefined) {
+      onFound(food);
       return;
     }
-    onFound(food);
+    if (online.allowed) {
+      await lookUpOnline(gtin);
+    } else if (online.mustAsk) {
+      // The first unknown code with a service to ask: the question, in the status region's place (MM-58).
+      setUnknownGtin(undefined);
+      setMessage(undefined);
+      setAsking(gtin);
+    } else {
+      notOnPhone(gtin);
+    }
   };
 
   const scan = async () => {
@@ -87,7 +127,7 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
         icon="barcode"
         kind={unknownGtin === undefined && !cameraUnavailable ? 'primary' : 'secondary'}
         expand
-        onPress={cameraUnavailable ? undefined : () => void scan()}
+        onPress={cameraUnavailable || lookingUp ? undefined : () => void scan()}
       />
       <div className="app-gap-small" />
       <MmTextField
@@ -105,8 +145,14 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
       <MmButton
         label="Look up"
         kind="secondary"
-        onPress={digits.trim() === '' ? undefined : () => void lookup({ digits, symbology: 'gtin14' })}
+        onPress={digits.trim() === '' || lookingUp ? undefined : () => void lookup({ digits, symbology: 'gtin14' })}
       />
+      {asking === undefined ? null : (
+        <>
+          <div className="app-gap-small" />
+          <OnlineLookupAsk sent="barcode" onAllowed={() => void lookUpOnline(asking)} onNever={() => notOnPhone(asking)} />
+        </>
+      )}
       {/* A status region that exists before its text, so what a lookup found is announced, politely and without moving focus (MM-351). */}
       <div role="status" aria-live="polite">
         {message === undefined ? null : (

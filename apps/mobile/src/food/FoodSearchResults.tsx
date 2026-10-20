@@ -13,6 +13,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
+import { OnlineSearchResults } from './online/OnlineSearchResults';
 
 interface FoodSearchResultsProps {
   query: string;
@@ -76,13 +77,16 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
     );
   }
   if (hits.length === 0) {
-    if (alsoFound && catalog.packs.length > 0) return null;
+    if (alsoFound && catalog.installedPacks.length > 0) return <OnlineSearchResults query={query} onPick={onPick} />;
     return (
-      <p className="app-text food-no-hits">
-        {catalog.packs.length === 0
-          ? 'No food database is on this phone yet. You can download one in Settings, under Data, or enter the food yourself.'
-          : `Nothing found for "${settled.trim()}".`}
-      </p>
+      <>
+        <p className="app-text food-no-hits">
+          {catalog.installedPacks.length === 0
+            ? 'No food database is on this phone yet. You can download one in Settings, under Data, or enter the food yourself.'
+            : `Nothing found for "${settled.trim()}".`}
+        </p>
+        <OnlineSearchResults query={query} onPick={onPick} />
+      </>
     );
   }
   return (
@@ -116,6 +120,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
       {answer !== undefined && answer.found.length > answer.limit ? (
         <MmButton label="More results" kind="text" expand onPress={() => setPages({ query: settled, count: answer.limit / pageSize + 1 })} />
       ) : null}
+      <OnlineSearchResults query={query} onPick={onPick} />
     </>
   );
 }

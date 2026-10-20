@@ -208,6 +208,16 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchThemePreference())).toBe('dark');
     });
 
+    it('asks before any online lookup until the person chooses, and keeps the choice (MM-58)', async () => {
+      expect(await first(repo.watchOnlineLookup())).toBe('ask');
+      await repo.saveOnlineLookup('never');
+      expect(await first(repo.watchOnlineLookup())).toBe('never');
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchOnlineLookup()), 'other preferences leave it alone').toBe('never');
+      await repo.saveOnlineLookup('always');
+      expect(await first(repo.watchOnlineLookup())).toBe('always');
+    });
+
     it('emits the current choice first, then each change', async () => {
       await expectChangeEmits(repo.watchThemePreference(), {
         before: 'unselected',

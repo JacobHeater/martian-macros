@@ -5,6 +5,7 @@ import type { CatalogSearch } from './CatalogSearch';
 import type { CatalogServing } from './CatalogServing';
 import type { CatalogServingLookup } from './CatalogServingLookup';
 import type { FoodPack } from './FoodPack';
+import { onlinePackId } from './online/onlinePackId';
 import type { SearchHit } from './SearchHit';
 import { sourceReliability } from './sourceReliability';
 
@@ -28,6 +29,11 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
 
   constructor(packs: readonly FoodPack[]) {
     this.packs = packs;
+  }
+
+  /** The packs that are files on the phone: without one, search has nothing to find but what was found online (MM-58). */
+  get installedPacks(): readonly FoodPack[] {
+    return this.packs.filter((pack) => pack.packId !== onlinePackId);
   }
 
   async search(query: string, { limit = 25, offset = 0 }: { limit?: number; offset?: number } = {}): Promise<SearchHit[]> {

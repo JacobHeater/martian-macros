@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { InsightSwitches } from '../domain/InsightSwitches';
@@ -25,6 +26,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly switches = new ObservableValue(InsightSwitches.allOn);
   private readonly lastBackup = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly exactTargets = new ObservableValue(false);
+  private readonly onlineLookup = new ObservableValue<OnlineLookupChoice>('ask');
   private readonly labelNoteDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly easeIntoMaintenance = new ObservableValue(false);
 
@@ -131,6 +133,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.switches.value = switches;
   }
 
+  watchOnlineLookup(): Watched<OnlineLookupChoice> {
+    return this.onlineLookup.watch();
+  }
+
+  async saveOnlineLookup(choice: OnlineLookupChoice): Promise<void> {
+    this.onlineLookup.value = choice;
+  }
+
   watchExactTargets(): Watched<boolean> {
     return this.exactTargets.watch();
   }
@@ -158,6 +168,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.exactTargets.value = false;
+    this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;
     this.easeIntoMaintenance.value = false;
     this.theme.value = 'unselected';

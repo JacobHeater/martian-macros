@@ -145,4 +145,36 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('CREATE TABLE "menstruation_days" ("epoch_day" INTEGER NOT NULL, PRIMARY KEY ("epoch_day"))');
     },
   ],
+  // 11 to 12 (MM-58): whether unknown foods may be looked up online, and the foods found online, kept on the phone.
+  [
+    11,
+    async (db) => {
+      await db.execute(
+        "ALTER TABLE user_preferences ADD COLUMN online_lookup TEXT NOT NULL DEFAULT 'ask' CHECK (\"online_lookup\" IN ('ask', 'always', 'never'))",
+      );
+      await db.execute(
+        'CREATE TABLE "online_foods" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"gtin" TEXT NULL, ' +
+          '"name" TEXT NOT NULL, ' +
+          '"brand" TEXT NULL, ' +
+          '"kcal" REAL NOT NULL CHECK("kcal" >= 0.0), ' +
+          '"protein_g" REAL NOT NULL CHECK("protein_g" >= 0.0), ' +
+          '"carbs_g" REAL NOT NULL CHECK("carbs_g" >= 0.0), ' +
+          '"fat_g" REAL NOT NULL CHECK("fat_g" >= 0.0), ' +
+          '"fiber_g" REAL NULL, ' +
+          '"sugar_alcohols_g" REAL NULL, ' +
+          '"sodium_mg" REAL NULL, ' +
+          '"alcohol_g" REAL NULL, ' +
+          '"micros" TEXT NOT NULL DEFAULT \'{}\', ' +
+          '"servings" TEXT NOT NULL DEFAULT \'[]\', ' +
+          '"source" TEXT NOT NULL, ' +
+          '"source_id" TEXT NULL, ' +
+          '"tier" INTEGER NOT NULL, ' +
+          '"tier_reason" TEXT NOT NULL' +
+          ')',
+      );
+      await db.execute('CREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" ("gtin")');
+    },
+  ],
 ]);

@@ -137,8 +137,13 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 11 left it: without the online lookup choice and the foods found online (MM-58). */
+const versionEleven = currentSchema
+  .replace(`  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),\n`, '')
+  .replace(/CREATE TABLE "online_foods" \([\s\S]*?\n\);\nCREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" \("gtin"\);\n/, '');
+
 /** The schema as version 10 left it: without exact targets, the label note, easing into maintenance, the pace change day, the maintenance anchor and correction (MM-123, MM-128, MM-130). */
-const versionTen = currentSchema
+const versionTen = versionEleven
   .replace('  "exact_targets" INTEGER NOT NULL DEFAULT 0 CHECK ("exact_targets" IN (0, 1)),\n', '')
   .replace('  "label_note_dismissed_epoch_day" INTEGER NULL,\n', '')
   .replace('  "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),\n', '')
@@ -300,4 +305,19 @@ it('a version 8 database comes up to date with net carbs on and its entries kept
   expect(await columnsOf(sql, 'food_entries')).toContain('sugar_alcohols_g');
   expect(await columnsOf(sql, 'custom_foods')).toContain('sugar_alcohols_g');
   expect(await first(repos.preferences.watchNetCarbs())).toBe(true);
+});
+
+it('a version 11 database comes up to date asking before any online lookup, with nothing found online yet (MM-58)', async () => {
+  expect(versionEleven).not.toContain('online_lookup');
+  expect(versionEleven).not.toContain('online_foods');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 11, schema: versionEleven });
+  await old.execute("INSERT INTO user_preferences (id, theme_preference) VALUES (1, 'dark')");
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  expect(await first(repos.preferences.watchOnlineLookup())).toBe('ask');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  expect(await columnsOf(sql, 'online_foods')).toContain('gtin');
+  expect(await sql.select('SELECT count(*) AS n FROM online_foods')).toEqual([{ n: 0 }]);
 });

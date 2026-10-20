@@ -27,7 +27,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
   // Version 7 (MM-364): the switches of Settings > Coach. Version 9 (MM-396): net carbs. Version 10 (MM-63): the last backup.
-  // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance.
+  // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance. Version 12 (MM-58): the online lookup choice.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -44,6 +44,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'exact_targets',
     'label_note_dismissed_epoch_day',
     'ease_into_maintenance',
+    'online_lookup',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   setups: [
@@ -70,6 +71,8 @@ const tablesAddedSince: readonly string[] = [
   'inline_insight_snoozes',
   // Version 11 (MM-20): the days marked with menstrual flow.
   'menstruation_days',
+  // Version 12 (MM-58): the foods found online, kept on the phone.
+  'online_foods',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

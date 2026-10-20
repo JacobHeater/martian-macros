@@ -14,6 +14,20 @@ const manifestUrl =
   ] ??
   '';
 
+// A FoodData Central API key, when the build has one (MM-58): from the
+// environment or the git-ignored config/prod.local.json. Without one the app
+// asks only Open Food Facts, which needs no key. Never committed.
+const fdcApiKey =
+  process.env['MM_FDC_API_KEY'] ??
+  (() => {
+    try {
+      return (JSON.parse(readFileSync(new URL('../../config/prod.local.json', import.meta.url), 'utf8')) as Record<string, string>)['MM_FDC_API_KEY'];
+    } catch {
+      return undefined;
+    }
+  })() ??
+  '';
+
 // Which identity the shell around this build has (MM-8): the real app, the
 // dev twin beside it, or the seeded demo. Only the demo may seed itself,
 // and only the demo has its own database name. A build with none given is
@@ -30,6 +44,7 @@ export default defineConfig({
   base: './',
   define: {
     __MM_FOOD_PACK_MANIFEST_URL__: JSON.stringify(manifestUrl),
+    __MM_FDC_API_KEY__: JSON.stringify(fdcApiKey),
     __MM_DEMO_SEED__: demoSeed,
     __MM_IDENTITY__: JSON.stringify(identity),
   },

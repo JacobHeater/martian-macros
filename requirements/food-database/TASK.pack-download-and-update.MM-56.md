@@ -1,6 +1,6 @@
 ---
 id: MM-56
-status: in-progress
+status: done
 component: food-database
 related: [MM-50, MM-51, MM-55, MM-57]
 ---
@@ -69,3 +69,12 @@ Scenario: Skipped
 
 ## Release 2026-10-19
 The manifest at `releases/latest/download/manifest.json` now lists format 3 packs: `barcode_us` 53.8 MB gzip (520,988 foods) and `generic` 1.5 MB (13,285). A phone with the 2026-10-09 packs installed sees the newer version through the usual update path; not yet tried on a phone.
+
+## Progress (2026-10-20, feat/m2)
+Closing the ticket. Since the notes above: the React app's download (`PackDownload` over `MmPacks`) was verified on the
+Android emulator against the real host in the conversion (HANDOFF, Session 21: the real manifest lists two packs; Common
+foods downloads, checks, unpacks, commits and answers a search), the Food database screen offers every pack with its size and
+what the host learns (MM-346, MM-384, MM-385), and the generic pack's licence text is on the new Food data sources screen
+(MM-57). Not done, by decision: the generic pack is not bundled inside the app, and the end of onboarding does not offer a
+download, both waiting on MM-57's qualified reading of the licence; an unknown barcode now offers the online lookup (MM-58)
+rather than a download. Slow or flaky mobile connections remain untested on a device.
