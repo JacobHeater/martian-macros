@@ -474,6 +474,29 @@ no iOS app yet (the owner's call). Phone checks listed above.
   `--env dev|demo` installs a twin. Unit tests in `tool/test/phones.test.ts`.
   The owner's phone was paired but not connected in the session, so the
   install and launch are the owner's first run to verify.
+- **M2 on one branch (`feat/m2`, the owner, 2026-10-19: close the beta's
+  tickets on a single branch; backup and restore moved into M2).** Done so
+  far: the seven design bugs (MM-324, MM-336, MM-342, MM-351, MM-352,
+  MM-373, MM-374) in one batch through the panel
+  (`docs/agent-runs/m2-design-bugs`; MM-413 proposed from it); **backup and
+  restore (MM-63, MM-64 in progress)**: libsodium Argon2id and
+  XChaCha20-Poly1305 behind `BackupCipher`, the file format with a bound
+  plain header, `BackupPlatform` (wasm, native `MmBackup` plugin in Swift
+  and Kotlin, a fake), `SqlDataRestorer` copying every table in one write
+  after migrating the copy, schema version 10 (`last_backup_epoch_day`),
+  Settings > Backup with the passphrase sheet and the restore confirmation,
+  four stories; both shells build; the share sheet and picker are untested
+  on a device. The providers (Google Drive and the rest) wait on the owner's
+  developer registrations. The panel reviewed the section
+  (`docs/agent-runs/mm63-backup`; pass): the cloud-backup sentence, the
+  dialog's description, a 12-character minimum with a Show toggle, the busy
+  row staying a button. **Owner questions:** a restore entry at the welcome
+  step for a fresh phone (Settings needs setup first); whether Android's
+  "handed to another app" counts as a backup made; the renders of the seven
+  `SettingsBackup*`/`SettingsRestore*` stories in the three palettes; on the
+  phone, the share sheet and picker, and the keyboard over the sheet's buttons. Remaining M2 tickets are listed by `mm roadmap`;
+  the next in order: MM-357 (story people), the WS-08 leftovers, the WS-09
+  coaching leftovers, the WS-06 target stories, the WS-15 sleep stories.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to

@@ -10,7 +10,7 @@ import type { SettingsSectionId } from '../../settings/SettingsSectionId';
 import { FoodDatabaseScreen } from '../../foodPacks/FoodDatabaseScreen';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
-import { userEvent, within } from 'storybook/test';
+import { screen, userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
@@ -21,6 +21,14 @@ import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
 import { onIos } from './onIos';
 import { measuredBodyFatScenario } from './measuredBodyFatScenario';
+import { BackupFile } from '../../backup/BackupFile';
+import { SodiumBackupCipher } from '../../backup/SodiumBackupCipher';
+import { FakeBackupPlatform } from '../../backup/FakeBackupPlatform';
+import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
+import { SqlRepositories } from '../../data/SqlRepositories';
+import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
+import { typicalSetup } from '../../fixtures/typicalSetup';
+import { storyToday } from './storyToday';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 
@@ -407,6 +415,103 @@ export const SettingsOpensHowThisWorks = screenStory({
   shows: 'How this works',
   open: settingsAt('about'),
   walk: pressAnywhere(/^How this works/),
+});
+
+/** MM-63: Settings > Backup before any backup was made. */
+export const SettingsBackupNever = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Back up now',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});
+
+/** MM-63: a backup was made; its day is shown. */
+export const SettingsBackedUp = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^Last backup/,
+  scenario: demoWith({ then: async (repos, today) => repos.preferences.saveLastBackupOn(today.addDays(-3)) }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});
+
+/** MM-63: the passphrase asked for a new backup, twice, with its warning. */
+export const SettingsBackupPassphrase = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: /If you lose it/,
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+  },
+});
+
+/** MM-63: the passphrase of a backup being restored, after a wrong one. */
+export const SettingsRestorePassphraseWrong = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: 'That passphrase does not open this backup.',
+  device: async (services) => {
+    const backup = new FakeBackupPlatform();
+    backup.toPick = await BackupFile.write(new Uint8Array([1, 2, 3]), 'the right one', { schemaVersion: 10, createdOn: '2026-10-12' }, new SodiumBackupCipher());
+    return { ...services, backup };
+  },
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Restore from a backup/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'The backup’s passphrase' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'the wrong one');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Open' }));
+  },
+});
+
+/** MM-63: the two passphrases differ once the second is long enough to be wrong. */
+export const SettingsBackupMismatch = screenStory({
+  covers: ['SettingsScreen', 'PassphraseSheet'],
+  shows: 'The two do not match.',
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'A passphrase for this backup' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.type(within(sheet).getByLabelText('Passphrase again'), 'correct horse batterx');
+  },
+});
+
+/** MM-63: sealing the backup, which takes about a second: the row says so and stays a button. */
+export const SettingsBackingUp = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Backing up…',
+  device: async (services) => ({ ...services, backup: new FakeBackupPlatform(() => new Promise<Uint8Array>(() => undefined)) }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Back up now/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'A passphrase for this backup' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.type(within(sheet).getByLabelText('Passphrase again'), 'correct horse battery');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Back up' }));
+  },
+});
+
+/** MM-63: the right passphrase; what the backup holds and what a restore replaces, asked before anything changes. */
+export const SettingsRestoreAsks = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Restore this backup?',
+  device: async (services) => {
+    const backup = new FakeBackupPlatform();
+    const db = await WasmSqlDatabase.open();
+    const sql = await SqlRepositories.open(db);
+    await sql.setup.saveSetup(typicalSetup({ onboardedOn: storyToday.addDays(-40), healthCheckConfirmedOn: storyToday }));
+    await sql.weights.saveWeight(storyToday.addDays(-9), 82.4);
+    await sql.weights.saveWeight(storyToday.addDays(-8), 82.1);
+    backup.toPick = await BackupFile.write(await db.exportBytes(), 'correct horse battery', { schemaVersion: 10, createdOn: storyToday.addDays(-8).toString() }, new SodiumBackupCipher());
+    const restorer = new FakeDataRestorer();
+    restorer.toDescribe = { weighIns: 2, foodDays: 0, workouts: 0, customFoods: 0, from: storyToday.addDays(-9), to: storyToday.addDays(-8), hasSetup: true };
+    restorer.here = { weighIns: 71, foodDays: 58, workouts: 12, customFoods: 3, from: storyToday.addDays(-70), to: storyToday, hasSetup: true };
+    return { ...services, backup, restorer };
+  },
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Restore from a backup/ }, { timeout: 10000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'The backup’s passphrase' }, { timeout: 10000 });
+    await userEvent.type(within(sheet).getByLabelText('Passphrase'), 'correct horse battery');
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Open' }));
+  },
 });
 
 export const SettingsOpensPause = screenStory({

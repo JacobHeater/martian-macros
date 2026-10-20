@@ -114,6 +114,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
     return this.save({ recovery_check_in_skipped_epoch_day: day.epochDay });
   }
 
+  watchLastBackupOn(): Watched<CalendarDate | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalDay(row, 'last_backup_epoch_day')));
+  }
+
+  saveLastBackupOn(day: CalendarDate): Promise<void> {
+    return this.save({ last_backup_epoch_day: day.epochDay });
+  }
+
   watchNutritionGoals(): Watched<NutritionGoals> {
     return this.watch((row) =>
       row === undefined

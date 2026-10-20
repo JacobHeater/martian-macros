@@ -4,6 +4,8 @@ import type { InMemoryRepositories } from '../fixtures/InMemoryRepositories';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
+import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
 import { FakeHealthSource } from '../healthIngest/testing/FakeHealthSource';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
@@ -59,5 +61,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     healthSamples: repos.healthSamples,
     exerciseProgressions: repos.exerciseProgressions,
     eraser: repos.eraser,
+    // No real backup: a fake that keeps what is saved and gives what a test put there (MM-63).
+    restorer: new FakeDataRestorer(),
+    backup: new FakeBackupPlatform(),
   };
 }

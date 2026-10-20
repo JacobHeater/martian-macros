@@ -32,6 +32,7 @@ import { CoachSettingsSection } from './CoachSettingsSection';
 import { HealthPlatformSection } from './HealthPlatformSection';
 import { NutritionGoalsSection } from './NutritionGoalsSection';
 import { ProfileSection } from './ProfileSection';
+import { BackupSection } from './BackupSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
 import { SettingsOpenSectionContext } from './SettingsOpenSectionContext';
@@ -230,6 +231,7 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
             />
           </MmListGroup>
         </MmSection>
+        <BackupSection />
         <MmSection icon="palette" title="Appearance" {...fold('appearance')}>
           <MmListGroup>
             <ThemeSettings />

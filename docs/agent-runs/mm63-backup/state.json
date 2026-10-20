@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "task_id": "mm63-backup",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/m2",
+    "commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm63-backup/brief.md": "0674169d009c3944dacc4f718b0e2799ec7d8c92d9f5043c55678aa14b2bdd08",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/settings/BackupSection.tsx": "c03ef2ffaa4dae3d2195cac1db7a5c5bda242330643c477ba9df71cbdacec6fc",
+        "apps/mobile/src/settings/PassphraseSheet.tsx": "4290802a62ad100e7f0cf9ea06b57a41722be6320eeb2d835cc45c8706763067",
+        "apps/mobile/src/backup/restoreWords.ts": "b1674ea70bbeaeab3bc9177318d762f7752f9dc0ba348ef75c028d158cb5410b",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "1f1c3ae2ee1e8fc65eba2ce0d5e3d86e1bd2a8b4b6687b2a57ed1f075aaf80d0",
+        "apps/mobile/src/ui/MmTextField.tsx": "bb56a54a166ba4fe6a52fe11a7a4f8182482b8b3516aaa13825335139a54e690",
+        "apps/mobile/src/gallery/screens/Settings.stories.tsx": "4c07e46ec110561c93b400f3c17c7b5c3da1afe8ec8afafaff82f0c2da21576c",
+        "requirements/persistence/STORY.encrypted-backup-and-restore.MM-63.md": "0ecb1eadd1bff73e07ab723c2adbefa3dc2100996c41b52d6471f0de4f4337a2",
+        "requirements/persistence/TASK.backup-storage-providers.MM-64.md": "e6e2f68bb50116c7adca64a0cfce298302e282efc2d5ec1cfaed2d41a52bb973",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "the edited tree after the reviews",
+          "the flow, words, file and restore tests, run"
+        ],
+        "not_inspected": [
+          "a render",
+          "a device",
+          "the native share sheet and picker"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; the reviewers did not see the edited tree."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The reviewers researched their own claims.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Settings > Backup as drawn in its stories: siblings, the warning, the destructive guard, undrawn states, the word.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm63-backup/brief.md": "0674169d009c3944dacc4f718b0e2799ec7d8c92d9f5043c55678aa14b2bdd08",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/settings/BackupSection.tsx": "c03ef2ffaa4dae3d2195cac1db7a5c5bda242330643c477ba9df71cbdacec6fc",
+        "apps/mobile/src/settings/PassphraseSheet.tsx": "4290802a62ad100e7f0cf9ea06b57a41722be6320eeb2d835cc45c8706763067",
+        "apps/mobile/src/backup/restoreWords.ts": "b1674ea70bbeaeab3bc9177318d762f7752f9dc0ba348ef75c028d158cb5410b",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "1f1c3ae2ee1e8fc65eba2ce0d5e3d86e1bd2a8b4b6687b2a57ed1f075aaf80d0",
+        "apps/mobile/src/ui/MmTextField.tsx": "bb56a54a166ba4fe6a52fe11a7a4f8182482b8b3516aaa13825335139a54e690",
+        "apps/mobile/src/gallery/screens/Settings.stories.tsx": "4c07e46ec110561c93b400f3c17c7b5c3da1afe8ec8afafaff82f0c2da21576c",
+        "requirements/persistence/STORY.encrypted-backup-and-restore.MM-63.md": "0ecb1eadd1bff73e07ab723c2adbefa3dc2100996c41b52d6471f0de4f4337a2",
+        "requirements/persistence/TASK.backup-storage-providers.MM-64.md": "e6e2f68bb50116c7adca64a0cfce298302e282efc2d5ec1cfaed2d41a52bb973",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the section, sheet, words, problems, fake",
+          "the Settings screen, the sibling sheets and sections",
+          "the design-system parts and stylesheet",
+          "the four stories, the tests, MM-63/64/65/280, the direction documents, design-map.json"
+        ],
+        "not_inspected": [
+          "a render",
+          "the cryptography and plugins",
+          "providers",
+          "token contrast"
+        ],
+        "referrals": [
+          "ux-accessibility: the sheet label, focus on close, the alert on remount, the paragraph",
+          "react-capacitor/privacy: Android's chooser outcome"
+        ],
+        "limitations": "Source inspection only; one reviewer; no rendered palettes."
+      },
+      "research": {
+        "status": "performed",
+        "question": "In comparable products that encrypt a user backup under a user-held secret, is the word passphrase or password?",
+        "reason": "The brief's explicit question.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://blog.whatsapp.com/end-to-end-encrypted-backups-on-whatsapp",
+            "title": "End-to-end encrypted backups on WhatsApp",
+            "published_or_updated": "unknown",
+            "accessed": "2026-10-19",
+            "claim": "The user secures the backup with a password of their choice or a 64-digit key."
+          }
+        ],
+        "summary": "The convention is split; the repository's own decision decides it.",
+        "limitations": "Signal's article returned 403; its wording unverified."
+      }
+    },
+    {
+      "task": "The same section for a novice with a screen reader and at 200%: the hidden fields, the warning, the dialog, the busy states, focus, the word.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm63-backup/brief.md": "0674169d009c3944dacc4f718b0e2799ec7d8c92d9f5043c55678aa14b2bdd08",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/settings/BackupSection.tsx": "c03ef2ffaa4dae3d2195cac1db7a5c5bda242330643c477ba9df71cbdacec6fc",
+        "apps/mobile/src/settings/PassphraseSheet.tsx": "4290802a62ad100e7f0cf9ea06b57a41722be6320eeb2d835cc45c8706763067",
+        "apps/mobile/src/backup/restoreWords.ts": "b1674ea70bbeaeab3bc9177318d762f7752f9dc0ba348ef75c028d158cb5410b",
+        "apps/mobile/src/settings/SettingsScreen.tsx": "1f1c3ae2ee1e8fc65eba2ce0d5e3d86e1bd2a8b4b6687b2a57ed1f075aaf80d0",
+        "apps/mobile/src/ui/MmTextField.tsx": "bb56a54a166ba4fe6a52fe11a7a4f8182482b8b3516aaa13825335139a54e690",
+        "apps/mobile/src/gallery/screens/Settings.stories.tsx": "4c07e46ec110561c93b400f3c17c7b5c3da1afe8ec8afafaff82f0c2da21576c",
+        "requirements/persistence/STORY.encrypted-backup-and-restore.MM-63.md": "0ecb1eadd1bff73e07ab723c2adbefa3dc2100996c41b52d6471f0de4f4337a2",
+        "requirements/persistence/TASK.backup-storage-providers.MM-64.md": "e6e2f68bb50116c7adca64a0cfce298302e282efc2d5ec1cfaed2d41a52bb973",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the section, sheet, words",
+          "the Settings screen, the height sheet",
+          "the field, sheet, dialog, overlays, button, row components and stylesheet",
+          "the four stories, the flow and overlays tests",
+          "MM-63/64/65/280, the direction documents"
+        ],
+        "not_inspected": [
+          "the native share sheet, picker and plugins",
+          "the cipher and file format",
+          "providers",
+          "the backup file and restore tests"
+        ],
+        "referrals": [
+          "product-designer: F12, the dialog at 200%",
+          "chair: F8's routing",
+          "implementation: the keyboard device check"
+        ],
+        "limitations": "Analytical only; reader behaviour inside a fresh modal is a hypothesis."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Do normative sources ask for a show-secret option and paste on hidden secret fields, and treat passphrase as a synonym of password?",
+        "reason": "F3 and F11 are normative claims.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://pages.nist.gov/800-63-3/sp800-63b.html",
+            "title": "NIST SP 800-63B (2017, updated 2020-03-02)",
+            "published_or_updated": "2020-03-02",
+            "accessed": "2026-10-19",
+            "claim": "Verifiers should permit paste and offer to display the secret; spaces acceptable."
+          },
+          {
+            "url": "https://pages.nist.gov/800-63-4/sp800-63b.html",
+            "title": "NIST SP 800-63B-4",
+            "published_or_updated": "2025-08-26",
+            "accessed": "2026-10-19",
+            "claim": "The same, a 15-character single-factor minimum, password sometimes called passphrase."
+          },
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html",
+            "title": "Understanding SC 3.3.8 Accessible Authentication (Minimum)",
+            "published_or_updated": "2026-09-06",
+            "accessed": "2026-10-19",
+            "claim": "Password managers and paste are mechanisms; applicability indirect."
+          }
+        ],
+        "summary": "A show option and paste are supported; the word is a synonym.",
+        "limitations": "Indirect applicability of 3.3.8."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-19",
+      "limitations": "No browser automation; one page returned 403."
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "Q1",
+      "question": "A restore entry at the welcome step for a fresh phone?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q2",
+      "question": "Does Android's 'handed to another app' count as a backup made?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q3",
+      "question": "The renders of the seven stories; the share sheet, picker and keyboard on the phone.",
+      "owner": "product owner",
+      "status": "open"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "F8/PD-1: the cloud-backup sentence in the caption.",
+      "authority": "chair, under MM-65"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "F1: MmDialog names its body as its description.",
+      "authority": "chair"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "PD-2: the section stays with its reason written; icon document; the duplicate sentence gone.",
+      "authority": "chair, under rule 9"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "PD-3/F6: the busy row stays a button with its subtitle and a status region; three stories.",
+      "authority": "chair, following the health section"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "F5/PD-4: the warning before the first field in body type, naming the act.",
+      "authority": "chair"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "F2, F3, F4, F10, F11/PD-9: mismatch timing, Show toggle and current-password, Enter, the headline label, the helper and glossary.",
+      "authority": "chair, under NIST SP 800-63B as the guard cited"
+    },
+    {
+      "id": "D7",
+      "status": "accepted",
+      "summary": "F7/PD-8, F9/PD-5: two paragraphs with years; a fixed error sentence.",
+      "authority": "chair"
+    },
+    {
+      "id": "D8",
+      "status": "accepted",
+      "summary": "The minimum is 12 characters.",
+      "authority": "chair, for the privacy role"
+    },
+    {
+      "id": "D9",
+      "status": "deferred",
+      "summary": "PD-7: Android's handed outcome and Last backup (Q2).",
+      "authority": "product owner"
+    },
+    {
+      "id": "D10",
+      "status": "deferred",
+      "summary": "Q1: a restore entry at the welcome step.",
+      "authority": "product owner"
+    },
+    {
+      "id": "D11",
+      "status": "accepted",
+      "summary": "PD-6: the restore row not danger, the reason written.",
+      "authority": "chair"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit",
+      "result": "clean",
+      "commit": "working tree of feat/m2"
+    },
+    {
+      "command": "npx vitest run test/settings/backup.test.tsx test/backup/restoreWords.test.ts",
+      "result": "5 passed",
+      "commit": "working tree of feat/m2"
+    },
+    {
+      "command": "npx vitest run test/backup/backupFile.test.ts test/data/restore.test.ts",
+      "result": "5 passed",
+      "commit": "working tree of feat/m2"
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-19",
+    "phase": "complete",
+    "next": "story walks and mm check before the pull request"
+  }
+}

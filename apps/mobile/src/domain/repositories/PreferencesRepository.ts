@@ -4,6 +4,8 @@ import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
 import type { InsightSwitchesReader } from './InsightSwitchesReader';
 import type { InsightSwitchesWriter } from './InsightSwitchesWriter';
+import type { LastBackupReader } from './LastBackupReader';
+import type { LastBackupWriter } from './LastBackupWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
 import type { NetCarbsReader } from './NetCarbsReader';
@@ -47,4 +49,6 @@ export interface PreferencesRepository
     NutritionGoalsReader,
     NutritionGoalsWriter,
     InsightSwitchesReader,
-    InsightSwitchesWriter {}
+    InsightSwitchesWriter,
+    LastBackupReader,
+    LastBackupWriter {}

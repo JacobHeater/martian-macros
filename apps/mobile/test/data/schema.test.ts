@@ -39,6 +39,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'inline_insight_areas_off',
     'inline_insight_kinds_off',
     'net_carbs',
+    'last_backup_epoch_day',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks.
   setups: ['fluid_limited_by_clinician'],

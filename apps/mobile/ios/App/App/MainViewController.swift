@@ -11,5 +11,6 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(MmRemindersPlugin())
         bridge?.registerPluginInstance(MmScannerPlugin())
         bridge?.registerPluginInstance(MmHealthPlugin())
+        bridge?.registerPluginInstance(MmBackupPlugin())
     }
 }

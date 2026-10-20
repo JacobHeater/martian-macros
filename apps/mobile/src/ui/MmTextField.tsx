@@ -21,6 +21,10 @@ interface MmTextFieldProps {
   error?: string | undefined;
   /** A unit shown after the value. */
   suffix?: string | undefined;
+  /** For a passphrase: whether it is being chosen or recalled, so a password manager offers the right thing (MM-63). */
+  secret?: 'new' | 'existing';
+  /** For a passphrase: shown as typed, on the person's request (NIST SP 800-63B: offer to display the secret). */
+  revealed?: boolean;
   kind?: MmTextFieldKind;
   dense?: boolean;
   /** The id of words outside the field that also describe it (a hint drawn across a row, MM-295). */
@@ -40,6 +44,8 @@ export function MmTextField({
   helperIsWarning = false,
   error,
   suffix,
+  secret = 'new',
+  revealed = false,
   kind = 'text',
   dense = false,
   describedBy: describedByOutside,
@@ -69,10 +75,10 @@ export function MmTextField({
         <input
           id={id}
           className="mm-field-input"
-          type="text"
+          type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
           inputMode={kind === 'number' ? 'decimal' : 'text'}
           autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
-          autoComplete="off"
+          autoComplete={kind === 'passphrase' ? (secret === 'existing' ? 'current-password' : 'new-password') : 'off'}
           aria-label={spoken}
           aria-invalid={error === undefined ? undefined : true}
           aria-describedby={describedBy === '' ? undefined : describedBy}

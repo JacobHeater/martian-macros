@@ -78,7 +78,10 @@ export function MmOverlays({ children }: { children: ReactNode }) {
               </>
             }
           >
-            <p>{message}</p>
+            {/* A blank line in the message is a paragraph break, so a loss and what replaces it can stand apart (MM-63). */}
+            {message.split('\n\n').map((part, at) => (
+              <p key={at}>{part}</p>
+            ))}
           </MmDialog>
         ));
         return confirmed === true;

@@ -5,6 +5,8 @@ import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
+import type { DataRestorer } from '../domain/repositories/DataRestorer';
+import type { BackupPlatform } from '../backup/BackupPlatform';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -62,6 +64,10 @@ export interface AppServices {
   readonly healthSamples: HealthSampleStore;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
+  /** Puts a backup in place of this phone's data (MM-63). */
+  readonly restorer: DataRestorer;
+  /** The phone's part of a backup: the snapshot, the share sheet and the file picker (MM-63). */
+  readonly backup: BackupPlatform;
 
   /** The installed food packs read as one catalog (MM-42); given again when a pack is installed or removed. */
   readonly catalog: Watched<FoodCatalog>;

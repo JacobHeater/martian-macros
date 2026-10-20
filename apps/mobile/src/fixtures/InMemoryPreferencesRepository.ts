@@ -23,6 +23,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly terms = new ObservableValue<TermsAcceptance | undefined>(undefined);
   private readonly goals = new ObservableValue(NutritionGoals.none);
   private readonly switches = new ObservableValue(InsightSwitches.allOn);
+  private readonly lastBackup = new ObservableValue<CalendarDate | undefined>(undefined);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -139,5 +140,13 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.terms.value = undefined;
     this.goals.value = NutritionGoals.none;
     this.switches.value = InsightSwitches.allOn;
+  }
+
+  watchLastBackupOn(): Watched<CalendarDate | undefined> {
+    return this.lastBackup.watch();
+  }
+
+  async saveLastBackupOn(day: CalendarDate): Promise<void> {
+    this.lastBackup.value = day;
   }
 }

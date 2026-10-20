@@ -119,4 +119,11 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE custom_foods ADD COLUMN sugar_alcohols_g REAL NULL');
     },
   ],
+  // 9 to 10 (MM-63): the day the last backup was made.
+  [
+    9,
+    async (db) => {
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN last_backup_epoch_day INTEGER NULL');
+    },
+  ],
 ]);
