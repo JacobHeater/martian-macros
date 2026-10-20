@@ -1,6 +1,6 @@
 ---
 id: MM-416
-status: proposed
+status: done
 component: sleep
 related: [MM-250, MM-155, MM-291, MM-257]
 ---
@@ -48,3 +48,16 @@ PD-5), the folded recovery line's length (PD-10), the Progress group budget in
 `design/design-map.json` (PD-12), and a device pass with TalkBack and
 VoiceOver over the chips' "·", "h" and "m" (F8). Not bugs; the owner's and the
 designer's calls after a render in the three palettes.
+
+## Progress (2026-10-20, feat/m2)
+Decided under the owner's blanket instruction (say if wrong): **no exception; rule 1 holds.** The owner's own rule (MM-291)
+already says anything that holds a control sits on a surface, so the entries move rather than the rule bending.
+- **The sibling followed** (rule 9): the Dashboard's in-place rows and Settings' sodium limit, an `MmListGroup` holding one
+  `MmListRow` with its `entry`. Waist's row is "Today's waist" with the note as its subtitle and the three readings and Save
+  in the entry; Sleep's is the picked night with its note, and the night chips sit in the same entry as the field they drive.
+- **The waist chart** and its 90d / 1y switch sit on a surface, as the trend's switch sits in the hero.
+- **The check**: `hierarchyProblems` now counts chips and segmented controls as well as fields, and the hierarchy test runs
+  the open-entry stories (`SleepNotRecorded`, `SleepFromWatch`, `SleepMistyped`, `ProgressWaistFirstMeasurements`).
+- After a night is saved, focus goes to that night's chip rather than the page.
+- Reviewed: product-designer and UX-accessibility, one round (`docs/agent-runs/mm416-progress-entries/`): the designer's
+  sibling, chips, range switch and spacing findings are done; the UX role found nothing blocking.

@@ -13,6 +13,7 @@ import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
+import { MmSurface } from '../ui/MmSurface';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSpinner } from '../ui/MmSpinner';
 import { NumberEntry } from '../ui/NumberEntry';
@@ -185,36 +186,38 @@ export function ProgressScreen() {
           recordedToday={todaysWaist === undefined ? undefined : waistAmount(todaysWaist.waistCm, fmt)}
           chart={
             latestWaist === undefined ? undefined : (
-              <div className="progress-waist-chart">
-                <div className="progress-hero-head">
-                  <h3 className="progress-waist-chart-title">Waist over time</h3>
-                  <MmSegmented<number>
-                    name="Waist range"
-                    compact
-                    segments={[
-                      { value: 90, label: '90d' },
-                      { value: 365, label: '1y' },
-                    ]}
-                    selected={waistRangeDays}
-                    onChange={(chosen) => setWaistRangeDays(chosen ?? waistRangeDays)}
+              <MmSurface>
+                <div className="progress-waist-chart">
+                  <div className="progress-hero-head">
+                    <h3 className="progress-waist-chart-title">Waist over time</h3>
+                    <MmSegmented<number>
+                      name="Waist range"
+                      compact
+                      segments={[
+                        { value: 90, label: '90d' },
+                        { value: 365, label: '1y' },
+                      ]}
+                      selected={waistRangeDays}
+                      onChange={(chosen) => setWaistRangeDays(chosen ?? waistRangeDays)}
+                    />
+                  </div>
+                  <WaistChart
+                    waist={waist}
+                    today={today}
+                    rangeDays={waistRangeDays}
+                    fmt={fmt}
+                    label={
+                      `Waist over the last ${waistRangeDays === 365 ? 'year' : `${waistRangeDays} days`}. ` +
+                      `Latest ${waistAmount(latestWaist.waistCm, fmt)}, from ${waist.length} measurement${waist.length === 1 ? '' : 's'}.`
+                    }
                   />
+                  <p className="app-caption">
+                    {waist.length < 3
+                      ? 'Dots are measurements. From the third, a line through the middle of each three, and a band of what a tape can tell apart.'
+                      : 'Dots are measurements. The line is the middle of each three; the band is what a tape can tell apart.'}
+                  </p>
                 </div>
-                <WaistChart
-                  waist={waist}
-                  today={today}
-                  rangeDays={waistRangeDays}
-                  fmt={fmt}
-                  label={
-                    `Waist over the last ${waistRangeDays === 365 ? 'year' : `${waistRangeDays} days`}. ` +
-                    `Latest ${waistAmount(latestWaist.waistCm, fmt)}, from ${waist.length} measurement${waist.length === 1 ? '' : 's'}.`
-                  }
-                />
-                <p className="app-caption">
-                  {waist.length < 3
-                    ? 'Dots are measurements. From the third, a line through the middle of each three, and a band of what a tape can tell apart.'
-                    : 'Dots are measurements. The line is the middle of each three; the band is what a tape can tell apart.'}
-                </p>
-              </div>
+              </MmSurface>
             )
           }
           onSave={saveWaist}

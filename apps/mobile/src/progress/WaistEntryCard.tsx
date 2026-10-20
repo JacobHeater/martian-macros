@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { parseNumber } from '../format/parseNumber';
 import { MmButton } from '../ui/MmButton';
+import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmSection } from '../ui/MmSection';
 import { MmTextField } from '../ui/MmTextField';
@@ -105,24 +107,33 @@ export function WaistEntryCard({ unit, summary, recordedToday, entries, chart, o
           {protocol}
         </MmDisclosure>
       )}
-      <div className="progress-waist-fields">
-        {places.map((place, i) => (
-          // Short enough to fit three across a phone; the unit is said once, under the fields.
-          <MmTextField
-            key={place}
-            label={place}
-            name={`${place} waist reading, ${unit}`}
-            kind="number"
-            dense
-            value={readings[i] ?? ''}
-            onChange={(text) => setReadings(readings.map((reading, at) => (at === i ? text : reading)))}
-          />
-        ))}
-      </div>
-      <div className="progress-waist-save">
-        <p className="app-caption progress-waist-note">{note}</p>
-        <MmButton label="Save" kind="secondary" onPress={ready ? () => void save() : undefined} />
-      </div>
+      <MmListGroup>
+        <MmListRow
+          title="Today’s waist"
+          subtitle={note}
+          entry={
+            <>
+              <div className="progress-waist-fields">
+                {places.map((place, i) => (
+                  // Short enough to fit three across a phone; the unit is said once, under the fields.
+                  <MmTextField
+                    key={place}
+                    label={place}
+                    name={`${place} waist reading, ${unit}`}
+                    kind="number"
+                    dense
+                    value={readings[i] ?? ''}
+                    onChange={(text) => setReadings(readings.map((reading, at) => (at === i ? text : reading)))}
+                  />
+                ))}
+              </div>
+              <div className="progress-waist-save">
+                <MmButton label="Save" name="Save waist" kind="secondary" onPress={ready ? () => void save() : undefined} />
+              </div>
+            </>
+          }
+        />
+      </MmListGroup>
       {chart}
     </MmSection>
   );

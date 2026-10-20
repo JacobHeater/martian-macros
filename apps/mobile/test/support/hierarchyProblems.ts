@@ -44,7 +44,7 @@ export function hierarchyProblems(root: ParentNode): string[] {
   if (primaries > 1) problems.push(`${primaries} primary actions are shown; one is the limit (rule 6)`);
   // Rule 1, the owner's ruling of 2026-10-14 (MM-291): a field sits on a surface
   // (a card, the hero, a list group, a sheet or a dialog), never bare on the canvas.
-  const bare = [...root.querySelectorAll('.mm-field')].filter(
+  const bare = [...root.querySelectorAll('.mm-field, .mm-chip, .mm-segmented')].filter(
     (field) => field.closest('.mm-surface, .mm-hero, .mm-list-group, .mm-sheet, .mm-dialog, [role="dialog"]') === null,
   ).length;
   if (bare > 0) problems.push(`${bare} field(s) sit bare on the canvas (rule 1)`);
