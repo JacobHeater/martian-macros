@@ -29,6 +29,7 @@ import type { ExerciseProgression } from '../domain/training/ExerciseProgression
 import type { Workout } from '../domain/training/Workout';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
+import type { SleepNight } from '../domain/SleepNight';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
@@ -89,6 +90,8 @@ import { foodItemInsights } from '../engine/foodItemInsights';
 import { waistWithinNoiseInsights } from '../engine/waistWithinNoiseInsights';
 import { waterFewDaysInsights } from '../engine/waterFewDaysInsights';
 import { WaterFewDaysRule } from '../engine/WaterFewDaysRule';
+import type { SleepAverage } from '../engine/SleepAverage';
+import { sleepAverageOf } from '../engine/sleepAverageOf';
 import type { StallAssessment } from '../engine/StallAssessment';
 import type { StrengthTrend } from '../engine/StrengthTrend';
 import { summarizeAdherence } from '../engine/summarizeAdherence';
@@ -104,6 +107,8 @@ import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthImporter } from '../healthIngest/HealthImporter';
+import type { NightOfSleep } from '../healthIngest/NightOfSleep';
+import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
@@ -114,6 +119,7 @@ import { DerivedCell } from './DerivedCell';
 import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
+import { mergeSleepNights } from './mergeSleepNights';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
@@ -211,6 +217,18 @@ export class AppState {
   /** Intake for anything that judges a day: paused days are left out. */
   readonly judgedIntake: Cell<readonly IntakeDay[] | undefined>;
   readonly waist: Cell<Loadable<WaistObservation[]>>;
+
+  /** The nights of sleep the person typed, and nothing imported (MM-250). */
+  readonly typedSleep: Cell<Loadable<SleepNight[]>>;
+
+  /** The imported sleep that counts for each night (MM-250), from what has been read and kept. Empty when nothing has been imported. */
+  readonly importedSleep: Cell<Loadable<NightOfSleep[]>>;
+
+  /** The nights the app works from: typed over imported, oldest first (MM-250). */
+  readonly sleepNights: Cell<Loadable<SleepNight[]>>;
+
+  /** The fourteen-night average (MM-252); undefined before the nights are read, or with none in the window. */
+  readonly sleepAverage: Cell<SleepAverage | undefined>;
   /** The days marked with menstrual flow (MM-20). */
   readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
@@ -516,6 +534,20 @@ export class AppState {
       return withoutPausedDays(intake, pauses, { keepComplete: false });
     });
     this.waist = stream(() => s.waist.watchWaist());
+    this.typedSleep = stream(() => s.sleep.watchSleepNights());
+    this.importedSleep = stream(() => this.importedSamples('sleep', nightlySleep));
+    this.sleepNights = derived(() => {
+      const typed = this.typedSleep.value;
+      const imported = of(this.importedSleep) ?? [];
+      const today = this.today.value;
+      // A read that went wrong stays wrong here, so whoever shows the nights can say so.
+      if (!typed.ready) return typed;
+      return Loadable.of(mergeSleepNights({ typed: typed.value, imported, today }));
+    });
+    this.sleepAverage = derived(() => {
+      const nights = of(this.sleepNights);
+      return nights === undefined ? undefined : sleepAverageOf({ nights, through: this.today.value });
+    });
     this.flowDays = stream(() => s.flowDays.watchFlowDays());
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
@@ -631,6 +663,7 @@ export class AppState {
         weightEvents,
         workouts,
         hasCycleData,
+        sleepAverage: this.sleepAverage.value,
         today: this.today.value,
       });
     });
@@ -723,6 +756,7 @@ export class AppState {
           trend: coach.trend,
           waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
+          sleepAverage: this.sleepAverage.value,
         }),
         log,
         today,
@@ -880,6 +914,8 @@ export class AppState {
         today,
         deficitRestartOn: snapshot.deficitRestartOn,
         pauses,
+        // Short sleep from the record is a signal of its own (MM-252).
+        sleepAverage: this.sleepAverage.value,
       });
     });
 
@@ -1185,6 +1221,8 @@ export class AppState {
         if (setup === undefined || workouts === undefined) return undefined;
         return trainingSuspended({ setup, workouts, today: this.today.value });
       },
+      // A record that could not be read is no record: the check-in is not held up for it.
+      sleepNights: () => (Loadable.hasFailed(this.sleepNights.value) ? [] : of(this.sleepNights)),
       today: this.today,
       targets: this.services.targets,
       setups: this.services.setup,
@@ -1199,6 +1237,32 @@ export class AppState {
   /** Call after an import from the health platform, so what was imported is read again. */
   healthImported(): void {
     this.imports.put(this.imports.value + 1);
+  }
+
+  /**
+   * What has been read and kept of `type`, as `derive` makes it, read again
+   * after every import (MM-68, MM-250).
+   */
+  private importedSamples<T>(type: HealthDataType, derive: (samples: HealthSample[]) => T): Watched<T> {
+    // Read here so that an import makes this ask again.
+    void this.imports.value;
+    const store = this.services.healthSamples;
+    return {
+      subscribe: (listener, onError) => {
+        let stopped = false;
+        store.samples(type).then(
+          (samples) => {
+            if (!stopped) listener(derive(samples));
+          },
+          (error: unknown) => {
+            if (!stopped) onError?.(error);
+          },
+        );
+        return () => {
+          stopped = true;
+        };
+      },
+    };
   }
 
   /**

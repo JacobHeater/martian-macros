@@ -20,6 +20,8 @@ interface StallAssessmentInit {
   expectedChangeKcal?: number | undefined;
   atFloor?: boolean;
   estimateLow?: boolean;
+  shortSleepAverageMinutes?: number | undefined;
+  shortSleepNights?: number | undefined;
 }
 
 /**
@@ -67,6 +69,14 @@ export class StallAssessment {
   /** The estimate is low enough that food is often missing from the log. */
   readonly estimateLow: boolean;
 
+  /**
+   * Sleep averaged short over the window (MM-252): the average in minutes
+   * and the nights it rests on, said before anything about the log. Undefined
+   * when it did not, or no nights were recorded.
+   */
+  readonly shortSleepAverageMinutes: number | undefined;
+  readonly shortSleepNights: number;
+
   constructor(init: StallAssessmentInit) {
     this.status = init.status;
     this.windowDays = init.windowDays;
@@ -85,6 +95,8 @@ export class StallAssessment {
     this.expectedChangeKcal = init.expectedChangeKcal;
     this.atFloor = init.atFloor ?? false;
     this.estimateLow = init.estimateLow ?? false;
+    this.shortSleepAverageMinutes = init.shortSleepAverageMinutes;
+    this.shortSleepNights = init.shortSleepNights ?? 0;
   }
 
   static notAssessed(reason: StallNotAssessedReason, { windowDays }: { windowDays: number }): StallAssessment {

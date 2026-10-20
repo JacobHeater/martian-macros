@@ -119,6 +119,17 @@ export const HealthCheck = screenStory({
   walk: (canvas) => walkOnboarding(canvas, 6),
 });
 
+/** MM-251: a diagnosed sleep disorder ticked: the caution with its clinician pointer, and nothing in the numbers. */
+export const HealthCheckSleepDisorder = screenStory({
+  covers: ['HealthStep'],
+  shows: /^Sleep disorders change how a deficit works for you/,
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 6);
+    await userEvent.click(await within(canvas).findByRole('checkbox', { name: /^A diagnosed sleep disorder/ }));
+  },
+});
+
 /** MM-128: under a chosen fat-loss goal, the three paces with what each would cost from the starting estimate. */
 export const GoalPaces = screenStory({
   covers: ['GoalStep'],

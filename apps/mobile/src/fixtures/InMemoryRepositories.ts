@@ -10,6 +10,7 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -37,6 +38,7 @@ import { InMemoryPreferencesRepository } from './InMemoryPreferencesRepository';
 import { InMemoryRecoveryCheckInRepository } from './InMemoryRecoveryCheckInRepository';
 import { InMemoryReminderRepository } from './InMemoryReminderRepository';
 import { InMemorySetupRepository } from './InMemorySetupRepository';
+import { InMemorySleepRepository } from './InMemorySleepRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
 import { InMemoryWaistRepository } from './InMemoryWaistRepository';
@@ -56,6 +58,7 @@ export class InMemoryRepositories {
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
   readonly flowDays: MenstruationRepository;
+  readonly sleep: SleepRepository;
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
@@ -81,6 +84,7 @@ export class InMemoryRepositories {
     const weightEvents = new InMemoryWeightEventRepository();
     const waist = new InMemoryWaistRepository();
     const flowDays = new InMemoryMenstruationRepository();
+    const sleep = new InMemorySleepRepository();
     const water = new InMemoryWaterRepository();
     const food = new InMemoryFoodRepository();
     const customFoods = new InMemoryCustomFoodRepository();
@@ -103,6 +107,7 @@ export class InMemoryRepositories {
     this.weightEvents = weightEvents;
     this.waist = waist;
     this.flowDays = flowDays;
+    this.sleep = sleep;
     this.water = water;
     this.food = food;
     this.customFoods = customFoods;
@@ -126,6 +131,7 @@ export class InMemoryRepositories {
       () => weightEvents.clear(),
       () => waist.clear(),
       () => flowDays.clear(),
+      () => sleep.clear(),
       () => water.clear(),
       () => food.clear(),
       () => customFoods.clear(),

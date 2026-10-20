@@ -1,3 +1,5 @@
+import { SleepRule } from './SleepRule';
+
 /**
  * The thresholds of the offer to ease a deficit (MM-117). Judgement: none
  * has a trial behind it. Tune them here.
@@ -37,8 +39,8 @@ export const ReliefRule = {
    */
   breakFromDeficitWeeks: 8,
 
-  /** Reported sleep below this adds a line to the offer. */
-  shortSleepHours: 6,
+  /** Sleep below this is short: a signal of its own from the record (MM-252), a line when only typed at the check-in. */
+  shortSleepHours: SleepRule.shortSleepHours,
 
   /**
    * The paces a fat-loss goal can run at, fastest first, as a fraction of

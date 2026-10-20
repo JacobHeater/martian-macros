@@ -5,6 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Pause } from '../../src/domain/Pause';
 import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
 import { RecoveryQuestion } from '../../src/domain/RecoveryQuestion';
+import { SleepNight } from '../../src/domain/SleepNight';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { recoveryQuestionText } from '../../src/format/recoveryQuestionText';
@@ -55,7 +56,8 @@ it('answering stores one record and shows the five lines', async () => {
 
   const answers: Readonly<Record<RecoveryQuestion, number>> = { hunger: 2, energy: 3, sleep: 1, training: 4, mood: 5 };
   for (const question of RecoveryQuestion.values) await pick(question, answers[question]);
-  await userEvent.type(screen.getByRole('textbox', { name: 'Typical hours of sleep' }), '6.5');
+  await userEvent.type(screen.getByRole('textbox', { name: /^Typical hours of sleep, hours/ }), '6');
+  await userEvent.type(screen.getByRole('textbox', { name: /^Typical hours of sleep, minutes/ }), '30');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await expect.poll(async () => (await stored()).length).toBe(1);
@@ -122,4 +124,25 @@ it('it is not offered during a pause', async () => {
   const card = await openCoach();
   expect(within(card).queryByRole('button', { name: 'Answer this week' })).not.toBeInTheDocument();
   expect(within(card).queryByRole('button', { name: 'Skip this week' })).not.toBeInTheDocument();
+});
+
+// MM-252: the fourteen-night average fills the typical hours, and can be changed.
+it('typical hours are filled from the last fourteen nights recorded, and can be changed', async () => {
+  for (let night = 0; night < 14; night++) {
+    await repos.sleep.saveSleepNight(new SleepNight({ date: today.addDays(-night), minutesAsleep: 410, source: 'typed' }));
+  }
+  const card = await openCoach();
+  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
+  await screen.findByRole('heading', { name: 'This week' });
+  const hours = screen.getByRole<HTMLInputElement>('textbox', { name: /^Typical hours of sleep, hours/ });
+  const minutes = screen.getByRole<HTMLInputElement>('textbox', { name: /^Typical hours of sleep, minutes/ });
+  expect([hours.value, minutes.value]).toEqual(['6', '50']);
+  expect(screen.getByText('Your average over the last 14 nights, from 14 recorded. Change it if that is not typical.')).toBeInTheDocument();
+
+  await userEvent.clear(minutes);
+  await userEvent.type(minutes, '20');
+  for (const question of RecoveryQuestion.values) await pick(question, 3);
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await expect.poll(async () => (await stored()).length).toBe(1);
+  expect((await stored())[0]?.sleepHours).toBeCloseTo(6 + 20 / 60, 6);
 });

@@ -3,6 +3,8 @@ import type { DailyTargets } from './DailyTargets';
 import { ExplanationLine } from './ExplanationLine';
 import type { ExplanationReason } from './ExplanationReason';
 import type { ExplanationTrigger } from './ExplanationTrigger';
+import { shortSleep } from './shortSleep';
+import type { SleepAverage } from './SleepAverage';
 import { TargetsExplanation } from './TargetsExplanation';
 import type { TargetsRecord } from './TargetsRecord';
 import type { TargetsTrace } from './TargetsTrace';
@@ -39,7 +41,9 @@ function reasonFor(trigger: ExplanationTrigger): ExplanationReason {
  * The change is split in the order the calculation runs: the move in
  * expenditure, everything else in the ordinary formula, then each limit that
  * acted. Nothing is attributed to a day's eating: the engine estimates
- * expenditure, it does not react to intake.
+ * expenditure, it does not react to intake. Sleep that averaged short over
+ * the window is noted beside the lines (MM-252), never as a line: it moved
+ * no number.
  */
 export function explainTargets({
   trigger,
@@ -48,6 +52,7 @@ export function explainTargets({
   trace,
   tdee,
   confidence,
+  sleepAverage,
 }: {
   trigger: ExplanationTrigger;
   previous: TargetsRecord | undefined;
@@ -55,6 +60,8 @@ export function explainTargets({
   trace: TargetsTrace;
   tdee: TdeeEstimate;
   confidence?: CoachConfidence | undefined;
+  /** The fourteen-night average as of these targets (MM-250); undefined with no nights recorded. */
+  sleepAverage?: SleepAverage | undefined;
 }): TargetsExplanation {
   const lines: ExplanationLine[] = [];
   const add = (reason: ExplanationReason, kcal: number, ends: { from?: number; to?: number } = {}) => {
@@ -95,5 +102,7 @@ export function explainTargets({
     excludedPartialDays: tdee.excludedPartialDays,
     weighIns: tdee.weighIns,
     confidence,
+    shortSleepAverageMinutes: shortSleep(sleepAverage) ? sleepAverage?.averageMinutes : undefined,
+    shortSleepNights: shortSleep(sleepAverage) ? sleepAverage?.nights : undefined,
   });
 }

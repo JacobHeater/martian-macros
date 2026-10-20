@@ -8,6 +8,8 @@ import { InsightPriority } from './InsightPriority';
 import { InsightRationing } from './InsightRationing';
 import { InsightRule } from './InsightRule';
 import { ProteinSpreadRule } from './ProteinSpreadRule';
+import { shortSleep } from './shortSleep';
+import type { SleepAverage } from './SleepAverage';
 import type { SodiumPattern } from './SodiumPattern';
 import type { StallAssessment } from './StallAssessment';
 import type { TargetsRecord } from './TargetsRecord';
@@ -41,6 +43,7 @@ export function findInsights({
   trend = [],
   waist = [],
   limitToProteinAndLogging = false,
+  sleepAverage,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
@@ -54,6 +57,8 @@ export function findInsights({
   trend?: readonly WeightTrendPoint[];
   waist?: readonly WaistObservation[];
   limitToProteinAndLogging?: boolean;
+  /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
+  sleepAverage?: SleepAverage | undefined;
 }): Insight[] {
   const days = InsightRationing.patternDays;
   const minimum = InsightRationing.minimumBasisDays;
@@ -241,6 +246,18 @@ export function findInsights({
         averageKcal: (one.highest.kcal + two.highest.kcal) / 2,
       });
     }
+  }
+
+  // Sleep averaged short over the last fourteen recorded nights (MM-252).
+  if (sleepAverage !== undefined && shortSleep(sleepAverage)) {
+    found.push(
+      new Insight({
+        rule: 'shortSleep',
+        from: sleepAverage.from,
+        to: sleepAverage.to,
+        figures: { averageMinutes: sleepAverage.averageMinutes, nights: sleepAverage.nights },
+      }),
+    );
   }
 
   const allowed = found.filter(

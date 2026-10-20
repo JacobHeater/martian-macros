@@ -25,7 +25,8 @@ describe('every message of every kind, as Dart printed it', () => {
     Object.fromEntries(values.map((value) => [value, message(value)]));
 
   it.each([
-    ['caution', all(Caution.values, cautionMessage)],
+    // The caution added since the Flutter app (MM-251, a sleep disorder) has no Dart words to match.
+    ['caution', all(Caution.values.filter((caution) => caution in dart.labels.caution), cautionMessage)],
     // The flags added since the Flutter app (MM-128, MM-130, MM-134) have no Dart words to match.
     ['targetFlag', all(TargetFlag.values.filter((flag) => flag in dart.labels.targetFlag), targetFlagMessage)],
     ['modeReason', all(ModeReason.values, modeReasonExplanation)],

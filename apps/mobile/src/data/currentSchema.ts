@@ -38,6 +38,7 @@ CREATE TABLE "setups" (
   "pace_changed_epoch_day" INTEGER NULL,
   "maintenance_anchor_epoch_day" INTEGER NULL,
   "maintenance_correction_from_epoch_day" INTEGER NULL,
+  "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (
@@ -338,5 +339,12 @@ CREATE TABLE "exercise_progressions" (
   PRIMARY KEY ("exercise_id"),
   CHECK (reps_low >= 1 AND reps_low < reps_high),
   CHECK (load_step_kg IS NULL OR load_step_kg > 0)
+);
+CREATE TABLE "sleep_nights" (
+  "epoch_day" INTEGER NOT NULL,
+  "minutes_asleep" REAL NOT NULL CHECK("minutes_asleep" > 0.0 AND "minutes_asleep" <= 1440.0),
+  "source" TEXT NOT NULL CHECK("source" IN ('typed', 'imported')),
+  "source_name" TEXT NULL,
+  PRIMARY KEY ("epoch_day")
 );
 `;

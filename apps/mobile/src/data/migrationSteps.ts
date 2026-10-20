@@ -177,4 +177,21 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('CREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" ("gtin")');
     },
   ],
+  // 12 to 13 (MM-250, MM-251): a diagnosed sleep disorder in the health check, and the nights of sleep.
+  [
+    12,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN sleep_disorder INTEGER NOT NULL DEFAULT 0 CHECK (sleep_disorder IN (0, 1))',
+      );
+      await db.execute(
+        'CREATE TABLE "sleep_nights" (' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"minutes_asleep" REAL NOT NULL CHECK("minutes_asleep" > 0.0 AND "minutes_asleep" <= 1440.0), ' +
+          '"source" TEXT NOT NULL CHECK("source" IN (\'typed\', \'imported\')), ' +
+          '"source_name" TEXT NULL, ' +
+          'PRIMARY KEY ("epoch_day"))',
+      );
+    },
+  ],
 ]);

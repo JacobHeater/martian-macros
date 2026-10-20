@@ -52,3 +52,26 @@
   flex-wrap: wrap;
   gap: var(--space-8);
 }
+
+/* Sleep (MM-250): the last two weeks of nights as chips that wrap, then hours and minutes beside Save. */
+.progress-sleep-how {
+  margin: 0 0 var(--space-12);
+}
+.progress-sleep-nights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+.progress-sleep-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+.progress-sleep-entry > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.progress-sleep-note {
+  margin: var(--space-8) 0;
+}

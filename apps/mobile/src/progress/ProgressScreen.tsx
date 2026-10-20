@@ -15,6 +15,7 @@ import { MmSegmented } from '../ui/MmSegmented';
 import { MmSpinner } from '../ui/MmSpinner';
 import { NumberEntry } from '../ui/NumberEntry';
 import { RecompSignalCard } from './RecompSignalCard';
+import { SleepNightCard } from './SleepNightCard';
 import { StrengthSection } from './StrengthSection';
 import { WaistEntryCard } from './WaistEntryCard';
 import { onboardingCreatine } from './onboardingCreatine';
@@ -26,8 +27,8 @@ import './progress.css';
 
 /**
  * The body's record, in tiers (MM-257): the hero holds today's weigh-in
- * and the trend with its chart; weight events, the waist and strength are
- * sections beneath, the last two folded to a line until opened.
+ * and the trend with its chart; weight events, sleep (MM-250), the waist and
+ * strength are sections beneath, the last two folded to a line until opened.
  */
 export function ProgressScreen() {
   const { services, state } = useApp();
@@ -128,6 +129,7 @@ export function ProgressScreen() {
       </MmHeroSurface>
       <WeightEventsCard />
       <PeriodDaysCard />
+      <SleepNightCard />
       <WaistEntryCard
         key={`waist-${setup.unitSystem}`}
         unit={fmt.imperial ? 'inches' : 'centimeters'}

@@ -8,6 +8,7 @@ const labels: Readonly<Record<HealthDataType, string>> = {
   workout: 'Exercise sessions',
   menstruation: 'Menstruation',
   steps: 'Steps',
+  sleep: 'Sleep',
 };
 
 /** What the reading is called where the user allows it (MM-68). */

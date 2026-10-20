@@ -1,9 +1,11 @@
 import type { Pause } from '../domain/Pause';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { SleepNight } from '../domain/SleepNight';
 import type { UserSetup } from '../domain/UserSetup';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import { nextTargets } from '../engine/nextTargets';
+import { sleepAverageOf } from '../engine/sleepAverageOf';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 import type { Unsubscribe } from '../lang/Unsubscribe';
@@ -20,6 +22,8 @@ interface CheckInInputs {
   readonly easeIntoMaintenance?: () => boolean | undefined;
   /** On lean gain, whether training has lapsed (MM-134); undefined until the training log is read. */
   readonly trainingLapsed?: () => boolean | undefined;
+  /** The nights of sleep the app works from (MM-250); undefined until they are read. */
+  readonly sleepNights?: () => readonly SleepNight[] | undefined;
   readonly today: Cell<CalendarDate>;
   readonly targets: TargetsHistoryRepository;
   readonly setups: SetupRepository;
@@ -53,8 +57,19 @@ export class CheckIn {
       // made from the wrong facts, and the day would then be taken.
       const easeIntoMaintenance = inputs.easeIntoMaintenance === undefined ? false : inputs.easeIntoMaintenance();
       const trainingLapsed = inputs.trainingLapsed === undefined ? false : inputs.trainingLapsed();
-      if (easeIntoMaintenance === undefined || trainingLapsed === undefined) return undefined;
-      return nextTargets({ setup, snapshot, history, today, pauses, easeIntoMaintenance, trainingLapsed });
+      const sleepNights = inputs.sleepNights === undefined ? [] : inputs.sleepNights();
+      if (easeIntoMaintenance === undefined || trainingLapsed === undefined || sleepNights === undefined) return undefined;
+      return nextTargets({
+        setup,
+        snapshot,
+        history,
+        today,
+        pauses,
+        easeIntoMaintenance,
+        trainingLapsed,
+        // Said in the explanation when it averaged short (MM-252); it moves no number.
+        sleepAverage: sleepAverageOf({ nights: sleepNights, through: today }),
+      });
     });
   }
 

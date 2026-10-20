@@ -7,10 +7,10 @@ import { MmButton } from '../ui/MmButton';
 import { Notice } from '../ui/Notice';
 
 /**
- * The offer to ease a deficit when recovery is failing (MM-117): a
- * maintenance week now, a slower pace from the next check-in, or carry on.
- * Never an automatic change. Carrying on is one tap and free of comment.
- * Empty when no offer is due.
+ * The offer to ease a deficit when recovery is failing (MM-117), or sleep has
+ * run short for a fortnight (MM-252): a maintenance week now, a slower pace
+ * from the next check-in, or carry on. Never an automatic change. Carrying on
+ * is one tap and free of comment. Empty when no offer is due.
  */
 export function ReliefOfferCard() {
   const { services, state } = useApp();
@@ -21,7 +21,7 @@ export function ReliefOfferCard() {
   const words = reliefOfferText(offer);
   const slower = offer.slowerPace;
   const suggestsBreak = offer.suggestion === 'maintenanceWeek';
-  const text = [words.body, words.suggestion, ...(words.sleep === undefined ? [] : [words.sleep])].join('\n\n');
+  const text = [words.body, words.suggestion, words.sleep].filter((part) => part !== undefined && part !== '').join('\n\n');
   return (
     <div className="app-stack-item">
       <Notice

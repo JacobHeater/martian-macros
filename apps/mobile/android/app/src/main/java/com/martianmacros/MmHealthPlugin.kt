@@ -11,6 +11,7 @@ import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
 import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.changes.DeletionChange
@@ -28,6 +29,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.Instant
 import kotlin.reflect.KClass
 
@@ -49,7 +51,31 @@ class MmHealthPlugin : Plugin() {
         "workout" to ExerciseSessionRecord::class,
         "menstruation" to MenstruationFlowRecord::class,
         "steps" to StepsRecord::class,
+        "sleep" to SleepSessionRecord::class,
     )
+
+    /** The stages of a sleep session that are sleep: not awake, not in bed, not out of bed (MM-250). */
+    private val asleepStages = setOf(
+        SleepSessionRecord.STAGE_TYPE_SLEEPING,
+        SleepSessionRecord.STAGE_TYPE_LIGHT,
+        SleepSessionRecord.STAGE_TYPE_DEEP,
+        SleepSessionRecord.STAGE_TYPE_REM,
+    )
+
+    /**
+     * Minutes asleep in a session (MM-250): the asleep stages summed when the
+     * platform recorded stages, else the whole span, since an app that writes
+     * no stages writes the session as the time asleep.
+     */
+    private fun minutesAsleep(record: SleepSessionRecord): Double {
+        val asleep = record.stages.filter { it.stage in asleepStages }
+        val millis = if (asleep.isEmpty()) {
+            Duration.between(record.startTime, record.endTime).toMillis()
+        } else {
+            asleep.sumOf { Duration.between(it.startTime, it.endTime).toMillis() }
+        }
+        return millis / 60000.0
+    }
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -143,6 +169,7 @@ class MmHealthPlugin : Plugin() {
             is ExerciseSessionRecord -> json.span(record.startTime, record.endTime)
             is MenstruationFlowRecord -> json.put("value", record.flow.toDouble()).at(record.time)
             is StepsRecord -> json.put("value", record.count.toDouble()).span(record.startTime, record.endTime)
+            is SleepSessionRecord -> json.put("value", minutesAsleep(record)).span(record.startTime, record.endTime)
         }
         return json
     }

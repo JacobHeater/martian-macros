@@ -13,6 +13,8 @@ interface TargetsExplanationInit {
   excludedPartialDays?: number;
   weighIns?: number;
   confidence?: CoachConfidence | undefined;
+  shortSleepAverageMinutes?: number | undefined;
+  shortSleepNights?: number | undefined;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -44,6 +46,14 @@ export class TargetsExplanation {
   /** The confidence assessment when these targets were issued, if available. */
   readonly confidence: CoachConfidence | undefined;
 
+  /**
+   * Sleep averaged short over the window these targets were issued in
+   * (MM-252): the average in minutes and the nights it rests on. Undefined
+   * when it did not, or no nights were recorded.
+   */
+  readonly shortSleepAverageMinutes: number | undefined;
+  readonly shortSleepNights: number;
+
   constructor(init: TargetsExplanationInit) {
     this.lines = init.lines;
     this.newKcal = init.newKcal;
@@ -53,6 +63,8 @@ export class TargetsExplanation {
     this.excludedPartialDays = init.excludedPartialDays ?? 0;
     this.weighIns = init.weighIns ?? 0;
     this.confidence = init.confidence;
+    this.shortSleepAverageMinutes = init.shortSleepAverageMinutes;
+    this.shortSleepNights = init.shortSleepNights ?? 0;
   }
 
   static decode(source: string): TargetsExplanation {
@@ -62,6 +74,7 @@ export class TargetsExplanation {
     const newKcal = json['newKcal'];
     const previousKcal = json['previousKcal'];
     const confidence = json['confidence'];
+    const shortSleep = json['shortSleepAverageMinutes'];
     if (!Array.isArray(lines)) throw new ArgumentError('An explanation has a list of lines.');
     if (typeof newKcal !== 'number') throw new ArgumentError(`newKcal is not a number: ${String(newKcal)}`);
     return new TargetsExplanation({
@@ -76,6 +89,8 @@ export class TargetsExplanation {
       excludedPartialDays: count(json['excludedPartialDays']),
       weighIns: count(json['weighIns']),
       confidence: isRecord(confidence) ? CoachConfidence.fromJson(confidence) : undefined,
+      shortSleepAverageMinutes: typeof shortSleep === 'number' ? shortSleep : undefined,
+      shortSleepNights: count(json['shortSleepNights']),
     });
   }
 
@@ -100,6 +115,10 @@ export class TargetsExplanation {
     json['excludedPartialDays'] = this.excludedPartialDays;
     json['weighIns'] = this.weighIns;
     if (this.confidence !== undefined) json['confidence'] = this.confidence.toJson();
+    if (this.shortSleepAverageMinutes !== undefined) {
+      json['shortSleepAverageMinutes'] = this.shortSleepAverageMinutes;
+      json['shortSleepNights'] = this.shortSleepNights;
+    }
     return JSON.stringify(json);
   }
 }

@@ -359,22 +359,40 @@ describe('notices', () => {
   });
 
   it('easing a deficit: a maintenance week or a slower pace, and sleep only when it has been short', () => {
-    const early = reliefOfferText({ suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3, shortSleep: false });
+    const hard = ['hardCheckIns'] as const;
+    const early = reliefOfferText({ suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3, shortSleep: false, signals: hard, sleepAverage: undefined });
     expect(early.title).toBe('Two hard weeks in a row');
     expect(early.suggestion).toBe(
       'The coach would slow the pace: you are early in this deficit, and a gentler pace is easier to hold than a break.',
     );
     expect(early.sleep).toBeUndefined();
 
-    const late = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true });
+    const late = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true, signals: hard, sleepAverage: undefined });
     expect(late.suggestion).toBe(
       'The coach would take a maintenance week: you are 9 weeks into this deficit, and a week at maintenance is a diet break taken early.',
     );
     expect(late.sleep).toContain('under six hours');
 
-    const noSlower = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: undefined, deficitWeeks: 2, shortSleep: false });
+    const noSlower = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: undefined, deficitWeeks: 2, shortSleep: false, signals: hard, sleepAverage: undefined });
     expect(noSlower.suggestion).toBe(
       'The coach would take a maintenance week: a week at maintenance is a diet break taken early, and the deficit can resume after it.',
     );
+
+    // MM-252: short sleep from the record is a signal of its own, with its own title and the average in the body.
+    const from = CalendarDate.of(2026, 9, 22);
+    const sleepOnly = reliefOfferText({
+      suggestion: 'slowerPace',
+      slowerPace: 0.005,
+      deficitWeeks: 3,
+      shortSleep: true,
+      signals: ['shortSleep'],
+      sleepAverage: { averageMinutes: 330, nights: 12, from, to: from.addDays(13) },
+    });
+    expect(sleepOnly.title).toBe('Two weeks of short sleep');
+    expect(sleepOnly.body).toBe(
+      'Your sleep averaged 5 h 30 m over the last 12 nights. With short sleep, more of what you lose appears to be lean tissue and hunger runs higher.',
+    );
+    expect(sleepOnly.suggestion).toContain('slow the pace');
+    expect(sleepOnly.sleep).toBeUndefined();
   });
 });

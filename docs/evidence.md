@@ -123,6 +123,17 @@ maintenance until you confirm your answers.
 
 Rows: UserSetup.healthCheckIntervalDays, CoachingPolicy.seniorMaxWeeklyLossFraction, CoachingPolicy.seniorMinimumProteinGPerKgReferenceWeight, CoachingPolicy.insulinUnconfirmedMaxWeeklyLossFraction, CoachingPolicy.targetsAllowed
 
+### How does sleep come into it?
+
+Your nights, typed or read from your health platform, are averaged over the
+last fourteen. When that average is under six hours across at least seven
+recorded nights, the coach names it: in a deficit, short sleep appears to shift
+what is lost away from fat and toward lean tissue, and hunger runs higher. It
+offers the gentler pace and changes nothing until you choose. A diagnosed sleep
+disorder is a caution and a pointer to your clinician, and changes no number.
+
+Rows: SleepRule.shortSleepHours, SleepRule.windowNights, SleepRule.minimumNights, Caution.sleepDisorder
+
 ### How is a food graded?
 
 Every food gets a grade from A+ to D- for the food itself, from what it
@@ -270,6 +281,10 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `StallRule.trainingRestartGapDays` | 28 days without a finished workout | engine StallRule.ts | When a workout counts as training starting again (MM-140) | Product judgement | judgement | None | No |
 | `StallRule.minimumFoodDays`, `minimumWeighIns` | 12 whole food days and 10 weigh-ins in the window | engine StallRule.ts | Below these the diagnosis is "data" (MM-140) | Product judgement | judgement | None | No |
 | `StallRule.lowEstimateRestingMultiple` | 1.3 times resting energy | engine StallRule.ts | Below it the estimate diagnosis raises missing food once (MM-140) | Physical activity levels under 1.4 are rare in free-living adults (FAO/WHO/UNU 2001); an estimate lower still usually means intake is under-logged | moderate | Free-living adults | No |
+| `SleepRule.shortSleepHours` | 6 hours asleep a night, averaged | engine SleepRule.ts | Below it the coach names short sleep as a signal of its own: in the offer to ease a deficit, the check-in explanation, the stall diagnosis and one insight (MM-252) | Nedeltcheva, Kilkus, Imperial, Schoeller, Penev, Annals of Internal Medicine 2010;153(7):435-441: fourteen days of caloric restriction with 5.5 against 8.5 hours of sleep opportunity cut the share of weight lost as fat by 55% and raised the loss of fat-free mass by 60%, with more hunger; randomized crossover, ten adults. Tasali, Wroblewski, Kahn, Kilkus, Schoeller, JAMA Internal Medicine 2022: extending sleep by 1.2 hours in adults sleeping under 6.5 hours cut intake by about 270 kcal a day, measured by doubly labelled water; randomized, eighty adults. The six hours is between the two trials' short arms (MM-249) | moderate | Adults with overweight (BMI 25 to 32), middle-aged, mostly sedentary; applied to everyone on a deficit as an extrapolation | No |
+| `SleepRule.windowNights` | 14 nights | engine SleepRule.ts | The window the average and the signal are taken over (MM-252) | Nedeltcheva 2010 restricted sleep for fourteen days and saw the shift; the fortnight is also the check-in's and the insights' period (`InsightRationing.patternDays`), so the person reads one window everywhere | judgement | None directly | No |
+| `SleepRule.minimumNights` | 7 recorded nights in the window | engine SleepRule.ts | Fewer recorded nights than this say nothing, so one short night typed is never called short sleep (MM-252) | Product judgement: half the window, the app's convention for "few" (`WaterFewDaysRule.fewerThanDays`) | judgement | None | No |
+| `Caution.sleepDisorder` | A caution and a clinician pointer; no number changes | domain CoachingPolicy.ts | What a diagnosed sleep disorder (sleep apnea, insomnia, a circadian disorder) does in the app (MM-251) | Shechter, Sleep Medicine Reviews 2016;34:59-69: obstructive sleep apnea carries abnormal leptin and ghrelin, and people with OSA and visceral obesity lost less BMI and fat mass under a lifestyle intervention; measures of intake are lacking and CPAP itself tends to add weight, so nothing in the numbers changes until the clinician reviewer (MM-29) and the panel grade it (MM-249) | emerging | Adults with obstructive sleep apnea, mostly with obesity; insomnia and circadian disorders are not covered by it | No |
 | `FatLossPace` | Gentle 0.5%, Standard 0.75% (default), Faster 1.0% of body weight a week | engine FatLossPace.ts | The paces a cut may run at (MM-128) | Garthe 2011 (0.7%/week kept lean mass, 1.4% did not; n=24); Helms 2014 (0.5 to 1.0%, the leaner the slower) | moderate | Trained athletes (Garthe, Helms); applied to everyone | No |
 | `PaceRule.maxDeficitFractionOfExpenditure` | 35% of estimated expenditure | engine PaceRule.ts | The deficit never exceeds it, whatever the pace asks (MM-128) | Product judgement: a share of body weight is a fixed kcal per kg while expenditure per kg varies widely; Murphy and Koehler 2022 (lean-mass gain from training fell to zero near a 500 kcal average deficit) informs the direction | judgement | None directly | No |
 | `PaceRule.fasterBodyFatPercent` | Men 25%, women 35%, on the cautious (lower) body-fat figure | engine PaceRule.ts | When Faster is offered at all (MM-128, MM-132) | Forbes relationship (more fat, larger deficits with less lean loss); the cut-offs are product judgement | judgement | None directly | No |

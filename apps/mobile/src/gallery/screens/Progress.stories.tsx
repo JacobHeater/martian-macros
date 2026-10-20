@@ -8,6 +8,7 @@ import { StrengthLiftsScreen } from '../../progress/StrengthLiftsScreen';
 import { WeightEventEntrySheet } from '../../progress/WeightEventEntrySheet';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import { healthPlatform } from './healthPlatform';
 import { oldLiftsScenario } from './oldLiftsScenario';
 import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
@@ -272,4 +273,54 @@ export const LiftHistoryBodyweight = screenStory({
   covers: ['StrengthHistoryScreen'],
   shows: /^Uses total bodyweight plus added or assisted weight/,
   open: ({ navigator }) => void navigator.push(() => <StrengthHistoryScreen exerciseId="pull-up" />),
+});
+
+// ---- MM-250: the nights of sleep ----
+
+/** Set up and weighed, no night recorded yet. */
+const noNights: StoryScenario = async (repos, today) => {
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-20), healthCheckConfirmedOn: today }));
+  for (let d = 20; d >= 0; d--) await repos.weights.saveWeight(today.addDays(-d), 86 - (20 - d) * 0.05);
+};
+
+/** MM-250: last night not recorded: the section open, the fortnight as chips, hours and minutes to type. Beside Period days (its sibling for the chips) and Waist (for the fields and Save). */
+export const SleepNotRecorded = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Last night not recorded yet.',
+  scenario: noNights,
+  open: onProgress,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('heading', { name: 'Sleep' }));
+  },
+});
+
+/** MM-250: nights typed, last night among them: folded to its line; opened, each chip carries its night's hours and last night's fill the fields. */
+export const SleepRecorded = screenStory({
+  covers: ['ProgressScreen'],
+  shows: / of the last 14 nights recorded\.$/,
+  open: onProgress,
+  walk: pressNamed(/^Sleep/),
+});
+
+/** MM-250: nights read from the watch through Health Connect (MM-320), last night not among them; the night before picked, which says the watch's hours would give way to typed ones. */
+export const SleepFromWatch = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'The night before: 6 h 52 m from Watch. A night you type is used instead.',
+  scenario: noNights,
+  device: healthPlatform({ allowed: ['sleep'] }),
+  open: onProgress,
+  walk: pressNamed('The night before · 6 h 52 m'),
+});
+
+/** MM-250: more than a day typed: refused under the field, and Save waits. */
+export const SleepMistyped = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Up to 24 hours.',
+  scenario: noNights,
+  open: onProgress,
+  walk: async (canvas) => {
+    const hours = await within(canvas).findByRole('textbox', { name: /^Last night, hours/ }, { timeout: 5000 });
+    reveal(hours);
+    await userEvent.type(hours, '25');
+  },
 });

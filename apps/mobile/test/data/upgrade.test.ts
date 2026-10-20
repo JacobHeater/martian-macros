@@ -6,6 +6,7 @@ import { currentSchemaVersion as current } from '../../src/data/currentSchemaVer
 import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { SleepNight } from '../../src/domain/SleepNight';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { StateError } from '../../src/lang/StateError';
 import { SqlFailure } from '../../src/sql/SqlFailure';
@@ -137,8 +138,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 12 left it: without the sleep-disorder answer and the nights of sleep (MM-250, MM-251). */
+const versionTwelve = currentSchema
+  .replace('  "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),\n', '')
+  .replace(/CREATE TABLE "sleep_nights" \([\s\S]*?\n\);\n/, '');
+
+/** The schema as version 10 left it: without exact targets, the label note, easing into maintenance, the pace change day, the maintenance anchor and correction (MM-123, MM-128, MM-130). */
 /** The schema as version 11 left it: without the online lookup choice and the foods found online (MM-58). */
-const versionEleven = currentSchema
+const versionEleven = versionTwelve
   .replace(`  "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),\n`, '')
   .replace(/CREATE TABLE "online_foods" \([\s\S]*?\n\);\nCREATE UNIQUE INDEX "online_foods_gtin" ON "online_foods" \("gtin"\);\n/, '');
 
@@ -320,4 +327,30 @@ it('a version 11 database comes up to date asking before any online lookup, with
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
   expect(await columnsOf(sql, 'online_foods')).toContain('gtin');
   expect(await sql.select('SELECT count(*) AS n FROM online_foods')).toEqual([{ n: 0 }]);
+});
+
+// MM-250, MM-251: a version 12 database gains the sleep-disorder answer, "no", and an empty record of nights;
+// its setup and weigh-ins are kept.
+it('a version 12 database comes up to date with no sleep disorder and no nights recorded', async () => {
+  expect(versionTwelve).not.toContain('sleep_disorder');
+  expect(versionTwelve).not.toContain('sleep_nights');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 12, schema: versionTwelve });
+  // Written as version 12 wrote them: today's repositories know the new column.
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'setups')).toContain('sleep_disorder');
+  expect((await repos.setup.loadSetup())?.screening.sleepDisorder).toBe(false);
+  expect(await first(repos.sleep.watchSleepNights())).toEqual([]);
+  await repos.sleep.saveSleepNight(new SleepNight({ date: day, minutesAsleep: 440, source: 'typed' }));
+  expect((await first(repos.sleep.watchSleepNights())).map((n) => n.minutesAsleep)).toEqual([440]);
 });

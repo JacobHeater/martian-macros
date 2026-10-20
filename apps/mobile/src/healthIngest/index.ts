@@ -18,6 +18,8 @@ export * from './HealthReadFailure';
 export * from './HealthSample';
 export * from './HealthSampleStore';
 export * from './HealthSource';
+export * from './NightOfSleep';
+export * from './nightlySleep';
 export * from './NutritionRecord';
 export * from './primaryWeightSource';
 export * from './sameHealthSample';

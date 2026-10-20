@@ -9,6 +9,7 @@ import { StatRow } from '../ui/StatRow';
 import { explanationLineText } from '../format/explanationLineText';
 import { Fmt } from '../format/Fmt';
 import { reboundText } from '../format/reboundText';
+import { shortSleepText } from '../format/shortSleepText';
 import { useLoaded } from '../app/useLoaded';
 import { whatWouldChangeIt } from '../format/whatWouldChangeIt';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
@@ -97,6 +98,12 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
         ))
       )}
       {remainder === undefined ? null : <p className="app-text">{remainder}</p>}
+      {/* Short sleep over the window, before anything about the log (MM-252): a cause the person can act on, not a line that moved the number. */}
+      {explanation?.shortSleepAverageMinutes === undefined ? null : (
+        <p className="app-text">
+          {shortSleepText({ averageMinutes: explanation.shortSleepAverageMinutes, nights: explanation.shortSleepNights })}
+        </p>
+      )}
       {explanation === undefined ? null : (
         <>
           <SectionLabel text="What it was based on" />

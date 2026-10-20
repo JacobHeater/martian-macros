@@ -3,11 +3,13 @@ import { Micronutrients } from '../domain/food/micros/Micronutrients';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { Meal } from '../domain/Meal';
 import { RecoveryCheckIn } from '../domain/RecoveryCheckIn';
+import { SleepNight } from '../domain/SleepNight';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DayMarkWriter } from '../domain/repositories/DayMarkWriter';
 import type { FoodEntryWriter } from '../domain/repositories/FoodEntryWriter';
 import type { RecoveryCheckInWriter } from '../domain/repositories/RecoveryCheckInWriter';
 import type { SetupWriter } from '../domain/repositories/SetupWriter';
+import type { SleepWriter } from '../domain/repositories/SleepWriter';
 import type { WaistWriter } from '../domain/repositories/WaistWriter';
 import type { WaterWriter } from '../domain/repositories/WaterWriter';
 import type { WeightWriter } from '../domain/repositories/WeightWriter';
@@ -82,6 +84,7 @@ export class DemoSeed {
     recovery,
     workouts,
     water,
+    sleep,
   }: {
     eraser: DataEraser;
     setup: SetupWriter;
@@ -93,6 +96,7 @@ export class DemoSeed {
     recovery: RecoveryCheckInWriter;
     workouts?: WorkoutWriter | undefined;
     water?: WaterWriter | undefined;
+    sleep?: SleepWriter | undefined;
   }): Promise<void> {
     await eraser.eraseAll();
     const start = this.today.addDays(-DemoSeed.historyDays);
@@ -100,6 +104,10 @@ export class DemoSeed {
     for (let i = 0; i <= DemoSeed.historyDays; i++) {
       const date = start.addDays(i);
       await weights.saveWeight(date, 86 - i * 0.035 + Math.sin(i * 1.7) * 0.35);
+      // Most nights typed, around seven hours, one in five left unrecorded (MM-250).
+      if (sleep !== undefined && i % 5 !== 2) {
+        await sleep.saveSleepNight(new SleepNight({ date, minutesAsleep: 400 + ((i * 37) % 60), source: 'typed' }));
+      }
       if (i % 7 === 0) {
         const week = Math.trunc(i / 7);
         const fourWeeks = Math.trunc(i / 28);

@@ -26,4 +26,5 @@ export const tables = [
   'inline_insight_snoozes',
   'menstruation_days',
   'online_foods',
+  'sleep_nights',
 ] as const;
