@@ -58,11 +58,14 @@ export function MmDialog({ title, children, actions, onDismiss }: MmDialogProps)
         }
       }}
     >
-      <div ref={panel} className="mm-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
+      {/* The body is the dialog's description, so a reader hears the question's consequence with its title (MM-63, the UX guard's F1). */}
+      <div ref={panel} className="mm-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={`${titleId}-body`} tabIndex={-1}>
         <h2 id={titleId} className="mm-dialog-title">
           {title}
         </h2>
-        <div className="mm-dialog-body">{children}</div>
+        <div id={`${titleId}-body`} className="mm-dialog-body">
+          {children}
+        </div>
         {actions === undefined ? null : <div className="mm-dialog-actions">{actions}</div>}
       </div>
     </div>

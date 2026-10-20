@@ -1,4 +1,8 @@
 import { SqlRepositories } from '../data/SqlRepositories';
+import { NativeBackupPlatform } from '../backup/NativeBackupPlatform';
+import { openNativeSnapshot } from '../backup/openNativeSnapshot';
+import { WasmBackupPlatform } from '../backup/WasmBackupPlatform';
+import { mmBackup } from '../platform/mmBackup';
 import { AppIdentity } from './AppIdentity';
 import { databaseNameFor } from './databaseNameFor';
 import { SystemClock } from '../domain/integration/SystemClock';
@@ -41,11 +45,11 @@ export async function openAppServices(): Promise<AppServices> {
   const native = runningNatively();
   // The database is named for the identity the shell has (MM-8): the demo's
   // keeps the name it always had, so a seed can never touch another's.
-  const repositories = await SqlRepositories.open(
-    native
-      ? await NativeSqlDatabase.open({ name: databaseNameFor(AppIdentity.of(__MM_IDENTITY__)) }, mmDb)
-      : await WasmSqlDatabase.open(),
-  );
+  const databaseName = databaseNameFor(AppIdentity.of(__MM_IDENTITY__));
+  const sql = native ? await NativeSqlDatabase.open({ name: databaseName }, mmDb) : await WasmSqlDatabase.open();
+  // A backup is the phone's copy of that database, encrypted before it leaves (MM-63); a restore opens a copy brought back.
+  const repositories = await SqlRepositories.open(sql, native ? { openSnapshot: openNativeSnapshot({ api: mmBackup, db: mmDb }) } : {});
+  const backup = sql instanceof WasmSqlDatabase ? new WasmBackupPlatform(sql) : new NativeBackupPlatform({ api: mmBackup, databaseName });
   const packStore = native
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
@@ -74,6 +78,8 @@ export async function openAppServices(): Promise<AppServices> {
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
     eraser: repositories.eraser,
+    restorer: repositories.restorer,
+    backup,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or
     // removed. A browser has none. No camera plugin is in the shell yet

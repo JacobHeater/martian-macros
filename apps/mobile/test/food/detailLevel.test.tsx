@@ -75,18 +75,19 @@ it('Simple hides carbohydrate and fat, not the data', async () => {
 
 it('the fiber line shows at Full, with its guide, never at Standard', async () => {
   await openFood();
-  expect(screen.queryByText(/^Fiber:/)).not.toBeInTheDocument();
+  expect(screen.queryByText('Fiber')).not.toBeInTheDocument();
 });
 
 it('Full shows fiber against the guide', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(await screen.findByText(/Fiber: 16 g · guide/)).toBeInTheDocument();
+  // MM-336: a row of the hero, the name at the start and the figures at the end.
+  expect((await screen.findByText('Fiber')).parentElement?.textContent).toMatch(/^Fiber16 g · guide/);
 });
 
 it('too little fiber data says so and gives no total', async () => {
   await repos.food.addFood(foodOn(today, { name: 'Typed meal', kcal: 800, proteinG: 30, carbsG: 80, fatG: 30 }));
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(await screen.findByText('Fiber: not enough data')).toBeInTheDocument();
+  expect((await screen.findByText('Fiber')).parentElement?.textContent).toBe('Fibernot enough data');
 });

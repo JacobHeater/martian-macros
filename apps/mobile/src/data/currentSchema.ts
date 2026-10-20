@@ -144,6 +144,7 @@ CREATE TABLE "user_preferences" (
   "inline_insight_areas_off" TEXT NOT NULL DEFAULT '',
   "inline_insight_kinds_off" TEXT NOT NULL DEFAULT '',
   "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),
+  "last_backup_epoch_day" INTEGER NULL,
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

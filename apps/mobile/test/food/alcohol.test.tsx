@@ -31,7 +31,7 @@ async function openFood(): Promise<void> {
 
 it('a day with no alcohol shows no alcohol line', async () => {
   await openFood();
-  expect(screen.queryByText(/^Alcohol:/)).not.toBeInTheDocument();
+  expect(screen.queryByText('Alcohol')).not.toBeInTheDocument();
 });
 
 it('a logged drink shows its own line at 7 kcal a gram', async () => {
@@ -50,7 +50,8 @@ it('a logged drink shows its own line at 7 kcal a gram', async () => {
     }),
   );
   await openFood();
-  expect(await screen.findByText('Alcohol: 98 kcal')).toBeInTheDocument();
+  // MM-336: a row of the hero, said as part of the day's total.
+  expect((await screen.findByText('Alcohol')).parentElement?.textContent).toBe('Alcohol98 kcal, in the total');
 });
 
 it('a typed drink saves without a mismatch and keeps its alcohol', async () => {

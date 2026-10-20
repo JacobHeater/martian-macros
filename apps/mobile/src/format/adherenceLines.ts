@@ -1,15 +1,9 @@
 import type { AdherenceSummary } from '../engine';
 import { StateError } from '../lang/StateError';
+import type { AdherenceLine } from './AdherenceLine';
 import { Fmt } from './Fmt';
 
 const daysWord = (count: number) => (count === 1 ? 'day' : 'days');
-
-/** One line of the summary: a label, a figure, and what the figure is measured against or rests on (MM-342). */
-export interface AdherenceLine {
-  readonly label: string;
-  readonly value: string;
-  readonly detail?: string;
-}
 
 function intakeLine(s: AdherenceSummary, floorKcal: number): AdherenceLine {
   const intake = s.averageIntakeKcal;

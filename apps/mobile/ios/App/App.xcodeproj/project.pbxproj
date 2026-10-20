@@ -19,6 +19,7 @@
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		7D696CB11E8A73D0EE30D33F /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728ACC88D22733C255E5992B /* MainViewController.swift */; };
 		823CA1D3841FD07B756A57C8 /* MmHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */; };
+		7A1B2C3D4E5F60718293A4B5 /* MmBackupPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A49382716F5E4D3C2B1A70 /* MmBackupPlugin.swift */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
 		A22DA04077393E9F8E2AC990 /* MmScannerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF83D1E04ACAF4531482287 /* MmScannerPlugin.swift */; };
 		B44B4F6F08E88F76DAAF4F39 /* MmRemindersPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276EE51C3F8EFC39216D45D4 /* MmRemindersPlugin.swift */; };
@@ -45,6 +46,7 @@
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		B16D53D58543CB6CFE59FD4B /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmHealthPlugin.swift; sourceTree = "<group>"; };
+		B5A49382716F5E4D3C2B1A70 /* MmBackupPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmBackupPlugin.swift; sourceTree = "<group>"; };
 		DA06207BA58848900AD095C4 /* MmFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmFiles.swift; sourceTree = "<group>"; };
 		F6CDA8CA892DF8932B302BA5 /* MmDbPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MmDbPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,6 +109,7 @@
 				6BF83D1E04ACAF4531482287 /* MmScannerPlugin.swift */,
 				B16D53D58543CB6CFE59FD4B /* ScanViewController.swift */,
 				D278F624F69C3B53046CF838 /* MmHealthPlugin.swift */,
+				B5A49382716F5E4D3C2B1A70 /* MmBackupPlugin.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				A22DA04077393E9F8E2AC990 /* MmScannerPlugin.swift in Sources */,
 				F3AA4D9DE8D5822D84CEB169 /* ScanViewController.swift in Sources */,
 				823CA1D3841FD07B756A57C8 /* MmHealthPlugin.swift in Sources */,
+				7A1B2C3D4E5F60718293A4B5 /* MmBackupPlugin.swift in Sources */,
 				7D696CB11E8A73D0EE30D33F /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

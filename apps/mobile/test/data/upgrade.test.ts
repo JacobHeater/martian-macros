@@ -9,7 +9,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { StateError } from '../../src/lang/StateError';
 import { SqlFailure } from '../../src/sql/SqlFailure';
-import type { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
+import { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
 import { first } from '../support/first';
 import { openSql } from './support/openRepositories';
 
@@ -41,7 +41,7 @@ const columnsOf = async (sql: WasmSqlDatabase, table: string) =>
 
 async function expectDataIntact(sql: WasmSqlDatabase): Promise<void> {
   // Read with the current repositories: an added column does not disturb them.
-  const repos = new SqlRepositories(await AppDatabase.open(sql, { version: Number(await versionOf(sql)) }));
+  const repos = new SqlRepositories(await AppDatabase.open(sql, { version: Number(await versionOf(sql)) }), (bytes) => WasmSqlDatabase.open({ bytes }));
   expect((await repos.setup.loadSetup())?.profile.sex).toBe('female');
   expect((await first(repos.weights.watchWeights())).map((w) => [w.date, w.weightKg])).toEqual([[day, 80]]);
 }
@@ -137,8 +137,11 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 9 left it: without the day of the last backup (MM-63). */
+const versionNine = currentSchema.replace('  "last_backup_epoch_day" INTEGER NULL,\n', '');
+
 /** The schema as version 8 left it: without net carbs and sugar alcohols (MM-396, MM-397). */
-const versionEight = currentSchema
+const versionEight = versionNine
   .replace('  "net_carbs" INTEGER NOT NULL DEFAULT 1 CHECK ("net_carbs" IN (0, 1)),\n', '')
   .split('  "cholesterol_mg" REAL NULL,\n  "sugar_alcohols_g" REAL NULL\n);')
   .join('  "cholesterol_mg" REAL NULL\n);');

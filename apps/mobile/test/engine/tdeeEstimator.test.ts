@@ -115,10 +115,10 @@ it('is unbiased for a logger whose estimates are noisy (MM-150)', () => {
   expect(stats.coverage2Sigma).toBeGreaterThanOrEqual(0.85);
 });
 
-// MM-173 (open): at 30% a day the unmarked-partial-day rule drops honest
-// low days and the estimate drifts about 160 kcal high. Un-skip this with
-// the change that fixes it.
-it.skip('stays unbiased when a noisy logger has days 30% apart (MM-173: fails today, about 160 kcal high)', () => {
+// MM-173: at 30% a day the fixed 65%-of-P75 rule dropped honest low days
+// and the estimate drifted about 160 kcal high; the threshold now widens
+// with the window's own spread.
+it('stays unbiased when a noisy logger has days 30% apart (MM-173)', () => {
   const stats = monteCarlo({
     makeUser: (seed) => new SyntheticUser({ seed, baseTdeeKcal: 2800, entrySigma: 0.3 }),
     loggedKcal: 2200,

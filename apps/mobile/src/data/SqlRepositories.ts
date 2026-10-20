@@ -1,6 +1,7 @@
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
+import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -25,6 +26,8 @@ import { AppDatabase } from './AppDatabase';
 import { SqlCustomExerciseRepository } from './SqlCustomExerciseRepository';
 import { SqlCustomFoodRepository } from './SqlCustomFoodRepository';
 import { SqlDataEraser } from './SqlDataEraser';
+import { SqlDataRestorer } from './SqlDataRestorer';
+import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import { SqlDayMarkRepository } from './SqlDayMarkRepository';
 import { SqlExerciseProgressionRepository } from './SqlExerciseProgressionRepository';
 import { SqlFoodRepository } from './SqlFoodRepository';
@@ -74,8 +77,9 @@ export class SqlRepositories {
   readonly healthSamples: HealthSampleStore;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
+  readonly restorer: DataRestorer;
 
-  constructor(db: AppDatabase) {
+  constructor(db: AppDatabase, openSnapshot: (bytes: Uint8Array) => Promise<SqlDatabase>) {
     this.db = db;
     this.setup = new SqlSetupRepository(db);
     this.weights = new SqlWeightRepository(db);
@@ -99,11 +103,19 @@ export class SqlRepositories {
     this.healthSamples = new SqlHealthSampleStore(db);
     this.exerciseProgressions = new SqlExerciseProgressionRepository(db);
     this.eraser = new SqlDataEraser(db);
+    this.restorer = new SqlDataRestorer(db, openSnapshot);
   }
 
-  /** Opens the user's database in `sql`, creating or upgrading it, and every repository over it. */
-  static async open(sql: SqlDatabase): Promise<SqlRepositories> {
-    return new SqlRepositories(await AppDatabase.open(sql));
+  /**
+   * Opens the user's database in `sql`, creating or upgrading it, and every
+   * repository over it. `openSnapshot` is how a backup's bytes become a
+   * connection to a copy (MM-63): in memory unless the phone gives another way.
+   */
+  static async open(
+    sql: SqlDatabase,
+    { openSnapshot = (bytes) => WasmSqlDatabase.open({ bytes }) }: { openSnapshot?: (bytes: Uint8Array) => Promise<SqlDatabase> } = {},
+  ): Promise<SqlRepositories> {
+    return new SqlRepositories(await AppDatabase.open(sql), openSnapshot);
   }
 
   close(): Promise<void> {

@@ -1199,14 +1199,14 @@
           "MM-115",
           "MM-120",
           "MM-131",
-          "MM-132"
+          "MM-132",
+          "MM-173"
         ],
         "remaining": [
           "MM-22",
           "MM-35",
           "MM-110",
-          "MM-135",
-          "MM-173"
+          "MM-135"
         ]
       },
       "sequence": [
@@ -3060,7 +3060,7 @@
       "file": "ws-12-backup-and-portability.md",
       "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose.",
       "recommendedOrder": 13,
-      "status": "not-started",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3124,7 +3124,7 @@
         ],
         "meaning": "A backup made at one schema version restores at a later one."
       },
-      "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring."
+      "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring. 2026-10-19: MM-63 and MM-64 built as far as the share sheet and picker (the providers wait on the owner's registrations); moved into M2."
     },
     {
       "id": "WS-13",
