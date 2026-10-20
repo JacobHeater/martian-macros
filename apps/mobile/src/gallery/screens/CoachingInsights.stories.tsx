@@ -463,10 +463,10 @@ const lastWorkout = async (stage: StoryStage) => {
  */
 export const WorkoutWithInsights = screenStory({
   covers: ['WorkoutScreen'],
-  shows: /^8 sets for chest in the 7 days to this workout/,
+  shows: /^9 sets for chest in the 7 days to this workout/,
   scenario: demoWith({ then: extraChestDay }),
   open: lastWorkout,
-  walk: async (canvas) => void (await revealed(/^Coach: 8 sets for chest/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: 9 sets for chest/)(canvas)),
 });
 
 /** MM-366: the line opened. */
@@ -476,13 +476,13 @@ export const WorkoutInsightOpen = screenStory({
   scenario: demoWith({ then: extraChestDay }),
   open: lastWorkout,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: 8 sets for chest/)(canvas));
+    await userEvent.click(await revealed(/^Coach: 9 sets for chest/)(canvas));
   },
 });
 
-/** The line the workout stories show, for the Coach tab's list. */
+/** The line the workout stories show, for the Coach tab's list: the demo's step-week bench (3 sets, MM-289) and the extra day's 6. */
 const chestJump =
-  '8 sets for chest in the 7 days to this workout. Your usual is about 2 a week. A jump this big can bring more ' +
+  '9 sets for chest in the 7 days to this workout. Your usual is about 2 a week. A jump this big can bring more ' +
   'soreness; adding sets more slowly is easier to recover from.';
 
 // ---- The Dashboard: the waist and water ----
@@ -609,7 +609,7 @@ export const CoachRecentInsightsLogged = screenStory({
 /** MM-363: a lift's entry pressed opens the workout it was said in, with the line under the bench press. */
 export const CoachRecentInsightOpensWorkout = screenStory({
   covers: ['CoachScreen', 'WorkoutScreen'],
-  shows: /^8 sets for chest in the 7 days to this workout/,
+  shows: /^9 sets for chest in the 7 days to this workout/,
   scenario: loggedChestJump,
   open: ({ state }) => state.homeTab.put('coach'),
   walk: async (canvas) => {
