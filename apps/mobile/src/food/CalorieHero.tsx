@@ -1,10 +1,14 @@
+import type { ReactNode } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { IntakeDay } from '../domain/IntakeDay';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { MacroPicture } from '../domain/MacroPicture';
+import { CalorieBand } from '../engine/CalorieBand';
 import type { DailyTargets } from '../engine/DailyTargets';
+import { intakeStandingOf } from '../engine/intakeStandingOf';
+import { displayTargets } from '../format/displayTargets';
 import { Fmt } from '../format/Fmt';
 import { clamp } from '../lang/clamp';
 import { useApp } from '../app/useApp';
@@ -22,6 +26,8 @@ import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 interface CalorieHeroProps {
+  /** The day's other lines (fiber, alcohol), inside the hero under its picture, never bare on the canvas (MM-336). */
+  lines?: ReactNode;
   intake: IntakeDay;
   /** The day's foods, for the Micros picture (MM-310). */
   entries: readonly FoodEntry[];
@@ -57,8 +63,14 @@ interface CalorieHeroProps {
  * between grams against target and the split of calories (MM-253, rule 4),
  * remembered per person, never both at once. At Full detail the switch has
  * a third choice on Food, the day's micronutrients (MM-310).
+ *
+ * Targets are shown rounded, to the nearest 25 kcal and 5 g, unless the
+ * person asked for exact ones; and "on target" is a band, the larger of 5%
+ * and 100 kcal either side, drawn on the arc and said in the caption
+ * (MM-123). A day below the calorie floor is never on target.
  */
 export function CalorieHero({
+  lines,
   intake,
   entries,
   microsOffered = false,
@@ -78,17 +90,28 @@ export function CalorieHero({
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
   const goals = useLoaded(state.nutritionGoals) ?? NutritionGoals.none;
+  const exact = useLoaded(state.exactTargets) ?? false;
+  const floorKcal = useCell(state.coach)?.calorieFloorKcal;
   const shown = DetailLevel.showsCarbsAndFat(level) ? macros : macros.filter((macro) => macro === 'protein');
-  const t = targets;
+  // The figures are the rounded targets; the band is judged on the exact ones.
+  const t = targets === undefined ? undefined : displayTargets(targets, { exact });
   const left = t === undefined || paused ? undefined : t.kcal - intake.kcal;
   const over = left !== undefined && left < 0;
   const figure = left === undefined ? Fmt.whole(intake.kcal) : Fmt.whole(Math.abs(left));
+  const onTarget =
+    targets !== undefined && !paused && intakeStandingOf({ kcal: intake.kcal, targetKcal: targets.kcal, floorKcal }) === 'onTarget';
   let caption: string;
   if (paused && t !== undefined) caption = `kcal logged · paused, guide ${Fmt.whole(t.kcal)}`;
   else if (left === undefined || t === undefined) caption = 'kcal logged';
-  else caption = over ? `kcal over ${Fmt.whole(t.kcal)}` : `kcal left of ${Fmt.whole(t.kcal)}`;
+  else caption = `${over ? `kcal over ${Fmt.whole(t.kcal)}` : `kcal left of ${Fmt.whole(t.kcal)}`}${onTarget ? ' · on target' : ''}`;
   let progress = 0;
   if (t !== undefined && t.kcal > 0) progress = paused ? clamp(intake.kcal / t.kcal, 0, 1) : intake.kcal / t.kcal;
+  // The zone that counts as on target, as shares of the target (MM-123); none during a pause.
+  let band: readonly [number, number] | undefined;
+  if (targets !== undefined && !paused && targets.kcal > 0) {
+    const zone = new CalorieBand(targets.kcal);
+    band = [zone.lowKcal / targets.kcal, zone.highKcal / targets.kcal];
+  }
 
   // Carbs net of fiber and sugar alcohols while that is on, against the same target, read as net (MM-396).
   const netCarbs = useNetCarbs();
@@ -108,7 +131,7 @@ export function CalorieHero({
     <MmHeroSurface>
       <h2 className="mm-visually-hidden">Calories</h2>
       {/* Where the figure is plain text the arc is not spoken too; inside a press it is the spoken figure (MM-389). */}
-      <HorizonArc progress={progress} label={onPress === undefined ? undefined : `${figure} ${caption}`} />
+      <HorizonArc progress={progress} band={band} label={onPress === undefined ? undefined : `${figure} ${caption}`} />
       {onPress === undefined ? (
         <>
           <p className="food-hero-figure">{figure}</p>
@@ -158,6 +181,7 @@ export function CalorieHero({
           ))}
         </div>
       )}
+      {lines === undefined ? null : <div className="food-hero-lines">{lines}</div>}
       {status === undefined ? null : (
         <div className="food-hero-status">
           <MmListRow

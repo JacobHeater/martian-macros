@@ -1,4 +1,8 @@
 import { SqlRepositories } from '../data/SqlRepositories';
+import { NativeBackupPlatform } from '../backup/NativeBackupPlatform';
+import { openNativeSnapshot } from '../backup/openNativeSnapshot';
+import { WasmBackupPlatform } from '../backup/WasmBackupPlatform';
+import { mmBackup } from '../platform/mmBackup';
 import { AppIdentity } from './AppIdentity';
 import { databaseNameFor } from './databaseNameFor';
 import { SystemClock } from '../domain/integration/SystemClock';
@@ -9,6 +13,10 @@ import { NativePackHttp } from '../foodCatalog/download/native/NativePackHttp';
 import { NativePackStore } from '../foodCatalog/download/native/NativePackStore';
 import { openInstalledCatalog } from '../foodCatalog/download/openInstalledCatalog';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import { SqlOnlineFoodCache } from '../foodCatalog/online/SqlOnlineFoodCache';
+import { OpenFoodFactsSource } from '../foodOnline/OpenFoodFactsSource';
+import { UsdaFoodDataCentralSource } from '../foodOnline/UsdaFoodDataCentralSource';
+import { CapacitorJsonHttp } from '../platform/CapacitorJsonHttp';
 import { constant } from '../lang/constant';
 import { mmHealth } from '../platform/mmHealth';
 import { mmReminders } from '../platform/mmReminders';
@@ -41,21 +49,25 @@ export async function openAppServices(): Promise<AppServices> {
   const native = runningNatively();
   // The database is named for the identity the shell has (MM-8): the demo's
   // keeps the name it always had, so a seed can never touch another's.
-  const repositories = await SqlRepositories.open(
-    native
-      ? await NativeSqlDatabase.open({ name: databaseNameFor(AppIdentity.of(__MM_IDENTITY__)) }, mmDb)
-      : await WasmSqlDatabase.open(),
-  );
+  const databaseName = databaseNameFor(AppIdentity.of(__MM_IDENTITY__));
+  const sql = native ? await NativeSqlDatabase.open({ name: databaseName }, mmDb) : await WasmSqlDatabase.open();
+  // A backup is the phone's copy of that database, encrypted before it leaves (MM-63); a restore opens a copy brought back.
+  const repositories = await SqlRepositories.open(sql, native ? { openSnapshot: openNativeSnapshot({ api: mmBackup, db: mmDb }) } : {});
+  const backup = sql instanceof WasmSqlDatabase ? new WasmBackupPlatform(sql) : new NativeBackupPlatform({ api: mmBackup, databaseName });
   const packStore = native
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
+  const onlineHttp = new CapacitorJsonHttp();
+  const onlineFoods = new SqlOnlineFoodCache(sql);
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
     weights: repositories.weights,
     weightEvents: repositories.weightEvents,
     waist: repositories.waist,
+    flowDays: repositories.flowDays,
+    sleep: repositories.sleep,
     water: repositories.water,
     food: repositories.food,
     customFoods: repositories.customFoods,
@@ -74,16 +86,26 @@ export async function openAppServices(): Promise<AppServices> {
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
     eraser: repositories.eraser,
+    restorer: repositories.restorer,
+    backup,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or
     // removed. A browser has none. No camera plugin is in the shell yet
     // (MM-232, step 5).
-    catalog: native ? once(() => openInstalledCatalog(packStore)) : constant(new FoodCatalog([])),
+    catalog: native ? once(() => openInstalledCatalog(packStore, [onlineFoods])) : constant(new FoodCatalog([onlineFoods])),
     packStore,
     packHttp: native ? new NativePackHttp(mmPacks) : new InMemoryPackHttp(),
     // Where to read the list of packs on offer, set for each build (MM-56).
     // A browser build offers no downloads and makes no request.
     packManifestUrl: native ? __MM_FOOD_PACK_MANIFEST_URL__ : '',
+    // The services an unknown food may be looked up at, only when the person allows it (MM-58): Open Food
+    // Facts needs no key; FoodData Central only when the build was given one. A browser has them too, so the
+    // dev server can be tried, but a story or a test never (fixtureServices).
+    onlineSources: [
+      new OpenFoodFactsSource({ http: onlineHttp }),
+      ...(__MM_FDC_API_KEY__ === '' ? [] : [new UsdaFoodDataCentralSource({ http: onlineHttp, apiKey: __MM_FDC_API_KEY__ })]),
+    ],
+    onlineFoods,
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),

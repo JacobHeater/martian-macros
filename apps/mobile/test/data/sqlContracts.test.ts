@@ -17,14 +17,19 @@ import { preferencesRepositoryContract } from '../contracts/preferencesRepositor
 import { recoveryCheckInRepositoryContract } from '../contracts/recoveryCheckInRepositoryContract';
 import { reminderRepositoryContract } from '../contracts/reminderRepositoryContract';
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
+import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
+import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { weightEventRepositoryContract } from '../contracts/weightEventRepositoryContract';
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
 import { first } from '../support/first';
-import { openRepositories as open } from './support/openRepositories';
+import { openRepositories as open, openSql } from './support/openRepositories';
+import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
+import { SqlOnlineFoodCache } from '../../src/foodCatalog/online/SqlOnlineFoodCache';
+import { AppDatabase } from '../../src/data/AppDatabase';
 
 /**
  * Runs every repository contract against the database's implementations.
@@ -35,6 +40,13 @@ setupRepositoryContract('SQLite', async () => (await open()).setup);
 weightRepositoryContract('SQLite', async () => (await open()).weights);
 weightEventRepositoryContract('SQLite', async () => (await open()).weightEvents);
 waistRepositoryContract('SQLite', async () => (await open()).waist);
+menstruationRepositoryContract('SQLite', async () => (await open()).flowDays);
+onlineFoodCacheContract('SQLite', async () => {
+  const sql = await openSql();
+  await AppDatabase.open(sql);
+  return new SqlOnlineFoodCache(sql);
+});
+sleepRepositoryContract('SQLite', async () => (await open()).sleep);
 waterRepositoryContract('SQLite', async () => (await open()).water);
 preferencesRepositoryContract('SQLite', async () => (await open()).preferences);
 foodRepositoryContract('SQLite', async () => (await open()).food);

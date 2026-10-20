@@ -4,9 +4,14 @@ import type { PreparationState } from '../foodCatalog/PreparationState';
 import type { TrustTier } from '../foodCatalog/TrustTier';
 import { StateError } from '../lang/StateError';
 import type { CandidateFood } from './CandidateFood';
+import { communityCheckThisReason } from './communityCheckThisReason';
 import { plausibleMicros } from './plausibleMicros';
 
-function tierOf(source: string): readonly [TrustTier, string] {
+/** What a community record that is complete and comfortably consistent is (MM-153): a label, transcribed by a contributor. */
+const communityLabelReason = 'Copied from the package by Open Food Facts contributors; complete and consistent, though nobody checked it.';
+
+function tierOf(food: CandidateFood, asOfSeconds: number): readonly [TrustTier, string] {
+  const source = food.source;
   switch (source) {
     case 'usda_foundation':
     case 'usda_sr_legacy':
@@ -15,8 +20,11 @@ function tierOf(source: string): readonly [TrustTier, string] {
       return ['reference', 'Compiled by USDA from analysed foods and recipes for the national dietary survey.'];
     case 'usda_branded':
       return ['label', 'Label data submitted by the manufacturer to USDA.'];
-    case 'off':
-      return ['checkThis', 'Entered by Open Food Facts contributors and not checked against a package.'];
+    case 'off': {
+      // MM-153: "Check this" near the energy check's edge, missing fiber or sodium, or five years old; otherwise a label.
+      const doubt = communityCheckThisReason(food, asOfSeconds);
+      return doubt === undefined ? ['label', communityLabelReason] : ['checkThis', doubt];
+    }
     default:
       // A source the pipeline does not know must not pass as crowd data (MM-383, the panel's IN-3).
       throw new StateError(`Unknown food source "${source}": add it to packEntryFor before building.`);
@@ -33,10 +41,11 @@ function stated(value: number | undefined, what: string, food: CandidateFood): n
 /**
  * The pack entry for `food` with pack id `id`.
  *
- * The trust tier is provisional until MM-153 settles it: analysed USDA
- * foods are `reference`, USDA branded data is `label`, and Open Food Facts
- * data, or anything two sources disagree about, is `checkThis`. No food is
- * ever called verified.
+ * The trust tier (MM-153): analysed USDA foods are `reference`; USDA branded
+ * data is `label`; an Open Food Facts record is `label` when it is complete
+ * and comfortably consistent and `checkThis` with its reason otherwise; and
+ * anything two sources disagree about is `checkThis`. `asOfSeconds` dates the
+ * data a community record is judged against. No food is ever called verified.
  */
 export function packEntryFor(
   food: CandidateFood,
@@ -47,6 +56,7 @@ export function packEntryFor(
     disagreement,
     preparation = 'unspecified',
     pairedFoodId,
+    asOfSeconds = 0,
   }: {
     id: number;
     packId: string;
@@ -54,9 +64,10 @@ export function packEntryFor(
     disagreement?: string | undefined;
     preparation?: PreparationState;
     pairedFoodId?: number | undefined;
+    asOfSeconds?: number;
   },
 ): PackEntry {
-  const [tier, reason] = disagreement !== undefined ? (['checkThis', disagreement] as const) : tierOf(food.source);
+  const [tier, reason] = disagreement !== undefined ? (['checkThis', disagreement] as const) : tierOf(food, asOfSeconds);
   return {
     food: new CatalogFood({
       id,

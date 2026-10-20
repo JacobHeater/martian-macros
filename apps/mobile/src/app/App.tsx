@@ -8,6 +8,8 @@ import { Loadable } from '../state/Loadable';
 import { isDarkPalette } from '../theme/isDarkPalette';
 import { paletteFor } from '../theme/paletteFor';
 import { DemoNotice } from '../ui/DemoNotice';
+import type { MmFolds } from '../ui/MmFolds';
+import { MmFoldsContext } from '../ui/MmFoldsContext';
 import { MmOverlays } from '../ui/MmOverlays';
 import { AppContext } from './AppContext';
 import { AppRoot } from './AppRoot';
@@ -35,6 +37,14 @@ interface AppProps {
 export function App({ services, systemBars, demo = false, children }: AppProps) {
   const state = useMemo(() => new AppState(services), [services]);
   const scope = useMemo(() => ({ services, state }), [services, state]);
+  // Folds are kept in the state (MM-286), so a destination finds its sections as they were left.
+  const folds = useMemo<MmFolds>(
+    () => ({
+      get: (key) => state.folds.peek().get(key),
+      set: (key, expanded) => state.folds.put(new Map(state.folds.peek()).set(key, expanded)),
+    }),
+    [state],
+  );
 
   const preview = useCell(state.themePreview);
   const stored = useCell(state.themePreference);
@@ -87,5 +97,9 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
       </DownloadStatusHost>
     </MmOverlays>
   );
-  return <AppContext.Provider value={scope}>{demo ? <DemoNotice>{content}</DemoNotice> : content}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={scope}>
+      <MmFoldsContext.Provider value={folds}>{demo ? <DemoNotice>{content}</DemoNotice> : content}</MmFoldsContext.Provider>
+    </AppContext.Provider>
+  );
 }

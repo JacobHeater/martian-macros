@@ -72,7 +72,7 @@ async function exerciseDemoSeed(r: Seeded): Promise<void> {
   expect(initialDays.slice(0, 70).every((d) => d.completeness === 'complete')).toBe(true);
   expect(initialDays[70]?.completeness).toBe('partial');
   expect(initialDays[70]?.kcal).toBeLessThan(1000);
-  expect((await first(r.food.watchFood(today))).length).toBe(1);
+  expect((await first(r.food.watchFood(today))).length).toBe(3);
   expect((await first(r.food.watchFood(today.addDays(-1)))).length).toBe(4);
   expect((await first(r.waist.watchWaist())).length).toBe(11);
   expect((await first(r.recovery.watchRecoveryCheckIns())).length).toBe(11);
@@ -97,7 +97,7 @@ async function exerciseDemoSeed(r: Seeded): Promise<void> {
   );
   await seed(today);
   expect((await first(r.workouts.watchWorkouts())).map((w) => w.date)).toEqual(initialWorkouts.map((w) => w.date));
-  expect((await first(r.food.watchFood(today))).length).toBe(1);
+  expect((await first(r.food.watchFood(today))).length).toBe(3);
   expect((await first(r.weights.watchWeights())).map((w) => w.weightKg)).toEqual(initialWeights.map((w) => w.weightKg));
   expect((await first(r.intake.watchIntakeDays({ since: today.addDays(-100) }))).map((d) => d.kcal)).toEqual(
     initialDays.map((d) => d.kcal),

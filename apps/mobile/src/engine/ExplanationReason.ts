@@ -33,6 +33,12 @@ const values = [
   'noExplanationRecorded',
   /** A maintenance week the user chose to take (MM-117). */
   'requestedBreak',
+  /** The user chose a different fat-loss pace (MM-128). */
+  'paceChange',
+  /** The surplus paused for want of training (MM-134). */
+  'trainingLapse',
+  /** A diet break ran its length and the deficit resumed (MM-135). */
+  'breakEnded',
 ] as const;
 
 /**

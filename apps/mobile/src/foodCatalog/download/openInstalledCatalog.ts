@@ -6,10 +6,11 @@ import type { PackStore } from './PackStore';
 /**
  * The installed packs read as one catalog (MM-42). Empty until a pack is
  * installed; search then has nothing to find and the sheet says so. A pack
- * that will not open is skipped, not fatal to search.
+ * that will not open is skipped, not fatal to search. `also` joins packs that
+ * are not files: the foods found online (MM-58).
  */
-export async function openInstalledCatalog(store: PackStore): Promise<FoodCatalog> {
-  const packs: FoodPack[] = [];
+export async function openInstalledCatalog(store: PackStore, also: readonly FoodPack[] = []): Promise<FoodCatalog> {
+  const packs: FoodPack[] = [...also];
   for (const installed of await store.installed()) {
     try {
       packs.push(await SqliteFoodPack.open(await store.open(installed)));

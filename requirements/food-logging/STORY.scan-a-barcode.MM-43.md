@@ -1,6 +1,6 @@
 ---
 id: MM-43
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-42, MM-44, MM-54, MM-55, MM-58, MM-167]
 ---
@@ -68,3 +68,14 @@ shown behind it).
 ## Clarified by MM-167 (proposed, not built)
 A scanned product's default of one label serving is recorded as the label-serving method with a quantity of servings and the serving's
 weight (MM-167); today it is recorded by the amount step's cup-or-spoon mapping.
+
+## Progress (2026-10-20, feat/m2)
+Closing the ticket: the fallback order is complete. A scanned code is looked up in the person's own foods, then the installed
+packs, then online when the person allows it (MM-58, with its question the first time), and failing that "Read the label"
+(MM-44) and "Enter manually" are offered. The React scan step (`BarcodeScanStep`, over `MmScanner`) says before the system
+prompt that the camera reads the barcode on this phone. A product found by any route opens the same amount step, defaulting
+to its first serving; MM-167 records it as a label serving. Tests: `scanAnnounced.test.tsx`, `scanOnline.test.tsx`, the
+food flows. Stories: AddFoodScan, ScanUnknownCode, ScanNoCamera, and the MM-58 scan stories.
+
+Not verified, as before: reading a real barcode with a phone's camera on real packaging (the emulator's scene has none).
+That is a device test for the owner's acceptance pass; no code waits on it. Say if the ticket should stay open for it.

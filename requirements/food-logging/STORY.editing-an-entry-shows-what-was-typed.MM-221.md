@@ -1,6 +1,6 @@
 ---
 id: MM-221
-status: proposed
+status: done
 component: food-logging
 related: [MM-48, MM-167, MM-212]
 ---
@@ -69,3 +69,13 @@ Scenario: An entry without an amount
 - Evidence: step records 4.2, 4.3b and 4.3d; screenshot tests
   `add_food_edit_per_serving_dark` (added at the reviewers' request) and
   `add_food_edit_dark`.
+
+## Decisions and build (2026-10-19)
+- **An entry calculated from a serving shows the numbers it rests on**, under its amount: "Per serving: 199 kcal · 20 g protein · 15 g carbs · 6 g fat" (or per 100 g or 100 ml), in the terms they were typed; "Edit nutrition per serving" opens them for correction where they were typed, as before.
+- **The day control says what it does**: labelled "Logged on", and an entry saved to another day is followed by "Moved to Yesterday." (or the day), since it leaves the list the person was looking at.
+- **An old entry without an amount** shows no method as chosen until the person chooses one, and the notice reads "To add one, choose how it was measured."
+- The first point is treated as a usability gap closed here, not as a bug against MM-167, since the stored entry was right; the owner may reclassify.
+- Regression test: `apps/mobile/test/food/addFoodSays.test.tsx` (MM-221).
+
+## After the panel (2026-10-19)
+- The day control is a group named "Logged on" and the day it shows is a status, so a press is heard (F4). Stories `EditFoodPerServing` and `EditFoodMoved` draw the per-serving caption and the move's snack (PD-4, F11). The day stepper's title weight in the sheet (PD-10) is the owner's call.

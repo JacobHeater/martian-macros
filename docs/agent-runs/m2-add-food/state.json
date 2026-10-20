@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "task_id": "m2-add-food",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "feat/m2",
+    "commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the parent session, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-add-food/brief.md": "58b0298fe84d6dadbb2dcaa26ba709fe22fde8f30fcc412ae16f4110a8e474cd",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "edb774013e0832d10fb0f5c2dee2b6159aa42bf7cd9168c796f6e280812adccc",
+        "apps/mobile/src/food/FoodAmountStep.tsx": "f3b18aab74347202bcaaf50c3a3d78002174fe7161f6ea6ed3c13a55b91ffc56",
+        "apps/mobile/src/food/estimate/EstimateMealStep.tsx": "9adaaef30a198f3a855d9e6a772810f8683f40de86da2e856233627151ff206f",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "4e0f7f0191ced8ba0b9c4867e9fc3dc0524d362f7deac8e595e18845ae37fe2f",
+        "apps/mobile/src/food/custom/CustomFoodForm.tsx": "f0f3b9fce5f17b2144c0453af4f01dbbc737f252b0489d967557879430888015",
+        "apps/mobile/src/food/food.css": "5777f81a2ef3fc74634f272ad1d07e9fbffcd92d5a650fe05eaa3ab99b8a1836",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "1dbf52ecc442ec0314b1c43e05c7d7988e4bed007ee09c6c1fc0df97fc6dc09e",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "the edited tree after the reviews",
+          "the batch's test and the food folder, run"
+        ],
+        "not_inspected": [
+          "a render",
+          "a device",
+          "a screen reader"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; the reviewers did not see the edited tree."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The findings rest on the repository's own rules and tickets.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The five changes as drawn in their stories: siblings, the sheet's words, the Still needed caption, the method's word, one Logs pattern, undrawn states.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-add-food/brief.md": "58b0298fe84d6dadbb2dcaa26ba709fe22fde8f30fcc412ae16f4110a8e474cd",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "edb774013e0832d10fb0f5c2dee2b6159aa42bf7cd9168c796f6e280812adccc",
+        "apps/mobile/src/food/FoodAmountStep.tsx": "f3b18aab74347202bcaaf50c3a3d78002174fe7161f6ea6ed3c13a55b91ffc56",
+        "apps/mobile/src/food/estimate/EstimateMealStep.tsx": "9adaaef30a198f3a855d9e6a772810f8683f40de86da2e856233627151ff206f",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "4e0f7f0191ced8ba0b9c4867e9fc3dc0524d362f7deac8e595e18845ae37fe2f",
+        "apps/mobile/src/food/custom/CustomFoodForm.tsx": "f0f3b9fce5f17b2144c0453af4f01dbbc737f252b0489d967557879430888015",
+        "apps/mobile/src/food/food.css": "5777f81a2ef3fc74634f272ad1d07e9fbffcd92d5a650fe05eaa3ab99b8a1836",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "1dbf52ecc442ec0314b1c43e05c7d7988e4bed007ee09c6c1fc0df97fc6dc09e",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the sheet, both steps, the results, the custom form, the tile, the labels, the design-system parts, the stylesheets",
+          "the Food stories, the batch's test, the earlier run's reports",
+          "MM-167, MM-218 to MM-221, MM-223, MM-271, MM-411, the direction documents"
+        ],
+        "not_inspected": [
+          "MyFoodsStep, RecipeForm, BarcodeScanStep, MacroSplitChart",
+          "palettes, large text, the keyboard"
+        ],
+        "referrals": [
+          "ux-accessibility: the reader questions and PD-12's flow",
+          "react-capacitor: PD-10, PD-2's one home",
+          "qa: PD-3, PD-4"
+        ],
+        "limitations": "Source inspection only; one reviewer."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "The findings rest on the repository's own rules and tickets.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The same changes for a novice with a screen reader and at 200%: the Logs line, the caption, the day control, the rows, the failed read, the estimate step.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the parent session acting as chair, 2026-10-19",
+      "status": "complete",
+      "inspected_commit": "39f315c5d2a6623a42a70ce71118e219bddb24b5",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/m2-add-food/brief.md": "58b0298fe84d6dadbb2dcaa26ba709fe22fde8f30fcc412ae16f4110a8e474cd",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/food/AddFoodSheet.tsx": "edb774013e0832d10fb0f5c2dee2b6159aa42bf7cd9168c796f6e280812adccc",
+        "apps/mobile/src/food/FoodAmountStep.tsx": "f3b18aab74347202bcaaf50c3a3d78002174fe7161f6ea6ed3c13a55b91ffc56",
+        "apps/mobile/src/food/estimate/EstimateMealStep.tsx": "9adaaef30a198f3a855d9e6a772810f8683f40de86da2e856233627151ff206f",
+        "apps/mobile/src/food/FoodSearchResults.tsx": "4e0f7f0191ced8ba0b9c4867e9fc3dc0524d362f7deac8e595e18845ae37fe2f",
+        "apps/mobile/src/food/custom/CustomFoodForm.tsx": "f0f3b9fce5f17b2144c0453af4f01dbbc737f252b0489d967557879430888015",
+        "apps/mobile/src/food/food.css": "5777f81a2ef3fc74634f272ad1d07e9fbffcd92d5a650fe05eaa3ab99b8a1836",
+        "apps/mobile/src/gallery/screens/Food.stories.tsx": "1dbf52ecc442ec0314b1c43e05c7d7988e4bed007ee09c6c1fc0df97fc6dc09e",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74",
+        "design/voice-and-wording.md": "70d01e1d64fa526bcee2a59da2016358efa6053a63cea95e46ff146fc724ce5e"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "the sheet, both steps, the results, the custom form, the chips, the sheet and overlays, the hook, the labels, tokens",
+          "the Food stories, the batch's test, unseen.json, the earlier run's reports",
+          "MM-167, MM-223, MM-271, the five tickets, the direction documents"
+        ],
+        "not_inspected": [
+          "MyFoodsStep, BarcodeScanStep, the chart, the arithmetic, trapFocus, MmDialog",
+          "any runtime behaviour"
+        ],
+        "referrals": [
+          "react-capacitor: describedBy, DayStepper, ReadFailedNotice pending, focus",
+          "product-designer: wording",
+          "measurement: F12",
+          "qa: device checks"
+        ],
+        "limitations": "Analytical only; no reader observed."
+      },
+      "research": {
+        "status": "performed",
+        "question": "Should a value that changes as the person types be a live region?",
+        "reason": "Decides F1 and F4.",
+        "path": "direct",
+        "sources": [
+          {
+            "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+            "title": "Understanding SC 4.1.3: Status Messages (WCAG 2.2)",
+            "published_or_updated": "2026-05-11",
+            "accessed": "2026-10-19",
+            "claim": "A status message informs of the result of an action; announcing on every change risks being too chatty."
+          }
+        ],
+        "summary": "The Logs line is bound to the action, not live; a day name after a press is one status message.",
+        "limitations": "General WCAG guidance; no claim about announcement rates on a device."
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-19",
+      "limitations": "No browser automation; stories read from source."
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "Q1",
+      "question": "Scan and Saved under search results (PD-12)?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q2",
+      "question": "The day stepper's title weight in the edit sheet (PD-10)?",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q3",
+      "question": "Focus after in-sheet step swaps and a save that moves the entry (F5): TalkBack and VoiceOver.",
+      "owner": "product owner",
+      "status": "open"
+    },
+    {
+      "id": "Q4",
+      "question": "The chair's decisions in MM-218 to MM-221, open to overrule.",
+      "owner": "product owner",
+      "status": "open"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "PD-1/F2: the caution names the kept basis; the Logs line alone says what is logged; two servings tested.",
+      "authority": "chair, under MM-218"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "PD-2/F12: 'Estimated totals' everywhere for the method; 'Nutrition for everything eaten' under it.",
+      "authority": "chair, under MM-167 and voice-and-wording"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "F1/F3: MmButton.describedBy; the finishing action carries the Logs line and the Still needed caption; not live.",
+      "authority": "chair, under WCAG 2.2 4.1.3 as the guard cited"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "F4: DayStepper named as a group, the day a status.",
+      "authority": "chair"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "F6: Trying… while pending; the alert remounts per attempt; a third scenario.",
+      "authority": "chair"
+    },
+    {
+      "id": "D6",
+      "status": "accepted",
+      "summary": "F7/PD-11, PD-6/PD-7/F9, PD-8, PD-9/F10, PD-5: the notice's route, the caption's place and punctuation and the name helper, the amount step's caption, the bracket on edits, the own-food chevron.",
+      "authority": "chair"
+    },
+    {
+      "id": "D7",
+      "status": "accepted",
+      "summary": "PD-4/F11: four stories; a snack's words count as a state.",
+      "authority": "chair, under MM-292"
+    },
+    {
+      "id": "D8",
+      "status": "rejected",
+      "summary": "F8: the chevron stays visual only, as the guard advised.",
+      "authority": "chair"
+    },
+    {
+      "id": "D9",
+      "status": "deferred",
+      "summary": "PD-12, PD-10, F5: the owner's calls and device check.",
+      "authority": "product owner"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npx tsc --noEmit",
+      "result": "clean",
+      "commit": "working tree of feat/m2"
+    },
+    {
+      "command": "npx vitest run test/food",
+      "result": "passed after the edits (addFoodSays 7, the folder)",
+      "commit": "working tree of feat/m2"
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-19",
+    "phase": "complete",
+    "next": "story walks and mm check before the pull request"
+  }
+}

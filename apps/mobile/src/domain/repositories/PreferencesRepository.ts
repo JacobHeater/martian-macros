@@ -1,15 +1,27 @@
+import type { CookingFatReader } from './CookingFatReader';
+import type { CookingFatWriter } from './CookingFatWriter';
 import type { DetailLevelReader } from './DetailLevelReader';
 import type { DetailLevelWriter } from './DetailLevelWriter';
+import type { EaseIntoMaintenanceReader } from './EaseIntoMaintenanceReader';
+import type { EaseIntoMaintenanceWriter } from './EaseIntoMaintenanceWriter';
 import type { EasyToMissReader } from './EasyToMissReader';
 import type { EasyToMissWriter } from './EasyToMissWriter';
+import type { ExactTargetsReader } from './ExactTargetsReader';
+import type { ExactTargetsWriter } from './ExactTargetsWriter';
 import type { InsightSwitchesReader } from './InsightSwitchesReader';
 import type { InsightSwitchesWriter } from './InsightSwitchesWriter';
+import type { LastBackupReader } from './LastBackupReader';
+import type { LabelNoteReader } from './LabelNoteReader';
+import type { LabelNoteWriter } from './LabelNoteWriter';
+import type { LastBackupWriter } from './LastBackupWriter';
 import type { MacroPictureReader } from './MacroPictureReader';
 import type { MacroPictureWriter } from './MacroPictureWriter';
 import type { NetCarbsReader } from './NetCarbsReader';
 import type { NetCarbsWriter } from './NetCarbsWriter';
 import type { NutritionGoalsReader } from './NutritionGoalsReader';
 import type { NutritionGoalsWriter } from './NutritionGoalsWriter';
+import type { OnlineLookupReader } from './OnlineLookupReader';
+import type { OnlineLookupWriter } from './OnlineLookupWriter';
 import type { PreferencesReader } from './PreferencesReader';
 import type { PreferencesWriter } from './PreferencesWriter';
 import type { RecoverySkipReader } from './RecoverySkipReader';
@@ -47,4 +59,16 @@ export interface PreferencesRepository
     NutritionGoalsReader,
     NutritionGoalsWriter,
     InsightSwitchesReader,
-    InsightSwitchesWriter {}
+    InsightSwitchesWriter,
+    LastBackupReader,
+    LastBackupWriter,
+    ExactTargetsReader,
+    ExactTargetsWriter,
+    LabelNoteReader,
+    LabelNoteWriter,
+    EaseIntoMaintenanceReader,
+    EaseIntoMaintenanceWriter,
+    OnlineLookupReader,
+    OnlineLookupWriter,
+    CookingFatReader,
+    CookingFatWriter {}

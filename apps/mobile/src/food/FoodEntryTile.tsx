@@ -8,6 +8,7 @@ import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { MmIcon } from '../ui/MmIcon';
+import { foodEntryLinesId } from './foodEntryLinesId';
 import { methodIcon } from './methodIcon';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
@@ -32,7 +33,8 @@ export function FoodEntryTile({ entry }: { entry: FoodEntry }) {
       <span className="food-entry-method" role="img" aria-label={method}>
         <MmIcon name={methodIcon(entry.source)} size={20} />
       </span>
-      <span className="food-entry-text">
+      {/* The lines carry an id so the row's press is described by them (MM-429): a reader hears the macros and the portion, not only "Edit". */}
+      <span className="food-entry-text" id={foodEntryLinesId(entry)}>
         <span className="food-entry-name">{entry.name}</span>
         <span className="food-entry-line">
           {DetailLevel.showsCarbsAndFat(level)

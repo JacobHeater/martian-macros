@@ -94,8 +94,14 @@ for (const [name, run] of Object.entries(runs)) {
     expect(expected, name).toBeDefined();
     const results = run();
     expect(results).toHaveLength(expected?.length ?? -1);
+    // MM-135 (2026-10-20): the break the Dart engine forced at sixteen weeks
+    // is now planned at twenty, so the glycogen7 run's weeks 16 to 19 (Dart's
+    // break and its step-limited return) are no longer what the engine does.
+    // The sixteen weeks before it are compared; `dietBreakLoop.test.ts` has
+    // the new behaviour.
+    const compared = name === 'glycogen7' ? 16 : results.length;
     let worst = 0;
-    results.forEach((week, i) => {
+    results.slice(0, compared).forEach((week, i) => {
       const dart = expected?.[i] as Week;
       const mine = [
         week.targets.kcal,

@@ -138,6 +138,8 @@ export class CoachingPolicy {
     if (s.insulinOrSulfonylurea) cautions.add('insulinOrSulfonylurea');
     if (s.bariatricSurgery) cautions.add('bariatricSurgery');
     if (s.weightAffectingMedication) cautions.add('weightAffectingMedication');
+    // Refer-only until MM-29's reviewer and the panel grade it (MM-251): nothing below reads it.
+    if (s.sleepDisorder) cautions.add('sleepDisorder');
 
     return new CoachingPolicy({
       blocked: false,

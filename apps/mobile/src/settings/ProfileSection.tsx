@@ -31,6 +31,7 @@ const tickedCount = (s: ScreeningAnswers) =>
     s.bariatricSurgery,
     s.weightAffectingMedication,
     s.fluidLimitedByClinician,
+    s.sleepDisorder,
   ].filter((ticked) => ticked).length;
 
 /**
@@ -95,6 +96,7 @@ export function ProfileSection() {
               bariatricSurgery: s.bariatricSurgery,
               weightAffectingMedication: s.weightAffectingMedication,
               fluidLimitedByClinician: s.fluidLimitedByClinician,
+              sleepDisorder: s.sleepDisorder,
             }),
           }
         : {}),

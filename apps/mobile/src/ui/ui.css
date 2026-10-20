@@ -36,10 +36,25 @@
   border-color: var(--outline-strong);
   color: var(--text);
 }
-.mm-button-text {
+/* A text action is the heading rung, in the text colour, never Ember (MM-288, the panel's PD-2): Ember
+   is the one primary's. The lead kind is that primary where it stands in the app bar and cannot be a
+   fill (the Dashboard's Add food), the only Ember text in the app. */
+.mm-button-text,
+.mm-button-lead {
   min-width: 48px;
   padding: 0 var(--space-12);
+  color: var(--text);
+}
+.mm-button-lead {
   color: var(--ember);
+}
+/* A text action is underlined (MM-288, the panel's PD2 and F7): in the text colour at the heading weight
+   it would otherwise read as the value or the title beside it. The lead keeps its Ember instead. */
+.mm-button-text:not(:disabled) .mm-button-label,
+.mm-button-text:not(:disabled) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 /* The quiet destructive kind (MM-280): danger as text, never a fill, so the
    safe exit beside it is the stronger button. */
@@ -84,12 +99,14 @@
   color: var(--text3);
   cursor: default;
 }
-/* The action kind: the icon form of the text button, a solid Ember glyph and no plate (MM-384). */
+/* The action kind: the icon form of the text button, a solid glyph in the text colour and no plate
+   (MM-384; in the text colour since MM-288, as the text button is). */
 .mm-icon-button-action:not(:disabled) {
-  color: var(--ember);
+  color: var(--text);
 }
-/* The add plate: a quiet plate with the plus in Ember; pressed, hovered or
-   focused it fills Ember. Ember is never a tint (MM-276). */
+/* The add plate: a quiet plate with the plus in the text colour (MM-288, the panel's PD1: Ember at rest
+   would be a second Ember action on Food and Progress); pressed, hovered or focused it fills Ember.
+   Ember is never a tint (MM-276). */
 .mm-icon-button-plate {
   display: grid;
   place-items: center;
@@ -97,7 +114,7 @@
   height: 28px;
   border-radius: var(--radius-chip);
   background: var(--selected);
-  color: var(--ember);
+  color: var(--text);
   transition:
     background var(--motion-fast),
     color var(--motion-fast);
@@ -144,6 +161,12 @@
   min-width: 0;
   margin: 0;
   font: var(--type-title);
+  /* A one-word title at 200% text breaks inside the word rather than over the bar's action (MM-374), hyphenated as the navigation labels are. */
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.mm-app-bar > :not(.mm-app-bar-title) {
+  flex-shrink: 0;
 }
 
 .mm-navigation-bar {
@@ -167,6 +190,16 @@
   font: var(--type-nav);
   cursor: pointer;
   transition: background var(--motion-fast);
+}
+/* The label stays inside its destination at any text size: it wraps, breaking a word if it must (MM-373). */
+.mm-nav-label {
+  display: block;
+  max-width: 100%;
+  padding: 0 var(--space-4);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-align: center;
+  line-height: 1.15;
 }
 .mm-nav-indicator {
   display: grid;
@@ -494,11 +527,20 @@
 .mm-list-row-with-action {
   padding: 0;
 }
+/* At large text the action's words wrap inside the button and the row stays one row (MM-374); the action takes at most half, so the words keep the rest. */
+.mm-list-row-with-action > .mm-button {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 50%;
+  white-space: normal;
+  text-align: center;
+}
 .mm-list-row-main {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: var(--space-12);
+  /* The same gap as a row without an action, so every row's words start on one column (MM-324). */
+  gap: var(--space-16);
   min-width: 0;
   min-height: inherit;
   padding: var(--space-8) var(--space-16);
@@ -743,7 +785,7 @@
 }
 .mm-segment-selected {
   background: var(--selected);
-  color: var(--ember);
+  color: var(--text);
 }
 
 /* ---- Progress ---- */
@@ -1053,6 +1095,7 @@
   display: flex;
   gap: var(--space-12);
   padding: var(--space-12);
+  border: 1px solid var(--outline);
   border-radius: var(--radius-control);
   background: var(--surface);
 }
@@ -1060,6 +1103,11 @@
 .mm-sheet .mm-notice,
 .mm-dialog .mm-notice {
   background: var(--sunken);
+}
+/* A well of the sheet keeps no rim: a sunken surface with a light edge would read as raised (MM-352, the panel's PD-1). */
+.mm-sheet .mm-notice-info,
+.mm-dialog .mm-notice-info {
+  border-color: transparent;
 }
 .mm-notice-caution {
   border: 1px solid var(--caution);
@@ -1083,6 +1131,10 @@
 }
 .mm-notice-word {
   font: var(--type-label);
+}
+/* A notice's text keeps its paragraph breaks (the relief offer's body, suggestion and sleep line, MM-135). */
+.mm-notice-body > span {
+  white-space: pre-line;
 }
 .mm-notice-title {
   font-weight: 700;
@@ -1163,7 +1215,20 @@
 .mm-stat-label {
   color: var(--text2);
 }
+/* What a figure is measured against, under the row, so the value column keeps figures (MM-342): the caption role, as a row's subtitle. */
+.mm-stat-detail {
+  flex-basis: 100%;
+  margin: calc(-1 * var(--space-4)) 0 0;
+  padding-bottom: var(--space-4);
+  color: var(--text2);
+  font: var(--type-caption);
+}
+.mm-stat-row-with-detail {
+  flex-wrap: wrap;
+}
 .mm-stat-value {
+  /* At the end of its line even when large text wraps it under the label (MM-342, the UX guard's F3). */
+  margin-inline-start: auto;
   font-size: 1rem;
   font-weight: 600;
   text-align: end;
@@ -1465,6 +1530,12 @@
 }
 .mm-horizon-track {
   stroke: var(--track);
+}
+/* The on-target zone (MM-123): a wider, quiet band the track runs through; square ends so it reads as a stretch, not a second arc. */
+.mm-horizon-band {
+  fill: none;
+  stroke: color-mix(in srgb, var(--energy) 22%, transparent);
+  stroke-linecap: butt;
 }
 .mm-horizon-fill,
 .mm-horizon-ring {
@@ -2040,4 +2111,35 @@
     transform: none;
     box-shadow: 0 0 0 4px var(--selected);
   }
+}
+
+/* A duration as hours and minutes (MM-250): two dense fields across, each taking half. */
+.mm-duration-field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+.mm-duration-field > * {
+  flex: 1;
+  min-width: 0;
+}
+/* ---- The waist protocol, drawn (MM-155): strokes in the text colours, the tape the heaviest of them ---- */
+
+.mm-waist-figure {
+  display: block;
+  flex: none;
+  width: 72px;
+  height: 96px;
+}
+.mm-waist-figure-body {
+  stroke: var(--text2);
+}
+.mm-waist-figure-navel {
+  fill: var(--text);
+}
+.mm-waist-figure-tape {
+  stroke: var(--text);
+}
+.mm-waist-figure-level {
+  stroke: var(--outline);
 }

@@ -1,6 +1,6 @@
 ---
 id: MM-220
-status: proposed
+status: done
 component: food-logging
 related: [MM-38, MM-45, MM-150, MM-212]
 ---
@@ -75,3 +75,16 @@ Scenario: Nothing to estimate from yet
   `add_food_estimate_dark`, `add_food_form_end_dark`, `add_food_edit_dark`.
 - Not checked: the keyboard open, larger text, other screen heights, system
   bars, and how the sheet answers a drag or the back gesture.
+
+## Decisions and build (2026-10-19)
+- **An action that is off says what is still needed**: "Still needed: a name, calories above zero, typed or from the macros." under the typed form's totals, and the same under "Save food" for a saved food (a name, what one serving is, its weight in grams, calories, a valid barcode or none).
+- **Every state of the sheet has a visible way out**: `MmSheet`'s Close (MM-271), checked by test.
+- **Nothing to estimate from yet**: the estimate step shows only the notice, "Enter manually" and Back; the size and kind choices and the disabled action are not drawn.
+- **The finishing action on a 360 by 800 screen** cannot be measured in the test's document; the sheet scrolls and content past the edge is cut by it, not ended in blank space, since MM-271's sheet. The owner's look at `AddFoodManually` and `AddFoodEstimate` on a small viewport story is the check (MM-91).
+- The direction's "Food logging flows" (a focused search, segmented routes, an Add bar) versus the built sheet: the built sheet stands (MM-223 settled discovery against entry); the direction document is the owner's to amend.
+- Regression test: `apps/mobile/test/food/addFoodSays.test.tsx` (MM-220).
+
+## After the panel (2026-10-19)
+- The "Still needed" caption sits after the gap, beside the action, in both forms (PD-6), is the action's description for a reader (F3), reads "calories above zero (typed, or from the macros)" (PD-7, F9), and the empty name field says "A name is needed." (PD-6).
+- With nothing to estimate from, the notice names the route: choose "Estimated totals" and type the calories you think it had (F7, PD-11).
+- Focus after an in-sheet step swap (F5) is the owner's device check.

@@ -190,15 +190,19 @@ describe('the weight trend', () => {
     expect(document.querySelector('.chart-spark')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('states the trend weight, the last week and the whole span, with a dash where there is too little', () => {
-    const { rerender } = render(<TrendStats trend={trend(9)} fmt={metric} />);
-    const value = (label: string) => screen.getByText(label).nextElementSibling?.textContent;
-    expect(value('Trend weight')).toBe('82.2 kg');
-    expect(value('Last 7 days')).toBe('−0.7 kg');
-    expect(value('Since start')).toBe('−0.8 kg');
+  it('states the trend weight as the one figure, with the last week and the whole span as one line (MM-287)', () => {
+    const { container, rerender } = render(<TrendStats trend={trend(9)} fmt={metric} />);
+    const figure = () => container.querySelector('.chart-stat-figure');
+    const line = () => container.querySelector('.chart-stat-line')?.textContent;
+    expect(figure()?.textContent).toBe('Trend weight 82.2 kg');
+    expect(container.querySelectorAll('.chart-stat-figure')).toHaveLength(1);
+    expect(line()).toBe('−0.7 kg last 7 days · −0.8 kg since start');
+    // Too little history for a change: the change is left out, never dashed.
+    rerender(<TrendStats trend={trend(3)} fmt={metric} />);
+    expect(line()).toMatch(/^−\d\.\d kg since start$/);
     rerender(<TrendStats trend={trend(1)} fmt={metric} />);
-    expect(value('Last 7 days')).toBe('—');
-    expect(value('Since start')).toBe('—');
+    expect(figure()).not.toBeNull();
+    expect(container.querySelector('.chart-stat-line')).toBeNull();
   });
 });
 

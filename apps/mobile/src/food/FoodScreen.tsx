@@ -13,10 +13,12 @@ import { MmDisclosure } from '../ui/MmDisclosure';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { CalorieHero } from './CalorieHero';
+import { LabelAccuracyNote } from './LabelAccuracyNote';
 import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
+import { HeroFactLine } from './HeroFactLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { MealSection } from './MealSection';
@@ -66,9 +68,22 @@ export function FoodScreen() {
           onRetry={() => state.retryPauses()}
         />
       ) : null}
-      <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
-      <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
-      {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
+      <CalorieHero
+        intake={intake}
+        entries={entries}
+        microsOffered
+        targets={paused ? guide : targets?.targets}
+        paused={paused}
+        lines={
+          // The day's fiber and alcohol belong where the day's energy is, inside the hero (MM-336).
+          <>
+            <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
+            {alcoholKcal > 0 ? <HeroFactLine name="Alcohol" figures={`${Fmt.whole(alcoholKcal)} kcal, in the total`} /> : null}
+          </>
+        }
+      />
+      {/* Once, under the figures, until dismissed (MM-123): close is as good as exact. */}
+      {targets === undefined || paused ? null : <LabelAccuracyNote />}
       {entries.length === 0 && yesterday.length > 0 ? (
         <div className="app-stack-item">
           <MmButton
@@ -91,7 +106,7 @@ export function FoodScreen() {
             <FoodDayGradeRow entries={entries} />
           </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
-          <MmDisclosure title="More about this day">
+          <MmDisclosure title="More about this day" remember="food.more">
             <p className="app-caption">
               Partial days are left out of your metabolism estimate instead of being read as under-eating.
             </p>

@@ -1,6 +1,6 @@
 ---
 id: MM-42
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-38, MM-45, MM-50, MM-55, MM-167, MM-408]
 ---
@@ -82,3 +82,18 @@ pack's top 20.
 The amount step collects a quantity and unit and then stores only totals and a method, and it records every serving as a cup-or-spoon
 measurement. MM-167 requires the quantity, unit, serving and reference basis to be stored and a label serving to be recorded as a label
 serving. Those are implementation gaps, not met by this ticket's progress.
+
+## Progress (2026-10-20, feat/m2)
+Closing the ticket. What the "Not done" list above still held, and what became of each:
+- **"Scan its label" when nothing is found**: the add sheet's choices already carry Scan and the saved-food form's "Read the
+  nutrition label" (MM-44); with MM-58 an empty search offers "Search online" first, since a food the packs lack is more often
+  online than on a label the person is holding. Say if a label offer belongs under an empty search too.
+- **Branded variants collapsed under the generic**: realised as ordering, not nesting. The reliability order (MM-383) lists
+  the analysed generic food first and every branded product below it; a second level of disclosure would hide the branded
+  rows behind one more tap for the person who scanned nothing and wants the product. Decided here (say if wrong).
+- **Paging**: "More results" since MM-410.
+- **Ranking against the hundred most common US foods, and the 150 ms bound on a phone**: not measured on a phone this
+  session (no device in the loop); the pack-level search is timed in the catalog tests (about 16 ms for a two-prefix query on
+  a laptop, MM-51). Left for the owner's acceptance pass; no code waits on it.
+- **Online search on request** (MM-58): under the phone's results, never as the person types.
+Stories: AddFood, AddFoodSearchFailed, the MM-410 paging stories, and the MM-58 search stories.

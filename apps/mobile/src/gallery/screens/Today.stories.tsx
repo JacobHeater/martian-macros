@@ -4,13 +4,17 @@ import { userEvent, within } from 'storybook/test';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
+import { maintenanceScenario } from './maintenanceScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { pausedScenario } from './pausedScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
+import { weekShapeScenario } from './weekShapeScenario';
+import { weightJumpScenario } from './weightJumpScenario';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -22,6 +26,20 @@ const meta = { title: 'Screens/Today', ...screensMeta } satisfies Meta;
 export default meta;
 
 export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week' });
+
+/** MM-91: the Dashboard on a 360 px phone: the hero, its macro rows and the strip inside the width. */
+export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', viewport: 'smallPhone' });
+
+/** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the bar's Add food and the title share the width. */
+export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', textScale: 2 });
+
+/** MM-91: the morning before the weigh-in at 200% text: the field, its Save and the hint inside the row. */
+export const NotWeighedTodayLargeText = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'First thing in the morning, after the bathroom.',
+  scenario: notWeighedTodayScenario,
+  textScale: 2,
+});
 
 export const FirstDay = screenStory({
   covers: ['DashboardScreen'],
@@ -39,7 +57,7 @@ export const NotWeighedToday = screenStory({
 /** Weighed today, the waist last measured over a week ago: the Dashboard asks for it in place (MM-301). */
 export const WaistDue = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  shows: 'Morning, after the bathroom, before eating. Tape level with the navel, snug, breathe out normally, the same tape each time.',
   scenario: waistDueScenario,
 });
 
@@ -50,7 +68,7 @@ const type = (name: string, text: string) => async (canvas: HTMLElement) =>
 /** A waist typed and not yet saved: Save is on, and secondary (MM-301). */
 export const WaistTyped = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  shows: 'Morning, after the bathroom, before eating. Tape level with the navel, snug, breathe out normally, the same tape each time.',
   scenario: waistDueScenario,
   walk: type('Today’s waist, inches', '36'),
 });
@@ -99,11 +117,10 @@ export const Water = screenStory({
   },
 });
 
-/** MM-313: a goal of 2.5 L in metric, and the snack after one tap, with Undo. */
+/** MM-313: the snack after one tap, with Undo. */
 export const WaterGlassAdded = screenStory({
   covers: ['DashboardScreen'],
   shows: /Added a glass/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
   walk: async (canvas) => {
     const add = await within(canvas).findByRole('button', { name: 'Add a glass of water' });
     reveal(add);
@@ -246,4 +263,96 @@ export const ReportReady = screenStory({
   walk: async (canvas) => {
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Open the report' }));
   },
+});
+
+/** MM-141: the weekend rule, in the person's own averages against the target, with the numbers one tap down. */
+export const InsightWeekendHigher = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Weekends run higher than weekdays',
+  scenario: weekShapeScenario('weekend'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Weekends run higher than weekdays'));
+  },
+});
+
+/** MM-141: one weekday the highest day in both weeks: stated, no action. */
+export const InsightHighestDay = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /is your highest day$/,
+  scenario: weekShapeScenario('highestDay'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/is your highest day$/));
+  },
+});
+
+/** MM-141: one weekday unlogged in both weeks: a day the coach cannot see. */
+export const InsightUnloggedDay = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /goes unlogged$/,
+  scenario: weekShapeScenario('unloggedDay'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/goes unlogged$/));
+  },
+});
+
+/** MM-141: the waist down beyond its noise while the trend held, at maintenance. */
+export const InsightWaistAgainstWeight = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Your waist is down while the scale held',
+  scenario: waistDownScenario,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Your waist is down while the scale held'));
+  },
+});
+
+/** MM-130: the first fortnight after a cut: under the weigh-in, why the scale rises, said before it does. */
+export const WeighInAfterCut = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /^Expect the scale to rise/,
+  scenario: maintenanceScenario({ daysAgo: 4 }),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/^Expect the scale to rise/));
+  },
+});
+
+// ---- MM-142: when the scale jumps, what probably did it, under the weigh-in ----
+
+/** MM-142: today's reading 1.3 kg above a flat trend after a 340 g carbohydrate day and a workout: both named, with their figures. */
+export const WeighInJump = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /above your trend\./,
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+});
+
+/** MM-142: the figures behind the explanation, one tap down, and the way to its switch. */
+export const WeighInJumpFigures = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Usual carbohydrate',
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+  walk: async (canvas) => {
+    const line = await within(canvas).findByRole('button', { name: /^Coach: Today’s weigh-in is/ });
+    reveal(line);
+    await userEvent.click(line);
+  },
+});
+
+/** MM-142: the same jump after two ordinary days: nothing in the log explains it, and a weight event is offered. */
+export const WeighInJumpNothingInLog = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /Nothing in your log explains this\./,
+  scenario: weightJumpScenario(),
+});
+
+/** MM-142: a reading 1.3 kg below the trend the morning after an illness event: likely water, and it will probably come back. */
+export const WeighInLowAfterIllness = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /below your trend\./,
+  scenario: weightJumpScenario({ todayKg: 80.7, illnessYesterday: true }),
+});
+
+/** MM-142: yesterday 2,900 kcal over target: said plainly, with the most of it that could be fat, the rest water and food. */
+export const WeighInOvershoot = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /against a [\d,]+ kcal target\./,
+  scenario: weightJumpScenario({ yesterdaysKcal: 5100 }),
 });

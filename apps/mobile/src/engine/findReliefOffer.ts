@@ -4,9 +4,13 @@ import type { RecoveryCheckIn } from '../domain/RecoveryCheckIn';
 import { RecoveryQuestion } from '../domain/RecoveryQuestion';
 import type { UserSetup } from '../domain/UserSetup';
 import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
+import { DietBreakRule } from './DietBreakRule';
 import { pauseOn } from './pauseOn';
 import type { ReliefOffer } from './ReliefOffer';
 import { ReliefRule } from './ReliefRule';
+import type { ReliefSignal } from './ReliefSignal';
+import { shortSleep } from './shortSleep';
+import type { SleepAverage } from './SleepAverage';
 import { slowerPace } from './slowerPace';
 import type { TargetsRecord } from './TargetsRecord';
 
@@ -15,16 +19,21 @@ const hard = (checkIn: RecoveryCheckIn) =>
   ReliefRule.hardAnswersPerCheckIn;
 
 /**
- * The offer to ease a deficit, if one is due on `today` (MM-117).
+ * The offer to ease a deficit, if one is due on `today` (MM-117, MM-135).
  *
- * Made only on a deficit goal whose current targets are a deficit, when
- * each of the last two weekly check-ins (MM-116) had at least three of its
- * five answers at the hard end. Not during a pause, and not for three weeks
- * after the user last answered it.
+ * Made only on a deficit goal whose current targets are a deficit, not
+ * during a pause, and not for three weeks after the user last answered it.
+ * Two things bring it, the first that holds naming the reason: the
+ * recovery signals have failed (MM-117), or the deficit has run
+ * `DietBreakRule.offerFromWeeks` unbroken weeks (MM-135). The break either
+ * offers is the same one, `DietBreakRule.breakWeeks` at maintenance; the
+ * slower pace is offered with the recovery signals only.
  *
- * The strength trigger of MM-117 needs the training log and is not here.
- * Nothing this returns can lower calories or ask for more exercise: the
- * choices are a maintenance week, a slower pace, or carrying on.
+ * Short sleep is a signal of its own (MM-252): an average under six hours
+ * over the last fourteen recorded nights makes the offer whether or not the
+ * check-ins were hard. The strength trigger of MM-117 needs the training log
+ * and is not here. Nothing this returns can lower calories or ask for more
+ * exercise: the choices are a break, a slower pace, or carrying on.
  */
 export function findReliefOffer({
   setup,
@@ -33,6 +42,7 @@ export function findReliefOffer({
   today,
   deficitRestartOn,
   pauses = [],
+  sleepAverage,
 }: {
   setup: UserSetup;
   checkIns: readonly RecoveryCheckIn[];
@@ -40,6 +50,8 @@ export function findReliefOffer({
   today: CalendarDate;
   deficitRestartOn?: CalendarDate | undefined;
   pauses?: Iterable<Pause>;
+  /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
+  sleepAverage?: SleepAverage | undefined;
 }): ReliefOffer | undefined {
   if (setup.goalMode !== 'fatLoss' && setup.goalMode !== 'recomp') {
     return undefined;
@@ -54,6 +66,50 @@ export function findReliefOffer({
     return undefined;
   }
 
+  const weeks = consecutiveDeficitWeeks(history, today, { restartOn: deficitRestartOn });
+  const recent = hardWeeks(checkIns, today);
+  const sleepIsShort = shortSleep(sleepAverage);
+  const signals: ReliefSignal[] = [];
+  if (recent !== undefined) signals.push('hardCheckIns');
+  if (sleepIsShort) signals.push('shortSleep');
+  if (signals.length > 0) {
+    const slower = setup.goalMode === 'fatLoss' ? slowerPace(setup.requestedLossFraction) : undefined;
+    // With no record of nights, the hours typed at the hard check-ins stand in for the line.
+    const hours: number[] = [];
+    for (const c of recent ?? []) {
+      if (c.sleepHours !== undefined) hours.push(c.sleepHours);
+    }
+    const typedShort =
+      sleepAverage === undefined && hours.length > 0 && hours.reduce((a, b) => a + b) / hours.length < ReliefRule.shortSleepHours;
+    return {
+      reason: 'recoverySignals',
+      suggestion: slower === undefined || weeks >= ReliefRule.breakFromDeficitWeeks ? 'break' : 'slowerPace',
+      slowerPace: slower,
+      deficitWeeks: weeks,
+      signals,
+      shortSleep: sleepIsShort || typedShort,
+      sleepAverage: sleepIsShort ? sleepAverage : undefined,
+    };
+  }
+  if (weeks >= DietBreakRule.offerFromWeeks) {
+    return {
+      reason: 'longDeficit',
+      suggestion: 'break',
+      slowerPace: undefined,
+      deficitWeeks: weeks,
+      signals: [],
+      shortSleep: false,
+      sleepAverage: undefined,
+    };
+  }
+  return undefined;
+}
+
+/**
+ * The last two weekly check-ins, when each had most answers at the hard end,
+ * the latest is fresh and they are a week or two apart (MM-117); undefined otherwise.
+ */
+function hardWeeks(checkIns: readonly RecoveryCheckIn[], today: CalendarDate): readonly RecoveryCheckIn[] | undefined {
   const sorted = checkIns.filter((c) => !c.date.isAfter(today)).sort((a, b) => a.date.compareTo(b.date));
   if (sorted.length < ReliefRule.hardCheckInsRunning) return undefined;
   const recent = sorted.slice(sorted.length - ReliefRule.hardCheckInsRunning);
@@ -65,18 +121,5 @@ export function findReliefOffer({
       return undefined;
     }
   }
-  if (!recent.every(hard)) return undefined;
-
-  const weeks = consecutiveDeficitWeeks(history, today, { restartOn: deficitRestartOn });
-  const slower = setup.goalMode === 'fatLoss' ? slowerPace(setup.requestedLossFraction) : undefined;
-  const hours: number[] = [];
-  for (const c of recent) {
-    if (c.sleepHours !== undefined) hours.push(c.sleepHours);
-  }
-  return {
-    suggestion: slower === undefined || weeks >= ReliefRule.breakFromDeficitWeeks ? 'maintenanceWeek' : 'slowerPace',
-    slowerPace: slower,
-    deficitWeeks: weeks,
-    shortSleep: hours.length > 0 && hours.reduce((a, b) => a + b) / hours.length < ReliefRule.shortSleepHours,
-  };
+  return recent.every(hard) ? recent : undefined;
 }

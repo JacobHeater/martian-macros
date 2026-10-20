@@ -1,6 +1,6 @@
 ---
 id: MM-141
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-137, MM-11, MM-92, MM-98, MM-108, MM-114, MM-117, MM-118, MM-125, MM-126, MM-139, MM-140, MM-142, MM-143, MM-149]
 ---
@@ -117,3 +117,28 @@ Not built:
 - **Hiding weight** (MM-118) and an action attached to an insight.
 - "Forbidden subjects" is tested on the five rules' words with representative figures, not by running every rule against every
   simulated user.
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **Three more rules** in the catalog (`findInsights`, thresholds in `WeekPatternRule`): **weekend and weekday** (whole weekend days
+  average 20% of the target or more above weekdays, on at least 2 weekend days and 5 weekdays; states both averages against the
+  target, no action, since shaping the week (MM-124) is not built), **waist against weight** (the waist down beyond its noise by
+  MM-155's shared answer over the 14 days while the trend weight moved less than its own uncertainty; in any goal but recomp, where
+  the recomp signal (MM-32) already says it), and **consistent day** (one weekday unlogged in both weeks with 5 logged days each, or
+  the highest whole day in both weeks, alone at the top and 15% of the target above the week's other days; stated, no action).
+  `CalendarDate` gained `weekday` and `isWeekend`. All three are patterns, suppressed for an eating-disorder history (the two about
+  intake as "other intake", the waist one as "about weight").
+- **Every rule against simulated people**: `insightsSimulation.test.ts` runs the catalog over six synthetic users (steady, skipping
+  weigh-ins, partial days, skipping logging, under-reporting, noisy) through the closed-loop simulator and checks every insight's
+  words against the banned list and the seven-day minimum basis.
+- **Evidence register entries** (MM-143) for every rule, the rationing and the stall thresholds, in `docs/evidence.md`.
+- Stories: `InsightWeekendHigher`, `InsightHighestDay`, `InsightUnloggedDay`, `InsightWaistAgainstWeight` (Today).
+
+Decided here (say if wrong):
+- **"Strength holding on a cut" lives under the lift, not on the dashboard**: MM-377 built it as an item insight at the workout the
+  evidence belongs to, with the panel's measurement rules. A second, rationed copy on the dashboard would say the same thing twice.
+  The catalog's row is satisfied by that insight.
+- **Fiber and hunger** stays with MM-126 (not in M2), which owns the fiber coverage rule the insight needs.
+
+Not in this ticket's milestone, left to their own tickets: hiding weight (MM-118), an action attached to an insight (MM-124's
+shaping the week), the Coach unlock (MM-85).

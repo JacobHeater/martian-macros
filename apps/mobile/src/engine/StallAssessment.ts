@@ -16,9 +16,12 @@ interface StallAssessmentInit {
   averageTargetKcal?: number | undefined;
   waistChangeCm?: number | undefined;
   maskedByEvent?: boolean;
+  maskedByTraining?: boolean;
   expectedChangeKcal?: number | undefined;
   atFloor?: boolean;
   estimateLow?: boolean;
+  shortSleepAverageMinutes?: number | undefined;
+  shortSleepNights?: number | undefined;
 }
 
 /**
@@ -51,6 +54,9 @@ export class StallAssessment {
   /** A passing weight event falls in the last days of the window. */
   readonly maskedByEvent: boolean;
 
+  /** Training started, or started again after a month off, in the last days of the window. */
+  readonly maskedByTraining: boolean;
+
   /**
    * The change to the calorie target expected at the next check-in under
    * the estimate diagnosis (negative is a reduction); undefined when none.
@@ -62,6 +68,14 @@ export class StallAssessment {
 
   /** The estimate is low enough that food is often missing from the log. */
   readonly estimateLow: boolean;
+
+  /**
+   * Sleep averaged short over the window (MM-252): the average in minutes
+   * and the nights it rests on, said before anything about the log. Undefined
+   * when it did not, or no nights were recorded.
+   */
+  readonly shortSleepAverageMinutes: number | undefined;
+  readonly shortSleepNights: number;
 
   constructor(init: StallAssessmentInit) {
     this.status = init.status;
@@ -77,9 +91,12 @@ export class StallAssessment {
     this.averageTargetKcal = init.averageTargetKcal;
     this.waistChangeCm = init.waistChangeCm;
     this.maskedByEvent = init.maskedByEvent ?? false;
+    this.maskedByTraining = init.maskedByTraining ?? false;
     this.expectedChangeKcal = init.expectedChangeKcal;
     this.atFloor = init.atFloor ?? false;
     this.estimateLow = init.estimateLow ?? false;
+    this.shortSleepAverageMinutes = init.shortSleepAverageMinutes;
+    this.shortSleepNights = init.shortSleepNights ?? 0;
   }
 
   static notAssessed(reason: StallNotAssessedReason, { windowDays }: { windowDays: number }): StallAssessment {

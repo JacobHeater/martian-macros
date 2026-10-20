@@ -6,6 +6,7 @@ import type { StoryDevice } from './StoryDevice';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import type { StoryStores } from './StoryStores';
+import type { StorySubject } from './StorySubject';
 import type { StoryTerms } from './StoryTerms';
 
 interface ScreenStory {
@@ -17,6 +18,12 @@ interface ScreenStory {
    */
   shows?: string | RegExp;
   scenario?: StoryScenario;
+  /**
+   * What the story's person differs in from the demo person, being what the story is about (MM-357): their
+   * units, or a water goal of their own. Undeclared, the person's units and water goal are the demo person's,
+   * and `test/gallery/storyPeople.test.ts` holds every story to it.
+   */
+  about?: readonly StorySubject[];
   /** What the phone brings; nothing of a device unless a story is about it. */
   device?: StoryDevice;
   /** How storage behaves: a read still loading or one that failed (MM-321); every read ready unless given. */
@@ -43,6 +50,7 @@ export function screenStory({
   covers,
   shows,
   scenario,
+  about = [],
   device,
   stores,
   open,
@@ -55,7 +63,8 @@ export function screenStory({
   viewport,
 }: ScreenStory): StoryObj {
   return {
-    parameters: shows === undefined ? { covers } : { covers, shows },
+    // The scenario and the subject travel with the story, so a test can hold its person to the demo person's (MM-357).
+    parameters: { covers, scenario, about, ...(shows === undefined ? {} : { shows }) },
     ...(viewport === undefined ? {} : { globals: { viewport: { value: viewport, isRotated: false } } }),
     render: (_args, { globals }) => {
       const palette = globals['palette'] as ThemePreference;

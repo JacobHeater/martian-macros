@@ -37,6 +37,17 @@ const values = [
    * (MM-117).
    */
   'requestedBreak',
+  /**
+   * The deficit was capped at a share of expenditure (MM-128): the pace
+   * chosen asked for more than a body this size spends.
+   */
+  'deficitCapped',
+  /** The first of two steps out of a deficit (MM-130): halfway to maintenance for a week. */
+  'easingIn',
+  /** A gentle, temporary pace back toward the maintenance anchor (MM-130). */
+  'maintenanceCorrection',
+  /** On lean gain, no training for three weeks or no training days set: the surplus is paused (MM-134). */
+  'trainingLapsed',
 ] as const;
 
 export type TargetFlag = (typeof values)[number];

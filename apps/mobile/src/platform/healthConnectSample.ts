@@ -9,7 +9,9 @@ import type { MmHealthRecord } from './MmHealthRecord';
  *
  * Height arrives in meters and is kept in centimeters. A workout is kept
  * as its length in minutes, and a day of menstrual flow as 1; what the
- * platform says about either beyond that is not imported.
+ * platform says about either beyond that is not imported. A sleep session
+ * is kept as its minutes asleep: what the plugin summed from its stages,
+ * or its whole span when the platform recorded no stages (MM-250).
  */
 export function healthConnectSample(record: MmHealthRecord): HealthSample | undefined {
   if (!(HealthDataType.values as readonly string[]).includes(record.type)) return undefined;
@@ -21,6 +23,9 @@ export function healthConnectSample(record: MmHealthRecord): HealthSample | unde
       break;
     case 'menstruation':
       value = 1;
+      break;
+    case 'sleep':
+      value = record.value ?? (record.endMs - record.startMs) / 60000;
       break;
     case 'height':
       if (record.value === undefined) return undefined;

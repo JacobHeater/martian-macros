@@ -3,6 +3,8 @@ import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { megabytes } from '../format/megabytes';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
+import { useNavigator } from '../app/useNavigator';
+import { FoodSourcesScreen } from './FoodSourcesScreen';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { focusNeighbourOf } from '../ui/focusNeighbourOf';
@@ -25,6 +27,7 @@ import './foodPacks.css';
 export function FoodDatabaseScreen() {
   const { services, state } = useApp();
   const overlays = useOverlays();
+  const navigator = useNavigator();
   const url = services.packManifestUrl;
   const manifest = useCell(state.packManifest.state);
   const installed = useLoaded(state.installedPacks) ?? [];
@@ -130,13 +133,14 @@ export function FoodDatabaseScreen() {
       <div ref={installedList}>
         <MmListGroup>
           {installed.length === 0 ? (
-            <MmListRow title="Nothing downloaded yet" />
+            <MmListRow leadingIcon="info" title="Nothing downloaded yet" />
           ) : (
             installed.map((pack) => {
               const title = pack.title ?? titles.get(pack.id) ?? pack.id;
               return (
                 <MmListRow
                   key={pack.id}
+                  leadingIcon="document"
                   title={title}
                   subtitle={`Version ${pack.version} · ${megabytes(pack.bytes)}`}
                   trailingAction={
@@ -159,11 +163,15 @@ export function FoodDatabaseScreen() {
       ))}
       {available()}
       <GroupHeader text="Where the foods come from" />
-      <p className="app-text app-muted">
-        Food data from Open Food Facts (openfoodfacts.org), available under the Open Database License, and USDA
-        FoodData Central (its Foundation, SR Legacy, FNDDS survey and Branded foods, public domain). The files are
-        published at github.com/JacobHeater/martian-macros-food-data.
-      </p>
+      <MmListGroup>
+        <MmListRow
+          leadingIcon="document"
+          title="Food data sources"
+          subtitle="Open Food Facts and USDA FoodData Central, their licences, and what goes online."
+          opens
+          onPress={() => void navigator.push(() => <FoodSourcesScreen />)}
+        />
+      </MmListGroup>
     </Screen>
   );
 }

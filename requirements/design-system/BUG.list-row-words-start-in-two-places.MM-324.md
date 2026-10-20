@@ -1,6 +1,6 @@
 ---
 id: MM-324
-status: proposed
+status: done
 component: design-system
 related: [MM-320, MM-259]
 ---
@@ -22,3 +22,6 @@ Scenario: One text column
   Given a group with a row that has an edit action and a row that has none
   Then their titles start at the same distance from the card's edge
 ```
+
+## Regression test
+`apps/mobile/test/ui/listRowColumn.test.ts` reads `ui.css`: the gap of `.mm-list-row-main` equals the gap of `.mm-list-row`, so a row's words start on one column with an action or without. Fixed 2026-10-19: the action row's gap was 12 px against the plain row's 16 px.

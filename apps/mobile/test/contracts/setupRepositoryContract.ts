@@ -53,6 +53,26 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       expect(back.reliefAnsweredOn).toBe(day.addDays(1));
     });
 
+    // MM-128, MM-130: the day a pace was chosen, the maintenance anchor and the correction; the last two can be cleared.
+    it('keeps the pace change day, the maintenance anchor and the correction', async () => {
+      const day = CalendarDate.of(2026, 10, 5);
+      await repo.saveSetup(typicalSetup());
+      const fresh = await loaded();
+      expect(fresh.paceChangedOn).toBeUndefined();
+      expect(fresh.maintenanceAnchorOn).toBeUndefined();
+      expect(fresh.maintenanceCorrectionFrom).toBeUndefined();
+      await repo.saveSetup(
+        typicalSetup().copyWith({ paceChangedOn: day, maintenanceAnchorOn: day.addDays(1), maintenanceCorrectionFrom: day.addDays(2) }),
+      );
+      const back = await loaded();
+      expect(back.paceChangedOn).toBe(day);
+      expect(back.maintenanceAnchorOn).toBe(day.addDays(1));
+      expect(back.maintenanceCorrectionFrom).toBe(day.addDays(2));
+      await repo.saveSetup(back.copyWith({ maintenanceAnchorOn: undefined, maintenanceCorrectionFrom: undefined }));
+      expect((await loaded()).maintenanceAnchorOn).toBeUndefined();
+      expect((await loaded()).maintenanceCorrectionFrom).toBeUndefined();
+    });
+
     it('keeps the creatine start date', async () => {
       const startedOn = CalendarDate.of(2026, 1, 1);
       await repo.saveSetup(typicalSetup().copyWith({ creatineStartedOn: startedOn }));

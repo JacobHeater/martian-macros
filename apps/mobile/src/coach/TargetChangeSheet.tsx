@@ -2,8 +2,15 @@ import type { TargetsExplanation } from '../engine/TargetsExplanation';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 import { ExplanationLine } from '../engine/ExplanationLine';
 import { confidenceLabel } from '../format/confidenceLabel';
+import { adherenceLines } from '../format/adherenceLines';
+import { useApp } from '../app/useApp';
+import { useCell } from '../app/useCell';
+import { StatRow } from '../ui/StatRow';
 import { explanationLineText } from '../format/explanationLineText';
 import { Fmt } from '../format/Fmt';
+import { reboundText } from '../format/reboundText';
+import { shortSleepText } from '../format/shortSleepText';
+import { useLoaded } from '../app/useLoaded';
 import { whatWouldChangeIt } from '../format/whatWouldChangeIt';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { MmButton } from '../ui/MmButton';
@@ -39,6 +46,15 @@ function change(label: string, before: number | undefined, after: number, unit: 
  * that add up), what it was based on, and what would change it (MM-138).
  */
 export function TargetChangeSheet({ current, previous, onHold }: TargetChangeSheetProps) {
+  const { state } = useApp();
+  // The week the check-in read, as five facts beside its reasons (MM-149): the person and the coach look at one account.
+  const week = useCell(state.adherenceSummary);
+  const floor = useCell(state.coach)?.calorieFloorKcal;
+  const underEatingNotice = useCell(state.underEatingNotice) !== undefined;
+  const units = useLoaded(state.setup)?.unitSystem ?? 'metric';
+  // Leaving a deficit (MM-130): the scale's rise is explained before it happens.
+  const leftDeficit =
+    previous !== undefined && previous.targets.weeklyRateFraction < 0 && current.mode === 'maintenance' && current.targets.weeklyRateFraction === 0;
   const explanation = current.explanation;
   const t = current.targets;
   const p = previous?.targets;
@@ -58,6 +74,16 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
       <div className="app-gap-small" />
       <SectionLabel text="What changed" />
       <p className="app-text">{changes.join('. ')}</p>
+      {leftDeficit ? <p className="app-text">{reboundText(new Fmt(units))}</p> : null}
+      {week === undefined || floor === undefined ? null : (
+        <>
+          <div className="app-gap-small" />
+          <SectionLabel text="Your last 7 days" />
+          {adherenceLines(week, { floorKcal: floor, underEatingNotice }).map(({ label, value, detail }) => (
+            <StatRow key={label} label={label} value={value} detail={detail} />
+          ))}
+        </>
+      )}
       <div className="app-gap-small" />
       <SectionLabel text="Why" />
       {explanation === undefined ? (
@@ -72,6 +98,12 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
         ))
       )}
       {remainder === undefined ? null : <p className="app-text">{remainder}</p>}
+      {/* Short sleep over the window, before anything about the log (MM-252): a cause the person can act on, not a line that moved the number. */}
+      {explanation?.shortSleepAverageMinutes === undefined ? null : (
+        <p className="app-text">
+          {shortSleepText({ averageMinutes: explanation.shortSleepAverageMinutes, nights: explanation.shortSleepNights })}
+        </p>
+      )}
       {explanation === undefined ? null : (
         <>
           <SectionLabel text="What it was based on" />

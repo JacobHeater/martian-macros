@@ -1,4 +1,5 @@
 import type { Fmt } from '../format/Fmt';
+import { waistProtocolText } from '../format/waistProtocolText';
 import { MmListRow } from '../ui/MmListRow';
 import { NumberEntry } from '../ui/NumberEntry';
 
@@ -30,7 +31,7 @@ export function WaistRow({ fmt, last, onSaveWaist }: WaistRowProps) {
           title={`Today’s waist, ${fmt.imperial ? 'inches' : 'centimeters'}`}
           unit={fmt.lengthUnit}
           initial={undefined}
-          hint="Morning, before eating. Tape level with the navel, snug, breathe out normally."
+          hint={waistProtocolText}
           saves="waist"
           saveKind="secondary"
           onSave={(value) => onSaveWaist(fmt.lengthToCm(value))}

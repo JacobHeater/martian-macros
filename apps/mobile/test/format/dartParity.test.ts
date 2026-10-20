@@ -163,7 +163,8 @@ describe('every label of every kind', () => {
     ['trustTier', all(TrustTier.values, trustTierLabel)],
     ['equipment', all(Equipment.values, equipmentLabel)],
     ['timeSpanProblem', all(TimeSpanProblem.values, timeSpanProblemMessage)],
-    ['quantitySource', all(QuantitySource.values, quantitySourceLabel)],
+    // MM-219: typed totals are "Estimated totals" now, told from "Estimate a meal", the way in; the Flutter app said "Estimate".
+    ['quantitySource', { ...all(QuantitySource.values, quantitySourceLabel), quickAdd: 'Estimate' }],
     ['detailLevel', all(DetailLevel.values, detailLevelLabel)],
     ['detailLevelDescription', all(DetailLevel.values, detailLevelDescription)],
     ['muscleGroup', all(MuscleGroup.values, muscleGroupLabel)],
@@ -172,8 +173,9 @@ describe('every label of every kind', () => {
     ['dailyActivity', all(DailyActivity.values, dailyActivityLabel)],
     ['dailyActivityDetail', all(DailyActivity.values, dailyActivityDetail)],
     ['packDownloadProblem', all(PackDownloadProblem.values, packDownloadProblemText)],
-    ['healthDataType', all(HealthDataType.values, healthDataTypeLabel)],
-    ['healthDataTypePurpose', all(HealthDataType.values, healthDataTypePurpose)],
+    // The kind added since the Flutter app (MM-250, sleep) has no Dart words to match.
+    ['healthDataType', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataType), healthDataTypeLabel)],
+    ['healthDataTypePurpose', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataTypePurpose), healthDataTypePurpose)],
     ['confidence', all(ConfidenceLevel.values, confidenceLabel)],
     ['reminder', all(ReminderKind.values, reminderLabel)],
     ['reminderSentWhen', all(ReminderKind.values, reminderSentWhen)],

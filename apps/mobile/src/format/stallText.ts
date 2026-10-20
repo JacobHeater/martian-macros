@@ -2,15 +2,25 @@ import { type StallAssessment, StallRule } from '../engine';
 import { StateError } from '../lang/StateError';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { Fmt } from './Fmt';
+import { shortSleepText } from './shortSleepText';
 
 /**
  * What the coach says about a stall (MM-140): the body, then any options.
  *
  * Arithmetic, not accusation. It states averages and what they predict, and
  * offers options, never instructions. The chance that the log understates
- * what was eaten is raised once, only when the estimate is very low.
+ * what was eaten is raised once, only when the estimate is very low. Sleep
+ * that averaged short comes first, before any line about the log (MM-252).
  */
 export function stallText(a: StallAssessment, fmt: Fmt): readonly [body: string, options: readonly string[]] {
+  const [body, options] = diagnosisText(a, fmt);
+  const sleep = a.shortSleepAverageMinutes;
+  if (sleep === undefined) return [body, options];
+  return [`${shortSleepText({ averageMinutes: sleep, nights: a.shortSleepNights })} ${body}`, options];
+}
+
+/** The body and options of the diagnosis itself. */
+function diagnosisText(a: StallAssessment, fmt: Fmt): readonly [body: string, options: readonly string[]] {
   switch (a.diagnosis) {
     case undefined:
       throw new StateError('Only a stall that was diagnosed has words.');
@@ -25,6 +35,14 @@ export function stallText(a: StallAssessment, fmt: Fmt): readonly [body: string,
       ];
     case 'masked': {
       const waist = a.waistChangeCm;
+      if (a.maskedByTraining && !a.maskedByEvent) {
+        return [
+          `You started training in the last ${StallRule.maskingEventDays} days. ` +
+            'New training holds water in the muscles for a while, which can ' +
+            'hide fat loss on the scale. The scale usually catches up. Nothing to change.',
+          [],
+        ];
+      }
       if (!a.maskedByEvent && waist !== undefined) {
         const down = `${toStringAsFixed(fmt.lengthFromCm(Math.abs(waist)), 1)} ${fmt.lengthUnit}`;
         return [

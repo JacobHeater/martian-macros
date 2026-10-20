@@ -2,9 +2,11 @@ import type { GoalMode } from '../domain/GoalMode';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import { clamp } from '../lang/clamp';
 import { DailyTargets } from './DailyTargets';
+import { DietBreakRule } from './DietBreakRule';
 import { energyDensityKcalPerKg } from './energyDensityKcalPerKg';
 import { leanFractionOfChange } from './leanFractionOfChange';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
+import { PaceRule } from './PaceRule';
 import { SafetyBounds } from './SafetyBounds';
 import type { TargetFlag } from './TargetFlag';
 import type { TargetInputs } from './TargetInputs';
@@ -25,10 +27,21 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
   }
 
   let rate = weeklyRate(mode, i, safetyBf);
+  if (mode === 'maintenance' && rate !== 0) flags.add('maintenanceCorrection');
+  // A surplus without training is stored as fat (MM-134): maintenance until a workout is logged.
+  if (rate > 0 && i.trainingLapsed) {
+    rate = 0;
+    flags.add('trainingLapsed');
+  }
+  // A diet break (MM-135): the one the user chose, the one already running,
+  // or the one the app plans at the cap. Each is maintenance for its length.
   if (rate < 0 && i.breakRequested) {
     rate = 0;
     flags.add('requestedBreak');
-  } else if (rate < 0 && i.consecutiveDeficitWeeks >= SafetyBounds.maxContinuousDeficitWeeks) {
+  } else if (rate < 0 && i.continuingBreak !== undefined) {
+    rate = 0;
+    flags.add(i.continuingBreak);
+  } else if (rate < 0 && i.consecutiveDeficitWeeks >= DietBreakRule.forceFromWeeks) {
     rate = 0;
     flags.add('dietBreak');
   }
@@ -40,8 +53,22 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
       resistanceTrained: TrainingStatus.isResistanceTrained(i.trainingStatus),
     }),
   );
-  const dailyEnergyDelta = (rho * rate * i.trendWeightKg) / 7;
+  let dailyEnergyDelta = (rho * rate * i.trendWeightKg) / 7;
+  // A deficit never exceeds a share of expenditure (MM-128): a share of body
+  // weight asks the same calories per kilogram of everyone, and a heavy,
+  // sedentary body spends fewer. The pace recorded is the one this gives.
+  const maxDeficit = PaceRule.maxDeficitFractionOfExpenditure * i.tdeeKcal;
+  if (-dailyEnergyDelta > maxDeficit) {
+    dailyEnergyDelta = -maxDeficit;
+    rate = (dailyEnergyDelta * 7) / (rho * i.trendWeightKg);
+    flags.add('deficitCapped');
+  }
   let kcal = i.tdeeKcal + dailyEnergyDelta + i.policy.maintenanceOffsetKcal;
+  // The two-step way out of a deficit (MM-130): this set stops halfway.
+  if (mode === 'maintenance' && i.easeFromKcal !== undefined && i.easeFromKcal < kcal) {
+    kcal = (i.easeFromKcal + kcal) / 2;
+    flags.add('easingIn');
+  }
   const formulaKcal = kcal;
   let limitedKcal = kcal;
   let heldKcal = kcal;
@@ -147,6 +174,7 @@ function weeklyRate(mode: GoalMode, i: TargetInputs, safetyBf: number): number {
           return i.policy.elevatedMuscleGainPrior ? 0.0025 : 0.0015;
       }
     case 'maintenance':
-      return 0;
+      // A correction back toward the maintenance anchor (MM-130), else held.
+      return i.correctionRateFraction ?? 0;
   }
 }

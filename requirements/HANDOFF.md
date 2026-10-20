@@ -5,7 +5,7 @@ private belongs here. Requirements are authoritative for behavior.
 
 ## Where things stand
 
-Last updated: 2026-10-19, by Claude, Session 37.
+Last updated: 2026-10-20, by Claude, Session 39.
 
 **The conversion out of the Flutter ecosystem is complete (MM-228/MM-232).**
 The app is the React one in `apps/mobile/`, inside a thin Capacitor shell with
@@ -129,30 +129,27 @@ navigation bar** (owner, same day, MM-302): the bar publishes
 (`--mm-snack-clearance`). Don't position bottom overlays without them.
 
 **What to build next** (the roadmap's "What is available right now", in
-order; `mm roadmap` draws it).
-- WS-03 step 14: MM-304, what the waist panel left (focus after an
-  in-place save, Open Progress landing on the waist, correcting today's
-  waist) and three owner calls listed in it.
-- WS-02 step 6: MM-135, the diet break the owner decided (offered at 12
-  weeks and on failing recovery signals, forced at 20); an engine change.
-- WS-03 step 12 is built (MM-290 to MM-299). Open from its panel runs:
-  whether the trend above the weigh-in field anchors the entry
-  (measurement), whether a first-section "Change goal" invites switching
-  (safety), and the goal as one row instead of a section (PD-4, owner).
-- WS-03 step 11: MM-286 (destinations keep their state across tabs),
-  MM-287 (Progress with one figure and lift rows), MM-289 (a demo seed
-  that shows every mark); MM-288 is the owner's decision on Ember text.
-- WS-15 steps 1 and 2: MM-250 (the nightly sleep record), MM-251 (sleep
-  disorders in the health check).
+order; `mm roadmap` draws it). M2's buildable tickets are all done
+(Session 39); what M2 still holds waits on people, listed there.
+- The owner's to-dos for M2: a FoodData Central API key in
+  `config/prod.local.json` (`MM_FDC_API_KEY`) so builds ask USDA as well as
+  Open Food Facts; the backup storage providers (MM-63, MM-64); a pantry
+  and fifty packages for MM-51's checks; a qualified reader for MM-57 and
+  the terms (MM-242). Outside M2: the one-week break option (MM-432).
+- Device passes owed: the native sleep readers (Kotlin, Swift), the online
+  lookup through the shell's HTTP, TalkBack and VoiceOver
+  (`design/accessibility-checklist.md` section 4), the largest system text.
+- A pack rebuild (`mm food fetch`, `build`, `package`, then a release in
+  martian-macros-food-data) puts MM-153's community tiers into the packs.
 - WS-11 step 2 (MM-71), WS-13 step 1 (MM-95, MM-247, MM-244), WS-09 step 4
-  (MM-248), WS-04 step 1 (MM-51, waiting on a pantry).
+  (MM-248): the next milestone's work.
 - MM-214 and MM-215 remain skipped in the web suite, each waiting on its fix.
 - Blocked: phase planning (MM-36) needs body-fat estimates (MM-34).
 
 **Decided by the product owner on 2026-10-13** (each recorded in its
 ticket): the hold-a-reduction stays as built (MM-138 closed; M1 is
 complete); the diet break is offered at 12 weeks and on failing recovery
-signals, forced only at 20 (MM-135, engine change to do); onboarding's
+signals, forced only at 20 (MM-135, built in Session 39); onboarding's
 grouped screens stay grouped (MM-103 closed); the purchase plugin is our
 own over StoreKit 2 and Billing 9 (MM-84); the terms guard stays first, the
 legal blanks stay blank for the attorney, the four flagged behaviours stay
@@ -360,6 +357,99 @@ Apple Health readings on a device (MM-69), the camera (MM-406), a reminder
 at its time (MM-405), a pack download over the network on iOS. CI builds
 no iOS app yet (the owner's call). Phone checks listed above.
 
+## Session 39: 2026-10-20, Claude (M2 closed on feat/m2: food data online, sleep, the weight jump, the diet break, WS-03 and WS-08, history rewritten)
+
+- **The owner's words this session:** "I do expect you to have a solution for the food data including additional
+  sources. The present sources are in martian-macros-food-data. ... I expect this work to be done when I sign back on in
+  the morning and the indication of done will be that we're back on main." Then, asked, "Yes, please rewrite the commit
+  history, then continue on with other work."
+- **History rewritten (owner's go-ahead):** two commits on `feat/m2` had carried `DEVELOPMENT_TEAM` in the Xcode project,
+  the owner's local `.claude/settings.json` edit and a Vitest cache under a stray root `node_modules`. They were rebuilt
+  without them (`535f71b`, `0ee0e75`) through a temporary index, and pushed with a lease. The root `/node_modules/` is now
+  ignored. The old commits may stay reachable on GitHub by SHA until GitHub collects them; nothing references them.
+  **Standing rule kept:** the team id and the settings edit stay unstaged in the working tree.
+- **Food data, with additional sources (MM-58, MM-57, MM-51, MM-153):** an unknown barcode, or a search on request, is
+  looked up online if the person allows it (ask, always, just for now, never; Settings, Data): Open Food Facts' API, and
+  USDA FoodData Central's API in a build given `MM_FDC_API_KEY` (free from api.data.gov; set it in the environment or the
+  git-ignored `config/prod.local.json`; **not set yet, the owner's to obtain**). Answers pass the pack's own nutrition
+  checks and tiers and are kept on the phone (`online_foods`, schema 12). A Food data sources screen names each source and
+  licence. Community records are now judged by MM-153's rule (label, or "Check this" with the reason), and "Fix this
+  food" keeps a corrected copy. MenuStat, CNF, OpenNutrition were read and declined (MM-51). The food-data repository's
+  README says the app can ask online (committed there locally, **not pushed**). The published packs of 2026-10-19 keep the
+  old community tiers until the next `mm food build`.
+- **Built by six lanes in worktrees (`/Users/jacobheater/dev/mm-wt/`), integrated by cherry-pick:** sleep (MM-250, 251,
+  252, 414, 415; schema 13; Kotlin and Swift readers unbuilt and unverified on a device), the weight jump and the waist
+  (MM-142, 155, 418), WS-03 (MM-91, 106, 286, 287, 288 option (a), 289, 304, 357, 422, 436, 437; the accessibility
+  checklist), WS-08 (MM-42, 43, 49, 150, 151, 152, 167, 428, 429; schema 14, renumbered from the lane's 15), the diet
+  break (MM-135, offered at 12 weeks and planned at 20, two weeks long; MM-31 superseded in part; merged with sleep's
+  short-sleep signal), MM-55, MM-56, MM-417 (seven unseen places), MM-416 (Progress entries onto a surface), MM-435.
+  Every design change went through the product-designer and UX-accessibility roles (`docs/agent-runs/`), blocking
+  findings fixed with bug tickets and regression tests.
+- **Decided under the owner's blanket instruction, each recorded "say if wrong" on its ticket:** the Ember budget is
+  option (a), text actions underlined (MM-288); "Just for now" lasts until the app is closed (MM-58); FoodData Central as
+  the second online source and a name search on request (MM-58); MM-304's three owner questions; MM-416 follows rule 1
+  rather than an exception; MM-135's open points (two weeks, seven days at maintenance resets, exempt from the step
+  limit); community records that are complete and consistent are a label (MM-153).
+- **Where M2 stands:** every buildable ticket done. Left, and only people can close them: MM-51 (the fifty-product hand
+  check and the pantry test need real packages), MM-57 (a qualified reader of the licensing), MM-63/MM-64 (backup storage
+  providers, the owner's choice). Outside M2 and the owner's: MM-432 (a one-week break option). Unverified on a device: the native sleep
+  readers, the online lookup through the shell's HTTP, screen readers, the phone's largest text.
+- Roadmap: WS-15, WS-07, WS-08, WS-03, WS-04, WS-02 steps tagged M2 are built; `mm roadmap` regenerated.
+
+## Session 38: 2026-10-19 to 20, Claude (M2 closed up on one branch: backup, coaching rules, targets, period days, training, what to expect, the icon)
+
+- The owner asked for backup and restore in M2 and to "get started on M2 and
+  close up all the tickets there on a single branch" (`feat/m2`); mid-session
+  the owner added the app icon and two loading screens. Every owner-open
+  decision in this session was taken under that instruction and recorded on
+  the ticket as "say if wrong"; nothing was asked.
+- **Commits on the branch so far:** the seven M2 design bugs through the
+  panel (`44cb4b6`), backup and restore with the noisy-logger rule
+  (`dc14797`), the Add food sheet and the week's summary (`842d3f8`), and
+  this session's uncommitted batch below (committed once `mm check` is
+  green).
+- **Built this session, M2 tickets closed:** MM-141 (three more insight
+  rules: weekend higher, waist against weight, consistent day; every rule
+  against six simulated people for banned words; register rows for every
+  rule and threshold), MM-140 (training start masks a stall; the
+  closed-loop "estimate was high" scenario; "a gentler pace" is a button;
+  cycle data shortens the window), MM-123 (targets rounded to 25 kcal and
+  5 g, the on-target band drawn on the arc and said in the caption, the
+  label-accuracy line once, Exact targets in Settings), MM-128 (Gentle,
+  Standard, Faster with what each costs today, the 35% deficit cap, a pace
+  change at once built on the estimate the targets rest on, in onboarding
+  and on the Coach), MM-130 (the maintenance anchor and band, the drift
+  question, the rebound said before it happens, the pause before another
+  cut, Ease into maintenance), MM-20 (period days on Progress, the trend
+  widened and the chart shaded), MM-134 (the training notes, the lean-gain
+  acknowledgement, lapse notices, the surplus suspended), MM-158 ("What to
+  expect", onboarding step 8 and reread from the Coach, the weigh-in
+  reminder offered there), MM-180 and MM-136 (closed: built and tested),
+  MM-413 (the camera failure announced, focus kept). Schema 11: exact
+  targets, the label note, easing in, the pace change day, the maintenance
+  anchor and correction, the pace on each targets record, the
+  `menstruation_days` table.
+- **The icon and splash (owner's art):** `apps/mobile/design/` holds the
+  masters; `scripts/app-icons.py` (pure Python) writes every iOS, Android
+  and web icon and splash; the launch storyboard shows the splash whole on
+  the art's sky colour. See the app's README.
+- **Where M2 stands:** 128 of 156 tickets done. Left, with why: MM-135,
+  MM-51, MM-57, MM-288 wait on the owner or on people; MM-63/MM-64 wait on
+  the owner's choice of storage providers; MM-155 (the protocol drawing,
+  the waist chart, the monthly report's figure), MM-142 (the weight-jump
+  explanation), WS-08's food tickets (MM-42, 43, 49, 150, 151, 152, 167:
+  each with a short "not built" list in its progress), MM-55/MM-56/MM-153
+  (phone timings, a real device run, licensing), WS-15 sleep (three
+  stories), WS-03 (MM-91, 106, 286, 287, 289, 304, 357) are buildable and
+  next on this branch.
+- **Owner questions recorded on tickets:** "kcal left" kept over the
+  ticket's "to go" (MM-123); the example deficits reflect the engine's
+  energy density, not 7,400 kcal/kg (MM-128); strength-on-a-cut lives under
+  the lift, not the dashboard (MM-141); a check-in now waits for the
+  training log and preferences to load (CheckIn).
+- Roadmap: WS-09 step 3, WS-06 steps 4 to 6, WS-07 steps 2 and 3, WS-05
+  steps 3 and 4, WS-08 steps 5 and 9 advanced to built.
+
 ## Session 37: 2026-10-19, Claude (the iOS shell: five plugins in Swift, on the owner's Mac)
 
 - The owner's 2016 MacBook Pro was brought to macOS Sequoia 15.8 and Xcode
@@ -474,91 +564,30 @@ no iOS app yet (the owner's call). Phone checks listed above.
   `--env dev|demo` installs a twin. Unit tests in `tool/test/phones.test.ts`.
   The owner's phone was paired but not connected in the session, so the
   install and launch are the owner's first run to verify.
+- **M2 on one branch (`feat/m2`, the owner, 2026-10-19: close the beta's
+  tickets on a single branch; backup and restore moved into M2).** Done so
+  far: the seven design bugs (MM-324, MM-336, MM-342, MM-351, MM-352,
+  MM-373, MM-374) in one batch through the panel
+  (`docs/agent-runs/m2-design-bugs`; MM-413 proposed from it); **backup and
+  restore (MM-63, MM-64 in progress)**: libsodium Argon2id and
+  XChaCha20-Poly1305 behind `BackupCipher`, the file format with a bound
+  plain header, `BackupPlatform` (wasm, native `MmBackup` plugin in Swift
+  and Kotlin, a fake), `SqlDataRestorer` copying every table in one write
+  after migrating the copy, schema version 10 (`last_backup_epoch_day`),
+  Settings > Backup with the passphrase sheet and the restore confirmation,
+  four stories; both shells build; the share sheet and picker are untested
+  on a device. The providers (Google Drive and the rest) wait on the owner's
+  developer registrations. The panel reviewed the section
+  (`docs/agent-runs/mm63-backup`; pass): the cloud-backup sentence, the
+  dialog's description, a 12-character minimum with a Show toggle, the busy
+  row staying a button. **Owner questions:** a restore entry at the welcome
+  step for a fresh phone (Settings needs setup first); whether Android's
+  "handed to another app" counts as a backup made; the renders of the seven
+  `SettingsBackup*`/`SettingsRestore*` stories in the three palettes; on the
+  phone, the share sheet and picker, and the keyboard over the sheet's buttons. Remaining M2 tickets are listed by `mm roadmap`;
+  the next in order: MM-357 (story people), the WS-08 leftovers, the WS-09
+  coaching leftovers, the WS-06 target stories, the WS-15 sleep stories.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to
   another account on that Mac, so `brew install` fails there.
-
-## Session 36: 2026-10-18, Claude (anti-cruft: lines that narrate the layout)
-
-- The owner, on the empty Food screen: "Nothing logged yet. Start with
-  breakfast." is cruft that fills white space, AI slop; have the UX and
-  Product roles inspect the app. The line was prescribed by
-  `design/screen-direction.md`, now corrected; the anti-cruft doc gains a
-  "No narration" limit.
-- **Panel run:** `docs/agent-runs/mm389-anti-cruft/` (product and UX audits
-  of the whole app; the product designer PASS and the UX guard PASS after
-  its one blocking finding on a test was fixed).
-- **Built:** MM-389 (seventeen narrating lines cut or rewritten, folds over
-  empty sections gone, a stale fold forgotten, the arc no longer spoken twice),
-  MM-390 (a past day heard as today in three places). Opened: MM-391 (one
-  route to the check-in on Coach) and MM-392 (the unmarked day's subtitle,
-  pending the coaching and safety roles).
-- **Say if any is wrong:** Train keeps its one reason line; Progress says
-  "No trend yet."; "Encrypted backup is coming" removed from Settings.
-- Incident: a scratch worktree linked to `apps/mobile/node_modules` was
-  removed with git, which deleted part of the real install through the
-  link; `npm ci` restored it. Nothing in the repository was affected.
-- Roadmap: WS-03 step 18 added (MM-389 to MM-392).
-- **Then, by message:** the owner logged biscuits and saw only the portion
-  check, not the protein line that also held: "It should show multiple."
-  MM-362's "one insight per item" (a choice recorded for the owner to
-  overrule) is gone. MM-393: every rule that holds on an item shows its own
-  line, the higher priority first, under foods, lifts and the Dashboard's
-  rows. Reviewed in `docs/agent-runs/mm393-several-insights/`, where both roles
-  passed it. WS-09 step 12.
-- **Found while verifying:** three workout stories failed `npm run unseen`
-  (the covered story run in `mm check`) on main itself on this machine: their
-  walks waited the default second. MM-394 sets five seconds for every walk
-  in the story suite, as `pressNamed` already did. WS-03 step 19.
-- **Then, from a phone screenshot:** the Steps row read "28 readings from
-  com.android.healthconnect.phone.j0716…" and ran out of the card. MM-395: the
-  plugin names a source by its app label; no name is counted, never shown
-  as the package; list rows wrap long words. WS-11 step 11.
-- **Then, on branch `feat/net-carbs`, by message, all on one branch at the
-  owner's word:** net carbs, on by default and everywhere carbs show, net =
-  total − fiber − sugar alcohols (MM-396); sugar alcohols carried through
-  pack format 3, the label reader, saved foods and the phone's store
-  (schema 9), with an EU label's carbohydrate made a US total at build time
-  (MM-397); Settings as an accordion, closed by default (MM-398); a folding
-  section's heading moved outside its button (MM-399); the page that
-  scrolled the frame away, found by measuring a story at 2,500 px on a
-  915 px screen (MM-400); "Your own amount." and a filler guard in the
-  voice test (MM-401); one spacing rhythm around folding groups (MM-402).
-  Reviewed in `docs/agent-runs/mm396-net-carbs/`. The first pack build in
-  format 3 is the owner's; format 3 packs must not be published before the
-  app that reads them (an older app now skips them). WS-08 step 13, WS-03
-  step 20.
-
-## Session 35: 2026-10-18, Claude (the grade of the app's own; a third source, the reliability score, concurrent downloads)
-
-- The owner withdrew the published grading tables ("not what I asked you to
-  build") and chose, through the question tool: nutrient density per calorie
-  with the vitamins and minerals; calories, macros, fiber and sodium
-  required; the grade unnamed; run end to end. Then by message, no questions:
-  add a food data source with the panel, derive a reliability score and
-  order search by it (the scan ranking the author's), enable concurrent
-  pack downloads, make the download button an icon.
-- **Panel runs:** `docs/agent-runs/mm380-proprietary-grade/` (nutrition,
-  micronutrients, measurement, integrations on the draft method and the
-  pack question; all "build with the listed changes") and
-  `mm383-sources-and-downloads/` (integrations, product, react-capacitor on
-  the source, the score and the downloads; product designer and UX guard on
-  the renders). Every reconciliation is in each run's `decision.md`.
-- **Built:** MM-380 (the method, `docs/food-grades.md`, 61-food calibration
-  set, 23 register rows), MM-382 (the engine, the popover's "not counted"
-  sentences), MM-381 (`docs/food-packs-data.md`), MM-383 (FNDDS wired, the
-  reliability score, search order, the build-time conflict policy, one name
-  one food, the build gate, coverage per source, CC0 terms), MM-384
-  (concurrent downloads, the icon, a card and a strip line per download),
-  MM-385 and MM-388 (bugs found by the panel, fixed with failing-first
-  tests), MM-386 and MM-387 opened (the catalog re-open leak; streaming to
-  the file natively).
-- **Measured** on the published packs with node:sqlite: 89.9% of common
-  foods and 82.8% of barcode foods grade today on the new method.
-- **Not done:** a real pack build (DuckDB not installed; sources not
-  downloaded), so FNDDS and the coverage shares are unmeasured until the
-  owner runs the commands; paging in search (MM-42) as FNDDS enlarges the
-  generic block; an added-sugars column (format 3) that would retire most of
-  the sugars waiver.
-- Roadmap: WS-08 step 12 added (MM-380 to MM-388).

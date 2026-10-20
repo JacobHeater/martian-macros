@@ -5,6 +5,8 @@ import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
+import type { DataRestorer } from '../domain/repositories/DataRestorer';
+import type { BackupPlatform } from '../backup/BackupPlatform';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -14,6 +16,8 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
+import type { SleepRepository } from '../domain/repositories/SleepRepository';
+import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
@@ -29,6 +33,8 @@ import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { Watched } from '../lang/Watched';
+import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
+import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
 import type { BarcodeScanner } from '../platform/BarcodeScanner';
 import type { LabelTextReader } from '../platform/LabelTextReader';
 
@@ -44,6 +50,10 @@ export interface AppServices {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  /** The days marked with menstrual flow (MM-20). */
+  readonly flowDays: MenstruationRepository;
+  /** The nights of sleep the person typed (MM-250); imported nights come through `healthSamples`. */
+  readonly sleep: SleepRepository;
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
@@ -62,6 +72,10 @@ export interface AppServices {
   readonly healthSamples: HealthSampleStore;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
+  /** Puts a backup in place of this phone's data (MM-63). */
+  readonly restorer: DataRestorer;
+  /** The phone's part of a backup: the snapshot, the share sheet and the file picker (MM-63). */
+  readonly backup: BackupPlatform;
 
   /** The installed food packs read as one catalog (MM-42); given again when a pack is installed or removed. */
   readonly catalog: Watched<FoodCatalog>;
@@ -77,6 +91,12 @@ export interface AppServices {
    * Empty means this build offers no downloads and makes no request.
    */
   readonly packManifestUrl: string;
+
+  /** The web services that may be asked for a food the phone does not have, if the person allows it (MM-58). None in a build without them. */
+  readonly onlineSources: readonly OnlineFoodSource[];
+
+  /** Foods found online, kept on the phone (MM-58). */
+  readonly onlineFoods: OnlineFoodCache;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
 

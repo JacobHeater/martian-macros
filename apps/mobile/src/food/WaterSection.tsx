@@ -116,6 +116,7 @@ export function WaterSection({ day }: { day: CalendarDate }) {
       // No drinks yet, nothing to fold (MM-389).
       collapsible={entries.length > 0}
       maintainState
+      remember="food.water"
       trailing={<MmIconButton icon="plus" kind="add" label="Add water" onPress={() => void add()} />}
     >
       {entries.map((entry) => (

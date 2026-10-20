@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { Watched } from '../lang/Watched';
+import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
 import { orNull } from './columns';
 import { foodFromRow } from './foodFromRow';
@@ -54,6 +55,18 @@ export class SqlFoodRepository implements FoodRepository {
 
   deleteFood(id: number): Promise<void> {
     return this.db.write(['food_entries'], (db) => db.execute('DELETE FROM food_entries WHERE id = ?', [id]));
+  }
+
+  async lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
+    if (foodIds.length === 0) return undefined;
+    const rows = await this.db.read((db) =>
+      db.select(
+        `SELECT * FROM food_entries WHERE origin_pack_id = ? AND origin_food_id IN (${foodIds.map(() => '?').join(', ')}) ` +
+          'ORDER BY id DESC LIMIT 1',
+        [packId, ...foodIds],
+      ),
+    );
+    return rows.length === 0 ? undefined : foodFromRow(rows[0] as SqlRow);
   }
 
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {

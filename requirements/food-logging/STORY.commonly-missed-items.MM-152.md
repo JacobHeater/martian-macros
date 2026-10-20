@@ -1,6 +1,6 @@
 ---
 id: MM-152
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-23, MM-27, MM-39, MM-40, MM-108, MM-114, MM-127, MM-140, MM-151]
 ---
@@ -104,3 +104,37 @@ choosing one logs a second entry, "Cooking oil" (4.5 g or 13.5 g of fat, about 4
 dismissed" (the control is optional and defaults to No each time, so there is nothing to dismiss), and "cooked" is judged from the
 pack's preparation state because the pack has no category for pan-fried or roasted foods, so rice, which is not usually cooked in
 oil, is offered it too.
+
+## Progress (2026-10-20, feat/m2)
+Built: **the user's usual cooking fat.** Once a spoon is chosen under "Cooked with oil?", the amount step shows which fat, as choice
+chips like the "Amount in" chips above: Oil, Butter, Ghee, Coconut oil (`CookingFatKind`, each with its USDA numbers per 100 g and
+its spoon weights), the person's usual one preselected, with a caption saying what it adds ("Adds butter as its own entry: about
+34 kcal · 4 g fat"). The fat chosen is logged under its own name ("Butter", "Cooking oil") and becomes the usual
+(`usual_cooking_fat` on the preferences, schema 14, `CookingFatReader`/`Writer`, oil until chosen), so the next time it is one tap.
+Tests: `test/domain/cookingFat.test.ts`, the preferences contract, `test/food/rawOrCooked.test.tsx` ("butter chosen as the fat is
+logged as butter and remembered as the usual"). Story: `AddFoodAmountCookedWithOil`.
+
+Already true, recorded here: the line is suppressed while the under-eating notice is active (MM-114 is built; tested in
+`easyToMiss.test.tsx`), and a word searched from the line lists the person's own recent foods above the pack's results, so "the
+user's own recent ones first" holds.
+
+Decided here (say if wrong): the usual fat is learned where it is used, on the amount step, with no Settings control (Settings is
+another lane's this round, and a control there would be a second home for one choice); "off for this food once dismissed" is not
+built, because the control defaults to No and asks nothing, so there is nothing to dismiss; add-food filtered to a *kind* of item
+stays a word searched, since the pack has no categories (the food-database lane); "cooked" is still judged from the pack's state,
+so rice is offered oil too; the fade stays by calendar days since onboarding, the simplest reading of "days of use".
+
+### After the panel's review (2026-10-20, `docs/agent-runs/ws08-m2-close/`)
+- **The question stays while the weight is switched to raw** (UX-1, PD-10): "Cooked with oil?" is offered for a generic food
+  that is cooked *or has a cooked form*, so weighing rice raw and frying it in butter logs both. Decided here (say if wrong).
+- **The Logs line names the second entry** (UX-2, PD-2): "Logs 730 kcal · … · 1 g fat. Plus butter as its own entry: about
+  34 kcal · 4 g fat." The control sits above the line, so everything that changes what is logged precedes the summary; the
+  macro split is the food's own, since the fat is its own entry. The earlier caption under the chips is gone: one place says it.
+- **"Which fat" has a visible label** (UX-3), like "Weighed as" and "Cooked with oil?".
+- Open for the owner: the question's word is "oil" while the chips offer butter and ghee (PD-7; "Cooked in oil or butter?" is
+  the alternative); and whether the control should be withheld for an eating-disorder history as the easy-to-miss line is
+  (the UX reviewer's safety question). Neither is changed here: the control asks what went into the food, not for more.
+
+## UI/UX
+- Cooked with oil, which fat — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmountCookedWithOil). The chip
+  row below the spoon, built like "Amount in"; the Logs line naming both entries.

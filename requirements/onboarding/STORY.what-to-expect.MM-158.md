@@ -1,6 +1,6 @@
 ---
 id: MM-158
-status: proposed
+status: done
 component: onboarding
 related: [MM-9, MM-12, MM-24, MM-25, MM-96, MM-108, MM-128, MM-130, MM-131, MM-133, MM-136, MM-139, MM-142, MM-143, MM-146]
 ---
@@ -93,3 +93,19 @@ Scenario: Rereading
 - Priority: should-have; small, and it prepares the ground for MM-131 and MM-138, whose effects the user will otherwise meet cold.
 - The onboarding Epic's three-minute target (MM-9) should still hold: this is one screen and one tap.
 - Wording goes through MM-96's claims review, since it is the place the app comes closest to describing outcomes.
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **One screen after the plan step** ("What to expect", onboarding step 8, `WhatToExpectStep`) with at most five short points by
+  goal (`whatToExpectPoints`), every figure the person's own: the aim as a range of two thirds to four thirds of the chosen pace
+  times their weight, labelled "aims for"; the day-to-day figure as one to two standard deviations of the trend model's water noise
+  for their weight (MM-18); the two weeks of calibration and the small first change; creatine (fat loss); for recomp the flat scale,
+  waist and strength, the eight-week review and who it suits; for lean gain the first week's water and food and that faster adds
+  fat; for maintenance the band (MM-130). A female profile who has not said she is past menopause gets the point about periods
+  (MM-20). Every version ends "These are the plan's aims, not promises. Bodies vary, and the coach adjusts to yours."
+- **Reread from the Coach tab**: a "What to expect" row under the goal opens `WhatToExpectScreen`, built from the goal and pace in
+  force now.
+- **The weigh-in reminder is offered on that step**, once, as a switch; on, it is saved at the default morning time after the
+  phone's permission (MM-146).
+- Tests: `whatToExpect.test.tsx` (each acceptance scenario; no promised amounts). Stories: `WhatToExpect` (first run),
+  `WhatToExpectReread` (Coach). The claims review (MM-96) is the test that no point states an amount by a date.

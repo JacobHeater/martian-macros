@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-19",
+  "asOf": "2026-10-20",
   "generatedFrom": {
     "requirements": "requirements/ (287 tickets, MM-1 to MM-289; 170 done, 51 in-progress, 66 proposed)",
     "statusSource": "mm req (ticket status in requirements/ is authoritative; mm req fails when the built/remaining lists or the steps here disagree with it, MM-245)",
@@ -412,7 +412,7 @@
     {
       "id": "M2",
       "name": "Closed beta",
-      "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating.",
+      "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating, and a backup the person can restore (the owner, 2026-10-19).",
       "requires": [
         {
           "workstream": "WS-03",
@@ -498,7 +498,11 @@
             "MM-357",
             "MM-360",
             "MM-373",
-            "MM-374"
+            "MM-374",
+            "MM-417",
+            "MM-422",
+            "MM-436",
+            "MM-437"
           ]
         },
         {
@@ -595,7 +599,12 @@
             "MM-221",
             "MM-408",
             "MM-410",
-            "MM-411"
+            "MM-411",
+            "MM-413",
+            "MM-58",
+            "MM-435",
+            "MM-428",
+            "MM-429"
           ]
         },
         {
@@ -614,7 +623,17 @@
           "tickets": [
             "MM-250",
             "MM-251",
-            "MM-252"
+            "MM-252",
+            "MM-414",
+            "MM-415",
+            "MM-416"
+          ]
+        },
+        {
+          "workstream": "WS-12",
+          "tickets": [
+            "MM-63",
+            "MM-64"
           ]
         }
       ]
@@ -635,6 +654,12 @@
           "workstream": "WS-01",
           "tickets": [
             "MM-8"
+          ]
+        },
+        {
+          "workstream": "WS-02",
+          "tickets": [
+            "MM-432"
           ]
         },
         {
@@ -680,9 +705,7 @@
         {
           "workstream": "WS-12",
           "tickets": [
-            "MM-65",
-            "MM-63",
-            "MM-64"
+            "MM-65"
           ]
         },
         {
@@ -744,7 +767,6 @@
             "MM-171",
             "MM-46",
             "MM-44",
-            "MM-58",
             "MM-172",
             "MM-306",
             "MM-308",
@@ -790,6 +812,7 @@
             "MM-362",
             "MM-363",
             "MM-364",
+            "MM-418",
             "MM-371",
             "MM-365",
             "MM-366",
@@ -1193,14 +1216,15 @@
           "MM-115",
           "MM-120",
           "MM-131",
-          "MM-132"
+          "MM-132",
+          "MM-135",
+          "MM-173"
         ],
         "remaining": [
           "MM-22",
           "MM-35",
           "MM-110",
-          "MM-135",
-          "MM-173"
+          "MM-432"
         ]
       },
       "sequence": [
@@ -1266,6 +1290,14 @@
           "milestone": "M2",
           "tickets": [
             "MM-173"
+          ]
+        },
+        {
+          "step": 9,
+          "title": "The one-week break choice: a setups column, chosen length carried by the break's record",
+          "milestone": "M3",
+          "tickets": [
+            "MM-432"
           ]
         }
       ],
@@ -1423,14 +1455,31 @@
           "MM-400",
           "MM-401",
           "MM-402",
-          "MM-407"
+          "MM-407",
+          "MM-324",
+          "MM-336",
+          "MM-342",
+          "MM-351",
+          "MM-352",
+          "MM-373",
+          "MM-374",
+          "MM-357",
+          "MM-289",
+          "MM-422",
+          "MM-91",
+          "MM-106",
+          "MM-286",
+          "MM-287",
+          "MM-288",
+          "MM-304",
+          "MM-436",
+          "MM-437",
+          "MM-417"
         ],
         "remaining": [
           "MM-89",
-          "MM-91",
           "MM-97",
           "MM-101",
-          "MM-106",
           "MM-108",
           "MM-109",
           "MM-176",
@@ -1438,19 +1487,6 @@
           "MM-183",
           "MM-224",
           "MM-242",
-          "MM-286",
-          "MM-287",
-          "MM-288",
-          "MM-289",
-          "MM-304",
-          "MM-324",
-          "MM-336",
-          "MM-342",
-          "MM-351",
-          "MM-352",
-          "MM-357",
-          "MM-373",
-          "MM-374",
           "MM-375",
           "MM-391",
           "MM-392",
@@ -1593,7 +1629,9 @@
             "MM-286",
             "MM-287",
             "MM-288",
-            "MM-289"
+            "MM-289",
+            "MM-436",
+            "MM-437"
           ],
           "milestone": "M2"
         },
@@ -1727,6 +1765,15 @@
             "MM-403"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 21,
+          "title": "Closing M2's app-shell and design tasks (2026-10-20, WS-03): what the close found in passing",
+          "tickets": [
+            "MM-417",
+            "MM-422"
+          ],
+          "milestone": "M2"
         }
       ],
       "gate": {
@@ -1771,15 +1818,15 @@
           "MM-53",
           "MM-54",
           "MM-307",
-          "MM-409"
+          "MM-409",
+          "MM-55",
+          "MM-56",
+          "MM-153"
         ],
         "remaining": [
           "MM-50",
           "MM-51",
-          "MM-55",
-          "MM-56",
-          "MM-57",
-          "MM-153"
+          "MM-57"
         ]
       },
       "sequence": [
@@ -1903,13 +1950,13 @@
           "MM-82",
           "MM-83",
           "MM-112",
-          "MM-164"
+          "MM-164",
+          "MM-134",
+          "MM-158"
         ],
         "remaining": [
           "MM-80",
-          "MM-113",
-          "MM-134",
-          "MM-158"
+          "MM-113"
         ]
       },
       "sequence": [
@@ -2015,16 +2062,16 @@
           "MM-138",
           "MM-139",
           "MM-143",
-          "MM-144"
+          "MM-144",
+          "MM-123",
+          "MM-128",
+          "MM-130"
         ],
         "remaining": [
           "MM-119",
           "MM-122",
-          "MM-123",
           "MM-124",
-          "MM-128",
           "MM-129",
-          "MM-130",
           "MM-137"
         ]
       },
@@ -2151,17 +2198,17 @@
         "built": [
           "MM-16",
           "MM-17",
-          "MM-21"
+          "MM-21",
+          "MM-20",
+          "MM-136",
+          "MM-142",
+          "MM-155"
         ],
         "remaining": [
           "MM-15",
-          "MM-20",
           "MM-34",
           "MM-118",
-          "MM-136",
-          "MM-142",
           "MM-154",
-          "MM-155",
           "MM-156",
           "MM-157"
         ]
@@ -2330,34 +2377,38 @@
           "MM-396",
           "MM-397",
           "MM-408",
-          "MM-410"
+          "MM-410",
+          "MM-218",
+          "MM-219",
+          "MM-220",
+          "MM-221",
+          "MM-411",
+          "MM-180",
+          "MM-413",
+          "MM-42",
+          "MM-43",
+          "MM-58",
+          "MM-435",
+          "MM-49",
+          "MM-150",
+          "MM-151",
+          "MM-152",
+          "MM-167",
+          "MM-428",
+          "MM-429"
         ],
         "remaining": [
           "MM-386",
           "MM-387",
           "MM-37",
-          "MM-42",
-          "MM-43",
           "MM-44",
           "MM-45",
           "MM-46",
-          "MM-49",
-          "MM-58",
           "MM-126",
           "MM-127",
-          "MM-150",
-          "MM-151",
-          "MM-152",
-          "MM-167",
-          "MM-180",
-          "MM-218",
-          "MM-219",
-          "MM-220",
-          "MM-221",
           "MM-305",
           "MM-329",
-          "MM-406",
-          "MM-411"
+          "MM-406"
         ]
       },
       "sequence": [
@@ -2404,16 +2455,20 @@
             "MM-217",
             "MM-408",
             "MM-410",
-            "MM-411"
+            "MM-411",
+            "MM-428"
           ],
           "milestone": "M2"
         },
         {
           "step": 5,
-          "title": "Barcode scanning; raw or cooked",
+          "title": "Barcode scanning; raw or cooked; live lookup with consent",
           "tickets": [
             "MM-43",
-            "MM-151"
+            "MM-151",
+            "MM-413",
+            "MM-58",
+            "MM-435"
           ],
           "milestone": "M2"
         },
@@ -2440,7 +2495,6 @@
           "title": "Nutrition-label scanning; live lookup with consent",
           "tickets": [
             "MM-44",
-            "MM-58",
             "MM-172"
           ],
           "milestone": "M4"
@@ -2459,7 +2513,8 @@
             "MM-218",
             "MM-219",
             "MM-220",
-            "MM-221"
+            "MM-221",
+            "MM-429"
           ]
         },
         {
@@ -2593,6 +2648,7 @@
           "MM-372",
           "MM-362",
           "MM-364",
+          "MM-418",
           "MM-366",
           "MM-367",
           "MM-378",
@@ -2601,23 +2657,23 @@
           "MM-371",
           "MM-379",
           "MM-377",
-          "MM-393"
+          "MM-393",
+          "MM-149",
+          "MM-147",
+          "MM-114",
+          "MM-140",
+          "MM-141"
         ],
         "remaining": [
           "MM-33",
           "MM-36",
           "MM-92",
-          "MM-114",
           "MM-116",
           "MM-117",
           "MM-125",
-          "MM-140",
-          "MM-141",
           "MM-145",
           "MM-146",
-          "MM-147",
           "MM-148",
-          "MM-149",
           "MM-248",
           "MM-361",
           "MM-368",
@@ -2714,6 +2770,7 @@
             "MM-362",
             "MM-363",
             "MM-364",
+            "MM-418",
             "MM-371",
             "MM-365",
             "MM-366",
@@ -3052,7 +3109,7 @@
       "file": "ws-12-backup-and-portability.md",
       "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose.",
       "recommendedOrder": 13,
-      "status": "not-started",
+      "status": "in-progress",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3099,7 +3156,7 @@
           "tickets": [
             "MM-63"
           ],
-          "milestone": "M3"
+          "milestone": "M2"
         },
         {
           "step": 3,
@@ -3107,7 +3164,7 @@
           "tickets": [
             "MM-64"
           ],
-          "milestone": "M3"
+          "milestone": "M2"
         }
       ],
       "gate": {
@@ -3116,7 +3173,7 @@
         ],
         "meaning": "A backup made at one schema version restores at a later one."
       },
-      "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring."
+      "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring. 2026-10-19: MM-63 and MM-64 built as far as the share sheet and picker (the providers wait on the owner's registrations); moved into M2."
     },
     {
       "id": "WS-13",
@@ -3233,7 +3290,7 @@
       "file": "ws-15-sleep.md",
       "intent": "Sleep as a first-class signal: a nightly record from a wearable or by hand, sleep disorders in the health check, and a coach that reads it (MM-249, the owner's decision of 2026-10-13).",
       "recommendedOrder": 15,
-      "status": "not-started",
+      "status": "partially-built",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3259,12 +3316,16 @@
         "HS-onboarding-screen"
       ],
       "sourceRequirements": {
-        "built": [],
-        "remaining": [
-          "MM-249",
+        "built": [
           "MM-250",
           "MM-251",
-          "MM-252"
+          "MM-252",
+          "MM-414",
+          "MM-415",
+          "MM-416"
+        ],
+        "remaining": [
+          "MM-249"
         ]
       },
       "sequence": [
@@ -3272,7 +3333,8 @@
           "step": 1,
           "title": "The record, imported and typed",
           "tickets": [
-            "MM-250"
+            "MM-250",
+            "MM-414"
           ],
           "milestone": "M2"
         },
@@ -3288,13 +3350,22 @@
           "step": 3,
           "title": "The coach reads it, after the panel pass in grading mode",
           "tickets": [
-            "MM-252"
+            "MM-252",
+            "MM-415"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 4,
+          "title": "After the design review: the Progress entries onto a surface, or the exception written",
+          "tickets": [
+            "MM-416"
           ],
           "milestone": "M2"
         }
       ],
       "gate": null,
-      "notes": "Added 2026-10-13 on the owner's decision that sleep is first class; the earlier \"emerging\" grading in MM-116 is overruled with the evidence in MM-249."
+      "notes": "Added 2026-10-13 on the owner's decision that sleep is first class; the earlier \"emerging\" grading in MM-116 is overruled with the evidence in MM-249. MM-250, MM-251 and MM-252 built 2026-10-20 on feat/m2; the epic MM-249 stays open for the panel pass in grading mode and the owner's decision on a target change."
     }
   ],
   "dependencyEdges": [
@@ -4275,5 +4346,5 @@
       ]
     }
   ],
-  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both. Caught up 2026-10-13 (MM-245): the tickets of the React conversion, Storybook, the expert panel and the terms of use (MM-166 to MM-245) were placed, built/remaining now follow ticket status, and mm req checks that they do."
+  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both. Caught up 2026-10-13 (MM-245): the tickets of the React conversion, Storybook, the expert panel and the terms of use (MM-166 to MM-245) were placed, built/remaining now follow ticket status, and mm req checks that they do. 2026-10-19: backup and restore (WS-12 steps 2 and 3, MM-63, MM-64) moved from M3 into M2 on the owner's decision; the beta's testers must be able to keep their data."
 }

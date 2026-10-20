@@ -119,11 +119,41 @@ export const HealthCheck = screenStory({
   walk: (canvas) => walkOnboarding(canvas, 6),
 });
 
+/** MM-251: a diagnosed sleep disorder ticked: the caution with its clinician pointer, and nothing in the numbers. */
+export const HealthCheckSleepDisorder = screenStory({
+  covers: ['HealthStep'],
+  shows: /^Sleep disorders change how a deficit works for you/,
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 6);
+    await userEvent.click(await within(canvas).findByRole('checkbox', { name: /^A diagnosed sleep disorder/ }));
+  },
+});
+
+/** MM-128: under a chosen fat-loss goal, the three paces with what each would cost from the starting estimate. */
+export const GoalPaces = screenStory({
+  covers: ['GoalStep'],
+  shows: 'How fast',
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 7);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Fat loss/ }));
+  },
+});
+
 export const Goal = screenStory({
   covers: ['GoalStep'],
   shows: 'Your plan',
   scenario: newInstallScenario,
   walk: (canvas) => walkOnboarding(canvas, 7),
+});
+
+/** MM-158: the last step, what the first month will look like, every figure the person's own, and the weigh-in reminder offered once. */
+export const WhatToExpect = screenStory({
+  covers: ['WhatToExpectStep'],
+  shows: 'What to expect',
+  scenario: newInstallScenario,
+  walk: (canvas) => walkOnboarding(canvas, 8),
 });
 
 export const AdultsOnly = screenStory({
@@ -288,4 +318,33 @@ export const TermsAgreeFails = screenStory({
   terms: 'unanswered',
   stores: failingWrite('preferences', 'saveTermsAcceptance'),
   walk: pressAnywhere('I agree'),
+});
+
+/**
+ * MM-134, MM-417: the goal step for someone not lifting yet, Lean gain chosen: what training means here, and the one
+ * acknowledgement a surplus without training asks for. A lighter person, so Lean gain is among the goals offered.
+ */
+export const GoalLeanGainNotTraining = screenStory({
+  covers: ['GoalStep'],
+  shows: /^Training here means/,
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    const app = within(canvas);
+    const press = async (name: string | RegExp) => userEvent.click(await app.findByRole('button', { name }, { timeout: 5000 }));
+    await press('Begin');
+    await press('Male');
+    await press('Next');
+    await press(/Choose a date/);
+    await userEvent.click(await within(await app.findByRole('dialog')).findByRole('button', { name: 'OK' }));
+    await press('Next');
+    await userEvent.type(await app.findByRole('textbox', { name: 'Feet' }), '5');
+    await userEvent.type(await app.findByRole('textbox', { name: 'Inches' }), '11');
+    await userEvent.type(await app.findByRole('textbox', { name: 'lb' }), '150');
+    await press('Next');
+    await press('Next');
+    await press('Not lifting yet');
+    await press('Next');
+    await press('Next');
+    await press(/^Lean gain/);
+  },
 });

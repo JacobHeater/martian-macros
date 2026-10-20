@@ -91,11 +91,14 @@ export function InlineInsight({ insight, layout = 'entry', initiallyExpanded = f
             <StatRow key={label} label={label} value={value} />
           ))}
           <div className="coach-inline-insight-settings">
-            <MmButton
-              label={`Settings for “${insight.rule}”`}
-              kind="text"
-              onPress={() => void navigator.push(() => <CoachAreaScreen area={insight.area} focus={insight.rule} />)}
-            />
+            {/* Only a line of a listed kind has a switch to go to (MM-418): a line of the app's own, or a design's, has none. */}
+            {logged === undefined ? null : (
+              <MmButton
+                label={`Settings for “${insight.rule}”`}
+                kind="text"
+                onPress={() => void navigator.push(() => <CoachAreaScreen area={insight.area} focus={insight.rule} />)}
+              />
+            )}
             {snooze === undefined ? null : (
               <MmButton label="Snooze…" name={`Snooze… ${insight.rule} for ${snooze.item}`} kind="text" onPress={() => void snoozeIt()} />
             )}

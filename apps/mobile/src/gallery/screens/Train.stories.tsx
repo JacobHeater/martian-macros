@@ -299,3 +299,11 @@ export const SetStartTime = screenStory({
     await userEvent.click(within(editor).getByRole('button', { name: /^Started/ }));
   },
 });
+
+/** MM-417: Train before any workout is finished: what the screen is for, in one line. */
+export const TrainFirstTime = screenStory({
+  covers: ['TrainScreen'],
+  shows: /^Strength is one of the three things the app watches/,
+  scenario: firstDayScenario,
+  open: onTrain,
+});

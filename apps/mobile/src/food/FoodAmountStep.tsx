@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
@@ -6,8 +6,11 @@ import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CookingFat } from '../domain/food/CookingFat';
+import { CookingFatKind } from '../domain/food/CookingFatKind';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { HandModel } from '../domain/food/hand/HandModel';
+import { conversionFor } from '../domain/food/portion/conversionFor';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import { parseQuantity } from '../domain/food/portion/parseQuantity';
@@ -20,13 +23,17 @@ import type { Meal } from '../domain/Meal';
 import type { QuantitySource } from '../domain/QuantitySource';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
+import { cookingFatEntryName } from '../format/cookingFatEntryName';
+import { cookingFatKindLabel } from '../format/cookingFatKindLabel';
 import { portionUnitChipLabel } from '../format/portionUnitChipLabel';
 import { portionUnitOf } from '../format/portionUnitOf';
+import { referenceBasisLabel } from '../format/referenceBasisLabel';
 import { quantityText } from '../format/quantityText';
 import { roundedToZeroNote } from '../format/roundedToZeroNote';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmSegmented } from '../ui/MmSegmented';
@@ -37,6 +44,7 @@ import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
 import { MealChips } from './MealChips';
 import { microsOfPackFood } from './microsOfPackFood';
+import { preparationOf } from './preparationOf';
 import './food.css';
 
 interface FoodAmountStepProps {
@@ -47,6 +55,8 @@ interface FoodAmountStepProps {
   onBack: () => void;
   /** Called once the food is logged. */
   onDone: () => void;
+  /** Copies a database food into the person's own to correct it ("Fix this food", MM-153); absent for their own foods. */
+  onFix?: (() => void) | undefined;
   /** Set when the food is one the user saved: its numbers are per serving. */
   custom?: CustomFood | undefined;
   /**
@@ -54,6 +64,11 @@ interface FoodAmountStepProps {
    * (MM-151): offered as a switch while logging by weight.
    */
   alternate?: CatalogFood | undefined;
+  /**
+   * Whether to start weighing as `alternate`: the state this food was last
+   * logged in, remembered per food (MM-151).
+   */
+  startOnAlternate?: boolean | undefined;
 }
 
 const n = (value: number) => `${roundHalfAwayFromZero(value) + 0}`;
@@ -83,10 +98,25 @@ const choiceLabel = (choice: AmountChoice) => {
  * grams, with the macros updating as the amount changes. Logging records
  * how it was measured.
  */
-export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, onBack, onDone, custom, alternate }: FoodAmountStepProps) {
+export function FoodAmountStep({
+  food: chosen,
+  servings,
+  day,
+  meal: firstMeal,
+  onBack,
+  onDone,
+  custom,
+  alternate,
+  startOnAlternate = false,
+  onFix,
+}: FoodAmountStepProps) {
+  const ids = useId();
   const { services, state } = useApp();
   const preview = useInsightPreview();
   const hand = useCell(state.handSize);
+  // Simple detail shows calories and protein only (MM-49); what is logged is the whole food.
+  const level = useLoaded(state.detailLevel) ?? 'standard';
+  const usualFat = useLoaded(state.usualCookingFat) ?? 'oil';
 
   const [choices] = useState<readonly AmountChoice[]>(() => {
     if (custom === undefined) {
@@ -103,21 +133,8 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
     ];
   });
 
-  /**
-   * Starts on the state (raw, dry or cooked) this food was last logged in,
-   * as far back as the recent foods go (MM-151).
-   */
-  const [remembered] = useState(() => {
-    if (alternate === undefined) return false;
-    const recents = state.recentFoods.peek();
-    for (const e of recents.ready ? recents.value : []) {
-      const origin = e.portion?.origin;
-      if (origin === undefined || origin.packId !== alternate.packId) continue;
-      if (origin.foodId === chosen.id) return false;
-      if (origin.foodId === alternate.id) return true;
-    }
-    return false;
-  });
+  // Starts on the state (raw, dry or cooked) this food was last logged in (MM-151).
+  const remembered = startOnAlternate && alternate !== undefined;
   const byWeight = choices.find((c) => c.unit === 'gram');
   const first = (remembered ? byWeight : undefined) ?? (choices[0] as AmountChoice);
 
@@ -126,11 +143,18 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   const [quantity, setQuantity] = useState(() => defaultQuantity(first));
   const [meal, setMeal] = useState(firstMeal);
   const [oil, setOil] = useState<CookingFat>('none');
+  /** The fat chosen here, once chosen; until then the person's usual (MM-152). */
+  const [fatChosen, setFatChosen] = useState<CookingFatKind | undefined>(undefined);
+  const fat = fatChosen ?? usualFat;
 
   /** The food being logged: the one chosen, or its raw or cooked counterpart. */
   const food = useAlternate && alternate !== undefined ? alternate : chosen;
-  /** A cooked generic food may have been cooked in oil (MM-152). */
-  const offersOil = custom === undefined && food.preparation === 'cooked';
+  /**
+   * A generic food that is cooked, or has a cooked form, may have been cooked
+   * in fat (MM-152): rice weighed raw is still fried, so the state switch
+   * never takes the question away (the panel's UX-1).
+   */
+  const offersOil = custom === undefined && (chosen.preparation === 'cooked' || alternate?.preparation === 'cooked');
 
   /**
    * The food's nutrition for 100 g, with the chosen serving's details so
@@ -167,7 +191,7 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
     if (PortionUnit.isWeight(choice.unit)) return 'weighed';
     const byHand = handMethod(choice.unit);
     if (byHand !== undefined) return byHand;
-    const packaged = custom !== undefined || food.source === 'usda_branded' || food.source === 'off';
+    const packaged = custom !== undefined || food.preparation === 'packaged' || food.source === 'usda_branded' || food.source === 'off';
     return packaged ? 'labelServing' : 'householdMeasure';
   };
 
@@ -206,17 +230,21 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
           impliedGrams: isHand ? grams : undefined,
           handModelVersion: isHand ? HandModel.version : undefined,
           origin: { packId: food.packId, foodId: food.id, source: food.source, sourceId: food.sourceId },
+          preparation: custom === undefined ? preparationOf(food) : undefined,
+          conversion: conversionFor(choice.unit, reference, { hand }),
         },
       }),
     );
-    const oilTotals = CookingFat.totals(oil);
+    const oilTotals = CookingFat.totals(oil, fat);
     if (oilTotals !== undefined && offersOil) {
+      // The fat chosen becomes the usual, so it is one tap next time (MM-152).
+      if (fat !== usualFat) await services.preferences.saveUsualCookingFat(fat);
       await services.food.addFood(
         new FoodEntry({
           id: 0,
           date: day,
           meal,
-          name: 'Cooking oil',
+          name: cookingFatEntryName(fat),
           kcal: oilTotals.kcal,
           proteinG: oilTotals.proteinG,
           carbsG: oilTotals.carbsG,
@@ -246,7 +274,17 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   const note =
     grams === undefined || custom !== undefined ? undefined : roundedToZeroNote(food, { description: 'amount', grams });
   const invalid = quantity.trim() !== '' && amount === undefined;
-  const oilTotals = offersOil ? CookingFat.totals(oil) : undefined;
+  const oilTotals = offersOil ? CookingFat.totals(oil, fat) : undefined;
+  const showsCarbsAndFat = DetailLevel.showsCarbsAndFat(level);
+  /** What the food's source states for its reference amount, and nothing invented (MM-153), in the level's fields (MM-49). */
+  const referenceLine =
+    `${referenceBasisLabel(reference.basis)}: ${n(reference.nutrition.kcal)} kcal · ${n(reference.nutrition.proteinG)} g protein` +
+    (showsCarbsAndFat ? ` · ${n(reference.nutrition.carbsG)} g carbs · ${n(reference.nutrition.fatG)} g fat` : '');
+  /** The fat, its own entry, said with the food's totals so the Logs line names everything Log it does (the panel's UX-2). */
+  const plusFat =
+    oilTotals === undefined
+      ? ''
+      : ` Plus ${cookingFatEntryName(fat).toLowerCase()} as its own entry: about ${n(oilTotals.kcal)} kcal${showsCarbsAndFat ? ` · ${n(oilTotals.fatG)} g fat` : ''}.`;
   const wholeGrams = grams === undefined ? undefined : quantityText(roundHalfAwayFromZero(grams) + 0);
   let helper: string | undefined;
   if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
@@ -284,7 +322,10 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
             onChange={(other) => setUseAlternate(other === true)}
           />
           {amount !== undefined && grams !== undefined ? (
-            <p className="app-caption">{consequence(grams, alternate)}</p>
+            <p className="app-caption">
+              {/* Why the switch starts where it does, when that came from memory (MM-151, the panel's UX-6). */}
+              {`${consequence(grams, alternate)}${remembered && useAlternate ? ` Starts on ${stateLabel(alternate).toLowerCase()}, as last time.` : ''}`}
+            </p>
           ) : null}
         </>
       ) : null}
@@ -297,16 +338,9 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         helper={helper}
         helperIsWarning={invalid}
       />
-      <p className="app-subhead food-totals" data-testid="amount-macros">
-        {totals === undefined
-          ? 'Enter an amount to see the totals.'
-          : `${isHand ? 'Estimated: ' : ''}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein · ` +
-            `${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
-            `${n(totals.fatG)} g fat`}
-      </p>
-      {note === undefined ? null : <Notice kind="info" text={note} />}
       {offersOil ? (
         <>
+          {/* Every control that changes what is logged comes before the line that says it (the panel's PD-2). */}
           <p className="food-label food-label-spaced">Cooked with oil?</p>
           <MmSegmented<CookingFat>
             name="Cooked with oil?"
@@ -318,9 +352,38 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
             selected={oil}
             onChange={(next) => setOil(next ?? 'none')}
           />
+          {oil === 'none' ? null : (
+            <>
+              {/* Which fat, the usual one first chosen, like the "Amount in" chips above (MM-152). */}
+              <p className="food-label food-label-spaced">Which fat</p>
+              <div className="app-row" role="group" aria-label="Which fat">
+                {CookingFatKind.values.map((kind) => (
+                  <MmChoiceChip key={kind} label={cookingFatKindLabel(kind)} selected={kind === fat} onSelect={() => setFatChosen(kind)} />
+                ))}
+              </div>
+            </>
+          )}
         </>
       ) : null}
-      {totals === undefined ? null : (
+      {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
+      <p className="app-caption food-reference-line">{referenceLine}</p>
+      {totals === undefined ? (
+        <p id={`${ids}-needed`} className="app-caption food-still-needed" data-testid="amount-macros">
+          Still needed: an amount above zero.
+        </p>
+      ) : (
+        <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="amount-macros">
+          {`${isHand ? 'Logs an estimate: ' : 'Logs '}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein` +
+            (showsCarbsAndFat
+              ? ` · ${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
+                `${n(totals.fatG)} g fat`
+              : '') +
+            (plusFat === '' ? '' : `.${plusFat}`)}
+        </p>
+      )}
+      {note === undefined ? null : <Notice kind="info" text={note} />}
+      {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. It is the food's own: the fat is its own entry (the panel's PD-2). */}
+      {totals === undefined || !showsCarbsAndFat ? null : (
         <>
           <p className="food-label food-label-spaced">{isHand ? 'Estimated macro split' : 'Macro split'}</p>
           <MacroSplitChart
@@ -328,11 +391,11 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
             intake={
               new IntakeDay({
                 date: day,
-                kcal: totals.kcal + (oilTotals?.kcal ?? 0),
-                proteinG: totals.proteinG + (oilTotals?.proteinG ?? 0),
-                carbsG: totals.carbsG + (oilTotals?.carbsG ?? 0),
-                netCarbsG: netCarbsG(totals.carbsG) + (oilTotals?.carbsG ?? 0),
-                fatG: totals.fatG + (oilTotals?.fatG ?? 0),
+                kcal: totals.kcal,
+                proteinG: totals.proteinG,
+                carbsG: totals.carbsG,
+                netCarbsG: netCarbsG(totals.carbsG),
+                fatG: totals.fatG,
               })
             }
             netCarbs={netCarbs}
@@ -342,7 +405,8 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
       <div className="app-gap" />
-      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} />
+      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
+      {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}
       <MmButton label="Back to search" kind="text" onPress={onBack} />
     </div>
   );

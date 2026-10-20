@@ -53,8 +53,11 @@ export async function storyFacts(
   let waterGoal: string;
   if (goals.waterGoalOff) waterGoal = 'Off';
   else if (goals.waterGoalMl !== undefined) waterGoal = `${waterAmount(goals.waterGoalMl, setup.unitSystem)}, their own`;
-  else if (suggested !== undefined) waterGoal = `${waterAmount(suggested, setup.unitSystem)}, suggested`;
-  else waterGoal = 'None suggested: a care team sets their fluids';
+  else if (suggested === undefined) waterGoal = 'None suggested: a care team sets their fluids';
+  // With no targets stored, the coach issues the first on opening, and the suggestion follows their protein
+  // target: an amount worked out here without it would be wrong on the screen (MM-422).
+  else if (targets.length === 0) waterGoal = 'Suggested, from the targets the coach issues on opening';
+  else waterGoal = `${waterAmount(suggested, setup.unitSystem)}, suggested`;
   const paused = pauseOn(pauses, today);
   return [
     ['Person', `${setup.profile.sex === 'male' ? 'Male' : 'Female'}, ${setup.profile.ageOn(today)}`],

@@ -246,6 +246,7 @@ describe('why targets changed', () => {
       'Your calorie floor is 1,500 kcal; the target would otherwise be 1,380 kcal.',
     );
     expect(explanationLineText(new ExplanationLine('userHold', 0))).toBe('You kept last week’s targets for now (0).');
+    expect(explanationLineText(new ExplanationLine('paceChange', 180))).toBe('You chose a different pace (+180).');
   });
 
   it('what would change them next, in order of what matters most', () => {
@@ -357,23 +358,69 @@ describe('notices', () => {
     );
   });
 
-  it('easing a deficit: a maintenance week or a slower pace, and sleep only when it has been short', () => {
-    const early = reliefOfferText({ suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3, shortSleep: false });
+  it('easing a deficit: a break or a slower pace, and sleep only when it has been short', () => {
+    const hard = ['hardCheckIns'] as const;
+    const signals = { reason: 'recoverySignals', signals: hard, sleepAverage: undefined, shortSleep: false } as const;
+    const early = reliefOfferText({ ...signals, suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3 });
     expect(early.title).toBe('Two hard weeks in a row');
     expect(early.suggestion).toBe(
       'The coach would slow the pace: you are early in this deficit, and a gentler pace is easier to hold than a break.',
     );
     expect(early.sleep).toBeUndefined();
 
-    const late = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true });
+    const late = reliefOfferText({ ...signals, suggestion: 'break', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true });
     expect(late.suggestion).toBe(
-      'The coach would take a maintenance week: you are 9 weeks into this deficit, and a week at maintenance is a diet break taken early.',
+      'The coach would take a break: you are 9 weeks into this deficit, and two weeks at maintenance is a rest from dieting, ' +
+        'which many people find makes the next weeks easier. Once taken, it runs its two weeks.',
     );
     expect(late.sleep).toContain('under six hours');
 
-    const noSlower = reliefOfferText({ suggestion: 'maintenanceWeek', slowerPace: undefined, deficitWeeks: 2, shortSleep: false });
+    const noSlower = reliefOfferText({ ...signals, suggestion: 'break', slowerPace: undefined, deficitWeeks: 2 });
     expect(noSlower.suggestion).toBe(
-      'The coach would take a maintenance week: a week at maintenance is a diet break taken early, and the deficit can resume after it.',
+      'The coach would take a break: two weeks at maintenance is a rest from dieting, which many people find makes the next ' +
+        'weeks easier, and the deficit resumes after it. Once taken, it runs its two weeks.',
     );
+
+    // MM-252: short sleep from the record is a signal of its own, with its own title and the average in the body.
+    const from = CalendarDate.of(2026, 9, 22);
+    const sleepOnly = reliefOfferText({
+      reason: 'recoverySignals',
+      suggestion: 'slowerPace',
+      slowerPace: 0.005,
+      deficitWeeks: 3,
+      shortSleep: true,
+      signals: ['shortSleep'],
+      sleepAverage: { averageMinutes: 330, nights: 12, from, to: from.addDays(13) },
+    });
+    expect(sleepOnly.title).toBe('Two weeks of short sleep');
+    expect(sleepOnly.body).toBe(
+      'Your sleep averaged 5 h 30 m over the last 12 nights. With short sleep, more of what you lose appears to be lean tissue and hunger runs higher.',
+    );
+    expect(sleepOnly.suggestion).toContain('slow the pace');
+    expect(sleepOnly.sleep).toBeUndefined();
+  });
+
+  // MM-135: the offer at twelve unbroken weeks says what a break is and what happens at twenty, and claims nothing about metabolism.
+  it('twelve weeks in a deficit: the break offer names the weeks and the cap', () => {
+    const offer = reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks: 12, shortSleep: false, signals: [], sleepAverage: undefined });
+    expect(offer.title).toBe('12 weeks in a deficit');
+    expect(offer.body).toBe(
+      'A break is two weeks at maintenance: a rest from dieting, which many people find makes the next weeks easier. ' +
+        'The deficit resumes after it, and the count starts again. Once taken, it runs its two weeks.',
+    );
+    expect(offer.suggestion).toBe(
+      'The coach would take the break now. If you carry on, the coach asks again in three weeks, and at 20 weeks it plans a break itself.',
+    );
+    expect(offer.sleep).toBeUndefined();
+    for (const text of [offer.title, offer.body, offer.suggestion]) {
+      expect(text.toLowerCase()).not.toMatch(/metabol|reset|recover|repair/);
+    }
+    // Near the cap, "asks again in three weeks" would be false (the panel's UX-3): the planned break is what comes next.
+    const at = (deficitWeeks: number) =>
+      reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks, shortSleep: false, signals: [], sleepAverage: undefined }).suggestion;
+    expect(at(16)).toContain('asks again in three weeks');
+    expect(at(17)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 3 weeks, at 20 weeks.');
+    expect(at(18)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 2 weeks, at 20 weeks.');
+    expect(at(19)).toBe('The coach would take the break now. If you carry on, the app plans the break itself at the next check-in, at 20 weeks.');
   });
 });

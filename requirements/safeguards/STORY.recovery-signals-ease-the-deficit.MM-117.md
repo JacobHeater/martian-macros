@@ -2,7 +2,7 @@
 id: MM-117
 status: in-progress
 component: safeguards
-related: [MM-110, MM-24, MM-31, MM-77, MM-79, MM-116, MM-128, MM-135, MM-138, MM-141]
+related: [MM-110, MM-24, MM-31, MM-77, MM-79, MM-116, MM-128, MM-135, MM-138, MM-141, MM-432]
 ---
 
 # Story: Offer to ease a deficit when recovery is failing
@@ -107,3 +107,13 @@ Not built:
 
 ## Note (2026-10-13, MM-249)
 "Short sleep adds a line, not a trigger" is superseded: MM-252 makes a fourteen-night average under six hours a recovery signal of its own in this rule, and the offer names the gentler pace. The sentence stays worded "appears to" until the panel pass MM-249 asks for.
+
+## Note (2026-10-20, MM-135)
+This offer is now one of two triggers of the same `ReliefOffer` (`reason: 'recoverySignals'`); the other is twelve
+unbroken weeks of deficit (`'longDeficit'`), the signal-triggered offer MM-135's panel asked for having been this ticket
+all along. The recovery signals take precedence when both hold. **The "maintenance week" is now the diet break itself:
+two weeks at maintenance** (`DietBreakRule.breakWeeks`; `ReliefChoice` `'break'`; the button "Take a two-week break";
+the flag stays `requestedBreak`, worded "the two-week break you chose"), held by `nextTargets` for its length and
+followed by the deficit resuming in one step. "Counted as one" in the Decisions above now means it ends the unbroken
+run, which it does (seven days at maintenance). Declining either offer is quiet for three weeks for both. The slower
+pace, the suggestion rule (eight weeks), the sleep line and "carry on" are unchanged. A one-week break waits on MM-432.

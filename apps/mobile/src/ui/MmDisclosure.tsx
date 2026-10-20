@@ -1,5 +1,6 @@
-import { type ReactNode, useId, useState } from 'react';
+import { type ReactNode, useId } from 'react';
 import { MmIcon } from './MmIcon';
+import { useFold } from './useFold';
 import './ui.css';
 
 interface MmDisclosureProps {
@@ -11,6 +12,8 @@ interface MmDisclosureProps {
   initiallyExpanded?: boolean;
   /** Keeps what is inside alive while closed, so it does not start over. */
   maintainState?: boolean;
+  /** Names the fold to the app, which keeps it as it was left across visits (MM-286). */
+  remember?: string;
 }
 
 /** A heading that opens more detail underneath: the "one tap down" layer. */
@@ -21,8 +24,9 @@ export function MmDisclosure({
   header,
   initiallyExpanded = false,
   maintainState = false,
+  remember,
 }: MmDisclosureProps) {
-  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [expanded, setExpanded] = useFold(remember, initiallyExpanded);
   const id = useId();
   return (
     <div className={`mm-disclosure${header === undefined ? '' : ' mm-disclosure-with-header'}`}>

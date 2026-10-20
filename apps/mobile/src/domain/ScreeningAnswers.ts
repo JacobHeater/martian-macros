@@ -12,6 +12,7 @@ const names = [
   'bariatricSurgery',
   'weightAffectingMedication',
   'fluidLimitedByClinician',
+  'sleepDisorder',
 ] as const;
 
 type ScreeningAnswersInit = { [name in (typeof names)[number]]?: boolean };
@@ -37,6 +38,13 @@ export class ScreeningAnswers {
   /** A clinician limits how much the person drinks (MM-359): no water goal is suggested. */
   readonly fluidLimitedByClinician: boolean;
 
+  /**
+   * A clinician has diagnosed a sleep disorder: sleep apnea, insomnia, a
+   * shift-work or other circadian disorder (MM-251). Refer-only: a caution and
+   * a pointer to the clinician, and no number changes.
+   */
+  readonly sleepDisorder: boolean;
+
   constructor(init: ScreeningAnswersInit = {}) {
     this.pregnant = init.pregnant ?? false;
     this.breastfeeding = init.breastfeeding ?? false;
@@ -51,6 +59,7 @@ export class ScreeningAnswers {
     this.bariatricSurgery = init.bariatricSurgery ?? false;
     this.weightAffectingMedication = init.weightAffectingMedication ?? false;
     this.fluidLimitedByClinician = init.fluidLimitedByClinician ?? false;
+    this.sleepDisorder = init.sleepDisorder ?? false;
   }
 
   /** Whether every answer is the same as in `other`. */

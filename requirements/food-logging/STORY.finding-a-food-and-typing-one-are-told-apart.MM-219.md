@@ -1,6 +1,6 @@
 ---
 id: MM-219
-status: proposed
+status: done
 component: food-logging
 related: [MM-38, MM-39, MM-42, MM-150, MM-167, MM-212, MM-213, MM-223, MM-224]
 ---
@@ -92,3 +92,15 @@ Scenario: A recent food beside a found one
   `add_food_opened_dark`, `add_food_search_dark`.
 - `design/screen-direction.md` (Food logging flows) describes a different
   sheet from the one built; see MM-220.
+
+## Decisions and build (2026-10-19)
+- **From results, every way in stays in reach**: under "Enter manually", an "Estimate a meal" text action whenever a query is typed (found or not).
+- **Each word names one thing**: the method chip under "How was it measured?" is "Totals only" (it asks for the totals and no amount); "Estimate" is the way in that estimates a meal. The method's name on a logged entry's tile stays "Estimate", since that is what such an entry is.
+- **A result row says what kind of step follows**: a found food's row carries the chevron (it opens the amount step); a recent food's row does not (it fills the form in place). The recent-food question (open the amount step when a reference is stored) is left as MM-167 says; the owner may change it.
+- "Reference" and "Saved" are unchanged (MM-153 names the tiers; "Saved" opens the person's own foods, MM-45).
+- Regression test: `apps/mobile/test/food/addFoodSays.test.tsx` (MM-219).
+
+## After the panel (2026-10-19)
+- One word for the method everywhere (PD-2, F12, MM-167's own phrase): the chip, the tile and the portion line say "Estimated totals"; the way in stays "Estimate" / "Estimate a meal". The numbers under that method are labelled "Nutrition for everything eaten". The chair's answer to the measurement question: an entry typed as totals with no amount is stored at the estimate's uncertainty (`quickAdd`, 0.4), which the week's "mostly estimated" and the estimator's weighting both read, so the word says what the numbers are treated as.
+- A found own food's row carries the chevron too (PD-5).
+- Under results, one secondary ("Enter manually") and one text action ("Estimate a meal"): one secondary per state (PD-12's reason, written). Scan and Saved under results are the owner's call.

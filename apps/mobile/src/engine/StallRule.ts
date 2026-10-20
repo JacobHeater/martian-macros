@@ -18,8 +18,11 @@ export const StallRule = {
   /** Not assessed within this many days of a lasting weight event. */
   lastingEventDays: 14,
 
-  /** A passing event this recent can be hiding fat loss behind water. */
+  /** A passing event, or the start of training, this recent can be hiding fat loss behind water. */
   maskingEventDays: 10,
+
+  /** Training started, or started again, when no workout was finished in this many days before one. */
+  trainingRestartGapDays: 28,
 
   minimumFoodDays: 12,
   minimumWeighIns: 10,

@@ -8,7 +8,15 @@ import {
   ScreeningAnswers,
   type TrainingStatus,
 } from '../../src/domain';
-import { BodyFatEstimate, computeTargets, type DailyTargets, SafetyBounds, TargetInputs } from '../../src/engine';
+import {
+  BodyFatEstimate,
+  type BreakFlag,
+  computeTargets,
+  type DailyTargets,
+  DietBreakRule,
+  SafetyBounds,
+  TargetInputs,
+} from '../../src/engine';
 import { expectClose } from '../support/expectClose';
 
 const today = CalendarDate.of(2026, 10, 5);
@@ -36,6 +44,8 @@ const inputs = ({
   safetyRaise = 0,
   safetyBodyFat,
   trainingDaysPerWeek = 3,
+  breakRequested = false,
+  continuingBreak,
 }: {
   sex?: BiologicalSex;
   mode?: GoalMode;
@@ -52,6 +62,8 @@ const inputs = ({
   safetyRaise?: number;
   safetyBodyFat?: number;
   trainingDaysPerWeek?: number;
+  breakRequested?: boolean;
+  continuingBreak?: BreakFlag;
 } = {}) =>
   new TargetInputs({
     sex,
@@ -69,6 +81,8 @@ const inputs = ({
     requestedLossFraction: requestedLoss,
     safetyBodyFatPercent: safetyBodyFat,
     safetyRaiseKcal: safetyRaise,
+    breakRequested,
+    continuingBreak,
   });
 
 describe('SafetyBounds', () => {
@@ -341,17 +355,33 @@ describe('computeTargets', () => {
 
   it('a diet break returns calories at once, not 100 at a time', () => {
     const deficit = computeTargets(inputs());
-    const onBreak = computeTargets(inputs({ previous: deficit, deficitWeeks: 16 }));
+    const onBreak = computeTargets(inputs({ previous: deficit, deficitWeeks: DietBreakRule.forceFromWeeks }));
     expect(onBreak.flags).toContain('dietBreak');
     expectClose(onBreak.kcal, 2800, 1e-9);
     expect(onBreak.kcal - deficit.kcal).toBeGreaterThan(100);
   });
 
-  it('forces a diet break after 16 deficit weeks', () => {
-    const t = computeTargets(inputs({ deficitWeeks: 16 }));
+  // MM-135 (2026-10-20): the break MM-31 forced at sixteen weeks is offered at twelve and planned only at twenty.
+  it('plans a diet break at 20 deficit weeks, and not at 16', () => {
+    const t = computeTargets(inputs({ deficitWeeks: 20 }));
     expect(t.weeklyRateFraction).toBe(0);
     expectClose(t.kcal, 2800, 1e-9);
     expect(t.flags).toContain('dietBreak');
+    expect(DietBreakRule.forceFromWeeks).toBe(20);
+    const sixteen = computeTargets(inputs({ deficitWeeks: 16 }));
+    expect(sixteen.weeklyRateFraction).toBeLessThan(0);
+    expect(sixteen.flags).not.toContain('dietBreak');
+  });
+
+  it('a break still running keeps targets reissued inside it at maintenance, under the same flag', () => {
+    for (const flag of ['dietBreak', 'requestedBreak'] as const) {
+      const t = computeTargets(inputs({ deficitWeeks: 0, continuingBreak: flag }));
+      expect(t.weeklyRateFraction, flag).toBe(0);
+      expect(t.flags, flag).toContain(flag);
+    }
+    const chosen = computeTargets(inputs({ breakRequested: true, continuingBreak: 'dietBreak' }));
+    expect(chosen.flags, 'a new request outranks a continuation').toContain('requestedBreak');
+    expect(chosen.flags).not.toContain('dietBreak');
   });
 
   it('falls back to maintenance when the mode is not allowed', () => {

@@ -13,6 +13,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(MmRemindersPlugin.class);
         registerPlugin(MmScannerPlugin.class);
         registerPlugin(MmHealthPlugin.class);
+        registerPlugin(MmBackupPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

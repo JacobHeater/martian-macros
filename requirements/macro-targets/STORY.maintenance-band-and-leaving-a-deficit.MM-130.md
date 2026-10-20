@@ -1,6 +1,6 @@
 ---
 id: MM-130
-status: proposed
+status: done
 component: macro-targets
 related: [MM-119, MM-24, MM-25, MM-31, MM-36, MM-113, MM-131, MM-135, MM-138, MM-142, MM-144, MM-158]
 ---
@@ -86,3 +86,31 @@ Scenario: Easing in
 - Priority: should-have, and before any user finishes a first cut (about twelve weeks after launch).
 - The same wording, mirrored, applies at the *start* of a deficit, where the early drop is water (MM-158).
 - A user stopping weight-loss medication is in a similar position with a different cause (MM-113).
+
+## Progress (2026-10-19, feat/m2)
+Built, closing the ticket:
+- **The band and the anchor** (`MaintenanceRule`, `maintenanceStartOn`, `maintenanceAnchorOf`, `assessMaintenanceDrift`,
+  `assessMaintenance`): the anchor is the trend weight 14 days after maintenance began (or the day the user accepted a new
+  weight, `UserSetup.maintenanceAnchorOn`, schema 11); the band is 1.5% either side. Inside it, `nextTargets` changes
+  maintenance targets only when the expenditure estimate moved by more than its own uncertainty, never for drift.
+- **Drifting out**: outside the band for 14 consecutive days the Coach's "Maintaining" card asks (no judgement in the words):
+  Correct back (a 0.25% a week pace toward the anchor, flagged `maintenanceCorrection`, until the trend is back inside half
+  the band; `UserSetup.maintenanceCorrectionFrom`) or Accept the new weight (the anchor moves to today's trend). Nothing changes
+  until answered.
+- **Leaving a deficit** goes straight to maintenance at the measured expenditure in one step (as MM-24 already did). The scale's
+  rise is said before it happens: in the change sheet, on the Maintaining card, and under Today's weigh-in for 14 days
+  (`reboundText`: "Expect the scale to rise 1 to 4 lb over the next week or two. That is stored carbohydrate and water
+  returning, not fat. Your trend will settle.").
+- **The pause before another cut**: about a week per four of deficit, at least two (`suggestedMaintenanceWeeks`), said on the
+  card with the length of the cut that ended.
+- **Ease into it**: Settings > Coach > "Ease into maintenance", off by default (`ease_into_maintenance`, schema 11); on, leaving
+  a deficit stops halfway for a week (flag `easingIn`) and completes a week later. The words claim comfort and nothing else.
+- **The rebound is not a surplus**: MM-131's settling windows already exclude the first ten days after a change of intake level
+  from the slope the estimator reads (`phaseChange.test.ts`, "leaving a deficit does" open one), so the glycogen's return does
+  not lower the estimate; this ticket adds no second mechanism.
+- Evidence rows for every threshold (MM-143). Tests: `maintenance.test.ts` (engine, each acceptance scenario),
+  `maintenance.test.tsx` (the card, the question, the weigh-in line), `coachSwitches.test.tsx`. Stories: `MaintenanceAfterCut`,
+  `MaintenanceHolding`, `MaintenanceDrifted` (Coach), `WeighInAfterCut` (Today).
+
+Not done: the mirrored wording at the start of a deficit belongs to MM-158 (onboarding, not in M2); a medication stop (MM-113)
+is its own ticket.

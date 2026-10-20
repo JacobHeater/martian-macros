@@ -28,6 +28,8 @@ const libraries: Record<string, readonly string[]> = {
   react: ['*'],
   'react-dom/client': ['main.tsx'],
   '@sqlite.org/sqlite-wasm': ['sql/wasm/'],
+  // Argon2id and XChaCha20-Poly1305 for the backup file (MM-63), behind BackupCipher.
+  'libsodium-wrappers-sumo': ['backup/SodiumBackupCipher.ts'],
   '@capacitor/core': ['platform/', 'sql/native/', 'foodCatalog/download/native/'],
   '@capacitor/app': ['platform/'],
   '@mui/icons-material/': ['ui/'],

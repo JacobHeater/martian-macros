@@ -37,8 +37,9 @@ flat, waist is falling, and e1RM is rising, the app shows a "Recomp signal".
 - Days 1–7: calibration week, with targets held.
 - Day ~15: first adaptive update, from a window of at least 14 days.
 - Day 28: first monthly report.
-- After that: a weekly check-in, a monthly report, and a forced maintenance
-  break after 16 consecutive deficit weeks.
+- After that: a weekly check-in, a monthly report, and the diet break
+  (MM-135): offered after 12 unbroken deficit weeks and whenever recovery is
+  failing, planned by the app only at 20; two weeks at maintenance.
 
 **Rewards.** Reward process (logging, protein, sessions, PRs). Never reward a
 bigger deficit, a lowest weight, or a streak of low intake.

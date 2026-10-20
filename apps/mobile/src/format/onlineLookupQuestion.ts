@@ -1,0 +1,15 @@
+import { onlineSourceNames } from './onlineSourceNames';
+
+/**
+ * The question asked before the first online lookup (MM-58), saying exactly
+ * what would be sent and to whom (the barcode number, or the words typed),
+ * what each lasting answer means, and where to change it.
+ */
+export function onlineLookupQuestion(sent: 'barcode' | 'words', sources: readonly string[]): string {
+  const what = sent === 'barcode' ? 'Only the barcode number is sent' : 'Only the words you typed are sent';
+  return (
+    `Look this up online? ${what} to ${onlineSourceNames(sources)}, nothing about you. ` +
+    'For now means until you close the app; always means every food not on this phone is looked up without asking. ' +
+    'You can change this in Settings, under Data.'
+  );
+}
