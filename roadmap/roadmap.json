@@ -499,7 +499,8 @@
             "MM-360",
             "MM-373",
             "MM-374",
-            "MM-417"
+            "MM-417",
+            "MM-422"
           ]
         },
         {
@@ -1441,7 +1442,10 @@
           "MM-351",
           "MM-352",
           "MM-373",
-          "MM-374"
+          "MM-374",
+          "MM-357",
+          "MM-289",
+          "MM-422"
         ],
         "remaining": [
           "MM-89",
@@ -1459,9 +1463,7 @@
           "MM-286",
           "MM-287",
           "MM-288",
-          "MM-289",
           "MM-304",
-          "MM-357",
           "MM-375",
           "MM-391",
           "MM-392",
@@ -1742,9 +1744,10 @@
         },
         {
           "step": 21,
-          "title": "Seven places on feat/m2 that no story draws (MM-417): draw each state so npm run unseen passes",
+          "title": "Closing M2's app-shell and design tasks (2026-10-20, WS-03): what the close found in passing",
           "tickets": [
-            "MM-417"
+            "MM-417",
+            "MM-422"
           ],
           "milestone": "M2"
         }

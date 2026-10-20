@@ -25,7 +25,8 @@ describe('seedDemo', () => {
     const repos = new InMemoryRepositories();
     const seeded = await seedDemo({ services: servicesOf(repos, new FixedClock(today)), asked: true, native: true });
     expect(seeded).toBe(true);
-    expect(await counts(repos)).toEqual({ setup: 1, weights: DemoSeed.historyDays + 1, foodToday: 1 });
+    // Today is partly logged: breakfast, a coffee and the snack (MM-289).
+    expect(await counts(repos)).toEqual({ setup: 1, weights: DemoSeed.historyDays + 1, foodToday: 3 });
     const weights = await first(repos.weights.watchWeights());
     expect(weights.at(-1)?.date.daysUntil(today)).toBe(0);
   });
