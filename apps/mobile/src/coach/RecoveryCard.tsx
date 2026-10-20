@@ -9,6 +9,7 @@ import { sleepDurationText } from '../format/sleepDurationText';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
+import { Loadable } from '../state/Loadable';
 import { useNavigator } from '../app/useNavigator';
 import { MmButton } from '../ui/MmButton';
 import { MmSection } from '../ui/MmSection';
@@ -29,6 +30,8 @@ export function RecoveryCard() {
   const all = useLoaded(state.recoveryCheckIns) ?? [];
   const due = useCell(state.recoveryCheckInDue);
   const sleep = useCell(state.sleepAverage);
+  // A read that went wrong is said, never shown as no nights (MM-334).
+  const sleepUnread = Loadable.hasFailed(useCell(state.sleepNights));
   const today = useCell(state.today);
   const [wasDue, setWasDue] = useState(due);
   const [timesDue, setTimesDue] = useState(0);
@@ -43,17 +46,24 @@ export function RecoveryCard() {
   else if (latest === undefined) summary = 'Five quick questions a week. Not answered yet.';
   else summary = `Last answered ${Fmt.day(latest.date, today)}.`;
   if (sleep !== undefined) summary += ` Sleep ${sleepDurationText(sleep.averageMinutes)} over ${sleep.nights} nights.`;
-  const sleepNights = sleep === undefined ? 'No nights recorded yet' : `${sleep.nights} of ${SleepRule.windowNights} nights recorded`;
+  let sleepValue: string;
+  let sleepDetail: string;
+  if (sleepUnread) {
+    sleepValue = 'Not read';
+    sleepDetail = 'Could not read your nights of sleep. Progress has the way to try again.';
+  } else if (sleep === undefined) {
+    sleepValue = 'Not recorded';
+    sleepDetail = 'Nights are typed on Progress or read from your health platform.';
+  } else {
+    sleepValue = sleepDurationText(sleep.averageMinutes);
+    sleepDetail = `${sleep.nights} of ${SleepRule.windowNights} nights recorded`;
+  }
   return (
     // Drawn anew each time it falls due, which may be after the check-ins are read, so it opens then;
     // answering leaves it open with the answers (MM-339).
     <MmSection key={timesDue} icon="heart" title="How you are holding up" summary={summary} collapsible initiallyExpanded={due}>
       {/* The record, not the check-in's word for it (MM-250): typed on Progress or read from the health platform. */}
-      <StatRow
-        label={`Sleep, last ${SleepRule.windowNights} nights`}
-        value={sleep === undefined ? 'Not recorded' : sleepDurationText(sleep.averageMinutes)}
-        detail={sleepNights}
-      />
+      <StatRow label={`Sleep, last ${SleepRule.windowNights} nights`} value={sleepValue} detail={sleepDetail} />
       {latest === undefined ? (
         <p className="app-text">
           Five quick questions a week on hunger, energy, sleep, training and mood. They are what the food log and the

@@ -56,8 +56,8 @@ it('answering stores one record and shows the five lines', async () => {
 
   const answers: Readonly<Record<RecoveryQuestion, number>> = { hunger: 2, energy: 3, sleep: 1, training: 4, mood: 5 };
   for (const question of RecoveryQuestion.values) await pick(question, answers[question]);
-  await userEvent.type(screen.getByRole('textbox', { name: /^Typical hours of sleep, hours/ }), '6');
-  await userEvent.type(screen.getByRole('textbox', { name: /^Typical hours of sleep, minutes/ }), '30');
+  await userEvent.type(screen.getByRole('textbox', { name: 'Typical hours of sleep, Hours' }), '6');
+  await userEvent.type(screen.getByRole('textbox', { name: 'Typical hours of sleep, Minutes' }), '30');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await expect.poll(async () => (await stored()).length).toBe(1);
@@ -134,8 +134,8 @@ it('typical hours are filled from the last fourteen nights recorded, and can be 
   const card = await openCoach();
   await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
   await screen.findByRole('heading', { name: 'This week' });
-  const hours = screen.getByRole<HTMLInputElement>('textbox', { name: /^Typical hours of sleep, hours/ });
-  const minutes = screen.getByRole<HTMLInputElement>('textbox', { name: /^Typical hours of sleep, minutes/ });
+  const hours = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Hours' });
+  const minutes = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Minutes' });
   expect([hours.value, minutes.value]).toEqual(['6', '50']);
   expect(screen.getByText('Your average over the last 14 nights, from 14 recorded. Change it if that is not typical.')).toBeInTheDocument();
 
@@ -145,4 +145,22 @@ it('typical hours are filled from the last fourteen nights recorded, and can be 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
   await expect.poll(async () => (await stored()).length).toBe(1);
   expect((await stored())[0]?.sleepHours).toBeCloseTo(6 + 20 / 60, 6);
+});
+
+// MM-252, the panel's F7: a value the app would refuse on Progress is refused here too, not dropped.
+it('more than a day of sleep is refused under the field and holds Save', async () => {
+  const card = await openCoach();
+  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
+  await screen.findByRole('heading', { name: 'This week' });
+  for (const question of RecoveryQuestion.values) await pick(question, 3);
+  const hours = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Hours' });
+  await userEvent.type(hours, '25');
+  expect(screen.getByText('Up to 24 hours.')).toBeInTheDocument();
+  expect(hours).toHaveAttribute('aria-invalid', 'true');
+  expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  await userEvent.clear(hours);
+  await userEvent.type(hours, '7');
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await expect.poll(async () => (await stored()).length).toBe(1);
+  expect((await stored())[0]?.sleepHours).toBe(7);
 });

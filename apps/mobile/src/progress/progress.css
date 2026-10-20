@@ -53,7 +53,7 @@
   gap: var(--space-8);
 }
 
-/* Sleep (MM-250): the last two weeks of nights as chips that wrap, then hours and minutes beside Save. */
+/* Sleep (MM-250): the last two weeks of nights as chips that wrap, then hours and minutes, then the note beside Save as the waist's is. */
 .progress-sleep-how {
   margin: 0 0 var(--space-12);
 }
@@ -63,15 +63,13 @@
   gap: var(--space-8);
   margin-bottom: var(--space-12);
 }
-.progress-sleep-entry {
+.progress-sleep-save {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-12);
-}
-.progress-sleep-entry > :first-child {
-  flex: 1;
-  min-width: 0;
+  margin: var(--space-8) 0;
 }
 .progress-sleep-note {
-  margin: var(--space-8) 0;
+  flex: 1;
+  margin: 0;
 }

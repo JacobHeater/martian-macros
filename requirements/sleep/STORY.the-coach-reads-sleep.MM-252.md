@@ -62,7 +62,8 @@ Scenario: Registered
 
 - The offer on short sleep alone — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachShortSleep). The title "Two weeks of short sleep", the one sentence, the three buttons.
 - The sleep line — Coach.stories.tsx (Story: CoachSleepLine). In "How you are holding up": a `StatRow` with the average and the nights; the folded line carries it too.
-- The check-in pre-fill — Coach.stories.tsx (Stories: RecoveryCheckIn, RecoveryCheckInNoNights). Hours and minutes filled from the record, with a caption; empty with no nights.
+- The check-in pre-fill — Coach.stories.tsx (Stories: RecoveryCheckIn, RecoveryCheckInNoNights, RecoveryCheckInMistyped). Hours and minutes filled from the record, with a caption; empty with no nights; more than a day refused under the field.
+- The sleep line when the nights could not be read — Coach.stories.tsx (Story: CoachSleepReadFailed). "Not read", never "Not recorded".
 - The explanation — Coach.stories.tsx (Story: WhyYourTargetsShortSleep). The sleep sentence after the lines and before "What it was based on".
 
 ## Progress (2026-10-20, feat/m2)
@@ -85,4 +86,6 @@ Scenario: Registered
 - "Shown at most once a fortnight" for the insight is the catalog's existing rationing: it stays while it holds and is quiet for 28 days once dismissed; no sleep-specific clock was added.
 - The sleep line lives in "How you are holding up" (recovery is where sleep belongs), as a `StatRow` like those of "Your targets" and "Body"; the folded line carries the figure so it is read without opening.
 - The explanation's sleep note is a sentence beside the lines, not an `ExplanationLine`: it moved no kilocalories, and the lines must add up to the change.
+- The check-in's typical hours are refused the same way as a night on Progress (one `parseDurationFields`), said under the field with Save held, instead of being dropped at save as before (the panel's F7); the average is rounded to the minute before it fills the fields (MM-415).
+- The sleep line says "Not read" when the nights could not be read, with where to try again (Progress), never "Not recorded" (the panel's F4).
 - The panel pass in grading mode that MM-249 asks for before this ticket was not run in this session (no owner present); the thresholds were registered with their sources and graded moderate (six hours) and judgement (the window and the minimum). The epic stays open for that pass and for the owner's decision on a target change.

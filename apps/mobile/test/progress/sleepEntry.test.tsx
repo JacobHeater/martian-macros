@@ -7,6 +7,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { HealthImporter } from '../../src/healthIngest/HealthImporter';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
+import { failing } from '../support/failing';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
@@ -48,8 +49,8 @@ async function openSleep(): Promise<void> {
   }
 }
 
-const hours = () => within(section).getByRole<HTMLInputElement>('textbox', { name: /, hours/ });
-const minutes = () => within(section).getByRole<HTMLInputElement>('textbox', { name: /, minutes/ });
+const hours = () => within(section).getByRole<HTMLInputElement>('textbox', { name: /, Hours$/ });
+const minutes = () => within(section).getByRole<HTMLInputElement>('textbox', { name: /, Minutes$/ });
 const stored = () => first(repos.sleep.watchSleepNights());
 
 async function type(h: string, m: string): Promise<void> {
@@ -62,7 +63,9 @@ async function type(h: string, m: string): Promise<void> {
 it('7 h 20 m typed for last night is kept as 440 minutes, typed, and said on the line', async () => {
   await openSleep();
   expect(within(section).getByText('Last night not recorded yet.')).toBeInTheDocument();
-  expect(within(section).getByText('0 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('Last night: not recorded yet. 0 of the last 14 nights recorded.')).toBeInTheDocument();
+  // Heard as the night and its part, once (the panel's F1).
+  expect(hours()).toHaveAttribute('aria-label', 'Last night, Hours');
   await type('7', '20');
   await userEvent.click(within(section).getByRole('button', { name: 'Save night' }));
   await expect.poll(async () => (await stored()).length).toBe(1);
@@ -71,7 +74,9 @@ it('7 h 20 m typed for last night is kept as 440 minutes, typed, and said on the
   expect(night?.minutesAsleep).toBe(440);
   expect(night?.source).toBe('typed');
   expect(await within(section).findByText('Last night 7 h 20 m.')).toBeInTheDocument();
-  expect(within(section).getByText('1 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('Last night: 7 h 20 m, typed. 1 of the last 14 nights recorded.')).toBeInTheDocument();
+  // Said where the action was taken, and aloud (the panel's F2).
+  expect(screen.getByRole('status')).toHaveTextContent('Saved: Last night, 7 h 20 m.');
 });
 
 it('imported sessions make one night, and a typed value for that night is used instead', async () => {
@@ -82,7 +87,7 @@ it('imported sessions make one night, and a typed value for that night is used i
   // Two sessions summed, kept against the morning they ended on, with the watch named.
   expect(within(section).getByText('Last night 6 h 50 m, from Watch.')).toBeInTheDocument();
   expect(within(section).getByRole('button', { name: 'The night before · 6 h 40 m' })).toBeInTheDocument();
-  expect(within(section).getByText(/^Last night: 6 h 50 m from Watch\. A night you type is used instead\.$/)).toBeInTheDocument();
+  expect(within(section).getByText(/^Last night: 6 h 50 m from Watch\. A night you type is used instead\. 2 of the last 14 nights recorded\.$/)).toBeInTheDocument();
   expect([hours().value, minutes().value]).toEqual(['6', '50']);
 
   await type('7', '20');
@@ -93,7 +98,7 @@ it('imported sessions make one night, and a typed value for that night is used i
   // The import is kept, not used: another read changes nothing.
   await new HealthImporter({ source, store: repos.healthSamples }).import('sleep');
   expect((await stored())[0]?.source).toBe('typed');
-  expect(within(section).getByText(/A night you type is used instead of one read from Health Connect\.$/)).toBeInTheDocument();
+  expect(within(section).getByText(/^Last night: 7 h 20 m, typed\. 2 of the last 14 nights recorded\. A night you type is used instead of one read from Health Connect\.$/)).toBeInTheDocument();
 });
 
 it('any night of the last fourteen can be typed, and a mistyped value is refused in place', async () => {
@@ -103,9 +108,19 @@ it('any night of the last fourteen can be typed, and a mistyped value is refused
   expect([hours().value, minutes().value]).toEqual(['', '']);
   await type('25', '0');
   expect(within(section).getByText('Up to 24 hours.')).toBeInTheDocument();
+  expect(hours()).toHaveAttribute('aria-invalid', 'true');
+  expect(minutes()).not.toHaveAttribute('aria-invalid', 'true');
   expect(within(section).getByRole('button', { name: 'Save night' })).toBeDisabled();
+  // MM-414: the field whose value is wrong is the one marked.
   await type('6', '75');
   expect(within(section).getByText('Minutes from 0 to 59.')).toBeInTheDocument();
+  expect(minutes()).toHaveAttribute('aria-invalid', 'true');
+  expect(hours()).not.toHaveAttribute('aria-invalid', 'true');
+  await type('24', '30');
+  expect(within(section).getByText('Up to 24 hours in all.')).toBeInTheDocument();
+  await type('0', '0');
+  expect(within(section).getByText('Type the hours asleep.')).toBeInTheDocument();
+  expect(within(section).getByRole('button', { name: 'Save night' })).toBeDisabled();
   await type('6', '5');
   await userEvent.click(within(section).getByRole('button', { name: 'Save night' }));
   await expect.poll(async () => (await stored()).length).toBe(2);
@@ -113,5 +128,27 @@ it('any night of the last fourteen can be typed, and a mistyped value is refused
     [today.addDays(-1), 365],
     [today, 420],
   ]);
-  expect(within(section).getByText('2 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('The night before: 6 h 5 m, typed. 2 of the last 14 nights recorded.')).toBeInTheDocument();
 });
+
+// The panel's F4: a read that went wrong is said, with a way to try again, never shown as no nights.
+it('when the nights cannot be read the section says so and offers to try again', async () => {
+  let fails = true;
+  renderApp(repos, today, {
+    change: (s) => ({
+      ...s,
+      sleep: {
+        saveSleepNight: (night) => s.sleep.saveSleepNight(night),
+        watchSleepNights: () => (fails ? failing() : s.sleep.watchSleepNights()),
+      },
+    }),
+  });
+  await openTab('Progress');
+  section = (await screen.findByRole('heading', { name: 'Sleep' })).closest('.mm-section') as HTMLElement;
+  expect(within(section).getByText('Could not read your nights of sleep')).toBeInTheDocument();
+  expect(within(section).queryByText(/nights recorded/)).not.toBeInTheDocument();
+  fails = false;
+  await userEvent.click(within(section).getByRole('button', { name: 'Try again' }));
+  expect(await within(section).findByText('Last night not recorded yet.')).toBeInTheDocument();
+});
+

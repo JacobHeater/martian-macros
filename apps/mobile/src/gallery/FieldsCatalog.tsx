@@ -50,7 +50,8 @@ function Fields() {
       <MmTextField label="Height" kind="number" suffix="cm" value="300" onChange={() => undefined} error="Between 100 and 250 cm." />
       {/* Hours and minutes as two fields (MM-250), and the same in error. */}
       <MmDurationField name="Last night" hours={slept.hours} minutes={slept.minutes} onChange={(hours, minutes) => setSlept({ hours, minutes })} />
-      <MmDurationField name="Last night, mistyped" hours="25" minutes="0" onChange={() => undefined} error="Up to 24 hours." />
+      <MmDurationField name="Last night, mistyped" hours="25" minutes="0" onChange={() => undefined} error={{ on: 'hours', text: 'Up to 24 hours.' }} />
+      <MmDurationField name="Last night, minutes mistyped" hours="6" minutes="75" onChange={() => undefined} error={{ on: 'minutes', text: 'Minutes from 0 to 59.' }} />
       <MmDropdown
         label="Meal"
         value={meal}

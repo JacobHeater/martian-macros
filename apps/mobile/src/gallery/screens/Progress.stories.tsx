@@ -305,7 +305,7 @@ export const SleepRecorded = screenStory({
 /** MM-250: nights read from the watch through Health Connect (MM-320), last night not among them; the night before picked, which says the watch's hours would give way to typed ones. */
 export const SleepFromWatch = screenStory({
   covers: ['ProgressScreen'],
-  shows: 'The night before: 6 h 52 m from Watch. A night you type is used instead.',
+  shows: /^The night before: 6 h 52 m from Watch\. A night you type is used instead\./,
   scenario: noNights,
   device: healthPlatform({ allowed: ['sleep'] }),
   open: onProgress,
@@ -319,8 +319,42 @@ export const SleepMistyped = screenStory({
   scenario: noNights,
   open: onProgress,
   walk: async (canvas) => {
-    const hours = await within(canvas).findByRole('textbox', { name: /^Last night, hours/ }, { timeout: 5000 });
+    const hours = await within(canvas).findByRole('textbox', { name: 'Last night, Hours' }, { timeout: 5000 });
     reveal(hours);
     await userEvent.type(hours, '25');
+  },
+});
+
+/** MM-250: minutes mistyped: the minutes field is the one marked (MM-414). */
+export const SleepMinutesMistyped = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Minutes from 0 to 59.',
+  scenario: noNights,
+  open: onProgress,
+  walk: async (canvas) => {
+    const hours = await within(canvas).findByRole('textbox', { name: 'Last night, Hours' }, { timeout: 5000 });
+    reveal(hours);
+    await userEvent.type(hours, '6');
+    await userEvent.type(within(canvas).getByRole('textbox', { name: 'Last night, Minutes' }), '75');
+  },
+});
+
+/** MM-250: the nights could not be read: said in the section, with a way to try again, never shown as none. */
+export const SleepReadFailed = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Could not read your nights of sleep',
+  stores: failingRead('sleep', 'watchSleepNights'),
+  open: onProgress,
+});
+
+/** MM-250: the nights still being read: the section waits on its own spinner. */
+export const SleepLoading = screenStory({
+  covers: ['ProgressScreen'],
+  stores: waitingRead('sleep', 'watchSleepNights'),
+  open: onProgress,
+  walk: async (canvas) => {
+    const heading = await within(canvas).findByRole('heading', { name: 'Sleep' });
+    reveal(heading);
+    await within(heading.closest('.mm-section') as HTMLElement).findByRole('progressbar', { name: 'Loading' });
   },
 });

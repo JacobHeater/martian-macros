@@ -2,7 +2,8 @@ import { useContext, useState } from 'react';
 import { RecoveryCheckIn } from '../domain/RecoveryCheckIn';
 import { RecoveryQuestion } from '../domain/RecoveryQuestion';
 import { RecoveryRule } from '../engine/RecoveryRule';
-import { parseNumber } from '../format/parseNumber';
+import { durationFieldsOf } from '../format/durationFieldsOf';
+import { parseDurationFields } from '../format/parseDurationFields';
 import { SleepRule } from '../engine/SleepRule';
 import { recoveryHighWord } from '../format/recoveryHighWord';
 import { recoveryLowWord } from '../format/recoveryLowWord';
@@ -18,12 +19,6 @@ import { SectionLabel } from '../ui/SectionLabel';
 
 const answers = Array.from({ length: RecoveryRule.highest - RecoveryRule.lowest + 1 }, (_, i) => RecoveryRule.lowest + i);
 
-/** Hours and minutes as typed, from minutes kept. */
-const fieldsOf = (minutes: number | undefined) =>
-  minutes === undefined
-    ? { hours: '', minutes: '' }
-    : { hours: `${Math.trunc(minutes / 60)}`, minutes: `${Math.round(minutes - Math.trunc(minutes / 60) * 60)}` };
-
 /**
  * The weekly recovery check-in (MM-116): five answers and, if given, hours
  * of sleep. The hours are filled from the last fourteen nights recorded
@@ -35,18 +30,23 @@ export function RecoveryCheckInScreen() {
   const average = useCell(state.sleepAverage);
   const [given, setGiven] = useState<Partial<Record<RecoveryQuestion, number>>>({});
   const [typedSleep, setTypedSleep] = useState<{ hours: string; minutes: string }>();
-  const sleepFields = typedSleep ?? fieldsOf(average?.averageMinutes);
+  const sleepFields = typedSleep ?? durationFieldsOf(average?.averageMinutes);
+  // Refused the same way as on Progress (MM-250): said under the field, and Save waits.
+  const parsedSleep = parseDurationFields(sleepFields);
 
   const { hunger, energy, sleep, training, mood } = given;
   const complete =
-    hunger !== undefined && energy !== undefined && sleep !== undefined && training !== undefined && mood !== undefined;
+    hunger !== undefined &&
+    energy !== undefined &&
+    sleep !== undefined &&
+    training !== undefined &&
+    mood !== undefined &&
+    parsedSleep.error === undefined;
 
   const save = async () => {
     if (!complete) return;
-    // Hours of sleep, when something sensible was typed or filled in.
-    const h = sleepFields.hours.trim() === '' ? 0 : parseNumber(sleepFields.hours);
-    const m = sleepFields.minutes.trim() === '' ? 0 : parseNumber(sleepFields.minutes);
-    const hours = h === undefined || m === undefined ? undefined : h + m / 60;
+    // Hours of sleep, when something was typed or filled in.
+    const hours = parsedSleep.minutes === undefined ? undefined : parsedSleep.minutes / 60;
     await services.recovery.saveRecoveryCheckIn(
       new RecoveryCheckIn({
         date: state.today.peek(),
@@ -55,7 +55,7 @@ export function RecoveryCheckInScreen() {
         sleep,
         training,
         mood,
-        sleepHours: hours === undefined || hours <= 0 || hours > 24 ? undefined : hours,
+        sleepHours: hours,
       }),
     );
     close?.();
@@ -94,10 +94,15 @@ export function RecoveryCheckInScreen() {
         name="Typical hours of sleep"
         hours={sleepFields.hours}
         minutes={sleepFields.minutes}
+        error={parsedSleep.error}
         onChange={(hours, minutes) => setTypedSleep({ hours, minutes })}
       />
       {average === undefined ? null : (
-        <p className="app-caption">{`Your average over the last ${SleepRule.windowNights} nights, from ${average.nights} recorded. Change it if that is not typical.`}</p>
+        <p className="app-caption">
+          {typedSleep === undefined
+            ? `Your average over the last ${SleepRule.windowNights} nights, from ${average.nights} recorded. Change it if that is not typical.`
+            : 'Your own figure is kept in place of the average.'}
+        </p>
       )}
       <div className="app-gap" />
       <MmButton label="Save" expand onPress={complete ? () => void save() : undefined} />
