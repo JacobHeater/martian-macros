@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { GoalMode } from '../../domain/GoalMode';
 import { DailyTargets } from '../../engine/DailyTargets';
+import type { TargetFlag } from '../../engine/TargetFlag';
 import type { TargetsExplanation } from '../../engine/TargetsExplanation';
 import { TargetsRecord } from '../../engine/TargetsRecord';
 import type { TdeeStatus } from '../../engine/TdeeStatus';
@@ -15,6 +16,7 @@ export function storyTargets(
     fatG = 70,
     carbsG = 250,
     weeklyRateFraction = -0.0075,
+    flags = [],
     mode = 'fatLoss',
     tdeeKcal = 2700,
     tdeeSigmaKcal = 400,
@@ -27,6 +29,7 @@ export function storyTargets(
     fatG?: number;
     carbsG?: number;
     weeklyRateFraction?: number;
+    flags?: readonly TargetFlag[];
     mode?: GoalMode;
     tdeeKcal?: number;
     tdeeSigmaKcal?: number;
@@ -40,7 +43,7 @@ export function storyTargets(
     tdeeKcal,
     tdeeSigmaKcal,
     tdeeStatus,
-    targets: new DailyTargets({ kcal, proteinG, proteinMinimumG, fatG, carbsG, weeklyRateFraction }),
+    targets: new DailyTargets({ kcal, proteinG, proteinMinimumG, fatG, carbsG, weeklyRateFraction, flags: new Set(flags) }),
     explanation,
   });
 }
