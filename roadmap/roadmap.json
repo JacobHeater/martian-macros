@@ -412,7 +412,7 @@
     {
       "id": "M2",
       "name": "Closed beta",
-      "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating.",
+      "intent": "A small group can use the app daily for two months: real food search and barcodes, the dashboard and design system, honest measurement, and a coach that handles stalls, gaps and under-eating, and a backup the person can restore (the owner, 2026-10-19).",
       "requires": [
         {
           "workstream": "WS-03",
@@ -595,7 +595,8 @@
             "MM-221",
             "MM-408",
             "MM-410",
-            "MM-411"
+            "MM-411",
+            "MM-413"
           ]
         },
         {
@@ -615,6 +616,13 @@
             "MM-250",
             "MM-251",
             "MM-252"
+          ]
+        },
+        {
+          "workstream": "WS-12",
+          "tickets": [
+            "MM-63",
+            "MM-64"
           ]
         }
       ]
@@ -680,9 +688,7 @@
         {
           "workstream": "WS-12",
           "tickets": [
-            "MM-65",
-            "MM-63",
-            "MM-64"
+            "MM-65"
           ]
         },
         {
@@ -1423,7 +1429,14 @@
           "MM-400",
           "MM-401",
           "MM-402",
-          "MM-407"
+          "MM-407",
+          "MM-324",
+          "MM-336",
+          "MM-342",
+          "MM-351",
+          "MM-352",
+          "MM-373",
+          "MM-374"
         ],
         "remaining": [
           "MM-89",
@@ -1443,14 +1456,7 @@
           "MM-288",
           "MM-289",
           "MM-304",
-          "MM-324",
-          "MM-336",
-          "MM-342",
-          "MM-351",
-          "MM-352",
           "MM-357",
-          "MM-373",
-          "MM-374",
           "MM-375",
           "MM-391",
           "MM-392",
@@ -2357,7 +2363,8 @@
           "MM-305",
           "MM-329",
           "MM-406",
-          "MM-411"
+          "MM-411",
+          "MM-413"
         ]
       },
       "sequence": [
@@ -2413,7 +2420,8 @@
           "title": "Barcode scanning; raw or cooked",
           "tickets": [
             "MM-43",
-            "MM-151"
+            "MM-151",
+            "MM-413"
           ],
           "milestone": "M2"
         },
@@ -3099,7 +3107,7 @@
           "tickets": [
             "MM-63"
           ],
-          "milestone": "M3"
+          "milestone": "M2"
         },
         {
           "step": 3,
@@ -3107,7 +3115,7 @@
           "tickets": [
             "MM-64"
           ],
-          "milestone": "M3"
+          "milestone": "M2"
         }
       ],
       "gate": {
@@ -4275,5 +4283,5 @@
       ]
     }
   ],
-  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both. Caught up 2026-10-13 (MM-245): the tickets of the React conversion, Storybook, the expert panel and the terms of use (MM-166 to MM-245) were placed, built/remaining now follow ticket status, and mm req checks that they do."
+  "restaged": "2026-10-08: design first, then structure first. WS-03 moved to the front, and WS-14 (architecture and module boundaries) was added ahead of it because the product owner's engineering rules (MM-159) must hold before components and repositories are built. Milestone M0 now covers both. Caught up 2026-10-13 (MM-245): the tickets of the React conversion, Storybook, the expert panel and the terms of use (MM-166 to MM-245) were placed, built/remaining now follow ticket status, and mm req checks that they do. 2026-10-19: backup and restore (WS-12 steps 2 and 3, MM-63, MM-64) moved from M3 into M2 on the owner's decision; the beta's testers must be able to keep their data."
 }

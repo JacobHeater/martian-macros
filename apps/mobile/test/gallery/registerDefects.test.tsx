@@ -51,14 +51,16 @@ it('MM-335: the history under the Dashboard has no headline of its own and no ca
   expect(screen.queryByRole('heading', { name: 'Your metrics' })).not.toBeInTheDocument();
 });
 
-it.skip('MM-336: the alcohol of the day is said inside the screen hierarchy, not bare on the canvas', async () => {
+it('MM-336: the alcohol of the day is said inside the screen hierarchy, not bare on the canvas', async () => {
   await repos.food.addFood(
     new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Red wine', kcal: 125, proteinG: 0, carbsG: 4, fatG: 0, source: 'weighed', alcoholG: 15.6 }),
   );
   renderApp(repos, today);
   await openTab('Food');
-  const line = await screen.findByText(/^Alcohol: /);
-  expect(line.closest('.mm-section, .food-hero')).not.toBeNull();
+  const line = await screen.findByText('Alcohol');
+  expect(line.closest('.mm-section, .mm-hero')).not.toBeNull();
+  // Said as the macro rows above it are, and as part of the day's total.
+  expect(line.parentElement?.textContent).toMatch(/kcal, in the total$/);
 });
 
 it('MM-337: an unknown barcode leaves one primary action on the sheet', async () => {
@@ -90,7 +92,7 @@ it('MM-340: weighed in, and a record the coach needs unread: Coach says so, neve
   expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
 });
 
-it.skip('MM-342: the last 7 days hold figures in their value column, not sentences', async () => {
+it('MM-342: the last 7 days hold figures in their value column, not sentences', async () => {
   await repos.targets.saveTargets(targetsFrom(today.addDays(-20), { kcal: 2100 }));
   for (let i = 1; i <= 7; i++) {
     await repos.food.addFood(
@@ -101,8 +103,11 @@ it.skip('MM-342: the last 7 days hold figures in their value column, not sentenc
   renderApp(repos, today);
   await openTab('Coach');
   const label = await screen.findByText('Average intake');
-  const value = label.parentElement?.lastElementChild?.textContent ?? '';
+  const row = label.parentElement as HTMLElement;
+  const value = row.querySelector('.mm-stat-value')?.textContent ?? '';
   expect(value.length).toBeLessThanOrEqual(16);
+  // The target and the distance are still said, under the row.
+  expect(row.querySelector('.mm-stat-detail')?.textContent).toMatch(/against a 2,100 kcal target: 500 over/);
 });
 
 it('MM-344: the strength trends on Progress are rows of their section, not cards inside it', async () => {

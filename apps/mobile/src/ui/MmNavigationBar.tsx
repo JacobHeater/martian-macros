@@ -45,7 +45,7 @@ export function MmNavigationBar<Id extends string>({ destinations, current, onSe
             <span className="mm-nav-indicator">
               <MmIcon name={destination.icon} />
             </span>
-            {destination.label}
+            <span className="mm-nav-label">{destination.label}</span>
           </button>
         );
       })}

@@ -130,13 +130,14 @@ export function FoodDatabaseScreen() {
       <div ref={installedList}>
         <MmListGroup>
           {installed.length === 0 ? (
-            <MmListRow title="Nothing downloaded yet" />
+            <MmListRow leadingIcon="info" title="Nothing downloaded yet" />
           ) : (
             installed.map((pack) => {
               const title = pack.title ?? titles.get(pack.id) ?? pack.id;
               return (
                 <MmListRow
                   key={pack.id}
+                  leadingIcon="document"
                   title={title}
                   subtitle={`Version ${pack.version} · ${megabytes(pack.bytes)}`}
                   trailingAction={

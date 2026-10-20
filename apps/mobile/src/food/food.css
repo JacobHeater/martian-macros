@@ -40,6 +40,18 @@
   margin-top: var(--space-12);
   border-top: 1px solid var(--outline);
 }
+/* The day's fiber and alcohol, inside the hero as rows shaped like the macro rows' heads (MM-336). */
+.food-hero-lines {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-12);
+}
+.food-hero-fact {
+  margin-bottom: 0;
+}
+.food-hero-lines:empty {
+  display: none;
+}
 /* The rhythm strip runs edge to edge, so seven 48 dp days fit a 360 dp phone (MM-254). */
 .food-rhythm {
   margin: var(--space-4) calc(-1 * var(--space-16)) 0;

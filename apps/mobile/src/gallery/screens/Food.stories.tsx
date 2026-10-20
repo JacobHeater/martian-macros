@@ -607,12 +607,13 @@ export const DayCompleteness = screenStory({
   },
 });
 
-/** MM-321: a glass of wine today: the alcohol's energy said on its own line. */
+/** MM-321, MM-336: a glass of wine today at Full detail: the alcohol's energy and the fiber as rows of the hero. */
 export const FoodWithAlcohol = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Alcohol: /,
+  shows: 'Alcohol',
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
+    await repos.preferences.saveDetailLevel('full');
     await repos.food.addFood(
       new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Red wine', kcal: 125, proteinG: 0, carbsG: 4, fatG: 0, source: 'weighed', alcoholG: 15.6 }),
     );

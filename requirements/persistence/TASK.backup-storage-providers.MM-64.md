@@ -46,3 +46,6 @@ Scenario: Only ciphertext leaves the device
 ## Notes
 - Each provider needs a developer registration and its own review (Google's OAuth verification in particular). Check whether the app-data
   scopes avoid the heavier "restricted scope" review before committing to an order.
+
+## Milestone
+Moved from M3 into M2 on 2026-10-19 by the product owner: the closed beta's testers must be able to keep their data across phones.

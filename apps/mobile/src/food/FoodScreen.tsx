@@ -17,6 +17,7 @@ import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
+import { HeroFactLine } from './HeroFactLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { MealSection } from './MealSection';
@@ -66,9 +67,20 @@ export function FoodScreen() {
           onRetry={() => state.retryPauses()}
         />
       ) : null}
-      <CalorieHero intake={intake} entries={entries} microsOffered targets={paused ? guide : targets?.targets} paused={paused} />
-      <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
-      {alcoholKcal > 0 ? <p className="app-text app-muted food-line">Alcohol: {Fmt.whole(alcoholKcal)} kcal</p> : null}
+      <CalorieHero
+        intake={intake}
+        entries={entries}
+        microsOffered
+        targets={paused ? guide : targets?.targets}
+        paused={paused}
+        lines={
+          // The day's fiber and alcohol belong where the day's energy is, inside the hero (MM-336).
+          <>
+            <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
+            {alcoholKcal > 0 ? <HeroFactLine name="Alcohol" figures={`${Fmt.whole(alcoholKcal)} kcal, in the total`} /> : null}
+          </>
+        }
+      />
       {entries.length === 0 && yesterday.length > 0 ? (
         <div className="app-stack-item">
           <MmButton

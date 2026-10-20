@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { IntakeDay } from '../domain/IntakeDay';
@@ -22,6 +23,8 @@ import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 interface CalorieHeroProps {
+  /** The day's other lines (fiber, alcohol), inside the hero under its picture, never bare on the canvas (MM-336). */
+  lines?: ReactNode;
   intake: IntakeDay;
   /** The day's foods, for the Micros picture (MM-310). */
   entries: readonly FoodEntry[];
@@ -59,6 +62,7 @@ interface CalorieHeroProps {
  * a third choice on Food, the day's micronutrients (MM-310).
  */
 export function CalorieHero({
+  lines,
   intake,
   entries,
   microsOffered = false,
@@ -158,6 +162,7 @@ export function CalorieHero({
           ))}
         </div>
       )}
+      {lines === undefined ? null : <div className="food-hero-lines">{lines}</div>}
       {status === undefined ? null : (
         <div className="food-hero-status">
           <MmListRow

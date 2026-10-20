@@ -61,3 +61,6 @@ Scenario: Restore is confirmed
 ## Notes
 - Automatic scheduled backup is a natural follow-up; leave it out of the first version.
 - Custom foods and recipes are user data and are included; downloaded food packs are not (they can be fetched again).
+
+## Milestone
+Moved from M3 into M2 on 2026-10-19 by the product owner: the closed beta's testers must be able to keep their data across phones.

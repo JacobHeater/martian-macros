@@ -79,6 +79,8 @@ it('a build with no download address says so and fetches nothing', async () => {
   expect(packs.getByText(/not set up in this version/)).toBeInTheDocument();
   expect(packs.queryByRole('button', { name: 'See what is available' })).not.toBeInTheDocument();
   expect(packs.getByText('Nothing downloaded yet')).toBeInTheDocument();
+  // Every row of "On this phone" carries an icon by meaning (MM-352).
+  expect(packs.getByText('Nothing downloaded yet').closest('.mm-list-row')?.querySelector('.mm-list-row-leading')).not.toBeNull();
   expect(http.requests).toEqual([]);
 });
 

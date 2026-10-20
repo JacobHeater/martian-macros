@@ -6,6 +6,7 @@ import type { FoodEntry } from '../domain/FoodEntry';
 import { Fmt } from '../format/Fmt';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
+import { HeroFactLine } from './HeroFactLine';
 
 interface FiberLineProps {
   entries: readonly FoodEntry[];
@@ -14,8 +15,8 @@ interface FiberLineProps {
 }
 
 /**
- * The day's fiber against its guide, at Full detail only (MM-126). A guide,
- * never judged: no "under", no streak. With too little of the day's
+ * The day's fiber against its guide, at Full detail only (MM-126), a row of
+ * the hero (MM-336). A guide, never judged: no "under", no streak. With too little of the day's
  * calories carrying a fiber value it says so instead of showing a total
  * that would treat missing as zero.
  */
@@ -25,9 +26,9 @@ export function FiberLine({ entries, kcalTarget, sex }: FiberLineProps) {
   if (!DetailLevel.showsExtras(level) || entries.length === 0) return null;
   const day = FiberDay.of(entries);
   const guide = kcalTarget === undefined || sex === undefined ? undefined : fiberGuideG({ kcalTarget, sex });
-  let line: string;
-  if (!day.enough) line = 'Fiber: not enough data';
-  else if (guide === undefined) line = `Fiber: ${Fmt.whole(day.totalG)} g`;
-  else line = `Fiber: ${Fmt.whole(day.totalG)} g · guide ${Fmt.whole(guide)} g`;
-  return <p className="app-text app-muted food-line">{line}</p>;
+  let figures: string;
+  if (!day.enough) figures = 'not enough data';
+  else if (guide === undefined) figures = `${Fmt.whole(day.totalG)} g`;
+  else figures = `${Fmt.whole(day.totalG)} g · guide ${Fmt.whole(guide)} g`;
+  return <HeroFactLine name="Fiber" figures={figures} />;
 }
