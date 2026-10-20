@@ -82,3 +82,6 @@ Built on the owner's Mac. Verified: the three identities installed side by
 side on the Android emulator and on the iPhone simulator, each launching by
 its own id with its own name; `mm check`. Not verified: a phone; a release
 build of the real id (MM-7).
+
+## Amended 2026-10-19 (the owner): `--prod`
+`mm run --prod`, `mm run --ios --prod`, `mm run --ios --phone --prod`, `mm build android --prod` and `mm build ios --prod` are the real app, the short way to `--env prod`, on both platforms. `--prod` beside an `--env` that says otherwise is a usage error. Tested in `tool/test/identity.test.ts`.

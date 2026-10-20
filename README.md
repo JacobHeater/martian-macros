@@ -36,15 +36,15 @@ signing team, see [docs/ios-signing.md](docs/ios-signing.md).
 | `mm check` | CI gate: requirements, panel, the tool's tests, then the web check (type check, tests, build, offline) |
 | `mm web` | The web check alone |
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
-| `mm run [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator; `--env prod` is the real app, otherwise the dev twin |
-| `mm run --ios [-d UDID] [--env prod\|dev\|demo]` | Builds, installs and launches on an iPhone simulator (`MM_SIMULATOR` sets the default); the dev twin unless said |
-| `mm run --ios --phone [name \| id] [--env prod\|dev\|demo]` | Builds signed, installs and opens on the iPhone plugged in (`MM_IPHONE` sets the default; `MM_APPLE_TEAM` the signing team); the real app unless said |
+| `mm run [--prod] [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator; `--prod` (or `--env prod`) is the real app, otherwise the dev twin |
+| `mm run --ios [-d UDID] [--prod \| --env prod\|dev\|demo]` | Builds, installs and launches on an iPhone simulator (`MM_SIMULATOR` sets the default); the dev twin unless said |
+| `mm run --ios --phone [name \| id] [--prod \| --env prod\|dev\|demo]` | Builds signed, installs and opens on the iPhone plugged in (`MM_IPHONE` sets the default; `MM_APPLE_TEAM` the signing team); the real app unless said |
 | `mm demo [--seed] -d <Android device ID>` | The isolated DEMO app on an exact device; `--seed` starts it from the demo scenario on every launch |
 | `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given; a simulator by its UDID |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm simulator [name \| udid]` | Starts an iPhone simulator and waits for it (`mm simulator list` to list) |
-| `mm build android [--release] [--env prod\|dev]` | Builds the web app, syncs the shell and assembles the APK |
-| `mm build ios [--release] [--phone] [--env prod\|dev]` | Builds the web app, syncs the iOS shell and builds it for the simulator (no signing), or signed for a phone |
+| `mm build android [--release] [--prod \| --env prod\|dev]` | Builds the web app, syncs the shell and assembles the APK |
+| `mm build ios [--release] [--phone] [--prod \| --env prod\|dev]` | Builds the web app, syncs the iOS shell and builds it for the simulator (no signing), or signed for a phone |
 | `mm food fetch\|build\|package` | Builds the food packs (MM-52); `build` needs DuckDB on PATH |
 | `mm storybook [build]` | The design register: every token, icon, component and screen as built, in a browser (MM-237) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
@@ -68,7 +68,7 @@ app **Martian Macros** (`com.martianmacros`), the development twin
 **Martian Macros Dev** (`com.martianmacros.dev`) that sits beside it so a
 development build never replaces your data, and the seeded demo **Martian
 Macros DEMO** (`com.martianmacros.demo`). `mm run` and `mm build` make the
-dev twin unless `--env prod`; `mm demo` makes the demo.
+dev twin unless `--prod` (or `--env prod`); `mm demo` makes the demo.
 
 ## Isolated demo
 

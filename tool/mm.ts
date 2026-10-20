@@ -104,12 +104,12 @@ const commands: Record<string, [string, Command]> = {
   ci: ['Watch pull request checks without waiting: mm ci help', (a) => runCi(repoRoot, a)],
   roadmap: ['Write roadmap/progress.html, the progress page: mm roadmap [--check] [--no-open]', (a) => runRoadmapReport(repoRoot, a)],
   food: ['Build the food packs: mm food fetch | build | package', (a) => runFood(repoRoot, a)],
-  run: ['Build, install and launch on a device: mm run [-d DEVICE] [--env phone] [--live [--port N]] (--live: hot reload from the dev server); mm run --ios [-d UDID] for a simulator; mm run --ios --phone [name | id] for the iPhone plugged in (MM-412)', (a) => (a.includes('--ios') ? runIosApp(repoRoot, a) : runApp(repoRoot, a))],
+  run: ['Build, install and launch on a device: mm run [-d DEVICE] [--prod | --env prod|dev|demo|phone] [--live [--port N]] (--live: hot reload from the dev server); mm run --ios [-d UDID] for a simulator; mm run --ios --phone [name | id] for the iPhone plugged in (MM-412)', (a) => (a.includes('--ios') ? runIosApp(repoRoot, a) : runApp(repoRoot, a))],
   demo: ['The isolated demo app on an exact device: mm demo [--seed] -d <device ID>', (a) => runDemo(repoRoot, a)],
   emulator: ['Start an emulator: mm emulator [id] [--cold] | list', (a) => runEmulator(repoRoot, a)],
   simulator: ['Start an iPhone simulator: mm simulator [name | udid] | list (MM-403)', (a) => runSimulator(a)],
   screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238); a simulator by its UDID', (a) => screenshot(a)],
-  build: ['Build the app: mm build android [--release] | mm build ios [--release] [--phone] (a simulator build, or a signed phone build)', (a) => (a[0] === 'ios' ? runIosBuild(repoRoot, a) : runBuild(repoRoot, a))],
+  build: ['Build the app: mm build android [--release] | mm build ios [--release] [--phone] (a simulator build, or a signed phone build); --prod for the real app, else the dev twin', (a) => (a[0] === 'ios' ? runIosBuild(repoRoot, a) : runBuild(repoRoot, a))],
   clean: ['Remove build outputs and caches', () => {
     cleanIos(repoRoot);
     return runClean(repoRoot);

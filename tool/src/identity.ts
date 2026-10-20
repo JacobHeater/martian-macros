@@ -12,18 +12,22 @@ const names: Record<Identity, string> = { prod: 'Martian Macros', dev: 'Martian 
 const suffixes: Record<Identity, string> = { prod: '', dev: '.dev', demo: '.demo' };
 
 /**
- * The identity `args` ask for: `--env prod` is the real app, `--env dev`
- * or nothing is the dev twin, and `--env demo` the demo (which `mm demo`
- * asks for by itself). `phone`, which only chooses the device (MM-234),
- * is the dev twin too. Anything else is a usage error, given as text.
+ * The identity `args` ask for: `--prod` or `--env prod` is the real app,
+ * `--env dev` or nothing is the dev twin, and `--env demo` the demo (which
+ * `mm demo` asks for by itself). `phone`, which only chooses the device
+ * (MM-234), is the dev twin too. Anything else is a usage error, given as
+ * text; so is `--prod` beside an `--env` that says otherwise.
  */
 export function identityOf(args: readonly string[]): Identity | string {
+  const prod = args.includes('--prod');
   const at = args.indexOf('--env');
-  if (at === -1) return 'dev';
+  if (at === -1) return prod ? 'prod' : 'dev';
   const env = args[at + 1];
   if (env === undefined || env.startsWith('-')) return '--env needs a value: prod, dev or phone.';
-  if (env === 'phone') return 'dev';
-  return (identities as readonly string[]).includes(env) ? (env as Identity) : '--env must be one of: dev, prod, phone';
+  const named = env === 'phone' ? 'dev' : (identities as readonly string[]).includes(env) ? (env as Identity) : undefined;
+  if (named === undefined) return '--env must be one of: dev, prod, phone';
+  if (prod && named !== 'prod') return `--prod and --env ${env} disagree; say one.`;
+  return named;
 }
 
 /** The app id on either platform. */

@@ -11,6 +11,11 @@ test('the identity follows --env, and nothing or phone is the dev twin', () => {
   assert.equal(identityOf(['--env', 'phone']), 'dev');
   assert.match(identityOf(['--env', 'staging']) as string, /must be one of/);
   assert.match(identityOf(['--env']) as string, /needs a value/);
+  // `--prod` is the short way to the real app, on either platform (the owner, 2026-10-19).
+  assert.equal(identityOf(['--prod']), 'prod');
+  assert.equal(identityOf(['--ios', '--phone', '--prod']), 'prod');
+  assert.equal(identityOf(['--prod', '--env', 'prod']), 'prod');
+  assert.match(identityOf(['--prod', '--env', 'demo']) as string, /disagree/);
   assert.match(identityOf(['--env', '--release']) as string, /needs a value/);
 });
 
