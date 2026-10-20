@@ -80,6 +80,20 @@ out of line is set aside.
 
 Rows: WeightTrendModel.relativeWaterSigma, WeightTrendModel.waterPersistence, WeightTrendModel.relativeScaleSigma, WeightTrendModel.levelProcessSigmaKg, WeightTrendModel.slopeProcessSigmaKgPerDay, WeightTrendModel.initialSlopeSigmaKgPerDay, WeightTrendModel.outlierSigmas, WeightTrendModel.maxConsecutiveRejections, settlingShiftFraction, settlingSlopeShiftFraction
 
+### Why did the scale jump?
+
+A weigh-in well above or below your trend is usually water, food still being
+digested, or stored carbohydrate, not fat: gaining a kilogram of fat in a day
+would take many thousands of calories over what you use. When a reading is far
+enough from the trend, the app looks through the last two days of your own log
+for the likely causes it knows about: a weight event you noted, a day of much
+more carbohydrate or sodium than usual, calories outside the target band,
+alcohol, a workout, the days around a period start, or a recent change of
+targets. It names what it finds as likely, never certain, and says what the
+difference would have had to cost to be fat.
+
+Rows: WeightJumpRule.noiseFraction, WeightJumpRule.lookBackDays, WeightJumpRule.usualDays, WeightJumpRule.usualMinimumDays, WeightJumpRule.aboveUsualFraction, WeightJumpRule.eventWithinDays, WeightJumpRule.maxCauses, weightJumpText, fatMassKcalPerKg
+
 ### Why do my targets change slowly?
 
 Targets change at most once a week, by a small step, so one unusual week cannot
@@ -302,6 +316,14 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `TrainingRule.suspendAfterDays` | 21 days without a finished workout, or no training days set | engine TrainingRule.ts | When a lean-gain surplus is replaced by maintenance until a workout is logged (MM-134) | Resistance training is the main driver of muscle gain; protein without training does little for lean mass (Nunes 2022); the three weeks is product judgement | judgement | Adults; the direction (Nunes 2022) is strong, the figure is not from a trial | No |
 | `trainingMeaning` | Each major muscle group with hard sets at least twice a week | format trainingGoalNote.ts | What "training" means in the notes (MM-134, MM-78) | Schoenfeld 2016 (frequency), Schoenfeld 2017 and Pelland 2024 (volume dose-response); stated as a typical minimum, not a program | moderate | Trained and untrained adults | No |
 | `CycleRule` | Noise ×1.6 from 5 days before a period start through 2 after | engine CycleRule.ts | How marked period days widen the trend's noise (MM-19, MM-20) | Premenstrual water retention is widely reported; the window and factor are product judgement | judgement | Menstruating women | No |
+| `WeightJumpRule.noiseFraction` | 0.6% of trend weight (about 0.5 kg at 80 kg) | engine WeightJumpRule.ts | How far from the trend a weigh-in has to be before the app explains it (MM-142) | One standard deviation of the trend model's day-to-day water noise (`WeightTrendModel.relativeWaterSigma`), itself product judgement tuned in simulation | judgement | None | No |
+| `WeightJumpRule.lookBackDays` | 2 days | engine WeightJumpRule.ts | How far back the log is searched for a cause (MM-142) | Glycogen and its water, sodium and gut contents move the scale for one to three days (strong in direction); the two days are product judgement | judgement | None | No |
+| `WeightJumpRule.usualDays` | 14 days | engine WeightJumpRule.ts | The days averaged for the person's usual carbohydrate and sodium (MM-142) | Product judgement, the insight rules' pattern window | judgement | None | No |
+| `WeightJumpRule.usualMinimumDays` | 5 logged days | engine WeightJumpRule.ts | How many of those days must be logged before the usual means anything (MM-142) | Product judgement | judgement | None | No |
+| `WeightJumpRule.aboveUsualFraction` | 30% above the usual day (below it for a low reading) | engine WeightJumpRule.ts | When a day's carbohydrate or sodium counts as a likely cause (MM-142) | Each gram of glycogen is stored with about 3 g of water (Olsson and Saltin 1970; strong in mechanism), so a day 100 g over usual can add most of a kilogram; a salty day raises body water for a day or more (strong in direction). The 30% is product judgement and should be tuned | judgement | Trained men (Olsson and Saltin); the mechanism is general | No |
+| `WeightJumpRule.eventWithinDays` | 3 days, today included | engine WeightJumpRule.ts | How recent a weight event has to be to count as a likely cause (MM-142) | Product judgement; illness, travel and a salty meal move the scale for days, creatine for weeks (MM-136) | judgement | None | No |
+| `WeightJumpRule.maxCauses` | 3 | engine WeightJumpRule.ts | How many likely causes are listed (MM-142) | Product judgement: the most likely first, and no list a person will not read | judgement | None | No |
+| `weightJumpText` | "For this to be fat you would have needed about 10,400 kcal over your expenditure yesterday"; after a day far over target, the most of it that could be fat and that the rest is water and food | format weightJumpText.ts | What is said when a weigh-in is far from the trend (MM-142) | The energy in fat tissue (`fatMassKcalPerKg`, Hall 2008; strong); causes said as likely, never certain (MM-108). A high-carbohydrate day's figures are given with the person's usual; a cause the data cannot judge (a meal's clock time) is not claimed | strong | Adults | No |
 | `whatToExpectPoints` | The aim as two thirds to four thirds of the chosen pace; the day-to-day figure as one to two standard deviations of the trend model's water noise (0.6% of body weight) | format whatToExpectPoints.ts | What onboarding says the first month looks like (MM-158) | Glycogen and water in week one (strong); the noise figure is MM-18's; the range widths are product judgement; MM-96 forbids promised amounts | judgement | None | No |
 | `countHardSets` | A set is hard with 4 or fewer reps in reserve, or none recorded; it counts in full for its exercise's main muscle and half for each other muscle it trains | engine countHardSets.ts | How weekly volume (MM-78) and the volume jump (MM-366) count sets | Product judgement; the half for a secondary muscle is a common convention in set counting, not a measured share | judgement | None directly | No |
 | `volumeJump` | Hard sets for a muscle group in the 7 days to a workout at least `VolumeJumpRule.ratio` times its usual week and `VolumeJumpRule.minimumMoreSets` more; said once a workout, whenever it holds, until snoozed (MM-378) | engine volumeJumpInsights.ts | Whether the coach mentions a jump in weekly sets under a lift (MM-366) | The figures are product judgement. The direction, that unaccustomed work can bring more soreness and smaller steps help, rests on the repeated bout effect (Nosaka and Aoki 2011). The acute:chronic workload ratio is contested (Impellizzeri 2020) and is not the source; no injury is claimed | judgement | Mostly untrained adults in eccentric-exercise studies, extrapolated to weekly set counts | No |

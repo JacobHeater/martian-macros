@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from 'react';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
@@ -19,7 +20,14 @@ interface TrendChartProps {
   cycleWindows?: readonly { from: CalendarDate; to: CalendarDate }[];
   /** What the chart says, for a screen reader (the chart itself is drawn). */
   label: string;
+  /** The weigh-in the person chose, drawn larger (MM-142). */
+  pickedDay?: CalendarDate | undefined;
+  /** Called with a weigh-in's day when its dot, or the chart near it, is tapped (MM-142). */
+  onPickDay?: ((date: CalendarDate) => void) | undefined;
 }
+
+/** How far from a dot, in the chart's own units, a tap still picks it. */
+const pickReach = 12;
 
 const width = 320;
 const height = 190;
@@ -34,7 +42,18 @@ const plotHeight = height - bottom - 4;
  * day a weight event was noted, and a quiet shade over the days around a
  * period start, where the band is wider by design (MM-20).
  */
-export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents = [], cycleWindows = [], label }: TrendChartProps) {
+export function TrendChart({
+  trend,
+  weights,
+  today,
+  rangeDays,
+  fmt,
+  weightEvents = [],
+  cycleWindows = [],
+  label,
+  pickedDay,
+  onPickDay,
+}: TrendChartProps) {
   const start = today.addDays(1 - rangeDays);
   const points = trend.filter((p) => !p.date.isBefore(start));
   if (points.length === 0) return <p className="chart-empty chart-empty-tall">No weigh-ins in this range.</p>;
@@ -43,8 +62,8 @@ export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents
   const at = (p: WeightTrendPoint, sigmas: number) => fmt.weightFromKg(p.levelKg + sigmas * p.levelSigmaKg);
   const raw = weights
     .filter((w) => !w.date.isBefore(start))
-    .map((w) => [dayOf(w.date), fmt.weightFromKg(w.weightKg)] as const);
-  const ys = [...raw.map(([, value]) => value), ...points.map((p) => at(p, 2)), ...points.map((p) => at(p, -2))];
+    .map((w) => ({ day: dayOf(w.date), value: fmt.weightFromKg(w.weightKg), date: w.date }));
+  const ys = [...raw.map(({ value }) => value), ...points.map((p) => at(p, 2)), ...points.map((p) => at(p, -2))];
   const lowest = Math.min(...ys);
   const highest = Math.max(...ys);
   const pad = Math.max((highest - lowest) * 0.1, 0.5);
@@ -62,8 +81,45 @@ export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents
     .filter(({ from, to }) => !to.isBefore(from));
   const gridValues = [1, 2, 3].map((step) => low + ((high - low) / 4) * step);
 
+  // A tap on a dot picks that weigh-in; a tap near one, anywhere down the plot, picks the nearest (MM-142).
+  const pick = (event: MouseEvent<SVGSVGElement>) => {
+    if (onPickDay === undefined || raw.length === 0) return;
+    const tapped = (event.target as Element).getAttribute('data-day');
+    let chosen = tapped === null ? undefined : raw.find((r) => r.day === Number(tapped));
+    if (chosen === undefined) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      const atX = ((event.clientX - rect.left) / rect.width) * width;
+      const nearest = raw.reduce((best, r) => (Math.abs(x(r.day) - atX) < Math.abs(x(best.day) - atX) ? r : best));
+      if (Math.abs(x(nearest.day) - atX) > pickReach) return;
+      chosen = nearest;
+    }
+    onPickDay(chosen.date);
+  };
+
+  // The arrow keys move the pick between weigh-ins, Home and End to the first and last (the panel's UX-3).
+  const move = (event: KeyboardEvent<SVGSVGElement>) => {
+    if (onPickDay === undefined || raw.length === 0) return;
+    const at = raw.findIndex((r) => r.date === pickedDay);
+    const from = at === -1 ? raw.length - 1 : at;
+    const steps: Readonly<Record<string, number>> = { ArrowLeft: from - 1, ArrowRight: from + 1, Home: 0, End: raw.length - 1 };
+    const next = steps[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    const chosen = raw[Math.min(raw.length - 1, Math.max(0, next))];
+    if (chosen !== undefined) onPickDay(chosen.date);
+  };
+
   return (
-    <svg className="chart-plot chart-trend" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
+    <svg
+      className={`chart-plot chart-trend${onPickDay === undefined ? '' : ' chart-trend-pickable'}`}
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label={label}
+      tabIndex={onPickDay === undefined ? undefined : 0}
+      onClick={onPickDay === undefined ? undefined : pick}
+      onKeyDown={onPickDay === undefined ? undefined : move}
+    >
       {gridValues.map((value) => (
         <g key={value}>
           <line className="chart-grid" x1={left} x2={width - 4} y1={y(value)} y2={y(value)} />
@@ -101,9 +157,19 @@ export function TrendChart({ trend, weights, today, rangeDays, fmt, weightEvents
       ))}
       <path className="chart-band" d={band} />
       <path className="chart-line chart-estimate" d={linePath(along(0))} strokeWidth={3} />
-      {raw.map(([day, value]) => (
-        <circle key={day} className="chart-weigh-in" cx={x(day)} cy={y(value)} r={2.5} />
-      ))}
+      {raw.map(({ day, value, date }) => {
+        const picked = date === pickedDay;
+        return (
+          <circle
+            key={day}
+            className={`chart-weigh-in${picked ? ' chart-weigh-in-picked' : ''}`}
+            data-day={day}
+            cx={x(day)}
+            cy={y(value)}
+            r={picked ? 4.5 : 2.5}
+          />
+        );
+      })}
     </svg>
   );
 }

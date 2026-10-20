@@ -2119,3 +2119,23 @@
   flex: 1;
   min-width: 0;
 }
+/* ---- The waist protocol, drawn (MM-155): strokes in the text colours, the tape the heaviest of them ---- */
+
+.mm-waist-figure {
+  display: block;
+  flex: none;
+  width: 72px;
+  height: 96px;
+}
+.mm-waist-figure-body {
+  stroke: var(--text2);
+}
+.mm-waist-figure-navel {
+  fill: var(--text);
+}
+.mm-waist-figure-tape {
+  stroke: var(--text);
+}
+.mm-waist-figure-level {
+  stroke: var(--outline);
+}

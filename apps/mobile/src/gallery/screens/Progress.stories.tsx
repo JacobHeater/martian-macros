@@ -10,13 +10,17 @@ import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { healthPlatform } from './healthPlatform';
 import { oldLiftsScenario } from './oldLiftsScenario';
+import { oldWaistScenario } from './oldWaistScenario';
 import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
+import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
+import { waistYearScenario } from './waistYearScenario';
 import { waitingRead } from './waitingRead';
+import { weightJumpScenario } from './weightJumpScenario';
 
 /**
  * Weight, waist and strength over time. Before MM-257 (main at 9fb8c79,
@@ -401,4 +405,100 @@ export const SleepLoading = screenStory({
     reveal(heading);
     await within(heading.closest('.mm-section') as HTMLElement).findByRole('progressbar', { name: 'Loading' });
   },
+});
+
+// ---- MM-142: a weigh-in's explanation at the point on the chart ----
+
+/** MM-142: today's reading far above the trend: explained under the chart without a tap, the latest reading being the one in view. */
+export const ProgressWeightJump = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /above your trend\./,
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+  open: onProgress,
+});
+
+/** Taps the weigh-in dot drawn on day `day` of the chart's range. */
+const pickDot = (day: number) => async (canvas: HTMLElement) => {
+  const chart = await within(canvas).findByRole('img', { name: /^Weight trend over the last 30 days\./ }, { timeout: 5000 });
+  reveal(chart);
+  const dot = chart.querySelector(`[data-day="${day}"]`);
+  if (dot !== null) await userEvent.click(dot);
+};
+
+/** MM-142: an ordinary dot tapped: that reading, its distance from the trend, and that it is inside the noise. */
+export const ProgressPickedWeighIn = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /inside the day-to-day noise\.$/,
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+  open: onProgress,
+  walk: pickDot(0),
+});
+
+/** MM-142: today's dot tapped: the reading said, then its explanation. */
+export const ProgressPickedJump = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Today: [\d.]+ (lb|kg), \+/,
+  scenario: weightJumpScenario({ yesterdaysCarbsG: 340, workoutYesterday: true }),
+  open: onProgress,
+  walk: pickDot(29),
+});
+
+// ---- MM-155: how to measure, drawn; the waist over time ----
+
+/** Opens the Waist section, folded to its line until pressed (MM-257). */
+const openWaist = async (canvas: HTMLElement) => {
+  const header = await within(canvas).findByRole('button', { name: /^Waist/ }, { timeout: 5000 });
+  reveal(header);
+  await userEvent.click(header);
+};
+
+/** MM-155: two measurements so far: the protocol drawn in full beside its steps, and the chart of the two. */
+export const ProgressWaistFirstMeasurements = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Tape level with the navel, snug and not pressing in.',
+  scenario: waistDueScenario,
+  open: onProgress,
+  walk: openWaist,
+});
+
+/** MM-155: six weekly measurements: the protocol one tap down, the chart with dots, the smoothed line and the noise band. */
+export const ProgressWaistChart = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Waist over time',
+  scenario: waistDownScenario,
+  open: onProgress,
+  walk: openWaist,
+});
+
+/** MM-155: "How to measure" opened from the card after the first three measurements. */
+export const ProgressWaistHowToMeasure = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'First thing in the morning, after the bathroom, before eating.',
+  scenario: waistDownScenario,
+  open: onProgress,
+  walk: async (canvas) => {
+    await openWaist(canvas);
+    await pressNamed(/^How to measure/)(canvas);
+  },
+});
+
+/** MM-155: thirty weekly measurements over a year, one a quick entry where the band widens. */
+export const ProgressWaistYear = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Dots are measurements\./,
+  scenario: waistYearScenario,
+  open: onProgress,
+  walk: async (canvas) => {
+    await openWaist(canvas);
+    await pressNamed('1y')(canvas);
+  },
+});
+
+/** MM-155: the one measurement is older than the range: the chart says so. */
+export const ProgressWaistNoneInRange = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'No waist measurements in this range.',
+  scenario: oldWaistScenario,
+  open: onProgress,
+  walk: openWaist,
 });
