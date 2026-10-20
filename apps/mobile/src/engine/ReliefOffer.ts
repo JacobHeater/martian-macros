@@ -1,18 +1,24 @@
 import type { ReliefChoice } from './ReliefChoice';
+import type { ReliefReason } from './ReliefReason';
 import type { ReliefSignal } from './ReliefSignal';
 import type { SleepAverage } from './SleepAverage';
 
 /**
- * An offer to ease a deficit because recovery is failing (MM-117). Never an
- * automatic change: the user picks, and carrying on is one of the picks.
+ * An offer to ease a deficit (MM-117, MM-135): because recovery is failing,
+ * or because the deficit has run twelve unbroken weeks. Never an automatic
+ * change: the user picks, and carrying on is one of the picks.
  */
 export interface ReliefOffer {
-  /** What the coach would pick: a maintenance week or a slower pace. */
+  /** What brought the offer. */
+  readonly reason: ReliefReason;
+
+  /** What the coach would pick: a break or a slower pace. */
   readonly suggestion: ReliefChoice;
 
   /**
    * The pace one step gentler than the current one, as a fraction of body
-   * weight a week; undefined when there is none to offer.
+   * weight a week; undefined when there is none to offer, and on the
+   * long-deficit offer, whose answer is a rest, not a pace.
    */
   readonly slowerPace: number | undefined;
 

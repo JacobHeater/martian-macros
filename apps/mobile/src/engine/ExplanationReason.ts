@@ -37,6 +37,8 @@ const values = [
   'paceChange',
   /** The surplus paused for want of training (MM-134). */
   'trainingLapse',
+  /** A diet break ran its length and the deficit resumed (MM-135). */
+  'breakEnded',
 ] as const;
 
 /**

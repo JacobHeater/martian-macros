@@ -1,11 +1,15 @@
 import type { ReliefOffer } from '../engine';
 import { shortSleepText } from './shortSleepText';
 
+const rest = 'a rest from dieting, which many people find makes the next weeks easier';
+
 /**
- * The fixed words of the offer to ease a deficit (MM-117, MM-252). Nothing
- * here suggests eating less, training more or adding cardio. Short sleep
+ * The fixed words of the offer to ease a deficit (MM-117, MM-135). Nothing
+ * here suggests eating less, training more or adding cardio, and nothing
+ * claims a break does anything to metabolism: the evidence grades a break
+ * as a rest that eases the diet, not as a repair (MM-135). Short sleep
  * from the record is a signal of its own with its own title; typed at the
- * check-in, it is a line.
+ * check-in, it is a line (MM-252).
  */
 export function reliefOfferText(offer: ReliefOffer): {
   title: string;
@@ -13,17 +17,26 @@ export function reliefOfferText(offer: ReliefOffer): {
   suggestion: string;
   sleep: string | undefined;
 } {
+  if (offer.reason === 'longDeficit') {
+    return {
+      title: `${offer.deficitWeeks} weeks in a deficit`,
+      body:
+        `You have been in a deficit for ${offer.deficitWeeks} weeks without a break. A break is two weeks at ` +
+        `maintenance: ${rest}. The deficit resumes after it, and the count starts again.`,
+      suggestion:
+        'The coach would take the break now. If you carry on, it asks again in three weeks, and at 20 weeks it plans ' +
+        'a break itself.',
+      sleep: undefined,
+    };
+  }
   const hardWeeks = offer.signals.includes('hardCheckIns');
   let suggestion: string;
-  if (offer.suggestion === 'maintenanceWeek') {
+  if (offer.suggestion === 'break') {
     suggestion =
       offer.slowerPace === undefined
-        ? 'The coach would take a maintenance week: a week at maintenance ' +
-          'is a diet break taken early, and the deficit can resume ' +
-          'after it.'
-        : 'The coach would take a maintenance week: you are ' +
-          `${offer.deficitWeeks} weeks into this deficit, and a week at ` +
-          'maintenance is a diet break taken early.';
+        ? `The coach would take a break: two weeks at maintenance is ${rest}, and the deficit resumes after it.`
+        : `The coach would take a break: you are ${offer.deficitWeeks} weeks into this deficit, and two weeks at ` +
+          `maintenance is ${rest}.`;
   } else if (hardWeeks) {
     suggestion =
       'The coach would slow the pace: you are early in this deficit, and a ' +

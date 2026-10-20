@@ -12,8 +12,12 @@ const messages: Readonly<Record<TargetFlag, string>> = {
   heldByUser: 'You kept last week’s targets. They may come down at the next ' + 'check-in.',
   rateLimited:
     'This week’s change was limited to a small step. Targets move ' + 'gradually so one odd week can’t swing them.',
-  requestedBreak: 'This is the maintenance week you chose. The deficit can resume at ' + 'the next check-in.',
-  dietBreak: 'You’ve been in a deficit for 16 weeks. This is a maintenance ' + 'break to recover before continuing.',
+  requestedBreak:
+    'This is the two-week break you chose: a rest from dieting, at maintenance. The deficit resumes after it, and the ' +
+    'count of weeks starts again.',
+  dietBreak:
+    'You’ve been in a deficit for 20 weeks, the longest the app plans without a rest. These two weeks are at ' +
+    'maintenance; the deficit resumes after them.',
   underweightMaintenance:
     'Your weight is below the range where the app will plan a calorie ' +
     'deficit, so targets are at maintenance. If you are not eating ' +

@@ -10,7 +10,9 @@ import {
 } from '../../../src/domain';
 import {
   type BodyFatEstimate,
+  breakInForce,
   computeTargetsTraced,
+  consecutiveDeficitWeeks,
   type DailyTargets,
   deurenbergBodyFat,
   energyDensityForSlope,
@@ -50,6 +52,7 @@ export function runCoachLoop({
   settle = true,
   modeAt,
   bodyFat,
+  beforeCheckIn,
 }: {
   user: SyntheticUser;
   profile: Profile;
@@ -64,6 +67,12 @@ export function runCoachLoop({
   modeAt?: (week: number) => GoalMode | undefined;
   /** The body-fat estimate the engine works from; by default the formula one. */
   bodyFat?: BodyFatEstimate;
+  /**
+   * Sees the targets history before each week's check-in, and may have the
+   * simulated person take the diet break the coach offers (MM-135), as the
+   * Coach screen's button would.
+   */
+  beforeCheckIn?: (week: number, history: readonly TargetsRecord[]) => { takeBreak?: boolean } | undefined;
 }): WeekResult[] {
   const policy = CoachingPolicy.derive({ profile, screening: new ScreeningAnswers(), today: user.today });
   const intakeLog: IntakeDay[] = [];
@@ -93,7 +102,6 @@ export function runCoachLoop({
 
   let targets: DailyTargets | undefined;
   let trendWeight = user.weightKg;
-  let deficitWeeks = 0;
   let safetyBf: number | undefined;
   const results: WeekResult[] = [];
   const history: TargetsRecord[] = [];
@@ -144,10 +152,30 @@ export function runCoachLoop({
     }
 
     let explanation: TargetsExplanation | undefined;
+    // As in `nextTargets`: a diet break holds for its length (MM-135), and
+    // the deficit then resumes at once, unthrottled, as after a change of
+    // goal. The count of deficit weeks is the engine's own.
+    const previousRecord = history[history.length - 1];
+    const onBreak = !modeChanged && breakInForce(history, user.today) !== undefined;
+    const breakOver =
+      !modeChanged &&
+      !onBreak &&
+      previousRecord !== undefined &&
+      (previousRecord.targets.flags.has('dietBreak') || previousRecord.targets.flags.has('requestedBreak'));
+    // A break the person takes starts at once, like the Coach's button (MM-117, MM-135).
+    const asked = targets === undefined ? undefined : beforeCheckIn?.(week, history);
+    const takeBreak = !onBreak && targets !== undefined && targets.weeklyRateFraction < 0 && asked?.takeBreak === true;
     // As in `nextTargets`: nothing changes during calibration or while the
     // estimate is held, and a change of goal applies at once, unthrottled.
-    if (targets === undefined || modeChanged || safetyRaise > 0 || (week >= 2 && tdee.status === 'updated')) {
-      const previousRecord = history[history.length - 1];
+    if (
+      !onBreak &&
+      (targets === undefined ||
+        modeChanged ||
+        breakOver ||
+        takeBreak ||
+        safetyRaise > 0 ||
+        (week >= 2 && tdee.status === 'updated'))
+    ) {
       const traced = computeTargetsTraced(
         new TargetInputs({
           sex: profile.sex,
@@ -160,22 +188,24 @@ export function runCoachLoop({
           policy,
           tdeeKcal: tdee.kcal,
           bmrKcal: bmrFor(trendWeight),
-          previous: modeChanged ? undefined : targets,
-          consecutiveDeficitWeeks: deficitWeeks,
+          previous: modeChanged || breakOver ? undefined : targets,
+          consecutiveDeficitWeeks: consecutiveDeficitWeeks(history, user.today),
           safetyBodyFatPercent: safetyBf,
-          safetyRaiseKcal: modeChanged ? 0 : safetyRaise,
+          safetyRaiseKcal: modeChanged || breakOver ? 0 : safetyRaise,
+          breakRequested: takeBreak,
         }),
       );
       targets = traced.targets;
       explanation = explainTargets({
-        trigger: previousRecord === undefined ? 'firstTargets' : modeChanged ? 'goalChange' : 'checkIn',
+        trigger: previousRecord === undefined ? 'firstTargets' : modeChanged ? 'goalChange' : breakOver ? 'breakEnded' : 'checkIn',
         previous: previousRecord,
         targets: traced.targets,
         trace: traced.trace,
         tdee,
       });
     }
-    const inForce: DailyTargets = targets;
+    // The first week always issues targets; the `onBreak` guard above cannot hold before any exist.
+    const inForce = targets as DailyTargets;
     if (history[history.length - 1]?.targets !== inForce) {
       history.push(
         new TargetsRecord({
@@ -188,11 +218,6 @@ export function runCoachLoop({
           explanation,
         }),
       );
-    }
-    if (inForce.weeklyRateFraction < 0) {
-      deficitWeeks++;
-    } else {
-      deficitWeeks = 0;
     }
     results.push({
       week,
