@@ -240,7 +240,7 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
             <MmListRow
               leadingIcon="download"
               title="Food database"
-              subtitle="Optional download for food search and barcode scanning. The only thing this app ever fetches."
+              subtitle="Optional download for food search and barcode scanning, fetched only when you ask."
               opens
               onPress={() => void navigator.push(() => <FoodDatabaseScreen />)}
             />
@@ -255,14 +255,18 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
             <MmListRow
               leadingIcon="document"
               title="Food data sources"
-              subtitle="Where the foods come from, their licences, and what the app sends online."
+              subtitle="Where the foods come from and their licences."
               opens
               onPress={() => void navigator.push(() => <FoodSourcesScreen />)}
             />
             <MmListRow
               leadingIcon="lock"
               title="Your records stay on this device"
-              subtitle="Nothing about you is uploaded. Only a barcode or search words ever go online, and only if you allow it."
+              subtitle={
+                onlineSources.length === 0
+                  ? 'Nothing about you is uploaded.'
+                  : 'Nothing about you is uploaded. Only a barcode or search words ever go online, and only if you allow it.'
+              }
             />
           </MmListGroup>
         </MmSection>

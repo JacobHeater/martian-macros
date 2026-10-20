@@ -87,7 +87,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
         `Everything you enter (your profile, date of birth, health answers, weigh-ins, measurements, food log, workouts and check-ins) and anything you let the app read from ${health} is kept in a database inside this app on this phone.`,
         'There is no account. We run no server that receives your records, so we cannot see, recover, correct or delete them for you. The app does not send your records anywhere.',
         'If you choose to download the food database, your phone contacts GitHub to fetch a file. GitHub sees your IP address, which file was requested, when, and basic technical details your phone sends with any download. Nothing about you or your records is sent, and nothing is downloaded unless you ask for it.',
-        'If you allow it, the app can look a food up online when the food database on this phone does not have it: it sends the barcode number you scanned or typed, or the words you searched for, to Open Food Facts and, in builds that include it, to USDA FoodData Central. Those services see your IP address and what was asked. Nothing about you or your records is sent. The app asks before the first lookup, and you can choose always, just this once or never, and change that in Settings. A food found this way is kept on this phone.',
+        'If you allow it, the app can look a food up online when the food database on this phone does not have it: it sends the barcode number you scanned or typed, or the words you searched for, to Open Food Facts and, where the app offers it, to USDA FoodData Central. Those services see your IP address and what was asked. Nothing about you or your records is sent. The app asks before the first lookup, and you can choose always, just for now (until you close the app) or never, and change that in Settings, under Data. A food found this way is kept on this phone.',
         `${health} is optional. If you allow it, the app reads only the kinds of data you allow, and never writes to ${health}. What it reads is copied into the app on this phone and stays there until you erase it, even if you later take the permission away.`,
         ios
           ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept.'
@@ -156,7 +156,7 @@ export const termsOfUse = {
     [
       2,
       [
-        'The app can now look a food up online when the food database on this phone does not have it, but only if you allow it. It then sends the barcode number or the words you searched for to Open Food Facts (and to USDA FoodData Central in builds that include it), and nothing about you. Section 9 says more.',
+        'The app can now look a food up online when the food database on this phone does not have it, but only if you allow it. It then sends the barcode number or the words you searched for to Open Food Facts (and, where the app offers it, to USDA FoodData Central), and nothing about you. Section 9 says more.',
       ],
     ],
   ]),

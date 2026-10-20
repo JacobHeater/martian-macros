@@ -109,7 +109,7 @@ describe('once agreed', () => {
     await withRecords();
     renderApp(repos, today);
     const settings = await openSettings();
-    expect(settings.getByText('Version 1, agreed October 12, 2026')).toBeInTheDocument();
+    expect(settings.getByText(`Version ${termsOfUse.version}, agreed October 12, 2026`)).toBeInTheDocument();
     await userEvent.click(settings.getByRole('button', { name: /^Terms of use/ }));
     const terms = within(topLayer());
     expect(await terms.findByRole('heading', { level: 1, name: 'Terms of use' })).toBeInTheDocument();
@@ -172,7 +172,7 @@ describe('terms that changed', () => {
     );
     open();
     expect(await screen.findByRole('heading', { level: 1, name: 'The terms have changed' })).toBeInTheDocument();
-    expect(screen.getByText(/You agreed to version 0 on September 12, 2026\./)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`You agreed to version ${termsOfUse.version - 1} on September 12, 2026\\.`))).toBeInTheDocument();
     expect(screen.getByText(/your answer here does not remove them/)).toBeInTheDocument();
     expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
     await press('I agree');

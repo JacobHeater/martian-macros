@@ -14,6 +14,7 @@ import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { onTargetScenario } from './onTargetScenario';
 import { onlineFoods } from './onlineFoods';
+import { storyPackHost } from './storyPackHost';
 import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
 import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
@@ -908,7 +909,7 @@ const typeUnknownCode = async (canvas: HTMLElement) => {
 
 export const ScanAsksOnline = screenStory({
   covers: ['BarcodeScanStep'],
-  shows: 'Just this once',
+  shows: 'Just for now',
   device: onlineFoods(),
   open: addFood,
   walk: typeUnknownCode,
@@ -917,12 +918,12 @@ export const ScanAsksOnline = screenStory({
 /** MM-58: allowed once, the product a service knows comes to its amount step, marked as found online. */
 export const ScanFoundOnline = screenStory({
   covers: ['BarcodeScanStep', 'FoodAmountStep'],
-  shows: /found online/,
+  shows: /Found online/,
   device: onlineFoods(),
   open: addFood,
   walk: async (canvas) => {
     await typeUnknownCode(canvas);
-    await press('Just this once')(canvas);
+    await press('Just for now')(canvas);
   },
 });
 
@@ -998,6 +999,21 @@ export const SearchOnlineFound = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('peanut noodle')(canvas);
+    await press('Search online')(canvas);
+  },
+});
+
+/** MM-58: what a service found, beside the phone's own results, on a phone with a pack installed (the panel's F16). */
+export const SearchOnlineBesidePack = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Found online',
+  scenario: async (repos) => {
+    await repos.preferences.saveOnlineLookup('always');
+  },
+  device: async (services) => onlineFoods()(await storyPackHost({ installed: '2026-10-09' })(services)),
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('noodle')(canvas);
     await press('Search online')(canvas);
   },
 });

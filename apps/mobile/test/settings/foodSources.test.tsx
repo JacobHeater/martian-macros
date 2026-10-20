@@ -35,7 +35,7 @@ it('the sources screen names each source, its licence and its address, and what 
   expect(sources.getByText(/Open Database License 1\.0/)).toBeInTheDocument();
   expect(sources.getAllByText(/openfoodfacts\.org/).length).toBeGreaterThan(0);
   expect(sources.getAllByText(/martian-macros-food-data/).length).toBeGreaterThan(0);
-  expect(sources.getByText(/Ask each time\./)).toBeInTheDocument();
+  expect(sources.getByText(/Those services see your IP address/)).toBeInTheDocument();
   expect(sources.getByText(/not been reviewed by a lawyer/)).toBeInTheDocument();
   // The licences are never called verified, and the records never promised right.
   expect(topLayer().textContent).not.toMatch(/verified/i);
