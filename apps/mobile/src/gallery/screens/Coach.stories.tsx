@@ -18,6 +18,8 @@ import { firstDayScenario } from './firstDayScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
 import { shortSleepScenario } from './shortSleepScenario';
+import { breakOfferScenario } from './breakOfferScenario';
+import { onBreakScenario } from './onBreakScenario';
 import { reveal } from './reveal';
 import { maintenanceScenario } from './maintenanceScenario';
 import { stalledScenario } from './stalledScenario';
@@ -298,6 +300,33 @@ export const CoachReliefOffer = screenStory({
   covers: ['CoachScreen'],
   shows: 'Two hard weeks in a row',
   scenario: reliefScenario,
+  open: onCoach,
+});
+
+/**
+ * MM-135: twelve unbroken weeks of a cut with recovery fine: the same card as the relief offer, with the
+ * calendar, offering the two-week break or carrying on; no slower pace, since the answer here is a rest.
+ */
+export const CoachBreakOffer = screenStory({
+  covers: ['CoachScreen'],
+  shows: '12 weeks in a deficit',
+  scenario: breakOfferScenario,
+  open: onCoach,
+});
+
+/** MM-135: the first week of the break the person chose: targets at maintenance, the next check-in two weeks out. */
+export const CoachOnChosenBreak = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^This is the two-week break you chose/,
+  scenario: onBreakScenario('requestedBreak'),
+  open: onCoach,
+});
+
+/** MM-135: the break the app planned at twenty weeks, the safety floor, in its first week. */
+export const CoachOnPlannedBreak = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^You’ve been in a deficit for 20 weeks/,
+  scenario: onBreakScenario('dietBreak'),
   open: onCoach,
 });
 
