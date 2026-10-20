@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "task_id": "mm135-diet-break",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "wt/coach",
+    "commit": "5b58368cee382653759c9aec88f6aa00ad577574"
+  },
+  "phase": "complete",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Sameness with the relief card (rule 9), hierarchy, the three palettes, a break in force as a caution notice.",
+      "role": "product-designer",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "5b58368cee382653759c9aec88f6aa00ad577574",
+      "input_hashes": {
+        "docs/agent-runs/mm135-diet-break/brief.md": "3017fb6929abb57afc689c7e62b9f98c9f355331ef6dd10565e6218051a17cc8",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "requirements/adaptive-coach/SPIKE.diet-break-policy.MM-135.md": "eaf834c125a4e75a80f79d70880784309e26f76721b30fb748a5e8bd5079b85d",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MM-135",
+          "ReliefOfferCard.tsx",
+          "reliefOfferText.ts",
+          "targetFlagMessage.ts",
+          "CoachScreen.tsx",
+          "MaintenanceCard.tsx",
+          "UnderEatingNotice.tsx",
+          "TrainingLapseNotice.tsx",
+          "Notice.tsx",
+          "MmButton.tsx",
+          "ui.css",
+          "app.css",
+          "Coach.stories.tsx",
+          "the three scenarios",
+          "design/screen-direction.md",
+          "twelve renders"
+        ],
+        "not_inspected": [
+          "the engine",
+          "the dashboard",
+          "MM-117 in full",
+          "tests beyond reliefOffer.test.tsx labels"
+        ],
+        "referrals": [
+          "ux-accessibility: comprehension of the body and the button kinds"
+        ],
+        "limitations": "Static renders cropped at the right edge; no device; no text scaling."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "All claims rest on repository rules and renders.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Comprehension of the offer and the commitment, the three button kinds, Carry on free of comment, accessible names, structure, contrast, large text; the UX guard ruling.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude Fable 5.1, read-only subagent of the parent session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "5b58368cee382653759c9aec88f6aa00ad577574",
+      "input_hashes": {
+        "docs/agent-runs/mm135-diet-break/brief.md": "3017fb6929abb57afc689c7e62b9f98c9f355331ef6dd10565e6218051a17cc8",
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "requirements/adaptive-coach/SPIKE.diet-break-policy.MM-135.md": "eaf834c125a4e75a80f79d70880784309e26f76721b30fb748a5e8bd5079b85d",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "render-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "MM-135",
+          "MM-117",
+          "ReliefOfferCard.tsx",
+          "reliefOfferText.ts",
+          "targetFlagMessage.ts",
+          "nextCheckIn.ts",
+          "nextTargets.ts (the break hold)",
+          "Notice.tsx",
+          "MmButton.tsx",
+          "MmIcon.tsx",
+          "ui.css",
+          "app.css",
+          "CoachScreen.tsx",
+          "MaintenanceCard.tsx",
+          "TargetChangeSheet.tsx",
+          "DashboardScreen.tsx",
+          "reboundText.ts",
+          "Coach.stories.tsx",
+          "the scenarios",
+          "reliefOffer.test.tsx",
+          "voice.test.ts",
+          "tokens.test.ts",
+          "twelve renders"
+        ],
+        "not_inspected": [
+          "the dashboard's card at runtime",
+          "the engine rules",
+          "the breakEnded resumption",
+          "a device",
+          "a screen reader",
+          "measured contrast"
+        ],
+        "referrals": [
+          "coaching/engine: ending a break early; the event after Carry on at 18 weeks (answered by the chair)",
+          "product-designer: UX-4"
+        ],
+        "limitations": "Static renders cropped at the right edge; no device; contrast of Ember not measured."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "No disputed convention.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "chair",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The parent session chairs and owns the edits; its synthesis is decision.md.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/chair.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The policy was decided by the owner on the panel's earlier review recorded in MM-135; the engine change is held by tests.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As training.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As training; the chair answered the UX reviewer's engine questions from the tests.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As training.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "As training.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    },
+    {
+      "task": "Not assigned.",
+      "role": "react-capacitor",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The card reuses Notice and MmButton; no shell or state change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/react-capacitor.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Not assigned."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "",
+        "reason": "Not assigned.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "None.",
+        "limitations": "None."
+      }
+    }
+  ],
+  "unresolved_questions": [],
+  "decisions": [
+    {
+      "id": "MM135-ui",
+      "status": "accepted",
+      "summary": "The twelve-week offer is the relief card with a second trigger; Carry on on its own row; a notice keeps paragraph breaks; the words say the break runs its two weeks and, near the cap, that the app plans it next; the rebound note shows under a break's notice; a 200% story.",
+      "authority": "Chair (decision.md), from PD-1, PD-2, UX-1, UX-2, UX-3, UX-5, UX-6"
+    },
+    {
+      "id": "MM135-recorded",
+      "status": "accepted",
+      "summary": "PD-3/UX-4, PD-4, UX-7 and the Ember contrast request are recorded, not built: pre-existing or the owner's.",
+      "authority": "Chair (decision.md)"
+    }
+  ],
+  "pending_work": [],
+  "tests": [],
+  "checkpoint": {
+    "at": "2026-10-20T08:30:00Z",
+    "writers_stopped": true
+  },
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (read-only panel adapters)",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-20",
+      "limitations": "No reviewer could run a test or reach a device; renders were read as images."
+    }
+  ]
+}

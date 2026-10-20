@@ -29,7 +29,7 @@ at the card's right edge is unobserved. Contrast is not measured here; `tokens.t
 `outline-strong` on surfaces (lines 81-106) but not `--ember`/`--on-ember` (primary fill) or `--ember` on `--surface`
 (text button).
 
-## Novice mobile experience
+## Novice mobile experience (when UX/product design is assigned)
 Goal: twelve weeks into a fat-loss cut, open Coach, decide about the offer, live through the first week. Walked:
 1. Card at top, calendar, "12 weeks in a deficit". Body says what a break is, the cost, what carrying on means, and the
    coach's view. "Deficit", "maintenance" are the app's words since onboarding; "the count" is never shown as a number
@@ -69,8 +69,11 @@ Alternative at 3: "Carry on" removes the card; nothing else changes; the mis-tap
 
 Voice: no banned MM-108 word, no metabolic claim; `reliefOffer.test.tsx:92` guards "metabol|good".
 
-## Sources and evidence / Research
-None external; in-repo only. Research unnecessary.
+## Sources and evidence
+None external; in-repo only.
+
+## Research
+Status: unnecessary. No disputed convention; contrast is a measurement request, not a research question.
 
 ## Confidence and limitations
 Medium-high: source plus static renders; no device, screen reader, or measured contrast; right-edge clipping in
@@ -96,3 +99,6 @@ Source inspection and render reading only; no tests run.
 
 ## Guard ruling
 **GUARD PASS.** No blocking finding. UX-1, UX-2 and UX-5 are medium and should be disposed before merge or ticketed.
+
+## Targeted challenges
+None.

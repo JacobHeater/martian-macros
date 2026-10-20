@@ -93,7 +93,12 @@ and the choices the build forced:
   offer are tested against "metabol", "reset", "recover" and "repair".
 - **Built like its sibling.** The twelve-week offer is `ReliefOfferCard` itself (MM-117), the same `Notice` with a title,
   a body and a row of `MmButton`s, told apart by the calendar icon in place of the heart; a break in force shows as the
-  Coach's flag notice (`targetFlagMessage`), as every target flag does. No new part.
+  Coach's flag notice (`targetFlagMessage`), as every target flag does, with MM-130's rebound note under it for the
+  first fourteen days (`reboundText`, as `MaintenanceCard` shows it after a cut). No new part. The panel (product-designer
+  and UX-accessibility, `docs/agent-runs/mm135-diet-break/`, UX guard pass) confirmed the sameness; after it "Carry on"
+  sits on its own row under the choices (three buttons wrapped by overflow), a notice's text keeps its paragraph
+  breaks, and the words say the break runs its two weeks once taken and, from seventeen weeks, that the app plans the
+  break next rather than asking again.
 - **Recomp counts as a deficit** here, as MM-31 chose.
 
 ## Acceptance Criteria
@@ -118,7 +123,9 @@ Scenario: The claim matches the evidence
 - CoachOnPlannedBreak — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachOnPlannedBreak). The break the
   app planned at twenty weeks, in its first week.
 - CoachReliefOffer — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachReliefOffer). MM-117's offer with
-  the new break button beside the slower pace.
+  the new break button beside the slower pace, "Carry on" on its own row.
+- CoachReliefOfferLargeText — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachReliefOfferLargeText). The
+  same at 200% text (the panel's UX-6).
 
 ## Progress (2026-10-20, feat/m2)
 Built:
@@ -159,8 +166,9 @@ Tests:
   forbidden metabolic words. `test/engine/targets.test.ts`: planned at 20 and not 16; a continuing break.
 - Departures recorded in-test: `dartMessages.test.ts` leaves the two break flags out of the Dart comparison;
   `dartParity.test.ts` compares the glycogen7 run through week 15 (Dart forced its break at 16).
-- Whole suite, typecheck, `npm run unseen` and `mm req`: see the handoff of this branch; the panel's reviews and the
-  outcome of every finding are under `docs/agent-runs/mm135-diet-break/`.
+- The panel's reviews and the outcome of every finding are under `docs/agent-runs/mm135-diet-break/` (one round;
+  UX guard pass; seven findings built, four recorded as pre-existing or the owner's). Whole suite, `npm run typecheck`,
+  `npm run unseen` and `mm req` run clean on the branch at completion.
 
 Not built: the one-week choice (MM-432, a `setups` column); MM-117's strength trigger (MM-75, MM-77, as before); the
 forced cap at 16 for the lean bands of MM-28 (not adopted by the owner). Not verified on a phone.

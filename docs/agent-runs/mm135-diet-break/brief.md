@@ -25,7 +25,12 @@
   stories above in Martian, Light and Dark. Reviewers read the PNGs with their Read tool.
 - **Roles:** product-designer (sameness with the relief card, hierarchy) and ux-accessibility (the UX guard:
   comprehension of "12 weeks in a deficit", the two-week commitment, the cap at twenty, the three button kinds).
-- **Omitted roles:** chair (the parent session chairs and owns the edits); training, nutrition, coaching, measurement,
-  safety: the policy was decided by the owner on the panel's earlier review recorded in MM-135; the engine change is
-  held by tests, not a design review.
+- **Omitted roles** (the reasons as recorded in `state.json`):
+  - chair: The parent session chairs and owns the edits; its synthesis is decision.md.
+  - training: The policy was decided by the owner on the panel's earlier review recorded in MM-135; the engine change is held by tests.
+  - nutrition: As training.
+  - coaching: As training; the chair answered the UX reviewer's engine questions from the tests.
+  - measurement: As training.
+  - safety: As training.
+  - react-capacitor: The card reuses Notice and MmButton; no shell or state change.
 - **Writer:** the parent session (Claude Fable 5.1), single edit owner. Reviewers are read-only. One round.
