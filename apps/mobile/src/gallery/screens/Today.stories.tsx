@@ -102,11 +102,10 @@ export const Water = screenStory({
   },
 });
 
-/** MM-313: a goal of 2.5 L in metric, and the snack after one tap, with Undo. */
+/** MM-313: the snack after one tap, with Undo. */
 export const WaterGlassAdded = screenStory({
   covers: ['DashboardScreen'],
   shows: /Added a glass/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
   walk: async (canvas) => {
     const add = await within(canvas).findByRole('button', { name: 'Add a glass of water' });
     reveal(add);

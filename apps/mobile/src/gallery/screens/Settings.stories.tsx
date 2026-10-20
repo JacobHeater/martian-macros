@@ -164,6 +164,7 @@ export const NutritionGoals = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Daily sodium limit',
   scenario: demoWith({ sodiumLimitMg: 2300, waterGoalMl: 2000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Daily water goal'));
@@ -235,6 +236,7 @@ export const WaterGoalOwnAmount = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Use the suggested amount',
   scenario: demoWith({ waterGoalMl: 3000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Use the suggested amount'));
@@ -246,6 +248,7 @@ export const WaterGoalBackToSuggested = screenStory({
   covers: ['SettingsScreen'],
   shows: /^Suggested from your protein target and training./,
   scenario: demoWith({ waterGoalMl: 3000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     const back = await within(canvas).findByRole('button', { name: /^Use the suggested amount/ });
@@ -255,11 +258,12 @@ export const WaterGoalBackToSuggested = screenStory({
   },
 });
 
-/** MM-313: a goal above 4 L carries a plain note (owner, 2026-10-14; the panel's SA-5). */
+/** MM-313: a goal above 4 L (169 fl oz) carries a plain note (owner, 2026-10-14; the panel's SA-5). Only the goal differs (MM-357). */
 export const WaterGoalHigh = screenStory({
   covers: ['SettingsScreen'],
   shows: /More than most people need/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 5000 }),
+  scenario: demoWith({ waterGoalMl: 5000 }),
+  about: ['waterGoal'],
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="nutritionGoals" />),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/More than most people need/));
@@ -579,6 +583,7 @@ export const ChangeHeightMetric = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Centimetres',
   scenario: demoWith({ units: 'metric' }),
+  about: ['units'],
   open: settingsAt('profile'),
   walk: pressAnywhere(/^Height/),
 });

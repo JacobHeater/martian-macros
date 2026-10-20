@@ -1,6 +1,6 @@
 ---
 id: MM-357
-status: proposed
+status: done
 component: developer-tooling
 related: [MM-356, MM-313, MM-326]
 ---
@@ -36,6 +36,25 @@ Scenario: A story about the amount
   Then only its water goal differs from the demo person's
 ```
 
-## Notes
-Not yet guarded: the test lands with the fix, checking every screen story's facts against the demo person's
-outside each story's declared subject. Waits for MM-358, which sets the default goal.
+## Progress (2026-10-20, feat/m2)
+MM-358 was done, so this was buildable. Built:
+
+- `screenStory` takes `about: ('units' | 'waterGoal')[]` (`StorySubject.ts`): what a story's person differs in
+  from the demo person, being what the story is about. The scenario and the subject travel in the story's
+  parameters.
+- The twelve stories brought back to the demo person: the nine water stories (`Screens/Food` Water Goal
+  Reached, Water Other Refused, Water Goal Set None, Water Goal Partway, Water Edit, Water Bar, Water Bar
+  Folded, Water Bar Nearly There; `Screens/Today` Water Glass Added), the two Coach recomp stories
+  (`recompScenario` is imperial now) and `Screens/Settings` Water Goal High, which keeps its 5 L (169 fl oz)
+  goal and nothing else. The bar stories use the goal suggested for the first-day person (12 glasses) and
+  vary the drinks instead of the goal; Water Goal Reached adds a bottle to the demo's day instead of
+  lowering the goal.
+- Declared subjects: Water Other Amount and Change Height Metric (`units`); Nutrition Goals, Water Goal Own
+  Amount, Water Goal Back To Suggested and Water Goal High (`waterGoal`, an amount of their own).
+- Guard: `apps/mobile/test/gallery/storyPeople.test.ts` runs every screen story's scenario and checks its
+  person's units and water goal against the demo person's outside its declared subjects, and that a declared
+  subject is one the person differs in. It failed on the twelve before the fix.
+- Found in passing: the Person panel's water goal before the coach's first targets, MM-422.
+
+Decided here (say if wrong): a goal withheld by the health check (kidney disease, a clinician's limit) is
+not a difference the guard counts, since the health check is those stories' subject and the goal follows it.
