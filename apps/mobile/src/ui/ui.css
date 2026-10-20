@@ -36,10 +36,25 @@
   border-color: var(--outline-strong);
   color: var(--text);
 }
-.mm-button-text {
+/* A text action is the heading rung, in the text colour, never Ember (MM-288, the panel's PD-2): Ember
+   is the one primary's. The lead kind is that primary where it stands in the app bar and cannot be a
+   fill (the Dashboard's Add food), the only Ember text in the app. */
+.mm-button-text,
+.mm-button-lead {
   min-width: 48px;
   padding: 0 var(--space-12);
+  color: var(--text);
+}
+.mm-button-lead {
   color: var(--ember);
+}
+/* A text action is underlined (MM-288, the panel's PD2 and F7): in the text colour at the heading weight
+   it would otherwise read as the value or the title beside it. The lead keeps its Ember instead. */
+.mm-button-text:not(:disabled) .mm-button-label,
+.mm-button-text:not(:disabled) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 /* The quiet destructive kind (MM-280): danger as text, never a fill, so the
    safe exit beside it is the stronger button. */
@@ -84,12 +99,14 @@
   color: var(--text3);
   cursor: default;
 }
-/* The action kind: the icon form of the text button, a solid Ember glyph and no plate (MM-384). */
+/* The action kind: the icon form of the text button, a solid glyph in the text colour and no plate
+   (MM-384; in the text colour since MM-288, as the text button is). */
 .mm-icon-button-action:not(:disabled) {
-  color: var(--ember);
+  color: var(--text);
 }
-/* The add plate: a quiet plate with the plus in Ember; pressed, hovered or
-   focused it fills Ember. Ember is never a tint (MM-276). */
+/* The add plate: a quiet plate with the plus in the text colour (MM-288, the panel's PD1: Ember at rest
+   would be a second Ember action on Food and Progress); pressed, hovered or focused it fills Ember.
+   Ember is never a tint (MM-276). */
 .mm-icon-button-plate {
   display: grid;
   place-items: center;
@@ -97,7 +114,7 @@
   height: 28px;
   border-radius: var(--radius-chip);
   background: var(--selected);
-  color: var(--ember);
+  color: var(--text);
   transition:
     background var(--motion-fast),
     color var(--motion-fast);
@@ -768,7 +785,7 @@
 }
 .mm-segment-selected {
   background: var(--selected);
-  color: var(--ember);
+  color: var(--text);
 }
 
 /* ---- Progress ---- */

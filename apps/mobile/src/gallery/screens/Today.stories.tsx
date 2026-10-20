@@ -26,6 +26,20 @@ export default meta;
 
 export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week' });
 
+/** MM-91: the Dashboard on a 360 px phone: the hero, its macro rows and the strip inside the width. */
+export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', viewport: 'smallPhone' });
+
+/** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the bar's Add food and the title share the width. */
+export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', textScale: 2 });
+
+/** MM-91: the morning before the weigh-in at 200% text: the field, its Save and the hint inside the row. */
+export const NotWeighedTodayLargeText = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'First thing in the morning, after the bathroom.',
+  scenario: notWeighedTodayScenario,
+  textScale: 2,
+});
+
 export const FirstDay = screenStory({
   covers: ['DashboardScreen'],
   shows: /kcal left/,
@@ -42,7 +56,7 @@ export const NotWeighedToday = screenStory({
 /** Weighed today, the waist last measured over a week ago: the Dashboard asks for it in place (MM-301). */
 export const WaistDue = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  shows: 'Morning, after the bathroom, before eating. Tape level with the navel, snug, breathe out normally, the same tape each time.',
   scenario: waistDueScenario,
 });
 
@@ -53,7 +67,7 @@ const type = (name: string, text: string) => async (canvas: HTMLElement) =>
 /** A waist typed and not yet saved: Save is on, and secondary (MM-301). */
 export const WaistTyped = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'Morning, before eating. Tape level with the navel, snug, breathe out normally.',
+  shows: 'Morning, after the bathroom, before eating. Tape level with the navel, snug, breathe out normally, the same tape each time.',
   scenario: waistDueScenario,
   walk: type('Today’s waist, inches', '36'),
 });

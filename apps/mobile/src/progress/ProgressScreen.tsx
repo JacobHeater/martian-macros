@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { TrendChart } from '../charts/TrendChart';
 import { TrendStats } from '../charts/TrendStats';
 import { CalendarDate } from '../domain/CalendarDate';
@@ -6,6 +6,7 @@ import { Fmt } from '../format/Fmt';
 import { importedWeighInText } from '../format/importedWeighInText';
 import { waistSummary } from '../format/waistSummary';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
+import { waistAmount } from '../format/waistAmount';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -28,11 +29,24 @@ import './progress.css';
 /**
  * The body's record, in tiers (MM-257): the hero holds today's weigh-in
  * and the trend with its chart; weight events, sleep (MM-250), the waist and
- * strength are sections beneath, the last two folded to a line until opened.
+ * strength are sections beneath, the last two folded to a line until opened. The range
+ * and the folds are kept across visits (MM-286), and the waist's
+ * confirmation on the Dashboard opens the screen at its Waist section
+ * (MM-304).
  */
 export function ProgressScreen() {
   const { services, state } = useApp();
-  const [rangeDays, setRangeDays] = useState(30);
+  const rangeDays = useCell(state.progressRangeDays);
+  const reveal = useCell(state.progressReveal);
+  const waistSection = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (reveal !== 'waist') return;
+    const section = waistSection.current;
+    // In view and in hand: the section's header takes focus, so a reader goes on from it (UX-6, PD-6).
+    section?.scrollIntoView?.({ block: 'start' });
+    section?.querySelector<HTMLElement>('.mm-section-heading button')?.focus();
+    state.progressReveal.put(undefined);
+  }, [reveal, state]);
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
   const weights = useLoaded(state.weights) ?? [];
@@ -53,6 +67,7 @@ export function ProgressScreen() {
     ? undefined
     : [...imported].reverse().find((weighIn) => CalendarDate.fromDate(weighIn.day) === today);
   const last = trend[trend.length - 1];
+  const todaysWaist = waist.find((observation) => observation.date === today);
 
   const saveWaist = (readings: readonly number[]) =>
     saveWaistReadings(
@@ -88,7 +103,7 @@ export function ProgressScreen() {
                 { value: 90, label: '90d' },
               ]}
               selected={rangeDays}
-              onChange={(chosen) => setRangeDays(chosen ?? rangeDays)}
+              onChange={(chosen) => state.progressRangeDays.put(chosen ?? rangeDays)}
             />
           </div>
           {last === undefined && weights.length > 0 ? (
@@ -116,7 +131,7 @@ export function ProgressScreen() {
               {weights.length < 2 ? <p className="app-text">A trend needs more weigh-ins.</p> : null}
               {/* The one line about uncertainty stays in view; the rest is one tap down (UX-5, PD-19). */}
               <p className="app-caption">The band is the trend’s uncertainty; day-to-day jumps inside it are noise, not fat.</p>
-              <MmDisclosure title="How to read this">
+              <MmDisclosure title="How to read this" remember="progress.how-to-read">
                 <p className="app-caption">
                   Dots are weigh-ins. The line is your trend with water swings filtered out. Dashed markers show
                   recorded weight events. A shaded stretch is the days around a period start, where the band is wider
@@ -130,12 +145,15 @@ export function ProgressScreen() {
       <WeightEventsCard />
       <PeriodDaysCard />
       <SleepNightCard />
-      <WaistEntryCard
-        key={`waist-${setup.unitSystem}`}
-        unit={fmt.imperial ? 'inches' : 'centimeters'}
-        summary={waist.length === 0 ? undefined : waistSummary(waist, fmt, today)}
-        onSave={saveWaist}
-      />
+      <div ref={waistSection} className="progress-waist">
+        <WaistEntryCard
+          key={`waist-${setup.unitSystem}`}
+          unit={fmt.imperial ? 'inches' : 'centimeters'}
+          summary={waist.length === 0 ? undefined : waistSummary(waist, fmt, today)}
+          recordedToday={todaysWaist === undefined ? undefined : waistAmount(todaysWaist.waistCm, fmt)}
+          onSave={saveWaist}
+        />
+      </div>
       <RecompSignalCard fmt={fmt} />
       <StrengthSection />
     </>

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { HomeDestination } from '../state/HomeDestination';
 import { MmAppBar } from '../ui/MmAppBar';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -19,6 +20,8 @@ import { Fmt } from '../format/Fmt';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
+import { useKeptScroll } from './useKeptScroll';
+import { useLoaded } from './useLoaded';
 import { useNavigator } from './useNavigator';
 import './app.css';
 
@@ -33,7 +36,15 @@ export function HomeShell() {
   const overlays = useOverlays();
   const shownDay = useShownDay();
   const today = useCell(state.today);
+  // Before the weigh-in the Dashboard's primary is the row's Save, a fill, so the bar's Add food is a
+  // text action; once weighed, Add food is the screen's lead, the one Ember text there is (MM-288).
+  const weighedToday = (useLoaded(state.weights) ?? []).some((weight) => weight.date === today);
+  // The relief offer brings its own primary to the Dashboard; then Add food is a text action (MM-288, the panel's PD3).
+  const offerShown = useCell(state.reliefOffer) !== undefined;
   useTargetChangeSummaries();
+  // A destination keeps its scroll position across a visit elsewhere (MM-286).
+  const body = useRef<HTMLElement>(null);
+  const scroll = useKeptScroll(body, current, state.destinationScroll);
   return (
     <div className="app-frame">
       <MmAppBar
@@ -46,7 +57,7 @@ export function HomeShell() {
               <MmButton
                 label="Add food"
                 icon="plus"
-                kind="text"
+                kind={weighedToday && !offerShown ? 'lead' : 'text'}
                 onPress={() => void showAddFoodSheet(overlays, state.today.peek())}
               />
             ) : null}
@@ -58,7 +69,13 @@ export function HomeShell() {
           </>
         }
       />
-      <main className="app-body">
+      {/* Before the body in the document (MM-286): after the bar, the primary action is the next focus stop, not the last. */}
+      {current === 'food' ? (
+        <div className="app-fab-anchor">
+          <MmFab label="Add food" icon="plus" onPress={() => void showAddFoodSheet(overlays, shownDay)} />
+        </div>
+      ) : null}
+      <main className="app-body" ref={body}>
         {current === 'dashboard' ? (
           <DashboardScreen />
         ) : current === 'food' ? (
@@ -71,12 +88,14 @@ export function HomeShell() {
           <CoachScreen />
         )}
       </main>
-      {current === 'food' ? (
-        <div className="app-fab-anchor">
-          <MmFab label="Add food" icon="plus" onPress={() => void showAddFoodSheet(overlays, shownDay)} />
-        </div>
-      ) : null}
-      <MmNavigationBar destinations={destinations} current={current} onSelect={(id) => state.homeTab.put(id)} />
+      <MmNavigationBar
+        destinations={destinations}
+        current={current}
+        onSelect={(id) => {
+          scroll.leave(current);
+          state.homeTab.put(id);
+        }}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -119,4 +119,27 @@ it('a reading that cannot be a waist is refused and nothing is stored', async ()
   await save();
   expect(await screen.findByText('That value looks off. Check it.')).toBeInTheDocument();
   expect(await stored()).toEqual([]);
+});
+
+// MM-304 (ME-6, UX-8): with today's waist recorded, the section says so and that saving again replaces it.
+it('says when today’s waist is recorded and that saving again replaces it', async () => {
+  await repos.waist.saveWaist(today, 92);
+  await openWaist();
+  expect(within(card).getByText('Today’s waist is recorded: 92 cm. Saving again replaces it.')).toBeInTheDocument();
+  await type(['91']);
+  await save();
+  await expect.poll(async () => (await stored()).map((w) => w.waistCm)).toEqual([91]);
+});
+
+it('says nothing of today before a waist is recorded today', async () => {
+  await repos.waist.saveWaist(today.addDays(-3), 92);
+  await openWaist();
+  expect(within(card).queryByText(/Saving again replaces it/)).toBeNull();
+});
+
+it('after a save, focus is on the line saying what is recorded (the WS-03 panel\'s F5)', async () => {
+  await openWaist();
+  await type(['91.5', '92.5', '92']);
+  await save();
+  await waitFor(() => expect(document.activeElement).toHaveTextContent(/Today’s waist is recorded/));
 });

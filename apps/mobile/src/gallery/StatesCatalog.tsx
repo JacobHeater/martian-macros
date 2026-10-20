@@ -53,6 +53,7 @@ export function StatesCatalog() {
         <State name="Disabled"><MmButton label="Cancel" kind="secondary" /></State>
         <State name="Text"><MmButton label="Skip" kind="text" onPress={nothing} /></State>
         <State name="Disabled"><MmButton label="Skip" kind="text" /></State>
+        <State name="Lead"><MmButton label="Add food" icon="plus" kind="lead" onPress={nothing} /></State>
         <State name="Destructive"><MmButton label="Erase" kind="destructive" onPress={nothing} /></State>
       </div>
       <div className="gallery-state-row">

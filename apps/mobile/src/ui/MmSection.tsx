@@ -2,6 +2,7 @@ import { type ReactNode, useId, useState } from 'react';
 import { MmIcon } from './MmIcon';
 import type { MmIconName } from './MmIconName';
 import { MmPressable } from './MmPressable';
+import { useFold } from './useFold';
 import './ui.css';
 
 interface MmSectionProps {
@@ -23,6 +24,8 @@ interface MmSectionProps {
   initiallyExpanded?: boolean;
   /** Keeps what is inside alive while folded, so it does not start over. */
   maintainState?: boolean;
+  /** Names the fold to the app, which keeps it as it was left across visits (MM-286). */
+  remember?: string;
   /** The header opens something else (a screen) instead of folding. */
   onPress?: (() => void) | undefined;
   /** With `onPress`: where it goes, said after the title and summary ("Opens Food", MM-335). */
@@ -45,11 +48,12 @@ export function MmSection({
   collapsible = false,
   initiallyExpanded = true,
   maintainState = false,
+  remember,
   onPress,
   opens,
   children,
 }: MmSectionProps) {
-  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [expanded, setExpanded] = useFold(remember, initiallyExpanded);
   // A section with nothing to fold forgets an old fold, so its first rows are not hidden (MM-389).
   const [couldFold, setCouldFold] = useState(collapsible);
   if (couldFold !== collapsible) {

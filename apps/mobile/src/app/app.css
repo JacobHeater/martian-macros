@@ -1,4 +1,5 @@
 .app-frame {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -123,8 +124,13 @@
 .app-centered-middle {
   align-items: center;
 }
-/* Where a floating action hangs: over the bottom of the body, above the navigation bar. */
+/* Where a floating action hangs: over the bottom of the body, above the navigation bar, whose height the
+   bar publishes (MM-302). It stands before the body in the document (MM-286), so it is positioned against
+   the frame and drawn over the body. */
 .app-fab-anchor {
-  position: relative;
+  position: absolute;
+  right: 0;
+  bottom: var(--mm-navigation-bar-height, 72px);
+  z-index: 1;
   height: 0;
 }

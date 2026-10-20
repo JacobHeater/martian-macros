@@ -5,7 +5,6 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
@@ -47,14 +46,15 @@ export function StrengthSection() {
   else if (recent.length === 0) summary = 'No qualifying sessions in the last 90 days.';
   else summary = `${recent.length === 1 ? '1 lift' : `${recent.length} lifts`} over the last 90 days.`;
   return (
-    <MmSection icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0}>
+    <MmSection icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
       {all.length === 0 ? null : (
         <>
-          <MmListGroup>
+          <>
             {recent.slice(0, 4).map((trend) => (
               <MmListRow
                 key={trend.exerciseId}
-                leadingIcon="train"
+                // A lift's row carries the trend icon (MM-287): what the row shows is the estimate's movement.
+                leadingIcon="trend"
                 title={trend.name}
                 subtitle={liftSummary(trend, fmt)}
                 opens
@@ -68,7 +68,7 @@ export function StrengthSection() {
               opens
               onPress={() => void navigator.push(() => <StrengthLiftsScreen />)}
             />
-          </MmListGroup>
+          </>
           <p className="app-caption">Smoothed estimated one-rep max, from finished workouts. A comparison, not a real max.</p>
         </>
       )}

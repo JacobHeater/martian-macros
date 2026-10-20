@@ -63,7 +63,8 @@ describe('the add button', () => {
     const plate = rule('.mm-icon-button-plate');
     expect(plate).toMatch(/width: 28px;[\s\S]*height: 28px;[\s\S]*border-radius: var\(--radius-chip\);/);
     expect(plate).toContain('background: var(--selected);');
-    expect(plate).toContain('color: var(--ember);');
+    // At rest in the text colour since MM-288's review (the panel's PD1); Ember only pressed, hovered or focused.
+    expect(plate).toContain('color: var(--text);');
     expect(css).toMatch(
       /\.mm-icon-button-add:not\(:disabled\):hover \.mm-icon-button-plate,[\s\S]*?\{\s*background: var\(--ember\);\s*color: var\(--on-ember\);/,
     );

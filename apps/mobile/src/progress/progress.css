@@ -18,8 +18,16 @@
 .progress-hero-head > .progress-hero-title {
   margin: 0;
 }
+/* The waist section's wrapper, which the Dashboard's confirmation brings into view (MM-304). */
+.progress-waist {
+  display: contents;
+}
 .progress-waist-how {
   margin: 0 0 var(--space-12);
+}
+.progress-waist-today {
+  margin: 0 0 var(--space-12);
+  color: var(--text2);
 }
 .progress-waist-fields {
   display: flex;

@@ -253,3 +253,55 @@ it('confirms a quarter-inch waist as typed', async () => {
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '35.25{Enter}');
   expect(await screen.findByRole('status')).toHaveTextContent('Waist saved: 35.25 in');
 });
+
+// MM-288: one Ember action on the Dashboard. Before the weigh-in it is the row's Save; once weighed, the bar's Add food.
+it('the bar’s Add food is the lead action once weighed, and a text action while the weigh-in asks', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  const addFood = await screen.findByRole('button', { name: 'Add food' });
+  await screen.findByRole('button', { name: 'Save weigh-in' });
+  expect(addFood).toHaveClass('mm-button-text');
+  expect(addFood).not.toHaveClass('mm-button-lead');
+  await userEvent.type(screen.getByRole('textbox', { name: 'Today’s weigh-in' }), '181.4{Enter}');
+  await screen.findByRole('status');
+  await expect.poll(() => screen.getByRole('button', { name: 'Add food' }).className).toContain('mm-button-lead');
+  expect(document.querySelectorAll('.mm-button-primary:not([disabled]), .mm-fab, .mm-button-lead')).toHaveLength(1);
+});
+
+// MM-304 (UX-5): after a save in place, focus is on the row that takes the entry's place.
+it('after the weigh-in is saved, focus is on the weight row that replaces the field', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4{Enter}');
+  const row = await screen.findByRole('button', { name: /^Trend \d/ });
+  expect(document.activeElement).toBe(row);
+});
+
+it('after the waist is saved, focus is on the waist row that replaces the field', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '36{Enter}');
+  const row = await screen.findByRole('button', { name: /^36 in/ });
+  expect(document.activeElement).toBe(row);
+});
+
+// MM-304 (UX-6, PD-6): the waist's confirmation opens Progress at its Waist section, unfolded and in hand; the weigh-in's at the top.
+it('"Open Progress" from the waist confirmation lands on the Waist section, open', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '36{Enter}');
+  await userEvent.click(await screen.findByRole('button', { name: 'Open Progress' }));
+  const header = await screen.findByRole('button', { name: /^Waist/, expanded: true });
+  expect(document.activeElement).toBe(header);
+  expect(screen.getByText(/^Today’s waist is recorded: 36 in\. Saving again replaces it\.$/)).toBeInTheDocument();
+});
+
+it('"Open Progress" from the weigh-in confirmation lands at the top', async () => {
+  await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s weigh-in' }), '181.4{Enter}');
+  await userEvent.click(await screen.findByRole('button', { name: 'Open Progress' }));
+  await screen.findByText(/^Trend weight/);
+  expect((document.querySelector('main.app-body') as HTMLElement).scrollTop).toBe(0);
+  expect(screen.getByRole('button', { name: /^Waist/ })).toHaveAttribute('aria-expanded', 'false');
+});
