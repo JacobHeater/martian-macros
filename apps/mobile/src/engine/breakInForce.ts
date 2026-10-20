@@ -1,10 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { BreakFlag } from './BreakFlag';
 import { DietBreakRule } from './DietBreakRule';
-import type { TargetFlag } from './TargetFlag';
 import type { TargetsRecord } from './TargetsRecord';
-
-/** The flag a break's targets carry: planned by the app, or chosen. */
-export type BreakFlag = Extract<TargetFlag, 'dietBreak' | 'requestedBreak'>;
 
 /**
  * The diet break the current targets belong to, while it has not run its

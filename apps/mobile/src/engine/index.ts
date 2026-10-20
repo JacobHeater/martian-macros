@@ -148,6 +148,7 @@ export * from './ReportTargetChange';
 export * from './restStartedAt';
 export * from './restTargetMsOf';
 export * from './bodyFatClearlyAbove';
+export * from './BreakFlag';
 export * from './breakInForce';
 export * from './cautiousBodyFatPercent';
 export * from './safetyBodyFatConstants';

@@ -3,7 +3,7 @@ import type { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { GoalMode } from '../domain/GoalMode';
 import type { TrainingStatus } from '../domain/TrainingStatus';
 import type { BodyFatEstimate } from './BodyFatEstimate';
-import type { BreakFlag } from './breakInForce';
+import type { BreakFlag } from './BreakFlag';
 import type { DailyTargets } from './DailyTargets';
 
 interface TargetInputsInit {
