@@ -371,14 +371,14 @@ describe('notices', () => {
     const late = reliefOfferText({ ...signals, suggestion: 'break', slowerPace: 0.005, deficitWeeks: 9, shortSleep: true });
     expect(late.suggestion).toBe(
       'The coach would take a break: you are 9 weeks into this deficit, and two weeks at maintenance is a rest from dieting, ' +
-        'which many people find makes the next weeks easier.',
+        'which many people find makes the next weeks easier. Once taken, it runs its two weeks.',
     );
     expect(late.sleep).toContain('under six hours');
 
     const noSlower = reliefOfferText({ ...signals, suggestion: 'break', slowerPace: undefined, deficitWeeks: 2 });
     expect(noSlower.suggestion).toBe(
       'The coach would take a break: two weeks at maintenance is a rest from dieting, which many people find makes the next ' +
-        'weeks easier, and the deficit resumes after it.',
+        'weeks easier, and the deficit resumes after it. Once taken, it runs its two weeks.',
     );
 
     // MM-252: short sleep from the record is a signal of its own, with its own title and the average in the body.
@@ -405,15 +405,22 @@ describe('notices', () => {
     const offer = reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks: 12, shortSleep: false, signals: [], sleepAverage: undefined });
     expect(offer.title).toBe('12 weeks in a deficit');
     expect(offer.body).toBe(
-      'You have been in a deficit for 12 weeks without a break. A break is two weeks at maintenance: a rest from dieting, ' +
-        'which many people find makes the next weeks easier. The deficit resumes after it, and the count starts again.',
+      'A break is two weeks at maintenance: a rest from dieting, which many people find makes the next weeks easier. ' +
+        'The deficit resumes after it, and the count starts again. Once taken, it runs its two weeks.',
     );
     expect(offer.suggestion).toBe(
-      'The coach would take the break now. If you carry on, it asks again in three weeks, and at 20 weeks it plans a break itself.',
+      'The coach would take the break now. If you carry on, the coach asks again in three weeks, and at 20 weeks it plans a break itself.',
     );
     expect(offer.sleep).toBeUndefined();
     for (const text of [offer.title, offer.body, offer.suggestion]) {
       expect(text.toLowerCase()).not.toMatch(/metabol|reset|recover|repair/);
     }
+    // Near the cap, "asks again in three weeks" would be false (the panel's UX-3): the planned break is what comes next.
+    const at = (deficitWeeks: number) =>
+      reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks, shortSleep: false, signals: [], sleepAverage: undefined }).suggestion;
+    expect(at(16)).toContain('asks again in three weeks');
+    expect(at(17)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 3 weeks, at 20 weeks.');
+    expect(at(18)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 2 weeks, at 20 weeks.');
+    expect(at(19)).toBe('The coach would take the break now. If you carry on, the app plans the break itself at the next check-in, at 20 weeks.');
   });
 });

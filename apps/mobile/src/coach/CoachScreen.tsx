@@ -4,6 +4,8 @@ import { intakeDayFrom } from '../domain/intakeDayFrom';
 import type { UserSetup } from '../domain/UserSetup';
 import { calibrationDays } from '../engine/coachConstants';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
+import { breakInForce } from '../engine/breakInForce';
+import { MaintenanceRule } from '../engine/MaintenanceRule';
 import { nextCheckIn } from '../engine/nextCheckIn';
 import { TdeeEstimator } from '../engine/TdeeEstimator';
 import { cautionMessage } from '../format/cautionMessage';
@@ -13,6 +15,7 @@ import { Fmt } from '../format/Fmt';
 import { displayTargets } from '../format/displayTargets';
 import { FatLossPace } from '../engine/FatLossPace';
 import { paceName } from '../format/paceName';
+import { reboundText } from '../format/reboundText';
 import { goalModeBlurb } from '../format/goalModeBlurb';
 import { goalModeLabel } from '../format/goalModeLabel';
 import { trainingGoalNote } from '../format/trainingGoalNote';
@@ -191,6 +194,9 @@ export function CoachScreen() {
   };
 
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
+  // A diet break brings the water back as leaving a cut does (MM-130): said under the break's notice while it does (MM-135, the panel's UX-5).
+  const runningBreak = breakInForce(history, today);
+  const breakRebound = runningBreak !== undefined && runningBreak.startedOn.daysUntil(today) < MaintenanceRule.reboundNoteDays;
   // Rounded as every screen shows them, unless the person asked for exact ones (MM-123).
   const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
@@ -223,6 +229,11 @@ export function CoachScreen() {
               <Notice kind="caution" text={targetFlagMessage(flag)} />
             </div>
           ))}
+          {breakRebound ? (
+            <div className="app-stack-item">
+              <Notice text={reboundText(fmt)} />
+            </div>
+          ) : null}
         </>
       )}
       {/* The goal first, under the figures and the warnings (MM-299). */}

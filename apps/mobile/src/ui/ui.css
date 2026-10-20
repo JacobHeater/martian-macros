@@ -1132,6 +1132,10 @@
 .mm-notice-word {
   font: var(--type-label);
 }
+/* A notice's text keeps its paragraph breaks (the relief offer's body, suggestion and sleep line, MM-135). */
+.mm-notice-body > span {
+  white-space: pre-line;
+}
 .mm-notice-title {
   font-weight: 700;
 }
