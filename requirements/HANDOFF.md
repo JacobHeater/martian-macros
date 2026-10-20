@@ -133,7 +133,7 @@ order; `mm roadmap` draws it). M2's buildable tickets are all done
 (Session 39); what M2 still holds waits on people, listed there.
 - The owner's to-dos for M2: a FoodData Central API key in
   `config/prod.local.json` (`MM_FDC_API_KEY`) so builds ask USDA as well as
-  Open Food Facts; the backup storage providers (MM-63, MM-64); a pantry
+  Open Food Facts; a pantry
   and fifty packages for MM-51's checks; a qualified reader for MM-57 and
   the terms (MM-242). Outside M2: the one-week break option (MM-432).
 - Device passes owed: the native sleep readers (Kotlin, Swift), the online
@@ -391,9 +391,12 @@ no iOS app yet (the owner's call). Phone checks listed above.
   rather than an exception; MM-135's open points (two weeks, seven days at maintenance resets, exempt from the step
   limit); community records that are complete and consistent are a label (MM-153).
 - **Where M2 stands:** every buildable ticket done. Left, and only people can close them: MM-51 (the fifty-product hand
-  check and the pantry test need real packages), MM-57 (a qualified reader of the licensing), MM-63/MM-64 (backup storage
-  providers, the owner's choice). Outside M2 and the owner's: MM-432 (a one-week break option). Unverified on a device: the native sleep
-  readers, the online lookup through the shell's HTTP, screen readers, the phone's largest text.
+  check and the pantry test need real packages), MM-57 (a qualified reader of the licensing). MM-63 and MM-64 closed after the
+  owner decided (2026-10-20): the share sheet is the only way a backup leaves, no storage-service connectors, the file stays
+  `.mmbackup` rather than a password zip, and no export for reading the data outside the app or for other logging apps.
+  Outside M2 and the owner's: MM-432 (a one-week break option). Unverified on a device: the native sleep
+  readers, the online lookup through the shell's HTTP, a backup through the share sheet and back through the picker, screen
+  readers, the phone's largest text.
 - Roadmap: WS-15, WS-07, WS-08, WS-03, WS-04, WS-02 steps tagged M2 are built; `mm roadmap` regenerated.
 
 ## Session 38: 2026-10-19 to 20, Claude (M2 closed up on one branch: backup, coaching rules, targets, period days, training, what to expect, the icon)
