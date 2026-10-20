@@ -1,7 +1,18 @@
-import type { ReliefOffer } from '../engine';
+import { DietBreakRule, type ReliefOffer } from '../engine';
 import { shortSleepText } from './shortSleepText';
 
 const rest = 'a rest from dieting, which many people find makes the next weeks easier';
+const runs = 'Once taken, it runs its two weeks.';
+
+/** What carrying on leads to, from where the person stands: the next ask, or the break the app plans (the panel's UX-3). */
+function ifCarryingOn(deficitWeeks: number): string {
+  const untilCap = DietBreakRule.forceFromWeeks - deficitWeeks;
+  if (untilCap > 3) {
+    return `If you carry on, the coach asks again in three weeks, and at ${DietBreakRule.forceFromWeeks} weeks it plans a break itself.`;
+  }
+  const when = untilCap <= 1 ? 'at the next check-in' : `in ${untilCap} weeks`;
+  return `If you carry on, the app plans the break itself ${when}, at ${DietBreakRule.forceFromWeeks} weeks.`;
+}
 
 /**
  * The fixed words of the offer to ease a deficit (MM-117, MM-135). Nothing
@@ -20,12 +31,9 @@ export function reliefOfferText(offer: ReliefOffer): {
   if (offer.reason === 'longDeficit') {
     return {
       title: `${offer.deficitWeeks} weeks in a deficit`,
-      body:
-        `You have been in a deficit for ${offer.deficitWeeks} weeks without a break. A break is two weeks at ` +
-        `maintenance: ${rest}. The deficit resumes after it, and the count starts again.`,
-      suggestion:
-        'The coach would take the break now. If you carry on, it asks again in three weeks, and at 20 weeks it plans ' +
-        'a break itself.',
+      // The title carries the count; the body says what a break is (the panel's PD-1) and that it is a commitment (UX-2).
+      body: `A break is two weeks at maintenance: ${rest}. The deficit resumes after it, and the count starts again. ${runs}`,
+      suggestion: `The coach would take the break now. ${ifCarryingOn(offer.deficitWeeks)}`,
       sleep: undefined,
     };
   }
@@ -34,9 +42,9 @@ export function reliefOfferText(offer: ReliefOffer): {
   if (offer.suggestion === 'break') {
     suggestion =
       offer.slowerPace === undefined
-        ? `The coach would take a break: two weeks at maintenance is ${rest}, and the deficit resumes after it.`
+        ? `The coach would take a break: two weeks at maintenance is ${rest}, and the deficit resumes after it. ${runs}`
         : `The coach would take a break: you are ${offer.deficitWeeks} weeks into this deficit, and two weeks at ` +
-          `maintenance is ${rest}.`;
+          `maintenance is ${rest}. ${runs}`;
   } else if (hardWeeks) {
     suggestion =
       'The coach would slow the pace: you are early in this deficit, and a ' +

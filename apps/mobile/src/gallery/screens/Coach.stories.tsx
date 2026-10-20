@@ -330,6 +330,15 @@ export const CoachOnPlannedBreak = screenStory({
   open: onCoach,
 });
 
+/** MM-135 (the panel's UX-6): the relief card's three buttons at 200% text, "Carry on" on its own line. */
+export const CoachReliefOfferLargeText = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Two hard weeks in a row',
+  scenario: reliefScenario,
+  open: onCoach,
+  textScale: 2,
+});
+
 /** MM-321: twelve weeks of recomposition: the review is due on Coach. */
 export const CoachRecompReview = screenStory({
   covers: ['CoachScreen'],

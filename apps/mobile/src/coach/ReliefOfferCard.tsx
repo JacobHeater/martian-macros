@@ -13,8 +13,9 @@ import { Notice } from '../ui/Notice';
  * (the heart), or the deficit has run twelve unbroken weeks (the calendar);
  * the slower pace is offered with the first only. Short sleep over a
  * fortnight of recorded nights is a recovery signal of its own (MM-252). Never an automatic
- * change. Carrying on is one tap and free of comment. Empty when no offer
- * is due.
+ * change. Carrying on is one tap and free of comment, on its own line under
+ * the choices (the panel's PD-2: three buttons wrapped by overflow). Empty
+ * when no offer is due.
  */
 export function ReliefOfferCard() {
   const { services, state } = useApp();
@@ -33,32 +34,36 @@ export function ReliefOfferCard() {
         title={words.title}
         text={text}
         action={
-          <div className="app-row">
-            <MmButton
-              label="Take a two-week break"
-              kind={suggestsBreak ? 'primary' : 'secondary'}
-              onPress={() =>
-                void services.setup.saveSetup(setup.copyWith({ maintenanceWeekFrom: today, reliefAnsweredOn: today }))
-              }
-            />
-            {slower === undefined ? null : (
+          <>
+            <div className="app-row">
               <MmButton
-                label={`Slow to ${paceLabel(slower)}`}
-                kind={suggestsBreak ? 'secondary' : 'primary'}
+                label="Take a two-week break"
+                kind={suggestsBreak ? 'primary' : 'secondary'}
                 onPress={() =>
-                  void services.setup.saveSetup(
-                    // A pace change acts at once (MM-128), and a slower pace only raises the target.
-                    setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today, paceChangedOn: today }),
-                  )
+                  void services.setup.saveSetup(setup.copyWith({ maintenanceWeekFrom: today, reliefAnsweredOn: today }))
                 }
               />
-            )}
-            <MmButton
-              label="Carry on"
-              kind="text"
-              onPress={() => void services.setup.saveSetup(setup.copyWith({ reliefAnsweredOn: today }))}
-            />
-          </div>
+              {slower === undefined ? null : (
+                <MmButton
+                  label={`Slow to ${paceLabel(slower)}`}
+                  kind={suggestsBreak ? 'secondary' : 'primary'}
+                  onPress={() =>
+                    void services.setup.saveSetup(
+                      // A pace change acts at once (MM-128), and a slower pace only raises the target.
+                      setup.copyWith({ requestedLossFraction: slower, reliefAnsweredOn: today, paceChangedOn: today }),
+                    )
+                  }
+                />
+              )}
+            </div>
+            <div className="app-row">
+              <MmButton
+                label="Carry on"
+                kind="text"
+                onPress={() => void services.setup.saveSetup(setup.copyWith({ reliefAnsweredOn: today }))}
+              />
+            </div>
+          </>
         }
       />
     </div>
