@@ -521,3 +521,25 @@ export const WhyYourTargetsShortSleep = screenStory({
   ),
   open: openWhy,
 });
+
+/** MM-252: the check-in with more than a day typed: refused under the field, and Save waits. */
+export const RecoveryCheckInMistyped = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'Up to 24 hours.',
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+  walk: async (canvas) => {
+    const hours = await within(canvas).findByRole('textbox', { name: 'Typical hours of sleep, Hours' });
+    await userEvent.clear(hours);
+    await userEvent.type(hours, '25');
+  },
+});
+
+/** MM-252: the nights could not be read: the sleep line says so, never "Not recorded". */
+export const CoachSleepReadFailed = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Not read',
+  scenario: shortSleepScenario,
+  stores: failingRead('sleep', 'watchSleepNights'),
+  open: onCoach,
+  walk: pressOnCoach(/^How you are holding up/),
+});

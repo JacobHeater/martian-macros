@@ -1,0 +1,416 @@
+{
+  "schema_version": 1,
+  "task_id": "mm250-sleep",
+  "audit_mode": "change",
+  "baseline": {
+    "branch": "wt/sleep",
+    "commit": "c5ac538b06c979ceedf8e17db5c742bd8884223c"
+  },
+  "phase": "checkpoint",
+  "owner": null,
+  "assignments": [
+    {
+      "task": "Scope, the brief, the two reviews' persistence, synthesis in decision.md, the edits and their verification.",
+      "role": "chair",
+      "reviewer": "Claude, the sleep workstream session, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "c5ac538b06c979ceedf8e17db5c742bd8884223c",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm250-sleep/brief.md": "9ddb7de1a4b79849eb1218e77570ef638e1fc909497e42f7a576003093706e0b",
+        "agents/roles/chair.md": "5008faf0fbef93f63074b0a6dde53ef5ceeb29ecbba6c4eeb3e5dada1a47a895",
+        "apps/mobile/src/progress/SleepNightCard.tsx (as reviewed, c5ac538)": "7264361bc0a2675cbb73843e75cc96ae13149227df51782f94e35467b2ef9e6b",
+        "apps/mobile/src/ui/MmDurationField.tsx (as reviewed, c5ac538)": "d68344f40b2cf33d5895464323af634e38ce2480d9e027a2fbb4f29319eb0c90",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/chair.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "test-results"
+        ],
+        "inspected": [
+          "the brief's inputs",
+          "the edits listed in findings/chair.md",
+          "the focused suites and npm run unseen (run)"
+        ],
+        "not_inspected": [
+          "a browser render of the stories",
+          "a phone",
+          "TalkBack or VoiceOver",
+          "text at 200%"
+        ],
+        "referrals": [],
+        "limitations": "The chair also implements; sequential self-review is not independent review. The reviews were of the tree at c5ac538; the edits are the dispositions in decision.md, re-tested, not re-reviewed."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Neither reviewer's finding rested on an external claim; both marked research unnecessary.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The Sleep section, the duration field, the Coach sleep line and the short-sleep offer as drawn in their stories, against their siblings (rule 9), hierarchy, density, words and the design system.",
+      "role": "product-designer",
+      "reviewer": "Claude, read-only subagent of the sleep workstream session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "c5ac538b06c979ceedf8e17db5c742bd8884223c",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm250-sleep/brief.md": "9ddb7de1a4b79849eb1218e77570ef638e1fc909497e42f7a576003093706e0b",
+        "agents/roles/product-designer.md": "8bf1398283164813885f66db04a4ff8857fb9a2443d219477abcfa5a1783e2bb",
+        "apps/mobile/src/progress/SleepNightCard.tsx (c5ac538)": "7264361bc0a2675cbb73843e75cc96ae13149227df51782f94e35467b2ef9e6b",
+        "apps/mobile/src/ui/MmDurationField.tsx (c5ac538)": "d68344f40b2cf33d5895464323af634e38ce2480d9e027a2fbb4f29319eb0c90",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/product-designer.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "SleepNightCard.tsx",
+          "MmDurationField.tsx",
+          "RecoveryCard.tsx",
+          "ReliefOfferCard.tsx",
+          "RecoveryCheckInScreen.tsx",
+          "reliefOfferText.ts",
+          "shortSleepText.ts",
+          "sleepDurationText.ts",
+          "PeriodDaysCard.tsx",
+          "WaistEntryCard.tsx",
+          "ProgressScreen.tsx",
+          "CoachScreen.tsx",
+          "the design-system parts and their CSS",
+          "the eight stories",
+          "the three screen tests",
+          "hierarchy.test.tsx and hierarchyProblems.ts",
+          "MM-250, MM-252, MM-249",
+          "the direction documents and design-map.json"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "Settings health rows",
+          "HealthStep.tsx",
+          "engine thresholds",
+          "native plugins",
+          "schema",
+          "TargetChangeSheet, stallText, insightText",
+          "palette token values for contrast"
+        ],
+        "referrals": [
+          "react-capacitor: PD-1 remedy, PD-6, PD-8",
+          "ux-accessibility: PD-4, PD-5, PD-6, PD-7, PD-13",
+          "owner: PD-1, PD-3, PD-5, PD-11, PD-12"
+        ],
+        "limitations": "Source inspection only; one reviewer; no rendered palettes; the MM-250 ticket changed between two reads."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Every finding rests on the repository's written direction, the owner's recorded rulings and the step record; a render would help more than a source.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "The same stories for a novice on a phone, with a screen reader and at large text: which night a chip is, which value is kept, the fields, Save and its feedback, the mistyped state, the Coach line, the pre-fill, the offer; empty, loading, failed and validation states.",
+      "role": "ux-accessibility",
+      "reviewer": "Claude, read-only subagent of the sleep workstream session acting as chair, 2026-10-20",
+      "status": "complete",
+      "inspected_commit": "c5ac538b06c979ceedf8e17db5c742bd8884223c",
+      "input_hashes": {
+        "agents/panel-protocol.md": "8fe36a9eb6c5fb23c29b16ceb9ba0a3b8a927ed588633474f5e693bf45445e62",
+        "agents/review-contract.md": "7965b6e0cb7dd14dbe6a442b2f1a36bb304300a6a04cee04059bc332527722f8",
+        "docs/agent-runs/mm250-sleep/brief.md": "9ddb7de1a4b79849eb1218e77570ef638e1fc909497e42f7a576003093706e0b",
+        "agents/roles/ux-accessibility.md": "679b6b24ec000782eba619f6fe917619367ff0d1fd297078646e21b6c4cefaf3",
+        "apps/mobile/src/progress/SleepNightCard.tsx (c5ac538)": "7264361bc0a2675cbb73843e75cc96ae13149227df51782f94e35467b2ef9e6b",
+        "apps/mobile/src/ui/MmDurationField.tsx (c5ac538)": "d68344f40b2cf33d5895464323af634e38ce2480d9e027a2fbb4f29319eb0c90",
+        "design/screen-direction.md": "9a0758bdaf8ef5f346c8c2ac50ac9cae64ea5d8c69657c2e0395b5a8d2babe70",
+        "design/anti-cruft-and-anti-slop.md": "d9dc14a757d6819472e2c155ab8648997d3ddef2d241346e128a772500cfac74"
+      },
+      "report": "findings/ux-accessibility.md",
+      "coverage": {
+        "methods": [
+          "source-inspection",
+          "task-walkthrough"
+        ],
+        "inspected": [
+          "SleepNightCard.tsx",
+          "MmDurationField.tsx",
+          "RecoveryCard.tsx",
+          "RecoveryCheckInScreen.tsx",
+          "ReliefOfferCard.tsx",
+          "the format files",
+          "the design-system parts and their CSS",
+          "PeriodDaysCard.tsx",
+          "WaistEntryCard.tsx",
+          "AppState.ts (in part)",
+          "the eight stories",
+          "the three screen tests and fieldErrors.test.tsx"
+        ],
+        "not_inspected": [
+          "a browser render",
+          "a device",
+          "assistive technology",
+          "text scaling",
+          "contrast",
+          "Settings health rows",
+          "engine thresholds",
+          "native plugins",
+          "schema"
+        ],
+        "referrals": [
+          "react-capacitor: F1, F3, F5, F4",
+          "product-designer: F9",
+          "QA: the named tests, a render at 200%, TalkBack and VoiceOver"
+        ],
+        "limitations": "No browser or device; heard names inferred from the DOM; F1's test outcome predicted (and then confirmed by the chair)."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "No finding rests on a contested external convention; F8 is settled by a device pass, not a document.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned in this bounded design review.",
+      "role": "training",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No exercise or strength content in the change.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/training.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned in this bounded design review.",
+      "role": "nutrition",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No energy target, macro or body-composition rule changes; the sleep signal moves no number.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/nutrition.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned in this bounded design review.",
+      "role": "coaching",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "The offer's words are the one sentence the evidence rows support, graded in docs/evidence.md; the grading pass MM-249 asks for is a separate run the owner convenes.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/coaching.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned in this bounded design review.",
+      "role": "measurement",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "No estimator, trend or uncertainty change; the fourteen-night mean is arithmetic with its rows in the register.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/measurement.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    },
+    {
+      "task": "Not assigned in this bounded design review.",
+      "role": "safety",
+      "reviewer": "none",
+      "status": "omitted",
+      "omission_reason": "Refer-only handling of the sleep-disorder answer (MM-251) changes no number; its grading waits for MM-29's clinician reviewer and the panel pass MM-249 asks for.",
+      "inspected_commit": null,
+      "input_hashes": {},
+      "report": "findings/safety.md",
+      "coverage": {
+        "inspected": [],
+        "not_inspected": [
+          "everything in this role's remit"
+        ],
+        "referrals": [],
+        "methods": [],
+        "limitations": "Omitted; see the reason."
+      },
+      "research": {
+        "status": "unnecessary",
+        "question": "none",
+        "reason": "Role omitted.",
+        "path": "not-needed",
+        "sources": [],
+        "summary": "none",
+        "limitations": "none"
+      }
+    }
+  ],
+  "research_capabilities": [
+    {
+      "surface": "Claude Code subagents (panel-product-designer, panel-ux-accessibility) on the owner's Mac",
+      "discovery": [
+        "WebSearch"
+      ],
+      "retrieval": [
+        "WebFetch",
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "status": "observed",
+      "checked_at": "2026-10-20",
+      "limitations": "No browser automation in this session, so no Storybook capture; the stories were read from source."
+    }
+  ],
+  "unresolved_questions": [
+    "Q1: Fields inside an open Progress section (Sleep, Waist): a surface, or a written exception to rule 1 (PD-1, MM-416)? Owner: product owner.",
+    "Q2: The order of the fortnight's chips and the fields, and whether chips carry their hours (PD-3, PD-5). Owner: product owner.",
+    "Q3: Dated nights named by the morning they ended on, or as a span (PD-11; MM-250 Notes). Owner: product owner.",
+    "Q4: A render of SleepNotRecorded at 200% text in the three palettes (PD-2, F9, PD-10). Owner: product owner.",
+    "Q5: A TalkBack and a VoiceOver pass over SleepRecorded for the chips' middle dot, h and m (F8). Owner: product owner.",
+    "Q6: Whether a typed night can be removed, not only overwritten (the guard's decision 1). Owner: product owner."
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "status": "accepted",
+      "summary": "F1: the duration fields are named '<night>, Hours' and '<night>, Minutes', which contain their labels, so the name alone is heard; the tests assert the exact name.",
+      "authority": "chair, under MM-279 and the pinned composition in fieldErrors.test.tsx"
+    },
+    {
+      "id": "D2",
+      "status": "accepted",
+      "summary": "F3/PD-6: MM-414, the error goes to the field it concerns; regression test and story.",
+      "authority": "chair, under AGENTS.md (every bug a ticket and a test)"
+    },
+    {
+      "id": "D3",
+      "status": "accepted",
+      "summary": "F5: MM-415, one rounding helper before splitting; regression test.",
+      "authority": "chair"
+    },
+    {
+      "id": "D4",
+      "status": "accepted",
+      "summary": "F4/PD-8: the failed-read notice with Try again and a loading spinner on Progress; 'Not read' on Coach; stories and tests.",
+      "authority": "chair, under screen-direction's Error and Loading states"
+    },
+    {
+      "id": "D5",
+      "status": "accepted",
+      "summary": "F2/PD-13: a polite save snack; F10/PD-4: the note names the picked night in every state; PD-2/F9: the Waist layout; F6, F7/PD-7: the two extra messages and the check-in refusing in place; PD-9 and PD-11 wording.",
+      "authority": "chair"
+    },
+    {
+      "id": "D6",
+      "status": "pending",
+      "summary": "PD-1: the fields inside the open section, as the Waist sibling: MM-416 proposed for the owner.",
+      "authority": "product owner"
+    },
+    {
+      "id": "D7",
+      "status": "pending",
+      "summary": "PD-3, PD-5, PD-10, PD-12, F8: kept as drawn with the reasons in MM-250 Decisions; listed in MM-416 for the owner after a render and a device pass.",
+      "authority": "product owner"
+    }
+  ],
+  "pending_work": [],
+  "tests": [
+    {
+      "command": "npm run typecheck",
+      "commit": "c5ac538b06c979ceedf8e17db5c742bd8884223c",
+      "dirty": true,
+      "exit_code": 0,
+      "result": "passed",
+      "summary": "tsc --noEmit clean after the review edits."
+    }
+  ],
+  "checkpoint": {
+    "at": "2026-10-20T00:00:00Z",
+    "writers_stopped": true
+  }
+}

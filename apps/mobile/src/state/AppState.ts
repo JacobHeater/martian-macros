@@ -1181,6 +1181,13 @@ export class AppState {
     }
   }
 
+  /** Reads the nights of sleep again, typed and imported, after a read went wrong (MM-250). */
+  retrySleep(): void {
+    for (const cell of [this.typedSleep, this.importedSleep]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
   /** Reads the pauses again, after a read went wrong (MM-334). */
   retryPauses(): void {
     if (this.pauses instanceof StreamCell) this.pauses.retry();

@@ -617,7 +617,10 @@
           "tickets": [
             "MM-250",
             "MM-251",
-            "MM-252"
+            "MM-252",
+            "MM-414",
+            "MM-415",
+            "MM-416"
           ]
         },
         {
@@ -3273,10 +3276,13 @@
         "built": [
           "MM-250",
           "MM-251",
-          "MM-252"
+          "MM-252",
+          "MM-414",
+          "MM-415"
         ],
         "remaining": [
-          "MM-249"
+          "MM-249",
+          "MM-416"
         ]
       },
       "sequence": [
@@ -3284,7 +3290,8 @@
           "step": 1,
           "title": "The record, imported and typed",
           "tickets": [
-            "MM-250"
+            "MM-250",
+            "MM-414"
           ],
           "milestone": "M2"
         },
@@ -3300,7 +3307,16 @@
           "step": 3,
           "title": "The coach reads it, after the panel pass in grading mode",
           "tickets": [
-            "MM-252"
+            "MM-252",
+            "MM-415"
+          ],
+          "milestone": "M2"
+        },
+        {
+          "step": 4,
+          "title": "After the design review: the Progress entries onto a surface, or the exception written",
+          "tickets": [
+            "MM-416"
           ],
           "milestone": "M2"
         }

@@ -8,6 +8,7 @@ import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
+import { failing } from '../support/failing';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
@@ -66,7 +67,22 @@ it('with no night recorded the line says so', async () => {
   await openCoach();
   const section = await holdingUp();
   expect(within(section).getByText('Not recorded')).toBeInTheDocument();
-  expect(within(section).getByText('No nights recorded yet')).toBeInTheDocument();
+  expect(within(section).getByText('Nights are typed on Progress or read from your health platform.')).toBeInTheDocument();
+});
+
+// The panel's F4: a read that went wrong is never "Not recorded".
+it('when the nights cannot be read the line says so', async () => {
+  renderApp(repos, today, {
+    change: (s) => ({
+      ...s,
+      sleep: { saveSleepNight: (night) => s.sleep.saveSleepNight(night), watchSleepNights: () => failing() },
+    }),
+  });
+  await dashboardLoaded();
+  await openTab('Coach');
+  const section = await holdingUp();
+  expect(within(section).getByText('Not read')).toBeInTheDocument();
+  expect(within(section).queryByText('Not recorded')).not.toBeInTheDocument();
 });
 
 it('short sleep alone brings the offer with the sentence and the gentler pace, and nothing changes until it is pressed', async () => {
