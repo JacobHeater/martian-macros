@@ -6,7 +6,6 @@ import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
-import type { UnitSystem } from '../../domain/UnitSystem';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
@@ -300,11 +299,16 @@ export const WaterNone = screenStory({
   },
 });
 
-/** MM-313, MM-318: a goal of 1.5 L in metric, and a day past it. */
+/** MM-313, MM-318: a day past the goal suggested for the demo person (MM-357): a bottle more than the demo's day. */
 export const WaterGoalReached = screenStory({
   covers: ['FoodScreen'],
   shows: /Goal reached/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 1500 }),
+  scenario: demoWith({
+    then: async (repos, today) => {
+      const yesterday = today.addDays(-1);
+      await repos.water.addWater(new WaterEntry({ id: 0, date: yesterday, ml: 1500, at: new Date(yesterday.year, yesterday.month - 1, yesterday.day, 21) }));
+    },
+  }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     reveal(await within(canvas).findByText(/Goal reached/));
@@ -321,11 +325,12 @@ export const WaterAddSheet = screenStory({
   walk: addWater,
 });
 
-/** MM-318: the sheet in metric with another amount typed. */
+/** MM-318: the sheet in metric with another amount typed; the one water story about units (MM-357). */
 export const WaterOtherAmount = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'Up to 3,000 ml at a time.',
   scenario: demoWith({ units: 'metric' }),
+  about: ['units'],
   open: yesterdaysFood,
   walk: async (canvas) => {
     await addWater(canvas);
@@ -347,12 +352,11 @@ export const WaterOtherOpen = screenStory({
 export const WaterOtherRefused = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'That is more than one drink can be.',
-  scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     await addWater(canvas);
     const body = canvas.ownerDocument.body;
-    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, millilitres' }), '5000');
+    await userEvent.type(await within(body).findByRole('textbox', { name: 'Water, fluid ounces' }), '170');
     await userEvent.click(within(body).getByRole('button', { name: 'Save water' }));
   },
 });
@@ -369,29 +373,24 @@ export const WaterRemoved = screenStory({
   },
 });
 
-/** MM-318 (the panel's PD-2): a goal of 2 L and nothing yet: the header says the goal alone. */
+/** MM-318 (the panel's PD-2): the first day, the goal suggested and nothing yet: the header says the goal alone. */
 export const WaterGoalSetNone = screenStory({
   covers: ['FoodScreen'],
-  shows: /Goal 2 L/,
-  scenario: async (repos, today) => {
-    await firstDayScenario(repos, today);
-    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: 'metric' }));
-    await repos.preferences.saveWaterGoal(2000);
-  },
+  shows: /^Goal \d+ fl oz/,
+  scenario: firstDayScenario,
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/Goal 2 L/));
+    reveal(await within(canvas).findByText(/^Goal \d+ fl oz/));
   },
 });
 
-/** MM-318 (the panel's PD-2): a goal of 2.5 L and part of it drunk. */
+/** MM-318 (the panel's PD-2): the demo person's goal and part of it drunk. */
 export const WaterGoalPartway = screenStory({
   covers: ['FoodScreen'],
-  shows: /of 2.5 L/,
-  scenario: demoWith({ units: 'metric', waterGoalMl: 2500 }),
+  shows: /fl oz of \d+ fl oz/,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/of 2.5 L/));
+    reveal(await within(canvas).findByText(/fl oz of \d+ fl oz/));
   },
 });
 
@@ -399,7 +398,6 @@ export const WaterGoalPartway = screenStory({
 export const WaterEdit = screenStory({
   covers: ['AddWaterSheet'],
   shows: 'Edit water',
-  scenario: demoWith({ units: 'metric' }),
   open: yesterdaysFood,
   walk: async (canvas) => {
     const [drink] = await within(canvas).findAllByRole('button', { name: /^Edit .* of water/ });
@@ -411,15 +409,14 @@ export const WaterEdit = screenStory({
 });
 
 /**
- * MM-326: the first day in `units` with a water goal of `goalMl` and these
- * drinks today, an hour apart from 7 AM, on the Food screen.
+ * MM-326: the first day with the goal suggested for the person (96 fl oz,
+ * 12 glasses, from the day's own targets; MM-357) and these drinks today,
+ * an hour apart from 7 AM, on the Food screen.
  */
 const waterToday =
-  (units: UnitSystem, goalMl: number, drinksMl: readonly number[]): StoryScenario =>
+  (drinksMl: readonly number[]): StoryScenario =>
   async (repos, today) => {
     await firstDayScenario(repos, today);
-    await repos.setup.saveSetup((await repos.setup.loadSetup())!.copyWith({ unitSystem: units }));
-    await repos.preferences.saveWaterGoal(goalMl);
     for (const [i, ml] of drinksMl.entries()) {
       const at = new Date(today.year, today.month - 1, today.day, 7 + i);
       await repos.water.addWater(new WaterEntry({ id: 0, date: today, ml, at }));
@@ -428,38 +425,38 @@ const waterToday =
 
 const eightFlOz = WaterUnits.flOzToMl(8);
 
-/** MM-326: a gallon's goal and three glasses: the water poured a little way into its bar. */
+/** MM-326: three glasses of the twelve suggested: the water poured a little way into its bar. */
 export const WaterBar = screenStory({
   covers: ['FoodScreen'],
-  shows: /3 of 16 glasses/,
-  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  shows: /3 of 12 glasses/,
+  scenario: waterToday([eightFlOz, eightFlOz, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+    reveal(await within(canvas).findByText(/3 of 12 glasses/));
   },
 });
 
 /** MM-326: the section folded: the drinks hide and the bar stays. */
 export const WaterBarFolded = screenStory({
   covers: ['FoodScreen'],
-  shows: /3 of 16 glasses/,
-  scenario: waterToday('imperial', WaterUnits.flOzToMl(128), [eightFlOz, eightFlOz, eightFlOz]),
+  shows: /3 of 12 glasses/,
+  scenario: waterToday([eightFlOz, eightFlOz, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
     const header = await within(canvas).findByRole('button', { name: /^Water/, expanded: true });
     await userEvent.click(header);
-    reveal(await within(canvas).findByText(/3 of 16 glasses/));
+    reveal(await within(canvas).findByText(/3 of 12 glasses/));
   },
 });
 
-/** MM-326: most of a 2.5 L goal, a past day, beside the meals. */
+/** MM-326: most of the suggested goal, beside the meals. */
 export const WaterBarNearlyThere = screenStory({
   covers: ['FoodScreen'],
-  shows: /9 of 10 glasses/,
-  scenario: waterToday('metric', 2500, [500, 500, 500, 500, 250]),
+  shows: /11 of 12 glasses/,
+  scenario: waterToday([eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz * 2, eightFlOz]),
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByText(/9 of 10 glasses/));
+    reveal(await within(canvas).findByText(/11 of 12 glasses/));
   },
 });
 
