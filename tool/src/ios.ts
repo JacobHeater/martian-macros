@@ -171,9 +171,9 @@ async function pairedPhones(): Promise<Phone[]> {
   }
 }
 
-/** The identity a run asked for: the dev twin unless said, except a phone, which is the real app unless said (MM-412). */
+/** The identity a run asked for: the dev twin unless said (`--prod`, `--env`), except a phone, which is the real app unless said (MM-412). */
 const identityFor = (args: readonly string[]): ReturnType<typeof identityOf> =>
-  args.includes('--phone') && !args.includes('--env') ? 'prod' : identityOf(args);
+  args.includes('--phone') && !args.includes('--env') && !args.includes('--prod') ? 'prod' : identityOf(args);
 
 async function installedSimulators(): Promise<Simulator[]> {
   const listed = await capture(['xcrun', 'simctl', 'list', '-j', 'devices', 'available']);
