@@ -11,7 +11,7 @@ Requirements read: MM-135 ("Decided here", "Progress", "UI/UX"); MM-117 located,
 `app/app.css` (`.app-row`), `Coach.stories.tsx` 289-322, the three scenarios, `design/screen-direction.md`, and the
 twelve PNGs. SHA-256 not computed (no shell).
 
-## Answer first
+## Answer first (the brief's sibling question)
 **Yes: the twelve-week offer is the relief card**, the same `Notice` with title, body and `MmButton` row
 (`ReliefOfferCard.tsx:28-62`), with `reason` switching only the icon (line 31) and the words
 (`reliefOfferText.ts:17-28`); the slower pace is absent because `offer.slowerPace` is undefined, not because of a
@@ -37,7 +37,7 @@ the engine, the dashboard's copy of the card, `underEatingText`, `trainingLapseT
 `test/coach/reliefOffer.test.tsx:80-152`. Evidence: source inspection and static renders; no device, no user
 observation, no test run.
 
-## Novice mobile experience
+## Novice mobile experience (when UX/product design is assigned)
 **Walked:** a person twelve weeks into a cut opens Coach and answers the offer (source + `coach-break-offer-*`).
 1. Sees the card first, above the hero: calendar, bold "12 weeks in a deficit". Passes.
 2. Reads seven lines: what a break is, that the deficit resumes and the count restarts, the coach's lean, the
@@ -73,8 +73,11 @@ Burden: the long body is evidenced in the render (seven lines); whether novices 
 Break offer, both breaks and the relief card render cleanly in Martian, Light and Dark: one flat Ember fill, no
 colored notice fill, caution border and word as every flag. No mascot, no decoration. The voice matches the sibling.
 
-## Sources and evidence / Research
-Unnecessary: all claims rest on repository rules and renders. No external sources consulted.
+## Sources and evidence
+None consulted: all claims rest on repository rules and renders.
+
+## Research
+Status: unnecessary. No question needed an outside source.
 
 ## Confidence and limitations
 High on sameness and hierarchy; medium on PD-2 (cropped captures). Static renders only; no text scaling, no device.
@@ -94,3 +97,6 @@ None for this change. PD-3's broader question (chosen states as cautions) is the
 
 ## Verification
 No commands run. Request to the edit owner: a 412-px-wide capture of `CoachReliefOffer` and `CoachBreakOffer`.
+
+## Targeted challenges
+None yet.
