@@ -41,15 +41,24 @@ move it to a git-ignored `xcconfig` if that becomes a chore.
 
 ## From the command line, once the team is set
 
+With the phone plugged in and unlocked, from the repository root:
+
 ```sh
-cd apps/mobile && npm run ios && cd ios/App
-xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
-  -destination 'generic/platform=iOS' -allowProvisioningUpdates build
+mm run --ios --phone
 ```
 
-`xcrun devicectl list devices` names the phone;
-`xcrun devicectl device install app --device <id> <path to App.app>` installs
-the build. `mm` does not wrap device builds yet (MM-403).
+It builds the web app, syncs the shell, builds it signed for the device,
+installs it and opens it (MM-412). The real app unless `--env dev|demo`;
+`mm run --ios --phone "Jacob’s iPhone"` or `MM_IPHONE=<name or id>` picks
+one when several are connected. The team: `MM_APPLE_TEAM=<id>` in the shell,
+else the project's own `DEVELOPMENT_TEAM` line from step 5, which stays
+uncommitted. `mm build ios --phone` is the signed build alone.
+
+The first time, iOS refuses to open the app until the developer is trusted
+(Settings, General, VPN & Device Management, your Apple ID, Trust); the
+command says so when the launch is refused after the install. Underneath it
+runs `xcodebuild … -destination 'generic/platform=iOS' -allowProvisioningUpdates`,
+`xcrun devicectl device install app` and `xcrun devicectl device process launch`.
 
 ## What a signed phone unlocks
 

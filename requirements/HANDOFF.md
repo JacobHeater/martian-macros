@@ -467,6 +467,13 @@ no iOS app yet (the owner's call). Phone checks listed above.
   spinner only if perceptible); whether the search rows sit 16 dp further in
   than the field (pre-existing). Stories `AddFoodMoreResults`,
   `AddFoodMoreResultsShown` for the owner's look in the three palettes.
+- **MM-412 (done; a sixth pull request):** `mm run --ios --phone [name | id]`
+  builds signed, installs and opens the real app on the iPhone plugged into
+  the Mac (`xcrun devicectl`); `mm build ios --phone` is the signed build
+  alone; `MM_APPLE_TEAM` or the project's uncommitted line gives the team;
+  `--env dev|demo` installs a twin. Unit tests in `tool/test/phones.test.ts`.
+  The owner's phone was paired but not connected in the session, so the
+  install and launch are the owner's first run to verify.
 - Housekeeping on the Mac, outside the repository: Node 22 (nvm), Temurin
   JDK 21, the Android SDK for API 36 and the `Pixel_8_API_36` emulator,
   DuckDB, all user-level; Homebrew's `/usr/local/Cellar` still belongs to
