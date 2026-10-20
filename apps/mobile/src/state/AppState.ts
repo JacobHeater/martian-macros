@@ -7,6 +7,7 @@ import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
 import type { NutritionGoals } from '../domain/NutritionGoals';
@@ -263,6 +264,8 @@ export class AppState {
 
   /** Whether carbohydrate is shown as net of fiber and sugar alcohols (MM-396); on until switched off. */
   readonly netCarbs: Cell<Loadable<boolean>>;
+  /** The fat the person usually cooks with (MM-152); oil until one is chosen. */
+  readonly usualCookingFat: Cell<Loadable<CookingFatKind>>;
   /** Targets shown exact, unrounded (MM-123); off by default. */
   readonly exactTargets: Cell<Loadable<boolean>>;
   /** The day the line about label accuracy was dismissed (MM-123). */
@@ -572,6 +575,7 @@ export class AppState {
     this.detailLevel = stream(() => s.preferences.watchDetailLevel());
     this.macroPicture = stream(() => s.preferences.watchMacroPicture());
     this.netCarbs = stream(() => s.preferences.watchNetCarbs());
+    this.usualCookingFat = stream(() => s.preferences.watchUsualCookingFat());
     this.exactTargets = stream(() => s.preferences.watchExactTargets());
     this.labelNoteDismissedOn = stream(() => s.preferences.watchLabelNoteDismissedOn());
     this.easeIntoMaintenance = stream(() => s.preferences.watchEaseIntoMaintenance());

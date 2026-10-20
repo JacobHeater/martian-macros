@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { OnlineLookupChoice } from '../domain/food/online/OnlineLookupChoice';
+import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import type { DetailLevel } from '../domain/food/detail/DetailLevel';
 import { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import { InsightSwitches } from '../domain/InsightSwitches';
@@ -29,6 +30,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly onlineLookup = new ObservableValue<OnlineLookupChoice>('ask');
   private readonly labelNoteDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly easeIntoMaintenance = new ObservableValue(false);
+  private readonly usualCookingFat = new ObservableValue<CookingFatKind>('oil');
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -165,8 +167,17 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.easeIntoMaintenance.value = on;
   }
 
+  watchUsualCookingFat(): Watched<CookingFatKind> {
+    return this.usualCookingFat.watch();
+  }
+
+  async saveUsualCookingFat(kind: CookingFatKind): Promise<void> {
+    this.usualCookingFat.value = kind;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
+    this.usualCookingFat.value = 'oil';
     this.exactTargets.value = false;
     this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;

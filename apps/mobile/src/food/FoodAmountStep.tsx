@@ -6,8 +6,11 @@ import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CookingFat } from '../domain/food/CookingFat';
+import { CookingFatKind } from '../domain/food/CookingFatKind';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { HandModel } from '../domain/food/hand/HandModel';
+import { conversionFor } from '../domain/food/portion/conversionFor';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import { parseQuantity } from '../domain/food/portion/parseQuantity';
@@ -20,6 +23,8 @@ import type { Meal } from '../domain/Meal';
 import type { QuantitySource } from '../domain/QuantitySource';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
+import { cookingFatEntryName } from '../format/cookingFatEntryName';
+import { cookingFatKindLabel } from '../format/cookingFatKindLabel';
 import { portionUnitChipLabel } from '../format/portionUnitChipLabel';
 import { portionUnitOf } from '../format/portionUnitOf';
 import { quantityText } from '../format/quantityText';
@@ -27,6 +32,7 @@ import { roundedToZeroNote } from '../format/roundedToZeroNote';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmSegmented } from '../ui/MmSegmented';
@@ -37,6 +43,7 @@ import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
 import { MealChips } from './MealChips';
 import { microsOfPackFood } from './microsOfPackFood';
+import { preparationOf } from './preparationOf';
 import './food.css';
 
 interface FoodAmountStepProps {
@@ -54,6 +61,11 @@ interface FoodAmountStepProps {
    * (MM-151): offered as a switch while logging by weight.
    */
   alternate?: CatalogFood | undefined;
+  /**
+   * Whether to start weighing as `alternate`: the state this food was last
+   * logged in, remembered per food (MM-151).
+   */
+  startOnAlternate?: boolean | undefined;
 }
 
 const n = (value: number) => `${roundHalfAwayFromZero(value) + 0}`;
@@ -83,11 +95,24 @@ const choiceLabel = (choice: AmountChoice) => {
  * grams, with the macros updating as the amount changes. Logging records
  * how it was measured.
  */
-export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, onBack, onDone, custom, alternate }: FoodAmountStepProps) {
+export function FoodAmountStep({
+  food: chosen,
+  servings,
+  day,
+  meal: firstMeal,
+  onBack,
+  onDone,
+  custom,
+  alternate,
+  startOnAlternate = false,
+}: FoodAmountStepProps) {
   const ids = useId();
   const { services, state } = useApp();
   const preview = useInsightPreview();
   const hand = useCell(state.handSize);
+  // Simple detail shows calories and protein only (MM-49); what is logged is the whole food.
+  const level = useLoaded(state.detailLevel) ?? 'standard';
+  const usualFat = useLoaded(state.usualCookingFat) ?? 'oil';
 
   const [choices] = useState<readonly AmountChoice[]>(() => {
     if (custom === undefined) {
@@ -104,21 +129,8 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
     ];
   });
 
-  /**
-   * Starts on the state (raw, dry or cooked) this food was last logged in,
-   * as far back as the recent foods go (MM-151).
-   */
-  const [remembered] = useState(() => {
-    if (alternate === undefined) return false;
-    const recents = state.recentFoods.peek();
-    for (const e of recents.ready ? recents.value : []) {
-      const origin = e.portion?.origin;
-      if (origin === undefined || origin.packId !== alternate.packId) continue;
-      if (origin.foodId === chosen.id) return false;
-      if (origin.foodId === alternate.id) return true;
-    }
-    return false;
-  });
+  // Starts on the state (raw, dry or cooked) this food was last logged in (MM-151).
+  const remembered = startOnAlternate && alternate !== undefined;
   const byWeight = choices.find((c) => c.unit === 'gram');
   const first = (remembered ? byWeight : undefined) ?? (choices[0] as AmountChoice);
 
@@ -127,6 +139,9 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   const [quantity, setQuantity] = useState(() => defaultQuantity(first));
   const [meal, setMeal] = useState(firstMeal);
   const [oil, setOil] = useState<CookingFat>('none');
+  /** The fat chosen here, once chosen; until then the person's usual (MM-152). */
+  const [fatChosen, setFatChosen] = useState<CookingFatKind | undefined>(undefined);
+  const fat = fatChosen ?? usualFat;
 
   /** The food being logged: the one chosen, or its raw or cooked counterpart. */
   const food = useAlternate && alternate !== undefined ? alternate : chosen;
@@ -207,17 +222,21 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
           impliedGrams: isHand ? grams : undefined,
           handModelVersion: isHand ? HandModel.version : undefined,
           origin: { packId: food.packId, foodId: food.id, source: food.source, sourceId: food.sourceId },
+          preparation: custom === undefined ? preparationOf(food) : undefined,
+          conversion: conversionFor(choice.unit, reference, { hand }),
         },
       }),
     );
-    const oilTotals = CookingFat.totals(oil);
+    const oilTotals = CookingFat.totals(oil, fat);
     if (oilTotals !== undefined && offersOil) {
+      // The fat chosen becomes the usual, so it is one tap next time (MM-152).
+      if (fat !== usualFat) await services.preferences.saveUsualCookingFat(fat);
       await services.food.addFood(
         new FoodEntry({
           id: 0,
           date: day,
           meal,
-          name: 'Cooking oil',
+          name: cookingFatEntryName(fat),
           kcal: oilTotals.kcal,
           proteinG: oilTotals.proteinG,
           carbsG: oilTotals.carbsG,
@@ -247,7 +266,13 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
   const note =
     grams === undefined || custom !== undefined ? undefined : roundedToZeroNote(food, { description: 'amount', grams });
   const invalid = quantity.trim() !== '' && amount === undefined;
-  const oilTotals = offersOil ? CookingFat.totals(oil) : undefined;
+  const oilTotals = offersOil ? CookingFat.totals(oil, fat) : undefined;
+  const showsCarbsAndFat = DetailLevel.showsCarbsAndFat(level);
+  /** What the food's source states for its reference amount, and nothing invented (MM-153). */
+  const referenceLine =
+    `${reference.basis === 'perServing' ? 'Per serving' : reference.basis === 'per100g' ? 'Per 100 g' : 'Per 100 mL'}: ` +
+    `${n(reference.nutrition.kcal)} kcal · ${n(reference.nutrition.proteinG)} g protein · ` +
+    `${n(reference.nutrition.carbsG)} g carbs · ${n(reference.nutrition.fatG)} g fat`;
   const wholeGrams = grams === undefined ? undefined : quantityText(roundHalfAwayFromZero(grams) + 0);
   let helper: string | undefined;
   if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
@@ -298,15 +323,19 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
         helper={helper}
         helperIsWarning={invalid}
       />
+      {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
+      <p className="app-caption food-reference-line">{referenceLine}</p>
       {totals === undefined ? (
         <p id={`${ids}-needed`} className="app-caption food-still-needed" data-testid="amount-macros">
           Still needed: an amount above zero.
         </p>
       ) : (
         <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="amount-macros">
-          {`${isHand ? 'Logs an estimate: ' : 'Logs '}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein · ` +
-            `${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
-            `${n(totals.fatG)} g fat`}
+          {`${isHand ? 'Logs an estimate: ' : 'Logs '}${n(totals.kcal)} kcal · ${n(totals.proteinG)} g protein` +
+            (showsCarbsAndFat
+              ? ` · ${netCarbs ? `${n(netCarbsG(totals.carbsG))} g net carbs (${n(totals.carbsG)} g total)` : `${n(totals.carbsG)} g carbs`} · ` +
+                `${n(totals.fatG)} g fat`
+              : '')}
         </p>
       )}
       {note === undefined ? null : <Notice kind="info" text={note} />}
@@ -323,9 +352,25 @@ export function FoodAmountStep({ food: chosen, servings, day, meal: firstMeal, o
             selected={oil}
             onChange={(next) => setOil(next ?? 'none')}
           />
+          {oil === 'none' ? null : (
+            <>
+              {/* Which fat, the usual one first chosen, like the "Amount in" chips above (MM-152). */}
+              <div className="app-row food-chips" role="group" aria-label="Which fat">
+                {CookingFatKind.values.map((kind) => (
+                  <MmChoiceChip key={kind} label={cookingFatKindLabel(kind)} selected={kind === fat} onSelect={() => setFatChosen(kind)} />
+                ))}
+              </div>
+              {oilTotals === undefined ? null : (
+                <p className="app-caption food-reference-line">
+                  {`Adds ${cookingFatEntryName(fat).toLowerCase()} as its own entry: about ${n(oilTotals.kcal)} kcal · ${n(oilTotals.fatG)} g fat`}
+                </p>
+              )}
+            </>
+          )}
         </>
       ) : null}
-      {totals === undefined ? null : (
+      {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. */}
+      {totals === undefined || !showsCarbsAndFat ? null : (
         <>
           <p className="food-label food-label-spaced">{isHand ? 'Estimated macro split' : 'Macro split'}</p>
           <MacroSplitChart

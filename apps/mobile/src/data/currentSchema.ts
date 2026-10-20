@@ -93,7 +93,10 @@ CREATE TABLE "food_entries" (
   "sugars_g" REAL NULL,
   "saturated_fat_g" REAL NULL,
   "cholesterol_mg" REAL NULL,
-  "sugar_alcohols_g" REAL NULL
+  "sugar_alcohols_g" REAL NULL,
+  "preparation" TEXT NULL,
+  "conversion_kind" TEXT NULL,
+  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)
 );
 CREATE TABLE "day_marks" (
   "epoch_day" INTEGER NOT NULL,
@@ -154,6 +157,7 @@ CREATE TABLE "user_preferences" (
   "label_note_dismissed_epoch_day" INTEGER NULL,
   "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),
   "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
+  "usual_cooking_fat" TEXT NOT NULL DEFAULT 'oil',
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

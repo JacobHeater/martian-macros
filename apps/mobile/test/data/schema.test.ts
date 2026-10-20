@@ -27,7 +27,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 2 (MM-242): the agreement to the terms of use. Version 3 (MM-254): the macro picture.
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
   // Version 7 (MM-364): the switches of Settings > Coach. Version 9 (MM-396): net carbs. Version 10 (MM-63): the last backup.
-  // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance. Version 12 (MM-58): the online lookup choice.
+  // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance. Version 12 (MM-58): the online lookup choice. Version 14 (MM-152): the usual cooking fat.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -45,6 +45,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'label_note_dismissed_epoch_day',
     'ease_into_maintenance',
     'online_lookup',
+    'usual_cooking_fat',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   // Version 13 (MM-251): a diagnosed sleep disorder.
@@ -58,7 +59,14 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 11 (MM-128): the pace each record of targets was asked for.
   targets_history: ['requested_loss_fraction'],
   // Version 4 (MM-308): the micronutrients a food log entry keeps. Version 9 (MM-397): sugar alcohols.
-  food_entries: [...Micronutrient.added.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
+  // Version 15 (MM-167, MM-151): the state the food was logged in and the conversion that made its unit grams.
+  food_entries: [
+    ...Micronutrient.added.map((n) => Micronutrient.column(n)),
+    'sugar_alcohols_g',
+    'preparation',
+    'conversion_kind',
+    'conversion_factor',
+  ],
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
   custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
 };

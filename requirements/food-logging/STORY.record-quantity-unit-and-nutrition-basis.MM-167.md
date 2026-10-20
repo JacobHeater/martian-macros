@@ -1,6 +1,6 @@
 ---
 id: MM-167
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-27, MM-63, MM-38, MM-42, MM-43, MM-44, MM-45, MM-46, MM-48, MM-49, MM-55, MM-61, MM-139, MM-150, MM-151]
 ---
@@ -297,3 +297,28 @@ Done since: `QuantitySource.quickAdd` (Estimate) is now 0.40, as decided; the do
 was not given a new estimate-heavy user (MM-30, MM-150 own that).
 
 Done since: the source food is stored. A portion carries an optional `FoodOrigin` (pack, food id, source, source id); schema version 14 adds four nullable columns to `food_entries` (migration 13 to 14, guarded); foods logged from a pack, barcode or saved food record it. Still not stored: the conversion record and the raw or cooked state (the latter can be read back through the origin). Contract and migration tests pass.
+
+## Progress (2026-10-20, feat/m2)
+Built, the last of the persistence and the screens that read it:
+- **The conversion record is stored.** A `Portion` carries an optional `Conversion`: its kind (`servingWeight`, `density`, `handModel`)
+  and the grams one unit came to, computed by `conversionFor` in the domain from the same branches as `gramsFor`, so the stored
+  record and the stored grams cannot disagree. A weight records none (it is exact); typed totals record none. The hand model's
+  version keeps its own column. Schema version 15 adds `conversion_kind` and `conversion_factor` to `food_entries`
+  (migration step 14 to 15); the SQL and in-memory repositories and the shared contract read and write them.
+- **The raw or cooked state is stored** (`preparation`: raw, cooked or packaged, from the pack's state; nothing for a food that
+  states none) in the same schema version, and the portion line says it: "Weighed · 200 g raw · calculated from 365 kcal per
+  100 g", "1.5 × 1 bar (40 g), as packaged · calculated from 160 kcal per serving" (MM-151's "the entry says which state it is").
+- **Editing** carries the state and recomputes the conversion for the unit chosen, so an amount changed on a calculated entry keeps
+  an honest record; the source food, state and reference travel with the entry as before.
+- The amount step states what the source gives, "Per 100 g: 130 kcal · 3 g protein · 28 g carbs · 0 g fat", under the amount
+  (MM-153), built like the edit sheet's "Per serving:" caption (MM-221).
+Tests: `test/domain/conversionFor.test.ts` (every unit agrees with `gramsFor`), the food repository contract (SQLite and memory),
+`test/data/upgrade.test.ts` (a version 14 database keeps its entries with no state or conversion invented), `test/food/rawOrCooked.test.tsx`.
+Stories: `FoodWeighedRaw`, `AddFoodAmount`, `AddFoodAmountRememberedRaw` (`Food.stories.tsx`).
+
+Decided here (say if wrong): a weight records no conversion (the unit constants are exact and in code, not data); the state is
+stored only where the pack states one, so a saved food or a typed entry has none; "as packaged" is the row's wording for a
+branded or barcode food. Still with other tickets: hand portions stay a count with typed totals on the manual form until MM-46's
+model is wired there; the published packs' pairs and states wait on the pipeline run (MM-151, the food-database lane). The
+encrypted backup (MM-63, built) copies every table, so the new columns ride along.
+

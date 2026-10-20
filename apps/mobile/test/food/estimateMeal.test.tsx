@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { openAddFood, press, typeIn } from '../support/addFood';
@@ -59,4 +60,37 @@ it('a larger size and a richer kind change the entry', async () => {
   const entry = await only();
   expect(entry?.name).toBe('Estimated meal (large, rich)');
   expectClose(((entry?.fatG ?? 0) * 9) / (entry?.kcal ?? 1), 0.5, 1e-9);
+});
+
+// MM-150: an estimate comes back from recents with its mark, so it is never mistaken for a measured food.
+it('an estimated meal in recents keeps its estimated mark', async () => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'dinner',
+      name: 'Thai place, usual',
+      kcal: 900,
+      proteinG: 45,
+      carbsG: 112,
+      fatG: 30,
+      source: 'quickAdd',
+      portion: { method: 'quickAdd', basis: 'enteredTotals' },
+    }),
+  );
+  await repos.food.addFood(
+    new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'lunch', name: 'Thai curry, weighed', kcal: 600, proteinG: 30, carbsG: 50, fatG: 25, source: 'weighed' }),
+  );
+  renderApp(repos, today);
+  await openTab('Food');
+  const sheet = await openAddFood();
+  await typeIn(sheet, 'Search foods', 'thai');
+  expect(within(sheet).getByText('Your recent food · estimated · 900 kcal')).toBeInTheDocument();
+  expect(within(sheet).getByText('Your recent food · 600 kcal')).toBeInTheDocument();
+  await userEvent.click(within(sheet).getByRole('button', { name: /^Thai place, usual/ }));
+  // Refilled as estimated totals, in one tap, with Log it ready.
+  expect(within(sheet).getByRole('button', { name: 'Estimated totals', pressed: true })).toBeInTheDocument();
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await first(repos.food.watchFood(today))).length).toBe(1);
+  expect((await first(repos.food.watchFood(today)))[0]?.source).toBe('quickAdd');
 });

@@ -297,6 +297,92 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       expect(single(await first(repo.watchFood(d1))).portion).toBeUndefined();
     });
 
+    // MM-167, MM-151: the state the food was logged in and the conversion to grams ride with the portion.
+    it('the preparation and the conversion are kept with a portion, and absent stay absent', async () => {
+      const reference: ReferenceNutrition = {
+        basis: 'per100g',
+        nutrition: new NutritionTotals({ kcal: 130, proteinG: 2.7, carbsG: 28, fatG: 0.3 }),
+        servingDescription: '1 cup',
+        servingGrams: 158,
+        servingUnit: 'serving',
+      };
+      const cup = await repo.addFood(
+        new FoodEntry({
+          id: 0,
+          date: d1,
+          meal: 'dinner',
+          name: 'White rice, cooked',
+          kcal: 205.4,
+          proteinG: 4.3,
+          carbsG: 44.2,
+          fatG: 0.5,
+          source: 'householdMeasure',
+          portion: {
+            method: 'householdMeasure',
+            basis: 'calculated',
+            quantity: 1,
+            unit: 'serving',
+            reference,
+            origin: { packId: 'fixture', foodId: 4, source: 'fixture' },
+            preparation: 'cooked',
+            conversion: { kind: 'servingWeight', gramsPerUnit: 158 },
+          },
+        }),
+      );
+      const weighed = await repo.addFood(
+        new FoodEntry({
+          id: 0,
+          date: d1,
+          meal: 'dinner',
+          name: 'White rice, raw',
+          kcal: 730,
+          proteinG: 14,
+          carbsG: 160,
+          fatG: 1.4,
+          source: 'weighed',
+          portion: { method: 'weighed', basis: 'calculated', quantity: 200, unit: 'gram', reference, preparation: 'raw' },
+        }),
+      );
+      const byId = new Map((await first(repo.watchFood(d1))).map((e) => [e.id, e]));
+      expect(found(byId, cup).portion?.preparation).toBe('cooked');
+      expect(found(byId, cup).portion?.conversion).toEqual({ kind: 'servingWeight', gramsPerUnit: 158 });
+      expect(found(byId, weighed).portion?.preparation).toBe('raw');
+      expect(found(byId, weighed).portion?.conversion, 'a weight needs none').toBeUndefined();
+    });
+
+    // MM-151: which state a food was last logged in is read back from the whole log, not only recent foods.
+    it('the last entry logged from a food is found however long ago, and none for a food never logged', async () => {
+      const from = (name: string, foodId: number, unit: 'gram' | 'serving') =>
+        new FoodEntry({
+          id: 0,
+          date: d1,
+          meal: 'lunch',
+          name,
+          kcal: 100,
+          proteinG: 1,
+          carbsG: 1,
+          fatG: 1,
+          source: unit === 'gram' ? 'weighed' : 'householdMeasure',
+          portion: {
+            method: unit === 'gram' ? 'weighed' : 'householdMeasure',
+            basis: 'calculated',
+            quantity: 1,
+            unit,
+            origin: { packId: 'fixture', foodId, source: 'fixture' },
+          },
+        });
+      expect(await repo.lastLoggedFrom('fixture', [3, 4])).toBeUndefined();
+      await repo.addFood(from('White rice, raw', 3, 'gram'));
+      for (let i = 0; i < 30; i++) await repo.addFood(entry(d2, `Other food ${i}`));
+      expect((await repo.lastLoggedFrom('fixture', [3, 4]))?.name).toBe('White rice, raw');
+      await repo.addFood(from('White rice, cooked', 4, 'serving'));
+      const last = await repo.lastLoggedFrom('fixture', [3, 4]);
+      expect(last?.name).toBe('White rice, cooked');
+      expect(last?.portion?.unit).toBe('serving');
+      expect(await repo.lastLoggedFrom('other-pack', [3, 4]), 'another pack\'s ids are another food').toBeUndefined();
+      expect(await repo.lastLoggedFrom('fixture', [])).toBeUndefined();
+    });
+
     it('ids are never reused after a delete', async () => {
       const a = await repo.addFood(entry(d1, 'Oats'));
       await repo.deleteFood(a);

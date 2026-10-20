@@ -3,7 +3,9 @@ import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
+import { Micronutrients } from '../../domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
+import { FixturePack } from '../../foodCatalog/FixturePack';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { WaterEntry } from '../../domain/water/WaterEntry';
@@ -1058,5 +1060,147 @@ export const SearchOnlineUnavailable = screenStory({
   walk: async (canvas) => {
     await typeSearch('quinoa')(canvas);
     await press('Search online')(canvas);
+  },
+});
+
+// ---- WS-08 M2 close (MM-167, MM-151, MM-152, MM-49, MM-150): the amount step and the form, every new state ----
+
+/** The demo with 200 g of raw rice weighed yesterday from the pack, so the switch remembers raw (MM-151). */
+const withRawRiceWeighed: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'dinner',
+      name: 'White rice, raw',
+      kcal: 730,
+      proteinG: 14,
+      carbsG: 160,
+      fatG: 1.4,
+      source: 'weighed',
+      portion: {
+        method: 'weighed',
+        basis: 'calculated',
+        quantity: 200,
+        unit: 'gram',
+        reference: { basis: 'per100g', nutrition: new NutritionTotals({ kcal: 365, proteinG: 7, carbsG: 80, fatG: 0.7 }) },
+        origin: { packId: FixturePack.packId, foodId: 3, source: 'fixture' },
+        preparation: 'raw',
+      },
+    }),
+  );
+};
+
+/** MM-152: a cooked food with a teaspoon of fat chosen: which fat, the usual one first, and what it adds. */
+export const AddFoodAmountCookedWithOil = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Which fat',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, cooked' }),
+  walk: async (canvas) => {
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: '1 tsp' }));
+  },
+});
+
+/** MM-151: white rice opened again after it was last weighed raw: the switch starts on Raw, by weight, from the whole log. */
+export const AddFoodAmountRememberedRaw = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^Logs 365 kcal/,
+  scenario: withRawRiceWeighed,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, cooked' }),
+  walk: press(/^White rice, cooked/),
+});
+
+/** MM-167, MM-151: the row of a food weighed raw says so: "200 g raw · calculated from 365 kcal per 100 g". */
+export const FoodWeighedRaw = screenStory({
+  covers: ['FoodScreen'],
+  shows: /200 g raw · calculated from 365 kcal per 100 g/,
+  scenario: withRawRiceWeighed,
+  open: ({ state, today }) => {
+    state.homeTab.put('food');
+    state.selectedDay.put(today.addDays(-1));
+  },
+});
+
+/** MM-49: Simple detail on the amount step: calories and protein, no split; the whole food is logged. */
+export const AddFoodAmountSimple = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^Logs \d+ kcal · \d+ g protein$/,
+  scenario: demoWith({ detail: 'simple' }),
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' }),
+  walk: press(/^Chicken breast, cooked/),
+});
+
+/** MM-49: Simple detail on the typed form: calories and protein only. */
+export const AddFoodManuallySimple = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Protein g',
+  scenario: demoWith({ detail: 'simple' }),
+  open: addFood,
+  walk: press('Enter manually'),
+});
+
+/** MM-49: Full detail on the typed form: the label's other lines, two to a line as a saved food's are. */
+export const AddFoodManuallyFull = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full' }),
+  open: addFood,
+  walk: press('Enter manually'),
+});
+
+/** MM-49: at Full detail a row shows the sugars and saturated fat its source stated (format 3 packs carry them). */
+export const FoodFullLabelLines = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Sugars 15 g · Saturated fat 3 g/,
+  scenario: demoWith({
+    detail: 'full',
+    then: async (repos, today) => {
+      await repos.food.addFood(
+        new FoodEntry({
+          id: 0,
+          date: today,
+          meal: 'snack',
+          name: 'Greek yogurt, vanilla',
+          kcal: 150,
+          proteinG: 12,
+          carbsG: 17,
+          fatG: 4,
+          source: 'labelServing',
+          fiberG: 0,
+          sodiumMg: 60,
+          micros: new Micronutrients({ sugars: 15, saturatedFat: 3 }),
+        }),
+      );
+    },
+  }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-150: an estimated meal found again among recent foods keeps its mark. */
+export const AddFoodRecentEstimate = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Your recent food · estimated · 900 kcal',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({
+        id: 0,
+        date: today.addDays(-2),
+        meal: 'dinner',
+        name: 'Thai place, usual',
+        kcal: 900,
+        proteinG: 45,
+        carbsG: 112,
+        fatG: 30,
+        source: 'quickAdd',
+        portion: { method: 'quickAdd', basis: 'enteredTotals' },
+      }),
+    );
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'thai');
   },
 });
