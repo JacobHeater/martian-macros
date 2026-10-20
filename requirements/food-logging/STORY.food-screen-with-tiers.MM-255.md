@@ -9,6 +9,8 @@ related: [MM-253, MM-254, MM-224, MM-180, MM-179, MM-219, MM-220]
 
 ## What is built
 
+**Superseded in part by MM-438 (2026-10-20):** no screen has an Add food button; food is added from a meal's "+".
+
 - **The hero** with the macro switch shared with Dashboard (MM-254); the
   "Macronutrient split" card is removed.
 - **Meals as sections, not cards**: each meal is a section header with a
