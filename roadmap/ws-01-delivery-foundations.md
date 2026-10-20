@@ -80,6 +80,7 @@ WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 6. **Devices from the runner: run on a phone, the isolated demo app, screenshots (MM-175, MM-177, MM-178, MM-182, MM-234, MM-235, MM-238).** M2. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-190.
 
+   MM-412 (2026-10-19, done): `mm run --ios --phone` builds signed, installs and opens the real app on the iPhone plugged in; the team from `MM_APPLE_TEAM` or the project's uncommitted line.
 ## Done enough to unblock others
 MM-61 is done: a migration from version 1 to 2 exists, is tested against a
 populated version 1 database, and the schema-lane rules in the roadmap README
