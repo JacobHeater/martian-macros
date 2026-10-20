@@ -498,7 +498,8 @@
             "MM-357",
             "MM-360",
             "MM-373",
-            "MM-374"
+            "MM-374",
+            "MM-417"
           ]
         },
         {
@@ -1464,7 +1465,8 @@
           "MM-375",
           "MM-391",
           "MM-392",
-          "MM-403"
+          "MM-403",
+          "MM-417"
         ]
       },
       "sequence": [
@@ -1737,6 +1739,14 @@
             "MM-403"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 21,
+          "title": "Seven places on feat/m2 that no story draws (MM-417): draw each state so npm run unseen passes",
+          "tickets": [
+            "MM-417"
+          ],
+          "milestone": "M2"
         }
       ],
       "gate": {

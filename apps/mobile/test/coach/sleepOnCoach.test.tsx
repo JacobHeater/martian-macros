@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { SleepNight } from '../../src/domain/SleepNight';
 import type { TargetsRecord } from '../../src/engine/TargetsRecord';
@@ -53,6 +54,10 @@ async function holdingUp(): Promise<HTMLElement> {
 
 it('the sleep line: the fourteen-night average in hours and minutes and the nights, no score', async () => {
   await nights(410, 12);
+  // Answered yesterday, so the check-in is not due and the folded line carries the sleep figure.
+  await repos.recovery.saveRecoveryCheckIn(
+    new RecoveryCheckIn({ date: today.addDays(-1), hunger: 4, energy: 4, sleep: 3, training: 4, mood: 4 }),
+  );
   await openCoach();
   const section = await holdingUp();
   expect(within(section).getByText(/Sleep 6 h 50 m over 12 nights\.$/)).toBeInTheDocument();
@@ -123,4 +128,12 @@ it('a diagnosed sleep disorder is a caution with a clinician pointer, and the ta
   const [current] = (await history()).slice(-1);
   expect(current?.targets.kcal).toBe(2000);
   expect(current?.targets.flags.size).toBe(0);
+});
+
+// The panel's PD-10: while the check-in is due, the folded line is its call alone.
+it('while the check-in is due the folded line does not carry the sleep figure', async () => {
+  await nights(410, 12);
+  await openCoach();
+  const section = (await screen.findByRole('heading', { name: 'How you are holding up' })).closest('.mm-section') as HTMLElement;
+  expect(within(section).getByText('This week’s five questions are due.')).toBeInTheDocument();
 });

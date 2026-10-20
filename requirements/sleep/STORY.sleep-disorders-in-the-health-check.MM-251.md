@@ -54,7 +54,7 @@ Scenario: Wording
 **Built.**
 - `ScreeningAnswers.sleepDisorder`, asked in `HealthStep` as "A diagnosed sleep disorder (sleep apnea, insomnia, a shift-work or other circadian disorder)", so it is asked at setup, at the 90-day re-check and in Settings (the one step serves all three); kept in the `sleep_disorder` column of `setups` (schema version 13, with MM-250's table), mapped in `SqlSetupRepository`, and carried through the two places that rebuild the answers field by field (onboarding's female-only clearing, the profile section's sex change).
 - Refer-only: `Caution.sleepDisorder` from `CoachingPolicy.derive`, worded in `cautionMessage` as "Sleep disorders change how a deficit works for you; keep your care team in the loop. The app changes none of your numbers for this."; shown as a `Notice` under the item on the health step and among the Coach's cautions. Nothing else in the policy or the targets reads the answer.
-- The terms' "talk to a doctor" list names a diagnosed sleep disorder such as sleep apnea (MM-242). The evidence register has a row for `Caution.sleepDisorder` (Shechter 2016, graded emerging).
+- The terms' "talk to a doctor" list names "sleep apnea or another sleep disorder" (MM-242); the word "diagnosed" is kept out of the terms, whose claims test allows "diagnose" only where the app says what it does not do. The evidence register has a row for `Caution.sleepDisorder` (Shechter 2016, graded emerging).
 
 **Tests.** `test/domain/sleepDisorder.test.ts`: the answer is kept and raises the caution; the policy and the targets are the same as for the same person answering no. `test/coach/sleepOnCoach.test.tsx`: the caution on Coach, the targets unchanged. The Dart parity test for cautions filters the one added since the Flutter app.
 

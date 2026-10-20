@@ -45,7 +45,8 @@ export function RecoveryCard() {
   if (due) summary = 'This week’s five questions are due.';
   else if (latest === undefined) summary = 'Five quick questions a week. Not answered yet.';
   else summary = `Last answered ${Fmt.day(latest.date, today)}.`;
-  if (sleep !== undefined) summary += ` Sleep ${sleepDurationText(sleep.averageMinutes)} over ${sleep.nights} nights.`;
+  // While the check-in is due the line is its call alone; otherwise it carries the sleep figure (the panel's PD-10).
+  if (!due && sleep !== undefined) summary += ` Sleep ${sleepDurationText(sleep.averageMinutes)} over ${sleep.nights} nights.`;
   let sleepValue: string;
   let sleepDetail: string;
   if (sleepUnread) {
