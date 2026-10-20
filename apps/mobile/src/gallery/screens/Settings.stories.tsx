@@ -904,3 +904,19 @@ export const SettingsOnlineLookup = screenStory({
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Change online lookup' }));
   },
 });
+
+/** MM-57: Settings, Data, opens where the food data comes from. */
+export const SettingsOpensFoodSources = screenStory({
+  covers: ['SettingsScreen', 'FoodSourcesScreen'],
+  shows: 'The sources',
+  open: settingsAt('data'),
+  walk: pressAnywhere(/^Food data sources/),
+});
+
+/** MM-57: the Food database screen cites its sources with a row that opens them. */
+export const FoodDatabaseOpensSources = screenStory({
+  covers: ['FoodDatabaseScreen', 'FoodSourcesScreen'],
+  shows: 'The sources',
+  open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
+  walk: pressAnywhere(/^Food data sources/),
+});

@@ -502,3 +502,18 @@ export const ProgressWaistNoneInRange = screenStory({
   open: onProgress,
   walk: openWaist,
 });
+
+/** MM-250: a night typed and saved: the snack says it, and focus is on the night's chip. */
+export const SleepSaved = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Saved: Last night, 7 h 20 m\./,
+  scenario: noNights,
+  open: onProgress,
+  walk: async (canvas) => {
+    const hours = await within(canvas).findByRole('textbox', { name: 'Last night, Hours' }, { timeout: 5000 });
+    reveal(hours);
+    await userEvent.type(hours, '7');
+    await userEvent.type(within(canvas).getByRole('textbox', { name: 'Last night, Minutes' }), '20');
+    await userEvent.click(within(canvas).getByRole('button', { name: 'Save night' }));
+  },
+});

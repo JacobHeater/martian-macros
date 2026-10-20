@@ -1254,3 +1254,17 @@ export const FixThisFood = screenStory({
     await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Fix this food' }, { timeout: 10000 }));
   },
 });
+
+/** MM-417 follow-up: nothing logged today, a day logged yesterday: Food offers to copy it. */
+export const FoodCopyYesterday = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy yesterday',
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
+    await repos.weights.saveWeight(today, 82);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'breakfast', name: 'Oatmeal', kcal: 300, proteinG: 10, carbsG: 54, fatG: 6, source: 'weighed' }),
+    );
+  },
+  open: ({ state }) => state.homeTab.put('food'),
+});
