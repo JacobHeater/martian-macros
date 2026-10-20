@@ -14,5 +14,5 @@ import { packEntryFor } from '../foodPipeline/packEntryFor';
 export function onlineEntryOf(candidate: CandidateFood): PackEntry | undefined {
   if (checkNutrition(candidate) !== undefined) return undefined;
   const gtin14 = candidate.rawBarcode === undefined ? undefined : normalizeBarcode(candidate.rawBarcode);
-  return packEntryFor(candidate, { id: 0, packId: onlinePackId, gtin14 });
+  return packEntryFor(candidate, { id: 0, packId: onlinePackId, gtin14, asOfSeconds: Math.floor(Date.now() / 1000) });
 }

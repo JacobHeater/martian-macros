@@ -48,8 +48,9 @@ describe('a product by barcode', () => {
     expect(food.micros.vitaminC).toBe(0);
     expect(food.source).toBe('off');
     expect(food.sourceId).toBe('0737628064502');
-    expect(food.tier).toBe('checkThis');
-    expect(food.tierReason).toBe('Entered by Open Food Facts contributors and not checked against a package.');
+    // Complete and comfortably consistent (385 kcal against about 392 from its macros), changed this year: a label (MM-153).
+    expect(food.tier).toBe('label');
+    expect(food.tierReason).toMatch(/^Copied from the package by Open Food Facts contributors/);
     expect(food.packId).toBe('online');
     expect(servings, 'the weight in the text goes: it is shown beside it').toEqual([{ description: '1/3 package', grams: 52 }]);
     expect(barcodes).toEqual([gtin]);

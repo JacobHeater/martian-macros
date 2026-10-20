@@ -63,9 +63,12 @@ export class PackBuilder {
     const report = new BuildReport({ expected: this.expectedSources });
     const generic: CandidateFood[] = [];
     const byBarcode = new Map<string, Map<string, CandidateFood>>();
+    // When the data was current: the newest record read, so the same export always builds the same pack (MM-153).
+    let asOfSeconds = 0;
 
     for await (const c of candidates) {
       report.countRead(c.source);
+      if (c.updatedAt > asOfSeconds) asOfSeconds = c.updatedAt;
       const problem = checkNutrition({
         name: c.name,
         kcal: c.kcal,
@@ -126,6 +129,7 @@ export class PackBuilder {
           gtin14: gtin,
           disagreement: disagree ? disagreement : undefined,
           preparation: 'packaged',
+          asOfSeconds,
         }),
       );
       report.countWritten(winner.source);
@@ -161,6 +165,7 @@ export class PackBuilder {
         packId: this.genericPackId,
         preparation: link.state,
         pairedFoodId: link.pairIndex === undefined ? undefined : link.pairIndex + 1,
+        asOfSeconds,
       });
     });
     for (const c of generic) report.countWritten(c.source);

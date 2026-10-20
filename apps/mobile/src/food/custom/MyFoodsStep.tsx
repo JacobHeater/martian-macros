@@ -18,17 +18,19 @@ interface MyFoodsStepProps {
    * the next scan finds it (MM-44).
    */
   initialBarcode?: string | undefined;
+  /** A database food copied to be corrected (MM-153): the form opens on it. */
+  draft?: CustomFood | undefined;
 }
 
 /** Which screen of "My foods" is showing. */
 type MyFoodsPage = 'list' | 'foodForm' | 'recipeForm';
 
 /** The foods and recipes the user saved: add, edit and delete them (MM-45). */
-export function MyFoodsStep({ onBack, initialBarcode }: MyFoodsStepProps) {
+export function MyFoodsStep({ onBack, initialBarcode, draft }: MyFoodsStepProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const foods = useLoaded(state.customFoods) ?? [];
-  const [page, setPage] = useState<MyFoodsPage>(initialBarcode === undefined ? 'list' : 'foodForm');
+  const [page, setPage] = useState<MyFoodsPage>(initialBarcode === undefined && draft === undefined ? 'list' : 'foodForm');
   const [editing, setEditing] = useState<CustomFood>();
   const [barcode, setBarcode] = useState(initialBarcode);
 
@@ -48,7 +50,7 @@ export function MyFoodsStep({ onBack, initialBarcode }: MyFoodsStepProps) {
     if (ok) await services.customFoods.deleteCustomFood(food.id);
   };
 
-  if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} onDone={() => show('list')} />;
+  if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} draft={editing === undefined ? draft : undefined} onDone={() => show('list')} />;
   if (page === 'recipeForm') return <RecipeForm recipe={editing} onDone={() => show('list')} />;
   return (
     <div className="food-sheet">

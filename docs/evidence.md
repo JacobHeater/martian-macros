@@ -172,6 +172,22 @@ known.
 
 Rows: foodGrade, FoodGradeRule.againstFloorKcal, FoodGradeRule.proteinGPer100Kcal, FoodGradeRule.fiberGPer100Kcal, FoodGradeRule.micronutrientsPercentPer100Kcal, FoodGradeRule.micronutrientCapPercent, FoodGradeRule.micronutrientBreadthPercent, FoodGradeRule.micronutrientsCapWithSugars, FoodGradeRule.micronutrientsMinStated, FoodGradeRule.dailyValues, FoodGradeRule.kcalPerGram, FoodGradeRule.sodiumMgPer100Kcal, FoodGradeRule.sugarsGPer100Kcal, FoodGradeRule.sugarsWaiverProteinG, FoodGradeRule.sugarsWaiverFiberG, FoodGradeRule.sugarsWaiverKcalPerGram, FoodGradeRule.saturatedFatGPer100Kcal, FoodGradeRule.minKcalPer100g, FoodGradeRule.alcoholLimitG, FoodGradeRule.rollupCoverage, FoodGradeRule.letterSteps, foodGrade.requiredNutrients, foodGrade.refinementsWhenStated
 
+### How far can a food's numbers be trusted?
+
+Food labels are allowed to be off: in the United States calories and several
+nutrients may run up to 20% over the label before a product is misbranded,
+and measured foods do run over on average. The coach is built to cope with
+that as long as you log the same way from week to week, so close is as good
+as exact. Each food says where its numbers came from and marks one of three
+things: Reference (analysed by USDA), Label (a maker's label, or a community
+copy of one that is complete and consistent), or Check this, with the
+reason: two sources disagree, its calories and macros only just agree, it
+leaves out fiber or sodium, or it has not changed in five years. Nothing is
+called verified, because nobody checks a food. "Fix this food" keeps a
+corrected copy of your own.
+
+Rows: CommunityReviewRule.nearToleranceFraction, CommunityReviewRule.nearToleranceKcal, CommunityReviewRule.staleSeconds
+
 ### How are foods ranked?
 
 Foods from analysed sources list first (USDA Foundation, then SR Legacy,
@@ -404,6 +420,9 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `foodGrade.requiredNutrients` | Calories, the macros, fiber and sodium must be stated | engine gradeOfNutrition.ts | When a grade is impossible | The product owner, 2026-10-18 (MM-380): MM-310's rule that a missing value is never zero, with the two the packs state for most foods required | judgement | None | No |
 | `foodGrade.refinementsWhenStated` | Sugars, saturated fat and the vitamins and minerals count only when stated, and the popover says when they were not | engine nutrientDensityScore.ts | What a grade without them was computed from | The product owner, 2026-10-18 (MM-380): about nine in ten common foods and five in six barcode foods grade today without them; a cola scores 0 and grades C until a format 2 pack states its sugars (the panel's NU-4) | judgement | None | No |
 | `sourceReliability` | The source's base, less the disagreement penalty, plus the completeness bonuses, clamped 0 to 100 | foodCatalog sourceReliability.ts | The order of search results and which record a scanned barcode shows (MM-383) | The app's own ordinal statement of provenance, reviewed in docs/agent-runs/mm383-sources-and-downloads/ (the panel's IN-18): the modifiers reward completeness within a source and never cross one | judgement | None | No |
+| `CommunityReviewRule.nearToleranceFraction` | 10% from what the macros imply, inside the 15% energy check | foodPipeline CommunityReviewRule.ts | When a community record passes the energy check only near its edge and is marked "Check this" (MM-153) | Product judgement: the last third of the MM-53 tolerance; a record there is consistent with itself only loosely, and transcription slips show up as energy that barely agrees | judgement | None | No |
+| `CommunityReviewRule.nearToleranceKcal` | More than 20 kcal per 100 g off as well | foodPipeline CommunityReviewRule.ts | Keeps low-calorie foods, where rounding alone moves the ratio, out of the near-tolerance mark (MM-153) | Product judgement, matching the 20 kcal floor of the MM-53 energy check | judgement | None | No |
+| `CommunityReviewRule.staleSeconds` | Five years | foodPipeline CommunityReviewRule.ts | When a community record unchanged for longer than this is marked "Check this" (MM-153) | MM-153's decision; US labels were reformatted from 2020 (21 CFR 101.9 as amended in 2016), so a record older than five years may describe an earlier label. The interval is judgement | judgement | US packaged foods | No |
 | `SourceReliabilityRule.bases` | USDA Foundation 95, SR Legacy 90, FNDDS 80, Branded 65, Open Food Facts 40 | foodCatalog SourceReliabilityRule.ts | The base by source | Foundation: analytically derived values, sample level, current. SR Legacy: analyses, calculations and published literature, final April 2018. FNDDS: compiled by recipe mainly from Foundation and SR Legacy for the national dietary survey, with some ingredient values from other sources; one step from measurement. Branded: the maker's declaration through the GS1 data pool, rounded and tolerated by 21 CFR 101.9 (80% floor, 20% ceiling), median record date January 2020, submitted not verified. Open Food Facts: volunteer transcription without systematic verification; where only one of two disagreeing records is self-consistent it is USDA's 2,126 times to Open Food Facts' 456 (MM-51) | judgement | None | No |
 | `SourceReliabilityRule.basesByTier` | Reference 85, label 60, check this 35 | foodCatalog SourceReliabilityRule.ts | A source the rule does not know, by its tier | Product judgement: the fixture pack and a future source | judgement | None | No |
 | `SourceReliabilityRule.disagreementPenalty` | 15 | foodCatalog SourceReliabilityRule.ts | A record marked "check this" because another source's record for its barcode differed by more than 10% | MM-51: 27% of shared, complete products disagree; the mark says two sources disagreed, not which was wrong. Never inverts the source order | judgement | None | No |
