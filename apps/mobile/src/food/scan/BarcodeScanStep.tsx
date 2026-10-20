@@ -16,7 +16,8 @@ import { OnlineLookupAsk } from '../online/OnlineLookupAsk';
 import '../food.css';
 
 interface BarcodeScanStepProps {
-  onFound: (food: CatalogFood) => void;
+  /** A food found, and the GTIN-14 it was found by (kept so a correction keeps the barcode, MM-153). */
+  onFound: (food: CatalogFood, gtin: string) => void;
   onFoundCustom: (food: CustomFood) => void;
   /**
    * A product the packs do not have: read its label, to be saved against
@@ -72,7 +73,7 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
     setLookingUp(false);
     setAsking(undefined);
     if (result.kind === 'found') {
-      onFound(result.food);
+      onFound(result.food, gtin);
       return;
     }
     setUnknownGtin(gtin);
@@ -101,7 +102,7 @@ export function BarcodeScanStep({ onFound, onFoundCustom, onReadLabel, onManual,
     }
     const food = await catalog?.byBarcode(gtin);
     if (food !== undefined) {
-      onFound(food);
+      onFound(food, gtin);
       return;
     }
     if (online.allowed) {

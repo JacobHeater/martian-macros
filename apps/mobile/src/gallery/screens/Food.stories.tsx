@@ -1243,3 +1243,14 @@ export const AddFoodRecentEstimate = screenStory({
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'thai');
   },
 });
+
+/** MM-153: "Fix this food" on a database food: the person's own copy, prefilled at its first serving, to correct and keep. */
+export const FixThisFood = screenStory({
+  covers: ['AddFoodSheet', 'FoodAmountStep', 'MyFoodsStep'],
+  shows: /Your copy is what you find from now on/,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'protein bar' }),
+  walk: async (canvas) => {
+    await press(/^Protein bar, chocolate/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Fix this food' }, { timeout: 10000 }));
+  },
+});

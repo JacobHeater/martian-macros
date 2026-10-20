@@ -55,6 +55,8 @@ interface FoodAmountStepProps {
   onBack: () => void;
   /** Called once the food is logged. */
   onDone: () => void;
+  /** Copies a database food into the person's own to correct it ("Fix this food", MM-153); absent for their own foods. */
+  onFix?: (() => void) | undefined;
   /** Set when the food is one the user saved: its numbers are per serving. */
   custom?: CustomFood | undefined;
   /**
@@ -106,6 +108,7 @@ export function FoodAmountStep({
   custom,
   alternate,
   startOnAlternate = false,
+  onFix,
 }: FoodAmountStepProps) {
   const ids = useId();
   const { services, state } = useApp();
@@ -403,6 +406,7 @@ export function FoodAmountStep({
       <MealChips meal={meal} onChange={setMeal} />
       <div className="app-gap" />
       <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
+      {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}
       <MmButton label="Back to search" kind="text" onPress={onBack} />
     </div>
   );

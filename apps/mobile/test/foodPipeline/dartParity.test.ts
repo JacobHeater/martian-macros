@@ -1,4 +1,5 @@
 import { PackMicronutrient } from '../../src/foodCatalog/PackMicronutrient';
+import { disagreementReason } from '../../src/foodCatalog/disagreementReason';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -53,9 +54,19 @@ async function rowsOf(path: string) {
   return withoutTerms(dartColumns);
 }
 
-/** The licence and attribution are the app's current words (MM-57, MM-383), not pipeline output; they are compared apart. */
+/**
+ * The licence and attribution are the app's current words (MM-57, MM-383), not pipeline output; they are compared apart.
+ * A community record's tier departed from Dart with MM-153 (2026-10-20): Dart marked every Open Food Facts record
+ * "Check this"; now one that is complete and comfortably consistent is a label. Those two columns are compared in
+ * `communityTier.test.ts`; a disagreement between sources is still compared here.
+ */
 function withoutTerms<T extends { header: unknown[][] }>(pack: T): T {
-  return { ...pack, header: pack.header.filter(([key]) => key !== 'license' && key !== 'attribution') };
+  const foods = (pack as unknown as { foods?: unknown[][] }).foods?.map((row) => {
+    const source = row[row.length - 4];
+    const reason = row[row.length - 1];
+    return source === 'off' && reason !== disagreementReason ? [...row.slice(0, -2), null, null] : row;
+  });
+  return { ...pack, ...(foods === undefined ? {} : { foods }), header: pack.header.filter(([key]) => key !== 'license' && key !== 'attribution') };
 }
 
 for (const [prefer, policy] of Object.entries(policies) as [keyof typeof recorded, ConflictPolicy][]) {

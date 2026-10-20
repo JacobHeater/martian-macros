@@ -54,6 +54,7 @@ import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { FoodAmountStep } from './FoodAmountStep';
 import { FoodGrade } from './FoodGrade';
 import { FoodSearchResults } from './FoodSearchResults';
+import { copyOfPackFood } from './custom/copyOfPackFood';
 import { OnlineSearchResults } from './online/OnlineSearchResults';
 import { MealChips } from './MealChips';
 import { BarcodeScanStep } from './scan/BarcodeScanStep';
@@ -216,7 +217,7 @@ type Step =
   | { readonly at: 'manual' }
   | { readonly at: 'scanning' }
   | { readonly at: 'estimating' }
-  | { readonly at: 'myFoods'; readonly barcode?: string | undefined }
+  | { readonly at: 'myFoods'; readonly barcode?: string | undefined; readonly draft?: CustomFood | undefined }
   | {
       readonly at: 'amount';
       readonly food: CatalogFood;
@@ -224,6 +225,8 @@ type Step =
       readonly alternate?: CatalogFood | undefined;
       readonly startOnAlternate?: boolean | undefined;
       readonly custom?: CustomFood | undefined;
+      /** The barcode the food was scanned by, so "Fix this food" keeps it (MM-153). */
+      readonly barcode?: string | undefined;
     };
 
 /**
@@ -467,14 +470,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     if (entry !== undefined && entry.date !== day) overlays.snack(`Moved to ${Fmt.day(day, today)}.`);
   };
 
-  const pick = async (food: CatalogFood) => {
+  const pick = async (food: CatalogFood, barcode?: string) => {
     const [alternate, servings] =
       catalog === undefined ? [undefined, []] : await Promise.all([catalog.pairOf(food), catalog.servingsOf(food)]);
     // The state this food was last weighed in, however long ago, is where the switch starts (MM-151).
     const last = alternate === undefined ? undefined : await services.food.lastLoggedFrom(food.packId, [food.id, alternate.id]);
     const startOnAlternate =
       last?.portion?.unit !== undefined && PortionUnit.isWeight(last.portion.unit) && last.portion.origin?.foodId === alternate?.id;
-    setStep({ at: 'amount', food, servings, alternate, startOnAlternate });
+    setStep({ at: 'amount', food, servings, alternate, startOnAlternate, barcode });
   };
   const pickCustom = (custom: CustomFood) =>
     setStep({ at: 'amount', food: customCatalogFood(custom), servings: [], custom });
@@ -492,10 +495,15 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         meal={meal}
         onBack={choices}
         onDone={onDone}
+        onFix={
+          step.custom === undefined
+            ? () => setStep({ at: 'myFoods', draft: copyOfPackFood(step.food, step.servings, step.barcode) })
+            : undefined
+        }
       />
     );
   }
-  if (step.at === 'myFoods') return <MyFoodsStep initialBarcode={step.barcode} onBack={choices} />;
+  if (step.at === 'myFoods') return <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} />;
   if (step.at === 'estimating') {
     return (
       <EstimateMealStep
@@ -511,7 +519,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   if (step.at === 'scanning') {
     return (
       <BarcodeScanStep
-        onFound={(food) => void pick(food)}
+        onFound={(food, gtin) => void pick(food, gtin)}
         onFoundCustom={pickCustom}
         onReadLabel={(gtin) => setStep({ at: 'myFoods', barcode: gtin })}
         onManual={() => setStep({ at: 'manual' })}
