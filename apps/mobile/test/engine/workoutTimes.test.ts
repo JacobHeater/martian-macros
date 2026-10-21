@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CalendarDate, Workout, WorkoutExercise, WorkoutSet } from '../../src/domain';
-import { checkTimeSpan, restStartedAt } from '../../src/engine';
+import { checkTimeSpan, restStartedAt, timedSetsOf } from '../../src/engine';
 
-/** MM-191: the rules for typed times, and when a rest began. */
+/** MM-191: the rules for typed times, when a rest began, and which sets can be segments. */
 const six = new Date(2026, 9, 5, 18);
 const at = (minutes: number, seconds = 0) => new Date(six.getTime() + (minutes * 60 + seconds) * 1000);
 
@@ -65,5 +65,41 @@ describe('rest', () => {
       ]),
     );
     expect(started).toEqual(at(9, 30));
+  });
+});
+
+describe('sets that can be written as segments', () => {
+  const workout = (exercises: WorkoutExercise[]) =>
+    new Workout({ id: 1, date: CalendarDate.of(2026, 10, 5), startedAt: six, endedAt: at(30), exercises });
+
+  it('are only the sets with both times, and none is made up', () => {
+    const timed = new WorkoutSet({ reps: 8, loadKg: 100, startedAt: at(2), endedAt: at(2, 40) });
+    const untimed = new WorkoutSet({ reps: 8, loadKg: 100 });
+    const endOnly = new WorkoutSet({ reps: 8, loadKg: 100, endedAt: at(6) });
+    const segments = timedSetsOf(
+      workout([new WorkoutExercise({ exerciseId: 'back-squat', sets: [timed, untimed, endOnly] })]),
+    );
+    expect(segments).toEqual([{ exerciseId: 'back-squat', set: timed, startedAt: at(2), endedAt: at(2, 40) }]);
+  });
+
+  it('come in the order they began, across exercises', () => {
+    const squat = new WorkoutSet({ reps: 8, loadKg: 100, startedAt: at(10), endedAt: at(11) });
+    const pullUp = new WorkoutSet({ reps: 6, loadKg: 0, startedAt: at(4), endedAt: at(5) });
+    const segments = timedSetsOf(
+      workout([
+        new WorkoutExercise({ exerciseId: 'back-squat', sets: [squat] }),
+        new WorkoutExercise({ exerciseId: 'pull-up', sets: [pullUp] }),
+      ]),
+    );
+    expect(segments.map((s) => s.exerciseId)).toEqual(['pull-up', 'back-squat']);
+  });
+
+  it('are none in a workout without a timed set, which is still a session', () => {
+    const untimed = workout([
+      new WorkoutExercise({ exerciseId: 'back-squat', sets: [new WorkoutSet({ reps: 8, loadKg: 100 })] }),
+    ]);
+    expect(timedSetsOf(untimed)).toEqual([]);
+    expect(untimed.startedAt).toEqual(six);
+    expect(untimed.endedAt).toEqual(at(30));
   });
 });

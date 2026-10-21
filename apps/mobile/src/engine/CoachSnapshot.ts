@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { ActivityGap } from './ActivityGap';
+import type { BodyFatBasis } from './BodyFatBasis';
 import type { BodyFatEstimate } from './BodyFatEstimate';
 import type { CoachConfidence } from './CoachConfidence';
 import type { ModeRecommendation } from './ModeRecommendation';
@@ -13,6 +14,7 @@ interface CoachSnapshotInit {
   trend: readonly WeightTrendPoint[];
   trendWeightKg: number;
   bodyFat: BodyFatEstimate;
+  bodyFatBasis?: BodyFatBasis;
   bmrKcal: number;
   calorieFloorKcal: number;
   tdee: TdeeEstimate;
@@ -31,6 +33,9 @@ export class CoachSnapshot {
   readonly trend: readonly WeightTrendPoint[];
   readonly trendWeightKg: number;
   readonly bodyFat: BodyFatEstimate;
+
+  /** What `bodyFat` rests on (MM-34); the formula unless said. */
+  readonly bodyFatBasis: BodyFatBasis;
   readonly bmrKcal: number;
 
   /**
@@ -58,6 +63,7 @@ export class CoachSnapshot {
     this.trend = init.trend;
     this.trendWeightKg = init.trendWeightKg;
     this.bodyFat = init.bodyFat;
+    this.bodyFatBasis = init.bodyFatBasis ?? 'formula';
     this.bmrKcal = init.bmrKcal;
     this.calorieFloorKcal = init.calorieFloorKcal;
     this.tdee = init.tdee;

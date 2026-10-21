@@ -30,7 +30,28 @@ export const ReliefRule = {
    */
   apartDays: 5,
 
-  /** After the offer is answered it is not made again for this long. */
+  /**
+   * The strength trigger (MM-117): a lift's smoothed estimated max (MM-77)
+   * down by this fraction or more over the window...
+   */
+  strengthDrop: 0.05,
+
+  /** ...on at least this many lifts... */
+  fallingLiftsNeeded: 2,
+
+  /** ...each trained on at least this many distinct days within the window. */
+  strengthSessions: 3,
+
+  /** The window, in days: three weeks. */
+  strengthWindowDays: 21,
+
+  /** The session the window is measured from is no more than this many days before it opens. */
+  strengthBaselineWithinDays: 7,
+
+  /**
+   * After the offer is answered it is not made again for this long, unless
+   * both the check-ins and the lifts say so at once (MM-117).
+   */
   quietDays: 21,
 
   /**

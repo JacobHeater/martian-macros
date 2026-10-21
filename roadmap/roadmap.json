@@ -648,7 +648,8 @@
           "workstream": "WS-03",
           "tickets": [
             "MM-109",
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -701,6 +702,7 @@
             "MM-71",
             "MM-68",
             "MM-73",
+            "MM-498",
             "MM-188"
           ]
         },
@@ -722,6 +724,7 @@
             "MM-87",
             "MM-96",
             "MM-94",
+            "MM-454",
             "MM-247"
           ]
         }
@@ -741,7 +744,8 @@
         {
           "workstream": "WS-05",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ]
         },
         {
@@ -749,7 +753,8 @@
           "tickets": [
             "MM-122",
             "MM-124",
-            "MM-129"
+            "MM-129",
+            "MM-480"
           ]
         },
         {
@@ -758,6 +763,8 @@
             "MM-118",
             "MM-156",
             "MM-34",
+            "MM-501",
+            "MM-502",
             "MM-157"
           ]
         },
@@ -798,6 +805,7 @@
             "MM-388",
             "MM-396",
             "MM-397",
+            "MM-456",
             "MM-406"
           ]
         },
@@ -847,6 +855,7 @@
           "workstream": "WS-11",
           "tickets": [
             "MM-72",
+            "MM-516",
             "MM-70",
             "MM-69",
             "MM-441",
@@ -1499,6 +1508,7 @@
           "MM-183",
           "MM-224",
           "MM-242",
+          "MM-453",
           "MM-375",
           "MM-403"
         ]
@@ -1588,7 +1598,8 @@
           "title": "The terms of use before anything else",
           "milestone": "M3",
           "tickets": [
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -1966,7 +1977,8 @@
         ],
         "remaining": [
           "MM-80",
-          "MM-113"
+          "MM-113",
+          "MM-510"
         ]
       },
       "sequence": [
@@ -2006,7 +2018,8 @@
           "step": 5,
           "title": "Weight-loss medication support",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ],
           "milestone": "M4"
         }
@@ -2075,13 +2088,14 @@
           "MM-144",
           "MM-123",
           "MM-128",
-          "MM-130"
+          "MM-130",
+          "MM-129"
         ],
         "remaining": [
           "MM-119",
           "MM-122",
           "MM-124",
-          "MM-129",
+          "MM-480",
           "MM-137"
         ]
       },
@@ -2149,7 +2163,8 @@
           "step": 8,
           "title": "Lean-gain guardrails",
           "tickets": [
-            "MM-129"
+            "MM-129",
+            "MM-480"
           ],
           "milestone": "M4"
         }
@@ -2212,11 +2227,13 @@
           "MM-20",
           "MM-136",
           "MM-142",
-          "MM-155"
+          "MM-155",
+          "MM-34"
         ],
         "remaining": [
           "MM-15",
-          "MM-34",
+          "MM-501",
+          "MM-502",
           "MM-118",
           "MM-154",
           "MM-156",
@@ -2276,7 +2293,9 @@
           "step": 7,
           "title": "Body-fat range from the user's own measurements",
           "tickets": [
-            "MM-34"
+            "MM-34",
+            "MM-501",
+            "MM-502"
           ],
           "milestone": "M4"
         },
@@ -2411,6 +2430,7 @@
           "MM-151",
           "MM-152",
           "MM-167",
+          "MM-45",
           "MM-428",
           "MM-429"
         ],
@@ -2418,7 +2438,7 @@
           "MM-387",
           "MM-37",
           "MM-44",
-          "MM-45",
+          "MM-456",
           "MM-46",
           "MM-305",
           "MM-406"
@@ -2591,6 +2611,14 @@
           "title": "The camera on iOS (MM-406): a barcode read live with AVFoundation and a label read with Vision, on the device",
           "tickets": [
             "MM-406"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 14,
+          "title": "A recipe ingredient keeps the food it came from (MM-456), on the schema lane after MM-45",
+          "tickets": [
+            "MM-456"
           ],
           "milestone": "M4"
         }
@@ -3012,6 +3040,7 @@
         "built": [
           "MM-67",
           "MM-71",
+          "MM-72",
           "MM-188",
           "MM-395"
         ],
@@ -3022,8 +3051,9 @@
           "MM-70",
           "MM-441",
           "MM-442",
-          "MM-72",
+          "MM-516",
           "MM-73",
+          "MM-498",
           "MM-314",
           "MM-323"
         ]
@@ -3055,9 +3085,10 @@
         },
         {
           "step": 4,
-          "title": "History backfill on first connection",
+          "title": "History backfill on first connection, and keeping it through a re-read (MM-498)",
           "tickets": [
-            "MM-73"
+            "MM-73",
+            "MM-498"
           ],
           "milestone": "M3"
         },
@@ -3065,7 +3096,8 @@
           "step": 5,
           "title": "Background sync",
           "tickets": [
-            "MM-72"
+            "MM-72",
+            "MM-516"
           ],
           "milestone": "M4"
         },
@@ -3251,6 +3283,7 @@
           "MM-95",
           "MM-96",
           "MM-244",
+          "MM-454",
           "MM-247"
         ]
       },
@@ -3262,6 +3295,7 @@
             "MM-88",
             "MM-95",
             "MM-244",
+            "MM-454",
             "MM-247"
           ],
           "milestone": "M3"

@@ -85,8 +85,11 @@ to declare.
    left is step 12.
 3. **Health Connect (MM-68).** M3. Agree the workout table with WS-10 before
    importing sessions.
-4. **History backfill (MM-73).** M3.
-5. **Background sync (MM-72).** M4.
+4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
+   re-read after an expired token must keep it (MM-498).
+5. **Background sync (MM-72, MM-516).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening always reads,
+   coming back to the front reads once the last read is fifteen minutes old, one read at a time. The scheduled run while the
+   app is closed (MM-516) waits on a decision: WorkManager is not a dependency, and no web view runs the importer then.
 6. **Write nutrition (MM-70).** M4. Needs entries with real nutrient data
    (WS-08 step 4) to be worth doing.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
@@ -109,6 +112,8 @@ can run during group A.
 
 ## Requirement sources
 - Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
+- Added 2026-10-21 (step 5): MM-516 (the scheduled background run, split from MM-72).
+- Added 2026-10-21 (step 4): MM-498 (a re-read after an expired token keeps the history read by MM-73).
 - Added 2026-10-21 (step 12): MM-441 (a weigh-in window) and MM-442 (steps through the platform's aggregation), moved out of MM-71 when it was done.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).
 - Added 2026-10-14 (step 10): MM-323 (after Health Connect stops asking, say where to allow a kind).

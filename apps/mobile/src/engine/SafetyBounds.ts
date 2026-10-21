@@ -1,5 +1,6 @@
 import type { BiologicalSex } from '../domain/BiologicalSex';
 import type { CoachingPolicy } from '../domain/CoachingPolicy';
+import type { TrainingStatus } from '../domain/TrainingStatus';
 import { clamp } from '../lang/clamp';
 import type { GoalBodyFatCheck } from './GoalBodyFatCheck';
 import { ProteinRange } from './ProteinRange';
@@ -9,6 +10,14 @@ import type { ProteinTargets } from './ProteinTargets';
 const minEnergyAvailabilityKcalPerKgFfm = 30;
 const maxWeeklyTargetChangeKcal = 100;
 const maxWeeklyTargetChangeFraction = 0.05;
+
+/**
+ * The largest surplus, as a share of estimated expenditure (MM-129): more
+ * adds fat, not muscle, in trained lifters (Helms 2023). Novices, returning
+ * and untrained lifters gain lean mass faster, so theirs is wider.
+ */
+const maxSurplusFractionOfExpenditure = 0.1;
+const maxSurplusFractionForNovices = 0.15;
 
 /** Share of the weight above BMI 25 that counts toward `referenceWeightKg`. */
 const excessWeightFraction = 0.25;
@@ -53,6 +62,8 @@ export const SafetyBounds = {
   minEnergyAvailabilityKcalPerKgFfm,
   maxWeeklyTargetChangeKcal,
   maxWeeklyTargetChangeFraction,
+  maxSurplusFractionOfExpenditure,
+  maxSurplusFractionForNovices,
   excessWeightFraction,
   absoluteFloorKcal,
   energyAvailabilityThresholdPercent,
@@ -95,6 +106,16 @@ export const SafetyBounds = {
     if (bodyFatPercent < slowBelow) return 0.005;
     if (bodyFatPercent < moderateBelow) return 0.007;
     return 0.01;
+  },
+
+  /**
+   * The largest daily surplus over estimated expenditure, kcal (MM-129),
+   * whatever the percentage pace asks. It is on measured expenditure, so it
+   * rises when expenditure does.
+   */
+  maxSurplusKcal(trainingStatus: TrainingStatus, tdeeKcal: number): number {
+    const trained = trainingStatus === 'intermediate' || trainingStatus === 'advanced';
+    return (trained ? maxSurplusFractionOfExpenditure : maxSurplusFractionForNovices) * tdeeKcal;
   },
 
   /** Largest allowed change from last week's calorie target. */

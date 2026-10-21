@@ -18,6 +18,7 @@ import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
 import { waistChangeOf } from './waistChangeOf';
 import { WeekPatternRule } from './WeekPatternRule';
+import { WeighProteinRule } from './WeighProteinRule';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
 const mainMeals: readonly Meal[] = ['breakfast', 'lunch', 'dinner'];
@@ -131,6 +132,18 @@ export function findInsights({
   }
   if (judged >= minimum && met * 2 < judged) {
     add('proteinShort', { wholeDays: judged, metDays: met, averageShortfallG: shortfall / (judged - met) });
+  }
+
+  // Most protein on whole days was logged by palm, in a goal where protein
+  // matters (MM-46). Weighing food is not asked of a user with an
+  // eating-disorder history.
+  const goal = sorted[sorted.length - 1]?.mode;
+  if (!limitToProteinAndLogging && whole.length >= minimum && goal !== undefined && WeighProteinRule.modes.includes(goal)) {
+    const protein = whole.reduce((s, d) => s + d.proteinG, 0);
+    const byPalm = whole.reduce((s, d) => s + d.proteinG * d.palmProteinShare, 0);
+    if (protein > 0 && byPalm / protein > WeighProteinRule.palmProteinShare) {
+      add('weighProtein', { wholeDays: whole.length, palmProteinShare: byPalm / protein });
+    }
   }
 
   // Known sodium over the limit on more than half of the whole days since it

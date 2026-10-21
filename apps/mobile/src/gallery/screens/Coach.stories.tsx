@@ -15,8 +15,11 @@ import { failingRead } from './failingRead';
 import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
+import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
+import { liftsFallingScenario } from './liftsFallingScenario';
+import { missedPeriodScenario } from './missedPeriodScenario';
 import { shortSleepScenario } from './shortSleepScenario';
 import { breakOfferScenario } from './breakOfferScenario';
 import { onBreakScenario } from './onBreakScenario';
@@ -99,6 +102,19 @@ export const RecoveryCheckIn = screenStory({
   open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
 });
 
+/** MM-116: a previously regular cycle with no period marked for 46 days: the check-in asks once, and "not sure" on a cut brings the notice. */
+export const RecoveryCheckInMissedPeriod = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'No period marked for 46 days. Is that expected?',
+  scenario: missedPeriodScenario,
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+  walk: async (canvas) => {
+    const button = await within(canvas).findByRole('button', { name: 'Not sure' }, { timeout: 5000 });
+    reveal(button);
+    await userEvent.click(button);
+  },
+});
+
 /** Two sliders under their labels, at the screen's inset (MM-240). */
 export const Pause = screenStory({
   covers: ['PauseScreen'],
@@ -122,6 +138,33 @@ export const CoachFirstDay = screenStory({
   covers: ['CoachScreen'],
   shows: 'Targets are held while the coach learns.',
   scenario: firstDayScenario,
+  open: onCoach,
+});
+
+/** MM-34: no waist yet: the rough formula range, and what would narrow it. */
+export const CoachBodyFatRough = screenStory({
+  covers: ['CoachScreen'],
+  shows: /waist measurements within 4 weeks narrow this range\.$/,
+  scenario: firstDayScenario,
+  open: onCoach,
+});
+
+/** MM-34: four weekly waist entries: the range from the tape and the formula, and what it cannot say. */
+export const CoachBodyFatFromWaist = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^From your height, weight and waist\./,
+  open: onCoach,
+});
+
+/** MM-34: an eating-disorder history: the rough range, and no ask to measure more. */
+export const CoachBodyFatRoughEatingDisorder = screenStory({
+  covers: ['CoachScreen'],
+  shows: /\(rough estimate\)$/,
+  scenario: async (repos, today) => {
+    const setup = typicalSetup({ goalMode: 'maintenance', onboardedOn: today, healthCheckConfirmedOn: today });
+    await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, eatingDisorderHistory: true }) }));
+    await repos.weights.saveWeight(today, 86);
+  },
   open: onCoach,
 });
 
@@ -306,6 +349,14 @@ export const CoachReliefOffer = screenStory({
   open: onCoach,
 });
 
+/** MM-117: nine weeks into a cut, the squat and the row down over three weeks with no check-in answered: the offer for the lifts. */
+export const CoachReliefOfferLifts = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your lifts are falling',
+  scenario: liftsFallingScenario,
+  open: onCoach,
+});
+
 /**
  * MM-135: twelve unbroken weeks of a cut with recovery fine: the same card as the relief offer, with the
  * calendar, offering the two-week break or carrying on; no slower pace, since the answer here is a rest.
@@ -347,6 +398,23 @@ export const CoachRecompReview = screenStory({
   covers: ['CoachScreen'],
   shows: /^Recomp review, week/,
   scenario: recompScenario,
+  open: onCoach,
+});
+
+/** MM-129: ten weeks of lean gain, waist up 4 cm on 3 kg, lifts flat: fat-heavy, strength flat, and a goal offered. */
+export const CoachLeanGainFatHeavy = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The gain looks fat-heavy/,
+  scenario: leanGainScenario({ bodyFatPercent: 15 }),
+  open: onCoach,
+  walk: pressOnCoach('Choose a goal'),
+});
+
+/** MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. */
+export const CoachLeanGainTimeToStop = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The coach recommends ending the gain now/,
+  scenario: leanGainScenario(),
   open: onCoach,
 });
 

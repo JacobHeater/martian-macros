@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { ExternalLinks } from '../domain/integration/ExternalLinks';
 import type { Platform } from '../domain/integration/Platform';
 import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
 import type { ExactAlarms } from '../domain/integration/ExactAlarms';
@@ -32,6 +33,8 @@ import type { PackFileFetch } from '../foodCatalog/download/PackFileFetch';
 import type { PackHttp } from '../foodCatalog/download/PackHttp';
 import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
+import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
+import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { Watched } from '../lang/Watched';
@@ -71,7 +74,7 @@ export interface AppServices {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
-  readonly healthSamples: HealthSampleStore;
+  readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
   /** Puts a backup in place of this phone's data (MM-63). */
@@ -120,7 +123,7 @@ export interface AppServices {
   readonly exactAlarms: ExactAlarms;
 
   /** The phone's health platform (MM-68). The app only reads from it. */
-  readonly healthSource: HealthSource;
+  readonly healthSource: HealthSource & HealthHistoryAccess;
 
   /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
   readonly evidence: () => Promise<string>;
@@ -133,4 +136,7 @@ export interface AppServices {
 
   /** How the end of a rest is signalled (MM-191). */
   readonly restSignal: RestSignal;
+
+  /** The phone's browser, handed an address when the person presses a link (MM-454). The app fetches nothing itself. */
+  readonly externalLinks: ExternalLinks;
 }

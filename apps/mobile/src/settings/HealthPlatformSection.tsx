@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { HealthBackfill } from '../healthIngest/HealthBackfill';
 import { healthSourceName } from '../healthIngest/healthSourceName';
 import { healthDataTypeLabel } from '../format/healthDataTypeLabel';
 import { healthDataTypePurpose } from '../format/healthDataTypePurpose';
@@ -80,7 +81,7 @@ export function HealthPlatformSection() {
    * leaves what is kept as it was, and says so.
    */
   const read = async (allowed?: HealthDataType): Promise<boolean> => {
-    if (await state.syncHealth()) return true;
+    if (await state.syncHealth('asked')) return true;
     // An allowing whose first read fails still says it was allowed (the panel's UX-11).
     const first = allowed === undefined ? name : `${healthDataTypeLabel(allowed)} ${ios ? 'asked for' : 'allowed'}, but ${name}`;
     overlays.snack(`${first} could not be read just now. Nothing was changed.`);
@@ -106,6 +107,10 @@ export function HealthPlatformSection() {
       overlays.snack(`${label} was not allowed. You can allow it here, or in ${name}, whenever you like.`);
       return;
     }
+    // The history is asked for with the first kind it is read for, and only
+    // then (MM-73). Refused, the window the platform allows is read and
+    // nothing more is said about it.
+    if (HealthBackfill.types.includes(type)) await services.healthSource.requestHistory().catch(() => false);
     // The row stops being a button, so what happened is said (the panel's UX-3).
     if (!(await read(type))) return;
     if (!ios) {
