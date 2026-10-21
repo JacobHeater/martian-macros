@@ -65,4 +65,12 @@ export const HealthConnectSegment = {
   platformName(segment: HealthConnectSegment): string {
     return segments[segment][1];
   },
+
+  /**
+   * The segment type Health Connect stores as `id`, or undefined for one a
+   * strength session does not name (a pause, a rest, an unknown type).
+   */
+  fromPlatformId(id: number): HealthConnectSegment | undefined {
+    return (Object.keys(segments) as HealthConnectSegment[]).find((segment) => segments[segment][0] === id);
+  },
 } as const;

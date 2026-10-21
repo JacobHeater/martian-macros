@@ -1,8 +1,8 @@
 ---
 id: MM-189
-status: proposed
+status: in-progress
 component: training
-related: [MM-66, MM-68, MM-69, MM-70, MM-74, MM-75, MM-76, MM-77, MM-188, MM-191]
+related: [MM-66, MM-68, MM-69, MM-70, MM-74, MM-75, MM-76, MM-77, MM-188, MM-191, MM-489, MM-490]
 ---
 
 # Story: Workouts that line up with the health platforms, with a fallback
@@ -92,3 +92,23 @@ Scenario: Writing is separate permission
   tested against a fake on Windows.
 - The training log's own list and muscle taxonomy (MM-76) are the app's; the mapping adds to them and never constrains them.
 - Not planned: reading a watch's heart-rate or calories for a workout.
+- **Built (2026-10-21), the rules and the seam, with no phone:** the mapping was already the library's data (`healthConnect` on
+  each built-in exercise). Added `HealthWorkoutReader` and `HealthWorkoutWriter` (`domain/integration/`), the shapes
+  `PlatformWorkout`, `PlatformWorkoutSegment` and `WorkoutForPlatform` (`domain/training/`), and in the engine
+  `workoutForPlatform` (export), `workoutFromPlatform` (import, with `Exercise.otherId` for "Other exercise"),
+  `segmentExerciseId` (a segment's anchor exercise) and `writeWorkoutToPlatform` (nothing written without write permission).
+  `InMemoryHealthWorkouts` (fixture) and `NoHealthWorkouts` (`platform/`) are held to `healthWorkoutReaderContract` and
+  `healthWorkoutWriterContract`; the scenarios above are `test/engine/platformWorkouts.test.ts`. Not run locally; CI validates.
+- **Still to do:** the shells' native reading and writing (MM-489) and the app's use of it: the write switch, writing on finish,
+  importing into the log with a stored platform id, and "Other exercise" on the Train screens (MM-490).
+
+Choices I made without asking while building (say if any is wrong):
+- **Not written twice is kept by an id the app gives each workout it writes** (`martian-macros-workout-<id>`, the platform's
+  client record id), so no stored column is needed to recognize the app's own; a re-import of someone else's workout needs its
+  platform id stored, which is MM-490.
+- **Back-to-back segments of one movement import as one exercise with several sets**; a pause or rest segment is not an
+  exercise. Where the platform gives no repetitions or weight the set has 0 of each, for the user to edit.
+- **A segment imports as its movement's anchor**: the first built-in exercise that maps to it (a bench press segment is a barbell
+  bench press). The one-sided curl and triceps segments import as MM-188 says. A custom exercise is never an anchor.
+- **A set that overlaps one already written is left out of the segments**, since the platform refuses overlapping segments.
+- **The shells use the app's own `MmHealth` plugin, not the `health` package**, as they already do for reading (MM-489).

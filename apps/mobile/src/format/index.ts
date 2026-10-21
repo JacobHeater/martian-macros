@@ -4,6 +4,8 @@
  * `format` folder of the Flutter app.
  */
 export * from './adherenceLines';
+export * from './bodyFatNote';
+export * from './bodyFatRangeText';
 export * from './cautionMessage';
 export * from './clockTimeText';
 export * from './coachLineText';

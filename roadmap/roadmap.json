@@ -758,6 +758,8 @@
             "MM-118",
             "MM-156",
             "MM-34",
+            "MM-501",
+            "MM-502",
             "MM-157"
           ]
         },
@@ -837,6 +839,8 @@
             "MM-195",
             "MM-79",
             "MM-189",
+            "MM-489",
+            "MM-490",
             "MM-191",
             "MM-196"
           ]
@@ -2210,11 +2214,13 @@
           "MM-20",
           "MM-136",
           "MM-142",
-          "MM-155"
+          "MM-155",
+          "MM-34"
         ],
         "remaining": [
           "MM-15",
-          "MM-34",
+          "MM-501",
+          "MM-502",
           "MM-118",
           "MM-154",
           "MM-156",
@@ -2274,7 +2280,9 @@
           "step": 7,
           "title": "Body-fat range from the user's own measurements",
           "tickets": [
-            "MM-34"
+            "MM-34",
+            "MM-501",
+            "MM-502"
           ],
           "milestone": "M4"
         },
@@ -2374,6 +2382,7 @@
           "MM-326",
           "MM-327",
           "MM-328",
+          "MM-329",
           "MM-358",
           "MM-359",
           "MM-369",
@@ -2418,7 +2427,6 @@
           "MM-45",
           "MM-46",
           "MM-305",
-          "MM-329",
           "MM-406"
         ]
       },
@@ -2885,6 +2893,8 @@
         "remaining": [
           "MM-74",
           "MM-189",
+          "MM-489",
+          "MM-490",
           "MM-191",
           "MM-447"
         ]
@@ -2938,7 +2948,9 @@
           "step": 6,
           "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
           "tickets": [
-            "MM-189"
+            "MM-189",
+            "MM-489",
+            "MM-490"
           ],
           "milestone": "M4"
         },
