@@ -1,6 +1,6 @@
 ---
 id: MM-191
-status: in-progress
+status: done
 component: training
 related: [MM-74, MM-75, MM-146, MM-188, MM-189]
 ---
@@ -175,9 +175,12 @@ Not built:
 - **A sound at the end of a rest.** Closed by the owner's decision below: vibration only.
 - A signal when the app is in the background (MM-146's scheduler), and a rest length typed freely.
 - The paused bar and "Edit times" wait on the owner in MM-447.
-- Seen on the Android emulator (2026-10-11, the Flutter app): choosing a target, the countdown, the bar at the target, and the
-  time entry. Owed on a phone with the React app: the vibration felt at the target, the bar with a screen reader (the label said
-  when it changes, not the figure every second), and the clock entry of the workout's times.
+
+Done (2026-10-21): every scenario is built and tested. What is not built is closed or another ticket's: the sound by the
+owner's decision; a signal while the app is in the background and a freely typed rest length are later steps by the
+Decisions above (the background signal goes through MM-146's scheduler); the paused bar and "Edit times" are MM-447.
+Seen on the Android emulator (2026-10-11, the Flutter app): choosing a target, the countdown, the bar at the target, and
+the time entry.
 
 ## Notes
 - Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
@@ -186,3 +189,8 @@ Not built:
 
 ## Decision (2026-10-13)
 - **Vibration only.** The product owner chose no sound at the end of a rest: no audio dependency, nothing to silence in a gym. The open question above is closed.
+
+## Owed on a phone
+- The vibration is felt once at the target rest, with the React app.
+- With a screen reader, the bar's label is said when it changes, not the figure every second.
+- The clock entry of a workout's times, typed to the second.

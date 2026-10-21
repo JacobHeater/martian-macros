@@ -1,6 +1,6 @@
 ---
 id: MM-44
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-38, MM-43, MM-45, MM-53]
 ---
@@ -62,3 +62,28 @@ Not built or not verified: the real camera and ML Kit have not been run on the e
 real photographs is unknown; panels whose labels and values sit in separate columns are not read; sugars and saturated fat are not
 read (a saved food has no place for them yet); unsure fields are not individually marked, only the calories-versus-macros check and
 the missing-fields note; the iOS build with ML Kit is untried; contributing to Open Food Facts is undecided.
+
+Built (2026-10-21, React app): **columnar panels and per-field unsure marks.** `readLabelColumns` reads a panel whose
+labels and values the recogniser returned in separate columns: a run of three or more label lines, then the value
+lines, paired in order with percent-only lines set aside. It pairs only when the two runs are the same length; a column
+it cannot line up is not read at all, and the plain read is kept from taking the number under its last label. A value
+whose printed unit does not fit its label (fat in mg) is left empty. `LabelReading.unsure` names the numbers to check:
+a value paired by position, a digit repaired from a look-alike letter, more grams of a nutrient than the serving
+weighs, or more energy than pure fat could give. The saved-food form says "Unsure: check it" under each marked field,
+in the warning style, until that field is changed, and the note says marked numbers were hard to read. Sugars and
+saturated fat are read and saved through the food's nutrients (MM-309), so they need no schema change. Tests:
+`parseNutritionLabel.test.ts` ("a panel read in two columns", "unsure marks"), `labelRead.test.tsx` ("a panel read in
+columns fills the form with each number marked unsure until changed"); story `Food/NewOwnFoodLabelUnsure`. Not run
+locally; CI validates.
+
+Choices I made without asking (say if any is wrong):
+- **A column is three or more labels in a row**, so a label with its value on the next line is still read as before.
+- **Only position-paired, repaired or impossible numbers are marked.** Calories that disagree with the macros keep
+  their own warning (MM-53), which says more than "unsure".
+
+Elsewhere: the iOS build of the label reader is MM-406. Contributing a food to Open Food Facts stays undecided (Notes);
+it is not part of this story's acceptance criteria and needs its own ticket if the owner wants it.
+
+## Owed on a phone
+- A real Nutrition Facts panel photographed with the camera and read by ML Kit on the Android emulator or a phone: how
+  well the parser and the column reader cope with real photographs.
