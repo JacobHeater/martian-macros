@@ -36,13 +36,16 @@ export function RemindersSection() {
 
   // Asked once, with its reason before the phone's own page; nothing waits on the answer (MM-248).
   const askForTheMinute = async () => {
-    const allow = await overlays.confirm({
+    // Two real answers, neither destructive; closing it is "Not now".
+    const allow = await overlays.choice({
       title: 'Reminders on the minute',
       message: 'So a reminder arrives at the time you set.',
-      confirmLabel: 'Open phone settings',
-      cancelLabel: 'Not now',
+      primaryLabel: 'Open phone settings',
+      primary: true,
+      secondaryLabel: 'Not now',
+      secondary: false,
     });
-    await (allow ? services.exactAlarms.openSetting() : services.exactAlarms.notNow());
+    await (allow === true ? services.exactAlarms.openSetting() : services.exactAlarms.notNow());
     setAnswers((count) => count + 1);
   };
 
@@ -71,6 +74,7 @@ export function RemindersSection() {
         }),
       }),
     );
+    if ((await services.exactAlarms.timing()) === 'notAsked') await askForTheMinute();
   };
 
   const changeTime = async (setting: ReminderSetting) => {
