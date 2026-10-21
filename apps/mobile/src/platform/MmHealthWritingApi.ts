@@ -1,12 +1,12 @@
 import type { MmHealthNutrition } from './MmHealthNutrition';
 
 /**
- * The health plugin's writing (MM-70, MM-314, MM-489). Each kind ("food",
- * "water", "workouts") is turned on by itself, which asks the platform for
- * that kind's write permission alone; the plugin keeps in its own
- * preferences which are on. It writes a kind only while that kind is on
- * and permitted, and only ever changes or removes the app's own records,
- * found by the app's id for them.
+ * The health plugin's writing (MM-70, MM-314, MM-513, MM-489). Each kind
+ * ("food", "water", "weight", "workouts") is turned on by itself, which
+ * asks the platform for that kind's write permission alone; the plugin
+ * keeps in its own preferences which are on. It writes a kind only while
+ * that kind is on and permitted, and only ever changes or removes the
+ * app's own records, found by the app's id for them.
  */
 export interface MmHealthWritingApi {
   /** Of `kinds`, those on and permitted now. */
@@ -18,6 +18,14 @@ export interface MmHealthWritingApi {
   /** Turns `kind` off. Nothing on the platform is changed. */
   stopWriting(options: { kind: string }): Promise<{ on: boolean }>;
 
+  /**
+   * Removes every record of `kind` the app wrote whose id starts with
+   * `prefix` (MM-514), under any namespace, and nothing another app wrote.
+   * Needs `kind`'s write permission, not `kind` on; without it nothing is
+   * removed and `removed` is false. A prefix not the app's own is refused.
+   */
+  removeWritten(options: { kind: string; prefix: string }): Promise<{ removed: boolean }>;
+
   /** The namespace every id the app writes carries (MM-522), made once and kept in the plugin's preferences. */
   writeNamespace(): Promise<{ namespace: string }>;
 
@@ -28,4 +36,7 @@ export interface MmHealthWritingApi {
   removeNutrition(options: { id: string }): Promise<{ removed: boolean }>;
   writeWater(options: { id: string; atMs: number; ml: number }): Promise<{ written: boolean }>;
   removeWater(options: { id: string }): Promise<{ removed: boolean }>;
+  /** A weigh-in typed in the app (MM-513), in kilograms at the moment it is said to be from. */
+  writeWeight(options: { id: string; atMs: number; kg: number }): Promise<{ written: boolean }>;
+  removeWeight(options: { id: string }): Promise<{ removed: boolean }>;
 }

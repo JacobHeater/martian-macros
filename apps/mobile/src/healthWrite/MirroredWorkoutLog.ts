@@ -5,6 +5,7 @@ import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository
 import { builtInExercises } from '../domain/training/builtInExercises';
 import type { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
+import { workoutClientIdPrefix } from '../engine/workoutClientIdPrefix';
 import { writeWorkoutToPlatform } from '../engine/writeWorkoutToPlatform';
 import type { Watched } from '../lang/Watched';
 import { namespacedWorkoutId } from './namespacedWorkoutId';
@@ -36,7 +37,9 @@ function now<T>(watched: Watched<T>): Promise<T> {
  * a finished one is changed, so the platform holds one workout for it. A
  * workout in progress is never written. The app's log is saved first and is
  * the same whatever the platform does; writing only happens while writing
- * workouts is on (`writeWorkoutToPlatform`).
+ * workouts is on (`writeWorkoutToPlatform`). A workout deleted in the app
+ * is removed from the platform, only while writing workouts is on
+ * (MM-515).
  */
 export class MirroredWorkoutLog implements WorkoutRepository {
   private readonly log: WorkoutRepository;
@@ -72,8 +75,20 @@ export class MirroredWorkoutLog implements WorkoutRepository {
     return id;
   }
 
-  deleteWorkout(id: number): Promise<void> {
-    return this.log.deleteWorkout(id);
+  async deleteWorkout(id: number): Promise<void> {
+    await this.log.deleteWorkout(id);
+    await this.removed(id);
+  }
+
+  /** Removes what was written for the workout `id` under this run's namespace; a platform that fails changes nothing here. */
+  private async removed(id: number): Promise<boolean> {
+    try {
+      if (!(await this.platform.writePermitted())) return false;
+      const namespace = await this.ids.writeNamespace();
+      return await this.platform.removeWorkout(namespacedWorkoutId(`${workoutClientIdPrefix}${id}`, namespace));
+    } catch {
+      return false;
+    }
   }
 
   private async written(workout: Workout): Promise<boolean> {
@@ -91,6 +106,7 @@ export class MirroredWorkoutLog implements WorkoutRepository {
         requestWritePermission: () => platform.requestWritePermission(),
         writeWorkout: (written) =>
           platform.writeWorkout({ ...written, clientId: namespacedWorkoutId(written.clientId, namespace) }),
+        removeWorkout: (clientId) => platform.removeWorkout(namespacedWorkoutId(clientId, namespace)),
       };
       return await writeWorkoutToPlatform(namespaced, workout, (exerciseId) => exercises.get(exerciseId));
     } catch {

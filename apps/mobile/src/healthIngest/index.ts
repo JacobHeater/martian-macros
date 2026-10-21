@@ -6,6 +6,7 @@
  * `testing/` holds stand-ins for a platform and its store, for tests and
  * demos; never the user's real data.
  */
+export * from './BodyWeightRecord';
 export * from './byStartThenId';
 export * from './dailyWeighIns';
 export * from './DaySteps';
@@ -22,6 +23,8 @@ export * from './HealthImporter';
 export * from './HealthImportResult';
 export * from './HealthImportStatus';
 export * from './HealthIntakeWriter';
+export * from './HealthPermissionsPlace';
+export * from './HealthWeightWriter';
 export * from './HealthReadFailure';
 export * from './HealthSample';
 export * from './HealthSampleStore';
@@ -30,6 +33,7 @@ export * from './HealthSyncReason';
 export * from './HealthSyncSchedule';
 export * from './HealthWriteKind';
 export * from './HealthWriteNamespace';
+export * from './healthWritePrefix';
 export * from './HealthWriting';
 export * from './NightOfSleep';
 export * from './localMidnight';

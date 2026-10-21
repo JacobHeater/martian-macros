@@ -89,6 +89,28 @@ it('refusing a kind leaves it not allowed and says how to allow it later', async
   expect(await stored('weight')).toEqual([]);
 });
 
+it('once Health Connect stops asking for a kind, it says to allow it there and opens it (MM-323)', async () => {
+  source.stopsAsking = new Set<HealthDataType>(['weight']);
+  const settings = await open();
+  await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
+  expect(await screen.findByText('Health Connect no longer asks for weight here. You can allow it in Health Connect instead.')).toBeInTheDocument();
+  // Not "You can allow it here": that would send the person round in a circle.
+  expect(screen.queryByText(/You can allow it here/)).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Open Health Connect' }));
+  await expect.poll(() => source.permissionsOpened).toBe(1);
+  // Nothing was allowed there, so the row still offers it.
+  expect(row(settings, 'Weight')).toHaveTextContent('Not allowed.');
+});
+
+it('where Health Connect cannot be opened, it says where to allow the kind instead (MM-323)', async () => {
+  source.stopsAsking = new Set<HealthDataType>(['weight']);
+  source.opensPermissions = false;
+  const settings = await open();
+  await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Open Health Connect' }));
+  expect(await screen.findByText(/Health Connect could not be opened from here\./)).toBeInTheDocument();
+});
+
 it('reading again brings an edit and a deletion made since', async () => {
   const settings = await open();
   await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));

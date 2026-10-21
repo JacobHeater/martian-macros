@@ -15,6 +15,7 @@ import { failingRead } from './failingRead';
 import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
+import { healthPlatform } from './healthPlatform';
 import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
@@ -175,6 +176,60 @@ export const CoachPhaseProjected = screenStory({
   covers: ['CoachScreen'],
   shows: 'Projected end',
   open: onCoach,
+});
+
+/** MM-523: weigh-ins on Health Connect and not allowed, few typed: beside the trend, what that costs, and where to allow them. */
+export const CoachWeighInsGap = screenStory({
+  covers: ['CoachScreen'],
+  shows: /your trend and the dates it projects are less certain/,
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/your trend and the dates it projects are less certain/, undefined, { timeout: 5000 }));
+  },
+});
+
+/** MM-523: "Open Settings" beside the weigh-ins gap opens Settings at Health Connect, where Weight is allowed. */
+export const CoachWeighInsGapOpensSettings = screenStory({
+  covers: ['CoachScreen', 'SettingsScreen'],
+  shows: /Nothing read leaves this phone/,
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: pressOnCoach('Open Settings: Health Connect'),
+});
+
+/** MM-523: the weigh-ins gap dismissed: it goes, and does not come back for that gap. */
+export const CoachWeighInsGapDismissed = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Trend weight',
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: pressOnCoach('Got it: weigh-ins'),
+});
+
+/** MM-523: the history refused (MM-73): beside the expenditure estimate, that it has less to go on, and where to allow it. */
+export const CoachHistoryGap = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Allowing past data in Health Connect would give it more/,
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true }),
+  open: onCoach,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Allowing past data in Health Connect/, undefined, { timeout: 5000 }));
+  },
+});
+
+/** MM-523, MM-323: "Open Health Connect" where it cannot be opened: a snack says where to allow it instead. */
+export const CoachHistoryGapCannotOpen = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Health Connect could not be opened from here/,
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true, opensPermissions: false }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
 });
 
 /** MM-36: a man cut to 12%: the cut has ended, and the coach recommends maintenance, then a lean gain, with why. */
@@ -541,6 +596,41 @@ export const MonthlyReportWithRecords = screenStory({
       await userEvent.click(row);
     }
   },
+});
+
+/**
+ * A month in, with weekly waist entries from three weeks before it to its last week and weigh-ins from a month
+ * before it: a body-fat range from the waist had settled at both ends of the month (MM-450).
+ */
+const waistMonthScenario =
+  ({ eatingDisorderHistory = false }: { eatingDisorderHistory?: boolean } = {}): StoryScenario =>
+  async (repos, today) => {
+    const onboardedOn = today.addDays(-31);
+    await monthInScenario(repos, today);
+    if (eatingDisorderHistory) {
+      const setup = typicalSetup({ onboardedOn, healthCheckConfirmedOn: today });
+      await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, eatingDisorderHistory: true }) }));
+    }
+    for (let day = 60; day > 31; day -= 3) await repos.weights.saveWeight(today.addDays(-day), 88.5 - (60 - day) * 0.02);
+    for (const day of [-21, -14, -7, 6, 13, 20, 27]) {
+      await repos.waist.saveWaist(onboardedOn.addDays(day), 93 - day * 0.03, { readings: [93, 93, 93] });
+    }
+  };
+
+/** MM-450: the report's body fat, the range at the end of the month and the range when it began. */
+export const MonthlyReportBodyFat = screenStory({
+  covers: ['MonthlyReportScreen'],
+  shows: /when the month began; a tape narrows the range/,
+  scenario: waistMonthScenario(),
+  open: ({ navigator }) => void navigator.push(() => <MonthlyReportScreen index={0} />),
+});
+
+/** MM-450: an eating-disorder history: the range at the end of the month only, no change in body fat. */
+export const MonthlyReportBodyFatEatingDisorder = screenStory({
+  covers: ['MonthlyReportScreen'],
+  shows: /^At the end of the month; a tape narrows the range/,
+  scenario: waistMonthScenario({ eatingDisorderHistory: true }),
+  open: ({ navigator }) => void navigator.push(() => <MonthlyReportScreen index={0} />),
 });
 
 /** MM-321: the one thing to do is this week's check-in, and it opens. */

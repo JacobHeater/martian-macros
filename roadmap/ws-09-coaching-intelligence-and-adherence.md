@@ -121,6 +121,7 @@ the trial is timed to end after the first monthly report.
 8. **Protein across meals; phase planning (MM-125, MM-36, MM-507, MM-450).** M4. Phase
    planning's projections are fiction without the body-fat estimate from
    WS-07 step 7, and the report's body-fat range (MM-450) waits for it too.
+   MM-450 done 2026-10-21: the range from the waist at each end of the month.
 - Also placed 2026-10-13 in earlier steps: step 3: MM-168.
 13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests.
 
@@ -156,7 +157,8 @@ independent of step 3.
   place in the target-change summary), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
   break, a slower pace, or carry on; not the pace names, and not checked on a device), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
-  and the month's personal records; body fat is MM-450, photos MM-157), MM-92 (the logging streak, forgiving one missed
+  and the month's personal records; photos MM-157), MM-450 (the body-fat range from the waist in the report, at the end
+  of the month and when it began, as it stood then; no change with an eating-disorder history), MM-92 (the logging streak, forgiving one missed
   day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).
 - Remaining: MM-133, MM-32, MM-36, MM-507. Epic: MM-145.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).

@@ -21,8 +21,8 @@ whom:
 - `data/` SQL repositories over `SqlDatabase` (see `src/data/AGENTS.md`);
 - `format/` labels and text;
 - `platform/` the shell's plugins behind interfaces;
-- `healthWrite/` the food, water and workout logs, told to the health platform
-  as they change (MM-70, MM-314, MM-489);
+- `healthWrite/` the food, water, weight and workout logs, told to the health
+  platform as they change (MM-70, MM-314, MM-513, MM-489);
 - `state/` cells and controllers; then the screen folders.
 
 `src/ui/` is the design-system library: screens use it, never raw HTML

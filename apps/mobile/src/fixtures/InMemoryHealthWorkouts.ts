@@ -82,4 +82,13 @@ export class InMemoryHealthWorkouts implements HealthWorkoutReader, HealthWorkou
     });
     return Promise.resolve(true);
   }
+
+  /** Removes only what this app wrote under `clientId` (MM-515); a workout from another app is never reached. */
+  removeWorkout(clientId: string): Promise<boolean> {
+    if (!this.writeGranted) return Promise.resolve(false);
+    for (const [platformId, workout] of this.held) {
+      if (workout.clientId === clientId && workout.sourceId === InMemoryHealthWorkouts.appSourceId) this.held.delete(platformId);
+    }
+    return Promise.resolve(true);
+  }
 }

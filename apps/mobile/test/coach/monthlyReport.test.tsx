@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { ExplanationLine } from '../../src/engine/ExplanationLine';
 import { TargetsExplanation } from '../../src/engine/TargetsExplanation';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
@@ -215,4 +216,42 @@ it('nothing in a report grades or praises', async () => {
   for (const word of ['score', 'grade', 'great', 'well done', 'good job', 'lowest', 'on track', 'cheat', 'under target']) {
     expect(all, word).not.toContain(word);
   }
+});
+
+/** MM-450: weekly waist entries from three weeks before the month, and weigh-ins from a month before. */
+async function measuredWaist({ eatingDisorderHistory = false }: { eatingDisorderHistory?: boolean } = {}): Promise<void> {
+  await seed({ daysSinceOnboarding: 28 });
+  if (eatingDisorderHistory) {
+    await repos.setup.saveSetup(
+      typicalSetup({
+        onboardedOn: onboarded,
+        healthCheckConfirmedOn: onboarded,
+        screening: new ScreeningAnswers({ eatingDisorderHistory: true }),
+      }),
+    );
+  }
+  for (let d = -30; d < 0; d += 2) await repos.weights.saveWeight(onboarded.addDays(d), 90.5);
+  for (const d of [-21, -14, -7, 6, 13, 20, 27]) await repos.waist.saveWaist(onboarded.addDays(d), 92, { readings: [92, 92, 92] });
+}
+
+it('a month with no waist entries says nothing about body fat (MM-450)', async () => {
+  await seed({ daysSinceOnboarding: 28 });
+  await openFirstReport(onboarded.addDays(28));
+  expect(shown()).not.toContain('Body fat');
+});
+
+it('a settled range from the waist is shown as a range, at the end of the month and when it began (MM-450)', async () => {
+  await measuredWaist();
+  await openFirstReport(onboarded.addDays(28));
+  expect(within(topLayer()).getByText('Body fat')).toBeInTheDocument();
+  expect(within(topLayer()).getByText(/^\d+–\d+% \(from your waist\)$/)).toBeInTheDocument();
+  expect(shown()).toMatch(/\d+–\d+% when the month began;/);
+});
+
+it('with an eating-disorder history the report shows no change in body fat (MM-450)', async () => {
+  await measuredWaist({ eatingDisorderHistory: true });
+  await openFirstReport(onboarded.addDays(28));
+  expect(within(topLayer()).getByText(/^\d+–\d+% \(from your waist\)$/)).toBeInTheDocument();
+  expect(shown()).toContain('At the end of the month;');
+  expect(shown()).not.toContain('when the month began');
 });

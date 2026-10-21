@@ -1,4 +1,5 @@
 import type { RecompReview } from './RecompReview';
+import type { ReportBodyFat } from './ReportBodyFat';
 import type { ReportEstimate } from './ReportEstimate';
 import type { ReportEstimateGap } from './ReportEstimateGap';
 import type { ReportLift } from './ReportLift';
@@ -18,6 +19,7 @@ interface MonthlyReportInit {
   averageProteinG?: number | undefined;
   averageProteinTargetG?: number | undefined;
   waistChange?: WaistChange | undefined;
+  bodyFat?: ReportBodyFat | undefined;
   estimate?: ReportEstimate | undefined;
   estimateGap?: ReportEstimateGap | undefined;
   workouts?: number;
@@ -73,6 +75,14 @@ export class MonthlyReport {
   readonly waistChange: WaistChange | undefined;
 
   /**
+   * The body-fat range from the user's measurements (MM-450), at the end
+   * of the month and, when one had settled then, at its start. Undefined
+   * until a range from the waist has settled: the report then says
+   * nothing about body fat.
+   */
+  readonly bodyFat: ReportBodyFat | undefined;
+
+  /**
    * The expenditure estimate the month ended on, or undefined with
    * `estimateGap` saying why.
    */
@@ -115,6 +125,7 @@ export class MonthlyReport {
     this.averageProteinG = init.averageProteinG;
     this.averageProteinTargetG = init.averageProteinTargetG;
     this.waistChange = init.waistChange;
+    this.bodyFat = init.bodyFat;
     this.estimate = init.estimate;
     this.estimateGap = init.estimateGap;
     this.workouts = init.workouts ?? 0;

@@ -1,7 +1,11 @@
 package com.martianmacros
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.SystemClock
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -19,6 +23,7 @@ import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
+import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
@@ -53,12 +58,14 @@ import kotlin.reflect.KClass
  * is rejected, never answered with nothing.
  *
  * It writes only what the user turned on in Settings (MM-70, MM-314,
- * MM-489): food, water and finished workouts, each with its own write
- * permission, never asked for with reading. Which kinds are on is kept in
- * this plugin's preferences. Every record it writes carries the app's own
- * id as its client record id, so writing again replaces it and removing it
- * removes only the app's own record. What the app wrote is never read back
- * as a reading.
+ * MM-513, MM-489): food, water, typed weight and finished workouts, each
+ * with its own write permission, never asked for with reading. Which kinds
+ * are on is kept in this plugin's preferences. Every record it writes
+ * carries the app's own id as its client record id, so writing again
+ * replaces it and removing it removes only the app's own record. What the
+ * app wrote is never read back as a reading. Turned off, a kind's records
+ * the app wrote can be removed, found by the app's prefix among its own
+ * (MM-514).
  */
 @CapacitorPlugin(name = "MmHealth")
 class MmHealthPlugin : Plugin() {
@@ -110,10 +117,11 @@ class MmHealthPlugin : Plugin() {
 
     private fun preferences() = context.getSharedPreferences("MmHealth", Context.MODE_PRIVATE)
 
-    /** What the app writes, by the name the app calls it, and the record Health Connect keeps it as (MM-70, MM-314, MM-489). */
+    /** What the app writes, by the name the app calls it, and the record Health Connect keeps it as (MM-70, MM-314, MM-513, MM-489). */
     private val writeTypes: Map<String, KClass<out Record>> = mapOf(
         "food" to NutritionRecord::class,
         "water" to HydrationRecord::class,
+        "weight" to WeightRecord::class,
         "workouts" to ExerciseSessionRecord::class,
     )
 
@@ -168,26 +176,70 @@ class MmHealthPlugin : Plugin() {
         call.resolve(JSObject().put("types", have))
     }
 
+    /** When the last request for read permissions was started (MM-323). */
+    private var requestStartedAt = 0L
+
+    /**
+     * An answer quicker than this came back without the question shown
+     * (MM-323): once a request has been refused more than twice, Health
+     * Connect answers at once and shows nothing. Nobody reads the question
+     * and answers it this fast.
+     */
+    private val unshownWithinMs = 800L
+
     @PluginMethod
     fun requestPermission(call: PluginCall) {
         val wanted = readPermissions(typeNames(call))
         if (wanted.isEmpty()) return call.resolve(JSObject().put("types", JSArray()))
         val contract = PermissionController.createRequestPermissionResultContract()
         val intent = contract.createIntent(context, wanted.values.toSet())
+        requestStartedAt = SystemClock.elapsedRealtime()
         startActivityForResult(call, intent, "permissionAnswered")
     }
 
     @ActivityCallback
     fun permissionAnswered(call: PluginCall?, result: ActivityResult) {
         if (call == null) return
+        val shown = SystemClock.elapsedRealtime() - requestStartedAt >= unshownWithinMs
         asked(call) {
             val granted = client().permissionController.getGrantedPermissions()
             val have = JSArray()
             for ((name, permission) in readPermissions(types.keys.toList())) {
                 if (granted.contains(permission)) have.put(name)
             }
-            call.resolve(JSObject().put("types", have))
+            call.resolve(JSObject().put("types", have).put("shown", shown))
         }
+    }
+
+    /**
+     * Opens Health Connect's screen of this app's permissions (MM-323),
+     * where a kind it no longer asks about, or the history (MM-73), is
+     * allowed: the app's own page on Android 14 and later, Health Connect's
+     * settings before. Answers once the person is back, or with `opened`
+     * false when neither opens.
+     */
+    @PluginMethod
+    fun openPermissions(call: PluginCall) {
+        val ownPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Intent("android.health.connect.action.MANAGE_HEALTH_PERMISSIONS")
+                .putExtra(Intent.EXTRA_PACKAGE_NAME, context.packageName)
+        } else {
+            null
+        }
+        for (intent in listOfNotNull(ownPage, Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))) {
+            try {
+                startActivityForResult(call, intent, "permissionsClosed")
+                return
+            } catch (missing: ActivityNotFoundException) {
+                // The next way in, if there is one.
+            }
+        }
+        call.resolve(JSObject().put("opened", false))
+    }
+
+    @ActivityCallback
+    fun permissionsClosed(call: PluginCall?, result: ActivityResult) {
+        call?.resolve(JSObject().put("opened", true))
     }
 
     /** Whether readings older than the thirty days before the first grant can be read (MM-73). */
@@ -507,6 +559,67 @@ class MmHealthPlugin : Plugin() {
     @PluginMethod
     fun removeWater(call: PluginCall) = removeOwn(call, "water", HydrationRecord::class)
 
+    /** Writes one weigh-in typed in the app (MM-513), at the moment it is said to be from, replacing what was written under its id. */
+    @PluginMethod
+    fun writeWeight(call: PluginCall) = asked(call) {
+        val id = call.getString("id") ?: return@asked call.reject("writeWeight needs an id.")
+        if (!writes("weight")) return@asked call.resolve(JSObject().put("written", false))
+        val at = Instant.ofEpochMilli(call.getLong("atMs") ?: 0L)
+        val record = WeightRecord(
+            time = at,
+            zoneOffset = offsetAt(at),
+            weight = Mass.kilograms(call.getDouble("kg") ?: 0.0),
+            metadata = ownedBy(id),
+        )
+        client().insertRecords(listOf(record))
+        call.resolve(JSObject().put("written", true))
+    }
+
+    @PluginMethod
+    fun removeWeight(call: PluginCall) = removeOwn(call, "weight", WeightRecord::class)
+
+    /** What every id the app writes starts with (MM-514): a removal by prefix reaches nothing else. */
+    private val ownPrefix = "martian-macros-"
+
+    /** Health Connect is given this many ids to delete at once. */
+    private val deleteBatch = 100
+
+    /**
+     * Removes every record of `kind` this app wrote whose client record id
+     * starts with `prefix` (MM-514), under any namespace. Only the app's own
+     * records are read for it and Health Connect lets an app delete only its
+     * own. Needs the kind's write permission, not the kind on, so it can
+     * follow turning it off.
+     */
+    @PluginMethod
+    fun removeWritten(call: PluginCall) = asked(call) {
+        val kind = call.getString("kind") ?: return@asked call.reject("removeWritten needs a kind.")
+        val type = writeTypes[kind] ?: return@asked call.reject("Not a kind this app writes: $kind.")
+        val prefix = call.getString("prefix") ?: return@asked call.reject("removeWritten needs a prefix.")
+        if (!prefix.startsWith(ownPrefix)) return@asked call.reject("Not a prefix of the app's own: $prefix.")
+        val granted = client().permissionController.getGrantedPermissions().contains(HealthPermission.getWritePermission(type))
+        if (!granted) return@asked call.resolve(JSObject().put("removed", false))
+        val ids = mutableListOf<String>()
+        var pageToken: String? = null
+        do {
+            val response = client().readRecords(
+                ReadRecordsRequest(
+                    recordType = type,
+                    timeRangeFilter = TimeRangeFilter.between(Instant.EPOCH, Instant.now().plus(Duration.ofDays(400))),
+                    dataOriginFilter = setOf(DataOrigin(context.packageName)),
+                    pageToken = pageToken,
+                ),
+            )
+            for (record in response.records) {
+                val clientId = record.metadata.clientRecordId ?: continue
+                if (ours(record) && clientId.startsWith(prefix)) ids.add(record.metadata.id)
+            }
+            pageToken = response.pageToken
+        } while (pageToken != null)
+        for (batch in ids.chunked(deleteBatch)) client().deleteRecords(type, batch, emptyList())
+        call.resolve(JSObject().put("removed", true))
+    }
+
     private fun removeOwn(call: PluginCall, kind: String, type: KClass<out Record>) = asked(call) {
         val id = call.getString("id") ?: return@asked call.reject("A removal needs an id.")
         if (!writes(kind)) return@asked call.resolve(JSObject().put("removed", false))
@@ -592,5 +705,14 @@ class MmHealthPlugin : Plugin() {
         )
         client().insertRecords(listOf(record))
         call.resolve(JSObject().put("written", true))
+    }
+
+    /** Removes the app's own workout written under `clientId` (MM-515), when it is deleted in the app; another app's cannot be reached. */
+    @PluginMethod
+    fun removeWorkout(call: PluginCall) = asked(call) {
+        val clientId = call.getString("clientId") ?: return@asked call.reject("removeWorkout needs a clientId.")
+        if (!writes("workouts")) return@asked call.resolve(JSObject().put("removed", false))
+        client().deleteRecords(ExerciseSessionRecord::class, emptyList(), listOf(clientId))
+        call.resolve(JSObject().put("removed", true))
     }
 }

@@ -18,4 +18,7 @@ export interface MmHealthWorkoutsApi {
     endMs: number;
     segments: MmHealthSegment[];
   }): Promise<{ written: boolean }>;
+
+  /** Removes the app's own workout written under `clientId` (MM-515); needs "workouts" on. */
+  removeWorkout(options: { clientId: string }): Promise<{ removed: boolean }>;
 }
