@@ -19,10 +19,9 @@ per worktree and PR. This handoff is updated once per session, in its own PR.
 
 **Open PRs at the end of Session 41**, each waiting on CI, then merged by
 Claude: #221 (MM-122, MM-124 and MM-486: the carbs-and-fat balance and week
-shape, stored at schema v16; unchosen stays as issued), #224 (MM-36: phase
-planning on the body-fat range; a gain ends where MM-129 says), #226 (MM-495,
-and MM-432 closed by the owner), #227 (MM-489, MM-70, MM-314, MM-522: food,
-water and workouts written to the health platforms), and this handoff (#223).
+shape, stored at schema v16; unchosen stays as issued) and #227 (MM-489,
+MM-70, MM-314, MM-522: food, water and workouts written to the health
+platforms). A new session checks them first (`gh pr list`).
 
 **What to build next.**
 - The schema lane, one at a time after #221 (v16): MM-510 (the
@@ -183,7 +182,7 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
-## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 25 PRs merged)
+## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 27 PRs merged)
 
 - **The owner's words this session:** "I want all milestones done in rapid fire. No more excuses, and no more
   delays." The owner allowed `gh pr merge` and lifted the subagent cap for this push. On #211: "I reject #211 icons."
@@ -195,7 +194,8 @@ MM-242, a draft by non-lawyers that blocks release.
   closes what it replaces, downloads streamed to a file natively), #215 (MM-189: the rules for platform workouts).
 - **Also merged:** #205 (MM-45), #208 (MM-116, MM-117), #210 (MM-46), #213 (MM-329), #214 (MM-129: lean-gain
   guardrails), #216 (MM-191), #217 (MM-34: the body-fat range), #219 (MM-73: a year of history), #222 (MM-113,
-  unwired), #225 (MM-72: sync on open and on return). The owner merged #203 (MM-95, MM-247) and #218 (MM-454).
+  unwired), #225 (MM-72: sync on open and on return), #224 (MM-36: phase planning on the body-fat range; a gain ends
+  where MM-129 says, at the upper end of the range), #226 (MM-495; MM-432 closed). The owner merged #203 (MM-95, MM-247) and #218 (MM-454).
 - **Closed:** #211 (MM-109's planet icon) and #220 (MM-432), by the owner. MM-368 was declined as medical advice.
 - **New tickets:** MM-441, MM-442 (WS-11), MM-443 (done), MM-447 (Train decisions), MM-450 (body fat in the report),
   MM-453 (the terms predate the backup), MM-454, MM-456, MM-471 (done), MM-474 (dev and demo icon markers, moot
