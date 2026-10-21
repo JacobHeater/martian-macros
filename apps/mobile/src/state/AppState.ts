@@ -51,6 +51,8 @@ import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import type { PhasePlan } from '../engine/PhasePlan';
 import { bodyFatReadingsOf } from './bodyFatReadingsOf';
 import { planPhases } from '../engine/planPhases';
+import { weightDisplayOf } from '../engine/weightDisplayOf';
+import type { WeightDisplay } from '../domain/WeightDisplay';
 import { platformWorkoutImports } from '../engine/platformWorkoutImports';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
@@ -328,6 +330,15 @@ export class AppState {
   readonly usualCookingFat: Cell<Loadable<CookingFatKind>>;
   /** Targets shown exact, unrounded (MM-123); off by default. */
   readonly exactTargets: Cell<Loadable<boolean>>;
+
+  /** The weight display the person chose (MM-118), or undefined before they choose. */
+  readonly chosenWeightDisplay: Cell<Loadable<WeightDisplay | undefined>>;
+
+  /** The weight display in force (MM-118): the one chosen, or the default the health check sets. */
+  readonly weightDisplay: Cell<WeightDisplay>;
+
+  /** Whether the one-time offer of the weight display has been answered (MM-118). */
+  readonly weightDisplayOffered: Cell<Loadable<boolean>>;
   /** The day the line about label accuracy was dismissed (MM-123). */
   readonly labelNoteDismissedOn: Cell<Loadable<CalendarDate | undefined>>;
   /** Leaving a deficit in two steps (MM-130); off by default. */
@@ -670,6 +681,13 @@ export class AppState {
     this.netCarbs = stream(() => s.preferences.watchNetCarbs());
     this.usualCookingFat = stream(() => s.preferences.watchUsualCookingFat());
     this.exactTargets = stream(() => s.preferences.watchExactTargets());
+    this.chosenWeightDisplay = stream(() => s.preferences.watchWeightDisplay());
+    this.weightDisplay = derived(() =>
+      weightDisplayOf(of(this.chosenWeightDisplay), {
+        eatingDisorderHistory: of(this.setup)?.screening.eatingDisorderHistory ?? false,
+      }),
+    );
+    this.weightDisplayOffered = stream(() => s.preferences.watchWeightDisplayOffered());
     this.labelNoteDismissedOn = stream(() => s.preferences.watchLabelNoteDismissedOn());
     this.easeIntoMaintenance = stream(() => s.preferences.watchEaseIntoMaintenance());
     this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());

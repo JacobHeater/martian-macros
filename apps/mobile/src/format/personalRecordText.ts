@@ -6,5 +6,5 @@ import type { Fmt } from './Fmt';
  * 110.0 kg, up from 107.5 kg."
  */
 export function personalRecordText(record: PersonalRecord, fmt: Fmt): string {
-  return `${record.name}: estimated max ${fmt.weight(record.estimateKg)}, up from ${fmt.weight(record.previousBestKg)}.`;
+  return `${record.name}: estimated max ${fmt.load(record.estimateKg)}, up from ${fmt.load(record.previousBestKg)}.`;
 }
