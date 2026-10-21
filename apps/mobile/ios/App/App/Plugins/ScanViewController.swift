@@ -20,6 +20,9 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
     private let session = AVCaptureSession()
     private var preview: AVCaptureVideoPreviewLayer?
     private var finished = false
+    /// Set when the camera could not be started; told once the scan is on screen, since a view
+    /// controller still being presented cannot be dismissed, and the app would never hear back.
+    private var unusable = false
 
     init(done: @escaping (Outcome) -> Void) {
         self.done = done
@@ -37,10 +40,10 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
         guard let device = AVCaptureDevice.default(for: .video),
               let input = try? AVCaptureDeviceInput(device: device),
               session.canAddInput(input)
-        else { return finish(.failed("The camera cannot be used.")) }
+        else { unusable = true; return }
         session.addInput(input)
         let output = AVCaptureMetadataOutput()
-        guard session.canAddOutput(output) else { return finish(.failed("The camera cannot be used.")) }
+        guard session.canAddOutput(output) else { unusable = true; return }
         session.addOutput(output)
         output.setMetadataObjectsDelegate(self, queue: .main)
         let wanted: [AVMetadataObject.ObjectType] = [.ean13, .ean8, .upce]
@@ -69,6 +72,11 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
         ])
 
         DispatchQueue.global(qos: .userInitiated).async { self.session.startRunning() }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if unusable { finish(.failed("The camera cannot be used.")) }
     }
 
     override func viewDidLayoutSubviews() {
