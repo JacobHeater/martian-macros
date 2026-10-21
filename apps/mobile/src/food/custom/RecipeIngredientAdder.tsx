@@ -81,6 +81,8 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
         carbsG: weighed.carbsG,
         fatG: weighed.fatG,
       }).times(weight / 100),
+      // The pack food it was found as, so its weight can be changed in place later (MM-456).
+      source: { packId: weighed.packId, foodId: weighed.id },
     };
   };
   const ready = line();
