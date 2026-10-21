@@ -1,6 +1,6 @@
 ---
 id: MM-73
-status: in-progress
+status: done
 component: health-sync
 related: [MM-66, MM-68, MM-69, MM-17, MM-23, MM-71, MM-498]
 ---
@@ -64,12 +64,19 @@ Built (2026-10-21), not run locally; CI validates:
 - Contract suites for both new interfaces run against every implementation (the fake, the in-memory and
   SQLite stores, the adapter over a stood-in plugin, no platform).
 
-Not built:
-- Scenario "Onboarding weight": onboarding offering today's imported weigh-in, with MM-68's offer to
-  connect at the end of onboarding (a screen change, for the panel).
-- Saying on screen how far the history has been read; the backfill reports it per month, unused.
+Built (2026-10-21), not run locally; CI validates:
+- **Connecting during onboarding** (with MM-68): at the weight question, "Read weight from Health Connect" asks for
+  weight and then the history, and reads; the backfill fills the trend. Today's imported weigh-in is offered as
+  "Use 181.7 lb", which fills the weight; used as it is, nothing is typed over the import, so today's weigh-in is the
+  scale's (MM-71). Typing over it makes it the person's own. Scenarios in `test/app/onboardingHealth.test.tsx` (six
+  months read, history refused leaves thirty days, the onboarding weight).
 
-Owed on a phone (Pixel, Health Connect with months of weigh-ins):
+Not built, by choice: saying on screen how far the history has been read (no scenario asks for it; the backfill
+reports it per month).
+
+## Owed on a phone
+Pixel, Health Connect with months of weigh-ins:
+- Connecting from onboarding's weight question asks for weight, then the history, and offers this morning's weigh-in.
 - The history question is shown once, with the first kind allowed; granting it reads back a year,
   refusing it leaves thirty days; asking again shows nothing.
 - On a Health Connect without the history feature, the request does not fail.
