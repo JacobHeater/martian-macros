@@ -3092,25 +3092,25 @@
       ],
       "sourceRequirements": {
         "built": [
-          "MM-69",
           "MM-67",
           "MM-71",
+          "MM-441",
           "MM-72",
           "MM-188",
           "MM-498",
           "MM-395",
           "MM-522",
+          "MM-516",
           "MM-70",
           "MM-513",
           "MM-514",
           "MM-442",
           "MM-314",
-          "MM-516"
+          "MM-69"
         ],
         "remaining": [
           "MM-66",
           "MM-68",
-          "MM-441",
           "MM-73",
           "MM-323",
           "MM-523"
@@ -3213,7 +3213,7 @@
         },
         {
           "step": 12,
-          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; the rule built, its column and Settings row wait on a schema version), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; built: the rule, its column in schema version 19 and the Settings row; device check owed), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
           "tickets": [
             "MM-441",
             "MM-442"

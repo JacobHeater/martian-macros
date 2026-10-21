@@ -33,6 +33,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   17: '36d03cffa516cd7d4e701f2b0d274676262f1b68765f1ba7f494c93adec67970',
   // MM-510: the weight-loss medication answer (MM-113).
   18: '89f0d47164ae28802b39a9fd05d95ec3a8235c6d10890f82f21a1445fafa57d4',
+  // MM-441: the weigh-in window chosen in Settings.
+  19: '4420c0548b76f6c025290ee331d1d8753dc6caa19b66b61d7ca90f3dd0d40e49',
 };
 
 it('the schema is the one recorded for its version', () => {
