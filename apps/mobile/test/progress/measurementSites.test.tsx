@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import type { BiologicalSex } from '../../src/domain/BiologicalSex';
@@ -110,7 +110,8 @@ it('A session: with waist, hips and thigh one screen takes all three in order an
   const section = await openMeasurements();
   await userEvent.click(await within(section).findByRole('button', { name: 'Measure' }));
   await layer().findByRole('region', { name: 'Waist' });
-  expect(layer().getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual(['Waist', 'Hips', 'Thigh (left)']);
+  // Each site a section of its own, in order.
+  expect(layer().getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)).toEqual(['Waist', 'Hips', 'Thigh (left)']);
   const typeIn = async (name: string, readings: readonly string[]) => {
     const region = layer().getByRole('region', { name });
     for (const [i, reading] of readings.entries()) {
@@ -139,10 +140,74 @@ it('a value no hip can be is refused, and nothing of the session is saved', asyn
   const section = await openMeasurements();
   await userEvent.click(await within(section).findByRole('button', { name: 'Measure' }));
   const hips = await layer().findByRole('region', { name: 'Hips' });
-  await userEvent.type(within(hips).getAllByRole('textbox')[0] as HTMLElement, '9');
+  const field = within(hips).getAllByRole('textbox')[0] as HTMLElement;
+  await userEvent.type(field, '9');
   await userEvent.click(layer().getByRole('button', { name: 'Save measurements' }));
-  expect(await screen.findByText('That hips value looks off. Check it.')).toBeInTheDocument();
+  // Said on the field, which takes focus.
+  expect(await within(hips).findByRole('alert')).toHaveTextContent('That hips reading looks off. Check it.');
+  expect(field).toHaveAttribute('aria-invalid', 'true');
+  await waitFor(() => expect(field).toHaveFocus());
   expect(await first(repos.measurements.watchMeasurements())).toEqual([]);
+});
+
+it('two of three readings: once the site is left, its field says why Save is off', async () => {
+  await person();
+  await repos.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['hips'], suggestionAnswered: true }));
+  const section = await openMeasurements();
+  await userEvent.click(await within(section).findByRole('button', { name: 'Measure' }));
+  const waist = await layer().findByRole('region', { name: 'Waist' });
+  const [first1, second, third] = within(waist).getAllByRole('textbox') as HTMLElement[];
+  await userEvent.type(first1 as HTMLElement, '80');
+  await userEvent.click(second as HTMLElement);
+  await userEvent.type(second as HTMLElement, '81');
+  // Moving on to the third reading says nothing yet.
+  await userEvent.click(third as HTMLElement);
+  expect(within(waist).queryByRole('alert')).not.toBeInTheDocument();
+  expect(layer().getByRole('button', { name: 'Save measurements' })).toBeDisabled();
+  // Leaving the site with two says why.
+  await userEvent.click(within(layer().getByRole('region', { name: 'Hips' })).getAllByRole('textbox')[0] as HTMLElement);
+  expect(await within(waist).findByRole('alert')).toHaveTextContent('Type one reading, or all three.');
+  expect(layer().getByRole('button', { name: 'Save measurements' })).toBeDisabled();
+  await userEvent.type(third as HTMLElement, '80.5');
+  expect(within(waist).queryByRole('alert')).not.toBeInTheDocument();
+  expect(layer().getByRole('button', { name: 'Save measurements' })).toBeEnabled();
+});
+
+it('the drawing is shown in full the first session, and behind "How to measure" from the second', async () => {
+  await person();
+  await repos.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['hips'], suggestionAnswered: true }));
+  await repos.measurements.saveMeasurement('waist', today.addDays(-7), 80);
+  const section = await openMeasurements();
+  await userEvent.click(await within(section).findByRole('button', { name: 'Measure' }));
+  const waist = await layer().findByRole('region', { name: 'Waist' });
+  expect(within(waist).getByRole('button', { name: /^How to measure/ })).toBeInTheDocument();
+  const hips = layer().getByRole('region', { name: 'Hips' });
+  expect(within(hips).queryByRole('button', { name: /^How to measure/ })).not.toBeInTheDocument();
+});
+
+it('"Choose sites" ends the sites group, saying how many of six are measured', async () => {
+  await person();
+  await repos.measurementSettings.saveMeasurementSettings(
+    new MeasurementSettings({ sites: ['hips', 'thigh', 'upperArm'], limbSide: 'left', suggestionAnswered: true }),
+  );
+  const section = await openMeasurements();
+  const choose = await within(section).findByRole('button', { name: /^Choose sites/ });
+  expect(within(choose).getByText('3 of 6')).toBeInTheDocument();
+});
+
+it('the limb side can be changed, saying earlier entries were on the other side', async () => {
+  await person();
+  await repos.measurementSettings.saveMeasurementSettings(
+    new MeasurementSettings({ sites: ['thigh'], limbSide: 'left', suggestionAnswered: true }),
+  );
+  await repos.measurements.saveMeasurement('thigh', today.addDays(-7), 57);
+  const section = await openMeasurements();
+  await userEvent.click(await within(section).findByRole('button', { name: /^Choose sites/ }));
+  await userEvent.click(await layer().findByRole('button', { name: /^Limb side/ }));
+  await userEvent.click(await screen.findByRole('option', { name: /^Right/ }));
+  await expect.poll(async () => (await settings()).limbSide).toBe('right');
+  expect(await screen.findByText('Limbs are measured on the right side from now on. Earlier entries were on the left side.')).toBeInTheDocument();
+  expect(await layer().findByText('Limbs are measured on the right side.')).toBeInTheDocument();
 });
 
 it('Limits of a tape: upper arm up 1.0 cm with no clear change in the waist is said as two facts', async () => {
