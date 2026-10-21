@@ -94,6 +94,7 @@ export function fakeMmHealthWrites({
         sourceId: 'com.martianmacros',
         sourceName: 'Martian Macros',
         segments,
+        ours: true,
       });
       return { written: true };
     },

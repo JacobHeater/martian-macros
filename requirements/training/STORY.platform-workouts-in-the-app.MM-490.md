@@ -44,3 +44,7 @@ Scenario: Other exercise
   Then it shows as "Other exercise" with its time
   And the user can move its sets to an exercise they choose
 ```
+
+## Notes
+- 2026-10-21 (`fix/health-plugins-review`): a workout the platform says the app wrote is never offered for import,
+  whatever its client id (MM-489's `ours` mark).

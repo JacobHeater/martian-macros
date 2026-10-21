@@ -23,11 +23,21 @@ it('asks to read sex, date of birth and height, and to share nothing', () => {
 });
 
 it('answers sex as female, male or other, and leaves not set out', () => {
-  expect([...profile.matchAll(/answer\["sex"\] = "(\w+)"/g)].map((m) => m[1])).toEqual(['female', 'male', 'other']);
+  expect([...profile.matchAll(/found\["sex"\] = "(\w+)"/g)].map((m) => m[1])).toEqual(['female', 'male', 'other']);
   expect(profile).not.toContain('notSet');
 });
 
 it('answers the date of birth as its parts and the height in metres', () => {
-  for (const key of ['birthYear', 'birthMonth', 'birthDay']) expect(profile).toContain(`answer["${key}"]`);
+  for (const key of ['birthYear', 'birthMonth', 'birthDay']) expect(profile).toContain(`found["${key}"]`);
   expect(profile).toContain('answer["heightM"] = height.quantity.doubleValue(for: .meter())');
+});
+
+it('no HealthKit handler adds to a var it captured: each takes its own copy (the panel review of MM-69)', () => {
+  expect(profile).toContain('let known = found');
+  expect(profile).toContain('var answer = known');
+  const changes = swift.slice(swift.indexOf('@objc func changes('), swift.indexOf('// MARK: Writing'));
+  expect(changes).toContain('let gathered = ChangesGathered(anchor: anchor)');
+  expect(changes).not.toMatch(/\bvar (upserted|deleted|failure|next)\b/);
+  const removeOwn = swift.slice(swift.indexOf('private func removeOwn('));
+  expect(removeOwn.slice(0, removeOwn.indexOf('\n    }\n'))).toContain('let failed = FirstFailure()');
 });

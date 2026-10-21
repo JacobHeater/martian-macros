@@ -24,8 +24,12 @@ const dayMs = 24 * 60 * 60 * 1000;
  * month read before it is kept and marked.
  */
 export class HealthBackfill {
-  /** The kinds whose history is read (MM-73): what the trend and the body-fat estimate use. */
-  static readonly types: readonly HealthDataType[] = ['weight', 'bodyFat', 'leanMass', 'menstruation'];
+  /**
+   * The kinds whose history is read (MM-73): what the trend and the body-fat
+   * estimate use, and the height, so one recorded more than thirty days ago
+   * is still offered (MM-68).
+   */
+  static readonly types: readonly HealthDataType[] = ['weight', 'bodyFat', 'leanMass', 'menstruation', 'height'];
 
   /** How far back it reads. */
   static readonly days = 365;
