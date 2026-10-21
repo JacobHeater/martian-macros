@@ -37,6 +37,8 @@ import { NoHealthWriting } from '../platform/NoHealthWriting';
 import { MirroredFoodLog } from '../healthWrite/MirroredFoodLog';
 import { MirroredWaterLog } from '../healthWrite/MirroredWaterLog';
 import { MirroredWorkoutLog } from '../healthWrite/MirroredWorkoutLog';
+import { RenewingEraser } from '../healthWrite/RenewingEraser';
+import { RenewingRestorer } from '../healthWrite/RenewingRestorer';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { mmDb } from '../sql/native/mmDb';
@@ -101,12 +103,14 @@ export async function openAppServices(): Promise<AppServices> {
       log: repositories.workouts,
       platform: healthWorkouts,
       customExercises: repositories.customExercises,
+      ids: healthWriting,
     }),
     customExercises: repositories.customExercises,
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
-    eraser: repositories.eraser,
-    restorer: repositories.restorer,
+    // Erasing or restoring starts entry ids again: a new write namespace keeps new writes from replacing old ones (MM-522).
+    eraser: new RenewingEraser({ eraser: repositories.eraser, ids: healthWriting }),
+    restorer: new RenewingRestorer({ restorer: repositories.restorer, ids: healthWriting }),
     backup,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or

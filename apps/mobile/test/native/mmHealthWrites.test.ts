@@ -17,6 +17,8 @@ const methods = [
   'writing',
   'startWriting',
   'stopWriting',
+  'writeNamespace',
+  'renewWriteNamespace',
   'writeNutrition',
   'removeNutrition',
   'writeWater',

@@ -12,6 +12,11 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { MirroredFoodLog } from '../../src/healthWrite/MirroredFoodLog';
 import { MirroredWaterLog } from '../../src/healthWrite/MirroredWaterLog';
 import { MirroredWorkoutLog } from '../../src/healthWrite/MirroredWorkoutLog';
+import { RenewingEraser } from '../../src/healthWrite/RenewingEraser';
+import { RenewingRestorer } from '../../src/healthWrite/RenewingRestorer';
+import { workoutFromPlatform } from '../../src/engine/workoutFromPlatform';
+import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
+import { dataEraserContract } from '../contracts/dataEraserContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
@@ -30,7 +35,12 @@ workoutRepositoryContract('The workout log told to the health platform', async (
   const repos = new InMemoryRepositories();
   const platform = new InMemoryHealthWorkouts({ namesExercises: true });
   await platform.requestWritePermission();
-  return new MirroredWorkoutLog({ log: repos.workouts, platform, customExercises: repos.customExercises });
+  return new MirroredWorkoutLog({
+    log: repos.workouts,
+    platform,
+    customExercises: repos.customExercises,
+    ids: new InMemoryHealthWriting(),
+  });
 });
 
 const today = CalendarDate.of(2026, 10, 5);
@@ -59,7 +69,7 @@ describe('food (MM-70)', () => {
   it('A logged food appears: 510 kcal at its meal, from the app, with what the entry states', async () => {
     const { platform, food } = setUp(true);
     const id = await food.addFood(lunch(510));
-    const written = platform.nutrition.get(`martian-macros-food-${id}`);
+    const written = platform.nutrition.get(`martian-macros-food-ns1-${id}`);
     expect(written).toMatchObject({ kcal: 510, proteinG: 40, meal: 'lunch', fiberG: 4, sugarsG: 3, name: 'Chicken and rice' });
     expect(written?.start).toEqual(new Date(2026, 9, 5, 12, 30));
     expect(written?.end.getTime()).toBeGreaterThan(written!.start.getTime());
@@ -105,8 +115,8 @@ describe('water (MM-314)', () => {
     const platform = writingOn();
     const water = new MirroredWaterLog({ log: new InMemoryRepositories().water, platform });
     const id = await water.addWater(glass);
-    expect(platform.water.get(`martian-macros-water-${id}`)).toEqual({
-      id: `martian-macros-water-${id}`,
+    expect(platform.water.get(`martian-macros-water-ns1-${id}`)).toEqual({
+      id: `martian-macros-water-ns1-${id}`,
       at: new Date(2026, 9, 5, 9, 15),
       ml: 250,
     });
@@ -142,7 +152,13 @@ describe('workouts (MM-489)', () => {
     const repos = new InMemoryRepositories();
     const platform = new InMemoryHealthWorkouts({ namesExercises: true });
     if (permit) await platform.requestWritePermission();
-    return { platform, workouts: new MirroredWorkoutLog({ log: repos.workouts, platform, customExercises: repos.customExercises }) };
+    const ids = new InMemoryHealthWriting();
+    return {
+      platform,
+      ids,
+      repos,
+      workouts: new MirroredWorkoutLog({ log: repos.workouts, platform, customExercises: repos.customExercises, ids }),
+    };
   };
 
   it('a workout in progress is not written; finished, it is, with its timed set', async () => {
@@ -151,7 +167,7 @@ describe('workouts (MM-489)', () => {
     expect(platform.all).toEqual([]);
     await workouts.saveWorkout(started.copyWith({ id, endedAt: at(45) }));
     expect(platform.all).toHaveLength(1);
-    expect(platform.all[0]?.clientId).toBe(`martian-macros-workout-${id}`);
+    expect(platform.all[0]?.clientId).toBe(`martian-macros-workout-ns1-${id}`);
     expect(platform.all[0]?.segments).toHaveLength(1);
   });
 
@@ -171,5 +187,69 @@ describe('workouts (MM-489)', () => {
     await workouts.saveWorkout(started.copyWith({ id, endedAt: at(45) }));
     expect(platform.all).toEqual([]);
     expect((await first(workouts.watchWorkouts()))[0]?.endedAt).toEqual(at(45));
+  });
+});
+
+// MM-522: "Erase all data" starts entry ids again; what is written after must never replace what was written before.
+dataEraserContract('Erasing that renews the write namespace', () => {
+  const r = new InMemoryRepositories();
+  return {
+    eraser: new RenewingEraser({ eraser: r.eraser, ids: new InMemoryHealthWriting() }),
+    setup: r.setup,
+    weights: r.weights,
+    weightEvents: r.weightEvents,
+    food: r.food,
+    targets: r.targets,
+    preferences: r.preferences,
+    workouts: r.workouts,
+    customExercises: r.customExercises,
+  };
+});
+
+describe('ids across an erase (MM-522)', () => {
+  it('a food logged after an erase, with the id an older one had, is a record of its own', async () => {
+    const platform = writingOn();
+    const before = new InMemoryRepositories();
+    const firstId = await new MirroredFoodLog({ log: before.food, platform }).addFood(lunch(510));
+    await new RenewingEraser({ eraser: before.eraser, ids: platform }).eraseAll();
+    // A fresh log gives its first entry the first id again, as after an erase.
+    const after = new InMemoryRepositories();
+    const secondId = await new MirroredFoodLog({ log: after.food, platform }).addFood(lunch(300));
+    expect(secondId).toBe(firstId);
+    expect([...platform.nutrition.values()].map((record) => record.kcal).sort()).toEqual([300, 510]);
+  });
+
+  it('a drink logged after an erase never replaces one from before it', async () => {
+    const platform = writingOn();
+    const glass = new WaterEntry({ id: 0, date: today, ml: 250, at: new Date(2026, 9, 5, 9, 15) });
+    const before = new InMemoryRepositories();
+    await new MirroredWaterLog({ log: before.water, platform }).addWater(glass);
+    await new RenewingEraser({ eraser: before.eraser, ids: platform }).eraseAll();
+    await new MirroredWaterLog({ log: new InMemoryRepositories().water, platform }).addWater(glass);
+    expect(platform.water.size).toBe(2);
+  });
+
+  it('a restore renews the namespace too', async () => {
+    const ids = new InMemoryHealthWriting();
+    const before = await ids.writeNamespace();
+    await new RenewingRestorer({ restorer: new FakeDataRestorer(), ids }).restoreFrom(new Uint8Array());
+    expect(await ids.writeNamespace()).not.toBe(before);
+  });
+
+  it('a workout written after an erase is a workout of its own, and every namespace is still known as the app’s', async () => {
+    const at = (minute: number) => new Date(2026, 9, 5, 18, minute);
+    const finished = new Workout({ id: 0, date: today, startedAt: at(0), exercises: [] });
+    const platform = new InMemoryHealthWorkouts({ namesExercises: true });
+    await platform.requestWritePermission();
+    const ids = new InMemoryHealthWriting();
+    for (let run = 0; run < 2; run++) {
+      const repos = new InMemoryRepositories();
+      const log = new MirroredWorkoutLog({ log: repos.workouts, platform, customExercises: repos.customExercises, ids });
+      const id = await log.saveWorkout(finished);
+      await log.saveWorkout(finished.copyWith({ id, endedAt: at(45) }));
+      await new RenewingEraser({ eraser: repos.eraser, ids }).eraseAll();
+    }
+    expect(platform.all).toHaveLength(2);
+    for (const written of platform.all) expect(workoutFromPlatform(written)).toBeUndefined();
   });
 });

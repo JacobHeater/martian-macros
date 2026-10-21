@@ -3,6 +3,7 @@ import { InMemoryHealthWriting } from '../../src/fixtures/InMemoryHealthWriting'
 import { NativeHealthWriting } from '../../src/platform/NativeHealthWriting';
 import { NoHealthWriting } from '../../src/platform/NoHealthWriting';
 import { healthIntakeWriterContract } from '../contracts/healthIntakeWriterContract';
+import { healthWriteNamespaceContract } from '../contracts/healthWriteNamespaceContract';
 import { healthWritingContract } from '../contracts/healthWritingContract';
 import { fakeMmHealthWrites } from '../support/fakeMmHealthWrites';
 
@@ -23,6 +24,17 @@ healthIntakeWriterContract(
 );
 healthIntakeWriterContract('in memory', async () => new InMemoryHealthWriting());
 healthIntakeWriterContract('no health platform', async () => new NoHealthWriting());
+
+// MM-522: the namespace every written id carries, through the plugin, in memory and where there is no platform.
+healthWriteNamespaceContract('Health Connect (bridge stood in for)', async () => new NativeHealthWriting(fakeMmHealthWrites().api));
+healthWriteNamespaceContract('in memory', async () => new InMemoryHealthWriting());
+healthWriteNamespaceContract('no health platform', async () => new NoHealthWriting());
+
+it('without a namespace from the plugin, nothing is written (MM-522)', async () => {
+  const fake = fakeMmHealthWrites();
+  const writing = new NativeHealthWriting({ ...fake.api, writeNamespace: async () => ({ namespace: '' }) });
+  await expect(writing.writeNamespace()).rejects.toThrow();
+});
 
 const lunch = {
   id: 'martian-macros-food-1',

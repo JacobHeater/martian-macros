@@ -1,5 +1,6 @@
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
 import { HealthWriteKind } from '../healthIngest/HealthWriteKind';
+import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
 import type { NutritionRecord } from '../healthIngest/NutritionRecord';
 import type { WaterRecord } from '../healthIngest/WaterRecord';
@@ -30,9 +31,10 @@ function nutrition(record: NutritionRecord): MmHealthNutrition {
  * MM-314), over the app's own plugin. Which kinds are on is kept by the
  * plugin, on the phone; each kind is asked for by itself. A write the
  * platform refuses is false here, and the entry in the app is the same
- * either way: the health app is told, never relied on.
+ * either way: the health app is told, never relied on. The write namespace
+ * every id carries is the plugin's too (MM-522).
  */
-export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter {
+export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWriteNamespace {
   private readonly api: MmHealthWritingApi;
 
   constructor(api: MmHealthWritingApi) {
@@ -55,6 +57,17 @@ export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter {
       // Not asked, or not answered: what is on is what the plugin says next.
     }
     return (await this.writing()).has(kind);
+  }
+
+  /** Rejects when the plugin cannot say: nothing is written without a namespace (MM-522). */
+  async writeNamespace(): Promise<string> {
+    const { namespace } = await this.api.writeNamespace();
+    if (namespace === '') throw new Error('The health plugin gave no write namespace.');
+    return namespace;
+  }
+
+  async renewWriteNamespace(): Promise<void> {
+    await this.api.renewWriteNamespace();
   }
 
   async stopWriting(kind: HealthWriteKind): Promise<void> {

@@ -25,6 +25,7 @@ export * from './HealthSample';
 export * from './HealthSampleStore';
 export * from './HealthSource';
 export * from './HealthWriteKind';
+export * from './HealthWriteNamespace';
 export * from './HealthWriting';
 export * from './NightOfSleep';
 export * from './nightlySleep';

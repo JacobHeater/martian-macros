@@ -37,6 +37,8 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "writing", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startWriting", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopWriting", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeNamespace", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "renewWriteNamespace", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeNutrition", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "removeNutrition", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeWater", returnType: CAPPluginReturnPromise),
@@ -310,6 +312,30 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let kind = call.getString("kind") else { return call.reject("stopWriting needs a kind.") }
         writingOn = writingOn.subtracting([kind])
         call.resolve(["on": false])
+    }
+
+    /// Where the namespace every id the app writes carries is kept (MM-522).
+    private static let namespaceKey = "mm_health_write_namespace"
+
+    private static func newNamespace() -> String {
+        String(UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased().prefix(12))
+    }
+
+    /// The write namespace (MM-522), made the first time it is asked for.
+    @objc func writeNamespace(_ call: CAPPluginCall) {
+        if let namespace = UserDefaults.standard.string(forKey: Self.namespaceKey), !namespace.isEmpty {
+            return call.resolve(["namespace": namespace])
+        }
+        let namespace = Self.newNamespace()
+        UserDefaults.standard.set(namespace, forKey: Self.namespaceKey)
+        call.resolve(["namespace": namespace])
+    }
+
+    /// A new write namespace (MM-522), after the app's data is erased or restored.
+    @objc func renewWriteNamespace(_ call: CAPPluginCall) {
+        let namespace = Self.newNamespace()
+        UserDefaults.standard.set(namespace, forKey: Self.namespaceKey)
+        call.resolve(["namespace": namespace])
     }
 
     /// The metadata of what is written for the entry `id`: the app's id, and a sync identifier with a growing version, so HealthKit replaces rather than adds.

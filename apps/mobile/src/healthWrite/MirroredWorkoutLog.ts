@@ -1,4 +1,5 @@
 import type { HealthWorkoutWriter } from '../domain/integration/HealthWorkoutWriter';
+import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { CustomExerciseReader } from '../domain/repositories/CustomExerciseReader';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
 import { builtInExercises } from '../domain/training/builtInExercises';
@@ -6,6 +7,7 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
 import { writeWorkoutToPlatform } from '../engine/writeWorkoutToPlatform';
 import type { Watched } from '../lang/Watched';
+import { namespacedWorkoutId } from './namespacedWorkoutId';
 
 /** The value `watched` has now, and no later one. */
 function now<T>(watched: Watched<T>): Promise<T> {
@@ -40,19 +42,24 @@ export class MirroredWorkoutLog implements WorkoutRepository {
   private readonly log: WorkoutRepository;
   private readonly platform: HealthWorkoutWriter;
   private readonly customExercises: CustomExerciseReader;
+  private readonly ids: HealthWriteNamespace;
 
   constructor({
     log,
     platform,
     customExercises,
+    ids,
   }: {
     log: WorkoutRepository;
     platform: HealthWorkoutWriter;
     customExercises: CustomExerciseReader;
+    /** Where the write namespace is kept (MM-522), so a workout is never written under an id from before an erase. */
+    ids: HealthWriteNamespace;
   }) {
     this.log = log;
     this.platform = platform;
     this.customExercises = customExercises;
+    this.ids = ids;
   }
 
   watchWorkouts(): Watched<Workout[]> {
@@ -75,7 +82,17 @@ export class MirroredWorkoutLog implements WorkoutRepository {
       const exercises = new Map<string, Exercise>(
         [...builtInExercises, ...custom].map((e): [string, Exercise] => [e.id, e]),
       );
-      return await writeWorkoutToPlatform(this.platform, workout, (exerciseId) => exercises.get(exerciseId));
+      const namespace = await this.ids.writeNamespace();
+      const platform = this.platform;
+      // The same writer, its client ids carrying this run's namespace after the app's prefix (MM-522).
+      const namespaced: HealthWorkoutWriter = {
+        namesExercises: platform.namesExercises,
+        writePermitted: () => platform.writePermitted(),
+        requestWritePermission: () => platform.requestWritePermission(),
+        writeWorkout: (written) =>
+          platform.writeWorkout({ ...written, clientId: namespacedWorkoutId(written.clientId, namespace) }),
+      };
+      return await writeWorkoutToPlatform(namespaced, workout, (exerciseId) => exercises.get(exerciseId));
     } catch {
       return false;
     }

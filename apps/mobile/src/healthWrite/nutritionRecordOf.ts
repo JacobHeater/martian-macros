@@ -25,11 +25,11 @@ const mealMs = 30 * 60 * 1000;
  * entry states them, never zero for what it does not. Its id is the app's
  * own, so a change replaces it and a removal finds it.
  */
-export function nutritionRecordOf(entry: FoodEntry, id: number): NutritionRecord {
+export function nutritionRecordOf(entry: FoodEntry, id: number, namespace: string): NutritionRecord {
   const [hour, minute] = mealTime[entry.meal];
   const start = new Date(entry.date.year, entry.date.month - 1, entry.date.day, hour, minute);
   return {
-    id: foodRecordId(id),
+    id: foodRecordId(namespace, id),
     start,
     end: new Date(start.getTime() + mealMs),
     kcal: entry.kcal,
