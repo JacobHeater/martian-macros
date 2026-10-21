@@ -45,6 +45,14 @@ describe('the full terms', () => {
     expect(everything).not.toMatch(/encrypt|securely|HIPAA|backed up|backup/i);
   });
 
+  // MM-453: since MM-63 a person can export an encrypted backup through the share sheet, yet section 10
+  // says "The app makes no copy of your records anywhere else" and the check above forbids the word.
+  // Unskipped when the owner and the attorney settle the wording (and the "backup" ban above is lifted).
+  it.skip('MM-453: say that a backup is made only when the person makes one, and goes where they send it', () => {
+    expect(full).not.toContain('The app makes no copy of your records anywhere else.');
+    expect(full).toMatch(/backup/i);
+  });
+
   it('are numbered in order, each section with something to say', () => {
     termsOfUse.sections.forEach((section, index) => {
       expect(section.heading.startsWith(`${index + 1}. `), section.heading).toBe(true);

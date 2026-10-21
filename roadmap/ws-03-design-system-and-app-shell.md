@@ -111,7 +111,7 @@ WS-13, which needs accessibility, both themes and the icon.
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
 trend line.
 7. **Storybook as the design register (MM-237).** M0. Placed 2026-10-13.
-8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13.
+8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13. MM-453 (the terms and the Apple Health permission text still say no copy leaves the phone, which the backup contradicts; wording for the owner and the attorney) placed here 2026-10-21.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-181, MM-184, MM-185, MM-186, MM-236, MM-239, MM-240; step 3: MM-176, MM-179, MM-183, MM-206, MM-208; step 4: MM-187.
 9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories. **Built 2026-10-13** in one pull request: the direction in design/screen-direction.md, the panel pass in docs/agent-runs/mm253-hierarchy, the six destinations in tiers with MmSection, MmRhythmStrip and the icon set, the checkable rule in test/gallery/hierarchy.test.tsx, and the three bugs the panel found (MM-283 to MM-285). The step is done.
 11. **What the hierarchy panel left for later (MM-286 to MM-289).** M2. Destinations keep their state across tabs (MM-286), Progress with one figure and the lifts as rows (MM-287), the Ember budget for text actions, an owner decision (MM-288), a demo seed that shows every mark (MM-289).

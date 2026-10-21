@@ -20,6 +20,8 @@ import { trainingStatusLabel } from '../format/trainingStatusLabel';
 import { clamp } from '../lang/clamp';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { PauseScreen } from '../pause/PauseScreen';
+import { PrivacyPolicyScreen } from '../terms/PrivacyPolicyScreen';
+import { privacyPolicy } from '../terms/privacyPolicy';
 import { TermsScreen } from '../terms/TermsScreen';
 import { termsOfUse } from '../terms/termsOfUse';
 import { Screen } from '../app/Screen';
@@ -305,6 +307,13 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
               }
               opens
               onPress={() => void navigator.push(() => <TermsScreen />)}
+            />
+            <MmListRow
+              leadingIcon="lock"
+              title="Privacy policy"
+              subtitle={`Version ${privacyPolicy.version}: what the app keeps, and what it sends`}
+              opens
+              onPress={() => void navigator.push(() => <PrivacyPolicyScreen />)}
             />
           </MmListGroup>
         </MmSection>

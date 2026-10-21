@@ -1,8 +1,8 @@
 ---
 id: MM-247
 component: release
-status: proposed
-related: [MM-94, MM-95, MM-242]
+status: in-progress
+related: [MM-94, MM-95, MM-242, MM-454]
 ---
 
 # Task: the terms and the privacy policy, published from the repository
@@ -45,6 +45,17 @@ Scenario: The owner merges the workflow
 
 Scenario: The address is the stores' and the app's
   Then both store listings and the app's About rows carry the same address
+
+Scenario: Both phones on one page
+  Given a paragraph the terms or the policy say differently on Android and on an iPhone
+  Then the page gives each, labelled "On Android" and "On iPhone", and every sentence the app shows on either phone is on the page
+
+Scenario: Only the page is published
+  Then the Pages artifact is one folder holding index.html and nothing else from the repository
+
+Scenario: A draft says so
+  Given the attorney's review is not recorded
+  Then the page says above everything that the terms and the policy are a draft not in effect
 ```
 
 ## Notes
@@ -53,3 +64,15 @@ Scenario: The address is the stores' and the app's
 - The licensor name, contact address, governing law and disputes stay as
   the attorney leaves them (MM-242); the page renders whatever the file
   says.
+
+## Progress
+**Page and workflow built (2026-10-21), the workflow awaiting the owner's merge.** `apps/mobile/src/terms/legalPageHtml.ts` renders
+the terms and the privacy policy (MM-95), both phones on one page, with a Content-Security-Policy of `default-src 'none'`, inline
+styles only, light and dark. `apps/mobile/scripts/legal-page.mjs` (`mm legal [out-dir]`, `npm run legal`) loads it through Vite's
+runner and writes `index.html` alone into the folder. `.github/workflows/legal-pages.yml` builds that folder on a push to `main` that
+touches the text (or by hand) and deploys only it with `actions/upload-pages-artifact` and `actions/deploy-pages`. Test:
+`apps/mobile/test/terms/legalPage.test.ts`. Not run locally; CI validates the renderer, and the workflow runs only once merged.
+
+**Waiting on the owner:** merging the workflow's pull request; turning on Pages with source "GitHub Actions" in the repository
+settings (a private repository needs a plan that allows Pages); the address, expected to be
+`https://jacobheater.github.io/martian-macros/`, entered in both store listings. The link to it from the app's About rows is MM-454.

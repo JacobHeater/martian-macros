@@ -19,6 +19,7 @@ import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
+import { PrivacyPolicyScreen } from '../../terms/PrivacyPolicyScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
 import { onIos } from './onIos';
@@ -141,6 +142,21 @@ export const TermsOfUse = screenStory({
   covers: ['TermsScreen'],
   shows: 'Before you start',
   open: ({ navigator }) => void navigator.push(() => <TermsScreen />),
+});
+
+/** MM-95: the privacy policy, read from About beside the terms: the short account, then every section. */
+export const PrivacyPolicy = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: 'In short',
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
+});
+
+/** MM-95, MM-403: on an iPhone the policy names Apple Health and the reader that is part of iOS. */
+export const PrivacyPolicyOnIphone = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: '3. Apple Health',
+  device: onIos(),
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
 });
 
 export const HowThisWorks = screenStory({
@@ -547,6 +563,13 @@ export const SettingsOpensTerms = screenStory({
   shows: 'Terms of use',
   open: settingsAt('about'),
   walk: pressAnywhere(/^Terms of use/),
+});
+
+export const SettingsOpensPrivacyPolicy = screenStory({
+  covers: ['SettingsScreen', 'PrivacyPolicyScreen'],
+  shows: 'Privacy policy',
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^Privacy policy/),
 });
 
 export const SettingsOpensHealthCheck = screenStory({
