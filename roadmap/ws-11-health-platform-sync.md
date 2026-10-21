@@ -93,7 +93,7 @@ to declare.
 6. **Write nutrition (MM-70, MM-513, MM-514).** M4. Needs entries with real nutrient data
    (WS-08 step 4) to be worth doing. MM-70 and water (MM-314) built 2026-10-21 in both
    shells, device checks owed; typed weight written (MM-513) and the offer to remove what was
-   written when writing is turned off (MM-514) remain.
+   written when writing is turned off (MM-514) built 2026-10-21 in both shells, device checks owed.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
    biological-sex value may pre-fill the onboarding question when it is male
    or female; other values are ignored and the user always confirms.
