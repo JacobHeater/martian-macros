@@ -685,7 +685,8 @@ it('a version 20 database comes up to date with no goal body fat, and keeps one 
 // MM-490: a version 21 database comes up to date with its workouts kept, none of them imported and none deleted;
 // an imported workout saved from then on keeps its platform id and source, and deleting it remembers the id.
 it('a version 21 database comes up to date with its workouts kept and none imported, and keeps an import after', async () => {
-  expect(versionTwentyOne).not.toContain('platform_id');
+  expect(versionTwentyOne).not.toContain('platform_source_name');
+  expect(versionTwentyOne).not.toContain('deleted_platform_workouts');
   expect(versionTwentyOne).toContain('goal_body_fat');
   const old = await openSql();
   await AppDatabase.open(old, { version: 21, schema: versionTwentyOne });
