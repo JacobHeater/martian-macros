@@ -87,9 +87,9 @@ to declare.
    importing sessions.
 4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
    re-read after an expired token keeps it (MM-498, built 2026-10-21).
-5. **Background sync (MM-72, MM-516).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening always reads,
-   coming back to the front reads once the last read is fifteen minutes old, one read at a time. The scheduled run while the
-   app is closed (MM-516) waits on a decision: WorkManager is not a dependency, and no web view runs the importer then.
+5. **Sync while the app is open (MM-72, MM-516, MM-523).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening
+   always reads, coming back to the front reads once the last read is fifteen minutes old, one read at a time. No background
+   sync (the owner, 2026-10-21; MM-516 closed). Where missing data weakens coaching, the app says so and the user decides (MM-523).
 6. **Write nutrition (MM-70, MM-513, MM-514).** M4. Needs entries with real nutrient data
    (WS-08 step 4) to be worth doing. MM-70 and water (MM-314) built 2026-10-21 in both
    shells, device checks owed; typed weight written (MM-513) and the offer to remove what was
@@ -99,7 +99,9 @@ to declare.
    or female; other values are ignored and the user always confirms.
 12. **What MM-71 left (MM-441, MM-442).** M4. A weigh-in window for a
     morning that is not 04:00 to 12:00, and steps through the platform's
-    own aggregation (native, needs a device).
+    own aggregation (native, needs a device). Built 2026-10-21 behind the
+    interfaces: the window's rule, with its column and Settings row waiting
+    on a schema version; steps in both shells, device checks owed.
 
 ## Done enough to unblock others
 MM-67 and MM-71 are done: weigh-ins carry a source, one rule chooses the
@@ -114,7 +116,7 @@ can run during group A.
 
 ## Requirement sources
 - Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
-- Added 2026-10-21 (step 5): MM-516 (the scheduled background run, split from MM-72).
+- Added 2026-10-21 (step 5): MM-516 (the scheduled background run, split from MM-72; declined by the owner), MM-523 (a gap says what it costs).
 - Added 2026-10-21 (step 4): MM-498 (a re-read after an expired token keeps the history read by MM-73).
 - Added 2026-10-21 (step 12): MM-441 (a weigh-in window) and MM-442 (steps through the platform's aggregation), moved out of MM-71 when it was done.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).

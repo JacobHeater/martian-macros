@@ -1,7 +1,7 @@
 const values = [
-  /** The first reading of the morning, between 04:00 and 12:00. */
+  /** The first reading in the weigh-in window: 04:00 to 12:00 unless it was moved (MM-441). */
   'firstMorning',
-  /** No morning reading: the middle value of the day's readings. */
+  /** No reading in the window: the middle value of the day's readings. */
   'medianOfDay',
 ] as const;
 

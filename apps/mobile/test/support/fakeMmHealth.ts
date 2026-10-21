@@ -6,15 +6,30 @@ import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
  * with a change log, so the adapter's token flow runs without a phone.
  * The history permission (MM-73) is granted when `history` says so, or
  * when asked for the first time if `grantsHistory`; it is asked once.
+ *
+ * A day's steps (MM-442) are the platform's own totals, `stepDays`, as
+ * the platform would give them after applying its source priority; with
+ * none given, the step records' counts by the day they start on.
  */
 export function fakeMmHealth(
   records: MmHealthRecord[],
-  { permitted, history = false, grantsHistory = true }: { permitted?: string[]; history?: boolean; grantsHistory?: boolean } = {},
+  {
+    permitted,
+    history = false,
+    grantsHistory = true,
+    stepDays,
+  }: {
+    permitted?: string[];
+    history?: boolean;
+    grantsHistory?: boolean;
+    stepDays?: { startMs: number; steps: number }[];
+  } = {},
 ) {
   const log: { record?: MmHealthRecord; deletedId?: string }[] = records.map((record) => ({ record }));
   const granted = new Set(permitted ?? ['weight', 'bodyFat', 'leanMass', 'height', 'workout', 'menstruation', 'steps']);
   let historyGranted = history;
   let historyAsked = 0;
+  const dailyStepsAsked: { fromMs: number; toMs: number }[] = [];
   const api: MmHealthApi = {
     status: async () => ({ status: 'available' }),
     permitted: async ({ types }) => ({ types: types.filter((type) => granted.has(type)) }),
@@ -39,6 +54,18 @@ export function fakeMmHealth(
             record !== undefined && record.type === type && record.startMs >= fromMs && record.startMs < toMs,
         ),
     }),
+    dailySteps: async ({ fromMs, toMs }) => {
+      dailyStepsAsked.push({ fromMs, toMs });
+      if (stepDays !== undefined) return { days: stepDays };
+      const totals = new Map<number, number>();
+      for (const { record } of log) {
+        if (record === undefined || record.type !== 'steps' || record.startMs < fromMs || record.startMs >= toMs) continue;
+        const at = new Date(record.startMs);
+        const midnight = new Date(at.getFullYear(), at.getMonth(), at.getDate()).getTime();
+        totals.set(midnight, (totals.get(midnight) ?? 0) + (record.value ?? 0));
+      }
+      return { days: [...totals].map(([startMs, steps]) => ({ startMs, steps })) };
+    },
     changesToken: async ({ type }) => ({ token: `${type}@${log.length}` }),
     changes: async ({ token }) => {
       const found = /^(\w+)@(\d+)$/.exec(token);
@@ -58,6 +85,8 @@ export function fakeMmHealth(
     api,
     /** How many times the history question was shown. */
     historyAsked: () => historyAsked,
+    /** The ranges a day's steps were asked for over (MM-442). */
+    dailyStepsAsked: () => dailyStepsAsked,
     change: (entry: { record?: MmHealthRecord; deletedId?: string }) => log.push(entry),
   };
 }
