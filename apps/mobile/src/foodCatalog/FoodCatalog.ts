@@ -23,12 +23,29 @@ function byReliabilityThenMatch(a: SearchHit, b: SearchHit): number {
  * Several installed packs presented as one: search returns one ranked list,
  * and a barcode takes the most reliable record across the packs (MM-383),
  * the tie going to the pack listed first.
+ *
+ * `owned` are the handles this catalog opened and closes with `close`
+ * (MM-386): the pack files, never a pack it was lent, such as the foods
+ * found online, which live in the user's own database.
  */
 export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, CatalogServingLookup, CatalogPairLookup {
   readonly packs: readonly FoodPack[];
+  private readonly owned: readonly { close(): Promise<void> }[];
+  private closing: Promise<void> | undefined;
 
-  constructor(packs: readonly FoodPack[]) {
+  constructor(packs: readonly FoodPack[], owned: readonly { close(): Promise<void> }[] = []) {
     this.packs = packs;
+    this.owned = owned;
+  }
+
+  /**
+   * Closes the handles this catalog opened (MM-386). It is not read
+   * afterwards; closing twice closes once. One that will not close does not
+   * keep the others open.
+   */
+  close(): Promise<void> {
+    this.closing ??= Promise.allSettled(this.owned.map((handle) => handle.close())).then(() => undefined);
+    return this.closing;
   }
 
   /** The packs that are files on the phone: without one, search has nothing to find but what was found online (MM-58). */

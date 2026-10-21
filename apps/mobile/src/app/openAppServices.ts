@@ -9,9 +9,9 @@ import { SystemClock } from '../domain/integration/SystemClock';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { mmPacks } from '../foodCatalog/download/native/mmPacks';
+import { NativePackFetch } from '../foodCatalog/download/native/NativePackFetch';
 import { NativePackHttp } from '../foodCatalog/download/native/NativePackHttp';
 import { NativePackStore } from '../foodCatalog/download/native/NativePackStore';
-import { openInstalledCatalog } from '../foodCatalog/download/openInstalledCatalog';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { SqlOnlineFoodCache } from '../foodCatalog/online/SqlOnlineFoodCache';
 import { OpenFoodFactsSource } from '../foodOnline/OpenFoodFactsSource';
@@ -35,7 +35,7 @@ import { NativeSqlDatabase } from '../sql/native/NativeSqlDatabase';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import { reminderPrompt } from '../format/reminderPrompt';
 import type { AppServices } from '../state/AppServices';
-import { once } from '../state/once';
+import { installedCatalog } from '../state/installedCatalog';
 
 /**
  * The one place the app chooses where things are stored (MM-162, MM-231).
@@ -90,11 +90,14 @@ export async function openAppServices(): Promise<AppServices> {
     backup,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or
-    // removed. A browser has none. No camera plugin is in the shell yet
+    // removed; the catalog it replaces is closed (MM-386). A browser has none. No camera plugin is in the shell yet
     // (MM-232, step 5).
-    catalog: native ? once(() => openInstalledCatalog(packStore, [onlineFoods])) : constant(new FoodCatalog([onlineFoods])),
+    catalog: native ? installedCatalog(packStore, [onlineFoods]) : constant(new FoodCatalog([onlineFoods])),
     packStore,
     packHttp: native ? new NativePackHttp(mmPacks) : new InMemoryPackHttp(),
+    // A pack file goes from the connection into its file natively, and only its count reaches the app (MM-387).
+    // A browser reads it through `packHttp` into `packStore` instead.
+    packFetch: native ? new NativePackFetch(mmPacks) : undefined,
     // Where to read the list of packs on offer, set for each build (MM-56).
     // A browser build offers no downloads and makes no request.
     packManifestUrl: native ? __MM_FOOD_PACK_MANIFEST_URL__ : '',
