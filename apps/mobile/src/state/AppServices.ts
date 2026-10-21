@@ -37,6 +37,8 @@ import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
+import type { HealthWriting } from '../healthIngest/HealthWriting';
+import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { Watched } from '../lang/Watched';
 import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
 import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
@@ -122,8 +124,19 @@ export interface AppServices {
   /** Whether a reminder arrives on the minute or within an hour (MM-248). */
   readonly exactAlarms: ExactAlarms;
 
-  /** The phone's health platform (MM-68). The app only reads from it. */
+  /** The phone's health platform, read (MM-68). */
   readonly healthSource: HealthSource & HealthHistoryAccess;
+
+  /**
+   * Which kinds the app writes to the health platform, each turned on in
+   * Settings with a permission of its own (MM-70, MM-314, MM-489). What is
+   * written is the food, water and workout logs as they change: those
+   * repositories tell the platform themselves.
+   */
+  readonly healthWriting: HealthWriting;
+
+  /** Workouts on the health platform with their segments (MM-489), for importing them (MM-490). */
+  readonly healthWorkouts: HealthWorkoutReader;
 
   /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
   readonly evidence: () => Promise<string>;

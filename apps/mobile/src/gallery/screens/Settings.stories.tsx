@@ -307,7 +307,7 @@ export const HealthConnectAbsent = screenStory({
 /** MM-320: Health Connect on the phone and nothing allowed yet: a row for each kind, and the note. */
 export const HealthConnectNoneAllowed = screenStory({
   covers: ['SettingsScreen'],
-  shows: /The app only reads/,
+  shows: /Nothing read leaves this phone/,
   device: healthPlatform(),
   open: settingsAt('healthConnect'),
   walk: async (canvas) => {
@@ -323,6 +323,17 @@ export const HealthConnectSomeAllowed = screenStory({
   open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-70, MM-314, MM-489: writing food and workouts turned on, water off; each switch asks for its own permission. */
+export const HealthConnectWriting = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Send food you log to Health Connect',
+  device: healthPlatform({ allowed: ['weight'], writing: ['food', 'workouts'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('switch', { name: /Send water you log/ }));
   },
 });
 
@@ -951,6 +962,17 @@ export const AppleHealthSomeAsked = screenStory({
   open: settingsAt('healthConnect'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Exercise sessions'));
+  },
+});
+
+/** MM-489: on an iPhone a workout is written as the session alone, so its switch says so. */
+export const AppleHealthWriting = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Each finished workout, as a strength workout.',
+  device: onIos(healthPlatform({ allowed: ['weight'], writing: ['workouts'] })),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('switch', { name: /Send workouts you finish/ }));
   },
 });
 

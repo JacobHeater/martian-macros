@@ -88,7 +88,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
         'There is no account. We run no server that receives your records, so we cannot see, recover, correct or delete them for you. The app does not send your records anywhere.',
         'If you choose to download the food database, your phone contacts GitHub to fetch a file. GitHub sees your IP address, which file was requested, when, and basic technical details your phone sends with any download. Nothing about you or your records is sent, and nothing is downloaded unless you ask for it.',
         'If you allow it, the app can look a food up online when the food database on this phone does not have it: it sends the barcode number you scanned or typed, or the words you searched for, to Open Food Facts and, where the app offers it, to USDA FoodData Central. Those services see your IP address and what was asked. Nothing about you or your records is sent. The app asks before the first lookup, and you can choose always, just for now (until you close the app) or never, and change that in Settings, under Data. A food found this way is kept on this phone.',
-        `${health} is optional. If you allow it, the app reads only the kinds of data you allow, and never writes to ${health}. What it reads is copied into the app on this phone and stays there until you erase it, even if you later take the permission away.`,
+        `${health} is optional. If you allow it, the app reads only the kinds of data you allow. What it reads is copied into the app on this phone and stays there until you erase it, even if you later take the permission away. The app writes to ${health} only the kinds you turn on in Settings, each with its own permission: the food you log, the water you log and the workouts you finish. It writes only what you logged in the app, and never changes or removes what another app wrote. Food or water you change or remove here is changed or removed there too, and a workout you change is written again. What it wrote stays in ${health} when you turn writing off or erase the app’s data, until you remove it there.`,
         ios
           ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept.'
           : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component (ML Kit). Google says that component sends Google technical details about itself, such as the phone’s model, the app’s version, and performance and error codes. It is not given your records.',
@@ -98,9 +98,9 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
     {
       heading: '10. Keeping your records',
       paragraphs: [
-        'The app makes no copy of your records anywhere else. If you lose, break, reset or replace the phone, uninstall the app, or erase its data, your records are gone and we cannot restore them. We do not promise that your records will be preserved.',
+        'The app makes no copy of your records anywhere else, apart from what you turn on writing to your phone’s health app (section 9). If you lose, break, reset or replace the phone, uninstall the app, or erase its data, your records are gone and we cannot restore them. We do not promise that your records will be preserved.',
         'Your records are as private as your phone. The app does not add a password or a lock of its own, so anyone who can unlock your phone can open the app. Keep a screen lock on and keep the phone up to date.',
-        'Settings, then "Erase all data and start over", deletes every record in the app and returns it to first use. Uninstalling the app removes them too. Erasing does not remove a food database you downloaded and does not change permissions you granted; you can withdraw those in the phone’s settings.',
+        'Settings, then "Erase all data and start over", deletes every record in the app and returns it to first use. Uninstalling the app removes them too. Erasing does not remove a food database you downloaded or what the app wrote to your phone’s health app, and does not change permissions you granted; you can withdraw those in the phone’s settings.',
       ],
     },
     {
@@ -147,9 +147,9 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
 
 export const termsOfUse = {
   /** Raised when the terms change in a way that matters. The app asks again when this differs from what was agreed to. */
-  version: 2,
+  version: 3,
 
-  effectiveOn: CalendarDate.of(2026, 10, 20),
+  effectiveOn: CalendarDate.of(2026, 10, 21),
 
   /** What changed in each version after the first, in a sentence or two each, for someone who agreed to an earlier one. */
   changes: new Map<number, readonly string[]>([
@@ -157,6 +157,12 @@ export const termsOfUse = {
       2,
       [
         'The app can now look a food up online when the food database on this phone does not have it, but only if you allow it. It then sends the barcode number or the words you searched for to Open Food Facts (and, where the app offers it, to USDA FoodData Central), and nothing about you. Section 9 says more.',
+      ],
+    ],
+    [
+      3,
+      [
+        'The app can now write to your phone’s health app the food you log, the water you log and the workouts you finish, each only if you turn it on in Settings and allow it there. It is off until you do. Sections 9 and 10 say more.',
       ],
     ],
   ]),

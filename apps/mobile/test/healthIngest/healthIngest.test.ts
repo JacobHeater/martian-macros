@@ -5,7 +5,6 @@ import {
   HealthImporter,
   HealthReadFailure,
   InMemoryHealthSampleStore,
-  type NutritionRecord,
   recordedHealthHistory,
 } from '../../src/healthIngest';
 import { healthBackfillMarksContract } from '../contracts/healthBackfillMarksContract';
@@ -116,25 +115,6 @@ describe('the fake', () => {
     expect((await source.permitted()).size).toBe(0);
     const after = await source.requestPermission(new Set<HealthDataType>(['weight', 'steps', 'menstruation']));
     expect(after).toEqual(new Set(['weight']));
-  });
-
-  it('nutrition is written by id, or refused', async () => {
-    const source = await permitted();
-    const meal = (kcal: number): NutritionRecord => ({
-      id: 'meal-1',
-      start: new Date(2026, 8, 9, 12),
-      end: new Date(2026, 8, 9, 12, 30),
-      kcal,
-      proteinG: 40,
-      carbsG: 60,
-      fatG: 20,
-    });
-    expect(await source.writeNutrition(meal(600))).toBe(true);
-    expect(await source.writeNutrition(meal(650))).toBe(true);
-    expect([...source.written.values()].map((r) => r.kcal)).toEqual([650]);
-    source.takesNutrition = false;
-    expect(await source.writeNutrition(meal(700))).toBe(false);
-    expect([...source.written.values()].map((r) => r.kcal)).toEqual([650]);
   });
 });
 
