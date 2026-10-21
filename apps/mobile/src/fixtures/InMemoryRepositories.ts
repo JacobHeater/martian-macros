@@ -7,6 +7,8 @@ import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { IntakeReader } from '../domain/repositories/IntakeReader';
 import type { PauseRepository } from '../domain/repositories/PauseRepository';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
@@ -70,6 +72,8 @@ export class InMemoryRepositories {
   readonly targets: TargetsHistoryRepository;
   readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
+  /** The weigh-in window (MM-441), kept with the preferences and erased with them. */
+  readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
@@ -121,6 +125,7 @@ export class InMemoryRepositories {
     this.targets = targets;
     this.targetShapes = targetShapes;
     this.preferences = preferences;
+    this.weighInWindow = preferences;
     this.insightLog = insightLog;
     this.inlineInsightLog = inlineInsightLog;
     this.insightSnoozes = insightSnoozes;

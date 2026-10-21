@@ -11,6 +11,8 @@ interface MmTimeOfDayDialogProps {
   first?: number | undefined;
   last?: number | undefined;
   everyMinute?: boolean;
+  /** Why a time cannot be taken, if it cannot: said in place of the time, and OK is off (MM-222, MM-441). */
+  refuse?: ((minuteOfDay: number) => string | undefined) | undefined;
   /** Called with minutes after midnight, or undefined when backed out of. */
   onDone: (minuteOfDay: number | undefined) => void;
 }
@@ -28,10 +30,14 @@ const said = (minuteOfDay: number) => {
  * time back in words beneath them, and refuses a time outside the allowed
  * range with the range said, so nothing is refused after the fact.
  */
-export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, first, last, everyMinute = false, onDone }: MmTimeOfDayDialogProps) {
+export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, first, last, everyMinute = false, refuse, onDone }: MmTimeOfDayDialogProps) {
   const [minute, setMinute] = useState(initialMinuteOfDay);
   const title = helpText ?? 'Select time';
-  const allowed = (first === undefined || minute >= first) && (last === undefined || minute <= last);
+  const inRange = (first === undefined || minute >= first) && (last === undefined || minute <= last);
+  const refusal = inRange
+    ? refuse?.(minute)
+    : `Choose a time between ${said(first ?? 0)} and ${said(last ?? 24 * 60 - 1)}.`;
+  const allowed = refusal === undefined;
   return (
     <MmDialog
       title={title}
@@ -48,7 +54,7 @@ export function MmTimeOfDayDialog({ initialMinuteOfDay, helpText, first, last, e
         <p className="mm-time-detail">{said(minute)}</p>
       ) : (
         <p className="mm-dialog-error" role="alert">
-          Choose a time between {said(first ?? 0)} and {said(last ?? 24 * 60 - 1)}.
+          {refusal}
         </p>
       )}
     </MmDialog>

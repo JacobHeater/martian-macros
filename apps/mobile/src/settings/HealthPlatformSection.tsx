@@ -16,6 +16,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
 import { HealthWritingGroup } from './HealthWritingGroup';
 import { PrimaryScaleRow } from './PrimaryScaleRow';
+import { WeighInWindowRow } from './WeighInWindowRow';
 import { useSettingsSection } from './useSettingsSection';
 
 /**
@@ -156,6 +157,8 @@ export function HealthPlatformSection() {
         })}
         {/* Which scale counts first, once weigh-ins come from more than one (MM-71). */}
         {connection.permitted.has('weight') ? <PrimaryScaleRow weighIns={connection.imported.get('weight') ?? []} /> : null}
+        {/* The hours in which an imported reading counts as the morning weigh-in (MM-441). */}
+        {connection.permitted.has('weight') ? <WeighInWindowRow /> : null}
         {connection.permitted.size === 0 ? null : (
           <MmListRow
             leadingIcon="sync"
