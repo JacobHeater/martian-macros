@@ -94,6 +94,7 @@ export async function openAppServices(): Promise<AppServices> {
     dayMarks: repositories.dayMarks,
     intake: repositories.intake,
     targets: repositories.targets,
+    targetShapes: repositories.targetShapes,
     preferences: repositories.preferences,
     insightLog: repositories.insightLog,
     inlineInsightLog: repositories.inlineInsightLog,

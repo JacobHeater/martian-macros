@@ -625,6 +625,22 @@ export const SettingsOpensPrivacyPolicy = screenStory({
   walk: pressAnywhere(/^Privacy policy/),
 });
 
+/** MM-122: Settings > Coach > Carbs and fat balance, opened from its row. */
+export const SettingsOpensCarbFatBalance = screenStory({
+  covers: ['SettingsScreen', 'CarbFatBalanceScreen'],
+  shows: /^For fat loss and muscle, this balance matters much less/,
+  open: settingsAt('coach'),
+  walk: pressAnywhere(/^Carbs and fat balance/),
+});
+
+/** MM-124: Settings > Coach > Week shape, opened from its row. */
+export const SettingsOpensWeekShape = screenStory({
+  covers: ['SettingsScreen', 'WeekShapeScreen'],
+  shows: 'None: every day has the same target.',
+  open: settingsAt('coach'),
+  walk: pressAnywhere(/^Week shape/),
+});
+
 /** MM-454: the public page, opened in the phone's browser; the story's phone only keeps the address. */
 export const SettingsOpensThePublicPage = screenStory({
   covers: ['SettingsScreen'],

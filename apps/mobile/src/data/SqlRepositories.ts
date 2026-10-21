@@ -12,6 +12,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
+import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -45,6 +46,7 @@ import { SqlRecoveryCheckInRepository } from './SqlRecoveryCheckInRepository';
 import { SqlReminderRepository } from './SqlReminderRepository';
 import { SqlSetupRepository } from './SqlSetupRepository';
 import { SqlSleepRepository } from './SqlSleepRepository';
+import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlWaistRepository } from './SqlWaistRepository';
@@ -73,6 +75,8 @@ export class SqlRepositories {
   readonly dayMarks: DayMarkRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
+  /** How the user shapes their targets, by the day each shape was set from (MM-122, MM-124, MM-486). */
+  readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
@@ -101,6 +105,7 @@ export class SqlRepositories {
     this.dayMarks = new SqlDayMarkRepository(db);
     this.intake = new SqlIntakeReader(db);
     this.targets = new SqlTargetsHistoryRepository(db);
+    this.targetShapes = new SqlTargetShapeRepository(db);
     this.preferences = new SqlPreferencesRepository(db);
     this.insightLog = new SqlInsightLogRepository(db);
     this.inlineInsightLog = new SqlInlineInsightLogRepository(db);

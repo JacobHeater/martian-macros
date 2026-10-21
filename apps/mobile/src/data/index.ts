@@ -32,6 +32,7 @@ export * from './SqlRecoveryCheckInRepository';
 export * from './SqlReminderRepository';
 export * from './SqlRepositories';
 export * from './SqlSetupRepository';
+export * from './SqlTargetShapeRepository';
 export * from './SqlTargetsHistoryRepository';
 export * from './SqlWaistRepository';
 export * from './SqlWeightEventRepository';

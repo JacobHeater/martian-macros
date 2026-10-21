@@ -17,6 +17,7 @@ import { recoveryCheckInRepositoryContract } from '../contracts/recoveryCheckInR
 import { reminderRepositoryContract } from '../contracts/reminderRepositoryContract';
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
 import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
+import { targetShapeRepositoryContract } from '../contracts/targetShapeRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
@@ -44,6 +45,7 @@ foodRepositoryContract('In-memory', () => new InMemoryRepositories().food);
 customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().customFoods);
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
+targetShapeRepositoryContract('In-memory', () => new InMemoryRepositories().targetShapes);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
 inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories().inlineInsightLog);
 insightSnoozeRepositoryContract('In-memory', () => new InMemoryRepositories().insightSnoozes);
@@ -68,6 +70,7 @@ dataEraserContract('In-memory', () => {
     weightEvents: r.weightEvents,
     food: r.food,
     targets: r.targets,
+    targetShapes: r.targetShapes,
     preferences: r.preferences,
     workouts: r.workouts,
     customExercises: r.customExercises,
