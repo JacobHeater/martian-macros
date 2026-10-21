@@ -116,7 +116,8 @@ it('the camera is off once its screen is left', async () => {
   await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
   await layer().findByRole('button', { name: 'Take front photo' });
   await waitFor(() => expect(camera.running).toBe(1));
-  await userEvent.click(layer().getByRole('button', { name: 'Back' }));
+  // The top bar's back, the first of the screen's ways back.
+  await userEvent.click(layer().getAllByRole('button', { name: 'Back' })[0] as HTMLElement);
   await waitFor(() => expect(camera.running).toBe(0));
 });
 
