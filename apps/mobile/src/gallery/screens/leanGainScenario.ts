@@ -7,8 +7,8 @@ import { storyWorkout } from './storyWorkout';
  * Ten weeks of lean gain (MM-129): trend weight up 3 kg, the waist up 4 cm
  * between its smoothed ends over weekly entries, two lifts trained weekly at the same loads. With
  * `bodyFatPercent` under 20 the gain reads fat-heavy with strength flat;
- * without it the estimate from body mass index is above 20%, so the coach
- * recommends ending the gain first.
+ * without it the estimate from body mass index, and the upper end of its
+ * range, is above 20%, so the coach recommends ending the gain first.
  */
 export const leanGainScenario =
   ({ bodyFatPercent }: { bodyFatPercent?: number } = {}): StoryScenario =>

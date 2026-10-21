@@ -29,6 +29,7 @@ import { BackupFile } from '../../backup/BackupFile';
 import { SodiumBackupCipher } from '../../backup/SodiumBackupCipher';
 import { FakeBackupPlatform } from '../../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
+import { InMemoryExternalLinks } from '../../fixtures/InMemoryExternalLinks';
 import { SqlRepositories } from '../../data/SqlRepositories';
 import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
 import { typicalSetup } from '../../fixtures/typicalSetup';
@@ -611,6 +612,27 @@ export const SettingsOpensPrivacyPolicy = screenStory({
   shows: 'Privacy policy',
   open: settingsAt('about'),
   walk: pressAnywhere(/^Privacy policy/),
+});
+
+/** MM-454: the public page, opened in the phone's browser; the story's phone only keeps the address. */
+export const SettingsOpensThePublicPage = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /in your browser$/,
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^On the web/),
+});
+
+/** MM-454: a phone with no browser to open the page in; the snack gives the address to type. */
+export const SettingsPublicPageNoBrowser = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^The browser could not be opened/,
+  device: async (services) => {
+    const externalLinks = new InMemoryExternalLinks();
+    externalLinks.noBrowser = true;
+    return { ...services, externalLinks };
+  },
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^On the web/),
 });
 
 export const SettingsOpensHealthCheck = screenStory({
