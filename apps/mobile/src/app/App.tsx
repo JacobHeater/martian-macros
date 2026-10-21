@@ -69,18 +69,19 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
   // Reminders follow the plan for as long as the app is open (MM-146).
   useEffect(() => state.keepRemindersScheduled(), [state]);
 
-  // The health platform is read when the app opens (MM-68).
+  // The health platform is read when the app opens (MM-68), always (MM-72).
   useEffect(() => {
-    void state.syncHealth();
+    void state.syncHealth('opened');
   }, [state]);
 
   // Roll the calendar day over if the app was left open overnight, and
-  // read the health platform again when the app comes back to the front.
+  // read the health platform again when the app comes back to the front,
+  // unless it was read only minutes ago (MM-72).
   useEffect(() => {
     const resumed = () => {
       if (document.visibilityState !== 'visible') return;
       state.refreshToday();
-      void state.syncHealth();
+      void state.syncHealth('resumed');
     };
     document.addEventListener('visibilitychange', resumed);
     return () => document.removeEventListener('visibilitychange', resumed);
