@@ -17,6 +17,10 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * platform names by a package id and no app name (MM-395). `secondScale`
  * adds evening weigh-ins from a gym's scale on two of the days (MM-71).
  * `writing` are the kinds the app writes to it, turned on already (MM-70).
+ * `historyRefused` keeps the app to the thirty days before the story's
+ * week (MM-73), the history permission refused. `stopsAsking` are kinds
+ * the platform no longer shows the request for, and `opensPermissions`
+ * whether its screen of the app's permissions opens (MM-323).
  */
 export function healthPlatform({
   allowed = [],
@@ -26,6 +30,9 @@ export function healthPlatform({
   stepsUnnamed = false,
   secondScale = false,
   writing = [],
+  historyRefused = false,
+  stopsAsking = [],
+  opensPermissions = true,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
@@ -34,6 +41,9 @@ export function healthPlatform({
   stepsUnnamed?: boolean;
   secondScale?: boolean;
   writing?: readonly HealthWriteKind[];
+  historyRefused?: boolean;
+  stopsAsking?: readonly HealthDataType[];
+  opensPermissions?: boolean;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
@@ -90,6 +100,14 @@ export function healthPlatform({
     await source.permit(new Set(allowed));
     source.willPermit = new Set(HealthDataType.values.filter((type) => !refuses.includes(type)));
     source.unreadable = unreadable;
+    source.stopsAsking = new Set(stopsAsking);
+    source.opensPermissions = opensPermissions;
+    if (historyRefused) {
+      source.historyFrom = new Date(`${storyToday.addDays(-30).toString()}T00:00:00`);
+      source.willPermitHistory = false;
+      // Asked once already, and refused.
+      await source.requestHistory();
+    }
     return { ...services, healthSource: source, healthWriting: new InMemoryHealthWriting({ on: writing }) };
   };
 }

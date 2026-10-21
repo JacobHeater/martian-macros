@@ -2,6 +2,7 @@ import { HealthChanges } from '../healthIngest/HealthChanges';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthDataType as Types } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
+import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPlace';
 import { HealthReadFailure } from '../healthIngest/HealthReadFailure';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSource } from '../healthIngest/HealthSource';
@@ -22,13 +23,19 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  * "nothing".
  *
  * It also says whether the history permission is granted (MM-73), and asks
- * for it once.
+ * for it once. It remembers, while the app runs, which kinds came back
+ * refused without the question being shown (MM-323), and opens Health
+ * Connect's screen of the app's permissions where `opensPermissions` says
+ * the shell has one (Android, not an iPhone).
  */
-export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
+export class NativeHealthSource implements HealthSource, HealthHistoryAccess, HealthPermissionsPlace {
   private readonly api: MmHealthApi;
+  private readonly opensPermissions: boolean;
+  private readonly unshown = new Set<HealthDataType>();
 
-  constructor(api: MmHealthApi) {
+  constructor(api: MmHealthApi, { opensPermissions = false }: { opensPermissions?: boolean } = {}) {
     this.api = api;
+    this.opensPermissions = opensPermissions;
   }
 
   private async asked<T>(what: string, step: () => Promise<T>): Promise<T> {
@@ -54,8 +61,29 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
   async requestPermission(types: ReadonlySet<HealthDataType>): Promise<Set<HealthDataType>> {
     const here = await this.available();
     const asked = [...types].filter((type) => here.has(type));
-    if (asked.length > 0) await this.api.requestPermission({ types: asked });
-    return this.permitted();
+    if (asked.length === 0) return this.permitted();
+    const { shown } = await this.api.requestPermission({ types: asked });
+    const after = await this.permitted();
+    for (const type of asked) {
+      // Only a refusal that came back unshown means the platform stopped asking (MM-323).
+      if (shown === false && !after.has(type)) this.unshown.add(type);
+      else this.unshown.delete(type);
+    }
+    return after;
+  }
+
+  async stoppedAsking(type: HealthDataType): Promise<boolean> {
+    return this.unshown.has(type);
+  }
+
+  async openPermissions(): Promise<boolean> {
+    if (!this.opensPermissions) return false;
+    try {
+      const { opened } = await this.api.openPermissions();
+      return opened;
+    } catch {
+      return false;
+    }
   }
 
   async historyPermitted(): Promise<boolean> {
