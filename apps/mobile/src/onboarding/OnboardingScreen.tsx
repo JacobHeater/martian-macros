@@ -23,6 +23,10 @@ import { Fmt } from '../format/Fmt';
 import { trainsNotYet } from '../format/trainsNotYet';
 import { parseNumber } from '../format/parseNumber';
 import { useApp } from '../app/useApp';
+import { useLoaded } from '../app/useLoaded';
+import { healthPlatformName } from '../format/healthPlatformName';
+import { toStringAsFixed } from '../lang/toStringAsFixed';
+import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { MmButton } from '../ui/MmButton';
 import { StepProgress } from '../ui/StepProgress';
 import { useOverlays } from '../ui/useOverlays';
@@ -32,6 +36,7 @@ import { GoalStep } from './GoalStep';
 import { HealthStep } from './HealthStep';
 import { MeasurementsStep } from './MeasurementsStep';
 import type { MeasurementsTyped } from './MeasurementsTyped';
+import type { WeightFromHealth } from './WeightFromHealth';
 import { SexStep } from './SexStep';
 import { TrainingStep } from './TrainingStep';
 import { WelcomeStep } from './WelcomeStep';
@@ -72,6 +77,11 @@ export function OnboardingScreen() {
   const [pace, setPace] = useState<FatLossPace>();
   const [gainAcknowledged, setGainAcknowledged] = useState(false);
   const [remind, setRemind] = useState(false);
+  // The health platform's offer at the weight question (MM-68, MM-73).
+  const connection = useLoaded(state.healthConnection);
+  const importedWeighIns = useLoaded(state.importedWeighIns);
+  const [healthReading, setHealthReading] = useState(false);
+  const [usedImport, setUsedImport] = useState(false);
 
   // The numbers the typed measurements mean, in what is stored.
   const fmt = new Fmt(units);
@@ -164,11 +174,52 @@ export function OnboardingScreen() {
     if (picked !== undefined) setCreatineStartedOn(picked);
   };
 
+  const platform = healthPlatformName(services.platform);
+  const importedToday = importedWeighIns?.find((w) => CalendarDate.fromDate(w.day) === today);
+
+  /**
+   * Asks to read weight and, with it, its history (MM-73), then reads. Refused,
+   * the person types the weight as before; Settings can allow it later.
+   */
+  const allowWeight = async () => {
+    const after = await services.healthSource.requestPermission(new Set<HealthDataType>(['weight']));
+    state.refreshHealthConnection();
+    if (!after.has('weight')) {
+      overlays.snack(`Weight was not allowed. You can allow it in Settings, or in ${platform}, whenever you like.`);
+      return;
+    }
+    await services.healthSource.requestHistory().catch(() => false);
+    setHealthReading(true);
+    try {
+      if (!(await state.syncHealth('asked'))) overlays.snack(`${platform} could not be read just now. Type today’s weight instead.`);
+    } finally {
+      setHealthReading(false);
+    }
+  };
+
+  const health: WeightFromHealth | undefined =
+    connection === undefined || !connection.available.has('weight')
+      ? undefined
+      : {
+          platform,
+          allowed: connection.permitted.has('weight'),
+          reading: healthReading,
+          today: importedToday === undefined ? undefined : { kg: importedToday.kg, sourceName: importedToday.sourceName },
+          used: usedImport,
+          onAllow: () => void allowWeight(),
+          onUse: () => {
+            if (importedToday === undefined) return;
+            setTyped({ ...typed, weight: toStringAsFixed(fmt.weightFromKg(importedToday.kg), 1) });
+            setUsedImport(true);
+          },
+        };
+
   const finish = async () => {
     if (profile === undefined || policy === undefined || recommendation === undefined || weightKg === undefined) return;
     const chosen = mode ?? recommendation.mode;
     setSaving(true);
-    await services.weights.saveWeight(today, weightKg);
+    // Today's imported weigh-in, used as it was, is today's weigh-in already: nothing is typed over it (MM-71, MM-73).
+    if (!usedImport || importedToday === undefined) await services.weights.saveWeight(today, weightKg);
     await services.setup.saveSetup(
       new UserSetup({
         profile,
@@ -248,8 +299,14 @@ export function OnboardingScreen() {
         onUnits={(chosen) => {
           setUnits(chosen);
           setTyped(nothingTyped);
+          setUsedImport(false);
         }}
-        onTyped={setTyped}
+        onTyped={(changed) => {
+          // A weight typed over the platform's is the person's own.
+          if (changed.weight !== typed.weight) setUsedImport(false);
+          setTyped(changed);
+        }}
+        health={health}
       />
     );
   } else if (step === 3) {

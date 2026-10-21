@@ -83,10 +83,10 @@ to declare.
    weigh-ins. Do it before any import exists, against the fake. MM-71 is
    done, with the primary scale chosen in Settings (2026-10-21); what it
    left is step 12.
-3. **Health Connect (MM-68).** M3. Agree the workout table with WS-10 before
-   importing sessions.
-4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
-   re-read after an expired token keeps it (MM-498, built 2026-10-21).
+3. **Health Connect (MM-68).** M3. Done 2026-10-21, with the offer at onboarding's weight question, imported
+   period days in the trend and the height suggestion; importing sessions is MM-490 (WS-10).
+4. **History backfill (MM-73).** M3. Done 2026-10-21, with onboarding offering today's imported weigh-in; a
+   re-read after an expired token keeps it (MM-498).
 5. **Sync while the app is open (MM-72, MM-516, MM-523).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening
    always reads, coming back to the front reads once the last read is fifteen minutes old, one read at a time. No background
    sync (the owner, 2026-10-21; MM-516 closed). Where missing data weakens coaching, the app says so and the user decides (MM-523).
