@@ -14,6 +14,7 @@ import { portionSummary } from '../../src/format/portionSummary';
 import { progressionSettingsText } from '../../src/format/progressionSettingsText';
 import { progressionText } from '../../src/format/progressionText';
 import { reliefOfferText } from '../../src/format/reliefOfferText';
+import { reliefPaceText } from '../../src/format/reliefPaceText';
 import { restTargetText } from '../../src/format/restTargetText';
 import { roundedToZeroNote } from '../../src/format/roundedToZeroNote';
 import { setText } from '../../src/format/setText';
@@ -355,6 +356,24 @@ describe('notices', () => {
     expect(underEatingText(finding, { supportLine: false })).toBe(base);
     expect(underEatingText(finding, { supportLine: true })).toBe(
       `${base} If eating has become a source of distress, a doctor or a registered dietitian is the right person to talk to.`,
+    );
+  });
+
+  it('easing a deficit: the slower pace by its name and what it costs (MM-117, MM-128)', () => {
+    const text = reliefPaceText({
+      pace: 'gentle',
+      fraction: 0.005,
+      offered: true,
+      withheld: undefined,
+      deficitKcal: 410,
+      targetKcal: 2190,
+      achievedFraction: 0.005,
+      limitedBy: undefined,
+      aboveFatSupply: false,
+    });
+    expect(text).toBe(
+      'Gentle is 0.5% a week: about 410 kcal a day under your expenditure, for a target of 2,190 kcal. ' +
+        'Slow and steady: hunger and training are easiest to manage, and muscle is best kept.',
     );
   });
 
