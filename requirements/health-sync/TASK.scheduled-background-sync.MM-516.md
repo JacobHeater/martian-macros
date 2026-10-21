@@ -1,6 +1,6 @@
 ---
 id: MM-516
-status: proposed
+status: done
 component: health-sync
 related: [MM-72, MM-68, MM-69, MM-67]
 ---
@@ -20,6 +20,8 @@ anchored queries with background delivery on iOS. That half was split out here b
 - Health Connect refuses reads off screen without `READ_HEALTH_DATA_IN_BACKGROUND`, asked for separately.
 
 ## Decisions
+- **Declined by the owner (2026-10-21): no background sync.** "No, I don't want bg sync. If the app needs more data to close gaps, it can inform the user that without the data it will have gaps which can affect coaching and trajectory accuracy, but that should ultimately be up to the user." Nothing here is built; the app reads only while open (MM-72), and saying what a gap costs is MM-523.
+
 Choices I made without asking (say if any is wrong):
 - **Background sync stays a convenience, not a dependency** (MM-72). Nothing breaks if it never runs.
 - **It is off until the user turns it on in Settings**, and Android's background permission is asked for only then.
