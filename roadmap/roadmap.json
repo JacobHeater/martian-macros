@@ -842,6 +842,7 @@
           "tickets": [
             "MM-72",
             "MM-516",
+            "MM-523",
             "MM-70",
             "MM-522",
             "MM-513",
@@ -1516,14 +1517,14 @@
           "MM-304",
           "MM-436",
           "MM-437",
-          "MM-417"
+          "MM-417",
+          "MM-109"
         ],
         "remaining": [
           "MM-89",
           "MM-97",
           "MM-101",
           "MM-108",
-          "MM-109",
           "MM-176",
           "MM-179",
           "MM-183",
@@ -2730,7 +2731,8 @@
           "MM-147",
           "MM-114",
           "MM-140",
-          "MM-141"
+          "MM-141",
+          "MM-368"
         ],
         "remaining": [
           "MM-36",
@@ -2743,7 +2745,6 @@
           "MM-148",
           "MM-248",
           "MM-361",
-          "MM-368",
           "MM-405"
         ]
       },
@@ -3070,7 +3071,8 @@
           "MM-72",
           "MM-188",
           "MM-395",
-          "MM-522"
+          "MM-522",
+          "MM-516"
         ],
         "remaining": [
           "MM-66",
@@ -3081,11 +3083,11 @@
           "MM-514",
           "MM-441",
           "MM-442",
-          "MM-516",
           "MM-73",
           "MM-498",
           "MM-314",
-          "MM-323"
+          "MM-323",
+          "MM-523"
         ]
       },
       "sequence": [
@@ -3124,10 +3126,11 @@
         },
         {
           "step": 5,
-          "title": "Background sync",
+          "title": "Sync while the app is open; no background sync (the owner, 2026-10-21)",
           "tickets": [
             "MM-72",
-            "MM-516"
+            "MM-516",
+            "MM-523"
           ],
           "milestone": "M4"
         },
@@ -3184,7 +3187,7 @@
         },
         {
           "step": 12,
-          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; the rule built, its column and Settings row wait on a schema version), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
           "tickets": [
             "MM-441",
             "MM-442"

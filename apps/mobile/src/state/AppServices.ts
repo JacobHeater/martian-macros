@@ -35,6 +35,7 @@ import type { PackHttp } from '../foodCatalog/download/PackHttp';
 import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
+import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
@@ -127,8 +128,8 @@ export interface AppServices {
   /** Whether a reminder arrives on the minute or within an hour (MM-248). */
   readonly exactAlarms: ExactAlarms;
 
-  /** The phone's health platform, read (MM-68). */
-  readonly healthSource: HealthSource & HealthHistoryAccess;
+  /** The phone's health platform, read (MM-68), with a day's steps as it totals them (MM-442). */
+  readonly healthSource: HealthSource & HealthHistoryAccess & HealthDailySteps;
 
   /**
    * Which kinds the app writes to the health platform, each turned on in

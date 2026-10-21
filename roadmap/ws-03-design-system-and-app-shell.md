@@ -106,7 +106,7 @@ WS-13, which needs accessibility, both themes and the icon.
    add the small trend line the dashboard needs.
 5. **Dark-theme, small-screen, large-text and accessibility verification
    (MM-91, MM-106).** M2. The gallery (MM-105) moved to step 1.
-6. **Icon and launch screen (MM-109).** M3.
+6. **Icon and launch screen (MM-109).** M3. Closed 2026-10-21 with the owner's own art.
 
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
 trend line.

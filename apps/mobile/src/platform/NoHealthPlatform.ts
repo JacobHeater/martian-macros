@@ -1,4 +1,6 @@
 import { HealthChanges } from '../healthIngest/HealthChanges';
+import type { DaySteps } from '../healthIngest/DaySteps';
+import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthSample } from '../healthIngest/HealthSample';
@@ -9,7 +11,7 @@ import type { HealthSource } from '../healthIngest/HealthSource';
  * the Health Connect plugin. Nothing is available, so nothing is asked for
  * and nothing is read, history included (MM-73).
  */
-export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
+export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, HealthDailySteps {
   available(): Promise<Set<HealthDataType>> {
     return Promise.resolve(new Set());
   }
@@ -36,5 +38,9 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
 
   changesSince(): Promise<HealthChanges> {
     return Promise.resolve(new HealthChanges({ nextToken: '' }));
+  }
+
+  dailySteps(): Promise<DaySteps[]> {
+    return Promise.resolve([]);
   }
 }
