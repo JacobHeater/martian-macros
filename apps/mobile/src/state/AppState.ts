@@ -120,6 +120,8 @@ import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
+import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
 import type { AppServices } from './AppServices';
@@ -1255,8 +1257,37 @@ export class AppState {
    * read (MM-73), once the history permission is granted. A backfill that
    * cannot finish keeps what it read and goes on next time; it does not
    * make the import count as failed.
+   *
+   * `reason` decides whether it reads at all (MM-72, `HealthSyncSchedule`):
+   * coming back to the front soon after a read does nothing, and answers
+   * true. Only one read runs at a time. Opening or coming back while one
+   * runs waits for it; asking while one runs waits, then reads again, so a
+   * kind allowed just now is read.
    */
-  async syncHealth(): Promise<boolean> {
+  syncHealth(reason: HealthSyncReason = 'asked'): Promise<boolean> {
+    const running = this.syncing;
+    if (running !== undefined) {
+      if (reason !== 'asked') return running;
+      const again = () => this.syncHealth(reason);
+      return running.then(again, again);
+    }
+    if (!HealthSyncSchedule.due(reason, this.lastHealthSync, this.services.clock.now())) return Promise.resolve(true);
+    const sync = this.readHealth().then((read) => {
+      if (read) this.lastHealthSync = this.services.clock.now();
+      return read;
+    });
+    this.syncing = sync.finally(() => {
+      this.syncing = undefined;
+    });
+    return this.syncing;
+  }
+
+  private syncing: Promise<boolean> | undefined;
+
+  /** When the last read of the health platform that succeeded finished, while the app has been running (MM-72). */
+  private lastHealthSync: Date | undefined;
+
+  private async readHealth(): Promise<boolean> {
     const { healthSource: source, healthSamples: store } = this.services;
     let changed = false;
     try {
