@@ -27,6 +27,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   14: '6ea4e17738f9d1c856ead90d9c7486da11d53a22bc7f40ccf73672afe1e6f420',
   // MM-71: the scale chosen as primary in Settings.
   15: 'eef87657d12062f15e42cbc2abd1ece171456c8d17e7a33912cabc3248bf03ef',
+  // MM-486: how the user shapes their targets (MM-122, MM-124).
+  16: 'a76d6b199d6dcbaa83ea2e277b425d2c9979355927cfb92435936af5827a3b16',
 };
 
 it('the schema is the one recorded for its version', () => {

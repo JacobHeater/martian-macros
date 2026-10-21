@@ -17,7 +17,7 @@ export class InMemoryTargetShapeRepository implements TargetShapeRepository {
     );
   }
 
-  /** Empties the store (used by `InMemoryDataEraser`, and by the app's erase while it is held in memory, MM-486). */
+  /** Empties the store (used by `InMemoryDataEraser`). */
   clear(): void {
     this.shapes.value = [];
   }

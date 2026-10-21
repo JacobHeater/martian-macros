@@ -65,7 +65,7 @@ export interface AppServices {
   readonly dayMarks: DayMarkRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
-  /** How the user shapes their targets (MM-122, MM-124); held in memory on the phone until MM-486. */
+  /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */
   readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;

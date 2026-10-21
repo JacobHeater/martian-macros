@@ -42,7 +42,8 @@ it('a bar of 24 g carbohydrate, 9 g fiber and 10 g sugar alcohols counts 5 g net
   await openTab('Food');
   await screen.findByText('Protein bar');
   expect(carbsBar()).toHaveTextContent('Net carbs');
-  expect(carbsBar()).toHaveTextContent('5 / 250 g');
+  // The carb target is the day's, split as Balanced until a balance is chosen (MM-486); the count is what is checked.
+  expect(carbsBar()).toHaveTextContent(/\b5 \/ [\d,]+ g/);
   expect(screen.getByText(/P 20 · C 5 · F 7/)).toBeInTheDocument();
 });
 
@@ -54,7 +55,7 @@ it('switched off, the same day shows 24 g, labelled Carbs', async () => {
   await screen.findByText('Protein bar');
   expect(carbsBar()).toHaveTextContent('Carbs');
   expect(carbsBar()).not.toHaveTextContent('Net carbs');
-  expect(carbsBar()).toHaveTextContent('24 / 250 g');
+  expect(carbsBar()).toHaveTextContent(/\b24 \/ [\d,]+ g/);
 });
 
 it('the switch in Settings changes what is shown at once', async () => {

@@ -41,8 +41,8 @@ export function CarbFatBalanceScreen() {
   const limits = useCell(state.targetShapeLimits);
   const current = useCell(state.currentTargets)?.targets;
   const chosen = TargetShape.on(shapes, today)?.balance;
-  // Until one is chosen, MM-24's split stands: fat 25% of calories, no carb floor.
-  const balance = chosen ?? new CarbFatBalance({ fatShare: CarbFatBalance.unchosenFatShare });
+  // Until one is chosen, the day is Balanced (MM-486).
+  const balance = chosen ?? CarbFatBalance.balanced;
   const save = async (next: CarbFatBalance) => {
     try {
       await services.targetShapes.saveTargetShape(nextTargetShape({ shapes, today, balance: next }));
@@ -59,7 +59,7 @@ export function CarbFatBalanceScreen() {
   const split =
     current === undefined || limits === undefined
       ? undefined
-      : splitCarbsAndFat({ kcal: current.kcal, proteinG: current.proteinG, fatMinimumG: limits.fatMinimumG(current.kcal), balance: chosen });
+      : splitCarbsAndFat({ kcal: current.kcal, proteinG: current.proteinG, fatMinimumG: limits.fatMinimumG(current.kcal), balance });
   const shareGiven = split === undefined || current === undefined ? undefined : (9 * split.fatG) / current.kcal;
   // Fat gave way to the carbohydrate floor at these calories.
   const heldByFloor = shareGiven !== undefined && shareGiven < balance.fatShare - 0.005;
@@ -73,7 +73,7 @@ export function CarbFatBalanceScreen() {
         <MmListRow
           leadingIcon="percent"
           title={`Fat: ${percent(Math.max(balance.fatShare, lowest))} of calories`}
-          subtitle={chosen === undefined ? 'As the app set it until you choose. Balanced is 30%.' : undefined}
+          subtitle={chosen === undefined ? 'As the app set it until you choose: Balanced.' : undefined}
           entry={
             <>
               <MmSegmented<number>
