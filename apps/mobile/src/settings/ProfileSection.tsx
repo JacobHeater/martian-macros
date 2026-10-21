@@ -1,10 +1,10 @@
 import { CalendarDate } from '../domain/CalendarDate';
 import { Profile } from '../domain/Profile';
 import { ScreeningAnswers } from '../domain/ScreeningAnswers';
-import { Units } from '../domain/Units';
 import type { UserSetup } from '../domain/UserSetup';
 import { Fmt } from '../format/Fmt';
-import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { healthPlatformName } from '../format/healthPlatformName';
+import { heightLabel } from '../format/heightLabel';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -38,6 +38,10 @@ const tickedCount = (s: ScreeningAnswers) =>
 /**
  * The You section of Settings (MM-259): sex, date of birth, height and the
  * health check, each correctable (MM-83). Every change issues new targets at once.
+ *
+ * A height read from the health platform that shows differently from the
+ * profile's is offered under the height row and in its sheet, and saved
+ * only when the person chooses it there (MM-68).
  */
 export function ProfileSection() {
   // Folds in place, closed until opened (MM-398).
@@ -47,13 +51,20 @@ export function ProfileSection() {
   const overlays = useOverlays();
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
+  const platformHeight = useLoaded(state.importedHeight);
   if (setup === undefined) return null;
   const profile = setup.profile;
   const imperial = new Fmt(setup.unitSystem).imperial;
-  const inches = Units.cmToInches(profile.heightCm);
-  const height = imperial
-    ? `${Math.trunc(inches / 12)}′ ${roundHalfAwayFromZero(inches % 12) + 0}″`
-    : `${roundHalfAwayFromZero(profile.heightCm) + 0} cm`;
+  const height = heightLabel(profile.heightCm, imperial);
+  const platform = healthPlatformName(services.platform);
+  const suggestedCm = platformHeight?.value;
+  const suggestion =
+    suggestedCm !== undefined &&
+    suggestedCm >= Profile.minHeightCm &&
+    suggestedCm <= Profile.maxHeightCm &&
+    heightLabel(suggestedCm, imperial) !== height
+      ? { cm: suggestedCm, label: heightLabel(suggestedCm, imperial), from: platform }
+      : undefined;
   const ticked = tickedCount(setup.screening);
 
   /**
@@ -122,6 +133,7 @@ export function ProfileSection() {
       <EditHeightSheet
         initialCm={profile.heightCm}
         imperial={imperial}
+        suggestion={suggestion}
         onSave={(heightCm) => {
           close();
           void save(setup, { profile: new Profile({ sex: profile.sex, birthDate: profile.birthDate, heightCm }) });
@@ -146,7 +158,13 @@ export function ProfileSection() {
           trailing={<span>{Fmt.longDate(profile.birthDate)}</span>}
           onPress={() => void changeBirthDate()}
         />
-        <MmListRow leadingIcon="ruler" title="Height" trailing={<span>{height}</span>} onPress={() => void changeHeight()} />
+        <MmListRow
+          leadingIcon="ruler"
+          title="Height"
+          subtitle={suggestion === undefined ? undefined : `${suggestion.from} says ${suggestion.label}`}
+          trailing={<span>{height}</span>}
+          onPress={() => void changeHeight()}
+        />
         <MmListRow
           leadingIcon="health"
           title="Health check"
