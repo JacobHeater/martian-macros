@@ -78,7 +78,7 @@ WS-04 step 3 and 6, WS-05 to WS-13.
 3. **Integration seams (MM-162).** M0. `Clock`, `FoodSearch`/`FoodBarcodeLookup`,
    `BackupStorage`, `EntitlementReader` and the harness.
 , MM-246).** M0. Placed 2026-10-13.
-5. **The phone's storage on iOS (MM-404).** M4. `MmDb` over the system SQLite (FTS5 is in it) and `MmPacks` in Swift, in the iOS shell of MM-403, behind the seams MM-231 and MM-56 already have; nothing above the plugins changes.
+5. **The phone's storage on iOS (MM-404).** M4. `MmDb` over the system SQLite (FTS5 is in it) and `MmPacks` in Swift, in the iOS shell of MM-403, behind the seams MM-231 and MM-56 already have; nothing above the plugins changes. Done 2026-10-21; its phone checks are owed.
 
 ## Done enough to unblock others
 MM-160 and MM-161 are done: new files follow the rules and all persistence is

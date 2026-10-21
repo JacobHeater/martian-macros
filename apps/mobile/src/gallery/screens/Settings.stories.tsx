@@ -86,6 +86,18 @@ export const EditHeight = screenStory({
   },
 });
 
+/** MM-68: Health Connect holds a height that shows differently from the profile's: said under the row, offered in the sheet. */
+export const HeightFromHealthConnect = screenStory({
+  covers: ['SettingsScreen', 'EditHeightSheet'],
+  shows: 'Health Connect says 5′ 9″',
+  device: healthPlatform({ allowed: ['height'], heightCm: 176 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="profile" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Height/ }));
+    await screen.findByRole('button', { name: 'Use 5′ 9″' });
+  },
+});
+
 /** MM-268: a choice in Settings is the options dialog, with the value in force marked Chosen. */
 export const ChangeDailyActivity = screenStory({
   covers: ['SettingsScreen'],
