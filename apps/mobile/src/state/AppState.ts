@@ -104,6 +104,7 @@ import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
+import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
@@ -500,7 +501,7 @@ export class AppState {
       return once(() => s.packStore.installed());
     });
     this.packDownloads = new PackDownloadsController({
-      http: s.packHttp,
+      fetch: s.packFetch ?? new StreamedPackFetch({ http: s.packHttp, store: s.packStore }),
       store: s.packStore,
       onInstalled: () => this.packsChanged(),
     });
