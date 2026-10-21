@@ -15,6 +15,7 @@ import { failingRead } from './failingRead';
 import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
+import { healthPlatform } from './healthPlatform';
 import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
@@ -175,6 +176,60 @@ export const CoachPhaseProjected = screenStory({
   covers: ['CoachScreen'],
   shows: 'Projected end',
   open: onCoach,
+});
+
+/** MM-523: weigh-ins on Health Connect and not allowed, few typed: beside the trend, what that costs, and where to allow them. */
+export const CoachWeighInsGap = screenStory({
+  covers: ['CoachScreen'],
+  shows: /your trend and the dates it projects are less certain/,
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/your trend and the dates it projects are less certain/, undefined, { timeout: 5000 }));
+  },
+});
+
+/** MM-523: "Open Settings" beside the weigh-ins gap opens Settings at Health Connect, where Weight is allowed. */
+export const CoachWeighInsGapOpensSettings = screenStory({
+  covers: ['CoachScreen', 'SettingsScreen'],
+  shows: /Nothing read leaves this phone/,
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: pressOnCoach('Open Settings: Health Connect'),
+});
+
+/** MM-523: the weigh-ins gap dismissed: it goes, and does not come back for that gap. */
+export const CoachWeighInsGapDismissed = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Trend weight',
+  scenario: firstDayScenario,
+  device: healthPlatform(),
+  open: onCoach,
+  walk: pressOnCoach('Got it: weigh-ins'),
+});
+
+/** MM-523: the history refused (MM-73): beside the expenditure estimate, that it has less to go on, and where to allow it. */
+export const CoachHistoryGap = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Allowing past data in Health Connect would give it more/,
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true }),
+  open: onCoach,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText(/Allowing past data in Health Connect/, undefined, { timeout: 5000 }));
+  },
+});
+
+/** MM-523, MM-323: "Open Health Connect" where it cannot be opened: a snack says where to allow it instead. */
+export const CoachHistoryGapCannotOpen = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Health Connect could not be opened from here/,
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true, opensPermissions: false }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
 });
 
 /** MM-36: a man cut to 12%: the cut has ended, and the coach recommends maintenance, then a lean gain, with why. */

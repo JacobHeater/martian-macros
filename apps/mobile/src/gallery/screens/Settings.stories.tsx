@@ -406,6 +406,33 @@ export const HealthConnectRefused = screenStory({
   },
 });
 
+/** MM-323: Health Connect no longer shows the request for weight: the snack says to allow it there, and offers to open it. */
+export const HealthConnectStoppedAsking = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Health Connect no longer asks for weight here/,
+  device: healthPlatform({ stopsAsking: ['weight'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+  },
+});
+
+/** MM-323: opening Health Connect from that snack where it cannot be opened: a snack says where to allow it instead. */
+export const HealthConnectStoppedAskingCannotOpen = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Health Connect could not be opened from here/,
+  device: healthPlatform({ stopsAsking: ['weight'], opensPermissions: false }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('button', { name: 'Open Health Connect' }));
+  },
+});
+
 /** MM-320: Health Connect could not be read: a snack says so, and nothing kept changes. */
 export const HealthConnectReadFailed = screenStory({
   covers: ['SettingsScreen'],

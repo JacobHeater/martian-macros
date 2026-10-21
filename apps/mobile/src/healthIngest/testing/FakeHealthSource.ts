@@ -7,6 +7,7 @@ import type { HealthDailySteps } from '../HealthDailySteps';
 import { HealthChanges } from '../HealthChanges';
 import { HealthDataType } from '../HealthDataType';
 import type { HealthHistoryAccess } from '../HealthHistoryAccess';
+import type { HealthPermissionsPlace } from '../HealthPermissionsPlace';
 import { HealthReadFailure } from '../HealthReadFailure';
 import type { HealthSample } from '../HealthSample';
 import type { HealthSource } from '../HealthSource';
@@ -40,11 +41,14 @@ const typeOf = (event: RecordedEvent) => byName(HealthDataType.values, event['ty
  * history permission is granted. Unset, as on Apple Health, there is no
  * window and history counts as granted.
  *
+ * Kinds in `stopsAsking` are ones the platform no longer shows the app's
+ * request for (MM-323): asked for, they come back refused at once.
+ *
  * It totals a day's steps as the platforms do (MM-442): where readings
  * from two sources overlap in time, only the one that comes first in
  * `stepsPriority` counts for that time.
  */
-export class FakeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps {
+export class FakeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps, HealthPermissionsPlace {
   private readonly sources: ReadonlyMap<string, string>;
   private readonly events: readonly RecordedEvent[];
 
@@ -71,6 +75,18 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess, Heal
 
   /** How many times the user was shown the history question. */
   historyAsked = 0;
+
+  /** The kinds the platform no longer asks about (MM-323). */
+  stopsAsking: ReadonlySet<HealthDataType> = new Set();
+
+  /** Whether the platform's screen of the app's permissions can be opened (MM-323). */
+  opensPermissions = true;
+
+  /** How many times that screen was opened. */
+  permissionsOpened = 0;
+
+  /** The kinds whose last request came back without being shown. */
+  private readonly unshown = new Set<HealthDataType>();
 
   /**
    * The order of step sources the person set in their phone's health
@@ -195,9 +211,25 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess, Heal
   async requestPermission(types: ReadonlySet<HealthDataType>): Promise<Set<HealthDataType>> {
     const here = await this.available();
     for (const type of types) {
-      if (here.has(type) && (this.willPermit?.has(type) ?? true)) this.allowed.add(type);
+      if (!here.has(type)) continue;
+      if (this.stopsAsking.has(type) && !this.allowed.has(type)) {
+        this.unshown.add(type);
+        continue;
+      }
+      this.unshown.delete(type);
+      if (this.willPermit?.has(type) ?? true) this.allowed.add(type);
     }
     return this.permitted();
+  }
+
+  async stoppedAsking(type: HealthDataType): Promise<boolean> {
+    return this.unshown.has(type);
+  }
+
+  async openPermissions(): Promise<boolean> {
+    if (!this.opensPermissions) return false;
+    this.permissionsOpened++;
+    return true;
   }
 
   async historyPermitted(): Promise<boolean> {

@@ -48,6 +48,8 @@ import { ScreenLoading } from '../ui/ScreenLoading';
 import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
+import { DataGapNote } from './DataGapNote';
+import { dataGapsOf } from './dataGapsOf';
 import { LastChangeCard } from './LastChangeCard';
 import { LeanGainCard } from './LeanGainCard';
 import { MaintenanceCard } from './MaintenanceCard';
@@ -123,6 +125,7 @@ export function CoachScreen() {
   const food = useLoaded(state.foodForDay(today)) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
   const weights = useCell(state.weights);
+  const connection = useLoaded(state.healthConnection);
   // What the coach works from; any of it unread leaves the coach with nothing to say (MM-340).
   const sources = [weights, useCell(state.weightEvents), useCell(state.intakeDays), useCell(state.targetsHistory), useCell(state.pauses)];
   // What the coach said inline (MM-363), or a design story's own list.
@@ -216,6 +219,12 @@ export function CoachScreen() {
   // On a weight-loss medication (MM-113, MM-510): the fast pace is for the prescriber, and training keeps muscle.
   const paceNote = current === undefined ? undefined : weightLossMedicationPaceNote(setup.screening, current.targets.flags);
   const trainingNote = weightLossMedicationTrainingNote(setup.screening, setup.trainingDaysPerWeek);
+  // What the health platform's gaps cost, each beside the estimate it weakens (MM-523).
+  const gaps = dataGapsOf({
+    connection,
+    confidence: snapshot.confidence,
+    eatingDisorderHistory: setup.screening.eatingDisorderHistory,
+  });
   return (
     <>
       {/* The safeguards are outside the rationing: above the hero, in full, in this order. */}
@@ -335,6 +344,7 @@ export function CoachScreen() {
       <ReportsCard />
       <MmSection icon="bolt" title="Your metabolism">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
+        {gaps.includes('history') ? <DataGapNote gap="history" /> : null}
       </MmSection>
       <MmSection icon="coach" title={`Coach confidence · ${confidence}`}>
         {snapshot.confidence.level === 'learning' ? (
@@ -350,6 +360,7 @@ export function CoachScreen() {
       </MmSection>
       <MmSection icon="body" title="Body">
         <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
+        {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
         <StatRow label="Resting energy (BMR)" value={Fmt.kcal(snapshot.bmrKcal)} />
       </MmSection>
