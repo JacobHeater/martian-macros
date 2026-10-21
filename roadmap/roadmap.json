@@ -742,7 +742,8 @@
         {
           "workstream": "WS-05",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ]
         },
         {
@@ -1970,7 +1971,8 @@
         ],
         "remaining": [
           "MM-80",
-          "MM-113"
+          "MM-113",
+          "MM-510"
         ]
       },
       "sequence": [
@@ -2010,7 +2012,8 @@
           "step": 5,
           "title": "Weight-loss medication support",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ],
           "milestone": "M4"
         }
