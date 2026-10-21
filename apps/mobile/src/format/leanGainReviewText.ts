@@ -44,7 +44,7 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
     said.push(
       `Over ${review.weeks} weeks your waist is up ${waistAmount(review.waistChangeCm, fmt)} with ` +
         (fmt.weightHidden ? 'a rise in trend weight. ' : `${fmt.weight(review.weightChangeKg)} of trend weight. `) +
-        'The gain looks fat-heavy: more of it is going to your ` +
+        'The gain looks fat-heavy: more of it is going to your ' +
         'waist than a lean gain usually puts there. ' +
         // MM-480: already on the slower gain, maintenance is what is left to suggest.
         (review.slowerPace
