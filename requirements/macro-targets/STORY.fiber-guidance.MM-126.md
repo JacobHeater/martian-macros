@@ -1,6 +1,6 @@
 ---
 id: MM-126
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-49, MM-53, MM-55, MM-108, MM-141, MM-153]
 ---
@@ -31,6 +31,20 @@ Choices I made without asking (say if any is wrong):
   (MM-116) or has no recovery answers: a plain statement that more fiber and bulkier foods usually make a deficit easier, with two or
   three examples drawn from foods they already log.
 - **No food is called good or bad** (MM-108). The insight talks about fullness.
+- **How the insight reads the rule** (2026-10-21, built against the recommendation above):
+  - "On a deficit" is the fat-loss goal; recomp, lean gain and maintenance are left out.
+  - The average is over the fortnight's whole days (MM-27) that carry enough fiber data (the 70% rule), at least seven of
+    them; a day with too little data is left out, never read as zero.
+  - "High hunger" is the latest check-in of the fortnight answering hunger at the hard end (2 or below, the relief offer's
+    `hardAnswer`, MM-117); "no recovery answers" is no check-in in that fortnight.
+  - "At most monthly": once shown, it does not start again as new for 30 days (`FiberRule.quietDaysAfterShown`), on top of
+    the 28 quiet days after a dismissal and the usual one-a-day, three-a-week ration.
+  - The examples are the logged foods of the fortnight with at least the guide's own density (14 g per 1,000 kcal), densest
+    first, each name once, three at most; with fewer than two, none are named.
+  - Only at Full detail, as the fiber line is: below it the insight would be about a number the user never sees (the
+    "Standard detail" scenario).
+  - It is about intake other than protein, so it is left out for a user with an eating-disorder history (MM-141's CO-1),
+    and it is an education insight, the lowest priority.
 - **No micronutrient tracking**; see MM-49's note and the non-goals (MM-144).
 
 Where the experts disagreed:
@@ -62,7 +76,23 @@ Scenario: Not enough data
   Then the fiber line says there is not enough data, and shows no total
 
 Scenario: Never judged
-  Then no screen, streak, summary or reward depends on fiber
+  Then no streak, summary or reward depends on fiber, and no text calls fiber low or a food good or bad
+
+Scenario: The insight
+  Given Full detail, the fat-loss goal, and a fortnight whose days with enough fiber data number at least seven
+  And fiber averaged under half the guide on them
+  And the latest check-in of the fortnight answered hunger at 2 or below, or there was none
+  Then one insight says the average against the guide, that more fiber and bulkier foods usually make a deficit easier
+    because they fill you up for the same calories, and names two or three foods the user already logs
+
+Scenario: The insight holds back
+  Given the latest check-in says hunger is fine, or the goal is not fat loss, or fiber is at half the guide or more,
+    or too few days carry enough fiber data, or the detail level is below Full, or there is an eating-disorder history
+  Then there is no fiber insight
+
+Scenario: At most monthly
+  Given the fiber insight was shown 29 days ago and dismissed
+  Then it is not shown again until 30 days have passed
 
 Scenario: Standard detail
   Given Standard detail
@@ -80,4 +110,9 @@ screen at Full detail only: "Fiber: 28 g · guide 34 g", or "Fiber: not enough d
 from entries with fiber, never a total that treats missing as zero. Nothing else depends on fiber: no streak, no summary, no reward.
 Tested in `fiber_test.dart` and `detail_level_test.dart`.
 
-Not built: the insight rule (MM-141) and any fiber on the Today dashboard.
+Built (2026-10-21): the insight rule `fiberForFullness` (`fiberInsight`, `FiberRule`, `FiberPattern`), wired through the
+app's state at Full detail only and shown on Today like the other insights: "Fiber, and staying full on a deficit".
+Tested in `test/engine/fiberInsight.test.ts`, `test/coach/fiberInsightCard.test.tsx` and `test/coach/insightCard.test.tsx`
+("the fiber insight states the average…"); drawn in the gallery's `InsightFiberForFullness`. Not run locally; CI validates.
+
+Not built, by decision: fiber on the Today dashboard (the Decisions place it on Food, at Full detail).

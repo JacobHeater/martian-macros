@@ -904,7 +904,7 @@ export const ScanNoCamera = screenStory({
   },
 });
 
-/** MM-321: entered by hand with alcohol: its grams, and what a standard drink is. */
+/** MM-321, MM-127: entered by hand with alcohol: two standard drinks typed, filling in their 28 g. */
 export const AddFoodWithAlcohol = screenStory({
   covers: ['AddFoodSheet'],
   shows: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
@@ -912,6 +912,7 @@ export const AddFoodWithAlcohol = screenStory({
   walk: async (canvas) => {
     await press('Enter manually')(canvas);
     await press('Includes alcohol?')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Standard drinks' }), '2');
   },
 });
 
