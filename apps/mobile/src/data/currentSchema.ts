@@ -210,7 +210,9 @@ CREATE TABLE "recipe_ingredients" (
   "kcal" REAL NOT NULL,
   "protein_g" REAL NOT NULL,
   "carbs_g" REAL NOT NULL,
-  "fat_g" REAL NOT NULL
+  "fat_g" REAL NOT NULL,
+  "source_pack_id" TEXT NULL,
+  "source_food_id" INTEGER NULL
 );
 CREATE TABLE "insight_log" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
