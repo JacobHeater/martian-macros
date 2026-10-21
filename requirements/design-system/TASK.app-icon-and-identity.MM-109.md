@@ -24,6 +24,7 @@ Choices I made without asking (say if any is wrong):
   flash.
 - **The name is written "Martian Macros"**, two words, both capitalized. The short name under the icon is "Macros" if the full name is
   truncated.
+- **The owner rejected the planet direction (2026-10-21, PR #211 closed):** the owner's own icon and launch art (in the shells since 2026-10-20) stays. Whether this ticket closes with that art, given its written name, its detail at 48 px and its near-black sky against the first frame, is the owner's call.
 
 ## Description
 Chosen direction, produced as icon assets for both platforms, the launch screen, and the store listing's icon.
