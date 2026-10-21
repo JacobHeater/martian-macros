@@ -145,8 +145,20 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/**
+ * The schema as version 22 left it: the waist in a table of its own, and no other site measured (MM-156). The
+ * waist's table goes back where it was, after the day marks, so every older version is derived from this one.
+ */
+const versionTwentyTwo = currentSchema
+  .replace(/CREATE TABLE "body_measurements" \([\s\S]*?\n\);\nCREATE TABLE "measurement_settings" \([\s\S]*?\n\);\n/, '')
+  .replace(
+    /(CREATE TABLE "day_marks" \([\s\S]*?\n\);\n)/,
+    '$1CREATE TABLE "waist_entries" (\n  "epoch_day" INTEGER NOT NULL,\n  "waist_cm" REAL NOT NULL CHECK("waist_cm" BETWEEN 30.0 AND 300.0),\n' +
+      '  "reading1_cm" REAL NULL,\n  "reading2_cm" REAL NULL,\n  "reading3_cm" REAL NULL,\n  PRIMARY KEY ("epoch_day")\n);\n',
+  );
+
 /** The schema as version 21 left it: without the imported workouts' platform ids, nor the ones deleted (MM-490). */
-const versionTwentyOne = currentSchema
+const versionTwentyOne = versionTwentyTwo
   .replace('  "set_started_at_ms" INTEGER NULL,\n  "platform_id" TEXT NULL,\n  "platform_source_name" TEXT NULL\n', '  "set_started_at_ms" INTEGER NULL\n')
   .replace('CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id");\n', '')
   .replace(/CREATE TABLE "deleted_platform_workouts" \([\s\S]*?\n\);\n/, '');
@@ -711,4 +723,39 @@ it('a version 21 database comes up to date with its workouts kept and none impor
   expect((await first(repos.workouts.watchWorkouts())).find((w) => w.id === id)?.imported).toEqual({ platformId: 'hc-9', sourceName: 'Watch' });
   await repos.workouts.deleteWorkout(id);
   expect(await repos.workouts.deletedPlatformIds()).toEqual(new Set(['hc-9']));
+});
+
+// MM-156: a version 22 database comes up to date with its waist moved into the store of every site, each entry's day,
+// value and readings intact, the waist's own table gone, and no other site measured; a new site saves after.
+it('a version 22 database comes up to date with the waist in the new store, unchanged, and keeps a new site after', async () => {
+  expect(versionTwentyTwo).toContain('"waist_entries"');
+  expect(versionTwentyTwo).not.toContain('body_measurements');
+  expect(versionTwentyTwo).toContain('deleted_platform_workouts');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 22, schema: versionTwentyTwo });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute('INSERT INTO waist_entries (epoch_day, waist_cm) VALUES (?, 92)', [day.addDays(-14).epochDay]);
+  await old.execute('INSERT INTO waist_entries (epoch_day, waist_cm, reading1_cm, reading2_cm, reading3_cm) VALUES (?, 91, 90.5, 91.5, 91)', [
+    day.epochDay,
+  ]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await sql.select("SELECT name FROM sqlite_master WHERE name = 'waist_entries'")).toEqual([]);
+  const waist = await first(repos.waist.watchWaist());
+  expect(waist.map((w) => [w.date, w.waistCm, [...w.readings]])).toEqual([
+    [day.addDays(-14), 92, []],
+    [day, 91, [90.5, 91.5, 91]],
+  ]);
+  expect(await first(repos.measurements.watchSite('waist'))).toHaveLength(2);
+  expect([...(await first(repos.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);
+  await repos.measurements.saveMeasurement('neck', day, 37.5, { readings: [37.5, 37.4, 37.6] });
+  expect((await first(repos.measurements.watchSite('neck'))).map((o) => o.valueCm)).toEqual([37.5]);
 });
