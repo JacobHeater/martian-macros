@@ -921,6 +921,32 @@ export const NewOwnFoodNoCamera = screenStory({
   },
 });
 
+/**
+ * MM-44: a label read from a panel whose labels and values came back in two columns: the numbers paired by
+ * position, and each one marked unsure until it is changed.
+ */
+export const NewOwnFoodLabelUnsure = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Numbers for one serving',
+  device: (services) =>
+    Promise.resolve({
+      ...services,
+      labelReader: {
+        readLabel: () =>
+          Promise.resolve(
+            'Nutrition Facts\nServing size 1 bar (40g)\nCalories 180\nTotal Fat\nSodium\nTotal Carbohydrate\nProtein\n6g\n95mg\n24g\n8g',
+          ),
+      },
+    }),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New food')(canvas);
+    await press('Read the nutrition label')(canvas);
+    await within(canvas).findByText(/Numbers marked unsure were hard to read/);
+  },
+});
+
 /** MM-321: scanning on a phone whose camera is not allowed: type the digits instead. */
 export const ScanNoCamera = screenStory({
   covers: ['BarcodeScanStep'],
