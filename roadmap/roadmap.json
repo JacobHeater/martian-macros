@@ -808,6 +808,7 @@
             "MM-32",
             "MM-125",
             "MM-36",
+            "MM-450",
             "MM-312",
             "MM-361",
             "MM-362",
@@ -2644,6 +2645,8 @@
       "sourceRequirements": {
         "built": [
           "MM-32",
+          "MM-92",
+          "MM-33",
           "MM-133",
           "MM-168",
           "MM-312",
@@ -2667,9 +2670,8 @@
           "MM-141"
         ],
         "remaining": [
-          "MM-33",
           "MM-36",
-          "MM-92",
+          "MM-450",
           "MM-116",
           "MM-117",
           "MM-125",
@@ -2752,7 +2754,8 @@
           "title": "Protein across meals; phase planning",
           "tickets": [
             "MM-125",
-            "MM-36"
+            "MM-36",
+            "MM-450"
           ],
           "milestone": "M4"
         },
