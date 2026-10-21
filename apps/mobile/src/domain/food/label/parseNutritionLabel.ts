@@ -1,7 +1,9 @@
 import { tryParseDouble } from '../../../lang/tryParseDouble';
 import type { Micronutrient } from '../micros/Micronutrient';
 import { Micronutrients } from '../micros/Micronutrients';
+import type { LabelField } from './LabelField';
 import { LabelReading } from './LabelReading';
+import { readLabelColumns } from './readLabelColumns';
 
 /**
  * Reads the US Nutrition Facts layout from recognised `text` (MM-44): serving
@@ -10,32 +12,102 @@ import { LabelReading } from './LabelReading';
  *
  * It is deliberately plain. It finds each label's first number after the
  * label, tolerating the line breaks a text recogniser inserts and the
- * look-alike characters it confuses with digits. It cannot read a panel
- * whose labels and values are in separate columns, and it never fills a
- * field it did not find. The caller reviews everything it returns.
+ * look-alike characters it confuses with digits. A panel whose labels and
+ * values came back in separate columns is paired in order
+ * (`readLabelColumns`), and those values replace what the plain read found
+ * for the same labels, which would be another line's. It never fills a field
+ * it did not find, and it marks the numbers it was unsure of. The caller
+ * reviews everything it returns.
  */
 export function parseNutritionLabel(text: string): LabelReading {
   const t = clean(text);
+  const columns = readLabelColumns(digits(t));
+  const unsure = new Set<LabelField>();
+
+  /** The column's value when the label was in a column, else the plain read; marks what is unsure. */
+  const take = (field: LabelField, plain: PlainRead | undefined, unit: 'g' | 'mg' | 'kcal'): number | undefined => {
+    if (columns.has(field)) {
+      const column = columns.get(field);
+      if (column === undefined) return undefined;
+      const [value, printed] = column;
+      const fits = printed === undefined || (unit !== 'kcal' && printed === unit);
+      if (!fits) return undefined;
+      unsure.add(field);
+      return value;
+    }
+    if (plain === undefined) return undefined;
+    if (plain.repaired) unsure.add(field);
+    return plain.value;
+  };
+
+  const servingG = servingGrams(t);
+  const kcal = take('kcal', numberAfter(t, String.raw`calories(?!\s*from)`), 'kcal');
+  const fatG = take('fatG', numberAfter(t, String.raw`total\s*fat`), 'g');
+  const carbsG = take('carbsG', numberAfter(t, String.raw`total\s*carb\w*\.?`), 'g');
+  const proteinG = take('proteinG', numberAfter(t, String.raw`protein`), 'g');
+  const fiberG = take('fiberG', numberAfter(t, String.raw`(?:dietary\s*)?fiber`), 'g');
+  const sodiumMg = take('sodiumMg', numberAfter(t, String.raw`sodium`), 'mg');
+
+  // What the serving's weight makes impossible: more grams of a nutrient than the serving, or more energy than pure fat.
+  if (servingG !== undefined && servingG > 0) {
+    for (const [field, grams] of [
+      ['proteinG', proteinG],
+      ['carbsG', carbsG],
+      ['fatG', fatG],
+      ['fiberG', fiberG],
+    ] as const) {
+      if (grams !== undefined && grams > servingG) unsure.add(field);
+    }
+    if (sodiumMg !== undefined && sodiumMg / 1000 > servingG) unsure.add('sodiumMg');
+    if (kcal !== undefined && kcal > servingG * 9 + 5) unsure.add('kcal');
+  }
+
   return new LabelReading({
     servingText: servingText(t),
-    servingGrams: servingGrams(t),
-    kcal: numberAfter(t, String.raw`calories(?!\s*from)`),
-    fatG: numberAfter(t, String.raw`total\s*fat`),
-    carbsG: numberAfter(t, String.raw`total\s*carb\w*\.?`),
-    proteinG: numberAfter(t, String.raw`protein`),
-    fiberG: numberAfter(t, String.raw`(?:dietary\s*)?fiber`),
+    servingGrams: servingG,
+    kcal,
+    fatG,
+    carbsG,
+    proteinG,
+    fiberG,
     // "Sugar Alcohol", or a single polyol by its name (21 CFR 101.9(c)(6)(iv)), only with grams; never a bare
     // "alcohol", which is ethanol, and never allulose, which is not a sugar alcohol (MM-397).
-    sugarAlcoholsG: amountAfter(
-      t,
-      String.raw`(?:sugar\s*alcohols?|polyols?|erythritol|xylitol|sorbitol|maltitol|mannitol|isomalt|lactitol)`,
-      'g',
-    ),
-    sodiumMg: numberAfter(t, String.raw`sodium`),
+    sugarAlcoholsG: columns.has('sugarAlcoholsG')
+      ? fromColumn(columns, 'sugarAlcoholsG', 'g')
+      : amountAfter(
+          t,
+          String.raw`(?:sugar\s*alcohols?|polyols?|erythritol|xylitol|sorbitol|maltitol|mannitol|isomalt|lactitol)`,
+          'g',
+        ),
+    sodiumMg,
     micros: new Micronutrients(
-      Object.fromEntries(lines.map(([nutrient, label, unit]) => [nutrient, amountAfter(t, label, unit)])),
+      Object.fromEntries(
+        lines.map(([nutrient, label, unit]) => [
+          nutrient,
+          columns.has(nutrient) ? fromColumn(columns, nutrient, unit) : amountAfter(t, label, unit),
+        ]),
+      ),
     ),
+    unsure,
   });
+}
+
+/** A number found after its label, and whether a look-alike letter was repaired in it. */
+interface PlainRead {
+  readonly value: number;
+  readonly repaired: boolean;
+}
+
+/** A value read from a column with the unit asked for (a bare number counts), or undefined. */
+function fromColumn(
+  columns: ReadonlyMap<string, readonly [number, string | undefined] | undefined>,
+  key: string,
+  unit: 'g' | 'mg' | 'mcg',
+): number | undefined {
+  const column = columns.get(key);
+  if (column === undefined) return undefined;
+  const [value, printed] = column;
+  return printed === undefined || printed === unit ? value : undefined;
 }
 
 const vitamin = (letter: string) => String.raw`vit(?:amin|\.)?\s*` + letter + String.raw`\b`;
@@ -88,10 +160,15 @@ function digits(s: string): string {
   return s.replace(/(?<=\d)[oO](?=\d|\b)|(?<=\b)[oO](?=\d)/g, '0').replace(/(?<=\d)[l|](?=\d)/g, '1');
 }
 
-function numberAfter(t: string, label: string): number | undefined {
+function numberAfter(t: string, label: string): PlainRead | undefined {
   const m = new RegExp(label + String.raw`[\s:.\-]*(\d+(?:[.,]\d+)?)`).exec(digits(t));
   const found = m?.[1];
-  return found === undefined ? undefined : tryParseDouble(found.replaceAll(',', '.'));
+  if (m === null || found === undefined) return undefined;
+  const value = tryParseDouble(found.replaceAll(',', '.'));
+  if (value === undefined) return undefined;
+  // The number ends the match, and the repair keeps every length, so the same span of the text is what was printed.
+  const end = m.index + m[0].length;
+  return { value, repaired: t.slice(end - found.length, end) !== found };
 }
 
 function servingLine(t: string): string | undefined {
