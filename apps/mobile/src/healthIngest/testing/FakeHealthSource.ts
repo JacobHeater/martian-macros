@@ -2,12 +2,15 @@ import { ArgumentError } from '../../lang/ArgumentError';
 import { byName } from '../../lang/byName';
 import { compareStrings } from '../../lang/compareStrings';
 import { byStartThenId } from '../byStartThenId';
+import type { DaySteps } from '../DaySteps';
+import type { HealthDailySteps } from '../HealthDailySteps';
 import { HealthChanges } from '../HealthChanges';
 import { HealthDataType } from '../HealthDataType';
 import type { HealthHistoryAccess } from '../HealthHistoryAccess';
 import { HealthReadFailure } from '../HealthReadFailure';
 import type { HealthSample } from '../HealthSample';
 import type { HealthSource } from '../HealthSource';
+import { localMidnight } from '../localMidnight';
 
 /** One recorded event, as it is written in a history. */
 type RecordedEvent = Readonly<Record<string, unknown>>;
@@ -36,8 +39,12 @@ const typeOf = (event: RecordedEvent) => byName(HealthDataType.values, event['ty
  * does (MM-73): readings that start before it are not shown until the
  * history permission is granted. Unset, as on Apple Health, there is no
  * window and history counts as granted.
+ *
+ * It totals a day's steps as the platforms do (MM-442): where readings
+ * from two sources overlap in time, only the one that comes first in
+ * `stepsPriority` counts for that time.
  */
-export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
+export class FakeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps {
   private readonly sources: ReadonlyMap<string, string>;
   private readonly events: readonly RecordedEvent[];
 
@@ -64,6 +71,13 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
 
   /** How many times the user was shown the history question. */
   historyAsked = 0;
+
+  /**
+   * The order of step sources the person set in their phone's health
+   * settings, first counts first (MM-442). A source not in it comes after
+   * those in it, by its id.
+   */
+  stepsPriority: readonly string[] = [];
 
   private readonly allowed = new Set<HealthDataType>();
   private historyAllowed = false;
@@ -249,5 +263,68 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
       upserted: upserted.sort(byStartThenId),
       deletedIds: deletedIds.sort(compareStrings),
     });
+  }
+
+  async dailySteps({ from, to }: { from: Date; to: Date }): Promise<DaySteps[]> {
+    if (!this.allowed.has('steps')) return [];
+    if (this.unreadable) throw new HealthReadFailure('daily steps');
+    const readings = [...this.state('steps', this.happened).values()].filter((s) => this.visible(s));
+    const rank = (sourceId: string): number => {
+      const at = this.stepsPriority.indexOf(sourceId);
+      return at === -1 ? this.stepsPriority.length : at;
+    };
+    // Before `rank` ties are told apart by id, so the answer never depends on the order of the history.
+    const before = (a: string, b: string): boolean => rank(a) < rank(b) || (rank(a) === rank(b) && compareStrings(a, b) < 0);
+    const days: DaySteps[] = [];
+    const last = localMidnight(to).getTime();
+    for (let day = localMidnight(from); day.getTime() < last; day = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1)) {
+      const next = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1).getTime();
+      const total = this.stepsBetween(readings, day.getTime(), next, before);
+      if (Math.round(total) > 0) days.push({ day, steps: Math.round(total) });
+    }
+    return days;
+  }
+
+  /**
+   * The steps from `start` up to `end`: each stretch of time is counted
+   * from the source that comes first there, a reading's steps spread evenly
+   * over its span. A reading with no span counts unless a source before its
+   * own was counting at that moment.
+   */
+  private stepsBetween(
+    readings: readonly HealthSample[],
+    start: number,
+    end: number,
+    before: (a: string, b: string) => boolean,
+  ): number {
+    const spanned = readings.filter((r) => r.end !== undefined && r.end.getTime() > r.start.getTime());
+    const covering = (from: number, until: number) =>
+      spanned.filter((r) => r.start.getTime() <= from && (r.end as Date).getTime() >= until);
+    const firstSource = (among: readonly HealthSample[]): string | undefined =>
+      among.reduce<string | undefined>((best, r) => (best === undefined || before(r.sourceId, best) ? r.sourceId : best), undefined);
+
+    const cuts = new Set<number>([start, end]);
+    for (const r of spanned) {
+      for (const at of [r.start.getTime(), (r.end as Date).getTime()]) if (at > start && at < end) cuts.add(at);
+    }
+    const ordered = [...cuts].sort((a, b) => a - b);
+    let total = 0;
+    for (let i = 0; i + 1 < ordered.length; i++) {
+      const from = ordered[i] as number;
+      const until = ordered[i + 1] as number;
+      const here = covering(from, until);
+      const counted = firstSource(here);
+      for (const r of here) {
+        if (r.sourceId !== counted) continue;
+        total += (r.value * (until - from)) / ((r.end as Date).getTime() - r.start.getTime());
+      }
+    }
+    for (const r of readings) {
+      const at = r.start.getTime();
+      if (spanned.includes(r) || at < start || at >= end) continue;
+      const counting = firstSource(covering(at, at));
+      if (counting === undefined || !before(counting, r.sourceId)) total += r.value;
+    }
+    return total;
   }
 }

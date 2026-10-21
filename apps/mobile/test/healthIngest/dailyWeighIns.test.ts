@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { dailyWeighIns, type DayWeighIn, type HealthSample, primaryWeightSource } from '../../src/healthIngest';
+import {
+  dailyWeighIns,
+  type DayWeighIn,
+  type HealthSample,
+  primaryWeightSource,
+  WeighInWindow,
+} from '../../src/healthIngest';
+import { ArgumentError } from '../../src/lang/ArgumentError';
 import { upTo } from '../support/upTo';
 
 /** MM-71: which imported weigh-in counts for a day. */
@@ -135,5 +142,49 @@ describe('the primary scale', () => {
 
   it('is none with no weigh-ins', () => {
     expect(primaryWeightSource([], { asOf })).toBeUndefined();
+  });
+});
+
+describe('a weigh-in window that was moved (MM-441)', () => {
+  const late = new WeighInWindow({ startMinute: 14 * 60, endMinute: 22 * 60 });
+
+  it('by default the usual window: the 06:40 reading counts', () => {
+    const day = only(dailyWeighIns([weight(82.9, 1, 21, 10), weight(82.1, 1, 6, 40)], { window: undefined }));
+    expect(day.kg).toBe(82.1);
+    expect(day.basis).toBe('firstMorning');
+  });
+
+  it('moved to 14:00 to 22:00: the 15:10 reading counts, not the 09:00 one', () => {
+    const day = only(
+      dailyWeighIns([weight(82.4, 1, 9, 0), weight(82.0, 1, 15, 10), weight(82.8, 1, 21, 0)], { window: late }),
+    );
+    expect(day.kg).toBe(82.0);
+    expect(day.basis).toBe('firstMorning');
+    expect(day.at).toEqual(new Date(2026, 8, 1, 15, 10));
+  });
+
+  it('runs from its start up to, not including, its end', () => {
+    expect(only(dailyWeighIns([weight(82, 1, 13, 59), weight(83, 1, 14, 0)], { window: late })).kg).toBe(83);
+    expect(only(dailyWeighIns([weight(82, 1, 22, 0)], { window: late })).basis).toBe('medianOfDay');
+    expect(only(dailyWeighIns([weight(82, 1, 21, 59)], { window: late })).basis).toBe('firstMorning');
+  });
+
+  it('with no reading in it, the middle value counts', () => {
+    const day = only(dailyWeighIns([weight(82, 1, 6, 0), weight(83, 1, 8, 0)], { window: late }));
+    expect(day.basis).toBe('medianOfDay');
+    expect(day.kg).toBe(82.5);
+  });
+
+  it('a reading counts for the day it was taken on: the window never crosses midnight', () => {
+    const toMidnight = new WeighInWindow({ startMinute: 20 * 60, endMinute: 24 * 60 });
+    const days = dailyWeighIns([weight(82, 1, 23, 50), weight(83, 2, 0, 10)], { window: toMidnight });
+    expect(days.map((d) => [d.day.getDate(), d.basis])).toEqual([
+      [1, 'firstMorning'],
+      [2, 'medianOfDay'],
+    ]);
+    expect(() => new WeighInWindow({ startMinute: 22 * 60, endMinute: 6 * 60 })).toThrow(ArgumentError);
+    expect(() => new WeighInWindow({ startMinute: 0, endMinute: 24 * 60 + 1 })).toThrow(ArgumentError);
+    expect(() => new WeighInWindow({ startMinute: 600, endMinute: 600 })).toThrow(ArgumentError);
+    expect(() => new WeighInWindow({ startMinute: 0.5, endMinute: 600 })).toThrow(ArgumentError);
   });
 });

@@ -22,6 +22,13 @@ export interface MmHealthApi {
    */
   requestHistory(): Promise<{ granted: boolean }>;
   read(options: { type: string; fromMs: number; toMs: number }): Promise<{ records: MmHealthRecord[] }>;
+  /**
+   * Each local day's steps from `fromMs` up to `toMs`, both local
+   * midnights, as the platform totals them with the person's own source
+   * priority (MM-442): Health Connect's aggregate by period, HealthKit's
+   * statistics collection. `startMs` is the day's local midnight.
+   */
+  dailySteps(options: { fromMs: number; toMs: number }): Promise<{ days: { startMs: number; steps: number }[] }>;
   changesToken(options: { type: string }): Promise<{ token: string }>;
   changes(options: { token: string }): Promise<{
     expired: boolean;

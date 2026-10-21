@@ -91,3 +91,5 @@ food composition.
   for (SA-1), and dropping "short most nights" in favour of MM-252's insight (CO-1), as MM-368's Notes record. Nothing
   else in the epic is buildable without the owner: the open "say if any is wrong" choices are listed in the handoff, and
   the phone checks (MM-366, MM-364, MM-378, MM-370, MM-382) wait for the owner's device pass.
+- 2026-10-21 (later): the owner declined MM-368 (sleep insights under a night) as medical advice; it is closed unbuilt.
+  The epic has no sleep part.
