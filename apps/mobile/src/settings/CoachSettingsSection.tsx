@@ -30,7 +30,7 @@ export function CoachSettingsSection() {
   const exact = useLoaded(state.exactTargets) ?? false;
   const ease = useLoaded(state.easeIntoMaintenance) ?? false;
   const shape = TargetShape.on(useLoaded(state.targetShapes) ?? [], useCell(state.today));
-  const fatShare = shape?.balance?.fatShare ?? CarbFatBalance.balancedFatShare;
+  const fatShare = shape?.balance?.fatShare ?? CarbFatBalance.issuedFatShare;
   const balanceName =
     fatShare === CarbFatBalance.moreCarbsFatShare
       ? 'More carbs'
@@ -53,7 +53,7 @@ export function CoachSettingsSection() {
         <MmListRow
           leadingIcon="percent"
           title="Carbs and fat balance"
-          subtitle={shape?.balance === undefined ? 'Balanced, as the app set it. Yours to choose.' : balanceName}
+          subtitle={shape?.balance === undefined ? 'Fat 25% of calories, as the app set it. Yours to choose.' : balanceName}
           opens
           onPress={() => void navigator.push(() => <CarbFatBalanceScreen />)}
         />

@@ -15,9 +15,9 @@ were built against `TargetShapeRepository` with its in-memory fixture and contra
 (`openAppServices`). A shape set on the phone lasts until the app closes. The app's erase and restore clear it,
 so nothing is left behind.
 
-The default split also waits for this task: until a choice is kept, an unchosen balance is MM-24's (fat the
-larger of its minimum and 25% of calories). With this task, the default becomes Balanced (30%), as MM-122
-decided.
+The default split was to wait for this task too (Balanced, 30%, once a choice is kept). It was taken out of
+this task on 2026-10-21: an unchosen balance stays MM-24's issued split (MM-122's Decisions), so this task is
+the table alone.
 
 ## Description
 A table of target shapes, one row per day a shape was set from, and `SqlTargetShapeRepository` over it, chosen
@@ -44,10 +44,10 @@ Scenario: Erase and backup
   Then no shape is left
   And a backup holds the shapes and a restore brings them back
 
-Scenario: The default becomes Balanced
+Scenario: No choice, no change
   Given a person who never chose a balance
   When this ships
-  Then their fat is 30% of calories, never under its minimum, and carbs at least 100 g where they fit
+  Then their carbs and fat are as the check-in issued them
 ```
 
 ## Notes
@@ -64,13 +64,11 @@ Built 2026-10-21 on PR #221 (with MM-122 and MM-124). Not run locally; CI valida
   `currentSchema`, the method reproducing version 15's recorded value first).
 - `SqlTargetShapeRepository`, in `SqlRepositories` and `openAppServices`; the in-memory store and its eraser and
   restorer wrappers are gone from `openAppServices`.
-- The default became Balanced in `shapedTargets`: with no balance chosen a day's fat is 30% of calories, never
-  under its minimum, carbs at least 100 g where they fit. The check-in still issues MM-24's split, which the
-  Dart parity test holds; the day's targets (Today, Food, the week) are what change. Settings > Coach says
-  "Balanced, as the app set it" until a choice is made.
+- The default did not move: with no balance chosen a day's carbs and fat are as issued (MM-24's split). Moving
+  everyone to Balanced was taken out of this task (coordinator, 2026-10-21; MM-122's Decisions).
 - Guarding tests: `targetShapeRepositoryContract` in `test/data/sqlContracts.test.ts` as well as the in-memory
   run; `dataEraserContract` now asks that no shape is left (both implementations); `test/data/restore.test.ts`
   (a backup's shapes replace this phone's); `test/data/upgrade.test.ts` (a version 15 database comes up with no
   shape and keeps one saved after); `test/data/schema.test.ts` (the table is named among those added);
-  `test/engine/shapedTargets.test.ts` (no balance chosen is Balanced, carbs at 100 g where they fit).
+  `test/engine/shapedTargets.test.ts` (no balance chosen leaves the targets as issued).
 - Not verified: the upgrade from 15 to 16 on the owner's phone, and a shape surviving a restart there.

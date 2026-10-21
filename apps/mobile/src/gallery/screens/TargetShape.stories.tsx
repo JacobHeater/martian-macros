@@ -42,7 +42,7 @@ export const CoachRows = screenStory({
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="coach" />),
 });
 
-/** MM-122, MM-486: nothing chosen yet: Balanced, fat 30% of calories, no named position chosen. */
+/** MM-122: nothing chosen yet: MM-24's split, fat 25% of calories, no named position chosen. */
 export const BalanceUnchosen = screenStory({
   covers: ['CarbFatBalanceScreen'],
   shows: /As the app set it until you choose/,
