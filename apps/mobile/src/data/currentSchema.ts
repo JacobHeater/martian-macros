@@ -162,6 +162,8 @@ CREATE TABLE "user_preferences" (
   "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
   "usual_cooking_fat" TEXT NOT NULL DEFAULT 'oil',
   "primary_scale_source_id" TEXT NULL,
+  "weigh_in_window_start_minute" INTEGER NULL CHECK ("weigh_in_window_start_minute" IS NULL OR "weigh_in_window_start_minute" BETWEEN 0 AND 1439),
+  "weigh_in_window_end_minute" INTEGER NULL CHECK ("weigh_in_window_end_minute" IS NULL OR "weigh_in_window_end_minute" BETWEEN 1 AND 1440),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

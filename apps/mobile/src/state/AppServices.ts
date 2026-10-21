@@ -41,6 +41,8 @@ import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPl
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { HealthProfileReader } from '../domain/integration/HealthProfileReader';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { Watched } from '../lang/Watched';
@@ -74,6 +76,8 @@ export interface AppServices {
   /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */
   readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
+  /** The hours in which an imported reading counts as the morning weigh-in (MM-441). */
+  readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;

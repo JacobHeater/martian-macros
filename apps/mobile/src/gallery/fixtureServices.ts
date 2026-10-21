@@ -72,6 +72,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     targets: repos.targets,
     targetShapes: repos.targetShapes,
     preferences: repos.preferences,
+    weighInWindow: repos.weighInWindow,
     insightLog: repos.insightLog,
     inlineInsightLog: repos.inlineInsightLog,
     insightSnoozes: repos.insightSnoozes,
