@@ -87,13 +87,15 @@
 }
 .train-timer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-12);
   padding: var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   background: var(--raised);
 }
 .train-timer-text {
-  flex: 1;
+  /* At large text the buttons drop to their own line rather than squeezing the words (MM-447). */
+  flex: 1 1 12rem;
   min-width: 0;
 }
 .train-timer-label {
