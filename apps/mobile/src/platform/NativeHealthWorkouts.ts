@@ -42,7 +42,8 @@ function platformWorkout(raw: MmHealthWorkout): PlatformWorkout | undefined {
  * "workouts" turned on, which asks for the write permission alone. A
  * workout is written as a strength session under the app's own id, so
  * writing it again replaces it; with its segments where the platform names
- * exercises (Health Connect), as the session alone where it does not.
+ * exercises (Health Connect), as the session alone where it does not. A
+ * workout deleted in the app is removed by that id (MM-515).
  */
 export class NativeHealthWorkouts implements HealthWorkoutReader, HealthWorkoutWriter {
   readonly namesExercises: boolean;
@@ -119,6 +120,15 @@ export class NativeHealthWorkouts implements HealthWorkoutReader, HealthWorkoutW
         segments,
       });
       return written;
+    } catch {
+      return false;
+    }
+  }
+
+  async removeWorkout(clientId: string): Promise<boolean> {
+    if (!(await this.writePermitted())) return false;
+    try {
+      return (await this.api.removeWorkout({ clientId })).removed;
     } catch {
       return false;
     }

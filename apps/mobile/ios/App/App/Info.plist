@@ -58,6 +58,6 @@
 	<key>NSHealthShareUsageDescription</key>
 	<string>To read the kinds of health data you allow, such as weigh-ins from your scale, so you need not type them. Nothing read leaves this device.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>To write what you log in the app to Apple Health, only for the kinds you turn on in Settings: food, water and finished workouts. The app changes or removes only what it wrote.</string>
+	<string>To write what you log in the app to Apple Health, only for the kinds you turn on in Settings: food, water, the weight you type and finished workouts. The app changes or removes only what it wrote.</string>
 </dict>
 </plist>

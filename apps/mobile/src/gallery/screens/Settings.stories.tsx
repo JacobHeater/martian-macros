@@ -326,14 +326,44 @@ export const HealthConnectSomeAllowed = screenStory({
   },
 });
 
-/** MM-70, MM-314, MM-489: writing food and workouts turned on, water off; each switch asks for its own permission. */
+/** MM-70, MM-314, MM-513, MM-489: writing food, weight and workouts turned on, water off; each switch asks for its own permission. */
 export const HealthConnectWriting = screenStory({
   covers: ['SettingsScreen'],
   shows: 'Send food you log to Health Connect',
+  device: healthPlatform({ allowed: ['weight'], writing: ['food', 'weight', 'workouts'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('switch', { name: /Send weight you type/ }));
+    reveal(await within(canvas).findByRole('switch', { name: /Send water you log/ }));
+  },
+});
+
+/** MM-514: writing food turned off asks once whether to keep what was sent or remove it, keeping first. */
+export const HealthConnectWritingOff = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Remove the food already sent?',
   device: healthPlatform({ allowed: ['weight'], writing: ['food', 'workouts'] }),
   open: settingsAt('healthConnect'),
   walk: async (canvas) => {
-    reveal(await within(canvas).findByRole('switch', { name: /Send water you log/ }));
+    const food = await within(canvas).findByRole('switch', { name: /Send food you log/ });
+    reveal(food);
+    await userEvent.click(food);
+    await screen.findByRole('dialog', { name: 'Remove the food already sent?' });
+  },
+});
+
+/** MM-514: "Remove" chosen: the app's own food is removed from Health Connect, and the snack says so. */
+export const HealthConnectWritingRemoved = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Sending food you log to Health Connect is off. What was sent is removed from Health Connect.',
+  device: healthPlatform({ allowed: ['weight'], writing: ['food', 'workouts'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const food = await within(canvas).findByRole('switch', { name: /Send food you log/ });
+    reveal(food);
+    await userEvent.click(food);
+    const dialog = await screen.findByRole('dialog', { name: 'Remove the food already sent?' });
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Remove' }));
   },
 });
 
