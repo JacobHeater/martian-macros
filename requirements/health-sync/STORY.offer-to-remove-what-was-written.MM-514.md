@@ -1,6 +1,6 @@
 ---
 id: MM-514
-status: in-progress
+status: done
 component: health-sync
 related: [MM-70, MM-314, MM-489]
 ---
@@ -48,5 +48,12 @@ Scenario: Removed
   namespace), the question in `HealthWritingGroup` (`test/settings/healthWriting.test.tsx`, stories
   `HealthConnectWritingOff` and `HealthConnectWritingRemoved`). Terms section 9 and the privacy policy say the app asks
   (terms version 4).
-- Device checks owed: that Health Connect lets the app read its own records of a kind it may only write (and older than
-  thirty days) for the removal, and that HealthKit's delete removes the app's own samples and no other app's.
+
+## Progress
+Done (2026-10-21, PR #238): both scenarios are built and held by the tests named in the notes; not run locally, CI
+validates.
+
+## Owed on a phone
+- Health Connect lets the app read its own records of a kind it may only write, including ones older than thirty days,
+  so "Remove" finds them.
+- HealthKit's delete removes the app's own samples and no other app's.

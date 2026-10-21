@@ -82,13 +82,11 @@ training-lapse rules owned by WS-05.
 5. **Progression suggestions (MM-79).** M4. Wording changes with the goal: on
    a cut, matching last time is the aim.
 6. **Workouts that line up with the health platforms (MM-189, MM-489, MM-515, MM-490).** M4. The rules and the seam
-   are built against a fake (MM-189); the shells' native reading and writing (MM-489) done 2026-10-21, device checks
-   owed; a workout deleted in the app removed from the platform (MM-515) built 2026-10-21, device checks owed; the app's
-   use of reading (MM-490) remains.
+   (MM-189) and a workout deleted in the app removed from the platform (MM-515) done 2026-10-21; the shells' native
+   reading and writing (MM-489) done 2026-10-21, device checks owed; the app's use of reading (MM-490) remains.
 7. **Set times, entered by hand or with set and rest timers (MM-191, MM-196).** M4.
-   MM-191 in progress: a workout's times typed to the second and the sets
-   that can be segments built 2026-10-21; the phone checks of the rest
-   vibration and the bar with a screen reader are owed.
+   Done 2026-10-21; the phone checks of the rest vibration and the bar with
+   a screen reader are listed in MM-191.
 8. **The Train screen hierarchy (MM-224) (MM-214, MM-215, MM-222, MM-447).** M3. Placed 2026-10-13.
    MM-214, MM-215 and MM-222 built 2026-10-21; MM-447 (the paused bar and
    the workout's times) waits on the owner.
