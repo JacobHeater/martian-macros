@@ -127,7 +127,7 @@ workstream's.
 
 ## Requirement sources
 - Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day completeness, daily summary), MM-48 (edit an entry, undo a
-  delete), MM-47 (copy yesterday, copy a meal).
+  delete), MM-47 (copy yesterday, copy a meal), MM-438 (food is added from a meal's "+" only).
 - In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
   barcode), MM-45 (saved foods and recipes), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
