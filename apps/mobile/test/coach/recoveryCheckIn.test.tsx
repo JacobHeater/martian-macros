@@ -36,10 +36,17 @@ async function openCoach(): Promise<HTMLElement> {
   const title = await screen.findByRole('heading', { name: 'How you are holding up' });
   const section = title.closest('.mm-section') as HTMLElement;
   // Folded to one line unless the check-in is due (MM-256).
-  if (within(section).queryByRole('button', { name: /^Answer/ }) === null) {
-    await userEvent.click(within(section).getByRole('button', { name: /^How you are holding up/ }));
-  }
+  const header = within(section).getByRole('button', { name: /^How you are holding up/ });
+  if (header.getAttribute('aria-expanded') !== 'true') await userEvent.click(header);
   return section;
+}
+
+/** The one way into a due check-in on Coach: the one-thing row under the goal (MM-391). */
+const oneThing = () => screen.queryByRole('button', { name: /^Answer this week’s five questions/ });
+
+async function answerThisWeek(): Promise<void> {
+  await userEvent.click(oneThing() as HTMLElement);
+  await screen.findByRole('heading', { name: 'This week' });
 }
 
 const stored = () => first(repos.recovery.watchRecoveryCheckIns());
@@ -50,9 +57,8 @@ async function pick(question: RecoveryQuestion, value: number): Promise<void> {
 }
 
 it('answering stores one record and shows the five lines', async () => {
-  const card = await openCoach();
-  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
-  await screen.findByRole('heading', { name: 'This week' });
+  await openCoach();
+  await answerThisWeek();
 
   const answers: Readonly<Record<RecoveryQuestion, number>> = { hunger: 2, energy: 3, sleep: 1, training: 4, mood: 5 };
   for (const question of RecoveryQuestion.values) await pick(question, answers[question]);
@@ -70,14 +76,13 @@ it('answering stores one record and shows the five lines', async () => {
   const after = (await screen.findByText('2 of 5')).closest('.mm-section') as HTMLElement;
   expect(within(after).getByText('Hunger')).toBeInTheDocument();
   expect(within(after).getByText('Mood')).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: 'Answer this week' })).not.toBeInTheDocument();
+  expect(oneThing()).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Skip this week' })).not.toBeInTheDocument();
 });
 
 it('it cannot be saved until all five are answered', async () => {
-  const card = await openCoach();
-  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
-  await screen.findByRole('heading', { name: 'This week' });
+  await openCoach();
+  await answerThisWeek();
   for (const question of RecoveryQuestion.values.slice(0, 4)) await pick(question, 3);
   const save = screen.getByRole('button', { name: 'Save' });
   expect(save).toBeDisabled();
@@ -90,13 +95,31 @@ it('skipping stores no answers and is not asked again this week', async () => {
   await userEvent.click(within(card).getByRole('button', { name: 'Skip this week' }));
   await expect.poll(() => screen.queryByRole('button', { name: 'Skip this week' })).toBeNull();
   expect(await stored()).toEqual([]);
-  expect(screen.queryByRole('button', { name: 'Answer this week' })).not.toBeInTheDocument();
+  expect(oneThing()).not.toBeInTheDocument();
 });
 
 it('a skipped week is offered again the week after', async () => {
   await repos.preferences.saveRecoveryCheckInSkippedOn(today.addDays(-7));
+  await openCoach();
+  expect(oneThing()).toBeInTheDocument();
+});
+
+// MM-391: one control opens a due check-in, and what the questions are for is said once.
+it('while the check-in is due Coach has one way into it, and says once what it is for', async () => {
   const card = await openCoach();
-  expect(within(card).getByRole('button', { name: 'Answer this week' })).toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /^Answer/ })).toEqual([oneThing()]);
+  expect(screen.getAllByText(/the scale cannot see/)).toHaveLength(1);
+  // The section keeps its skip.
+  expect(within(card).getByRole('button', { name: 'Skip this week' })).toBeInTheDocument();
+});
+
+it('with answers on record the due section keeps them and their promise, without a second way in', async () => {
+  await repos.recovery.saveRecoveryCheckIn(answered(14));
+  const card = await openCoach();
+  expect(oneThing()).toBeInTheDocument();
+  expect(within(card).getAllByText(/ of 5$/)).toHaveLength(5);
+  expect(within(card).getByText(/never to a lower target/)).toBeInTheDocument();
+  expect(within(card).queryByRole('button', { name: /^Answer/ })).not.toBeInTheDocument();
 });
 
 it('no screen combines the answers into one number or grade', async () => {
@@ -122,7 +145,7 @@ it('in the first week it can be answered but is not asked for', async () => {
 it('it is not offered during a pause', async () => {
   await repos.pauses.savePause(new Pause({ from: today.addDays(-1), to: today.addDays(5), reason: 'travel' }));
   const card = await openCoach();
-  expect(within(card).queryByRole('button', { name: 'Answer this week' })).not.toBeInTheDocument();
+  expect(oneThing()).not.toBeInTheDocument();
   expect(within(card).queryByRole('button', { name: 'Skip this week' })).not.toBeInTheDocument();
 });
 
@@ -131,9 +154,8 @@ it('typical hours are filled from the last fourteen nights recorded, and can be 
   for (let night = 0; night < 14; night++) {
     await repos.sleep.saveSleepNight(new SleepNight({ date: today.addDays(-night), minutesAsleep: 410, source: 'typed' }));
   }
-  const card = await openCoach();
-  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
-  await screen.findByRole('heading', { name: 'This week' });
+  await openCoach();
+  await answerThisWeek();
   const hours = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Hours' });
   const minutes = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Minutes' });
   expect([hours.value, minutes.value]).toEqual(['6', '50']);
@@ -149,9 +171,8 @@ it('typical hours are filled from the last fourteen nights recorded, and can be 
 
 // MM-252, the panel's F7: a value the app would refuse on Progress is refused here too, not dropped.
 it('more than a day of sleep is refused under the field and holds Save', async () => {
-  const card = await openCoach();
-  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
-  await screen.findByRole('heading', { name: 'This week' });
+  await openCoach();
+  await answerThisWeek();
   for (const question of RecoveryQuestion.values) await pick(question, 3);
   const hours = screen.getByRole<HTMLInputElement>('textbox', { name: 'Typical hours of sleep, Hours' });
   await userEvent.type(hours, '25');
