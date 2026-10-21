@@ -1,6 +1,6 @@
 ---
 id: MM-59
-status: in-progress
+status: done
 component: persistence
 related: [MM-60, MM-61, MM-62, MM-63, MM-64, MM-65, MM-5, MM-95]
 ---
@@ -29,3 +29,7 @@ share sheet, which places it with whatever storage the person uses (MM-64). One 
 The Epic is done when a user's data survives app updates; when they can move to a new phone by making an encrypted backup on the old one
 and restoring it on the new; when nobody who obtains the backup file can read it without the passphrase; and when they can wipe the app
 clean.
+
+## Progress
+Done 2026-10-21: every child is done (MM-60 to MM-65), and with MM-404 the database and its exclusion from device
+backups are on iOS as on Android. Restoring a backup on a new phone is owed on a phone (MM-63, MM-404).
