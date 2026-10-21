@@ -360,7 +360,7 @@ describe('notices', () => {
 
   it('easing a deficit: a break or a slower pace, and sleep only when it has been short', () => {
     const hard = ['hardCheckIns'] as const;
-    const signals = { reason: 'recoverySignals', signals: hard, sleepAverage: undefined, shortSleep: false } as const;
+    const signals = { reason: 'recoverySignals', signals: hard, fallingLifts: [], sleepAverage: undefined, shortSleep: false } as const;
     const early = reliefOfferText({ ...signals, suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3 });
     expect(early.title).toBe('Two hard weeks in a row');
     expect(early.suggestion).toBe(
@@ -390,6 +390,7 @@ describe('notices', () => {
       deficitWeeks: 3,
       shortSleep: true,
       signals: ['shortSleep'],
+      fallingLifts: [],
       sleepAverage: { averageMinutes: 330, nights: 12, from, to: from.addDays(13) },
     });
     expect(sleepOnly.title).toBe('Two weeks of short sleep');
@@ -400,9 +401,45 @@ describe('notices', () => {
     expect(sleepOnly.sleep).toBeUndefined();
   });
 
-  // MM-135: the offer at twelve unbroken weeks says what a break is and what happens at twenty, and claims nothing about metabolism.
+  // MM-117: falling lifts have their own title alone, a sentence beside the hard weeks, and carrying on answers a deload.
+  it('easing a deficit when lifts are falling', () => {
+    const lifts = [
+      { exerciseId: 'back-squat', name: 'Back squat', fromKg: 120, toKg: 112, sessions: 3 },
+      { exerciseId: 'barbell-row', name: 'Barbell row', fromKg: 80, toKg: 75, sessions: 4 },
+    ];
+    const base = { reason: 'recoverySignals', fallingLifts: lifts, sleepAverage: undefined, shortSleep: false } as const;
+    const alone = reliefOfferText({ ...base, signals: ['strengthFalling'], suggestion: 'break', slowerPace: 0.005, deficitWeeks: 9 });
+    expect(alone.title).toBe('Your lifts are falling');
+    expect(alone.body).toBe(
+      'Over three weeks your estimated max has dropped 5% or more on back squat and barbell row, going by the trend, not one ' +
+        'session. On a deficit that usually means it is too large, or has run too long, for you right now. Easing it is the fix. ' +
+        'A planned lighter week does this too; if that is it, carry on.',
+    );
+    expect(alone.suggestion).toContain('take a break');
+    const early = reliefOfferText({ ...base, signals: ['strengthFalling'], suggestion: 'slowerPace', slowerPace: 0.005, deficitWeeks: 3 });
+    expect(early.suggestion).toContain('easier to hold than a break');
+
+    const both = reliefOfferText({ ...base, signals: ['hardCheckIns', 'strengthFalling'], suggestion: 'break', slowerPace: 0.005, deficitWeeks: 9 });
+    expect(both.title).toBe('Two hard weeks in a row');
+    expect(both.body).toContain('back squat and barbell row');
+
+    const many = reliefOfferText({
+      ...base,
+      fallingLifts: [...lifts, { exerciseId: 'deadlift', name: 'Deadlift', fromKg: 150, toKg: 140, sessions: 3 }],
+      signals: ['strengthFalling'],
+      suggestion: 'break',
+      slowerPace: 0.005,
+      deficitWeeks: 9,
+    });
+    expect(many.body).toContain('back squat, barbell row and 1 more');
+    for (const text of [alone.title, alone.body, alone.suggestion, both.body]) {
+      expect(text.toLowerCase()).not.toMatch(/eat less|cardio|train more|exercise|push through/);
+    }
+  });
+
+ what a break is and what happens at twenty, and claims nothing about metabolism.
   it('twelve weeks in a deficit: the break offer names the weeks and the cap', () => {
-    const offer = reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks: 12, shortSleep: false, signals: [], sleepAverage: undefined });
+    const offer = reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks: 12, shortSleep: false, signals: [], fallingLifts: [], sleepAverage: undefined });
     expect(offer.title).toBe('12 weeks in a deficit');
     expect(offer.body).toBe(
       'A break is two weeks at maintenance: a rest from dieting, which many people find makes the next weeks easier. ' +
@@ -417,7 +454,7 @@ describe('notices', () => {
     }
     // Near the cap, "asks again in three weeks" would be false (the panel's UX-3): the planned break is what comes next.
     const at = (deficitWeeks: number) =>
-      reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks, shortSleep: false, signals: [], sleepAverage: undefined }).suggestion;
+      reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks, shortSleep: false, signals: [], fallingLifts: [], sleepAverage: undefined }).suggestion;
     expect(at(16)).toContain('asks again in three weeks');
     expect(at(17)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 3 weeks, at 20 weeks.');
     expect(at(18)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 2 weeks, at 20 weeks.');
