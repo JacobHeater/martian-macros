@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { HealthBackfill } from '../healthIngest/HealthBackfill';
 import { healthSourceName } from '../healthIngest/healthSourceName';
 import { healthDataTypeLabel } from '../format/healthDataTypeLabel';
 import { healthDataTypePurpose } from '../format/healthDataTypePurpose';
@@ -13,6 +14,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
+import { PrimaryScaleRow } from './PrimaryScaleRow';
 import { useSettingsSection } from './useSettingsSection';
 
 /**
@@ -105,6 +107,10 @@ export function HealthPlatformSection() {
       overlays.snack(`${label} was not allowed. You can allow it here, or in ${name}, whenever you like.`);
       return;
     }
+    // The history is asked for with the first kind it is read for, and only
+    // then (MM-73). Refused, the window the platform allows is read and
+    // nothing more is said about it.
+    if (HealthBackfill.types.includes(type)) await services.healthSource.requestHistory().catch(() => false);
     // The row stops being a button, so what happened is said (the panel's UX-3).
     if (!(await read(type))) return;
     if (!ios) {
@@ -146,6 +152,8 @@ export function HealthPlatformSection() {
             />
           );
         })}
+        {/* Which scale counts first, once weigh-ins come from more than one (MM-71). */}
+        {connection.permitted.has('weight') ? <PrimaryScaleRow weighIns={connection.imported.get('weight') ?? []} /> : null}
         {connection.permitted.size === 0 ? null : (
           <MmListRow
             leadingIcon="sync"
@@ -160,9 +168,9 @@ export function HealthPlatformSection() {
       </MmListGroup>
       <p className="app-caption settings-note">
         The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in
-        counts for a day: the first of the morning, or the middle of the day’s readings. A value you type for a day is
-        used instead. To stop, take the permission away in {ios ? healthPath : name}: what was read is kept until you
-        erase your data.
+        counts for a day: the first of the morning, or the middle of the day’s readings, from your primary scale when it
+        weighed you that day. A value you type for a day is used instead. To stop, take the permission away in{' '}
+        {ios ? healthPath : name}: what was read is kept until you erase your data.
       </p>
     </MmSection>
   );

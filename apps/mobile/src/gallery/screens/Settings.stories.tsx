@@ -12,6 +12,7 @@ import { FoodSourcesScreen } from '../../foodPacks/FoodSourcesScreen';
 import { onlineFoods } from './onlineFoods';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
+import { InMemoryExactAlarms } from '../../fixtures/InMemoryExactAlarms';
 import { screen, userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
@@ -19,6 +20,7 @@ import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
+import { PrivacyPolicyScreen } from '../../terms/PrivacyPolicyScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
 import { onIos } from './onIos';
@@ -141,6 +143,21 @@ export const TermsOfUse = screenStory({
   covers: ['TermsScreen'],
   shows: 'Before you start',
   open: ({ navigator }) => void navigator.push(() => <TermsScreen />),
+});
+
+/** MM-95: the privacy policy, read from About beside the terms: the short account, then every section. */
+export const PrivacyPolicy = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: 'In short',
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
+});
+
+/** MM-95, MM-403: on an iPhone the policy names Apple Health and the reader that is part of iOS. */
+export const PrivacyPolicyOnIphone = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: '3. Apple Health',
+  device: onIos(),
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
 });
 
 export const HowThisWorks = screenStory({
@@ -411,6 +428,46 @@ export const HealthConnectReadDone = screenStory({
   },
 });
 
+/** MM-71: weigh-ins from two scales: the primary scale row, chosen automatically as the one used most. */
+export const HealthConnectTwoScales = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Automatic: Bathroom scale, with the most weigh-ins in 30 days.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Primary scale'));
+  },
+});
+
+/** MM-71: the gym's scale chosen as primary in Settings: its weigh-ins count first from now on. */
+export const HealthConnectPrimaryScaleChosen = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Gym scale. Its weigh-ins count before any other source’s.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const change = await within(canvas).findByRole('button', { name: 'Change primary scale' });
+    reveal(change);
+    await userEvent.click(change);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Gym scale' }));
+  },
+});
+
+/** MM-71: choosing a primary scale and the save failing: it says so and keeps the one in force. */
+export const HealthConnectPrimaryScaleFails = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Your primary scale could not be saved. Nothing was changed.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  stores: failingWrite('preferences', 'savePrimaryScale'),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const change = await within(canvas).findByRole('button', { name: 'Change primary scale' });
+    reveal(change);
+    await userEvent.click(change);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Gym scale' }));
+  },
+});
+
 // ---- MM-321: Settings and the food packs, in the states no story drew ----
 
 const openFoodDatabase = ({ navigator }: StoryStage) => void navigator.push(() => <FoodDatabaseScreen />);
@@ -549,6 +606,13 @@ export const SettingsOpensTerms = screenStory({
   walk: pressAnywhere(/^Terms of use/),
 });
 
+export const SettingsOpensPrivacyPolicy = screenStory({
+  covers: ['SettingsScreen', 'PrivacyPolicyScreen'],
+  shows: 'Privacy policy',
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^Privacy policy/),
+});
+
 export const SettingsOpensHealthCheck = screenStory({
   covers: ['SettingsScreen', 'HealthCheckScreen'],
   shows: 'Health check',
@@ -588,7 +652,7 @@ export const ChangeHeightMetric = screenStory({
   walk: pressAnywhere(/^Height/),
 });
 
-/** MM-321: a reminder switched on shows the time it comes at. */
+/** MM-321: a reminder switched on shows the time it comes at; on the minute, as exact alarms are allowed (MM-248). */
 export const ReminderOn = screenStory({
   covers: ['SettingsScreen'],
   shows: /^At /,
@@ -597,6 +661,31 @@ export const ReminderOn = screenStory({
     await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
   },
   open: settingsAt('reminders'),
+});
+
+/** MM-248: exact alarms declined: reminders come within an hour, and the row leads to the phone's setting. */
+export const ReminderWithinAnHour = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Within an hour',
+  device: async (services) => ({ ...services, exactAlarms: new InMemoryExactAlarms({ held: false, asked: true }) }),
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: settingsAt('reminders'),
+});
+
+/** MM-248: not asked yet: the one line of reason, shown before the phone's own page. */
+export const ReminderOnTheMinuteAsked = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'So a reminder arrives at the time you set.',
+  device: async (services) => ({ ...services, exactAlarms: new InMemoryExactAlarms({ held: false }) }),
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: settingsAt('reminders'),
+  walk: pressAnywhere(/^Within an hour/),
 });
 
 /** MM-321: a new look chosen, and the save failing: it says so and keeps the old one. */

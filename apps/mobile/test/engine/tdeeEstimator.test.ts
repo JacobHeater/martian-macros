@@ -224,6 +224,55 @@ it('restarts the window when weighing gives way to estimates (MM-150)', () => {
   expect(apart).toBeLessThanOrEqual(2);
 });
 
+// MM-46: hand portions are a logging style of their own.
+it('restarts the window when three weeks of hand portions give way to a scale', () => {
+  const user = new SyntheticUser({ seed: 17, baseTdeeKcal: 2800, underReportFraction: 0.2, handShare: 1 });
+  const logs = simulate(user, {
+    days: 42,
+    loggedKcal: 2200,
+    beforeDay: (day, u) => {
+      if (day === 21) {
+        u.underReportFraction = 0.05;
+        u.handShare = 0;
+        u.weighedShare = 1;
+      }
+    },
+  });
+  const result = estimate(user, logs);
+  const switchDay = CalendarDate.of(2026, 1, 1).addDays(21);
+  expect(result.styleRestartOn).toBeDefined();
+  const apart = switchDay.daysUntil(result.windowStart as CalendarDate);
+  expect(apart).toBeGreaterThanOrEqual(0);
+  expect(apart).toBeLessThanOrEqual(2);
+});
+
+it('restarts the window when hand portions give way to label servings', () => {
+  // Weighed share stays at zero throughout: only the hand style changes.
+  const user = new SyntheticUser({ seed: 19, baseTdeeKcal: 2800, underReportFraction: 0.2, handShare: 1 });
+  const logs = simulate(user, {
+    days: 42,
+    loggedKcal: 2200,
+    beforeDay: (day, u) => {
+      if (day === 21) {
+        u.underReportFraction = 0.1;
+        u.handShare = 0;
+      }
+    },
+  });
+  const result = estimate(user, logs);
+  const switchDay = CalendarDate.of(2026, 1, 1).addDays(21);
+  expect(result.styleRestartOn).toBeDefined();
+  const apart = switchDay.daysUntil(result.windowStart as CalendarDate);
+  expect(apart).toBeGreaterThanOrEqual(0);
+  expect(apart).toBeLessThanOrEqual(2);
+});
+
+it('a steady mix of hand portions and labels is no switch', () => {
+  const user = new SyntheticUser({ seed: 23, baseTdeeKcal: 2800, underReportFraction: 0.15, handShare: 0.5 });
+  const logs = simulate(user, { days: 42, loggedKcal: 2200 });
+  expect(estimate(user, logs).styleRestartOn).toBeUndefined();
+});
+
 it('clamps implausible results to the BMR band', () => {
   const user = new SyntheticUser({ seed: 12, baseTdeeKcal: 2800 });
   // Logs only a token amount yet holds weight: physically impossible.

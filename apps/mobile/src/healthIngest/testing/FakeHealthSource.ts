@@ -4,6 +4,7 @@ import { compareStrings } from '../../lang/compareStrings';
 import { byStartThenId } from '../byStartThenId';
 import { HealthChanges } from '../HealthChanges';
 import { HealthDataType } from '../HealthDataType';
+import type { HealthHistoryAccess } from '../HealthHistoryAccess';
 import { HealthReadFailure } from '../HealthReadFailure';
 import type { HealthSample } from '../HealthSample';
 import type { HealthSource } from '../HealthSource';
@@ -31,8 +32,13 @@ const typeOf = (event: RecordedEvent) => byName(HealthDataType.values, event['ty
  * added, edited or deleted. A test shows the source the first few
  * (`happened`) and lets more happen later, as a platform changes between
  * two imports. Tokens are honored until `expireTokens`.
+ *
+ * With `historyFrom` set it keeps the app to a window as Health Connect
+ * does (MM-73): readings that start before it are not shown until the
+ * history permission is granted. Unset, as on Apple Health, there is no
+ * window and history counts as granted.
  */
-export class FakeHealthSource implements HealthSource {
+export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
   private readonly sources: ReadonlyMap<string, string>;
   private readonly events: readonly RecordedEvent[];
 
@@ -48,6 +54,18 @@ export class FakeHealthSource implements HealthSource {
    */
   unreadable = false;
 
+  /**
+   * The start of the window the app may read without the history
+   * permission, or undefined for a platform with no window (MM-73).
+   */
+  historyFrom: Date | undefined = undefined;
+
+  /** Whether the user would grant the history permission if asked. */
+  willPermitHistory = true;
+
+  /** How many times the user was shown the history question. */
+  historyAsked = 0;
+
   /** Whether the platform takes nutrition from the app. */
   takesNutrition = true;
 
@@ -55,6 +73,7 @@ export class FakeHealthSource implements HealthSource {
   readonly written = new Map<string, NutritionRecord>();
 
   private readonly allowed = new Set<HealthDataType>();
+  private historyAllowed = false;
   private generation = 0;
 
   private constructor(sources: ReadonlyMap<string, string>, events: readonly RecordedEvent[], happened: number) {
@@ -100,6 +119,21 @@ export class FakeHealthSource implements HealthSource {
   /** Permits `types`, or everything available, without asking. */
   async permit(types?: ReadonlySet<HealthDataType>): Promise<void> {
     for (const type of types ?? (await this.available())) this.allowed.add(type);
+  }
+
+  /** Grants the history permission without asking (MM-73). */
+  permitHistory(): void {
+    this.historyAllowed = true;
+  }
+
+  /** Takes the history permission away again (MM-73). */
+  revokeHistory(): void {
+    this.historyAllowed = false;
+  }
+
+  /** Whether `sample` is inside what the app may read just now (MM-73). */
+  private visible(sample: HealthSample): boolean {
+    return this.historyFrom === undefined || this.historyAllowed || sample.start.getTime() >= this.historyFrom.getTime();
   }
 
   /** Takes permission away again, as the user can in the phone's settings. */
@@ -159,11 +193,24 @@ export class FakeHealthSource implements HealthSource {
     return this.permitted();
   }
 
+  async historyPermitted(): Promise<boolean> {
+    return this.historyFrom === undefined || this.historyAllowed;
+  }
+
+  async requestHistory(): Promise<boolean> {
+    // Asked once ever, as the plugin does; after that it only says how it stands.
+    if (this.historyFrom !== undefined && this.historyAsked === 0) {
+      this.historyAsked++;
+      if (this.willPermitHistory) this.historyAllowed = true;
+    }
+    return this.historyPermitted();
+  }
+
   async read(type: HealthDataType, { from, to }: { from: Date; to: Date }): Promise<HealthSample[]> {
     if (!this.allowed.has(type)) return [];
     if (this.unreadable) throw new HealthReadFailure(`reading ${type}`);
     return [...this.state(type, this.happened).values()]
-      .filter((s) => s.start.getTime() >= from.getTime() && s.start.getTime() < to.getTime())
+      .filter((s) => this.visible(s) && s.start.getTime() >= from.getTime() && s.start.getTime() < to.getTime())
       .sort(byStartThenId);
   }
 
@@ -175,7 +222,7 @@ export class FakeHealthSource implements HealthSource {
     if (token === undefined) {
       return new HealthChanges({
         nextToken: next,
-        upserted: [...this.state(type, this.happened).values()].sort(byStartThenId),
+        upserted: [...this.state(type, this.happened).values()].filter((s) => this.visible(s)).sort(byStartThenId),
       });
     }
     const parts = token.split(':');

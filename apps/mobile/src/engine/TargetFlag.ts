@@ -48,6 +48,11 @@ const values = [
   'maintenanceCorrection',
   /** On lean gain, no training for three weeks or no training days set: the surplus is paused (MM-134). */
   'trainingLapsed',
+  /**
+   * The surplus was capped at a share of expenditure (MM-129): the gain pace
+   * asked for more than a body this size can turn into muscle.
+   */
+  'surplusCapped',
 ] as const;
 
 export type TargetFlag = (typeof values)[number];

@@ -52,6 +52,14 @@ const every = [
   insight('consistentDay', { weekday: 6, unlogged: 0, weeks: 2, averageKcal: 2700 }),
   insight('consistentDay', { weekday: 1, unlogged: 1, weeks: 2 }),
   insight('shortSleep', { averageMinutes: 340, nights: 12 }),
+  new Insight({
+    rule: 'fiberForFullness',
+    from: today.addDays(-14),
+    to: today.addDays(-1),
+    figures: { averageG: 11.4, guideG: 29.4, countedDays: 9 },
+    examples: ['Lentil soup', 'Raspberries', 'Oats'],
+  }),
+  insight('weighProtein', { wholeDays: 12, palmProteinShare: 0.8 }),
 ] as const;
 
 it('every rule in the catalog has words', () => {
@@ -110,6 +118,28 @@ it('the sodium insight says how many days could be judged', () => {
   expect(body).toContain('over your limit of 2,300 mg on 5 of 8 days with enough sodium data');
   expect(evidence).toContainEqual(['Days left out (too little sodium data)', '6']);
   expect(body).not.toContain('usual place to look');
+});
+
+// MM-126: fullness, in the user's own numbers and foods; never a food judged, never "under" or "low".
+it('the fiber insight states the average against the guide and names foods already logged', () => {
+  const [title, body, evidence] = insightText(every[12], fmt);
+  expect(title).toBe('Fiber, and staying full on a deficit');
+  expect(body).toContain('On the 9 days with enough fiber data, your fiber averaged about 11 g against a guide of 29 g.');
+  expect(body).toContain('they fill you up for the same calories');
+  expect(body).toContain('Some you already log: Lentil soup, Raspberries and Oats.');
+  expect(evidence).toContainEqual(['Days with enough fiber data', '9']);
+  for (const word of ['under', 'low', 'healthy', 'empty calories']) expect(body.toLowerCase()).not.toContain(word);
+  const fewer = new Insight({ rule: 'fiberForFullness', from: today.addDays(-14), to: today.addDays(-1), figures: every[12].figures });
+  expect(insightText(fewer, fmt)[1], 'without examples, no list').not.toContain('already log');
+});
+
+// MM-46: the nudge says how much protein was by palm and asks for one week.
+it('the weigh-protein insight asks for one week of weighing', () => {
+  const [title, body, evidence] = insightText(every[13], fmt);
+  expect(title).toBe('Weigh your main protein for a week');
+  expect(body).toContain('About 80% of your protein over the last two weeks was logged by palm');
+  expect(body).toContain('for one week');
+  expect(evidence).toContainEqual(['Protein logged by palm', '80%']);
 });
 
 it('forbidden subjects never appear', () => {

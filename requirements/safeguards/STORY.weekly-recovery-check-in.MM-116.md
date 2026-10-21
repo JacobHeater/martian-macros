@@ -64,6 +64,11 @@ Scenario: A missed period
   Then the check-in asks whether that is expected
   And "not sure" produces the notice
 
+Scenario: Asked once a gap
+  Given the missed-period question was shown at a check-in that was then answered
+  Then later check-ins do not ask it again until a new period is marked
+  And the answer to it is not stored
+
 Scenario: Male profile
   Given a male profile
   Then no question about periods is ever shown
@@ -98,8 +103,20 @@ Built:
 - Rules are in `RecoveryRule`. Tests: `recovery_check_in_test.dart` (engine), `recovery_check_in_test.dart` (app), the contract
   against both implementations, the preferences contract and the migration test.
 
+Built (2026-10-21, feat/mm-116-recovery-check-in):
+- **The missed-period question**, now that period days are marked (MM-20): on a female profile not past menopause, whose last
+  two marked cycles each ran 21 to 35 days start to start, once the last period started 45 or more days ago, the check-in asks
+  "No period marked for N days. Is that expected?" with Contraception, Pregnancy, Menopause and Not sure. It is optional, and the
+  answer is not stored: it is asked once a gap, until a check-in has been answered since the gap reached 45 days, and a newly
+  marked period starts the count again. "Not sure" on fat loss or recomp shows the notice: "Missed periods can follow eating too
+  little for a long time, and are worth raising with a doctor. This is not a diagnosis." Male profiles are never asked.
+  Thresholds are in `MissedPeriodRule` ("regular" is judgement: the usual adult range); the rule is `missedPeriodQuestion`. No
+  schema change. Tests: `missedPeriod.test.ts` (engine), `recoveryCheckIn.test.tsx` (the question, the notice, none off a deficit
+  goal, none for a male profile). Story: `RecoveryCheckInMissedPeriod` (Coach).
+
 Not built:
-- **The missed-period question**: cycle logging (MM-20) does not exist, so there is nothing to detect it from.
+- The missed-period answer is not kept, so "Menopause" does not change the health check's answer, and the question is not
+  repeated later in a long gap. Not checked on a device.
 - Shown "with the check-in": it is a card on the Coach screen, not part of the target-change summary.
 - Sleep hours pre-filled from a health platform (MM-68, not built), and step count beside the lines.
 - Its reminder (MM-146 lists one; that ticket's build left it out).

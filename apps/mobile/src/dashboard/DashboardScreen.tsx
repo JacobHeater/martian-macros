@@ -23,6 +23,7 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
+import { AlcoholLine } from '../food/AlcoholLine';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseScreen } from '../pause/PauseScreen';
 import { saveWaistReadings } from '../progress/saveWaistReadings';
@@ -195,6 +196,10 @@ export function DashboardScreen() {
         targets={heroTargets}
         paused={pause !== undefined}
         status={heroStatus}
+        lines={
+          // Today's alcohol, as on Food, at every detail level (MM-127).
+          <AlcoholLine entries={entries} />
+        }
         confidence={coach === undefined || pause !== undefined ? undefined : confidenceLabel(coach.confidence.level)}
         onStatusPress={
           pause !== undefined ? () => void navigator.push(() => <PauseScreen />) : () => open('coach')

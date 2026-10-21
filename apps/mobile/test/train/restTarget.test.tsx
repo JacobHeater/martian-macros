@@ -272,7 +272,8 @@ describe('a set’s times, to the second', () => {
     expect(set?.startedAt).toEqual(new Date(2026, 9, 5, 12, 2, 10));
     expect(set?.endedAt).toEqual(new Date(2026, 9, 5, 12, 2, 55));
     expect(within(exerciseCard('Back squat')).getByText('12:02:10 PM')).toBeInTheDocument();
-    expect(within(exerciseCard('Back squat')).getByText('12:02:55 PM')).toBeInTheDocument();
+    // MM-222: the end is shown with how long the set took.
+    expect(within(exerciseCard('Back squat')).getByText('12:02:55 PM · took 0:45')).toBeInTheDocument();
   });
 
   it('the entry opens on the time the set has', async () => {
@@ -331,7 +332,7 @@ describe('a workout that ends after midnight', () => {
     const workout = await only();
     expect(workout.startedAt).toEqual(new Date(2026, 9, 3, 23, 30));
     expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 0, 20));
-    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('12:20 AM, next day');
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('12:20:00 AM, next day');
   });
 
   it('keeps its end on the day after when its day is changed', async () => {

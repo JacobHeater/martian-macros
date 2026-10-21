@@ -1,8 +1,11 @@
 import type { Meta } from '@storybook/react-vite';
+import { FoodEntry } from '../../domain/FoodEntry';
+import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
+import { fiberLowScenario } from './fiberLowScenario';
 import { firstDayScenario } from './firstDayScenario';
 import { maintenanceScenario } from './maintenanceScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
@@ -52,6 +55,18 @@ export const NotWeighedToday = screenStory({
   covers: ['DashboardScreen'],
   shows: 'First thing in the morning, after the bathroom.',
   scenario: notWeighedTodayScenario,
+});
+
+/** MM-127: a glass of wine today, at Standard detail: the alcohol's energy as a row of the hero, said as part of the total. */
+export const TodayWithAlcohol = screenStory({
+  covers: ['DashboardScreen'],
+  shows: '109 kcal, in the total',
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Red wine', kcal: 125, proteinG: 0, carbsG: 4, fatG: 0, source: 'weighed', alcoholG: 15.6 }),
+    );
+  },
 });
 
 /** Weighed today, the waist last measured over a week ago: the Dashboard asks for it in place (MM-301). */
@@ -302,6 +317,16 @@ export const InsightWaistAgainstWeight = screenStory({
   scenario: waistDownScenario,
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Your waist is down while the scale held'));
+  },
+});
+
+/** MM-126: on a cut, fiber well under the guide and hunger hard: fullness, in foods already logged, at most monthly. */
+export const InsightFiberForFullness = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Fiber, and staying full on a deficit',
+  scenario: fiberLowScenario,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Fiber, and staying full on a deficit'));
   },
 });
 

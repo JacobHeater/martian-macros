@@ -80,16 +80,22 @@ to declare.
    daily weigher, a sporadic one, two scales that disagree, a duplicate
    written by two apps.
 2. **Duplicates and source precedence (MM-71).** M3. The schema change to
-   weigh-ins. Do it before any import exists, against the fake.
+   weigh-ins. Do it before any import exists, against the fake. MM-71 is
+   done, with the primary scale chosen in Settings (2026-10-21); what it
+   left is step 12.
 3. **Health Connect (MM-68).** M3. Agree the workout table with WS-10 before
    importing sessions.
-4. **History backfill (MM-73).** M3.
+4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
+   re-read after an expired token must keep it (MM-498).
 5. **Background sync (MM-72).** M4.
 6. **Write nutrition (MM-70).** M4. Needs entries with real nutrient data
    (WS-08 step 4) to be worth doing.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
    biological-sex value may pre-fill the onboarding question when it is male
    or female; other values are ignored and the user always confirms.
+12. **What MM-71 left (MM-441, MM-442).** M4. A weigh-in window for a
+    morning that is not 04:00 to 12:00, and steps through the platform's
+    own aggregation (native, needs a device).
 
 ## Done enough to unblock others
 MM-67 and MM-71 are done: weigh-ins carry a source, one rule chooses the
@@ -104,6 +110,8 @@ can run during group A.
 
 ## Requirement sources
 - Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
+- Added 2026-10-21 (step 4): MM-498 (a re-read after an expired token keeps the history read by MM-73).
+- Added 2026-10-21 (step 12): MM-441 (a weigh-in window) and MM-442 (steps through the platform's aggregation), moved out of MM-71 when it was done.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).
 - Added 2026-10-14 (step 10): MM-323 (after Health Connect stops asking, say where to allow a kind).
 - Started 2026-10-19 (step 7): MM-69 (import from Apple Health), in the iOS shell of MM-403; the owner's decisions of 2026-10-19 on the name and on what HealthKit cannot say are in the ticket.

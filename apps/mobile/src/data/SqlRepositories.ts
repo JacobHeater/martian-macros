@@ -22,6 +22,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import { AppDatabase } from './AppDatabase';
@@ -81,7 +82,7 @@ export class SqlRepositories {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
-  readonly healthSamples: HealthSampleStore;
+  readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
   readonly restorer: DataRestorer;

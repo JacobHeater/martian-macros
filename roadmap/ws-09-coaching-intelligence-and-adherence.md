@@ -108,8 +108,8 @@ the trial is timed to end after the first monthly report.
 4. **Pause; reminders (MM-148, MM-146).** M3. A pause must silence reminders,
    so build them together.
 5. **Recovery check-in and the offer to ease a deficit (MM-116, MM-117).** M4.
-   The self-report trigger needs nothing else; the strength trigger waits
-   for WS-10 step 3.
+   The self-report trigger needs nothing else; the strength trigger, built
+   2026-10-21 on WS-10 step 3's strength trend, reads the training log.
 6. **Recomp review and recomp signal (MM-133, MM-32).** M4. After WS-07
    step 1 and WS-10 step 3. A waist-and-weight-only version is possible
    earlier and is weaker; the review ticket says what to tell the user when
@@ -117,9 +117,10 @@ the trial is timed to end after the first monthly report.
 7. **Process rewards; monthly report (MM-92, MM-33).** M3. Rewards count
    exactly what the adherence summary counts. The report reuses the check-in
    explanation, the summary and the recovery lines; it restates nothing.
-8. **Protein across meals; phase planning (MM-125, MM-36).** M4. Phase
+   Done 2026-10-21.
+8. **Protein across meals; phase planning (MM-125, MM-36, MM-450).** M4. Phase
    planning's projections are fiction without the body-fat estimate from
-   WS-07 step 7.
+   WS-07 step 7, and the report's body-fat range (MM-450) waits for it too.
 - Also placed 2026-10-13 in earlier steps: step 3: MM-168.
 13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests.
 
@@ -148,14 +149,15 @@ independent of step 3.
   are not built), MM-141 (the insight framework, rationing and five of the ten
   rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
   the estimator, the deficit count and the resume screen; streaks do not exist to be frozen), MM-146 (three local
-  reminders with their own times, the two-a-day cap, the quiet period and the stop after a week unanswered; not the
-  check-in or recovery ones, nor the onboarding offer; iOS untried), MM-116 (the five weekly questions, skipping, and
-  the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
-  offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
-  the training log), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
-  work, the body, the measured expenditure or why there is none, and each target change; not strength, body fat or photos),
-  MM-92 (the logging streak, forgiving one missed day in seven, as a quiet Dashboard line; no personal records or
-  workouts yet).
+  reminders with their own times, the two-a-day cap, the quiet period, the stop after a week unanswered and the
+  onboarding offer; not the check-in or recovery ones; iOS untried), MM-248 (exact alarms when allowed, asked once
+  with a reason from Settings, "On the minute" or "Within an hour"; checking on a phone is open), MM-116 (the five weekly questions, skipping, the
+  eight-week lines on the Coach screen, and the missed-period question from marked period days; not its reminder or a
+  place in the target-change summary), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
+  break, a slower pace, or carry on; not the pace names, and not checked on a device), MM-33 (a report every 28 days: the
+  work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
+  and the month's personal records; body fat is MM-450, photos MM-157), MM-92 (the logging streak, forgiving one missed
+  day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).
 - Remaining: MM-133, MM-32, MM-36. Epic: MM-145.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).
 - Placed 2026-10-13 in step 4: MM-248 (reminders on the minute: the exact-alarm permission, asked once with a reason; the owner's call).

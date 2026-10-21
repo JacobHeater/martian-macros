@@ -732,7 +732,7 @@ export const DayCompleteness = screenStory({
   shows: 'Not marked',
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: /(Mark it complete or partial|Counted as a whole day|Left out of your metabolism estimate)/ }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /(Counted unless it looks unfinished|Counted as a whole day|Left out of your metabolism estimate)/ }));
   },
 });
 
@@ -845,6 +845,33 @@ export const NewRecipeByNumbers = screenStory({
   },
 });
 
+/** MM-45, MM-151: an ingredient the pack has raw and cooked, weighed: what the weight means either way. */
+export const NewRecipeIngredientWeighedAs = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: '200 g cooked is about 260 kcal. 200 g raw is about 730 kcal.',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New recipe')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
+  },
+});
+
+/** MM-45: a recipe's ingredient line opened: move it or remove it. */
+export const EditRecipeLineMenu = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Move down',
+  scenario: withOwnFoods,
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo chili/)(canvas);
+    await press('More actions for Ground beef, lean, cooked')(canvas);
+  },
+});
+
 /** MM-321: a barcode the pack does not know: read the label, or enter it by hand. */
 export const ScanUnknownCode = screenStory({
   covers: ['BarcodeScanStep'],
@@ -904,7 +931,7 @@ export const ScanNoCamera = screenStory({
   },
 });
 
-/** MM-321: entered by hand with alcohol: its grams, and what a standard drink is. */
+/** MM-321, MM-127: entered by hand with alcohol: two standard drinks typed, filling in their 28 g. */
 export const AddFoodWithAlcohol = screenStory({
   covers: ['AddFoodSheet'],
   shows: 'One standard drink is 14 g. Counted at 7 kcal per gram.',
@@ -912,6 +939,7 @@ export const AddFoodWithAlcohol = screenStory({
   walk: async (canvas) => {
     await press('Enter manually')(canvas);
     await press('Includes alcohol?')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Standard drinks' }), '2');
   },
 });
 

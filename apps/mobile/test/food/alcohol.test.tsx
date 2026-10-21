@@ -5,6 +5,7 @@ import { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { enterManually, openAddFood, press, typeIn } from '../support/addFood';
+import { dashboardLoaded } from '../support/dashboardLoaded';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
@@ -74,4 +75,47 @@ it('a typed drink saves without a mismatch and keeps its alcohol', async () => {
   expect(entry?.alcoholG).toBe(28);
   expect(entry?.carbsG, 'alcohol is not turned into carbs').toBe(26);
   expect(entry?.fatG).toBe(0);
+});
+
+// MM-127's scenario as written: two standard drinks fill in 28 g, and the energy check agrees.
+it('a typed drink counted in standard drinks saves 14 g each, without a mismatch', async () => {
+  await openFood();
+  const sheet = await openAddFood();
+  await enterManually(sheet);
+  await press(sheet, 'Weighed');
+  await typeIn(sheet, 'Food name', 'Two beers');
+  await typeIn(sheet, 'Carbs g', '26');
+  await typeIn(sheet, /^Calories/, '300');
+  await press(sheet, 'Includes alcohol?');
+  await typeIn(sheet, 'Standard drinks', '2');
+  expect(within(sheet).getByRole('textbox', { name: 'Alcohol g' })).toHaveValue('28');
+  expect(within(sheet).queryByText(/Double-check the label/)).not.toBeInTheDocument();
+  await typeIn(sheet, 'Amount', '700');
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await first(repos.food.watchFood(today))).length).toBe(1);
+  const entry = (await first(repos.food.watchFood(today)))[0];
+  expect(entry?.alcoholG).toBe(28);
+  expect(entry?.carbsG, 'alcohol is not turned into carbs').toBe(26);
+});
+
+it('grams typed over a count of drinks clear the count; only grams are kept', async () => {
+  await openFood();
+  const sheet = await openAddFood();
+  await enterManually(sheet);
+  await press(sheet, 'Includes alcohol?');
+  await typeIn(sheet, 'Standard drinks', '1.5');
+  expect(within(sheet).getByRole('textbox', { name: 'Alcohol g' })).toHaveValue('21');
+  await typeIn(sheet, 'Alcohol g', '10');
+  expect(within(sheet).getByRole('textbox', { name: 'Standard drinks' })).toHaveValue('');
+});
+
+// The line is on Today's hero too, at the default detail level, and absent with none.
+it('Today shows the day’s alcohol as part of the total, and nothing without any', async () => {
+  renderApp(repos, today);
+  await dashboardLoaded();
+  expect(screen.queryByText('Alcohol')).not.toBeInTheDocument();
+  await repos.food.addFood(
+    new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Wine', kcal: 153, proteinG: 0, carbsG: 13, fatG: 0, source: 'labelServing', alcoholG: 14 }),
+  );
+  expect((await screen.findByText('Alcohol')).parentElement?.textContent).toBe('Alcohol98 kcal, in the total');
 });

@@ -3,6 +3,8 @@ import type { IntakeDay } from '../domain/IntakeDay';
 import { Meal } from '../domain/Meal';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightObservation } from '../domain/WeightObservation';
+import type { FiberPattern } from './FiberPattern';
+import { fiberInsight } from './fiberInsight';
 import { Insight } from './Insight';
 import { InsightPriority } from './InsightPriority';
 import { InsightRationing } from './InsightRationing';
@@ -16,6 +18,7 @@ import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
 import { waistChangeOf } from './waistChangeOf';
 import { WeekPatternRule } from './WeekPatternRule';
+import { WeighProteinRule } from './WeighProteinRule';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
 const mainMeals: readonly Meal[] = ['breakfast', 'lunch', 'dinner'];
@@ -44,6 +47,7 @@ export function findInsights({
   waist = [],
   limitToProteinAndLogging = false,
   sleepAverage,
+  fiber,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
@@ -59,6 +63,8 @@ export function findInsights({
   limitToProteinAndLogging?: boolean;
   /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
   sleepAverage?: SleepAverage | undefined;
+  /** Each day's entries, the sex and the check-ins, at Full detail only (MM-126). */
+  fiber?: FiberPattern | undefined;
 }): Insight[] {
   const days = InsightRationing.patternDays;
   const minimum = InsightRationing.minimumBasisDays;
@@ -126,6 +132,18 @@ export function findInsights({
   }
   if (judged >= minimum && met * 2 < judged) {
     add('proteinShort', { wholeDays: judged, metDays: met, averageShortfallG: shortfall / (judged - met) });
+  }
+
+  // Most protein on whole days was logged by palm, in a goal where protein
+  // matters (MM-46). Weighing food is not asked of a user with an
+  // eating-disorder history.
+  const goal = sorted[sorted.length - 1]?.mode;
+  if (!limitToProteinAndLogging && whole.length >= minimum && goal !== undefined && WeighProteinRule.modes.includes(goal)) {
+    const protein = whole.reduce((s, d) => s + d.proteinG, 0);
+    const byPalm = whole.reduce((s, d) => s + d.proteinG * d.palmProteinShare, 0);
+    if (protein > 0 && byPalm / protein > WeighProteinRule.palmProteinShare) {
+      add('weighProtein', { wholeDays: whole.length, palmProteinShare: byPalm / protein });
+    }
   }
 
   // Known sodium over the limit on more than half of the whole days since it
@@ -258,6 +276,12 @@ export function findInsights({
         figures: { averageMinutes: sleepAverage.averageMinutes, nights: sleepAverage.nights },
       }),
     );
+  }
+
+  // On a deficit, fiber well under the guide and hunger hard or unasked (MM-126).
+  if (fiber !== undefined) {
+    const insight = fiberInsight({ pattern: fiber, whole, from, through, current: recordOn(through) });
+    if (insight !== undefined) found.push(insight);
   }
 
   const allowed = found.filter(

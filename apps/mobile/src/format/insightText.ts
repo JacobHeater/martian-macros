@@ -41,6 +41,16 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
         [period, ['Fully logged days', `${n('wholeDays')}`], ['Calories from estimates', `${share}%`]],
       ];
     }
+    case 'weighProtein': {
+      const share = roundHalfAwayFromZero((i.figures['palmProteinShare'] ?? 0) * 100) + 0;
+      return [
+        'Weigh your main protein for a week',
+        `About ${share}% of your protein over the last two weeks was logged by palm, and protein ` +
+          'matters for your goal. Weighing the protein food you eat most for one week shows what ' +
+          'your palms really hold, so the palms after are closer. Then log by palm again if you like.',
+        [period, ['Fully logged days', `${n('wholeDays')}`], ['Protein logged by palm', `${share}%`]],
+      ];
+    }
     case 'weighInTiming':
       return [
         'Weigh-ins have been sparse',
@@ -157,6 +167,24 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
           ['Period', `Last ${i.basisDays} nights`],
           ['Nights recorded', `${nights}`],
           ['Average', sleepDurationText(averageMinutes)],
+        ],
+      ];
+    }
+    case 'fiberForFullness': {
+      // Fullness, never a food called good or bad (MM-126, MM-108); the examples are the user's own.
+      const names = i.examples;
+      const listed =
+        names.length < 2 ? '' : ` Some you already log: ${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}.`;
+      return [
+        'Fiber, and staying full on a deficit',
+        `On the ${n('countedDays')} days with enough fiber data, your fiber averaged about ${n('averageG')} g ` +
+          `against a guide of ${n('guideG')} g. More fiber and bulkier foods usually make a deficit easier: ` +
+          `they fill you up for the same calories.${listed}`,
+        [
+          period,
+          ['Days with enough fiber data', `${n('countedDays')}`],
+          ['Average fiber', `${n('averageG')} g`],
+          ['Guide', `${n('guideG')} g`],
         ],
       ];
     }
