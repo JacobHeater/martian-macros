@@ -148,10 +148,12 @@ it('a month with training lists the workouts and each lift', async () => {
 
   const work = within(topLayer()).getByRole('heading', { name: 'What you did' }).closest('.mm-surface');
   expect(within(work as HTMLElement).getByText('Workouts')).toBeInTheDocument();
-  expect(within(topLayer()).getByText('Back squat')).toBeInTheDocument();
+  // The lift is also in the Personal records card (MM-92): the second session beat the first.
+  const lifts = within(topLayer()).getByRole('heading', { name: 'Your lifts' }).closest('.mm-surface') as HTMLElement;
+  expect(within(lifts).getByText('Back squat')).toBeInTheDocument();
   // 220 kg then 240 kg for one rep: the estimates are 227.3 and 248 kg,
   // and the last is smoothed with the one before it.
-  expect(within(topLayer()).getByText('501.2 lb to 524.0 lb (+22.8 lb)')).toBeInTheDocument();
+  expect(within(lifts).getByText('501.2 lb to 524.0 lb (+22.8 lb)')).toBeInTheDocument();
   expect(shown()).toContain('not tested');
 });
 
