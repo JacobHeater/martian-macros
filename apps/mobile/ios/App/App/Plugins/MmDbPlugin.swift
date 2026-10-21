@@ -58,6 +58,7 @@ public class MmDbPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func open(_ call: CAPPluginCall) {
         let readOnly = call.getBool("readOnly") ?? false
         let path: String
+        let ownFile = call.getString("name") != nil
         if let name = call.getString("name") {
             do {
                 path = try MmFiles.databasePath(name)
@@ -85,6 +86,8 @@ public class MmDbPlugin: CAPPlugin, CAPBridgedPlugin {
                 sqlite3_close_v2(db)
                 return call.reject(mmMessage(error))
             }
+            // The app's own database is kept out of iCloud and iTunes backups, file and folder (MM-404).
+            if ownFile { try? MmFiles.excludeFromBackup(path) }
             call.resolve(["db": self.register(OpenDb(connection: db, queue: queue))])
         }
     }

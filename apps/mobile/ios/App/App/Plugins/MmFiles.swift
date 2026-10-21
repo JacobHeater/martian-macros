@@ -27,6 +27,14 @@ enum MmFiles {
         return directory
     }
 
+    /// Marks the file at `path` as kept out of backups too, beside the folder it is in.
+    static func excludeFromBackup(_ path: String) throws {
+        var url = URL(fileURLWithPath: path)
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try url.setResourceValues(values)
+    }
+
     /// The app's own database `name`, as Android's `getDatabasePath(name)`.
     static func databasePath(_ name: String) throws -> String {
         try supportDirectory("databases").appendingPathComponent(name).path

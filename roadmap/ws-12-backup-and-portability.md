@@ -1,6 +1,6 @@
 # WS-12: Backup and portability
 
-**Order** 12 · **Group** C · **State** in progress (every step built; the epic MM-59 stays open for MM-404) · **Risk** medium
+**Order** 12 · **Group** C · **State** built (every step built; the epic MM-59 done with MM-404, 2026-10-21) · **Risk** medium
 
 ## Summary
 A user-initiated, encrypted snapshot of the user's data that they can restore,
@@ -98,7 +98,7 @@ Everything in group C. It touches the schema lane only to read the version.
   Drive as a provider; the database excluded from OS backups on both
   platforms; one encrypted file the person places).
 - Built: MM-63 (2026-10-19), MM-64 (closed 2026-10-20 by the owner's
-  decision: the share sheet only). Epic: MM-59, open for MM-404.
+  decision: the share sheet only). Epic: MM-59, done 2026-10-21 with MM-404.
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app
