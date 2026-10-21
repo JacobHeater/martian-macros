@@ -21,6 +21,8 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "permitted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "historyPermitted", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestHistory", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "read", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changesToken", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changes", returnType: CAPPluginReturnPromise),
@@ -90,6 +92,17 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             let have = self.asked
             call.resolve(["types": Self.types.map(\.name).filter { have.contains($0) }])
         }
+    }
+
+    /// Whether readings from before a default window can be read (MM-73). HealthKit has no such window: a kind that may be read may be read as far back as it goes, so there is nothing to ask.
+    @objc func historyPermitted(_ call: CAPPluginCall) {
+        guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
+        call.resolve(["granted": true])
+    }
+
+    /// Nothing to ask on Apple Health (MM-73): it says how it stands, which is granted.
+    @objc func requestHistory(_ call: CAPPluginCall) {
+        historyPermitted(call)
     }
 
     private func ms(_ date: Date) -> Int { Int((date.timeIntervalSince1970 * 1000).rounded()) }

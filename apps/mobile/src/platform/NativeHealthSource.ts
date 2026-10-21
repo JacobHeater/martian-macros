@@ -1,6 +1,7 @@
 import { HealthChanges } from '../healthIngest/HealthChanges';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthDataType as Types } from '../healthIngest/HealthDataType';
+import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import { HealthReadFailure } from '../healthIngest/HealthReadFailure';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSource } from '../healthIngest/HealthSource';
@@ -19,8 +20,11 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  * until writing nutrition is built (MM-70). A read the platform refuses is
  * a rejection from the plugin and `HealthReadFailure` here, never
  * "nothing".
+ *
+ * It also says whether the history permission is granted (MM-73), and asks
+ * for it once.
  */
-export class NativeHealthSource implements HealthSource {
+export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
   private readonly api: MmHealthApi;
 
   constructor(api: MmHealthApi) {
@@ -52,6 +56,18 @@ export class NativeHealthSource implements HealthSource {
     const asked = [...types].filter((type) => here.has(type));
     if (asked.length > 0) await this.api.requestPermission({ types: asked });
     return this.permitted();
+  }
+
+  async historyPermitted(): Promise<boolean> {
+    if ((await this.available()).size === 0) return false;
+    const { granted } = await this.asked('the history permission', () => this.api.historyPermitted());
+    return granted;
+  }
+
+  async requestHistory(): Promise<boolean> {
+    if ((await this.available()).size === 0) return false;
+    const { granted } = await this.api.requestHistory();
+    return granted;
   }
 
   async read(type: HealthDataType, range: { from: Date; to: Date }): Promise<HealthSample[]> {

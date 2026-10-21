@@ -107,6 +107,7 @@ import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
+import { HealthBackfill } from '../healthIngest/HealthBackfill';
 import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
@@ -1158,6 +1159,11 @@ export class AppState {
    * It is run while the app is on screen: when it opens, when it comes
    * back to the front, and when asked for in Settings. The platform
    * refuses to be read at any other time.
+   *
+   * After the import, what is left of the history up to a year back is
+   * read (MM-73), once the history permission is granted. A backfill that
+   * cannot finish keeps what it read and goes on next time; it does not
+   * make the import count as failed.
    */
   async syncHealth(): Promise<boolean> {
     const { healthSource: source, healthSamples: store } = this.services;
@@ -1168,16 +1174,44 @@ export class AppState {
         const result = await importer.import(type);
         changed = changed || result.status === 'readAgain' || result.upserted > 0 || result.deleted > 0;
       }
-      return true;
     } catch {
       // The platform could not be read, or there is none on this kind of device.
-      return false;
-    } finally {
-      // Only when something was read, so the screens that work from the
-      // weigh-ins are not made to reload every time the app comes forward.
       if (changed) this.healthImported();
       this.refreshHealthConnection();
+      return false;
     }
+    if (changed) this.healthImported();
+    await this.backfillHealth();
+    this.refreshHealthConnection();
+    return true;
+  }
+
+  private backfilling: Promise<void> | undefined;
+
+  /**
+   * Reads each permitted kind's history (MM-73), one at a time, and makes
+   * the screens reload after each kind that brought readings, so the trend
+   * fills in as they arrive. Only one runs at a time: a second call while
+   * one runs waits for it.
+   */
+  private backfillHealth(): Promise<void> {
+    this.backfilling ??= (async () => {
+      const { healthSource: source, healthSamples: store, clock } = this.services;
+      const backfill = new HealthBackfill({ source, history: source, store, marks: store });
+      try {
+        const permitted = await source.permitted();
+        for (const type of HealthBackfill.types) {
+          if (!permitted.has(type)) continue;
+          const result = await backfill.backfill(type, { now: clock.now() });
+          if (result.added > 0) this.healthImported();
+        }
+      } catch {
+        // Cut short (the platform refused a read): what was read is kept and marked, and the rest is read next time.
+      } finally {
+        this.backfilling = undefined;
+      }
+    })();
+    return this.backfilling;
   }
 
   /**

@@ -7,6 +7,7 @@ import { dataEraserContract } from '../contracts/dataEraserContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
+import { healthBackfillMarksContract } from '../contracts/healthBackfillMarksContract';
 import { healthSampleStoreContract } from '../contracts/healthSampleStoreContract';
 import { inlineInsightLogRepositoryContract } from '../contracts/inlineInsightLogRepositoryContract';
 import { insightLogRepositoryContract } from '../contracts/insightLogRepositoryContract';
@@ -63,6 +64,7 @@ workoutRepositoryContract('SQLite', async () => (await open()).workouts);
 customExerciseRepositoryContract('SQLite', async () => (await open()).customExercises);
 exerciseProgressionRepositoryContract('SQLite', async () => (await open()).exerciseProgressions);
 healthSampleStoreContract('SQLite', async () => (await open()).healthSamples);
+healthBackfillMarksContract('SQLite', async () => (await open()).healthSamples);
 intakeReaderContract('SQLite', async () => {
   const r = await open();
   return { food: r.food, marks: r.dayMarks, intake: r.intake };
