@@ -661,7 +661,8 @@
         {
           "workstream": "WS-02",
           "tickets": [
-            "MM-432"
+            "MM-432",
+            "MM-495"
           ]
         },
         {
@@ -818,6 +819,7 @@
             "MM-32",
             "MM-125",
             "MM-36",
+            "MM-507",
             "MM-450",
             "MM-312",
             "MM-361",
@@ -856,6 +858,7 @@
           "workstream": "WS-11",
           "tickets": [
             "MM-72",
+            "MM-516",
             "MM-70",
             "MM-522",
             "MM-513",
@@ -1240,13 +1243,14 @@
           "MM-131",
           "MM-132",
           "MM-135",
-          "MM-173"
+          "MM-173",
+          "MM-432",
+          "MM-495"
         ],
         "remaining": [
           "MM-22",
           "MM-35",
-          "MM-110",
-          "MM-432"
+          "MM-110"
         ]
       },
       "sequence": [
@@ -1319,7 +1323,8 @@
           "title": "The one-week break choice: a setups column, chosen length carried by the break's record",
           "milestone": "M3",
           "tickets": [
-            "MM-432"
+            "MM-432",
+            "MM-495"
           ]
         }
       ],
@@ -2714,6 +2719,7 @@
         ],
         "remaining": [
           "MM-36",
+          "MM-507",
           "MM-450",
           "MM-116",
           "MM-117",
@@ -2797,6 +2803,7 @@
           "tickets": [
             "MM-125",
             "MM-36",
+            "MM-507",
             "MM-450"
           ],
           "milestone": "M4"
@@ -3045,6 +3052,7 @@
         "built": [
           "MM-67",
           "MM-71",
+          "MM-72",
           "MM-188",
           "MM-395",
           "MM-522"
@@ -3058,7 +3066,7 @@
           "MM-514",
           "MM-441",
           "MM-442",
-          "MM-72",
+          "MM-516",
           "MM-73",
           "MM-498",
           "MM-314",
@@ -3103,7 +3111,8 @@
           "step": 5,
           "title": "Background sync",
           "tickets": [
-            "MM-72"
+            "MM-72",
+            "MM-516"
           ],
           "milestone": "M4"
         },

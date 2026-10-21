@@ -83,7 +83,7 @@ export function HealthPlatformSection() {
    * leaves what is kept as it was, and says so.
    */
   const read = async (allowed?: HealthDataType): Promise<boolean> => {
-    if (await state.syncHealth()) return true;
+    if (await state.syncHealth('asked')) return true;
     // An allowing whose first read fails still says it was allowed (the panel's UX-11).
     const first = allowed === undefined ? name : `${healthDataTypeLabel(allowed)} ${ios ? 'asked for' : 'allowed'}, but ${name}`;
     overlays.snack(`${first} could not be read just now. Nothing was changed.`);

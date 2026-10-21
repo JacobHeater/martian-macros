@@ -23,6 +23,8 @@ const named: Readonly<Record<string, string>> = {
   'world.openfoodfacts.org': 'Open Food Facts',
   'api.nal.usda.gov': 'USDA FoodData Central',
   'github.com': 'GitHub',
+  // The public page (MM-247), which the phone's browser fetches when "On the web" is pressed, not the app (MM-454).
+  'jacobheater.github.io': 'GitHub Pages',
 };
 
 function filesIn(folder: string): string[] {
@@ -79,6 +81,11 @@ describe('the policy matches the app', () => {
     expect(both).toContain('The app itself connects to no storage service.');
     expect(android).toContain('Android’s share menu');
     expect(ios).toContain('the iPhone’s share sheet');
+  });
+
+  it('says the public page is opened in the phone’s browser, which fetches it, not the app', () => {
+    expect(both).toContain('The browser fetches it, not the app');
+    expect(contactedHosts()).toContain('jacobheater.github.io');
   });
 
   // MM-70, MM-314, MM-489: the app writes to the health platform what the person turns on, so the policy says so.
