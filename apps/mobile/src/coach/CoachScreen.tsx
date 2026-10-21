@@ -52,6 +52,7 @@ import { useInsightPreview } from './useInsightPreview';
 import { useRecentInsights } from './useRecentInsights';
 import { MetabolismSummary } from './MetabolismSummary';
 import { OneThingRow } from './OneThingRow';
+import { PhaseRows } from './PhaseRows';
 import { RecompReviewCard } from './RecompReviewCard';
 import { RecoveryCard } from './RecoveryCard';
 import { ReliefOfferCard } from './ReliefOfferCard';
@@ -112,6 +113,7 @@ export function CoachScreen() {
   const today = useCell(state.today);
   const pause = useCell(state.activePause);
   const guide = useCell(state.maintenanceGuide);
+  const phase = useCell(state.phasePlan);
   const food = useLoaded(state.foodForDay(today)) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
   const weights = useCell(state.weights);
@@ -150,6 +152,28 @@ export function CoachScreen() {
 
   // Someone who does not train yet sees what a gain or recomp rests on (MM-134).
   const notTraining = trainsNotYet(setup);
+  // The one way a goal changes, chosen from the sheet or taken from the phase plan (MM-36).
+  const applyGoal = async (chosen: GoalMode | undefined) => {
+    if (chosen === undefined || chosen === setup.goalMode) return;
+    if (chosen === 'leanGain' && notTraining) {
+      // A surplus without training is the one case where the app would knowingly add fat: one acknowledgement.
+      const acknowledged = await overlays.confirm({
+        title: 'Lean gain without training',
+        message: `${trainingGoalNote('leanGain') ?? ''} Without workouts logged, the surplus pauses after three weeks.`,
+        confirmLabel: 'I understand, choose Lean gain',
+        cancelLabel: 'Not now',
+      });
+      if (!acknowledged) return;
+    }
+    if (chosen === 'fatLoss' || chosen === 'recomp') {
+      // A deficit is confirmed against the health check before it is kept.
+      await navigator.push<boolean>((close) => (
+        <HealthRecheckScreen pendingGoal={chosen} allowSkip={setup.healthCheckSkipCount < 2} onDone={close} />
+      ));
+      return;
+    }
+    await services.setup.saveSetup(setup.copyWith({ goalMode: chosen }));
+  };
   const changeGoal = async () => {
     const chosen = await overlays.sheet<GoalMode>('Choose a goal', (close) => (
       <div className="coach-sheet">
@@ -172,25 +196,7 @@ export function CoachScreen() {
         {notTraining ? <p className="app-caption">{trainingMeaning}</p> : null}
       </div>
     ));
-    if (chosen === undefined || chosen === setup.goalMode) return;
-    if (chosen === 'leanGain' && notTraining) {
-      // A surplus without training is the one case where the app would knowingly add fat: one acknowledgement.
-      const acknowledged = await overlays.confirm({
-        title: 'Lean gain without training',
-        message: `${trainingGoalNote('leanGain') ?? ''} Without workouts logged, the surplus pauses after three weeks.`,
-        confirmLabel: 'I understand, choose Lean gain',
-        cancelLabel: 'Not now',
-      });
-      if (!acknowledged) return;
-    }
-    if (chosen === 'fatLoss' || chosen === 'recomp') {
-      // A deficit is confirmed against the health check before it is kept.
-      await navigator.push<boolean>((close) => (
-        <HealthRecheckScreen pendingGoal={chosen} allowSkip={setup.healthCheckSkipCount < 2} onDone={close} />
-      ));
-      return;
-    }
-    await services.setup.saveSetup(setup.copyWith({ goalMode: chosen }));
+    await applyGoal(chosen);
   };
 
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
@@ -244,6 +250,15 @@ export function CoachScreen() {
         trailing={<MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />}
       >
         <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
+        {/* The phase, its projected end, and once it ends the next one (MM-36). */}
+        {phase === undefined ? null : (
+          <PhaseRows
+            plan={phase}
+            today={today}
+            onAccept={(mode) => void applyGoal(mode)}
+            onChooseAnother={() => void changeGoal()}
+          />
+        )}
         {/* What the first month looks like, reread any time (MM-158). */}
         <MmListRow
           leadingIcon="info"
