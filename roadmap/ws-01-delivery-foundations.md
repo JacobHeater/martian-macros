@@ -81,7 +81,7 @@ WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-190.
 
    MM-412 (2026-10-19, done): `mm run --ios --phone` builds signed, installs and opens the real app on the iPhone plugged in; the team from `MM_APPLE_TEAM` or the project's uncommitted line.
-8. **Screenshot the iPhone through the app (MM-536); the progress page split at the cut (MM-550).** M4. Placed 2026-10-21. `mm screenshot --phone`: the dev or demo app snapshots its own web view when `devicectl` asks, and `devicectl` copies the PNG out; nothing installed beyond Xcode, never the real app.
+8. **Screenshot the iPhone through the app (MM-536); the progress page split at the cut (MM-550).** M4. Placed 2026-10-21. MM-536 done 2026-10-21, its phone checks owed. `mm screenshot --phone`: the dev or demo app snapshots its own web view when `devicectl` asks, and `devicectl` copies the PNG out; nothing installed beyond Xcode, never the real app.
 ## Done enough to unblock others
 MM-61 is done: a migration from version 1 to 2 exists, is tested against a
 populated version 1 database, and the schema-lane rules in the roadmap README

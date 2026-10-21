@@ -121,6 +121,7 @@ export * from './partitionConstants';
 export * from './passingWeightEventNoise';
 export * from './pausedDaysBetween';
 export * from './pauseDeficitRestartOn';
+export * from './pauseSettlingWindows';
 export * from './pausedGuide';
 export * from './pauseOn';
 export * from './PauseRule';

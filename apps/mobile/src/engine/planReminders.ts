@@ -6,7 +6,7 @@ import type { ReminderFacts } from './ReminderFacts';
 import { reminderIgnoredStreak } from './reminderIgnoredStreak';
 import { ReminderRule } from './ReminderRule';
 
-const keepFirst: readonly ReminderKind[] = ['weeklyMeasurement', 'weighIn', 'logFood'];
+const keepFirst: readonly ReminderKind[] = ['weeklyMeasurement', 'recoveryCheckIn', 'weighIn', 'logFood'];
 
 /**
  * Every reminder to schedule from `minuteNow` on `today` (MM-146), oldest
@@ -20,7 +20,7 @@ const keepFirst: readonly ReminderKind[] = ['weeklyMeasurement', 'weighIn', 'log
  * - Each reminder is planned only as far as its ignored limit. So a user who
  *   stops opening the app hears `ReminderRule.ignoredLimit` more times and
  *   then nothing: nothing is ever sent because they are away.
- * - At most `ReminderRule.dailyCap` a day. The weekly one is kept first,
+ * - At most `ReminderRule.dailyCap` a day. The weekly ones are kept first,
  *   because a daily one comes round again tomorrow.
  */
 export function planReminders({

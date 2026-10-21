@@ -1,7 +1,7 @@
 ---
 id: MM-248
 component: adherence
-status: in-progress
+status: done
 related: [MM-146, MM-95]
 ---
 
@@ -122,7 +122,10 @@ Built (2026-10-21):
   `test/settings/reminders.test.tsx` ("on the minute"). Not run locally;
   CI validates.
 
-Not verified (needs the phone):
+The code is complete (2026-10-21); what is left can only be checked on a
+phone.
+
+## Owed on a phone
 
 - On Android 14 or later (where the permission starts off): the question,
   the phone's "Alarms & reminders" page opening for this app, and the row
