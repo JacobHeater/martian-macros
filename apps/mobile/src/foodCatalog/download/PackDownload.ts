@@ -3,10 +3,11 @@ import { PackDownloadCancelled } from './PackDownloadCancelled';
 import { PackDownloadFailed } from './PackDownloadFailed';
 import type { PackDownloadPhase } from './PackDownloadPhase';
 import { PackDownloadProgress } from './PackDownloadProgress';
-import type { PackHttp } from './PackHttp';
+import type { PackFileFetch } from './PackFileFetch';
+import type { PackFileTransfer } from './PackFileTransfer';
 import type { PackListing } from './PackListing';
-import type { PackResponse } from './PackResponse';
 import type { PackStore } from './PackStore';
+import { PackWriteFailed } from './PackWriteFailed';
 
 const said = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -32,25 +33,25 @@ export class PackDownload {
    */
   readonly done: Promise<void>;
 
-  private readonly http: PackHttp;
+  private readonly fetcher: PackFileFetch;
   private readonly store: PackStore;
   private readonly listeners = new Set<(progress: PackDownloadProgress) => void>();
   private cancelled = false;
   private finished = false;
-  private response: PackResponse | undefined;
+  private transfer: PackFileTransfer | undefined;
 
-  private constructor(listing: PackListing, http: PackHttp, store: PackStore) {
+  private constructor(listing: PackListing, fetcher: PackFileFetch, store: PackStore) {
     this.listing = listing;
-    this.http = http;
+    this.fetcher = fetcher;
     this.store = store;
     this.done = this.run();
     // Whoever started it may not be listening yet; a failure is theirs to read from `done`.
     this.done.catch(() => undefined);
   }
 
-  /** Begins downloading `listing` now. */
-  static start({ listing, http, store }: { listing: PackListing; http: PackHttp; store: PackStore }): PackDownload {
-    return new PackDownload(listing, http, store);
+  /** Begins downloading `listing` now: `fetch` brings the file into `store`'s partial, and `store` checks and installs it. */
+  static start({ listing, fetch, store }: { listing: PackListing; fetch: PackFileFetch; store: PackStore }): PackDownload {
+    return new PackDownload(listing, fetch, store);
   }
 
   /** Tells `listener` of progress as it happens, until the download ends. Gives the way to stop being told. */
@@ -63,7 +64,7 @@ export class PackDownload {
   cancel(): void {
     if (this.cancelled || this.finished) return;
     this.cancelled = true;
-    this.response?.abort();
+    this.transfer?.abort();
   }
 
   private emit(phase: PackDownloadPhase, receivedBytes: number): void {
@@ -101,56 +102,46 @@ export class PackDownload {
     this.emit('downloading', have);
     if (have === total) return;
 
-    let response: PackResponse;
+    let transfer: PackFileTransfer;
     try {
-      response = await this.http.get(url, { rangeStart: have > 0 ? have : undefined });
+      transfer = await this.fetcher.fetchInto({ url, id, version, rangeStart: have > 0 ? have : undefined });
     } catch (error) {
       throw new PackDownloadFailed('connection', said(error));
     }
-    this.response = response;
+    this.transfer = transfer;
     if (this.cancelled) {
-      response.abort();
+      transfer.abort();
       throw new PackDownloadCancelled();
     }
-    const status = response.statusCode;
+    const status = transfer.statusCode;
     if (status !== 200 && status !== 206) {
-      response.abort();
+      transfer.abort();
       throw new PackDownloadFailed('serverError', `HTTP ${status}`);
     }
     // A server that ignores the range sends the whole file again.
-    const append = status === 206 && have > 0;
-    if (!append) have = 0;
+    const kept = status === 206 && have > 0 ? have : 0;
+    have = kept;
 
-    let sink;
+    // Only counts arrive here: on the phone the bytes go from the connection to the file natively (MM-387).
+    const counts = transfer.written[Symbol.asyncIterator]();
     try {
-      sink = await this.store.writePartial(id, version, { append });
-    } catch (error) {
-      response.abort();
-      throw new PackDownloadFailed('noSpace', said(error));
-    }
-    try {
-      const chunks = response.body[Symbol.asyncIterator]();
       for (;;) {
-        let next: IteratorResult<Uint8Array>;
+        let next: IteratorResult<number>;
         try {
-          next = await chunks.next();
+          next = await counts.next();
         } catch (error) {
           if (this.cancelled) throw new PackDownloadCancelled();
+          if (error instanceof PackWriteFailed) throw new PackDownloadFailed('noSpace', said(error));
           throw new PackDownloadFailed('connection', said(error));
         }
         if (this.cancelled) throw new PackDownloadCancelled();
         if (next.done === true) break;
-        try {
-          await sink.write(next.value);
-        } catch (error) {
-          response.abort();
-          throw new PackDownloadFailed('noSpace', said(error));
-        }
-        have += next.value.length;
+        have = kept + next.value;
         this.emit('downloading', have);
       }
     } finally {
-      await sink.close();
+      // Stopping early closes the file.
+      await counts.return?.();
     }
     if (have < total) {
       throw new PackDownloadFailed('connection', `the connection ended at ${have} of ${total} bytes`);
