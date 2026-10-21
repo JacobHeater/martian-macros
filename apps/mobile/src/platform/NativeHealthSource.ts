@@ -25,6 +25,9 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  * for it once.
  */
 export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
+  /** How far back Health Connect reads without the history permission (MM-498). */
+  static readonly windowDays = 30;
+
   private readonly api: MmHealthApi;
 
   constructor(api: MmHealthApi) {
@@ -68,6 +71,18 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
     if ((await this.available()).size === 0) return false;
     const { granted } = await this.api.requestHistory();
     return granted;
+  }
+
+  /**
+   * Without the history permission Health Connect shows the thirty days
+   * before the first permission was granted (MM-498). The plugin does not
+   * say when that was, so this answers thirty days before now: never
+   * earlier than the real window, which keeps a re-read from removing
+   * history it cannot see.
+   */
+  async readableFrom(): Promise<Date | undefined> {
+    if (await this.historyPermitted()) return undefined;
+    return new Date(Date.now() - NativeHealthSource.windowDays * 24 * 60 * 60 * 1000);
   }
 
   async read(type: HealthDataType, range: { from: Date; to: Date }): Promise<HealthSample[]> {
