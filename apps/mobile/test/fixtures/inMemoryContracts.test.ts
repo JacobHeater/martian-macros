@@ -5,6 +5,8 @@ import { dataEraserContract } from '../contracts/dataEraserContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
+import { goalBodyFatRepositoryContract } from '../contracts/goalBodyFatRepositoryContract';
+import { InMemoryGoalBodyFatRepository } from '../../src/fixtures/InMemoryGoalBodyFatRepository';
 import { inlineInsightLogRepositoryContract } from '../contracts/inlineInsightLogRepositoryContract';
 import { insightLogRepositoryContract } from '../contracts/insightLogRepositoryContract';
 import { insightSnoozeRepositoryContract } from '../contracts/insightSnoozeRepositoryContract';
@@ -45,6 +47,8 @@ targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().t
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
 inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories().inlineInsightLog);
 insightSnoozeRepositoryContract('In-memory', () => new InMemoryRepositories().insightSnoozes);
+// MM-36: not in `InMemoryRepositories` until its table (MM-507) puts it in the app.
+goalBodyFatRepositoryContract('In-memory', () => new InMemoryGoalBodyFatRepository());
 pauseRepositoryContract('In-memory', () => new InMemoryRepositories().pauses);
 reminderRepositoryContract('In-memory', () => new InMemoryRepositories().reminders);
 recoveryCheckInRepositoryContract('In-memory', () => new InMemoryRepositories().recovery);

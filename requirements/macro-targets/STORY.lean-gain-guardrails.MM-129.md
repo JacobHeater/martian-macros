@@ -69,7 +69,7 @@ Scenario: Waist within noise
   Then no fat-heavy notice is shown
 
 Scenario: Time to stop
-  Given a man whose estimated body fat has reached 20% on lean gain
+  Given a man on lean gain whose body-fat range has its upper end at 20%, or who entered 20% himself
   Then the coach recommends ending the gain, with the reason, and leaves the goal unchanged until he decides
 
 Scenario: Weight up, strength flat
@@ -113,7 +113,10 @@ Choices I made without asking (say if any is wrong):
 - **Strength flat** needs trend weight up 1% or more, at least one lift judged (four sessions in the stretch, the latest in the last
   two weeks, a baseline within a week of the start), and none up 2.5%. Bodyweight lifts are left out: their estimate rises with body
   weight.
-- **Body fat for the stop line is the point estimate**, as MM-12 judges "high"; a goal body fat (MM-36) does not move it yet.
+- **Body fat for the stop line is the upper end of the range** (the estimate plus 0.6745 deviations, `gainLineBodyFatPercent`),
+  so a gain ends once it is plausibly past the line and never later than the point would end it; **a figure the user entered counts
+  as exact**, as MM-34 shows it. Coordinator's choice, 2026-10-21, replacing the point estimate; say if wrong. Phase planning
+  (MM-36) takes its end of a gain from this review, so the two agree. A goal body fat (MM-36) does not move the line yet.
 - **The card stays while a line holds**; it has no dismiss. A slower gain is MM-480.
 - **An eating-disorder history** hears only the 26-week line, as MM-141 leaves out lines about weight.
 

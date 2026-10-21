@@ -91,6 +91,8 @@ export class TargetsRecord {
       tdeeSigmaKcal: this.tdeeSigmaKcal,
       tdeeStatus: this.tdeeStatus,
       safetyBodyFatPercent: this.safetyBodyFatPercent,
+      // MM-495: the pace asked for is kept, or a record marked seen asks for a pace change.
+      requestedLossFraction: this.requestedLossFraction,
       profileRevision: this.profileRevision,
       targetRulesVersion: this.targetRulesVersion,
       explanation: this.explanation,
