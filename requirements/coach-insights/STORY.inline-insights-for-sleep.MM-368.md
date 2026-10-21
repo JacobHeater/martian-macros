@@ -1,6 +1,6 @@
 ---
 id: MM-368
-status: proposed
+status: done
 component: coach-insights
 related: [MM-361, MM-362, MM-249, MM-250, MM-252]
 ---
@@ -12,6 +12,8 @@ See MM-361 and MM-362. The owner named sleep. Nights of sleep are recorded since
 card; MM-252 already reads a fortnight's average (a rationed insight, the Coach line and the relief offer).
 
 ## Decisions
+**Not built: declined by the owner (2026-10-21):** "no, kill this. this gets into medical advice." The app adds no sleep insights under a night, and no hand-over from short nights to MM-251's clinician pointer. Sleep stays a record and a signal (MM-250, MM-252, MM-249) only.
+
 The product owner's (2026-10-17): sleep is one of the areas.
 
 Choices I made without asking (say if any is wrong). **A draft** for the panel's coaching and safety roles to check:
