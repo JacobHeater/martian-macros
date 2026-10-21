@@ -24,6 +24,8 @@ export function fakeMmHealthWrites({
   const water = new Map<string, { id: string; atMs: number; ml: number }>();
   const held = new Map<string, MmHealthWorkout>(workouts.map((w): [string, MmHealthWorkout] => [w.id, w]));
   const writes = (kind: string) => on.has(kind) && granted.has(kind);
+  let namespace = 'a1b2c3';
+  let renewals = 0;
   const api: Pick<MmHealthApi, 'status' | 'permitted'> & MmHealthWritingApi & MmHealthWorkoutsApi = {
     status: async () => ({ status: 'available' }),
     permitted: async ({ types }) => ({ types: types.filter((type) => type === 'workout' && readsWorkouts) }),
@@ -37,6 +39,12 @@ export function fakeMmHealthWrites({
     stopWriting: async ({ kind }) => {
       on.delete(kind);
       return { on: false };
+    },
+    writeNamespace: async () => ({ namespace }),
+    renewWriteNamespace: async () => {
+      renewals++;
+      namespace = `renewed${renewals}`;
+      return { namespace };
     },
     writeNutrition: async (record) => {
       if (!writes('food')) return { written: false };

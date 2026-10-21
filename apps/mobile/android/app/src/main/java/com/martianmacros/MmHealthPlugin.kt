@@ -382,6 +382,27 @@ class MmHealthPlugin : Plugin() {
         call.resolve(JSObject().put("on", false))
     }
 
+    /** Where the plugin keeps the namespace every id the app writes carries (MM-522). */
+    private val namespaceKey = "write_namespace"
+
+    private fun newNamespace(): String = java.util.UUID.randomUUID().toString().replace("-", "").take(12)
+
+    /** The write namespace (MM-522), made the first time it is asked for. */
+    @PluginMethod
+    fun writeNamespace(call: PluginCall) {
+        val prefs = preferences()
+        val namespace = prefs.getString(namespaceKey, null) ?: newNamespace().also { prefs.edit().putString(namespaceKey, it).commit() }
+        call.resolve(JSObject().put("namespace", namespace))
+    }
+
+    /** A new write namespace (MM-522), kept before it answers, after the app's data is erased or restored. */
+    @PluginMethod
+    fun renewWriteNamespace(call: PluginCall) {
+        val namespace = newNamespace()
+        preferences().edit().putString(namespaceKey, namespace).commit()
+        call.resolve(JSObject().put("namespace", namespace))
+    }
+
     private fun offsetAt(time: Instant): ZoneOffset = ZoneId.systemDefault().rules.getOffset(time)
 
     /** The app's id for a record, with a version that grows, so writing it again replaces what was there. */

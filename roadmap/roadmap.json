@@ -857,6 +857,7 @@
           "tickets": [
             "MM-72",
             "MM-70",
+            "MM-522",
             "MM-513",
             "MM-514",
             "MM-69",
@@ -3045,7 +3046,8 @@
           "MM-67",
           "MM-71",
           "MM-188",
-          "MM-395"
+          "MM-395",
+          "MM-522"
         ],
         "remaining": [
           "MM-66",
@@ -3110,6 +3112,7 @@
           "title": "Write nutrition to the health platform",
           "tickets": [
             "MM-70",
+            "MM-522",
             "MM-513",
             "MM-514"
           ],

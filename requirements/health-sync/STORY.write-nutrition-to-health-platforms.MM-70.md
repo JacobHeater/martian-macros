@@ -72,7 +72,7 @@ Scenario: Its own permission
   (`test/terms/termsText.test.ts`).
 - Owed on a device: a logged food shows in Health Connect and Apple Health at its meal's time with its nutrients; an edit
   leaves one record; a deletion removes it; the switch is still on after the app is closed; refusing leaves it off.
-- Not handled: "Erase all data" leaves what was written (the terms say so), and after an erase the entry ids start again,
-  so a new entry could replace a record written before the erase under the same id.
+- "Erase all data" leaves what was written (the terms and the privacy policy say so). Entry ids start again after an erase
+  or a restore, so every written id carries a write namespace that is renewed then (MM-522).
 - The privacy policy draft (MM-95), section 3 and the erase paragraph, now says what is written, as the terms do
   (`test/terms/privacyText.test.ts`). Its version stays 1: it took effect the same day and has not been released.

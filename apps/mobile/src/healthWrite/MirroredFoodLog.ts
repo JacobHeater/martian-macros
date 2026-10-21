@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
+import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { Watched } from '../lang/Watched';
 import { foodRecordId } from './foodRecordId';
 import { nutritionRecordOf } from './nutritionRecordOf';
@@ -15,9 +16,9 @@ import { nutritionRecordOf } from './nutritionRecordOf';
  */
 export class MirroredFoodLog implements FoodRepository {
   private readonly log: FoodRepository;
-  private readonly platform: HealthIntakeWriter;
+  private readonly platform: HealthIntakeWriter & HealthWriteNamespace;
 
-  constructor({ log, platform }: { log: FoodRepository; platform: HealthIntakeWriter }) {
+  constructor({ log, platform }: { log: FoodRepository; platform: HealthIntakeWriter & HealthWriteNamespace }) {
     this.log = log;
     this.platform = platform;
   }
@@ -36,17 +37,26 @@ export class MirroredFoodLog implements FoodRepository {
 
   async addFood(entry: FoodEntry): Promise<number> {
     const id = await this.log.addFood(entry);
-    await this.platform.writeNutrition(nutritionRecordOf(entry, id)).catch(() => false);
+    await this.tell((namespace) => this.platform.writeNutrition(nutritionRecordOf(entry, id, namespace)));
     return id;
   }
 
   async updateFood(entry: FoodEntry): Promise<void> {
     await this.log.updateFood(entry);
-    await this.platform.writeNutrition(nutritionRecordOf(entry, entry.id)).catch(() => false);
+    await this.tell((namespace) => this.platform.writeNutrition(nutritionRecordOf(entry, entry.id, namespace)));
   }
 
   async deleteFood(id: number): Promise<void> {
     await this.log.deleteFood(id);
-    await this.platform.removeNutrition(foodRecordId(id)).catch(() => false);
+    await this.tell((namespace) => this.platform.removeNutrition(foodRecordId(namespace, id)));
+  }
+
+  /** Tells the platform under this run's namespace (MM-522); a platform that fails changes nothing here. */
+  private async tell(step: (namespace: string) => Promise<boolean>): Promise<boolean> {
+    try {
+      return await step(await this.platform.writeNamespace());
+    } catch {
+      return false;
+    }
   }
 }

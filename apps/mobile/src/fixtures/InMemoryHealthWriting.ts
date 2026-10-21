@@ -1,5 +1,6 @@
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
 import type { HealthWriteKind } from '../healthIngest/HealthWriteKind';
+import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
 import type { NutritionRecord } from '../healthIngest/NutritionRecord';
 import type { WaterRecord } from '../healthIngest/WaterRecord';
@@ -9,7 +10,7 @@ import type { WaterRecord } from '../healthIngest/WaterRecord';
  * are on, what the user answers when asked for each, and what was written
  * by id, as the platform would keep it. Everything is off until asked for.
  */
-export class InMemoryHealthWriting implements HealthWriting, HealthIntakeWriter {
+export class InMemoryHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWriteNamespace {
   /** The kinds the user allows when asked; the others are refused. */
   willPermit: Set<HealthWriteKind>;
 
@@ -21,6 +22,7 @@ export class InMemoryHealthWriting implements HealthWriting, HealthIntakeWriter 
   readonly asked = new Map<HealthWriteKind, number>();
 
   private readonly on = new Set<HealthWriteKind>();
+  private generation = 1;
 
   constructor({
     on = [],
@@ -28,6 +30,16 @@ export class InMemoryHealthWriting implements HealthWriting, HealthIntakeWriter 
   }: { on?: readonly HealthWriteKind[]; willPermit?: readonly HealthWriteKind[] } = {}) {
     for (const kind of on) this.on.add(kind);
     this.willPermit = new Set(willPermit);
+  }
+
+  /** Numbered, so a test can tell one from the next (MM-522). */
+  writeNamespace(): Promise<string> {
+    return Promise.resolve(`ns${this.generation}`);
+  }
+
+  renewWriteNamespace(): Promise<void> {
+    this.generation++;
+    return Promise.resolve();
   }
 
   writing(): Promise<Set<HealthWriteKind>> {

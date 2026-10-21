@@ -18,6 +18,12 @@ export interface MmHealthWritingApi {
   /** Turns `kind` off. Nothing on the platform is changed. */
   stopWriting(options: { kind: string }): Promise<{ on: boolean }>;
 
+  /** The namespace every id the app writes carries (MM-522), made once and kept in the plugin's preferences. */
+  writeNamespace(): Promise<{ namespace: string }>;
+
+  /** Replaces the namespace with a new random one, kept before it answers. */
+  renewWriteNamespace(): Promise<{ namespace: string }>;
+
   writeNutrition(options: MmHealthNutrition): Promise<{ written: boolean }>;
   removeNutrition(options: { id: string }): Promise<{ removed: boolean }>;
   writeWater(options: { id: string; atMs: number; ml: number }): Promise<{ written: boolean }>;

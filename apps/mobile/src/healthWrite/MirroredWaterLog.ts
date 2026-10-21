@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WaterEntry } from '../domain/water/WaterEntry';
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
+import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { Watched } from '../lang/Watched';
 import { waterRecordId } from './waterRecordId';
 
@@ -14,9 +15,9 @@ import { waterRecordId } from './waterRecordId';
  */
 export class MirroredWaterLog implements WaterRepository {
   private readonly log: WaterRepository;
-  private readonly platform: HealthIntakeWriter;
+  private readonly platform: HealthIntakeWriter & HealthWriteNamespace;
 
-  constructor({ log, platform }: { log: WaterRepository; platform: HealthIntakeWriter }) {
+  constructor({ log, platform }: { log: WaterRepository; platform: HealthIntakeWriter & HealthWriteNamespace }) {
     this.log = log;
     this.platform = platform;
   }
@@ -31,17 +32,30 @@ export class MirroredWaterLog implements WaterRepository {
 
   async addWater(entry: WaterEntry): Promise<number> {
     const id = await this.log.addWater(entry);
-    await this.platform.writeWater({ id: waterRecordId(id), at: entry.at, ml: entry.ml }).catch(() => false);
+    await this.tell((namespace) =>
+      this.platform.writeWater({ id: waterRecordId(namespace, id), at: entry.at, ml: entry.ml }),
+    );
     return id;
   }
 
   async updateWater(entry: WaterEntry): Promise<void> {
     await this.log.updateWater(entry);
-    await this.platform.writeWater({ id: waterRecordId(entry.id), at: entry.at, ml: entry.ml }).catch(() => false);
+    await this.tell((namespace) =>
+      this.platform.writeWater({ id: waterRecordId(namespace, entry.id), at: entry.at, ml: entry.ml }),
+    );
   }
 
   async removeWater(id: number): Promise<void> {
     await this.log.removeWater(id);
-    await this.platform.removeWater(waterRecordId(id)).catch(() => false);
+    await this.tell((namespace) => this.platform.removeWater(waterRecordId(namespace, id)));
+  }
+
+  /** Tells the platform under this run's namespace (MM-522); a platform that fails changes nothing here. */
+  private async tell(step: (namespace: string) => Promise<boolean>): Promise<boolean> {
+    try {
+      return await step(await this.platform.writeNamespace());
+    } catch {
+      return false;
+    }
   }
 }
