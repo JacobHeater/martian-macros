@@ -93,7 +93,8 @@ and WS-09 steps 1 and 8.
    is a new `QuantitySource` value with 40% uncertainty; teach the
    estimator's style rule about it in the same change. The "cooked with oil"
    control in the prompt ticket needs generic foods and waits for step 4.
-3. **Custom foods and recipes (MM-45).** M3. First schema change here.
+3. **Custom foods and recipes (MM-45, MM-456).** M3. First schema change here. MM-456 adds the source food to
+   `recipe_ingredients` and waits for a free schema version.
 4. **Search; store every nutrient; detail level; quantity, unit and basis
    (MM-42, MM-49, MM-167).** M2. Build
    against the fixture pack. Storing nutrients is one migration, and the quantity, unit and nutrition-basis
@@ -127,12 +128,13 @@ workstream's.
 
 ## Requirement sources
 - Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day completeness, daily summary), MM-48 (edit an entry, undo a
-  delete), MM-47 (copy yesterday, copy a meal).
+  delete), MM-47 (copy yesterday, copy a meal), MM-45 (saved foods and recipes; a recipe's ingredient asks raw or cooked and
+  its lines can be reordered).
 - In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
-  barcode), MM-45 (saved foods and recipes), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
+  barcode), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
   need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food; not yet tried with the real camera). Epic: MM-37.
-- Remaining: MM-127, MM-126, MM-58.
+- Remaining: MM-127, MM-126, MM-58, MM-456 (a recipe's ingredient keeps the food it came from; needs a schema change).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-207 (Food entry deletion lacks a visible alternative to swipe, done); MM-169 (Editing a logged pack food dropped the record of which food it came from, done); MM-170 (Choosing "Raw" while weighing, then a serving, logged the raw food, done); MM-202 (An unchanged food edit rounds stored quantity and totals, done); MM-203 (Per-serving alcohol grams are not scaled with consumed energy, done); MM-204 (Converting a calculated entry to typed totals drops alcohol, done); MM-216 (Changing how a food was measured clears the amount without saying so, done); MM-217 (A found food logged by palm, cupped hand or thumb reads as an exact amount, done); MM-171 (The fiber and alcohol lines sat against the meals card, done); MM-172 (The Android release build failed after the label reader was added, done); MM-180 (Give each meal its own card); MM-213 (Saved and Estimate break mid-word at the top of the Add food sheet, done); MM-223 (Add food search and manual entry compete on the opening screen, done); MM-225 (Preview the macro-energy split before logging food, done); MM-226 (Manual nutrition does not explain what the entered values represent, done); MM-227 (Add food reference incorrectly centers Back to search, done); MM-218 (Before logging, the sheet says what it will log); MM-219 (Finding a food and typing one are told apart, and every way in stays in reach); MM-220 (The action that finishes a step is in view, says what it is waiting for, and the sheet can be left); MM-221 (Editing an entry shows what was typed, and says what its day control does).
 - Placed 2026-10-19: MM-408 (The search results flash on every keystroke, done); MM-410 (See more than the first twenty results, done); MM-411 (A failed page of search results says so, proposed).
 - Added 2026-10-14 (the owner, MM-305 water, sodium and micronutrients; step 10): MM-305 (epic), MM-306 (the micronutrient
