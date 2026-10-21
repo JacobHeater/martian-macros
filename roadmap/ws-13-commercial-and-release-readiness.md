@@ -6,10 +6,11 @@
 The Coach unlock and its trial, the external reviews, the stores' obligations,
 and the release itself.
 
-**On the backburner (the owner, 2026-10-21):** the app is for the owner's own
-phone through local builds, with no store release planned. Every step here is
-tagged M5, a future-vision milestone, and nothing is built until the owner
-decides to release.
+**On the backburner (the owner, 2026-10-21):** the owner tests the app on their
+own phone through local builds for weeks or months before any release
+decision. Every step here is a release gate, tagged M5, and waits for that
+decision. Features are never held back for these gates: a feature whose wording
+waits on a sign-off here is built and used now.
 
 ## Why this is a workstream
 Releasing a health app with an in-app purchase in the United States involves

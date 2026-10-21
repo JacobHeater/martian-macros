@@ -642,7 +642,7 @@
     {
       "id": "M3",
       "name": "My phone (personal use)",
-      "intent": "The app the owner uses every day on their own phone, through local builds: every feature M3 held except what exists only for a public release. Monetization and the store, legal and review work moved to M5 on 2026-10-21, when the owner decided the app is for personal use and is not planned for the stores.",
+      "intent": "The app the owner tests every day on their own phone, through local builds, for weeks or months before any release decision: every feature M3 held, with nothing release-gated or paywalled. Monetization and the store, legal and review sign-offs moved to M5 on 2026-10-21. A feature whose wording waits on a review is still built and used now; the review itself is in M5.",
       "requires": [
         {
           "workstream": "WS-03",
@@ -890,7 +890,7 @@
     {
       "id": "M5",
       "name": "Store release (future vision, backburner)",
-      "intent": "Not planned. The owner uses the app personally and does not intend to release it (2026-10-21). This holds what a public release would need: the Coach unlock and its free tier, trial and purchase (MM-84 to MM-87), the store listing and release (MM-94), the professional, health-claims and legal reviews (MM-29, MM-96, MM-242, MM-453), the privacy policy's store declarations (MM-95), the public legal page (MM-247, MM-454) and the reader's data watch (MM-244). It comes alive again only if the owner decides to release; nothing in it is built until then.",
+      "intent": "Not scheduled. The owner tests the app on their own phone for weeks or months before deciding on a release (2026-10-21). This holds only the release gates: the Coach unlock and its paywall (MM-84 to MM-87), the store listing and release (MM-94), the professional, health-claims and legal sign-offs (MM-29, MM-96, MM-242, MM-453), the store declarations (MM-95), the public legal page (MM-247, MM-454) and the reader's data watch (MM-244). Features are never held back for these: every feature is built and used now, without a paywall, and these gates come alive if the owner decides to release.",
       "requires": [
         {
           "workstream": "WS-03",
