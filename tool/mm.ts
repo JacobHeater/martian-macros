@@ -5,11 +5,14 @@ import { stderr, stdout } from 'node:process';
 import { runEmulator, runApp, runBuild, runClean, runDemo, runScreenshot } from './src/android.ts';
 import { runCi } from './src/ci/ciCommand.ts';
 import { runFood } from './src/food.ts';
-import { cleanIos, isSimulatorId, runIosApp, runIosBuild, runSimulator, simulatorScreenshot, temporaryScreenshot } from './src/ios.ts';
+import { choosePhone, cleanIos, pairedPhones, runIosApp, runIosBuild, runSimulator, simulatorScreenshot, temporaryScreenshot } from './src/ios.ts';
 import { runPanel } from './src/panelCommand.ts';
-import { run } from './src/proc.ts';
+import { phoneScreenshot } from './src/phoneScreenshot.ts';
+import { capture, run } from './src/proc.ts';
 import { runRequirements } from './src/requirements.ts';
 import { runRoadmapReport } from './src/roadmap.ts';
+import { screenshotArgs } from './src/screenshotArgs.ts';
+import { screenshotTarget } from './src/screenshotTarget.ts';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const webApp = `${repoRoot}/apps/mobile`;
@@ -67,17 +70,46 @@ async function doctor(): Promise<number> {
   return 0;
 }
 
-/** `mm screenshot`: a simulator by its UDID goes through simctl, anything else through adb (MM-238, MM-403). */
+/**
+ * `mm screenshot`: an iPhone through the app itself and devicectl (MM-536),
+ * a simulator by its UDID through simctl (MM-403), anything else through
+ * adb (MM-238).
+ */
 async function screenshot(args: readonly string[]): Promise<number> {
-  const device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
-  if (device === undefined || !isSimulatorId(device)) return runScreenshot(args);
-  const out = args.filter((arg, at) => !arg.startsWith('-') && args[at - 1] !== '-d');
+  const asked = screenshotArgs(args);
+  // Only a name or id after -d needs the paired phones to tell an iPhone from the rest.
+  const phones = asked.device !== undefined && !asked.phone && process.platform === 'darwin' ? await pairedPhones().catch(() => []) : [];
+  const target = screenshotTarget(asked.device, asked.phone, phones);
+  if (target === 'android') return runScreenshot(args);
   const stamp = new Date().toISOString().slice(0, 19).replaceAll(/[-:]/g, '').replace('T', '-');
-  const clipboard = args.includes('--clipboard');
-  const keepFile = out[0] !== undefined || !clipboard;
-  const path = resolve(out[0] ?? (keepFile ? `mm-screenshot-${stamp}.png` : temporaryScreenshot(stamp)));
-  const taken = await simulatorScreenshot(device, path);
-  if (taken !== 0) return taken;
+  const clipboard = asked.clipboard;
+  const keepFile = asked.out !== undefined || !clipboard;
+  const path = resolve(asked.out ?? (keepFile ? `mm-screenshot-${stamp}.png` : temporaryScreenshot(stamp)));
+  let device = asked.device ?? 'iPhone';
+  if (target === 'phone') {
+    const wanted = asked.device ?? process.env['MM_IPHONE'];
+    const taken = await phoneScreenshot({
+      identity: asked.identity,
+      choose: async () => {
+        try {
+          return choosePhone(phones.length > 0 ? phones : await pairedPhones(), wanted);
+        } catch (error) {
+          return error instanceof Error ? error.message : String(error);
+        }
+      },
+      stamp,
+      path,
+      capture: (command) => capture(command),
+      sleep: (ms) => new Promise<void>((done) => setTimeout(() => done(), ms)),
+      now: () => Date.now(),
+      say: (line) => stderr.write(`${line}\n`),
+    });
+    if (taken.code !== 0) return taken.code;
+    device = taken.phone?.name ?? device;
+  } else {
+    const taken = await simulatorScreenshot(device, path);
+    if (taken !== 0) return taken;
+  }
   if (!clipboard) {
     stdout.write(`${device} -> ${path}\n`);
     return 0;
@@ -109,7 +141,7 @@ const commands: Record<string, [string, Command]> = {
   demo: ['The isolated demo app on an exact device: mm demo [--seed] -d <device ID>', (a) => runDemo(repoRoot, a)],
   emulator: ['Start an emulator: mm emulator [id] [--cold] | list', (a) => runEmulator(repoRoot, a)],
   simulator: ['Start an iPhone simulator: mm simulator [name | udid] | list (MM-403)', (a) => runSimulator(a)],
-  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238); a simulator by its UDID', (a) => screenshot(a)],
+  screenshot: ['A device’s screen as a PNG: mm screenshot [-d DEVICE] [path] [--clipboard] (MM-238); a simulator by its UDID; mm screenshot --phone (or -d <iPhone name | id>) [--env demo] for the iPhone plugged in, through the dev or demo app, never the real one: the app’s screen only, no status bar or system interface (MM-536)', (a) => screenshot(a)],
   build: ['Build the app: mm build android [--release] | mm build ios [--release] [--phone] (a simulator build, or a signed phone build); --prod for the real app, else the dev twin', (a) => (a[0] === 'ios' ? runIosBuild(repoRoot, a) : runBuild(repoRoot, a))],
   clean: ['Remove build outputs and caches', () => {
     cleanIos(repoRoot);
