@@ -98,6 +98,7 @@ export * from './integration/Unavailable';
 export * from './macrosMatchEnergy';
 export * from './Meal';
 export * from './MenstruationDay';
+export * from './MissedPeriodAnswer';
 export * from './Pause';
 export * from './PauseReason';
 export * from './PlannedReminder';

@@ -1,3 +1,4 @@
+import type { FallingLift } from './FallingLift';
 import type { ReliefChoice } from './ReliefChoice';
 import type { ReliefReason } from './ReliefReason';
 import type { ReliefSignal } from './ReliefSignal';
@@ -25,8 +26,11 @@ export interface ReliefOffer {
   /** Whole weeks of unbroken deficit so far. */
   readonly deficitWeeks: number;
 
-  /** What made the offer: hard check-ins, short sleep, or both (MM-252). */
+  /** What made the offer: hard check-ins, falling lifts, short sleep, or more than one (MM-252, MM-77). */
   readonly signals: readonly ReliefSignal[];
+
+  /** The lifts that are falling, when that is one of the signals; empty otherwise. */
+  readonly fallingLifts: readonly FallingLift[];
 
   /**
    * Whether sleep has averaged under six hours: from the nights recorded

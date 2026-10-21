@@ -5,6 +5,7 @@ import { RecoveryQuestion } from '../domain/RecoveryQuestion';
 import type { UserSetup } from '../domain/UserSetup';
 import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
 import { DietBreakRule } from './DietBreakRule';
+import { fallingLifts } from './fallingLifts';
 import { pauseOn } from './pauseOn';
 import type { ReliefOffer } from './ReliefOffer';
 import { ReliefRule } from './ReliefRule';
@@ -12,6 +13,7 @@ import type { ReliefSignal } from './ReliefSignal';
 import { shortSleep } from './shortSleep';
 import type { SleepAverage } from './SleepAverage';
 import { slowerPace } from './slowerPace';
+import type { StrengthTrend } from './StrengthTrend';
 import type { TargetsRecord } from './TargetsRecord';
 
 const hard = (checkIn: RecoveryCheckIn) =>
@@ -31,9 +33,12 @@ const hard = (checkIn: RecoveryCheckIn) =>
  *
  * Short sleep is a signal of its own (MM-252): an average under six hours
  * over the last fourteen recorded nights makes the offer whether or not the
- * check-ins were hard. The strength trigger of MM-117 needs the training log
- * and is not here. Nothing this returns can lower calories or ask for more
- * exercise: the choices are a break, a slower pace, or carrying on.
+ * check-ins were hard. Falling lifts are the strength trigger (MM-117, MM-77):
+ * two or more down 5% over three weeks on their smoothed trend. The three
+ * weeks of quiet give way only when the lifts are falling and the check-ins
+ * are hard at once, with a hard check-in since the answer. Nothing this
+ * returns can lower calories or ask for more exercise: the choices are a
+ * break, a slower pace, or carrying on.
  */
 export function findReliefOffer({
   setup,
@@ -43,6 +48,7 @@ export function findReliefOffer({
   deficitRestartOn,
   pauses = [],
   sleepAverage,
+  strengthTrends = [],
 }: {
   setup: UserSetup;
   checkIns: readonly RecoveryCheckIn[];
@@ -52,6 +58,8 @@ export function findReliefOffer({
   pauses?: Iterable<Pause>;
   /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
   sleepAverage?: SleepAverage | undefined;
+  /** Every lift's strength trend from the training log (MM-77); none without one. */
+  strengthTrends?: readonly StrengthTrend[];
 }): ReliefOffer | undefined {
   if (setup.goalMode !== 'fatLoss' && setup.goalMode !== 'recomp') {
     return undefined;
@@ -61,16 +69,21 @@ export function findReliefOffer({
     return undefined;
   }
   if (pauseOn(pauses, today) !== undefined) return undefined;
+  const recent = hardWeeks(checkIns, today);
+  const falling = fallingLifts(strengthTrends, today);
+  const liftsFalling = falling.length >= ReliefRule.fallingLiftsNeeded;
   const answered = setup.reliefAnsweredOn;
   if (answered !== undefined && !answered.isAfter(today) && answered.daysUntil(today) < ReliefRule.quietDays) {
-    return undefined;
+    // Both triggers at once break the quiet, on a hard check-in made since the answer (MM-117).
+    const latest = recent?.[recent.length - 1];
+    if (!liftsFalling || latest === undefined || !latest.date.isAfter(answered)) return undefined;
   }
 
   const weeks = consecutiveDeficitWeeks(history, today, { restartOn: deficitRestartOn });
-  const recent = hardWeeks(checkIns, today);
   const sleepIsShort = shortSleep(sleepAverage);
   const signals: ReliefSignal[] = [];
   if (recent !== undefined) signals.push('hardCheckIns');
+  if (liftsFalling) signals.push('strengthFalling');
   if (sleepIsShort) signals.push('shortSleep');
   if (signals.length > 0) {
     const slower = setup.goalMode === 'fatLoss' ? slowerPace(setup.requestedLossFraction) : undefined;
@@ -87,6 +100,7 @@ export function findReliefOffer({
       slowerPace: slower,
       deficitWeeks: weeks,
       signals,
+      fallingLifts: liftsFalling ? falling : [],
       shortSleep: sleepIsShort || typedShort,
       sleepAverage: sleepIsShort ? sleepAverage : undefined,
     };
@@ -98,6 +112,7 @@ export function findReliefOffer({
       slowerPace: undefined,
       deficitWeeks: weeks,
       signals: [],
+      fallingLifts: [],
       shortSleep: false,
       sleepAverage: undefined,
     };
