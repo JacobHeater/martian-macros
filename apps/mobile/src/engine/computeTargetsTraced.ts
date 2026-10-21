@@ -63,6 +63,14 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
     rate = (dailyEnergyDelta * 7) / (rho * i.trendWeightKg);
     flags.add('deficitCapped');
   }
+  // A surplus never exceeds a share of expenditure (MM-129): beyond it the
+  // extra is mostly fat. The pace recorded is the one this gives.
+  const maxSurplus = SafetyBounds.maxSurplusKcal(i.trainingStatus, i.tdeeKcal);
+  if (dailyEnergyDelta > maxSurplus) {
+    dailyEnergyDelta = maxSurplus;
+    rate = (dailyEnergyDelta * 7) / (rho * i.trendWeightKg);
+    flags.add('surplusCapped');
+  }
   let kcal = i.tdeeKcal + dailyEnergyDelta + i.policy.maintenanceOffsetKcal;
   // The two-step way out of a deficit (MM-130): this set stops halfway.
   if (mode === 'maintenance' && i.easeFromKcal !== undefined && i.easeFromKcal < kcal) {

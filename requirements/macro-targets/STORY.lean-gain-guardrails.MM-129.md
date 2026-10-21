@@ -1,8 +1,8 @@
 ---
 id: MM-129
-status: proposed
+status: done
 component: macro-targets
-related: [MM-119, MM-12, MM-21, MM-25, MM-36, MM-77, MM-134, MM-138, MM-140, MM-155, MM-156]
+related: [MM-119, MM-12, MM-21, MM-25, MM-36, MM-77, MM-133, MM-134, MM-138, MM-140, MM-155, MM-156, MM-480]
 ---
 
 # Story: A lean gain that does not quietly become a bulk
@@ -51,6 +51,10 @@ Scenario: The surplus cap
   Given an intermediate lifter with an expenditure of 2,800 kcal on lean gain
   Then the calorie target is not above 3,080 kcal
 
+Scenario: The cap for novices
+  Given a novice, returning or untrained lifter with an expenditure of 2,800 kcal on lean gain
+  Then the calorie target is not above 3,220 kcal, and a capped target says so
+
 Scenario: Gaining too fast
   Given trend gain of 0.6% a week for three weeks against an intended 0.15%
   Then the next target is lower by at most the weekly step, and the reason is given
@@ -58,6 +62,7 @@ Scenario: Gaining too fast
 Scenario: Fat-heavy gain
   Given ten weeks on lean gain with trend weight up 3 kg and waist up 4 cm, with at least four waist measurements
   Then the Coach screen says the gain looks fat-heavy and offers a slower pace or maintenance
+  And the offer is the goal chooser until a slower gain pace exists (MM-480)
 
 Scenario: Waist within noise
   Given waist up 0.8 cm over ten weeks
@@ -70,9 +75,50 @@ Scenario: Time to stop
 Scenario: Weight up, strength flat
   Given eight weeks of surplus, trend weight up 2 kg, and no tracked lift's e1RM higher
   Then the coach says so and does not change calories because of it
+
+Scenario: An eating-disorder history
+  Given a user with an eating-disorder history on lean gain
+  Then no weight, waist or body-fat line is said, and only the 26-week line can be
 ```
 
+## UI/UX
+- CoachLeanGainFatHeavy — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachLeanGainFatHeavy). The card, built like
+  its sibling the recomp review (MM-133): a section with the findings in words, trend weight and the intended pace, and "Choose a
+  goal", which opens the Coach screen's goal chooser.
+- CoachLeanGainTimeToStop — apps/mobile/src/gallery/screens/Coach.stories.tsx (Story: CoachLeanGainTimeToStop). Ending the gain
+  recommended, with the reason.
+
+## Progress
+Built (2026-10-21), against this ticket's recommendations. Not run locally; CI validates.
+- **The cap** is `SafetyBounds.maxSurplusKcal` (10% of estimated expenditure for intermediate and advanced lifters, 15% for
+  untrained, novice and returning ones), applied in `computeTargetsTraced` after the deficit cap; a capped target carries the
+  `surplusCapped` flag, its message on the Coach screen, and the pace the cap gives. No rules-version bump: the cap binds only
+  for heavy users or the faster gain with androgen use, and the next check-in applies it.
+  The safety floor wins over the cap: a heavy, lean body's energy-availability floor (30 kcal per kg fat-free mass) can sit
+  above it, and the target is then the floor, flagged as such.
+- **Too fast** is the ordinary loop: the lower measured expenditure brings the target down by the weekly step, and the card says
+  why, with both paces.
+- **The three advisory rules** are `leanGainReviewOf`, with its figures in `LeanGainRule` and the evidence register; the card is
+  `LeanGainCard` on the Coach screen, under the recomp review, from the `leanGainReview` cell. None changes a target or the goal.
+- Guarding tests: `apps/mobile/test/engine/leanGainGuardrails.test.ts` (every scenario above, the evidence rows),
+  `apps/mobile/test/coach/leanGainCard.test.tsx` (the card, the goal chooser, the goal unchanged, the eating-disorder history,
+  another goal), `apps/mobile/test/engine/evidenceRegister.test.ts` (the two new SafetyBounds values).
+
+Choices I made without asking (say if any is wrong):
+- **"Novices" includes untrained lifters**, who share the novice pace (MM-25).
+- **Too fast** is the trend over the last three weeks, after the gain's first week (glycogen and water), above twice the intended
+  pace.
+- **The fat-heavy and waist-stop readings use the whole stretch on lean gain**, the waist's smoothed ends (MM-155), and the trend's
+  change over the same days.
+- **Strength flat** needs trend weight up 1% or more, at least one lift judged (four sessions in the stretch, the latest in the last
+  two weeks, a baseline within a week of the start), and none up 2.5%. Bodyweight lifts are left out: their estimate rises with body
+  weight.
+- **Body fat for the stop line is the point estimate**, as MM-12 judges "high"; a goal body fat (MM-36) does not move it yet.
+- **The card stays while a line holds**; it has no dismiss. A slower gain is MM-480.
+- **An eating-disorder history** hears only the 26-week line, as MM-141 leaves out lines about weight.
+
 ## Notes
+- Device checks owed: the card on a phone (CoachLeanGainFatHeavy), at 200% text.
 - Priority: could-have; lean gain is the least-used goal at launch.
 - Arm and thigh measurements (MM-156) would sharpen "where is the weight going"; not required here.
 - Users on testosterone therapy or anabolic steroids have a faster expected gain (MM-11); the caps and the stop lines are unchanged for

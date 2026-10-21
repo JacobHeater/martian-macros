@@ -15,6 +15,7 @@ import { failingRead } from './failingRead';
 import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
+import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
 import { shortSleepScenario } from './shortSleepScenario';
@@ -374,6 +375,23 @@ export const CoachRecompReview = screenStory({
   covers: ['CoachScreen'],
   shows: /^Recomp review, week/,
   scenario: recompScenario,
+  open: onCoach,
+});
+
+/** MM-129: ten weeks of lean gain, waist up 4 cm on 3 kg, lifts flat: fat-heavy, strength flat, and a goal offered. */
+export const CoachLeanGainFatHeavy = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The gain looks fat-heavy/,
+  scenario: leanGainScenario({ bodyFatPercent: 15 }),
+  open: onCoach,
+  walk: pressOnCoach('Choose a goal'),
+});
+
+/** MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. */
+export const CoachLeanGainTimeToStop = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The coach recommends ending the gain now/,
+  scenario: leanGainScenario(),
   open: onCoach,
 });
 

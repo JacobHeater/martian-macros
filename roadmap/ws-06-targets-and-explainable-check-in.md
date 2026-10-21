@@ -101,8 +101,10 @@ register, and the paywall gates features built here.
    step 2.
 7. **Carbohydrate and fat preference; week shape (MM-122, MM-124).** M4.
    One migration for both settings.
-8. **Lean-gain guardrails (MM-129).** M4. Its waist signal needs WS-07 step 1
+8. **Lean-gain guardrails (MM-129, MM-480).** M4. Its waist signal needs WS-07 step 1
    and its strength signal WS-10 step 3; the surplus cap needs neither.
+   MM-129 is built (2026-10-21); a slower lean-gain pace to choose (MM-480)
+   needs a stored setting, so a migration.
 
 ## Done enough to unblock others
 MM-121 is done: target records carry a protein minimum and goal-specific
@@ -125,6 +127,8 @@ beside anything.
   boundaries simulator-validated).
 - Remaining: MM-138, MM-123, MM-128, MM-130,
   MM-122, MM-124, MM-129. Epics: MM-119, MM-137.
+- Built (2026-10-21): MM-129 (lean-gain guardrails: the surplus cap and the Coach
+  screen's lean-gain card). Remaining from it: MM-480 (a slower gain pace).
 - Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
 
 ## Notes for whoever builds it
