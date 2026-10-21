@@ -10,6 +10,7 @@ import { CookingFatKind } from '../domain/food/CookingFatKind';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { HandModel } from '../domain/food/hand/HandModel';
+import { handUnitsFor } from '../domain/food/hand/handUnitsFor';
 import { conversionFor } from '../domain/food/portion/conversionFor';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
@@ -115,7 +116,9 @@ export function FoodAmountStep({
 
   const [choices] = useState<readonly AmountChoice[]>(() => {
     if (custom === undefined) {
-      const handUnits: readonly PortionUnit[] = hand === undefined ? [] : ['palm', 'cuppedHand', 'thumb'];
+      // The portion the food suits comes first: a palm of chicken, a thumb of butter (MM-46).
+      const makeup = new NutritionTotals({ kcal: chosen.kcal, proteinG: chosen.proteinG, carbsG: chosen.carbsG, fatG: chosen.fatG });
+      const handUnits: readonly PortionUnit[] = hand === undefined ? [] : handUnitsFor(makeup);
       return [
         ...servings.map((serving) => ({ unit: 'serving' as const, serving })),
         ...(['gram', 'ounce', ...handUnits] as const).map((unit) => ({ unit, serving: undefined })),
