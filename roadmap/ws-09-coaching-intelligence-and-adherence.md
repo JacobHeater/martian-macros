@@ -108,8 +108,8 @@ the trial is timed to end after the first monthly report.
 4. **Pause; reminders (MM-148, MM-146).** M3. A pause must silence reminders,
    so build them together.
 5. **Recovery check-in and the offer to ease a deficit (MM-116, MM-117).** M4.
-   The self-report trigger needs nothing else; the strength trigger waits
-   for WS-10 step 3.
+   The self-report trigger needs nothing else; the strength trigger, built
+   2026-10-21 on WS-10 step 3's strength trend, reads the training log.
 6. **Recomp review and recomp signal (MM-133, MM-32).** M4. After WS-07
    step 1 and WS-10 step 3. A waist-and-weight-only version is possible
    earlier and is weaker; the review ticket says what to tell the user when
@@ -149,10 +149,10 @@ independent of step 3.
   rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
   the estimator, the deficit count and the resume screen; streaks do not exist to be frozen), MM-146 (three local
   reminders with their own times, the two-a-day cap, the quiet period and the stop after a week unanswered; not the
-  check-in or recovery ones, nor the onboarding offer; iOS untried), MM-116 (the five weekly questions, skipping, and
-  the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
-  offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
-  the training log), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
+  check-in or recovery ones, nor the onboarding offer; iOS untried), MM-116 (the five weekly questions, skipping, the
+  eight-week lines on the Coach screen, and the missed-period question from marked period days; not its reminder or a
+  place in the target-change summary), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
+  break, a slower pace, or carry on; not the pace names, and not checked on a device), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, and each target change; not strength, body fat or photos),
   MM-92 (the logging streak, forgiving one missed day in seven, as a quiet Dashboard line; no personal records or
   workouts yet).
