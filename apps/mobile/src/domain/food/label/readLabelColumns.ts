@@ -19,7 +19,8 @@ const labels: readonly (readonly [string, RegExp])[] = [
 ];
 
 /** A value alone on its line ("8g", "160 mg", "230"), with an optional percent after it. */
-const valueLine = /^(\d+(?:[.,]\d+)?)\s*(g|mg|mcg|µg)?(?:\s+\d+(?:[.,]\d+)?\s*%)?$/;
+// "µg" lower-cased is the Greek "μg"; both are micrograms.
+const valueLine = /^(\d+(?:[.,]\d+)?)\s*(g|mg|mcg|µg|μg|ug)?(?:\s+\d+(?:[.,]\d+)?\s*%)?$/;
 const percentLine = /^\d+(?:[.,]\d+)?\s*%$/;
 
 /** The fewest labels in a row that make a column; one or two are a label and its value on the next line. */
@@ -63,7 +64,7 @@ export function readLabelColumns(text: string): ReadonlyMap<string, readonly [nu
       const line = lines[i] as string;
       const m = valueLine.exec(line);
       if (m !== null) {
-        values.push([Number((m[1] as string).replace(',', '.')), m[2] === 'µg' ? 'mcg' : m[2]]);
+        values.push([Number((m[1] as string).replace(',', '.')), m[2] === 'µg' || m[2] === 'μg' || m[2] === 'ug' ? 'mcg' : m[2]]);
       } else if (!percentLine.test(line)) {
         break;
       }
