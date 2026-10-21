@@ -6,11 +6,13 @@ import { Workout } from '../../src/domain/training/Workout';
 import { WorkoutExercise } from '../../src/domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../src/domain/training/WorkoutSet';
 import { WaterEntry } from '../../src/domain/water/WaterEntry';
+import { FixedClock } from '../../src/fixtures/FixedClock';
 import { InMemoryHealthWorkouts } from '../../src/fixtures/InMemoryHealthWorkouts';
 import { InMemoryHealthWriting } from '../../src/fixtures/InMemoryHealthWriting';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { MirroredFoodLog } from '../../src/healthWrite/MirroredFoodLog';
 import { MirroredWaterLog } from '../../src/healthWrite/MirroredWaterLog';
+import { MirroredWeightLog } from '../../src/healthWrite/MirroredWeightLog';
 import { MirroredWorkoutLog } from '../../src/healthWrite/MirroredWorkoutLog';
 import { RenewingEraser } from '../../src/healthWrite/RenewingEraser';
 import { RenewingRestorer } from '../../src/healthWrite/RenewingRestorer';
@@ -19,17 +21,25 @@ import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
 import { dataEraserContract } from '../contracts/dataEraserContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
+import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
 import { first } from '../support/first';
 
-/** MM-70, MM-314, MM-489: the logs as the app takes them on a phone, told to the health platform as they change. */
-const writingOn = () => new InMemoryHealthWriting({ on: ['food', 'water', 'workouts'] });
+/** MM-70, MM-314, MM-513, MM-489: the logs as the app takes them on a phone, told to the health platform as they change. */
+const writingOn = () => new InMemoryHealthWriting({ on: ['food', 'water', 'weight', 'workouts'] });
 
 foodRepositoryContract('The food log told to the health platform', () => {
   return new MirroredFoodLog({ log: new InMemoryRepositories().food, platform: writingOn() });
 });
 waterRepositoryContract('The water log told to the health platform', () => {
   return new MirroredWaterLog({ log: new InMemoryRepositories().water, platform: writingOn() });
+});
+weightRepositoryContract('The weigh-ins told to the health platform', () => {
+  return new MirroredWeightLog({
+    log: new InMemoryRepositories().weights,
+    platform: writingOn(),
+    clock: new FixedClock(CalendarDate.of(2026, 1, 2)),
+  });
 });
 workoutRepositoryContract('The workout log told to the health platform', async () => {
   const repos = new InMemoryRepositories();
@@ -140,6 +150,56 @@ describe('water (MM-314)', () => {
   });
 });
 
+describe('weight (MM-513)', () => {
+  const setUp = (platform: InMemoryHealthWriting) => {
+    const repos = new InMemoryRepositories();
+    const clock = new FixedClock(today, { hour: 7 });
+    return { repos, weights: new MirroredWeightLog({ log: repos.weights, platform, clock }) };
+  };
+
+  it('A typed weight appears: 82.4 kg typed for today is written at the moment it is typed', async () => {
+    const platform = writingOn();
+    await setUp(platform).weights.saveWeight(today, 82.4);
+    expect(platform.weight.get('martian-macros-weight-ns1-2026-10-05')).toEqual({
+      id: 'martian-macros-weight-ns1-2026-10-05',
+      at: new Date(2026, 9, 5, 7),
+      kg: 82.4,
+    });
+  });
+
+  it('changed, it is written again under its day, and removed, it is removed', async () => {
+    const platform = writingOn();
+    const { weights } = setUp(platform);
+    await weights.saveWeight(today, 82.4);
+    await weights.saveWeight(today, 82.1);
+    expect([...platform.weight.values()].map((record) => record.kg)).toEqual([82.1]);
+    await weights.deleteWeight(today);
+    expect(platform.weight.size).toBe(0);
+  });
+
+  it('a weigh-in typed for an earlier day is written in that day’s morning', async () => {
+    const platform = writingOn();
+    await setUp(platform).weights.saveWeight(today.addDays(-2), 83);
+    expect(platform.weight.get('martian-macros-weight-ns1-2026-10-03')?.at).toEqual(new Date(2026, 9, 3, 8, 0));
+  });
+
+  it('Off: typing a weight writes nothing, and the weigh-in is saved', async () => {
+    const platform = new InMemoryHealthWriting({ on: ['food', 'water', 'workouts'] });
+    const { repos, weights } = setUp(platform);
+    await weights.saveWeight(today, 82.4);
+    expect(platform.weight.size).toBe(0);
+    expect((await first(repos.weights.watchWeights())).map((w) => w.weightKg)).toEqual([82.4]);
+  });
+
+  it('a platform that fails leaves the weigh-in as it was saved', async () => {
+    const failing = writingOn();
+    failing.writeWeight = () => Promise.reject(new Error('The platform is busy.'));
+    const { repos, weights } = setUp(failing);
+    await weights.saveWeight(today, 82.4);
+    expect((await first(repos.weights.watchWeights())).map((w) => w.weightKg)).toEqual([82.4]);
+  });
+});
+
 describe('workouts (MM-489)', () => {
   const at = (minute: number) => new Date(2026, 9, 5, 18, minute);
   const bench = new WorkoutExercise({
@@ -179,6 +239,29 @@ describe('workouts (MM-489)', () => {
     await workouts.saveWorkout(finished.copyWith({ endedAt: at(50) }));
     expect(platform.all).toHaveLength(1);
     expect(platform.all[0]?.end).toEqual(at(50));
+  });
+
+  it('Removed (MM-515): a finished workout deleted in the app is gone from the platform', async () => {
+    const { platform, workouts } = await setUp(true);
+    const id = await workouts.saveWorkout(started);
+    await workouts.saveWorkout(started.copyWith({ id, endedAt: at(45) }));
+    const kept = await workouts.saveWorkout(started.copyWith({ id: 0, endedAt: at(40) }));
+    expect(platform.all).toHaveLength(2);
+    await workouts.deleteWorkout(id);
+    expect(platform.all.map((w) => w.clientId)).toEqual([`martian-macros-workout-ns1-${kept}`]);
+    expect((await first(workouts.watchWorkouts())).map((w) => w.id)).toEqual([kept]);
+  });
+
+  it('Off (MM-515): with writing workouts not allowed, deleting a workout asks nothing of the platform', async () => {
+    const { platform, workouts } = await setUp(false);
+    const removals: string[] = [];
+    platform.removeWorkout = (clientId) => {
+      removals.push(clientId);
+      return Promise.resolve(true);
+    };
+    const id = await workouts.saveWorkout(started.copyWith({ endedAt: at(45) }));
+    await workouts.deleteWorkout(id);
+    expect(removals).toEqual([]);
   });
 
   it('Writing asks for its own permission: not granted, nothing is written and the workout is saved', async () => {

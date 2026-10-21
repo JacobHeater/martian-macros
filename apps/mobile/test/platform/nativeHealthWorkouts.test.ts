@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { NativeHealthWorkouts } from '../../src/platform/NativeHealthWorkouts';
+import { NativeHealthWriting } from '../../src/platform/NativeHealthWriting';
 import type { MmHealthWorkout } from '../../src/platform/MmHealthWorkout';
 import { healthWorkoutReaderContract } from '../contracts/healthWorkoutReaderContract';
 import { healthWorkoutWriterContract } from '../contracts/healthWorkoutWriterContract';
@@ -98,4 +99,31 @@ it('Apple Health is given the session alone (MM-489)', async () => {
   await workouts.requestWritePermission();
   await workouts.writeWorkout(workout);
   expect(fake.workouts.get('hc-martian-macros-workout-7')?.segments).toEqual([]);
+});
+
+it('Removed: the workout written under its id is gone, and another app’s are kept (MM-515)', async () => {
+  const { fake, workouts } = android();
+  await workouts.requestWritePermission();
+  await workouts.writeWorkout(workout);
+  expect(await workouts.removeWorkout(workout.clientId)).toBe(true);
+  expect([...fake.workouts.keys()].sort()).toEqual(['hc-walk-1', 'hc-watch-1']);
+});
+
+it('Off: with writing workouts turned off, a removal changes nothing on the platform (MM-515)', async () => {
+  const { fake, workouts } = android();
+  await workouts.requestWritePermission();
+  await workouts.writeWorkout(workout);
+  await fake.api.stopWriting({ kind: 'workouts' });
+  expect(await workouts.removeWorkout(workout.clientId)).toBe(false);
+  expect(fake.workouts.has('hc-martian-macros-workout-7')).toBe(true);
+});
+
+it('turned off, every workout the app wrote can be removed by its prefix, and no other app’s (MM-514)', async () => {
+  const { fake, workouts } = android();
+  await workouts.requestWritePermission();
+  await workouts.writeWorkout(workout);
+  await workouts.writeWorkout({ ...workout, clientId: 'martian-macros-workout-renewed1-1' });
+  await fake.api.stopWriting({ kind: 'workouts' });
+  expect(await new NativeHealthWriting(fake.api).removeWritten('workouts')).toBe(true);
+  expect([...fake.workouts.keys()].sort()).toEqual(['hc-walk-1', 'hc-watch-1']);
 });

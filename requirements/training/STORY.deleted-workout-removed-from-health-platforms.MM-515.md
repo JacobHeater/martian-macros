@@ -1,6 +1,6 @@
 ---
 id: MM-515
-status: proposed
+status: in-progress
 component: training
 related: [MM-489, MM-189, MM-70]
 ---
@@ -36,3 +36,10 @@ Scenario: Off
 
 ## Notes
 - The terms' sentence on workouts (section 9) changes with this ticket.
+- Built 2026-10-21: `HealthWorkoutWriter.removeWorkout` (contract `healthWorkoutWriterContract`, run against the plugin
+  adapter for both platforms, the fixtures and no platform), `MirroredWorkoutLog.deleteWorkout`
+  (`test/healthWrite/mirroredLogs.test.ts`), the plugins' `removeWorkout` (Health Connect by client record id, HealthKit
+  by the app's source and sync identifier; `test/native/mmHealthWrites.test.ts`). Only the workout under the current
+  write namespace (MM-522) is removed: the app holds no workout written before an erase. Terms section 9 says a deleted
+  workout is removed (terms version 4).
+- Device checks owed: a finished workout deleted in the app is gone from Health Connect and Apple Health.

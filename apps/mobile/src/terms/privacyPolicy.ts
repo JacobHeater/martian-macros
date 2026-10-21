@@ -58,7 +58,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
       paragraphs: [
         `${health} is optional. If you allow it, the app reads only the kinds of data you allow from this list: weight, body fat, lean body mass, height, workouts, menstruation, steps and sleep.`,
         `What it reads is copied into the app’s database on this phone, is used only to work out your numbers in the app, and stays there until you erase it, even if you later take the permission away. It is not sent anywhere by the app, and it is not used for advertising.`,
-        `The app writes to ${health} only the kinds you turn on in Settings, each with its own permission: the food you log, the water you log and the workouts you finish. It writes only what you logged in the app, and never changes or removes what another app wrote. What it wrote is then kept by ${health}, and stays there when you turn writing off or erase the app’s data, until you remove it there.`,
+        `The app writes to ${health} only the kinds you turn on in Settings, each with its own permission: the food you log, the water you log, the weight you type and the workouts you finish. It writes only what you logged in the app, and never changes or removes what another app wrote. What it wrote is then kept by ${health}. When you turn writing a kind off, the app asks whether to remove what it wrote of that kind; what you keep stays there, also when you erase the app’s data, until you remove it there.`,
       ],
     },
     {

@@ -25,4 +25,8 @@ export class NoHealthWorkouts implements HealthWorkoutReader, HealthWorkoutWrite
   writeWorkout(): Promise<boolean> {
     return Promise.resolve(false);
   }
+
+  removeWorkout(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
 }
