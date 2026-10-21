@@ -43,6 +43,12 @@ const rules = {
    * on offer. Rationed like the rest, so at most once a fortnight.
    */
   shortSleep: { priority: 'coaching', aboutWeight: false, otherIntake: false },
+  /**
+   * Most of the fortnight's protein was logged by palm, in a goal where
+   * protein precision matters (MM-46): weigh the main protein food for a
+   * week to calibrate. Never asked of a user with an eating-disorder history.
+   */
+  weighProtein: { priority: 'dataQuality', aboutWeight: false, otherIntake: false },
 } as const satisfies Record<string, { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean }>;
 
 /**

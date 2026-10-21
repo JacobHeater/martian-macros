@@ -254,6 +254,7 @@ export * from './waistWithinNoiseInsights';
 export * from './WaterFewDaysRule';
 export * from './waterFewDaysInsights';
 export * from './WeekPatternRule';
+export * from './WeighProteinRule';
 export * from './WeightJumpRule';
 export * from './WeightJumpCauseKind';
 export * from './WeightJumpCause';

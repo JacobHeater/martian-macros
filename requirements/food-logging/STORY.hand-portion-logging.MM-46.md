@@ -48,6 +48,26 @@ Scenario: Switching to a scale
   Given three weeks logged by hand portions
   When the user begins weighing everything
   Then the expenditure estimate restarts its window at the switch
+
+Scenario: Switching to labels
+  Given three weeks logged by hand portions and nothing weighed
+  When the user begins logging label servings
+  Then the expenditure estimate restarts its window at the switch
+
+Scenario: A steady mix is not a switch
+  Given half of every day's energy logged by hand portions and half by label servings
+  Then the expenditure estimate does not restart its window
+
+Scenario: Weigh the main protein for a week
+  Given a goal of fat loss, recomposition or lean gain
+  And more than half of the protein on fully logged days of the last two weeks was logged by palm
+  Then the coach asks the user to weigh the protein food they eat most for one week
+  And says what share of their protein was logged by palm
+
+Scenario: No nudge where it does not help
+  When the goal is maintenance, or half the protein or less was logged by palm,
+  or the user has an eating-disorder history
+  Then the coach does not ask the user to weigh their protein
 ```
 
 ## Notes
@@ -76,5 +96,25 @@ shorter woman; a food's own density wins; no hand size, no conversion), the repo
 **Honest limits.** The reference volumes are judgement, rounded from common coaching guidance and not checked against measured
 hands; the code says so. The packs carry a density for few foods, so a palm of salmon and a palm of chicken weigh the same here and
 differ only in their nutrition per gram, not in weight as the first scenario asks. Foods are not yet matched to the fitting portion
-(palm for meat, cupped hand for grains): all three are offered. The nudge to weigh the main protein source for a week, the
-engine's separation of hand portions from label servings (MM-27), and a check against real hands are not built. Not seen on the emulator.
+(palm for meat, cupped hand for grains): all three are offered. A check against real hands is not built. Not seen on the emulator.
+
+Built: hand portions are a logging style of their own (MM-27). Each intake day carries the share of its energy logged by palm,
+cupped hand or thumb (`handShare`) beside the weighed share. The estimator's switch test is now the change in the mix of weighed, by
+hand and the rest (half the summed change in the three shares) between two runs of days, against the same 0.5 threshold. With no
+hand portions it is exactly the old weighed-share change, so earlier results are unchanged; hand portions to a scale, or to label
+servings, each count as a full switch. Tests: `tdeeEstimator.test.ts` (three weeks by hand then a scale restarts the window; hand
+portions to labels restarts it; a steady half-and-half mix does not), `intakeDaysFrom.test.ts` (the hand and palm-protein shares).
+
+Built: the nudge to weigh protein, as the insight rule `weighProtein` (MM-141's catalog, data quality, rationed like the rest).
+It fires when more than half the protein on the fortnight's fully logged days was logged by palm (`palmProteinShare` on each
+intake day) and the goal is fat loss, recomposition or lean gain; thresholds in `WeighProteinRule`. It asks for one week of
+weighing the protein food eaten most and states the share by palm. Tests: `insights.test.ts` (fires in fat loss; not at half;
+not in maintenance; never with an eating-disorder history) and `insightCard.test.tsx` (its words and evidence).
+
+Choices I made without asking (say if any is wrong):
+- **The nudge is never shown to a user with an eating-disorder history**, though it is about protein and logging: asking them
+  to weigh food is the wrong push.
+- **"Protein matters for their goal" is every goal but maintenance**, and "mostly by palm" is more than half the protein.
+- **The nudge does not name the food.** It says "the protein food you eat most"; insights carry figures, not names.
+- **The style test is one distance over three shares**, not a separate test per share, so a switch between any two styles counts
+  once and the old behaviour is kept exactly.
