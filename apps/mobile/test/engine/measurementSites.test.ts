@@ -87,11 +87,12 @@ describe('Limits of a tape', () => {
     expect(text).not.toMatch(/muscle|fat|lean|grew|gain/i);
   });
 
+  // The waist's change is the shared change function's (MM-155), from the ends of the period, not the first and last entry.
   it('a limb not added says nothing, and one with no clear change says so', () => {
     const measurements = [...weekly('waist', 92, 90), ...weekly('thigh', 58, 58.2), ...weekly('calf', 38, 39)];
     const facts = limbFactsOf({ measurements, sites: new Set(['thigh']), asOf: today });
     expect(facts.map((f) => f.site)).toEqual(['thigh']);
-    expect(limbFactText(facts[0]!, fmt)).toBe('Thigh: no clear change in 12 weeks while waist went down 2.0 cm.');
+    expect(limbFactText(facts[0]!, fmt)).toBe('Thigh: no clear change in 12 weeks while waist went down 1.5 cm.');
   });
 
   it('in a lean gain, limbs up with the waist steady is consistent with the gain, and the reverse with the fat-heavy notice', () => {
