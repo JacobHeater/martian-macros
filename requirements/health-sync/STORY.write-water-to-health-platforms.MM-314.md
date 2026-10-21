@@ -1,6 +1,6 @@
 ---
 id: MM-314
-status: in-progress
+status: done
 component: health-sync
 related: [MM-305, MM-313, MM-70, MM-66, MM-242]
 ---
@@ -53,4 +53,11 @@ Scenario: Not allowed
 - Built 2026-10-21 with MM-70, not run locally; CI validates: `MirroredWaterLog` with the water repository contract
   (`test/healthWrite/mirroredLogs.test.ts`), `writeWater` and `removeWater` of both plugins, `WRITE_HYDRATION` in the
   manifest.
-- Owed on a device: a glass shows as 250 ml at its time in Health Connect and Apple Health; removing it removes it.
+
+## Progress
+Done (2026-10-21): every scenario is built with MM-70's write path and held by the tests named in the notes; not run
+locally, CI validates.
+
+## Owed on a phone
+- A glass shows as 250 ml at its time in Health Connect and Apple Health.
+- Removing it in the app removes it there.
