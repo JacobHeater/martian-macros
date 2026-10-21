@@ -25,6 +25,14 @@ export class Exercise {
   static readonly customIdPrefix = 'custom-';
 
   /**
+   * The id an imported set is logged against when the platform named a
+   * movement the library cannot place (MM-189): "Other exercise", kept with
+   * its time so nothing is lost, and re-chosen by the user. No built-in or
+   * custom exercise has it.
+   */
+  static readonly otherId = 'other-exercise';
+
+  /**
    * Permanent. Logged sets refer to it, so it outlives a change of name.
    * Empty for one of the user's own that is not yet saved.
    */
