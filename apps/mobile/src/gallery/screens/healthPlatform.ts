@@ -20,7 +20,8 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * `historyRefused` keeps the app to the thirty days before the story's
  * week (MM-73), the history permission refused. `stopsAsking` are kinds
  * the platform no longer shows the request for, and `opensPermissions`
- * whether its screen of the app's permissions opens (MM-323).
+ * whether its screen of the app's permissions opens (MM-323). `heightCm`
+ * is the height the platform holds (MM-68).
  */
 export function healthPlatform({
   allowed = [],
@@ -33,6 +34,7 @@ export function healthPlatform({
   historyRefused = false,
   stopsAsking = [],
   opensPermissions = true,
+  heightCm = 180,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
@@ -44,12 +46,13 @@ export function healthPlatform({
   historyRefused?: boolean;
   stopsAsking?: readonly HealthDataType[];
   opensPermissions?: boolean;
+  heightCm?: number;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
     bodyFat: 21.5,
     leanMass: 64.7,
-    height: 180,
+    height: heightCm,
     workout: 50,
     menstruation: 1,
     steps: 8400,

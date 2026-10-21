@@ -133,6 +133,7 @@ import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { newestReading } from '../healthIngest/newestReading';
 import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
 import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
@@ -146,6 +147,7 @@ import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeSleepNights } from './mergeSleepNights';
+import { mergeFlowDays } from './mergeFlowDays';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
@@ -288,8 +290,17 @@ export class AppState {
 
   /** The fourteen-night average (MM-252); undefined before the nights are read, or with none in the window. */
   readonly sleepAverage: Cell<SleepAverage | undefined>;
-  /** The days marked with menstrual flow (MM-20). */
+  /** The days the person marked with menstrual flow (MM-20), and nothing imported. */
+  readonly typedFlowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The menstruation readings read and kept from the health platform (MM-68). Empty when nothing has been imported. */
+  readonly importedFlow: Cell<Loadable<HealthSample[]>>;
+
+  /** The days of flow the trend works from: marked and imported, each once, oldest first (MM-20, MM-68). */
   readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The newest height read from the health platform (MM-68), offered in Settings, never saved by itself. */
+  readonly importedHeight: Cell<Loadable<HealthSample | undefined>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
 
   /** How the user shapes their targets, oldest first (MM-122, MM-124). */
@@ -653,7 +664,17 @@ export class AppState {
       const nights = of(this.sleepNights);
       return nights === undefined ? undefined : sleepAverageOf({ nights, through: this.today.value });
     });
-    this.flowDays = stream(() => s.flowDays.watchFlowDays());
+    this.typedFlowDays = stream(() => s.flowDays.watchFlowDays());
+    this.importedFlow = stream(() => this.importedSamples('menstruation', (samples) => samples));
+    this.flowDays = derived(() => {
+      const typed = this.typedFlowDays.value;
+      const imported = of(this.importedFlow) ?? [];
+      const today = this.today.value;
+      // A read that went wrong stays wrong here, as for weights.
+      if (!typed.ready) return typed;
+      return Loadable.of(mergeFlowDays({ typed: typed.value, imported, today }));
+    });
+    this.importedHeight = stream(() => this.importedSamples('height', newestReading));
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
     this.goalBodyFat = stream(() => s.goalBodyFat.watchGoalBodyFat());

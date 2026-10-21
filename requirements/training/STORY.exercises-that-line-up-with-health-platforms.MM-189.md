@@ -1,6 +1,6 @@
 ---
 id: MM-189
-status: in-progress
+status: done
 component: training
 related: [MM-66, MM-68, MM-69, MM-70, MM-74, MM-75, MM-76, MM-77, MM-188, MM-191, MM-489, MM-490]
 ---
@@ -99,8 +99,6 @@ Scenario: Writing is separate permission
   `segmentExerciseId` (a segment's anchor exercise) and `writeWorkoutToPlatform` (nothing written without write permission).
   `InMemoryHealthWorkouts` (fixture) and `NoHealthWorkouts` (`platform/`) are held to `healthWorkoutReaderContract` and
   `healthWorkoutWriterContract`; the scenarios above are `test/engine/platformWorkouts.test.ts`. Not run locally; CI validates.
-- **Still to do:** the shells' native reading and writing (MM-489) and the app's use of it: the write switch, writing on finish,
-  importing into the log with a stored platform id, and "Other exercise" on the Train screens (MM-490).
 
 Choices I made without asking while building (say if any is wrong):
 - **Not written twice is kept by an id the app gives each workout it writes** (`martian-macros-workout-<id>`, the platform's
@@ -112,3 +110,21 @@ Choices I made without asking while building (say if any is wrong):
   bench press). The one-sided curl and triceps segments import as MM-188 says. A custom exercise is never an anchor.
 - **A set that overlaps one already written is left out of the segments**, since the platform refuses overlapping segments.
 - **The shells use the app's own `MmHealth` plugin, not the `health` package**, as they already do for reading (MM-489).
+
+## Progress
+Done (2026-10-21): the mapping, the export and import rules and the seam are built and every scenario is held by
+`test/engine/platformWorkouts.test.ts` against the fakes; not run locally, CI validates. The shells read and write
+workouts with their segments (MM-489, built: Health Connect writes the mapped sets as `ExerciseSegment`s, HealthKit a
+session), and the app writes a finished workout through `MirroredWorkoutLog` while "Send workouts you finish to …" is on.
+
+Left to other tickets:
+- **MM-490**: importing a platform's workouts into the log with a stored platform id (a schema change), and "Other
+  exercise" and an imported workout on the Train screens. The scenarios "Importing a workout with segments" and "An
+  unknown segment" are seen on a screen only once that is built; their rules are tested here.
+- **MM-489**: its device checks.
+
+## Owed on a phone
+- A finished workout with a bench press set that has both times shows in Health Connect as a strength session with a
+  bench press segment; an unmapped exercise is not in the segments and the session is still there.
+- On Apple Health the same workout is one strength session.
+- Reading the platform again shows no second workout for it.
