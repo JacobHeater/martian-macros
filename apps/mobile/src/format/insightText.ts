@@ -170,6 +170,24 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
         ],
       ];
     }
+    case 'fiberForFullness': {
+      // Fullness, never a food called good or bad (MM-126, MM-108); the examples are the user's own.
+      const names = i.examples;
+      const listed =
+        names.length < 2 ? '' : ` Some you already log: ${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}.`;
+      return [
+        'Fiber, and staying full on a deficit',
+        `On the ${n('countedDays')} days with enough fiber data, your fiber averaged about ${n('averageG')} g ` +
+          `against a guide of ${n('guideG')} g. More fiber and bulkier foods usually make a deficit easier: ` +
+          `they fill you up for the same calories.${listed}`,
+        [
+          period,
+          ['Days with enough fiber data', `${n('countedDays')}`],
+          ['Average fiber', `${n('averageG')} g`],
+          ['Guide', `${n('guideG')} g`],
+        ],
+      ];
+    }
     case 'stall': {
       const stall = i.stall;
       if (stall === undefined) throw new StateError('A stall insight carries its assessment.');

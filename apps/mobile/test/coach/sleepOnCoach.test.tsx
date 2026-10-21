@@ -46,9 +46,9 @@ async function openCoach(): Promise<void> {
 /** The "How you are holding up" section, opened: it is folded to one line unless the check-in is due (MM-256). */
 async function holdingUp(): Promise<HTMLElement> {
   const section = (await screen.findByRole('heading', { name: 'How you are holding up' })).closest('.mm-section') as HTMLElement;
-  if (within(section).queryByRole('button', { name: /^Answer/ }) === null) {
-    await userEvent.click(within(section).getByRole('button', { name: /^How you are holding up/ }));
-  }
+  // Judged by the header, not by an answer button: on Coach a due section has none (MM-391).
+  const header = within(section).getByRole('button', { name: /^How you are holding up/ });
+  if (header.getAttribute('aria-expanded') !== 'true') await userEvent.click(header);
   return section;
 }
 

@@ -171,6 +171,16 @@ export class WorkoutController {
     );
   }
 
+  /**
+   * Puts a removed set back where it was (MM-215), times and all. Its place
+   * is clamped to the sets there now.
+   */
+  restoreSet(workout: Workout, index: number, setIndex: number, set: WorkoutSet): Promise<void> {
+    const sets = workout.exercises[index]?.sets ?? [];
+    const at = Math.min(setIndex, sets.length);
+    return this.withSets(workout, index, [...sets.slice(0, at), set, ...sets.slice(at)]);
+  }
+
   private async withSets(workout: Workout, index: number, sets: readonly WorkoutSet[]): Promise<void> {
     await this.workouts.saveWorkout(
       workout.copyWith({

@@ -16,15 +16,22 @@ import { MmSection } from '../ui/MmSection';
 import { StatRow } from '../ui/StatRow';
 import { RecoveryCheckInScreen } from './RecoveryCheckInScreen';
 
+interface RecoveryCardProps {
+  /** Coach's one-thing row is the way into the check-in while it is due, and says what it is for (MM-391). */
+  answeredAbove?: boolean;
+}
+
 /**
  * How the user is holding up (MM-116): the weekly check-in when it is due,
  * and each answer as its own small line over the last eight check-ins. A
  * section that is open while the check-in is due and folded to one line
  * otherwise (MM-256). The answers are never combined into one number, and
  * never lower a target. The fourteen-night sleep average sits here as a
- * line (MM-252): hours and nights, no score and no colour.
+ * line (MM-252): hours and nights, no score and no colour. Where the one-thing
+ * row above answers the due check-in, the section keeps its history and its
+ * skip, and has no second way in (MM-391).
  */
-export function RecoveryCard() {
+export function RecoveryCard({ answeredAbove = false }: RecoveryCardProps) {
   const { services, state } = useApp();
   const navigator = useNavigator();
   const all = useLoaded(state.recoveryCheckIns) ?? [];
@@ -33,6 +40,7 @@ export function RecoveryCard() {
   // A read that went wrong is said, never shown as no nights (MM-334).
   const sleepUnread = Loadable.hasFailed(useCell(state.sleepNights));
   const today = useCell(state.today);
+  const routedAbove = due && answeredAbove;
   const [wasDue, setWasDue] = useState(due);
   const [timesDue, setTimesDue] = useState(0);
   if (due !== wasDue) {
@@ -66,10 +74,12 @@ export function RecoveryCard() {
       {/* The record, not the check-in's word for it (MM-250): typed on Progress or read from the health platform. */}
       <StatRow label={`Sleep, last ${SleepRule.windowNights} nights`} value={sleepValue} detail={sleepDetail} />
       {latest === undefined ? (
-        <p className="app-text">
-          Five quick questions a week on hunger, energy, sleep, training and mood. They are what the food log and the
-          scale cannot see.
-        </p>
+        routedAbove ? null : (
+          <p className="app-text">
+            Five quick questions a week on hunger, energy, sleep, training and mood. They are what the food log and the
+            scale cannot see.
+          </p>
+        )
       ) : (
         <>
           {RecoveryQuestion.values.map((question) => (
@@ -97,11 +107,13 @@ export function RecoveryCard() {
         </>
       )}
       <div className="app-row coach-recovery-actions">
-        <MmButton
-          label={due ? 'Answer this week' : all.length === 0 ? 'Answer now' : 'Answer again'}
-          kind={due ? 'secondary' : 'text'}
-          onPress={() => void navigator.push(() => <RecoveryCheckInScreen />)}
-        />
+        {routedAbove ? null : (
+          <MmButton
+            label={due ? 'Answer this week' : all.length === 0 ? 'Answer now' : 'Answer again'}
+            kind={due ? 'secondary' : 'text'}
+            onPress={() => void navigator.push(() => <RecoveryCheckInScreen />)}
+          />
+        )}
         {due ? (
           <MmButton
             label="Skip this week"

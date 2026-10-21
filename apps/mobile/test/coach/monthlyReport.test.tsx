@@ -148,10 +148,12 @@ it('a month with training lists the workouts and each lift', async () => {
 
   const work = within(topLayer()).getByRole('heading', { name: 'What you did' }).closest('.mm-surface');
   expect(within(work as HTMLElement).getByText('Workouts')).toBeInTheDocument();
-  expect(within(topLayer()).getByText('Back squat')).toBeInTheDocument();
+  // The lift is also in the Personal records card (MM-92): the second session beat the first.
+  const lifts = within(topLayer()).getByRole('heading', { name: 'Your lifts' }).closest('.mm-surface') as HTMLElement;
+  expect(within(lifts).getByText('Back squat')).toBeInTheDocument();
   // 220 kg then 240 kg for one rep: the estimates are 227.3 and 248 kg,
   // and the last is smoothed with the one before it.
-  expect(within(topLayer()).getByText('501.2 lb to 524.0 lb (+22.8 lb)')).toBeInTheDocument();
+  expect(within(lifts).getByText('501.2 lb to 524.0 lb (+22.8 lb)')).toBeInTheDocument();
   expect(shown()).toContain('not tested');
 });
 
@@ -171,11 +173,46 @@ it('a month with no training has no lifts card', async () => {
   expect(shown()).not.toContain('Workouts');
 });
 
+it('the month\'s longest logging run is in what you did (MM-92)', async () => {
+  await seed({ daysSinceOnboarding: 28 });
+  await openFirstReport(onboarded.addDays(28));
+  const work = within(topLayer()).getByRole('heading', { name: 'What you did' }).closest('.mm-surface') as HTMLElement;
+  expect(within(work).getByText('Longest logging run')).toBeInTheDocument();
+  expect(within(work).getByText('28 whole days in a row')).toBeInTheDocument();
+});
+
+it('a month with two logged days says no run', async () => {
+  await seed({ daysSinceOnboarding: 28, loggedDays: 2, twoChanges: false });
+  await openFirstReport(onboarded.addDays(28));
+  expect(shown()).not.toContain('Longest logging run');
+});
+
+it('the personal records set in the month are listed, with the day (MM-92)', async () => {
+  await seed({ daysSinceOnboarding: 28 });
+  await trainedOn(2, 220);
+  await trainedOn(9, 230);
+  await trainedOn(23, 240);
+  await openFirstReport(onboarded.addDays(28));
+  const card = within(topLayer()).getByRole('heading', { name: 'Personal records' }).closest('.mm-surface') as HTMLElement;
+  // The first session sets none: there is nothing to beat.
+  expect(within(card).getAllByText('Back squat')).toHaveLength(2);
+  expect(within(card).getByText('Sep 10')).toBeInTheDocument();
+  expect(within(card).getByText('Sep 24')).toBeInTheDocument();
+});
+
+it('a month whose training set no record has no records card', async () => {
+  await seed({ daysSinceOnboarding: 28 });
+  await trainedOn(2, 220);
+  await trainedOn(23, 200);
+  await openFirstReport(onboarded.addDays(28));
+  expect(shown()).not.toContain('Personal record');
+});
+
 it('nothing in a report grades or praises', async () => {
   await seed({ daysSinceOnboarding: 28 });
   await openFirstReport(onboarded.addDays(28));
   const all = shown().toLowerCase();
-  for (const word of ['score', 'grade', 'great', 'well done', 'good job', 'lowest', 'on track', 'cheat']) {
+  for (const word of ['score', 'grade', 'great', 'well done', 'good job', 'lowest', 'on track', 'cheat', 'under target']) {
     expect(all, word).not.toContain(word);
   }
 });

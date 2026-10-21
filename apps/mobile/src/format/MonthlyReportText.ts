@@ -1,5 +1,5 @@
 import type { CalendarDate } from '../domain';
-import { calibrationDays, type MeasuredChange, type MonthlyReport, ReportPeriod } from '../engine';
+import { calibrationDays, type MeasuredChange, type MonthlyReport, ReportPeriod, StreakRule } from '../engine';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { explanationLineText } from './explanationLineText';
 import { Fmt } from './Fmt';
@@ -34,8 +34,13 @@ export class MonthlyReportText {
     const lines: Pairs = [
       ['Days logged', `${report.daysLogged} of ${ReportPeriod.days}`],
       ['Whole days', `${report.completeDays}`],
-      ['Weigh-ins', `${report.weighIns}`],
     ];
+    // The month's longest logging run (MM-92), said from the same length as the Dashboard's streak line: the work only,
+    // never how much was eaten.
+    if (report.longestRunDays >= StreakRule.showFromDays) {
+      lines.push(['Longest logging run', `${report.longestRunDays} whole days in a row`]);
+    }
+    lines.push(['Weigh-ins', `${report.weighIns}`]);
     if (report.workouts > 0) lines.push(['Workouts', `${report.workouts}`]);
     const protein = report.averageProteinG;
     if (protein !== undefined) {
@@ -63,6 +68,19 @@ export class MonthlyReportText {
         lift.name,
         `${fmt.weight(lift.fromKg)} to ${fmt.weight(lift.toKg)} (${fmt.weightDelta(lift.toKg - lift.fromKg)})`,
       ]);
+  }
+
+  /**
+   * The month's personal records (MM-92), oldest first: the lift, its new
+   * estimated max against the best before it, and the day. Empty with none.
+   */
+  get personalRecords(): Pairs {
+    const { report, fmt } = this;
+    return report.personalRecords.map((record) => [
+      record.name,
+      `${fmt.weight(record.estimateKg)}, up from ${fmt.weight(record.previousBestKg)}`,
+      Fmt.shortDay(record.date),
+    ]);
   }
 
   /** What the body did, or why that cannot be said. */
