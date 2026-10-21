@@ -42,7 +42,7 @@ async function logManually(sheet: HTMLElement, name: string, kcal: string): Prom
 }
 
 /** From dashboard_test.dart. */
-it('MM-206: logging from the Dashboard ignores the day the Food screen is on', async () => {
+it('MM-206: the Dashboard shows today whatever day the Food screen is on', async () => {
   const yesterday = today.addDays(-1);
   await seed();
   await repos.targets.saveTargets(targetsFrom(today.addDays(-30)));
@@ -55,16 +55,11 @@ it('MM-206: logging from the Dashboard ignores the day the Food screen is on', a
   expect(screen.getByRole('button', { name: 'Yesterday' })).toBeInTheDocument();
 
   // By the bar at the bottom, not the intake figure, which clears the chosen day.
+  // Since MM-438 the Dashboard has no Add food; its figure is still today's.
   await openTab('Dashboard');
   expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('1,700')).toBeInTheDocument();
-
-  await logManually(await openAddFood(), 'MM-206 new food', '510');
-  const todays = await first(repos.food.watchFood(today));
-  expect(todays).toHaveLength(2);
-  expect(todays.find((e) => e.name === 'MM-206 new food')?.kcal).toBe(510);
-  expect(await first(repos.food.watchFood(yesterday))).toHaveLength(1);
-  expect(await screen.findByText('1,190')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Add food' })).not.toBeInTheDocument();
 
   // The Food screen is still on the day it was left on, and logs to it.
   await openTab('Food');
@@ -73,7 +68,7 @@ it('MM-206: logging from the Dashboard ignores the day the Food screen is on', a
   const historical = await first(repos.food.watchFood(yesterday));
   expect(historical.map((e) => e.name)).toContain('MM-206 historical food');
   expect(historical).toHaveLength(2);
-  expect(await first(repos.food.watchFood(today))).toHaveLength(2);
+  expect(await first(repos.food.watchFood(today))).toHaveLength(1);
 });
 
 /** From one_calorie_visual_test.dart. */
