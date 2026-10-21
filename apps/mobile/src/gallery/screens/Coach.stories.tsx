@@ -60,7 +60,10 @@ export const CoachSmallPhone = screenStory({
   viewport: 'smallPhone',
 });
 
-/** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
+/**
+ * The one thing to do under the goal: this week's recovery check-in is due (MM-299). It is the one way in, and
+ * "How you are holding up" keeps only the sleep line and the skip (MM-391).
+ */
 export const CheckInDue = screenStory({
   covers: ['CoachScreen'],
   shows: 'Answer this week’s five questions',
@@ -380,6 +383,48 @@ export const OneThingReport = screenStory({
   walk: pressOnCoach(/^Open your monthly report/),
 });
 
+/**
+ * A month of whole days, one missed day forgiven, and squats that rose: the report's longest logging run and its
+ * personal records (MM-92).
+ */
+const monthOfWorkScenario: StoryScenario = async (repos, today) => {
+  const onboardedOn = today.addDays(-31);
+  await monthInScenario(repos, today);
+  for (let i = 0; i < 28; i++) {
+    if (i === 12) continue;
+    const day = onboardedOn.addDays(i);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: day, meal: 'dinner', name: 'Demo day of food', kcal: 2300, proteinG: 150, carbsG: 220, fatG: 70, source: 'quickAdd' }),
+    );
+    await repos.dayMarks.setCompleteness(day, 'complete');
+  }
+  for (const [day, kg] of [[2, 80], [9, 82.5], [16, 82.5], [23, 85]] as const) {
+    await repos.workouts.saveWorkout(storyWorkout(onboardedOn.addDays(day), [['back-squat', 5, kg]]));
+  }
+};
+
+/** MM-92: the monthly report with the month's longest logging run and its personal records. */
+export const MonthlyReportWithRecords = screenStory({
+  covers: ['CoachScreen', 'MonthlyReportScreen'],
+  shows: 'Personal records',
+  scenario: monthOfWorkScenario,
+  open: onCoach,
+  walk: async (canvas) => {
+    const header = await within(canvas).findByRole('button', { name: /^Monthly reports/ }, { timeout: 5000 });
+    const report = /^[A-Z][a-z]{2} \d+ – /;
+    // The section is open in the week a report arrives (MM-256); fold-proof either way.
+    if (within(canvas).queryAllByRole('button', { name: report }).length === 0) {
+      reveal(header);
+      await userEvent.click(header);
+    }
+    const [row] = await within(canvas).findAllByRole('button', { name: report });
+    if (row !== undefined) {
+      reveal(row);
+      await userEvent.click(row);
+    }
+  },
+});
+
 /** MM-321: the one thing to do is this week's check-in, and it opens. */
 export const OneThingCheckIn = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],
@@ -389,13 +434,16 @@ export const OneThingCheckIn = screenStory({
   walk: pressOnCoach(/^Answer this week’s five questions/),
 });
 
-/** MM-321: "How you are holding up" opens the check-in. */
+/** MM-321: "How you are holding up" opens the check-in; MM-391: from the section only when it is not due. */
 export const RecoveryOpens = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],
   shows: 'This week',
-  scenario: checkInDueScenario,
+  scenario: shortSleepScenario,
   open: onCoach,
-  walk: pressOnCoach('Answer this week'),
+  walk: async (canvas) => {
+    await pressOnCoach(/^How you are holding up/)(canvas);
+    await pressOnCoach('Answer again')(canvas);
+  },
 });
 
 /** Targets changed yesterday, with the reasons the coach recorded (MM-121). */

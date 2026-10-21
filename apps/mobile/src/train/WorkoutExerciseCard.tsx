@@ -3,8 +3,7 @@ import { InlineInsight } from '../coach/InlineInsight';
 import { useExerciseInsights } from '../coach/useExerciseInsights';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import type { Workout } from '../domain/training/Workout';
-import { WorkoutSet } from '../domain/training/WorkoutSet';
-import { checkSetTimes } from '../engine/checkSetTimes';
+import type { WorkoutSet } from '../domain/training/WorkoutSet';
 import { defaultLoadStepKg } from '../engine/defaultLoadStepKg';
 import { defaultRepRange } from '../engine/defaultRepRange';
 import { previousSetsOf } from '../engine/previousSetsOf';
@@ -19,6 +18,7 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
+import { Loadable } from '../state/Loadable';
 import { InfoCard } from '../ui/InfoCard';
 import { MmButton } from '../ui/MmButton';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -26,6 +26,8 @@ import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
 import { ProgressionSettingsScreen } from './ProgressionSettingsScreen';
 import { SetEditor } from './SetEditor';
+import { setTimesRefusal } from './setTimesRefusal';
+import { useAddSet } from './useAddSet';
 import { useWorkoutController } from './useWorkoutController';
 import './train.css';
 
@@ -50,8 +52,16 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   const navigator = useNavigator();
   const overlays = useOverlays();
   const controller = useWorkoutController();
+  const recordSet = useAddSet(workout);
   /** The set whose controls are showing, if any. A set just added is. */
   const [open, setOpen] = useState<number>();
+  // A set recorded here or from the timer bar's "Set done" opens (MM-222).
+  const count = workout.exercises[index]?.sets.length ?? 0;
+  const [counted, setCounted] = useState(count);
+  if (count !== counted) {
+    setCounted(count);
+    if (count > counted) setOpen(count - 1);
+  }
   const exercises = useCell(state.exercisesById);
   const setup = useLoaded(state.setup);
   const workouts = useLoaded(state.workouts) ?? [];
@@ -111,14 +121,18 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
     await controller.setRestTarget(workout, index, chosen.value === 0 ? undefined : chosen.value);
   };
 
-  const addSet = () => {
-    // The next set is ready to adjust: its controls are open.
-    setOpen(entry.sets.length);
-    void controller.addSet(workout, index, {
-      // The first set starts from the suggestion, to be changed freely;
-      // without one, from last time's first set.
-      lastTime:
-        suggestion === undefined ? lastTime[0] : new WorkoutSet({ reps: suggestion.reps, loadKg: suggestion.loadKg }),
+  /** Removes a set at once and offers to put it back, times and all (MM-215). */
+  const removeSet = (s: number, removed: WorkoutSet) => {
+    setOpen(undefined);
+    void controller.removeSet(workout, index, s);
+    overlays.snack(`Removed set ${s + 1}`, {
+      label: 'Undo',
+      onAction: () => {
+        // The workout as it is now, unless it, or the exercise in it, has gone or moved since.
+        const now = Loadable.valueOf(state.workouts.value)?.find((w) => w.id === workout.id);
+        if (now === undefined || now.exercises[index]?.exerciseId !== entry.exerciseId) return;
+        void controller.restoreSet(now, index, s, removed);
+      },
     });
   };
 
@@ -147,34 +161,35 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
             number={s + 1}
             timeBase={workout.startedAt}
             timeLimit={timeLimit}
-            checkTimes={(start, end) =>
-              checkSetTimes({
+            refuseTimes={(start, end) =>
+              setTimesRefusal({
+                workout,
+                index,
+                setIndex: s,
                 start,
                 end,
-                notBefore: workout.startedAt,
                 notAfter: timeLimit(),
-                otherSets: workout.exercises.flatMap((other, e) => other.sets.filter((_, t) => e !== index || t !== s)),
+                nameOf: (exerciseId) => exercises.get(exerciseId)?.name ?? 'Deleted exercise',
               })
             }
             load={load}
             fmt={fmt}
             onChange={(changed) => void controller.updateSet(workout, index, s, changed)}
-            onRemove={() => {
-              setOpen(undefined);
-              void controller.removeSet(workout, index, s);
-            }}
+            onClose={() => setOpen(undefined)}
+            onRemove={(removed) => removeSet(s, removed)}
           />
         ) : (
           <MmListRow
             key={`set-${s}`}
             dense
             title={setText(set, fmt, load)}
-            // How long the set took, when it was timed.
+            // How long the set took, when it was timed; the chevron says it opens (MM-222).
             trailing={
               <span className="app-caption">
                 {set.durationMs === undefined ? `Set ${s + 1}` : `Set ${s + 1} · ${elapsedText(set.durationMs)}`}
               </span>
             }
+            opens
             onPress={() => setOpen(s)}
           />
         ),
@@ -203,7 +218,9 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
         </>
       ) : null}
       <div className="app-gap-small" />
-      <MmButton label="Add set" icon="plus" kind="secondary" expand onPress={addSet} />
+      <MmButton label="Add set" icon="plus" kind="secondary" expand onPress={() => void recordSet(index)} />
+      {/* What the button does, since it also ends the set and starts the rest (MM-222). */}
+      {workout.inProgress ? <p className="app-caption train-add-set-note">Records a set finished now and starts the rest.</p> : null}
     </InfoCard>
   );
 }

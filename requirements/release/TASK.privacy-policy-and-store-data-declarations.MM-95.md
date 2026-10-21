@@ -22,6 +22,8 @@ practices, and health permissions bring extra forms.
   - the purchase, handled by the store.
 - **Apple's privacy "nutrition label"** and **Google Play's Data safety form**, filled in to match.
 - **Google Play's Health Connect declaration**: each permission and why it is needed (MM-68).
+- **The exact-alarm permission** (`SCHEDULE_EXACT_ALARM`, MM-248), wherever Play's forms ask: so a reminder the user turned on
+  arrives at the time they set. Asked for once from the reminder settings; nothing else depends on it.
 - **Apple's HealthKit purpose strings** (MM-69).
 - No analytics or crash-reporting library is added without updating all of the above first.
 

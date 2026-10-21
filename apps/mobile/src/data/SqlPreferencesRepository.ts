@@ -13,7 +13,7 @@ import { ThemePreference } from '../domain/ThemePreference';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, orNull, text } from './columns';
+import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, optionalText, orNull, text } from './columns';
 import { upsert } from './upsert';
 import type { Values } from './Values';
 
@@ -80,6 +80,14 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   saveUsualCookingFat(kind: CookingFatKind): Promise<void> {
     return this.save({ usual_cooking_fat: kind });
+  }
+
+  watchPrimaryScale(): Watched<string | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalText(row, 'primary_scale_source_id')));
+  }
+
+  savePrimaryScale(sourceId: string | undefined): Promise<void> {
+    return this.save({ primary_scale_source_id: orNull(sourceId) });
   }
 
   watchMacroPicture(): Watched<MacroPicture> {
