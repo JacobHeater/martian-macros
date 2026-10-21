@@ -46,6 +46,8 @@ Scenario: Already weighed in
 ```
 
 ## Notes (built and verified)
+
+**Superseded in part by MM-438 (2026-10-20):** no screen has an Add food button; food is added from a meal's "+".
 - The dashboard has the same Add food button as Food (it logs to today, meal from the clock) and stays on the dashboard afterwards. With no weigh-in today the weight card is a number field with Save;
   once saved it shows the trend (`dashboard_test.dart`). Scanner and Start workout are not added because those features do not exist.
 - **Not verified**: "one tap from a cold start" was reasoned from the layout, not timed on a device.

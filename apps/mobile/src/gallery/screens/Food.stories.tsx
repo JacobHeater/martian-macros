@@ -60,7 +60,7 @@ export const FoodSmallPhone = screenStory({
   viewport: 'smallPhone',
 });
 
-/** MM-91: Food at 200% text: the day's heading and stepper, the meal headers and entries wrap, the floating action stays reachable. */
+/** MM-91: Food at 200% text: the day's heading and stepper, the meal headers with their "+" and the entries wrap. */
 export const FoodLargeText = screenStory({
   covers: ['FoodScreen'],
   shows: 'Breakfast',
@@ -70,7 +70,7 @@ export const FoodLargeText = screenStory({
 
 export const NothingLogged = screenStory({
   covers: ['FoodScreen'],
-  shows: 'Add food',
+  shows: 'Breakfast',
   scenario: firstDayScenario,
   open: ({ state }) => state.homeTab.put('food'),
 });
@@ -94,7 +94,7 @@ export const EntryMenu = screenStory({
   },
 });
 
-/** MM-302: an entry deleted; the Undo snack stands above the navigation bar and Add food rises above it. */
+/** MM-302: an entry deleted; the Undo snack stands above the navigation bar. */
 export const EntryRemoved = screenStory({
   covers: ['FoodScreen'],
   shows: 'Undo',
