@@ -433,13 +433,14 @@ export const TrainImportedWorkout = screenStory({
   open: ({ state }) => state.homeTab.put('train'),
 });
 
-/** MM-490: an imported workout opened: "Other exercise" with its time, and the way to move its sets. */
+/** MM-490: an imported workout's "Other exercise" moved: its sets go to the exercise chosen here. */
 export const ImportedWorkoutOtherExercise = screenStory({
-  covers: ['WorkoutScreen'],
-  shows: 'Move sets to an exercise',
+  covers: ['WorkoutScreen', 'ExercisePickerScreen'],
+  shows: 'Choose an exercise',
   scenario: importedScenario,
   open: async (stage) => {
     const workout = (await valueOf(stage.services.workouts.watchWorkouts())).find((w) => w.imported !== undefined);
     if (workout !== undefined) void stage.navigator.push(() => <WorkoutScreen workoutId={workout.id} />);
   },
+  walk: pressNamed('Move sets to an exercise'),
 });
