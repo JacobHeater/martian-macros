@@ -1,3 +1,4 @@
+import { InMemoryProgressPhotoRepository } from './InMemoryProgressPhotoRepository';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
@@ -87,6 +88,8 @@ export class InMemoryRepositories {
   readonly customExercises: CustomExerciseRepository;
   readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
+  /** The progress photos (MM-157), erased with everything else. */
+  readonly progressPhotos: InMemoryProgressPhotoRepository;
   readonly eraser: DataEraser;
 
   constructor() {
@@ -114,6 +117,7 @@ export class InMemoryRepositories {
     const customExercises = new InMemoryCustomExerciseRepository();
     const healthSamples = new InMemoryHealthSampleStore();
     const exerciseProgressions = new InMemoryExerciseProgressionRepository();
+    const progressPhotos = new InMemoryProgressPhotoRepository();
 
     this.setup = setup;
     this.weights = weights;
@@ -141,6 +145,7 @@ export class InMemoryRepositories {
     this.customExercises = customExercises;
     this.healthSamples = healthSamples;
     this.exerciseProgressions = exerciseProgressions;
+    this.progressPhotos = progressPhotos;
     this.eraser = new InMemoryDataEraser([
       () => setup.clear(),
       () => weights.clear(),
@@ -166,6 +171,7 @@ export class InMemoryRepositories {
       () => customExercises.clear(),
       () => healthSamples.clear(),
       () => exerciseProgressions.clear(),
+      () => progressPhotos.eraseAll(),
     ]);
   }
 

@@ -30,6 +30,8 @@ import type { ExerciseProgression } from '../domain/training/ExerciseProgression
 import type { Workout } from '../domain/training/Workout';
 import type { TargetShape } from '../domain/TargetShape';
 import type { GoalBodyFat } from '../domain/GoalBodyFat';
+import type { PhotoSettings } from '../domain/photos/PhotoSettings';
+import type { ProgressPhoto } from '../domain/photos/ProgressPhoto';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { SleepNight } from '../domain/SleepNight';
@@ -279,6 +281,12 @@ export class AppState {
 
   /** How the user shapes their targets, oldest first (MM-122, MM-124). */
   readonly targetShapes: Cell<Loadable<TargetShape[]>>;
+
+  /** The progress photos kept on this phone, oldest first, without their pictures (MM-157). */
+  readonly progressPhotos: Cell<Loadable<ProgressPhoto[]>>;
+
+  /** The choices about progress photos (MM-157). */
+  readonly photoSettings: Cell<Loadable<PhotoSettings>>;
 
   /** The goal body fat the user set (MM-36, MM-507), or undefined with none. */
   readonly goalBodyFat: Cell<Loadable<GoalBodyFat | undefined>>;
@@ -633,6 +641,8 @@ export class AppState {
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
     this.goalBodyFat = stream(() => s.goalBodyFat.watchGoalBodyFat());
+    this.progressPhotos = stream(() => s.progressPhotos.watchPhotos());
+    this.photoSettings = stream(() => s.progressPhotos.watchPhotoSettings());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {

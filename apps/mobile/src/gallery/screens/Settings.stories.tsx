@@ -1205,3 +1205,16 @@ export const FoodDatabaseOpensSources = screenStory({
   open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
   walk: pressAnywhere(/^Food data sources/),
 });
+
+/** MM-157: Back up photos turned on: what the photos add to each backup. */
+export const SettingsBackupPhotos = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /go into each backup/,
+  scenario: demoWith({
+    then: async (repos, today) => {
+      await repos.progressPhotos.savePhoto({ date: today, pose: 'front', takenAt: new Date(Date.UTC(2026, 9, 1, 7)), width: 1200, height: 1600, jpeg: new Uint8Array(2_400_000) });
+      await repos.progressPhotos.savePhotoSettings({ offered: undefined, backUp: true });
+    },
+  }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});

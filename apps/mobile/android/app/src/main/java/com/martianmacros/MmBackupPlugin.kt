@@ -1,10 +1,13 @@
 package com.martianmacros
 
 import android.app.Activity
+import android.app.KeyguardManager
+import android.content.Context
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
+import android.view.WindowManager
 import androidx.activity.result.ActivityResult
 import androidx.core.content.FileProvider
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
@@ -24,7 +27,9 @@ import java.util.concurrent.Executors
  * chooser for a file, and the document picker to choose one. Bytes cross
  * the bridge as base64; the app encrypts before anything leaves. It also
  * hands an https address to the phone's browser (MM-454): the browser
- * fetches the page, the app nothing.
+ * fetches the page, the app nothing. It keeps the progress photos private
+ * (MM-157): the phone's own lock is asked before they show, and the window
+ * is kept out of the app switcher and screenshots while they do.
  */
 @CapacitorPlugin(name = "MmBackup")
 class MmBackupPlugin : Plugin() {
@@ -127,5 +132,34 @@ class MmBackupPlugin : Plugin() {
         } catch (error: Throwable) {
             call.reject(error.message ?: error.toString())
         }
+    }
+
+    @PluginMethod
+    fun protectScreen(call: PluginCall) {
+        val on = call.getBoolean("on") ?: false
+        activity.runOnUiThread {
+            if (on) {
+                activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            } else {
+                activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            }
+            call.resolve()
+        }
+    }
+
+    @PluginMethod
+    fun unlock(call: PluginCall) {
+        val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        if (!keyguard.isDeviceSecure) return call.resolve(JSObject().put("outcome", "noLock"))
+        // The phone's own confirmation: fingerprint, face, PIN, pattern or password, whichever the phone is locked with.
+        @Suppress("DEPRECATION")
+        val confirm = keyguard.createConfirmDeviceCredentialIntent("Progress photos", call.getString("reason") ?: "")
+            ?: return call.resolve(JSObject().put("outcome", "noLock"))
+        startActivityForResult(call, confirm, "unlocked")
+    }
+
+    @ActivityCallback
+    fun unlocked(call: PluginCall?, result: ActivityResult) {
+        call?.resolve(JSObject().put("outcome", if (result.resultCode == Activity.RESULT_OK) "unlocked" else "refused"))
     }
 }

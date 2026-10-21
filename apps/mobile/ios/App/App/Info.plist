@@ -54,7 +54,9 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>To scan a barcode or read a nutrition label. Both are read on this phone, and no photo is kept.</string>
+	<string>To scan a barcode or read a nutrition label, both read on this phone, and to take progress photos if you choose to. Progress photos stay in the app on this phone and are never added to Photos.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>To open your progress photos only after you unlock with Face ID.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>To read the kinds of health data you allow, such as weigh-ins from your scale, so you need not type them. Nothing read leaves this device.</string>
 	<key>NSHealthUpdateUsageDescription</key>
