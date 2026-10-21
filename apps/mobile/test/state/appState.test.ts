@@ -217,6 +217,7 @@ describe('reminders', () => {
       ['weighIn', true],
       ['logFood', false],
       ['weeklyMeasurement', false],
+      ['recoveryCheckIn', false],
     ]);
     const plan = await settled(state.reminderPlan, (p) => p !== undefined);
     expect(plan?.length).toBeGreaterThan(0);
