@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CalendarDate, type DayCompleteness, IntakeDay, WaistObservation, type WeightObservation } from '../../src/domain';
+import { CalendarDate, type DayCompleteness, type GoalMode, IntakeDay, WaistObservation, type WeightObservation } from '../../src/domain';
 import {
   DailyTargets,
   findInsights,
@@ -18,10 +18,10 @@ import { upTo } from '../support/upTo';
 const through = CalendarDate.of(2026, 3, 14);
 const today = through.addDays(1);
 
-const targets = (proteinMinimumG = 130) =>
+const targets = (proteinMinimumG = 130, mode: GoalMode = 'fatLoss') =>
   new TargetsRecord({
     effectiveFrom: through.addDays(-60),
-    mode: 'fatLoss',
+    mode,
     tdeeKcal: 2700,
     tdeeSigmaKcal: 200,
     tdeeStatus: 'updated',
@@ -42,7 +42,8 @@ const day = (
     protein = 150,
     mark = 'complete',
     estimatedShare = 0,
-  }: { kcal?: number; protein?: number; mark?: DayCompleteness; estimatedShare?: number } = {},
+    palmProteinShare = 0,
+  }: { kcal?: number; protein?: number; mark?: DayCompleteness; estimatedShare?: number; palmProteinShare?: number } = {},
 ) =>
   new IntakeDay({
     date: through.addDays(-daysAgo),
@@ -52,6 +53,7 @@ const day = (
     fatG: 70,
     completeness: mark,
     estimatedShare,
+    palmProteinShare,
   });
 
 /** Days `from` up to but not including `to`, each made with `changes`. */
@@ -157,6 +159,26 @@ describe('the catalog', () => {
     const i = only(find({ intake: days(0, 14, { estimatedShare: 0.6 }) }));
     expect(i.rule).toBe('estimatesRising');
     expectClose(i.figures['estimatedShare'], 0.6, 1e-9);
+  });
+
+  // MM-46: a hand-portion logger is nudged to weigh their main protein for a week.
+  it('protein mostly by palm, in fat loss, asks to weigh it', () => {
+    const i = only(find({ intake: days(0, 14, { palmProteinShare: 0.8 }) }));
+    expect(i.rule).toBe('weighProtein');
+    expect(i.figures['wholeDays']).toBe(14);
+    expectClose(i.figures['palmProteinShare'], 0.8, 1e-9);
+  });
+
+  it('protein by palm on half the protein or less says nothing', () => {
+    expect(find({ intake: days(0, 14, { palmProteinShare: 0.5 }) })).toEqual([]);
+  });
+
+  it('in maintenance a palm is close enough', () => {
+    expect(find({ intake: days(0, 14, { palmProteinShare: 0.9 }), history: [targets(130, 'maintenance')] })).toEqual([]);
+  });
+
+  it('with an eating-disorder history weighing is never asked', () => {
+    expect(find({ intake: days(0, 14, { palmProteinShare: 0.9 }), limited: true })).toEqual([]);
   });
 
   it('fewer than four weigh-ins a week', () => {

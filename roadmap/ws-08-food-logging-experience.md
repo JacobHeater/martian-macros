@@ -106,8 +106,8 @@ and WS-09 steps 1 and 8.
    step 4. Fiber is a guide and is never judged. Done 2026-10-21: alcohol typed
    in grams or standard drinks, its line on Food and Today; the fiber line at
    Full detail and its one insight, at most monthly.
-7. **Hand portions (MM-46).** M4. Needs food densities in the pack and a
-   third logging style in the estimator.
+7. **Hand portions (MM-46).** M4. The estimator tells hand portions from
+   weighing and from labels; still needs food densities in the pack.
 8. **Label scanning; live lookup (MM-44, MM-58).** M4.
 9. **The Food screen and Add food hierarchy (MM-224) (MM-180, MM-213, MM-223, MM-225, MM-226, MM-227, MM-218, MM-219, MM-220, MM-221).** M2. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.

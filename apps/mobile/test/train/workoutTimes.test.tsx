@@ -217,7 +217,7 @@ describe('a workout’s times, by hand', () => {
     const workout = await only();
     expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 19, 15));
     expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 18));
-    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15 PM');
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15:00 PM');
   });
 
   it('the start can be changed', async () => {
@@ -235,6 +235,21 @@ describe('a workout’s times, by hand', () => {
     await enterTime('Ended', '17:00');
     expect(screen.getByText('The end has to be after the start.')).toBeInTheDocument();
     expect((await only()).endedAt).toEqual(new Date(2026, 9, 4, 18, 50));
+    // MM-222: refused inside the clock, which stays open on what was chosen.
+    expect(screen.getByRole('dialog', { name: 'Ended' })).toBeInTheDocument();
+  });
+
+  it('a start and an end can be typed to the second', async () => {
+    await openTimes();
+    await press(/^Ended/);
+    await enterClock(7, 15, 42, { period: 'PM', title: 'Ended' });
+    await press(/^Started/);
+    await enterClock(5, 30, 9, { period: 'PM', title: 'Started' });
+    const workout = await only();
+    expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 17, 30, 9));
+    expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 19, 15, 42));
+    expect(layer().getByRole('button', { name: /^Started/ })).toHaveTextContent('5:30:09 PM');
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15:42 PM');
   });
 
   it('the day moves both times with it', async () => {

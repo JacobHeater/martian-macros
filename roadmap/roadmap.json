@@ -648,7 +648,8 @@
           "workstream": "WS-03",
           "tickets": [
             "MM-109",
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -723,6 +724,7 @@
             "MM-87",
             "MM-96",
             "MM-94",
+            "MM-454",
             "MM-247"
           ]
         }
@@ -742,7 +744,8 @@
         {
           "workstream": "WS-05",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ]
         },
         {
@@ -1504,6 +1507,7 @@
           "MM-183",
           "MM-224",
           "MM-242",
+          "MM-453",
           "MM-375",
           "MM-403"
         ]
@@ -1593,7 +1597,8 @@
           "title": "The terms of use before anything else",
           "milestone": "M3",
           "tickets": [
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -1971,7 +1976,8 @@
         ],
         "remaining": [
           "MM-80",
-          "MM-113"
+          "MM-113",
+          "MM-510"
         ]
       },
       "sequence": [
@@ -2011,7 +2017,8 @@
           "step": 5,
           "title": "Weight-loss medication support",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ],
           "milestone": "M4"
         }
@@ -3266,6 +3273,7 @@
           "MM-95",
           "MM-96",
           "MM-244",
+          "MM-454",
           "MM-247"
         ]
       },
@@ -3277,6 +3285,7 @@
             "MM-88",
             "MM-95",
             "MM-244",
+            "MM-454",
             "MM-247"
           ],
           "milestone": "M3"

@@ -23,7 +23,20 @@ type Segment = readonly [from: CalendarDate, to: CalendarDate];
 
 const sq = (x: number) => x * x;
 
-const meanShare = (days: readonly IntakeDay[]) => days.reduce((sum, d) => sum + d.weighedShare, 0) / days.length;
+const mean = (days: readonly IntakeDay[], share: (d: IntakeDay) => number) =>
+  days.reduce((sum, d) => sum + share(d), 0) / days.length;
+
+/**
+ * How far apart two runs of days are in logging style (MM-27, MM-46): half
+ * the summed change in the shares weighed, by hand and the rest (label
+ * servings, measures, estimates). With no hand portions this is the change
+ * in weighed share; hand portions to a scale or to labels each count in full.
+ */
+function styleChange(before: readonly IntakeDay[], after: readonly IntakeDay[]): number {
+  const weighed = mean(after, (d) => d.weighedShare) - mean(before, (d) => d.weighedShare);
+  const hand = mean(after, (d) => d.handShare) - mean(before, (d) => d.handShare);
+  return (Math.abs(weighed) + Math.abs(hand) + Math.abs(weighed + hand)) / 2;
+}
 
 /**
  * Windowed energy-balance TDEE estimator.
@@ -55,8 +68,9 @@ export class TdeeEstimator {
   readonly partialDayFraction: number;
 
   /**
-   * A change in mean weighed share larger than this between two halves of
-   * the window counts as a logging-style switch.
+   * A change in logging style (`styleChange`: weighed, by hand, or the rest)
+   * larger than this between two parts of the window counts as a
+   * logging-style switch.
    */
   readonly styleSwitchThreshold: number;
   readonly minDaysPerStyleSegment: number;
@@ -267,7 +281,7 @@ export class TdeeEstimator {
     let best: CalendarDate | undefined;
     let bestChange = this.styleSwitchThreshold;
     for (let i = m; i <= days.length - m; i++) {
-      const change = Math.abs(meanShare(days.slice(i)) - meanShare(days.slice(0, i)));
+      const change = styleChange(days.slice(0, i), days.slice(i));
       if (change > bestChange) {
         bestChange = change;
         best = (days[i] as IntakeDay).date;

@@ -26,7 +26,7 @@ async function test(args: readonly string[]): Promise<number> {
   return run(['npx', 'vitest', 'run'], { cwd: webApp });
 }
 
-/** Type check, tests, build and the offline check of the React app. */
+/** Type check, tests, build, the offline check of the React app, and the public legal page (MM-247). */
 const web: Command = () => run(['npm', 'run', 'check'], { cwd: webApp });
 
 /**
@@ -96,7 +96,8 @@ const commands: Record<string, [string, Command]> = {
   doctor: ['Check the toolchain', doctor],
   bootstrap: ['Install the exact dependencies from the lock file, and opt this machine out of Capacitor telemetry', bootstrap],
   check: ['CI gate: requirements, panel, tool tests, web (type check, tests, build, offline)', check],
-  web: ['Check the React app: type check, tests, build, offline', web],
+  web: ['Check the React app: type check, tests, build, offline, legal page', web],
+  legal: ['The public page of the terms and the privacy policy (MM-247): mm legal [out-dir]', (a) => run(['npm', 'run', 'legal', '--', ...a], { cwd: webApp })],
   storybook: ['The design register, live: mm storybook [build] (MM-237)', (a) => run(['npm', 'run', a[0] === 'build' ? 'build-storybook' : 'storybook'], { cwd: webApp })],
   test: ['Run the tests: the tool’s own, then the web suite (--tool for the tool alone)', test],
   req: ['Requirements: mm req [list | next | show <id>] (no args validates)', (a) => runRequirements(repoRoot, a)],
