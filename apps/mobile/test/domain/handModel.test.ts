@@ -101,6 +101,26 @@ it('a per-serving food has no makeup per 100 g, so a palm takes the default', ()
   expectClose(gramsFor(1, 'palm', perServing, { hand: man }), HandModel.millilitersOf('palm', man) as number, 1e-9);
 });
 
+it('a dry, porous food is not weighed by its makeup: a palm of crisps or of bread is the default, not 1.2 g/ml (MM-46)', () => {
+  const crisps: ReferenceNutrition = { basis: 'per100g', nutrition: new NutritionTotals({ kcal: 536, proteinG: 7, carbsG: 53, fatG: 35 }) };
+  const bread: ReferenceNutrition = { basis: 'per100g', nutrition: new NutritionTotals({ kcal: 265, proteinG: 9, carbsG: 49, fatG: 3.2 }) };
+  expect(compositionDensity(crisps.nutrition)).toBeUndefined();
+  expect(compositionDensity(bread.nutrition)).toBeUndefined();
+  const palm = HandModel.millilitersOf('palm', man) as number;
+  expectClose(gramsFor(1, 'palm', crisps, { hand: man }), palm * 1.0, 1e-9);
+  expectClose(gramsFor(1, 'palm', bread, { hand: man }), palm * 1.0, 1e-9);
+  expectClose(gramsFor(1, 'thumb', crisps, { hand: man }), (HandModel.millilitersOf('thumb', man) as number) * 0.9, 1e-9);
+});
+
+it('makeup density is for a moist food or one mostly fat; protein is 1.32 g/ml at 20 °C', () => {
+  // Over half water: by its makeup.
+  expectClose(compositionDensity(new NutritionTotals({ kcal: 80, proteinG: 20, carbsG: 0, fatG: 0 })), 100 / (80 / 0.997 + 20 / 1.32), 1e-9);
+  // A spread, fat outweighing the rest: by its makeup, though dry.
+  expect(compositionDensity(new NutritionTotals({ kcal: 588, proteinG: 25, carbsG: 20, fatG: 50 }))).toBeDefined();
+  // Half water exactly and fat not dominant: the default.
+  expect(compositionDensity(new NutritionTotals({ kcal: 200, proteinG: 10, carbsG: 30, fatG: 10 }))).toBeUndefined();
+});
+
 describe('the fitting portion is offered first', () => {
   it('meat and fish by palm, fats by thumb, grains and fruit by cupped hand', () => {
     expect(handUnitsFor(chicken.nutrition)[0]).toBe('palm');
@@ -108,6 +128,14 @@ describe('the fitting portion is offered first', () => {
     expect(handUnitsFor(new NutritionTotals({ kcal: 717, proteinG: 0.9, carbsG: 0.1, fatG: 81 }))[0]).toBe('thumb');
     expect(handUnitsFor(new NutritionTotals({ kcal: 130, proteinG: 2.7, carbsG: 28, fatG: 0.3 }))[0]).toBe('cuppedHand');
     expect(handUnitsFor(new NutritionTotals({ kcal: 89, proteinG: 1.1, carbsG: 22.8, fatG: 0.3 }))[0]).toBe('cuppedHand');
+  });
+
+  it('nuts by cupped hand first, a thumb next; butter and oil still by thumb', () => {
+    const almonds = new NutritionTotals({ kcal: 579, proteinG: 21, carbsG: 22, fatG: 50 });
+    const macadamias = new NutritionTotals({ kcal: 718, proteinG: 8, carbsG: 14, fatG: 76 });
+    expect(handUnitsFor(almonds)).toEqual(['cuppedHand', 'thumb', 'palm']);
+    expect(handUnitsFor(macadamias)).toEqual(['cuppedHand', 'thumb', 'palm']);
+    expect(handUnitsFor(new NutritionTotals({ kcal: 884, proteinG: 0, carbsG: 0, fatG: 100 }))[0]).toBe('thumb');
   });
 
   it('every hand portion is still offered', () => {
