@@ -139,6 +139,8 @@ beside anything.
 - Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
 - Built (2026-10-21): MM-486 (the table for MM-122's and MM-124's settings,
   schema 16, after MM-71's version 15).
+- Built (2026-10-21): MM-122 (the carbs and fat balance; a look at its stories in the three palettes is
+  owed on a phone).
 
 ## Notes for whoever builds it
 - The explanation is data, not prose: a list of signed contributions with
