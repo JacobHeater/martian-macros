@@ -1,3 +1,6 @@
+import { FixturePhotoCamera } from '../fixtures/FixturePhotoCamera';
+import { InMemoryDeviceLock } from '../fixtures/InMemoryDeviceLock';
+import { InMemoryPrivateScreen } from '../fixtures/InMemoryPrivateScreen';
 import type { FixedClock } from '../fixtures/FixedClock';
 import { InMemoryReminderScheduler } from '../fixtures/InMemoryReminderScheduler';
 import { InMemoryExactAlarms } from '../fixtures/InMemoryExactAlarms';
@@ -50,6 +53,11 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     // Nothing is written to it unless a story or a test turns a kind on (MM-70).
     healthWriting: new InMemoryHealthWriting(),
     healthWorkouts: new InMemoryHealthWorkouts({ namesExercises: true }),
+    // Never the device's camera or lock: a camera whose every photo is the fixture, a lock that opens (MM-157).
+    progressPhotos: repos.progressPhotos,
+    photoCamera: new FixturePhotoCamera(),
+    deviceLock: new InMemoryDeviceLock(),
+    privateScreen: new InMemoryPrivateScreen(),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),
     environment: 'dev',
     // The app as on an Android phone, unless a story or a test is about an iPhone (`onIos`, MM-403).

@@ -20,7 +20,7 @@ import type { TermsSection } from './TermsSection';
  */
 function summaryOn(platform: Platform): readonly string[] {
   return [
-    'There is no account. We run no server that receives your records, and what you enter is kept in a database inside the app on your phone.',
+    'There is no account. We run no server that receives your records, and what you enter, progress photos included, is kept inside the app on your phone.',
     'The app uses the internet only when you ask it to download the food database or, if you allow it, to look a food up online. Neither request carries your records.',
     platform === 'ios'
       ? 'Barcodes and nutrition labels are read on the phone by software that is part of iOS.'
@@ -75,8 +75,8 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
       heading: '5. The camera, and the reader inside the app',
       paragraphs: [
         ios
-          ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept.'
-          : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component, ML Kit. Google says that this component sends Google technical details about itself and the phone, such as the phone’s model, the operating system and app versions, an identifier for the installation, and performance and error information. It is not given your records. Google’s own policy covers what Google receives.',
+          ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere, and they go into the app’s encrypted backup only if you turn that on.'
+          : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component, ML Kit. Google says that this component sends Google technical details about itself and the phone, such as the phone’s model, the operating system and app versions, an identifier for the installation, and performance and error information. It is not given your records. Google’s own policy covers what Google receives. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere, and they go into the app’s encrypted backup only if you turn that on.',
         ios
           ? 'The app runs inside the iPhone’s own web view, which is part of iOS. Apple’s policy, not this one, covers what iOS itself sends.'
           : 'The app runs inside Android’s own web view, which Google provides and updates. Google’s policy, not this one, covers what Android and its components send by themselves.',

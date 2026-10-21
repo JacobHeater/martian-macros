@@ -45,6 +45,10 @@ import type { HealthWriting } from '../healthIngest/HealthWriting';
 import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
 import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
+import type { DeviceLock } from '../domain/integration/DeviceLock';
+import type { PhotoCamera } from '../domain/integration/PhotoCamera';
+import type { PrivateScreen } from '../domain/integration/PrivateScreen';
+import type { ProgressPhotoRepository } from '../domain/repositories/ProgressPhotoRepository';
 import type { Watched } from '../lang/Watched';
 import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
 import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
@@ -150,6 +154,18 @@ export interface AppServices {
    * repositories tell the platform themselves.
    */
   readonly healthWriting: HealthWriting;
+
+  /** The progress photos, kept apart from the rest of the data (MM-157). */
+  readonly progressPhotos: ProgressPhotoRepository;
+
+  /** The camera progress photos are taken with, inside the app (MM-157). */
+  readonly photoCamera: PhotoCamera;
+
+  /** The phone's own lock, asked each time the photos are opened (MM-157). */
+  readonly deviceLock: DeviceLock;
+
+  /** Keeps a photo out of the app switcher and screenshots while it shows (MM-157). */
+  readonly privateScreen: PrivateScreen;
 
   /** Workouts on the health platform with their segments (MM-489), for importing them (MM-490). */
   readonly healthWorkouts: HealthWorkoutReader;
