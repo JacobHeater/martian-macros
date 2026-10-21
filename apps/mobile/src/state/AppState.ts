@@ -117,6 +117,7 @@ import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
+import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthBackfill } from '../healthIngest/HealthBackfill';
@@ -124,6 +125,7 @@ import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { newestReading } from '../healthIngest/newestReading';
 import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
 import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
@@ -136,6 +138,7 @@ import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeSleepNights } from './mergeSleepNights';
+import { mergeFlowDays } from './mergeFlowDays';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
@@ -219,6 +222,8 @@ export class AppState {
    * one with the most weigh-ins in thirty days counts.
    */
   readonly primaryScale: Cell<Loadable<string | undefined>>;
+  /** The hours in which an imported reading counts as the morning weigh-in (MM-441): 04:00 to 12:00 until moved. */
+  readonly weighInWindow: Cell<Loadable<WeighInWindow>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -263,8 +268,17 @@ export class AppState {
 
   /** The fourteen-night average (MM-252); undefined before the nights are read, or with none in the window. */
   readonly sleepAverage: Cell<SleepAverage | undefined>;
-  /** The days marked with menstrual flow (MM-20). */
+  /** The days the person marked with menstrual flow (MM-20), and nothing imported. */
+  readonly typedFlowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The menstruation readings read and kept from the health platform (MM-68). Empty when nothing has been imported. */
+  readonly importedFlow: Cell<Loadable<HealthSample[]>>;
+
+  /** The days of flow the trend works from: marked and imported, each once, oldest first (MM-20, MM-68). */
   readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The newest height read from the health platform (MM-68), offered in Settings, never saved by itself. */
+  readonly importedHeight: Cell<Loadable<HealthSample | undefined>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
 
   /** How the user shapes their targets, oldest first (MM-122, MM-124). */
@@ -552,11 +566,14 @@ export class AppState {
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
+    this.weighInWindow = stream(() => s.weighInWindow.watchWeighInWindow());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
       // And here so that choosing a scale does.
       const chosen = of(this.primaryScale);
+      // And here so that moving the weigh-in window does (MM-441).
+      const morning = of(this.weighInWindow) ?? WeighInWindow.usual;
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
@@ -564,7 +581,7 @@ export class AppState {
             (samples) => {
               if (stopped) return;
               const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
-              listener(dailyWeighIns(samples, { primarySourceId }));
+              listener(dailyWeighIns(samples, { primarySourceId, window: morning }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
@@ -613,7 +630,17 @@ export class AppState {
       const nights = of(this.sleepNights);
       return nights === undefined ? undefined : sleepAverageOf({ nights, through: this.today.value });
     });
-    this.flowDays = stream(() => s.flowDays.watchFlowDays());
+    this.typedFlowDays = stream(() => s.flowDays.watchFlowDays());
+    this.importedFlow = stream(() => this.importedSamples('menstruation', (samples) => samples));
+    this.flowDays = derived(() => {
+      const typed = this.typedFlowDays.value;
+      const imported = of(this.importedFlow) ?? [];
+      const today = this.today.value;
+      // A read that went wrong stays wrong here, as for weights.
+      if (!typed.ready) return typed;
+      return Loadable.of(mergeFlowDays({ typed: typed.value, imported, today }));
+    });
+    this.importedHeight = stream(() => this.importedSamples('height', newestReading));
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());

@@ -118,11 +118,32 @@ describe('the workout clock', () => {
   it('can be started again from now', async () => {
     await startSquats();
     await wait(minutes(20));
-    await press('Edit times');
+    await press('Edit workout times');
     await press('Start the clock again from now');
+    // MM-447: it cannot be taken back, so it asks first.
+    const asked = await screen.findByRole('dialog', { name: 'Start the clock again from now?' });
+    await user.click(within(asked).getByRole('button', { name: 'Start again' }));
+    await settle();
     const workout = await only();
     expect(workout.startedAt).toEqual(after(minutes(20)));
     expect(workout.inProgress).toBe(true);
+  });
+
+  it('is not started again when the question is turned down (MM-447)', async () => {
+    await startSquats();
+    await wait(minutes(20));
+    await press('Edit workout times');
+    await press('Start the clock again from now');
+    const asked = await screen.findByRole('dialog', { name: 'Start the clock again from now?' });
+    await user.click(within(asked).getByRole('button', { name: 'Cancel' }));
+    await settle();
+    expect((await only()).startedAt).toEqual(noon);
+  });
+
+  it('names the times it edits as the workout’s (MM-447)', async () => {
+    await startSquats();
+    expect(layer().getByRole('button', { name: 'Edit workout times' })).toBeInTheDocument();
+    expect(layer().queryByRole('button', { name: 'Edit times' })).not.toBeInTheDocument();
   });
 
   it('a finished workout shows when it was and how long', async () => {
@@ -143,7 +164,9 @@ describe('pausing the workout clock', () => {
     expect(clockLines()).toEqual(['Paused']);
     await wait(minutes(5));
     expect(elapsed()).toBe('10:00');
-    await press('Resume');
+    // Resume is on the clock card and, while paused, on the timer bar too (MM-447): the card's is pressed here.
+    await user.click(layer().getAllByRole('button', { name: 'Resume' })[0] as HTMLElement);
+    await settle();
     expect(clockLines()).toEqual(['Started 12:00 PM']);
     await wait(minutes(2));
     expect(elapsed()).toBe('12:00');
@@ -159,7 +182,22 @@ describe('pausing the workout clock', () => {
     await press('Pause');
     expect(timerLabel()).toBe('Paused');
     expect((await only()).setStartedAt).toBeUndefined();
-    expect(timerButton()).toBeDisabled();
+    // MM-447: the screen says the set's timing was dropped, and the bar names the control that resumes.
+    expect(await screen.findByText(/The set being timed was dropped/)).toBeInTheDocument();
+    const bar = document.querySelector('.train-timer') as HTMLElement;
+    expect(within(bar).getByText('Tap Resume to start the clock again.')).toBeInTheDocument();
+    expect(timerButton()).toHaveAccessibleName('Resume');
+    expect(timerButton()).toBeEnabled();
+    await pressTimer();
+    expect((await only()).paused).toBe(false);
+    expect(within(bar).getByRole('button', { name: 'Start set' })).toBeEnabled();
+  });
+
+  it('says nothing was dropped when no set was being timed (MM-447)', async () => {
+    await startSquats();
+    await press('Pause');
+    expect(screen.queryByText(/The set being timed was dropped/)).not.toBeInTheDocument();
+    expect(timerButton()).toHaveAccessibleName('Resume');
   });
 
   it('survives the app closing', async () => {
@@ -206,7 +244,7 @@ describe('a workout’s times, by hand', () => {
   async function openTimes(): Promise<void> {
     await saveFinished();
     await openFinished();
-    await press('Edit times');
+    await press('Edit workout times');
     await layer().findByRole('heading', { name: 'Workout times' });
   }
 

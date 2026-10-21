@@ -112,6 +112,13 @@ export class SqliteFoodPack implements FoodPack {
     return row === undefined ? undefined : this.food(row);
   }
 
+  async foodById(packId: string, foodId: number): Promise<CatalogFood | undefined> {
+    if (packId !== this.header.packId) return undefined;
+    const rows = await this.db.select(`SELECT ${this.columns} FROM foods f WHERE f.id = ?`, [foodId]);
+    const row = rows[0];
+    return row === undefined ? undefined : this.food(row);
+  }
+
   async servingsOf(food: CatalogFood): Promise<CatalogServing[]> {
     if (food.packId !== this.header.packId) return [];
     const rows = await this.db.select('SELECT description, grams FROM servings WHERE food_id = ? ORDER BY rowid', [
