@@ -58,9 +58,19 @@ export function roadmapPageData({
   tickets: readonly RoadmapTicket[];
   generatedOn: string;
 }): string {
+  const milestones = (roadmap['milestones'] ?? []) as readonly {
+    futureVision?: boolean;
+    requires?: readonly { tickets: readonly string[] }[];
+  }[];
+  const listedBy = (vision: boolean) =>
+    new Set(milestones.filter((m) => (m.futureVision === true) === vision).flatMap((m) => (m.requires ?? []).flatMap((r) => r.tickets)));
+  // Future vision is what only future-vision milestones hold; a ticket any committed milestone lists stays committed (MM-550).
+  const committed = listedBy(false);
+  const futureVision = [...listedBy(true)].filter((id) => !committed.has(id)).sort((a, b) => a.localeCompare(b));
   const data = {
     generatedOn,
     milestones: roadmap['milestones'],
+    futureVision,
     workstreams: (roadmap['workstreams'] as Record<string, unknown>[]).map((w) => ({
       id: w['id'],
       name: w['name'],

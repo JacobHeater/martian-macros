@@ -64,6 +64,8 @@
   summary::-webkit-details-marker { display: none; }
   summary .row { padding: 12px 0; }
   .tag { font-size: 12px; color: var(--muted); }
+  .group { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; margin: 18px 0 2px; }
+  .group:first-child { margin-top: 0; }
   .tickets { margin: 0 0 12px; padding: 0; list-style: none; }
   .tickets li { display: flex; gap: 8px; padding: 4px 0; font-size: 14px; }
   .tickets .st { flex: none; width: 74px; font-size: 12px; color: var(--muted); }
@@ -202,7 +204,7 @@ document.getElementById('generated').textContent =
     const chips = el('div', { class: 'chips' });
     for (const id of ids.sort((a, b) => ticketNum(a) - ticketNum(b))) chips.append(chip(id));
     host.append(el('div', { class: 'card' },
-      el('div', { class: 'tag', text: m.id }),
+      el('div', { class: 'tag', text: m.futureVision ? `${m.id} · future vision, not scheduled` : m.id }),
       el('h3', { text: m.name }),
       el('p', { class: 'sub', text: `${c.done} of ${c.total} required tickets done (${pct(c)}%)` }),
       bar(c), chips));
@@ -237,15 +239,25 @@ const placed = new Set();
   }
 })();
 
-// Components
+// Components, split at the cut between committed work and future vision (MM-550)
 (function components() {
-  const by = {};
-  for (const [id, t] of Object.entries(T)) (by[t.component] ||= []).push(id);
+  const vision = new Set(DATA.futureVision || []);
   const host = document.getElementById('components');
-  const rows = Object.entries(by).map(([name, ids]) => [name, count(ids)]).sort((a, b) => pct(b[1]) - pct(a[1]) || b[1].total - a[1].total);
-  for (const [name, c] of rows) {
-    host.append(el('div', { class: 'row' },
-      el('div', { text: name.replace(/-/g, ' ') }), bar(c), el('div', { class: 'pct', text: `${c.done}/${c.total}` })));
+  const group = (title, keep) => {
+    const by = {};
+    for (const [id, t] of Object.entries(T)) if (keep(id)) (by[t.component] ||= []).push(id);
+    const rows = Object.entries(by).map(([name, ids]) => [name, count(ids)]).sort((a, b) => pct(b[1]) - pct(a[1]) || b[1].total - a[1].total);
+    if (rows.length === 0) return;
+    if (title) host.append(el('h3', { class: 'group', text: title }));
+    for (const [name, c] of rows) {
+      host.append(el('div', { class: 'row' },
+        el('div', { text: name.replace(/-/g, ' ') }), bar(c), el('div', { class: 'pct', text: `${c.done}/${c.total}` })));
+    }
+  };
+  if (vision.size === 0) group('', () => true);
+  else {
+    group('Committed', id => !vision.has(id));
+    group('Future vision (not scheduled)', id => vision.has(id));
   }
   host.append(legend());
 })();

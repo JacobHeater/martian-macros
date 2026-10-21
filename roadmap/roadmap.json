@@ -722,7 +722,8 @@
         {
           "workstream": "WS-01",
           "tickets": [
-            "MM-536"
+            "MM-536",
+            "MM-550"
           ]
         },
         {
@@ -917,6 +918,7 @@
             "MM-454",
             "MM-247",
             "MM-29",
+            "MM-84",
             "MM-85",
             "MM-86",
             "MM-87",
@@ -924,7 +926,8 @@
             "MM-94"
           ]
         }
-      ]
+      ],
+      "futureVision": true
     }
   ],
   "workstreams": [
@@ -1118,7 +1121,8 @@
           "MM-245",
           "MM-300",
           "MM-8",
-          "MM-412"
+          "MM-412",
+          "MM-550"
         ],
         "remaining": [
           "MM-1",
@@ -1209,7 +1213,8 @@
           "title": "Screenshot the iPhone through the app (MM-536): the dev app snapshots its own web view, devicectl asks for it and copies it out",
           "milestone": "M4",
           "tickets": [
-            "MM-536"
+            "MM-536",
+            "MM-550"
           ]
         }
       ],
@@ -3369,6 +3374,7 @@
           "step": 3,
           "title": "Free tier boundary and the real entitlement implementation",
           "tickets": [
+            "MM-84",
             "MM-85"
           ],
           "milestone": "M5"
