@@ -65,6 +65,8 @@ it('onboarding requires sex and birth date, then creates a plan', async () => {
   // Male profile: female-only questions are not offered.
   expect(screen.queryByRole('checkbox', { name: 'Pregnant' })).not.toBeInTheDocument();
   expect(screen.getByRole('checkbox', { name: 'Chronic kidney disease' })).toBeInTheDocument();
+  // MM-510: the weight-loss medication answer is asked here, and blocks nothing.
+  await userEvent.click(screen.getByRole('checkbox', { name: 'I take a prescription weight-loss medication' }));
   await userEvent.click(next()); // health
 
   expect(screen.getByText('Recommended')).toBeInTheDocument();
@@ -81,6 +83,8 @@ it('onboarding requires sex and birth date, then creates a plan', async () => {
   expect(setup?.profile.sex).toBe('male');
   expectClose(setup?.profile.heightCm, 180.3, 0.1);
   expect(setup?.creatineStartedOn).toBe(today);
+  expect(setup?.screening.weightLossMedication).toBe(true);
+  expect(setup?.screening.weightAffectingMedication, 'never the broader answer').toBe(false);
   expect(setup?.onboardedOn).toBe(today);
   expectClose(single(await first(repos.weights.watchWeights())).weightKg, 90.7, 0.1);
   await expect.poll(async () => (await first(repos.targets.watchTargetsHistory())).length).toBe(1);

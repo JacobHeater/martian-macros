@@ -39,6 +39,7 @@ import { checkInDueScenario } from './checkInDueScenario';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
+import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 
 /**
  * What the coach believes, why, and what it will do next. Before MM-256
@@ -795,4 +796,46 @@ export const MaintenanceCorrecting = screenStory({
   scenario: maintenanceScenario({ daysAgo: 60, driftKg: 2.5 }),
   open: onCoach,
   walk: pressOnCoach('Correct back'),
+});
+
+// ---- MM-510: the weight-loss medication answer, wired to MM-113's rules and words ----
+
+/** MM-113, MM-510: on a weight-loss medication with no training days set: training, with enough protein, keeps muscle. */
+export const CoachOnWeightLossMedication = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Resistance training, with enough protein, is the best-supported way to keep muscle/,
+  scenario: weightLossMedicationScenario(),
+  open: onCoach,
+});
+
+/** MM-113, MM-115: losing faster than the limit on the medication: targets rise as usual, and the pace is for the prescriber. */
+export const CoachWeightLossMedicationFastPace = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Targets went up\. This pace is faster than the app would set/,
+  scenario: weightLossMedicationScenario(),
+  open: onCoach,
+});
+
+/** MM-113, MM-114: far below the floor on the medication: the notice adds the prescriber lines before the support line. */
+export const CoachWeightLossMedicationUnderEating = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Low appetite on this medication is common\./,
+  scenario: weightLossMedicationScenario(),
+  open: onCoach,
+});
+
+/** MM-113: the same person with the answer not ticked: the usual words, and no medication note. */
+export const CoachNotOnWeightLossMedication = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^You were losing weight faster than the app aims for at your body fat, because faster loss costs more muscle\. Targets went up\.$/,
+  scenario: weightLossMedicationScenario({ ticked: false }),
+  open: onCoach,
+});
+
+/** MM-113, MM-149: why the targets are what they are, on the medication: the protein-minimum days lead the week. */
+export const WhyYourTargetsOnWeightLossMedication = screenStory({
+  covers: ['TargetChangeSheet'],
+  shows: 'Protein minimum met',
+  scenario: weightLossMedicationScenario(),
+  open: openWhy,
 });

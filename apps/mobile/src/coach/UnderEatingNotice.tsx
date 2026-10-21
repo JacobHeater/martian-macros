@@ -13,7 +13,9 @@ import { Notice } from '../ui/Notice';
 export function UnderEatingNotice() {
   const { services, state } = useApp();
   const finding = useCell(state.underEatingNotice);
-  const history = useLoaded(state.setup)?.screening.eatingDisorderHistory ?? false;
+  const screening = useLoaded(state.setup)?.screening;
+  const history = screening?.eatingDisorderHistory ?? false;
+  const weightLossMedication = screening?.weightLossMedication ?? false;
   const today = useCell(state.today);
   if (finding === undefined) return null;
   const markPartial = async () => {
@@ -24,7 +26,7 @@ export function UnderEatingNotice() {
       <Notice
         kind="caution"
         title="About your logged days"
-        text={underEatingText(finding, { supportLine: history })}
+        text={underEatingText(finding, { supportLine: history, weightLossMedication })}
         action={
           <div className="app-row">
             <MmButton label="Mark those days partial" kind="secondary" onPress={() => void markPartial()} />
