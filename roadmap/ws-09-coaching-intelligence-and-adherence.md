@@ -122,6 +122,8 @@ the trial is timed to end after the first monthly report.
    planning's projections are fiction without the body-fat estimate from
    WS-07 step 7, and the report's body-fat range (MM-450) waits for it too.
    MM-450 done 2026-10-21: the range from the waist at each end of the month.
+   MM-507 done 2026-10-21: the goal body fat is set from the goal section, kept in
+   schema 21, and the plan runs the cut to it.
 - Also placed 2026-10-13 in earlier steps: step 3: MM-168.
 13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests. Done 2026-10-21; its phone checks are owed.
 
@@ -159,7 +161,8 @@ independent of step 3.
   and the month's personal records; photos MM-157), MM-450 (the body-fat range from the waist in the report, at the end
   of the month and when it began, as it stood then; no change with an eating-disorder history), MM-92 (the logging streak, forgiving one missed
   day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).
-- Remaining: MM-133, MM-32, MM-507. Epic: MM-145.
+- Remaining: MM-133, MM-32. Epic: MM-145.
+- Built 2026-10-21: MM-507 (the goal body fat, set from the Coach's goal section and kept across restarts).
 - Done 2026-10-21: MM-36 (phase planning; setting the goal body fat is MM-507), MM-361 (every child built or
   closed), MM-248 (reminders on the minute; what is owed is on a phone).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).

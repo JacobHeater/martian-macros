@@ -367,4 +367,9 @@ CREATE TABLE "target_shapes" (
   "raise_share" REAL NOT NULL CHECK("raise_share" > 0.0 AND "raise_share" < 1.0),
   PRIMARY KEY ("since_epoch_day")
 );
+CREATE TABLE "goal_body_fat" (
+  "id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1),
+  "percent" REAL NOT NULL CHECK("percent" > 0.0 AND "percent" < 100.0),
+  "set_epoch_day" INTEGER NOT NULL
+);
 `;

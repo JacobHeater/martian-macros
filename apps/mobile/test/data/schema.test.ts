@@ -97,6 +97,8 @@ const tablesAddedSince: readonly string[] = [
   'sleep_nights',
   // Version 16 (MM-486): how the user shapes their targets (MM-122, MM-124).
   'target_shapes',
+  // Version 21 (MM-507): the goal body fat the user set (MM-36).
+  'goal_body_fat',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

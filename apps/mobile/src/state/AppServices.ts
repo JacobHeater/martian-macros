@@ -20,6 +20,7 @@ import type { ReminderRepository } from '../domain/repositories/ReminderReposito
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
+import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -75,6 +76,8 @@ export interface AppServices {
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */
   readonly targetShapes: TargetShapeRepository;
+  /** The goal body fat the user set (MM-36), kept in the database (MM-507). */
+  readonly goalBodyFat: GoalBodyFatRepository;
   readonly preferences: PreferencesRepository;
   /** The hours in which an imported reading counts as the morning weigh-in (MM-441). */
   readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
