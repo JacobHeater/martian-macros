@@ -132,6 +132,7 @@ export * from './PhasePlan';
 export * from './PhaseRecommendation';
 export * from './PhaseRule';
 export * from './planPhases';
+export * from './platformWorkoutImports';
 export * from './personalRecordsOf';
 export * from './placeTimeOfDay';
 export * from './planReminders';

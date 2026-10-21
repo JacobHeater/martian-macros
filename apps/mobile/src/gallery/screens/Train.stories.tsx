@@ -1,5 +1,7 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
+import { DemoSeed } from '../../fixtures/DemoSeed';
+import { Exercise } from '../../domain/training/Exercise';
 import { Workout } from '../../domain/training/Workout';
 import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../domain/training/WorkoutSet';
@@ -16,6 +18,7 @@ import { oldLiftsScenario } from './oldLiftsScenario';
 import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
+import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { valueOf } from './valueOf';
 
@@ -395,4 +398,48 @@ export const TrainFirstTime = screenStory({
   shows: /^Strength is one of the three things the app watches/,
   scenario: firstDayScenario,
   open: onTrain,
+});
+
+// ---- MM-490: workouts imported from the health platform ----
+
+/** The demo, with a strength session from a watch yesterday: a movement the library cannot place, then bench press. */
+const importedScenario: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  const day = today.addDays(-1);
+  const at = (minute: number) => new Date(day.year, day.month - 1, day.day, 18, minute);
+  await repos.workouts.saveWorkout(
+    new Workout({
+      id: 0,
+      date: day,
+      startedAt: at(0),
+      endedAt: at(45),
+      exercises: [
+        new WorkoutExercise({ exerciseId: Exercise.otherId, sets: [new WorkoutSet({ reps: 0, loadKg: 0, startedAt: at(5), endedAt: at(7) })] }),
+        new WorkoutExercise({
+          exerciseId: 'barbell-bench-press',
+          sets: [new WorkoutSet({ reps: 8, loadKg: 0, startedAt: at(10), endedAt: at(11) })],
+        }),
+      ],
+      imported: { platformId: 'story-hc-1', sourceName: 'Watch' },
+    }),
+  );
+};
+
+/** MM-490: the Train list with a workout imported from the health platform, saying where from. */
+export const TrainImportedWorkout = screenStory({
+  covers: ['TrainScreen'],
+  shows: /from Watch$/,
+  scenario: importedScenario,
+  open: ({ state }) => state.homeTab.put('train'),
+});
+
+/** MM-490: an imported workout opened: "Other exercise" with its time, and the way to move its sets. */
+export const ImportedWorkoutOtherExercise = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'Move sets to an exercise',
+  scenario: importedScenario,
+  open: async (stage) => {
+    const workout = (await valueOf(stage.services.workouts.watchWorkouts())).find((w) => w.imported !== undefined);
+    if (workout !== undefined) void stage.navigator.push(() => <WorkoutScreen workoutId={workout.id} />);
+  },
 });

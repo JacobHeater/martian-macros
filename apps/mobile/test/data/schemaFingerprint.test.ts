@@ -39,6 +39,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   20: 'df49dc832ffb4fcaca2b7cf567671bf0bbff2d92b67424a932e864498df6045a',
   // MM-507: the goal body fat the user set (MM-36).
   21: '1706073ad4fc3ba0d1609ec4fd6fb4147ba5acbc956c988dfeef613a4ffed107',
+  // MM-490: the platform id and source of an imported workout, and the imported workouts deleted in the app.
+  22: '45937119313e69074c46dbb43fdb04aee5c4d70da682207a69e6e3cc402d3bb7',
 };
 
 it('the schema is the one recorded for its version', () => {

@@ -25,6 +25,7 @@ export * from './detailLevelDescription';
 export * from './detailLevelLabel';
 export * from './elapsedText';
 export * from './equipmentLabel';
+export * from './exerciseNameOf';
 export * from './explanationLineText';
 export * from './extraNutrientsLine';
 export * from './Fmt';
