@@ -1,7 +1,7 @@
 ---
 id: MM-453
 status: proposed
-component: app-shell
+component: release
 related: [MM-242, MM-63, MM-64, MM-95, MM-69]
 ---
 
