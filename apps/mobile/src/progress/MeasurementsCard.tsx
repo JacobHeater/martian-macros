@@ -92,34 +92,32 @@ export function MeasurementsCard({ fmt }: { fmt: Fmt }) {
           }
         />
       )}
-      {sites.length === 0 ? null : (
-        <MmListGroup>
-          {sites.map((site) => (
-            <MmListRow
-              key={site}
-              title={siteLabel(site, settings.limbSide)}
-              subtitle={siteSummary(measurements, site, fmt, today)}
-              opens
-              onPress={() => void navigator.push(() => <SiteHistoryScreen site={site} />)}
-            />
-          ))}
-        </MmListGroup>
-      )}
-      {facts.map((fact) => (
-        <p key={fact.site} className="app-text">
-          {limbFactText(fact, fmt, settings.limbSide)}
-        </p>
-      ))}
-      {pair === undefined ? null : <p className="app-caption">{leanGainPairText(pair)}</p>}
+      {/* The measured sites, then the choice of sites as the group's last row (MM-156). */}
       <MmListGroup>
+        {sites.map((site) => (
+          <MmListRow
+            key={site}
+            title={siteLabel(site, settings.limbSide)}
+            subtitle={siteSummary(measurements, site, fmt, today)}
+            opens
+            onPress={() => void navigator.push(() => <SiteHistoryScreen site={site} />)}
+          />
+        ))}
         <MmListRow
           leadingIcon="tape"
           title="Choose sites"
-          subtitle="Neck, chest, hips, upper arm, thigh, calf"
+          subtitle={`${sites.length} of ${MeasurementSite.optional.length}`}
           opens
           onPress={() => void navigator.push(() => <MeasurementSitesScreen />)}
         />
       </MmListGroup>
+      {/* What limbs did beside the waist: facts said as captions under the rows, not body text. */}
+      {facts.map((fact) => (
+        <p key={fact.site} className="app-caption">
+          {limbFactText(fact, fmt, settings.limbSide)}
+        </p>
+      ))}
+      {pair === undefined ? null : <p className="app-caption">{leanGainPairText(pair)}</p>}
       <div className="app-gap-small" />
       <MmButton
         label="Measure"

@@ -5,6 +5,7 @@ import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { MmListGroup } from '../ui/MmListGroup';
+import { MmListRow } from '../ui/MmListRow';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import './progress.css';
@@ -14,12 +15,15 @@ import './progress.css';
  * added, as Nutrition goals' switches are (the sibling, rule 9). The first
  * limb added asks which side: limbs are measured on that one side from then
  * on, so every entry is of the same limb. Any site can be added here, with
- * or without a suggestion.
+ * or without a suggestion. Once a side is chosen, a "Limb side" row can
+ * change it; with limbs already measured, the change says earlier entries
+ * were on the other side.
  */
 export function MeasurementSitesScreen() {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const settings = useLoaded(state.measurementSettings);
+  const measurements = useLoaded(state.measurements) ?? [];
   if (settings === undefined) return <Screen title="Measurement sites">{null}</Screen>;
 
   const turn = async (site: MeasurementSite, on: boolean) => {
@@ -43,6 +47,26 @@ export function MeasurementSitesScreen() {
     );
   };
 
+  const changeSide = async () => {
+    const was = settings.limbSide;
+    const chosen = await overlays.options<LimbSide>({
+      title: 'Limb side',
+      options: [
+        { value: 'left', label: 'Left' },
+        { value: 'right', label: 'Right' },
+      ],
+      selected: was,
+    });
+    if (chosen === undefined || chosen.value === was) return;
+    await services.measurementSettings.saveMeasurementSettings(settings.copyWith({ limbSide: chosen.value }));
+    const limbsMeasured = measurements.some((entry) => MeasurementSite.isLimb(entry.site));
+    overlays.snack(
+      limbsMeasured && was !== undefined
+        ? `Limbs are measured on the ${chosen.value} side from now on. Earlier entries were on the ${was} side.`
+        : `Limbs are measured on the ${chosen.value} side.`,
+    );
+  };
+
   return (
     <Screen title="Measurement sites">
       <p className="app-text">
@@ -61,7 +85,15 @@ export function MeasurementSitesScreen() {
         ))}
       </MmListGroup>
       {settings.limbSide === undefined ? null : (
-        <p className="app-caption">{`Limbs are measured on the ${settings.limbSide} side.`}</p>
+        <MmListGroup>
+          <MmListRow
+            leadingIcon="tape"
+            title="Limb side"
+            subtitle={`Limbs are measured on the ${settings.limbSide} side.`}
+            opens
+            onPress={() => void changeSide()}
+          />
+        </MmListGroup>
       )}
     </Screen>
   );
