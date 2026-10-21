@@ -134,12 +134,30 @@ Guarding tests:
 - `test/engine/usualTrainingWeekdays.test.ts`; `test/settings/targetShape.test.tsx` (flat until chosen, at most
   three, no text about making a day up).
 Built 2026-10-21: **the simulator suite over shaped intake**, `test/engine/shapedIntakeSimulation.test.ts`.
-Forty simulated users per case eat a shaped week as planned for 35 days (the weekend 30% higher; three days
+Seventy simulated users per case eat a shaped week as planned for 35 days (the weekend 30% higher; three days
 30% higher, held to 15% lower days), with the usual logging and adherence noise, with and without a
 glycogen-and-gut store that rises and falls with the higher days (MM-131). Each case asks of the
 expenditure estimate what the flat case does: bias under 100 kcal, the truth inside two stated deviations
-at least 85% of the time, within 60 kcal of the same users with the same noise eating flat, and no more
+at least 88% of the time, within 60 kcal of the same users with the same noise eating flat, and no more
 partial days dropped than flat. So the 15% limit stands unless CI says otherwise. Not run locally; CI
+validates.
+
+Fixed 2026-10-21 after CI failed the suite: with three higher days the window's 75th percentile is a higher
+day, so the partial-day line (65% of it, about 78% of the flat figure) sat close under the planned lower day
+(85%), and a lower day eaten a little under plan, with ordinary noise, was dropped (1.7 a trial, which also
+pushed the glycogen case's bias to 103 kcal). An estimator defect, not a wrong expectation: the partial-day
+rule now reads each day against its plan. `plannedDayShare(shapes)` gives the share of the flat figure the
+shape in force planned for the day; `usableIntakeDays` divides a day's intake by it before the comparison
+(flat when not given), and `analyze` passes the user's shapes to the estimator. Guarded by "the partial-day
+rule read against the plan" in `test/engine/weekShape.test.ts` (a lower day 200 kcal under plan is dropped
+read flat, kept read against the plan; a half day is still dropped). The adherence summary, the under-eating
+notice, insights, the monthly report and the logging streak still read every day as flat: a follow-up.
+
+The measurement review's points on the suite, applied: each trial starts on a different weekday (seed % 7,
+70 trials, ten per weekday), so the window's ends fall on higher and lower days alike; the window is checked
+directly to be four whole weeks; coverage is held to 88%; and dropped days are counted directly by date (a
+dropped planned day moves the estimate about 15 kcal, too little for the 60 kcal paired bound): at most 1 in
+100 planned lower days dropped, and no more than the same days eaten flat plus that. Not run locally; CI
 validates.
 
 The code is complete. The panel's product-designer and UX review was a fast source-only pass (no render);
