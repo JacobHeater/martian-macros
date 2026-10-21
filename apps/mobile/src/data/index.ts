@@ -21,6 +21,7 @@ export * from './SqlDataEraser';
 export * from './SqlDayMarkRepository';
 export * from './SqlExerciseProgressionRepository';
 export * from './SqlFoodRepository';
+export * from './SqlGoalBodyFatRepository';
 export * from './SqlHealthSampleStore';
 export * from './SqlInlineInsightLogRepository';
 export * from './SqlInsightLogRepository';

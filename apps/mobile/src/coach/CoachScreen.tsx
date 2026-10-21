@@ -16,6 +16,10 @@ import { confidenceNextStepText } from '../format/confidenceNextStepText';
 import { Fmt } from '../format/Fmt';
 import { displayTargets } from '../format/displayTargets';
 import { FatLossPace } from '../engine/FatLossPace';
+import { PhaseRule } from '../engine/PhaseRule';
+import { SafetyBounds } from '../engine/SafetyBounds';
+import { goalBodyFatSubtitle } from '../format/goalBodyFatSubtitle';
+import { quantityText } from '../format/quantityText';
 import { leanGainPaceName } from '../format/leanGainPaceName';
 import { paceName } from '../format/paceName';
 import { reboundText } from '../format/reboundText';
@@ -49,6 +53,7 @@ import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { DataGapNote } from './DataGapNote';
+import { GoalBodyFatSheet } from './GoalBodyFatSheet';
 import { dataGapsOf } from './dataGapsOf';
 import { LastChangeCard } from './LastChangeCard';
 import { LeanGainCard } from './LeanGainCard';
@@ -122,6 +127,7 @@ export function CoachScreen() {
   const pause = useCell(state.activePause);
   const guide = useCell(state.maintenanceGuide);
   const phase = useCell(state.phasePlan);
+  const goalBodyFat = useLoaded(state.goalBodyFat);
   const food = useLoaded(state.foodForDay(today)) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
   const weights = useCell(state.weights);
@@ -208,6 +214,23 @@ export function CoachScreen() {
     await applyGoal(chosen);
   };
 
+  // The goal body fat (MM-507): set from the goal section, refused under the hard floor, kept across restarts.
+  const changeGoalBodyFat = async () => {
+    const sex = setup.profile.sex;
+    const answer = await overlays.sheet<number | 'default'>('Goal body fat', (close) => (
+      <GoalBodyFatSheet sex={sex} current={goalBodyFat} onDone={close} />
+    ));
+    if (answer === undefined) return;
+    if (answer === 'default') {
+      await services.goalBodyFat.clearGoalBodyFat();
+      overlays.snack(`The plan runs to its own line, ${PhaseRule.cutGoalPercent(sex)}%.`);
+      return;
+    }
+    if (SafetyBounds.checkGoalBodyFat(sex, answer) === 'rejected') return;
+    await services.goalBodyFat.saveGoalBodyFat({ percent: answer, setOn: today });
+    overlays.snack(`Goal body fat set to ${quantityText(answer)}%.`);
+  };
+
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
   // A diet break brings the water back as leaving a cut does (MM-130): said under the break's notice while it does (MM-135, the panel's UX-5).
   const runningBreak = breakInForce(history, today);
@@ -287,6 +310,18 @@ export function CoachScreen() {
             today={today}
             onAccept={(mode) => void applyGoal(mode)}
             onChooseAnother={() => void changeGoal()}
+          />
+        )}
+        {/* The goal body fat (MM-507); never offered with an eating-disorder history, as MM-36 projects nothing from body fat for it. */}
+        {setup.screening.eatingDisorderHistory ? null : (
+          <MmListRow
+            leadingIcon="percent"
+            title="Goal body fat"
+            subtitle={goalBodyFatSubtitle(setup.profile.sex, goalBodyFat)}
+            dense
+            flush
+            opens
+            onPress={() => void changeGoalBodyFat()}
           />
         )}
         {/* What the first month looks like, reread any time (MM-158). */}

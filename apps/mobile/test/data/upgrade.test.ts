@@ -144,8 +144,11 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 20 left it: without the goal body fat (MM-507). */
+const versionTwenty = currentSchema.replace(/CREATE TABLE "goal_body_fat" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 19 left it: without the pack food a recipe's ingredient was found as (MM-456). */
-const versionNineteen = currentSchema.replace(
+const versionNineteen = versionTwenty.replace(
   '  "fat_g" REAL NOT NULL,\n  "source_pack_id" TEXT NULL,\n  "source_food_id" INTEGER NULL\n',
   '  "fat_g" REAL NOT NULL\n',
 );
@@ -632,4 +635,30 @@ it("a version 19 database comes up to date with recipe lines kept, sourceless, a
   await repos.customFoods.saveCustomFood(new CustomFood({ ...bowl, ingredients: [{ ...line, source: { packId: 'fixture', foodId: 3 } }] }));
   const [kept] = (await first(repos.customFoods.watchCustomFoods()))[0]?.ingredients ?? [];
   expect(kept?.source).toEqual({ packId: 'fixture', foodId: 3 });
+});
+
+// MM-507: a version 20 database comes up to date with no goal body fat set, so the plan runs to its default line;
+// a goal set from then on is kept with the day it was set, and clearing it removes it.
+it('a version 20 database comes up to date with no goal body fat, and keeps one set after', async () => {
+  expect(versionTwenty).not.toContain('goal_body_fat');
+  expect(versionTwenty).toContain('source_pack_id');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 20, schema: versionTwenty });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'goal_body_fat')).toEqual(['id', 'percent', 'set_epoch_day']);
+  expect(await first(repos.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
+  await repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: day });
+  expect(await first(repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: day });
+  await repos.goalBodyFat.clearGoalBodyFat();
+  expect(await first(repos.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
 });

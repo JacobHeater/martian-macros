@@ -9,6 +9,7 @@ import type { FoodRepository } from '../../src/domain/repositories/FoodRepositor
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
 import type { SetupRepository } from '../../src/domain/repositories/SetupRepository';
 import type { TargetShapeRepository } from '../../src/domain/repositories/TargetShapeRepository';
+import type { GoalBodyFatRepository } from '../../src/domain/repositories/GoalBodyFatRepository';
 import type { WeightEventRepository } from '../../src/domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../../src/domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../../src/domain/repositories/WorkoutRepository';
@@ -34,6 +35,7 @@ interface Erasable {
   food: FoodRepository;
   targets: TargetsHistoryRepository;
   targetShapes: TargetShapeRepository;
+  goalBodyFat: GoalBodyFatRepository;
   preferences: PreferencesRepository;
   weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   workouts: WorkoutRepository;
@@ -79,6 +81,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
         }),
       );
       await r.targetShapes.saveTargetShape(new TargetShape({ since: day, balance: CarbFatBalance.balanced }));
+      await r.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: day });
       await r.workouts.saveWorkout(
         new Workout({
           id: 0,
@@ -103,6 +106,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.targets.watchTargetsHistory())).toEqual([]);
       // MM-486: no shape is left.
       expect(await first(r.targetShapes.watchTargetShapes())).toEqual([]);
+      // MM-507: no goal body fat is left.
+      expect(await first(r.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
       expect(await first(r.workouts.watchWorkouts())).toEqual([]);
       expect(await first(r.customExercises.watchCustomExercises())).toEqual([]);
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');

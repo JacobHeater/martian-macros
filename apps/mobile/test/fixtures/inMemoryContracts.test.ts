@@ -73,6 +73,7 @@ dataEraserContract('In-memory', () => {
     food: r.food,
     targets: r.targets,
     targetShapes: r.targetShapes,
+    goalBodyFat: r.goalBodyFat,
     preferences: r.preferences,
     weighInWindow: r.weighInWindow,
     workouts: r.workouts,
