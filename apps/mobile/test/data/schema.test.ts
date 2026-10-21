@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Micronutrient } from '../../src/domain/food/micros/Micronutrient';
+import { WeighInWindow } from '../../src/healthIngest/WeighInWindow';
 import { AppDatabase } from '../../src/data/AppDatabase';
 import { currentSchemaVersion } from '../../src/data/currentSchemaVersion';
 import { tables } from '../../src/data/tables';
@@ -28,7 +29,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
   // Version 7 (MM-364): the switches of Settings > Coach. Version 9 (MM-396): net carbs. Version 10 (MM-63): the last backup.
   // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance. Version 12 (MM-58): the online lookup choice. Version 14 (MM-152): the usual cooking fat.
-  // Version 15 (MM-71): the scale chosen as primary.
+  // Version 15 (MM-71): the scale chosen as primary. Version 19 (MM-441): the weigh-in window.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -48,6 +49,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'online_lookup',
     'usual_cooking_fat',
     'primary_scale_source_id',
+    'weigh_in_window_start_minute',
+    'weigh_in_window_end_minute',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   // Version 13 (MM-251): a diagnosed sleep disorder. Version 17 (MM-480): the lean-gain pace chosen.
@@ -149,6 +152,19 @@ it('rejects impossible weights', async () => {
 it('rejects impossible waist measurements', async () => {
   const { repos } = await opened();
   await expect(repos.waist.saveWaist(day, 5)).rejects.toBeInstanceOf(SqlFailure);
+});
+
+// MM-441: a weigh-in window lies within one day, in minutes after midnight; one stored backwards is refused when read.
+it('the schema keeps a weigh-in window within one day', async () => {
+  const { sql, repos } = await opened();
+  await repos.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 0, endMinute: 24 * 60 }));
+  expect((await first(repos.weighInWindow.watchWeighInWindow())).endMinute).toBe(24 * 60);
+  await expect(sql.execute('UPDATE user_preferences SET weigh_in_window_start_minute = 1440')).rejects.toBeInstanceOf(SqlFailure);
+  await expect(sql.execute('UPDATE user_preferences SET weigh_in_window_start_minute = -1')).rejects.toBeInstanceOf(SqlFailure);
+  await expect(sql.execute('UPDATE user_preferences SET weigh_in_window_end_minute = 0')).rejects.toBeInstanceOf(SqlFailure);
+  await expect(sql.execute('UPDATE user_preferences SET weigh_in_window_end_minute = 1441')).rejects.toBeInstanceOf(SqlFailure);
+  await sql.execute('UPDATE user_preferences SET weigh_in_window_start_minute = 900, weigh_in_window_end_minute = 600');
+  await expect(first(repos.weighInWindow.watchWeighInWindow())).rejects.toThrow();
 });
 
 // Added in the move.
