@@ -50,16 +50,17 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'primary_scale_source_id',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
-  // Version 13 (MM-251): a diagnosed sleep disorder.
+  // Version 13 (MM-251): a diagnosed sleep disorder. Version 17 (MM-480): the lean-gain pace chosen.
   setups: [
     'fluid_limited_by_clinician',
     'pace_changed_epoch_day',
     'maintenance_anchor_epoch_day',
     'maintenance_correction_from_epoch_day',
     'sleep_disorder',
+    'lean_gain_pace',
   ],
-  // Version 11 (MM-128): the pace each record of targets was asked for.
-  targets_history: ['requested_loss_fraction'],
+  // Version 11 (MM-128): the pace each record of targets was asked for. Version 17 (MM-480): the lean-gain one.
+  targets_history: ['requested_loss_fraction', 'lean_gain_pace'],
   // Version 4 (MM-308): the micronutrients a food log entry keeps. Version 9 (MM-397): sugar alcohols.
   // Version 15 (MM-167, MM-151): the state the food was logged in and the conversion that made its unit grams.
   food_entries: [

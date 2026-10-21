@@ -1,6 +1,7 @@
 import { BiologicalSex } from '../domain/BiologicalSex';
 import { DailyActivity } from '../domain/DailyActivity';
 import { GoalMode } from '../domain/GoalMode';
+import { LeanGainPace } from '../domain/LeanGainPace';
 import { Profile } from '../domain/Profile';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import { ScreeningAnswers } from '../domain/ScreeningAnswers';
@@ -47,6 +48,7 @@ function setupFrom(r: SqlRow): UserSetup {
     unitSystem: named(UnitSystem.values, r, 'unit_system'),
     bodyFatPercent: optionalNumber(r, 'body_fat_percent'),
     requestedLossFraction: optionalNumber(r, 'requested_loss_fraction'),
+    leanGainPace: named(LeanGainPace.values, r, 'lean_gain_pace'),
     healthCheckConfirmedOn: optionalDay(r, 'health_check_confirmed_epoch_day'),
     healthCheckSkipCount: integer(r, 'health_check_skip_count'),
     creatineStartedOn: optionalDay(r, 'creatine_started_epoch_day'),
@@ -96,6 +98,7 @@ export class SqlSetupRepository implements SetupRepository {
         onboarded_epoch_day: setup.onboardedOn.epochDay,
         body_fat_percent: orNull(setup.bodyFatPercent),
         requested_loss_fraction: orNull(setup.requestedLossFraction),
+        lean_gain_pace: setup.leanGainPace,
         pregnant: asFlag(s.pregnant),
         breastfeeding: asFlag(s.breastfeeding),
         eating_disorder_history: asFlag(s.eatingDisorderHistory),

@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { GoalMode } from '../../domain/GoalMode';
+import type { LeanGainPace } from '../../domain/LeanGainPace';
 import { DailyTargets } from '../../engine/DailyTargets';
 import type { TargetFlag } from '../../engine/TargetFlag';
 import type { TargetsExplanation } from '../../engine/TargetsExplanation';
@@ -22,6 +23,7 @@ export function storyTargets(
     tdeeSigmaKcal = 400,
     tdeeStatus = 'held',
     explanation,
+    leanGainPace,
   }: {
     kcal?: number;
     proteinG?: number;
@@ -35,6 +37,7 @@ export function storyTargets(
     tdeeSigmaKcal?: number;
     tdeeStatus?: TdeeStatus;
     explanation?: TargetsExplanation | undefined;
+    leanGainPace?: LeanGainPace | undefined;
   } = {},
 ): TargetsRecord {
   return new TargetsRecord({
@@ -45,5 +48,6 @@ export function storyTargets(
     tdeeStatus,
     targets: new DailyTargets({ kcal, proteinG, proteinMinimumG, fatG, carbsG, weeklyRateFraction, flags: new Set(flags) }),
     explanation,
+    leanGainPace,
   });
 }

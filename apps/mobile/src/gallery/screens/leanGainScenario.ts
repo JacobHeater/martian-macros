@@ -9,11 +9,13 @@ import { storyWorkout } from './storyWorkout';
  * `bodyFatPercent` under 20 the gain reads fat-heavy with strength flat;
  * without it the estimate from body mass index, and the upper end of its
  * range, is above 20%, so the coach recommends ending the gain first.
+ * `slower`: the whole gain on the slower pace the user chose (MM-480).
  */
 export const leanGainScenario =
-  ({ bodyFatPercent }: { bodyFatPercent?: number } = {}): StoryScenario =>
+  ({ bodyFatPercent, slower = false }: { bodyFatPercent?: number; slower?: boolean } = {}): StoryScenario =>
   async (repos, today) => {
-    const setup = typicalSetup({ onboardedOn: today.addDays(-90), goalMode: 'leanGain', healthCheckConfirmedOn: today });
+    const typical = typicalSetup({ onboardedOn: today.addDays(-90), goalMode: 'leanGain', healthCheckConfirmedOn: today });
+    const setup = slower ? typical.copyWith({ leanGainPace: 'slower' }) : typical;
     await repos.setup.saveSetup(bodyFatPercent === undefined ? setup : setup.copyWith({ bodyFatPercent }));
     for (let d = 80; d >= 0; d--) {
       await repos.weights.saveWeight(today.addDays(-d), (d >= 70 ? 80 : 80 + (3 * (70 - d)) / 70) + (d % 2 === 0 ? 0.2 : -0.2));
@@ -27,7 +29,8 @@ export const leanGainScenario =
           tdeeSigmaKcal: 150,
           tdeeStatus: 'updated',
           proteinG: 150,
-          weeklyRateFraction: 0.0035,
+          weeklyRateFraction: slower ? 0.00175 : 0.0035,
+          leanGainPace: slower ? 'slower' : undefined,
         }),
       );
       // Flat for the first three entries and the last three, so each smoothed end is a plain 86 and 90.

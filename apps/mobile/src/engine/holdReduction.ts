@@ -29,6 +29,9 @@ export function holdReduction(history: readonly TargetsRecord[]): TargetsRecord 
     tdeeSigmaKcal: current.tdeeSigmaKcal,
     tdeeStatus: current.tdeeStatus,
     safetyBodyFatPercent: current.safetyBodyFatPercent,
+    // MM-533: the pace asked for is kept, or the engine sees a pace change and undoes the hold at once.
+    requestedLossFraction: current.requestedLossFraction,
+    leanGainPace: current.leanGainPace,
     profileRevision: current.profileRevision,
     targetRulesVersion: current.targetRulesVersion,
     targets: new DailyTargets({

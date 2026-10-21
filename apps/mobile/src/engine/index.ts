@@ -223,6 +223,8 @@ export * from './PaceLimit';
 export * from './PaceWithheldReason';
 export * from './FatLossPace';
 export * from './describePaces';
+export * from './describeLeanGainPaces';
+export * from './LeanGainPaceOption';
 export * from './trainingStartOn';
 export * from './StallStatus';
 export * from './streakEndingOn';

@@ -44,7 +44,8 @@ import { TdeeEstimate } from './TdeeEstimate';
  * - Never during a pause, and not at a weekly check-in until
  *   `checkInIntervalDays` after one ends (MM-148).
  * - A pace change: immediate, built on the estimate the current targets
- *   rest on (MM-128).
+ *   rest on (MM-128); a lean-gain pace change also keeps the weekly step
+ *   (MM-480).
  * - At maintenance (MM-130): once the anchor is set, targets change only
  *   when the expenditure estimate moved beyond its own uncertainty, never
  *   for drift inside the band; drifted out for two weeks, nothing changes
@@ -137,6 +138,7 @@ export function nextTargets({
         previous,
         consecutiveDeficitWeeks: deficitWeeks,
         requestedLossFraction: setup.requestedLossFraction,
+        leanGainPace: setup.leanGainPace,
         safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal,
         breakRequested,
@@ -161,6 +163,7 @@ export function nextTargets({
       tdeeStatus: tdee.status,
       safetyBodyFatPercent: safetyBf,
       requestedLossFraction: setup.requestedLossFraction,
+      leanGainPace: setup.leanGainPace === 'standard' ? undefined : setup.leanGainPace,
       targets,
       summarySeen: false,
       explanation: explainTargets({
@@ -228,6 +231,17 @@ export function nextTargets({
     Math.abs(paceOf(last.requestedLossFraction) - paceOf(setup.requestedLossFraction)) > 1e-9
   ) {
     return build({ deficitWeeks: deficitWeeks(), trigger: 'paceChange', restingOn: last.tdeeKcal });
+  }
+
+  // A lean-gain pace chosen since the current targets (MM-480) applies at
+  // once too, on the same estimate, but inside the weekly step: nothing
+  // about a gain needs calories moved faster than that.
+  if (
+    setup.goalMode === 'leanGain' &&
+    last.mode === 'leanGain' &&
+    (last.leanGainPace ?? 'standard') !== setup.leanGainPace
+  ) {
+    return build({ previous: last.targets, trigger: 'paceChange', restingOn: last.tdeeKcal });
   }
 
   // A corrected sex, date of birth, height or health check: the old targets

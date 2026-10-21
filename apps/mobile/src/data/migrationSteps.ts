@@ -231,4 +231,17 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 16 to 17 (MM-480): the lean-gain pace chosen, standard until chosen, and the pace each record of targets was
+  // asked for, none on what is already there (the standard pace).
+  [
+    16,
+    async (db) => {
+      await db.execute(
+        "ALTER TABLE setups ADD COLUMN lean_gain_pace TEXT NOT NULL DEFAULT 'standard' CHECK (\"lean_gain_pace\" IN ('standard', 'slower'))",
+      );
+      await db.execute(
+        "ALTER TABLE targets_history ADD COLUMN lean_gain_pace TEXT NULL CHECK (\"lean_gain_pace\" IS NULL OR \"lean_gain_pace\" IN ('standard', 'slower'))",
+      );
+    },
+  ],
 ]);

@@ -446,6 +446,27 @@ export const CoachLeanGainTimeToStop = screenStory({
   open: onCoach,
 });
 
+/** MM-480: the fat-heavy gain's "Gain more slowly": the two lean-gain paces with what each means today. */
+export const CoachLeanGainSlower = screenStory({
+  covers: ['CoachScreen', 'LeanGainPaceSheet'],
+  shows: 'Choose a gain pace',
+  scenario: leanGainScenario({ bodyFatPercent: 15 }),
+  open: onCoach,
+  walk: pressOnCoach('Gain more slowly'),
+});
+
+/** MM-480: the same gain already on the slower pace: the card says so, offers the goal only, and the targets section's pace row opens the same sheet. */
+export const CoachLeanGainAlreadySlower = screenStory({
+  covers: ['CoachScreen', 'LeanGainPaceSheet'],
+  shows: 'Choose a gain pace',
+  scenario: leanGainScenario({ bodyFatPercent: 15, slower: true }),
+  open: onCoach,
+  walk: async (canvas) => {
+    await within(canvas).findByText(/You are already on the slower gain/, undefined, { timeout: 5000 });
+    await pressOnCoach('Change pace')(canvas);
+  },
+});
+
 /** MM-321: a monthly report holding a recomp review and the month's target changes. */
 export const MonthlyReportWithRecomp = screenStory({
   covers: ['CoachScreen', 'MonthlyReportScreen'],

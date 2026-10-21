@@ -5,6 +5,7 @@ interface LeanGainReviewInit {
   startedOn: CalendarDate;
   days: number;
   intendedFraction: number;
+  slowerPace?: boolean;
   gainFraction?: number | undefined;
   gainingFast?: boolean;
   weightChangeKg?: number | undefined;
@@ -31,6 +32,9 @@ export class LeanGainReview {
 
   /** The pace the targets in force aim for, a share of body weight a week. */
   readonly intendedFraction: number;
+
+  /** The targets in force are on the slower gain the user chose (MM-480). */
+  readonly slowerPace: boolean;
 
   /** The trend's pace over the last three weeks, when it can be read. */
   readonly gainFraction: number | undefined;
@@ -64,6 +68,7 @@ export class LeanGainReview {
     this.startedOn = init.startedOn;
     this.days = init.days;
     this.intendedFraction = init.intendedFraction;
+    this.slowerPace = init.slowerPace ?? false;
     this.gainFraction = init.gainFraction;
     this.gainingFast = init.gainingFast ?? false;
     this.weightChangeKg = init.weightChangeKg;
@@ -91,5 +96,13 @@ export class LeanGainReview {
   /** A slower gain or maintenance is offered: the gain looks fat-heavy, or it is time to end it. */
   get offersGoalChange(): boolean {
     return this.fatHeavy || this.stop !== undefined;
+  }
+
+  /**
+   * The slower gain is offered beside maintenance (MM-480): the gain looks
+   * fat-heavy, it is not yet time to end it, and it is not already slower.
+   */
+  get offersSlowerGain(): boolean {
+    return this.fatHeavy && this.stop === undefined && !this.slowerPace;
   }
 }
