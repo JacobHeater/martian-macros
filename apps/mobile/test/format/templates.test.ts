@@ -437,7 +437,7 @@ describe('notices', () => {
     }
   });
 
- what a break is and what happens at twenty, and claims nothing about metabolism.
+  // MM-135: the offer at twelve unbroken weeks says what a break is and what happens at twenty, and claims nothing about metabolism.
   it('twelve weeks in a deficit: the break offer names the weeks and the cap', () => {
     const offer = reliefOfferText({ reason: 'longDeficit', suggestion: 'break', slowerPace: undefined, deficitWeeks: 12, shortSleep: false, signals: [], fallingLifts: [], sleepAverage: undefined });
     expect(offer.title).toBe('12 weeks in a deficit');
