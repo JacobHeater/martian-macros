@@ -12,7 +12,7 @@ Getting a health app with in-app purchases onto the App Store and Google Play, i
 discover late: privacy disclosures, health-data declarations, rules about health claims, and several reviews by people outside the project.
 
 ## On the backburner
-- **The owner, 2026-10-21:** "I don't actually intend to release to app stores and only intend to use this personally on my own phone through local builds." This is future vision (M5); nothing here is built unless the owner decides to release.
+- **The owner, 2026-10-21:** "I don't actually intend to release to app stores and only intend to use this personally on my own phone through local builds." The owner tests the app on their own phone for weeks or months first, with every feature built and none paywalled; this is future vision (M5), built only if the owner decides to release.
 
 ## Narrative
 The first release is United States only, on both stores.

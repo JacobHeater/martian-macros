@@ -105,14 +105,16 @@ Order within a workstream follows four milestones, starting with M0. A step's `m
 2. **M2, a closed beta.** Real food search and barcodes, the dashboard and
    design system, honest measurement, and a coach that handles stalls, gaps
    and under-eating: enough for a small group to use daily for two months.
-3. **M3, my phone.** The app the owner uses every day on their own phone,
-   through local builds (the owner, 2026-10-21: no store release planned).
+3. **M3, my phone.** The app the owner tests every day on their own phone,
+   through local builds, for weeks or months before any release decision
+   (the owner, 2026-10-21). Every feature is built and used, none paywalled
+   or held back for a review.
 4. **M4** is everything else, in each workstream's own order.
-5. **M5, store release: future vision, on the backburner.** What a public
-   release would need: the Coach unlock (free tier, trial, purchase), the
-   store listing, and the professional, health-claims and legal reviews. Not
-   planned and not built; it comes alive again only if the owner decides to
-   release.
+5. **M5, store release: future vision, on the backburner.** Only the release
+   gates: the Coach unlock's paywall (free tier, trial, purchase), the store
+   listing, and the professional, health-claims and legal sign-offs. A feature
+   whose wording waits on a sign-off is built now; the sign-off waits here.
+   It comes alive if the owner decides to release.
 
 ## How order is decided
 
