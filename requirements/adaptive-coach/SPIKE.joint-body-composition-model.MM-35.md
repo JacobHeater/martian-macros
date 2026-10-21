@@ -76,8 +76,11 @@ The honest case in the acceptance criteria applies. The joint model cannot be be
 the partition it would need is not identifiable from these data. The recommendation is not to build it.
 
 **Revisit when either holds:**
-- MM-502 has learned a per-device bias, so a smart scale gives a usable lean-mass signal. A joint model could then
-  identify the partition, and question 1 should be rerun with that observation.
+- The app has an absolute calibration of body composition, such as a reference scan (DEXA or similar) the user
+  enters, so a smart scale's readings can be tied to the truth. MM-502 is not enough on its own: it learns only the
+  offsets between scales, and the first scale's absolute bias stays unidentified, so the lean-mass signal is still
+  off by an unknown constant. With an anchor, a joint model could identify the partition, and question 1 should be
+  rerun with that observation.
 - The owner's own logs (months of carbohydrate and daily weigh-ins) show that recent carbohydrate explains a useful
   share of the trend's residuals. That is question 2, answered with real data. If it does, the step is a glycogen
   term in the two-step trend filter, not the joint model.
