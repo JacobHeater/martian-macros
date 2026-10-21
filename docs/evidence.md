@@ -142,14 +142,15 @@ The Coach shows the phase you are in, how long it has run and, at your current
 pace, about when it ends. A cut ends once the lower end of your body-fat range
 reaches its goal, after sixteen weeks in a deficit, or when progress has
 stalled with the target already at the lowest the app sets; a lean gain when
-the lean-gain guardrails say so (estimated body fat at its line, the waist up
-5%, or twenty-six weeks), so the two never disagree. Then
+the lean-gain guardrails say so (the upper end of the body-fat range at its
+line, the waist up 5%, or twenty-six weeks), so the two never disagree. Then
 the app recommends what comes next, with the reason: a hold at maintenance,
-then a lean gain if you are at the cut's goal or another cut if not. A cut reads
-body fat as a range, never as one figure, and nothing changes until you choose.
+then a lean gain if you are at the cut's goal or another cut if not. Body fat
+is read as a range, never as one figure (a figure you entered counts as
+exact), and nothing changes until you choose.
 The weeks and lines are the app's judgement.
 
-Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, LeanGainRule.stopWaistRiseFraction, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
+Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, gainLineBodyFatPercent, LeanGainRule.stopWaistRiseFraction, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
 
 ### When does the app ask about my health?
 
@@ -248,7 +249,8 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `PhaseRule.lowGoalHoldWeeks` | 4 weeks | engine PhaseRule.ts | The time limit on a goal under the soft floor: once reached it is held at most this long, then a lean gain is recommended (MM-28, MM-36) | Product judgement; to be confirmed in MM-29 | judgement | None | No |
 | `PhaseRule.steadyPaceSigmas` | 2 standard deviations of the trend's slope | engine PhaseRule.ts | When the pace is steady enough to project the end of a phase from it (MM-36) | Product judgement, the two-deviation width the body-fat range is shown at | judgement | None | No |
 | `PhaseRule.cutGoalPercent` | 15% men, 23% women | engine PhaseRule.ts | The body fat a cut runs to when no goal is set (MM-36): the line under which the starting recommendation is a lean gain | Product judgement, the line of `recommendMode` (MM-12), informed by Barakat 2020 | judgement | None directly | No |
-| `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when MM-129's review ends it | engine planPhases.ts | Which end of the body-fat range a cut reads, so a cut never rests on one figure (MM-36, MM-34); a gain's end is the lean-gain card's, so the two agree (MM-129) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction; ending a gain is not a safety rule (MM-132) | judgement | None | No |
+| `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when MM-129's review ends it | engine planPhases.ts | Which end of the body-fat range a cut reads, so a cut never rests on one figure (MM-36, MM-34); a gain's end is the lean-gain card's, so the two agree (MM-129) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction | judgement | None | No |
+| `gainLineBodyFatPercent` | The estimate plus 0.6745 deviations; a figure the user entered, exactly | engine gainLineBodyFatPercent.ts | The body fat a lean gain's stop line is read against (MM-129) and its projected end (MM-36): a gain ends once plausibly past the line, never later than the point would end it | The quarter-chance rule MM-132 applies to safety thresholds, mirrored for a gain; the coordinator's choice, 2026-10-21 | judgement | None | No |
 | `fatMassKcalPerKg` | 9,440 kcal per kg (39.5 MJ) | engine partitionConstants.ts | The energy in a kilogram of fat | Hall 2008, as cited | strong | Adults | No |
 | `fatFreeMassKcalPerKg` | 1,815 kcal per kg (7.6 MJ) | engine partitionConstants.ts | The energy in a kilogram of lean tissue | Hall 2008, as cited | moderate | Adults | No |
 | `forbesConstantKg` | 10.4 kg | engine partitionConstants.ts | How the lean share of a weight change falls as fat mass rises | Forbes, revised in Hall 2007, as cited | moderate | Adults across a range of body fat | No |
@@ -419,7 +421,7 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `LeanGainRule.fatHeavyMinWeeks` | 8 weeks | engine LeanGainRule.ts | How long a gain runs before the waist is read against the weight | Product judgement, as the recomp review's first look (MM-133) | judgement | None | No |
 | `LeanGainRule.fatHeavyWaistCmPerKg` | 1 cm of waist per kg of trend weight | engine LeanGainRule.ts | When a gain looks fat-heavy | No literature: a starting value to be tuned on real data, and the app says so | judgement | None | No |
 | `LeanGainRule.minWaistEntries` | 4 entries in the stretch | engine LeanGainRule.ts | How much tape the fat-heavy reading needs | The recomp review's figure (MM-133) | judgement | None | No |
-| `LeanGainRule.stopBodyFatPercent` | 20% men, 30% women | engine LeanGainRule.ts | Estimated body fat at which ending the gain is recommended | MM-12's lines for "high"; a user may set a lower goal body fat (MM-36); product judgement | judgement | None | No |
+| `LeanGainRule.stopBodyFatPercent` | 20% men, 30% women | engine LeanGainRule.ts | Body fat at which ending the gain is recommended, read against the upper end of the range (the estimate plus 0.6745 deviations), or exactly for a figure the user entered (coordinator, 2026-10-21; MM-36 reads the same) | MM-12's lines for "high"; a user may set a lower goal body fat (MM-36); product judgement | judgement | None | No |
 | `LeanGainRule.stopWaistRiseFraction` | 5% of the waist at the start of the gain | engine LeanGainRule.ts | Waist rise at which ending the gain is recommended | Product judgement | judgement | None | No |
 | `LeanGainRule.stopWeeks` | 26 weeks | engine LeanGainRule.ts | Length after which ending the gain is recommended | Product judgement | judgement | None | No |
 | `LeanGainRule.strengthMinWeeks` | 8 weeks | engine LeanGainRule.ts | How long a surplus runs before strength is read against the weight | Product judgement | judgement | None | No |

@@ -12,6 +12,7 @@ import {
   WaistObservation,
 } from '../../src/domain';
 import {
+  type BodyFatBasis,
   BodyFatEstimate,
   computeTargets,
   computeTargetsTraced,
@@ -202,6 +203,8 @@ const review = ({
   waist = [],
   strength = [],
   bodyFatPercent = 15,
+  bodyFatSigma = 4,
+  basis = 'yourFigure',
   weightSignals,
 }: {
   days?: number;
@@ -211,7 +214,10 @@ const review = ({
   trendPoints?: WeightTrendPoint[];
   waist?: WaistObservation[];
   strength?: StrengthTrend[];
+  /** By default the user's own figure, read exactly; `formula` reads the upper end of the range. */
   bodyFatPercent?: number;
+  bodyFatSigma?: number;
+  basis?: BodyFatBasis;
   weightSignals?: boolean;
 } = {}) =>
   leanGainReviewOf({
@@ -220,7 +226,8 @@ const review = ({
     waist,
     strengthTrends: strength,
     sex: 'male',
-    bodyFatPercent,
+    bodyFat: new BodyFatEstimate({ percent: bodyFatPercent, sigmaPercent: bodyFatSigma }),
+    bodyFatBasis: basis,
     today,
     ...(weightSignals === undefined ? {} : { weightSignals }),
   });
@@ -267,7 +274,7 @@ describe('the lean-gain review', () => {
     expect(review({ rate: 0.0035, trendPoints: rising(80, 84, 70), waist: waistOver(86, 89) })?.fatHeavy ?? false).toBe(false);
   });
 
-  it('time to stop: estimated body fat at 20% for a man, with the reason, and the goal left alone', () => {
+  it('time to stop: his own figure at 20% for a man, read exactly, with the reason, and the goal left alone', () => {
     const r = review({ bodyFatPercent: 20 });
     expect(r?.stop).toBe('bodyFat');
     expect(r?.offersGoalChange).toBe(true);
@@ -275,6 +282,18 @@ describe('the lean-gain review', () => {
     expect(text).toContain('Your estimated body fat has reached about 20%');
     expect(text).toContain('Your goal stays as it is until you change it.');
     expect(review({ bodyFatPercent: 19.4 })).toBeUndefined();
+  });
+
+  it('time to stop from an estimate: the upper end of the range reaches the line, never the point (coordinator, 2026-10-21)', () => {
+    // 17.4 plus a quarter's 4 deviations is 20.1: plausibly past 20%, though the point is not.
+    const r = review({ bodyFatPercent: 17.4, basis: 'formula' });
+    expect(r?.stop).toBe('bodyFat');
+    expect(said(r)).toContain('The upper end of your body-fat range has reached about 20%');
+    // 17.2 gives 19.9; a narrower range from the waist (MM-34) pushes the end later.
+    expect(review({ bodyFatPercent: 17.2, basis: 'formula' })).toBeUndefined();
+    expect(review({ bodyFatPercent: 18.5, bodyFatSigma: 2, basis: 'waist' })).toBeUndefined();
+    // Never later than the point would end it.
+    expect(review({ bodyFatPercent: 20, bodyFatSigma: 0.5, basis: 'waist' })?.stop).toBe('bodyFat');
   });
 
   it('time to stop: the waist up 5% since the gain began, or 26 weeks on the goal', () => {

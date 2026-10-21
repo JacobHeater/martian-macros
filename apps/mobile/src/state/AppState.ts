@@ -1139,7 +1139,9 @@ export class AppState {
         waist: of(this.waist) ?? [],
         strengthTrends: of(this.strengthTrends) ?? [],
         sex: setup.profile.sex,
-        bodyFatPercent: snapshot.bodyFat.percent,
+        // The upper end of the range reaches the stop line, never a point (coordinator, 2026-10-21).
+        bodyFat: snapshot.bodyFat,
+        bodyFatBasis: snapshot.bodyFatBasis,
         today: this.today.value,
         // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
         weightSignals: !setup.screening.eatingDisorderHistory,
