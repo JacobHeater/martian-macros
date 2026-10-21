@@ -2,7 +2,6 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { intakeDayFrom } from '../domain/intakeDayFrom';
 import { Meal } from '../domain/Meal';
 import { pauseOn } from '../engine/pauseOn';
-import { Fmt } from '../format/Fmt';
 import { Loadable } from '../state/Loadable';
 import { targetsOn } from '../state/targetsOn';
 import { useApp } from '../app/useApp';
@@ -12,13 +11,13 @@ import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
+import { AlcoholLine } from './AlcoholLine';
 import { CalorieHero } from './CalorieHero';
 import { LabelAccuracyNote } from './LabelAccuracyNote';
 import { copyEntries } from './copyEntries';
 import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
-import { HeroFactLine } from './HeroFactLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { MealSection } from './MealSection';
@@ -57,7 +56,6 @@ export function FoodScreen() {
   // On a paused day the targets are a maintenance guide (MM-148).
   const paused = pauseOn(Loadable.valueOf(pausesState) ?? [], day) !== undefined;
   const intake = intakeDayFrom(day, entries);
-  const alcoholKcal = entries.reduce((sum, e) => sum + e.alcoholKcal, 0);
 
   return (
     <>
@@ -78,7 +76,7 @@ export function FoodScreen() {
           // The day's fiber and alcohol belong where the day's energy is, inside the hero (MM-336).
           <>
             <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
-            {alcoholKcal > 0 ? <HeroFactLine name="Alcohol" figures={`${Fmt.whole(alcoholKcal)} kcal, in the total`} /> : null}
+            <AlcoholLine entries={entries} />
           </>
         }
       />

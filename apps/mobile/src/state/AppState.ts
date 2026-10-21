@@ -6,7 +6,7 @@ import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
-import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
@@ -52,6 +52,7 @@ import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
 import type { SodiumPattern } from '../engine/SodiumPattern';
+import type { FiberPattern } from '../engine/FiberPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
@@ -103,6 +104,7 @@ import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
+import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
@@ -199,6 +201,11 @@ export class AppState {
    * been read and kept. Empty when nothing has been imported.
    */
   readonly importedWeighIns: Cell<Loadable<DayWeighIn[]>>;
+  /**
+   * The scale the person chose in Settings (MM-71), or undefined while the
+   * one with the most weigh-ins in thirty days counts.
+   */
+  readonly primaryScale: Cell<Loadable<string | undefined>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -312,6 +319,7 @@ export class AppState {
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
   /** The sodium limit and each recent day's sodium, for the coach (MM-312); undefined with no limit. */
   private readonly sodiumPattern: Cell<SodiumPattern | undefined>;
+  private readonly fiberPattern: Cell<FiberPattern | undefined>;
 
   /** The monthly reports that are ready (MM-33), oldest first. */
   readonly reportPeriods: Cell<readonly ReportPeriod[]>;
@@ -493,7 +501,7 @@ export class AppState {
       return once(() => s.packStore.installed());
     });
     this.packDownloads = new PackDownloadsController({
-      http: s.packHttp,
+      fetch: s.packFetch ?? new StreamedPackFetch({ http: s.packHttp, store: s.packStore }),
       store: s.packStore,
       onInstalled: () => this.packsChanged(),
     });
@@ -506,16 +514,20 @@ export class AppState {
       onKept: () => this.packsChanged(),
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
+    this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
+      // And here so that choosing a scale does.
+      const chosen = of(this.primaryScale);
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
           s.healthSamples.samples('weight').then(
             (samples) => {
               if (stopped) return;
-              listener(dailyWeighIns(samples, { primarySourceId: primaryWeightSource(samples, { asOf: s.clock.now() }) }));
+              const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
+              listener(dailyWeighIns(samples, { primarySourceId }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
@@ -705,6 +717,25 @@ export class AppState {
       return byDay;
     });
 
+    // Before the fiber pattern, which reads it (MM-126).
+    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
+
+    // Fiber only at Full detail, where it is shown (MM-126): below it the insight would be about a number never seen.
+    this.fiberPattern = derived<FiberPattern | undefined>(() => {
+      const sex = of(this.setup)?.profile.sex;
+      const level = of(this.detailLevel);
+      const checkIns = of(this.recoveryCheckIns);
+      if (sex === undefined || level === undefined || !DetailLevel.showsExtras(level) || checkIns === undefined) return undefined;
+      const today = this.today.value;
+      const days = new Map<CalendarDate, readonly FoodEntry[]>();
+      for (let i = 1; i <= InsightRationing.patternDays; i++) {
+        const day = today.addDays(-i);
+        const entries = of(this.foodForDay(day));
+        if (entries !== undefined) days.set(day, entries);
+      }
+      return { sex, days, checkIns };
+    });
+
     this.sodiumPattern = derived<SodiumPattern | undefined>(() => {
       const goals = of(this.nutritionGoals);
       const limitMg = goals?.sodiumLimitMg;
@@ -774,6 +805,7 @@ export class AppState {
           waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
           sleepAverage: this.sleepAverage.value,
+          fiber: this.fiberPattern.value,
         }),
         log,
         today,
@@ -889,7 +921,6 @@ export class AppState {
       return underEatingNoticeDue({ today, dismissedOn: dismissed.value }) ? finding : undefined;
     });
 
-    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
     this.recoverySkipped = stream(() => s.preferences.watchRecoveryCheckInSkippedOn());
 
     this.recoveryCheckInDue = derived(() => {

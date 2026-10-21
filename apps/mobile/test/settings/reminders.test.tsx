@@ -5,6 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Pause } from '../../src/domain/Pause';
 import { ReminderKind } from '../../src/domain/ReminderKind';
 import { ReminderSetting } from '../../src/domain/ReminderSetting';
+import { InMemoryExactAlarms } from '../../src/fixtures/InMemoryExactAlarms';
 import { InMemoryReminderScheduler } from '../../src/fixtures/InMemoryReminderScheduler';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
@@ -19,10 +20,12 @@ import { renderApp } from '../support/renderApp';
 const today = CalendarDate.of(2026, 10, 5);
 let repos: InMemoryRepositories;
 let scheduler: InMemoryReminderScheduler;
+let exactAlarms: InMemoryExactAlarms;
 
 beforeEach(async () => {
   repos = new InMemoryRepositories();
   scheduler = new InMemoryReminderScheduler();
+  exactAlarms = new InMemoryExactAlarms();
   await repos.preferences.saveThemePreference('martian');
   await repos.setup.saveSetup(
     typicalSetup({ onboardedOn: today.addDays(-200), healthCheckConfirmedOn: today.addDays(-30) }),
@@ -31,7 +34,7 @@ beforeEach(async () => {
 });
 
 async function open(): Promise<void> {
-  renderApp(repos, today, { change: (services) => ({ ...services, reminderScheduler: scheduler }) });
+  renderApp(repos, today, { change: (services) => ({ ...services, reminderScheduler: scheduler, exactAlarms }) });
   await screen.findByRole('navigation', { name: 'Destinations' });
 }
 
@@ -68,6 +71,9 @@ it('nothing is on, scheduled or asked for until the user acts', async () => {
   expect(await stored()).toEqual([]);
   expect(scheduler.permissionRequests).toBe(0);
   expect(scheduler.scheduled).toEqual([]);
+  // MM-248: never on first run, and no exact-alarm question before reminders are opened.
+  expect(exactAlarms.asked).toBe(false);
+  expect(exactAlarms.settingOpened).toBe(0);
   for (const name of [/^Weigh-in/, /^Log food/]) {
     expect(settings.getByRole('switch', { name })).not.toBeChecked();
   }
@@ -126,6 +132,73 @@ it('the time can be changed, but not to the night', async () => {
   expect(within(dialog).getByRole('button', { name: 'OK' })).toBeDisabled();
   await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
   expect((await stored())[0]?.minuteOfDay).toBe(8 * 60 + 30);
+});
+
+/** MM-248: reminders on the minute, the exact-alarm permission asked for once, with its reason. */
+describe('on the minute', () => {
+  const reason = 'So a reminder arrives at the time you set.';
+
+  it('granted: the row says "On the minute", and nothing is asked', async () => {
+    await open();
+    const settings = await openSettings();
+    await userEvent.click(settings.getByRole('switch', { name: /^Weigh-in/ }));
+    expect(await settings.findByText('On the minute')).toBeInTheDocument();
+    expect(screen.queryByText(reason)).toBeNull();
+    expect(exactAlarms.settingOpened).toBe(0);
+  });
+
+  it('asked once, with the reason before the phone’s own page', async () => {
+    exactAlarms = new InMemoryExactAlarms({ held: false });
+    await open();
+    const settings = await openSettings();
+    await userEvent.click(settings.getByRole('switch', { name: /^Weigh-in/ }));
+    expect(await screen.findByText(reason)).toBeInTheDocument();
+    // The reason first: the phone's page has not been opened yet.
+    expect(exactAlarms.settingOpened).toBe(0);
+    await userEvent.click(screen.getByRole('button', { name: 'Open phone settings' }));
+    expect(await settings.findByText('On the minute')).toBeInTheDocument();
+    expect(exactAlarms.settingOpened).toBe(1);
+    await userEvent.click(settings.getByRole('switch', { name: /^Log food/ }));
+    await expect.poll(async () => (await stored()).filter((setting) => setting.enabled).length).toBe(2);
+    expect(screen.queryByText(reason)).toBeNull();
+    expect(exactAlarms.settingOpened).toBe(1);
+  });
+
+  it('declined: within an hour, the same plan, and the way to the phone’s setting', async () => {
+    exactAlarms = new InMemoryExactAlarms({ held: false, allowInSetting: false });
+    await open();
+    const settings = await openSettings();
+    await userEvent.click(settings.getByRole('switch', { name: /^Weigh-in/ }));
+    await screen.findByText(reason);
+    await userEvent.click(screen.getByRole('button', { name: 'Not now' }));
+    await expect.poll(() => screen.queryByText(reason)).toBeNull();
+    // Nothing else changes: the reminder is on and the same seven are planned.
+    expect((await stored())[0]?.enabled).toBe(true);
+    await expect.poll(() => scheduler.scheduled.length).toBe(7);
+    expect(exactAlarms.settingOpened).toBe(0);
+    expect(await settings.findByRole('button', { name: /^Within an hour/ })).toBeInTheDocument();
+    // Not asked again when another is turned on.
+    await userEvent.click(settings.getByRole('switch', { name: /^Log food/ }));
+    await expect.poll(async () => (await stored()).filter((setting) => setting.enabled).length).toBe(2);
+    expect(screen.queryByText(reason)).toBeNull();
+    // The row opens the phone's setting itself, without the question.
+    await userEvent.click(settings.getByRole('button', { name: /^Within an hour/ }));
+    await expect.poll(() => exactAlarms.settingOpened).toBe(1);
+    expect(screen.queryByText(reason)).toBeNull();
+  });
+
+  it('a reminder turned on before it was asked: the row asks, with the reason', async () => {
+    exactAlarms = new InMemoryExactAlarms({ held: false });
+    await repos.reminders.saveReminder(
+      new ReminderSetting({ kind: 'weighIn', enabled: true, minuteOfDay: 7 * 60, countFrom: today }),
+    );
+    await open();
+    const settings = await openSettings();
+    await userEvent.click(await settings.findByRole('button', { name: /^Within an hour/ }));
+    expect(await screen.findByText(reason)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Open phone settings' }));
+    expect(await settings.findByText('On the minute')).toBeInTheDocument();
+  });
 });
 
 const foodReminder = () =>
@@ -188,6 +261,13 @@ describe('ignored for a week', () => {
     await expect.poll(() => screen.queryByText(asks)).toBeNull();
     expect((await stored())[0]?.countFrom).toBe(today.addDays(1));
     await expect.poll(() => scheduler.scheduled.length).toBeGreaterThan(0);
+  });
+
+  it('weighing in starts them again, without the question', async () => {
+    await repos.weights.saveWeight(today, 81.8);
+    await open();
+    await expect.poll(() => scheduler.scheduled.length).toBeGreaterThan(0);
+    expect(screen.queryByText(asks)).toBeNull();
   });
 
   it('Turn off turns them off', async () => {
