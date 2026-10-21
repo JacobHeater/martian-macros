@@ -15,8 +15,11 @@ import { failingRead } from './failingRead';
 import { waitingRead } from './waitingRead';
 import { demoWith } from './demoWith';
 import { firstDayScenario } from './firstDayScenario';
+import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
+import { liftsFallingScenario } from './liftsFallingScenario';
+import { missedPeriodScenario } from './missedPeriodScenario';
 import { shortSleepScenario } from './shortSleepScenario';
 import { breakOfferScenario } from './breakOfferScenario';
 import { onBreakScenario } from './onBreakScenario';
@@ -60,7 +63,10 @@ export const CoachSmallPhone = screenStory({
   viewport: 'smallPhone',
 });
 
-/** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
+/**
+ * The one thing to do under the goal: this week's recovery check-in is due (MM-299). It is the one way in, and
+ * "How you are holding up" keeps only the sleep line and the skip (MM-391).
+ */
 export const CheckInDue = screenStory({
   covers: ['CoachScreen'],
   shows: 'Answer this week’s five questions',
@@ -96,6 +102,19 @@ export const RecoveryCheckIn = screenStory({
   open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
 });
 
+/** MM-116: a previously regular cycle with no period marked for 46 days: the check-in asks once, and "not sure" on a cut brings the notice. */
+export const RecoveryCheckInMissedPeriod = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'No period marked for 46 days. Is that expected?',
+  scenario: missedPeriodScenario,
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+  walk: async (canvas) => {
+    const button = await within(canvas).findByRole('button', { name: 'Not sure' }, { timeout: 5000 });
+    reveal(button);
+    await userEvent.click(button);
+  },
+});
+
 /** Two sliders under their labels, at the screen's inset (MM-240). */
 export const Pause = screenStory({
   covers: ['PauseScreen'],
@@ -119,6 +138,33 @@ export const CoachFirstDay = screenStory({
   covers: ['CoachScreen'],
   shows: 'Targets are held while the coach learns.',
   scenario: firstDayScenario,
+  open: onCoach,
+});
+
+/** MM-34: no waist yet: the rough formula range, and what would narrow it. */
+export const CoachBodyFatRough = screenStory({
+  covers: ['CoachScreen'],
+  shows: /waist measurements within 4 weeks narrow this range\.$/,
+  scenario: firstDayScenario,
+  open: onCoach,
+});
+
+/** MM-34: four weekly waist entries: the range from the tape and the formula, and what it cannot say. */
+export const CoachBodyFatFromWaist = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^From your height, weight and waist\./,
+  open: onCoach,
+});
+
+/** MM-34: an eating-disorder history: the rough range, and no ask to measure more. */
+export const CoachBodyFatRoughEatingDisorder = screenStory({
+  covers: ['CoachScreen'],
+  shows: /\(rough estimate\)$/,
+  scenario: async (repos, today) => {
+    const setup = typicalSetup({ goalMode: 'maintenance', onboardedOn: today, healthCheckConfirmedOn: today });
+    await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, eatingDisorderHistory: true }) }));
+    await repos.weights.saveWeight(today, 86);
+  },
   open: onCoach,
 });
 
@@ -303,6 +349,14 @@ export const CoachReliefOffer = screenStory({
   open: onCoach,
 });
 
+/** MM-117: nine weeks into a cut, the squat and the row down over three weeks with no check-in answered: the offer for the lifts. */
+export const CoachReliefOfferLifts = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your lifts are falling',
+  scenario: liftsFallingScenario,
+  open: onCoach,
+});
+
 /**
  * MM-135: twelve unbroken weeks of a cut with recovery fine: the same card as the relief offer, with the
  * calendar, offering the two-week break or carrying on; no slower pace, since the answer here is a rest.
@@ -347,6 +401,23 @@ export const CoachRecompReview = screenStory({
   open: onCoach,
 });
 
+/** MM-129: ten weeks of lean gain, waist up 4 cm on 3 kg, lifts flat: fat-heavy, strength flat, and a goal offered. */
+export const CoachLeanGainFatHeavy = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The gain looks fat-heavy/,
+  scenario: leanGainScenario({ bodyFatPercent: 15 }),
+  open: onCoach,
+  walk: pressOnCoach('Choose a goal'),
+});
+
+/** MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. */
+export const CoachLeanGainTimeToStop = screenStory({
+  covers: ['CoachScreen'],
+  shows: /The coach recommends ending the gain now/,
+  scenario: leanGainScenario(),
+  open: onCoach,
+});
+
 /** MM-321: a monthly report holding a recomp review and the month's target changes. */
 export const MonthlyReportWithRecomp = screenStory({
   covers: ['CoachScreen', 'MonthlyReportScreen'],
@@ -380,6 +451,48 @@ export const OneThingReport = screenStory({
   walk: pressOnCoach(/^Open your monthly report/),
 });
 
+/**
+ * A month of whole days, one missed day forgiven, and squats that rose: the report's longest logging run and its
+ * personal records (MM-92).
+ */
+const monthOfWorkScenario: StoryScenario = async (repos, today) => {
+  const onboardedOn = today.addDays(-31);
+  await monthInScenario(repos, today);
+  for (let i = 0; i < 28; i++) {
+    if (i === 12) continue;
+    const day = onboardedOn.addDays(i);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: day, meal: 'dinner', name: 'Demo day of food', kcal: 2300, proteinG: 150, carbsG: 220, fatG: 70, source: 'quickAdd' }),
+    );
+    await repos.dayMarks.setCompleteness(day, 'complete');
+  }
+  for (const [day, kg] of [[2, 80], [9, 82.5], [16, 82.5], [23, 85]] as const) {
+    await repos.workouts.saveWorkout(storyWorkout(onboardedOn.addDays(day), [['back-squat', 5, kg]]));
+  }
+};
+
+/** MM-92: the monthly report with the month's longest logging run and its personal records. */
+export const MonthlyReportWithRecords = screenStory({
+  covers: ['CoachScreen', 'MonthlyReportScreen'],
+  shows: 'Personal records',
+  scenario: monthOfWorkScenario,
+  open: onCoach,
+  walk: async (canvas) => {
+    const header = await within(canvas).findByRole('button', { name: /^Monthly reports/ }, { timeout: 5000 });
+    const report = /^[A-Z][a-z]{2} \d+ – /;
+    // The section is open in the week a report arrives (MM-256); fold-proof either way.
+    if (within(canvas).queryAllByRole('button', { name: report }).length === 0) {
+      reveal(header);
+      await userEvent.click(header);
+    }
+    const [row] = await within(canvas).findAllByRole('button', { name: report });
+    if (row !== undefined) {
+      reveal(row);
+      await userEvent.click(row);
+    }
+  },
+});
+
 /** MM-321: the one thing to do is this week's check-in, and it opens. */
 export const OneThingCheckIn = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],
@@ -389,13 +502,16 @@ export const OneThingCheckIn = screenStory({
   walk: pressOnCoach(/^Answer this week’s five questions/),
 });
 
-/** MM-321: "How you are holding up" opens the check-in. */
+/** MM-321: "How you are holding up" opens the check-in; MM-391: from the section only when it is not due. */
 export const RecoveryOpens = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],
   shows: 'This week',
-  scenario: checkInDueScenario,
+  scenario: shortSleepScenario,
   open: onCoach,
-  walk: pressOnCoach('Answer this week'),
+  walk: async (canvas) => {
+    await pressOnCoach(/^How you are holding up/)(canvas);
+    await pressOnCoach('Answer again')(canvas);
+  },
 });
 
 /** Targets changed yesterday, with the reasons the coach recorded (MM-121). */

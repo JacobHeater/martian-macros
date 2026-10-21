@@ -35,26 +35,42 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
   if (workout === undefined) return <Screen title="Workout times">{null}</Screen>;
   const ended = workout.endedAt;
 
+  /** Why a start and an end cannot be the workout's, or undefined if they can. */
+  const refusal = (start: Date, end: Date | undefined) => {
+    const problem = checkTimeSpan({ start, end, notAfter: services.clock.now() });
+    if (problem === undefined) return undefined;
+    return problem === 'tooLate' ? 'A workout cannot be in the future.' : timeSpanProblemMessage(problem);
+  };
+
   /** Keeps the change if it makes sense; says why not otherwise. */
   const change = async ({ date, startedAt, endedAt }: { date?: CalendarDate; startedAt?: Date; endedAt?: Date }) => {
     const start = startedAt ?? workout.startedAt;
     const end = endedAt ?? workout.endedAt;
-    const problem = checkTimeSpan({ start, end, notAfter: services.clock.now() });
+    const problem = refusal(start, end);
     if (problem !== undefined) {
-      overlays.snack(problem === 'tooLate' ? 'A workout cannot be in the future.' : timeSpanProblemMessage(problem));
+      overlays.snack(problem);
       return;
     }
     await controller.setTimes(workout, { date: date ?? workout.date, startedAt: start, endedAt: end });
   };
 
-  const pickTime = async (current: Date, help: string) => {
-    const minutes = await overlays.timeOfDay({
-      initialMinuteOfDay: current.getHours() * 60 + current.getMinutes(),
-      helpText: help,
+  /**
+   * Asks for a time of day to the second, as a set's times are (MM-191).
+   * `place` says which moment a time of day means; one that cannot be the
+   * workout's is refused inside the clock, so what was chosen stays on it
+   * (MM-222).
+   */
+  const pickTime = (
+    title: string,
+    current: Date,
+    place: (timeOfDayMs: number) => Date,
+    refuseAt: (picked: Date) => string | undefined,
+  ) =>
+    overlays.clockTime({
+      title,
+      initialMs: (current.getHours() * 3600 + current.getMinutes() * 60 + current.getSeconds()) * 1000,
+      refuse: (ms) => refuseAt(place(ms)),
     });
-    if (minutes === undefined) return undefined;
-    return new Date(current.getFullYear(), current.getMonth(), current.getDate(), 0, minutes);
-  };
 
   const pickDay = async () => {
     const date = await overlays.date({
@@ -75,22 +91,21 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
   };
 
   const pickStart = async () => {
-    const picked = await pickTime(workout.startedAt, 'Started');
-    if (picked !== undefined) await change({ startedAt: picked });
+    const current = workout.startedAt;
+    // The start stays on its day.
+    const place = (timeOfDayMs: number) =>
+      new Date(current.getFullYear(), current.getMonth(), current.getDate(), 0, 0, Math.trunc(timeOfDayMs / 1000));
+    const picked = await pickTime('Started', current, place, (start) => refusal(start, workout.endedAt));
+    if (picked !== undefined) await change({ startedAt: place(picked) });
   };
 
   const pickEnd = async (current: Date) => {
-    const picked = await pickTime(current, 'Ended');
-    if (picked === undefined) return;
     // A time of day before the start is after midnight, on the next day,
     // when that is not still to come.
-    await change({
-      endedAt: placeTimeOfDay({
-        notBefore: workout.startedAt,
-        notAfter: services.clock.now(),
-        timeOfDayMs: (picked.getHours() * 60 + picked.getMinutes()) * 60000,
-      }),
-    });
+    const place = (timeOfDayMs: number) =>
+      placeTimeOfDay({ notBefore: workout.startedAt, notAfter: services.clock.now(), timeOfDayMs });
+    const picked = await pickTime('Ended', current, place, (end) => refusal(workout.startedAt, end));
+    if (picked !== undefined) await change({ endedAt: place(picked) });
   };
 
   return (
@@ -99,7 +114,7 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
         <MmListRow title="Day" subtitle={Fmt.day(workout.date, today)} opens onPress={() => void pickDay()} />
         <MmListRow
           title="Started"
-          subtitle={clockTimeText(workout.startedAt)}
+          subtitle={clockTimeText(workout.startedAt, { seconds: true })}
           opens
           onPress={() => void pickStart()}
         />
@@ -107,7 +122,9 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
           <MmListRow
             title="Ended"
             subtitle={
-              daysOn(workout.startedAt, ended) > 0 ? `${clockTimeText(ended)}, next day` : clockTimeText(ended)
+              daysOn(workout.startedAt, ended) > 0
+                ? `${clockTimeText(ended, { seconds: true })}, next day`
+                : clockTimeText(ended, { seconds: true })
             }
             opens
             onPress={() => void pickEnd(ended)}

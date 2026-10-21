@@ -17,6 +17,8 @@ export function intakeDayFrom(
   let netCarbs = 0;
   let fat = 0;
   let weighed = 0;
+  let hand = 0;
+  let palmProtein = 0;
   let estimated = 0;
   for (const e of all) {
     kcal += e.kcal;
@@ -25,6 +27,8 @@ export function intakeDayFrom(
     netCarbs += e.netCarbsG;
     fat += e.fatG;
     if (e.source === 'weighed') weighed += e.kcal;
+    if (e.source === 'palm' || e.source === 'cuppedHand' || e.source === 'thumb') hand += e.kcal;
+    if (e.source === 'palm') palmProtein += e.proteinG;
     if (e.source === 'quickAdd') estimated += e.kcal;
   }
   return new IntakeDay({
@@ -37,6 +41,8 @@ export function intakeDayFrom(
     completeness,
     relativeSigma: dailyRelativeSigma(all.map((e) => [e.kcal, e.source] as const)),
     weighedShare: kcal <= 0 ? 0 : weighed / kcal,
+    handShare: kcal <= 0 ? 0 : hand / kcal,
+    palmProteinShare: protein <= 0 ? 0 : palmProtein / protein,
     estimatedShare: kcal <= 0 ? 0 : estimated / kcal,
   });
 }

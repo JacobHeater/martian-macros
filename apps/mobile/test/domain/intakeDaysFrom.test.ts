@@ -32,6 +32,23 @@ it('aggregates days with marks and measurement quality', () => {
   expect(days[0]?.completeness).toBe('unmarked');
 });
 
+// MM-46: hand portions are a style of their own, and palm protein is counted for the nudge to weigh it.
+it('counts the energy logged by hand and the protein logged by palm', () => {
+  const [today] = intakeDaysFrom(
+    [
+      food('Chicken', 400, day, 'palm'),
+      food('Rice', 300, day, 'cuppedHand'),
+      food('Butter', 100, day, 'thumb'),
+      food('Bar', 200, day, 'labelServing'),
+    ],
+    new Map(),
+  );
+  expectClose(today?.handShare, 0.8, 1e-9);
+  expectClose(today?.weighedShare, 0, 1e-9);
+  // Protein is 30% of each food's energy here, so the palm's share of it is its share of energy.
+  expectClose(today?.palmProteinShare, 0.4, 1e-9);
+});
+
 it('no entries, no days', () => {
   expect(intakeDaysFrom([], new Map())).toEqual([]);
 });

@@ -59,6 +59,14 @@ export class StreamCell<T> extends Cell<Loadable<T>> {
       subscribed = true;
       this.sources.set(source, stop);
     }
+    // A cell read while asleep can change as it wakes, inside `subscribe`, which tells no one:
+    // asked with what it held before, the question is asked again with what it holds now (MM-443).
+    for (const [source, version] of read) {
+      if (source.version !== version) {
+        this.connect();
+        return;
+      }
+    }
     let current = true;
     const stop = watched.subscribe(
       (value) => {

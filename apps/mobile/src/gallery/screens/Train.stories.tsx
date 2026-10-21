@@ -1,6 +1,8 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import { Workout } from '../../domain/training/Workout';
+import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
+import { WorkoutSet } from '../../domain/training/WorkoutSet';
 import { WorkoutController } from '../../state/WorkoutController';
 import { CustomExerciseScreen } from '../../train/CustomExerciseScreen';
 import { ExercisePickerScreen } from '../../train/ExercisePickerScreen';
@@ -95,6 +97,14 @@ const onTrain = ({ state }: StoryStage) => state.homeTab.put('train');
 /** Presses the button named `name`, once it is there. */
 const pressNamed = (name: string | RegExp) => async (canvas: HTMLElement) => {
   const button = await within(canvas).findByRole('button', { name }, { timeout: 5000 });
+  reveal(button);
+  await userEvent.click(button);
+};
+
+/** Presses the first button named `name`, once there is one: "Add set" is on every exercise. */
+const pressFirst = (name: string | RegExp) => async (canvas: HTMLElement) => {
+  const [button] = await within(canvas).findAllByRole('button', { name }, { timeout: 5000 });
+  if (button === undefined) return;
   reveal(button);
   await userEvent.click(button);
 };
@@ -196,11 +206,58 @@ export const ChooseExerciseNotFound = screenStory({
   },
 });
 
-/** MM-321: an hour in, eight minutes paused, a set being timed. */
+/** MM-321: an hour in, eight minutes paused, a set being timed; MM-222: "Set done" on the bar ends it. */
 export const WorkoutTimingASet = screenStory({
   covers: ['WorkoutScreen'],
-  shows: 'Tap Add set when the set is done.',
+  shows: /^Tap Set done to record it on /,
   open: (stage) => midWorkout(stage, { setRunning: true })(),
+});
+
+/**
+ * MM-222: on a 360 px phone, a set being timed with the previous set's
+ * controls open: the control that records the set is on the bar, in view.
+ */
+export const WorkoutTimingASetSmallPhone = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'Set done',
+  viewport: 'smallPhone',
+  open: (stage) => midWorkout(stage, { setRunning: true })(),
+  walk: async (canvas) => {
+    const [set] = await within(canvas).findAllByRole('button', { name: /Set 1/ });
+    if (set !== undefined) await userEvent.click(set);
+  },
+});
+
+/** MM-222: a set just added says it is recorded, and "Done" closes it; "Add set" says what it does. */
+export const WorkoutSetJustAdded = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'Recorded. Changes are kept as you make them.',
+  open: startFromLast,
+  walk: pressFirst('Add set'),
+});
+
+/** MM-214: reps that are not a whole number are said not to be kept, with what the set has. */
+export const WorkoutSetRepsRefused = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: /^Whole reps only/,
+  open: startFromLast,
+  walk: async (canvas) => {
+    await pressFirst('Add set')(canvas);
+    const reps = await within(canvas).findByRole('textbox', { name: 'Reps' });
+    await userEvent.clear(reps);
+    await userEvent.type(reps, '8.5');
+  },
+});
+
+/** MM-215: a set removed is offered back. */
+export const WorkoutSetRemoved = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'Undo',
+  open: startFromLast,
+  walk: async (canvas) => {
+    await pressFirst('Add set')(canvas);
+    await pressNamed('Remove set')(canvas);
+  },
 });
 
 /** MM-321: a set pressed in a workout under way opens its editor. */
@@ -276,7 +333,7 @@ export const WeeklyVolumeUnmapped = screenStory({
   open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
 });
 
-/** MM-321: a workout's start time pressed opens the clock to set it. */
+/** MM-321: a workout's start time pressed opens the clock to set it, to the second (MM-191). */
 export const WorkoutTimesSetsTheStart = screenStory({
   covers: ['WorkoutTimesScreen'],
   shows: 'OK',
@@ -295,6 +352,38 @@ export const SetStartTime = screenStory({
   walk: async (canvas) => {
     const [set] = await within(canvas).findAllByRole('button', { name: /Set 1/ });
     if (set !== undefined) await userEvent.click(set);
+    const editor = await within(canvas).findByRole('group', { name: 'Set 1' });
+    await userEvent.click(within(editor).getByRole('button', { name: /^Started/ }));
+  },
+});
+
+/**
+ * MM-222: a set's start that cannot be right is refused while the clock is
+ * open, with the reason: a set that ended half an hour ago, untimed, opens
+ * its start on its end.
+ */
+export const SetStartTimeRefused = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'The end has to be after the start.',
+  open: async (stage) => {
+    const now = stage.services.clock.now();
+    const id = await stage.services.workouts.saveWorkout(
+      new Workout({
+        id: 0,
+        date: stage.today,
+        startedAt: new Date(now.getTime() - 60 * 60 * 1000),
+        exercises: [
+          new WorkoutExercise({
+            exerciseId: 'back-squat',
+            sets: [new WorkoutSet({ reps: 8, loadKg: 100, endedAt: new Date(now.getTime() - 30 * 60 * 1000) })],
+          }),
+        ],
+      }),
+    );
+    void stage.navigator.push(() => <WorkoutScreen workoutId={id} />);
+  },
+  walk: async (canvas) => {
+    await pressNamed(/Set 1$/)(canvas);
     const editor = await within(canvas).findByRole('group', { name: 'Set 1' });
     await userEvent.click(within(editor).getByRole('button', { name: /^Started/ }));
   },

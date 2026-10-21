@@ -31,6 +31,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly labelNoteDismissed = new ObservableValue<CalendarDate | undefined>(undefined);
   private readonly easeIntoMaintenance = new ObservableValue(false);
   private readonly usualCookingFat = new ObservableValue<CookingFatKind>('oil');
+  private readonly primaryScale = new ObservableValue<string | undefined>(undefined);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -175,9 +176,18 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.usualCookingFat.value = kind;
   }
 
+  watchPrimaryScale(): Watched<string | undefined> {
+    return this.primaryScale.watch();
+  }
+
+  async savePrimaryScale(sourceId: string | undefined): Promise<void> {
+    this.primaryScale.value = sourceId;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.usualCookingFat.value = 'oil';
+    this.primaryScale.value = undefined;
     this.exactTargets.value = false;
     this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;

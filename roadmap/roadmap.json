@@ -312,6 +312,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -647,7 +648,8 @@
           "workstream": "WS-03",
           "tickets": [
             "MM-109",
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -689,7 +691,8 @@
             "MM-192",
             "MM-214",
             "MM-215",
-            "MM-222"
+            "MM-222",
+            "MM-447"
           ]
         },
         {
@@ -699,6 +702,7 @@
             "MM-71",
             "MM-68",
             "MM-73",
+            "MM-498",
             "MM-188"
           ]
         },
@@ -720,6 +724,7 @@
             "MM-87",
             "MM-96",
             "MM-94",
+            "MM-454",
             "MM-247"
           ]
         }
@@ -739,7 +744,8 @@
         {
           "workstream": "WS-05",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ]
         },
         {
@@ -748,7 +754,8 @@
             "MM-122",
             "MM-486",
             "MM-124",
-            "MM-129"
+            "MM-129",
+            "MM-480"
           ]
         },
         {
@@ -757,6 +764,8 @@
             "MM-118",
             "MM-156",
             "MM-34",
+            "MM-501",
+            "MM-502",
             "MM-157"
           ]
         },
@@ -793,9 +802,11 @@
             "MM-385",
             "MM-386",
             "MM-387",
+            "MM-471",
             "MM-388",
             "MM-396",
             "MM-397",
+            "MM-456",
             "MM-406"
           ]
         },
@@ -808,6 +819,7 @@
             "MM-32",
             "MM-125",
             "MM-36",
+            "MM-450",
             "MM-312",
             "MM-361",
             "MM-362",
@@ -834,6 +846,8 @@
             "MM-195",
             "MM-79",
             "MM-189",
+            "MM-489",
+            "MM-490",
             "MM-191",
             "MM-196"
           ]
@@ -844,6 +858,8 @@
             "MM-72",
             "MM-70",
             "MM-69",
+            "MM-441",
+            "MM-442",
             "MM-314",
             "MM-323",
             "MM-395"
@@ -931,6 +947,7 @@
           "MM-231",
           "MM-232",
           "MM-233",
+          "MM-443",
           "MM-246",
           "MM-261",
           "MM-278"
@@ -976,6 +993,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -1450,6 +1468,8 @@
           "MM-376",
           "MM-389",
           "MM-390",
+          "MM-391",
+          "MM-392",
           "MM-394",
           "MM-398",
           "MM-399",
@@ -1488,9 +1508,8 @@
           "MM-183",
           "MM-224",
           "MM-242",
+          "MM-453",
           "MM-375",
-          "MM-391",
-          "MM-392",
           "MM-403"
         ]
       },
@@ -1579,7 +1598,8 @@
           "title": "The terms of use before anything else",
           "milestone": "M3",
           "tickets": [
-            "MM-242"
+            "MM-242",
+            "MM-453"
           ]
         },
         {
@@ -1957,7 +1977,8 @@
         ],
         "remaining": [
           "MM-80",
-          "MM-113"
+          "MM-113",
+          "MM-510"
         ]
       },
       "sequence": [
@@ -1997,7 +2018,8 @@
           "step": 5,
           "title": "Weight-loss medication support",
           "tickets": [
-            "MM-113"
+            "MM-113",
+            "MM-510"
           ],
           "milestone": "M4"
         }
@@ -2066,14 +2088,15 @@
           "MM-144",
           "MM-123",
           "MM-128",
-          "MM-130"
+          "MM-130",
+          "MM-129"
         ],
         "remaining": [
           "MM-119",
           "MM-122",
           "MM-486",
           "MM-124",
-          "MM-129",
+          "MM-480",
           "MM-137"
         ]
       },
@@ -2142,7 +2165,8 @@
           "step": 8,
           "title": "Lean-gain guardrails",
           "tickets": [
-            "MM-129"
+            "MM-129",
+            "MM-480"
           ],
           "milestone": "M4"
         }
@@ -2205,11 +2229,13 @@
           "MM-20",
           "MM-136",
           "MM-142",
-          "MM-155"
+          "MM-155",
+          "MM-34"
         ],
         "remaining": [
           "MM-15",
-          "MM-34",
+          "MM-501",
+          "MM-502",
           "MM-118",
           "MM-154",
           "MM-156",
@@ -2269,7 +2295,9 @@
           "step": 7,
           "title": "Body-fat range from the user's own measurements",
           "tickets": [
-            "MM-34"
+            "MM-34",
+            "MM-501",
+            "MM-502"
           ],
           "milestone": "M4"
         },
@@ -2332,6 +2360,7 @@
         "built": [
           "MM-38",
           "MM-39",
+          "MM-439",
           "MM-40",
           "MM-41",
           "MM-47",
@@ -2339,6 +2368,8 @@
           "MM-169",
           "MM-170",
           "MM-171",
+          "MM-126",
+          "MM-127",
           "MM-172",
           "MM-202",
           "MM-203",
@@ -2366,6 +2397,7 @@
           "MM-326",
           "MM-327",
           "MM-328",
+          "MM-329",
           "MM-358",
           "MM-359",
           "MM-369",
@@ -2376,6 +2408,8 @@
           "MM-383",
           "MM-384",
           "MM-385",
+          "MM-386",
+          "MM-471",
           "MM-388",
           "MM-396",
           "MM-397",
@@ -2398,20 +2432,17 @@
           "MM-151",
           "MM-152",
           "MM-167",
+          "MM-45",
           "MM-428",
           "MM-429"
         ],
         "remaining": [
-          "MM-386",
           "MM-387",
           "MM-37",
           "MM-44",
-          "MM-45",
+          "MM-456",
           "MM-46",
-          "MM-126",
-          "MM-127",
           "MM-305",
-          "MM-329",
           "MM-406"
         ]
       },
@@ -2563,6 +2594,7 @@
             "MM-385",
             "MM-386",
             "MM-387",
+            "MM-471",
             "MM-388"
           ],
           "milestone": "M4"
@@ -2581,6 +2613,14 @@
           "title": "The camera on iOS (MM-406): a barcode read live with AVFoundation and a label read with Vision, on the device",
           "tickets": [
             "MM-406"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 14,
+          "title": "A recipe ingredient keeps the food it came from (MM-456), on the schema lane after MM-45",
+          "tickets": [
+            "MM-456"
           ],
           "milestone": "M4"
         }
@@ -2646,6 +2686,8 @@
       "sourceRequirements": {
         "built": [
           "MM-32",
+          "MM-92",
+          "MM-33",
           "MM-133",
           "MM-168",
           "MM-312",
@@ -2658,6 +2700,7 @@
           "MM-378",
           "MM-363",
           "MM-365",
+          "MM-125",
           "MM-371",
           "MM-379",
           "MM-377",
@@ -2669,12 +2712,10 @@
           "MM-141"
         ],
         "remaining": [
-          "MM-33",
           "MM-36",
-          "MM-92",
+          "MM-450",
           "MM-116",
           "MM-117",
-          "MM-125",
           "MM-145",
           "MM-146",
           "MM-148",
@@ -2754,7 +2795,8 @@
           "title": "Protein across meals; phase planning",
           "tickets": [
             "MM-125",
-            "MM-36"
+            "MM-36",
+            "MM-450"
           ],
           "milestone": "M4"
         },
@@ -2867,15 +2909,18 @@
           "MM-193",
           "MM-194",
           "MM-195",
-          "MM-196"
+          "MM-196",
+          "MM-214",
+          "MM-215",
+          "MM-222"
         ],
         "remaining": [
           "MM-74",
           "MM-189",
+          "MM-489",
+          "MM-490",
           "MM-191",
-          "MM-214",
-          "MM-215",
-          "MM-222"
+          "MM-447"
         ]
       },
       "sequence": [
@@ -2927,7 +2972,9 @@
           "step": 6,
           "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
           "tickets": [
-            "MM-189"
+            "MM-189",
+            "MM-489",
+            "MM-490"
           ],
           "milestone": "M4"
         },
@@ -2947,7 +2994,8 @@
           "tickets": [
             "MM-214",
             "MM-215",
-            "MM-222"
+            "MM-222",
+            "MM-447"
           ]
         }
       ],
@@ -2993,6 +3041,7 @@
       "sourceRequirements": {
         "built": [
           "MM-67",
+          "MM-71",
           "MM-188",
           "MM-395"
         ],
@@ -3001,9 +3050,11 @@
           "MM-68",
           "MM-69",
           "MM-70",
-          "MM-71",
+          "MM-441",
+          "MM-442",
           "MM-72",
           "MM-73",
+          "MM-498",
           "MM-314",
           "MM-323"
         ]
@@ -3035,9 +3086,10 @@
         },
         {
           "step": 4,
-          "title": "History backfill on first connection",
+          "title": "History backfill on first connection, and keeping it through a re-read (MM-498)",
           "tickets": [
-            "MM-73"
+            "MM-73",
+            "MM-498"
           ],
           "milestone": "M3"
         },
@@ -3094,6 +3146,15 @@
           "title": "A reading's source named by its app, never its package id, and a row that wraps a long word (MM-395)",
           "tickets": [
             "MM-395"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "tickets": [
+            "MM-441",
+            "MM-442"
           ],
           "milestone": "M4"
         }
@@ -3222,6 +3283,7 @@
           "MM-95",
           "MM-96",
           "MM-244",
+          "MM-454",
           "MM-247"
         ]
       },
@@ -3233,6 +3295,7 @@
             "MM-88",
             "MM-95",
             "MM-244",
+            "MM-454",
             "MM-247"
           ],
           "milestone": "M3"

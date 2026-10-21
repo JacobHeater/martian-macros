@@ -59,17 +59,21 @@ export async function enterDate(value: string): Promise<void> {
 }
 
 /**
- * Turns the drums of the clock time entry of a set: `hour` on the twelve-hour
- * clock, with `period` where it matters. With `confirm` false the dialog is
- * left open.
+ * Turns the drums of the clock time entry of a set, or of the one `title`
+ * names: `hour` on the twelve-hour clock, with `period` where it matters.
+ * With `confirm` false the dialog is left open.
  */
 export async function enterClock(
   hour: number,
   minute: number,
   second = 0,
-  { period, confirm = true }: { period?: 'AM' | 'PM'; confirm?: boolean } = {},
+  {
+    period,
+    confirm = true,
+    title = /^Set (started|ended)$/,
+  }: { period?: 'AM' | 'PM'; confirm?: boolean; title?: string | RegExp } = {},
 ): Promise<HTMLElement> {
-  const dialog = await screen.findByRole('dialog', { name: /^Set (started|ended)$/ });
+  const dialog = await screen.findByRole('dialog', { name: title });
   await turnClock(dialog, { hour, minute, second, period });
   if (confirm) {
     await user.click(within(dialog).getByRole('button', { name: 'OK' }));

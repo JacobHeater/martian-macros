@@ -144,8 +144,8 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         ));
       },
 
-      clockTime({ title, initialMs }) {
-        return ask((finish) => <MmClockTimeDialog title={title} initialMs={initialMs} onDone={finish} />);
+      clockTime({ title, initialMs, refuse }) {
+        return ask((finish) => <MmClockTimeDialog title={title} initialMs={initialMs} refuse={refuse} onDone={finish} />);
       },
 
       sheet(label, content) {

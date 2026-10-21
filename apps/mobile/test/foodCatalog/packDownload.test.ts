@@ -8,6 +8,7 @@ import { PackDownloadFailed } from '../../src/foodCatalog/download/PackDownloadF
 import type { PackDownloadPhase } from '../../src/foodCatalog/download/PackDownloadPhase';
 import type { PackDownloadProblem } from '../../src/foodCatalog/download/PackDownloadProblem';
 import type { PackListing } from '../../src/foodCatalog/download/PackListing';
+import { StreamedPackFetch } from '../../src/foodCatalog/download/StreamedPackFetch';
 import { fixtureDownload, gzipped, memoryPackStore, packUrl, sha256Hex } from '../support/fixtureDownload';
 
 /** MM-56: one download of one pack. Carried over from pack_download_test.dart; the manifest's cases are in packManifest.test.ts. */
@@ -18,7 +19,8 @@ beforeEach(() => {
 });
 
 const serving = (gz: Uint8Array, chunkSize = 256) => new InMemoryPackHttp([[packUrl, gz]], { chunkSize });
-const start = (listing: PackListing, http: InMemoryPackHttp) => PackDownload.start({ listing, http, store });
+const start = (listing: PackListing, http: InMemoryPackHttp) =>
+  PackDownload.start({ listing, fetch: new StreamedPackFetch({ http, store }), store });
 const installed = async () => (await store.installed()).find((pack) => pack.id === 'barcode_us');
 const finds = async (query: string) => (await (await openInstalledCatalog(store)).search(query)).length;
 

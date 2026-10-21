@@ -6,7 +6,7 @@ import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
-import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
@@ -54,7 +54,10 @@ import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
 import type { SodiumPattern } from '../engine/SodiumPattern';
+import type { FiberPattern } from '../engine/FiberPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
+import type { MissedPeriod } from '../engine/MissedPeriod';
+import { missedPeriodQuestion } from '../engine/missedPeriodQuestion';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
 import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
@@ -80,6 +83,8 @@ import type { RecompReview } from '../engine/RecompReview';
 import type { RecompSignal } from '../engine/RecompSignal';
 import { recompSignalOf } from '../engine/recompSignalOf';
 import { recompReviewOf } from '../engine/recompReviewOf';
+import type { LeanGainReview } from '../engine/LeanGainReview';
+import { leanGainReviewOf } from '../engine/leanGainReviewOf';
 import { recoveryCheckInDue } from '../engine/recoveryCheckInDue';
 import type { ReliefOffer } from '../engine/ReliefOffer';
 import { ReminderFacts } from '../engine/ReminderFacts';
@@ -105,10 +110,12 @@ import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
+import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
+import { HealthBackfill } from '../healthIngest/HealthBackfill';
 import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
@@ -201,6 +208,11 @@ export class AppState {
    * been read and kept. Empty when nothing has been imported.
    */
   readonly importedWeighIns: Cell<Loadable<DayWeighIn[]>>;
+  /**
+   * The scale the person chose in Settings (MM-71), or undefined while the
+   * one with the most weigh-ins in thirty days counts.
+   */
+  readonly primaryScale: Cell<Loadable<string | undefined>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -320,6 +332,7 @@ export class AppState {
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
   /** The sodium limit and each recent day's sodium, for the coach (MM-312); undefined with no limit. */
   private readonly sodiumPattern: Cell<SodiumPattern | undefined>;
+  private readonly fiberPattern: Cell<FiberPattern | undefined>;
 
   /** The monthly reports that are ready (MM-33), oldest first. */
   readonly reportPeriods: Cell<readonly ReportPeriod[]>;
@@ -402,6 +415,9 @@ export class AppState {
   /** The offer to ease a deficit, when one is due (MM-117). */
   readonly reliefOffer: Cell<ReliefOffer | undefined>;
 
+  /** The missed-period question for this week's recovery check-in, when it is to be asked (MM-116). */
+  readonly missedPeriod: Cell<MissedPeriod | undefined>;
+
   /** The reminder settings the user has stored (MM-146). */
   readonly reminders: Cell<Loadable<ReminderSetting[]>>;
 
@@ -447,6 +463,9 @@ export class AppState {
 
   /** The recomp review due today, if one is (MM-133). Not during a pause, which is not time on recomp. */
   readonly recompReview: Cell<RecompReview | undefined>;
+
+  /** What the coach says about a running lean gain (MM-129), if anything. Not during a pause. */
+  readonly leanGainReview: Cell<LeanGainReview | undefined>;
 
   /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
   readonly recompSignal: Cell<RecompSignal | undefined>;
@@ -501,7 +520,7 @@ export class AppState {
       return once(() => s.packStore.installed());
     });
     this.packDownloads = new PackDownloadsController({
-      http: s.packHttp,
+      fetch: s.packFetch ?? new StreamedPackFetch({ http: s.packHttp, store: s.packStore }),
       store: s.packStore,
       onInstalled: () => this.packsChanged(),
     });
@@ -514,16 +533,20 @@ export class AppState {
       onKept: () => this.packsChanged(),
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
+    this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
+      // And here so that choosing a scale does.
+      const chosen = of(this.primaryScale);
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
           s.healthSamples.samples('weight').then(
             (samples) => {
               if (stopped) return;
-              listener(dailyWeighIns(samples, { primarySourceId: primaryWeightSource(samples, { asOf: s.clock.now() }) }));
+              const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
+              listener(dailyWeighIns(samples, { primarySourceId }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
@@ -600,6 +623,8 @@ export class AppState {
       const pauses = of(this.pauses);
       // Period days widen the trend's noise around each start (MM-19, MM-20); none until read, as with no marked days.
       const flowDays = of(this.flowDays) ?? [];
+      // Waist entries join the body-fat formula (MM-34); none until read, as with no entries.
+      const waists = of(this.waist) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -611,7 +636,7 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, today });
     });
 
     this.targetShapeLimits = derived(() => {
@@ -726,6 +751,25 @@ export class AppState {
       return byDay;
     });
 
+    // Before the fiber pattern, which reads it (MM-126).
+    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
+
+    // Fiber only at Full detail, where it is shown (MM-126): below it the insight would be about a number never seen.
+    this.fiberPattern = derived<FiberPattern | undefined>(() => {
+      const sex = of(this.setup)?.profile.sex;
+      const level = of(this.detailLevel);
+      const checkIns = of(this.recoveryCheckIns);
+      if (sex === undefined || level === undefined || !DetailLevel.showsExtras(level) || checkIns === undefined) return undefined;
+      const today = this.today.value;
+      const days = new Map<CalendarDate, readonly FoodEntry[]>();
+      for (let i = 1; i <= InsightRationing.patternDays; i++) {
+        const day = today.addDays(-i);
+        const entries = of(this.foodForDay(day));
+        if (entries !== undefined) days.set(day, entries);
+      }
+      return { sex, days, checkIns };
+    });
+
     this.sodiumPattern = derived<SodiumPattern | undefined>(() => {
       const goals = of(this.nutritionGoals);
       const limitMg = goals?.sodiumLimitMg;
@@ -795,6 +839,7 @@ export class AppState {
           waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
           sleepAverage: this.sleepAverage.value,
+          fiber: this.fiberPattern.value,
         }),
         log,
         today,
@@ -910,7 +955,6 @@ export class AppState {
       return underEatingNoticeDue({ today, dismissedOn: dismissed.value }) ? finding : undefined;
     });
 
-    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
     this.recoverySkipped = stream(() => s.preferences.watchRecoveryCheckInSkippedOn());
 
     this.recoveryCheckInDue = derived(() => {
@@ -954,7 +998,17 @@ export class AppState {
         pauses,
         // Short sleep from the record is a signal of its own (MM-252).
         sleepAverage: this.sleepAverage.value,
+        // Falling lifts are the strength trigger (MM-117, MM-77); none until the log has loaded.
+        strengthTrends: of(this.strengthTrends) ?? [],
       });
+    });
+
+    this.missedPeriod = derived(() => {
+      const setup = of(this.setup);
+      const flowDays = of(this.flowDays);
+      const checkIns = of(this.recoveryCheckIns);
+      if (setup === undefined || flowDays === undefined || checkIns === undefined) return undefined;
+      return missedPeriodQuestion({ setup, flowDays, checkIns, today: this.today.value });
     });
 
     this.reminders = stream(() => s.reminders.watchReminders());
@@ -1094,6 +1148,32 @@ export class AppState {
       });
     });
 
+    this.leanGainReview = derived(() => {
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      const setup = of(this.setup);
+      if (
+        snapshot === undefined ||
+        history === undefined ||
+        setup === undefined ||
+        !snapshot.policy.targetsAllowed ||
+        this.activePause.value !== undefined
+      ) {
+        return undefined;
+      }
+      return leanGainReviewOf({
+        history,
+        trend: snapshot.trend,
+        waist: of(this.waist) ?? [],
+        strengthTrends: of(this.strengthTrends) ?? [],
+        sex: setup.profile.sex,
+        bodyFatPercent: snapshot.bodyFat.percent,
+        today: this.today.value,
+        // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
+        weightSignals: !setup.screening.eatingDisorderHistory,
+      });
+    });
+
     this.recompSignal = derived(() => {
       const trend = this.coach.value?.trend;
       if (trend === undefined) return undefined;
@@ -1170,6 +1250,11 @@ export class AppState {
    * It is run while the app is on screen: when it opens, when it comes
    * back to the front, and when asked for in Settings. The platform
    * refuses to be read at any other time.
+   *
+   * After the import, what is left of the history up to a year back is
+   * read (MM-73), once the history permission is granted. A backfill that
+   * cannot finish keeps what it read and goes on next time; it does not
+   * make the import count as failed.
    */
   async syncHealth(): Promise<boolean> {
     const { healthSource: source, healthSamples: store } = this.services;
@@ -1180,16 +1265,44 @@ export class AppState {
         const result = await importer.import(type);
         changed = changed || result.status === 'readAgain' || result.upserted > 0 || result.deleted > 0;
       }
-      return true;
     } catch {
       // The platform could not be read, or there is none on this kind of device.
-      return false;
-    } finally {
-      // Only when something was read, so the screens that work from the
-      // weigh-ins are not made to reload every time the app comes forward.
       if (changed) this.healthImported();
       this.refreshHealthConnection();
+      return false;
     }
+    if (changed) this.healthImported();
+    await this.backfillHealth();
+    this.refreshHealthConnection();
+    return true;
+  }
+
+  private backfilling: Promise<void> | undefined;
+
+  /**
+   * Reads each permitted kind's history (MM-73), one at a time, and makes
+   * the screens reload after each kind that brought readings, so the trend
+   * fills in as they arrive. Only one runs at a time: a second call while
+   * one runs waits for it.
+   */
+  private backfillHealth(): Promise<void> {
+    this.backfilling ??= (async () => {
+      const { healthSource: source, healthSamples: store, clock } = this.services;
+      const backfill = new HealthBackfill({ source, history: source, store, marks: store });
+      try {
+        const permitted = await source.permitted();
+        for (const type of HealthBackfill.types) {
+          if (!permitted.has(type)) continue;
+          const result = await backfill.backfill(type, { now: clock.now() });
+          if (result.added > 0) this.healthImported();
+        }
+      } catch {
+        // Cut short (the platform refused a read): what was read is kept and marked, and the rest is read next time.
+      } finally {
+        this.backfilling = undefined;
+      }
+    })();
+    return this.backfilling;
   }
 
   /**
@@ -1408,6 +1521,8 @@ export class AppState {
           trend: coach?.trend ?? [],
           workouts,
           exercises,
+          // Paused days neither count nor break the month's longest logging run (MM-92).
+          pauses: of(this.pauses) ?? [],
           // As the app would recommend today: body fat then is not kept.
           recommendation: coach?.recommendation,
         });

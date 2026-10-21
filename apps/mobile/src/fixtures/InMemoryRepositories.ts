@@ -22,6 +22,7 @@ import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository'
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import { InMemoryHealthSampleStore } from '../healthIngest/testing/InMemoryHealthSampleStore';
 import { InMemoryCustomExerciseRepository } from './InMemoryCustomExerciseRepository';
@@ -77,7 +78,7 @@ export class InMemoryRepositories {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
-  readonly healthSamples: HealthSampleStore;
+  readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
 

@@ -48,15 +48,20 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const today = useCell(state.today);
   const total = entries.reduce((sum, e) => sum + e.kcal, 0);
   const protein = entries.reduce((sum, e) => sum + e.proteinG, 0);
+  const hand = useCell(state.handSize);
   // Full detail shows the protein of the meal and a quiet marker when it
-  // is a solid serving (MM-125). There is no per-meal target.
+  // is a solid serving for the reference weight (MM-125). There is no
+  // per-meal target.
   const full = DetailLevel.showsExtras(useLoaded(state.detailLevel) ?? 'standard');
   const weightKg = useCell(state.coach)?.trendWeightKg;
-  const solid = full && weightKg !== undefined && mealHasSolidProtein({ proteinG: protein, weightKg });
+  const solid =
+    full &&
+    weightKg !== undefined &&
+    hand !== undefined &&
+    mealHasSolidProtein({ proteinG: protein, weightKg, heightCm: hand.heightCm });
   const label = mealLabel(meal);
   // Grades (MM-370) and the coach's lines (MM-362): none in the app until they are built.
   const preview = useInsightPreview();
-  const hand = useCell(state.handSize);
   // Each entry's grade and the meal's (MM-370), unless a design story hands in its own.
   const gradeOf = (entry: FoodEntry) => preview.entryGrades?.get(entry.name) ?? gradeOfFoodEntry(entry, { hand });
   const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');

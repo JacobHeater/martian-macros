@@ -217,7 +217,7 @@ describe('a workout’s times, by hand', () => {
     const workout = await only();
     expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 19, 15));
     expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 18));
-    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15 PM');
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15:00 PM');
   });
 
   it('the start can be changed', async () => {
@@ -235,6 +235,21 @@ describe('a workout’s times, by hand', () => {
     await enterTime('Ended', '17:00');
     expect(screen.getByText('The end has to be after the start.')).toBeInTheDocument();
     expect((await only()).endedAt).toEqual(new Date(2026, 9, 4, 18, 50));
+    // MM-222: refused inside the clock, which stays open on what was chosen.
+    expect(screen.getByRole('dialog', { name: 'Ended' })).toBeInTheDocument();
+  });
+
+  it('a start and an end can be typed to the second', async () => {
+    await openTimes();
+    await press(/^Ended/);
+    await enterClock(7, 15, 42, { period: 'PM', title: 'Ended' });
+    await press(/^Started/);
+    await enterClock(5, 30, 9, { period: 'PM', title: 'Started' });
+    const workout = await only();
+    expect(workout.startedAt).toEqual(new Date(2026, 9, 4, 17, 30, 9));
+    expect(workout.endedAt).toEqual(new Date(2026, 9, 4, 19, 15, 42));
+    expect(layer().getByRole('button', { name: /^Started/ })).toHaveTextContent('5:30:09 PM');
+    expect(layer().getByRole('button', { name: /^Ended/ })).toHaveTextContent('7:15:42 PM');
   });
 
   it('the day moves both times with it', async () => {
@@ -263,6 +278,22 @@ describe('the set timer', () => {
     expect(set?.startedAt).toEqual(after(minutes(3)));
     expect(set?.durationMs).toBe(seconds(40));
     expect(workout.setStartedAt).toBeUndefined();
+  });
+
+  it('MM-222: ends a set from the bar, on the exercise it names', async () => {
+    await startSquats();
+    await pressTimer();
+    await wait(seconds(40));
+    const bar = document.querySelector('.train-timer') as HTMLElement;
+    expect(within(bar).getByText('Tap Set done to record it on Back squat.')).toBeInTheDocument();
+    await user.click(within(bar).getByRole('button', { name: 'Set done' }));
+    await settle();
+    const set = await onlySet();
+    expect(set?.startedAt).toEqual(after(minutes(0)));
+    expect(set?.durationMs).toBe(seconds(40));
+    expect(timerLabel()).toBe('Rest');
+    // The set's controls open, with how long it took beside its times.
+    expect(within(setEditor()).getByText(/took 0:40$/)).toBeInTheDocument();
   });
 
   it('then counts the rest until the next set starts', async () => {
@@ -328,7 +359,8 @@ describe('the set timer', () => {
 });
 
 describe('a set’s times, by hand', () => {
-  const overlaps = 'That overlaps another set in this workout.';
+  // MM-222: a clash names the set it is with.
+  const overlaps = 'That overlaps set 1 of Back squat.';
 
   it('MM-196 checks partial times against other sets of the same exercise', async () => {
     const first = new WorkoutSet({ reps: 8, loadKg: 100, startedAt: after(minutes(2)), endedAt: after(minutes(4)) });
@@ -354,7 +386,7 @@ describe('a set’s times, by hand', () => {
     expect(sets[1]?.startedAt).toBeUndefined();
     expect(sets[1]?.endedAt).toBeUndefined();
 
-    await pressInSet(/^Ended/, 2, user);
+    // MM-222: the refused time stays on the clock, which stays open to correct it.
     await enterClock(12, 4);
     sets = (await only()).exercises[0]?.sets ?? [];
     expect(sets[1]?.startedAt).toBeUndefined();
@@ -387,8 +419,8 @@ describe('a set’s times, by hand', () => {
     expect(workout.exercises[1]?.sets[0]).toEqual(second);
     expect(workout.exercises[0]?.sets[0]).toEqual(first);
 
-    // A shared boundary is valid, and the edited set excludes itself.
-    await pressInSet(/^Started/, 1, user);
+    // A shared boundary is valid, and the edited set excludes itself; the
+    // clock stays open on the refused time to correct it (MM-222).
     await enterClock(12, 3);
     workout = await only();
     expect(workout.exercises[1]?.sets[0]?.startedAt).toEqual(after(minutes(3)));

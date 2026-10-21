@@ -73,6 +73,19 @@ describe('NativePackHttp', () => {
     expect(aborted).toEqual([1]);
   });
 
+  it('MM-471: abort wakes a reader waiting on the next chunk', async () => {
+    const { api } = fakePacks();
+    const http = new NativePackHttp(api);
+    const response = await http.get(new URL('https://packs.example/a'));
+    const waiting = read(response.body).then(
+      () => 'ended',
+      () => 'ended',
+    );
+    await Promise.resolve();
+    response.abort();
+    expect(await waiting).toBe('ended');
+  });
+
   it('two transfers at once keep their bytes apart', async () => {
     const { api, emit } = fakePacks();
     const http = new NativePackHttp(api);

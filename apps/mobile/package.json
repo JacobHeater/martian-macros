@@ -9,12 +9,13 @@
     "test": "vitest run",
     "build": "vite build",
     "offline": "node scripts/check-offline.mjs",
+    "legal": "node scripts/legal-page.mjs",
     "unseen": "vitest run test/gallery/stories.test.tsx --project screens --coverage && node scripts/check-unseen.mjs",
     "android": "vite build && cap telemetry off && cap sync android",
     "ios": "vite build && cap telemetry off && cap sync ios",
     "storybook": "storybook dev -p 6006 --no-version-updates",
     "build-storybook": "storybook build",
-    "check": "npm run typecheck && npm run test && npm run unseen && npm run build && npm run offline"
+    "check": "npm run typecheck && npm run test && npm run unseen && npm run build && npm run offline && npm run legal"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",

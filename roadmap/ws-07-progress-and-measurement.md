@@ -94,8 +94,10 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
    shows weight; cheap if WS-03's chart components have one switch for raw
    readings.
 6. **More sites (MM-156).** M4.
-7. **Body-fat range (MM-34).** M4. Needs the model decision, neck and hip
-   measurements from step 6, and optionally scale readings from WS-11.
+7. **Body-fat range (MM-34, MM-501, MM-502).** M4. MM-34 is built: the
+   formula joined by the waist, shown as a range. The Navy method (MM-501)
+   needs neck and hip from step 6; scale readings with a per-device bias
+   (MM-502) need WS-11's ingest and the model decision.
 8. **Progress photos (MM-157).** M4. Privacy rules are fixed in the ticket
    now so it is built correctly later.
 
@@ -113,8 +115,9 @@ storage rules above.
 
 ## Requirement sources
 - Built: MM-16, MM-17 (weigh-in, trend chart); MM-21 (waist, built but
-  unverified).
-- Remaining: MM-155, MM-136, MM-20, MM-142, MM-118, MM-156, MM-34, MM-157.
+  unverified); MM-34 (body-fat range from the waist).
+- Remaining: MM-155, MM-136, MM-20, MM-142, MM-118, MM-156, MM-501, MM-502,
+  MM-157.
   Epics: MM-15, MM-154.
 
 ## Notes for whoever builds it

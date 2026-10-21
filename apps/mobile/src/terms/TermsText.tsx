@@ -1,4 +1,5 @@
 import type { Platform } from '../domain/integration/Platform';
+import { LegalSections } from './LegalSections';
 import { termsOfUse } from './termsOfUse';
 import './terms.css';
 
@@ -25,16 +26,7 @@ export function TermsText({ platform }: TermsTextProps) {
         The full terms below say this in more detail and cover more, including the limits of what we are responsible
         for.
       </p>
-      {termsOfUse.sectionsOn(platform).map((section) => (
-        <section key={section.heading}>
-          <h2 className="app-subhead">{section.heading}</h2>
-          {section.paragraphs.map((paragraph) => (
-            <p key={paragraph} className="app-text">
-              {paragraph}
-            </p>
-          ))}
-        </section>
-      ))}
+      <LegalSections sections={termsOfUse.sectionsOn(platform)} />
     </>
   );
 }

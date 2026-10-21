@@ -1,5 +1,6 @@
 import type { FixedClock } from '../fixtures/FixedClock';
 import { InMemoryReminderScheduler } from '../fixtures/InMemoryReminderScheduler';
+import { InMemoryExactAlarms } from '../fixtures/InMemoryExactAlarms';
 import type { InMemoryRepositories } from '../fixtures/InMemoryRepositories';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
@@ -37,6 +38,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     restSignal: { restOver: () => undefined },
     // Never the device's notifications.
     reminderScheduler: new InMemoryReminderScheduler(),
+    // Exact alarms allowed, unless a story or a test is about asking (MM-248).
+    exactAlarms: new InMemoryExactAlarms(),
     // Never the device's health platform: one with nothing in it, unless another is brought.
     healthSource: FakeHealthSource.fromJson('{"sources": [], "events": []}'),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),

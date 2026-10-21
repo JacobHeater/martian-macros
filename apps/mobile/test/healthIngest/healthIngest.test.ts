@@ -8,6 +8,8 @@ import {
   type NutritionRecord,
   recordedHealthHistory,
 } from '../../src/healthIngest';
+import { healthBackfillMarksContract } from '../contracts/healthBackfillMarksContract';
+import { healthHistoryAccessContract } from '../contracts/healthHistoryAccessContract';
 import { healthSampleStoreContract } from '../contracts/healthSampleStoreContract';
 import { healthSourceContract } from '../contracts/healthSourceContract';
 
@@ -30,6 +32,26 @@ healthSourceContract('the fake with only weight permitted', async () => {
 healthSourceContract('the fake with nothing permitted', async () => FakeHealthSource.fromJson(recordedHealthHistory));
 
 healthSampleStoreContract('In-memory', () => new InMemoryHealthSampleStore());
+// MM-73: the history permission and how far back the history has been read.
+healthBackfillMarksContract('In-memory', () => new InMemoryHealthSampleStore());
+healthHistoryAccessContract('the fake with no window, as Apple Health', () => permitted());
+healthHistoryAccessContract('the fake with a window, granting history', async () => {
+  const source = await permitted();
+  source.historyFrom = new Date(2026, 8, 5);
+  return source;
+});
+healthHistoryAccessContract('the fake with a window, refusing history', async () => {
+  const source = await permitted();
+  source.historyFrom = new Date(2026, 8, 5);
+  source.willPermitHistory = false;
+  return source;
+});
+healthHistoryAccessContract('the fake with history already granted', async () => {
+  const source = await permitted();
+  source.historyFrom = new Date(2026, 8, 5);
+  source.permitHistory();
+  return source;
+});
 
 describe('the fake', () => {
   it('serves the recorded history: sources, an edit and a deletion', async () => {

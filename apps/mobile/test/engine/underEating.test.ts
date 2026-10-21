@@ -76,3 +76,15 @@ it('dismissed, it stays quiet for 14 days', () => {
   expect(underEatingNoticeDue({ today: dismissed.addDays(14), dismissedOn: dismissed })).toBe(true);
   expect(underEatingNoticeDue({ today: dismissed, dismissedOn: undefined })).toBe(true);
 });
+
+// MM-113: on a weight-loss medication, five whole days are enough; without the answer, seven.
+it('on a weight-loss medication, five whole days are a pattern', () => {
+  const onMedication = (intake: readonly IntakeDay[]) =>
+    findUnderEating({ through, intake, floorKcal: 1500, weightLossMedication: true });
+  expect(onMedication(days(4, 1000))).toBeUndefined();
+  expect(onMedication(days(5, 1000))?.days).toBe(5);
+  expect(onMedication(days(5, 1350)), 'exactly 10% below').toBeUndefined();
+  expect(onMedication(days(5, 1000, 'partial'))).toBeUndefined();
+  expect(find(days(5, 1000)), 'not ticked').toBeUndefined();
+  expect(findUnderEating({ through, intake: days(6, 1000), floorKcal: 1500, weightLossMedication: false })).toBeUndefined();
+});

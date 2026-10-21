@@ -1,3 +1,4 @@
+import { FiberRule } from './FiberRule';
 import type { InsightPriority } from './InsightPriority';
 
 const rules = {
@@ -43,7 +44,22 @@ const rules = {
    * on offer. Rationed like the rest, so at most once a fortnight.
    */
   shortSleep: { priority: 'coaching', aboutWeight: false, otherIntake: false },
-} as const satisfies Record<string, { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean }>;
+  /**
+   * On a deficit, fiber averaged under half the guide, with hunger at the
+   * hard end or no check-in to say (MM-126): fullness, in foods already
+   * logged. At most monthly.
+   */
+  fiberForFullness: { priority: 'education', aboutWeight: false, otherIntake: true, quietDaysAfterShown: FiberRule.quietDaysAfterShown },
+  /**
+   * Most of the fortnight's protein was logged by palm, in a goal where
+   * protein precision matters (MM-46): weigh the main protein food for a
+   * week to calibrate. Never asked of a user with an eating-disorder history.
+   */
+  weighProtein: { priority: 'dataQuality', aboutWeight: false, otherIntake: false },
+} as const satisfies Record<
+  string,
+  { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean; quietDaysAfterShown?: number }
+>;
 
 /**
  * The catalog of insight rules (MM-141). Every insight comes from one of
@@ -69,6 +85,12 @@ export const InsightRule = {
    */
   otherIntake(rule: InsightRule): boolean {
     return rules[rule].otherIntake;
+  },
+
+  /** Days after it was last shown before a rule may start again as new; 0 for most (MM-126). */
+  quietDaysAfterShown(rule: InsightRule): number {
+    const r = rules[rule];
+    return 'quietDaysAfterShown' in r ? r.quietDaysAfterShown : 0;
   },
 
   /** The place of a rule in the catalog: 0 is first. */
