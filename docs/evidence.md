@@ -136,6 +136,22 @@ forth on a small change.
 
 Rows: deurenbergBodyFat, relativeFatMass, BodyFatRule.waistFormulaSigmaPercent, BodyFatRule.formulaErrorCorrelation, BodyFatRule.waistWindowDays, BodyFatRule.minWaistEntries, combineBodyFatEstimates, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
 
+### How does the app plan the phases ahead?
+
+The Coach shows the phase you are in, how long it has run and, at your current
+pace, about when it ends. A cut ends once the lower end of your body-fat range
+reaches its goal, after sixteen weeks in a deficit, or when progress has
+stalled with the target already at the lowest the app sets; a lean gain when
+the lean-gain guardrails say so (the upper end of the body-fat range at its
+line, the waist up 5%, or twenty-six weeks), so the two never disagree. Then
+the app recommends what comes next, with the reason: a hold at maintenance,
+then a lean gain if you are at the cut's goal or another cut if not. Body fat
+is read as a range, never as one figure (a figure you entered counts as
+exact), and nothing changes until you choose.
+The weeks and lines are the app's judgement.
+
+Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, gainLineBodyFatPercent, LeanGainRule.stopWaistRiseFraction, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
+
 ### When does the app ask about my health?
 
 The health check is repeated every 90 days and before you switch to a deficit.
@@ -228,6 +244,13 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `SafetyBounds.proteinRangeG` | Evidence range: 1.6 to 2.2 g per kg of reference weight; 2.3 to 3.1 g per kg fat-free mass for lean users in a deficit; capped for kidney disease | engine SafetyBounds.ts | The evidence-backed range used to inform target selection; not the selected app target | Morton 2018 for the general range and Helms 2014 for lean people in a deficit, as cited; the kidney cap is product judgement | moderate | Trained adults (Morton); lean resistance-trained athletes dieting (Helms); the cap is not from either | No |
 | `SafetyBounds.proteinTargetsG` | Minimum and target vary by goal and lifting; lean-deficit target interpolates over 3 body-fat points; kidney disease sets both to 0.8 g/kg body weight | engine SafetyBounds.ts | The minimum to clear and goal-specific target (MM-121) | Moderate evidence from Morton 2018, Nunes 2022, and Helms 2014 informs the selection; exact points, interpolation, and kidney cap are product judgement | judgement | Adults by goal and training status; lean dieters; kidney disease cap is not from the cited protein trials | No |
 | `SafetyBounds.checkGoalBodyFat` | Rejected under 8% men or 16% women; warned under 10% or 18% | engine SafetyBounds.ts | Whether a goal body fat is accepted | Product judgement | judgement | None | No |
+| `SafetyBounds.goalBodyFatFloorsPercent` | Hard 8% men, 16% women; soft 10% men, 18% women | engine SafetyBounds.ts | The floors `checkGoalBodyFat` applies and the words of a refused or limited goal say (MM-28, MM-36) | Product judgement, the table MM-28 accepted | judgement | None | No |
+| `PhaseRule.longestCutWeeks` | 16 whole weeks of unbroken deficit | engine PhaseRule.ts | When a cut ends and maintenance is recommended (MM-36); a recommendation, unlike the planned diet break at 20 weeks (MM-135) | MM-36's decision with the product owner, from the 16-week cap MM-28 accepted; no trial sets how long a cut should run | judgement | None | No |
+| `PhaseRule.lowGoalHoldWeeks` | 4 weeks | engine PhaseRule.ts | The time limit on a goal under the soft floor: once reached it is held at most this long, then a lean gain is recommended (MM-28, MM-36) | Product judgement; to be confirmed in MM-29 | judgement | None | No |
+| `PhaseRule.steadyPaceSigmas` | 2 standard deviations of the trend's slope | engine PhaseRule.ts | When the pace is steady enough to project the end of a phase from it (MM-36) | Product judgement, the two-deviation width the body-fat range is shown at | judgement | None | No |
+| `PhaseRule.cutGoalPercent` | 15% men, 23% women | engine PhaseRule.ts | The body fat a cut runs to when no goal is set (MM-36): the line under which the starting recommendation is a lean gain | Product judgement, the line of `recommendMode` (MM-12), informed by Barakat 2020 | judgement | None directly | No |
+| `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when MM-129's review ends it | engine planPhases.ts | Which end of the body-fat range a cut reads, so a cut never rests on one figure (MM-36, MM-34); a gain's end is the lean-gain card's, so the two agree (MM-129) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction | judgement | None | No |
+| `gainLineBodyFatPercent` | The estimate plus 0.6745 deviations; a figure the user entered, exactly | engine gainLineBodyFatPercent.ts | The body fat a lean gain's stop line is read against (MM-129) and its projected end (MM-36): a gain ends once plausibly past the line, never later than the point would end it | The quarter-chance rule MM-132 applies to safety thresholds, mirrored for a gain; the coordinator's choice, 2026-10-21 | judgement | None | No |
 | `fatMassKcalPerKg` | 9,440 kcal per kg (39.5 MJ) | engine partitionConstants.ts | The energy in a kilogram of fat | Hall 2008, as cited | strong | Adults | No |
 | `fatFreeMassKcalPerKg` | 1,815 kcal per kg (7.6 MJ) | engine partitionConstants.ts | The energy in a kilogram of lean tissue | Hall 2008, as cited | moderate | Adults | No |
 | `forbesConstantKg` | 10.4 kg | engine partitionConstants.ts | How the lean share of a weight change falls as fat mass rises | Forbes, revised in Hall 2007, as cited | moderate | Adults across a range of body fat | No |
@@ -399,7 +422,7 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `LeanGainRule.fatHeavyMinWeeks` | 8 weeks | engine LeanGainRule.ts | How long a gain runs before the waist is read against the weight | Product judgement, as the recomp review's first look (MM-133) | judgement | None | No |
 | `LeanGainRule.fatHeavyWaistCmPerKg` | 1 cm of waist per kg of trend weight | engine LeanGainRule.ts | When a gain looks fat-heavy | No literature: a starting value to be tuned on real data, and the app says so | judgement | None | No |
 | `LeanGainRule.minWaistEntries` | 4 entries in the stretch | engine LeanGainRule.ts | How much tape the fat-heavy reading needs | The recomp review's figure (MM-133) | judgement | None | No |
-| `LeanGainRule.stopBodyFatPercent` | 20% men, 30% women | engine LeanGainRule.ts | Estimated body fat at which ending the gain is recommended | MM-12's lines for "high"; a user may set a lower goal body fat (MM-36); product judgement | judgement | None | No |
+| `LeanGainRule.stopBodyFatPercent` | 20% men, 30% women | engine LeanGainRule.ts | Body fat at which ending the gain is recommended, read against the upper end of the range (the estimate plus 0.6745 deviations), or exactly for a figure the user entered (coordinator, 2026-10-21; MM-36 reads the same) | MM-12's lines for "high"; a user may set a lower goal body fat (MM-36); product judgement | judgement | None | No |
 | `LeanGainRule.stopWaistRiseFraction` | 5% of the waist at the start of the gain | engine LeanGainRule.ts | Waist rise at which ending the gain is recommended | Product judgement | judgement | None | No |
 | `LeanGainRule.stopWeeks` | 26 weeks | engine LeanGainRule.ts | Length after which ending the gain is recommended | Product judgement | judgement | None | No |
 | `LeanGainRule.strengthMinWeeks` | 8 weeks | engine LeanGainRule.ts | How long a surplus runs before strength is read against the weight | Product judgement | judgement | None | No |

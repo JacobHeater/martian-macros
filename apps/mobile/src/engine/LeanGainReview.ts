@@ -13,6 +13,7 @@ interface LeanGainReviewInit {
   fatHeavy?: boolean;
   stop?: LeanGainStopReason | undefined;
   bodyFatPercent: number;
+  bodyFatFromRange?: boolean;
   waistRiseFraction?: number | undefined;
   strengthFlat?: boolean;
   liftsJudged?: number;
@@ -45,7 +46,12 @@ export class LeanGainReview {
 
   /** Why ending the gain is recommended, or undefined. */
   readonly stop: LeanGainStopReason | undefined;
+  /**
+   * The body fat the stop line was read against: the upper end of the range,
+   * or the user's own figure (`bodyFatFromRange` false).
+   */
   readonly bodyFatPercent: number;
+  readonly bodyFatFromRange: boolean;
 
   /** The waist's rise as a share of where it began, when it rose beyond its noise. */
   readonly waistRiseFraction: number | undefined;
@@ -66,6 +72,7 @@ export class LeanGainReview {
     this.fatHeavy = init.fatHeavy ?? false;
     this.stop = init.stop;
     this.bodyFatPercent = init.bodyFatPercent;
+    this.bodyFatFromRange = init.bodyFatFromRange ?? false;
     this.waistRiseFraction = init.waistRiseFraction;
     this.strengthFlat = init.strengthFlat ?? false;
     this.liftsJudged = init.liftsJudged ?? 0;
