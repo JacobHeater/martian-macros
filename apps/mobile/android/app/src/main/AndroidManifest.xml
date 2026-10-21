@@ -48,13 +48,15 @@
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!-- A reminder at its time, and setting them again after a restart (MM-146). -->
+        <!-- A reminder at its time, and setting them again after a restart
+             (MM-146) or once exact alarms are allowed (MM-248). -->
         <receiver android:name=".ReminderReceiver" android:exported="false" />
         <receiver android:name=".ReminderBootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
@@ -81,6 +83,12 @@
          After a restart Android forgets them, so they are set again. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- So a reminder arrives at the time the user set rather than up to an
+         hour later (MM-248, the owner's call 2026-10-13). Asked for once,
+         from the reminder settings, never on first run; declined, reminders
+         are scheduled inexactly and nothing else changes. Not
+         USE_EXACT_ALARM: alarms are not this app's core function. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- Health Connect (MM-68): read only, and only what the user grants
          one by one in Settings. Nothing read leaves the device, and the
          app writes nothing to the user's health data. -->

@@ -7,13 +7,17 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.result.ActivityResult
 import androidx.core.app.NotificationManagerCompat
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
+import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
@@ -21,11 +25,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Reminders scheduled on the device itself (MM-146): inexact alarms, so a
- * reminder a few minutes late needs no special permission. No push service
- * and no token; nothing leaves the device. What is scheduled is kept in
- * the app's own preferences so a restart can set it again (the boot
- * receiver), because Android forgets alarms when the phone turns off.
+ * Reminders scheduled on the device itself (MM-146). Exact alarms when the
+ * person allowed them (MM-248), asked once from the reminder settings with
+ * a reason; inexact ones otherwise, up to an hour late, with the same plan.
+ * No push service and no token; nothing leaves the device. What is
+ * scheduled is kept in the app's own preferences so a restart can set it
+ * again (the boot receiver), because Android forgets alarms when the phone
+ * turns off.
  */
 @CapacitorPlugin(
     name = "MmReminders",
@@ -51,6 +57,34 @@ class MmRemindersPlugin : Plugin() {
     }
 
     @PluginMethod
+    fun exactAlarms(call: PluginCall) = answerTiming(call)
+
+    /** The phone's own page for the permission (Android 12 and later); asked, whatever the answer (MM-248). */
+    @PluginMethod
+    fun openExactAlarmSetting(call: PluginCall) {
+        Reminders.markAsked(context)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || Reminders.exact(context)) return answerTiming(call)
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + context.packageName))
+        startActivityForResult(call, intent, "exactAlarmSettingClosed")
+    }
+
+    @ActivityCallback
+    fun exactAlarmSettingClosed(call: PluginCall?, result: ActivityResult) {
+        if (call == null) return
+        // Allowed there: what is scheduled is set again, now on the minute.
+        Reminders.schedule(context, Reminders.scheduled(context))
+        answerTiming(call)
+    }
+
+    @PluginMethod
+    fun skipExactAlarms(call: PluginCall) {
+        Reminders.markAsked(context)
+        answerTiming(call)
+    }
+
+    private fun answerTiming(call: PluginCall) = call.resolve(JSObject().put("timing", Reminders.timing(context)))
+
+    @PluginMethod
     fun replaceAll(call: PluginCall) {
         val reminders = call.getArray("reminders") ?: return call.reject("replaceAll needs reminders.")
         try {
@@ -66,6 +100,7 @@ class MmRemindersPlugin : Plugin() {
 object Reminders {
     private const val PREFS = "mm_reminders"
     private const val KEY = "scheduled"
+    private const val ASKED = "exactAlarmsAsked"
     const val CHANNEL = "reminders"
 
     private fun alarms(context: Context) = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -81,6 +116,20 @@ object Reminders {
         )
     }
 
+    /** Whether an alarm can be exact: always before Android 12, by the person's consent after (MM-248). */
+    fun exact(context: Context): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms(context).canScheduleExactAlarms()
+
+    fun markAsked(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(ASKED, true).apply()
+    }
+
+    /** What the app's settings show: "onTheMinute", "notAsked" or "withinAnHour". */
+    fun timing(context: Context): String = when {
+        exact(context) -> "onTheMinute"
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(ASKED, false) -> "withinAnHour"
+        else -> "notAsked"
+    }
+
     /** Cancels everything scheduled before and schedules exactly `reminders`. */
     fun replaceAll(context: Context, reminders: JSONArray) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -90,19 +139,29 @@ object Reminders {
         schedule(context, reminders)
     }
 
-    /** Schedules `reminders` whose times have not already passed. */
+    /**
+     * Schedules `reminders` whose times have not already passed: exact when
+     * allowed, inexact otherwise (MM-248). Setting one again replaces it.
+     */
     fun schedule(context: Context, reminders: JSONArray) {
         ensureChannel(context)
         val now = System.currentTimeMillis()
+        val onTheMinute = exact(context)
         for (index in 0 until reminders.length()) {
             val reminder = reminders.getJSONObject(index)
             val at = reminder.getLong("atMs")
             if (at < now) continue
-            alarms(context).setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                at,
-                pending(context, index, reminder.getString("title")),
-            )
+            val intent = pending(context, index, reminder.getString("title"))
+            try {
+                if (onTheMinute) {
+                    alarms(context).setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent)
+                } else {
+                    alarms(context).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent)
+                }
+            } catch (revoked: SecurityException) {
+                // Withdrawn since the check: the inexact one, as if never allowed.
+                alarms(context).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent)
+            }
         }
     }
 
