@@ -9,6 +9,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { openAddFood, press, typeIn } from '../support/addFood';
 import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
+import { fixtureCatalog, withCatalog } from '../support/fixtureCatalog';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
@@ -225,4 +226,62 @@ it('deleting a saved food asks first and keeps the sheet open', async () => {
   const question = await screen.findByRole('dialog', { name: 'Delete Old bar?' });
   await userEvent.click(within(question).getByRole('button', { name: 'Delete' }));
   expect(await within(sheet).findByText('Nothing saved yet.')).toBeInTheDocument();
+});
+
+/** Opens a new recipe called `name`, with the fixture pack installed. */
+async function newRecipe(name: string): Promise<HTMLElement> {
+  renderApp(repos, today, { change: withCatalog(await fixtureCatalog()) });
+  await openTab('Food');
+  const sheet = await openAddFood();
+  await press(sheet, 'Saved');
+  await press(sheet, 'New recipe');
+  await typeIn(sheet, 'Name', name);
+  return sheet;
+}
+
+it('an ingredient the pack has raw and cooked asks which was weighed', async () => {
+  const sheet = await newRecipe('Rice bowl');
+  await typeIn(sheet, 'Search ingredients', 'white rice');
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^White rice, cooked/ }));
+  expect(await within(sheet).findByText('Choose the state it was in when you weighed it.')).toBeInTheDocument();
+  await typeIn(sheet, 'Weight g', '200');
+  expect(within(sheet).getByText('200 g cooked is about 260 kcal. 200 g raw is about 730 kcal.')).toBeInTheDocument();
+  await press(sheet, 'Raw');
+  expect(within(sheet).getByText('200 g raw is about 730 kcal. 200 g cooked is about 260 kcal.')).toBeInTheDocument();
+  await press(sheet, 'Add');
+  await typeIn(sheet, 'Makes servings', '2');
+  expect(within(sheet).getByText(/One serving: 365 kcal/)).toBeInTheDocument();
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved()).length).toBe(1);
+  const line = (await saved())[0]?.ingredients[0];
+  expect(line?.name).toBe('White rice, raw');
+  expect(line?.grams).toBe(200);
+  expectClose(line?.totals.kcal ?? 0, 730, 1e-9);
+});
+
+it("a recipe's ingredients can be put in another order", async () => {
+  const sheet = await newRecipe('Chili');
+  await press(sheet, 'Enter numbers instead');
+  for (const [name, kcal] of [
+    ['Beef', '1000'],
+    ['Beans', '600'],
+    ['Onion', '80'],
+  ] as const) {
+    await typeIn(sheet, 'Ingredient', name);
+    await typeIn(sheet, 'kcal', kcal);
+    await press(sheet, 'Add');
+  }
+  await press(sheet, 'More actions for Beef');
+  const down = await screen.findByRole('menuitem', { name: 'Move down' });
+  expect(screen.queryByRole('menuitem', { name: 'Move up' }), 'the first cannot go higher').not.toBeInTheDocument();
+  await userEvent.click(down);
+  await press(sheet, 'More actions for Onion');
+  const up = await screen.findByRole('menuitem', { name: 'Move up' });
+  expect(screen.queryByRole('menuitem', { name: 'Move down' }), 'the last cannot go lower').not.toBeInTheDocument();
+  await userEvent.click(up);
+  await press(sheet, 'More actions for Beans');
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved()).length).toBe(1);
+  expect((await saved())[0]?.ingredients.map((i) => i.name)).toEqual(['Onion', 'Beef']);
 });

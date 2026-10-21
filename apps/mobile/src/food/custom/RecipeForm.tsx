@@ -6,11 +6,13 @@ import { recipeServingGrams } from '../../domain/food/custom/recipeServingGrams'
 import { parseQuantity } from '../../domain/food/portion/parseQuantity';
 import { Fmt } from '../../format/Fmt';
 import { quantityText } from '../../format/quantityText';
+import { moved } from '../../lang/moved';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { useApp } from '../../app/useApp';
 import { MmButton } from '../../ui/MmButton';
-import { MmIconButton } from '../../ui/MmIconButton';
 import { MmListRow } from '../../ui/MmListRow';
+import { MmMenuButton } from '../../ui/MmMenuButton';
+import type { MmMenuItem } from '../../ui/MmMenuItem';
 import { MmTextField } from '../../ui/MmTextField';
 import { RecipeIngredientAdder } from './RecipeIngredientAdder';
 import '../food.css';
@@ -23,10 +25,20 @@ interface RecipeFormProps {
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 
+type LineAction = 'up' | 'down' | 'remove';
+
+/** What can be done to the line at `at` of `count`: move it, where there is room, or remove it (MM-45). */
+const lineActions = (at: number, count: number): MmMenuItem<LineAction>[] => [
+  ...(at > 0 ? [{ value: 'up' as const, label: 'Move up' }] : []),
+  ...(at < count - 1 ? [{ value: 'down' as const, label: 'Move down' }] : []),
+  { value: 'remove', label: 'Remove' },
+];
+
 /**
  * Define a recipe: its ingredients, how many servings it makes, and
  * optionally the cooked weight of the whole pot (MM-45). One serving is the
- * summed ingredients divided by the servings.
+ * summed ingredients divided by the servings. Ingredients are kept in the
+ * order they are put in, and each line's menu moves or removes it.
  */
 export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
   const { services } = useApp();
@@ -41,6 +53,11 @@ export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
   const cookedGrams = parseQuantity(cooked);
   const per = servingCount === undefined ? undefined : recipePerServing(ingredients, servingCount);
   const valid = name.trim() !== '' && ingredients.length > 0 && (per?.kcal ?? 0) > 0;
+
+  const act = (at: number, action: LineAction) => {
+    if (action === 'remove') setIngredients(ingredients.filter((_, i) => i !== at));
+    else setIngredients(moved(ingredients, at, action === 'up' ? at - 1 : at + 1));
+  };
 
   const save = async () => {
     if (servingCount === undefined || per === undefined) return;
@@ -83,10 +100,11 @@ export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
             Fmt.kcal(ingredient.totals.kcal)
           }
           trailingAction={
-            <MmIconButton
-              icon="close"
-              label={`Remove ${ingredient.name}`}
-              onPress={() => setIngredients(ingredients.filter((_, at) => at !== i))}
+            <MmMenuButton<LineAction>
+              icon="more"
+              label={`More actions for ${ingredient.name}`}
+              items={lineActions(i, ingredients.length)}
+              onSelect={(action) => act(i, action)}
             />
           }
         />
