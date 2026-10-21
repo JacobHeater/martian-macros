@@ -135,6 +135,15 @@ export function targetsHistoryRepositoryContract(
       expect(history[1]?.summarySeen).toBe(false);
     });
 
+    // MM-495: marking a summary seen dropped the pace asked for in memory, so the engine saw a pace change.
+    it('marks summaries seen without losing the pace asked for', async () => {
+      await repo.saveTargets(record(d1, 2175, { requestedLossFraction: 0.005 }).copyWith({ summarySeen: false }));
+      await repo.markSummariesSeenThrough(d1);
+      const marked = single(await first(repo.watchTargetsHistory()));
+      expect(marked.summarySeen).toBe(true);
+      expect(marked.requestedLossFraction).toBe(0.005);
+    });
+
     it('keeps the estimate and the flags', async () => {
       const firstFlag = TargetFlag.values[0];
       const lastFlag = TargetFlag.values[TargetFlag.values.length - 1] as TargetFlag;
