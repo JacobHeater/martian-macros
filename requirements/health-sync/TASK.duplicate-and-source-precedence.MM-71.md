@@ -1,8 +1,8 @@
 ---
 id: MM-71
-status: in-progress
+status: done
 component: health-sync
-related: [MM-66, MM-67, MM-16, MM-18, MM-34, MM-68, MM-69]
+related: [MM-66, MM-67, MM-16, MM-18, MM-34, MM-68, MM-69, MM-441, MM-442, MM-443]
 ---
 
 # Task: Which reading counts when several sources report the same thing
@@ -49,6 +49,27 @@ Scenario: A typed value wins
 
 Scenario: Deterministic
   Then the same samples in any order give the same result
+
+Scenario: The primary scale is chosen automatically until the user names one
+  Given weigh-ins from two scales and no scale chosen
+  Then the scale with the most weigh-ins in the last thirty days is primary
+  And Settings says so, as "Automatic"
+
+Scenario: Choosing the primary scale in Settings
+  Given weigh-ins from two scales
+  When the user chooses the one with fewer weigh-ins as primary in Settings
+  Then its readings count first from then on
+  And choosing "Automatic" goes back to the scale with the most weigh-ins
+
+Scenario: Nothing to choose with one scale
+  Given weigh-ins from one source only
+  Then Settings offers no primary scale
+
+Scenario: The choice survives an update and goes with an erase
+  Given a database from before the choice existed
+  When the app is updated
+  Then no scale is chosen and the automatic rule applies
+  And erasing all data forgets a scale that was chosen
 ```
 
 ## Progress
@@ -65,13 +86,39 @@ Choices I made without asking (say if any is wrong):
 - **A middle value taken across two sources is said to be from "several sources".**
 - **The morning is 04:00 up to, not including, 12:00.**
 
-Not built:
-- **Changing the primary scale in Settings**: it is chosen automatically only.
-- Steps through the platform's own aggregation, and body fat tracked per source (MM-34): only weight is used so far.
-- A weigh-in window for people whose morning is not 04:00 to 12:00.
+Built (2026-10-21):
+- **The primary scale chosen in Settings.** A "Primary scale" row in the health platform's section, laid out as
+  Appearance is (rule 9): the scale in force, with "Automatic: Bathroom scale, with the most weigh-ins in 30 days."
+  until one is chosen, and a chooser of "Automatic" and each named source. Shown only when weigh-ins come from more
+  than one source. The choice is kept in `user_preferences.primary_scale_source_id` (schema version 15; none,
+  automatic, until chosen), behind `PrimaryScaleReader` and `PrimaryScaleWriter`, and the day's weigh-ins are
+  chosen again as soon as it changes. The section's note says the primary scale counts first.
+- Guarding tests: `test/settings/primaryScale.test.tsx` (automatic, chosen, Settings round trip, one scale);
+  the `PreferencesRepository` contract (`test/contracts/preferencesRepositoryContract.ts`) against both
+  implementations; `test/data/upgrade.test.ts` ("a version 14 database comes up to date with the primary scale
+  chosen automatically"); the erase contract (`test/contracts/dataEraserContract.ts`); `test/data/schema.test.ts`
+  and `test/data/schemaFingerprint.test.ts` (version 15). Not run locally; CI validates.
+
+Choices I made without asking (say if any is wrong):
+- **A source the platform did not name is never offered** in the chooser (MM-395); it still counts when it is the
+  automatic choice.
+- **A chosen scale with nothing kept** (its readings deleted) stays chosen, and the row says every source's readings
+  count alike until it weighs again.
+- **The choice is forgotten when all data is erased**, with the readings it was chosen from.
+- **The first CI run found MM-443**: a choice saved before the app opened never reached the day's weigh-in, because the
+  state cell that reads it asked once, before the choice had loaded. Fixed in `StreamCell`.
+- **No panel pass**: one row in an existing section, built like its sibling Appearance; the stories draw it.
+
+Moved to their own tickets:
+- A weigh-in window for people whose morning is not 04:00 to 12:00: MM-441.
+- Steps through the platform's own aggregation: MM-442. Body fat tracked per source stays with MM-34.
+
+## UI/UX
+- The primary scale in Settings — apps/mobile/src/gallery/screens/Settings.stories.tsx
+  (Stories: HealthConnectTwoScales, HealthConnectPrimaryScaleChosen, HealthConnectPrimaryScaleFails).
 
 ## Notes
 - "First morning reading" assumes a usual sleep schedule. A night-shift worker's morning is not 04:00 to 12:00; a setting for the weigh-in
-  window is a small later addition.
+  window is a small later addition (MM-441).
 - When the primary scale changes, the trend filter will see a step if the scales disagree. The outlier rule (MM-18) absorbs a small one;
   a large one needs a per-source offset, which MM-34's design should cover for weight as well as body fat.

@@ -115,6 +115,8 @@ export * from './repositories/DayMarkRepository';
 export * from './repositories/DayMarkWriter';
 export * from './repositories/CookingFatReader';
 export * from './repositories/CookingFatWriter';
+export * from './repositories/PrimaryScaleReader';
+export * from './repositories/PrimaryScaleWriter';
 export * from './repositories/DetailLevelReader';
 export * from './repositories/DetailLevelWriter';
 export * from './repositories/EasyToMissReader';
