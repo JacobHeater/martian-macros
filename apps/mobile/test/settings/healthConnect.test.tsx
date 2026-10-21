@@ -122,7 +122,7 @@ describe('laid out as Reminders is (MM-320)', () => {
     const settings = await open();
     const section = (await settings.findByRole('region', { name: 'Health Connect' })) as HTMLElement;
     const card = section.querySelector('.mm-list-group')!;
-    const note = within(section).getByText(/^The app only reads/);
+    const note = within(section).getByText(/^Nothing read leaves this phone/);
     expect(card.contains(note)).toBe(false);
     expect([...card.children].every((child) => child.classList.contains('mm-list-row'))).toBe(true);
     expect(within(card as HTMLElement).getByRole('button', { name: 'Read from Health Connect now' })).toBeInTheDocument();

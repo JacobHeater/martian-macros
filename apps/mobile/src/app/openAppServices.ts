@@ -23,6 +23,8 @@ import { mmReminders } from '../platform/mmReminders';
 import { mmScanner } from '../platform/mmScanner';
 import { NativeCamera } from '../platform/NativeCamera';
 import { NativeHealthSource } from '../platform/NativeHealthSource';
+import { NativeHealthWorkouts } from '../platform/NativeHealthWorkouts';
+import { NativeHealthWriting } from '../platform/NativeHealthWriting';
 import { NativeReminderScheduler } from '../platform/NativeReminderScheduler';
 import { NativeExactAlarms } from '../platform/NativeExactAlarms';
 import { NoExactAlarmPermission } from '../platform/NoExactAlarmPermission';
@@ -30,6 +32,11 @@ import { NoCamera } from '../platform/NoCamera';
 import { runningNatively } from '../platform/runningNatively';
 import { runningOn } from '../platform/runningOn';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
+import { NoHealthWorkouts } from '../platform/NoHealthWorkouts';
+import { NoHealthWriting } from '../platform/NoHealthWriting';
+import { MirroredFoodLog } from '../healthWrite/MirroredFoodLog';
+import { MirroredWaterLog } from '../healthWrite/MirroredWaterLog';
+import { MirroredWorkoutLog } from '../healthWrite/MirroredWorkoutLog';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { mmDb } from '../sql/native/mmDb';
@@ -62,6 +69,13 @@ export async function openAppServices(): Promise<AppServices> {
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
   const onlineHttp = new CapacitorJsonHttp();
   const onlineFoods = new SqlOnlineFoodCache(sql);
+  const platform = runningOn();
+  // What is logged is written to the health platform only for the kinds turned on in Settings (MM-70, MM-314,
+  // MM-489); the plugin keeps which those are. Health Connect names a workout's exercises, Apple Health does not.
+  const healthWriting = native ? new NativeHealthWriting(mmHealth) : new NoHealthWriting();
+  const healthWorkouts = native
+    ? new NativeHealthWorkouts({ api: mmHealth, namesExercises: platform === 'android' })
+    : new NoHealthWorkouts();
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
@@ -70,8 +84,8 @@ export async function openAppServices(): Promise<AppServices> {
     waist: repositories.waist,
     flowDays: repositories.flowDays,
     sleep: repositories.sleep,
-    water: repositories.water,
-    food: repositories.food,
+    water: new MirroredWaterLog({ log: repositories.water, platform: healthWriting }),
+    food: new MirroredFoodLog({ log: repositories.food, platform: healthWriting }),
     customFoods: repositories.customFoods,
     dayMarks: repositories.dayMarks,
     intake: repositories.intake,
@@ -83,7 +97,11 @@ export async function openAppServices(): Promise<AppServices> {
     pauses: repositories.pauses,
     reminders: repositories.reminders,
     recovery: repositories.recovery,
-    workouts: repositories.workouts,
+    workouts: new MirroredWorkoutLog({
+      log: repositories.workouts,
+      platform: healthWorkouts,
+      customExercises: repositories.customExercises,
+    }),
     customExercises: repositories.customExercises,
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
@@ -119,8 +137,10 @@ export async function openAppServices(): Promise<AppServices> {
       : new NoNotifications(),
     exactAlarms: native ? new NativeExactAlarms(mmReminders) : new NoExactAlarmPermission(),
     healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
+    healthWriting,
+    healthWorkouts,
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
-    platform: runningOn(),
+    platform,
   };
 }

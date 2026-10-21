@@ -8,7 +8,6 @@ import type { HealthHistoryAccess } from '../HealthHistoryAccess';
 import { HealthReadFailure } from '../HealthReadFailure';
 import type { HealthSample } from '../HealthSample';
 import type { HealthSource } from '../HealthSource';
-import type { NutritionRecord } from '../NutritionRecord';
 
 /** One recorded event, as it is written in a history. */
 type RecordedEvent = Readonly<Record<string, unknown>>;
@@ -65,12 +64,6 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
 
   /** How many times the user was shown the history question. */
   historyAsked = 0;
-
-  /** Whether the platform takes nutrition from the app. */
-  takesNutrition = true;
-
-  /** What was written with `writeNutrition`, by record id. */
-  readonly written = new Map<string, NutritionRecord>();
 
   private readonly allowed = new Set<HealthDataType>();
   private historyAllowed = false;
@@ -252,11 +245,5 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess {
       upserted: upserted.sort(byStartThenId),
       deletedIds: deletedIds.sort(compareStrings),
     });
-  }
-
-  async writeNutrition(record: NutritionRecord): Promise<boolean> {
-    if (!this.takesNutrition) return false;
-    this.written.set(record.id, record);
-    return true;
   }
 }

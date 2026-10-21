@@ -89,9 +89,8 @@
          are scheduled inexactly and nothing else changes. Not
          USE_EXACT_ALARM: alarms are not this app's core function. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <!-- Health Connect (MM-68): read only, and only what the user grants
-         one by one in Settings. Nothing read leaves the device, and the
-         app writes nothing to the user's health data. -->
+    <!-- Health Connect (MM-68): read only what the user grants one by one
+         in Settings. Nothing read leaves the device. -->
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
     <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
     <uses-permission android:name="android.permission.health.READ_LEAN_BODY_MASS" />
@@ -103,6 +102,13 @@
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY" />
     <!-- Sleep sessions, for the nightly record (MM-250). -->
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <!-- Writing (MM-70, MM-314, MM-489): each asked for by itself, apart from
+         reading, only when the user turns that kind on in Settings. Only what
+         is logged in the app is written, and only the app's own records are
+         ever changed or removed. -->
+    <uses-permission android:name="android.permission.health.WRITE_NUTRITION" />
+    <uses-permission android:name="android.permission.health.WRITE_HYDRATION" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
 
     <!-- Whether Health Connect is on the device (MM-68). -->
     <queries>

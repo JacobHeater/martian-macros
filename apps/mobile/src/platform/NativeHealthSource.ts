@@ -16,8 +16,8 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
 
 /**
  * Android's Health Connect behind `HealthSource` (MM-68), over the app's
- * own plugin. It only reads: nothing is written to the user's health data
- * until writing nutrition is built (MM-70). A read the platform refuses is
+ * own plugin. It only reads: writing is `NativeHealthWriting` (MM-70) and
+ * `NativeHealthWorkouts` (MM-489). A read the platform refuses is
  * a rejection from the plugin and `HealthReadFailure` here, never
  * "nothing".
  *
@@ -125,9 +125,5 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
       upserted: sorted([...upserted.values()]),
       deletedIds: [...deleted].sort(),
     });
-  }
-
-  writeNutrition(): Promise<boolean> {
-    return Promise.resolve(false);
   }
 }

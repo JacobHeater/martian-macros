@@ -1,6 +1,8 @@
 import type { FixedClock } from '../fixtures/FixedClock';
 import { InMemoryReminderScheduler } from '../fixtures/InMemoryReminderScheduler';
 import { InMemoryExactAlarms } from '../fixtures/InMemoryExactAlarms';
+import { InMemoryHealthWorkouts } from '../fixtures/InMemoryHealthWorkouts';
+import { InMemoryHealthWriting } from '../fixtures/InMemoryHealthWriting';
 import type { InMemoryRepositories } from '../fixtures/InMemoryRepositories';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
@@ -42,6 +44,9 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     exactAlarms: new InMemoryExactAlarms(),
     // Never the device's health platform: one with nothing in it, unless another is brought.
     healthSource: FakeHealthSource.fromJson('{"sources": [], "events": []}'),
+    // Nothing is written to it unless a story or a test turns a kind on (MM-70).
+    healthWriting: new InMemoryHealthWriting(),
+    healthWorkouts: new InMemoryHealthWorkouts({ namesExercises: true }),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),
     environment: 'dev',
     // The app as on an Android phone, unless a story or a test is about an iPhone (`onIos`, MM-403).
