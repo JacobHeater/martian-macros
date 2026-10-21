@@ -870,7 +870,8 @@
             "MM-401",
             "MM-402",
             "MM-403",
-            "MM-407"
+            "MM-407",
+            "MM-474"
           ]
         },
         {
@@ -1562,8 +1563,7 @@
           "step": 6,
           "title": "App icon and launch screen",
           "tickets": [
-            "MM-109",
-            "MM-474"
+            "MM-109"
           ],
           "milestone": "M3"
         },
@@ -1776,6 +1776,14 @@
             "MM-422"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 22,
+          "title": "Dev and demo icons carry a marker (MM-474), after MM-109",
+          "tickets": [
+            "MM-474"
+          ],
+          "milestone": "M4"
         }
       ],
       "gate": {

@@ -106,9 +106,9 @@ WS-13, which needs accessibility, both themes and the icon.
    add the small trend line the dashboard needs.
 5. **Dark-theme, small-screen, large-text and accessibility verification
    (MM-91, MM-106).** M2. The gallery (MM-105) moved to step 1.
-6. **Icon and launch screen (MM-109, MM-474).** M3. The vector icon (the ringed
+6. **Icon and launch screen (MM-109).** M3. The vector icon (the ringed
    planet), the themed icon and the launch screen on Martian's canvas are built
-   and wait for the owner's look on the phone; MM-474 marks the dev and demo icons.
+   and wait for the owner's look on the phone; the dev and demo markers are step 22.
 
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
 trend line.
@@ -119,6 +119,7 @@ trend line.
 11. **What the hierarchy panel left for later (MM-286 to MM-289).** M2. Destinations keep their state across tabs (MM-286), Progress with one figure and the lifts as rows (MM-287), the Ember budget for text actions, an owner decision (MM-288), a demo seed that shows every mark (MM-289).
 10. **Own the full visual experience (MM-262; MM-263 to MM-282 less MM-278).** M2. The owner's rule of 2026-10-13: nothing native shows. Custom date, time and select pickers; checkbox and slider drawn by us; a pressed state on every control; menus never clipped; focus trapped in overlays; a story for every component and state; tokens honoured; the written system. From the component walk in docs/agent-runs/mm253-components. **Built 2026-10-13**, the same day, in one pull request: the step is done.
 20. **The iOS shell (MM-403).** M4. Started 2026-10-19 on the owner's Mac (macOS Sequoia, Xcode 26.3): the Capacitor iOS project under the DEMO identity with Swift Package Manager, the plugins registered from `MainViewController` as `MainActivity` registers the Kotlin ones, `AppServices.platform`, the terms declined on iOS without "Close the app", `mm build ios`, `mm run --ios`, `mm simulator` and the simulator in `mm screenshot`. The plugins themselves are MM-404 (WS-14), MM-405 (WS-09), MM-406 (WS-08) and MM-69 (WS-11).
+22. **Dev and demo icons carry a marker (MM-474).** M4. After MM-109: prod, dev and demo share one icon until then.
 
 ## Done enough to unblock others
 MM-104, MM-108 and MM-99 are done: existing screens use library components
