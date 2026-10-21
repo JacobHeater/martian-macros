@@ -198,10 +198,10 @@ async function missedPeriod(sex: 'female' | 'male', goalMode: 'fatLoss' | 'leanG
 
 const periodQuestion = 'No period marked for 46 days. Is that expected?';
 
+/** Into this week's check-in from the row under the goal (MM-391). */
 async function openCheckIn(): Promise<void> {
-  const card = await openCoach();
-  await userEvent.click(within(card).getByRole('button', { name: 'Answer this week' }));
-  await screen.findByRole('heading', { name: 'This week' });
+  await openCoach();
+  await answerThisWeek();
 }
 
 it('a missed period is asked about, and "not sure" on fat loss brings the notice', async () => {
