@@ -4,6 +4,7 @@ const prompts: Readonly<Record<ReminderKind, string>> = {
   weighIn: 'Morning weigh-in?',
   logFood: 'Log today’s food?',
   weeklyMeasurement: 'Time for this week’s measurement?',
+  recoveryCheckIn: 'Five quick questions on the week?',
 };
 
 /**
