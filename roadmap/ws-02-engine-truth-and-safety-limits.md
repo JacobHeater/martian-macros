@@ -98,8 +98,9 @@ should see corrected limits).
 7. **Joint model spike (MM-35).** M4. Only after step 2 has shown what the
    two-step model can and cannot do with a glycogen term.
 8. **The partial-day rule for estimate-heavy logging (MM-173).** M2. Placed 2026-10-13.
-9. **The one-week break choice (MM-432).** M3. Needs a `setups` column, so it
-   waits on the schema lane; placed 2026-10-20 when MM-135 stopped at it.
+9. **The one-week break choice (MM-432, MM-495).** M3. Declined by the owner on
+   2026-10-21: a break stays two weeks. MM-495, found while building it (a record
+   marked seen lost its asked-for pace), is fixed.
 
 ## Done enough to unblock others
 MM-120, MM-131, MM-115 and MM-132 are done, the full engine suite passes, and
@@ -124,7 +125,7 @@ is changing.
   (reference weight, settling after a phase change); MM-115 (raise when loss
   outruns the limit); MM-111 (underweight guard); MM-132 (body-fat thresholds
   under uncertainty).
-- Remaining: MM-35, MM-432 (the one-week break choice). Epics: MM-22, MM-110.
+- Remaining: MM-35. Epics: MM-22, MM-110.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-173 (Honest low days from a noisy logger are dropped as partial, and the estimate drifts high).
 
 ## Notes for whoever builds it
