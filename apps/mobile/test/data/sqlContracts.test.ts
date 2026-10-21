@@ -20,6 +20,7 @@ import { reminderRepositoryContract } from '../contracts/reminderRepositoryContr
 import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
 import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
 import { targetShapeRepositoryContract } from '../contracts/targetShapeRepositoryContract';
+import { goalBodyFatRepositoryContract } from '../contracts/goalBodyFatRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
@@ -58,6 +59,7 @@ customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);
 dayMarkRepositoryContract('SQLite', async () => (await open()).dayMarks);
 targetsHistoryRepositoryContract('SQLite', async () => (await open()).targets);
 targetShapeRepositoryContract('SQLite', async () => (await open()).targetShapes);
+goalBodyFatRepositoryContract('SQLite', async () => (await open()).goalBodyFat);
 insightLogRepositoryContract('SQLite', async () => (await open()).insightLog);
 inlineInsightLogRepositoryContract('SQLite', async () => (await open()).inlineInsightLog);
 insightSnoozeRepositoryContract('SQLite', async () => (await open()).insightSnoozes);
@@ -83,6 +85,7 @@ dataEraserContract('SQLite', async () => {
     food: r.food,
     targets: r.targets,
     targetShapes: r.targetShapes,
+    goalBodyFat: r.goalBodyFat,
     preferences: r.preferences,
     weighInWindow: r.weighInWindow,
     workouts: r.workouts,
