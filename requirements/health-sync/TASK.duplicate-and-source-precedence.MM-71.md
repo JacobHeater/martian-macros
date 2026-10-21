@@ -2,7 +2,7 @@
 id: MM-71
 status: done
 component: health-sync
-related: [MM-66, MM-67, MM-16, MM-18, MM-34, MM-68, MM-69, MM-441, MM-442]
+related: [MM-66, MM-67, MM-16, MM-18, MM-34, MM-68, MM-69, MM-441, MM-442, MM-443]
 ---
 
 # Task: Which reading counts when several sources report the same thing
@@ -105,6 +105,8 @@ Choices I made without asking (say if any is wrong):
 - **A chosen scale with nothing kept** (its readings deleted) stays chosen, and the row says every source's readings
   count alike until it weighs again.
 - **The choice is forgotten when all data is erased**, with the readings it was chosen from.
+- **The first CI run found MM-443**: a choice saved before the app opened never reached the day's weigh-in, because the
+  state cell that reads it asked once, before the choice had loaded. Fixed in `StreamCell`.
 - **No panel pass**: one row in an existing section, built like its sibling Appearance; the stories draw it.
 
 Moved to their own tickets:
