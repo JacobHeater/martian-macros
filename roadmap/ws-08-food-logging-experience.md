@@ -108,11 +108,12 @@ and WS-09 steps 1 and 8.
    Full detail and its one insight, at most monthly.
 7. **Hand portions (MM-46).** M4. The estimator tells hand portions from
    weighing and from labels; still needs food densities in the pack.
-8. **Label scanning; live lookup (MM-44, MM-58).** M4.
+8. **Label scanning; live lookup (MM-44, MM-58).** M4. MM-44 done 2026-10-21:
+   columnar panels read, unsure numbers marked; the real camera is owed on a phone.
 9. **The Food screen and Add food hierarchy (MM-224) (MM-180, MM-213, MM-223, MM-225, MM-226, MM-227, MM-218, MM-219, MM-220, MM-221).** M2. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
 - Placed 2026-10-19 in step 4: MM-408 (the search results flashed on every keystroke; the packs are now asked once the typing pauses and the last results stay until the next arrive, done); MM-410 ("More results" lengthens the list by twenty while there are more, the first new row focused and announced, now that the 2026-10-19 packs give a common word hundreds of matches; done); MM-411 (a failed page of results says so; proposed, from the panel's review of MM-410).
-12. **The grade, the packs' sources and their downloads (MM-380 to MM-388, MM-471).** M4. Of the download follow-ups: re-opening the catalog closes the packs of the one it replaces (MM-386, done); a pack file streams into its partial natively and only counts reach the app (MM-387, built, the release-build memory check on the phone owed); a cancelled native download settles (MM-471, done).
+12. **The grade, the packs' sources and their downloads (MM-380 to MM-388, MM-471).** M4. Of the download follow-ups: re-opening the catalog closes the packs of the one it replaces (MM-386, done); a pack file streams into its partial natively and only counts reach the app (MM-387, done; the release-build memory check is owed on a phone); a cancelled native download settles (MM-471, done).
 13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's.
 14. **A recipe ingredient keeps the food it came from (MM-456).** M4. Done 2026-10-21: schema 20 adds the source food to `recipe_ingredients`, so a found line's weight changes in place from the food as installed.
 
@@ -136,7 +137,7 @@ workstream's.
 - In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
   barcode), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
-  need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food; not yet tried with the real camera). Epic: MM-37.
+  need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food, columnar panels included, each unsure number marked; not yet tried with the real camera). Epic: MM-37.
 - Remaining: MM-58.
 - Built 2026-10-21: MM-456 (a recipe's ingredient keeps the food it came from; its weight changes in place).
 - Built 2026-10-21: MM-127 (alcohol in standard drinks, its line on Today too), MM-126 (the fiber insight).
