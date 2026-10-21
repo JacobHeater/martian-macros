@@ -53,7 +53,15 @@ export function MeasurementsStep({ units, typed, onUnits, onTyped, health }: Mea
       )}
       <div className="app-gap" />
       <SectionLabel text="Current weight" />
-      {field('weight', fmt.weightUnit)}
+      {/* Drawn again, and focused, each time a row of the offer that was pressed goes away (the panel's review). */}
+      <MmTextField
+        key={`weight-${health?.focusWeight ?? 0}`}
+        label={fmt.weightUnit}
+        kind="number"
+        value={typed.weight}
+        onChange={(value) => onTyped({ ...typed, weight: value })}
+        autoFocus={(health?.focusWeight ?? 0) > 0}
+      />
       {/* Said when it changes, as the offer under it does, since the row pressed goes away (the panel's review). */}
       <p className="app-caption" aria-live="polite">
         {health?.used === true && health.today !== undefined

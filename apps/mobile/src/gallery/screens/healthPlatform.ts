@@ -22,7 +22,8 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * the platform no longer shows the request for, and `opensPermissions`
  * whether its screen of the app's permissions opens (MM-323). `heightCm`
  * is the height the platform holds (MM-68), and `weighInToday` adds this
- * morning's weigh-in from the bathroom scale (MM-73).
+ * morning's weigh-in from the bathroom scale (MM-73). `readsHang` keeps
+ * every read waiting, for the moment a read is out.
  */
 export function healthPlatform({
   allowed = [],
@@ -37,6 +38,7 @@ export function healthPlatform({
   opensPermissions = true,
   heightCm = 180,
   weighInToday = false,
+  readsHang = false,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
@@ -50,6 +52,7 @@ export function healthPlatform({
   opensPermissions?: boolean;
   heightCm?: number;
   weighInToday?: boolean;
+  readsHang?: boolean;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
@@ -111,6 +114,11 @@ export function healthPlatform({
     source.unreadable = unreadable;
     source.stopsAsking = new Set(stopsAsking);
     source.opensPermissions = opensPermissions;
+    if (readsHang) {
+      const waiting = () => new Promise<never>(() => undefined);
+      source.read = waiting;
+      source.changesSince = waiting;
+    }
     if (historyRefused) {
       source.historyFrom = new Date(`${storyToday.addDays(-30).toString()}T00:00:00`);
       source.willPermitHistory = false;

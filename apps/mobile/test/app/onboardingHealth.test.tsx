@@ -91,8 +91,12 @@ it('today’s imported weigh-in is offered as the current weight, and is not typ
   const repos = await toMeasurements(scale(10));
   expect(next(), 'no weight yet').toBeDisabled();
   await press(/^Read weight from Health Connect/);
+  // The row pressed goes away: the weight field takes focus, so a reader goes on from there.
+  await expect.poll(() => weightField()).toHaveFocus();
   await press(/^Use 181\.7 lb/);
   expect(weightField().value).toBe('181.7');
+  // The Use row goes away too: focus is on the field it filled.
+  await expect.poll(() => weightField()).toHaveFocus();
   expect(screen.getByText('Today’s weigh-in from Bathroom scale, in Health Connect. Type to change it.')).toBeInTheDocument();
   expect(next()).toBeEnabled();
   await finish();
@@ -116,6 +120,7 @@ it('with nothing weighed today, the weight is typed as before', async () => {
   await toMeasurements(scale(10, { todayToo: false }));
   await press(/^Read weight from Health Connect/);
   expect(await screen.findByText('No weigh-in in Health Connect today')).toBeInTheDocument();
+  expect(weightField()).toHaveFocus();
   expect(screen.queryByRole('button', { name: /^Use / })).toBeNull();
 });
 
