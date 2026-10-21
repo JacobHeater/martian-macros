@@ -29,6 +29,7 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
 import type { TargetShape } from '../domain/TargetShape';
+import type { BodyFatObservation } from '../domain/BodyFatObservation';
 import type { GoalBodyFat } from '../domain/GoalBodyFat';
 import type { PhotoSettings } from '../domain/photos/PhotoSettings';
 import type { ProgressPhoto } from '../domain/photos/ProgressPhoto';
@@ -46,6 +47,7 @@ import type { TrainingLapse } from '../engine/TrainingLapse';
 import { trainingSuspended } from '../engine/trainingSuspended';
 import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import type { PhasePlan } from '../engine/PhasePlan';
+import { bodyFatReadingsOf } from './bodyFatReadingsOf';
 import { planPhases } from '../engine/planPhases';
 import { platformWorkoutImports } from '../engine/platformWorkoutImports';
 import { assessStall } from '../engine/assessStall';
@@ -269,6 +271,9 @@ export class AppState {
 
   /** The imported sleep that counts for each night (MM-250), from what has been read and kept. Empty when nothing has been imported. */
   readonly importedSleep: Cell<Loadable<NightOfSleep[]>>;
+
+  /** Smart-scale body-fat readings read from the health platform (MM-502), for the body-fat range. */
+  readonly bodyFatReadings: Cell<Loadable<BodyFatObservation[]>>;
 
   /** The nights the app works from: typed over imported, oldest first (MM-250). */
   readonly sleepNights: Cell<Loadable<SleepNight[]>>;
@@ -625,6 +630,7 @@ export class AppState {
     this.waist = stream(() => s.waist.watchWaist());
     this.typedSleep = stream(() => s.sleep.watchSleepNights());
     this.importedSleep = stream(() => this.importedSamples('sleep', nightlySleep));
+    this.bodyFatReadings = stream(() => this.importedSamples('bodyFat', bodyFatReadingsOf));
     this.sleepNights = derived(() => {
       const typed = this.typedSleep.value;
       const imported = of(this.importedSleep) ?? [];
@@ -670,6 +676,8 @@ export class AppState {
       const flowDays = of(this.flowDays) ?? [];
       // Waist entries join the body-fat formula (MM-34); none until read, as with no entries.
       const waists = of(this.waist) ?? [];
+      // A smart scale's readings join it too (MM-502); none until read.
+      const bodyFatReadings = of(this.bodyFatReadings) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -681,7 +689,7 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, bodyFatReadings, today });
     });
 
     this.targetShapeLimits = derived(() => {
@@ -1669,6 +1677,7 @@ export class AppState {
           intake,
           weights,
           waist,
+          bodyFatReadings: of(this.bodyFatReadings) ?? [],
           history,
           trend: coach?.trend ?? [],
           workouts,
