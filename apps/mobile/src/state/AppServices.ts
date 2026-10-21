@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { ExternalLinks } from '../domain/integration/ExternalLinks';
 import type { Platform } from '../domain/integration/Platform';
 import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
 import type { RestSignal } from '../domain/integration/RestSignal';
@@ -117,4 +118,7 @@ export interface AppServices {
 
   /** How the end of a rest is signalled (MM-191). */
   readonly restSignal: RestSignal;
+
+  /** The phone's browser, handed an address when the person presses a link (MM-454). The app fetches nothing itself. */
+  readonly externalLinks: ExternalLinks;
 }

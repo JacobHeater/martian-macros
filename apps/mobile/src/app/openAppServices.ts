@@ -22,6 +22,7 @@ import { mmHealth } from '../platform/mmHealth';
 import { mmReminders } from '../platform/mmReminders';
 import { mmScanner } from '../platform/mmScanner';
 import { NativeCamera } from '../platform/NativeCamera';
+import { NativeExternalLinks } from '../platform/NativeExternalLinks';
 import { NativeHealthSource } from '../platform/NativeHealthSource';
 import { NativeReminderScheduler } from '../platform/NativeReminderScheduler';
 import { NoCamera } from '../platform/NoCamera';
@@ -30,6 +31,7 @@ import { runningOn } from '../platform/runningOn';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
+import { WindowExternalLinks } from '../platform/WindowExternalLinks';
 import { mmDb } from '../sql/native/mmDb';
 import { NativeSqlDatabase } from '../sql/native/NativeSqlDatabase';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
@@ -109,6 +111,8 @@ export async function openAppServices(): Promise<AppServices> {
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),
+    // A link the person presses opens in the phone's browser (MM-454); in a browser, in a new tab.
+    externalLinks: native ? new NativeExternalLinks(mmBackup) : new WindowExternalLinks(),
     reminderScheduler: native
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),

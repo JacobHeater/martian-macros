@@ -7,6 +7,7 @@ import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoodCache';
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
+import { InMemoryExternalLinks } from '../fixtures/InMemoryExternalLinks';
 import { FakeHealthSource } from '../healthIngest/testing/FakeHealthSource';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
@@ -35,6 +36,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     labelReader: camera,
     // Never the device's vibration.
     restSignal: { restOver: () => undefined },
+    // Never the device's browser: a link pressed is only kept (MM-454).
+    externalLinks: new InMemoryExternalLinks(),
     // Never the device's notifications.
     reminderScheduler: new InMemoryReminderScheduler(),
     // Never the device's health platform: one with nothing in it, unless another is brought.
