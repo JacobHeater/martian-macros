@@ -146,5 +146,33 @@ describe('the field border', () => {
         expect(ratio(tokens.get('on-grade')!, tokens.get(`grade-${band}`)!), `${palette} ${band}`).toBeGreaterThanOrEqual(4.5);
       }
     });
+
+    // MM-375: a grade badge is told apart from where it sits: its fill holds 3:1 there, or, where the fill is too pale
+    // for that (light), its edge does.
+    it(`gives every grade badge a 3:1 boundary on canvas, surface and raised in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      const edge = tokens.get('grade-edge')!;
+      for (const level of ['canvas', 'surface', 'raised']) {
+        if (edge !== 'transparent') {
+          expect(ratio(edge, tokens.get(level)!), `${palette} grade edge on ${level}`).toBeGreaterThanOrEqual(3);
+          continue;
+        }
+        for (const band of ['a', 'b', 'c', 'd']) {
+          expect(ratio(tokens.get(`grade-${band}`)!, tokens.get(level)!), `${palette} ${band} on ${level}`).toBeGreaterThanOrEqual(3);
+        }
+      }
+    });
+
+    // MM-375: macro colours mean their macro only, so none is water or a grade fill, and no grade wears the action.
+    it(`keeps the macros off water and the grade fills, and the grades off the action, in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      const grades = ['a', 'b', 'c', 'd'].map((band) => tokens.get(`grade-${band}`)!.toLowerCase());
+      for (const macro of ['protein', 'carbs', 'fat']) {
+        const value = tokens.get(macro)!.toLowerCase();
+        expect(value, `${palette} ${macro} is water`).not.toBe(tokens.get('water')!.toLowerCase());
+        expect(grades, `${palette} ${macro} is a grade fill`).not.toContain(value);
+      }
+      expect(grades, `${palette} a grade is the action`).not.toContain(tokens.get('ember')!.toLowerCase());
+    });
   }
 });
