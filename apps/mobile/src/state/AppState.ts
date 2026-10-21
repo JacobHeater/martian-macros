@@ -6,7 +6,7 @@ import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
-import type { DetailLevel } from '../domain/food/detail/DetailLevel';
+import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { MacroPicture } from '../domain/MacroPicture';
@@ -52,6 +52,7 @@ import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
 import type { SodiumPattern } from '../engine/SodiumPattern';
+import type { FiberPattern } from '../engine/FiberPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
@@ -312,6 +313,7 @@ export class AppState {
   readonly mealProtein: Cell<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>;
   /** The sodium limit and each recent day's sodium, for the coach (MM-312); undefined with no limit. */
   private readonly sodiumPattern: Cell<SodiumPattern | undefined>;
+  private readonly fiberPattern: Cell<FiberPattern | undefined>;
 
   /** The monthly reports that are ready (MM-33), oldest first. */
   readonly reportPeriods: Cell<readonly ReportPeriod[]>;
@@ -705,6 +707,25 @@ export class AppState {
       return byDay;
     });
 
+    // Before the fiber pattern, which reads it (MM-126).
+    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
+
+    // Fiber only at Full detail, where it is shown (MM-126): below it the insight would be about a number never seen.
+    this.fiberPattern = derived<FiberPattern | undefined>(() => {
+      const sex = of(this.setup)?.profile.sex;
+      const level = of(this.detailLevel);
+      const checkIns = of(this.recoveryCheckIns);
+      if (sex === undefined || level === undefined || !DetailLevel.showsExtras(level) || checkIns === undefined) return undefined;
+      const today = this.today.value;
+      const days = new Map<CalendarDate, readonly FoodEntry[]>();
+      for (let i = 1; i <= InsightRationing.patternDays; i++) {
+        const day = today.addDays(-i);
+        const entries = of(this.foodForDay(day));
+        if (entries !== undefined) days.set(day, entries);
+      }
+      return { sex, days, checkIns };
+    });
+
     this.sodiumPattern = derived<SodiumPattern | undefined>(() => {
       const goals = of(this.nutritionGoals);
       const limitMg = goals?.sodiumLimitMg;
@@ -774,6 +795,7 @@ export class AppState {
           waist: of(this.waist) ?? [],
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
           sleepAverage: this.sleepAverage.value,
+          fiber: this.fiberPattern.value,
         }),
         log,
         today,
@@ -889,7 +911,6 @@ export class AppState {
       return underEatingNoticeDue({ today, dismissedOn: dismissed.value }) ? finding : undefined;
     });
 
-    this.recoveryCheckIns = stream(() => s.recovery.watchRecoveryCheckIns());
     this.recoverySkipped = stream(() => s.preferences.watchRecoveryCheckInSkippedOn());
 
     this.recoveryCheckInDue = derived(() => {
