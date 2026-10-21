@@ -164,6 +164,20 @@ describe('a cell over something a repository watches', () => {
     expect(seen).toEqual(['from a', 'from b', 'b changed']);
   });
 
+  // MM-443: a stream asleep when read, whose store answers as it wakes, was read as still loading and never asked again.
+  it('asks again when a cell its question read changes as it wakes', () => {
+    const chosen = new ObservableValue<string | undefined>('gym');
+    const choice = new StreamCell(() => chosen.watch());
+    const stores = { automatic: new ObservableValue('from home'), gym: new ObservableValue('from gym') } as const;
+    const cell = new StreamCell(() => stores[Loadable.valueOf(choice.value) === 'gym' ? 'gym' : 'automatic'].watch());
+    const seen: (string | undefined)[] = [];
+    const stop = cell.subscribe((value) => seen.push(Loadable.valueOf(value)));
+    expect(Loadable.valueOf(cell.value)).toBe('from gym');
+    chosen.value = undefined;
+    stop();
+    expect(seen.at(-1)).toBe('from home');
+  });
+
   it('says what went wrong, and can be asked again', () => {
     const failure = new Error('the store is gone');
     const cell = new StreamCell<number>(() => ({

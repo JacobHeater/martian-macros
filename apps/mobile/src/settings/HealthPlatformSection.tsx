@@ -13,6 +13,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
+import { PrimaryScaleRow } from './PrimaryScaleRow';
 import { useSettingsSection } from './useSettingsSection';
 
 /**
@@ -146,6 +147,8 @@ export function HealthPlatformSection() {
             />
           );
         })}
+        {/* Which scale counts first, once weigh-ins come from more than one (MM-71). */}
+        {connection.permitted.has('weight') ? <PrimaryScaleRow weighIns={connection.imported.get('weight') ?? []} /> : null}
         {connection.permitted.size === 0 ? null : (
           <MmListRow
             leadingIcon="sync"
@@ -160,9 +163,9 @@ export function HealthPlatformSection() {
       </MmListGroup>
       <p className="app-caption settings-note">
         The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in
-        counts for a day: the first of the morning, or the middle of the day’s readings. A value you type for a day is
-        used instead. To stop, take the permission away in {ios ? healthPath : name}: what was read is kept until you
-        erase your data.
+        counts for a day: the first of the morning, or the middle of the day’s readings, from your primary scale when it
+        weighed you that day. A value you type for a day is used instead. To stop, take the permission away in{' '}
+        {ios ? healthPath : name}: what was read is kept until you erase your data.
       </p>
     </MmSection>
   );
