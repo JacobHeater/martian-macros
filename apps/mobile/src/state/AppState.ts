@@ -1079,13 +1079,26 @@ export class AppState {
       const intake = of(this.intakeDays);
       const waist = of(this.waist);
       const pauses = of(this.pauses);
-      if (weights === undefined || intake === undefined || waist === undefined || pauses === undefined) {
+      const checkIns = of(this.recoveryCheckIns);
+      const skipped = this.recoverySkipped.value;
+      if (
+        weights === undefined ||
+        intake === undefined ||
+        waist === undefined ||
+        pauses === undefined ||
+        checkIns === undefined ||
+        !skipped.ready
+      ) {
         return undefined;
       }
+      const skippedOn = skipped.value;
       return new ReminderFacts({
         weighInDays: weights.map((w) => w.date),
         foodDays: intake.filter((d) => d.kcal > 0).map((d) => d.date),
         waistDays: waist.map((w) => w.date),
+        // The weekly recovery check-in: answered or skipped, and from a week after setup (MM-116).
+        recoveryDays: [...checkIns.map((c) => c.date), ...(skippedOn === undefined ? [] : [skippedOn])],
+        recoveryFrom: of(this.setup)?.onboardedOn,
         pauses,
       });
     });

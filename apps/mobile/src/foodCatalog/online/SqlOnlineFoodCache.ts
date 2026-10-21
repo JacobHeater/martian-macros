@@ -98,6 +98,12 @@ export class SqlOnlineFoodCache implements OnlineFoodCache {
     return undefined;
   }
 
+  async foodById(packId: string, foodId: number): Promise<CatalogFood | undefined> {
+    if (packId !== onlinePackId) return undefined;
+    const row = (await this.db.select(`SELECT * FROM ${table} WHERE id = ?`, [foodId]))[0];
+    return row === undefined ? undefined : this.food(row);
+  }
+
   async servingsOf(food: CatalogFood): Promise<CatalogServing[]> {
     if (food.packId !== onlinePackId) return [];
     const row = (await this.db.select(`SELECT servings FROM ${table} WHERE id = ?`, [food.id]))[0];

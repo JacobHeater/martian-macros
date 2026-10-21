@@ -77,6 +77,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   ],
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
   custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
+  // Version 20 (MM-456): the pack food a recipe's ingredient was found as.
+  recipe_ingredients: ['source_pack_id', 'source_food_id'],
 };
 
 /** The tables added since the Dart database's last version. */

@@ -1,6 +1,6 @@
 ---
 id: MM-456
-status: proposed
+status: done
 component: food-logging
 related: [MM-45, MM-151, MM-167, MM-61]
 ---
@@ -46,3 +46,35 @@ Scenario: A pack update does not rewrite a recipe
 
 ## Notes
 - Found while finishing MM-45 on 2026-10-21; that round's schema change was held by another branch, so this was not built with it.
+
+## Decisions
+Choices I made without asking (say if any is wrong):
+- **"Change weight" is in a found line's menu**, beside Move up, Move down and Remove (sibling: MM-45's line menu in
+  `RecipeForm`), and opens the weight under the line in place, with what the new weight comes to. A typed line has
+  no such item.
+- **A food no longer installed is said, not guessed**: "Its food is not installed, so this line keeps its totals."
+  No weight is offered, since there is nothing to work it out from.
+- **A food found online counts as installed**: it is kept in the user's own database (MM-58), so it is found again.
+
+## Progress
+Built 2026-10-21. Not run locally; CI validates.
+- Schema 20 (stacked on MM-441's 19): `recipe_ingredients` gains `source_pack_id` and `source_food_id`, both
+  nullable, null on every line saved before. `currentSchemaVersion`, `currentSchema`, the step keyed 19 in
+  `migrationSteps`, and the fingerprint for 20 (sha256 of `currentSchema`, the method reproducing 19's first).
+- `IngredientSource` (pack and food id) on `RecipeIngredient`; `SqlCustomFoodRepository` reads and writes it; the
+  in-memory store keeps the object. `RecipeIngredientAdder` records it for a line found in a pack.
+- `CatalogFoodLookup.foodById` on every pack (`SqliteFoodPack`, both online food caches) and on `FoodCatalog`.
+- `reweighedIngredient` works a line out again from its food per 100 g; `RecipeLineWeight` changes a found line's
+  weight in place in `RecipeForm`.
+- Guarding tests: `customFoodRepositoryContract` (a found line keeps its source, a typed one none; in memory and
+  SQL); `test/domain/recipe.test.ts` (reweighing); `test/food/customFoods.test.tsx` (the source is kept, a weight
+  changed in place from 200 g to 100 g is about 365 kcal, a typed line has no Change weight, a recipe saved at
+  other numbers than the pack's now is unchanged until its line is edited, a food no longer installed keeps its
+  totals and says so); `test/data/upgrade.test.ts` (a version 19 database comes up with its lines kept and
+  sourceless, and keeps a source saved after).
+- Stories: `EditRecipeLineWeight` and `EditRecipeLineFoodGone` in `Food.stories.tsx`.
+
+## Owed on a phone
+- The upgrade from 19 to 20 on the owner's phone keeps every saved recipe, and a found line's weight changes in place
+  there.
+
