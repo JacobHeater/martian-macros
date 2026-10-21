@@ -233,6 +233,21 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchDetailLevel())).toBe('full');
     });
 
+    // MM-71: the primary scale is chosen automatically until the person names one, and "Automatic" goes back.
+    it('no primary scale until one is chosen; a choice is kept apart from the rest and can be undone', async () => {
+      expect(await first(repo.watchPrimaryScale())).toBeUndefined();
+      await repo.savePrimaryScale('com.withings.wiscale2');
+      await repo.saveThemePreference('dark');
+      await repo.saveUsualCookingFat('butter');
+      expect(await first(repo.watchPrimaryScale()), 'other preferences leave it alone').toBe('com.withings.wiscale2');
+      expect(await first(repo.watchUsualCookingFat())).toBe('butter');
+      await repo.savePrimaryScale('gym');
+      expect(await first(repo.watchPrimaryScale())).toBe('gym');
+      await repo.savePrimaryScale(undefined);
+      expect(await first(repo.watchPrimaryScale())).toBeUndefined();
+      expect(await first(repo.watchThemePreference())).toBe('dark');
+    });
+
     it('emits the current choice first, then each change', async () => {
       await expectChangeEmits(repo.watchThemePreference(), {
         before: 'unselected',

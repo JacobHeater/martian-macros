@@ -293,30 +293,95 @@ describe('choosing an exercise', () => {
 
 /**
  * Two defects in a workout set's controls, found by the walkthrough review
- * of workout logging (MM-212). Carried over from
- * workout_set_editor_findings_test.dart, where they are skipped too: each
- * is enabled with its fix.
+ * of workout logging (MM-212), each skipped until its fix and enabled with
+ * it: MM-214 and MM-215.
  */
-describe('known defects of the set controls', () => {
+describe('the set controls keep the field and the set in step', () => {
   for (const typed of ['', '8.5']) {
-    // Fails today: the stored reps stay at 8. Enable with the fix.
-    it.skip(`MM-214: the reps field shows what is stored, after typing "${typed}" over 8`, async () => {
+    it(`MM-214: the reps field shows what is stored, after typing "${typed}" over 8`, async () => {
       await squats();
       await addSet();
       await typeInSet('Reps', '8');
       await typeInSet('Reps', typed);
       const shown = Number.parseInt(within(setEditor()).getByRole<HTMLInputElement>('textbox', { name: 'Reps' }).value, 10);
-      expect((await onlySet())?.reps).toBe(Number.isNaN(shown) ? 0 : shown);
+      await expect.poll(async () => (await onlySet())?.reps).toBe(Number.isNaN(shown) ? 0 : shown);
     });
   }
 
-  // Fails today: the set is removed at once with no way back. Enable with the fix.
-  it.skip('MM-215: removing a set can be undone', async () => {
+  it('MM-214: a number of reps that is not whole is said not to be kept', async () => {
     await squats();
     await addSet();
     await typeInSet('Reps', '8');
+    await typeInSet('Reps', '8.5');
+    expect(within(setEditor()).getByRole('alert')).toHaveTextContent('Whole reps only. The set has 8.');
+    expect((await onlySet())?.reps).toBe(8);
+    // A whole number again takes it away.
+    await typeInSet('Reps', '9');
+    expect(within(setEditor()).queryByRole('alert')).not.toBeInTheDocument();
+    await expect.poll(async () => (await onlySet())?.reps).toBe(9);
+  });
+
+  it('MM-214: a cleared load is no load', async () => {
+    await squats();
+    await addSet();
+    await typeInSet('Load', '100');
+    await expect.poll(async () => (await onlySet())?.loadKg).toBe(100);
+    await typeInSet('Load', '');
+    await expect.poll(async () => (await onlySet())?.loadKg).toBe(0);
+  });
+
+  it('MM-214: the reps keyboard has no decimal point', async () => {
+    await squats();
+    await addSet();
+    expect(within(setEditor()).getByRole('textbox', { name: 'Reps' })).toHaveAttribute('inputmode', 'numeric');
+  });
+
+  it('MM-215: removing a set can be undone', async () => {
+    await squats();
+    await addSet();
+    await typeInSet('Reps', '8');
+    await expect.poll(async () => (await onlySet())?.reps).toBe(8);
+    const before = await onlySet();
     await pressInSet('Remove set');
+    await expect.poll(async () => (await stored())[0]?.setCount).toBe(0);
     await userEvent.click(await screen.findByRole('button', { name: 'Undo' }));
     await expect.poll(async () => (await onlySet())?.reps).toBe(8);
+    // As it was, times included.
+    expect(await onlySet()).toEqual(before);
+  });
+});
+
+/** MM-222: a logged set looks logged, and the next action is in reach. */
+describe('the set just added', () => {
+  it('says it is recorded, and closes back to its row', async () => {
+    await squats();
+    await addSet();
+    await typeInSet('Reps', '8');
+    await typeInSet('Load', '100');
+    expect(within(setEditor()).getByText('Recorded. Changes are kept as you make them.')).toBeInTheDocument();
+    await pressInSet('Done');
+    expect(layer().queryByRole('group', { name: 'Set 1' })).not.toBeInTheDocument();
+    expect(layer().getByRole('button', { name: /^8 × 100 kg/ })).toBeInTheDocument();
+  });
+
+  it('a closed set shows that it opens', async () => {
+    await squats();
+    await addSet();
+    await pressInSet('Done');
+    const row = layer().getByRole('button', { name: /Set 1$/ });
+    expect(row.querySelector('.mm-list-row-opens')).not.toBeNull();
+  });
+
+  it('"Add set" says what it does in a workout under way', async () => {
+    await squats();
+    expect(within(exerciseCard('Back squat')).getByText('Records a set finished now and starts the rest.')).toBeInTheDocument();
+  });
+
+  it('the timer bar offers no set to time before there is an exercise', async () => {
+    await open();
+    await startWorkout();
+    const bar = document.querySelector('.train-timer') as HTMLElement;
+    expect(within(bar).getByRole('button', { name: 'Start set' })).toBeDisabled();
+    expect(within(bar).getByText('Add an exercise to time a set.')).toBeInTheDocument();
   });
 });
