@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { BreakFlag } from './BreakFlag';
-import { DietBreakRule } from './DietBreakRule';
+import { breakFlagOf } from './breakFlagOf';
+import { breakLengthDays } from './breakLengthDays';
 import type { TargetsRecord } from './TargetsRecord';
 
 /**
@@ -8,7 +9,9 @@ import type { TargetsRecord } from './TargetsRecord';
  * length (MM-135): which kind it is and the day it began, counted from the
  * first of the trailing records carrying its flag, so targets reissued
  * inside the break (a corrected profile, an app update) do not restart it.
- * Undefined when the current targets are not a break, or the break is over.
+ * The length is the one that first record carries (MM-432): one week if the
+ * person chose one, otherwise two. Undefined when the current targets are
+ * not a break, or the break is over.
  */
 export function breakInForce(
   history: readonly TargetsRecord[],
@@ -17,11 +20,7 @@ export function breakInForce(
   const inForce = history.filter((record) => !record.effectiveFrom.isAfter(today));
   const current = inForce[inForce.length - 1];
   if (current === undefined) return undefined;
-  const flag: BreakFlag | undefined = current.targets.flags.has('requestedBreak')
-    ? 'requestedBreak'
-    : current.targets.flags.has('dietBreak')
-      ? 'dietBreak'
-      : undefined;
+  const flag = breakFlagOf(current.targets.flags);
   if (flag === undefined) return undefined;
   let startedOn = current.effectiveFrom;
   for (let i = inForce.length - 2; i >= 0; i--) {
@@ -29,5 +28,5 @@ export function breakInForce(
     if (!record.targets.flags.has(flag)) break;
     startedOn = record.effectiveFrom;
   }
-  return startedOn.daysUntil(today) < DietBreakRule.breakWeeks * 7 ? { flag, startedOn } : undefined;
+  return startedOn.daysUntil(today) < breakLengthDays(flag) ? { flag, startedOn } : undefined;
 }

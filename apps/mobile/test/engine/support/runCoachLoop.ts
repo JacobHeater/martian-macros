@@ -10,6 +10,7 @@ import {
 } from '../../../src/domain';
 import {
   type BodyFatEstimate,
+  breakFlagOf,
   breakInForce,
   computeTargetsTraced,
   consecutiveDeficitWeeks,
@@ -161,7 +162,7 @@ export function runCoachLoop({
       !modeChanged &&
       !onBreak &&
       previousRecord !== undefined &&
-      (previousRecord.targets.flags.has('dietBreak') || previousRecord.targets.flags.has('requestedBreak'));
+      breakFlagOf(previousRecord.targets.flags) !== undefined;
     // A break the person takes starts at once, like the Coach's button (MM-117, MM-135).
     const asked = targets === undefined ? undefined : beforeCheckIn?.(week, history);
     const takeBreak = !onBreak && targets !== undefined && targets.weeklyRateFraction < 0 && asked?.takeBreak === true;

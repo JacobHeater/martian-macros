@@ -24,6 +24,7 @@ interface TargetInputsInit {
   safetyBodyFatPercent?: number | undefined;
   safetyRaiseKcal?: number;
   breakRequested?: boolean;
+  requestedBreakWeeks?: 1 | 2 | undefined;
   continuingBreak?: BreakFlag | undefined;
   correctionRateFraction?: number | undefined;
   easeFromKcal?: number | undefined;
@@ -76,6 +77,9 @@ export class TargetInputs {
    */
   readonly breakRequested: boolean;
 
+  /** How long the break asked for is, in weeks (MM-432): two unless the user chose one. */
+  readonly requestedBreakWeeks: 1 | 2;
+
   /**
    * A diet break the current targets began has not run its length
    * (`breakInForce`, MM-135): this set stays at maintenance and carries the
@@ -122,6 +126,7 @@ export class TargetInputs {
     this.easeFromKcal = init.easeFromKcal;
     this.trainingLapsed = init.trainingLapsed ?? false;
     this.breakRequested = init.breakRequested ?? false;
+    this.requestedBreakWeeks = init.requestedBreakWeeks ?? 2;
     this.continuingBreak = init.continuingBreak;
   }
 }

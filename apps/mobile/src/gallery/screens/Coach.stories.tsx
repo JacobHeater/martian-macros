@@ -322,6 +322,23 @@ export const CoachOnChosenBreak = screenStory({
   open: onCoach,
 });
 
+/** MM-432: "One week instead" under the two weeks: the question says what a week gives up before it is taken. */
+export const CoachBreakOfferOneWeek = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^One week at maintenance is still a rest from dieting/,
+  scenario: breakOfferScenario,
+  open: onCoach,
+  walk: pressOnCoach('One week instead'),
+});
+
+/** MM-432: the first days of a one-week break the person chose: its own words, the next check-in a week out. */
+export const CoachOnChosenOneWeekBreak = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^This is the one-week break you chose/,
+  scenario: onBreakScenario('requestedOneWeekBreak'),
+  open: onCoach,
+});
+
 /** MM-135: the break the app planned at twenty weeks, the safety floor, in its first week. */
 export const CoachOnPlannedBreak = screenStory({
   covers: ['CoachScreen'],

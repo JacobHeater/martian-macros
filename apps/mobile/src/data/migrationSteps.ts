@@ -215,4 +215,13 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE user_preferences ADD COLUMN primary_scale_source_id TEXT NULL');
     },
   ],
+  // 15 to 16 (MM-432): the length of the break chosen, two weeks until one is chosen.
+  [
+    15,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN break_weeks INTEGER NOT NULL DEFAULT 2 CHECK (break_weeks IN (1, 2))',
+      );
+    },
+  ],
 ]);

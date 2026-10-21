@@ -91,6 +91,14 @@ describe('a break in force', () => {
     expect(DietBreakRule.breakWeeks).toBe(2);
   });
 
+  // MM-432: the length is the one the break's first record carries.
+  it('lasts one week when one week was chosen', () => {
+    const chosen = [record(70), record(6, 0, { flags: ['requestedOneWeekBreak'] }), record(2, 0, { flags: ['requestedOneWeekBreak'] })];
+    expect(breakInForce(chosen, today)).toEqual({ flag: 'requestedOneWeekBreak', startedOn: today.addDays(-6) });
+    expect(breakInForce([record(70), record(7, 0, { flags: ['requestedOneWeekBreak'] })], today)).toBeUndefined();
+    expect(DietBreakRule.shortBreakWeeks).toBe(1);
+  });
+
   it('puts the next check-in two weeks out', () => {
     const user = new UserSetup({
       profile: new Profile({ sex: 'female', birthDate: CalendarDate.of(1990, 1, 1), heightCm: 165 }),
@@ -102,6 +110,9 @@ describe('a break in force', () => {
     });
     expect(nextCheckIn(user, record(3, 0, { flags: ['dietBreak'] }))).toBe(today.addDays(11));
     expect(nextCheckIn(user, record(3))).toBe(today.addDays(4));
+    // MM-432: a one-week break's own length, or the Coach and dashboard say the wrong date.
+    expect(nextCheckIn(user, record(3, 0, { flags: ['requestedOneWeekBreak'] }))).toBe(today.addDays(4));
+    expect(nextCheckIn(user, record(3, 0, { flags: ['requestedBreak'] }))).toBe(today.addDays(11));
   });
 });
 
@@ -138,6 +149,18 @@ describe('the break the app plans at twenty weeks', () => {
     expect(planned.targets.weeklyRateFraction).toBe(0);
     expect(planned.targets.kcal - 2100).toBeGreaterThan(100);
     expect(planned.explanation?.lines.map((l) => l.reason)).toContain('dietBreak');
+  });
+
+  // MM-432: a one-week break chosen before changes nothing here; the floor is two weeks.
+  it('is two weeks whatever length was chosen before', () => {
+    const choseOneWeek = user.copyWith({ maintenanceWeekFrom: today.addDays(-200), breakWeeks: 1 });
+    const planned = nextTargets({ setup: choseOneWeek, snapshot: snapshotOn(today), history, today }) as TargetsRecord;
+    expect(planned.targets.flags).toContain('dietBreak');
+    expect(planned.targets.flags).not.toContain('requestedOneWeekBreak');
+    expect(nextCheckIn(choseOneWeek, planned)).toBe(today.addDays(14));
+    expect(breakInForce([...history, planned], today.addDays(13))?.flag).toBe('dietBreak');
+    const on = today.addDays(7);
+    expect(nextTargets({ setup: choseOneWeek, snapshot: snapshotOn(on), history: [...history, planned], today: on })).toBeUndefined();
   });
 
   it('is not issued a week earlier', () => {

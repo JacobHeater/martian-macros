@@ -88,6 +88,7 @@ export * from './weekdayLabel';
 export * from './whatToExpectClosing';
 export * from './whatToExpectPoints';
 export * from './targetFlagMessage';
+export * from './oneWeekBreakText';
 export * from './themePreferenceLabel';
 export * from './timeSpanProblemMessage';
 export * from './trainingStatusLabel';

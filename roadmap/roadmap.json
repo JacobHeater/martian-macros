@@ -660,7 +660,8 @@
         {
           "workstream": "WS-02",
           "tickets": [
-            "MM-432"
+            "MM-432",
+            "MM-495"
           ]
         },
         {
@@ -1225,13 +1226,14 @@
           "MM-131",
           "MM-132",
           "MM-135",
+          "MM-432",
+          "MM-495",
           "MM-173"
         ],
         "remaining": [
           "MM-22",
           "MM-35",
-          "MM-110",
-          "MM-432"
+          "MM-110"
         ]
       },
       "sequence": [
@@ -1304,7 +1306,8 @@
           "title": "The one-week break choice: a setups column, chosen length carried by the break's record",
           "milestone": "M3",
           "tickets": [
-            "MM-432"
+            "MM-432",
+            "MM-495"
           ]
         }
       ],

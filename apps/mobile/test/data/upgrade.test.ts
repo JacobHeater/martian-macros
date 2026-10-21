@@ -138,8 +138,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
-/** The schema as version 14 left it: without the scale chosen as primary (MM-71). */
-const versionFourteen = currentSchema.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
+/** The schema as version 15 left it: without the length of the break chosen (MM-432). */
+const versionFifteen = currentSchema.replace(
+  '  "break_weeks" INTEGER NOT NULL DEFAULT 2 CHECK ("break_weeks" IN (1, 2)),\n',
+  '',
+);
+
+/** The schema as version 14 left it: the version 15 shape without the scale chosen as primary (MM-71). */
+const versionFourteen = versionFifteen.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
 
 /**
  * The schema as version 13 left it: the version 14 shape without the state a
@@ -427,4 +433,31 @@ it('a version 14 database comes up to date with the primary scale chosen automat
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
   await repos.preferences.savePrimaryScale('gym');
   expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
+});
+
+// MM-432: a version 15 database comes up to date with every break two weeks long, as before; a break
+// chosen on it is kept, and a one-week choice is kept from then on.
+it('a version 15 database comes up to date with breaks two weeks long', async () => {
+  expect(versionFifteen).not.toContain('break_weeks');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 15, schema: versionFifteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day, maintenance_week_from_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'novice', 3, 'fatLoss', 'imperial', ?, ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 1, 1).epochDay, day.epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'setups')).toContain('break_weeks');
+  const setup = await repos.setup.loadSetup();
+  expect(setup?.maintenanceWeekFrom).toBe(day);
+  expect(setup?.breakWeeks, 'a break chosen before the choice existed').toBe(2);
+  if (setup === undefined) throw new Error('No setup was loaded.');
+  await repos.setup.saveSetup(setup.copyWith({ breakWeeks: 1 }));
+  expect((await repos.setup.loadSetup())?.breakWeeks).toBe(1);
+  await expect(sql.execute('UPDATE setups SET break_weeks = 3')).rejects.toBeInstanceOf(SqlFailure);
 });

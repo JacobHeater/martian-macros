@@ -53,6 +53,17 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       expect(back.reliefAnsweredOn).toBe(day.addDays(1));
     });
 
+    // MM-432: the length of the break chosen, two weeks until one is chosen.
+    it('keeps the length of the break chosen', async () => {
+      const day = CalendarDate.of(2026, 10, 5);
+      await repo.saveSetup(typicalSetup());
+      expect((await loaded()).breakWeeks).toBe(2);
+      await repo.saveSetup(typicalSetup().copyWith({ maintenanceWeekFrom: day, breakWeeks: 1 }));
+      expect((await loaded()).breakWeeks).toBe(1);
+      await repo.saveSetup((await loaded()).copyWith({ breakWeeks: 2 }));
+      expect((await loaded()).breakWeeks).toBe(2);
+    });
+
     // MM-128, MM-130: the day a pace was chosen, the maintenance anchor and the correction; the last two can be cleared.
     it('keeps the pace change day, the maintenance anchor and the correction', async () => {
       const day = CalendarDate.of(2026, 10, 5);

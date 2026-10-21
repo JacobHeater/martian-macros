@@ -340,6 +340,63 @@ describe('the break the user takes', () => {
     expect(TargetFlag.values).toContain('requestedBreak');
     expect(canHoldReduction([...history, firstOfBreak()])).toBe(false);
   });
+
+  // MM-432: one week chosen in place of two. The length travels on the break's first record.
+  describe('one week chosen', () => {
+    const oneWeek = () => user.copyWith({ maintenanceWeekFrom: today, breakWeeks: 1 });
+    const firstOfShortBreak = () =>
+      nextTargets({ setup: oneWeek(), snapshot: snapshotOn(today), history, today }) as TargetsRecord;
+
+    it('starts at once, at maintenance, flagged as the break chosen, the next check-in a week out', () => {
+      const first = firstOfShortBreak();
+      expect(first.effectiveFrom).toBe(today);
+      expect(first.targets.flags).toContain('requestedOneWeekBreak');
+      expect(first.targets.flags).not.toContain('requestedBreak');
+      expect(first.targets.weeklyRateFraction).toBe(0);
+      expect(first.targets.kcal).toBeGreaterThan(lastKcal);
+      expect(first.explanation?.lines.map((l) => l.reason)).toContain('requestedBreak');
+      expect(nextCheckIn(oneWeek(), first)).toBe(today.addDays(7));
+      expect(canHoldReduction([...history, first])).toBe(false);
+    });
+
+    it('holds for its week, then the deficit resumes at once and the count restarts', () => {
+      const first = firstOfShortBreak();
+      for (let day = 0; day < 7; day++) {
+        const on = today.addDays(day);
+        expect(nextTargets({ setup: oneWeek(), snapshot: snapshotOn(on), history: [...history, first], today: on }), `day ${day}`).toBeUndefined();
+      }
+      expect(breakInForce([...history, first], today.addDays(6))?.flag).toBe('requestedOneWeekBreak');
+      expect(breakInForce([...history, first], today.addDays(7))).toBeUndefined();
+      const after = today.addDays(7);
+      const resumed = nextTargets({ setup: oneWeek(), snapshot: snapshotOn(after), history: [...history, first], today: after }) as TargetsRecord;
+      expect(resumed.targets.weeklyRateFraction).toBeLessThan(0);
+      expect(resumed.targets.flags).not.toContain('requestedOneWeekBreak');
+      expect(resumed.targets.flags).not.toContain('rateLimited');
+      expect(resumed.explanation?.lines.map((l) => l.reason)).toContain('breakEnded');
+      // A week at maintenance is the seven days that end the unbroken run (MM-135).
+      expect(consecutiveDeficitWeeks([...history, first, resumed], after.addDays(21))).toBe(3);
+    });
+
+    it('targets reissued inside it keep its length', () => {
+      const first = firstOfShortBreak();
+      const inside = today.addDays(3);
+      const reissued = nextTargets({
+        setup: oneWeek().copyWith({ profileRevision: 1 }),
+        snapshot: snapshotOn(inside),
+        history: [...history, first],
+        today: inside,
+      }) as TargetsRecord;
+      expect(reissued.targets.flags).toContain('requestedOneWeekBreak');
+      expect(breakInForce([...history, first, reissued], today.addDays(6))?.startedOn).toBe(today);
+      expect(breakInForce([...history, first, reissued], today.addDays(7))).toBeUndefined();
+    });
+
+    it('two weeks unless one was chosen', () => {
+      expect(user.breakWeeks).toBe(2);
+      expect(firstOfBreak().targets.flags).toContain('requestedBreak');
+      expect(nextCheckIn(taken(), firstOfBreak())).toBe(today.addDays(14));
+    });
+  });
 });
 
 // MM-252: short sleep from the record is a signal of its own, beside the check-ins.

@@ -15,6 +15,9 @@ export const DietBreakRule = {
   /** How long a break is, chosen or planned: weeks at maintenance. */
   breakWeeks: 2,
 
+  /** The shorter break a person may choose instead (MM-432); the planned one is always `breakWeeks`. */
+  shortBreakWeeks: 1,
+
   /**
    * Targets at or above maintenance in force for this many consecutive
    * days end the unbroken deficit, however they came about: a break, a

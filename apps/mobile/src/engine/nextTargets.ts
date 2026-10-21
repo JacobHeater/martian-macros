@@ -4,6 +4,7 @@ import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
 import { calibrationDays, checkInIntervalDays } from './coachConstants';
 import type { BreakFlag } from './BreakFlag';
+import { breakFlagOf } from './breakFlagOf';
 import { breakInForce } from './breakInForce';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { computeTargetsTraced } from './computeTargetsTraced';
@@ -87,6 +88,7 @@ export function nextTargets({
     deficitWeeks = 0,
     safetyRaiseKcal = 0,
     breakRequested = false,
+    requestedBreakWeeks,
     continuingBreak = running?.flag,
     trigger = 'checkIn',
     restingOn,
@@ -97,6 +99,8 @@ export function nextTargets({
     deficitWeeks?: number;
     safetyRaiseKcal?: number;
     breakRequested?: boolean;
+    /** The length of the break asked for (MM-432). */
+    requestedBreakWeeks?: 1 | 2;
     continuingBreak?: BreakFlag | undefined;
     trigger?: ExplanationTrigger;
     /** The expenditure estimate to build on instead of today's, when only the pace changed (MM-128). */
@@ -140,6 +144,7 @@ export function nextTargets({
         safetyBodyFatPercent: safetyBf,
         safetyRaiseKcal,
         breakRequested,
+        requestedBreakWeeks,
         continuingBreak,
         correctionRateFraction,
         easeFromKcal,
@@ -261,7 +266,7 @@ export function nextTargets({
     breakFrom.daysUntil(today) < checkInIntervalDays &&
     last.effectiveFrom.isBefore(breakFrom)
   ) {
-    return build({ previous: last.targets, breakRequested: true });
+    return build({ previous: last.targets, breakRequested: true, requestedBreakWeeks: setup.breakWeeks });
   }
 
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return undefined;
@@ -274,7 +279,7 @@ export function nextTargets({
   // ...and the deficit then resumes at once, as it would after a change of
   // goal, not 100 kcal a week: a planned return is neither a noisy week nor
   // a spiral. The count starts again from these targets.
-  if (last.targets.flags.has('dietBreak') || last.targets.flags.has('requestedBreak')) {
+  if (breakFlagOf(last.targets.flags) !== undefined) {
     return build({ trigger: 'breakEnded' });
   }
 

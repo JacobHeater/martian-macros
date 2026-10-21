@@ -100,6 +100,10 @@ should see corrected limits).
 8. **The partial-day rule for estimate-heavy logging (MM-173).** M2. Placed 2026-10-13.
 9. **The one-week break choice (MM-432).** M3. Needs a `setups` column, so it
    waits on the schema lane; placed 2026-10-20 when MM-135 stopped at it.
+   Built 2026-10-21 (schema version 16): "One week instead" on the offer, the
+   length kept in `setups.break_weeks` and carried by the break's flag
+   (`requestedOneWeekBreak`); the planned break stays two weeks. MM-495 (a
+   record marked seen lost its pace) was found and fixed on the way.
 
 ## Done enough to unblock others
 MM-120, MM-131, MM-115 and MM-132 are done, the full engine suite passes, and
@@ -123,8 +127,9 @@ is changing.
   break as decided: offered at twelve, planned at twenty); MM-120, MM-131
   (reference weight, settling after a phase change); MM-115 (raise when loss
   outruns the limit); MM-111 (underweight guard); MM-132 (body-fat thresholds
-  under uncertainty).
-- Remaining: MM-35, MM-432 (the one-week break choice). Epics: MM-22, MM-110.
+  under uncertainty); MM-432 (the one-week break choice); MM-495 (a record
+  marked seen kept its pace).
+- Remaining: MM-35. Epics: MM-22, MM-110.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-173 (Honest low days from a noisy logger are dropped as partial, and the estimate drifts high).
 
 ## Notes for whoever builds it

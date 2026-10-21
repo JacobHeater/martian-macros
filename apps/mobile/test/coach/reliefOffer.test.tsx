@@ -1,9 +1,10 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { GoalMode } from '../../src/domain/GoalMode';
 import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
+import { nextCheckIn } from '../../src/engine/nextCheckIn';
 import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
@@ -161,6 +162,55 @@ it('a break puts targets at maintenance at once, for two weeks', async () => {
   expect(last?.targets.kcal ?? 0).toBeGreaterThan(before[before.length - 1]?.targets.kcal ?? 0);
   // The dashboard's next check-in is the break's length away, not a week.
   expect(screen.getByText(Fmt.day(today.addDays(14), today))).toBeInTheDocument();
+});
+
+// MM-432: one week in place of two, asked once with what a week gives up.
+it('one week chosen puts targets at maintenance at once, for a week', async () => {
+  await seed();
+  const before = await open();
+  await userEvent.click(screen.getByRole('button', { name: 'One week instead' }));
+  const dialog = await screen.findByRole('dialog', { name: 'A one-week break' });
+  expect(dialog).toHaveTextContent('stored carbohydrate and water coming back');
+  expect(dialog.textContent?.toLowerCase()).not.toMatch(/metabol|reset|recover|repair/);
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Take one week' }));
+  await expect.poll(offer).toBeNull();
+  const setup = await repos.setup.loadSetup();
+  expect(setup?.maintenanceWeekFrom).toBe(today);
+  expect(setup?.breakWeeks).toBe(1);
+  await expect.poll(async () => (await history()).length).toBe(before.length + 1);
+  const now = await history();
+  const last = now[now.length - 1] as TargetsRecord;
+  expect(last.effectiveFrom).toBe(today);
+  expect(last.targets.flags.has('requestedOneWeekBreak')).toBe(true);
+  expect(last.targets.weeklyRateFraction).toBe(0);
+  if (setup === undefined) throw new Error('No setup was loaded.');
+  expect(nextCheckIn(setup, last)).toBe(today.addDays(7));
+});
+
+it('going back from the one-week question changes nothing', async () => {
+  await seed();
+  const before = await open();
+  await userEvent.click(screen.getByRole('button', { name: 'One week instead' }));
+  const dialog = await screen.findByRole('dialog', { name: 'A one-week break' });
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Back' }));
+  expect(offer()).not.toBeNull();
+  const setup = await repos.setup.loadSetup();
+  expect(setup?.maintenanceWeekFrom).toBeUndefined();
+  expect(setup?.reliefAnsweredOn).toBeUndefined();
+  expect(await history()).toHaveLength(before.length);
+});
+
+it('a one-week break chosen survives the app closing before its targets are issued', async () => {
+  await seed();
+  const setup = await repos.setup.loadSetup();
+  if (setup === undefined) throw new Error('No setup was seeded.');
+  // Chosen today; the app closed before the check-in ran.
+  await repos.setup.saveSetup(setup.copyWith({ maintenanceWeekFrom: today, breakWeeks: 1, reliefAnsweredOn: today }));
+  const now = await open();
+  const last = now[now.length - 1];
+  expect(last?.effectiveFrom).toBe(today);
+  expect(last?.targets.flags.has('requestedOneWeekBreak')).toBe(true);
+  expect(last?.targets.flags.has('requestedBreak')).toBe(false);
 });
 
 it('a slower pace is stored, and never a lower target', async () => {
