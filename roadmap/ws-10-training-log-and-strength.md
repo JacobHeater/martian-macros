@@ -81,6 +81,10 @@ training-lapse rules owned by WS-05.
 4. **Weekly volume per muscle group (MM-78).** M4.
 5. **Progression suggestions (MM-79).** M4. Wording changes with the goal: on
    a cut, matching last time is the aim.
+7. **Set times, entered by hand or with set and rest timers (MM-191, MM-196).** M4.
+   MM-191 in progress: a workout's times typed to the second and the sets
+   that can be segments built 2026-10-21; the phone checks of the rest
+   vibration and the bar with a screen reader are owed.
 8. **The Train screen hierarchy (MM-224) (MM-214, MM-215, MM-222, MM-447).** M3. Placed 2026-10-13.
    MM-214, MM-215 and MM-222 built 2026-10-21; MM-447 (the paused bar and
    the workout's times) waits on the owner.
