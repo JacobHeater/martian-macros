@@ -29,6 +29,7 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
 import type { TargetShape } from '../domain/TargetShape';
+import type { GoalBodyFat } from '../domain/GoalBodyFat';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { SleepNight } from '../domain/SleepNight';
@@ -272,6 +273,9 @@ export class AppState {
 
   /** How the user shapes their targets, oldest first (MM-122, MM-124). */
   readonly targetShapes: Cell<Loadable<TargetShape[]>>;
+
+  /** The goal body fat the user set (MM-36, MM-507), or undefined with none. */
+  readonly goalBodyFat: Cell<Loadable<GoalBodyFat | undefined>>;
 
   /** The calorie floor and fat minimum a shaped day keeps to; undefined until the coach has a view. */
   readonly targetShapeLimits: Cell<TargetShapeLimits | undefined>;
@@ -622,6 +626,7 @@ export class AppState {
     this.flowDays = stream(() => s.flowDays.watchFlowDays());
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
+    this.goalBodyFat = stream(() => s.goalBodyFat.watchGoalBodyFat());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
@@ -1236,7 +1241,7 @@ export class AppState {
       if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
         return undefined;
       }
-      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
+      // The goal body fat the user set (MM-507) replaces the cut's default line; none, the plan runs to it.
       // When a lean gain ends is MM-129's to say, so the plan and the lean-gain card agree.
       return planPhases({
         setup,
@@ -1244,6 +1249,7 @@ export class AppState {
         history,
         stall: this.stallAssessment.value,
         leanGainStop: this.leanGainReview.value?.stop,
+        goal: of(this.goalBodyFat),
         today: this.today.value,
       });
     });

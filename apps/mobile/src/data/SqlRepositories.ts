@@ -15,6 +15,7 @@ import type { ReminderRepository } from '../domain/repositories/ReminderReposito
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
+import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -49,6 +50,7 @@ import { SqlReminderRepository } from './SqlReminderRepository';
 import { SqlSetupRepository } from './SqlSetupRepository';
 import { SqlSleepRepository } from './SqlSleepRepository';
 import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
+import { SqlGoalBodyFatRepository } from './SqlGoalBodyFatRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlWaistRepository } from './SqlWaistRepository';
@@ -79,6 +81,8 @@ export class SqlRepositories {
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets, by the day each shape was set from (MM-122, MM-124, MM-486). */
   readonly targetShapes: TargetShapeRepository;
+  /** The goal body fat the user set (MM-36, MM-507). */
+  readonly goalBodyFat: GoalBodyFatRepository;
   readonly preferences: PreferencesRepository;
   /** The weigh-in window (MM-441), a column of the preferences' row. */
   readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
@@ -110,6 +114,7 @@ export class SqlRepositories {
     this.intake = new SqlIntakeReader(db);
     this.targets = new SqlTargetsHistoryRepository(db);
     this.targetShapes = new SqlTargetShapeRepository(db);
+    this.goalBodyFat = new SqlGoalBodyFatRepository(db);
     const preferences = new SqlPreferencesRepository(db);
     this.preferences = preferences;
     this.weighInWindow = preferences;

@@ -37,6 +37,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   19: '4420c0548b76f6c025290ee331d1d8753dc6caa19b66b61d7ca90f3dd0d40e49',
   // MM-456: the pack food a recipe's ingredient was found as.
   20: 'df49dc832ffb4fcaca2b7cf567671bf0bbff2d92b67424a932e864498df6045a',
+  // MM-507: the goal body fat the user set (MM-36).
+  21: '1706073ad4fc3ba0d1609ec4fd6fb4147ba5acbc956c988dfeef613a4ffed107',
 };
 
 it('the schema is the one recorded for its version', () => {
