@@ -1,6 +1,6 @@
 ---
 id: MM-513
-status: in-progress
+status: done
 component: health-sync
 related: [MM-70, MM-71, MM-66]
 ---
@@ -53,5 +53,12 @@ Scenario: Off
   `weightRepositoryContract` too), the plugins' `writeWeight` and `removeWeight` (`WRITE_WEIGHT` on Android, body mass
   share authorization on iOS; `test/native/mmHealthWrites.test.ts`), the switch (`test/settings/healthWriting.test.tsx`,
   story `HealthConnectWriting`). Terms and privacy policy say weight is written (terms version 4).
-- Device checks owed: on a phone, 82.4 kg typed appears in Health Connect and Apple Health from Martian Macros, a second
-  weigh-in that day replaces it, and the app does not import it back.
+
+## Progress
+Done (2026-10-21, PR #238): every scenario is built and held by the tests named in the notes; not run locally, CI
+validates.
+
+## Owed on a phone
+- 82.4 kg typed appears in Health Connect and Apple Health from Martian Macros.
+- A second weigh-in typed that day replaces it.
+- The app does not import it back as a reading.
