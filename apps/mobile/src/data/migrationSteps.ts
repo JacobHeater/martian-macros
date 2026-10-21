@@ -215,4 +215,20 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE user_preferences ADD COLUMN primary_scale_source_id TEXT NULL');
     },
   ],
+  // 15 to 16 (MM-486): how the user shapes their targets (MM-122, MM-124), one row per day a shape was
+  // set from; none yet, so every day is Balanced and flat.
+  [
+    15,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "target_shapes" (' +
+          '"since_epoch_day" INTEGER NOT NULL, ' +
+          '"fat_share" REAL NULL CHECK("fat_share" IS NULL OR "fat_share" BETWEEN 0.2 AND 0.4), ' +
+          '"carb_floor_off" INTEGER NOT NULL DEFAULT 0 CHECK ("carb_floor_off" IN (0, 1)), ' +
+          '"higher_days" TEXT NOT NULL DEFAULT \'\', ' +
+          '"raise_share" REAL NOT NULL CHECK("raise_share" > 0.0 AND "raise_share" < 1.0), ' +
+          'PRIMARY KEY ("since_epoch_day"))',
+      );
+    },
+  ],
 ]);

@@ -67,6 +67,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     dayMarks: repos.dayMarks,
     intake: repos.intake,
     targets: repos.targets,
+    targetShapes: repos.targetShapes,
     preferences: repos.preferences,
     insightLog: repos.insightLog,
     inlineInsightLog: repos.inlineInsightLog,

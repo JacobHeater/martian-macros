@@ -753,6 +753,7 @@
           "workstream": "WS-06",
           "tickets": [
             "MM-122",
+            "MM-486",
             "MM-124",
             "MM-129",
             "MM-480"
@@ -2097,7 +2098,8 @@
           "MM-123",
           "MM-128",
           "MM-130",
-          "MM-129"
+          "MM-129",
+          "MM-486"
         ],
         "remaining": [
           "MM-119",
@@ -2163,6 +2165,7 @@
           "title": "Carbohydrate and fat preference; week shape with higher days",
           "tickets": [
             "MM-122",
+            "MM-486",
             "MM-124"
           ],
           "milestone": "M4"
