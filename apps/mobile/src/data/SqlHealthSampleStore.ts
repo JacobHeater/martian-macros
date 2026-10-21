@@ -1,3 +1,4 @@
+import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -23,8 +24,18 @@ async function upsertAll(db: SqlDatabase, samples: readonly HealthSample[]): Pro
   }
 }
 
-/** `HealthSampleStore` kept in the database. */
-export class SqlHealthSampleStore implements HealthSampleStore {
+/**
+ * The key a backfill mark is kept under (MM-73). Marks share the table of
+ * import tokens, a text by a name, under names no type has, so no schema
+ * change was needed; the mark is the moment in milliseconds.
+ */
+const markKey = (type: HealthDataType) => `backfill:${type}`;
+
+/**
+ * `HealthSampleStore` kept in the database, and the backfill's marks
+ * (MM-73) beside its tokens.
+ */
+export class SqlHealthSampleStore implements HealthSampleStore, HealthBackfillMarks {
   private readonly db: AppDatabase;
 
   constructor(db: AppDatabase) {
@@ -80,6 +91,21 @@ export class SqlHealthSampleStore implements HealthSampleStore {
   saveToken(type: HealthDataType, token: string): Promise<void> {
     return this.db.write(['health_import_tokens'], (db) =>
       upsert(db, 'health_import_tokens', ['type'], { type, token }),
+    );
+  }
+
+  backfilledFrom(type: HealthDataType): Promise<Date | undefined> {
+    return this.db.read(async (db) => {
+      const row = (await db.select('SELECT token FROM health_import_tokens WHERE type = ?', [markKey(type)]))[0];
+      if (row === undefined) return undefined;
+      const ms = Number(text(row, 'token'));
+      return Number.isFinite(ms) ? new Date(ms) : undefined;
+    });
+  }
+
+  saveBackfilledFrom(type: HealthDataType, from: Date): Promise<void> {
+    return this.db.write(['health_import_tokens'], (db) =>
+      upsert(db, 'health_import_tokens', ['type'], { type: markKey(type), token: String(from.getTime()) }),
     );
   }
 }

@@ -81,6 +81,8 @@ import type { RecompReview } from '../engine/RecompReview';
 import type { RecompSignal } from '../engine/RecompSignal';
 import { recompSignalOf } from '../engine/recompSignalOf';
 import { recompReviewOf } from '../engine/recompReviewOf';
+import type { LeanGainReview } from '../engine/LeanGainReview';
+import { leanGainReviewOf } from '../engine/leanGainReviewOf';
 import { recoveryCheckInDue } from '../engine/recoveryCheckInDue';
 import type { ReliefOffer } from '../engine/ReliefOffer';
 import { ReminderFacts } from '../engine/ReminderFacts';
@@ -111,6 +113,7 @@ import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
+import { HealthBackfill } from '../healthIngest/HealthBackfill';
 import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
@@ -455,6 +458,9 @@ export class AppState {
 
   /** The recomp review due today, if one is (MM-133). Not during a pause, which is not time on recomp. */
   readonly recompReview: Cell<RecompReview | undefined>;
+
+  /** What the coach says about a running lean gain (MM-129), if anything. Not during a pause. */
+  readonly leanGainReview: Cell<LeanGainReview | undefined>;
 
   /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
   readonly recompSignal: Cell<RecompSignal | undefined>;
@@ -1125,6 +1131,32 @@ export class AppState {
       });
     });
 
+    this.leanGainReview = derived(() => {
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      const setup = of(this.setup);
+      if (
+        snapshot === undefined ||
+        history === undefined ||
+        setup === undefined ||
+        !snapshot.policy.targetsAllowed ||
+        this.activePause.value !== undefined
+      ) {
+        return undefined;
+      }
+      return leanGainReviewOf({
+        history,
+        trend: snapshot.trend,
+        waist: of(this.waist) ?? [],
+        strengthTrends: of(this.strengthTrends) ?? [],
+        sex: setup.profile.sex,
+        bodyFatPercent: snapshot.bodyFat.percent,
+        today: this.today.value,
+        // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
+        weightSignals: !setup.screening.eatingDisorderHistory,
+      });
+    });
+
     this.recompSignal = derived(() => {
       const trend = this.coach.value?.trend;
       if (trend === undefined) return undefined;
@@ -1201,6 +1233,11 @@ export class AppState {
    * It is run while the app is on screen: when it opens, when it comes
    * back to the front, and when asked for in Settings. The platform
    * refuses to be read at any other time.
+   *
+   * After the import, what is left of the history up to a year back is
+   * read (MM-73), once the history permission is granted. A backfill that
+   * cannot finish keeps what it read and goes on next time; it does not
+   * make the import count as failed.
    */
   async syncHealth(): Promise<boolean> {
     const { healthSource: source, healthSamples: store } = this.services;
@@ -1211,16 +1248,44 @@ export class AppState {
         const result = await importer.import(type);
         changed = changed || result.status === 'readAgain' || result.upserted > 0 || result.deleted > 0;
       }
-      return true;
     } catch {
       // The platform could not be read, or there is none on this kind of device.
-      return false;
-    } finally {
-      // Only when something was read, so the screens that work from the
-      // weigh-ins are not made to reload every time the app comes forward.
       if (changed) this.healthImported();
       this.refreshHealthConnection();
+      return false;
     }
+    if (changed) this.healthImported();
+    await this.backfillHealth();
+    this.refreshHealthConnection();
+    return true;
+  }
+
+  private backfilling: Promise<void> | undefined;
+
+  /**
+   * Reads each permitted kind's history (MM-73), one at a time, and makes
+   * the screens reload after each kind that brought readings, so the trend
+   * fills in as they arrive. Only one runs at a time: a second call while
+   * one runs waits for it.
+   */
+  private backfillHealth(): Promise<void> {
+    this.backfilling ??= (async () => {
+      const { healthSource: source, healthSamples: store, clock } = this.services;
+      const backfill = new HealthBackfill({ source, history: source, store, marks: store });
+      try {
+        const permitted = await source.permitted();
+        for (const type of HealthBackfill.types) {
+          if (!permitted.has(type)) continue;
+          const result = await backfill.backfill(type, { now: clock.now() });
+          if (result.added > 0) this.healthImported();
+        }
+      } catch {
+        // Cut short (the platform refused a read): what was read is kept and marked, and the rest is read next time.
+      } finally {
+        this.backfilling = undefined;
+      }
+    })();
+    return this.backfilling;
   }
 
   /**
