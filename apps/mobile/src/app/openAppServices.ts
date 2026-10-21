@@ -80,8 +80,10 @@ export async function openAppServices(): Promise<AppServices> {
   const healthWorkouts = native
     ? new NativeHealthWorkouts({ api: mmHealth, namesExercises: platform === 'android' })
     : new NoHealthWorkouts();
+  // One clock for the app and the adapters that need the time (MM-498).
+  const clock = new SystemClock();
   return {
-    clock: new SystemClock(),
+    clock,
     setup: repositories.setup,
     weights: repositories.weights,
     weightEvents: repositories.weightEvents,
@@ -147,7 +149,7 @@ export async function openAppServices(): Promise<AppServices> {
     exactAlarms: native ? new NativeExactAlarms(mmReminders) : new NoExactAlarmPermission(),
     // Only Health Connect has a screen of the app's permissions to open (MM-323).
     healthSource: native
-      ? new NativeHealthSource(mmHealth, { opensPermissions: platform === 'android' })
+      ? new NativeHealthSource(mmHealth, clock, { opensPermissions: platform === 'android' })
       : new NoHealthPlatform(),
     healthWriting,
     healthWorkouts,

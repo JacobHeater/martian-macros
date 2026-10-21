@@ -33,6 +33,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "requestHistory", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openPermissions", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "read", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "dailySteps", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changesToken", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changes", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writing", returnType: CAPPluginReturnPromise),
@@ -182,6 +183,32 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             if let error = error { return call.reject(error.localizedDescription) }
             let records: JSArray = (samples ?? []).compactMap { self.raw(name, $0) }
             call.resolve(["records": records])
+        }
+        store.execute(query)
+    }
+
+    /// Each local day's steps from `fromMs` up to `toMs` (MM-442), as Apple Health totals them: a statistics query's cumulative sum applies the order of sources the person set, so a walk the phone and a watch both counted is counted once. `startMs` is each day's local midnight. A statistics collection query is there from iOS 8, inside the iOS 15 target.
+    @objc func dailySteps(_ call: CAPPluginCall) {
+        guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
+        let from = dateArgument(call, "fromMs")
+        let to = dateArgument(call, "toMs")
+        if from >= to { return call.resolve(["days": []]) }
+        let calendar = Calendar.current
+        let query = HKStatisticsCollectionQuery(
+            quantityType: HKQuantityType(.stepCount),
+            quantitySamplePredicate: HKQuery.predicateForSamples(withStart: from, end: to, options: []),
+            options: .cumulativeSum,
+            anchorDate: calendar.startOfDay(for: from),
+            intervalComponents: DateComponents(day: 1)
+        )
+        query.initialResultsHandler = { _, results, error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            // One statistics a day; a day with no steps has no sum and is left out.
+            let days: JSArray = (results?.statistics() ?? []).compactMap { (statistics: HKStatistics) -> JSObject? in
+                guard let sum = statistics.sumQuantity() else { return nil }
+                return ["startMs": self.ms(statistics.startDate), "steps": sum.doubleValue(for: .count())]
+            }
+            call.resolve(["days": days])
         }
         store.execute(query)
     }

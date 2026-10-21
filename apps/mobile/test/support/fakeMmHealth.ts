@@ -9,6 +9,10 @@ import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
  * Kinds in `stopsAsking` come back refused without the question shown, as
  * Health Connect answers once it stops asking (MM-323); `opens` says
  * whether its screen of the app's permissions opens.
+ *
+ * A day's steps (MM-442) are the platform's own totals, `stepDays`, as
+ * the platform would give them after applying its source priority; with
+ * none given, the step records' counts by the day they start on.
  */
 export function fakeMmHealth(
   records: MmHealthRecord[],
@@ -16,15 +20,24 @@ export function fakeMmHealth(
     permitted,
     history = false,
     grantsHistory = true,
+    stepDays,
     stopsAsking = [],
     opens = true,
-  }: { permitted?: string[]; history?: boolean; grantsHistory?: boolean; stopsAsking?: string[]; opens?: boolean } = {},
+  }: {
+    permitted?: string[];
+    history?: boolean;
+    grantsHistory?: boolean;
+    stepDays?: { startMs: number; steps: number }[];
+    stopsAsking?: string[];
+    opens?: boolean;
+  } = {},
 ) {
   const log: { record?: MmHealthRecord; deletedId?: string }[] = records.map((record) => ({ record }));
   const granted = new Set(permitted ?? ['weight', 'bodyFat', 'leanMass', 'height', 'workout', 'menstruation', 'steps']);
   let historyGranted = history;
   let historyAsked = 0;
   let permissionsOpened = 0;
+  const dailyStepsAsked: { fromMs: number; toMs: number }[] = [];
   const api: MmHealthApi = {
     status: async () => ({ status: 'available' }),
     permitted: async ({ types }) => ({ types: types.filter((type) => granted.has(type)) }),
@@ -55,6 +68,18 @@ export function fakeMmHealth(
             record !== undefined && record.type === type && record.startMs >= fromMs && record.startMs < toMs,
         ),
     }),
+    dailySteps: async ({ fromMs, toMs }) => {
+      dailyStepsAsked.push({ fromMs, toMs });
+      if (stepDays !== undefined) return { days: stepDays };
+      const totals = new Map<number, number>();
+      for (const { record } of log) {
+        if (record === undefined || record.type !== 'steps' || record.startMs < fromMs || record.startMs >= toMs) continue;
+        const at = new Date(record.startMs);
+        const midnight = new Date(at.getFullYear(), at.getMonth(), at.getDate()).getTime();
+        totals.set(midnight, (totals.get(midnight) ?? 0) + (record.value ?? 0));
+      }
+      return { days: [...totals].map(([startMs, steps]) => ({ startMs, steps })) };
+    },
     changesToken: async ({ type }) => ({ token: `${type}@${log.length}` }),
     changes: async ({ token }) => {
       const found = /^(\w+)@(\d+)$/.exec(token);
@@ -76,6 +101,8 @@ export function fakeMmHealth(
     historyAsked: () => historyAsked,
     /** How many times Health Connect's screen of the app's permissions was opened (MM-323). */
     permissionsOpened: () => permissionsOpened,
+    /** The ranges a day's steps were asked for over (MM-442). */
+    dailyStepsAsked: () => dailyStepsAsked,
     change: (entry: { record?: MmHealthRecord; deletedId?: string }) => log.push(entry),
   };
 }
