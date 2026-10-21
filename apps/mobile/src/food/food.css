@@ -158,10 +158,6 @@
 .food-easy-to-miss {
   margin-bottom: var(--space-8);
 }
-/* Room for the last line to scroll clear of the floating action. */
-.food-fab-room {
-  height: 88px;
-}
 .food-sheet {
   padding: var(--space-4) var(--space-16) var(--space-16);
 }
