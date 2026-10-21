@@ -152,7 +152,7 @@ independent of step 3.
   check-in or recovery ones, nor the onboarding offer; iOS untried), MM-116 (the five weekly questions, skipping, and
   the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
   offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
-  the training log), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
+  the training log), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, and each target change; not strength, body fat or photos),
   MM-92 (the logging streak, forgiving one missed day in seven, as a quiet Dashboard line; no personal records or
   workouts yet).
