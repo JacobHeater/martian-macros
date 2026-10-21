@@ -67,9 +67,12 @@ export function weightJumpText(
 
   const calories = e.calories;
   if (calories === undefined) {
+    // The energy is the difference times the energy in a kilogram of fat, so with the weight hidden it is not said (MM-118).
     evidence.push([
       e.above ? 'For this to be fat' : 'For this to be fat loss',
-      `${aboutKcal(e.fatKcal)} ${e.above ? 'over' : 'under'} your expenditure yesterday`,
+      fmt.weightHidden
+        ? `Far more ${e.above ? 'over' : 'under'} your expenditure than one day can be`
+        : `${aboutKcal(e.fatKcal)} ${e.above ? 'over' : 'under'} your expenditure yesterday`,
     ]);
   } else {
     // Honest in both directions: a day far over target is not hidden, and neither is how little of it can be fat.

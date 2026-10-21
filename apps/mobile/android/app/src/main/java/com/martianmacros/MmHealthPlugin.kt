@@ -290,6 +290,9 @@ class MmHealthPlugin : Plugin() {
             .put("type", name)
             .put("sourceId", record.metadata.dataOrigin.packageName)
             .put("sourceName", appName(record.metadata.dataOrigin.packageName))
+            // The device that took it (MM-502): a body-fat reading's scale is its app and its device.
+            .put("deviceId", deviceOf(record.metadata))
+            .put("manual", record.metadata.recordingMethod == Metadata.RECORDING_METHOD_MANUAL_ENTRY)
         when (record) {
             is WeightRecord -> json.put("value", record.weight.inKilograms).at(record.time)
             is BodyFatRecord -> json.put("value", record.percentage.value).at(record.time)
@@ -301,6 +304,12 @@ class MmHealthPlugin : Plugin() {
             is SleepSessionRecord -> json.put("value", minutesAsleep(record)).span(record.startTime, record.endTime)
         }
         return json
+    }
+
+    /** The device a record names, its maker and model, or "" when it names none (MM-502). */
+    private fun deviceOf(metadata: Metadata): String {
+        val device = metadata.device ?: return ""
+        return listOfNotNull(device.manufacturer, device.model).filter { it.isNotBlank() }.joinToString(" ")
     }
 
     private fun JSObject.at(time: Instant): JSObject = put("startMs", time.toEpochMilli()).put("endMs", time.toEpochMilli())

@@ -2,7 +2,7 @@ import type { BodyFatObservation } from '../domain/BodyFatObservation';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { UserSetup } from '../domain/UserSetup';
 import type { SiteObservation } from '../domain/measurements/SiteObservation';
-import type { MeasurementSite } from '../domain/measurements/MeasurementSite';
+import { MeasurementSite } from '../domain/measurements/MeasurementSite';
 import type { WaistObservation } from '../domain/WaistObservation';
 import { BodyFatEstimate } from './BodyFatEstimate';
 import { BodyFatRule } from './BodyFatRule';
@@ -30,9 +30,11 @@ function median(values: readonly number[]): number {
  * they have settled (MM-502, `scaleBodyFat`), each scale's own bias taken
  * out. Pure: the same stored measurements give the same range.
  *
- * With the waist, the Navy tape method (MM-501) joins once neck (and, for
- * a female profile, hip) have as many entries in the same window: on each
- * site's middle value, so one mistyped entry moves nothing, and combined by
+ * With the waist, the Navy tape method (MM-501) joins for a male profile
+ * once the neck has as many entries in the same window (not for a female
+ * profile: her equation needs the waist at its narrowest, and the app's is
+ * at the navel): on the neck's middle value, so one mistyped entry moves
+ * nothing, and combined by
  * reliability with its error going together with the formulas'
  * (`BodyFatRule.navyErrorCorrelation`), so the range is never wider for it.
  */
@@ -60,8 +62,10 @@ export function estimateBodyFat({
   const outside = fromOutside({ setup, trendWeightKg, waists, sites, today });
   const scale = scaleBodyFat({ readings: bodyFatReadings, today });
   if (scale === undefined) return outside;
+  const joined = combineBodyFatEstimates(outside.estimate, scale.estimate, BodyFatRule.scaleErrorCorrelation);
   return {
-    estimate: combineBodyFatEstimates(outside.estimate, scale.estimate, BodyFatRule.scaleErrorCorrelation),
+    // A scale may only make safety stricter: the safety figures also read the estimate without it.
+    estimate: new BodyFatEstimate({ percent: joined.percent, sigmaPercent: joined.sigmaPercent, withoutScale: outside.estimate }),
     basis: 'scale',
     waistEntries: outside.waistEntries,
     scaleDays: scale.days,
@@ -99,25 +103,27 @@ function fromOutside({
   const fromWaist = relativeFatMass({ sex: profile.sex, heightCm: profile.heightCm, waistCm, waistNoiseCm });
   const withWaist = combineBodyFatEstimates(formula, fromWaist, BodyFatRule.formulaErrorCorrelation);
 
-  // The Navy tape method (MM-501): neck, and hip for a female profile, each with enough entries of its own.
+  // The Navy tape method (MM-501): men only, on the neck with enough entries of its own. The female
+  // equation reads the waist at its narrowest and the hip, while the app's waist is at the navel, with
+  // no natural-waist entry (MeasurementSite), so it is not used for a female profile.
   const middleOf = (site: MeasurementSite) => {
     const entries = sites.filter((o) => o.site === site && inWindow(o.date));
     if (entries.length < BodyFatRule.minWaistEntries) return undefined;
-    const noise = entries.some((o) => o.isSingleReading) ? WaistRule.singleReadingNoiseCm : WaistRule.medianOfThreeNoiseCm;
-    return { cm: median(entries.map((o) => o.valueCm)), noiseCm: noise / Math.sqrt(entries.length) };
+    // The site's own noise per entry; the middle of n entries is about a quarter less efficient than their mean.
+    const single = entries.some((o) => o.isSingleReading) ? WaistRule.singleReadingFactor : 1;
+    const perEntry = MeasurementSite.facts(site).noiseCm * single;
+    return { cm: median(entries.map((o) => o.valueCm)), noiseCm: (perEntry * Math.sqrt(1.25)) / Math.sqrt(entries.length) };
   };
-  const neck = middleOf('neck');
-  const hip = profile.sex === 'female' ? middleOf('hips') : undefined;
+  const neck = profile.sex === 'male' ? middleOf('neck') : undefined;
   const fromTape =
-    neck === undefined || (profile.sex === 'female' && hip === undefined)
+    neck === undefined
       ? undefined
       : navyBodyFat({
           sex: profile.sex,
           heightCm: profile.heightCm,
           waistCm,
           neckCm: neck.cm,
-          hipCm: hip?.cm,
-          circumferenceNoiseCm: Math.sqrt(waistNoiseCm ** 2 + neck.noiseCm ** 2 + (hip?.noiseCm ?? 0) ** 2),
+          circumferenceNoiseCm: Math.sqrt(waistNoiseCm ** 2 + neck.noiseCm ** 2),
         });
   if (fromTape === undefined) return { estimate: withWaist, basis: 'waist', waistEntries: recent.length };
   return {
