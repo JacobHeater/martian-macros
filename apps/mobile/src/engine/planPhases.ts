@@ -10,6 +10,7 @@ import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
 import { deficitStartOn } from './deficitStartOn';
 import type { GoalBodyFatCheck } from './GoalBodyFatCheck';
 import { leanFractionOfChange } from './leanFractionOfChange';
+import { LeanGainRule } from './LeanGainRule';
 import { MaintenanceRule } from './MaintenanceRule';
 import type { PhaseEndReason } from './PhaseEndReason';
 import type { PhasePlan } from './PhasePlan';
@@ -64,7 +65,7 @@ function kgToLine({
  * as the safety rules read a threshold (MM-132); a gain ends once the
  * upper end reaches its line. A cut also ends at `PhaseRule.longestCutWeeks`
  * of unbroken deficit or when it has stalled at the calorie floor; a gain at
- * `PhaseRule.longestGainWeeks`; maintenance after either once it has run
+ * `LeanGainRule.stopWeeks` (MM-129); maintenance after either once it has run
  * the weeks MM-130 suggests. Then the next phase is recommended from the
  * range: maintenance, and after it a lean gain if the lower end is at the
  * cut's goal, another cut if not. Recomp is reviewed by MM-133, and
@@ -178,17 +179,17 @@ export function planPhases({
       return plan({ linePercent: cutGoal, end: earlier(cap, reachedOn === undefined ? undefined : [reachedOn, 'goalReached']) });
     }
     case 'leanGain': {
-      const line = PhaseRule.gainEndPercent(sex);
+      const line = LeanGainRule.stopBodyFatPercent[sex];
       let reason: PhaseEndReason | undefined;
       if (upperPercent >= line) reason = 'gainLine';
-      else if (weeks >= PhaseRule.longestGainWeeks) reason = 'longestGain';
+      else if (weeks >= LeanGainRule.stopWeeks) reason = 'longestGain';
       if (reason !== undefined) {
         return plan({
           linePercent: line,
           recommendation: recommend(reason, 'maintenance', { nextWeeks: MaintenanceRule.minimumMaintenanceWeeks, then: 'fatLoss' }),
         });
       }
-      const cap = [startedOn.addDays(PhaseRule.longestGainWeeks * 7), 'longestGain'] as const;
+      const cap = [startedOn.addDays(LeanGainRule.stopWeeks * 7), 'longestGain'] as const;
       const kg = kgToLine({ weightKg, fatPercent: upperPercent, linePercent: line, losing: false, resistanceTrained });
       const reachedOn = projectTo(kg, steadyKgPerWeek(1));
       return plan({ linePercent: line, end: earlier(cap, reachedOn === undefined ? undefined : [reachedOn, 'gainLine']) });

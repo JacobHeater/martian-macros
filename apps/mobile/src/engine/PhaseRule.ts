@@ -3,13 +3,12 @@ import type { BiologicalSex } from '../domain/BiologicalSex';
 /**
  * How the coach plans the phases ahead (MM-36): when a phase ends and what
  * it reads. Each figure is a row in the evidence register; all judgement.
+ * A lean gain's end is MM-129's (`LeanGainRule.stopBodyFatPercent`,
+ * `LeanGainRule.stopWeeks`).
  */
 export const PhaseRule = {
   /** A cut ends, and maintenance is recommended, after this many whole weeks of unbroken deficit. */
   longestCutWeeks: 16,
-
-  /** A lean gain ends after this many whole weeks (MM-129's line). */
-  longestGainWeeks: 26,
 
   /**
    * A goal under the soft floor of `SafetyBounds.checkGoalBodyFat` is held
@@ -30,10 +29,5 @@ export const PhaseRule = {
    */
   cutGoalPercent(sex: BiologicalSex): number {
     return sex === 'male' ? 15 : 23;
-  },
-
-  /** The body fat at which a lean gain ends: the line MM-12 calls high (MM-129). */
-  gainEndPercent(sex: BiologicalSex): number {
-    return sex === 'male' ? 20 : 30;
   },
 } as const;

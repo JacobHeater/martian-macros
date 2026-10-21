@@ -1,4 +1,5 @@
 import type { PhasePlan } from '../engine/PhasePlan';
+import { LeanGainRule } from '../engine/LeanGainRule';
 import { PhaseRule } from '../engine/PhaseRule';
 
 /**
@@ -15,7 +16,7 @@ export function phaseEndText(plan: PhasePlan): string | undefined {
     case 'gainLine':
       return `At your current pace, when the upper end of your body-fat range reaches ${line}%.`;
     case 'longestGain':
-      return `At ${PhaseRule.longestGainWeeks} weeks, the longest the plan runs a gain.`;
+      return `At ${LeanGainRule.stopWeeks} weeks, the longest the plan runs a gain.`;
     case 'holdDone': {
       const end = plan.projectedEndOn;
       const weeks = end === undefined ? 0 : Math.round(plan.startedOn.daysUntil(end) / 7);

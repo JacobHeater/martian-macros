@@ -23,7 +23,7 @@ Choices I made without asking (say if any is wrong):
   deviations, the quarter-chance figure MM-132 gives the safety rules) reaches its goal, so a cut stops as soon as the goal is plausibly
   reached; a lean gain ends once the *upper* end reaches its line. A wider range ends a cut sooner and a gain sooner.
 - **Without a goal, a cut runs to 15% for men and 23% for women**, the line under which `recommendMode` starts someone on a lean gain;
-  a gain ends at 20% or 30%, MM-129's line, or 26 weeks, MM-129's stop (`PhaseRule`; MM-129 is not built and should read these).
+  a gain ends at MM-129's lines, read from `LeanGainRule` (`stopBodyFatPercent`, 20% or 30%; `stopWeeks`, 26), one source for both.
 - **"Sixteen weeks of deficit" is unbroken deficit** (`consecutiveDeficitWeeks`), so a diet break of a week or more (MM-135) restarts
   it. Ending the cut is a recommendation, apart from the break MM-135 plans at twenty.
 - **"Progress stalled" is a stall with the target already at the calorie floor** (MM-140, `atFloor`): any other stall is the loop's
@@ -79,7 +79,7 @@ Scenario: The next phase
 - Depends on a body-fat estimate better than the formula (MM-34), or the projections are fiction. MM-34 gives the range and what it
   rests on; with the formula alone the range is wide and the plan says so by ending a cut early.
 - Part of the paid Coach unlock (MM-84); not gated here, as nothing else in the Coach is yet.
-- Built: `engine/planPhases.ts`, `PhasePlan`, `PhaseRecommendation`, `PhaseEndReason`, `PhaseRule` (each figure an evidence row, and a
+- Built: `engine/planPhases.ts`, `PhasePlan`, `PhaseRecommendation`, `PhaseEndReason`, `PhaseRule` (the gain's end read from MM-129's `LeanGainRule`; each new figure an evidence row, and a
   How this works question), `SafetyBounds.goalBodyFatFloorsPercent`; `state.phasePlan`; `coach/PhaseRows.tsx` in the Coach's goal
   section; the words in `format/phaseEndText.ts`, `phaseNextTitle.ts`, `phaseRecommendationText.ts`, `goalBodyFatCheckText.ts`;
   `GoalBodyFatRepository` (`domain/repositories/`), `InMemoryGoalBodyFatRepository`, `test/contracts/goalBodyFatRepositoryContract.ts`.
