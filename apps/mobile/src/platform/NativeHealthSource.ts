@@ -1,10 +1,13 @@
 import { HealthChanges } from '../healthIngest/HealthChanges';
+import type { DaySteps } from '../healthIngest/DaySteps';
+import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthDataType as Types } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import { HealthReadFailure } from '../healthIngest/HealthReadFailure';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSource } from '../healthIngest/HealthSource';
+import { localMidnight } from '../healthIngest/localMidnight';
 import { healthConnectSample } from './healthConnectSample';
 import type { MmHealthApi } from './MmHealthApi';
 
@@ -22,9 +25,10 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  * "nothing".
  *
  * It also says whether the history permission is granted (MM-73), and asks
- * for it once.
+ * for it once, and reads a day's steps as the platform totals them
+ * (MM-442), never by adding up its readings.
  */
-export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
+export class NativeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps {
   private readonly api: MmHealthApi;
 
   constructor(api: MmHealthApi) {
@@ -86,6 +90,22 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess {
             sample.start.getTime() < range.to.getTime(),
         ),
     );
+  }
+
+  async dailySteps(range: { from: Date; to: Date }): Promise<DaySteps[]> {
+    const from = localMidnight(range.from);
+    const to = localMidnight(range.to);
+    if (to.getTime() <= from.getTime() || !(await this.permitted()).has('steps')) return [];
+    const { days } = await this.asked('daily steps', () => this.api.dailySteps({ fromMs: from.getTime(), toMs: to.getTime() }));
+    // One answer a day, at its local midnight, within the range; the platform's total as it is, rounded to a whole step.
+    const byDay = new Map<number, number>();
+    for (const { startMs, steps } of days) {
+      const day = localMidnight(new Date(startMs)).getTime();
+      const whole = Math.round(steps);
+      if (day < from.getTime() || day >= to.getTime() || !Number.isFinite(whole) || whole <= 0) continue;
+      byDay.set(day, whole);
+    }
+    return [...byDay.keys()].sort((a, b) => a - b).map((day) => ({ day: new Date(day), steps: byDay.get(day) as number }));
   }
 
   async changesSince(type: HealthDataType, token: string | undefined): Promise<HealthChanges> {
