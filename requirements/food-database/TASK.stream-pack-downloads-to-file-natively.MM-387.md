@@ -1,6 +1,6 @@
 ---
 id: MM-387
-status: in-progress
+status: done
 component: food-database
 related: [MM-384, MM-56, MM-386, MM-471]
 ---
@@ -70,6 +70,14 @@ Scenario: Two at once
   installs, and nothing but counts crosses the bridge", counts coalesced, write and connection failures told apart);
   `test/native/mmPacksFileProgress.test.ts` reads both plugins' source (no iOS build in CI).
 - Not run locally; CI validates. CI builds the Android app, not the iOS one.
-- Owed on the phone (why this stays in progress): on a release build, both packs started together, both installed with
-  matching checksums, the WebView process's memory watched in Android Studio's profiler (and Xcode's on an iPhone) not
-  growing with the download; a cancel and a resume end installed with a matching checksum.
+- The interface the iOS side implements is the plugin's `httpGetToFile` and its `packFileProgress` event, as
+  `MmPacksApi.ts` declares them; `MmPacksPlugin.swift` already implements it (`PackFileTransfer`). Any other shell
+  that brings a `PackFileFetch` passes the same contract suite.
+
+## Owed on a phone
+These are checks only a device can make; they do not hold the ticket open (owner, 2026-10-21).
+- On a release build, both packs started together end installed with matching checksums.
+- The WebView process's memory, watched in Android Studio's profiler (and Xcode's on an iPhone), does not grow with the
+  download.
+- A cancel and a resume end installed with a matching checksum.
+- The iOS build of `MmPacksPlugin.swift` (CI builds the Android app, not the iOS one).
