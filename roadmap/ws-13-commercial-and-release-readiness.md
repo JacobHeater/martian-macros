@@ -107,7 +107,7 @@ Nothing further. It is the end of the graph.
    progress until the owner confirms the address).
 2. **Professional review (MM-29).** M5. Recorded against rows of the evidence
    register, with name, credential and date.
-3. **Free tier and entitlements (MM-85).** M5. Decide the boundary feature by
+3. **Free tier and entitlements (MM-84, MM-85).** M5. Decide the boundary feature by
    feature, then implement the interface for real.
 4. **Trial and purchase (MM-86, MM-87).** M5.
 5. **Health-claims review (MM-96).** M5. Best done with the reviewer from
