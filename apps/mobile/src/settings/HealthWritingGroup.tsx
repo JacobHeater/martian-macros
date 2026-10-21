@@ -11,7 +11,16 @@ import { useOverlays } from '../ui/useOverlays';
 const named: Record<HealthWriteKind, string> = {
   food: 'Food you log',
   water: 'Water you log',
+  weight: 'Weight you type',
   workouts: 'Workouts you finish',
+};
+
+/** What was sent of each kind, as the question about removing it names it (MM-514). */
+const sent: Record<HealthWriteKind, string> = {
+  food: 'the food',
+  water: 'the water',
+  weight: 'the weigh-ins',
+  workouts: 'the workouts',
 };
 
 /** Where an iPhone's owner allows what an app writes to Apple Health: Apple asks only once. */
@@ -20,6 +29,7 @@ const healthPath = 'Settings, Health, Data Access & Devices';
 const icon: Record<HealthWriteKind, MmIconName> = {
   food: 'food',
   water: 'water',
+  weight: 'scale',
   workouts: 'train',
 };
 
@@ -30,6 +40,8 @@ function what(kind: HealthWriteKind, { ios, name }: { ios: boolean; name: string
       return `Each food with its calories and macros, at its meal. Changed or removed in ${name} too.`;
     case 'water':
       return `Each drink at the time you logged it. Removed in ${name} too.`;
+    case 'weight':
+      return `Each weigh-in you type, on its day. Changed or removed in ${name} too.`;
     case 'workouts':
       return ios
         ? 'Each finished workout, as a strength workout.'
@@ -39,11 +51,13 @@ function what(kind: HealthWriteKind, { ios, name }: { ios: boolean; name: string
 
 /**
  * The health platform's writing switches in Settings (MM-70, MM-314,
- * MM-489), a card of its own under the reading rows, built as Nutrition
- * goals' switches are (rule 9). Each is off until turned on, and turning
- * one on asks the platform for that kind's write permission alone; refused,
- * it stays off and says so. Turning one off writes nothing more and leaves
- * what was written where it is. The plugin keeps which are on.
+ * MM-513, MM-489), a card of its own under the reading rows, built as
+ * Nutrition goals' switches are (rule 9). Each is off until turned on, and
+ * turning one on asks the platform for that kind's write permission alone;
+ * refused, it stays off and says so. Turning one off writes nothing more,
+ * then asks once whether to keep or remove what the app wrote of that kind
+ * (MM-514), with keeping the safe choice, as every confirmation in the app
+ * is (MM-280). The plugin keeps which are on.
  */
 export function HealthWritingGroup() {
   const { services } = useApp();
@@ -84,7 +98,22 @@ export function HealthWritingGroup() {
       }
       await services.healthWriting.stopWriting(kind);
       setWriting(await services.healthWriting.writing());
-      overlays.snack(`Sending ${named[kind].toLowerCase()} to ${name} is off. What was sent stays there.`);
+      const off = `Sending ${named[kind].toLowerCase()} to ${name} is off.`;
+      const remove = await overlays.confirm({
+        title: `Remove ${sent[kind]} already sent?`,
+        message: `Nothing more is sent. You can keep what Martian Macros sent to ${name}, or remove it there. Nothing another app wrote is touched.`,
+        confirmLabel: 'Remove',
+        cancelLabel: 'Keep',
+      });
+      if (!remove) {
+        overlays.snack(`${off} What was sent stays there.`);
+        return;
+      }
+      overlays.snack(
+        (await services.healthWriting.removeWritten(kind))
+          ? `${off} What was sent is removed from ${name}.`
+          : `${off} What was sent could not be removed. You can remove it in ${name}.`,
+      );
     } finally {
       setAsking((now) => new Set([...now].filter((k) => k !== kind)));
     }

@@ -6,14 +6,16 @@ import type { MmHealthWritingApi } from '../../src/platform/MmHealthWritingApi';
 
 /**
  * The native health plugin's writing and workouts stood in for in memory
- * (MM-70, MM-314, MM-489), as the Kotlin and Swift plugins behave: a kind
- * is on once its write permission is granted when asked (`grants`), and
- * off when turned off; a write while a kind is off is not made. Records
+ * (MM-70, MM-314, MM-513, MM-489), as the Kotlin and Swift plugins behave:
+ * a kind is on once its write permission is granted when asked (`grants`),
+ * and off when turned off; a write while a kind is off is not made. Records
  * are kept by the app's id for them, so writing again replaces one.
- * Reading workouts needs `readsWorkouts`.
+ * Removing what was written of a kind (MM-514) needs its permission, not
+ * the kind on, and reaches only the app's own records with the prefix
+ * given. Reading workouts needs `readsWorkouts`.
  */
 export function fakeMmHealthWrites({
-  grants = ['food', 'water', 'workouts'],
+  grants = ['food', 'water', 'weight', 'workouts'],
   workouts = [],
   readsWorkouts = true,
 }: { grants?: string[]; workouts?: MmHealthWorkout[]; readsWorkouts?: boolean } = {}) {
@@ -22,6 +24,7 @@ export function fakeMmHealthWrites({
   const asked: string[] = [];
   const nutrition = new Map<string, MmHealthNutrition>();
   const water = new Map<string, { id: string; atMs: number; ml: number }>();
+  const weight = new Map<string, { id: string; atMs: number; kg: number }>();
   const held = new Map<string, MmHealthWorkout>(workouts.map((w): [string, MmHealthWorkout] => [w.id, w]));
   const writes = (kind: string) => on.has(kind) && granted.has(kind);
   let namespace = 'a1b2c3';
@@ -39,6 +42,18 @@ export function fakeMmHealthWrites({
     stopWriting: async ({ kind }) => {
       on.delete(kind);
       return { on: false };
+    },
+    removeWritten: async ({ kind, prefix }) => {
+      if (!granted.has(kind) || !prefix.startsWith('martian-macros-')) return { removed: false };
+      const records: Map<string, unknown> | undefined =
+        kind === 'food' ? nutrition : kind === 'water' ? water : kind === 'weight' ? weight : undefined;
+      for (const id of [...(records?.keys() ?? [])]) if (id.startsWith(prefix)) records?.delete(id);
+      if (kind === 'workouts') {
+        for (const [id, w] of [...held.entries()]) {
+          if (w.sourceId === 'com.martianmacros' && w.clientId.startsWith(prefix)) held.delete(id);
+        }
+      }
+      return { removed: true };
     },
     writeNamespace: async () => ({ namespace }),
     renewWriteNamespace: async () => {
@@ -58,6 +73,12 @@ export function fakeMmHealthWrites({
       return { written: true };
     },
     removeWater: async ({ id }) => ({ removed: writes('water') && water.delete(id) }),
+    writeWeight: async (record) => {
+      if (!writes('weight')) return { written: false };
+      weight.set(record.id, record);
+      return { written: true };
+    },
+    removeWeight: async ({ id }) => ({ removed: writes('weight') && weight.delete(id) }),
     readWorkouts: async ({ fromMs, toMs }) => ({
       workouts: [...held.values()].filter((w) => w.startMs >= fromMs && w.startMs < toMs),
     }),
@@ -76,6 +97,13 @@ export function fakeMmHealthWrites({
       });
       return { written: true };
     },
+    removeWorkout: async ({ clientId }) => {
+      if (!writes('workouts')) return { removed: false };
+      for (const [id, w] of [...held.entries()]) {
+        if (w.clientId === clientId && w.sourceId === 'com.martianmacros') held.delete(id);
+      }
+      return { removed: true };
+    },
   };
   return {
     api,
@@ -83,6 +111,7 @@ export function fakeMmHealthWrites({
     asked: () => [...asked],
     nutrition,
     water,
+    weight,
     /** Every workout the platform holds, by its id. */
     workouts: held,
   };
