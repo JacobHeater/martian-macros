@@ -15,6 +15,7 @@ export * from './InMemoryEntitlement';
 export * from './InMemoryExerciseProgressionRepository';
 export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
+export * from './InMemoryHealthWorkouts';
 export * from './InMemoryInlineInsightLogRepository';
 export * from './InMemoryInsightLogRepository';
 export * from './InMemoryInsightSnoozeRepository';
