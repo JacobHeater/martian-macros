@@ -853,10 +853,14 @@
   transition: width var(--motion-pour) cubic-bezier(0.33, 1, 0.68, 1);
 }
 /* While the level moves, the surface ripples, flattening and fading by the
-   end of the pour; the band is within the fill, so nothing shows past it. */
+   end of the pour; the band is within the fill, so nothing shows past it.
+   It is clipped to the fill's round end, so the front stays round while it
+   pours (MM-329). */
 .mm-progress-wave {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
 }
 .mm-progress-wave::before {

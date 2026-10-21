@@ -8,6 +8,8 @@ import { breakInForce } from '../engine/breakInForce';
 import { MaintenanceRule } from '../engine/MaintenanceRule';
 import { nextCheckIn } from '../engine/nextCheckIn';
 import { TdeeEstimator } from '../engine/TdeeEstimator';
+import { bodyFatNote } from '../format/bodyFatNote';
+import { bodyFatRangeText } from '../format/bodyFatRangeText';
 import { cautionMessage } from '../format/cautionMessage';
 import { confidenceLabel } from '../format/confidenceLabel';
 import { confidenceNextStepText } from '../format/confidenceNextStepText';
@@ -22,7 +24,6 @@ import { trainingGoalNote } from '../format/trainingGoalNote';
 import { trainingMeaning } from '../format/trainingMeaning';
 import { trainsNotYet } from '../format/trainsNotYet';
 import { targetFlagMessage } from '../format/targetFlagMessage';
-import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { Loadable } from '../state/Loadable';
 import { HealthRecheckScreen } from '../app/HealthRecheckScreen';
 import { useApp } from '../app/useApp';
@@ -63,7 +64,6 @@ import { WhatToExpectScreen } from './WhatToExpectScreen';
 import { usePaceSheet } from './usePaceSheet';
 import './coach.css';
 
-const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 const more = (count: number, what: string) => `${count} more ${what}${count === 1 ? '' : 's'}`;
 
 /** The pace in weight, worded as approximate until the coach is sure. */
@@ -200,6 +200,7 @@ export function CoachScreen() {
   // Rounded as every screen shows them, unless the person asked for exact ones (MM-123).
   const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
+  const bodyFatLine = bodyFatNote(snapshot.bodyFatBasis, { eatingDisorderHistory: setup.screening.eatingDisorderHistory });
   return (
     <>
       {/* The safeguards are outside the rationing: above the hero, in full, in this order. */}
@@ -302,14 +303,7 @@ export function CoachScreen() {
       </MmSection>
       <MmSection icon="body" title="Body">
         <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
-        <StatRow
-          label="Body fat"
-          value={
-            setup.bodyFatPercent !== undefined
-              ? `~${whole(snapshot.bodyFat.percent)}% (your estimate)`
-              : `${whole(snapshot.bodyFat.lowerPercent)}–${whole(snapshot.bodyFat.upperPercent)}% (rough estimate)`
-          }
-        />
+        <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
         <StatRow label="Resting energy (BMR)" value={Fmt.kcal(snapshot.bmrKcal)} />
       </MmSection>
     </>
