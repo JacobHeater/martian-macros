@@ -1,8 +1,8 @@
 ---
 id: MM-489
-status: proposed
+status: in-progress
 component: training
-related: [MM-68, MM-69, MM-188, MM-189, MM-244, MM-490]
+related: [MM-68, MM-69, MM-70, MM-188, MM-189, MM-242, MM-244, MM-490, MM-515]
 ---
 
 # Task: Read and write workouts with their segments in the Android and iOS shells
@@ -19,6 +19,15 @@ Choices I made without asking (say if any is wrong):
   `MmHealth` plugin (MM-68, MM-69), and it is the one place the AndroidX client and HealthKit are reached.
 - **Writing waits for this ticket and for the terms.** A write permission in the manifest and a terms change (MM-244) go in the
   same PR as the code that writes, not before.
+- **A switch in Settings, kept by the plugin** (2026-10-21). "Send workouts you finish to …" sits with MM-70's food and MM-314's
+  water switches in the health platform's section; turning it on asks for the write permission alone. Whether it is on is kept
+  in the plugin's own preferences (SharedPreferences, UserDefaults), not the database, so no schema change was needed and the
+  switch survives a restart.
+- **Written when finished, and again when a finished workout is saved again**, by wrapping the workout log
+  (`MirroredWorkoutLog`) where `openAppServices.ts` chooses implementations. A workout in progress is never written.
+- **Deleting a workout in the app does not remove it from the platform yet** (MM-515); the terms say only that a changed
+  workout is written again.
+- **On iOS the workout is written with `HKWorkoutBuilder`** (iOS 12 and later), so nothing needs `#available`.
 
 ## Description
 - **Android (`MmHealthPlugin.kt`)**: read a session's type, `clientRecordId` and segments (type, start, end, repetitions); write an
@@ -51,5 +60,10 @@ Scenario: Written once
 ```
 
 ## Notes
+- Built 2026-10-21, not run locally; CI validates. `src/platform/NativeHealthWorkouts.ts` over `readWorkouts` and
+  `writeWorkout` of both plugins, held to both contract suites with the bridge stood in (`test/platform/nativeHealthWorkouts.test.ts`);
+  `src/healthWrite/MirroredWorkoutLog.ts` (`test/healthWrite/mirroredLogs.test.ts`, with the workout repository contract);
+  `WRITE_EXERCISE` in the manifest and `NSHealthUpdateUsageDescription` in `Info.plist`; the Swift side guarded by
+  `test/native/mmHealthWrites.test.ts`. The app's own records are no longer read back as readings by either plugin.
 - Owed on a device: a written workout shows in Health Connect and Apple Health, a segment shows in Health Connect, writing again
   replaces it, and reading a watch's strength session returns its segments (MM-188's questions 3 and 5).

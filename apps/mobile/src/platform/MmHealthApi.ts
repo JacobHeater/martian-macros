@@ -1,9 +1,10 @@
 import type { MmHealthRecord } from './MmHealthRecord';
 
 /**
- * The native Health Connect plugin (MM-68). It only reads: nothing is
- * written to the user's health data. A call the platform refuses is
- * rejected, never answered with nothing.
+ * The native health plugin's reading (MM-68, MM-69). Writing is
+ * `MmHealthWritingApi` and `MmHealthWorkoutsApi`, each kind with a
+ * permission of its own, never asked for with reading. A call the platform
+ * refuses is rejected, never answered with nothing.
  */
 export interface MmHealthApi {
   status(): Promise<{ status: 'available' | 'unavailable' | 'updateRequired' }>;

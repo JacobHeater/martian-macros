@@ -37,8 +37,4 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
   changesSince(): Promise<HealthChanges> {
     return Promise.resolve(new HealthChanges({ nextToken: '' }));
   }
-
-  writeNutrition(): Promise<boolean> {
-    return Promise.resolve(false);
-  }
 }

@@ -20,6 +20,7 @@ import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository
 import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepository';
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
+import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -40,6 +41,7 @@ import { InMemoryRecoveryCheckInRepository } from './InMemoryRecoveryCheckInRepo
 import { InMemoryReminderRepository } from './InMemoryReminderRepository';
 import { InMemorySetupRepository } from './InMemorySetupRepository';
 import { InMemorySleepRepository } from './InMemorySleepRepository';
+import { InMemoryTargetShapeRepository } from './InMemoryTargetShapeRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
 import { InMemoryWaistRepository } from './InMemoryWaistRepository';
@@ -66,6 +68,7 @@ export class InMemoryRepositories {
   readonly dayMarks: DayMarkRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
+  readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
@@ -91,6 +94,7 @@ export class InMemoryRepositories {
     const customFoods = new InMemoryCustomFoodRepository();
     const dayMarks = new InMemoryDayMarkRepository();
     const targets = new InMemoryTargetsHistoryRepository();
+    const targetShapes = new InMemoryTargetShapeRepository();
     const preferences = new InMemoryPreferencesRepository();
     const insightLog = new InMemoryInsightLogRepository();
     const inlineInsightLog = new InMemoryInlineInsightLogRepository();
@@ -115,6 +119,7 @@ export class InMemoryRepositories {
     this.dayMarks = dayMarks;
     this.intake = new InMemoryIntakeReader(food, dayMarks);
     this.targets = targets;
+    this.targetShapes = targetShapes;
     this.preferences = preferences;
     this.insightLog = insightLog;
     this.inlineInsightLog = inlineInsightLog;
@@ -138,6 +143,7 @@ export class InMemoryRepositories {
       () => customFoods.clear(),
       () => dayMarks.clear(),
       () => targets.clear(),
+      () => targetShapes.clear(),
       () => preferences.clear(),
       () => insightLog.clear(),
       () => inlineInsightLog.clear(),

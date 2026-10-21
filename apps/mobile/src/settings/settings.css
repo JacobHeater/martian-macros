@@ -20,3 +20,9 @@
   flex: 1;
   min-width: 0;
 }
+/* The week shape's higher days (MM-124): chips that wrap, as Period days on Progress. */
+.settings-weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}

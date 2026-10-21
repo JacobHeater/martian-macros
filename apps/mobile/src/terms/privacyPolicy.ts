@@ -56,8 +56,9 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
     {
       heading: `3. ${health}`,
       paragraphs: [
-        `${health} is optional. If you allow it, the app reads only the kinds of data you allow from this list: weight, body fat, lean body mass, height, workouts, menstruation, steps and sleep. It never writes to ${health}.`,
+        `${health} is optional. If you allow it, the app reads only the kinds of data you allow from this list: weight, body fat, lean body mass, height, workouts, menstruation, steps and sleep.`,
         `What it reads is copied into the app’s database on this phone, is used only to work out your numbers in the app, and stays there until you erase it, even if you later take the permission away. It is not sent anywhere by the app, and it is not used for advertising.`,
+        `The app writes to ${health} only the kinds you turn on in Settings, each with its own permission: the food you log, the water you log and the workouts you finish. It writes only what you logged in the app, and never changes or removes what another app wrote. What it wrote is then kept by ${health}, and stays there when you turn writing off or erase the app’s data, until you remove it there.`,
       ],
     },
     {
@@ -120,7 +121,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
     {
       heading: '11. Your choices',
       paragraphs: [
-        'Settings, then "Erase all data and start over", deletes every record in the app and returns it to first use. Uninstalling the app removes them too. Erasing does not remove a food database you downloaded and does not change permissions you granted; you can withdraw those in the phone’s settings.',
+        'Settings, then "Erase all data and start over", deletes every record in the app and returns it to first use. Uninstalling the app removes them too. Erasing does not remove a food database you downloaded or what the app wrote to your phone’s health app, and does not change permissions you granted; you can withdraw those in the phone’s settings.',
         'Online lookups can be turned off at any time in Settings, under Data. A backup file you made is wherever you sent it, and is deleted there.',
         'Because we hold none of your records, there is nothing for us to show, correct or delete on request: all of it is on your phone, in your hands. You can still ask us anything about this policy at the address in section 1.',
       ],
