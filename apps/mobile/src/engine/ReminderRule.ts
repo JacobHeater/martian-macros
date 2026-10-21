@@ -7,6 +7,8 @@ const defaultMinutes: Record<ReminderKind, number> = {
   weighIn: 7 * 60,
   logFood: 20 * 60,
   weeklyMeasurement: 8 * 60,
+  // The table in MM-146 sends it "with the check-in", whose own notification it puts at 9 am.
+  recoveryCheckIn: 9 * 60,
 };
 
 /** The rules reminders obey (MM-146). Judgement: tune them here. */
