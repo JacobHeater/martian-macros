@@ -130,6 +130,17 @@ export const HealthCheckSleepDisorder = screenStory({
   },
 });
 
+/** MM-113, MM-510: the weight-loss medication answer, its own and not blocking, ticked. */
+export const HealthCheckWeightLossMedication = screenStory({
+  covers: ['HealthStep'],
+  shows: 'I take a prescription weight-loss medication',
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 6);
+    await userEvent.click(await within(canvas).findByRole('checkbox', { name: 'I take a prescription weight-loss medication' }));
+  },
+});
+
 /** MM-128: under a chosen fat-loss goal, the three paces with what each would cost from the starting estimate. */
 export const GoalPaces = screenStory({
   covers: ['GoalStep'],

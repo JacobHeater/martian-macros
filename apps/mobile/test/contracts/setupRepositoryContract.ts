@@ -114,6 +114,18 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       expect(back.screening.pcos).toBe(false);
     });
 
+    // MM-510: the weight-loss medication answer, not ticked until it is, and apart from the broader one.
+    it('keeps the weight-loss medication answer, apart from the weight-affecting one', async () => {
+      await repo.saveSetup(typicalSetup());
+      expect((await loaded()).screening.weightLossMedication).toBe(false);
+      await repo.saveSetup(typicalSetup({ screening: new ScreeningAnswers({ weightLossMedication: true }) }));
+      expect((await loaded()).screening.weightLossMedication).toBe(true);
+      expect((await loaded()).screening.weightAffectingMedication).toBe(false);
+      await repo.saveSetup(typicalSetup({ screening: new ScreeningAnswers({ weightAffectingMedication: true }) }));
+      expect((await loaded()).screening.weightLossMedication).toBe(false);
+      expect((await loaded()).screening.weightAffectingMedication).toBe(true);
+    });
+
     it('there is only one setup: saving replaces it', async () => {
       await repo.saveSetup(typicalSetup({ goalMode: 'fatLoss' }));
       await repo.saveSetup(typicalSetup({ goalMode: 'maintenance' }));

@@ -8,6 +8,7 @@ import type { MacroPicture } from '../domain/MacroPicture';
 import { CalorieBand } from '../engine/CalorieBand';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { intakeStandingOf } from '../engine/intakeStandingOf';
+import { calorieAimText } from '../format/calorieAimText';
 import { displayTargets } from '../format/displayTargets';
 import { Fmt } from '../format/Fmt';
 import { clamp } from '../lang/clamp';
@@ -68,6 +69,10 @@ interface CalorieHeroProps {
  * person asked for exact ones; and "on target" is a band, the larger of 5%
  * and 100 kcal either side, drawn on the arc and said in the caption
  * (MM-123). A day below the calorie floor is never on target.
+ *
+ * On a weight-loss medication (MM-113, MM-510) protein is the headline, its
+ * bar above the arc, and calories are a level to reach: what is logged so
+ * far and the aim, until the day is over it, when the usual words return.
  */
 export function CalorieHero({
   lines,
@@ -97,13 +102,19 @@ export function CalorieHero({
   const t = targets === undefined ? undefined : displayTargets(targets, { exact });
   const left = t === undefined || paused ? undefined : t.kcal - intake.kcal;
   const over = left !== undefined && left < 0;
-  const figure = left === undefined ? Fmt.whole(intake.kcal) : Fmt.whole(Math.abs(left));
+  const onMedication = setup?.screening.weightLossMedication ?? false;
+  const aim = setup === undefined || t === undefined || paused ? undefined : calorieAimText(setup.screening, intake.kcal, t.kcal);
+  const logged = Fmt.whole(intake.kcal);
+  const figure = left === undefined || aim !== undefined ? logged : Fmt.whole(Math.abs(left));
   const onTarget =
     targets !== undefined && !paused && intakeStandingOf({ kcal: intake.kcal, targetKcal: targets.kcal, floorKcal }) === 'onTarget';
+  const onTargetNote = onTarget ? ' · on target' : '';
   let caption: string;
   if (paused && t !== undefined) caption = `kcal logged · paused, guide ${Fmt.whole(t.kcal)}`;
   else if (left === undefined || t === undefined) caption = 'kcal logged';
-  else caption = `${over ? `kcal over ${Fmt.whole(t.kcal)}` : `kcal left of ${Fmt.whole(t.kcal)}`}${onTarget ? ' · on target' : ''}`;
+  // The aim's words begin with the logged figure, which stands above them as the figure.
+  else if (aim !== undefined) caption = `${aim.startsWith(`${logged} `) ? aim.slice(logged.length + 1) : aim}${onTargetNote}`;
+  else caption = `${over ? `kcal over ${Fmt.whole(t.kcal)}` : `kcal left of ${Fmt.whole(t.kcal)}`}${onTargetNote}`;
   let progress = 0;
   if (t !== undefined && t.kcal > 0) progress = paused ? clamp(intake.kcal / t.kcal, 0, 1) : intake.kcal / t.kcal;
   // The zone that counts as on target, as shares of the target (MM-123); none during a pause.
@@ -126,10 +137,24 @@ export function CalorieHero({
   // Micros is a choice at Full detail only; remembered below it, the bars are shown.
   const micros = microsOffered && DetailLevel.showsExtras(level);
   const chosen: MacroPicture = !switchable || (picture === 'micros' && !micros) ? 'bars' : picture;
+  const bar = (macro: MacroKind) => (
+    <MacroBar
+      key={macro}
+      macro={macro}
+      grams={grams[macro]}
+      target={target[macro]}
+      minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
+      emphasized={macro === 'protein'}
+      netCarbs={netCarbs}
+    />
+  );
+  // Protein leads on a weight-loss medication, above the calories (MM-113); the bars below hold the rest.
+  const below = onMedication ? shown.filter((macro) => macro !== 'protein') : shown;
 
   return (
     <MmHeroSurface>
       <h2 className="mm-visually-hidden">Calories</h2>
+      {onMedication ? <div className="food-hero-headline">{bar('protein')}</div> : null}
       {/* Where the figure is plain text the arc is not spoken too; inside a press it is the spoken figure (MM-389). */}
       <HorizonArc progress={progress} band={band} label={onPress === undefined ? undefined : `${figure} ${caption}`} />
       {onPress === undefined ? (
@@ -166,20 +191,8 @@ export function CalorieHero({
         <div className="food-hero-split">
           <MacroSplitChart intake={intake} compact netCarbs={netCarbs} />
         </div>
-      ) : (
-        <div className="food-hero-macros">
-          {shown.map((macro) => (
-            <MacroBar
-              key={macro}
-              macro={macro}
-              grams={grams[macro]}
-              target={target[macro]}
-              minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
-              emphasized={macro === 'protein'}
-              netCarbs={netCarbs}
-            />
-          ))}
-        </div>
+      ) : below.length === 0 ? null : (
+        <div className="food-hero-macros">{below.map(bar)}</div>
       )}
       {lines === undefined ? null : <div className="food-hero-lines">{lines}</div>}
       {status === undefined ? null : (
