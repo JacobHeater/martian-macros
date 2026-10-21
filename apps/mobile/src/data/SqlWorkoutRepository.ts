@@ -1,11 +1,13 @@
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
+import type { ImportedWorkout } from '../domain/training/ImportedWorkout';
 import { Workout } from '../domain/training/Workout';
 import { WorkoutExercise } from '../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
 import type { Watched } from '../lang/Watched';
 import type { SqlDatabase } from '../sql/SqlDatabase';
+import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { day, integer, moment, number, optionalInteger, optionalMoment, orNull, text } from './columns';
+import { day, integer, moment, number, optionalInteger, optionalMoment, optionalText, orNull, text } from './columns';
 import { insert } from './insert';
 import { update } from './update';
 
@@ -23,6 +25,12 @@ function pushTo<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   const list = map.get(key);
   if (list === undefined) map.set(key, [value]);
   else list.push(value);
+}
+
+/** Where an imported workout came from (MM-490), or undefined for one logged in the app. */
+function importedOf(row: SqlRow): ImportedWorkout | undefined {
+  const platformId = optionalText(row, 'platform_id');
+  return platformId === undefined ? undefined : { platformId, sourceName: optionalText(row, 'platform_source_name') ?? '' };
 }
 
 /** `WorkoutRepository` kept in the database. Ids are never reused. */
@@ -78,6 +86,7 @@ export class SqlWorkoutRepository implements WorkoutRepository {
             pausedForMs: integer(row, 'paused_for_ms'),
             setStartedAt: optionalMoment(row, 'set_started_at_ms'),
             exercises: exercises.get(integer(row, 'id')) ?? [],
+            imported: importedOf(row),
           }),
       );
     });
@@ -92,6 +101,8 @@ export class SqlWorkoutRepository implements WorkoutRepository {
         paused_at_ms: orNull(workout.pausedAt?.getTime()),
         paused_for_ms: Math.trunc(workout.pausedForMs),
         set_started_at_ms: orNull(workout.setStartedAt?.getTime()),
+        platform_id: orNull(workout.imported?.platformId),
+        platform_source_name: orNull(workout.imported?.sourceName),
       };
       let id = workout.id;
       if (id === 0) {
@@ -127,9 +138,19 @@ export class SqlWorkoutRepository implements WorkoutRepository {
   }
 
   deleteWorkout(id: number): Promise<void> {
-    return this.db.write(all, async (db) => {
+    return this.db.write([...all, 'deleted_platform_workouts'], async (db) => {
+      // An imported workout's platform id is kept, so a later read does not bring it back (MM-490).
+      await db.execute(
+        'INSERT OR IGNORE INTO deleted_platform_workouts (platform_id) SELECT platform_id FROM workouts WHERE id = ? AND platform_id IS NOT NULL',
+        [id],
+      );
       await deleteChildren(db, id);
       await db.execute('DELETE FROM workouts WHERE id = ?', [id]);
     });
+  }
+
+  async deletedPlatformIds(): Promise<ReadonlySet<string>> {
+    const rows = await this.db.read((db) => db.select('SELECT platform_id FROM deleted_platform_workouts'));
+    return new Set(rows.map((row) => text(row, 'platform_id')));
   }
 }

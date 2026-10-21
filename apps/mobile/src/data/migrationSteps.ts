@@ -289,4 +289,15 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 21 to 22 (MM-490): the platform id and source of a workout imported from the health platform, none for what is
+  // already logged; and the imported workouts deleted in the app, so a later read does not bring them back.
+  [
+    21,
+    async (db) => {
+      await db.execute('ALTER TABLE workouts ADD COLUMN platform_id TEXT NULL');
+      await db.execute('ALTER TABLE workouts ADD COLUMN platform_source_name TEXT NULL');
+      await db.execute('CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id")');
+      await db.execute('CREATE TABLE "deleted_platform_workouts" ("platform_id" TEXT NOT NULL PRIMARY KEY)');
+    },
+  ],
 ]);

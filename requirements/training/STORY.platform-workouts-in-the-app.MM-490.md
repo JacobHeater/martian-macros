@@ -1,6 +1,6 @@
 ---
 id: MM-490
-status: proposed
+status: done
 component: training
 related: [MM-71, MM-75, MM-189, MM-489]
 ---
@@ -44,6 +44,39 @@ Scenario: Other exercise
   Then it shows as "Other exercise" with its time
   And the user can move its sets to an exercise they choose
 ```
+
+## Progress
+Built 2026-10-21. Not run locally; CI validates.
+- Already there from MM-489: the "Workouts you finish" switch in the health platform's writing card, off until turned
+  on and asking the platform; a finished workout written once permitted and written again when edited
+  (`MirroredWorkoutLog`). Its first two description items needed nothing more.
+- Schema 22 (stacked on MM-507's 21): `workouts` gains `platform_id` (unique) and `platform_source_name`, none for
+  what is already logged; `deleted_platform_workouts` keeps the platform id of an imported workout deleted in the app,
+  so a later read does not bring it back (a decision: deleting an import is meant to last). Step keyed 21, fingerprint
+  for 22, `tables`.
+- `Workout.imported` (`ImportedWorkout`: platform id and source name), kept through every change; `WorkoutRepository`
+  gains `DeletedImportsReader`; SQL, in-memory and the mirror implement it. An imported workout is never written back
+  to the platform, finished or edited.
+- `platformWorkoutImports` (engine): each platform workout once, as `workoutFromPlatform` gives it; one already
+  logged is never added again, and read again its day and span follow the platform while its sets stay as the user
+  has them (a decision: the user's moved sets are not overwritten); one this app wrote, or deleted in the app, is
+  not brought in. `AppState.importWorkouts` runs it on every read of the health platform, over the last 30 days.
+- Train: an imported workout's summary says where from ("· from Watch"); "Other exercise" is named
+  (`exerciseNameOf`), says it counts toward no muscle, and "Move sets to an exercise" opens the exercise picker
+  (`WorkoutController.moveExercise`, sets and times kept). Repeating a workout leaves "Other exercise" out.
+- Guarding tests: `workoutRepositoryContract` (an import keeps its platform id through a change; deleting it
+  remembers the id; in memory, SQL and the mirror); `test/engine/platformWorkoutImports.test.ts`;
+  `test/healthWrite/mirroredLogs.test.ts` (an import is never written back); `test/train/importedWorkouts.test.tsx`
+  (not imported twice across a reopen; a deleted one stays deleted; Other exercise shown with its time and moved;
+  nothing with reading not allowed); `test/data/upgrade.test.ts` (from 21). Writing off until turned on stays
+  guarded by MM-489's tests.
+- Stories: `TrainImportedWorkout`, `ImportedWorkoutOtherExercise` in `Train.stories.tsx`.
+
+## Owed on a phone
+- Health Connect: a strength workout recorded by another app (a watch) appears in Train after opening the app, once,
+  with its exercise segments; reopening does not add a second; deleting it in the app keeps it deleted.
+- Apple Health: a workout from another app imports as a session with its span and no exercises.
+- A workout finished in the app with writing on is not imported back on the next read.
 
 ## Notes
 - 2026-10-21 (`fix/health-plugins-review`): a workout the platform says the app wrote is never offered for import,

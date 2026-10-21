@@ -79,6 +79,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
   // Version 20 (MM-456): the pack food a recipe's ingredient was found as.
   recipe_ingredients: ['source_pack_id', 'source_food_id'],
+  // Version 22 (MM-490): the platform id and source of a workout imported from the health platform.
+  workouts: ['platform_id', 'platform_source_name'],
 };
 
 /** The tables added since the Dart database's last version. */
@@ -99,6 +101,8 @@ const tablesAddedSince: readonly string[] = [
   'target_shapes',
   // Version 21 (MM-507): the goal body fat the user set (MM-36).
   'goal_body_fat',
+  // Version 22 (MM-490): the imported workouts deleted in the app.
+  'deleted_platform_workouts',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart
