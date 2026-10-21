@@ -40,7 +40,7 @@ signing team, see [docs/ios-signing.md](docs/ios-signing.md).
 | `mm run --ios [-d UDID] [--prod \| --env prod\|dev\|demo]` | Builds, installs and launches on an iPhone simulator (`MM_SIMULATOR` sets the default); the dev twin unless said |
 | `mm run --ios --phone [name \| id] [--prod \| --env prod\|dev\|demo]` | Builds signed, installs and opens on the iPhone plugged in (`MM_IPHONE` sets the default; `MM_APPLE_TEAM` the signing team); the real app unless said |
 | `mm demo [--seed] -d <Android device ID>` | The isolated DEMO app on an exact device; `--seed` starts it from the demo scenario on every launch |
-| `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given; a simulator by its UDID |
+| `mm screenshot [-d DEVICE] [path] [--clipboard]` | A device's screen as a PNG, for native behavior verification (design review is Storybook's); `--clipboard` puts it on the clipboard, instead of a file when no path is given; a simulator by its UDID; `--phone` (or `-d <iPhone name \| id>`) for the iPhone plugged in, through the dev or demo app and `devicectl` alone: the app's screen only, no status bar or system interface (MM-536) |
 | `mm emulator [id] [--cold]` | Starts an emulator and waits for it (`mm emulator list` to list; `--cold` if it hangs on boot; `MM_EMULATOR` sets the default) |
 | `mm simulator [name \| udid]` | Starts an iPhone simulator and waits for it (`mm simulator list` to list) |
 | `mm build android [--release] [--prod \| --env prod\|dev]` | Builds the web app, syncs the shell and assembles the APK |
