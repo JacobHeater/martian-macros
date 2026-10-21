@@ -843,6 +843,8 @@
             "MM-72",
             "MM-70",
             "MM-69",
+            "MM-441",
+            "MM-442",
             "MM-314",
             "MM-323",
             "MM-395"
@@ -2989,6 +2991,7 @@
       "sourceRequirements": {
         "built": [
           "MM-67",
+          "MM-71",
           "MM-188",
           "MM-395"
         ],
@@ -2997,7 +3000,8 @@
           "MM-68",
           "MM-69",
           "MM-70",
-          "MM-71",
+          "MM-441",
+          "MM-442",
           "MM-72",
           "MM-73",
           "MM-314",
@@ -3090,6 +3094,15 @@
           "title": "A reading's source named by its app, never its package id, and a row that wraps a long word (MM-395)",
           "tickets": [
             "MM-395"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "tickets": [
+            "MM-441",
+            "MM-442"
           ],
           "milestone": "M4"
         }

@@ -411,6 +411,46 @@ export const HealthConnectReadDone = screenStory({
   },
 });
 
+/** MM-71: weigh-ins from two scales: the primary scale row, chosen automatically as the one used most. */
+export const HealthConnectTwoScales = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Automatic: Bathroom scale, with the most weigh-ins in 30 days.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Primary scale'));
+  },
+});
+
+/** MM-71: the gym's scale chosen as primary in Settings: its weigh-ins count first from now on. */
+export const HealthConnectPrimaryScaleChosen = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Gym scale. Its weigh-ins count before any other source’s.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const change = await within(canvas).findByRole('button', { name: 'Change primary scale' });
+    reveal(change);
+    await userEvent.click(change);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Gym scale' }));
+  },
+});
+
+/** MM-71: choosing a primary scale and the save failing: it says so and keeps the one in force. */
+export const HealthConnectPrimaryScaleFails = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Your primary scale could not be saved. Nothing was changed.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  stores: failingWrite('preferences', 'savePrimaryScale'),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const change = await within(canvas).findByRole('button', { name: 'Change primary scale' });
+    reveal(change);
+    await userEvent.click(change);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Gym scale' }));
+  },
+});
+
 // ---- MM-321: Settings and the food packs, in the states no story drew ----
 
 const openFoodDatabase = ({ navigator }: StoryStage) => void navigator.push(() => <FoodDatabaseScreen />);
