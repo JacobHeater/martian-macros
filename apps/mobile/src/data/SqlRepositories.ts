@@ -8,6 +8,8 @@ import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { IntakeReader } from '../domain/repositories/IntakeReader';
 import type { PauseRepository } from '../domain/repositories/PauseRepository';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
@@ -78,6 +80,8 @@ export class SqlRepositories {
   /** How the user shapes their targets, by the day each shape was set from (MM-122, MM-124, MM-486). */
   readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
+  /** The weigh-in window (MM-441), a column of the preferences' row. */
+  readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
@@ -106,7 +110,9 @@ export class SqlRepositories {
     this.intake = new SqlIntakeReader(db);
     this.targets = new SqlTargetsHistoryRepository(db);
     this.targetShapes = new SqlTargetShapeRepository(db);
-    this.preferences = new SqlPreferencesRepository(db);
+    const preferences = new SqlPreferencesRepository(db);
+    this.preferences = preferences;
+    this.weighInWindow = preferences;
     this.insightLog = new SqlInsightLogRepository(db);
     this.inlineInsightLog = new SqlInlineInsightLogRepository(db);
     this.insightSnoozes = new SqlInsightSnoozeRepository(db);

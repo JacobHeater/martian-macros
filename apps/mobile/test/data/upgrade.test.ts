@@ -11,6 +11,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { SleepNight } from '../../src/domain/SleepNight';
 import { TargetShape } from '../../src/domain/TargetShape';
 import { WeekShape } from '../../src/domain/WeekShape';
+import { WeighInWindow } from '../../src/healthIngest/WeighInWindow';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { StateError } from '../../src/lang/StateError';
 import { SqlFailure } from '../../src/sql/SqlFailure';
@@ -142,8 +143,19 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 18 left it: without the weigh-in window (MM-441). */
+const versionEighteen = currentSchema
+  .replace(
+    '  "weigh_in_window_start_minute" INTEGER NULL CHECK ("weigh_in_window_start_minute" IS NULL OR "weigh_in_window_start_minute" BETWEEN 0 AND 1439),\n',
+    '',
+  )
+  .replace(
+    '  "weigh_in_window_end_minute" INTEGER NULL CHECK ("weigh_in_window_end_minute" IS NULL OR "weigh_in_window_end_minute" BETWEEN 1 AND 1440),\n',
+    '',
+  );
+
 /** The schema as version 17 left it: without the weight-loss medication answer (MM-510). */
-const versionSeventeen = currentSchema.replace(
+const versionSeventeen = versionEighteen.replace(
   '  "weight_loss_medication" INTEGER NOT NULL DEFAULT 0 CHECK ("weight_loss_medication" IN (0, 1)),\n',
   '',
 );
@@ -544,4 +556,34 @@ it('a version 17 database comes up to date with the weight-loss medication answe
     setup.copyWith({ screening: new ScreeningAnswers({ weightAffectingMedication: true, weightLossMedication: true }) }),
   );
   expect((await repos.setup.loadSetup())?.screening.weightLossMedication).toBe(true);
+});
+
+// MM-441: a version 18 database comes up to date with no weigh-in window chosen, so 04:00 to 12:00 counts as before;
+// its other preferences are kept, and a window moved from then on is kept, to the minute and up to midnight.
+it('a version 18 database comes up to date on the usual weigh-in window, and keeps one moved after', async () => {
+  expect(versionEighteen).not.toContain('weigh_in_window');
+  expect(versionEighteen).toContain('weight_loss_medication');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 18, schema: versionEighteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, primary_scale_source_id) VALUES (1, 'dark', 'gym')");
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'user_preferences')).toEqual(
+    expect.arrayContaining(['weigh_in_window_start_minute', 'weigh_in_window_end_minute']),
+  );
+  expect((await first(repos.weighInWindow.watchWeighInWindow())).equals(WeighInWindow.usual), 'none chosen: 04:00 to 12:00').toBe(true);
+  expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  await repos.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 14 * 60 + 5, endMinute: 24 * 60 }));
+  const moved = await first(repos.weighInWindow.watchWeighInWindow());
+  expect([moved.startMinute, moved.endMinute]).toEqual([14 * 60 + 5, 24 * 60]);
 });

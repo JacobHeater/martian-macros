@@ -117,6 +117,7 @@ import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
+import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthBackfill } from '../healthIngest/HealthBackfill';
@@ -221,6 +222,8 @@ export class AppState {
    * one with the most weigh-ins in thirty days counts.
    */
   readonly primaryScale: Cell<Loadable<string | undefined>>;
+  /** The hours in which an imported reading counts as the morning weigh-in (MM-441): 04:00 to 12:00 until moved. */
+  readonly weighInWindow: Cell<Loadable<WeighInWindow>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -563,11 +566,14 @@ export class AppState {
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
+    this.weighInWindow = stream(() => s.weighInWindow.watchWeighInWindow());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
       // And here so that choosing a scale does.
       const chosen = of(this.primaryScale);
+      // And here so that moving the weigh-in window does (MM-441).
+      const morning = of(this.weighInWindow) ?? WeighInWindow.usual;
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
@@ -575,7 +581,7 @@ export class AppState {
             (samples) => {
               if (stopped) return;
               const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
-              listener(dailyWeighIns(samples, { primarySourceId }));
+              listener(dailyWeighIns(samples, { primarySourceId, window: morning }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
