@@ -1,6 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
 import { HealthChanges } from '../healthIngest/HealthChanges';
-import type { Clock } from '../domain/integration/Clock';
 import type { DaySteps } from '../healthIngest/DaySteps';
 import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
