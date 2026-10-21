@@ -1,6 +1,6 @@
 ---
 id: MM-148
-status: in-progress
+status: done
 component: adherence
 related: [MM-145, MM-23, MM-24, MM-31, MM-92, MM-117, MM-134, MM-135, MM-136, MM-146, MM-147]
 ---
@@ -116,15 +116,29 @@ Built:
 - Thresholds are in `PauseRule`. Tests: `pause_test.dart` (engine), `pause_test.dart` (app), the pause repository contract against
   both implementations, and the migration test.
 
-Not built:
-- Streaks neither advance nor break: process rewards (MM-92) do not exist yet and must read the pause when built. (Reminders are
-  silent during a pause as of MM-146.)
-- Notices about training lapses (MM-134): not built either.
-- The glycogen rule at both ends of a pause (MM-131): the scale is not yet treated as settling when a pause starts or ends, beyond
-  the sentence on the resume screen. The wording is this ticket's, not MM-130's, which is not built.
-- The Coach screen still shows the stored targets under the paused notice; only the dashboard and Food screen swap in the guide.
+Built since (checked 2026-10-21, React app):
+- **Streaks neither advance nor break**: the logging streak (MM-92) skips paused days (`streakEndingOn`); guarded by "a
+  pause does not break it" in `test/dashboard/processRewards.test.tsx`. Reminders are silent during a pause as of MM-146.
+- **No notices about training lapses** (MM-134) during a pause, and a lean-gain surplus suspended without comment
+  (`assessTrainingLapse`; "a pause is legitimate" in `test/engine/trainingLapse.test.ts`).
+- **The Coach screen** shows the maintenance guide during a pause, as the dashboard and Food do (`CoachScreen`, the
+  calorie visual's `paused`).
+- **The glycogen rule at both ends** (MM-131), 2026-10-21: a pause long enough to be a diet break
+  (`PauseRule.deficitBreakDays`), taken from targets more than 10% from the expenditure they rest on, makes a settling
+  window on its first day and on the day after it (`pauseSettlingWindows`, joined to the target changes' windows in
+  `analyze`). The trend lets the scale move there and the estimator leaves those days out, so the water that comes and
+  goes is not read as tissue; while too few days are left the estimate is held and the Coach says it is waiting for
+  early water changes to settle. The first check-in still comes a week after the pause ends; it changes the targets
+  once the water has settled. Tests: "the glycogen shift at both ends" and "after a pause of a week or more, the week is
+  up but nothing moves while the water settles" in `test/engine/pause.test.ts` (the week's wait itself is now shown
+  with a six-day pause, too short to be a change of phase). Not run locally; CI validates.
+
+Left as they are (not in the acceptance criteria):
 - The guide for a past paused day is today's maintenance estimate, not that day's.
-- A pause cannot be edited (only ended, cancelled or extended a week), and its dates are set with sliders; there is no date picker
-  component yet.
-- Checked on the Android emulator: the form, a running pause, and the paused dashboard. The resume screen, the Food screen and the
-  Coach notice were not looked at there, and iOS is untried.
+- A pause cannot be edited (only ended, cancelled or extended a week), and its dates are set with sliders.
+- The resume screen's wording is this ticket's; MM-130's wording for the expected water shift is used by the
+  maintenance band, not here.
+
+## Owed on a phone
+- Checked on the Android emulator (Flutter build): the form, a running pause, and the paused dashboard. Still to look at:
+  the resume screen, the Food screen and the Coach screen during a pause, on Android and on iOS.
