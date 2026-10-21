@@ -312,6 +312,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -689,7 +690,8 @@
             "MM-192",
             "MM-214",
             "MM-215",
-            "MM-222"
+            "MM-222",
+            "MM-447"
           ]
         },
         {
@@ -808,6 +810,7 @@
             "MM-32",
             "MM-125",
             "MM-36",
+            "MM-450",
             "MM-312",
             "MM-361",
             "MM-362",
@@ -844,6 +847,8 @@
             "MM-72",
             "MM-70",
             "MM-69",
+            "MM-441",
+            "MM-442",
             "MM-314",
             "MM-323",
             "MM-395"
@@ -931,6 +936,7 @@
           "MM-231",
           "MM-232",
           "MM-233",
+          "MM-443",
           "MM-246",
           "MM-261",
           "MM-278"
@@ -976,6 +982,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -2332,6 +2339,7 @@
         "built": [
           "MM-38",
           "MM-39",
+          "MM-439",
           "MM-40",
           "MM-41",
           "MM-47",
@@ -2646,6 +2654,8 @@
       "sourceRequirements": {
         "built": [
           "MM-32",
+          "MM-92",
+          "MM-33",
           "MM-133",
           "MM-168",
           "MM-312",
@@ -2669,9 +2679,8 @@
           "MM-141"
         ],
         "remaining": [
-          "MM-33",
           "MM-36",
-          "MM-92",
+          "MM-450",
           "MM-116",
           "MM-117",
           "MM-125",
@@ -2754,7 +2763,8 @@
           "title": "Protein across meals; phase planning",
           "tickets": [
             "MM-125",
-            "MM-36"
+            "MM-36",
+            "MM-450"
           ],
           "milestone": "M4"
         },
@@ -2867,15 +2877,16 @@
           "MM-193",
           "MM-194",
           "MM-195",
-          "MM-196"
+          "MM-196",
+          "MM-214",
+          "MM-215",
+          "MM-222"
         ],
         "remaining": [
           "MM-74",
           "MM-189",
           "MM-191",
-          "MM-214",
-          "MM-215",
-          "MM-222"
+          "MM-447"
         ]
       },
       "sequence": [
@@ -2947,7 +2958,8 @@
           "tickets": [
             "MM-214",
             "MM-215",
-            "MM-222"
+            "MM-222",
+            "MM-447"
           ]
         }
       ],
@@ -2993,6 +3005,7 @@
       "sourceRequirements": {
         "built": [
           "MM-67",
+          "MM-71",
           "MM-188",
           "MM-395"
         ],
@@ -3001,7 +3014,8 @@
           "MM-68",
           "MM-69",
           "MM-70",
-          "MM-71",
+          "MM-441",
+          "MM-442",
           "MM-72",
           "MM-73",
           "MM-314",
@@ -3094,6 +3108,15 @@
           "title": "A reading's source named by its app, never its package id, and a row that wraps a long word (MM-395)",
           "tickets": [
             "MM-395"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "tickets": [
+            "MM-441",
+            "MM-442"
           ],
           "milestone": "M4"
         }
