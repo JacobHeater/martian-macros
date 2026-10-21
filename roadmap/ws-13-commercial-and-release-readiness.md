@@ -93,6 +93,11 @@ Nothing further. It is the end of the graph.
 1. **Long-lead items (MM-88, MM-95).** M3. Start now. Begin looking for the
    reviewer for step 2 at the same time; the ticket for the review cannot
    start, but the search can.
+   Since 2026-10-21 the privacy policy is drafted (MM-95, in progress: the
+   attorney's review, the store consoles and MM-244's observation remain),
+   and the public page and its Pages workflow are built (MM-247, in
+   progress until the owner merges the workflow and turns Pages on). The
+   link from the app's About rows to that page is MM-454.
 2. **Professional review (MM-29).** M3. Recorded against rows of the evidence
    register, with name, credential and date.
 3. **Free tier and entitlements (MM-85).** M3. Decide the boundary feature by
@@ -121,6 +126,7 @@ to WS-12.
 - Remaining: MM-95, MM-29, MM-85, MM-86, MM-87, MM-96, MM-94. Epic: MM-84.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-244 (observe what the barcode and label reader sends).
 - Placed 2026-10-13: MM-247 (the terms and the privacy policy, published from the repository on GitHub Pages; the workflow needs the owner's merge).
+- Placed 2026-10-21 in step 1: MM-454 (Settings, About links to the public page, once its address exists).
 
 ## Notes for whoever builds it
 - The free tier, as decided: food logging, barcode scanning, the training

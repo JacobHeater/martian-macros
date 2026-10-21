@@ -61,3 +61,9 @@ user agent, GitHub's redirect host), whether the label photo is left in
 the cache when Android recreates the app during capture, and whether
 erasing clears the reminder schedule kept outside the database. Each
 becomes a bug ticket with a regression test if it is confirmed.
+
+## Progress
+Still open; it needs a release build on a phone (2026-10-21). The privacy policy drafted for MM-95 is worded for either answer, as the
+terms are: on Android it names ML Kit and repeats what Google says it sends, says it is not given the person's records, and never says
+that nothing leaves the phone. When this run is done, section 5 of `apps/mobile/src/terms/privacyPolicy.ts`, its summary point, and
+MM-95's draft Data safety answers are updated to what was seen.
