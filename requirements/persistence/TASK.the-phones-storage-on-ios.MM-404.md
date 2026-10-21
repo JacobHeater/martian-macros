@@ -1,6 +1,6 @@
 ---
 id: MM-404
-status: in-progress
+status: done
 component: persistence
 related: [MM-231, MM-56, MM-403, MM-228]
 ---
@@ -88,3 +88,31 @@ Scenario: Values cross the bridge as stored
 - The contract suite of MM-231 runs against the WebAssembly adapter in the
   test runner; the Swift plugin is held to the same contract by the
   scenarios above on the simulator, recorded in Progress.
+
+## Progress
+Done 2026-10-21. Not run locally; CI validates the TypeScript tests. CI builds no iOS app, so the Swift is held by
+`test/ios/storageOnIos.test.ts`, which reads it, until it is built on the Mac.
+- `ios/App/App/Plugins/MmDbPlugin.swift`: every method of the Kotlin `MmDb`, over the system SQLite; one serial queue
+  per open database; blobs as `{ $blob: base64 }` both ways; a whole number beyond `Number.MAX_SAFE_INTEGER` refused
+  when read; a script split outside strings, quoted names and comments.
+- `ios/App/App/Plugins/MmFiles.swift`: the database in `Library/Application Support/databases/`, the packs in
+  `Library/Application Support/food_packs/`, both folders excluded from backup; nothing in `Documents`. Added while
+  finishing: the database file itself is marked excluded from backup too once it is opened, as the scenario says.
+- `ios/App/App/Plugins/MmPacksPlugin.swift`: every method of the Kotlin `MmPacks`; the fetch over an ephemeral
+  `URLSession` with no cookies and no cache, a `Range` header when resuming, 20 s to connect and 30 s between bytes,
+  `packHttpChunk` events in order, and the pack file fetched natively into its partial (MM-387); SHA-256 of a partial
+  with CryptoKit; gzip unpacked as a stream with the system's zlib; the atomic swap that keeps the old pack.
+- The TypeScript above the plugins (`NativeSqlDatabase`, `NativePackStore`, `NativePackHttp`) is the Android one,
+  held to MM-231's and MM-56's contracts.
+
+## Owed on a phone
+On the simulator or the phone:
+- Onboarded with a weigh-in, the app ended and opened again: the setup and the weigh-in are read back from the native
+  database.
+- The database file is under `Library/Application Support/databases/` and reports `isExcludedFromBackup`.
+- Common foods downloaded from Settings: checked, unpacked, committed, and it answers a search (FTS5 with
+  `unicode61 remove_diacritics 2` in the system SQLite).
+- A download cancelled part way resumes with a `Range` header and installs.
+- A checksum that does not match discards the download and the installed pack still answers.
+- Text, whole numbers, decimals, nulls and blobs come back as written.
+- The first iOS build of the three files.
