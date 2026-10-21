@@ -73,6 +73,18 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       expect((await loaded()).maintenanceCorrectionFrom).toBeUndefined();
     });
 
+    // MM-480: the lean-gain pace chosen; standard until one is.
+    it('keeps the lean-gain pace, standard until chosen', async () => {
+      await repo.saveSetup(typicalSetup({ goalMode: 'leanGain' }));
+      expect((await loaded()).leanGainPace).toBe('standard');
+      await repo.saveSetup((await loaded()).copyWith({ leanGainPace: 'slower' }));
+      expect((await loaded()).leanGainPace).toBe('slower');
+      await repo.saveSetup((await loaded()).copyWith({ goalMode: 'maintenance' }));
+      expect((await loaded()).leanGainPace, 'kept across a change of goal').toBe('slower');
+      await repo.saveSetup((await loaded()).copyWith({ leanGainPace: 'standard' }));
+      expect((await loaded()).leanGainPace).toBe('standard');
+    });
+
     it('keeps the creatine start date', async () => {
       const startedOn = CalendarDate.of(2026, 1, 1);
       await repo.saveSetup(typicalSetup().copyWith({ creatineStartedOn: startedOn }));
@@ -100,6 +112,18 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       const back = await loaded();
       expect(back.screening.eatingDisorderHistory).toBe(true);
       expect(back.screening.pcos).toBe(false);
+    });
+
+    // MM-510: the weight-loss medication answer, not ticked until it is, and apart from the broader one.
+    it('keeps the weight-loss medication answer, apart from the weight-affecting one', async () => {
+      await repo.saveSetup(typicalSetup());
+      expect((await loaded()).screening.weightLossMedication).toBe(false);
+      await repo.saveSetup(typicalSetup({ screening: new ScreeningAnswers({ weightLossMedication: true }) }));
+      expect((await loaded()).screening.weightLossMedication).toBe(true);
+      expect((await loaded()).screening.weightAffectingMedication).toBe(false);
+      await repo.saveSetup(typicalSetup({ screening: new ScreeningAnswers({ weightAffectingMedication: true }) }));
+      expect((await loaded()).screening.weightLossMedication).toBe(false);
+      expect((await loaded()).screening.weightAffectingMedication).toBe(true);
     });
 
     it('there is only one setup: saving replaces it', async () => {

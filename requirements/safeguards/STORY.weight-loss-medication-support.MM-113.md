@@ -1,6 +1,6 @@
 ---
 id: MM-113
-status: in-progress
+status: done
 component: safeguards
 related: [MM-110, MM-112, MM-114, MM-115, MM-121, MM-23, MM-29, MM-134, MM-149, MM-510]
 ---
@@ -122,6 +122,10 @@ Built, unwired, with tests (not run locally; CI validates):
 Not built, and why: the question, its storage and every screen. No column can hold the answer without a schema change (held for another
 pull request), and `weightAffectingMedication` is broader. A question forgotten on restart must not ship, so MM-510 stores, asks and
 wires it, after MM-29 reviews the words and the 5-day rule. Protein first on Food and the weekly summary's first line are MM-510's too.
+
+Wired by MM-510 (2026-10-21), by the owner's direction: the answer is stored (schema 18), asked on the health step and in
+the profile, and read by Food, the dashboard, Coach, the under-eating notice and the week's summary. The words ship as
+they are while still pending MM-29, whose review is a release gate (M5), not a block on wiring.
 
 Open for the owner: the calorie card wording ("so far, aiming for about" versus "to go"). Open for MM-29: every string marked "pending
 MM-29", the escalation line, and the 5 days. The tirzepatide share and the trial details need a primary-source check.

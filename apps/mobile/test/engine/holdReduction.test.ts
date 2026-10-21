@@ -143,3 +143,23 @@ it('not without an explanation, and not for the first targets', () => {
 it('holding what cannot be held is refused', () => {
   expect(() => holdReduction([record(0, 2400)])).toThrow();
 });
+
+// MM-533: a held reduction dropped the pace its targets were asked for, so the engine saw a pace change and
+// redid the targets at once, undoing the hold, for anyone on a pace other than the default.
+it('holding keeps the pace the targets were asked for', () => {
+  const withPace = (r: TargetsRecord) =>
+    new TargetsRecord({
+      effectiveFrom: r.effectiveFrom,
+      mode: r.mode,
+      tdeeKcal: r.tdeeKcal,
+      tdeeSigmaKcal: r.tdeeSigmaKcal,
+      tdeeStatus: r.tdeeStatus,
+      targets: r.targets,
+      explanation: r.explanation,
+      requestedLossFraction: 0.005,
+      leanGainPace: 'slower',
+    });
+  const held = holdReduction(reduction().map(withPace));
+  expect(held.requestedLossFraction).toBe(0.005);
+  expect(held.leanGainPace).toBe('slower');
+});

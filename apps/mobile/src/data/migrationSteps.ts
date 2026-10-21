@@ -231,4 +231,27 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 16 to 17 (MM-480): the lean-gain pace chosen, standard until chosen, and the pace each record of targets was
+  // asked for, none on what is already there (the standard pace).
+  [
+    16,
+    async (db) => {
+      await db.execute(
+        "ALTER TABLE setups ADD COLUMN lean_gain_pace TEXT NOT NULL DEFAULT 'standard' CHECK (\"lean_gain_pace\" IN ('standard', 'slower'))",
+      );
+      await db.execute(
+        "ALTER TABLE targets_history ADD COLUMN lean_gain_pace TEXT NULL CHECK (\"lean_gain_pace\" IS NULL OR \"lean_gain_pace\" IN ('standard', 'slower'))",
+      );
+    },
+  ],
+  // 17 to 18 (MM-510): the answer "I take a prescription weight-loss medication" (MM-113), kept apart from the
+  // broader weight-affecting medication answer; not ticked on what is already there.
+  [
+    17,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN weight_loss_medication INTEGER NOT NULL DEFAULT 0 CHECK (weight_loss_medication IN (0, 1))',
+      );
+    },
+  ],
 ]);

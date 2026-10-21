@@ -97,6 +97,7 @@ export * from './integration/RestSignal';
 export * from './integration/Succeeded';
 export * from './integration/SystemClock';
 export * from './integration/Unavailable';
+export * from './LeanGainPace';
 export * from './macrosMatchEnergy';
 export * from './Meal';
 export * from './MenstruationDay';

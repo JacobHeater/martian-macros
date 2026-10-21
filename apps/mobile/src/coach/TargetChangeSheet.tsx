@@ -51,7 +51,10 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
   const week = useCell(state.adherenceSummary);
   const floor = useCell(state.coach)?.calorieFloorKcal;
   const underEatingNotice = useCell(state.underEatingNotice) !== undefined;
-  const units = useLoaded(state.setup)?.unitSystem ?? 'metric';
+  const setup = useLoaded(state.setup);
+  const units = setup?.unitSystem ?? 'metric';
+  // On a weight-loss medication the protein-minimum days lead the week (MM-113, MM-510).
+  const weightLossMedication = setup?.screening.weightLossMedication ?? false;
   // Leaving a deficit (MM-130): the scale's rise is explained before it happens.
   const leftDeficit =
     previous !== undefined && previous.targets.weeklyRateFraction < 0 && current.mode === 'maintenance' && current.targets.weeklyRateFraction === 0;
@@ -79,7 +82,7 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
         <>
           <div className="app-gap-small" />
           <SectionLabel text="Your last 7 days" />
-          {adherenceLines(week, { floorKcal: floor, underEatingNotice }).map(({ label, value, detail }) => (
+          {adherenceLines(week, { floorKcal: floor, underEatingNotice, weightLossMedication }).map(({ label, value, detail }) => (
             <StatRow key={label} label={label} value={value} detail={detail} />
           ))}
         </>

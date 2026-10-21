@@ -35,5 +35,12 @@ export function healthHistoryAccessContract(name: string, create: () => Promise<
       const after = await access.requestHistory();
       if (before) expect(after).toBe(true);
     });
+
+    it('shows everything once the history is permitted, and from a moment otherwise (MM-498)', async () => {
+      const permitted = await access.historyPermitted();
+      const from = await access.readableFrom();
+      if (permitted) expect(from).toBeUndefined();
+      else expect(from).toBeInstanceOf(Date);
+    });
   });
 }

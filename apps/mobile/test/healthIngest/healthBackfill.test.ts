@@ -194,17 +194,42 @@ it('the kinds read back are those the trend and the body-fat estimate use', () =
 });
 
 describe('MM-498', () => {
-  // A re-read after an expired token makes the store match what the
+  // A re-read after an expired token made the store match what the
   // platform shows, and without the history permission it shows thirty
-  // days: the history read before is dropped, though MM-68 keeps what was
+  // days: the history read before was dropped, though MM-68 keeps what was
   // read when a permission is taken away.
-  it.skip('MM-498: a re-read after the history permission is taken away keeps the history', async () => {
+  it('MM-498: a re-read after the history permission is taken away keeps the history', async () => {
     source.permitHistory();
     await backfill.backfill('weight', { now });
     source.revokeHistory();
     source.expireTokens();
     const result = await new HealthImporter({ source, store }).import('weight');
     expect(result.status).toBe('readAgain');
+    expect(result.deleted).toBe(0);
     expect(await weights()).toHaveLength(198);
+  });
+
+  it('MM-498: a reading deleted on the platform within its window is still removed by the re-read', async () => {
+    const add = (id: string, days: number) =>
+      `{"op": "add", "type": "weight", "id": "${id}", "value": 80, "start": "${local(daysAgo(days))}", "source": "scale"}`;
+    const deleted = '{"op": "delete", "type": "weight", "id": "w-5"}';
+    const scale = FakeHealthSource.fromJson(
+      `{"sources": [{"id": "scale", "name": "Bathroom scale"}], "events": [${add('w-100', 100)}, ${add('w-6', 6)}, ${add('w-5', 5)}, ${deleted}]}`,
+      { happened: 3 },
+    );
+    scale.historyFrom = new Date(now.getTime() - 30 * dayMs);
+    await scale.permit(new Set(['weight']));
+    scale.permitHistory();
+    const kept = new InMemoryHealthSampleStore();
+    const importer = new HealthImporter({ source: scale, store: kept });
+    await importer.import('weight');
+    expect((await kept.samples('weight')).map((s) => s.platformId)).toEqual(['w-100', 'w-6', 'w-5']);
+    scale.revokeHistory();
+    scale.letAllHappen();
+    scale.expireTokens();
+    const result = await importer.import('weight');
+    expect(result.status).toBe('readAgain');
+    expect(result.deleted).toBe(1);
+    expect((await kept.samples('weight')).map((s) => s.platformId)).toEqual(['w-100', 'w-6']);
   });
 });

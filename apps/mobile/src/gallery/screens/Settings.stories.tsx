@@ -118,6 +118,14 @@ export const HealthCheck = screenStory({
   open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
 });
 
+/** MM-510: the profile's health check with the weight-loss medication answer ticked. */
+export const ProfileHealthCheckWeightLossMedication = screenStory({
+  covers: ['HealthCheckScreen'],
+  shows: 'I take a prescription weight-loss medication',
+  scenario: demoWith({ screening: { weightLossMedication: true } }),
+  open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
+});
+
 export const FoodDatabase = screenStory({
   covers: ['FoodDatabaseScreen'],
   shows: 'Food database',

@@ -86,7 +86,7 @@ to declare.
 3. **Health Connect (MM-68).** M3. Agree the workout table with WS-10 before
    importing sessions.
 4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
-   re-read after an expired token must keep it (MM-498).
+   re-read after an expired token keeps it (MM-498, built 2026-10-21).
 5. **Sync while the app is open (MM-72, MM-516, MM-523).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening
    always reads, coming back to the front reads once the last read is fifteen minutes old, one read at a time. No background
    sync (the owner, 2026-10-21; MM-516 closed). Where missing data weakens coaching, the app says so and the user decides (MM-523).
