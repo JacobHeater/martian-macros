@@ -13,12 +13,15 @@ export class FixturePhotoCamera implements PhotoCamera {
   /** How many times it was started, and is running now. */
   started = 0;
   running = 0;
+  /** Which way it was asked to face, each time it was asked to start. */
+  readonly facings: ('user' | 'environment')[] = [];
 
   constructor({ available = true }: { available?: boolean } = {}) {
     this.available = available;
   }
 
-  async start(): Promise<CameraPreview | undefined> {
+  async start(facing: 'user' | 'environment'): Promise<CameraPreview | undefined> {
+    this.facings.push(facing);
     if (!this.available) return undefined;
     this.started++;
     this.running++;

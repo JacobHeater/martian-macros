@@ -31,3 +31,10 @@ it('a phone with nothing loses nothing, and a backup with no records says so', (
   const words = restoreWords(contents({}), contents({}), 'October 12, 2026');
   expect(words).toBe('This phone holds nothing yet, so nothing is lost.\n\nThe backup, made on October 12, 2026, holds no weigh-ins and no food.');
 });
+
+it('MM-157: a backup with progress photos says they replace this phone’s; one without says nothing of them', () => {
+  const here = contents({ weighIns: 3, hasSetup: true });
+  const withPhotos = restoreWords(contents({}), here, 'October 12, 2026', true);
+  expect(withPhotos.split('\n\n').at(-1)).toBe('It holds progress photos too: they replace every progress photo on this phone.');
+  expect(restoreWords(contents({}), here, 'October 12, 2026')).not.toMatch(/photo/);
+});

@@ -150,6 +150,7 @@ import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeSleepNights } from './mergeSleepNights';
 import { mergeFlowDays } from './mergeFlowDays';
+import { PhotoLock } from './PhotoLock';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
@@ -313,6 +314,9 @@ export class AppState {
 
   /** The choices about progress photos (MM-157). */
   readonly photoSettings: Cell<Loadable<PhotoSettings>>;
+
+  /** The progress photos behind the phone's lock, shared by every screen that shows them (MM-157). */
+  readonly photoLock: PhotoLock;
 
   /** The goal body fat the user set (MM-36, MM-507), or undefined with none. */
   readonly goalBodyFat: Cell<Loadable<GoalBodyFat | undefined>>;
@@ -691,6 +695,7 @@ export class AppState {
     this.goalBodyFat = stream(() => s.goalBodyFat.watchGoalBodyFat());
     this.progressPhotos = stream(() => s.progressPhotos.watchPhotos());
     this.photoSettings = stream(() => s.progressPhotos.watchPhotoSettings());
+    this.photoLock = new PhotoLock(s.deviceLock);
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
