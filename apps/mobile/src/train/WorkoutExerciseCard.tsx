@@ -100,14 +100,41 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   const timeLimit = () => workout.endedAt ?? services.clock.now();
   // An exercise of the user's own that has since been deleted, or an imported movement the library cannot place (MM-490).
   const name = exerciseNameOf(entry.exerciseId, exercise);
+  // The title's id is the workout's and the place's, so it survives the card being drawn anew for a moved exercise (MM-490).
+  const titleId = `workout-${workout.id}-exercise-${index}-title`;
+  /** Focuses this card's title once it reads `title`: the card is drawn anew when its exercise changes. */
+  const focusTitleWhen = (title: string) => {
+    let tries = 0;
+    const step = () => {
+      const heading = document.getElementById(titleId);
+      if (heading?.textContent === title) heading.focus();
+      else if (tries++ < 60) setTimeout(step, 16);
+    };
+    setTimeout(step, 0);
+  };
   const other = entry.exerciseId === Exercise.otherId;
 
-  /** Moves an imported "Other exercise"'s sets to the exercise the user says it was (MM-490). */
+  /**
+   * Moves an imported "Other exercise"'s sets to the exercise the user says it was (MM-490), says so with an
+   * Undo, and puts focus on the card's title, now that exercise's name.
+   */
   const moveSets = async () => {
     const exerciseId = await navigator.push<string>((done) => <ExercisePickerScreen onPick={done} />);
     if (exerciseId === undefined) return;
     setOpen(undefined);
     await controller.moveExercise(workout, index, exerciseId);
+    const movedTo = exerciseNameOf(exerciseId, exercises.get(exerciseId));
+    focusTitleWhen(movedTo);
+    const count = entry.sets.length;
+    overlays.snack(`Moved ${count} ${count === 1 ? 'set' : 'sets'} to ${movedTo}`, {
+      label: 'Undo',
+      onAction: () => {
+        // The workout as it is now, unless it, or the exercise in it, has gone or changed since.
+        const now = Loadable.valueOf(state.workouts.value)?.find((w) => w.id === workout.id);
+        if (now === undefined || now.exercises[index]?.exerciseId !== exerciseId) return;
+        void controller.moveExercise(now, index, Exercise.otherId);
+      },
+    });
   };
 
   const removeExercise = async () => {
@@ -151,16 +178,13 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
   return (
     <InfoCard
       title={name}
+      titleId={titleId}
       trailing={<MmIconButton icon="close" label={`Remove ${name}`} onPress={() => void removeExercise()} />}
     >
       {other ? (
         <>
-          <p className="app-caption">
-            Imported from a movement the exercise library does not know. Its sets count toward no muscle until you say what
-            it was.
-          </p>
-          <MmButton label="Move sets to an exercise" kind="secondary" expand onPress={() => void moveSets()} />
-          <div className="app-gap-small" />
+          <p className="app-caption">An imported movement the library does not know; its sets count toward no muscle.</p>
+          <MmButton label="Say which exercise" kind="text" onPress={() => void moveSets()} />
         </>
       ) : null}
       {lastTime.length === 0 ? null : (

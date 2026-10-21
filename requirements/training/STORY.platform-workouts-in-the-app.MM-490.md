@@ -18,6 +18,10 @@ Choices I made without asking (say if any is wrong):
   second (MM-71). That is a schema change, made after the health-sync settings change in flight takes its own.
 - **"Other exercise" is shown by name, and its sets can be moved to an exercise the user chooses.** It is not in the picker and
   counts toward no muscle group.
+- **The move is a text action, "Say which exercise"** (panel review, 2026-10-21), under a one-line caption ("An
+  imported movement the library does not know; its sets count toward no muscle."), so it does not outweigh "Add set".
+  After the move a snack says "Moved N sets to {exercise}" with Undo (sibling: "Removed set N" with Undo, MM-215),
+  and focus goes to the card's title, now the exercise's name.
 
 ## Description
 - A switch for writing workouts in the health platform's settings, off until the user turns it on; turning it on asks the
@@ -71,6 +75,9 @@ Built 2026-10-21. Not run locally; CI validates.
   nothing with reading not allowed); `test/data/upgrade.test.ts` (from 21). Writing off until turned on stays
   guarded by MM-489's tests.
 - Stories: `TrainImportedWorkout`, `ImportedWorkoutOtherExercise` in `Train.stories.tsx`.
+- Panel review fixes (2026-10-21): `WorkoutExerciseCard`'s text action, snack with Undo (moves the exercise back to
+  "Other exercise" unless it changed since) and focus on the title (`InfoCard`'s `titleId`). Tests in
+  `test/train/importedWorkouts.test.tsx` (the snack and focus; Undo). Story `ImportedWorkoutOtherExerciseMoved`.
 
 ## Owed on a phone
 - Health Connect: a strength workout recorded by another app (a watch) appears in Train after opening the app, once,

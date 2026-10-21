@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -86,16 +86,35 @@ it('Other exercise: shown by name with its time, and its sets moved to an exerci
   const other = await layer().findByRole('heading', { name: 'Other exercise' });
   const card = other.closest('.mm-surface') as HTMLElement;
   expect(within(card).getByText(/· 2:00$/)).toBeInTheDocument();
-  await userEvent.click(within(card).getByRole('button', { name: 'Move sets to an exercise' }));
+  await userEvent.click(within(card).getByRole('button', { name: 'Say which exercise' }));
   await layer().findByRole('textbox', { name: 'Search exercises' });
   await userEvent.type(layer().getByRole('textbox', { name: 'Search exercises' }), 'deadlift');
   await userEvent.click(layer().getAllByRole('button', { name: /^Deadlift/ })[0] as HTMLElement);
-  await layer().findByRole('heading', { name: /^Deadlift/ });
+  const heading = await layer().findByRole('heading', { name: /^Deadlift/ });
   expect(layer().queryByRole('heading', { name: 'Other exercise' })).not.toBeInTheDocument();
+  // Said with an Undo, and focus on the card's title, now the exercise's name.
+  expect(await screen.findByText(/^Moved \d+ sets? to Deadlift/)).toBeInTheDocument();
+  await waitFor(() => expect(heading).toHaveFocus());
   const [moved] = await storedWorkouts(repos);
   expect(moved?.exercises[0]?.exerciseId).not.toBe('other-exercise');
   expect(moved?.exercises[0]?.sets[0]?.startedAt).toEqual(yesterday(5));
   expect(exerciseCard('Barbell bench press')).toBeInTheDocument();
+});
+
+it('Other exercise: a move is undone from its snack, the sets back under "Other exercise"', async () => {
+  const platform = new InMemoryHealthWorkouts({ namesExercises: true, held: [fromWatch] });
+  renderApp(repos, today, { change: withPlatform(platform) });
+  await openTrain();
+  await screen.findByText(/from Watch$/);
+  await userEvent.click(workoutRows()[0] as HTMLElement);
+  const card = (await layer().findByRole('heading', { name: 'Other exercise' })).closest('.mm-surface') as HTMLElement;
+  await userEvent.click(within(card).getByRole('button', { name: 'Say which exercise' }));
+  await userEvent.type(await layer().findByRole('textbox', { name: 'Search exercises' }), 'deadlift');
+  await userEvent.click(layer().getAllByRole('button', { name: /^Deadlift/ })[0] as HTMLElement);
+  await layer().findByRole('heading', { name: /^Deadlift/ });
+  await userEvent.click(await screen.findByRole('button', { name: 'Undo' }));
+  expect(await layer().findByRole('heading', { name: 'Other exercise' })).toBeInTheDocument();
+  await expect.poll(async () => (await storedWorkouts(repos))[0]?.exercises[0]?.exerciseId).toBe('other-exercise');
 });
 
 it('with reading workouts not allowed, nothing is imported', async () => {
