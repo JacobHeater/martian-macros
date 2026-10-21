@@ -59,6 +59,7 @@ const every = [
     figures: { averageG: 11.4, guideG: 29.4, countedDays: 9 },
     examples: ['Lentil soup', 'Raspberries', 'Oats'],
   }),
+  insight('weighProtein', { wholeDays: 12, palmProteinShare: 0.8 }),
 ] as const;
 
 it('every rule in the catalog has words', () => {
@@ -130,6 +131,15 @@ it('the fiber insight states the average against the guide and names foods alrea
   for (const word of ['under', 'low', 'healthy', 'empty calories']) expect(body.toLowerCase()).not.toContain(word);
   const fewer = new Insight({ rule: 'fiberForFullness', from: today.addDays(-14), to: today.addDays(-1), figures: every[12].figures });
   expect(insightText(fewer, fmt)[1], 'without examples, no list').not.toContain('already log');
+});
+
+// MM-46: the nudge says how much protein was by palm and asks for one week.
+it('the weigh-protein insight asks for one week of weighing', () => {
+  const [title, body, evidence] = insightText(every[13], fmt);
+  expect(title).toBe('Weigh your main protein for a week');
+  expect(body).toContain('About 80% of your protein over the last two weeks was logged by palm');
+  expect(body).toContain('for one week');
+  expect(evidence).toContainEqual(['Protein logged by palm', '80%']);
 });
 
 it('forbidden subjects never appear', () => {

@@ -56,6 +56,8 @@ import { findInsights } from '../engine/findInsights';
 import type { SodiumPattern } from '../engine/SodiumPattern';
 import type { FiberPattern } from '../engine/FiberPattern';
 import { findReliefOffer } from '../engine/findReliefOffer';
+import type { MissedPeriod } from '../engine/MissedPeriod';
+import { missedPeriodQuestion } from '../engine/missedPeriodQuestion';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
 import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
@@ -412,6 +414,9 @@ export class AppState {
 
   /** The offer to ease a deficit, when one is due (MM-117). */
   readonly reliefOffer: Cell<ReliefOffer | undefined>;
+
+  /** The missed-period question for this week's recovery check-in, when it is to be asked (MM-116). */
+  readonly missedPeriod: Cell<MissedPeriod | undefined>;
 
   /** The reminder settings the user has stored (MM-146). */
   readonly reminders: Cell<Loadable<ReminderSetting[]>>;
@@ -980,7 +985,17 @@ export class AppState {
         pauses,
         // Short sleep from the record is a signal of its own (MM-252).
         sleepAverage: this.sleepAverage.value,
+        // Falling lifts are the strength trigger (MM-117, MM-77); none until the log has loaded.
+        strengthTrends: of(this.strengthTrends) ?? [],
       });
+    });
+
+    this.missedPeriod = derived(() => {
+      const setup = of(this.setup);
+      const flowDays = of(this.flowDays);
+      const checkIns = of(this.recoveryCheckIns);
+      if (setup === undefined || flowDays === undefined || checkIns === undefined) return undefined;
+      return missedPeriodQuestion({ setup, flowDays, checkIns, today: this.today.value });
     });
 
     this.reminders = stream(() => s.reminders.watchReminders());

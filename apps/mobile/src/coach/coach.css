@@ -23,6 +23,13 @@
 .coach-question {
   margin-top: var(--space-24);
 }
+/* The missed-period answers (MM-116): chips that wrap, as the period days on Progress. */
+.coach-period-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
 .coach-question-ends {
   display: flex;
   justify-content: space-between;

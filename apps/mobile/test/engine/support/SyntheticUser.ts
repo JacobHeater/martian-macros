@@ -18,6 +18,8 @@ interface SyntheticUserInit {
   waterSigmaKg?: number;
   waterPersistence?: number;
   weighedShare?: number;
+  /** Share of energy logged by hand portions (MM-46). */
+  handShare?: number;
   resistanceTrained?: boolean;
   adaptationKcalPerKg?: number;
   glycogenSwingFraction?: number;
@@ -72,6 +74,7 @@ export class SyntheticUser {
   skipLogProbability: number;
   partialLogProbability: number;
   weighedShare: number;
+  handShare: number;
 
   today: CalendarDate;
   weightKg: number;
@@ -92,6 +95,7 @@ export class SyntheticUser {
     this.waterSigmaKg = init.waterSigmaKg ?? 0.5;
     this.waterPersistence = init.waterPersistence ?? 0.65;
     this.weighedShare = init.weighedShare ?? 0;
+    this.handShare = init.handShare ?? 0;
     this.resistanceTrained = init.resistanceTrained ?? true;
     this.adaptationKcalPerKg = init.adaptationKcalPerKg ?? 22;
     this.glycogenSwingFraction = init.glycogenSwingFraction ?? 0;
@@ -142,6 +146,7 @@ export class SyntheticUser {
         fatG: (logged * 0.3) / 9,
         relativeSigma: this.entrySigma,
         weighedShare: this.weighedShare,
+        handShare: this.handShare,
       });
     }
 

@@ -185,3 +185,53 @@ it('more than a day of sleep is refused under the field and holds Save', async (
   await expect.poll(async () => (await stored()).length).toBe(1);
   expect((await stored())[0]?.sleepHours).toBe(7);
 });
+
+/** MM-116: a previously regular cycle with no period marked for 46 days. */
+async function missedPeriod(sex: 'female' | 'male', goalMode: 'fatLoss' | 'leanGain' = 'fatLoss'): Promise<void> {
+  await repos.setup.saveSetup(
+    typicalSetup({ sex, goalMode, onboardedOn: today.addDays(-200), healthCheckConfirmedOn: today.addDays(-30) }),
+  );
+  for (const ago of [104, 75, 46]) {
+    for (let d = 0; d < 4; d++) await repos.flowDays.markFlowDay(today.addDays(-ago + d));
+  }
+}
+
+const periodQuestion = 'No period marked for 46 days. Is that expected?';
+
+/** Into this week's check-in from the row under the goal (MM-391). */
+async function openCheckIn(): Promise<void> {
+  await openCoach();
+  await answerThisWeek();
+}
+
+it('a missed period is asked about, and "not sure" on fat loss brings the notice', async () => {
+  await missedPeriod('female');
+  await openCheckIn();
+  const answers = await screen.findByRole('group', { name: periodQuestion });
+  for (const label of ['Contraception', 'Pregnancy', 'Menopause']) {
+    await userEvent.click(within(answers).getByRole('button', { name: label }));
+    expect(screen.queryByText(/^Missed periods can follow/)).not.toBeInTheDocument();
+  }
+  await userEvent.click(within(answers).getByRole('button', { name: 'Not sure' }));
+  expect(screen.getByText(/^Missed periods can follow eating too little/)).toHaveTextContent('This is not a diagnosis.');
+
+  // Optional, and not kept: the check-in saves as ever, with nothing about periods in it.
+  for (const question of RecoveryQuestion.values) await pick(question, 3);
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await expect.poll(async () => (await stored()).length).toBe(1);
+});
+
+it('off a deficit goal "not sure" brings no notice', async () => {
+  await missedPeriod('female', 'leanGain');
+  await openCheckIn();
+  const answers = await screen.findByRole('group', { name: periodQuestion });
+  await userEvent.click(within(answers).getByRole('button', { name: 'Not sure' }));
+  expect(screen.queryByText(/^Missed periods can follow/)).not.toBeInTheDocument();
+});
+
+it('a male profile is never asked about periods', async () => {
+  await missedPeriod('male');
+  await openCheckIn();
+  expect(screen.queryByText(/No period marked/)).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Not sure' })).not.toBeInTheDocument();
+});

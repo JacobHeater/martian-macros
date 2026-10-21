@@ -1,8 +1,21 @@
-import { DietBreakRule, type ReliefOffer } from '../engine';
+import { DietBreakRule, type FallingLift, type ReliefOffer, ReliefRule } from '../engine';
 import { shortSleepText } from './shortSleepText';
 
 const rest = 'a rest from dieting, which many people find makes the next weeks easier';
 const runs = 'Once taken, it runs its two weeks.';
+
+const tooLarge = 'On a deficit that usually means it is too large, or has run too long, for you right now. Easing it is the fix.';
+
+/** The falling lifts in a sentence, lower case as the recomp signal names them (MM-117). */
+function liftsFalling(lifts: readonly FallingLift[]): string {
+  const names = lifts.map((lift) => lift.name.toLowerCase());
+  const named = names.length <= 2 ? names.join(' and ') : `${names.slice(0, 2).join(', ')} and ${names.length - 2} more`;
+  const drop = Math.round(ReliefRule.strengthDrop * 100);
+  return `Over three weeks your estimated max has dropped ${drop}% or more on ${named}, going by the trend, not one session.`;
+}
+
+// A deload does this too (MM-117's notes), so carrying on is named as the answer to one.
+const lighterWeek = 'A planned lighter week does this too; if that is it, carry on.';
 
 /** What carrying on leads to, from where the person stands: the next ask, or the break the app plans (the panel's UX-3). */
 function ifCarryingOn(deficitWeeks: number): string {
@@ -20,7 +33,8 @@ function ifCarryingOn(deficitWeeks: number): string {
  * claims a break does anything to metabolism: the evidence grades a break
  * as a rest that eases the diet, not as a repair (MM-135). Short sleep
  * from the record is a signal of its own with its own title; typed at the
- * check-in, it is a line (MM-252).
+ * check-in, it is a line (MM-252). Falling lifts (MM-117, MM-77) are said
+ * with the hard weeks when both hold, and with their own title alone.
  */
 export function reliefOfferText(offer: ReliefOffer): {
   title: string;
@@ -38,6 +52,7 @@ export function reliefOfferText(offer: ReliefOffer): {
     };
   }
   const hardWeeks = offer.signals.includes('hardCheckIns');
+  const falling = offer.signals.includes('strengthFalling');
   let suggestion: string;
   if (offer.suggestion === 'break') {
     suggestion =
@@ -45,7 +60,7 @@ export function reliefOfferText(offer: ReliefOffer): {
         ? `The coach would take a break: two weeks at maintenance is ${rest}, and the deficit resumes after it. ${runs}`
         : `The coach would take a break: you are ${offer.deficitWeeks} weeks into this deficit, and two weeks at ` +
           `maintenance is ${rest}. ${runs}`;
-  } else if (hardWeeks) {
+  } else if (hardWeeks || falling) {
     suggestion =
       'The coach would slow the pace: you are early in this deficit, and a ' +
       'gentler pace is easier to hold than a break.';
@@ -62,6 +77,14 @@ export function reliefOfferText(offer: ReliefOffer): {
       'deficit appears to shift loss away from fat, so sleep may be the ' +
       'cheaper fix.';
   }
+  if (!hardWeeks && falling) {
+    return {
+      title: 'Your lifts are falling',
+      body: `${liftsFalling(offer.fallingLifts)} ${tooLarge} ${lighterWeek}`,
+      suggestion,
+      sleep,
+    };
+  }
   if (!hardWeeks) {
     return {
       title: 'Two weeks of short sleep',
@@ -72,10 +95,9 @@ export function reliefOfferText(offer: ReliefOffer): {
   }
   return {
     title: 'Two hard weeks in a row',
-    body:
-      'Your last two check-ins had most answers at the hard end. On a ' +
-      'deficit that usually means it is too large, or has run too long, for ' +
-      'you right now. Easing it is the fix.',
+    body: `Your last two check-ins had most answers at the hard end. ${tooLarge}${
+      falling ? ` ${liftsFalling(offer.fallingLifts)} ${lighterWeek}` : ''
+    }`,
     suggestion,
     sleep,
   };
