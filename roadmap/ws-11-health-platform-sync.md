@@ -90,13 +90,13 @@ to declare.
 5. **Sync while the app is open (MM-72, MM-516, MM-523).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening
    always reads, coming back to the front reads once the last read is fifteen minutes old, one read at a time. No background
    sync (the owner, 2026-10-21; MM-516 closed). Where missing data weakens coaching, the app says so and the user decides (MM-523).
-6. **Write nutrition (MM-70, MM-513, MM-514).** M4. Needs entries with real nutrient data
-   (WS-08 step 4) to be worth doing. MM-70 and water (MM-314) built 2026-10-21 in both
-   shells, device checks owed; typed weight written (MM-513) and the offer to remove what was
-   written when writing is turned off (MM-514) built 2026-10-21 in both shells, device checks owed.
+6. **Write nutrition (MM-70, MM-513, MM-514).** M4. Done 2026-10-21 in both shells: food and
+   water (MM-314), typed weight (MM-513) and the offer to remove what was written when writing is
+   turned off (MM-514). Each ticket lists what is owed on a phone.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
    biological-sex value may pre-fill the onboarding question when it is male
-   or female; other values are ignored and the user always confirms.
+   or female; other values are ignored and the user always confirms. Done 2026-10-21:
+   "Fill in from Apple Health" on onboarding's first step fills sex, date of birth and height; phone checks owed.
 12. **What MM-71 left (MM-441, MM-442).** M4. A weigh-in window for a
     morning that is not 04:00 to 12:00, and steps through the platform's
     own aggregation (native, needs a device). Built 2026-10-21 behind the

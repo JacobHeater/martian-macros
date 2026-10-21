@@ -59,7 +59,7 @@ to exactly one workstream.
 | 10 | WS-09 | [Coaching intelligence and adherence](ws-09-coaching-intelligence-and-adherence.md) | in progress | C |
 | 11 | WS-10 | [Training log and strength](ws-10-training-log-and-strength.md) | in progress | C |
 | 12 | WS-11 | [Health platform sync](ws-11-health-platform-sync.md) | in progress | C |
-| 13 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | steps built (epic open for MM-404) | C |
+| 13 | WS-12 | [Backup and portability](ws-12-backup-and-portability.md) | built (the epic MM-59 done with MM-404) | C |
 | 14 | WS-13 | [Commercial and release readiness](ws-13-commercial-and-release-readiness.md) | not started | D |
 | 15 | WS-15 | [Sleep](ws-15-sleep.md) | not started (added 2026-10-13, the owner's decision) | C |
 
