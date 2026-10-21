@@ -316,6 +316,8 @@ it("a found line's weight is changed in place, from the food as installed (MM-45
   const sheet = await editRecipe('Rice bowl');
   await press(sheet, 'More actions for White rice, raw');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
+  // The food is looked up in the pack first.
+  await within(sheet).findByRole('textbox', { name: 'New weight g for White rice, raw' });
   await typeIn(sheet, 'New weight g for White rice, raw', '100');
   expect(within(sheet).getByText('100 g is about 365 kcal.')).toBeInTheDocument();
   await press(sheet, 'Save weight');
@@ -351,7 +353,7 @@ it('a line whose food is no longer installed keeps its totals and says so (MM-45
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
   expect(await within(sheet).findByText('Its food is not installed, so this line keeps its totals.')).toBeInTheDocument();
   expect(within(sheet).queryByRole('textbox', { name: /^New weight g/ })).not.toBeInTheDocument();
-  await press(sheet, 'Close');
+  await press(sheet, 'Keep its totals');
   expect(within(sheet).getByText('200 g · 730 kcal')).toBeInTheDocument();
 });
 
