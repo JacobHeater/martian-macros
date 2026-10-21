@@ -117,9 +117,10 @@ the trial is timed to end after the first monthly report.
 7. **Process rewards; monthly report (MM-92, MM-33).** M3. Rewards count
    exactly what the adherence summary counts. The report reuses the check-in
    explanation, the summary and the recovery lines; it restates nothing.
-8. **Protein across meals; phase planning (MM-125, MM-36).** M4. Phase
+   Done 2026-10-21.
+8. **Protein across meals; phase planning (MM-125, MM-36, MM-450).** M4. Phase
    planning's projections are fiction without the body-fat estimate from
-   WS-07 step 7.
+   WS-07 step 7, and the report's body-fat range (MM-450) waits for it too.
 - Also placed 2026-10-13 in earlier steps: step 3: MM-168.
 13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests.
 
@@ -153,9 +154,9 @@ independent of step 3.
   the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
   offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
   the training log), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
-  work, the body, the measured expenditure or why there is none, and each target change; not strength, body fat or photos),
-  MM-92 (the logging streak, forgiving one missed day in seven, as a quiet Dashboard line; no personal records or
-  workouts yet).
+  work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
+  and the month's personal records; body fat is MM-450, photos MM-157), MM-92 (the logging streak, forgiving one missed
+  day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).
 - Remaining: MM-133, MM-32, MM-36. Epic: MM-145.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).
 - Placed 2026-10-13 in step 4: MM-248 (reminders on the minute: the exact-alarm permission, asked once with a reason; the owner's call).

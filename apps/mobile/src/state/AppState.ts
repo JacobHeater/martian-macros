@@ -1387,6 +1387,8 @@ export class AppState {
           trend: coach?.trend ?? [],
           workouts,
           exercises,
+          // Paused days neither count nor break the month's longest logging run (MM-92).
+          pauses: of(this.pauses) ?? [],
           // As the app would recommend today: body fat then is not kept.
           recommendation: coach?.recommendation,
         });
