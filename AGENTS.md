@@ -1,256 +1,133 @@
 # Martian Macros agent guide
 
-This file is the canonical contributor guide for AI agents and other automated
-contributors. Read it before making changes, along with the relevant code,
-requirements, and [docs/architecture.md](docs/architecture.md). Then read
-[requirements/HANDOFF.md](requirements/HANDOFF.md): it says what the last
-agent left in flight and what the product owner has ruled in conversation.
+This is the canonical guide for AI agents and other automated contributors.
+It holds only the rules that apply to every change. Rules for one part of the
+repository live beside it, in a nested `AGENTS.md`, and you read one only when
+your change touches that folder:
 
-For cross-domain development reviews, use the tool-neutral
-[repository expert panel](agents/README.md), its
-[protocol](agents/panel-protocol.md) and [review contract](agents/review-contract.md).
-Reviewers are read-only; one designated owner edits canonical files. Native
-delegation and sequential fallback do not supersede the working agreements here.
+| You change | Also read |
+| --- | --- |
+| anything in `apps/mobile/` (screens, state, components, stories, tests) | [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md) |
+| tables, migrations or repositories (`apps/mobile/src/data/`) | [apps/mobile/src/data/AGENTS.md](apps/mobile/src/data/AGENTS.md) |
+| the Android or iOS shell, or a native plugin | [apps/mobile/android/AGENTS.md](apps/mobile/android/AGENTS.md), [apps/mobile/ios/AGENTS.md](apps/mobile/ios/AGENTS.md) |
+| tickets in `requirements/` | [requirements/README.md](requirements/README.md) |
+| the roadmap | [roadmap/README.md](roadmap/README.md), "Keeping the roadmap current" |
+| a cross-domain review (the expert panel) | [agents/README.md](agents/README.md) |
 
-> **The app is a React HTML5 app in a thin native shell (MM-228,
-> decided by the product owner on 2026-10-12): Android, and since
-> 2026-10-19 iOS as well (MM-403, built on the owner's Mac).** The Flutter app it replaced
-> was removed with MM-232's final step; the old Dart sources remain in git
-> history, and the requirements describe the product as built in
-> `apps/mobile/`. The web is never a product: the app runs from files inside
-> the shell, offline.
+Read only the "Where things stand" section of
+[requirements/HANDOFF.md](requirements/HANDOFF.md) at the start of a session.
+Read the session entries below it only when your work continues one of them.
+For anything else, search for the lines you need rather than reading whole
+files.
+
+> **The app is a React HTML5 app in a thin native shell (MM-228)**: Android,
+> and iOS since 2026-10-19 (MM-403). The web is never a product: the app runs
+> from files inside the shell, offline. Architecture is in
+> [docs/architecture.md](docs/architecture.md); what the app will not do is in
+> [docs/non-goals.md](docs/non-goals.md).
+
+## Usage (owner's rules, 2026-10-20)
+
+Agent usage goes to feature work, not validation. CI validates.
+
+- **Never run tests, checks or builds locally.** That covers `mm check`,
+  `mm test`, vitest, typecheck, lint, `vite build`, Storybook builds,
+  `xcodebuild` and Gradle. Write the tests, push, and let the PR's CI run
+  them. You learn that a test failed only from CI: when you are notified, or
+  when you check the open PRs at the start and end of a session. A regression
+  test is written to fail with the bug; CI shows that it passes with the fix.
+- **Small branches, in parallel.** One ticket, or one small group of tickets,
+  per branch and per PR, each with its own CI. Never one long-lived branch
+  that carries a milestone.
+- **Subagents only when their role is required**, and all subagent runs in a
+  session together take five minutes or less. Inside that budget, a role may
+  run its own workflow to validate its requirements.
+- **Search, don't read whole files.** Use grep for the lines you need. Don't
+  re-read a guide that is already in context.
+- **Don't watch CI.** Check PRs once at the start and once at the end of a
+  session (`gh pr list`, then `gh pr checks <n>` for the open ones). Merge
+  green ones; fix a red one in a follow-up branch.
+- **Bookkeeping once a session.** The handoff is updated in one small PR
+  per session, not in every feature PR. A feature PR places its tickets in
+  the roadmap at different lines from its siblings (see below), so parallel
+  PRs don't conflict.
 
 ## Working agreements
 
 - Inspect the repository state before editing. Preserve unrelated and
   pre-existing changes; never discard or overwrite work you did not make.
-- Keep changes focused on the request. Follow existing patterns and avoid
-  unrelated refactors, generated-file edits, new dependencies, or speculative
+  The owner's team id in the Xcode project and their `.claude/settings.json`
+  edit stay unstaged in the working tree.
+- Keep changes focused on the request. Follow existing patterns. Avoid
+  unrelated refactors, generated-file edits, new dependencies and speculative
   behavior.
-- Requirements come first for behavior changes. Before changing app behavior,
-  create or update a ticket in the appropriate `requirements/<component>/`
-  folder. Follow [requirements/README.md](requirements/README.md): use
-  `mm req next` to allocate an ID, match the filename and frontmatter, and use
-  Gherkin acceptance criteria. Run `mm req` to validate the requirements.
-  A documentation-only change or internal refactor that does not change
-  behavior does not need a ticket.
-- Every bug gets a ticket and a regression test, at once. The moment a defect
-  is found, however small and wherever it was found (your own new code, the
-  emulator, CI, a review), write a `BUG.*.MM-n.md` ticket and a test that fails
-  with the bug and passes with the fix, and say in the ticket which test
-  guards it. Changing an existing test so that it passes around the bug is not
-  a regression test. A bug that cannot be fixed yet still gets its ticket, and
-  its test is skipped with the ticket's ID until the fix lands.
-- Keep the handoff document current. Every agent, whatever its vendor,
-  maintains [requirements/HANDOFF.md](requirements/HANDOFF.md) so the work can
-  change hands between agents without the product owner repeating anything
-  (MM-174). It is a living document that sums up the latest changes in the
-  three most recent sessions, newest first: when you start a session, add it
-  at the top and delete the oldest. Keep its "Where things stand" section
-  true: what is in flight, what to build next, what waits on the owner, and
-  any standing rule the owner gave you that is not in this file. Update it in
-  the same pull request as the work, and again before you finish, since a
-  session can end without warning. Nothing private goes in it.
-- Keep the roadmap current, always (MM-245). `roadmap/roadmap.json` is
-  where the next agent looks for what to build, so it changes in the same
-  pull request as the work: a ticket you create is placed in a workstream
-  and a step the moment it exists; a ticket you finish moves to built; a
-  step that no longer describes the work is rewritten. `mm req` fails when
-  the roadmap and the tickets disagree, and `mm roadmap` regenerates the
-  progress page. Before a session ends, check whether it moved the needle:
-  say in the handoff which workstream step or milestone advanced and what
-  that makes available, or that nothing moved and why.
-- Design decisions are reviewed in Storybook (MM-237). The stories render
-  the real tokens, icons and components the app ships, in every palette
-  (`mm storybook`, or `mm storybook build` for a static page). Every
-  screen, sheet and step has a story too, in `src/gallery/screens/`: the
-  whole app over in-memory stores, opened at that screen. A new one with no
-  story fails the tests. When you add
-  or change a component, change or add its story in the same pull request;
-  a ticket that needs a design decision links the story under `## UI/UX`.
-  The old HTML register (MM-210/MM-211) is deleted; git history has it.
-- Every design goes through Storybook and the panel before it is built
-  (owner's rule, 2026-10-14, MM-293), in this order: (1) draw it in a
-  story, in every state the screen can be in (first day, not done yet
-  today, done, empty, error); (2) look at it in the browser in the three
-  palettes; (3) have the panel's product-designer and UX-accessibility
-  roles review it, saving their reports and an outcome for every finding
-  under `docs/agent-runs/`; (4) build the spec only once the UX guard (the
-  UX-accessibility role) has no open blocking finding. A state the phone
-  can show that no story draws is a defect (MM-292), and `mm check` finds
-  it: `npm run unseen` fails on markup no story reaches unless
-  `apps/mobile/test/gallery/unseen.json` names it with a reason (MM-321).
-  Never add to that register to get past the check; draw the state. A
-  state that needs the phone (a health platform, a camera) is brought with
-  `screenStory`'s `device` (MM-320). Words are the
-  domain's own ("split", never an invented "share"), and nothing that
-  holds a control sits bare on the canvas (MM-291).
-  Do not add HTML drawings of screens anywhere in the repository.
-- Build a new part like its siblings (owner's rule, 2026-10-14, MM-318;
-  rule 9 of `design/screen-direction.md`). Before drawing a new section,
-  row or control, open the component of the nearest one on that screen
-  and reuse it; name that sibling in the ticket's Decisions, and give a
-  written reason for any different pattern. Inspect the whole screen with
-  the new part beside its siblings, and ask the panel to compare them.
-  When a reviewer says something outweighs or differs from its
-  neighbours, first ask whether it should simply be one of them. The
-  water section was invented beside the meal sections and shipped twice
-  before the owner had to point at the meals.
-- If the request is ambiguous in a way that materially affects behavior,
-  product scope, privacy, or data handling, ask before choosing an approach.
-  Otherwise use the simplest implementation consistent with the requirements
-  and architecture.
-- Treat health and profile data as sensitive. Preserve the offline-first
-  design; do not add data transmission, analytics, or external services unless
-  explicitly required and documented.
-- Report uncertainty and limitations plainly. Do not claim a check or behavior
-  was verified unless you actually verified it.
+- **Requirements come first for behavior changes.** Before changing what the
+  app does, create or update a ticket in `requirements/<component>/` (format
+  in [requirements/README.md](requirements/README.md); `mm req next` gives the
+  next ID, and two parallel branches must not take the same one). A
+  documentation-only change or a refactor that changes no behavior needs no
+  ticket.
+- **Every bug gets a ticket and a regression test, at once**, wherever it was
+  found. Name the guarding test in the ticket. Changing an existing test so
+  that it passes around the bug is not a regression test. A bug that cannot be
+  fixed yet still gets its ticket, and its test is skipped with the ticket's
+  ID.
+- **Keep the roadmap current (MM-245).** A ticket you create goes into a
+  workstream in the same PR, as `built` when it is done and `remaining` and in
+  a step otherwise. Insert it next to a related ID, not at the end of a list,
+  so sibling PRs touch different lines. Run `mm roadmap` (a generator, not a
+  check) so the committed progress page agrees.
+- **Keep the handoff current (MM-174)**, once a session: add the session at
+  the top, delete the oldest of the three, and keep "Where things stand"
+  true and short (what is in flight, what to build next, what waits on the
+  owner). Durable rules belong in an `AGENTS.md`, not in the handoff.
+  Nothing private goes in it.
+- If a request is ambiguous in a way that matters for behavior, scope,
+  privacy or data handling, ask. Questions to the owner go through the
+  interactive question tool, never as a numbered list in chat: up to four at
+  a time, concrete options, the recommendation first.
+- **Health and profile data are sensitive.** Keep the design offline-first.
+  Add no data transmission, analytics or external service unless it is
+  required and documented, and change the terms of use together with what
+  the app does with data (MM-244).
+- Report uncertainty plainly. Never claim that something was verified unless
+  it was, and say "not run locally; CI validates" where that is the case.
 
-## Delivery workflow (standing rules from the product owner)
+## Delivery (owner's standing rules)
 
-- Work through the roadmap without waiting to be asked. Commit, push, open
-  pull requests with `gh`, and merge them yourself (`gh pr merge --merge`) once
-  CI is green. The owner does not want to be involved in that.
-- Check open pull requests at the start and at the end of each session or
-  turn: merge the green ones, and fix a failing one in a follow-up. Never sit
-  waiting on CI in the middle of a session.
-- Between those two checks, `mm ci` can watch a pull request's checks in the
-  background and keep what it sees (`agents/ci-monitoring.md`). It adds to the
-  rules above and replaces none: the start and end checks stay mandatory,
-  nobody waits on CI, and merging stays your explicit action. Before merging,
-  read GitHub directly (`mm ci check <pr>`); a stored result, or one for an
-  older commit, is not enough.
-- Create the feature branch from a fresh `main` before editing anything. Stage
-  files by name, never `git add -A`. No stash juggling. Never switch branches
-  while a build is running. If work depends on an unmerged pull request, stack
-  on it deliberately and say "builds on #N" in the description.
-- `mm check` has passed only when its exit code is 0 and its last line is
-  "All checks passed." A tail reading "All tests passed!" can belong to one
-  suite while another failed.
-- Screen and design verification happens in a browser (owner's standing
-  rule, 2026-10-12). A change to how a screen looks is not done until you
-  have looked at it in a browser — the dev server, the built page or its
-  story — and its story is updated with it (MM-237). Storybook is where
-  the owner opines on design without running the app; that is a reason the
-  app moved to web technologies. How the app looks matters as much as what
-  it does.
-- Device and emulator screenshots are only for verifying native behavior:
-  plugins, permissions, persistence, notifications, the back button and the
-  like. They are never the design check.
-- Check a new native plugin with a release build, not only a debug one.
-- Bugs found in passing still follow the rule above; the owner will walk
-  through bugs and regressions at acceptance testing at the end, and until then
-  the focus is roadmap items and features.
+- Work through the roadmap without waiting to be asked. Commit, push, open PRs
+  with `gh`, and merge them yourself (`gh pr merge --merge`) once CI is green.
+  The owner does not want to be involved in that.
+- Create each branch from a fresh `origin/main`. Stage files by name, never
+  `git add -A`. No stash juggling. If work depends on an unmerged PR, stack on
+  it deliberately and say "builds on #N" in the description.
+- `mm` is not on PATH in a non-interactive shell: run `./mm` from the repo
+  root with Node 22 on PATH.
 
-## Project map and conventions
+## Engineering principles (binding, MM-159)
 
-- `apps/mobile/src/` is the app. Its first-level folders are layers, kept apart
-  exactly as the Dart packages were, and `apps/mobile/test/layers.test.ts`
-  enforces who may import whom:
-  - `lang/` small language helpers (no imports);
-  - `domain/` entities, units, repositories' interfaces, screening;
-  - `engine/` weight trend, adaptive TDEE, partition, safety bounds, targets, coach;
-  - `healthIngest/` what is read from a health platform;
-  - `sql/` the `SqlDatabase` interface, with the WebAssembly adapter in
-    `sql/wasm/` and the phone's in `sql/native/`;
-  - `foodCatalog/` food packs, search and the pack download, with the native
-    adapters in `foodCatalog/download/native/`;
-  - `foodPipeline/` the pack build (its file steps under `node/`);
-  - `fixtures/` in-memory implementations of every interface;
-  - `data/` SQL repositories over `SqlDatabase`;
-  - `format/` labels and text;
-  - `platform/` the shell's plugins behind interfaces (camera, reminders,
-    Health Connect, system bars, back button);
-  - `state/` the app's cells and controllers; then the screen folders.
-- `apps/mobile/src/ui/` is the design-system component library; screens use it
-  and never raw HTML controls.
-- `apps/mobile/android/` is the native shell: a Capacitor host and the app's own
-  Kotlin plugins (`MmDb`, `MmPacks`, `MmReminders`, `MmScanner`, `MmHealth`).
-- `apps/mobile/test/contracts/` holds the contract suites; every implementation
-  of an interface runs its suite, fixtures included.
-- `tool/` contains the dependency-free `mm` task runner: TypeScript run by
-  Node itself, with its own tests in `tool/test/`.
-- `requirements/` is the source of truth for planned and shipped product
-  behavior; `docs/architecture.md` records cross-cutting design; `docs/non-goals.md` lists what the
-  app will not do, and a change that proposes one needs its reopen condition met.
-- `roadmap/` orders the work. Read [roadmap/README.md](roadmap/README.md) and
-  `roadmap/roadmap.json` to choose what to build next and to see what is
-  blocked. It adds no requirements of its own.
-- Keep dependencies flowing with the existing layers. In particular, keep
-  domain and engine logic independent of React and persistence details.
-- A change to any table bumps `apps/mobile/src/data/currentSchemaVersion.ts`
-  by one, changes `currentSchema.ts` and adds the migration step; the
-  migration tests hold every released version's upgrade path. Never edit a
-  step or a version's shape after any build of it has run anywhere (a panel
-  build, the owner's phone): add a new version instead (MM-325). The schema's
-  fingerprint test fails when the schema changes without a new version.
+These override convenience. Where principles conflict, Liskov substitution (L)
+and interface segregation (I) win. The details and the tests that enforce them
+are in [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md).
 
-## Engineering principles (binding)
-
-These are the product owner's rules for how the code is built (MM-159). They
-override convenience. Where principles conflict, Liskov substitution (L) and
-interface segregation (I) win.
-
-1. Follow SOLID, and design for **L** and **I** first.
-2. Every integration point is an interface that any subtype can replace
-   (food source, barcode scanner, health source, backup provider, entitlement,
-   clock). Never import a vendor or platform package outside its adapter
-   folder; `apps/mobile/test/architecture.test.ts` lists every library and
-   the folders that may import it (MM-246), and
-   `apps/mobile/src/app/openAppServices.ts` is the one place implementations
-   are chosen.
-3. Consumers depend on the **narrowest** interface they need
-   (`WeightReader`, not a store). Interfaces live with the consumer's layer.
-4. If a product or vendor decision is open, build against the interface and an
-   in-memory fixture (`src/fixtures/`) and carry on. Do not wait for the
-   decision.
-5. **One declaration per file.** Every model, interface, class, union and
-   function module has its own file, named for it. Barrel files only
-   `export`. A component may carry its `<Name>Props` type, a union type its
-   same-named value, and a file of constants may hold a group;
-   `apps/mobile/test/architecture.test.ts` checks it (MM-246).
+1. SOLID, designed for L and I first.
+2. Every integration point is an interface that any subtype can replace. A
+   vendor or platform package is imported only in its adapter folder;
+   `openAppServices.ts` is the one place where implementations are chosen.
+3. Consumers depend on the narrowest interface they need.
+4. If a product or vendor decision is open, build against the interface and
+   an in-memory fixture, and carry on.
+5. One declaration per file.
 6. All database access goes through a repository interface with a SQL
-   implementation and an in-memory fixture. Screens and state never use SQL
-   or a concrete store.
-7. Every interface has a contract test suite run against **every**
-   implementation, fixtures included. That is how substitutability is proved.
-8. A reusable part of a view is a design-system component, written once. A
-   screen never uses a raw HTML control (`<button>`, `<input>`, `<select>`,
-   …); it uses the component (`MmPressable` for content that is pressed as
-   a whole). Components take meaning (`kind="primary"`), never a color,
-   radius or padding. The architecture test checks it (MM-246). **Nothing
-   native shows** (the owner, 2026-10-13, MM-262): no native date or time
-   picker, select list, engine-drawn checkbox, slider thumb, tap highlight
-   or focus ring; the design system draws every control and every state of
-   it, in every palette, and a native element may exist underneath only
-   for the keyboard and assistive technology, invisible or wholly
-   restyled. Inside the design system each control kind has one home
-   (MM-261) and a composite writes no control of its own.
-9. Prefer composition to inheritance and plain function components, so state
-   lives in `state/` cells and controllers, not in component classes.
-
-## Validation
-
-Run commands from the repository root using the `mm` wrapper (`.\mm` in
-PowerShell, `mm` in cmd.exe, or `./mm` on macOS/Linux):
-
-- `mm req` after creating or updating requirements.
-- `mm panel` validates panel roles, Claude/Copilot adapters and portable templates;
-  `mm panel docs/agent-runs/<task-id>` also checks saved run state.
-- `npx vitest run <relevant-path>` inside `apps/mobile` for focused tests;
-  `mm test` for the tool's tests and the whole web suite.
-- `mm check` before considering a change complete; it runs the CI checks.
-
-Choose the smallest relevant checks while iterating, then run the broader
-check when practical. If a check cannot run, state why and what remains
-unverified.
+   implementation and an in-memory fixture.
+7. Every interface has a contract suite run against every implementation.
+8. A reusable part of a view is a design-system component. Screens use no raw
+   HTML controls, and nothing native shows (MM-262).
+9. Composition over inheritance; state lives in `state/` cells and
+   controllers.
 
 ## Completion
 
-Before finishing, review the diff for unintended changes and ensure the
-requirements, implementation, and tests agree. Update
-[requirements/HANDOFF.md](requirements/HANDOFF.md) and the roadmap: every
-ticket you touched is in its workstream on the right side, and the handoff
-says which step or milestone moved. Summarize the changes and list
-the checks actually run, including any failures or omissions. Commit and push
-per the delivery workflow above.
+Review your diff for unintended changes, and make sure the requirements, the
+code and the tests agree. Then push, open the PR, and say in your reply what
+changed, what was not run (everything, locally), and which PRs are open.
