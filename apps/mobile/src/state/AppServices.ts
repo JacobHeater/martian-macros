@@ -28,6 +28,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { PackFileFetch } from '../foodCatalog/download/PackFileFetch';
 import type { PackHttp } from '../foodCatalog/download/PackHttp';
 import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
@@ -78,7 +79,10 @@ export interface AppServices {
   /** The phone's part of a backup: the snapshot, the share sheet and the file picker (MM-63). */
   readonly backup: BackupPlatform;
 
-  /** The installed food packs read as one catalog (MM-42); given again when a pack is installed or removed. */
+  /**
+   * The installed food packs read as one catalog (MM-42); given again when a
+   * pack is installed or removed, the one it replaces closed (MM-386).
+   */
   readonly catalog: Watched<FoodCatalog>;
 
   /** Where downloaded food packs are kept, apart from the user's own data (MM-56). */
@@ -86,6 +90,14 @@ export interface AppServices {
 
   /** The network, as far as packs are concerned: the only thing the app ever fetches. */
   readonly packHttp: PackHttp;
+
+  /**
+   * How a pack file reaches its unfinished download (MM-387): on the phone,
+   * natively, from the connection to the file. Absent, the app reads it
+   * through `packHttp` and writes it to `packStore` itself, as a browser, a
+   * story or a test does.
+   */
+  readonly packFetch?: PackFileFetch | undefined;
 
   /**
    * Where to read the list of downloadable packs, set for each build.

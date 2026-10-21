@@ -1,6 +1,6 @@
 ---
 id: MM-127
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-38, MM-41, MM-49, MM-53, MM-92, MM-108, MM-124, MM-142]
 ---
@@ -33,6 +33,11 @@ Choices I made without asking (say if any is wrong):
   exception is the weight-jump explanation, which may list last night's alcohol among the likely reasons for today's reading (MM-142).
 - **The app does not help plan drinking**: no "save calories for tonight" (that is banking, MM-124).
 
+- **Standard drinks fill in the grams** (2026-10-21): the typed entry has "Alcohol g" and "Standard drinks" side by side;
+  a count typed fills the grams in at 14 g each, grams typed over it clear the count, and only the grams are stored.
+- **The line is on Today's hero as well as Food's** (2026-10-21), built as the same row (`AlcoholLine`, a sibling of
+  `FiberLine` in the hero, MM-336), so the day's summary says the same thing wherever it is read.
+
 Where the experts disagreed:
 - The nutritionist wanted a weekly alcohol total with the US guideline limits shown. The UX strategist: that is health advice the user
   did not ask a macro tracker for, and it will read as judgement. Not included; reconsider only at user request.
@@ -48,7 +53,17 @@ Scenario: A drink from the database
 
 Scenario: A typed drink
   When an entry is typed with 300 kcal, 26 g carbohydrate and 2 standard drinks
-  Then it is saved without a mismatch warning
+  Then the alcohol field reads 28 g
+  And it is saved without a mismatch warning, with 28 g of alcohol and 26 g of carbohydrate
+
+Scenario: Grams typed over a count of drinks
+  Given 1.5 standard drinks typed, filling in 21 g
+  When 10 is typed as the grams
+  Then the count of drinks is cleared and 10 g is what is kept
+
+Scenario: On Today
+  Given today has an entry with 14 g of alcohol
+  Then Today's hero shows the alcohol line "98 kcal, in the total", at the default detail level
 
 Scenario: Guides are unchanged
   Given alcohol is logged
@@ -72,7 +87,13 @@ check, so 2 beers at 300 kcal, 26 g carbohydrate and 28 g alcohol no longer rais
 entry and is never turned into carbohydrate or fat; the targets are untouched and no text comments on drinking. Pack foods already
 carry their alcohol (MM-49). Tested in `alcohol_test.dart`.
 
-Not built: the field takes grams only (no "standard drinks" count), the line is on the Food screen only (not the Today dashboard),
-and the weight-jump explanation that may mention last night's alcohol belongs to MM-142.
+Built (2026-10-21): a "Standard drinks" field beside "Alcohol g" that fills the grams in at 14 g each (`StandardDrink`,
+`AlcoholFields`), so the scenario as written (2 standard drinks) saves without a mismatch; and the same alcohol line on
+Today's hero (`AlcoholLine`, shared with Food). Tested in `test/food/alcohol.test.tsx` ("a typed drink counted in standard
+drinks…", "grams typed over a count of drinks…", "Today shows the day's alcohol…"); drawn in the gallery's
+`AddFoodWithAlcohol` (two drinks typed) and `TodayWithAlcohol`. Not run locally; CI validates. Not checked on a device: the
+two dense fields side by side on a 360 dp phone.
+
+The weight-jump explanation that may mention last night's alcohol is built under MM-142.
 
 Changed after seeing it on the emulator: the alcohol field made every typed entry longer, so it now sits behind an "Includes alcohol?" text button and appears only when asked for (or when an entry already has alcohol).
