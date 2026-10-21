@@ -1,6 +1,6 @@
 ---
 id: MM-124
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-24, MM-27, MM-28, MM-41, MM-92, MM-98, MM-114, MM-121, MM-122, MM-123, MM-135, MM-144, MM-149, MM-486]
 ---
@@ -133,10 +133,22 @@ Guarding tests:
 - `test/state/dayTargetsOn.test.ts`: no taking back, no banking, a past day keeps its target.
 - `test/engine/usualTrainingWeekdays.test.ts`; `test/settings/targetShape.test.tsx` (flat until chosen, at most
   three, no text about making a day up).
-Still owed: the simulator suite over shaped intake (HS-estimator-style) beyond the partial-day guard;
-the panel's product-designer and UX review was a fast source-only pass (no render); its blocking findings
-(an action row that read as a status line, explanations inline, notice placement, repeated icons) were fixed;
-a look at the stories in all three palettes is still owed.
+Built 2026-10-21: **the simulator suite over shaped intake**, `test/engine/shapedIntakeSimulation.test.ts`.
+Forty simulated users per case eat a shaped week as planned for 35 days (the weekend 30% higher; three days
+30% higher, held to 15% lower days), with the usual logging and adherence noise, with and without a
+glycogen-and-gut store that rises and falls with the higher days (MM-131). Each case asks of the
+expenditure estimate what the flat case does: bias under 100 kcal, the truth inside two stated deviations
+at least 85% of the time, within 60 kcal of the same users with the same noise eating flat, and no more
+partial days dropped than flat. So the 15% limit stands unless CI says otherwise. Not run locally; CI
+validates.
+
+The code is complete. The panel's product-designer and UX review was a fast source-only pass (no render);
+its blocking findings (an action row that read as a status line, explanations inline, notice placement,
+repeated icons) were fixed.
+
+## Owed on a phone
+- A look at the stories (WeekFlat, WeekWeekendHigher, WeekShapeReduced, TodayOnALowerDay, CoachRows) in all
+  three palettes.
 
 ## Notes
 - Priority: should-have.
