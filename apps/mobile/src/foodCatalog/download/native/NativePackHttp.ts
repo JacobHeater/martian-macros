@@ -80,6 +80,11 @@ export class NativePackHttp implements PackHttp {
         // A response nobody reads must not keep its chunks (MM-384, the panel's F5).
         arrivals.delete(request);
         closed.add(request);
+        // A reader waiting on the next chunk is woken to an error: nothing more will come (MM-471).
+        mine.chunks.length = 0;
+        mine.chunks.push({ request, error: 'The transfer was aborted.' });
+        mine.wake?.();
+        mine.wake = undefined;
         void api.httpAbort({ request }).catch(() => undefined);
       },
     };

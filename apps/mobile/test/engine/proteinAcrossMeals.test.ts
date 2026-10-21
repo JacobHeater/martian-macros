@@ -68,15 +68,21 @@ const byMeal = (all: readonly Insight[]) => all.find((i) => i.rule === 'proteinB
 
 describe('the marker', () => {
   it('an 80 kg person with 30 g at lunch has it', () => {
-    expect(mealHasSolidProtein({ proteinG: 30, weightKg: 80 })).toBe(true);
+    expect(mealHasSolidProtein({ proteinG: 30, weightKg: 80, heightCm: 180 })).toBe(true);
   });
 
   it('23 g does not, and that says nothing', () => {
-    expect(mealHasSolidProtein({ proteinG: 23, weightKg: 80 })).toBe(false);
+    expect(mealHasSolidProtein({ proteinG: 23, weightKg: 80, heightCm: 180 })).toBe(false);
   });
 
   it('with no weight known there is no marker', () => {
-    expect(mealHasSolidProtein({ proteinG: 60, weightKg: 0 })).toBe(false);
+    expect(mealHasSolidProtein({ proteinG: 60, weightKg: 0, heightCm: 180 })).toBe(false);
+  });
+
+  it('it is per kg of reference weight, as the protein minimum is', () => {
+    // 130 kg at 180 cm: a reference weight of about 93 kg, so about 28 g, not 39.
+    expect(mealHasSolidProtein({ proteinG: 30, weightKg: 130, heightCm: 180 })).toBe(true);
+    expect(mealHasSolidProtein({ proteinG: 27, weightKg: 130, heightCm: 180 })).toBe(false);
   });
 });
 

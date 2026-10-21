@@ -312,6 +312,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -793,6 +794,7 @@
             "MM-385",
             "MM-386",
             "MM-387",
+            "MM-471",
             "MM-388",
             "MM-396",
             "MM-397",
@@ -835,6 +837,8 @@
             "MM-195",
             "MM-79",
             "MM-189",
+            "MM-489",
+            "MM-490",
             "MM-191",
             "MM-196"
           ]
@@ -845,6 +849,8 @@
             "MM-72",
             "MM-70",
             "MM-69",
+            "MM-441",
+            "MM-442",
             "MM-314",
             "MM-323",
             "MM-395"
@@ -932,6 +938,7 @@
           "MM-231",
           "MM-232",
           "MM-233",
+          "MM-443",
           "MM-246",
           "MM-261",
           "MM-278"
@@ -977,6 +984,7 @@
             "MM-231",
             "MM-232",
             "MM-233",
+            "MM-443",
             "MM-246",
             "MM-261",
             "MM-278"
@@ -1451,6 +1459,8 @@
           "MM-376",
           "MM-389",
           "MM-390",
+          "MM-391",
+          "MM-392",
           "MM-394",
           "MM-398",
           "MM-399",
@@ -1490,8 +1500,6 @@
           "MM-224",
           "MM-242",
           "MM-375",
-          "MM-391",
-          "MM-392",
           "MM-403"
         ]
       },
@@ -2331,6 +2339,7 @@
         "built": [
           "MM-38",
           "MM-39",
+          "MM-439",
           "MM-40",
           "MM-41",
           "MM-47",
@@ -2338,6 +2347,8 @@
           "MM-169",
           "MM-170",
           "MM-171",
+          "MM-126",
+          "MM-127",
           "MM-172",
           "MM-202",
           "MM-203",
@@ -2365,6 +2376,7 @@
           "MM-326",
           "MM-327",
           "MM-328",
+          "MM-329",
           "MM-358",
           "MM-359",
           "MM-369",
@@ -2375,6 +2387,8 @@
           "MM-383",
           "MM-384",
           "MM-385",
+          "MM-386",
+          "MM-471",
           "MM-388",
           "MM-396",
           "MM-397",
@@ -2401,16 +2415,12 @@
           "MM-429"
         ],
         "remaining": [
-          "MM-386",
           "MM-387",
           "MM-37",
           "MM-44",
           "MM-45",
           "MM-46",
-          "MM-126",
-          "MM-127",
           "MM-305",
-          "MM-329",
           "MM-406"
         ]
       },
@@ -2562,6 +2572,7 @@
             "MM-385",
             "MM-386",
             "MM-387",
+            "MM-471",
             "MM-388"
           ],
           "milestone": "M4"
@@ -2659,6 +2670,7 @@
           "MM-378",
           "MM-363",
           "MM-365",
+          "MM-125",
           "MM-371",
           "MM-379",
           "MM-377",
@@ -2674,7 +2686,6 @@
           "MM-450",
           "MM-116",
           "MM-117",
-          "MM-125",
           "MM-145",
           "MM-146",
           "MM-148",
@@ -2876,6 +2887,8 @@
         "remaining": [
           "MM-74",
           "MM-189",
+          "MM-489",
+          "MM-490",
           "MM-191",
           "MM-447"
         ]
@@ -2929,7 +2942,9 @@
           "step": 6,
           "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
           "tickets": [
-            "MM-189"
+            "MM-189",
+            "MM-489",
+            "MM-490"
           ],
           "milestone": "M4"
         },
@@ -2996,6 +3011,7 @@
       "sourceRequirements": {
         "built": [
           "MM-67",
+          "MM-71",
           "MM-188",
           "MM-395"
         ],
@@ -3004,7 +3020,8 @@
           "MM-68",
           "MM-69",
           "MM-70",
-          "MM-71",
+          "MM-441",
+          "MM-442",
           "MM-72",
           "MM-73",
           "MM-314",
@@ -3097,6 +3114,15 @@
           "title": "A reading's source named by its app, never its package id, and a row that wraps a long word (MM-395)",
           "tickets": [
             "MM-395"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 12,
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "tickets": [
+            "MM-441",
+            "MM-442"
           ],
           "milestone": "M4"
         }
