@@ -86,3 +86,8 @@ food composition.
   (`docs/agent-runs/mm365-food-rules/`, `mm367-body-water-rules/`). The epic's narrative now holds for a food, an exercise,
   a waist reading and the water section; a weigh-in gets no inline line (MM-142 keeps the weight jump), and a night waits
   for MM-250.
+- 2026-10-21: MM-250 is done, so a night no longer waits on it. The sleep catalog (MM-368) had its coaching and safety
+  review and is not built: it waits on evidence rows for its thresholds and sentences (SA-3), the cautions it is withheld
+  for (SA-1), and dropping "short most nights" in favour of MM-252's insight (CO-1), as MM-368's Notes record. Nothing
+  else in the epic is buildable without the owner: the open "say if any is wrong" choices are listed in the handoff, and
+  the phone checks (MM-366, MM-364, MM-378, MM-370, MM-382) wait for the owner's device pass.
