@@ -24,6 +24,8 @@ export * from './HealthReadFailure';
 export * from './HealthSample';
 export * from './HealthSampleStore';
 export * from './HealthSource';
+export * from './HealthSyncReason';
+export * from './HealthSyncSchedule';
 export * from './HealthWriteKind';
 export * from './HealthWriteNamespace';
 export * from './HealthWriting';

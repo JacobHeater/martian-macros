@@ -1,6 +1,7 @@
 package com.martianmacros
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
@@ -21,7 +22,9 @@ import java.util.concurrent.Executors
  * The phone's part of a backup (MM-63): a consistent copy of the database
  * (`VACUUM INTO`), a temporary file for a copy brought back, the send
  * chooser for a file, and the document picker to choose one. Bytes cross
- * the bridge as base64; the app encrypts before anything leaves.
+ * the bridge as base64; the app encrypts before anything leaves. It also
+ * hands an https address to the phone's browser (MM-454): the browser
+ * fetches the page, the app nothing.
  */
 @CapacitorPlugin(name = "MmBackup")
 class MmBackupPlugin : Plugin() {
@@ -92,6 +95,19 @@ class MmBackupPlugin : Plugin() {
     fun shared(call: PluginCall?, result: ActivityResult) {
         // The chooser gives no word on whether the other app kept the file; it was handed on unless cancelled.
         call?.resolve(JSObject().put("outcome", if (result.resultCode == Activity.RESULT_CANCELED) "sent" else "sent"))
+    }
+
+    @PluginMethod
+    fun openInBrowser(call: PluginCall) {
+        val address = call.getString("url") ?: return call.reject("openInBrowser needs an address.")
+        val uri = Uri.parse(address)
+        if (uri.scheme != "https" || uri.host.isNullOrEmpty()) return call.reject("Only an https address is opened.")
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE))
+            call.resolve()
+        } catch (error: ActivityNotFoundException) {
+            call.reject("No browser is installed.")
+        }
     }
 
     @PluginMethod

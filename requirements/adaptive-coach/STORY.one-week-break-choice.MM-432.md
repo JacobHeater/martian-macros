@@ -1,6 +1,6 @@
 ---
 id: MM-432
-status: proposed
+status: done
 component: adaptive-coach
 related: [MM-135, MM-117, MM-31, MM-325]
 ---
@@ -14,6 +14,9 @@ screen and the check-in that issues the break's targets, and nothing stored carr
 was chosen (`maintenanceWeekFrom`) and no length; `user_preferences` has fixed columns; a targets record's flags could
 carry the length once the record exists, but the engine writes that record from the setup. A `setups` column is
 unavoidable, and the schema belongs to another lane (MM-325), so MM-135 stopped this item here.
+
+## Decisions
+- **Declined by the owner (2026-10-21, "No go on 220"):** the one-week choice is not built. A break stays two weeks, as MM-135 decided; PR #220 was closed unmerged. The bug found while building it, MM-495, was kept on its own.
 
 ## Description
 Add `break_weeks` (1 or 2, default 2) to `setups` with a new schema version and migration step, carry it through

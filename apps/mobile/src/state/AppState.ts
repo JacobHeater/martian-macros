@@ -41,6 +41,8 @@ import { assessTrainingLapse } from '../engine/assessTrainingLapse';
 import type { TrainingLapse } from '../engine/TrainingLapse';
 import { trainingSuspended } from '../engine/trainingSuspended';
 import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
+import type { PhasePlan } from '../engine/PhasePlan';
+import { planPhases } from '../engine/planPhases';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
 import type { PaceOption } from '../engine/PaceOption';
@@ -118,6 +120,8 @@ import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
+import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
 import type { AppServices } from './AppServices';
@@ -317,6 +321,12 @@ export class AppState {
   readonly stallAssessment: Cell<StallAssessment | undefined>;
   /** Where the person stands at maintenance (MM-130); undefined when the targets in force are not maintenance. */
   readonly maintenance: Cell<MaintenanceStatus | undefined>;
+  /**
+   * The current phase, how long it has run, its projected end and, once it
+   * has ended, the next phase recommended (MM-36). Derived each time, never
+   * stored; undefined before any targets.
+   */
+  readonly phasePlan: Cell<PhasePlan | undefined>;
   /** Whether training has lapsed against a goal that needs it (MM-134). */
   readonly trainingLapse: Cell<TrainingLapse | undefined>;
 
@@ -1146,10 +1156,31 @@ export class AppState {
         waist: of(this.waist) ?? [],
         strengthTrends: of(this.strengthTrends) ?? [],
         sex: setup.profile.sex,
-        bodyFatPercent: snapshot.bodyFat.percent,
+        // The upper end of the range reaches the stop line, never a point (coordinator, 2026-10-21).
+        bodyFat: snapshot.bodyFat,
+        bodyFatBasis: snapshot.bodyFatBasis,
         today: this.today.value,
         // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
         weightSignals: !setup.screening.eatingDisorderHistory,
+      });
+    });
+
+    this.phasePlan = derived(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
+        return undefined;
+      }
+      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
+      // When a lean gain ends is MM-129's to say, so the plan and the lean-gain card agree.
+      return planPhases({
+        setup,
+        snapshot,
+        history,
+        stall: this.stallAssessment.value,
+        leanGainStop: this.leanGainReview.value?.stop,
+        today: this.today.value,
       });
     });
 
@@ -1234,8 +1265,37 @@ export class AppState {
    * read (MM-73), once the history permission is granted. A backfill that
    * cannot finish keeps what it read and goes on next time; it does not
    * make the import count as failed.
+   *
+   * `reason` decides whether it reads at all (MM-72, `HealthSyncSchedule`):
+   * coming back to the front soon after a read does nothing, and answers
+   * true. Only one read runs at a time. Opening or coming back while one
+   * runs waits for it; asking while one runs waits, then reads again, so a
+   * kind allowed just now is read.
    */
-  async syncHealth(): Promise<boolean> {
+  syncHealth(reason: HealthSyncReason = 'asked'): Promise<boolean> {
+    const running = this.syncing;
+    if (running !== undefined) {
+      if (reason !== 'asked') return running;
+      const again = () => this.syncHealth(reason);
+      return running.then(again, again);
+    }
+    if (!HealthSyncSchedule.due(reason, this.lastHealthSync, this.services.clock.now())) return Promise.resolve(true);
+    const sync = this.readHealth().then((read) => {
+      if (read) this.lastHealthSync = this.services.clock.now();
+      return read;
+    });
+    this.syncing = sync.finally(() => {
+      this.syncing = undefined;
+    });
+    return this.syncing;
+  }
+
+  private syncing: Promise<boolean> | undefined;
+
+  /** When the last read of the health platform that succeeded finished, while the app has been running (MM-72). */
+  private lastHealthSync: Date | undefined;
+
+  private async readHealth(): Promise<boolean> {
     const { healthSource: source, healthSamples: store } = this.services;
     let changed = false;
     try {

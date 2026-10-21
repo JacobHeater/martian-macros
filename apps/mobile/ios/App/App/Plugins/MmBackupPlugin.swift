@@ -7,7 +7,9 @@ import UniformTypeIdentifiers
 /// The phone's part of a backup (MM-63): a consistent copy of the database
 /// (`VACUUM INTO`), a temporary file for a copy brought back, the share sheet
 /// to save or send a file, and the document picker to choose one. The bytes
-/// cross the bridge as base64; the app encrypts before it shares.
+/// cross the bridge as base64; the app encrypts before it shares. It also
+/// hands an https address to the phone's browser (MM-454): the browser
+/// fetches the page, the app nothing.
 @objc(MmBackupPlugin)
 public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "MmBackupPlugin"
@@ -18,6 +20,7 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "removeTemp", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "share", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pick", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openInBrowser", returnType: CAPPluginReturnPromise),
     ]
 
     private var picker: PickDelegate?
@@ -90,6 +93,21 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
                 popover.sourceRect = CGRect(x: presenter.view.bounds.midX, y: presenter.view.bounds.midY, width: 1, height: 1)
             }
             presenter.present(sheet, animated: true)
+        }
+    }
+
+    @objc func openInBrowser(_ call: CAPPluginCall) {
+        guard let address = call.getString("url"), let url = URL(string: address), url.scheme == "https", url.host != nil else {
+            return call.reject("Only an https address is opened.")
+        }
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url, options: [:]) { opened in
+                if opened {
+                    call.resolve()
+                } else {
+                    call.reject("The browser could not be opened.")
+                }
+            }
         }
     }
 
