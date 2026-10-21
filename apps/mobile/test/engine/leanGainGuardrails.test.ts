@@ -220,7 +220,7 @@ const review = ({
     sex: 'male',
     bodyFatPercent,
     today,
-    weightSignals,
+    ...(weightSignals === undefined ? {} : { weightSignals }),
   });
 
 describe('the lean-gain review', () => {
