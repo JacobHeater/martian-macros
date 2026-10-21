@@ -1218,3 +1218,29 @@ export const SettingsBackupPhotos = screenStory({
   }),
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
 });
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: the weight display chosen from Appearance: Everything, Trend only, Hidden, each with what it shows. */
+export const ChangeWeightDisplay = screenStory({
+  covers: ['SettingsScreen', 'WeightDisplaySheet'],
+  shows: 'Your backup and any export still contain the numbers.',
+  open: settingsAt('appearance'),
+  walk: pressAnywhere('Change weight display'),
+});
+
+/** MM-118: with an eating-disorder history and nothing chosen, the display starts at Trend only. */
+export const WeightDisplayTrendOnlyByDefault = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Trend only',
+  scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
+  open: settingsAt('appearance'),
+});
+
+/** MM-118: the health check with an eating-disorder history ticked: weigh-ins start as the trend only, said here. */
+export const HealthCheckEatingDisorderWeightDisplay = screenStory({
+  covers: ['HealthCheckScreen'],
+  shows: /^With this ticked, weigh-ins show as the trend only/,
+  scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
+  open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
+});

@@ -10,6 +10,7 @@ import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
+import { WeightDisplay } from '../domain/WeightDisplay';
 import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
 import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
@@ -17,7 +18,20 @@ import { FormatError } from '../lang/FormatError';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, day, flag, integer, named, optionalDay, optionalInteger, optionalNumber, optionalText, orNull, text } from './columns';
+import {
+  asFlag,
+  day,
+  flag,
+  integer,
+  named,
+  optionalDay,
+  optionalInteger,
+  optionalNamed,
+  optionalNumber,
+  optionalText,
+  orNull,
+  text,
+} from './columns';
 import { upsert } from './upsert';
 import type { Values } from './Values';
 
@@ -93,6 +107,22 @@ export class SqlPreferencesRepository implements PreferencesRepository, WeighInW
 
   savePrimaryScale(sourceId: string | undefined): Promise<void> {
     return this.save({ primary_scale_source_id: orNull(sourceId) });
+  }
+
+  watchWeightDisplay(): Watched<WeightDisplay | undefined> {
+    return this.watch((row) => (row === undefined ? undefined : optionalNamed(WeightDisplay.values, row, 'weight_display')));
+  }
+
+  saveWeightDisplay(display: WeightDisplay | undefined): Promise<void> {
+    return this.save({ weight_display: orNull(display) });
+  }
+
+  watchWeightDisplayOffered(): Watched<boolean> {
+    return this.watch((row) => (row === undefined ? false : flag(row, 'weight_display_offered')));
+  }
+
+  markWeightDisplayOffered(): Promise<void> {
+    return this.save({ weight_display_offered: asFlag(true) });
   }
 
   watchWeighInWindow(): Watched<WeighInWindow> {

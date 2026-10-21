@@ -15,6 +15,8 @@ import { RecompReviewBody } from './RecompReviewBody';
  */
 export function MonthlyReportScreen({ index }: { index: number }) {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const report = useCell(state.monthlyReport(index));
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
@@ -25,7 +27,7 @@ export function MonthlyReportScreen({ index }: { index: number }) {
       </Screen>
     );
   }
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const words = new MonthlyReportText(report, fmt, today);
   const rows = (pairs: readonly (readonly [label: string, value: string, detail?: string])[]) =>
     pairs.map(([label, value, detail]) => (

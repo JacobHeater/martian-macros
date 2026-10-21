@@ -1,9 +1,13 @@
 import type { CalendarDate } from '../domain';
-import { calibrationDays, type MeasuredChange, type MonthlyReport, ReportPeriod, StreakRule } from '../engine';
+import { calibrationDays, type MeasuredChange, type MonthlyReport, paceInWordsOf, ReportPeriod, StreakRule } from '../engine';
+
+/** Over a month with no change intended, a trend that moved less than this is steady (MM-118). */
+const steadyMonthKg = 0.5;
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { bodyFatRange } from './bodyFatRange';
 import { bodyFatRangeText } from './bodyFatRangeText';
 import { explanationLineText } from './explanationLineText';
+import { paceInWordsText } from './paceInWordsText';
 import { Fmt } from './Fmt';
 import { waistAmount } from './waistAmount';
 import { wholeDaysLogged } from './wholeDaysLogged';
@@ -68,7 +72,7 @@ export class MonthlyReportText {
       .slice(0, 6)
       .map((lift) => [
         lift.name,
-        `${fmt.weight(lift.fromKg)} to ${fmt.weight(lift.toKg)} (${fmt.weightDelta(lift.toKg - lift.fromKg)})`,
+        `${fmt.load(lift.fromKg)} to ${fmt.load(lift.toKg)} (${fmt.loadDelta(lift.toKg - lift.fromKg)})`,
       ]);
   }
 
@@ -80,7 +84,7 @@ export class MonthlyReportText {
     const { report, fmt } = this;
     return report.personalRecords.map((record) => [
       record.name,
-      `${fmt.weight(record.estimateKg)}, up from ${fmt.weight(record.previousBestKg)}`,
+      `${fmt.load(record.estimateKg)}, up from ${fmt.load(record.previousBestKg)}`,
       Fmt.shortDay(record.date),
     ]);
   }
@@ -96,7 +100,17 @@ export class MonthlyReportText {
         'Trend weight',
         trend === undefined
           ? 'Too few weigh-ins to say'
-          : `${fmt.weightDelta(trend)}${intended === undefined ? '' : `, against ${fmt.weightDelta(intended)} intended`}`,
+          : fmt.weightHidden
+            ? // In words against the intended change, with the weight hidden (MM-118).
+              paceInWordsText(
+                intended === undefined || intended === 0
+                  ? Math.abs(trend) < steadyMonthKg
+                    ? 'steady'
+                    : 'fasterThanPlanned'
+                  : paceInWordsOf({ trendFractionPerWeek: trend, intendedFractionPerWeek: intended }),
+                { confident: true },
+              )
+            : `${fmt.weightDelta(trend)}${intended === undefined ? '' : `, against ${fmt.weightDelta(intended)} intended`}`,
       ],
     ];
     // The waist by the one rule every feature uses (MM-155): the value a figure or three words, what it rests on as the

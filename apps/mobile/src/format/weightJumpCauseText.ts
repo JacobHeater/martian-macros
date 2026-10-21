@@ -78,7 +78,8 @@ export function weightJumpCauseText(cause: WeightJumpCause, fmt: Fmt): { clause:
           ['Target', Fmt.kcal(n('targetKcal'))],
           [over < 0 ? 'Under target by' : 'Over target by', Fmt.kcal(Math.abs(over))],
           ['Expenditure estimate', Fmt.kcal(n('kcal') - n('overExpenditureKcal'))],
-          ['Fat at most', fmt.weight(n('fatAtMostKg'))],
+          // No figure with the weight hidden (MM-118).
+          ...(fmt.weightHidden ? [] : [['Fat at most', fmt.weight(n('fatAtMostKg'))] as const]),
         ],
       };
     }

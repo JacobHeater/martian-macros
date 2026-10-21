@@ -43,7 +43,8 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
   if (review.fatHeavy && review.waistChangeCm !== undefined && review.weightChangeKg !== undefined) {
     said.push(
       `Over ${review.weeks} weeks your waist is up ${waistAmount(review.waistChangeCm, fmt)} with ` +
-        `${fmt.weight(review.weightChangeKg)} of trend weight. The gain looks fat-heavy: more of it is going to your ` +
+        (fmt.weightHidden ? 'a rise in trend weight. ' : `${fmt.weight(review.weightChangeKg)} of trend weight. `) +
+        'The gain looks fat-heavy: more of it is going to your ` +
         'waist than a lean gain usually puts there. ' +
         // MM-480: already on the slower gain, maintenance is what is left to suggest.
         (review.slowerPace
@@ -54,7 +55,7 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
   }
   if (review.strengthFlat && review.weightChangeKg !== undefined) {
     said.push(
-      `Over ${review.weeks} weeks of surplus your trend weight is up ${fmt.weight(review.weightChangeKg)}, and none of ` +
+      `Over ${review.weeks} weeks of surplus your trend weight is up${fmt.weightHidden ? '' : ` ${fmt.weight(review.weightChangeKg)}`}, and none of ` +
         'your tracked lifts has got stronger. That usually means the training, not the food, is the limit: enough ' +
         'hard sets each week, and loads or reps that go up over time. Calories stay as they are.',
     );
