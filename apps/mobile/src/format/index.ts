@@ -35,6 +35,7 @@ export * from './healthPlatformName';
 export * from './importedWeighInText';
 export * from './displayTargets';
 export * from './insightText';
+export * from './leanGainReviewText';
 export * from './loadNumber';
 export * from './loggingStreakText';
 export * from './mealKindLabel';

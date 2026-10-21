@@ -30,7 +30,7 @@ it('the evidence register covers safety and model tuning values', () => {
 
   // If a pattern stopped matching, the test would pass while checking
   // nothing: these are the numbers of values each file has today.
-  expect(safety).toHaveLength(4);
+  expect(safety).toHaveLength(6);
   expect(partition).toHaveLength(3);
   expect(trend).toHaveLength(8);
   expect(estimator).toHaveLength(9);
