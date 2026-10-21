@@ -22,7 +22,9 @@ beforeEach(async () => {
 
 /**
  * MM-190: the meal a new entry starts in follows the app's clock, not the
- * device's. Carried over from default_meal_follows_clock_test.dart.
+ * device's. Carried over from default_meal_follows_clock_test.dart. Since
+ * MM-438 the sheet is opened from a meal's "+", so the meal pressed is the
+ * clock's.
  */
 const hours: readonly (readonly [number, Meal])[] = [
   [8, 'breakfast'],
@@ -33,7 +35,7 @@ const hours: readonly (readonly [number, Meal])[] = [
 for (const [hour, meal] of hours) {
   it(`food added at ${hour}:00 starts in ${meal}`, async () => {
     renderApp(repos, today, { hour });
-    const sheet = await openAddFood();
+    const sheet = await openAddFood(meal);
     await enterManually(sheet);
     await typeIn(sheet, 'Food name', 'Eggs');
     await typeIn(sheet, 'Protein g', '12');
