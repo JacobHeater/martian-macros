@@ -18,6 +18,9 @@ import { Workout } from '../../src/domain/training/Workout';
 import { WorkoutExercise } from '../../src/domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../src/domain/training/WorkoutSet';
 import { DailyTargets } from '../../src/engine/DailyTargets';
+import { WeighInWindow } from '../../src/healthIngest/WeighInWindow';
+import type { WeighInWindowReader } from '../../src/healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../../src/healthIngest/WeighInWindowWriter';
 import type { TargetsHistoryRepository } from '../../src/engine/TargetsHistoryRepository';
 import { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
@@ -32,6 +35,7 @@ interface Erasable {
   targets: TargetsHistoryRepository;
   targetShapes: TargetShapeRepository;
   preferences: PreferencesRepository;
+  weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   workouts: WorkoutRepository;
   customExercises: CustomExerciseRepository;
 }
@@ -63,6 +67,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       );
       await r.preferences.saveThemePreference('dark');
       await r.preferences.savePrimaryScale('scale');
+      await r.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 14 * 60, endMinute: 22 * 60 }));
       await r.targets.saveTargets(
         new TargetsRecord({
           effectiveFrom: day,
@@ -103,6 +108,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');
       // MM-71: the scale chosen goes with the readings it was chosen from.
       expect(await first(r.preferences.watchPrimaryScale())).toBeUndefined();
+      // MM-441: and the weigh-in window is the usual one again.
+      expect((await first(r.weighInWindow.watchWeighInWindow())).equals(WeighInWindow.usual)).toBe(true);
       // MM-242: first use again, so the terms are asked again.
       expect(await first(r.preferences.watchTermsAcceptance())).toBeUndefined();
     });

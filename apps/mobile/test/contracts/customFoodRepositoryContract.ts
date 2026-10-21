@@ -129,6 +129,32 @@ export function customFoodRepositoryContract(
       expect(again.servingGrams).toBeUndefined();
     });
 
+    // MM-456: a line found in a pack keeps the pack food it came from; a typed line has none.
+    it("a recipe's found line keeps its pack food, and a typed line has none", async () => {
+      await repo.saveCustomFood(
+        new CustomFood({
+          id: 0,
+          name: 'Rice bowl',
+          kind: 'recipe',
+          servingDescription: '1 serving',
+          perServing: new NutritionTotals({ kcal: 400, proteinG: 8, carbsG: 80, fatG: 2 }),
+          servings: 2,
+          ingredients: [
+            {
+              name: 'White rice, raw',
+              grams: 200,
+              totals: new NutritionTotals({ kcal: 730, proteinG: 14, carbsG: 160, fatG: 1.4 }),
+              source: { packId: 'fixture', foodId: 3 },
+            },
+            { name: 'Butter', totals: new NutritionTotals({ kcal: 70, proteinG: 0, carbsG: 0, fatG: 8 }) },
+          ],
+        }),
+      );
+      const bowl = single(await first(repo.watchCustomFoods()));
+      expect(bowl.ingredients[0]?.source).toEqual({ packId: 'fixture', foodId: 3 });
+      expect(bowl.ingredients[1]?.source).toBeUndefined();
+    });
+
     it('delete removes a food; a missing id does nothing', async () => {
       const id = await repo.saveCustomFood(food('Bar'));
       await repo.deleteCustomFood(id + 100);

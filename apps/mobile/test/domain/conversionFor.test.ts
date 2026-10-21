@@ -38,7 +38,7 @@ describe('conversionFor', () => {
   it('a hand portion converts through the hand model, and only with a hand', () => {
     const palm = conversionFor('palm', per100g, { hand });
     expect(palm?.kind).toBe('handModel');
-    expect(palm?.gramsPerUnit).toBe(HandModel.gramsOf('palm', hand));
+    expect(palm?.gramsPerUnit).toBe(HandModel.gramsOf('palm', hand, { per100g: per100g.nutrition }));
     expect(conversionFor('palm', per100g)).toBeUndefined();
   });
 

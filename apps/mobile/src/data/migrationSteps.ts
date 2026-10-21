@@ -254,4 +254,27 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 18 to 19 (MM-441): the weigh-in window chosen in Settings, in minutes after midnight, within one day; none
+  // (04:00 to 12:00, MM-71) until chosen.
+  [
+    18,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN weigh_in_window_start_minute INTEGER NULL ' +
+          'CHECK (weigh_in_window_start_minute IS NULL OR weigh_in_window_start_minute BETWEEN 0 AND 1439)',
+      );
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN weigh_in_window_end_minute INTEGER NULL ' +
+          'CHECK (weigh_in_window_end_minute IS NULL OR weigh_in_window_end_minute BETWEEN 1 AND 1440)',
+      );
+    },
+  ],
+  // 19 to 20 (MM-456): the pack food a recipe's ingredient was found as, none for what is already there.
+  [
+    19,
+    async (db) => {
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_pack_id TEXT NULL');
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_food_id INTEGER NULL');
+    },
+  ],
 ]);

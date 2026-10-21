@@ -17,6 +17,13 @@ Choices I made without asking (say if any is wrong):
 - **Each imported weigh-in shows where it came from**, and the user can type a value for a day to overrule it.
 - **Menstruation data is requested only for female profiles.**
 - **Height from the platform is offered as a suggestion** if it differs from the profile; it never overwrites silently.
+- (2026-10-21, the builder) **Where the height is offered**: the newest height read, when it shows differently from the
+  profile's in the person's units, is said under the Height row of Settings' You section ("Health Connect says 5′ 9″",
+  built like the Date of birth row's subtitle, rule 9) and offered in the Height sheet with "Use 5′ 9″", which fills the
+  fields; only Save keeps it.
+- (2026-10-21, the builder) **Imported days of flow join the marked ones** wherever period days are used (the trend's
+  noise, the chart's shading, a weight jump's explanation, the missed-period question). The Period days card still marks
+  only what was marked in the app, since an imported day cannot be unmarked there.
 
 ## Description
 On Android, the user connects Health Connect and grants read access to any of: weight, body fat, lean mass, height, exercise sessions,
@@ -78,11 +85,18 @@ Built next (2026-10-11), on the rule of MM-71:
   cannot be read, what was kept is still used. Screens reload only when an import changed something.
 - The weigh-in card says where today's weigh-in came from and that typing overrules it.
 
+Built (2026-10-21), not run locally; CI validates:
+- **Menstruation feeds the trend's noise**: `mergeFlowDays` joins the platform's days of flow to the marked ones in the
+  app's `flowDays` (`test/state/mergeFlowDays.test.ts`, `test/state/importedFlowDays.test.ts`).
+- **The height suggestion** (`test/settings/heightFromHealthPlatform.test.tsx`, story `HeightFromHealthConnect`).
+
+Closed or another ticket's:
+- Keeping up to date in the background: never, by the owner's decision of 2026-10-21 (MM-72, MM-516 closed). Reading back
+  further than Health Connect's first month is MM-73; a re-read after an expired token keeps it (MM-498).
+- Sessions in the training log: MM-490 (importing a platform's workouts needs a stored platform id, a schema change).
+
 Not built:
-- Keeping up to date in the background (MM-72: Health Connect refuses reads off screen without a further permission). Reading
-  back further than Health Connect's first month is built in MM-73 (2026-10-21); a re-read after an expired token can drop
-  that history (MM-498).
-- The offer at the end of onboarding; the height suggestion; menstruation feeding the trend's noise; sessions in the training log.
+- The offer at the end of onboarding.
 - The permission screen itself was not seen: permissions were granted over adb.
 - Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent
   opens the app's main screen for now.
