@@ -160,7 +160,8 @@ export function xcodebuildArgs({
 const builtApp = (repoRoot: string, release: boolean, phone = false) =>
   `${repoRoot}/${iosProject}/build/Build/Products/${release ? 'Release' : 'Debug'}-${phone ? 'iphoneos' : 'iphonesimulator'}/App.app`;
 
-async function pairedPhones(): Promise<Phone[]> {
+/** The iPhones paired with this Mac, as devicectl lists them; throws when devicectl cannot be run. */
+export async function pairedPhones(): Promise<Phone[]> {
   const out = join(tmpdir(), `mm-devices-${process.pid}.json`);
   const listed = await capture(['xcrun', 'devicectl', 'list', 'devices', '--json-output', out]);
   if (listed.code !== 0) throw new Error('xcrun devicectl could not be run. It comes with Xcode 15 or newer; select it with xcode-select.');

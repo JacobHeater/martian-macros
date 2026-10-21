@@ -81,6 +81,7 @@ WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-190.
 
    MM-412 (2026-10-19, done): `mm run --ios --phone` builds signed, installs and opens the real app on the iPhone plugged in; the team from `MM_APPLE_TEAM` or the project's uncommitted line.
+8. **Screenshot the iPhone through the app (MM-536).** M4. Placed 2026-10-21. `mm screenshot --phone`: the dev or demo app snapshots its own web view when `devicectl` asks, and `devicectl` copies the PNG out; nothing installed beyond Xcode, never the real app.
 ## Done enough to unblock others
 MM-61 is done: a migration from version 1 to 2 exists, is tested against a
 populated version 1 database, and the schema-lane rules in the roadmap README
@@ -98,6 +99,7 @@ builds a separate read-only pack database with its own format.
   toolchain, workspace, requirements tracker); MM-60 (schema v1); MM-62 (erase all data).
 - Remaining: MM-61, MM-93, MM-7, MM-8. Epic: MM-1.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-190 (Six Food-screen tests passed or failed by the hour they ran, done); MM-166 (A roadmap progress page that opens from disk, done); MM-174 (A handoff document every agent keeps, so work can change hands, done); MM-197 (Panel validation accepts non-object schemas and rejects native paths, done); MM-198 (Portable, research-capable development expert panel, done); MM-199 (Malformed panel schema keywords crash validation, done); MM-200 (Panel completion accepts unexplained review omissions, done); MM-201 (Every panel role audits existing implementation, done); MM-205 (Expert mobile-experience panel for novice fitness users, done); MM-209 (Watch pull request checks in the background, without waiting for them, done); MM-210 (HTML UI/UX assets are kept and linked in the requirements folder, done); MM-211 (An HTML reference of every view and component, kept with the requirements, done); MM-212 (The panel can find a usability problem by inspection, and no finding is left without an outcome, done); MM-241 (the panel's implementation role is for the app as it is built, done); MM-243 (the developer tools send no telemetry, done); MM-245 (the roadmap is kept current, and checked); MM-175 (Run on a connected Android phone with one command); MM-177 (Repeatable synthetic data in an isolated demo app); MM-178 (Android demo identity script fails to compile, done); MM-182 (Demo identification has no painted themed background, done); MM-234 (`mm run --env phone` was lost in the task runner's port, done); MM-235 (the runner's Android commands need env vars the machine never set, done); MM-238 (screenshot a device from the runner, done).
+- Placed 2026-10-21 (step 8): MM-536 (screenshot the iPhone through the app).
 - Built 2026-10-19 (step 4): MM-8, the three identities `com.martianmacros`, `.dev` and `.demo` on both platforms (Android flavors, iOS build settings), the owner's decision on the Mac.
 
 ## Notes for whoever builds it
