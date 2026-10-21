@@ -6,7 +6,7 @@ import { failingRead } from './failingRead';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { Pause } from '../../domain/Pause';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { HealthRecheckScreen } from '../../app/HealthRecheckScreen';
 import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
 import { newInstallScenario } from './newInstallScenario';
@@ -23,7 +23,7 @@ const meta = { title: 'Screens/First run and gates', ...screensMeta } satisfies 
 export default meta;
 
 /** Presses a button of the screen, once it is there. */
-const press = (name: string) => async (canvas: HTMLElement) =>
+const press = (name: string | RegExp) => async (canvas: HTMLElement) =>
   userEvent.click(await within(canvas).findByRole('button', { name }));
 
 /**
@@ -116,7 +116,10 @@ export const BiologicalSexFilledFromHealth = screenStory({
   device: appleHealthProfile({ profile: fromAppleHealth }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
+    // The outcome is said and focused, since the row pressed went away (the panel review of MM-69).
+    const said = await within(canvas).findByText(/Filled in from Apple Health/);
+    await waitFor(() => expect(canvas.ownerDocument.activeElement).toBe(said.closest('[aria-live="polite"]')));
   },
 });
 
@@ -128,7 +131,7 @@ export const BiologicalSexNothingInHealth = screenStory({
   device: appleHealthProfile(),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
   },
 });
 
@@ -139,7 +142,7 @@ export const BiologicalSexHealthUnreadable = screenStory({
   device: appleHealthProfile({ unreadable: true }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
   },
 });
 
@@ -151,7 +154,7 @@ export const DateOfBirthFromHealth = screenStory({
   device: appleHealthProfile({ profile: fromAppleHealth }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
     await within(canvas).findByText(/Filled in from Apple Health/);
     await press('Next')(canvas);
   },
