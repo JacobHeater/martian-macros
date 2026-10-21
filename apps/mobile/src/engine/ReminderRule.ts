@@ -29,6 +29,12 @@ export const ReminderRule = {
   /** The waist counts as measured for this many days. */
   measurementEveryDays: 7,
 
+  /**
+   * The most reminders planned at once: iOS keeps only the soonest 64
+   * pending local notifications and drops the rest without a word (MM-405).
+   */
+  mostPending: 64,
+
   /** How far ahead reminders are planned. Long enough for seven weekly ones. */
   horizonDays: 49,
 
