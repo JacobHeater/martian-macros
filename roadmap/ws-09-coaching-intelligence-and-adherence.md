@@ -156,7 +156,7 @@ independent of step 3.
   a week unanswered and the onboarding offer; done, a quiet period the user can change needs a schema change), MM-248 (exact alarms when allowed, asked once
   with a reason from Settings, "On the minute" or "Within an hour"; checking on a phone is open), MM-116 (the five weekly questions, skipping, the
   eight-week lines on the Coach screen, the missed-period question from marked period days, and its reminder; done), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
-  break, a slower pace, or carry on; not the pace names, and not checked on a device), MM-33 (a report every 28 days: the
+  break, a slower pace by its name and cost, or carry on; done, not checked on a device), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
   and the month's personal records; photos MM-157), MM-450 (the body-fat range from the waist in the report, at the end
   of the month and when it began, as it stood then; no change with an eating-disorder history), MM-92 (the logging streak, forgiving one missed
