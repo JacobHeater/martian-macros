@@ -18,6 +18,8 @@ import { firstDayScenario } from './firstDayScenario';
 import { leanGainScenario } from './leanGainScenario';
 import { recompScenario } from './recompScenario';
 import { reliefScenario } from './reliefScenario';
+import { liftsFallingScenario } from './liftsFallingScenario';
+import { missedPeriodScenario } from './missedPeriodScenario';
 import { shortSleepScenario } from './shortSleepScenario';
 import { breakOfferScenario } from './breakOfferScenario';
 import { onBreakScenario } from './onBreakScenario';
@@ -98,6 +100,19 @@ export const RecoveryCheckIn = screenStory({
   covers: ['RecoveryCheckInScreen'],
   shows: 'This week',
   open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+});
+
+/** MM-116: a previously regular cycle with no period marked for 46 days: the check-in asks once, and "not sure" on a cut brings the notice. */
+export const RecoveryCheckInMissedPeriod = screenStory({
+  covers: ['RecoveryCheckInScreen'],
+  shows: 'No period marked for 46 days. Is that expected?',
+  scenario: missedPeriodScenario,
+  open: ({ navigator }) => void navigator.push(() => <RecoveryCheckInScreen />),
+  walk: async (canvas) => {
+    const button = await within(canvas).findByRole('button', { name: 'Not sure' }, { timeout: 5000 });
+    reveal(button);
+    await userEvent.click(button);
+  },
 });
 
 /** Two sliders under their labels, at the screen's inset (MM-240). */
@@ -331,6 +346,14 @@ export const CoachReliefOffer = screenStory({
   covers: ['CoachScreen'],
   shows: 'Two hard weeks in a row',
   scenario: reliefScenario,
+  open: onCoach,
+});
+
+/** MM-117: nine weeks into a cut, the squat and the row down over three weeks with no check-in answered: the offer for the lifts. */
+export const CoachReliefOfferLifts = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Your lifts are falling',
+  scenario: liftsFallingScenario,
   open: onCoach,
 });
 

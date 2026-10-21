@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   CalendarDate,
+  Exercise,
+  type ExerciseLoad,
   type GoalMode,
   IntakeDay,
   Pause,
@@ -8,23 +10,31 @@ import {
   RecoveryCheckIn,
   ScreeningAnswers,
   UserSetup,
+  Workout,
+  WorkoutExercise,
+  WorkoutSet,
 } from '../../src/domain';
 import {
   analyze,
   breakInForce,
+  buildStrengthTrends,
   canHoldReduction,
   type CoachSnapshot,
   consecutiveDeficitWeeks,
   DailyTargets,
+  fallingLifts,
   findReliefOffer,
   nextCheckIn,
   nextTargets,
   type SleepAverage,
   slowerPace,
+  type StrengthPoint,
+  StrengthTrend,
   TargetFlag,
   TargetsRecord,
 } from '../../src/engine';
 import { expectClose } from '../support/expectClose';
+import { squat } from './support/squat';
 import { upTo } from '../support/upTo';
 
 /** MM-117: an offer to ease a deficit when recovery is failing. */
@@ -373,5 +383,124 @@ describe('short sleep as a signal of its own', () => {
     expect(offer({ checkIns: [], sleepAverage: slept(330), user: setup({ answeredOn: today.addDays(-5) }) })).toBeUndefined();
     expect(offer({ checkIns: [], sleepAverage: slept(330), history: [record(21, 0)] })).toBeUndefined();
     expect(offer({ checkIns: [], sleepAverage: slept(330), user: setup({ goal: 'maintenance' }) })).toBeUndefined();
+  });
+});
+
+// MM-117: the strength trigger, from the training log's smoothed trends (MM-77).
+describe('falling lifts', () => {
+  /**
+   * A lift whose smoothed max sits at `fromKg` four and three weeks ago and
+   * falls evenly to `toKg` over `sessions` sessions in the last three weeks.
+   */
+  const lift = (
+    name: string,
+    toKg: number,
+    { fromKg = 100, sessions = 3, load = 'addedWeight', start = true }: { fromKg?: number; sessions?: number; load?: ExerciseLoad; start?: boolean } = {},
+  ): StrengthTrend => {
+    const days = [-28, -21].filter(() => start);
+    const recent = [-18, -14, -11, -7, -4, -1].slice(6 - sessions);
+    const points: StrengthPoint[] = [
+      ...days.map((d, i) => ({ workoutId: i + 1, date: today.addDays(d), estimateKg: fromKg, trendKg: fromKg })),
+      ...recent.map((d, i) => {
+        const kg = fromKg + ((toKg - fromKg) * (i + 1)) / recent.length;
+        return { workoutId: 10 + i, date: today.addDays(d), estimateKg: kg, trendKg: kg };
+      }),
+    ];
+    return new StrengthTrend({
+      exercise: new Exercise({ id: name, name, equipment: squat.equipment, primary: squat.primary, load }),
+      exerciseId: name,
+      points,
+      loggedSessions: points.length,
+      recentSessions: points.length,
+    });
+  };
+
+  const calm = [fine(8), fine(1)];
+  const falling = [lift('Back squat', 94), lift('Barbell row', 94)];
+  const withLifts = (strengthTrends: StrengthTrend[], extra: { user?: UserSetup; checkIns?: RecoveryCheckIn[]; history?: TargetsRecord[] } = {}) =>
+    findReliefOffer({
+      setup: extra.user ?? setup(),
+      checkIns: extra.checkIns ?? calm,
+      history: extra.history ?? [record(63)],
+      today,
+      strengthTrends,
+    });
+
+  it('on fat loss for nine weeks, squat and row each down 6% over three sessions make the offer and say the break', () => {
+    const found = withLifts(falling);
+    expect(found?.reason).toBe('recoverySignals');
+    expect(found?.signals).toEqual(['strengthFalling']);
+    expect(found?.deficitWeeks).toBe(9);
+    expect(found?.suggestion).toBe('break');
+    expect(found?.slowerPace, 'the slower pace is still offered').toBe(0.005);
+    expect(found?.fallingLifts.map((l) => l.name)).toEqual(['Back squat', 'Barbell row']);
+    expect(found?.fallingLifts[0]?.sessions).toBe(3);
+  });
+
+  it('early in the deficit, the slower pace', () => {
+    expect(withLifts(falling, { history: [record(21)] })?.suggestion).toBe('slowerPace');
+  });
+
+  it('one lift falling is not enough', () => {
+    expect(withLifts([lift('Back squat', 90), lift('Barbell row', 99)])).toBeUndefined();
+    expect(fallingLifts([lift('Back squat', 90), lift('Barbell row', 99)], today).map((l) => l.name)).toEqual(['Back squat']);
+  });
+
+  it('one lift down 8% in a single session is not a fall: the trend is smoothed', () => {
+    const session = (daysAgo: number, loadKg: number, id: number) => {
+      const startedAt = new Date(today.year, today.month - 1, today.day - daysAgo, 18);
+      return new Workout({
+        id,
+        date: today.addDays(-daysAgo),
+        startedAt,
+        endedAt: new Date(startedAt.getTime() + 50 * 60 * 1000),
+        exercises: [new WorkoutExercise({ exerciseId: squat.id, sets: [new WorkoutSet({ reps: 5, loadKg })] })],
+      });
+    };
+    const workouts = [session(28, 100, 1), session(21, 100, 2), session(14, 100, 3), session(7, 100, 4), session(1, 92, 5)];
+    const trends = buildStrengthTrends({ workouts, exercises: [squat], weights: [], today });
+    expect(fallingLifts(trends, today)).toEqual([]);
+    expect(withLifts([...trends, lift('Barbell row', 94)])).toBeUndefined();
+  });
+
+  it('less than 5% down is held', () => {
+    expect(withLifts([lift('Back squat', 96), lift('Barbell row', 96)])).toBeUndefined();
+    expect(withLifts([lift('Back squat', 95), lift('Barbell row', 95)])?.signals).toEqual(['strengthFalling']);
+  });
+
+  it('a lift trained fewer than three times in the three weeks, or with no session where they start, is not judged', () => {
+    expect(withLifts([lift('Back squat', 90, { sessions: 2 }), lift('Barbell row', 90)])).toBeUndefined();
+    expect(withLifts([lift('Back squat', 90, { start: false }), lift('Barbell row', 90)])).toBeUndefined();
+  });
+
+  it('bodyweight lifts are left out: their estimate carries the weight a cut takes off', () => {
+    expect(withLifts([lift('Pull-up', 90, { load: 'bodyweight' }), lift('Barbell row', 90)])).toBeUndefined();
+  });
+
+  it('is not made on lean gain or at maintenance', () => {
+    expect(withLifts(falling, { user: setup({ goal: 'leanGain' }) })).toBeUndefined();
+    expect(withLifts(falling, { history: [record(63), record(2, 0)] })).toBeUndefined();
+  });
+
+  it('named beside the hard check-ins when both hold', () => {
+    expect(withLifts(falling, { checkIns: [hard(8), hard(1)] })?.signals).toEqual(['hardCheckIns', 'strengthFalling']);
+  });
+
+  describe('the three weeks of quiet after an answer', () => {
+    const answered = setup({ answeredOn: today.addDays(-5) });
+
+    it('hold for falling lifts alone, and for hard check-ins alone', () => {
+      expect(withLifts(falling, { user: answered })).toBeUndefined();
+      expect(withLifts([], { user: answered, checkIns: [hard(8), hard(1)] })).toBeUndefined();
+    });
+
+    it('give way when both hold at once, on a hard check-in since the answer', () => {
+      const found = withLifts(falling, { user: answered, checkIns: [hard(8), hard(1)] });
+      expect(found?.signals).toEqual(['hardCheckIns', 'strengthFalling']);
+    });
+
+    it('do not give way on the same hard check-ins the answer was made after', () => {
+      expect(withLifts(falling, { user: setup({ answeredOn: today.addDays(-1) }), checkIns: [hard(8), hard(1)] })).toBeUndefined();
+    });
   });
 });
