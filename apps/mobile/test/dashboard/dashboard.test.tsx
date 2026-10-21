@@ -259,6 +259,9 @@ it('the weigh-in’s Save is the only primary action while it asks', async () =>
   await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
   await screen.findByRole('button', { name: 'Save weigh-in' });
+  // Save is enabled once a weight is typed; nothing else on the screen is primary.
+  await userEvent.type(screen.getByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
+  expect(screen.queryByRole('button', { name: 'Add food' })).not.toBeInTheDocument();
   expect(document.querySelectorAll('.mm-button-primary:not([disabled]), .mm-fab, .mm-button-lead')).toHaveLength(1);
 });
 
