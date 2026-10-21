@@ -42,6 +42,11 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, Heal
     return Promise.resolve(false);
   }
 
+  /** Nothing can be read, so nothing is shown from any moment: the latest one there is (MM-498). */
+  readableFrom(): Promise<Date | undefined> {
+    return Promise.resolve(new Date(8.64e15));
+  }
+
   read(): Promise<HealthSample[]> {
     return Promise.resolve([]);
   }

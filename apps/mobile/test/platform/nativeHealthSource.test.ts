@@ -12,7 +12,7 @@ import { healthPermissionsPlaceContract } from '../contracts/healthPermissionsPl
 import { healthSourceContract } from '../contracts/healthSourceContract';
 import { fakeMmHealth } from '../support/fakeMmHealth';
 
-/** The app's clock, as the adapter is given it (MM-498). */
+/** The app's clock, as the adapter is given it (MM-190, MM-498). */
 const clock = new FixedClock(CalendarDate.of(2026, 10, 21));
 
 const day = (n: number) => new Date(2026, 8, n, 7, 0).getTime();
@@ -163,4 +163,12 @@ it('a type never granted reads as nothing and keeps the token it was asked with'
   const source = new NativeHealthSource(fake.api, clock);
   expect(await source.read('steps', { from: new Date(2000, 0, 1), to: new Date(2100, 0, 1) })).toEqual([]);
   expect((await source.changesSince('steps', 'kept')).nextToken).toBe('kept');
+});
+
+it('without the history, what is shown starts thirty days before the app clock\'s now, and with it nothing limits it (MM-498)', async () => {
+  const fake = fakeMmHealth([...held], { grantsHistory: false });
+  const source = new NativeHealthSource(fake.api, clock);
+  expect(await source.readableFrom()).toEqual(new Date(new Date(2026, 9, 21, 12).getTime() - 30 * 24 * 60 * 60 * 1000));
+  const granted = new NativeHealthSource(fakeMmHealth([...held], { history: true }).api, clock);
+  expect(await granted.readableFrom()).toBeUndefined();
 });

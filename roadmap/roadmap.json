@@ -737,6 +737,12 @@
       "intent": "Everything else: remaining tickets in every workstream, in each workstream's own order.",
       "requires": [
         {
+          "workstream": "WS-01",
+          "tickets": [
+            "MM-536"
+          ]
+        },
+        {
           "workstream": "WS-02",
           "tickets": [
             "MM-35"
@@ -756,7 +762,8 @@
             "MM-486",
             "MM-124",
             "MM-129",
-            "MM-480"
+            "MM-480",
+            "MM-533"
           ]
         },
         {
@@ -1101,7 +1108,8 @@
           "MM-412"
         ],
         "remaining": [
-          "MM-1"
+          "MM-1",
+          "MM-536"
         ]
       },
       "sequence": [
@@ -1182,6 +1190,14 @@
             "MM-300"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 8,
+          "title": "Screenshot the iPhone through the app (MM-536): the dev app snapshots its own web view, devicectl asks for it and copies it out",
+          "milestone": "M4",
+          "tickets": [
+            "MM-536"
+          ]
         }
       ],
       "gate": {
@@ -1981,14 +1997,14 @@
           "MM-82",
           "MM-83",
           "MM-112",
+          "MM-113",
+          "MM-510",
           "MM-164",
           "MM-134",
           "MM-158"
         ],
         "remaining": [
-          "MM-80",
-          "MM-113",
-          "MM-510"
+          "MM-80"
         ]
       },
       "sequence": [
@@ -2100,13 +2116,14 @@
           "MM-128",
           "MM-130",
           "MM-129",
+          "MM-480",
+          "MM-533",
           "MM-486"
         ],
         "remaining": [
           "MM-119",
           "MM-122",
           "MM-124",
-          "MM-480",
           "MM-137"
         ]
       },
@@ -2176,7 +2193,8 @@
           "title": "Lean-gain guardrails",
           "tickets": [
             "MM-129",
-            "MM-480"
+            "MM-480",
+            "MM-533"
           ],
           "milestone": "M4"
         }
@@ -3058,6 +3076,7 @@
           "MM-71",
           "MM-72",
           "MM-188",
+          "MM-498",
           "MM-395",
           "MM-522",
           "MM-516"
@@ -3072,7 +3091,6 @@
           "MM-441",
           "MM-442",
           "MM-73",
-          "MM-498",
           "MM-314",
           "MM-323",
           "MM-523"

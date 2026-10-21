@@ -80,7 +80,7 @@ export async function openAppServices(): Promise<AppServices> {
   const healthWorkouts = native
     ? new NativeHealthWorkouts({ api: mmHealth, namesExercises: platform === 'android' })
     : new NoHealthWorkouts();
-  // One clock for the app and the adapters that need the time (MM-498).
+  // One clock for the app and the adapters that count time (MM-190).
   const clock = new SystemClock();
   return {
     clock,
