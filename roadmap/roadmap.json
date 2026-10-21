@@ -837,6 +837,8 @@
             "MM-195",
             "MM-79",
             "MM-189",
+            "MM-489",
+            "MM-490",
             "MM-191",
             "MM-196"
           ]
@@ -2885,6 +2887,8 @@
         "remaining": [
           "MM-74",
           "MM-189",
+          "MM-489",
+          "MM-490",
           "MM-191",
           "MM-447"
         ]
@@ -2938,7 +2942,9 @@
           "step": 6,
           "title": "Workouts that line up with the health platforms, with a fallback (needs WS-11 step 1 and the exercise spike)",
           "tickets": [
-            "MM-189"
+            "MM-189",
+            "MM-489",
+            "MM-490"
           ],
           "milestone": "M4"
         },
