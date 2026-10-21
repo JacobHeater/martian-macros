@@ -141,14 +141,15 @@ Rows: deurenbergBodyFat, relativeFatMass, BodyFatRule.waistFormulaSigmaPercent, 
 The Coach shows the phase you are in, how long it has run and, at your current
 pace, about when it ends. A cut ends once the lower end of your body-fat range
 reaches its goal, after sixteen weeks in a deficit, or when progress has
-stalled with the target already at the lowest the app sets; a lean gain once
-the upper end of the range reaches its line, or after twenty-six weeks. Then
+stalled with the target already at the lowest the app sets; a lean gain when
+the lean-gain guardrails say so (estimated body fat at its line, the waist up
+5%, or twenty-six weeks), so the two never disagree. Then
 the app recommends what comes next, with the reason: a hold at maintenance,
-then a lean gain if you are at the cut's goal or another cut if not. Body fat
-is read as a range, never as one figure, and nothing changes until you choose.
+then a lean gain if you are at the cut's goal or another cut if not. A cut reads
+body fat as a range, never as one figure, and nothing changes until you choose.
 The weeks and lines are the app's judgement.
 
-Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
+Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, LeanGainRule.stopWaistRiseFraction, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
 
 ### When does the app ask about my health?
 
@@ -247,7 +248,7 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `PhaseRule.lowGoalHoldWeeks` | 4 weeks | engine PhaseRule.ts | The time limit on a goal under the soft floor: once reached it is held at most this long, then a lean gain is recommended (MM-28, MM-36) | Product judgement; to be confirmed in MM-29 | judgement | None | No |
 | `PhaseRule.steadyPaceSigmas` | 2 standard deviations of the trend's slope | engine PhaseRule.ts | When the pace is steady enough to project the end of a phase from it (MM-36) | Product judgement, the two-deviation width the body-fat range is shown at | judgement | None | No |
 | `PhaseRule.cutGoalPercent` | 15% men, 23% women | engine PhaseRule.ts | The body fat a cut runs to when no goal is set (MM-36): the line under which the starting recommendation is a lean gain | Product judgement, the line of `recommendMode` (MM-12), informed by Barakat 2020 | judgement | None directly | No |
-| `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when the upper end reaches its line | engine planPhases.ts | Which end of the body-fat range each phase reads, so a plan never rests on one figure (MM-36, MM-34) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction for each phase | judgement | None | No |
+| `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when MM-129's review ends it | engine planPhases.ts | Which end of the body-fat range a cut reads, so a cut never rests on one figure (MM-36, MM-34); a gain's end is the lean-gain card's, so the two agree (MM-129) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction; ending a gain is not a safety rule (MM-132) | judgement | None | No |
 | `fatMassKcalPerKg` | 9,440 kcal per kg (39.5 MJ) | engine partitionConstants.ts | The energy in a kilogram of fat | Hall 2008, as cited | strong | Adults | No |
 | `fatFreeMassKcalPerKg` | 1,815 kcal per kg (7.6 MJ) | engine partitionConstants.ts | The energy in a kilogram of lean tissue | Hall 2008, as cited | moderate | Adults | No |
 | `forbesConstantKg` | 10.4 kg | engine partitionConstants.ts | How the lean share of a weight change falls as fat mass rises | Forbes, revised in Hall 2007, as cited | moderate | Adults across a range of body fat | No |

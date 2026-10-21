@@ -5,8 +5,10 @@ const values = [
   'longestCut',
   /** Progress has stalled with the target already at the calorie floor (MM-140). */
   'stalledAtFloor',
-  /** The upper end of the body-fat range has reached the lean gain's line. */
+  /** Estimated body fat has reached the lean gain's line (MM-129). */
   'gainLine',
+  /** The waist is up `LeanGainRule.stopWaistRiseFraction` since the gain began (MM-129). */
+  'gainWaist',
   /** The lean gain has run `LeanGainRule.stopWeeks` (MM-129). */
   'longestGain',
   /** Maintenance after a cut or a gain has run its weeks. */

@@ -713,17 +713,6 @@ export class AppState {
       });
     });
 
-    this.phasePlan = derived(() => {
-      const setup = of(this.setup);
-      const snapshot = this.coach.value;
-      const history = of(this.targetsHistory);
-      if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
-        return undefined;
-      }
-      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
-      return planPhases({ setup, snapshot, history, stall: this.stallAssessment.value, today: this.today.value });
-    });
-
     this.mealProtein = derived<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>(() => {
       const today = this.today.value;
       const byDay = new Map<CalendarDate, ReadonlyMap<Meal, number>>();
@@ -1154,6 +1143,25 @@ export class AppState {
         today: this.today.value,
         // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
         weightSignals: !setup.screening.eatingDisorderHistory,
+      });
+    });
+
+    this.phasePlan = derived(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
+        return undefined;
+      }
+      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
+      // When a lean gain ends is MM-129's to say, so the plan and the lean-gain card agree.
+      return planPhases({
+        setup,
+        snapshot,
+        history,
+        stall: this.stallAssessment.value,
+        leanGainStop: this.leanGainReview.value?.stop,
+        today: this.today.value,
       });
     });
 

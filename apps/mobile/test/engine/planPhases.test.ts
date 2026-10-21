@@ -13,6 +13,7 @@ import {
   BodyFatEstimate,
   DailyTargets,
   LeanGainRule,
+  type LeanGainStopReason,
   MaintenanceRule,
   PhaseRule,
   planPhases,
@@ -141,19 +142,33 @@ describe('the next phase', () => {
     expect(stalled(false)?.recommendation).toBeUndefined();
   });
 
-  it('a lean gain ends when the upper end of the range reaches its line, or at twenty-six weeks', () => {
+  it('a lean gain ends when MM-129’s review says so, for its body-fat line, its waist or its weeks, and not otherwise', () => {
     const setup = setupFor({ goal: 'leanGain' });
-    const gain = (percent: number, daysAgo: number) =>
-      planPhases({ setup, snapshot: snapshotFor(setup, { percent, kgPerWeek: 0.25 }), history: [record(daysAgo, 'leanGain')], today });
-    // 18 plus a quarter's deviations is 20.7: at the line.
-    expect(gain(18, 70)?.recommendation).toEqual({
+    const gain = (leanGainStop: LeanGainStopReason | undefined, percent = 15) =>
+      planPhases({
+        setup,
+        snapshot: snapshotFor(setup, { percent, kgPerWeek: 0.25 }),
+        history: [record(70, 'leanGain')],
+        leanGainStop,
+        today,
+      });
+    expect(gain('bodyFat')?.recommendation).toEqual({
       reason: 'gainLine',
       next: 'maintenance',
       nextWeeks: MaintenanceRule.minimumMaintenanceWeeks,
       then: 'fatLoss',
     });
-    expect(gain(15, 70)?.recommendation).toBeUndefined();
-    expect(gain(15, LeanGainRule.stopWeeks * 7)?.recommendation?.reason).toBe('longestGain');
+    expect(gain('waist')?.recommendation?.reason).toBe('gainWaist');
+    expect(gain('weeks')?.recommendation?.reason).toBe('longestGain');
+    // One owner of when: an estimate past the line that the review has not called is not an end here either.
+    expect(gain(undefined, 22)?.recommendation).toBeUndefined();
+  });
+
+  it('a gain’s end is said once on the Coach: the plan’s words give only what follows', () => {
+    const recommendation = { reason: 'gainWaist', next: 'maintenance', nextWeeks: 2, then: 'fatLoss' } as const;
+    const words = phaseRecommendationText(recommendation, 20);
+    expect(words).toBe('About 2 weeks at maintenance first. Nothing changes until you choose.');
+    expect(words).not.toMatch(/end|waist|body fat/i);
   });
 
   it('maintenance after a cut runs the weeks MM-130 suggests, then the range decides what follows', () => {
@@ -223,12 +238,13 @@ describe('a projected end', () => {
     expect(plan?.projectedEndOn).toEqual(today.addDays(PhaseRule.longestCutWeeks * 7 - 14));
   });
 
-  it('a gain ends at whichever comes first, the line at this pace or twenty-six weeks', () => {
+  it('a gain ends at whichever comes first, the estimate at its line at this pace or twenty-six weeks', () => {
     const setup = setupFor({ goal: 'leanGain' });
     const at = (kgPerWeek: number) =>
-      planPhases({ setup, snapshot: snapshotFor(setup, { percent: 15, kgPerWeek }), history: [record(70, 'leanGain')], today });
+      planPhases({ setup, snapshot: snapshotFor(setup, { percent: 18, kgPerWeek }), history: [record(70, 'leanGain')], today });
+    // 80 kg at 18%: about 4.2 kg to 20%, part of it lean (the partition); the line MM-129 reads, against the estimate.
     expect(at(0.25)).toMatchObject({ projectedEndReason: 'longestGain', projectedEndOn: today.addDays(LeanGainRule.stopWeeks * 7 - 70) });
-    expect(at(0.5)).toMatchObject({ projectedEndReason: 'gainLine', projectedEndOn: today.addDays(69) });
+    expect(at(0.5)).toMatchObject({ projectedEndReason: 'gainLine', projectedEndOn: today.addDays(59) });
   });
 });
 
