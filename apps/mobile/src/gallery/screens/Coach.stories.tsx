@@ -363,7 +363,7 @@ export const CoachLeanGainFatHeavy = screenStory({
 /** MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. */
 export const CoachLeanGainTimeToStop = screenStory({
   covers: ['CoachScreen'],
-  shows: /It is a good time to end the gain/,
+  shows: /The coach recommends ending the gain now/,
   scenario: leanGainScenario(),
   open: onCoach,
 });

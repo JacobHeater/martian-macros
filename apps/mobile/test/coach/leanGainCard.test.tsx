@@ -10,7 +10,6 @@ import { first } from '../support/first';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
-import { topLayer } from '../support/topLayer';
 
 /** MM-129: the lean-gain guardrails on the Coach screen. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -55,10 +54,10 @@ describe('the lean-gain card', () => {
     await openCoach();
 
     const shown = within(card() as HTMLElement);
-    expect(shown.getByText(/It is a good time to end the gain/)).toBeInTheDocument();
+    expect(shown.getByText(/The coach recommends ending the gain now/)).toBeInTheDocument();
     expect(shown.getByText(/Your goal stays as it is until you change it\./)).toBeInTheDocument();
     await userEvent.click(shown.getByRole('button', { name: 'Choose a goal' }));
-    expect(await within(topLayer()).findByRole('heading', { name: 'Choose a goal' })).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: 'Choose a goal' })).toBeInTheDocument();
     expect((await first(repos.setup.watchSetup()))?.goalMode).toBe('leanGain');
   });
 
