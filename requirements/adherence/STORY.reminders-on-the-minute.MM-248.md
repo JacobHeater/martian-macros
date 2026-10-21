@@ -17,9 +17,10 @@ it (MM-146 schedules them inexactly today).
 
 Choices made while building it (say if any is wrong):
 
-- **The question is the app's confirm dialog**, as Backup's "Restore this
-  backup?" is: title "Reminders on the minute", the one line of reason,
-  "Open phone settings" and "Not now". Android 12 and later have no
+- **The question is the app's two-answer dialog** (`overlays.choice`,
+  not the destructive confirm): title "Reminders on the minute", the one
+  line of reason, "Open phone settings" and "Not now"; closing it is "Not
+  now". Android 12 and later have no
   dialog for this permission, only a page in the phone's settings, so the
   dialog is the reason and the phone's page is the "system prompt".
 - **"Not now" is an answer**: it is not asked again.
