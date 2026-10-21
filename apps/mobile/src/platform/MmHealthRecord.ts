@@ -11,4 +11,8 @@ export interface MmHealthRecord {
   readonly endMs: number;
   readonly sourceId: string;
   readonly sourceName: string;
+  /** The device that took it, its maker and model as the platform names them, or '' (MM-502). */
+  readonly deviceId?: string;
+  /** Whether the person typed it in rather than a device measuring it (MM-502). */
+  readonly manual?: boolean;
 }

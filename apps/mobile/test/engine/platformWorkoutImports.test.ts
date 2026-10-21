@@ -97,3 +97,50 @@ it('a segment the library cannot place comes in as "Other exercise", with its ti
   expect(other?.sets[0]?.startedAt).toEqual(at(5));
   expect(other?.sets[0]?.endedAt).toEqual(at(7));
 });
+
+it('read again with the same instants, a workout whose day the user changed keeps that day (MM-490)', () => {
+  const logged = new Workout({
+    id: 4,
+    // The user moved it to the next day; its start and end are as the platform has them.
+    date: CalendarDate.fromDate(base).addDays(1),
+    startedAt: at(0),
+    endedAt: at(60),
+    exercises: [],
+    imported: { platformId: 'hc-1', sourceName: 'Watch' },
+  });
+  expect(platformWorkoutImports({ platform: [fromWatch('hc-1')], logged: [logged], deleted: new Set() })).toEqual([]);
+});
+
+it('the same session from another source, overlapping 80% or more, is not imported again (MM-490)', () => {
+  const fromPhone = { ...fromWatch('hc-9', [], { start: 5, end: 62 }), sourceId: 'com.example.gym', sourceName: 'Gym app' };
+  const imported = new Workout({
+    id: 4,
+    date: CalendarDate.fromDate(base),
+    startedAt: at(0),
+    endedAt: at(60),
+    exercises: [],
+    imported: { platformId: 'hc-1', sourceName: 'Watch' },
+  });
+  // 55 of the shorter 57 minutes overlap: one session.
+  expect(platformWorkoutImports({ platform: [fromPhone], logged: [imported], deleted: new Set() })).toEqual([]);
+  // In one read, the second of the two is left out.
+  expect(platformWorkoutImports({ platform: [fromWatch('hc-1'), fromPhone], logged: [], deleted: new Set() }).map((w) => w.imported?.platformId)).toEqual([
+    'hc-1',
+  ]);
+  // Overlapping less than 80% (30 of 60 minutes): two sessions.
+  const later = { ...fromPhone, start: at(30), end: at(90) };
+  expect(platformWorkoutImports({ platform: [later], logged: [imported], deleted: new Set() })).toHaveLength(1);
+});
+
+it('a session timed live in the app and also recorded by a watch is not imported again (MM-490)', () => {
+  const live = new Workout({ id: 7, date: CalendarDate.fromDate(base), startedAt: at(2), endedAt: at(58), exercises: [] });
+  expect(platformWorkoutImports({ platform: [fromWatch('hc-1')], logged: [live], deleted: new Set() })).toEqual([]);
+  // A workout in the app at another time does not stop it.
+  const earlier = new Workout({ id: 8, date: CalendarDate.fromDate(base), startedAt: at(-120), endedAt: at(-60), exercises: [] });
+  expect(platformWorkoutImports({ platform: [fromWatch('hc-1')], logged: [earlier], deleted: new Set() })).toHaveLength(1);
+});
+
+it('a walk or a run a watch detected is not imported: only strength sessions are (MM-490)', () => {
+  const walk = { ...fromWatch('hc-5'), strength: false };
+  expect(platformWorkoutImports({ platform: [walk], logged: [], deleted: new Set() })).toEqual([]);
+});

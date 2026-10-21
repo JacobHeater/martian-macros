@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
+import type { WorkoutSet } from '../domain/training/WorkoutSet';
 import type { WeightObservation } from '../domain/WeightObservation';
 import { compareStrings } from '../lang/compareStrings';
 import { estimatedOneRepMax } from './estimatedOneRepMax';
@@ -58,10 +59,12 @@ export function buildStrengthTrends({
         }
       }
       let best: number | undefined;
+      let bestSet: WorkoutSet | undefined;
       for (const set of sets) {
         const estimate = estimatedOneRepMax(set, { load: exercise.load, bodyweightKg });
         if (estimate !== undefined && (best === undefined || estimate > best)) {
           best = estimate;
+          bestSet = set;
         }
       }
       if (best === undefined) continue;
@@ -74,6 +77,7 @@ export function buildStrengthTrends({
         date: workout.date,
         estimateKg: best,
         trendKg: values.reduce((a, b) => a + b) / values.length,
+        bestSet,
       });
     }
     if (loggedSessions > 0) {

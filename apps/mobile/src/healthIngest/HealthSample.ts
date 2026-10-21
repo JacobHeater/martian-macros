@@ -24,7 +24,9 @@ export interface HealthSample {
   /**
    * The app or device that wrote it, as the platform identifies it, and
    * its name as shown to the user, or '' when the platform gives none
-   * (MM-395; `healthSourceName` reads it).
+   * (MM-395; `healthSourceName` reads it). A body-fat reading's id is its
+   * app and its scale joined, `app|device`, when the platform names the
+   * device (MM-502).
    */
   readonly sourceId: string;
   readonly sourceName: string;

@@ -153,7 +153,7 @@ export function buildMonthlyReport({
     const from = month[0];
     const to = month[month.length - 1];
     if (month.length >= 2 && from !== undefined && to !== undefined) {
-      lifts.push({ name: lift.name, sessions: month.length, fromKg: from.trendKg, toKg: to.trendKg });
+      lifts.push({ name: lift.name, sessions: month.length, fromKg: from.trendKg, toKg: to.trendKg, load: lift.exercise?.load });
     }
   }
   lifts.sort((a, b) => {

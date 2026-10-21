@@ -138,6 +138,12 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func ms(_ date: Date) -> Int { Int((date.timeIntervalSince1970 * 1000).rounded()) }
 
+    /// The device a sample names, its maker, model and name, or the source's product type; "" when there is none (MM-502).
+    private static func deviceOf(_ sample: HKSample) -> String {
+        let parts: [String?] = [sample.device?.manufacturer, sample.device?.model, sample.device?.name, sample.sourceRevision.productType]
+        return parts.compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
     /// A reading as the adapter receives it, its value in Health Connect's unit; nil for one the app does not import.
     private func raw(_ name: String, _ sample: HKSample) -> JSObject? {
         // What this app wrote is never read back as a reading (MM-70).
@@ -149,6 +155,9 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             "sourceName": sample.sourceRevision.source.name,
             "startMs": ms(sample.startDate),
             "endMs": ms(sample.endDate),
+            // The device that took it (MM-502): a body-fat reading's scale is its app and its device.
+            "deviceId": Self.deviceOf(sample),
+            "manual": (sample.metadata?[HKMetadataKeyWasUserEntered] as? Bool) ?? false,
         ]
         if let quantity = sample as? HKQuantitySample {
             switch name {
