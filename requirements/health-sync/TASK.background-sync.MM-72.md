@@ -12,6 +12,9 @@ The data that matters changes about once a day (a morning weigh-in). Polling for
 restrict background work, Android's limits varying by manufacturer.
 
 ## Decisions (made with the product owner)
+- **Superseded by the owner (2026-10-21): no background sync on either platform.** The WorkManager and background-delivery
+  decisions below are withdrawn; the app reads on opening and on coming back (built), and MM-516 is closed. Where missing data
+  weakens coaching, the app says so and the user decides (MM-523).
 - **Android**: Health Connect's changes API, run by WorkManager about once a day, plus a sync whenever the app is opened. When a change
   token has expired (after about thirty days unused), re-read the whole window and take a new token.
 - **iOS**: anchored queries with background delivery, on the system's schedule.
