@@ -144,14 +144,23 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         let context = LAContext()
         var problem: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &problem) else {
-            return call.resolve(["outcome": "noLock"])
+            // Only a phone with no passcode set has nothing to ask (MM-157). Any other reason the lock
+            // cannot be asked (biometry locked out, the system busy) keeps the photos shut.
+            return call.resolve(["outcome": MmBackupPlugin.noPasscode(problem) ? "noLock" : "refused"])
         }
         let asked = call.getString("reason") ?? ""
         let reason = asked.isEmpty ? "Unlock to see your progress photos." : asked
         // Face ID, Touch ID or the passcode, whichever the phone is locked with.
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { passed, _ in
-            call.resolve(["outcome": passed ? "unlocked" : "refused"])
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { passed, error in
+            if passed { return call.resolve(["outcome": "unlocked"]) }
+            call.resolve(["outcome": MmBackupPlugin.noPasscode(error) ? "noLock" : "refused"])
         }
+    }
+
+    /// Whether `error` says the phone has no passcode set: the one case in which there is no lock to ask.
+    private static func noPasscode(_ error: Error?) -> Bool {
+        guard let error = error as NSError? else { return false }
+        return error.domain == LAErrorDomain && error.code == LAError.Code.passcodeNotSet.rawValue
     }
 
     @objc func protectScreen(_ call: CAPPluginCall) {

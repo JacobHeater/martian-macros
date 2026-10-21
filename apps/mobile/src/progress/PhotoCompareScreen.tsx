@@ -12,10 +12,15 @@ import { MmButton } from '../ui/MmButton';
 import { MmSegmented } from '../ui/MmSegmented';
 import { useOverlays } from '../ui/useOverlays';
 import { ComparedPhoto } from './ComparedPhoto';
+import { PhotoLockGate } from './PhotoLockGate';
+import { usePhotoLock } from './usePhotoLock';
 import './progress.css';
 
 interface PhotoCompareScreenProps {
-  /** Whether a weight is said under each photo; off when the person has chosen not to see weights (MM-118). */
+  /**
+   * Whether a weight is said under each photo; off when the person has chosen not to see weights (MM-118). With an
+   * eating-disorder history no weight is said whatever this is (MM-11).
+   */
   showWeight?: boolean;
 }
 
@@ -23,7 +28,11 @@ interface PhotoCompareScreenProps {
  * Two days compared (MM-157): the same pose from each, side by side, the
  * earlier on the left, with its day, trend weight and waist under it. Any
  * two days can be chosen. No slider that morphs one into the other, no
- * score, and nothing to export: the person looks.
+ * score, and nothing to export: the person looks. With an eating-disorder
+ * history no weight is said under a photo, whatever the weight display is
+ * (MM-11, the panel's safety finding): a body beside a number is the
+ * comparison most likely to hurt. Behind the phone's lock with the other
+ * photo screens (`usePhotoLock`).
  */
 export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProps) {
   const { services, state } = useApp();
@@ -31,13 +40,17 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
   const photos = useLoaded(state.progressPhotos) ?? [];
   const waist = useLoaded(state.waist) ?? [];
   const trend = useCell(state.coach)?.trend ?? [];
-  const units = useLoaded(state.setup)?.unitSystem ?? 'imperial';
+  const setup = useLoaded(state.setup);
+  const units = setup?.unitSystem ?? 'imperial';
+  // Unknown until the setup is read, so no weight is said until then either.
+  const edHistory = setup?.screening.eatingDisorderHistory ?? true;
+  const { status, unlock } = usePhotoLock();
   // No weight under the photos when the weight display is Hidden (MM-118); the trend's is shown otherwise.
   const weightDisplay = useCell(state.weightDisplay);
   const [pose, setPose] = useState<PhotoPose>('front');
   const [chosen, setChosen] = useState<{ earlier?: CalendarDate | undefined; later?: CalendarDate | undefined }>({});
 
-  // Out of the app switcher and screenshots while the photos show.
+  // Out of the app switcher (and, on Android, screenshots) while the photos show.
   useEffect(() => services.privateScreen.hide(), [services]);
 
   const ofPose = photos.filter((photo) => photo.pose === pose);
@@ -50,11 +63,11 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
   const right = photoOn(later);
   const fmt = new Fmt(units, { weightDisplay });
   const lines = (date: CalendarDate) =>
-    comparedPhotoLines({ date, trend, waist, fmt, showWeight: showWeight && weightDisplay !== 'hidden' });
+    comparedPhotoLines({ date, trend, waist, fmt, showWeight: showWeight && weightDisplay !== 'hidden' && !edHistory });
 
   const choose = async (side: 'earlier' | 'later') => {
     const picked = await overlays.options<number>({
-      title: side === 'earlier' ? 'The day on the left' : 'The day on the right',
+      title: side === 'earlier' ? 'The earlier day' : 'The later day',
       options: days.map((day) => ({ value: day.epochDay, label: Fmt.longDate(day) })),
       selected: (side === 'earlier' ? earlier : later)?.epochDay,
     });
@@ -62,6 +75,8 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
     const day = days.find((d) => d.epochDay === picked.value);
     setChosen({ ...chosen, [side]: day });
   };
+
+  if (status !== 'open') return <PhotoLockGate title="Compare" status={status} onUnlock={unlock} />;
 
   return (
     <Screen title="Compare">
@@ -83,8 +98,8 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
             <ComparedPhoto photo={right} lines={lines(right.date)} />
           </div>
           <div className="app-row">
-            <MmButton label="Change left day" kind="text" onPress={() => void choose('earlier')} />
-            <MmButton label="Change right day" kind="text" onPress={() => void choose('later')} />
+            <MmButton label="Change earlier day" kind="text" onPress={() => void choose('earlier')} />
+            <MmButton label="Change later day" kind="text" onPress={() => void choose('later')} />
           </div>
         </>
       )}

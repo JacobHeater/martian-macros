@@ -45,7 +45,15 @@ export function BackupSection() {
       <PassphraseSheet purpose={purpose} error={error} onContinue={(typed) => close(typed)} onCancel={() => close()} />
     ));
 
+  // The photos are behind the phone's lock wherever they are shown (MM-157), so a backup that carries them, or a
+  // restore that replaces them, asks for it first; not passed, nothing is done. A phone with no lock set asks nothing.
+  const photosUnlocked = async (reason: string) => (await services.deviceLock.unlock(reason)) !== 'refused';
+
   const backUp = async () => {
+    if (photoSettings?.backUp === true && !(await photosUnlocked('Unlock to back up your progress photos.'))) {
+      overlays.snack('Your progress photos stayed locked, so no backup was made.');
+      return;
+    }
     const typed = await passphrase('set');
     if (typed === undefined) return;
     setBusy('backup');
@@ -93,13 +101,25 @@ export function BackupSection() {
         const here = await services.restorer.describeHere();
         const confirmed = await overlays.confirm({
           title: 'Restore this backup?',
-          message: restoreWords(contents, here, Fmt.longDate(CalendarDate.parse(header.createdOn))),
+          message: restoreWords(contents, here, Fmt.longDate(CalendarDate.parse(header.createdOn)), photos !== undefined),
           confirmLabel: 'Restore',
         });
         if (!confirmed) return;
+        if (photos !== undefined && !(await photosUnlocked('Unlock to replace your progress photos.'))) {
+          overlays.snack('Your progress photos stayed locked, so nothing was restored.');
+          return;
+        }
         await services.restorer.restoreFrom(snapshot);
         // A backup with photos brings them back (MM-157); one without leaves this phone's photos as they are.
-        if (photos !== undefined) await services.progressPhotos.restoreArchive(photos);
+        if (photos !== undefined) {
+          try {
+            await services.progressPhotos.restoreArchive(photos);
+          } catch {
+            // The records are already back; the photos are replaced in one step or not at all, so they are as they were.
+            overlays.snack('Your records were restored, but the backup’s photos could not be. This phone’s photos are as they were.');
+            return;
+          }
+        }
         overlays.snack('Restored. Everything is as it was on that backup.');
         return;
       } catch (problem) {

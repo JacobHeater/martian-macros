@@ -2151,6 +2151,11 @@
 /* MM-157: progress photos, kept on the phone and drawn whole in a portrait frame. */
 .mm-photo {
   display: block;
+  /* A photo is never offered to save, share or drag out by the web view (MM-157). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: contain;
@@ -2169,6 +2174,11 @@
 /* MM-157: the camera's picture, with the last photo of the pose laid over it faintly. */
 .mm-camera {
   position: relative;
+  /* Neither the picture nor the faint last photo is offered to save, share or drag out (MM-157). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
   width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
@@ -2184,7 +2194,21 @@
   height: 100%;
   object-fit: cover;
 }
+/* The self-timer's seconds (MM-157), large enough to read from a few steps away. */
+.mm-camera-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: var(--type-figure-xl);
+  color: var(--text);
+  pointer-events: none;
+}
 .mm-camera-overlay {
   opacity: 0.35;
   pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }

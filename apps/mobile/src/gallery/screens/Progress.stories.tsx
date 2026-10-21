@@ -566,7 +566,7 @@ export const ProgressPhotosNone = screenStory({
   open: openPhotos,
 });
 
-/** MM-157: two sets, newest first, each to delete; Take photos and Compare. */
+/** MM-157: two sets, newest first, a month to a section, each a dated row with its delete in the row's menu; Take photos and Compare. */
 export const ProgressPhotosSets = screenStory({
   covers: ['ProgressPhotosScreen'],
   shows: 'Compare two days',
@@ -583,7 +583,7 @@ export const ProgressPhotosLocked = screenStory({
   open: openPhotos,
 });
 
-/** MM-157: the camera on a first set: the checklist, and no earlier photo to line up with. */
+/** MM-157: the camera on a first set: the checklist open, the front camera, and no earlier photo to line up with. */
 export const PhotoCameraFirstTime = screenStory({
   covers: ['PhotoCameraScreen'],
   shows: 'Each time, the same way',
@@ -598,12 +598,26 @@ export const PhotoCameraOverlay = screenStory({
   open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
 });
 
-/** MM-157: no camera allowed: how to allow it. */
+/** MM-157: no camera allowed: how to allow it, and Try again; no shutter or camera switch that could do nothing. */
 export const PhotoCameraUnavailable = screenStory({
   covers: ['PhotoCameraScreen'],
   shows: 'The camera could not be opened',
   device: async (services) => ({ ...services, photoCamera: new FixturePhotoCamera({ available: false }) }),
   open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: the self-timer counting, its seconds large over the picture and said aloud, with the way to cancel it. */
+export const PhotoCameraTimer = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: /^Photo in \d+ seconds?\.$/,
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+  walk: async (canvas) => {
+    const body = within(canvas.ownerDocument.body);
+    await userEvent.click(await body.findByRole('button', { name: '10 s timer' }, { timeout: 5000 }));
+    await userEvent.click(await body.findByRole('button', { name: 'Take front photo' }, { timeout: 5000 }));
+    await body.findByRole('button', { name: 'Cancel timer' }, { timeout: 5000 });
+  },
 });
 
 /** MM-157: two days side by side, the same pose, with each day's trend weight and waist. */
