@@ -123,7 +123,7 @@ the trial is timed to end after the first monthly report.
    WS-07 step 7, and the report's body-fat range (MM-450) waits for it too.
    MM-450 done 2026-10-21: the range from the waist at each end of the month.
 - Also placed 2026-10-13 in earlier steps: step 3: MM-168.
-13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests.
+13. **Reminders on iOS (MM-405).** M4. The plugin over `UNUserNotificationCenter` in the iOS shell of MM-403: the plan is exactly what is pending, a prompt and nothing more, no boot receiver because iOS keeps pending requests. Done 2026-10-21; its phone checks are owed.
 
 ## Done enough to unblock others
 MM-149, MM-114 and MM-147 are done. That is the part a public release
