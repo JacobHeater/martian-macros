@@ -3,6 +3,7 @@ import type { ReportEstimate } from './ReportEstimate';
 import type { ReportEstimateGap } from './ReportEstimateGap';
 import type { ReportLift } from './ReportLift';
 import type { ReportPeriod } from './ReportPeriod';
+import type { ReportPersonalRecord } from './ReportPersonalRecord';
 import type { ReportTargetChange } from './ReportTargetChange';
 import type { WaistChange } from './WaistChange';
 
@@ -21,6 +22,8 @@ interface MonthlyReportInit {
   estimateGap?: ReportEstimateGap | undefined;
   workouts?: number;
   lifts?: readonly ReportLift[];
+  personalRecords?: readonly ReportPersonalRecord[];
+  longestRunDays?: number;
   recompReview?: RecompReview | undefined;
 }
 
@@ -38,6 +41,13 @@ export class MonthlyReport {
   readonly daysLogged: number;
   readonly completeDays: number;
   readonly weighIns: number;
+
+  /**
+   * The longest logging streak in the month (MM-92), by the Dashboard
+   * streak's rule: whole days in a row, one missed day a week forgiven,
+   * paused days skipped. How much was eaten plays no part.
+   */
+  readonly longestRunDays: number;
 
   /**
    * Change in trend weight across the month; undefined with fewer than four
@@ -79,6 +89,13 @@ export class MonthlyReport {
   readonly lifts: readonly ReportLift[];
 
   /**
+   * The personal records set in the month (MM-92), oldest first: a
+   * session that beat every earlier session of its lift, as the strength
+   * history stood at the end of the month.
+   */
+  readonly personalRecords: readonly ReportPersonalRecord[];
+
+  /**
    * The recomp review that fell due in the month, if one did (MM-133),
    * as it stood on the last day of the month it was shown.
    */
@@ -102,6 +119,8 @@ export class MonthlyReport {
     this.estimateGap = init.estimateGap;
     this.workouts = init.workouts ?? 0;
     this.lifts = init.lifts ?? [];
+    this.personalRecords = init.personalRecords ?? [];
+    this.longestRunDays = init.longestRunDays ?? 0;
     this.recompReview = init.recompReview;
   }
 }

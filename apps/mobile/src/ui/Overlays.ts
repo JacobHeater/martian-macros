@@ -54,8 +54,16 @@ export interface Overlays {
     everyMinute?: boolean;
   }): Promise<number | undefined>;
 
-  /** Asks for a time of day to the second. Gives milliseconds after midnight. */
-  clockTime(question: { title: string; initialMs: number }): Promise<number | undefined>;
+  /**
+   * Asks for a time of day to the second. Gives milliseconds after
+   * midnight. With `refuse`, a time it gives a reason for is refused with
+   * that reason while the dialog stays open on it (MM-222).
+   */
+  clockTime(question: {
+    title: string;
+    initialMs: number;
+    refuse?: ((timeMs: number) => string | undefined) | undefined;
+  }): Promise<number | undefined>;
 
   /**
    * Brings a panel up from the bottom of the screen. `content` draws it and

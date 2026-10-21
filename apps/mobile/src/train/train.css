@@ -59,6 +59,16 @@
   flex: 1;
   min-width: 0;
 }
+/* A set's controls say the set is already recorded (MM-222). */
+.train-set-recorded {
+  margin: 0;
+  color: var(--text2);
+}
+/* What "Add set" does, under it (MM-222). */
+.train-add-set-note {
+  margin: var(--space-4) 0 0;
+  color: var(--text2);
+}
 .train-rir-label {
   margin: var(--space-4) 0 0;
   color: var(--text2);

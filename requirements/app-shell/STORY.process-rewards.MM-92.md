@@ -1,6 +1,6 @@
 ---
 id: MM-92
-status: in-progress
+status: done
 component: app-shell
 related: [MM-89, MM-11, MM-32, MM-33, MM-77]
 ---
@@ -26,6 +26,11 @@ Choices I made without asking (say if any is wrong):
 - **Personal records are the loudest moment** in the app. They are real, they are earned, and they come from training.
 - **Rewards are quiet**: a line on the Today screen and a weekly summary, with no confetti and no notifications unless the user turns them
   on.
+- **In the monthly report** (2026-10-21): the month's longest logging run, by the Dashboard streak's own rule, and the personal
+  records set in the month. The records card is built like its sibling "Your lifts" in the same report (rows of lift and value),
+  with the day as the row's detail.
+- **The weekly summary does not repeat the streak.** The weekly check-in's summary is about what changed in the targets and why
+  (MM-138); the streak is already said every day on the Dashboard, and the report says the month's.
 
 ## Description
 A small set of counters and acknowledgements, shown on Today and in the weekly and monthly summaries (MM-33).
@@ -50,6 +55,11 @@ Scenario: Eating-disorder history
 
 Scenario: Never
   Then nothing in the app celebrates a lowest weight, a largest deficit, or consecutive days under target
+
+Scenario: The month's work in the monthly report
+  Given a month of whole days with one day missed, and a set that gave a new best e1RM on a lift
+  Then the month's report gives the longest logging run, forgiving the missed day, and lists the personal record with its day
+  And eating under the target in that month does not change the run
 ```
 
 ## Notes
@@ -75,15 +85,22 @@ Built:
   ("Back squat: estimated max 122.5 kg, up from 116.7 kg.") and as "1 personal record" on its line in the workout list. No
   confetti, no notification. Tests: `personal_records_test.dart` (engine and app).
 
+- **In the monthly report** (2026-10-21, MM-33): "Longest logging run: 27 whole days in a row" in "What you did", said from three
+  days like the Dashboard line, and a "Personal records" card with each record set in the month (the lift, its estimated
+  max "up from" the best before it, the day under it), oldest first, against every earlier session of the lift in the month
+  or before it. No card in a month without one. The run and the Dashboard streak share one walk (`streakEndingOn`); `longestLoggingRunOf` takes
+  the month's whole days as the report already counts them, and paused days are skipped. Gallery: Screens/Coach,
+  `MonthlyReportWithRecords`. Tests: `longestLoggingRun.test.ts` and `monthlyReport.test.ts` (engine),
+  `coach/monthlyReport.test.tsx` (app); `loggingStreak.test.ts` still guards the Dashboard streak over the shared walk.
+
 Not built:
 - **Protein days and weigh-ins as rewards**: the adherence card on the Coach screen already shows both as plain counts; no
   acknowledgement was added. A weigh-in count is left out of rewards altogether, as it can pull attention to the scale.
 - A reward for workouts as such: the monthly report counts them (MM-33) and nothing more is said.
-- A personal record is not announced at the moment the workout is finished, beyond its mark in the list the user lands on, and
-  is not in the weekly or monthly summary.
+- A personal record is not announced at the moment the workout is finished, beyond its mark in the list the user lands on.
 - For a bodyweight lift the estimate includes body weight, so a record there can come partly from a change on the scale. Nothing in
   the wording refers to weight, so it is shown to everyone, including people with a history of an eating disorder; say if it
   should not be.
-- **The weekly and monthly summaries** (MM-33) do not mention the streak yet.
+- **The weekly summary** does not mention the streak or records (see Decisions).
 - A streak is computed from the last 60 days of food, so it cannot read past 60.
 - Not checked on a device.
