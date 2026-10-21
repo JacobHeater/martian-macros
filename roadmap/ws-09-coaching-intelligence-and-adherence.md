@@ -154,7 +154,7 @@ independent of step 3.
   with a reason from Settings, "On the minute" or "Within an hour"; checking on a phone is open), MM-116 (the five weekly questions, skipping, and
   the eight-week lines on the Coach screen; not the missed-period question, which needs cycle logging), MM-117 (the
   offer after two hard check-ins: a maintenance week now, a slower pace, or carry on; the strength trigger waits for
-  the training log), MM-125 (the per-meal protein marker at Full detail and the one insight), MM-33 (a report every 28 days: the
+  the training log), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
   and the month's personal records; body fat is MM-450, photos MM-157), MM-92 (the logging streak, forgiving one missed
   day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).

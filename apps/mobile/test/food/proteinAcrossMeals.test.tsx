@@ -62,3 +62,12 @@ it('no meal ever shows a protein target', async () => {
   expect(headers).not.toBe('');
   for (const word of ['target', 'of ', '/', 'goal', 'min']) expect(headers, word).not.toContain(word);
 });
+
+it('for a heavy person the marker is per kg of reference weight', async () => {
+  // 130 kg at 180 cm: about 93 kg of reference weight, so the marker is at about 28 g.
+  await repos.weights.saveWeight(today, 130);
+  await repos.preferences.saveDetailLevel('full');
+  await openFood();
+  expect(await screen.findByText(/30 g protein/)).toBeInTheDocument();
+  expect(marker('Lunch')).not.toBeNull();
+});

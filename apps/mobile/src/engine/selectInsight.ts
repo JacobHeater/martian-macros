@@ -2,7 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { Insight } from './Insight';
 import type { InsightLogEntry } from './InsightLogEntry';
 import { InsightRationing } from './InsightRationing';
-import type { InsightRule } from './InsightRule';
+import { InsightRule } from './InsightRule';
 import type { InsightSelection } from './InsightSelection';
 
 /**
@@ -52,6 +52,9 @@ export function selectInsight({
     if (dismissed !== undefined && dismissed.daysUntil(today) < InsightRationing.quietDaysAfterDismissal) {
       continue;
     }
+    // A rule with its own spacing starts again only once that has passed (MM-126: fiber at most monthly).
+    const shownOn = latest.get(candidate.rule)?.shownOn;
+    if (shownOn !== undefined && shownOn.daysUntil(today) < InsightRule.quietDaysAfterShown(candidate.rule)) continue;
     return { insight: candidate, isNew: true };
   }
   return undefined;
