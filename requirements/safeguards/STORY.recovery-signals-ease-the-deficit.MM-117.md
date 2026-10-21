@@ -58,6 +58,12 @@ Scenario: Declined
   When the user chooses to carry on
   Then targets are unchanged and the offer does not return for three weeks
 
+Scenario: Both triggers inside the quiet
+  Given the user chose to carry on five days ago
+  When two lifts are falling and the last two check-ins were hard, the latest answered since then
+  Then the offer is made again
+  But either trigger alone, or the same check-ins as before the answer, keeps it quiet
+
 Scenario: Accepted as a break
   When the user takes the maintenance week
   Then targets go to maintenance at once and the unbroken-deficit count restarts afterwards
@@ -97,13 +103,27 @@ Built:
 - Thresholds are in `ReliefRule`. Schema version 23 stores the day a maintenance week was taken and the day the offer was last
   answered. Tests: `relief_offer_test.dart` (engine and app), the setup contract and the migration test.
 
+Built (2026-10-21, feat/mm-116-recovery-check-in):
+- **The strength trigger**, now that the training log and the strength trend exist (MM-75, MM-77): two or more lifts whose
+  smoothed estimated max is down 5% or more over the last 21 days, each trained on at least three distinct days in them, measured
+  from the latest session on or before the window opens and no more than a week before it (`fallingLifts`, thresholds in
+  `ReliefRule`). The smoothing is MM-77's, so one bad session is not a fall. Bodyweight lifts are left out: their estimate
+  carries body weight, which falls on a cut (as MM-377). It is a signal beside the check-ins (`ReliefSignal` `'strengthFalling'`)
+  with the same gates, choices and suggestion rule. The card names the lifts and says a planned lighter week does this too, "if
+  that is it, carry on"; alone it is titled "Your lifts are falling", with the hard weeks it is a sentence in their card.
+- **"Unless both triggers hold at once"**: inside the three weeks of quiet the offer returns only when the lifts are falling and
+  the last two check-ins were hard, the latest of them answered after the offer was, so the evidence the user already answered
+  cannot bring it straight back.
+- Tests: `reliefOffer.test.ts` ("falling lifts": the nine-week squat and row scenario, one lift, one bad session through
+  `buildStrengthTrends`, under 5%, too few sessions, no starting session, bodyweight, lean gain and maintenance, the quiet and both
+  triggers), `reliefOffer.test.tsx` (the card from logged workouts), `templates.test.ts` (the words, none asking for less food or
+  more exercise). Story: `CoachReliefOfferLifts` (Coach).
+
 Not built:
-- **The strength trigger**: it needs the training log and the strength trend (MM-75, MM-77). So "unless both triggers hold at once"
-  does not apply yet: the three weeks of quiet are unconditional.
 - It is a notice, not an entry in the insight catalog (MM-141), so it is not rationed with insights. It is a safety offer and should
   not be.
 - The pace names and what each costs (MM-128): the offer shows the percentage only.
-- Not checked on a device.
+- Not checked on a device, the strength trigger included.
 
 ## Note (2026-10-13, MM-249)
 "Short sleep adds a line, not a trigger" is superseded: MM-252 makes a fourteen-night average under six hours a recovery signal of its own in this rule, and the offer names the gentler pace. The sentence stays worded "appears to" until the panel pass MM-249 asks for.

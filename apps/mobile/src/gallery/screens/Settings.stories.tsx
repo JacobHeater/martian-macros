@@ -20,6 +20,7 @@ import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
+import { PrivacyPolicyScreen } from '../../terms/PrivacyPolicyScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
 import { onIos } from './onIos';
@@ -28,6 +29,7 @@ import { BackupFile } from '../../backup/BackupFile';
 import { SodiumBackupCipher } from '../../backup/SodiumBackupCipher';
 import { FakeBackupPlatform } from '../../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
+import { InMemoryExternalLinks } from '../../fixtures/InMemoryExternalLinks';
 import { SqlRepositories } from '../../data/SqlRepositories';
 import { WasmSqlDatabase } from '../../sql/wasm/WasmSqlDatabase';
 import { typicalSetup } from '../../fixtures/typicalSetup';
@@ -142,6 +144,21 @@ export const TermsOfUse = screenStory({
   covers: ['TermsScreen'],
   shows: 'Before you start',
   open: ({ navigator }) => void navigator.push(() => <TermsScreen />),
+});
+
+/** MM-95: the privacy policy, read from About beside the terms: the short account, then every section. */
+export const PrivacyPolicy = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: 'In short',
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
+});
+
+/** MM-95, MM-403: on an iPhone the policy names Apple Health and the reader that is part of iOS. */
+export const PrivacyPolicyOnIphone = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: '3. Apple Health',
+  device: onIos(),
+  open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
 });
 
 export const HowThisWorks = screenStory({
@@ -588,6 +605,34 @@ export const SettingsOpensTerms = screenStory({
   shows: 'Terms of use',
   open: settingsAt('about'),
   walk: pressAnywhere(/^Terms of use/),
+});
+
+export const SettingsOpensPrivacyPolicy = screenStory({
+  covers: ['SettingsScreen', 'PrivacyPolicyScreen'],
+  shows: 'Privacy policy',
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^Privacy policy/),
+});
+
+/** MM-454: the public page, opened in the phone's browser; the story's phone only keeps the address. */
+export const SettingsOpensThePublicPage = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /in your browser$/,
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^On the web/),
+});
+
+/** MM-454: a phone with no browser to open the page in; the snack gives the address to type. */
+export const SettingsPublicPageNoBrowser = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /^The browser could not be opened/,
+  device: async (services) => {
+    const externalLinks = new InMemoryExternalLinks();
+    externalLinks.noBrowser = true;
+    return { ...services, externalLinks };
+  },
+  open: settingsAt('about'),
+  walk: pressAnywhere(/^On the web/),
 });
 
 export const SettingsOpensHealthCheck = screenStory({

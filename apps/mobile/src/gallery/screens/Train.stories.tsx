@@ -333,7 +333,7 @@ export const WeeklyVolumeUnmapped = screenStory({
   open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
 });
 
-/** MM-321: a workout's start time pressed opens the clock to set it. */
+/** MM-321: a workout's start time pressed opens the clock to set it, to the second (MM-191). */
 export const WorkoutTimesSetsTheStart = screenStory({
   covers: ['WorkoutTimesScreen'],
   shows: 'OK',

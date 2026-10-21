@@ -99,6 +99,8 @@
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
     <uses-permission android:name="android.permission.health.READ_MENSTRUATION" />
     <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <!-- Reading further back than thirty days before the first grant (MM-73). -->
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY" />
     <!-- Sleep sessions, for the nightly record (MM-250). -->
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
 

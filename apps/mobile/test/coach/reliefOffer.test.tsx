@@ -4,6 +4,9 @@ import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { GoalMode } from '../../src/domain/GoalMode';
 import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
+import { Workout } from '../../src/domain/training/Workout';
+import { WorkoutExercise } from '../../src/domain/training/WorkoutExercise';
+import { WorkoutSet } from '../../src/domain/training/WorkoutSet';
 import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
@@ -118,6 +121,41 @@ it('it never suggests eating less or moving more', async () => {
   ]) {
     expect(all, phrase).not.toContain(phrase);
   }
+});
+
+/** A finished workout `daysAgo`, five reps of the squat and the row at `loadKg`. */
+function lifted(daysAgo: number, loadKg: number): Workout {
+  const date = today.addDays(-daysAgo);
+  const startedAt = new Date(date.year, date.month - 1, date.day, 18);
+  return new Workout({
+    id: 0,
+    date,
+    startedAt,
+    endedAt: new Date(startedAt.getTime() + 50 * 60 * 1000),
+    exercises: ['back-squat', 'barbell-row'].map(
+      (exerciseId) => new WorkoutExercise({ exerciseId, sets: [new WorkoutSet({ reps: 5, loadKg })] }),
+    ),
+  });
+}
+
+/** MM-117: the strength trigger, with no check-in answered. */
+it('two lifts falling over three weeks on a cut bring the offer, and say a lighter week is a reason to carry on', async () => {
+  await seed({ hardWeeks: 0 });
+  for (const [daysAgo, kg] of [
+    [28, 100],
+    [21, 100],
+    [14, 96],
+    [7, 92],
+    [1, 88],
+  ] as const) {
+    await repos.workouts.saveWorkout(lifted(daysAgo, kg));
+  }
+  await open();
+  const card = screen.getByText('Your lifts are falling').closest('.mm-notice');
+  expect(card).toHaveTextContent('back squat and barbell row');
+  expect(card).toHaveTextContent('if that is it, carry on');
+  expect(screen.getByRole('button', { name: 'Slow to 0.5% a week' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
 });
 
 it('one hard week brings nothing', async () => {
