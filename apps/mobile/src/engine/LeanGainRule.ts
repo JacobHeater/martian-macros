@@ -45,4 +45,7 @@ export const LeanGainRule = {
   /** A lift is judged with this many sessions in the stretch, the latest in the last `strengthRecentDays`. */
   strengthMinSessions: 4,
   strengthRecentDays: 14,
+
+  /** The slower gain the user may choose (MM-480): this share of the pace training status sets. */
+  slowerPaceFactor: 0.5,
 } as const;

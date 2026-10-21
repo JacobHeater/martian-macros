@@ -18,6 +18,7 @@ import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
 import { weekShapeScenario } from './weekShapeScenario';
 import { weightJumpScenario } from './weightJumpScenario';
+import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 
 /**
  * The dashboard: where the app opens. Before MM-254 (main at 9fb8c79,
@@ -380,4 +381,11 @@ export const WeighInOvershoot = screenStory({
   covers: ['DashboardScreen'],
   shows: /against a [\d,]+ kcal target\./,
   scenario: weightJumpScenario({ yesterdaysKcal: 5100 }),
+});
+
+/** MM-113, MM-510: on a weight-loss medication the hero leads with protein, and calories are logged so far against the aim. */
+export const DashboardOnWeightLossMedication = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /^so far, aiming for about 2,100 kcal/,
+  scenario: weightLossMedicationScenario(),
 });

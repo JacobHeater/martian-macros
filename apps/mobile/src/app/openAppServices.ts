@@ -81,6 +81,7 @@ export async function openAppServices(): Promise<AppServices> {
   const healthWorkouts = native
     ? new NativeHealthWorkouts({ api: mmHealth, namesExercises: platform === 'android' })
     : new NoHealthWorkouts();
+  // One clock for the app and the adapters that count time (MM-190).
   const clock = new SystemClock();
   return {
     clock,
@@ -148,7 +149,7 @@ export async function openAppServices(): Promise<AppServices> {
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),
     exactAlarms: native ? new NativeExactAlarms(mmReminders) : new NoExactAlarmPermission(),
-    healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
+    healthSource: native ? new NativeHealthSource(mmHealth, clock) : new NoHealthPlatform(),
     healthWriting,
     healthWorkouts,
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),

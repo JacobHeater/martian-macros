@@ -1,4 +1,6 @@
 import { expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
+import { FixedClock } from '../../src/fixtures/FixedClock';
 import { NativeHealthSource } from '../../src/platform/NativeHealthSource';
 import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
 import { NoHealthPlatform } from '../../src/platform/NoHealthPlatform';
@@ -7,6 +9,8 @@ import { healthDailyStepsContract } from '../contracts/healthDailyStepsContract'
 import { healthHistoryAccessContract } from '../contracts/healthHistoryAccessContract';
 import { healthSourceContract } from '../contracts/healthSourceContract';
 import { fakeMmHealth } from '../support/fakeMmHealth';
+
+const clock = new FixedClock(CalendarDate.of(2026, 10, 21));
 
 const day = (n: number) => new Date(2026, 8, n, 7, 0).getTime();
 
@@ -17,25 +21,25 @@ const held: MmHealthRecord[] = [
 ];
 
 // MM-68: the adapter the phone uses, with the plugin stood in for.
-healthSourceContract('Health Connect (bridge stood in for)', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+healthSourceContract('Health Connect (bridge stood in for)', async () => new NativeHealthSource(fakeMmHealth([...held]).api, clock));
 
 // MM-73: the history permission, through the plugin and where there is none.
-healthHistoryAccessContract('Health Connect, history granted when asked', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+healthHistoryAccessContract('Health Connect, history granted when asked', async () => new NativeHealthSource(fakeMmHealth([...held]).api, clock));
 healthHistoryAccessContract(
   'Health Connect, history refused',
-  async () => new NativeHealthSource(fakeMmHealth([...held], { grantsHistory: false }).api),
+  async () => new NativeHealthSource(fakeMmHealth([...held], { grantsHistory: false }).api, clock),
 );
 healthHistoryAccessContract(
   'Health Connect, history granted already',
-  async () => new NativeHealthSource(fakeMmHealth([...held], { history: true }).api),
+  async () => new NativeHealthSource(fakeMmHealth([...held], { history: true }).api, clock),
 );
 healthHistoryAccessContract('no health platform', async () => new NoHealthPlatform());
 
 // MM-442: a day's steps as the platform totals them, through the plugin and where there is none.
-healthDailyStepsContract('Health Connect (bridge stood in for)', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+healthDailyStepsContract('Health Connect (bridge stood in for)', async () => new NativeHealthSource(fakeMmHealth([...held]).api, clock));
 healthDailyStepsContract(
   'Health Connect, steps not permitted',
-  async () => new NativeHealthSource(fakeMmHealth([...held], { permitted: ['weight'] }).api),
+  async () => new NativeHealthSource(fakeMmHealth([...held], { permitted: ['weight'] }).api, clock),
 );
 healthDailyStepsContract('no health platform', async () => new NoHealthPlatform());
 
@@ -52,7 +56,7 @@ it("two devices counted the same walk: the day has the platform's total, not the
   const fake = fakeMmHealth([walk('p', 'phone'), walk('w', 'watch')], {
     stepDays: [{ startMs: new Date(2026, 8, 2).getTime(), steps: 5000 }],
   });
-  const source = new NativeHealthSource(fake.api);
+  const source = new NativeHealthSource(fake.api, clock);
   const days = await source.dailySteps({ from: new Date(2026, 8, 1, 15, 0), to: new Date(2026, 8, 3, 9, 0) });
   expect(days).toEqual([{ day: new Date(2026, 8, 2), steps: 5000 }]);
   // Asked from the local midnight of the first day up to that of the last.
@@ -67,23 +71,23 @@ it("the platform's days are kept to the range, each once, whole, and none withou
       { startMs: new Date(2026, 8, 9).getTime(), steps: 900 },
     ],
   });
-  const days = await new NativeHealthSource(fake.api).dailySteps({ from: new Date(2026, 8, 1), to: new Date(2026, 8, 8) });
+  const days = await new NativeHealthSource(fake.api, clock).dailySteps({ from: new Date(2026, 8, 1), to: new Date(2026, 8, 8) });
   expect(days).toEqual([{ day: new Date(2026, 8, 3), steps: 4322 }]);
 });
 
 it('steps not permitted are not asked for; a refused read is a failure (MM-442)', async () => {
   const range = { from: new Date(2026, 8, 1), to: new Date(2026, 8, 8) };
   const unpermitted = fakeMmHealth([...held], { permitted: ['weight'] });
-  expect(await new NativeHealthSource(unpermitted.api).dailySteps(range)).toEqual([]);
+  expect(await new NativeHealthSource(unpermitted.api, clock).dailySteps(range)).toEqual([]);
   expect(unpermitted.dailyStepsAsked()).toEqual([]);
   const fake = fakeMmHealth([...held]);
-  const refusing = new NativeHealthSource({ ...fake.api, dailySteps: () => Promise.reject(new Error('refused')) });
+  const refusing = new NativeHealthSource({ ...fake.api, dailySteps: () => Promise.reject(new Error('refused')) }, clock);
   await expect(refusing.dailySteps(range)).rejects.toBeInstanceOf(HealthReadFailure);
 });
 
 it('the history is asked for through the plugin, which shows the question once (MM-73)', async () => {
   const fake = fakeMmHealth([...held], { grantsHistory: false });
-  const source = new NativeHealthSource(fake.api);
+  const source = new NativeHealthSource(fake.api, clock);
   expect(await source.historyPermitted()).toBe(false);
   expect(await source.requestHistory()).toBe(false);
   expect(await source.requestHistory()).toBe(false);
@@ -92,7 +96,7 @@ it('the history is asked for through the plugin, which shows the question once (
 
 it('a phone without Health Connect has no history to ask for (MM-73)', async () => {
   const fake = fakeMmHealth([...held], { history: true });
-  const source = new NativeHealthSource({ ...fake.api, status: async () => ({ status: 'unavailable' }) });
+  const source = new NativeHealthSource({ ...fake.api, status: async () => ({ status: 'unavailable' }) }, clock);
   expect(await source.historyPermitted()).toBe(false);
   expect(await source.requestHistory()).toBe(false);
   expect(fake.historyAsked()).toBe(0);
@@ -100,7 +104,7 @@ it('a phone without Health Connect has no history to ask for (MM-73)', async () 
 
 it('a change after the token is told, and a deletion is told as one', async () => {
   const fake = fakeMmHealth([...held]);
-  const source = new NativeHealthSource(fake.api);
+  const source = new NativeHealthSource(fake.api, clock);
   const first = await source.changesSince('weight', undefined);
   expect(first.upserted.map((s) => s.platformId)).toEqual(['w1', 'w2']);
   fake.change({ record: { id: 'w3', type: 'weight', value: 81.8, startMs: day(3), endMs: day(3), sourceId: 'scale', sourceName: 'Scale' } });
@@ -113,7 +117,15 @@ it('a change after the token is told, and a deletion is told as one', async () =
 
 it('a type never granted reads as nothing and keeps the token it was asked with', async () => {
   const fake = fakeMmHealth([...held], { permitted: ['weight'] });
-  const source = new NativeHealthSource(fake.api);
+  const source = new NativeHealthSource(fake.api, clock);
   expect(await source.read('steps', { from: new Date(2000, 0, 1), to: new Date(2100, 0, 1) })).toEqual([]);
   expect((await source.changesSince('steps', 'kept')).nextToken).toBe('kept');
+});
+
+it('without the history, what is shown starts thirty days before the app clock\'s now, and with it nothing limits it (MM-498)', async () => {
+  const fake = fakeMmHealth([...held], { grantsHistory: false });
+  const source = new NativeHealthSource(fake.api, clock);
+  expect(await source.readableFrom()).toEqual(new Date(new Date(2026, 9, 21, 12).getTime() - 30 * 24 * 60 * 60 * 1000));
+  const granted = new NativeHealthSource(fakeMmHealth([...held], { history: true }).api, clock);
+  expect(await granted.readableFrom()).toBeUndefined();
 });

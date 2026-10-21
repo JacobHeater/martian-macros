@@ -1,3 +1,4 @@
+import type { Clock } from '../domain/integration/Clock';
 import { HealthChanges } from '../healthIngest/HealthChanges';
 import type { DaySteps } from '../healthIngest/DaySteps';
 import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
@@ -29,10 +30,17 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  * (MM-442), never by adding up its readings.
  */
 export class NativeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps {
+  /** How far back Health Connect reads without the history permission (MM-498). */
+  static readonly windowDays = 30;
+
   private readonly api: MmHealthApi;
 
-  constructor(api: MmHealthApi) {
+  /** The app's clock (MM-190): the window is counted back from its now. */
+  private readonly clock: Pick<Clock, 'now'>;
+
+  constructor(api: MmHealthApi, clock: Pick<Clock, 'now'>) {
     this.api = api;
+    this.clock = clock;
   }
 
   private async asked<T>(what: string, step: () => Promise<T>): Promise<T> {
@@ -72,6 +80,18 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess, He
     if ((await this.available()).size === 0) return false;
     const { granted } = await this.api.requestHistory();
     return granted;
+  }
+
+  /**
+   * Without the history permission Health Connect shows the thirty days
+   * before the first permission was granted (MM-498). The plugin does not
+   * say when that was, so this answers thirty days before the app's now: never
+   * earlier than the real window, which keeps a re-read from removing
+   * history it cannot see.
+   */
+  async readableFrom(): Promise<Date | undefined> {
+    if (await this.historyPermitted()) return undefined;
+    return new Date(this.clock.now().getTime() - NativeHealthSource.windowDays * 24 * 60 * 60 * 1000);
   }
 
   async read(type: HealthDataType, range: { from: Date; to: Date }): Promise<HealthSample[]> {

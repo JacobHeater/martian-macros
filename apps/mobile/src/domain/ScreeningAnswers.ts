@@ -1,3 +1,5 @@
+import type { WeightLossMedicationAnswer } from './WeightLossMedicationAnswer';
+
 const names = [
   'pregnant',
   'breastfeeding',
@@ -13,12 +15,13 @@ const names = [
   'weightAffectingMedication',
   'fluidLimitedByClinician',
   'sleepDisorder',
+  'weightLossMedication',
 ] as const;
 
 type ScreeningAnswersInit = { [name in (typeof names)[number]]?: boolean };
 
 /** Answers to the onboarding health screen. Every one is "no" unless given. */
-export class ScreeningAnswers {
+export class ScreeningAnswers implements WeightLossMedicationAnswer {
   readonly pregnant: boolean;
   readonly breastfeeding: boolean;
   readonly eatingDisorderHistory: boolean;
@@ -45,6 +48,13 @@ export class ScreeningAnswers {
    */
   readonly sleepDisorder: boolean;
 
+  /**
+   * "I take a prescription weight-loss medication" (MM-113, MM-510). Not
+   * blocking. Kept apart from `weightAffectingMedication`, which also covers
+   * drugs that are not for weight loss, and never read in its place.
+   */
+  readonly weightLossMedication: boolean;
+
   constructor(init: ScreeningAnswersInit = {}) {
     this.pregnant = init.pregnant ?? false;
     this.breastfeeding = init.breastfeeding ?? false;
@@ -60,6 +70,7 @@ export class ScreeningAnswers {
     this.weightAffectingMedication = init.weightAffectingMedication ?? false;
     this.fluidLimitedByClinician = init.fluidLimitedByClinician ?? false;
     this.sleepDisorder = init.sleepDisorder ?? false;
+    this.weightLossMedication = init.weightLossMedication ?? false;
   }
 
   /** Whether every answer is the same as in `other`. */

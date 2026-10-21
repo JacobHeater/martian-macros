@@ -26,6 +26,7 @@ import type { StoryStage } from './StoryStage';
 import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
 import { waitingRead } from './waitingRead';
+import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 
 /**
  * The food log, and every step of adding to it. Before MM-255 (main at
@@ -1294,5 +1295,31 @@ export const FoodCopyYesterday = screenStory({
       new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'breakfast', name: 'Oatmeal', kcal: 300, proteinG: 10, carbsG: 54, fatG: 6, source: 'weighed' }),
     );
   },
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+// ---- MM-510: the calorie card on a weight-loss medication (MM-113) ----
+
+/** MM-113: protein first, above the calories, and the target a level to reach: what is logged so far and the aim. */
+export const FoodOnWeightLossMedication = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^so far, aiming for about 2,100 kcal/,
+  scenario: weightLossMedicationScenario(),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-113: over the target on the medication: the usual "over" words. */
+export const FoodOverOnWeightLossMedication = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^kcal over 2,100/,
+  scenario: weightLossMedicationScenario({ todayKcal: 2600 }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-113: the same day with the answer not ticked: what is left, and protein in its usual place. */
+export const FoodNotOnWeightLossMedication = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^kcal left of 2,100/,
+  scenario: weightLossMedicationScenario({ ticked: false }),
   open: ({ state }) => state.homeTab.put('food'),
 });

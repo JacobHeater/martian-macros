@@ -53,6 +53,14 @@ it('a typical week states each fact: a figure, and what it is measured against u
   ]);
 });
 
+// MM-113, MM-510: on a weight-loss medication the protein-minimum days are the first line; otherwise the last.
+it('on a weight-loss medication, the protein-minimum days lead the week', () => {
+  const lines = adherenceLines(summary(), { floorKcal: 1500, weightLossMedication: true });
+  expect(lines[0]).toEqual({ label: 'Protein minimum met', value: '4 of 5 days' });
+  expect(lines.map((line) => line.label)).toEqual(['Protein minimum met', 'Days logged', 'Weigh-ins', 'Average intake']);
+  expect(adherenceLines(summary(), { floorKcal: 1500 }).at(-1)?.label).toBe('Protein minimum met');
+});
+
 it('over and under read the same apart from the direction', () => {
   expect(intakeLine(summary({ intake: 2350, standing: 'above' }))).toEqual({ label: 'Average intake', value: '2,350 kcal', detail: 'against a 2,100 kcal target: 250 over' });
   expect(intakeLine(summary({ intake: 1850, standing: 'below' }))).toEqual({ label: 'Average intake', value: '1,850 kcal', detail: 'against a 2,100 kcal target: 250 under' });

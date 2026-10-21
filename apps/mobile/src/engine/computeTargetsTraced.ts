@@ -5,6 +5,7 @@ import { DailyTargets } from './DailyTargets';
 import { DietBreakRule } from './DietBreakRule';
 import { energyDensityKcalPerKg } from './energyDensityKcalPerKg';
 import { leanFractionOfChange } from './leanFractionOfChange';
+import { LeanGainRule } from './LeanGainRule';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
 import { PaceRule } from './PaceRule';
 import { SafetyBounds } from './SafetyBounds';
@@ -169,15 +170,18 @@ function weeklyRate(mode: GoalMode, i: TargetInputs, safetyBf: number): number {
       );
     case 'recomp':
       return highBodyFat ? -0.0025 : -0.001;
-    case 'leanGain':
+    case 'leanGain': {
+      // The pace training status sets (MM-25), or the slower one chosen (MM-480): never faster.
+      const factor = i.leanGainPace === 'slower' ? LeanGainRule.slowerPaceFactor : 1;
       switch (i.trainingStatus) {
         case 'untrained':
         case 'novice':
         case 'returning':
-          return 0.0035;
+          return 0.0035 * factor;
         default:
-          return i.policy.elevatedMuscleGainPrior ? 0.0025 : 0.0015;
+          return (i.policy.elevatedMuscleGainPrior ? 0.0025 : 0.0015) * factor;
       }
+    }
     case 'maintenance':
       // A correction back toward the maintenance anchor (MM-130), else held.
       return i.correctionRateFraction ?? 0;
