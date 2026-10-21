@@ -48,6 +48,8 @@ export * from './food/fiber/FiberDay';
 export * from './food/fiber/fiberGuideG';
 export * from './food/hand/HandModel';
 export * from './food/hand/HandSize';
+export * from './food/hand/compositionDensity';
+export * from './food/hand/handUnitsFor';
 export * from './food/label/LabelReading';
 export * from './food/label/parseNutritionLabel';
 export * from './food/normalizeBarcode';
