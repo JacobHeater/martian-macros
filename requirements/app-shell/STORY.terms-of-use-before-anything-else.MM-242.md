@@ -2,7 +2,7 @@
 id: MM-242
 component: app-shell
 status: in-progress
-related: [MM-11, MM-13, MM-29, MM-57, MM-62, MM-94, MM-95, MM-96, MM-110, MM-112, MM-114, MM-147, MM-165, MM-184, MM-244]
+related: [MM-11, MM-13, MM-29, MM-57, MM-62, MM-94, MM-95, MM-96, MM-110, MM-112, MM-114, MM-147, MM-165, MM-184, MM-244, MM-453]
 ---
 
 # Story: the terms of use come before anything else
@@ -199,6 +199,11 @@ Scenario: Reviewed before release
   are routed to MM-96, not changed here.
 
 ## Progress
+
+**The privacy policy beside them (2026-10-21, MM-95).** Settings, About has "Privacy policy" under "Terms of use"; both are drawn by
+the shared `LegalSections`. The public page (MM-247) carries both. Found while drafting it: section 10 still says the app makes no copy
+of the records, which the backup (MM-63) contradicts; that is MM-453, for the owner and the attorney.
+
 
 **Mechanism and draft text built (2026-10-12).** Tests in
 `apps/mobile/test/app/termsOfUse.test.tsx` (the flow),
