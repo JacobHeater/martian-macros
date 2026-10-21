@@ -23,6 +23,8 @@ export * from './HealthReadFailure';
 export * from './HealthSample';
 export * from './HealthSampleStore';
 export * from './HealthSource';
+export * from './HealthSyncReason';
+export * from './HealthSyncSchedule';
 export * from './NightOfSleep';
 export * from './nightlySleep';
 export * from './NutritionRecord';
