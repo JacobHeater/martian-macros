@@ -970,6 +970,7 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-404",
           "MM-160",
           "MM-161",
           "MM-162",
@@ -985,8 +986,7 @@
         ],
         "remaining": [
           "MM-159",
-          "MM-228",
-          "MM-404"
+          "MM-228"
         ]
       },
       "sequence": [
@@ -2483,12 +2483,12 @@
           "MM-45",
           "MM-456",
           "MM-428",
-          "MM-429"
+          "MM-429",
+          "MM-387",
+          "MM-44"
         ],
         "remaining": [
-          "MM-387",
           "MM-37",
-          "MM-44",
           "MM-46",
           "MM-305",
           "MM-406"
@@ -2760,7 +2760,8 @@
           "MM-114",
           "MM-140",
           "MM-141",
-          "MM-368"
+          "MM-368",
+          "MM-405"
         ],
         "remaining": [
           "MM-36",
@@ -2770,8 +2771,7 @@
           "MM-146",
           "MM-148",
           "MM-248",
-          "MM-361",
-          "MM-405"
+          "MM-361"
         ]
       },
       "sequence": [
@@ -2963,14 +2963,14 @@
           "MM-214",
           "MM-215",
           "MM-222",
-          "MM-490"
+          "MM-490",
+          "MM-189",
+          "MM-515",
+          "MM-191"
         ],
         "remaining": [
           "MM-74",
-          "MM-189",
           "MM-489",
-          "MM-515",
-          "MM-191",
           "MM-447"
         ]
       },
@@ -3100,18 +3100,18 @@
           "MM-498",
           "MM-395",
           "MM-522",
-          "MM-516"
+          "MM-516",
+          "MM-70",
+          "MM-513",
+          "MM-514",
+          "MM-442",
+          "MM-314"
         ],
         "remaining": [
           "MM-66",
           "MM-68",
           "MM-69",
-          "MM-70",
-          "MM-513",
-          "MM-514",
-          "MM-442",
           "MM-73",
-          "MM-314",
           "MM-323",
           "MM-523"
         ]
@@ -3236,7 +3236,7 @@
       "file": "ws-12-backup-and-portability.md",
       "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose through the system share sheet.",
       "recommendedOrder": 13,
-      "status": "in-progress",
+      "status": "built",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3259,13 +3259,12 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-59",
           "MM-65",
           "MM-63",
           "MM-64"
         ],
-        "remaining": [
-          "MM-59"
-        ]
+        "remaining": []
       },
       "sequence": [
         {
