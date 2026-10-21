@@ -245,6 +245,10 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess, Heal
     return this.historyPermitted();
   }
 
+  async readableFrom(): Promise<Date | undefined> {
+    return (await this.historyPermitted()) ? undefined : this.historyFrom;
+  }
+
   async read(type: HealthDataType, { from, to }: { from: Date; to: Date }): Promise<HealthSample[]> {
     if (!this.allowed.has(type)) return [];
     if (this.unreadable) throw new HealthReadFailure(`reading ${type}`);

@@ -44,8 +44,12 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
     said.push(
       `Over ${review.weeks} weeks your waist is up ${waistAmount(review.waistChangeCm, fmt)} with ` +
         `${fmt.weight(review.weightChangeKg)} of trend weight. The gain looks fat-heavy: more of it is going to your ` +
-        'waist than a lean gain usually puts there. A slower gain, or maintenance for a while, would suit. The line ' +
-        'between the two is a starting value the app will tune, not a measured one.',
+        'waist than a lean gain usually puts there. ' +
+        // MM-480: already on the slower gain, maintenance is what is left to suggest.
+        (review.slowerPace
+          ? 'You are already on the slower gain; maintenance for a while would suit. '
+          : 'A slower gain, or maintenance for a while, would suit. ') +
+        'The line between the two is a starting value the app will tune, not a measured one.',
     );
   }
   if (review.strengthFlat && review.weightChangeKg !== undefined) {

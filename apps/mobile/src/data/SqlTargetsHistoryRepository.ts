@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import { GoalMode } from '../domain/GoalMode';
+import { LeanGainPace } from '../domain/LeanGainPace';
 import { DailyTargets } from '../engine/DailyTargets';
 import { TargetFlag } from '../engine/TargetFlag';
 import { TargetsExplanation } from '../engine/TargetsExplanation';
@@ -10,7 +11,7 @@ import { byName } from '../lang/byName';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { asFlag, day, flag, integer, named, number, optionalNumber, optionalText, orNull, text } from './columns';
+import { asFlag, day, flag, integer, named, number, optionalNamed, optionalNumber, optionalText, orNull, text } from './columns';
 import { upsert } from './upsert';
 
 function recordFrom(r: SqlRow): TargetsRecord {
@@ -23,6 +24,7 @@ function recordFrom(r: SqlRow): TargetsRecord {
     tdeeStatus: named(TdeeStatus.values, r, 'tdee_status'),
     safetyBodyFatPercent: optionalNumber(r, 'safety_body_fat_percent'),
     requestedLossFraction: optionalNumber(r, 'requested_loss_fraction'),
+    leanGainPace: optionalNamed(LeanGainPace.values, r, 'lean_gain_pace'),
     profileRevision: integer(r, 'profile_revision'),
     targetRulesVersion: integer(r, 'target_rules_version'),
     explanation: explanation === undefined ? undefined : TargetsExplanation.decode(explanation),
@@ -75,6 +77,7 @@ export class SqlTargetsHistoryRepository implements TargetsHistoryRepository {
         tdee_status: record.tdeeStatus,
         safety_body_fat_percent: orNull(record.safetyBodyFatPercent),
         requested_loss_fraction: orNull(record.requestedLossFraction),
+        lean_gain_pace: orNull(record.leanGainPace),
         profile_revision: record.profileRevision,
         target_rules_version: record.targetRulesVersion,
         explanation: orNull(record.explanation?.encode()),

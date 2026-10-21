@@ -12,5 +12,9 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(MmScannerPlugin())
         bridge?.registerPluginInstance(MmHealthPlugin())
         bridge?.registerPluginInstance(MmBackupPlugin())
+        // `mm screenshot --phone` (MM-536): the dev and demo apps only, never the real one.
+        if MmScreenshotPlugin.isAllowed {
+            bridge?.registerPluginInstance(MmScreenshotPlugin())
+        }
     }
 }

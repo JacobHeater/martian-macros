@@ -1,6 +1,6 @@
 ---
 id: MM-498
-status: proposed
+status: done
 component: health-sync
 related: [MM-68, MM-73, MM-67]
 ---
@@ -31,7 +31,17 @@ Scenario: History permission taken away, then a token expires
 ```
 
 ## Notes
-- Guarded by the skipped test "MM-498: a re-read after the history permission is taken away keeps
-  the history" in `apps/mobile/test/healthIngest/healthBackfill.test.ts`. Unskip it with the fix.
-- A likely fix: `HealthImporter`'s re-read replaces only from the earliest moment the source can show,
-  which needs the source to say where its window starts.
+- Guarded by "MM-498: a re-read after the history permission is taken away keeps the history" and
+  "MM-498: a reading deleted on the platform within its window is still removed by the re-read" in
+  `apps/mobile/test/healthIngest/healthBackfill.test.ts`, and by the `healthHistoryAccessContract`
+  case "shows everything once the history is permitted, and from a moment otherwise (MM-498)".
+- Fixed 2026-10-21: `HealthHistoryAccess.readableFrom()` says where what the platform shows starts
+  (undefined when it shows everything). `HealthImporter`'s re-read still makes the store match the
+  platform exactly when nothing limits it; otherwise it keeps what it read, and removes only stored
+  readings from that moment on that the platform no longer has. The result's `deleted` counts the
+  readings the re-read removed.
+- Health Connect's plugin does not say when the first permission was granted, so
+  `NativeHealthSource` answers thirty days before the app clock's now (MM-190), never earlier than
+  the real window; `nativeHealthSource.test.ts` checks it with a fixed clock. A
+  reading deleted on the platform between the real window's start and that moment is kept by such
+  a re-read; keeping too much is the safe side.
