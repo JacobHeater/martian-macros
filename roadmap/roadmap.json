@@ -805,6 +805,7 @@
             "MM-388",
             "MM-396",
             "MM-397",
+            "MM-456",
             "MM-406"
           ]
         },
@@ -2428,6 +2429,7 @@
           "MM-151",
           "MM-152",
           "MM-167",
+          "MM-45",
           "MM-428",
           "MM-429"
         ],
@@ -2435,7 +2437,7 @@
           "MM-387",
           "MM-37",
           "MM-44",
-          "MM-45",
+          "MM-456",
           "MM-46",
           "MM-305",
           "MM-406"
@@ -2608,6 +2610,14 @@
           "title": "The camera on iOS (MM-406): a barcode read live with AVFoundation and a label read with Vision, on the device",
           "tickets": [
             "MM-406"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 14,
+          "title": "A recipe ingredient keeps the food it came from (MM-456), on the schema lane after MM-45",
+          "tickets": [
+            "MM-456"
           ],
           "milestone": "M4"
         }

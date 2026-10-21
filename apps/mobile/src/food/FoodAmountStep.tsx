@@ -45,6 +45,8 @@ import { FoodTrustMark } from './FoodTrustMark';
 import { MealChips } from './MealChips';
 import { microsOfPackFood } from './microsOfPackFood';
 import { preparationOf } from './preparationOf';
+import { weighedConsequence } from './weighedConsequence';
+import { weighedStateLabel } from './weighedStateLabel';
 import './food.css';
 
 interface FoodAmountStepProps {
@@ -78,13 +80,6 @@ const defaultQuantity = (choice: AmountChoice) => (choice.unit === 'gram' ? '100
 function handMethod(unit: PortionUnit): QuantitySource | undefined {
   if (unit === 'palm' || unit === 'cuppedHand' || unit === 'thumb') return unit;
   return undefined;
-}
-
-/** What the food is when it is weighed: cooked, dry or raw. */
-function stateLabel(food: CatalogFood): string {
-  if (food.preparation === 'cooked') return 'Cooked';
-  if (food.preparation === 'raw') return food.name.toLowerCase().includes(', dry') ? 'Dry' : 'Raw';
-  return 'As listed';
 }
 
 const choiceLabel = (choice: AmountChoice) => {
@@ -264,13 +259,6 @@ export function FoodAmountStep({
     setQuantity(defaultQuantity(next));
   };
 
-  /** The size of the difference, which is the education (MM-151). */
-  const consequence = (weighed: number, other: CatalogFood) => {
-    const line = (f: CatalogFood) =>
-      `${n(weighed)} g ${stateLabel(f).toLowerCase()} is about ${n((f.kcal * weighed) / 100)} kcal`;
-    return `${line(chosen)}. ${line(other)}.`;
-  };
-
   const note =
     grams === undefined || custom !== undefined ? undefined : roundedToZeroNote(food, { description: 'amount', grams });
   const invalid = quantity.trim() !== '' && amount === undefined;
@@ -315,8 +303,8 @@ export function FoodAmountStep({
           <MmSegmented<boolean>
             name="Weighed as"
             segments={[
-              { value: false, label: stateLabel(chosen) },
-              { value: true, label: stateLabel(alternate) },
+              { value: false, label: weighedStateLabel(chosen) },
+              { value: true, label: weighedStateLabel(alternate) },
             ]}
             selected={useAlternate}
             onChange={(other) => setUseAlternate(other === true)}
@@ -324,7 +312,7 @@ export function FoodAmountStep({
           {amount !== undefined && grams !== undefined ? (
             <p className="app-caption">
               {/* Why the switch starts where it does, when that came from memory (MM-151, the panel's UX-6). */}
-              {`${consequence(grams, alternate)}${remembered && useAlternate ? ` Starts on ${stateLabel(alternate).toLowerCase()}, as last time.` : ''}`}
+              {`${weighedConsequence(grams, chosen, alternate)}${remembered && useAlternate ? ` Starts on ${weighedStateLabel(alternate).toLowerCase()}, as last time.` : ''}`}
             </p>
           ) : null}
         </>
