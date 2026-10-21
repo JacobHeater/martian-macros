@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Workout } from '../../domain/training/Workout';
 import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../domain/training/WorkoutSet';
@@ -225,6 +225,12 @@ export const WorkoutPausedDroppedSet = screenStory({
     await pressNamed('Pause')(canvas);
     await within(canvas.ownerDocument.body).findByText(/The set being timed was dropped/);
     await within(canvas).findByText('Tap Resume to start the clock again.');
+    // One way on: the bar's Resume is the screen's only Resume and the bar's only primary, and no 0:00 shows while
+    // paused (MM-447). "Finish workout" keeps its own place at the foot of the screen.
+    await within(canvas).findByRole('button', { name: 'Resume' });
+    expect(within(canvas).getAllByRole('button', { name: 'Resume' })).toHaveLength(1);
+    expect(canvas.querySelectorAll('.train-timer .mm-button-primary')).toHaveLength(1);
+    expect(within(canvas).queryByText('0:00')).toBeNull();
   },
 });
 

@@ -58,7 +58,10 @@ Scenario: The workout's times
 The owner's answers were not given; the coordinator, for the owner (2026-10-21), had the recommended answer built as
 the default for each, and these are easy to overrule:
 - **The bar offers "Resume" while paused**, in place of the disabled "Start set", and says "Tap Resume to start the
-  clock again." The clock card keeps its own Resume beside Pause, the sibling it toggles with.
+  clock again." It is the screen's only Resume (panel review, 2026-10-21): the clock card says "Paused" and shows no
+  button while paused, so the screen has one primary way on. The bar shows no figure while paused (a 0:00 read as a
+  reset), and its buttons wrap to their own line at large text sizes.
+- **The workout clock is read as "Workout time …"**, as the bar's figure is read as a spoken duration.
 - **Pausing says when it drops a set being timed**: a snack, "Paused. The set being timed was dropped; start it again
   after you resume." Nothing is said when no set was being timed. The set is still dropped (MM-191: a pause is not part
   of a set).
@@ -84,3 +87,7 @@ Siblings reused (MM-318): the clock card's Resume (label and play icon) for the 
   workout's"). Stories `Train/WorkoutPausedDroppedSet` and `Train/WorkoutTimesRestartAsks`.
 - Not run locally; CI validates. Not reviewed by the design panel: the changes reuse existing controls and wording on
   the same screen.
+- Review fixes 2026-10-21 (`fix/mm-447-review`): one Resume (the clock card's removed while paused), the clock's
+  spoken label "Workout time …", no 0:00 on the bar while paused, `.train-timer` wraps. Tests:
+  `test/train/workoutTimes.test.tsx` (one Resume, no figure while paused, the clock's label); the
+  `Train/WorkoutPausedDroppedSet` story checks one primary button after its walk. Not run locally; CI validates.
