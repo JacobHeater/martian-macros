@@ -27,6 +27,7 @@ export * from './InMemoryReminderScheduler';
 export * from './InMemoryRepositories';
 export * from './InMemoryRestSignal';
 export * from './InMemorySetupRepository';
+export * from './InMemoryTargetShapeRepository';
 export * from './InMemoryTargetsHistoryRepository';
 export * from './InMemoryWaistRepository';
 export * from './InMemoryWeightEventRepository';

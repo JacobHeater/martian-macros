@@ -4,7 +4,7 @@ import { Meal } from '../domain/Meal';
 import { pauseOn } from '../engine/pauseOn';
 import { Fmt } from '../format/Fmt';
 import { Loadable } from '../state/Loadable';
-import { targetsOn } from '../state/targetsOn';
+import { dayTargetsOn } from '../state/dayTargetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -41,6 +41,9 @@ export function FoodScreen() {
   const entries = useLoaded(state.foodForDay(day)) ?? [];
   const yesterday = useLoaded(state.foodForDay(day.addDays(-1))) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
+  // The day's targets as the user shaped them then (MM-122, MM-124).
+  const shapes = useLoaded(state.targetShapes) ?? [];
+  const shapeLimits = useCell(state.targetShapeLimits);
   const setup = useLoaded(state.setup);
   const guide = useCell(state.maintenanceGuide);
   const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
@@ -53,7 +56,7 @@ export function FoodScreen() {
     setup !== undefined &&
     CoachingPolicy.derive({ profile: setup.profile, screening: setup.screening, today }).targetsAllowed;
   // Without the pauses, the day may be paused: no targets are shown as though it were not (MM-183).
-  const targets = pausesFailed ? undefined : targetsOn(history, day, { targetsAllowed });
+  const targets = pausesFailed ? undefined : dayTargetsOn({ history, day, shapes, limits: shapeLimits, targetsAllowed });
   // On a paused day the targets are a maintenance guide (MM-148).
   const paused = pauseOn(Loadable.valueOf(pausesState) ?? [], day) !== undefined;
   const intake = intakeDayFrom(day, entries);
@@ -72,12 +75,12 @@ export function FoodScreen() {
         intake={intake}
         entries={entries}
         microsOffered
-        targets={paused ? guide : targets?.targets}
+        targets={paused ? guide : targets}
         paused={paused}
         lines={
           // The day's fiber and alcohol belong where the day's energy is, inside the hero (MM-336).
           <>
-            <FiberLine entries={entries} kcalTarget={targets?.targets.kcal} sex={setup?.profile.sex} />
+            <FiberLine entries={entries} kcalTarget={targets?.kcal} sex={setup?.profile.sex} />
             {alcoholKcal > 0 ? <HeroFactLine name="Alcohol" figures={`${Fmt.whole(alcoholKcal)} kcal, in the total`} /> : null}
           </>
         }

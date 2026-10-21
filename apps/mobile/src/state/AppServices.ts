@@ -17,6 +17,7 @@ import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryC
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
+import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
@@ -60,6 +61,8 @@ export interface AppServices {
   readonly dayMarks: DayMarkRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
+  /** How the user shapes their targets (MM-122, MM-124); held in memory on the phone until MM-486. */
+  readonly targetShapes: TargetShapeRepository;
   readonly preferences: PreferencesRepository;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
