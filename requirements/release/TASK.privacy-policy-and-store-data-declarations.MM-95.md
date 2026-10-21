@@ -17,7 +17,8 @@ practices, and health permissions bring extra forms.
   - nothing, by default;
   - a food pack download request to static hosting (MM-56), which reveals an IP address and nothing else;
   - a barcode number to Open Food Facts, only if the user opted in (MM-58);
-  - an encrypted backup to a storage provider the user connected (MM-64);
+  - an encrypted backup file, only when the user makes one and hands it through the system share sheet to an app of their choosing
+    (MM-64; the app itself connects to no storage service);
   - the purchase, handled by the store.
 - **Apple's privacy "nutrition label"** and **Google Play's Data safety form**, filled in to match.
 - **Google Play's Health Connect declaration**: each permission and why it is needed (MM-68).
