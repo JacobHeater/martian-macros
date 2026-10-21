@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -143,8 +143,16 @@ it('offered once, with no comment, after more than one weigh-in a day on five da
   renderApp(repos, today);
   const offer = (await screen.findByText('How much of your weight to show')).closest('.mm-notice') as HTMLElement;
   expect(offer.textContent).not.toMatch(/often|too much|a lot/i);
-  await userEvent.click(within(offer).getByRole('button', { name: 'Not now' }));
+  // Backing out of the choice keeps the offer.
+  await userEvent.click(within(offer).getByRole('button', { name: 'Choose' }));
+  const sheet = await screen.findByRole('dialog', { name: 'Weight display' });
+  await userEvent.keyboard('{Escape}');
+  await waitFor(() => expect(sheet).not.toBeInTheDocument());
+  expect(await first(repos.preferences.watchWeightDisplayOffered())).toBe(false);
+  expect(screen.getByText('How much of your weight to show')).toBeInTheDocument();
+  await userEvent.click(within(offer).getByRole('button', { name: 'No thanks' }));
   await expect.poll(async () => first(repos.preferences.watchWeightDisplayOffered())).toBe(true);
+  expect(await screen.findByText('You can change this in Settings, Appearance.')).toBeInTheDocument();
   expect(screen.queryByText('How much of your weight to show')).not.toBeInTheDocument();
   cleanup();
   renderApp(repos, today);
