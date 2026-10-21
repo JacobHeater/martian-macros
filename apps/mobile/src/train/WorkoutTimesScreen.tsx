@@ -35,6 +35,16 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
   if (workout === undefined) return <Screen title="Workout times">{null}</Screen>;
   const ended = workout.endedAt;
 
+  /** Moves the workout's start to now, once asked: it cannot be taken back (MM-447). */
+  const restart = async () => {
+    const sure = await overlays.confirm({
+      title: 'Start the clock again from now?',
+      message: 'The workout’s start moves to now and its paused time is cleared. Sets already logged are kept.',
+      confirmLabel: 'Start again',
+    });
+    if (sure) await controller.restartClock(workout);
+  };
+
   /** Why a start and an end cannot be the workout's, or undefined if they can. */
   const refusal = (start: Date, end: Date | undefined) => {
     const problem = checkTimeSpan({ start, end, notAfter: services.clock.now() });
@@ -138,7 +148,7 @@ export function WorkoutTimesScreen({ workoutId }: { workoutId: number }) {
             label="Start the clock again from now"
             kind="secondary"
             expand
-            onPress={() => void controller.restartClock(workout)}
+            onPress={() => void restart()}
           />
         </>
       ) : null}
