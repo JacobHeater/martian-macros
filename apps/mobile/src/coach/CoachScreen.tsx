@@ -16,6 +16,7 @@ import { confidenceNextStepText } from '../format/confidenceNextStepText';
 import { Fmt } from '../format/Fmt';
 import { displayTargets } from '../format/displayTargets';
 import { FatLossPace } from '../engine/FatLossPace';
+import { leanGainPaceName } from '../format/leanGainPaceName';
 import { paceName } from '../format/paceName';
 import { reboundText } from '../format/reboundText';
 import { goalModeBlurb } from '../format/goalModeBlurb';
@@ -63,6 +64,7 @@ import { TargetsHistoryScreen } from './TargetsHistoryScreen';
 import { TrainingLapseNotice } from './TrainingLapseNotice';
 import { UnderEatingNotice } from './UnderEatingNotice';
 import { WhatToExpectScreen } from './WhatToExpectScreen';
+import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
 import { usePaceSheet } from './usePaceSheet';
 import './coach.css';
 
@@ -107,6 +109,7 @@ export function CoachScreen() {
   const navigator = useNavigator();
   const overlays = useOverlays();
   const openPaceSheet = usePaceSheet();
+  const openLeanGainPaceSheet = useLeanGainPaceSheet();
   const setup = useLoaded(state.setup);
   const snapshot = useCell(state.coach);
   const current = useCell(state.currentTargets);
@@ -284,11 +287,18 @@ export function CoachScreen() {
             }
             detail={detail}
           />
-          {/* The pace is the person's to choose on a cut (MM-128); recomp and the other goals have none. */}
+          {/* The pace is the person's to choose on a cut (MM-128) and a lean gain (MM-480); recomp and maintenance have none. */}
           {setup.goalMode === 'fatLoss' && openPaceSheet !== undefined ? (
             <div className="coach-pace-row">
               <StatRow label="Pace" value={paceName(FatLossPace.of(setup.requestedLossFraction) ?? FatLossPace.default)} />
               <MmButton label="Change pace" kind="text" onPress={() => void openPaceSheet()} />
+            </div>
+          ) : null}
+          {/* A lean gain has two paces to choose (MM-480), on the same row as the cut's. */}
+          {setup.goalMode === 'leanGain' && openLeanGainPaceSheet !== undefined ? (
+            <div className="coach-pace-row">
+              <StatRow label="Pace" value={leanGainPaceName(setup.leanGainPace)} />
+              <MmButton label="Change pace" kind="text" onPress={() => void openLeanGainPaceSheet()} />
             </div>
           ) : null}
         </MmSection>
@@ -298,7 +308,10 @@ export function CoachScreen() {
       {recent === undefined ? null : <RecentInsightsSection insights={recent} />}
       <StallCard />
       <RecompReviewCard />
-      <LeanGainCard onChangeGoal={() => void changeGoal()} />
+      <LeanGainCard
+        onChangeGoal={() => void changeGoal()}
+        onSlowerGain={openLeanGainPaceSheet === undefined ? undefined : () => void openLeanGainPaceSheet()}
+      />
       <AdherenceCard />
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />

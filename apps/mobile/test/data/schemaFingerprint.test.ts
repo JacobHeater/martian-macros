@@ -29,6 +29,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   15: 'eef87657d12062f15e42cbc2abd1ece171456c8d17e7a33912cabc3248bf03ef',
   // MM-486: how the user shapes their targets (MM-122, MM-124).
   16: 'a76d6b199d6dcbaa83ea2e277b425d2c9979355927cfb92435936af5827a3b16',
+  // MM-480: the lean-gain pace chosen, and the one each record of targets was asked for.
+  17: '36d03cffa516cd7d4e701f2b0d274676262f1b68765f1ba7f494c93adec67970',
 };
 
 it('the schema is the one recorded for its version', () => {

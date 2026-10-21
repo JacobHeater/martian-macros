@@ -1,6 +1,7 @@
 import type { CalendarDate } from './CalendarDate';
 import type { DailyActivity } from './DailyActivity';
 import type { GoalMode } from './GoalMode';
+import { LeanGainPace } from './LeanGainPace';
 import type { Profile } from './Profile';
 import type { ScreeningAnswers } from './ScreeningAnswers';
 import type { TrainingStatus } from './TrainingStatus';
@@ -18,6 +19,7 @@ interface UserSetupInit {
   unitSystem?: UnitSystem;
   bodyFatPercent?: number | undefined;
   requestedLossFraction?: number | undefined;
+  leanGainPace?: LeanGainPace;
   healthCheckConfirmedOn?: CalendarDate | undefined;
   healthCheckSkipCount?: number;
   creatineStartedOn?: CalendarDate | undefined;
@@ -46,6 +48,7 @@ interface UserSetupChanges {
   dailyActivity?: DailyActivity;
   bodyFatPercent?: number | undefined;
   requestedLossFraction?: number | undefined;
+  leanGainPace?: LeanGainPace;
   healthCheckConfirmedOn?: CalendarDate | undefined;
   healthCheckSkipCount?: number;
   creatineStartedOn?: CalendarDate | undefined;
@@ -90,6 +93,9 @@ export class UserSetup {
   /** Chosen fat-loss pace (fraction of body weight per week), if any. */
   readonly requestedLossFraction: number | undefined;
 
+  /** Chosen lean-gain pace (MM-480): the one training status sets, or half of it. */
+  readonly leanGainPace: LeanGainPace;
+
   /** The last day the user confirmed their health answers. */
   readonly healthCheckConfirmedOn: CalendarDate | undefined;
 
@@ -109,8 +115,9 @@ export class UserSetup {
   readonly reliefAnsweredOn: CalendarDate | undefined;
 
   /**
-   * The day the fat-loss pace was last chosen (MM-128). A pace change acts
-   * at once, like a change of goal, so targets issued before it are redone.
+   * The day a pace was last chosen: fat loss (MM-128) or lean gain (MM-480).
+   * A pace change acts at once, like a change of goal, so targets issued
+   * before it are redone.
    */
   readonly paceChangedOn: CalendarDate | undefined;
 
@@ -139,6 +146,7 @@ export class UserSetup {
     this.unitSystem = init.unitSystem ?? 'imperial';
     this.bodyFatPercent = init.bodyFatPercent;
     this.requestedLossFraction = init.requestedLossFraction;
+    this.leanGainPace = init.leanGainPace ?? LeanGainPace.default;
     this.healthCheckConfirmedOn = init.healthCheckConfirmedOn;
     this.healthCheckSkipCount = init.healthCheckSkipCount ?? 0;
     this.creatineStartedOn = init.creatineStartedOn;
@@ -168,6 +176,7 @@ export class UserSetup {
       bodyFatPercent: 'bodyFatPercent' in changes ? changes.bodyFatPercent : this.bodyFatPercent,
       requestedLossFraction:
         'requestedLossFraction' in changes ? changes.requestedLossFraction : this.requestedLossFraction,
+      leanGainPace: changes.leanGainPace ?? this.leanGainPace,
       healthCheckConfirmedOn:
         'healthCheckConfirmedOn' in changes ? changes.healthCheckConfirmedOn : this.healthCheckConfirmedOn,
       healthCheckSkipCount: changes.healthCheckSkipCount ?? this.healthCheckSkipCount,
