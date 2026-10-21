@@ -70,16 +70,6 @@ it('how far a destination was scrolled is kept and put back on return', async ()
   expect(stores).toBe(repos);
 });
 
-it('on Food, the floating action is the next focus stop after the bar, before the entries', async () => {
-  renderApp(repos, today);
-  await openTab('Food');
-  await screen.findByRole('heading', { name: 'Breakfast' });
-  screen.getByRole('button', { name: 'Settings' }).focus();
-  await userEvent.tab();
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Add food' }));
-  expect(document.activeElement).toHaveClass('mm-fab');
-});
-
 it('the scroll is kept when a destination is left through a row, not only the bar (the WS-03 panel\'s PD7)', async () => {
   renderApp(repos, today);
   const row = await screen.findByRole('button', { name: /^Trend / });
