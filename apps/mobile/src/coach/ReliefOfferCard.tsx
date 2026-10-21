@@ -1,5 +1,6 @@
 import { paceLabel } from '../format/paceLabel';
 import { reliefOfferText } from '../format/reliefOfferText';
+import { reliefPaceText } from '../format/reliefPaceText';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -22,11 +23,15 @@ export function ReliefOfferCard() {
   const offer = useCell(state.reliefOffer);
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
+  const paces = useCell(state.paceOptions);
   if (offer === undefined || setup === undefined) return null;
   const words = reliefOfferText(offer);
   const slower = offer.slowerPace;
   const suggestsBreak = offer.suggestion === 'break';
-  const text = [words.body, words.suggestion, words.sleep].filter((part) => part !== undefined && part !== '').join('\n\n');
+  // The slower pace by its name and what it costs, as the pace choice says it (MM-128).
+  const slowerOption = slower === undefined ? undefined : paces?.find((option) => Math.abs(option.fraction - slower) < 1e-9);
+  const paceText = slowerOption === undefined ? undefined : reliefPaceText(slowerOption);
+  const text = [words.body, words.suggestion, paceText, words.sleep].filter((part) => part !== undefined && part !== '').join('\n\n');
   return (
     <div className="app-stack-item">
       <Notice

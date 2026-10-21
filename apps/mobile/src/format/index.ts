@@ -80,6 +80,7 @@ export * from './recoveryLowWord';
 export * from './recoveryQuestionLabel';
 export * from './recoveryQuestionText';
 export * from './reliefOfferText';
+export * from './reliefPaceText';
 export * from './reminderLabel';
 export * from './reminderPausedLine';
 export * from './reminderPrompt';
