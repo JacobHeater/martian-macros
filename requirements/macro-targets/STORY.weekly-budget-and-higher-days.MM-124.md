@@ -122,8 +122,9 @@ Scenario: A planned lower day is a whole day
 
 ## Progress
 Built 2026-10-21 against `TargetShapeRepository` and its in-memory fixture (principle 4): another branch held
-the schema (MM-71), so the shape is held in memory on the phone until MM-486 adds its table. Not run locally;
-CI validates. Guarding tests:
+the schema (MM-71). MM-486 then added the table (schema 16) and `SqlTargetShapeRepository`, so the shape is
+kept on the phone, erased, backed up and restored with everything else. Not run locally; CI validates.
+Guarding tests:
 - `test/engine/weekShape.test.ts`: two higher days, the floor limits the shape, the 15% limit, at most three,
   and "a shaped week and the partial-day rule" (every allowed shape, eaten as planned, keeps all 28 days: the
   lowest planned day is about 68% of a higher one, above the 65% cut).
@@ -132,7 +133,7 @@ CI validates. Guarding tests:
 - `test/state/dayTargetsOn.test.ts`: no taking back, no banking, a past day keeps its target.
 - `test/engine/usualTrainingWeekdays.test.ts`; `test/settings/targetShape.test.tsx` (flat until chosen, at most
   three, no text about making a day up).
-Still owed: MM-486; the simulator suite over shaped intake (HS-estimator-style) beyond the partial-day guard;
+Still owed: the simulator suite over shaped intake (HS-estimator-style) beyond the partial-day guard;
 the panel's product-designer and UX review was a fast source-only pass (no render); its blocking findings
 (an action row that read as a status line, explanations inline, notice placement, repeated icons) were fixed;
 a look at the stories in all three palettes is still owed.

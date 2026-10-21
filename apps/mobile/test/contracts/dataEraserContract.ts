@@ -1,15 +1,18 @@
 import { TermsAcceptance } from '../../src/domain/TermsAcceptance';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import type { CustomExerciseRepository } from '../../src/domain/repositories/CustomExerciseRepository';
 import type { DataEraser } from '../../src/domain/repositories/DataEraser';
 import type { FoodRepository } from '../../src/domain/repositories/FoodRepository';
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
 import type { SetupRepository } from '../../src/domain/repositories/SetupRepository';
+import type { TargetShapeRepository } from '../../src/domain/repositories/TargetShapeRepository';
 import type { WeightEventRepository } from '../../src/domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../../src/domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../../src/domain/repositories/WorkoutRepository';
+import { TargetShape } from '../../src/domain/TargetShape';
 import { Exercise } from '../../src/domain/training/Exercise';
 import { Workout } from '../../src/domain/training/Workout';
 import { WorkoutExercise } from '../../src/domain/training/WorkoutExercise';
@@ -27,6 +30,7 @@ interface Erasable {
   weightEvents: WeightEventRepository;
   food: FoodRepository;
   targets: TargetsHistoryRepository;
+  targetShapes: TargetShapeRepository;
   preferences: PreferencesRepository;
   workouts: WorkoutRepository;
   customExercises: CustomExerciseRepository;
@@ -69,6 +73,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
           targets: new DailyTargets({ kcal: 2000, proteinG: 160, fatG: 70, carbsG: 200, weeklyRateFraction: -0.0075 }),
         }),
       );
+      await r.targetShapes.saveTargetShape(new TargetShape({ since: day, balance: CarbFatBalance.balanced }));
       await r.workouts.saveWorkout(
         new Workout({
           id: 0,
@@ -91,6 +96,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.weightEvents.watchWeightEvents())).toEqual([]);
       expect(await first(r.food.watchFood(day))).toEqual([]);
       expect(await first(r.targets.watchTargetsHistory())).toEqual([]);
+      // MM-486: no shape is left.
+      expect(await first(r.targetShapes.watchTargetShapes())).toEqual([]);
       expect(await first(r.workouts.watchWorkouts())).toEqual([]);
       expect(await first(r.customExercises.watchCustomExercises())).toEqual([]);
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');

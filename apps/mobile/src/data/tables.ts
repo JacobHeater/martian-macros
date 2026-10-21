@@ -27,4 +27,5 @@ export const tables = [
   'menstruation_days',
   'online_foods',
   'sleep_nights',
+  'target_shapes',
 ] as const;

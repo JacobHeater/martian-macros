@@ -87,6 +87,8 @@ const tablesAddedSince: readonly string[] = [
   'online_foods',
   // Version 13 (MM-250): the nights of sleep.
   'sleep_nights',
+  // Version 16 (MM-486): how the user shapes their targets (MM-122, MM-124).
+  'target_shapes',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart

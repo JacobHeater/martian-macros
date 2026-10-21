@@ -3,8 +3,9 @@ import { CarbFatBalance } from '../domain/CarbFatBalance';
 /**
  * Fat and carbohydrate for a day's calories after protein.
  *
- * Without a balance, MM-24's split: fat the larger of its minimum and 25% of
- * calories, carbohydrate the rest. With one (MM-122), fat its share of
+ * Without a balance, MM-24's split, which the check-in's targets are issued
+ * with: fat the larger of its minimum and 25% of calories, carbohydrate the
+ * rest. With one (MM-122), fat its share of
  * calories but never under its minimum, and carbohydrate at least the
  * carbohydrate floor unless the user turned it off. When protein, the fat
  * minimum and the floor do not all fit, the floor gives way first; protein
@@ -23,7 +24,7 @@ export function splitCarbsAndFat({
 }): { fatG: number; carbsG: number } {
   const afterProteinKcal = kcal - 4 * proteinG;
   if (balance === undefined) {
-    let fatG = Math.max(fatMinimumG, (CarbFatBalance.unchosenFatShare * kcal) / 9);
+    let fatG = Math.max(fatMinimumG, (CarbFatBalance.issuedFatShare * kcal) / 9);
     let carbsG = (afterProteinKcal - 9 * fatG) / 4;
     if (carbsG < 0) {
       fatG = fatMinimumG;

@@ -13,10 +13,11 @@ export class CarbFatBalance {
   static readonly moreFatFatShare = 0.4;
 
   /**
-   * MM-24's share, which stands until the user chooses (with no carbohydrate
-   * floor); Balanced becomes the default with MM-486.
+   * MM-24's share, which the check-in's targets are issued with (no
+   * carbohydrate floor). A day's targets take the user's balance, Balanced
+   * until they choose (MM-486).
    */
-  static readonly unchosenFatShare = 0.25;
+  static readonly issuedFatShare = 0.25;
 
   /**
    * Carbohydrate kept unless the user turns it off (judgement: a default
@@ -25,6 +26,7 @@ export class CarbFatBalance {
    */
   static readonly carbFloorG = 100;
 
+  /** Balanced, which a day's targets take until the user chooses (MM-486). */
   static readonly balanced = new CarbFatBalance({ fatShare: CarbFatBalance.balancedFatShare });
 
   /** Fat's share of calories, from `moreCarbsFatShare` to `moreFatFatShare`. */

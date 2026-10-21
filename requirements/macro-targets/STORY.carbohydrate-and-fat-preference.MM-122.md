@@ -35,10 +35,11 @@ Choices I made without asking (say if any is wrong):
 - **The setting is a proportion, not grams**, so it carries across check-ins as calories change.
 - **The explanation says the truth**: "For fat loss and muscle, this balance matters much less than calories and protein. Pick what you
   like eating."
-- **The default moves from 25% to 30% fat** only when this ships; until then MM-24 stands. Built (2026-10-21):
-  until the setting is kept on the phone (MM-486), an unchosen balance stays MM-24's split, and the screen
-  says so ("As the app set it until you choose. Balanced is 30%."); Balanced is one tap. Moving everyone's
-  default while the choice is forgotten on every restart would change targets nobody asked to change.
+- **The default moves from 25% to 30% fat** only when this ships; until then MM-24 stands. Built (2026-10-21,
+  with MM-486): now that the setting is kept on the phone, an unchosen balance is Balanced: a day's fat is 30%
+  of calories, never under its minimum, with carbs at least 100 g where they fit (`shapedTargets`), and the
+  screen says so ("As the app set it until you choose: Balanced."). The check-in still issues MM-24's split,
+  which the engine keeps for parity with the Dart engine; the day's targets are what change.
 - **Applied to the day's targets, not stored in them** (built 2026-10-21). The check-in still issues MM-24's
   split; the balance re-splits the day's calories after protein when the day is shown (`shapedTargets`), with
   the fat minimum for this person now (`TargetShapeLimits`, from the coach's view). So a change takes effect
@@ -109,17 +110,19 @@ Scenario: Chosen from today
 
 ## Progress
 Built 2026-10-21 against `TargetShapeRepository` and its in-memory fixture (principle 4): another branch held
-the schema (MM-71), so the setting is held in memory on the phone until MM-486 adds its table. Not run
-locally; CI validates. Guarding tests:
+the schema (MM-71). MM-486 then added the table (schema 16) and `SqlTargetShapeRepository`, so the setting is
+kept on the phone, erased, backed up and restored with everything else, and the default became Balanced. Not
+run locally; CI validates. Guarding tests:
 - `test/engine/carbFatBalance.test.ts`: each scenario above (Balanced, More carbs at the minimum, low
   calories, floor off, a proportion across check-ins, the minimum requiring more, the order of sacrifice,
-  protein and calories untouched, unchosen = MM-24).
-- `test/engine/shapedTargets.test.ts` ("splits a day by the balance chosen"); `test/state/dayTargetsOn.test.ts`
-  (a past day keeps its shape).
+  protein and calories untouched, no balance = MM-24's issued split).
+- `test/engine/shapedTargets.test.ts` ("splits a day by the balance chosen"; with none chosen a day is
+  Balanced, with carbs at 100 g where they fit); `test/state/dayTargetsOn.test.ts` (a past day keeps its shape).
 - `test/settings/targetShape.test.tsx`: unchosen until chosen, kept from today; the floor switched off only on
   purpose.
-- `test/contracts/targetShapeRepositoryContract.ts`, run in `test/fixtures/inMemoryContracts.test.ts`.
-Still owed: MM-486 (the table, and the default moving to Balanced); a look at the stories in all three palettes
+- `test/contracts/targetShapeRepositoryContract.ts`, run in `test/fixtures/inMemoryContracts.test.ts` and
+  `test/data/sqlContracts.test.ts` (MM-486).
+Still owed: a look at the stories in all three palettes
 (the panel's fast review was source-only; its blocking findings were fixed). Open question for the safety
 role: whether the "very low carb on purpose" switch needs a caution line.
 

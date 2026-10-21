@@ -8,7 +8,7 @@ import { expectChangeEmits } from '../support/expectChangeEmits';
 import { first } from '../support/first';
 import { single } from '../support/single';
 
-/** What every `TargetShapeRepository` must do (MM-122, MM-124; the table is MM-486). */
+/** What every `TargetShapeRepository` must do (MM-122, MM-124, MM-486), in memory and in the database. */
 export function targetShapeRepositoryContract(
   name: string,
   create: () => TargetShapeRepository | Promise<TargetShapeRepository>,

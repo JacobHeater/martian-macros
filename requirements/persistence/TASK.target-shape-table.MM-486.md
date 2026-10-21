@@ -1,6 +1,6 @@
 ---
 id: MM-486
-status: proposed
+status: done
 component: persistence
 related: [MM-122, MM-124, MM-60, MM-61, MM-63, MM-325]
 ---
@@ -53,3 +53,24 @@ Scenario: The default becomes Balanced
 ## Notes
 - The migration test holds the upgrade from MM-71's version to this one.
 - The in-memory wiring in `openAppServices` (the eraser and restorer wrappers) is removed with this task.
+
+## Progress
+Built 2026-10-21 on PR #221 (with MM-122 and MM-124). Not run locally; CI validates.
+- Schema 16: a `target_shapes` table, one row per day a shape was set from (`since_epoch_day` the key; `fat_share`
+  null for a balance not chosen, held between 0.2 and 0.4; `carb_floor_off`; `higher_days` as weekday numbers,
+  Sunday 0, joined by commas, empty for a flat week; `raise_share`). `currentSchemaVersion`, `currentSchema`,
+  `tables` (so the eraser, the restore and the backup, which is the whole database, carry it), the step keyed 15
+  in `migrationSteps`, and the fingerprint for 16 in `test/data/schemaFingerprint.test.ts` (sha256 of
+  `currentSchema`, the method reproducing version 15's recorded value first).
+- `SqlTargetShapeRepository`, in `SqlRepositories` and `openAppServices`; the in-memory store and its eraser and
+  restorer wrappers are gone from `openAppServices`.
+- The default became Balanced in `shapedTargets`: with no balance chosen a day's fat is 30% of calories, never
+  under its minimum, carbs at least 100 g where they fit. The check-in still issues MM-24's split, which the
+  Dart parity test holds; the day's targets (Today, Food, the week) are what change. Settings > Coach says
+  "Balanced, as the app set it" until a choice is made.
+- Guarding tests: `targetShapeRepositoryContract` in `test/data/sqlContracts.test.ts` as well as the in-memory
+  run; `dataEraserContract` now asks that no shape is left (both implementations); `test/data/restore.test.ts`
+  (a backup's shapes replace this phone's); `test/data/upgrade.test.ts` (a version 15 database comes up with no
+  shape and keeps one saved after); `test/data/schema.test.ts` (the table is named among those added);
+  `test/engine/shapedTargets.test.ts` (no balance chosen is Balanced, carbs at 100 g where they fit).
+- Not verified: the upgrade from 15 to 16 on the owner's phone, and a shape surviving a restart there.

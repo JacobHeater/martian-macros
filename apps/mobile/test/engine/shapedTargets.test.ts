@@ -15,9 +15,24 @@ describe('shapedTargets', () => {
   const weekend = new WeekShape({ higherDays: [6, 0], raise: 0.2 });
   const day = (weekday: number, shape: TargetShape | undefined, targets = flat) => shapedTargets({ targets, weekday, shape, limits });
 
-  it('leaves the targets as issued with no shape, or a flat week and no balance', () => {
-    expect(day(1, undefined)).toBe(flat);
-    expect(day(1, new TargetShape({ since }))).toBe(flat);
+  // MM-486: the default is Balanced, not MM-24's 25% the check-in issues.
+  it('with no balance chosen, a day is Balanced: fat 30% of calories, carbs the rest, calories and protein as issued', () => {
+    const issued = new DailyTargets({ kcal: 2000, proteinG: 160, proteinMinimumG: 130, fatG: 500 / 9, carbsG: (2000 - 640 - 500) / 4, weeklyRateFraction: -0.005 });
+    for (const shape of [undefined, new TargetShape({ since })]) {
+      const shaped = day(1, shape, issued);
+      expect(shaped.kcal).toBe(2000);
+      expect(shaped.proteinG).toBe(160);
+      expect(shaped.fatG).toBeCloseTo(600 / 9, 6);
+      expect(shaped.carbsG).toBeCloseTo((2000 - 640 - 600) / 4, 6);
+    }
+  });
+
+  it('with no balance chosen, carbs stay at 100 g where they fit, and fat never goes under its minimum', () => {
+    const lean = new DailyTargets({ kcal: 1600, proteinG: 200, fatG: 400 / 9, carbsG: (1600 - 800 - 400) / 4, weeklyRateFraction: -0.005 });
+    const shaped = day(1, undefined, lean);
+    expect(shaped.carbsG).toBeCloseTo(100, 6);
+    expect(shaped.fatG).toBeCloseTo((1600 - 800 - 400) / 9, 6);
+    expect(shaped.fatG).toBeGreaterThanOrEqual(limits.fatMinimumG(1600) - 1e-9);
   });
 
   it('gives each day its share of the week, and the seven days total the flat week', () => {

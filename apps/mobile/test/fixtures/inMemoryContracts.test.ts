@@ -66,6 +66,7 @@ dataEraserContract('In-memory', () => {
     weightEvents: r.weightEvents,
     food: r.food,
     targets: r.targets,
+    targetShapes: r.targetShapes,
     preferences: r.preferences,
     workouts: r.workouts,
     customExercises: r.customExercises,

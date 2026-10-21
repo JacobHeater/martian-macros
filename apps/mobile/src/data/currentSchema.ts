@@ -352,4 +352,12 @@ CREATE TABLE "sleep_nights" (
   "source_name" TEXT NULL,
   PRIMARY KEY ("epoch_day")
 );
+CREATE TABLE "target_shapes" (
+  "since_epoch_day" INTEGER NOT NULL,
+  "fat_share" REAL NULL CHECK("fat_share" IS NULL OR "fat_share" BETWEEN 0.2 AND 0.4),
+  "carb_floor_off" INTEGER NOT NULL DEFAULT 0 CHECK ("carb_floor_off" IN (0, 1)),
+  "higher_days" TEXT NOT NULL DEFAULT '',
+  "raise_share" REAL NOT NULL CHECK("raise_share" > 0.0 AND "raise_share" < 1.0),
+  PRIMARY KEY ("since_epoch_day")
+);
 `;

@@ -6,7 +6,6 @@ import { mmBackup } from '../platform/mmBackup';
 import { AppIdentity } from './AppIdentity';
 import { databaseNameFor } from './databaseNameFor';
 import { SystemClock } from '../domain/integration/SystemClock';
-import { InMemoryTargetShapeRepository } from '../fixtures/InMemoryTargetShapeRepository';
 import { InMemoryPackHttp } from '../foodCatalog/download/InMemoryPackHttp';
 import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { mmPacks } from '../foodCatalog/download/native/mmPacks';
@@ -63,9 +62,6 @@ export async function openAppServices(): Promise<AppServices> {
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
   const onlineHttp = new CapacitorJsonHttp();
   const onlineFoods = new SqlOnlineFoodCache(sql);
-  // How the user shapes their targets has no table yet (MM-486): it is held in memory, lasts until the app
-  // closes, and goes with an erase or a restore like everything else.
-  const targetShapes = new InMemoryTargetShapeRepository();
   return {
     clock: new SystemClock(),
     setup: repositories.setup,
@@ -80,7 +76,7 @@ export async function openAppServices(): Promise<AppServices> {
     dayMarks: repositories.dayMarks,
     intake: repositories.intake,
     targets: repositories.targets,
-    targetShapes,
+    targetShapes: repositories.targetShapes,
     preferences: repositories.preferences,
     insightLog: repositories.insightLog,
     inlineInsightLog: repositories.inlineInsightLog,
@@ -92,20 +88,8 @@ export async function openAppServices(): Promise<AppServices> {
     customExercises: repositories.customExercises,
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
-    eraser: {
-      eraseAll: async () => {
-        await repositories.eraser.eraseAll();
-        targetShapes.clear();
-      },
-    },
-    restorer: {
-      describe: (snapshot) => repositories.restorer.describe(snapshot),
-      describeHere: () => repositories.restorer.describeHere(),
-      restoreFrom: async (snapshot) => {
-        await repositories.restorer.restoreFrom(snapshot);
-        targetShapes.clear();
-      },
-    },
+    eraser: repositories.eraser,
+    restorer: repositories.restorer,
     backup,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or

@@ -6,7 +6,10 @@ import { currentSchemaVersion as current } from '../../src/data/currentSchemaVer
 import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
 import { SleepNight } from '../../src/domain/SleepNight';
+import { TargetShape } from '../../src/domain/TargetShape';
+import { WeekShape } from '../../src/domain/WeekShape';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { StateError } from '../../src/lang/StateError';
 import { SqlFailure } from '../../src/sql/SqlFailure';
@@ -138,8 +141,11 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 15 left it: without the target shapes (MM-486). */
+const versionFifteen = currentSchema.replace(/CREATE TABLE "target_shapes" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 14 left it: without the scale chosen as primary (MM-71). */
-const versionFourteen = currentSchema.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
+const versionFourteen = versionFifteen.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
 
 /**
  * The schema as version 13 left it: the version 14 shape without the state a
@@ -427,4 +433,40 @@ it('a version 14 database comes up to date with the primary scale chosen automat
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
   await repos.preferences.savePrimaryScale('gym');
   expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
+});
+
+// MM-486: a version 15 database comes up to date with no shape set, so every day is Balanced and flat;
+// what it held is kept, and a shape set from then on is kept with every field.
+it('a version 15 database comes up to date with no target shape set, and keeps one set after', async () => {
+  expect(versionFifteen).not.toContain('target_shapes');
+  expect(versionFifteen).toContain('primary_scale_source_id');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 15, schema: versionFifteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, primary_scale_source_id) VALUES (1, 'dark', 'gym')");
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'target_shapes')).toEqual(['since_epoch_day', 'fat_share', 'carb_floor_off', 'higher_days', 'raise_share']);
+  expect(await first(repos.targetShapes.watchTargetShapes())).toEqual([]);
+  expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
+  await repos.targetShapes.saveTargetShape(
+    new TargetShape({
+      since: day,
+      balance: new CarbFatBalance({ fatShare: CarbFatBalance.moreFatFatShare }),
+      week: new WeekShape({ higherDays: [6, 0], raise: 0.2 }),
+    }),
+  );
+  const [shape] = await first(repos.targetShapes.watchTargetShapes());
+  expect(shape?.since).toBe(day);
+  expect(shape?.balance?.fatShare).toBe(CarbFatBalance.moreFatFatShare);
+  expect([...(shape?.week.higherDays ?? [])]).toEqual([0, 6]);
+  expect(shape?.week.raise).toBe(0.2);
 });
