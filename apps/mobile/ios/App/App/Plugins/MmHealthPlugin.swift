@@ -52,6 +52,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "readWorkouts", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeWorkout", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "removeWorkout", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "profile", returnType: CAPPluginReturnPromise),
     ]
 
     private static let askedKey = "mm_health_asked"
@@ -620,6 +621,46 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         store.deleteObjects(of: HKObjectType.workoutType(), predicate: predicate) { _, _, error in
             if let error = error { return call.reject(error.localizedDescription) }
             call.resolve(["removed": true])
+        }
+    }
+
+    /**
+     * Onboarding's first answers from Apple Health (MM-69): asks to read biological sex, date of birth and height (the
+     * sheet shows only for what was never asked), then answers what is held. HealthKit does not say whether reading was
+     * refused: a refusal reads as nothing held. Sex is female, male or other; not set is left out. The date of birth is
+     * its parts, January as 1; the height the latest recorded, in metres. Nothing here is kept by the plugin.
+     */
+    @objc func profile(_ call: CAPPluginCall) {
+        guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
+        var wanted: Set<HKObjectType> = [HKQuantityType(.height)]
+        if let sex = HKObjectType.characteristicType(forIdentifier: .biologicalSex) { wanted.insert(sex) }
+        if let born = HKObjectType.characteristicType(forIdentifier: .dateOfBirth) { wanted.insert(born) }
+        store.requestAuthorization(toShare: nil, read: wanted) { _, error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            var answer: JSObject = [:]
+            // Each characteristic throws when it cannot be read; that is no answer, as a refusal is.
+            if let sex = try? self.store.biologicalSex().biologicalSex {
+                switch sex {
+                case .female: answer["sex"] = "female"
+                case .male: answer["sex"] = "male"
+                case .other: answer["sex"] = "other"
+                default: break
+                }
+            }
+            if let born = try? self.store.dateOfBirthComponents(), let year = born.year, let month = born.month, let day = born.day {
+                answer["birthYear"] = year
+                answer["birthMonth"] = month
+                answer["birthDay"] = day
+            }
+            let latest = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+            let query = HKSampleQuery(sampleType: HKQuantityType(.height), predicate: nil, limit: 1, sortDescriptors: [latest]) { _, samples, _ in
+                // A height that cannot be read is no answer either; the sex and date of birth still are.
+                if let height = samples?.first as? HKQuantitySample {
+                    answer["heightM"] = height.quantity.doubleValue(for: .meter())
+                }
+                call.resolve(answer)
+            }
+            self.store.execute(query)
         }
     }
 }
