@@ -5,6 +5,7 @@
  */
 export * from './adherenceLines';
 export * from './bodyFatNote';
+export * from './bodyFatRange';
 export * from './bodyFatRangeText';
 export * from './goalBodyFatCheckText';
 export * from './phaseEndText';
