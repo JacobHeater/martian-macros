@@ -20,7 +20,8 @@ export function PeriodDaysCard() {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const setup = useLoaded(state.setup);
-  const flowDays = useLoaded(state.flowDays);
+  // Only what was marked here can be unmarked here; days read from the health platform shade the chart (MM-68).
+  const flowDays = useLoaded(state.typedFlowDays);
   const today = useCell(state.today);
   if (setup === undefined || setup.profile.sex !== 'female' || setup.screening.menopause || flowDays === undefined) return null;
   const marked = new Set(flowDays.map((d) => d.date));
