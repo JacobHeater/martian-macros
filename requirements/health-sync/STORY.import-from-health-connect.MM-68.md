@@ -1,6 +1,6 @@
 ---
 id: MM-68
-status: in-progress
+status: done
 component: health-sync
 related: [MM-66, MM-67, MM-16, MM-19, MM-20, MM-34, MM-71, MM-72, MM-73, MM-188, MM-189, MM-498]
 ---
@@ -13,6 +13,9 @@ See MM-66.
 ## Decisions
 Choices I made without asking (say if any is wrong):
 - **Connecting is offered, never required**: at the end of onboarding and in Settings.
+  (2026-10-21, the builder) **In onboarding it is offered at the weight question, not at the end**, so that today's
+  weigh-in can be offered as the current weight (MM-73). Only weight is asked for there, with its history; the other
+  kinds are allowed in Settings. Built like Settings' health rows (rule 9): a list row under the weight field.
 - **Permissions are requested per data type**, with a sentence for each saying what it is used for. Refusing one does not block the others.
 - **Each imported weigh-in shows where it came from**, and the user can type a value for a day to overrule it.
 - **Menstruation data is requested only for female profiles.**
@@ -95,9 +98,14 @@ Closed or another ticket's:
   further than Health Connect's first month is MM-73; a re-read after an expired token keeps it (MM-498).
 - Sessions in the training log: MM-490 (importing a platform's workouts needs a stored platform id, a schema change).
 
-Not built:
-- The offer at the end of onboarding.
-- The permission screen itself was not seen: permissions were granted over adb.
+- **The offer in onboarding** (with MM-73): "Read weight from Health Connect" under the weight question
+  (`WeightFromHealthRows`; `test/app/onboardingHealth.test.tsx`; stories `MeasurementsHealthConnectOffered`,
+  `MeasurementsWeighInOffered`, `MeasurementsWeighInUsed`, `MeasurementsReadingHealth`, `MeasurementsNoWeighInToday`).
+  The rows and the caption under the weight are said when they change, and when a pressed row goes away the weight
+  field takes focus (the UX-accessibility review).
+
+Done (2026-10-21): every scenario is built and tested against the fake. Google Play's declaration and the
+privacy-policy page are release gates (MM-95, M5) and do not hold this.
 - Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent
   opens the app's main screen for now.
 
@@ -112,3 +120,10 @@ Not built:
 ## Notes
 - Health Connect has no biological-sex record, so nothing here touches MM-14.
 - Google Play requires a declaration of each health permission and why it is needed (MM-95).
+
+## Owed on a phone
+- Health Connect's permission sheet for each kind, and for weight from onboarding, as a person sees it (it was only
+  granted over adb).
+- A scale's real reading arrives as today's weigh-in with its source name and units, and the trend includes it.
+- A permission taken away in the phone's settings is noticed, reading stops, and what was read is kept.
+- Imported days of flow shade the Progress chart; a platform height that differs is offered under Height.
