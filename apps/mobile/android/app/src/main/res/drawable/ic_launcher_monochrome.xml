@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The themed (monochrome) icon (MM-109): the mark of ic_launcher_foreground.xml
+  in one colour, which the launcher tints. Only its alpha is used, so the gap
+  between the ring and the planet is a real cut, not a painted line.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.8"
+        android:scaleY="0.8">
+        <group
+            android:pivotX="54"
+            android:pivotY="54"
+            android:rotation="-20">
+            <path
+                android:fillColor="#00000000"
+                android:pathData="M82.898,54.754 A29,9 0 1,1 63.919,45.543"
+                android:strokeColor="#FFFFFFFF"
+                android:strokeLineCap="round"
+                android:strokeWidth="4" />
+            <group>
+                <clip-path android:pathData="M-60,54 L28.5,54 A25.5,5.5 0 0,0 79.5,54 L168,54 L168,-60 L-60,-60 Z M-60,54 L21.5,54 A32.5,12.5 0 0,0 86.5,54 L168,54 L168,168 L-60,168 Z" />
+                <path
+                    android:fillColor="#FFFFFFFF"
+                    android:pathData="M35,54 A19,19 0 1,1 73,54 A19,19 0 1,1 35,54 Z" />
+            </group>
+            <path
+                android:fillColor="#FFFFFFFF"
+                android:pathData="M74.615,49.5 A4.5,4.5 0 1,1 83.615,49.5 A4.5,4.5 0 1,1 74.615,49.5 Z" />
+        </group>
+    </group>
+</vector>

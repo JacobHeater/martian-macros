@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      MM-109: the launch screen's ground, Martian's canvas (the canvas token in
+      src/theme/tokens.css, the default palette), so the first frame does not
+      flash. capacitor.config.ts gives the web view the same colour;
+      test/shell/launchScreen.test.ts holds them equal.
+    -->
+    <color name="launch_canvas">#110C35</color>
+</resources>

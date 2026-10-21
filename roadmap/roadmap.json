@@ -1482,6 +1482,7 @@
           "MM-101",
           "MM-108",
           "MM-109",
+          "MM-474",
           "MM-176",
           "MM-179",
           "MM-183",
@@ -1561,7 +1562,8 @@
           "step": 6,
           "title": "App icon and launch screen",
           "tickets": [
-            "MM-109"
+            "MM-109",
+            "MM-474"
           ],
           "milestone": "M3"
         },

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app mark (MM-109), the twin of apps/mobile/design/icon.svg: change them
+  together. A tangerine Mars, the lime horizon arc as its ring, an aqua body
+  travelling on it. The adaptive icon's foreground, the Android 12+ splash icon
+  and the older launch screen's mark. Everything sits inside a 62-unit circle,
+  under the 66-unit safe zone, so no launcher mask clips it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.8"
+        android:scaleY="0.8">
+        <group
+            android:pivotX="54"
+            android:pivotY="54"
+            android:rotation="-20">
+            <!-- The ring, broken where the body sits; its back half passes behind the planet. -->
+            <path
+                android:fillColor="#00000000"
+                android:pathData="M82.898,54.754 A29,9 0 1,1 63.919,45.543"
+                android:strokeColor="#C4FF48"
+                android:strokeLineCap="round"
+                android:strokeWidth="4" />
+            <group>
+                <!-- The planet with a gap cut where the ring's front half crosses it. -->
+                <clip-path android:pathData="M-60,54 L28.5,54 A25.5,5.5 0 0,0 79.5,54 L168,54 L168,-60 L-60,-60 Z M-60,54 L21.5,54 A32.5,12.5 0 0,0 86.5,54 L168,54 L168,168 L-60,168 Z" />
+                <path
+                    android:fillColor="#FF9A3D"
+                    android:pathData="M35,54 A19,19 0 1,1 73,54 A19,19 0 1,1 35,54 Z" />
+                <group
+                    android:pivotX="54"
+                    android:pivotY="54"
+                    android:rotation="20">
+                    <path
+                        android:fillColor="#E0662A"
+                        android:pathData="M70.471,63.471 A19,19 0 1,1 44.529,37.529 A19,19 0 0,0 70.471,63.471 Z" />
+                </group>
+            </group>
+            <path
+                android:fillColor="#43F5E0"
+                android:pathData="M74.615,49.5 A4.5,4.5 0 1,1 83.615,49.5 A4.5,4.5 0 1,1 74.615,49.5 Z" />
+        </group>
+    </group>
+</vector>

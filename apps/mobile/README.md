@@ -119,18 +119,32 @@ came from, the conversion is written the same way everywhere.
 | A record `(a, b)` | A readonly tuple `[a, b]` |
 | `/// doc comment` | `/** doc comment */`, the same words |
 
-## App icon and splash
+## App icon and launch screen
 
-The masters live in `design/`: `app-icon.png` (square, the art filling the
-frame), `loading-screen.png` (portrait) and `landscape-loading-screen.png`.
-Every platform icon and splash is generated from them, never edited by hand:
+The icon is vector (MM-109): a tangerine Mars ringed by the lime horizon arc,
+with an aqua body on the ring. The masters are in `design/`: `icon.svg` (on
+Martian's overlay violet), `icon-dark.svg` and `icon-tinted.svg` (iOS 18's
+dark and tinted icons) and `launch-mark.svg` (the mark alone).
+
+- **Android** uses no raster (minSdk 26): the adaptive icon is
+  `res/drawable/ic_launcher_foreground.xml` on `@color/ic_launcher_background`,
+  with `ic_launcher_monochrome.xml` as the themed icon. These are hand-kept
+  twins of `icon.svg`; change them together. The launch theme shows the
+  foreground on `@color/launch_canvas` (Android 12+ through the splash
+  attributes, earlier through `drawable/launch_screen.xml`).
+- **iOS** and the rest take PNGs drawn from the masters, never edited by hand:
 
 ```sh
 python3 scripts/app-icons.py
 ```
 
-That writes the iOS 1024 px icon and its 2732 px splash (shown aspect-fit by
-the launch storyboard on the art's own sky colour), the Android launcher,
-round and adaptive foreground at each density (the adaptive background colour
-taken from the art's corner) and the portrait and landscape splashes at each
-density, and the web shell's favicon in `public/`.
+That writes the iOS 1024 px icons (opaque), the launch storyboard's mark at
+1x, 2x and 3x, the web shell's favicon in `public/` and the Play store's
+512 px icon in `design/store/`. It uses macOS's Quick Look, so it needs
+nothing installed.
+
+The launch screen, the web view's `backgroundColor` (`capacitor.config.ts`)
+and Martian's `--canvas` are the same colour, so the start does not flash;
+`test/shell/launchScreen.test.ts` holds them equal. The owner's illustrations
+(`app-icon.png`, `loading-screen.png`, `landscape-loading-screen.png`) stay in
+`design/` as art; nothing is generated from them.

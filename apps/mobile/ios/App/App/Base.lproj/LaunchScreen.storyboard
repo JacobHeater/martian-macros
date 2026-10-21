@@ -12,11 +12,11 @@
         <scene sceneID="EHf-IW-A2E">
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
-                    <imageView key="view" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Splash" id="snD-IY-ifK">
+                    <imageView key="view" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchMark" id="snD-IY-ifK">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <!-- The sky of design/loading-screen.png, so the bars beside the art on any screen match it (scripts/app-icons.py). -->
-                        <color key="backgroundColor" red="0.0078" green="0.0039" blue="0.051" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <!-- MM-109: the mark at its own size, centred on Martian's canvas #110c35 (the default palette's first frame; test/shell/launchScreen.test.ts). -->
+                        <color key="backgroundColor" red="0.0667" green="0.0471" blue="0.2078" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </imageView>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -25,7 +25,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Splash" width="1366" height="1366"/>
+        <image name="LaunchMark" width="192" height="192"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

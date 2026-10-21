@@ -1,33 +1,49 @@
 #!/usr/bin/env python3
-"""Every app icon and splash from design/ (run: python3 scripts/app-icons.py).
+"""The app icon's rasters, from the vector masters in design/ (MM-109).
 
-The icon master, app-icon.png, is a square PNG with the art filling the
-frame. iOS takes it at 1024 px. Android takes a square launcher at each
-density, a round one (the same art under a circle), and an adaptive
-foreground: the art at two thirds on a canvas of the art's own corner
-colour, which is also the adaptive background, so the system's mask shows
-a seamless edge. The web shell takes a 192 px favicon.
+Run on a Mac: python3 scripts/app-icons.py
 
-The splash masters are loading-screen.png (portrait) and
-landscape-loading-screen.png. Each platform's splash is the art fitted
-whole inside the frame that platform wants, on the art's own corner colour,
-so the bars on a taller or wider screen match the sky: iOS one 2732 px
-square of the portrait art (shown aspect-fit by the launch storyboard),
-Android the portrait art at each portrait density and the landscape art at
-each landscape density.
+The masters are SVG: icon.svg (the icon on its violet ground), icon-dark.svg
+and icon-tinted.svg (iOS 18's dark and tinted icons) and launch-mark.svg (the
+mark alone, for the launch screen). Android needs no raster: minSdk is 26, so
+its launcher icon, themed icon and launch screen are the vector drawables in
+android/app/src/main/res/drawable/, the twins of these masters.
 
-Pure Python: it decodes and encodes the PNGs itself, so it needs nothing
-installed.
+This writes the iOS 1024 px icons (opaque: the App Store refuses an icon with
+an alpha channel), the iOS launch mark at 1x, 2x and 3x, the web shell's
+favicon in public/, and the Play store's 512 px icon in design/store/.
+
+macOS's Quick Look (qlmanage) draws the SVG, so nothing is installed; the PNGs
+are decoded and re-encoded here to drop the alpha channel where it must go.
+Quick Look fills transparency with white, so a transparent master is drawn on
+black and on white and its alpha recovered from the difference.
+
+The owner's illustrations (app-icon.png, loading-screen.png,
+landscape-loading-screen.png) stay in design/ as art; nothing is generated
+from them any more.
 """
 import struct
+import subprocess
 import sys
+import tempfile
 import zlib
 from pathlib import Path
 
 mobile = Path(__file__).resolve().parent.parent
-master = mobile / 'design' / 'app-icon.png'
-splash_master = mobile / 'design' / 'loading-screen.png'
-landscape_master = mobile / 'design' / 'landscape-loading-screen.png'
+design = mobile / 'design'
+catalog = mobile / 'ios/App/App/Assets.xcassets'
+
+# (master, pixel size, output, keeps alpha)
+RASTERS = [
+    ('icon.svg', 1024, catalog / 'AppIcon.appiconset/AppIcon-1024.png', False),
+    ('icon-dark.svg', 1024, catalog / 'AppIcon.appiconset/AppIcon-1024-dark.png', False),
+    ('icon-tinted.svg', 1024, catalog / 'AppIcon.appiconset/AppIcon-1024-tinted.png', False),
+    ('launch-mark.svg', 192, catalog / 'LaunchMark.imageset/launch-mark.png', True),
+    ('launch-mark.svg', 384, catalog / 'LaunchMark.imageset/launch-mark@2x.png', True),
+    ('launch-mark.svg', 576, catalog / 'LaunchMark.imageset/launch-mark@3x.png', True),
+    ('icon.svg', 192, mobile / 'public/app-icon.png', False),
+    ('icon.svg', 512, design / 'store/play-icon-512.png', False),
+]
 
 
 def read_png(path: Path):
@@ -88,93 +104,44 @@ def write_png(path: Path, pixels, alpha: bool):
     path.write_bytes(out)
 
 
-def resize(pixels, size: int, width=None):
-    """A box filter over the source area each target pixel covers: clean downscaling, no library."""
-    source_h, source_w = len(pixels), len(pixels[0])
-    height, width = size, width if width is not None else size
+def render(master: Path, size: int, scratch: Path):
+    """Quick Look's drawing of the SVG at size by size, as decoded pixels."""
+    subprocess.run(['qlmanage', '-t', '-s', str(size), '-o', str(scratch), str(master)], check=True, capture_output=True)
+    width, height, pixels = read_png(scratch / f'{master.name}.png')
+    assert (width, height) == (size, size), f'{master.name} drew {width}x{height}, not {size}'
+    return pixels
+
+
+def on_ground(master: Path, ground: str, scratch: Path) -> Path:
+    """A copy of the master with a solid ground under the drawing."""
+    svg = master.read_text()
+    assert '</defs>' in svg, f'{master.name} has no <defs> to put the ground after'
+    copy = scratch / f'{master.stem}-{ground.strip("#")}.svg'
+    copy.write_text(svg.replace('</defs>', f'</defs><rect x="-1000" y="-1000" width="3000" height="3000" fill="{ground}"/>', 1))
+    return copy
+
+
+def transparent(master: Path, size: int, scratch: Path):
+    """The master's pixels with alpha: drawn on black and on white, alpha is one minus their difference."""
+    black = render(on_ground(master, '#000000', scratch), size, scratch)
+    white = render(on_ground(master, '#ffffff', scratch), size, scratch)
     out = []
-    for y in range(height):
-        y0, y1 = y * source_h / height, (y + 1) * source_h / height
+    for row_b, row_w in zip(black, white):
         row = []
-        for x in range(width):
-            x0, x1 = x * source_w / width, (x + 1) * source_w / width
-            total = [0.0, 0.0, 0.0, 0.0]
-            weight = 0.0
-            for sy in range(int(y0), min(source_h, int(y1) + 1)):
-                wy = min(y1, sy + 1) - max(y0, sy)
-                if wy <= 0:
-                    continue
-                for sx in range(int(x0), min(source_w, int(x1) + 1)):
-                    wx = min(x1, sx + 1) - max(x0, sx)
-                    if wx <= 0:
-                        continue
-                    w = wx * wy
-                    p = pixels[sy][sx]
-                    for i in range(4):
-                        total[i] += p[i] * w
-                    weight += w
-            row.append(tuple(int(round(t / weight)) for t in total))
+        for b, w in zip(row_b, row_w):
+            a = 255 - round(sum(w[i] - b[i] for i in range(3)) / 3)
+            a = max(0, min(255, a))
+            row.append(tuple(min(255, round(b[i] * 255 / a)) for i in range(3)) + (a,) if a else (0, 0, 0, 0))
         out.append(row)
     return out
 
 
-def on_canvas(art, size: int, scale: float, fill):
-    inner = resize(art, int(round(size * scale)))
-    offset = (size - len(inner)) // 2
-    canvas = [[fill for _ in range(size)] for _ in range(size)]
-    for y, row in enumerate(inner):
-        canvas[offset + y][offset:offset + len(inner)] = row
-    return canvas
-
-
-def fitted(art, width: int, height: int, fill):
-    """The art whole inside width by height, centred, on `fill`."""
-    art_h, art_w = len(art), len(art[0])
-    scale = min(width / art_w, height / art_h)
-    inner = resize(art, max(1, int(round(art_h * scale))), max(1, int(round(art_w * scale))))
-    top, left = (height - len(inner)) // 2, (width - len(inner[0])) // 2
-    canvas = [[fill for _ in range(width)] for _ in range(height)]
-    for y, row in enumerate(inner):
-        canvas[top + y][left:left + len(row)] = row
-    return canvas
-
-
-def rounded(pixels):
-    size = len(pixels)
-    r = size / 2
-    return [[p if (x + 0.5 - r) ** 2 + (y + 0.5 - r) ** 2 <= r * r else (0, 0, 0, 0) for x, p in enumerate(row)] for y, row in enumerate(pixels)]
-
-
 def main() -> None:
-    width, height, art = read_png(master)
-    assert width == height, 'the master must be square'
-    corner = art[4][4][:3] + (255,)
-    write_png(mobile / 'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png', resize(art, 1024), alpha=False)
-    res = mobile / 'android/app/src/main/res'
-    for density, launcher, foreground in [('mdpi', 48, 108), ('hdpi', 72, 162), ('xhdpi', 96, 216), ('xxhdpi', 144, 324), ('xxxhdpi', 192, 432)]:
-        square = resize(art, launcher)
-        write_png(res / f'mipmap-{density}/ic_launcher.png', square, alpha=False)
-        write_png(res / f'mipmap-{density}/ic_launcher_round.png', rounded(square), alpha=True)
-        write_png(res / f'mipmap-{density}/ic_launcher_foreground.png', on_canvas(art, foreground, 2 / 3, corner), alpha=False)
-    colour = '#%02X%02X%02X' % corner[:3]
-    (res / 'values/ic_launcher_background.xml').write_text(
-        '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">%s</color>\n</resources>\n' % colour
-    )
-    write_png(mobile / 'public/app-icon.png', resize(art, 192), alpha=False)
-    print(f'icons written from {master.name} ({width} px); adaptive background {colour}')
-
-    splash_w, splash_h, splash = read_png(splash_master)
-    sky = splash[4][4][:3] + (255,)
-    square = fitted(splash, 2732, 2732, sky)
-    for name in ['splash-2732x2732.png', 'splash-2732x2732-1.png', 'splash-2732x2732-2.png']:
-        write_png(mobile / 'ios/App/App/Assets.xcassets/Splash.imageset' / name, square, alpha=False)
-    land_w, land_h, landscape = read_png(landscape_master)
-    land_sky = landscape[4][4][:3] + (255,)
-    write_png(res / 'drawable/splash.png', fitted(landscape, 480, 320, land_sky), alpha=False)
-    for density, w, h in [('mdpi', 320, 480), ('hdpi', 480, 800), ('xhdpi', 720, 1280), ('xxhdpi', 960, 1600), ('xxxhdpi', 1280, 1920)]:
-        write_png(res / f'drawable-port-{density}/splash.png', fitted(splash, w, h, sky), alpha=False)
-        write_png(res / f'drawable-land-{density}/splash.png', fitted(landscape, h, w, land_sky), alpha=False)
-    print(f'splashes written from {splash_master.name} ({splash_w}x{splash_h} px) and {landscape_master.name} ({land_w}x{land_h} px); sky {"#%02X%02X%02X" % sky[:3]}')
+    with tempfile.TemporaryDirectory() as scratch:
+        for name, size, out, alpha in RASTERS:
+            draw = transparent if alpha else render
+            write_png(out, draw(design / name, size, Path(scratch)), alpha=alpha)
+            print(f'{out.relative_to(mobile)} ({size} px) from {name}')
 
 
 if __name__ == '__main__':
