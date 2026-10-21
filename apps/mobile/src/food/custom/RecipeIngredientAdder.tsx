@@ -9,7 +9,10 @@ import { useAsync } from '../../app/useAsync';
 import { useLoaded } from '../../app/useLoaded';
 import { MmButton } from '../../ui/MmButton';
 import { MmListRow } from '../../ui/MmListRow';
+import { MmSegmented } from '../../ui/MmSegmented';
 import { MmTextField } from '../../ui/MmTextField';
+import { weighedConsequence } from '../weighedConsequence';
+import { weighedStateLabel } from '../weighedStateLabel';
 import '../food.css';
 
 const per100g = (food: CatalogFood) => `${roundHalfAwayFromZero(food.kcal) + 0} kcal per 100 g`;
@@ -17,7 +20,8 @@ const per100g = (food: CatalogFood) => `${roundHalfAwayFromZero(food.kcal) + 0} 
 /**
  * Adds one line to a recipe (MM-45): a food found by search and a weight,
  * or a name and the totals typed in. Calls `onAdd` with the line and
- * clears.
+ * clears. A found food the pack has raw and cooked asks which state was
+ * weighed, as the amount step does (MM-151), and the line is of that state.
  */
 export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredient) => void }) {
   const { state } = useApp();
@@ -31,6 +35,7 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
   const [fat, setFat] = useState('');
   const [picked, setPicked] = useState<CatalogFood>();
   const [byNumbers, setByNumbers] = useState(false);
+  const [useAlternate, setUseAlternate] = useState(false);
 
   const searching = !byNumbers && picked === undefined && query.trim() !== '';
   const hits =
@@ -39,8 +44,18 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
       `${catalog?.packs.length ?? -1}:${searching ? query.trim() : ''}`,
     ) ?? [];
 
+  const alternate = useAsync(
+    () => (picked !== undefined && catalog !== undefined ? catalog.pairOf(picked) : Promise.resolve(undefined)),
+    `${catalog?.packs.length ?? -1}:${picked === undefined ? '' : `${picked.packId}:${picked.id}`}`,
+  );
+  const weighed = useAlternate && alternate !== undefined ? alternate : picked;
+  const choose = (food: CatalogFood | undefined) => {
+    setPicked(food);
+    setUseAlternate(false);
+  };
+
+  const weight = parseNumber(grams);
   const line = (): RecipeIngredient | undefined => {
-    const weight = parseNumber(grams);
     if (byNumbers) {
       const energy = parseNumber(kcal);
       const typed = name.trim();
@@ -56,15 +71,15 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
         }),
       };
     }
-    if (picked === undefined || weight === undefined || weight <= 0) return undefined;
+    if (weighed === undefined || weight === undefined || weight <= 0) return undefined;
     return {
-      name: picked.brand === undefined ? picked.name : `${picked.name} (${picked.brand})`,
+      name: weighed.brand === undefined ? weighed.name : `${weighed.name} (${weighed.brand})`,
       grams: weight,
       totals: new NutritionTotals({
-        kcal: picked.kcal,
-        proteinG: picked.proteinG,
-        carbsG: picked.carbsG,
-        fatG: picked.fatG,
+        kcal: weighed.kcal,
+        proteinG: weighed.proteinG,
+        carbsG: weighed.carbsG,
+        fatG: weighed.fatG,
       }).times(weight / 100),
     };
   };
@@ -73,7 +88,7 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
   const add = () => {
     if (ready === undefined) return;
     onAdd(ready);
-    setPicked(undefined);
+    choose(undefined);
     for (const clear of [setQuery, setGrams, setName, setKcal, setProtein, setCarbs, setFat]) clear('');
   };
 
@@ -100,7 +115,7 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
             <MmListRow
               title={picked.name}
               subtitle={per100g(picked)}
-              trailingAction={<MmButton label="Change" kind="text" onPress={() => setPicked(undefined)} />}
+              trailingAction={<MmButton label="Change" kind="text" onPress={() => choose(undefined)} />}
             />
           )}
           {hits.map(({ food }) => (
@@ -108,7 +123,7 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
               key={`${food.packId}-${food.id}`}
               title={food.name}
               subtitle={per100g(food)}
-              onPress={() => setPicked(food)}
+              onPress={() => choose(food)}
             />
           ))}
         </>
@@ -120,6 +135,26 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
         value={grams}
         onChange={setGrams}
       />
+      {!byNumbers && picked !== undefined && alternate !== undefined ? (
+        <>
+          {/* Raw and cooked weigh differently for the same energy (MM-45, MM-151). */}
+          <p className="food-label food-label-spaced">Weighed as</p>
+          <MmSegmented<boolean>
+            name="Weighed as"
+            segments={[
+              { value: false, label: weighedStateLabel(picked) },
+              { value: true, label: weighedStateLabel(alternate) },
+            ]}
+            selected={useAlternate}
+            onChange={(other) => setUseAlternate(other === true)}
+          />
+          <p className="app-caption">
+            {weight === undefined || weight <= 0 || weighed === undefined
+              ? 'Choose the state it was in when you weighed it.'
+              : weighedConsequence(weight, weighed, weighed === picked ? alternate : picked)}
+          </p>
+        </>
+      ) : null}
       <div className="app-gap-small" />
       <div className="app-row">
         <MmButton label="Add" kind="secondary" onPress={ready === undefined ? undefined : add} />

@@ -845,6 +845,33 @@ export const NewRecipeByNumbers = screenStory({
   },
 });
 
+/** MM-45, MM-151: an ingredient the pack has raw and cooked, weighed: what the weight means either way. */
+export const NewRecipeIngredientWeighedAs = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: '200 g cooked is about 260 kcal. 200 g raw is about 730 kcal.',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New recipe')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
+  },
+});
+
+/** MM-45: a recipe's ingredient line opened: move it or remove it. */
+export const EditRecipeLineMenu = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Move down',
+  scenario: withOwnFoods,
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo chili/)(canvas);
+    await press('More actions for Ground beef, lean, cooked')(canvas);
+  },
+});
+
 /** MM-321: a barcode the pack does not know: read the label, or enter it by hand. */
 export const ScanUnknownCode = screenStory({
   covers: ['BarcodeScanStep'],
