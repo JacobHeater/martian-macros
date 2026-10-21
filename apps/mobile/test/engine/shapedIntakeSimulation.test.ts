@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/domain/CalendarDate';
+import { TargetShape } from '../../src/domain/TargetShape';
 import { WeekShape } from '../../src/domain/WeekShape';
 import {
   energyDensityForSlope,
+  plannedDayShare,
   shapeWeek,
   type TdeeEstimate,
   TdeeEstimator,
   type TdeePrior,
+  usableIntakeDays,
   WeightTrendModel,
 } from '../../src/engine';
 import type { Logs } from './support/Logs';
@@ -19,18 +23,23 @@ import { SyntheticUser } from './support/SyntheticUser';
  * must not take a planned lower day for a half-logged one. Simulated users
  * eat the shape as planned, with the usual logging and adherence noise and a
  * glycogen-and-gut store (MM-131) that rises and falls with the higher days,
- * and each is compared with the same user, same noise, eating flat.
+ * and each is compared with the same user, same noise, eating flat. Each
+ * trial starts on a different weekday (seed % 7), so the window's ends fall
+ * on higher and lower days alike.
  */
 const estimator = new TdeeEstimator();
 const trendModel = new WeightTrendModel();
 const bmr = 1850;
 const prior: TdeePrior = { kcal: 2500, sigmaKcal: 375 };
 const flatKcal = 2200;
-const trials = 40;
+// A multiple of 7, so every start weekday is tried equally often.
+const trials = 70;
+const firstStart = CalendarDate.of(2026, 1, 1);
 
-function estimate(user: SyntheticUser, logs: Logs): TdeeEstimate {
+function estimate(user: SyntheticUser, logs: Logs, plannedShare: (date: CalendarDate) => number): TdeeEstimate {
   const asOf = user.today.addDays(-1);
   return estimator.estimate({
+    plannedShare,
     asOf,
     intake: logs.intake,
     trend: trendModel.smooth(logs.weights, { through: asOf }),
@@ -57,29 +66,56 @@ function live(user: SyntheticUser, week: WeekShape): Logs {
 interface Stats {
   bias: number;
   coverage2Sigma: number;
-  meanExcluded: number;
+  /** Logged planned lower days in the windows (every logged day is whole: the simulated users never half-log). */
+  lowerDays: number;
+  /** Of those, the ones the partial-day rule dropped. */
+  droppedLowerDays: number;
   errors: number[];
 }
 
-function monteCarlo(week: WeekShape, glycogenSwingFraction: number): Stats {
+/** `counted`: the shape whose lower days are counted, so a flat run is read on the same days as its shaped twin. */
+function monteCarlo(week: WeekShape, glycogenSwingFraction: number, counted: WeekShape = week): Stats {
   const errors: number[] = [];
   let covered = 0;
-  let excluded = 0;
+  let lowerDays = 0;
+  let droppedLowerDays = 0;
   for (let seed = 300; seed < 300 + trials; seed++) {
-    const user = new SyntheticUser({ seed, baseTdeeKcal: 2800, glycogenSwingFraction });
+    const start = firstStart.addDays(seed % 7);
+    const user = new SyntheticUser({ seed, start, baseTdeeKcal: 2800, glycogenSwingFraction });
     const logs = live(user, week);
-    const result = estimate(user, logs);
+    const plannedShare = plannedDayShare([new TargetShape({ since: start, week })]);
+    const result = estimate(user, logs, plannedShare);
     expect(result.status).toBe('updated');
-    const window = logs.trueTdee.slice(logs.trueTdee.length - 28);
-    const err = result.kcal - window.reduce((a, b) => a + b) / window.length;
+
+    // The window is four whole weeks: each weekday, higher or lower, four times.
+    const asOf = user.today.addDays(-1);
+    const from = result.windowStart ?? asOf;
+    expect(from.daysUntil(asOf) + 1, 'window length').toBe(28);
+    const window = logs.intake.filter((d) => !d.date.isBefore(from) && !d.date.isAfter(asOf));
+    const weekdays = Array.from({ length: from.daysUntil(asOf) + 1 }, (_, i) => from.addDays(i).weekday);
+    for (let weekday = 0; weekday < 7; weekday++) {
+      expect(weekdays.filter((w) => w === weekday), 'whole weeks').toHaveLength(4);
+    }
+
+    // Dropped days, read directly: the same rule over the same days, by date.
+    const kept = new Set(usableIntakeDays(window, { plannedShare }).map((d) => d.date.epochDay));
+    expect(window.length - kept.size, 'the estimate drops the days the rule drops').toBe(result.excludedPartialDays);
+    for (const day of window) {
+      if (counted.higherDays.has(day.date.weekday)) continue;
+      lowerDays++;
+      if (!kept.has(day.date.epochDay)) droppedLowerDays++;
+    }
+
+    const truth = logs.trueTdee.slice(logs.trueTdee.length - 28);
+    const err = result.kcal - truth.reduce((a, b) => a + b) / truth.length;
     errors.push(err);
     if (Math.abs(err) <= 2 * result.sigmaKcal) covered++;
-    excluded += result.excludedPartialDays;
   }
   return {
     bias: errors.reduce((a, b) => a + b) / trials,
     coverage2Sigma: covered / trials,
-    meanExcluded: excluded / trials,
+    lowerDays,
+    droppedLowerDays,
     errors,
   };
 }
@@ -92,14 +128,20 @@ describe('the estimate over a shaped week (MM-124)', () => {
   for (const glycogen of [0, 0.02]) {
     for (const [name, week] of shapes) {
       it(`${name}${glycogen > 0 ? ', with a glycogen store' : ''}: unbiased, honest, and no planned day dropped`, () => {
-        const flat = monteCarlo(WeekShape.flat, glycogen);
+        const flat = monteCarlo(WeekShape.flat, glycogen, week);
         const shaped = monteCarlo(week, glycogen);
         expect(Math.abs(shaped.bias), 'bias').toBeLessThan(100);
-        expect(shaped.coverage2Sigma, 'coverage').toBeGreaterThanOrEqual(0.85);
+        expect(shaped.coverage2Sigma, 'coverage').toBeGreaterThanOrEqual(0.88);
         // The same people with the same noise, eating flat: the shape adds next to nothing.
         const paired = shaped.errors.reduce((sum, err, i) => sum + err - (flat.errors[i] ?? 0), 0) / trials;
         expect(Math.abs(paired), 'shaped against flat').toBeLessThan(60);
-        expect(shaped.meanExcluded, 'partial days excluded').toBeLessThanOrEqual(flat.meanExcluded + 0.5);
+        // A dropped planned day moves the estimate by about 15 kcal, too little for the paired bound to see, so
+        // the dropped days are counted: one planned lower day dropped per trial would be one in sixteen to twenty.
+        expect(shaped.lowerDays, 'lower days in the windows').toBeGreaterThan(0);
+        expect(shaped.droppedLowerDays / shaped.lowerDays, 'planned lower days dropped').toBeLessThanOrEqual(0.01);
+        expect(shaped.droppedLowerDays, 'planned lower days dropped, against the same days eaten flat').toBeLessThanOrEqual(
+          flat.droppedLowerDays + Math.ceil(0.01 * shaped.lowerDays),
+        );
       });
     }
   }

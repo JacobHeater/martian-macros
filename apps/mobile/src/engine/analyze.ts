@@ -3,6 +3,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { Pause } from '../domain/Pause';
+import type { TargetShape } from '../domain/TargetShape';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
 import type { WaistObservation } from '../domain/WaistObservation';
@@ -25,6 +26,7 @@ import { estimateBodyFat } from './estimateBodyFat';
 import { passingWeightEventNoise } from './passingWeightEventNoise';
 import { pauseDeficitRestartOn } from './pauseDeficitRestartOn';
 import { pauseSettlingWindows } from './pauseSettlingWindows';
+import { plannedDayShare } from './plannedDayShare';
 import { recommendMode } from './recommendMode';
 import { safetyBodyFatPercent } from './safetyBodyFatPercent';
 import { SafetyBounds } from './SafetyBounds';
@@ -63,6 +65,7 @@ export function analyze({
   history = [],
   pauses = [],
   waists = [],
+  shapes = [],
   trendModel = new WeightTrendModel(),
   estimator = new TdeeEstimator(),
 }: {
@@ -75,6 +78,8 @@ export function analyze({
   history?: readonly TargetsRecord[];
   pauses?: readonly Pause[];
   waists?: readonly WaistObservation[];
+  /** How the user shaped their weeks, oldest first (MM-124): a planned lower day is not a partial one. */
+  shapes?: readonly TargetShape[];
   trendModel?: WeightTrendModel;
   estimator?: TdeeEstimator;
 }): CoachSnapshot | undefined {
@@ -166,6 +171,7 @@ export function analyze({
         resistanceTrained: TrainingStatus.isResistanceTrained(setup.trainingStatus),
       }),
     settling,
+    plannedShare: plannedDayShare(shapes),
   });
 
   return new CoachSnapshot({
