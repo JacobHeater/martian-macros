@@ -252,6 +252,24 @@ describe('workouts (MM-489)', () => {
     expect((await first(workouts.watchWorkouts())).map((w) => w.id)).toEqual([kept]);
   });
 
+  it('MM-490: a workout imported from the platform is never written back, finished or edited', async () => {
+    const { platform, workouts } = await setUp(true);
+    const imported = started.copyWith({ endedAt: at(45) });
+    const fromWatch = new Workout({
+      id: 0,
+      date: today,
+      startedAt: imported.startedAt,
+      endedAt: imported.endedAt,
+      exercises: imported.exercises,
+      imported: { platformId: 'hc-1', sourceName: 'Watch' },
+    });
+    const id = await workouts.saveWorkout(fromWatch);
+    await workouts.saveWorkout(fromWatch.copyWith({ id, endedAt: at(50) }));
+    expect(platform.all).toEqual([]);
+    await workouts.deleteWorkout(id);
+    expect(await workouts.deletedPlatformIds()).toEqual(new Set(['hc-1']));
+  });
+
   it('Off (MM-515): with writing workouts not allowed, deleting a workout asks nothing of the platform', async () => {
     const { platform, workouts } = await setUp(false);
     const removals: string[] = [];
