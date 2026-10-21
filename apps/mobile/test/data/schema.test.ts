@@ -51,6 +51,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   // Version 13 (MM-251): a diagnosed sleep disorder. Version 17 (MM-480): the lean-gain pace chosen.
+  // Version 18 (MM-510): the weight-loss medication answer (MM-113).
   setups: [
     'fluid_limited_by_clinician',
     'pace_changed_epoch_day',
@@ -58,6 +59,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'maintenance_correction_from_epoch_day',
     'sleep_disorder',
     'lean_gain_pace',
+    'weight_loss_medication',
   ],
   // Version 11 (MM-128): the pace each record of targets was asked for. Version 17 (MM-480): the lean-gain one.
   targets_history: ['requested_loss_fraction', 'lean_gain_pace'],

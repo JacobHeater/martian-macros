@@ -134,6 +134,17 @@ it('new screening answers can be changed in Settings', async () => {
   expect((await setup()).healthCheckConfirmedOn).toBe(today);
 });
 
+// MM-510: the weight-loss medication answer is its own, kept apart from the broader medication answer.
+it('the weight-loss medication answer is asked in Settings and kept apart from the broader one', async () => {
+  await seed();
+  const settings = await open();
+  await openHealthCheck(settings);
+  await userEvent.click(within(topLayer()).getByRole('checkbox', { name: 'I take a prescription weight-loss medication' }));
+  await expect.poll(async () => (await setup()).screening.weightLossMedication).toBe(true);
+  expect((await setup()).screening.weightAffectingMedication).toBe(false);
+  expect((await setup()).profileRevision).toBe(1);
+});
+
 it('no longer breastfeeding removes the 400 kcal and offers every goal again', async () => {
   await seed({ sex: 'female', screening: new ScreeningAnswers({ breastfeeding: true }), mode: 'maintenance' });
   const settings = await open();

@@ -25,6 +25,8 @@ import { trainingGoalNote } from '../format/trainingGoalNote';
 import { trainingMeaning } from '../format/trainingMeaning';
 import { trainsNotYet } from '../format/trainsNotYet';
 import { targetFlagMessage } from '../format/targetFlagMessage';
+import { weightLossMedicationPaceNote } from '../format/weightLossMedicationPaceNote';
+import { weightLossMedicationTrainingNote } from '../format/weightLossMedicationTrainingNote';
 import { Loadable } from '../state/Loadable';
 import { HealthRecheckScreen } from '../app/HealthRecheckScreen';
 import { useApp } from '../app/useApp';
@@ -211,6 +213,9 @@ export function CoachScreen() {
   const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
   const bodyFatLine = bodyFatNote(snapshot.bodyFatBasis, { eatingDisorderHistory: setup.screening.eatingDisorderHistory });
+  // On a weight-loss medication (MM-113, MM-510): the fast pace is for the prescriber, and training keeps muscle.
+  const paceNote = current === undefined ? undefined : weightLossMedicationPaceNote(setup.screening, current.targets.flags);
+  const trainingNote = weightLossMedicationTrainingNote(setup.screening, setup.trainingDaysPerWeek);
   return (
     <>
       {/* The safeguards are outside the rationing: above the hero, in full, in this order. */}
@@ -237,7 +242,14 @@ export function CoachScreen() {
           />
           {[...current.targets.flags].map((flag) => (
             <div key={flag} className="app-stack-item">
-              <Notice kind="caution" text={targetFlagMessage(flag)} />
+              <Notice
+                kind="caution"
+                text={
+                  flag === 'raisedForSafePace' && paceNote !== undefined
+                    ? `${targetFlagMessage(flag)} ${paceNote}`
+                    : targetFlagMessage(flag)
+                }
+              />
             </div>
           ))}
           {breakRebound ? (
@@ -246,6 +258,11 @@ export function CoachScreen() {
             </div>
           ) : null}
         </>
+      )}
+      {trainingNote === undefined ? null : (
+        <div className="app-stack-item">
+          <Notice text={trainingNote} />
+        </div>
       )}
       {/* The goal first, under the figures and the warnings (MM-299). */}
       <MmSection

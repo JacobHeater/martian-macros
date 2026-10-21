@@ -96,11 +96,11 @@ screening rules).
 4. **What to expect (MM-158).** M2. It quotes the chosen pace as a range; if
    the pace control (WS-06 step 5) is not built yet, it uses the fixed
    default pace.
-5. **Weight-loss medication (MM-113, MM-510).** M4. One more answer plus wording and
-   threshold changes on screens owned by WS-06 and WS-09; build it after
-   those exist. MM-113's rule and words are built and unwired; MM-510 stores
-   the answer (a schema change), asks it and wires the effects, after MM-29
-   reviews the words.
+5. **Weight-loss medication (MM-113, MM-510).** M4. Built: MM-510 stores the
+   answer (schema 18), asks it on the health step and in the profile, and
+   wires MM-113's rule and words into Food, the dashboard, Coach, the
+   under-eating notice and the week's summary. The words marked pending
+   MM-29 ship as they are; MM-29's clinician review is a release gate (M5).
 
 ## Done enough to unblock others
 MM-112 is done: `CoachingPolicy` carries pace limits, protein floors by age,
@@ -120,8 +120,8 @@ turns in the schema lane and keep to separate cards.
 - Built: MM-10, MM-11, MM-12, MM-13, MM-14 (profile, screening,
   recommendation, adults only, biological sex); MM-81, MM-82 (units, training
   and body fat in Settings); MM-164 (daily activity in the starting estimate); MM-83 (correct profile and
-  health check).
-- Remaining: MM-134, MM-158, MM-113, MM-510. Epics: MM-9, MM-80.
+  health check); MM-113, MM-510 (weight-loss medication support, stored and wired).
+- Remaining: MM-134, MM-158. Epics: MM-9, MM-80.
 
 ## Notes for whoever builds it
 - Biological sex is a strict male/female enum with no default, enforced by

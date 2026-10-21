@@ -961,8 +961,15 @@ export class AppState {
       const snapshot = this.coach.value;
       const intake = this.judgedIntake.value;
       const today = this.today.value;
-      if (snapshot === undefined || intake === undefined) return undefined;
-      return findUnderEating({ through: today.addDays(-1), intake, floorKcal: snapshot.calorieFloorKcal });
+      const setup = of(this.setup);
+      if (snapshot === undefined || intake === undefined || setup === undefined) return undefined;
+      return findUnderEating({
+        through: today.addDays(-1),
+        intake,
+        floorKcal: snapshot.calorieFloorKcal,
+        // MM-113: on a weight-loss medication, fewer whole days are enough (MM-510).
+        weightLossMedication: setup.screening.weightLossMedication,
+      });
     });
 
     this.underEatingNotice = derived(() => {
