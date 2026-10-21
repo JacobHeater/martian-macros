@@ -83,3 +83,11 @@ Pixel, Health Connect with months of weigh-ins:
 - A backfill interrupted by sending the app to the back goes on when it comes forward.
 - iOS: `historyPermitted` and `requestHistory` answer granted without a sheet.
 
+## Review fixes 2026-10-21 (`fix/health-plugins-review`)
+- `requestHistory` (Android) first checks `features.getFeatureStatus(FEATURE_READ_HEALTH_DATA_HISTORY)`; where Health
+  Connect does not offer it, it answers not granted and `unavailable` and does not mark it asked, so a later Health
+  Connect still asks once.
+- Erase all forgets that the history was asked: `renewWriteNamespace`, which runs after an erase (and a restore), also
+  removes `history_asked`. Height is now read back too (MM-68).
+- Tests: `test/native/mmHealthWrites.test.ts` reads the Kotlin. Owed on a phone: on a Health Connect without the
+  feature, allowing weight does not mark it asked; after Erase all, allowing weight asks for the history once more.

@@ -125,6 +125,10 @@ uncompiled until it is built on the Mac.
   longer puts Apple Health's back. `NSHealthShareUsageDescription` names sex, date of birth and height. Tests added to
   `test/app/onboardingFromAppleHealth.test.tsx`; the `BiologicalSexFilledFromHealth` story checks the focus. Not run
   locally; CI validates.
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): HealthKit's handlers are `@Sendable`, so none adds to
+  a captured `var` any more. `profile` copies what it found to `let known` before the height query and adds the height
+  to its own copy; `changes` gathers into a locked `ChangesGathered` box and `removeOwn` into a locked `FirstFailure`.
+  Test: `test/ios/healthProfileOnIos.test.ts` (reads the Swift). Not built: CI builds no iOS app.
 
 ## Owed on a phone
 - The shared health-source suite (MM-67) against HealthKit on the iPhone, with readings of each kind.
@@ -133,3 +137,4 @@ uncompiled until it is built on the Mac.
   reading refused, nothing is selected and the step waits.
 - No weight in Apple Health: Settings says none was found and where to check.
 - The first iOS build of `profile` in `MmHealthPlugin.swift`.
+- The first iOS build of the `@Sendable` fixes in `profile`, `changes` and `removeOwn` (no warning under strict concurrency).
