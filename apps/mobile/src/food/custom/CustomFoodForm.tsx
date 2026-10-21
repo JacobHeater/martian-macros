@@ -3,6 +3,7 @@ import { atwaterKcal } from '../../domain/atwaterKcal';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { Micronutrient } from '../../domain/food/micros/Micronutrient';
 import { Micronutrients } from '../../domain/food/micros/Micronutrients';
+import type { LabelField } from '../../domain/food/label/LabelField';
 import { parseNutritionLabel } from '../../domain/food/label/parseNutritionLabel';
 import { normalizeBarcode } from '../../domain/food/normalizeBarcode';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
@@ -42,6 +43,10 @@ const extraLabel = (key: Extra) =>
     : key === 'sugarAlcohols'
       ? 'Sugar alcohols g'
       : `${Micronutrient.label(key)} ${Micronutrient.unit(key)}${basis[key] ?? ''}`;
+/** Said under a number the label reader was unsure of, until it is changed (MM-44). */
+const unsureHelper = 'Unsure: check it';
+/** The label field behind an extra, for the two the reader can be unsure of. */
+const extraField: Partial<Record<Extra, LabelField>> = { fiber: 'fiberG', sodium: 'sodiumMg' };
 const optional = (value: number | undefined) => (value === undefined ? '' : oneDecimal(value));
 
 /**
@@ -75,6 +80,18 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
   /** What the last label read said, shown above the numbers. */
   const [labelNote, setLabelNote] = useState<string>();
   const [reading, setReading] = useState(false);
+  /** The numbers the last label read was unsure of; each mark goes when its field is changed. */
+  const [unsure, setUnsure] = useState<ReadonlySet<LabelField>>(() => new Set());
+  const settle = (field: LabelField) =>
+    setUnsure((now) => {
+      if (!now.has(field)) return now;
+      const next = new Set(now);
+      next.delete(field);
+      return next;
+    });
+  /** A field's helper and warning while its read is unsure. */
+  const marked = (field: LabelField | undefined) =>
+    field !== undefined && unsure.has(field) ? { helper: unsureHelper, helperIsWarning: true } : {};
 
   const readLabel = async () => {
     setReading(true);
@@ -87,6 +104,7 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
     setReading(false);
     if (text === undefined) return;
     const r = parseNutritionLabel(text);
+    setUnsure(r.unsure);
     if (r.isEmpty) {
       setLabelNote(
         'No Nutrition Facts panel was found. Try again with the label flat and well lit, or type the numbers.',
@@ -116,7 +134,8 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
     ];
     setLabelNote(
       'Read from the label. Check every number against the package' +
-        `${missing.length === 0 ? '.' : `, and fill in ${missing.join(', ')}.`}${more}`,
+        `${missing.length === 0 ? '.' : `, and fill in ${missing.join(', ')}.`}${more}` +
+        (r.unsure.size === 0 ? '' : ' Numbers marked unsure were hard to read.'),
     );
   };
 
@@ -195,25 +214,71 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
         <div className="food-field-wide">
           <MmTextField label="One serving is" value={serving} onChange={setServing} />
         </div>
-        <MmTextField label="Weighs g" kind="number" value={grams} onChange={setGrams} />
+        <MmTextField
+          label="Weighs g"
+          kind="number"
+          value={grams}
+          onChange={(typed) => {
+            setGrams(typed);
+            settle('servingGrams');
+          }}
+          {...marked('servingGrams')}
+        />
       </div>
       <p className="food-label food-label-spaced">Numbers for one serving</p>
       <div className="food-fields">
-        <MmTextField label="Protein g" kind="number" dense value={protein} onChange={setProtein} />
-        <MmTextField label="Carbs g" kind="number" dense value={carbs} onChange={setCarbs} />
-        <MmTextField label="Fat g" kind="number" dense value={fat} onChange={setFat} />
+        <MmTextField
+          label="Protein g"
+          kind="number"
+          dense
+          value={protein}
+          onChange={(typed) => {
+            setProtein(typed);
+            settle('proteinG');
+          }}
+          {...marked('proteinG')}
+        />
+        <MmTextField
+          label="Carbs g"
+          kind="number"
+          dense
+          value={carbs}
+          onChange={(typed) => {
+            setCarbs(typed);
+            settle('carbsG');
+          }}
+          {...marked('carbsG')}
+        />
+        <MmTextField
+          label="Fat g"
+          kind="number"
+          dense
+          value={fat}
+          onChange={(typed) => {
+            setFat(typed);
+            settle('fatG');
+          }}
+          {...marked('fatG')}
+        />
       </div>
       <div className="app-gap-small" />
       <MmTextField
         label="Calories"
         kind="number"
         value={kcal}
-        onChange={setKcal}
+        onChange={(typed) => {
+          setKcal(typed);
+          settle('kcal');
+        }}
         hint={fromMacros > 0 ? `${whole} from macros` : undefined}
         helper={
-          mismatch ? `Macros add up to ${whole} kcal; the ${kcal.trim()} typed is kept. Double-check the label.` : 'Leave blank to calculate from macros.'
+          mismatch
+            ? `Macros add up to ${whole} kcal; the ${kcal.trim()} typed is kept. Double-check the label.`
+            : unsure.has('kcal')
+              ? unsureHelper
+              : 'Leave blank to calculate from macros.'
         }
-        helperIsWarning={mismatch}
+        helperIsWarning={mismatch || unsure.has('kcal')}
       />
       <div className="app-gap-small" />
       <MmDisclosure
@@ -231,7 +296,12 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
               kind="number"
               dense
               value={extras[key]}
-              onChange={(typed) => setExtras((now) => ({ ...now, [key]: typed }))}
+              onChange={(typed) => {
+                setExtras((now) => ({ ...now, [key]: typed }));
+                const field = extraField[key];
+                if (field !== undefined) settle(field);
+              }}
+              {...marked(extraField[key])}
             />
           ))}
         </div>

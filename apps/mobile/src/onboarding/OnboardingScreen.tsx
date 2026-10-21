@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { BiologicalSex } from '../domain/BiologicalSex';
 import { CalendarDate } from '../domain/CalendarDate';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
+import type { HealthProfile } from '../domain/integration/HealthProfile';
 import type { DailyActivity } from '../domain/DailyActivity';
 import type { GoalMode } from '../domain/GoalMode';
 import { Profile } from '../domain/Profile';
@@ -29,6 +30,8 @@ import { useOverlays } from '../ui/useOverlays';
 import { ActivityStep } from './ActivityStep';
 import { BirthDateStep } from './BirthDateStep';
 import { GoalStep } from './GoalStep';
+import type { HealthFillState } from './HealthFillState';
+import { heightTyped } from './heightTyped';
 import { HealthStep } from './HealthStep';
 import { MeasurementsStep } from './MeasurementsStep';
 import type { MeasurementsTyped } from './MeasurementsTyped';
@@ -72,6 +75,9 @@ export function OnboardingScreen() {
   const [pace, setPace] = useState<FatLossPace>();
   const [gainAcknowledged, setGainAcknowledged] = useState(false);
   const [remind, setRemind] = useState(false);
+  // Onboarding filled in from Apple Health (MM-69): where the offer stands, and the height read, kept across a change of units.
+  const [fromHealth, setFromHealth] = useState<HealthFillState>('offered');
+  const [heightFromHealthCm, setHeightFromHealthCm] = useState<number>();
 
   // The numbers the typed measurements mean, in what is stored.
   const fmt = new Fmt(units);
@@ -227,15 +233,41 @@ export function OnboardingScreen() {
     );
   };
 
+  const chooseSex = (chosen: BiologicalSex) => {
+    setSex(chosen);
+    if (chosen === 'male') clearFemaleOnlyAnswers();
+  };
+
+  // What Apple Health holds fills the questions it answers; each is still confirmed with Next (MM-69, MM-14).
+  const fillFromHealth = async () => {
+    setFromHealth('asking');
+    let read: HealthProfile;
+    try {
+      read = await services.healthProfile.readProfile();
+    } catch {
+      setFromHealth('failed');
+      return;
+    }
+    const born = read.birthDate !== undefined && read.birthDate.epochDay <= today.epochDay ? read.birthDate : undefined;
+    const height = read.heightCm !== undefined && read.heightCm >= 100 && read.heightCm <= 250 ? read.heightCm : undefined;
+    if (read.sex !== undefined) chooseSex(read.sex);
+    if (born !== undefined) setBirthDate(born);
+    if (height !== undefined) {
+      setHeightFromHealthCm(height);
+      setTyped((was) => ({ ...was, ...heightTyped(height, units) }));
+    }
+    setFromHealth(read.sex !== undefined || born !== undefined || height !== undefined ? 'filled' : 'nothing');
+  };
+
   let body;
   if (step === 0) {
     body = (
       <SexStep
         sex={sex}
-        onSex={(chosen) => {
-          setSex(chosen);
-          if (chosen === 'male') clearFemaleOnlyAnswers();
-        }}
+        onSex={chooseSex}
+        fromHealth={
+          services.healthProfile.offersProfile ? { state: fromHealth, onFill: () => void fillFromHealth() } : undefined
+        }
       />
     );
   } else if (step === 1) {
@@ -247,7 +279,9 @@ export function OnboardingScreen() {
         typed={typed}
         onUnits={(chosen) => {
           setUnits(chosen);
-          setTyped(nothingTyped);
+          setTyped(
+            heightFromHealthCm === undefined ? nothingTyped : { ...nothingTyped, ...heightTyped(heightFromHealthCm, chosen) },
+          );
         }}
         onTyped={setTyped}
       />
