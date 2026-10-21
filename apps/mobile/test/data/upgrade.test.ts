@@ -8,6 +8,7 @@ import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
+import { Workout } from '../../src/domain/training/Workout';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { SleepNight } from '../../src/domain/SleepNight';
 import { TargetShape } from '../../src/domain/TargetShape';
@@ -144,8 +145,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 21 left it: without the imported workouts' platform ids, nor the ones deleted (MM-490). */
+const versionTwentyOne = currentSchema
+  .replace('  "set_started_at_ms" INTEGER NULL,\n  "platform_id" TEXT NULL,\n  "platform_source_name" TEXT NULL\n', '  "set_started_at_ms" INTEGER NULL\n')
+  .replace('CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id");\n', '')
+  .replace(/CREATE TABLE "deleted_platform_workouts" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 20 left it: without the goal body fat (MM-507). */
-const versionTwenty = currentSchema.replace(/CREATE TABLE "goal_body_fat" \([\s\S]*?\n\);\n/, '');
+const versionTwenty = versionTwentyOne.replace(/CREATE TABLE "goal_body_fat" \([\s\S]*?\n\);\n/, '');
 
 /** The schema as version 19 left it: without the pack food a recipe's ingredient was found as (MM-456). */
 const versionNineteen = versionTwenty.replace(
@@ -661,4 +668,48 @@ it('a version 20 database comes up to date with no goal body fat, and keeps one 
   expect(await first(repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: day });
   await repos.goalBodyFat.clearGoalBodyFat();
   expect(await first(repos.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
+});
+
+// MM-490: a version 21 database comes up to date with its workouts kept, none of them imported and none deleted;
+// an imported workout saved from then on keeps its platform id and source, and deleting it remembers the id.
+it('a version 21 database comes up to date with its workouts kept and none imported, and keeps an import after', async () => {
+  expect(versionTwentyOne).not.toContain('platform_source_name');
+  expect(versionTwentyOne).not.toContain('deleted_platform_workouts');
+  expect(versionTwentyOne).toContain('goal_body_fat');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 21, schema: versionTwentyOne });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  const start = new Date(2026, 9, 5, 18, 0).getTime();
+  await old.execute('INSERT INTO workouts (id, date_epoch_day, started_at_ms, ended_at_ms) VALUES (1, ?, ?, ?)', [
+    day.epochDay,
+    start,
+    start + 3600000,
+  ]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'workouts')).toEqual(expect.arrayContaining(['platform_id', 'platform_source_name']));
+  const [kept] = await first(repos.workouts.watchWorkouts());
+  expect(kept?.startedAt.getTime()).toBe(start);
+  expect(kept?.imported, 'logged in the app').toBeUndefined();
+  expect(await repos.workouts.deletedPlatformIds()).toEqual(new Set());
+  const id = await repos.workouts.saveWorkout(
+    new Workout({
+      id: 0,
+      date: day,
+      startedAt: new Date(start + 86400000),
+      endedAt: new Date(start + 86400000 + 1800000),
+      imported: { platformId: 'hc-9', sourceName: 'Watch' },
+    }),
+  );
+  expect((await first(repos.workouts.watchWorkouts())).find((w) => w.id === id)?.imported).toEqual({ platformId: 'hc-9', sourceName: 'Watch' });
+  await repos.workouts.deleteWorkout(id);
+  expect(await repos.workouts.deletedPlatformIds()).toEqual(new Set(['hc-9']));
 });

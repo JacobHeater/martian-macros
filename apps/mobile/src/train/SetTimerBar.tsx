@@ -1,3 +1,4 @@
+import { exerciseNameOf } from '../format/exerciseNameOf';
 import type { Workout } from '../domain/training/Workout';
 import { restStartedAt } from '../engine/restStartedAt';
 import { restTargetMsOf } from '../engine/restTargetMsOf';
@@ -51,7 +52,7 @@ export function SetTimerBar({ workout }: { workout: Workout }) {
   // The exercise "Set done" records on, named so it is not a guess (MM-222).
   const target = setDoneIndex(workout);
   const targetId = target === undefined ? undefined : workout.exercises[target]?.exerciseId;
-  const targetName = targetId === undefined ? undefined : (exercises.get(targetId)?.name ?? 'Deleted exercise');
+  const targetName = targetId === undefined ? undefined : exerciseNameOf(targetId, exercises.get(targetId));
   // Every instruction names a button on this bar (MM-222).
   let instruction: string | undefined;
   if (workout.paused) instruction = 'Tap Resume to start the clock again.';

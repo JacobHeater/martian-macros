@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { Clock } from '../domain/integration/Clock';
 import type { WorkoutWriter } from '../domain/repositories/WorkoutWriter';
+import { Exercise } from '../domain/training/Exercise';
 import { Workout } from '../domain/training/Workout';
 import { WorkoutExercise } from '../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
@@ -38,9 +39,10 @@ export class WorkoutController {
         id: 0,
         date: this.clock.today(),
         startedAt: this.clock.now(),
-        exercises: (from?.exercises ?? []).map(
-          (exercise) => new WorkoutExercise({ exerciseId: exercise.exerciseId, restTargetMs: exercise.restTargetMs }),
-        ),
+        // "Other exercise" is an imported placeholder (MM-490), not something to repeat.
+        exercises: (from?.exercises ?? [])
+          .filter((exercise) => exercise.exerciseId !== Exercise.otherId)
+          .map((exercise) => new WorkoutExercise({ exerciseId: exercise.exerciseId, restTargetMs: exercise.restTargetMs })),
       }),
     );
   }
@@ -122,6 +124,21 @@ export class WorkoutController {
     await this.workouts.saveWorkout(
       workout.copyWith({
         exercises: workout.exercises.map((exercise, i) => (i === index ? exercise.withRestTargetMs(targetMs) : exercise)),
+      }),
+    );
+  }
+
+  /**
+   * Moves the sets of the exercise at `index` to `exerciseId` (MM-490): how
+   * an imported "Other exercise" becomes the exercise the user says it was.
+   * Its sets, their times and its rest target are kept.
+   */
+  async moveExercise(workout: Workout, index: number, exerciseId: string): Promise<void> {
+    await this.workouts.saveWorkout(
+      workout.copyWith({
+        exercises: workout.exercises.map((exercise, i) =>
+          i === index ? new WorkoutExercise({ exerciseId, sets: exercise.sets, restTargetMs: exercise.restTargetMs }) : exercise,
+        ),
       }),
     );
   }

@@ -45,6 +45,7 @@ import { trainingSuspended } from '../engine/trainingSuspended';
 import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import type { PhasePlan } from '../engine/PhasePlan';
 import { planPhases } from '../engine/planPhases';
+import { platformWorkoutImports } from '../engine/platformWorkoutImports';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
 import { describeLeanGainPaces } from '../engine/describeLeanGainPaces';
@@ -131,6 +132,7 @@ import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
 import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
+import { currentValueOf } from '../lang/currentValueOf';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
@@ -155,6 +157,10 @@ const derived = <T>(compute: () => T) => new DerivedCell(compute);
 
 /** The value of a cell that loads, or undefined while it has not. */
 const of = <T>(cell: Cell<Loadable<T>>) => Loadable.valueOf(cell.value);
+
+/** How far back each read of the platform looks for workouts to import (MM-490). */
+const workoutImportDays = 30;
+const dayMs = 24 * 60 * 60 * 1000;
 
 /**
  * Everything the screens show that is worked out from what is stored: the
@@ -1417,9 +1423,34 @@ export class AppState {
       return false;
     }
     if (changed) this.healthImported();
+    await this.importWorkouts();
     await this.backfillHealth();
     this.refreshHealthConnection();
     return true;
+  }
+
+  /**
+   * Brings the platform's workouts of the last `workoutImportDays` days into
+   * the log (MM-490), as `platformWorkoutImports` says: each once, kept with
+   * its platform id; one this app wrote, or one deleted in the app, is not
+   * brought in. A platform that cannot be read changes nothing.
+   */
+  private async importWorkouts(): Promise<void> {
+    const { healthWorkouts, workouts, clock } = this.services;
+    try {
+      const now = clock.now();
+      const read = await healthWorkouts.readWorkouts({ from: new Date(now.getTime() - workoutImportDays * dayMs), to: now });
+      if (read.length === 0) return;
+      const changes = platformWorkoutImports({
+        platform: read,
+        logged: await currentValueOf(workouts.watchWorkouts()),
+        deleted: await workouts.deletedPlatformIds(),
+        library: this.exercises.value,
+      });
+      for (const workout of changes) await workouts.saveWorkout(workout);
+    } catch {
+      // Not read this time; the next read tries again.
+    }
   }
 
   private backfilling: Promise<void> | undefined;

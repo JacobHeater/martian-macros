@@ -251,7 +251,9 @@ CREATE TABLE "workouts" (
   "ended_at_ms" INTEGER NULL,
   "paused_at_ms" INTEGER NULL,
   "paused_for_ms" INTEGER NOT NULL DEFAULT 0,
-  "set_started_at_ms" INTEGER NULL
+  "set_started_at_ms" INTEGER NULL,
+  "platform_id" TEXT NULL,
+  "platform_source_name" TEXT NULL
 );
 CREATE TABLE "workout_exercises" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -371,5 +373,9 @@ CREATE TABLE "goal_body_fat" (
   "id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1),
   "percent" REAL NOT NULL CHECK("percent" > 0.0 AND "percent" < 100.0),
   "set_epoch_day" INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id");
+CREATE TABLE "deleted_platform_workouts" (
+  "platform_id" TEXT NOT NULL PRIMARY KEY
 );
 `;
