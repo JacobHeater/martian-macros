@@ -37,6 +37,9 @@ const messages: Readonly<Record<TargetFlag, string>> = {
   trainingLapsed:
     'The surplus is paused: no workout has been logged for three weeks (or no training days are set), and without ' +
     'training extra calories are stored as fat. Lean-gain targets return at the check-in after you log a workout.',
+  surplusCapped:
+    'Your surplus is capped at a share of your expenditure. Beyond it, the extra mostly adds fat, not muscle; the pace ' +
+    'shown is the one this gives.',
 };
 
 /** What a flag on the targets means, in a sentence or two. */

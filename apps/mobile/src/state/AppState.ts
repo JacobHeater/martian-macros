@@ -78,6 +78,8 @@ import type { RecompReview } from '../engine/RecompReview';
 import type { RecompSignal } from '../engine/RecompSignal';
 import { recompSignalOf } from '../engine/recompSignalOf';
 import { recompReviewOf } from '../engine/recompReviewOf';
+import type { LeanGainReview } from '../engine/LeanGainReview';
+import { leanGainReviewOf } from '../engine/leanGainReviewOf';
 import { recoveryCheckInDue } from '../engine/recoveryCheckInDue';
 import type { ReliefOffer } from '../engine/ReliefOffer';
 import { ReminderFacts } from '../engine/ReminderFacts';
@@ -439,6 +441,9 @@ export class AppState {
 
   /** The recomp review due today, if one is (MM-133). Not during a pause, which is not time on recomp. */
   readonly recompReview: Cell<RecompReview | undefined>;
+
+  /** What the coach says about a running lean gain (MM-129), if anything. Not during a pause. */
+  readonly leanGainReview: Cell<LeanGainReview | undefined>;
 
   /** The recomp signal as of today (MM-32), from what is logged. Undefined until the weight trend exists. */
   readonly recompSignal: Cell<RecompSignal | undefined>;
@@ -1070,6 +1075,32 @@ export class AppState {
         strengthTrends: of(this.strengthTrends) ?? [],
         recommendation: snapshot.recommendation,
         today: this.today.value,
+      });
+    });
+
+    this.leanGainReview = derived(() => {
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      const setup = of(this.setup);
+      if (
+        snapshot === undefined ||
+        history === undefined ||
+        setup === undefined ||
+        !snapshot.policy.targetsAllowed ||
+        this.activePause.value !== undefined
+      ) {
+        return undefined;
+      }
+      return leanGainReviewOf({
+        history,
+        trend: snapshot.trend,
+        waist: of(this.waist) ?? [],
+        strengthTrends: of(this.strengthTrends) ?? [],
+        sex: setup.profile.sex,
+        bodyFatPercent: snapshot.bodyFat.percent,
+        today: this.today.value,
+        // An eating-disorder history hears no weight, waist or body-fat line (as MM-141).
+        weightSignals: !setup.screening.eatingDisorderHistory,
       });
     });
 
