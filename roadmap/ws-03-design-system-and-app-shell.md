@@ -106,7 +106,9 @@ WS-13, which needs accessibility, both themes and the icon.
    add the small trend line the dashboard needs.
 5. **Dark-theme, small-screen, large-text and accessibility verification
    (MM-91, MM-106).** M2. The gallery (MM-105) moved to step 1.
-6. **Icon and launch screen (MM-109).** M3.
+6. **Icon and launch screen (MM-109, MM-474).** M3. The vector icon (the ringed
+   planet), the themed icon and the launch screen on Martian's canvas are built
+   and wait for the owner's look on the phone; MM-474 marks the dev and demo icons.
 
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
 trend line.
@@ -136,7 +138,7 @@ conflicts with this one.
 - Built: MM-90 (three tabs and day rollover; superseded in part by the
   dashboard navigation); MM-165 (light, dark or system theme); MM-105 (gallery and screenshot tests); MM-163 (one implementation per control).
 - Remaining: MM-102, MM-103, MM-104, MM-108, MM-99, MM-98, MM-100, MM-107,
-  MM-91, MM-106, MM-109. Epics: MM-89, MM-97, MM-101.
+  MM-91, MM-106, MM-109, MM-474 (dev and demo icon markers). Epics: MM-89, MM-97, MM-101.
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-181 (Remove the primary action's incandescent glow); MM-184 (Martian by default, with a first-launch theme choice, done); MM-185 (Theme confirmation resets the preview before storage publishes it, done); MM-186 (Preference loading incorrectly previews Martian for existing users, done); MM-236 (the hand-drawn icons are unreadable, so the set becomes Material, done); MM-239 (a focused text field draws two outlines, done); MM-240 (sliders in a list group sit at different insets, done); MM-176 (A metrics-heavy dashboard with useful history); MM-179 (See the logged macronutrient split on Dashboard and Food); MM-183 (Do not present ordinary targets before pause state is known); MM-206 (Dashboard Add food can log to a historical day, done); MM-208 (Dashboard Add food action obscures a chart label, done); MM-187 (One calorie visual, the arc, everywhere a day's calories are shown, done); MM-237 (Storybook is the design register, done); MM-242 (the terms of use come before anything else); MM-224 (Cross-app usability and information hierarchy).
 - Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
 - Added 2026-10-14 (steps 15, 16): MM-320 (Settings' Health Connect rows drawn and rebuilt as their own section, done); MM-321 (every part of a screen drawn by a story: the check and its register); MM-322 (hairlines between rows in every list group, done); MM-324 (one text column for list rows).

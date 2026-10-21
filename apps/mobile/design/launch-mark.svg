@@ -1,0 +1,18 @@
+<!--
+  The launch screen's mark, no ground: it sits on Martian's canvas (#110c35) (MM-109).
+  The ringed planet: a tangerine Mars, the lime horizon arc as its ring, an aqua
+  body travelling on it. Geometry in the 108-unit Android adaptive
+  canvas; the viewBox is its visible 72-unit square. The Android vector drawables
+  (android/app/src/main/res/drawable/ic_launcher_*.xml) are this drawing's twins:
+  change them together. Rasters come from scripts/app-icons.py.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 18 72 72" width="1024" height="1024"><defs><clipPath id="gap"><path d="M-60,54 L28.5,54 A25.5,5.5 0 0,0 79.5,54 L168,54 L168,-60 L-60,-60 Z M-60,54 L21.5,54 A32.5,12.5 0 0,0 86.5,54 L168,54 L168,168 L-60,168 Z"/></clipPath></defs><g transform="translate(54 54) scale(0.8) translate(-54 -54)">
+  <g transform="rotate(-20 54 54)">
+    <path fill="none" stroke="#c4ff48" stroke-width="4" stroke-linecap="round" d="M82.898,54.754 A29,9 0 1,1 63.919,45.543"/>
+    <g clip-path="url(#gap)">
+      <circle cx="54" cy="54" r="19" fill="#ff9a3d"/>
+      <g transform="rotate(20 54 54)"><path fill="#e0662a" d="M70.471,63.471 A19,19 0 1,1 44.529,37.529 A19,19 0 0,0 70.471,63.471 Z"/></g>
+    </g>
+    <circle cx="79.115" cy="49.5" r="4.5" fill="#43f5e0"/>
+  </g>
+</g></svg>

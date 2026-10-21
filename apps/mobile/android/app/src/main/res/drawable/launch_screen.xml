@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MM-109: the launch screen before Android 12 (Android 12+ draws its own from
+  the launch theme's splash attributes): the mark on Martian's canvas, at the
+  size Android 12's splash gives it.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/launch_canvas" />
+    <item
+        android:width="288dp"
+        android:height="288dp"
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:gravity="center" />
+</layer-list>

@@ -7,6 +7,10 @@ const config: CapacitorConfig = {
   appId: 'com.martianmacros',
   appName: 'Martian Macros',
   webDir: 'dist',
+  // The web view's ground before the page paints (MM-109): Martian's canvas,
+  // the default palette, the same as the launch screen, so the start does not
+  // flash. test/shell/launchScreen.test.ts holds them equal.
+  backgroundColor: '#110c35',
 };
 
 export default config;
