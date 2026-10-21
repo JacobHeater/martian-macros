@@ -1,5 +1,6 @@
 package com.martianmacros
 
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
@@ -77,6 +78,18 @@ class MmHealthPlugin : Plugin() {
         return millis / 60000.0
     }
 
+    /**
+     * Reading further back than the thirty days before the first grant
+     * (MM-73). Named as text so this builds whichever client version
+     * spells the constant.
+     */
+    private val historyPermission = "android.permission.health.READ_HEALTH_DATA_HISTORY"
+
+    /** Where the plugin keeps that it asked for the history once (MM-73). */
+    private val historyAskedKey = "history_asked"
+
+    private fun preferences() = context.getSharedPreferences("MmHealth", Context.MODE_PRIVATE)
+
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private fun client() = HealthConnectClient.getOrCreate(context)
@@ -138,6 +151,33 @@ class MmHealthPlugin : Plugin() {
             }
             call.resolve(JSObject().put("types", have))
         }
+    }
+
+    /** Whether readings older than the thirty days before the first grant can be read (MM-73). */
+    @PluginMethod
+    fun historyPermitted(call: PluginCall) = asked(call) {
+        val granted = client().permissionController.getGrantedPermissions()
+        call.resolve(JSObject().put("granted", granted.contains(historyPermission)))
+    }
+
+    /**
+     * Asks for the history permission the first time only (MM-73). Refused,
+     * the app reads the thirty days it is allowed and never asks again; the
+     * user can still allow it in Health Connect.
+     */
+    @PluginMethod
+    fun requestHistory(call: PluginCall) {
+        val prefs = preferences()
+        if (prefs.getBoolean(historyAskedKey, false)) return historyPermitted(call)
+        prefs.edit().putBoolean(historyAskedKey, true).apply()
+        val contract = PermissionController.createRequestPermissionResultContract()
+        startActivityForResult(call, contract.createIntent(context, setOf(historyPermission)), "historyAnswered")
+    }
+
+    @ActivityCallback
+    fun historyAnswered(call: PluginCall?, result: ActivityResult) {
+        if (call == null) return
+        historyPermitted(call)
     }
 
     /**

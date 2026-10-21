@@ -46,6 +46,7 @@ import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { LastChangeCard } from './LastChangeCard';
+import { LeanGainCard } from './LeanGainCard';
 import { MaintenanceCard } from './MaintenanceCard';
 import { RecentInsightsSection } from './RecentInsightsSection';
 import { useInsightPreview } from './useInsightPreview';
@@ -297,6 +298,7 @@ export function CoachScreen() {
       {recent === undefined ? null : <RecentInsightsSection insights={recent} />}
       <StallCard />
       <RecompReviewCard />
+      <LeanGainCard onChangeGoal={() => void changeGoal()} />
       <AdherenceCard />
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />
