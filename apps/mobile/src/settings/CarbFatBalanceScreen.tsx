@@ -41,8 +41,8 @@ export function CarbFatBalanceScreen() {
   const limits = useCell(state.targetShapeLimits);
   const current = useCell(state.currentTargets)?.targets;
   const chosen = TargetShape.on(shapes, today)?.balance;
-  // Until one is chosen, the day is Balanced (MM-486).
-  const balance = chosen ?? CarbFatBalance.balanced;
+  // Until one is chosen, MM-24's split stands: fat 25% of calories, no carb floor.
+  const balance = chosen ?? new CarbFatBalance({ fatShare: CarbFatBalance.issuedFatShare });
   const save = async (next: CarbFatBalance) => {
     try {
       await services.targetShapes.saveTargetShape(nextTargetShape({ shapes, today, balance: next }));
@@ -59,10 +59,10 @@ export function CarbFatBalanceScreen() {
   const split =
     current === undefined || limits === undefined
       ? undefined
-      : splitCarbsAndFat({ kcal: current.kcal, proteinG: current.proteinG, fatMinimumG: limits.fatMinimumG(current.kcal), balance });
+      : splitCarbsAndFat({ kcal: current.kcal, proteinG: current.proteinG, fatMinimumG: limits.fatMinimumG(current.kcal), balance: chosen });
   const shareGiven = split === undefined || current === undefined ? undefined : (9 * split.fatG) / current.kcal;
-  // Fat gave way to the carbohydrate floor at these calories.
-  const heldByFloor = shareGiven !== undefined && shareGiven < balance.fatShare - 0.005;
+  // Fat gave way to the carbohydrate floor at these calories: said only of a share the user chose.
+  const heldByFloor = chosen !== undefined && shareGiven !== undefined && shareGiven < chosen.fatShare - 0.005;
 
   return (
     <Screen title="Carbs and fat balance">
@@ -73,7 +73,7 @@ export function CarbFatBalanceScreen() {
         <MmListRow
           leadingIcon="percent"
           title={`Fat: ${percent(Math.max(balance.fatShare, lowest))} of calories`}
-          subtitle={chosen === undefined ? 'As the app set it until you choose: Balanced.' : undefined}
+          subtitle={chosen === undefined ? 'As the app set it until you choose. Balanced is 30%.' : undefined}
           entry={
             <>
               <MmSegmented<number>

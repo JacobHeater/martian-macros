@@ -9,6 +9,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
 import { renderApp } from '../support/renderApp';
+import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
 
 /** MM-122, MM-124: Settings > Coach opens the balance of carbs and fat and the week's shape; both start as the app set them. */
@@ -41,6 +42,17 @@ it('the balance is unchosen until a position is chosen, and then kept from today
   await userEvent.click(screen.getByRole('button', { name: 'More fat' }));
   await expect.poll(async () => (await shapeToday())?.balance?.fatShare).toBe(CarbFatBalance.moreFatFatShare);
   expect((await shapeToday())?.since).toBe(today);
+});
+
+// The notice that fat gave way to the carb floor speaks of "the share you chose": never before a choice.
+it('the carb floor notice appears only after a balance is chosen', async () => {
+  // So little after protein that MM-24's split puts fat at its minimum and More fat meets the carb floor.
+  await repos.targets.saveTargets(targetsFrom(today.addDays(-7), { kcal: 1500, proteinG: 300, fatG: 40, carbsG: 0 }));
+  await openRow(/^Carbs and fat balance/);
+  expect(await screen.findByText(/As the app set it until you choose/)).toBeInTheDocument();
+  expect(screen.queryByText(/so carbs can stay at 100 g/)).toBeNull();
+  await userEvent.click(screen.getByRole('button', { name: 'More fat' }));
+  expect(await screen.findByText(/so carbs can stay at 100 g/)).toBeInTheDocument();
 });
 
 it('the carb floor is switched off only on purpose', async () => {

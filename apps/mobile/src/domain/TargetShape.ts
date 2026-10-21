@@ -11,7 +11,7 @@ import { WeekShape } from './WeekShape';
 export class TargetShape {
   readonly since: CalendarDate;
 
-  /** Undefined: not chosen, so a day's targets are Balanced (`CarbFatBalance.balanced`, MM-486). */
+  /** Undefined: not chosen, so a day's carbs and fat are as issued (MM-24's split: fat the larger of its minimum and 25% of calories). */
   readonly balance: CarbFatBalance | undefined;
   readonly week: WeekShape;
 

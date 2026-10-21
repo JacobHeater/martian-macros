@@ -101,8 +101,8 @@ register, and the paywall gates features built here.
    step 2.
 7. **Carbohydrate and fat preference; week shape (MM-122, MM-124).** M4.
    Built 2026-10-21 against `TargetShapeRepository`; MM-486 added the table
-   (schema 16), one migration for both settings, and the default became
-   Balanced. Remaining: a look at the stories in all three palettes, and
+   (schema 16), one migration for both settings. An unchosen balance stays
+   as issued (MM-24's split; coordinator 2026-10-21). Remaining: a look at the stories in all three palettes, and
    MM-124's simulator suite over shaped intake.
 8. **Lean-gain guardrails (MM-129, MM-480).** M4. Its waist signal needs WS-07 step 1
    and its strength signal WS-10 step 3; the surplus cap needs neither.
