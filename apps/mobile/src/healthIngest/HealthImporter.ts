@@ -36,18 +36,18 @@ export class HealthImporter {
       // Only what the platform could show and no longer does is removed; older readings are kept.
       const from = await this.source.readableFrom();
       const all = await this.source.changesSince(type, undefined);
+      const shown = new Set(all.upserted.map((sample) => sample.platformId));
+      const gone = (await this.store.samples(type))
+        .filter((sample) => (from === undefined || sample.start.getTime() >= from.getTime()) && !shown.has(sample.platformId))
+        .map((sample) => sample.platformId);
       if (from === undefined) {
         await this.store.replace(type, all.upserted);
       } else {
-        const shown = new Set(all.upserted.map((sample) => sample.platformId));
-        const gone = (await this.store.samples(type))
-          .filter((sample) => sample.start.getTime() >= from.getTime() && !shown.has(sample.platformId))
-          .map((sample) => sample.platformId);
         await this.store.upsert(all.upserted);
         await this.store.delete(type, gone);
       }
       await this.store.saveToken(type, all.nextToken);
-      return { status: 'readAgain', upserted: all.upserted.length, deleted: 0 };
+      return { status: 'readAgain', upserted: all.upserted.length, deleted: gone.length };
     }
     await this.store.upsert(changes.upserted);
     await this.store.delete(type, changes.deletedIds);
