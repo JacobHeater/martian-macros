@@ -58,6 +58,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
         }),
       );
       await r.preferences.saveThemePreference('dark');
+      await r.preferences.savePrimaryScale('scale');
       await r.targets.saveTargets(
         new TargetsRecord({
           effectiveFrom: day,
@@ -93,6 +94,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.workouts.watchWorkouts())).toEqual([]);
       expect(await first(r.customExercises.watchCustomExercises())).toEqual([]);
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');
+      // MM-71: the scale chosen goes with the readings it was chosen from.
+      expect(await first(r.preferences.watchPrimaryScale())).toBeUndefined();
       // MM-242: first use again, so the terms are asked again.
       expect(await first(r.preferences.watchTermsAcceptance())).toBeUndefined();
     });

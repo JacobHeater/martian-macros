@@ -138,12 +138,15 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 14 left it: without the scale chosen as primary (MM-71). */
+const versionFourteen = currentSchema.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
+
 /**
- * The schema as version 13 left it: the current shape without the state a
+ * The schema as version 13 left it: the version 14 shape without the state a
  * food was logged in, the conversion to grams and the usual cooking fat
  * (MM-167, MM-151, MM-152).
  */
-const versionThirteen = currentSchema
+const versionThirteen = versionFourteen
   .replace('  "preparation" TEXT NULL,\n', '')
   .replace('  "conversion_kind" TEXT NULL,\n', '')
   .split('  "sugar_alcohols_g" REAL NULL,\n  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)\n);')
@@ -398,4 +401,30 @@ it('a version 13 database comes up to date: entries kept with no preparation or 
   expect(await first(repos.preferences.watchUsualCookingFat())).toBe('oil');
   expect(await first(repos.preferences.watchDetailLevel())).toBe('full');
   expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+});
+
+// MM-71: a version 14 database comes up to date with no scale chosen, so the one with the most
+// weigh-ins counts as before; its other preferences are kept, and a choice is kept from then on.
+it('a version 14 database comes up to date with the primary scale chosen automatically', async () => {
+  expect(versionFourteen).not.toContain('primary_scale_source_id');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 14, schema: versionFourteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, usual_cooking_fat) VALUES (1, 'dark', 'butter')");
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'user_preferences')).toContain('primary_scale_source_id');
+  expect(await first(repos.preferences.watchPrimaryScale()), 'none chosen: automatic').toBeUndefined();
+  expect(await first(repos.preferences.watchUsualCookingFat())).toBe('butter');
+  expect(await first(repos.preferences.watchThemePreference())).toBe('dark');
+  await repos.preferences.savePrimaryScale('gym');
+  expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
 });

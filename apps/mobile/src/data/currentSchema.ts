@@ -158,6 +158,7 @@ CREATE TABLE "user_preferences" (
   "ease_into_maintenance" INTEGER NOT NULL DEFAULT 0 CHECK ("ease_into_maintenance" IN (0, 1)),
   "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
   "usual_cooking_fat" TEXT NOT NULL DEFAULT 'oil',
+  "primary_scale_source_id" TEXT NULL,
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

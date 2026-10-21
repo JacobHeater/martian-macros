@@ -127,7 +127,7 @@ summary card is theirs, the add-food flow and entry rows are this
 workstream's.
 
 ## Requirement sources
-- Built: MM-38, MM-39, MM-40, MM-41 (log by macros, recents, day completeness, daily summary), MM-48 (edit an entry, undo a
+- Built: MM-38, MM-39, MM-439, MM-40, MM-41 (log by macros, recents listed as rows, day completeness, daily summary), MM-48 (edit an entry, undo a
   delete), MM-47 (copy yesterday, copy a meal), MM-438 (food is added from a meal's "+" only), MM-45 (saved foods and
   recipes; a recipe's ingredient asks raw or cooked and its lines can be reordered).
 - In progress: MM-42 (search of the installed packs and the amount step), MM-43 (scan or type a barcode; not tried with a real
