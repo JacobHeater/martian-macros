@@ -22,6 +22,7 @@ export * from './evidence/EvidenceGrade';
 export * from './evidence/EvidenceQuestion';
 export * from './evidence/EvidenceRegister';
 export * from './evidence/EvidenceRow';
+export * from './food/alcohol/StandardDrink';
 export * from './food/BarcodeSymbology';
 export * from './food/checkNutrition';
 export * from './food/maxKcalPer100g';
