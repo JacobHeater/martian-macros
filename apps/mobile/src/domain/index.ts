@@ -193,4 +193,5 @@ export * from './UserSetup';
 export * from './WaistObservation';
 export * from './WeightEvent';
 export * from './WeightEventType';
+export * from './WeightLossMedicationAnswer';
 export * from './WeightObservation';
