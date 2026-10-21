@@ -9,6 +9,7 @@ import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
 import { deficitStartOn } from './deficitStartOn';
 import type { GoalBodyFatCheck } from './GoalBodyFatCheck';
 import { leanFractionOfChange } from './leanFractionOfChange';
+import { gainLineBodyFatPercent } from './gainLineBodyFatPercent';
 import { LeanGainRule } from './LeanGainRule';
 import type { LeanGainStopReason } from './LeanGainStopReason';
 import { MaintenanceRule } from './MaintenanceRule';
@@ -73,10 +74,10 @@ function kgToLine({
  * the calorie floor. When a lean gain ends is MM-129's to say
  * (`leanGainStop`, from `leanGainReviewOf`): its body-fat line, its waist
  * rise or its weeks, so the plan and the lean-gain card never disagree; the
- * gain's projected end reads the estimate against that line, as MM-129
- * does (MM-132: ending a gain is not a safety rule). Maintenance after a cut
- * or a gain ends once it has run the weeks MM-130 suggests. Then the next phase is recommended from the
- * range: maintenance, and after it a lean gain if the lower end is at the
+ * gain's projected end reads the same upper end of the range against that
+ * line (`gainLineBodyFatPercent`). Maintenance after a cut or a gain ends
+ * once it has run the weeks MM-130 suggests. Then the next phase is
+ * recommended from the range: maintenance, and after it a lean gain if the lower end is at the
  * cut's goal, another cut if not. Recomp is reviewed by MM-133, and
  * maintenance chosen for itself is open-ended; both show only how long
  * they have run.
@@ -97,7 +98,7 @@ export function planPhases({
   today,
 }: {
   setup: UserSetup;
-  snapshot: Pick<CoachSnapshot, 'policy' | 'trend' | 'trendWeightKg' | 'bodyFat' | 'deficitRestartOn'>;
+  snapshot: Pick<CoachSnapshot, 'policy' | 'trend' | 'trendWeightKg' | 'bodyFat' | 'bodyFatBasis' | 'deficitRestartOn'>;
   history: readonly TargetsRecord[];
   stall?: StallAssessment | undefined;
   /** Why MM-129's review recommends ending the lean gain, if it does. */
@@ -199,7 +200,13 @@ export function planPhases({
         });
       }
       const cap = [startedOn.addDays(LeanGainRule.stopWeeks * 7), 'longestGain'] as const;
-      const kg = kgToLine({ weightKg, fatPercent: estimate.percent, linePercent: line, losing: false, resistanceTrained });
+      const kg = kgToLine({
+        weightKg,
+        fatPercent: gainLineBodyFatPercent(estimate, snapshot.bodyFatBasis),
+        linePercent: line,
+        losing: false,
+        resistanceTrained,
+      });
       const reachedOn = projectTo(kg, steadyKgPerWeek(1));
       return plan({ linePercent: line, end: earlier(cap, reachedOn === undefined ? undefined : [reachedOn, 'gainLine']) });
     }

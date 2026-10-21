@@ -19,12 +19,13 @@ change it. Nothing says when to change, or how long the current phase should las
 Choices I made without asking (say if any is wrong):
 - **The plan is derived each time, never stored.** The current phase is the trailing run of targets in the goal's mode; its end and the
   next phase come from the targets history, the trend and the body-fat range (`planPhases`, `state.phasePlan`).
-- **A cut reads body fat as a range, never a point (MM-34).** It ends once the *lower* end of the range (the estimate less 0.6745
-  deviations, the quarter-chance figure MM-132 gives the safety rules) reaches its goal, so a cut stops as soon as the goal is plausibly
-  reached. A wider range ends a cut sooner.
-- **When a lean gain ends is MM-129's alone** (`leanGainReviewOf`'s stop, passed to `planPhases`): estimated body fat at its line, the
-  waist up 5% since the gain began, or 26 weeks, so the plan and the lean-gain card never disagree. MM-129 reads the line against the
-  estimate, as MM-132 allows for a rule that is not a safety rule, and the gain's projected end does the same.
+- **Body fat is read as a range, never a point (MM-34).** A cut reads the lower end; a gain the upper end (`gainLineBodyFatPercent`,
+  the coordinator's choice of 2026-10-21, applied to MM-129's stop too); a figure the user entered counts as exact. A cut ends once
+  the *lower* end (the estimate less 0.6745 deviations, the quarter-chance figure MM-132 gives the safety rules) reaches its goal, so
+  a cut stops as soon as the goal is plausibly reached. A wider range ends a cut, or a gain, sooner.
+- **When a lean gain ends is MM-129's alone** (`leanGainReviewOf`'s stop, passed to `planPhases`): the upper end of the range at its line, the
+  waist up 5% since the gain began, or 26 weeks, so the plan and the lean-gain card never disagree. Both read the line against the
+  upper end of the range, and so does the gain's projected end.
 - **Said once (coordinator, 2026-10-21).** Why a gain ended is the lean-gain card's line; the goal section's notice gives only what
   follows ("Next: Maintenance, then Fat loss", the hold's length) and its two buttons.
 - **Without a goal, a cut runs to 15% for men and 23% for women**, the line under which `recommendMode` starts someone on a lean gain;

@@ -82,6 +82,7 @@ const snapshotFor = (
   ],
   trendWeightKg: weightKg,
   bodyFat: new BodyFatEstimate({ percent, sigmaPercent: sigma }),
+  bodyFatBasis: 'formula' as const,
   deficitRestartOn: undefined,
 });
 
@@ -238,13 +239,13 @@ describe('a projected end', () => {
     expect(plan?.projectedEndOn).toEqual(today.addDays(PhaseRule.longestCutWeeks * 7 - 14));
   });
 
-  it('a gain ends at whichever comes first, the estimate at its line at this pace or twenty-six weeks', () => {
+  it('a gain ends at whichever comes first, the upper end of the range at its line at this pace or twenty-six weeks', () => {
     const setup = setupFor({ goal: 'leanGain' });
     const at = (kgPerWeek: number) =>
-      planPhases({ setup, snapshot: snapshotFor(setup, { percent: 18, kgPerWeek }), history: [record(70, 'leanGain')], today });
-    // 80 kg at 18%: about 4.2 kg to 20%, part of it lean (the partition); the line MM-129 reads, against the estimate.
+      planPhases({ setup, snapshot: snapshotFor(setup, { percent: 15, kgPerWeek }), history: [record(70, 'leanGain')], today });
+    // 80 kg, the upper end at 17.7%: about 4.9 kg to 20%, part of it lean (the partition), as MM-129 reads the line.
     expect(at(0.25)).toMatchObject({ projectedEndReason: 'longestGain', projectedEndOn: today.addDays(LeanGainRule.stopWeeks * 7 - 70) });
-    expect(at(0.5)).toMatchObject({ projectedEndReason: 'gainLine', projectedEndOn: today.addDays(59) });
+    expect(at(0.5)).toMatchObject({ projectedEndReason: 'gainLine', projectedEndOn: today.addDays(69) });
   });
 });
 
