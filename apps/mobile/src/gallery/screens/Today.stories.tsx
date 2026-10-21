@@ -30,7 +30,7 @@ export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'More
 /** MM-91: the Dashboard on a 360 px phone: the hero, its macro rows and the strip inside the width. */
 export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', viewport: 'smallPhone' });
 
-/** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the bar's Add food and the title share the width. */
+/** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the title and Settings share the width. */
 export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', textScale: 2 });
 
 /** MM-91: the morning before the weigh-in at 200% text: the field, its Save and the hint inside the row. */

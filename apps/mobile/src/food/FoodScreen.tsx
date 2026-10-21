@@ -117,7 +117,6 @@ export function FoodScreen() {
           </MmDisclosure>
         </>
       )}
-      <div className="food-fab-room" />
     </>
   );
 }
