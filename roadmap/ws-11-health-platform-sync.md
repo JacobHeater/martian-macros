@@ -99,7 +99,9 @@ to declare.
    or female; other values are ignored and the user always confirms.
 12. **What MM-71 left (MM-441, MM-442).** M4. A weigh-in window for a
     morning that is not 04:00 to 12:00, and steps through the platform's
-    own aggregation (native, needs a device).
+    own aggregation (native, needs a device). Built 2026-10-21 behind the
+    interfaces: the window's rule, with its column and Settings row waiting
+    on a schema version; steps in both shells, device checks owed.
 
 ## Done enough to unblock others
 MM-67 and MM-71 are done: weigh-ins carry a source, one rule chooses the

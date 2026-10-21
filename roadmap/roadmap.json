@@ -3172,7 +3172,7 @@
         },
         {
           "step": 12,
-          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441), and steps through the platform's own aggregation (MM-442)",
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; the rule built, its column and Settings row wait on a schema version), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
           "tickets": [
             "MM-441",
             "MM-442"

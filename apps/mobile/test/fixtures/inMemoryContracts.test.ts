@@ -26,6 +26,8 @@ import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { weightEventRepositoryContract } from '../contracts/weightEventRepositoryContract';
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
+import { weighInWindowContract } from '../contracts/weighInWindowContract';
+import { InMemoryWeighInWindow } from '../../src/fixtures/InMemoryWeighInWindow';
 import { workoutRepositoryContract } from '../contracts/workoutRepositoryContract';
 
 /**
@@ -51,6 +53,8 @@ inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories()
 insightSnoozeRepositoryContract('In-memory', () => new InMemoryRepositories().insightSnoozes);
 // MM-36: not in `InMemoryRepositories` until its table (MM-507) puts it in the app.
 goalBodyFatRepositoryContract('In-memory', () => new InMemoryGoalBodyFatRepository());
+// MM-441: not in the app's services until the preferences table has a place for the window.
+weighInWindowContract('In-memory', () => new InMemoryWeighInWindow());
 pauseRepositoryContract('In-memory', () => new InMemoryRepositories().pauses);
 reminderRepositoryContract('In-memory', () => new InMemoryRepositories().reminders);
 recoveryCheckInRepositoryContract('In-memory', () => new InMemoryRepositories().recovery);
