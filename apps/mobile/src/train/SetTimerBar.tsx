@@ -19,7 +19,9 @@ import './train.css';
  * and end, so the control that ends a set is always on screen (MM-222).
  * From then the rest is counted, until the next set is started: up, or
  * down to the target rest of the exercise just done, and up again once
- * that is reached.
+ * that is reached. While the workout is paused the bar offers "Resume"
+ * where "Start set" was, so the way on is where the eye already is
+ * (MM-447).
  */
 export function SetTimerBar({ workout }: { workout: Workout }) {
   const { state } = useApp();
@@ -50,7 +52,8 @@ export function SetTimerBar({ workout }: { workout: Workout }) {
   const targetName = targetId === undefined ? undefined : (exercises.get(targetId)?.name ?? 'Deleted exercise');
   // Every instruction names a button on this bar (MM-222).
   let instruction: string | undefined;
-  if (targetName === undefined) instruction = 'Add an exercise to time a set.';
+  if (workout.paused) instruction = 'Tap Resume to start the clock again.';
+  else if (targetName === undefined) instruction = 'Add an exercise to time a set.';
   else if (setStarted !== undefined && !workout.paused) instruction = `Tap Set done to record it on ${targetName}.`;
 
   return (
@@ -65,21 +68,19 @@ export function SetTimerBar({ workout }: { workout: Workout }) {
         </p>
         {instruction === undefined ? null : <p className="train-timer-label">{instruction}</p>}
       </div>
-      {setStarted === undefined ? (
+      {workout.paused ? (
+        <MmButton label="Resume" icon="play" kind="primary" onPress={() => void controller.resume(workout)} />
+      ) : setStarted === undefined ? (
         <MmButton
           label="Start set"
           kind="primary"
-          // Nothing is timed while the workout is paused, or before it has an exercise to record on (MM-222).
-          onPress={workout.paused || target === undefined ? undefined : () => void controller.startSet(workout)}
+          // Nothing is timed before the workout has an exercise to record on (MM-222).
+          onPress={target === undefined ? undefined : () => void controller.startSet(workout)}
         />
       ) : (
         <>
-          <MmButton label="Cancel" kind="text" onPress={workout.paused ? undefined : () => void controller.cancelSet(workout)} />
-          <MmButton
-            label="Set done"
-            kind="primary"
-            onPress={workout.paused || target === undefined ? undefined : () => void addSet(target)}
-          />
+          <MmButton label="Cancel" kind="text" onPress={() => void controller.cancelSet(workout)} />
+          <MmButton label="Set done" kind="primary" onPress={target === undefined ? undefined : () => void addSet(target)} />
         </>
       )}
     </div>

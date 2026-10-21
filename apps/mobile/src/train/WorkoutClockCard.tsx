@@ -4,6 +4,7 @@ import { elapsedText } from '../format/elapsedText';
 import { useNavigator } from '../app/useNavigator';
 import { MmButton } from '../ui/MmButton';
 import { MmSurface } from '../ui/MmSurface';
+import { useOverlays } from '../ui/useOverlays';
 import { useNow } from './useNow';
 import { useWorkoutController } from './useWorkoutController';
 import { WorkoutTimesScreen } from './WorkoutTimesScreen';
@@ -23,7 +24,15 @@ function RunningTime({ workout }: { workout: Workout }) {
 export function WorkoutClockCard({ workout }: { workout: Workout }) {
   const controller = useWorkoutController();
   const navigator = useNavigator();
+  const overlays = useOverlays();
   const ended = workout.endedAt;
+
+  /** A pause is not part of a set, so a set being timed is dropped, and the screen says so (MM-447). */
+  const pause = async () => {
+    const dropped = workout.setStartedAt !== undefined;
+    await controller.pause(workout);
+    if (dropped) overlays.snack('Paused. The set being timed was dropped; start it again after you resume.');
+  };
   return (
     <MmSurface>
       <div className="train-clock">
@@ -52,12 +61,13 @@ export function WorkoutClockCard({ workout }: { workout: Workout }) {
             label={workout.paused ? 'Resume' : 'Pause'}
             icon={workout.paused ? 'play' : 'pause'}
             kind={workout.paused ? 'primary' : 'secondary'}
-            onPress={() => void (workout.paused ? controller.resume(workout) : controller.pause(workout))}
+            onPress={() => void (workout.paused ? controller.resume(workout) : pause())}
           />
         ) : null}
       </div>
       <MmButton
-        label="Edit times"
+        // Named for the workout: a set's times are edited on the set (MM-447).
+        label="Edit workout times"
         kind="text"
         onPress={() => void navigator.push(() => <WorkoutTimesScreen workoutId={workout.id} />)}
       />
