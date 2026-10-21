@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import type { LeanGainPace } from '../../src/domain/LeanGainPace';
 import { DailyTargets } from '../../src/engine/DailyTargets';
 import { ExplanationLine } from '../../src/engine/ExplanationLine';
 import { TargetFlag } from '../../src/engine/TargetFlag';
@@ -20,12 +21,14 @@ const record = (
     profileRevision = 0,
     explanation,
     requestedLossFraction,
+    leanGainPace,
   }: {
     flags?: ReadonlySet<TargetFlag>;
     safetyBodyFatPercent?: number;
     profileRevision?: number;
     explanation?: TargetsExplanation;
     requestedLossFraction?: number;
+    leanGainPace?: LeanGainPace;
   } = {},
 ) =>
   new TargetsRecord({
@@ -38,6 +41,7 @@ const record = (
     profileRevision,
     explanation,
     requestedLossFraction,
+    leanGainPace,
     targets: new DailyTargets({
       kcal,
       proteinG: 160,
@@ -144,6 +148,13 @@ export function targetsHistoryRepositoryContract(
       expect(marked.requestedLossFraction).toBe(0.005);
     });
 
+    // MM-480: the same for the lean-gain pace.
+    it('marks summaries seen without losing the lean-gain pace asked for', async () => {
+      await repo.saveTargets(record(d1, 2900, { leanGainPace: 'slower' }).copyWith({ summarySeen: false }));
+      await repo.markSummariesSeenThrough(d1);
+      expect(single(await first(repo.watchTargetsHistory())).leanGainPace).toBe('slower');
+    });
+
     it('keeps the estimate and the flags', async () => {
       const firstFlag = TargetFlag.values[0];
       const lastFlag = TargetFlag.values[TargetFlag.values.length - 1] as TargetFlag;
@@ -163,6 +174,15 @@ export function targetsHistoryRepositoryContract(
       const history = await first(repo.watchTargetsHistory());
       expect(history[0]?.requestedLossFraction).toBeUndefined();
       expect(history[1]?.requestedLossFraction).toBe(0.005);
+    });
+
+    // MM-480: the lean-gain pace a record was asked for; undefined for the standard one, or on older records.
+    it('keeps the lean-gain pace the targets were asked for', async () => {
+      await repo.saveTargets(record(d1, 2900));
+      await repo.saveTargets(record(d2, 2850, { leanGainPace: 'slower' }));
+      const history = await first(repo.watchTargetsHistory());
+      expect(history[0]?.leanGainPace).toBeUndefined();
+      expect(history[1]?.leanGainPace).toBe('slower');
     });
 
     it('emits the current list first, then each change', async () => {

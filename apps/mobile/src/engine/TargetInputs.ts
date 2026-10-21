@@ -1,6 +1,7 @@
 import type { BiologicalSex } from '../domain/BiologicalSex';
 import type { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { GoalMode } from '../domain/GoalMode';
+import type { LeanGainPace } from '../domain/LeanGainPace';
 import type { TrainingStatus } from '../domain/TrainingStatus';
 import type { BodyFatEstimate } from './BodyFatEstimate';
 import type { BreakFlag } from './BreakFlag';
@@ -21,6 +22,7 @@ interface TargetInputsInit {
   previous?: DailyTargets | undefined;
   consecutiveDeficitWeeks?: number;
   requestedLossFraction?: number | undefined;
+  leanGainPace?: LeanGainPace;
   safetyBodyFatPercent?: number | undefined;
   safetyRaiseKcal?: number;
   breakRequested?: boolean;
@@ -56,6 +58,12 @@ export class TargetInputs {
    * 0.0075). Clamped to the safety maximum. Defaults to 0.75%.
    */
   readonly requestedLossFraction: number | undefined;
+
+  /**
+   * Lean-gain pace chosen by the user (MM-480): the pace training status
+   * sets, or `LeanGainRule.slowerPaceFactor` of it. Defaults to the first.
+   */
+  readonly leanGainPace: LeanGainPace;
 
   /**
    * The body-fat figure the safety thresholds (loss limit, protein rule,
@@ -116,6 +124,7 @@ export class TargetInputs {
     this.previous = init.previous;
     this.consecutiveDeficitWeeks = init.consecutiveDeficitWeeks ?? 0;
     this.requestedLossFraction = init.requestedLossFraction;
+    this.leanGainPace = init.leanGainPace ?? 'standard';
     this.safetyBodyFatPercent = init.safetyBodyFatPercent;
     this.safetyRaiseKcal = init.safetyRaiseKcal ?? 0;
     this.correctionRateFraction = init.correctionRateFraction;

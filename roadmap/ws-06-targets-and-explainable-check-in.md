@@ -106,8 +106,10 @@ register, and the paywall gates features built here.
    MM-124's simulator suite over shaped intake.
 8. **Lean-gain guardrails (MM-129, MM-480).** M4. Its waist signal needs WS-07 step 1
    and its strength signal WS-10 step 3; the surplus cap needs neither.
-   MM-129 is built (2026-10-21); a slower lean-gain pace to choose (MM-480)
-   needs a stored setting, so a migration.
+   MM-129 is built (2026-10-21); MM-480 (2026-10-21) added a slower lean-gain
+   pace to choose, stored in schema 17, offered on the lean-gain card and the
+   targets section. MM-533, found while building it: a held reduction lost
+   its pace.
 
 ## Done enough to unblock others
 MM-121 is done: target records carry a protein minimum and goal-specific
@@ -131,7 +133,9 @@ beside anything.
 - Remaining: MM-138, MM-123, MM-128, MM-130,
   MM-122, MM-124, MM-129. Epics: MM-119, MM-137.
 - Built (2026-10-21): MM-129 (lean-gain guardrails: the surplus cap and the Coach
-  screen's lean-gain card). Remaining from it: MM-480 (a slower gain pace).
+  screen's lean-gain card).
+- Built (2026-10-21): MM-480 (a slower lean-gain pace, schema 17) and MM-533
+  (a held reduction kept its pace).
 - Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
 - Built (2026-10-21): MM-486 (the table for MM-122's and MM-124's settings,
   schema 16, after MM-71's version 15).
