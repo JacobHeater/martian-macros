@@ -123,6 +123,14 @@ export function targetsHistoryRepositoryContract(
       expect(single(await first(repo.watchTargetsHistory())).targets.kcal).toBe(1900);
     });
 
+    it('removes the record of one day, and a day with none is left as it is (MM-117)', async () => {
+      await repo.saveTargets(record(d1, 2100));
+      await repo.saveTargets(record(d2, 2000));
+      await repo.removeTargets(d2);
+      await repo.removeTargets(d2);
+      expect(single(await first(repo.watchTargetsHistory())).targets.kcal).toBe(2100);
+    });
+
     it('marks summaries through a day without removing their explanations', async () => {
       const why = new TargetsExplanation({
         lines: [new ExplanationLine('stepLimit', -25)],

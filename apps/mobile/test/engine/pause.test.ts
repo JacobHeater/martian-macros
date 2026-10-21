@@ -173,6 +173,42 @@ describe('the glycogen shift at both ends (MM-131)', () => {
     expect(windowsOf([pause(50, 60)], 45)).toEqual([]);
   });
 
+  it('a pause of exactly seven days is long enough to be a break', () => {
+    expect(windowsOf([pause(20, 26)], 45)).toEqual([window(20), window(27)]);
+  });
+
+  /** `kcal` against an expenditure of 2000, from day 0. */
+  const against2000 = (kcal: number) =>
+    new TargetsRecord({
+      effectiveFrom: start,
+      targets: new DailyTargets({ kcal, proteinG: 160, fatG: 70, carbsG: 200, weeklyRateFraction: -0.005 }),
+      mode: 'fatLoss',
+      tdeeKcal: 2000,
+      tdeeSigmaKcal: 150,
+      tdeeStatus: 'updated',
+    });
+
+  it('targets exactly on the 10% line are not a change of phase; just past it they are', () => {
+    expect(windowsOf([pause(20, 29)], 45, [against2000(1800)])).toEqual([]);
+    expect(windowsOf([pause(20, 29)], 45, [against2000(1799)])).toEqual([window(20), window(30)]);
+  });
+
+  it('each end is judged on the targets in force on it: a return to maintenance does not settle', () => {
+    const maintenanceFrom = (day: number) =>
+      new TargetsRecord({
+        effectiveFrom: start.addDays(day),
+        targets: new DailyTargets({ kcal: 2700, proteinG: 160, fatG: 70, carbsG: 290, weeklyRateFraction: 0 }),
+        mode: 'maintenance',
+        tdeeKcal: 2700,
+        tdeeSigmaKcal: 150,
+        tdeeStatus: 'updated',
+      });
+    // The goal changed to maintenance while paused: the pause began from a deficit and returns to maintenance.
+    expect(windowsOf([pause(20, 29)], 45, [record(0), maintenanceFrom(25)])).toEqual([window(20)]);
+    // Paused from maintenance, returning to a deficit issued on the day after.
+    expect(windowsOf([pause(20, 29)], 45, [maintenanceFrom(0), record(30)])).toEqual([window(30)]);
+  });
+
   it('a pause from targets at maintenance moves nothing, and neither does one before any targets', () => {
     const atMaintenance = new TargetsRecord({
       effectiveFrom: start,

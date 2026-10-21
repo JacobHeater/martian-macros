@@ -86,6 +86,12 @@ export class SqlTargetsHistoryRepository implements TargetsHistoryRepository {
     );
   }
 
+  removeTargets(effectiveFrom: CalendarDate): Promise<void> {
+    return this.db.write(['targets_history'], (db) =>
+      db.execute('DELETE FROM targets_history WHERE effective_epoch_day = ?', [effectiveFrom.epochDay]),
+    );
+  }
+
   markSummariesSeenThrough(effectiveFrom: CalendarDate): Promise<void> {
     return this.db.write(['targets_history'], (db) =>
       db.execute('UPDATE targets_history SET summary_seen = 1 WHERE effective_epoch_day <= ? AND summary_seen = 0', [
