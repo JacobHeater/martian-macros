@@ -76,6 +76,13 @@ the source-reading test below until it is built on the Mac.
   read back as readings by either plugin.
 - The app's use of what is read (MM-490) and removing a deleted workout (MM-515) are their own tickets.
 
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): both plugins' `readWorkouts` mark the app's own
+  workouts `"ours": true` by their source (Kotlin `ours(record)`, the package; Swift `source == HKSource.default()`), and
+  `NativeHealthWorkouts` skips them, so the client-id prefix is no longer the only guard. Tests:
+  `test/platform/nativeHealthWorkouts.test.ts` (an own workout with another client id is not read),
+  `test/native/mmHealthWrites.test.ts` (both plugins mark it). `InMemoryHealthWorkouts` still reads its own written
+  workouts back, and `workoutFromPlatform` still skips them by prefix.
+
 ## Owed on a phone
 - A written workout shows in Health Connect and in Apple Health; on Health Connect its segments show too.
 - Writing again after an edit leaves one workout on each platform.

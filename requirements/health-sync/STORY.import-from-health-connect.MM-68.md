@@ -109,6 +109,14 @@ privacy-policy page are release gates (MM-95, M5) and do not hold this.
 - Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent
   opens the app's main screen for now.
 
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): `height` is one of `HealthBackfill.types`, so a
+  height recorded more than thirty days ago (up to a year) is read and offered. Granting height now asks for the
+  history permission too, as weight does. Test: `test/healthIngest/healthBackfill.test.ts`.
+
+## Owed on a phone
+- A cycle app that writes only `MenstruationPeriodRecord` (no flow records): Android reads flow records only, so check
+  what Settings and the cycle-aware trend show; nothing is expected to be read today.
+
 ## Notes
 - Health Connect has no biological-sex record, so nothing here touches MM-14.
 - Google Play requires a declaration of each health permission and why it is needed (MM-95).
