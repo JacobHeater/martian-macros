@@ -81,7 +81,9 @@ training-lapse rules owned by WS-05.
 4. **Weekly volume per muscle group (MM-78).** M4.
 5. **Progression suggestions (MM-79).** M4. Wording changes with the goal: on
    a cut, matching last time is the aim.
-8. **The Train screen hierarchy (MM-224) (MM-214, MM-215, MM-222).** M3. Placed 2026-10-13.
+8. **The Train screen hierarchy (MM-224) (MM-214, MM-215, MM-222, MM-447).** M3. Placed 2026-10-13.
+   MM-214, MM-215 and MM-222 built 2026-10-21; MM-447 (the paused bar and
+   the workout's times) waits on the owner.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-193, MM-194; step 3: MM-192; step 4: MM-195; step 7: MM-196.
 
 ## Done enough to unblock others
@@ -101,7 +103,7 @@ creates is new.
 - Built: MM-76 (the library, its search, the picker and the user's own exercises), MM-75 (workouts set by set, the Train
   destination, schema 25).
 - Remaining: MM-191, MM-77, MM-78, MM-79, MM-189. Epic: MM-74.
-- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-193 (Demo workouts repeated for each nutrition day, done); MM-194 (Deleting a custom exercise hides preserved strength sessions, done); MM-192 (Invalid strength evidence bypasses the retry state, done); MM-195 (Weekly volume navigation disappears during a workout, done); MM-196 (Typed set times can overlap another set in the workout, done); MM-214 (A set's reps field can show a value the set does not have); MM-215 (Removing a set happens at once and cannot be undone); MM-222 (A logged set looks logged, and the next action is in reach).
+- Placed 2026-10-13 (MM-245), from the React conversion onward: MM-193 (Demo workouts repeated for each nutrition day, done); MM-194 (Deleting a custom exercise hides preserved strength sessions, done); MM-192 (Invalid strength evidence bypasses the retry state, done); MM-195 (Weekly volume navigation disappears during a workout, done); MM-196 (Typed set times can overlap another set in the workout, done); MM-214 (A set's reps field can show a value the set does not have, done); MM-215 (Removing a set happens at once and cannot be undone, done); MM-222 (A logged set looks logged, and the next action is in reach, done); MM-447 (A paused workout, and a workout's times, say what they do; placed 2026-10-21).
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do

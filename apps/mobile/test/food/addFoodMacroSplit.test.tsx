@@ -88,7 +88,7 @@ it('recent entry preview starts from its saved macro totals', async () => {
     foodOn(today, { name: 'Recent soup', meal: 'lunch', kcal: 400, proteinG: 20, carbsG: 30, fatG: 10 }),
   );
   const sheet = await open();
-  await press(sheet, 'Recent soup');
+  await press(sheet, /^Recent soup/);
   expect(sectors(sheet)).toEqual([80, 120, 90]);
 });
 

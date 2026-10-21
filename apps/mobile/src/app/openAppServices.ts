@@ -24,6 +24,8 @@ import { mmScanner } from '../platform/mmScanner';
 import { NativeCamera } from '../platform/NativeCamera';
 import { NativeHealthSource } from '../platform/NativeHealthSource';
 import { NativeReminderScheduler } from '../platform/NativeReminderScheduler';
+import { NativeExactAlarms } from '../platform/NativeExactAlarms';
+import { NoExactAlarmPermission } from '../platform/NoExactAlarmPermission';
 import { NoCamera } from '../platform/NoCamera';
 import { runningNatively } from '../platform/runningNatively';
 import { runningOn } from '../platform/runningOn';
@@ -112,6 +114,7 @@ export async function openAppServices(): Promise<AppServices> {
     reminderScheduler: native
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),
+    exactAlarms: native ? new NativeExactAlarms(mmReminders) : new NoExactAlarmPermission(),
     healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
