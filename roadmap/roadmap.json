@@ -721,7 +721,8 @@
         {
           "workstream": "WS-01",
           "tickets": [
-            "MM-536"
+            "MM-536",
+            "MM-550"
           ]
         },
         {
@@ -923,7 +924,8 @@
             "MM-94"
           ]
         }
-      ]
+      ],
+      "futureVision": true
     }
   ],
   "workstreams": [
@@ -1117,7 +1119,8 @@
           "MM-245",
           "MM-300",
           "MM-8",
-          "MM-412"
+          "MM-412",
+          "MM-550"
         ],
         "remaining": [
           "MM-1",
@@ -1208,7 +1211,8 @@
           "title": "Screenshot the iPhone through the app (MM-536): the dev app snapshots its own web view, devicectl asks for it and copies it out",
           "milestone": "M4",
           "tickets": [
-            "MM-536"
+            "MM-536",
+            "MM-550"
           ]
         }
       ],
