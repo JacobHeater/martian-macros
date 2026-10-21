@@ -1,12 +1,21 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { Meal } from '../../src/domain/Meal';
+import { mealLabel } from '../../src/format/mealLabel';
+import { openTab } from './openTab';
 
 /** The add-food sheet, or the edit-food one. */
 export const foodSheet = (name: 'Add food' | 'Edit food' = 'Add food') => screen.findByRole('dialog', { name });
 
-/** Opens the add-food sheet from the action showing (the Dashboard's, or the Food screen's). */
-export async function openAddFood(): Promise<HTMLElement> {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add food' }));
+/**
+ * Opens the add-food sheet from `meal`'s "+" on Food, going to Food first
+ * if another destination shows (MM-438: no screen has an Add food button).
+ * Lunch by default, the meal of the test clock's noon.
+ */
+export async function openAddFood(meal: Meal = 'lunch'): Promise<HTMLElement> {
+  const name = `Add food to ${mealLabel(meal).toLowerCase()}`;
+  if (screen.queryByRole('button', { name }) === null) await openTab('Food');
+  await userEvent.click(await screen.findByRole('button', { name }));
   return foodSheet();
 }
 

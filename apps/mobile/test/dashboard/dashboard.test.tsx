@@ -254,17 +254,14 @@ it('confirms a quarter-inch waist as typed', async () => {
   expect(await screen.findByRole('status')).toHaveTextContent('Waist saved: 35.25 in');
 });
 
-// MM-288: one Ember action on the Dashboard. Before the weigh-in it is the row's Save; once weighed, the bar's Add food.
-it('the bar’s Add food is the lead action once weighed, and a text action while the weigh-in asks', async () => {
+// MM-288, amended by MM-438: the Dashboard has no Add food; before the weigh-in its one Ember action is the row's Save.
+it('the weigh-in’s Save is the only primary action while it asks', async () => {
   await seed({ weighedToday: false, history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
-  const addFood = await screen.findByRole('button', { name: 'Add food' });
   await screen.findByRole('button', { name: 'Save weigh-in' });
-  expect(addFood).toHaveClass('mm-button-text');
-  expect(addFood).not.toHaveClass('mm-button-lead');
-  await userEvent.type(screen.getByRole('textbox', { name: 'Today’s weigh-in' }), '181.4{Enter}');
-  await screen.findByRole('status');
-  await expect.poll(() => screen.getByRole('button', { name: 'Add food' }).className).toContain('mm-button-lead');
+  // Save is enabled once a weight is typed; nothing else on the screen is primary.
+  await userEvent.type(screen.getByRole('textbox', { name: 'Today’s weigh-in' }), '181.4');
+  expect(screen.queryByRole('button', { name: 'Add food' })).not.toBeInTheDocument();
   expect(document.querySelectorAll('.mm-button-primary:not([disabled]), .mm-fab, .mm-button-lead')).toHaveLength(1);
 });
 
