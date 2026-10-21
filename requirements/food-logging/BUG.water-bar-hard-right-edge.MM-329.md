@@ -1,6 +1,6 @@
 ---
 id: MM-329
-status: proposed
+status: done
 component: food-logging
 related: [MM-326]
 ---
@@ -25,7 +25,13 @@ Scenario: A round front while pouring
 ```
 
 ## Notes
-Guarded by "MM-329: the ripple is clipped to the fill's round end" in
-`apps/mobile/test/ui/waterBarEdge.test.ts`, skipped with this ticket's ID until the fix lands. Confirm the
-cause with frames captured over the DevTools protocol before fixing (the headless `--screenshot` flag shows
-only the settled bar).
+Built 2026-10-21: the ripple band (`.mm-progress-wave` in `apps/mobile/src/ui/ui.css`) takes the fill's
+round end (`border-radius: inherit`) and clips its `::before` to it (`overflow: hidden`), so the band can no
+longer end square across the front while the level moves. Guarded by "MM-329: the ripple is clipped to the
+fill's round end" in `apps/mobile/test/ui/waterBarEdge.test.ts`, now unskipped; its pattern read `\s` inside
+a template string as a plain `s`, so it could not match a declaration after a line break, and it now
+escapes it. Not run locally; CI validates.
+
+Not verified: the cause was not confirmed with frames captured over the DevTools protocol (the owner's
+rule is no local builds). Owed: watch a glass pour on the phone in all three palettes; if a square front
+still shows, the next suspect is the fill itself during the width transition.
