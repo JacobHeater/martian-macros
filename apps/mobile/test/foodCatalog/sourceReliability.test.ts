@@ -46,6 +46,7 @@ const pack = (packId: string, hits: SearchHit[]): FoodPack => ({
   search: () => Promise.resolve(hits),
   byBarcode: () => Promise.resolve(hits[0]?.food),
   pairOf: () => Promise.resolve(undefined),
+  foodById: () => Promise.resolve(undefined),
   servingsOf: () => Promise.resolve([]),
 });
 

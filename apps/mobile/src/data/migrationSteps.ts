@@ -269,4 +269,12 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 19 to 20 (MM-456): the pack food a recipe's ingredient was found as, none for what is already there.
+  [
+    19,
+    async (db) => {
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_pack_id TEXT NULL');
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_food_id INTEGER NULL');
+    },
+  ],
 ]);

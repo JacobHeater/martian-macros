@@ -873,6 +873,60 @@ export const EditRecipeLineMenu = screenStory({
   },
 });
 
+/** MM-456: a recipe whose rice was found in the pack (`packId`), 200 g raw, and whose butter was typed. */
+const withRiceBowl =
+  (packId: string): StoryScenario =>
+  async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.customFoods.saveCustomFood(
+      new CustomFood({
+        id: 0,
+        name: 'Demo rice bowl',
+        kind: 'recipe',
+        servingDescription: '1 serving',
+        servings: 2,
+        perServing: new NutritionTotals({ kcal: 401, proteinG: 7, carbsG: 80, fatG: 4.7 }),
+        ingredients: [
+          {
+            name: 'White rice, raw',
+            grams: 200,
+            totals: new NutritionTotals({ kcal: 730, proteinG: 14, carbsG: 160, fatG: 1.4 }),
+            source: { packId, foodId: 3 },
+          },
+          { name: 'Butter', grams: 10, totals: new NutritionTotals({ kcal: 72, proteinG: 0, carbsG: 0, fatG: 8 }) },
+        ],
+      }),
+    );
+  };
+
+/** MM-456: a found line's weight changed in place, worked out again from the food as installed. */
+export const EditRecipeLineWeight = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: '200 g is about 730 kcal.',
+  scenario: withRiceBowl(FixturePack.packId),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo rice bowl/)(canvas);
+    await press('More actions for White rice, raw')(canvas);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
+  },
+});
+
+/** MM-456: a found line whose food is no longer installed keeps its totals and says so. */
+export const EditRecipeLineFoodGone = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Its food is not installed, so this line keeps its totals.',
+  scenario: withRiceBowl('a-pack-since-removed'),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo rice bowl/)(canvas);
+    await press('More actions for White rice, raw')(canvas);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
+  },
+});
+
 /** MM-321: a barcode the pack does not know: read the label, or enter it by hand. */
 export const ScanUnknownCode = screenStory({
   covers: ['BarcodeScanStep'],
