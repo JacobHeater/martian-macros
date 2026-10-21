@@ -43,18 +43,21 @@ async function phase({
   await repos.targets.saveTargets(
     targetsFrom(today.addDays(-daysAgo), goal === 'fatLoss' ? { kcal: 2100, tdeeKcal: 2600 } : { mode: 'leanGain', kcal: 2800, tdeeKcal: 2600, weeklyRateFraction: 0.0025 }),
   );
-  for (let i = 0; i <= 28; i++) await repos.weights.saveWeight(today.addDays(-i), 80 + (i * kgPerWeek) / 7);
+  for (let i = 0; i <= daysAgo + 14; i++) await repos.weights.saveWeight(today.addDays(-i), 80 + (i * kgPerWeek) / 7);
 }
 
 const goalSection = async () => (await screen.findByRole('heading', { name: /^Goal:/ })).closest('.mm-section') as HTMLElement;
 
 it('a steady cut toward its goal shows how long it has run and about when the goal is reached', async () => {
-  await phase({ percent: 20, daysAgo: 14 });
+  // Six weeks in: the start of a cut frees the trend's slope while glycogen settles (MM-131), so two weeks in the pace is not yet
+  // steady and only the sixteen-week end is projected. By six the lower end, 17.3%, is about six weeks from 15% at 0.5 kg a week,
+  // well before the sixteen weeks.
+  await phase({ percent: 20, daysAgo: 42 });
   renderApp(repos, today);
   await openTab('Coach');
   const section = await goalSection();
   expect(within(section).getByText('This phase')).toBeInTheDocument();
-  expect(within(section).getByText('2 weeks')).toBeInTheDocument();
+  expect(within(section).getByText('6 weeks')).toBeInTheDocument();
   expect(within(section).getByText('Projected end')).toBeInTheDocument();
   expect(within(section).getByText(/^About \w+ 20\d\d$/)).toBeInTheDocument();
   expect(within(section).getByText('At your current pace, when the lower end of your body-fat range reaches 15%.')).toBeInTheDocument();
