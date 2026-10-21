@@ -33,6 +33,10 @@ interface MmTextFieldProps {
   onSubmit?: (() => void) | undefined;
   /** Takes focus when it appears: for a field that is the next useful thing after a control went away (MM-413). */
   autoFocus?: boolean;
+  /** Called when focus leaves the field: for a check said once the value is typed, not on every keystroke (MM-507). */
+  onBlur?: (() => void) | undefined;
+  /** The helper is said politely as it changes (a caution that follows the value typed, MM-507). */
+  helperPolite?: boolean;
 }
 
 /** The app's text input. */
@@ -53,6 +57,8 @@ export function MmTextField({
   describedBy: describedByOutside,
   onSubmit,
   autoFocus = false,
+  onBlur,
+  helperPolite = false,
 }: MmTextFieldProps) {
   const id = useId();
   const helperId = `${id}-helper`;
@@ -67,6 +73,12 @@ export function MmTextField({
   ]
     .filter(Boolean)
     .join(' ');
+  const helperLine =
+    helper === undefined ? null : (
+      <p id={helperId} className={`mm-field-helper${helperIsWarning ? ' mm-field-helper-warning' : ''}`}>
+        {helper}
+      </p>
+    );
   return (
     <div className={`mm-field${dense ? ' mm-field-dense' : ''}`}>
       {label === undefined ? null : (
@@ -90,6 +102,7 @@ export function MmTextField({
           enterKeyHint={onSubmit === undefined ? undefined : 'done'}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && onSubmit !== undefined) {
               event.preventDefault();
@@ -108,11 +121,7 @@ export function MmTextField({
           {error}
         </p>
       )}
-      {helper === undefined ? null : (
-        <p id={helperId} className={`mm-field-helper${helperIsWarning ? ' mm-field-helper-warning' : ''}`}>
-          {helper}
-        </p>
-      )}
+      {helperPolite ? <div aria-live="polite">{helperLine}</div> : helperLine}
     </div>
   );
 }

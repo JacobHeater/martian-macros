@@ -20,6 +20,13 @@ Choices I made without asking (say if any is wrong):
 - **The goal is set from the Coach's goal section**, beside the phase rows (MM-36), with the reason under it as the user types: refused
   under the hard floor, accepted with a warning and a time limit under the soft floor.
 - **Never offered with an eating-disorder history**, as MM-36 projects nothing from body fat for that history.
+- **Offered only in fat loss and recomp** (coordinator's decision, panel review 2026-10-21): the goal is where a cut
+  runs to, so the row is hidden in lean gain and maintenance.
+- **A refusal is said once the value is typed** (on leaving the field or pressing Done), never on a partial value
+  such as the "1" of "12"; "Set goal" stays off meanwhile, and until the value differs from the goal in force. The
+  soft-floor warning is said politely as it is typed, and the snack after saving restates the limit.
+- **The row's subtitle stays short** ("12%, set Oct 3"); a soft-floor warning is a caution notice (icon and "Heads
+  up") under the row, the goal section's own notice pattern (sibling: the target flags' cautions above it).
 
 ## Description
 A SQL table and `SqlGoalBodyFatRepository` (schema migration, tested from every earlier version), run through
@@ -67,6 +74,13 @@ Built 2026-10-21. Not run locally; CI validates.
   (a woman's 14% refused with the reason and nothing stored; a man's 9% stored with the four-week warning; 18% kept
   across a restart and the projected end reads 18%; clearing returns to 15%; no row with an eating-disorder history).
 - Stories: `CoachGoalBodyFat`, `CoachGoalBodyFatRefused`, `CoachGoalBodyFatLow`, `CoachGoalBodyFatSet`.
+- Panel review fixes (2026-10-21): `MmTextField` takes `onBlur` and `helperPolite` (the helper in a polite live
+  region); `GoalBodyFatSheet` says the refusal only once the value is finished, holds "Set goal" until the value
+  differs, reads "Without one, the plan aims for 15%"; `goalBodyFatSubtitle` is short; the warning is a caution
+  `Notice` under the row; snacks "Goal body fat set to 9%, held 4 weeks at most once reached." and "The plan's own
+  goal, 15%, is back."; the row only in fat loss and recomp. Tests in `test/coach/goalBodyFat.test.tsx` (no alert on
+  a partial value; the refusal on leaving the field; the polite warning, the snack and the notice; "Set goal" off for
+  the goal in force; no row in lean gain or maintenance, a row in recomp). Story `CoachGoalBodyFatSetLow`.
 
 ## Owed on a phone
 - A goal set on the owner's phone survives closing and reopening the app, and the upgrade from 20 to 21 keeps
