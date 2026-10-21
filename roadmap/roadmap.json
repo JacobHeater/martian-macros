@@ -737,6 +737,12 @@
       "intent": "Everything else: remaining tickets in every workstream, in each workstream's own order.",
       "requires": [
         {
+          "workstream": "WS-01",
+          "tickets": [
+            "MM-536"
+          ]
+        },
+        {
           "workstream": "WS-02",
           "tickets": [
             "MM-35"
@@ -1100,7 +1106,8 @@
           "MM-412"
         ],
         "remaining": [
-          "MM-1"
+          "MM-1",
+          "MM-536"
         ]
       },
       "sequence": [
@@ -1181,6 +1188,14 @@
             "MM-300"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 8,
+          "title": "Screenshot the iPhone through the app (MM-536): the dev app snapshots its own web view, devicectl asks for it and copies it out",
+          "milestone": "M4",
+          "tickets": [
+            "MM-536"
+          ]
         }
       ],
       "gate": {
