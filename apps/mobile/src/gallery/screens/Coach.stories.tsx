@@ -61,7 +61,10 @@ export const CoachSmallPhone = screenStory({
   viewport: 'smallPhone',
 });
 
-/** The one thing to do under the goal: this week's recovery check-in is due (MM-299). */
+/**
+ * The one thing to do under the goal: this week's recovery check-in is due (MM-299). It is the one way in, and
+ * "How you are holding up" keeps only the sleep line and the skip (MM-391).
+ */
 export const CheckInDue = screenStory({
   covers: ['CoachScreen'],
   shows: 'Answer this week’s five questions',
@@ -449,13 +452,16 @@ export const OneThingCheckIn = screenStory({
   walk: pressOnCoach(/^Answer this week’s five questions/),
 });
 
-/** MM-321: "How you are holding up" opens the check-in. */
+/** MM-321: "How you are holding up" opens the check-in; MM-391: from the section only when it is not due. */
 export const RecoveryOpens = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],
   shows: 'This week',
-  scenario: checkInDueScenario,
+  scenario: shortSleepScenario,
   open: onCoach,
-  walk: pressOnCoach('Answer this week'),
+  walk: async (canvas) => {
+    await pressOnCoach(/^How you are holding up/)(canvas);
+    await pressOnCoach('Answer again')(canvas);
+  },
 });
 
 /** Targets changed yesterday, with the reasons the coach recorded (MM-121). */
