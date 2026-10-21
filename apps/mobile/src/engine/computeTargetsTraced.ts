@@ -8,6 +8,7 @@ import { leanFractionOfChange } from './leanFractionOfChange';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
 import { PaceRule } from './PaceRule';
 import { SafetyBounds } from './SafetyBounds';
+import { splitCarbsAndFat } from './splitCarbsAndFat';
 import type { TargetFlag } from './TargetFlag';
 import type { TargetInputs } from './TargetInputs';
 import type { TargetsTrace } from './TargetsTrace';
@@ -132,12 +133,8 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
   const proteinG = protein.targetG;
 
   const minFat = SafetyBounds.minFatG({ sex: i.sex, weightKg: i.trendWeightKg, heightCm: i.heightCm, kcal });
-  let fatG = Math.max(minFat, (0.25 * kcal) / 9);
-  let carbsG = (kcal - 4 * proteinG - 9 * fatG) / 4;
-  if (carbsG < 0) {
-    fatG = minFat;
-    carbsG = Math.max(0, (kcal - 4 * proteinG - 9 * fatG) / 4);
-  }
+  // MM-24's split; the user's balance (MM-122) is applied to the day's targets (`shapedTargets`).
+  const { fatG, carbsG } = splitCarbsAndFat({ kcal, proteinG, fatMinimumG: minFat });
 
   return {
     targets: new DailyTargets({

@@ -18,7 +18,7 @@ import { Fmt } from '../format/Fmt';
 import { waistAmount } from '../format/waistAmount';
 import type { HomeDestination } from '../state/HomeDestination';
 import { Loadable } from '../state/Loadable';
-import { targetsOn } from '../state/targetsOn';
+import { dayTargetsOn } from '../state/dayTargetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -66,6 +66,9 @@ export function DashboardScreen() {
   const waist = useLoaded(state.waist) ?? [];
   const workouts = useLoaded(state.workouts) ?? [];
   const current = useCell(state.currentTargets);
+  // Today's targets as the user shaped them (MM-122, MM-124).
+  const shapes = useLoaded(state.targetShapes) ?? [];
+  const shapeLimits = useCell(state.targetShapeLimits);
   // The coach's lines under the weigh-in, waist and water (MM-367): none in the app until they are built.
   const rowNotes = useInsightPreview().rowNotes;
   // The coach's lines under the waist and water rows (MM-367), unless a design story hands in its own.
@@ -165,7 +168,7 @@ export function DashboardScreen() {
   ).length;
 
   // Without the pauses, today may be paused: no targets are shown as though it were not (MM-183).
-  let heroTargets = pause !== undefined ? guide : targetsOn(history, today, { targetsAllowed })?.targets;
+  let heroTargets = pause !== undefined ? guide : dayTargetsOn({ history, day: today, shapes, limits: shapeLimits, targetsAllowed });
   let heroStatus: string | undefined =
     pause !== undefined
       ? `Paused until ${Fmt.day(pause.to, today)}. Nothing is counted against you.`

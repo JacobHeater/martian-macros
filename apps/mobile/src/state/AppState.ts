@@ -28,6 +28,7 @@ import { builtInExercises } from '../domain/training/builtInExercises';
 import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
+import type { TargetShape } from '../domain/TargetShape';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { SleepNight } from '../domain/SleepNight';
@@ -45,6 +46,7 @@ import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
 import type { PaceOption } from '../engine/PaceOption';
 import { TargetInputs } from '../engine/TargetInputs';
+import { TargetShapeLimits } from '../engine/TargetShapeLimits';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
 import { buildStrengthTrends } from '../engine/buildStrengthTrends';
 import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
@@ -246,6 +248,12 @@ export class AppState {
   /** The days marked with menstrual flow (MM-20). */
   readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
+
+  /** How the user shapes their targets, oldest first (MM-122, MM-124). */
+  readonly targetShapes: Cell<Loadable<TargetShape[]>>;
+
+  /** The calorie floor and fat minimum a shaped day keeps to; undefined until the coach has a view. */
+  readonly targetShapeLimits: Cell<TargetShapeLimits | undefined>;
 
   /** The user's own foods and recipes, by name (MM-45). */
   readonly customFoods: Cell<Loadable<CustomFood[]>>;
@@ -566,6 +574,7 @@ export class AppState {
     });
     this.flowDays = stream(() => s.flowDays.watchFlowDays());
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
+    this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
@@ -603,6 +612,18 @@ export class AppState {
         return undefined;
       }
       return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, today });
+    });
+
+    this.targetShapeLimits = derived(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      if (setup === undefined || snapshot === undefined) return undefined;
+      return new TargetShapeLimits({
+        floorKcal: snapshot.calorieFloorKcal,
+        sex: setup.profile.sex,
+        trendWeightKg: snapshot.trendWeightKg,
+        heightCm: setup.profile.heightCm,
+      });
     });
 
     this.maintenanceGuide = derived(() => {
