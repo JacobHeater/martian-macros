@@ -118,6 +118,13 @@ uncompiled until it is built on the Mac.
   nothing and cannot be skipped; a failed read; the date of birth and height on their steps; Android not offered).
 - What MM-68 itself has not built (the offer at the end of onboarding, sessions in the training log, background
   reading, which the owner ruled out) is MM-68's for both platforms, not this ticket's.
+- Panel review fixes 2026-10-21 (`fix/mm-69-review`, builds on #262): the offer is a list row with the `health` icon,
+  like the weight's (`WeightFromHealthRows`), subtitled with what it fills in, and reads "Reading Apple Health…" while
+  asking; the outcome notice sits in an `aria-live="polite"` region (as `MeasurementsStep`'s offer) and takes focus
+  once the read answers. A height typed over the one from Apple Health is the person's own, so a change of units no
+  longer puts Apple Health's back. `NSHealthShareUsageDescription` names sex, date of birth and height. Tests added to
+  `test/app/onboardingFromAppleHealth.test.tsx`; the `BiologicalSexFilledFromHealth` story checks the focus. Not run
+  locally; CI validates.
 - Integrations review fix 2026-10-21 (`fix/health-plugins-review`): HealthKit's handlers are `@Sendable`, so none adds to
   a captured `var` any more. `profile` copies what it found to `let known` before the height query and adds the height
   to its own copy; `changes` gathers into a locked `ChangesGathered` box and `removeOwn` into a locked `FirstFailure`.

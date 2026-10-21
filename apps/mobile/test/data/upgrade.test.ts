@@ -7,6 +7,7 @@ import { SchemaMigrationError } from '../../src/data/SchemaMigrationError';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
+import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { SleepNight } from '../../src/domain/SleepNight';
 import { TargetShape } from '../../src/domain/TargetShape';
@@ -143,8 +144,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 19 left it: without the pack food a recipe's ingredient was found as (MM-456). */
+const versionNineteen = currentSchema.replace(
+  '  "fat_g" REAL NOT NULL,\n  "source_pack_id" TEXT NULL,\n  "source_food_id" INTEGER NULL\n',
+  '  "fat_g" REAL NOT NULL\n',
+);
+
 /** The schema as version 18 left it: without the weigh-in window (MM-441). */
-const versionEighteen = currentSchema
+const versionEighteen = versionNineteen
   .replace(
     '  "weigh_in_window_start_minute" INTEGER NULL CHECK ("weigh_in_window_start_minute" IS NULL OR "weigh_in_window_start_minute" BETWEEN 0 AND 1439),\n',
     '',
@@ -586,4 +593,43 @@ it('a version 18 database comes up to date on the usual weigh-in window, and kee
   await repos.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 14 * 60 + 5, endMinute: 24 * 60 }));
   const moved = await first(repos.weighInWindow.watchWeighInWindow());
   expect([moved.startMinute, moved.endMinute]).toEqual([14 * 60 + 5, 24 * 60]);
+});
+
+// MM-456: a version 19 database comes up to date with its recipes' lines kept and no source on any of them;
+// a line saved from then on keeps the pack food it was found as.
+it("a version 19 database comes up to date with recipe lines kept, sourceless, and keeps a line's food after", async () => {
+  expect(versionNineteen).not.toContain('source_pack_id');
+  expect(versionNineteen).toContain('weigh_in_window_start_minute');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 19, schema: versionNineteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute(
+    'INSERT INTO custom_foods (id, name, kind, serving_description, kcal, protein_g, carbs_g, fat_g, servings) ' +
+      "VALUES (1, 'Rice bowl', 'recipe', '1 serving', 365, 7, 80, 0.7, 2)",
+  );
+  await old.execute(
+    'INSERT INTO recipe_ingredients (recipe_id, position, name, grams, kcal, protein_g, carbs_g, fat_g) ' +
+      "VALUES (1, 0, 'White rice, raw', 200, 730, 14, 160, 1.4)",
+  );
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'recipe_ingredients')).toEqual(expect.arrayContaining(['source_pack_id', 'source_food_id']));
+  const [bowl] = await first(repos.customFoods.watchCustomFoods());
+  const [line] = bowl?.ingredients ?? [];
+  expect(line?.name).toBe('White rice, raw');
+  expect(line?.grams).toBe(200);
+  expect(line?.totals.kcal).toBe(730);
+  expect(line?.source, 'what was saved before knows no source').toBeUndefined();
+  if (bowl === undefined || line === undefined) throw new Error('No recipe was read.');
+  await repos.customFoods.saveCustomFood(new CustomFood({ ...bowl, ingredients: [{ ...line, source: { packId: 'fixture', foodId: 3 } }] }));
+  const [kept] = (await first(repos.customFoods.watchCustomFoods()))[0]?.ingredients ?? [];
+  expect(kept?.source).toEqual({ packId: 'fixture', foodId: 3 });
 });
