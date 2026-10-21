@@ -23,6 +23,16 @@ export default meta;
 const press = (name: string) => async (canvas: HTMLElement) =>
   userEvent.click(await within(canvas).findByRole('button', { name }));
 
+/**
+ * MM-546: the app's spinner for one startup read, once the reads before it are in. The three
+ * spinners look alike, and the first one shows while every read is out, so a walk that waited
+ * for any spinner could end before the one it is about was ever drawn.
+ */
+const waitsOn = (read: 'setup' | 'theme' | 'terms') => async (canvas: HTMLElement) => {
+  const waiting = await within(canvas).findByTestId(`waiting-${read}`);
+  await within(waiting).findByRole('progressbar', { name: 'Loading' });
+};
+
 /** MM-242: the first thing a new installation shows. */
 export const TermsOfUse = screenStory({
   covers: ['TermsGuardScreen'],
@@ -217,13 +227,18 @@ export const AdultsOnlyOpensSettings = screenStory({
 /** MM-321: the demo build, its notice around every screen. */
 export const DemoBuild = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', demo: true });
 
+/** MM-546: the person's data still being opened: the app waits on its spinner. */
+export const SetupLoading = screenStory({
+  covers: ['DashboardScreen'],
+  stores: waitingRead('setup', 'watchSetup'),
+  walk: waitsOn('setup'),
+});
+
 /** MM-321: the look still being read: the app waits on its spinner. */
 export const ThemeLoading = screenStory({
   covers: ['DashboardScreen'],
   stores: waitingRead('preferences', 'watchThemePreference'),
-  walk: async (canvas) => {
-    await within(canvas).findByRole('progressbar', { name: 'Loading' });
-  },
+  walk: waitsOn('theme'),
 });
 
 /** MM-321: the look could not be read. */
@@ -237,9 +252,7 @@ export const ThemeFailed = screenStory({
 export const TermsLoading = screenStory({
   covers: ['TermsGuardScreen'],
   stores: waitingRead('preferences', 'watchTermsAcceptance'),
-  walk: async (canvas) => {
-    await within(canvas).findByRole('progressbar', { name: 'Loading' });
-  },
+  walk: waitsOn('terms'),
 });
 
 /** MM-321: the agreement to the terms could not be read. */

@@ -141,6 +141,7 @@ conflicts with this one.
 - Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
 - Built 2026-10-21 (step 18): MM-391 (one way into the check-in on Coach, done); MM-392 (an unmarked day says what the estimate does with it, done).
 - Added 2026-10-14 (steps 15, 16): MM-320 (Settings' Health Connect rows drawn and rebuilt as their own section, done); MM-321 (every part of a screen drawn by a story: the check and its register); MM-322 (hairlines between rows in every list group, done); MM-324 (one text column for list rows).
+- Added 2026-10-21 (step 15): MM-546 (the app's three startup spinners each drawn by a story that holds its read out, so `npm run unseen` no longer depends on timing, done).
 - Placed 2026-10-13 (the hierarchy pass) and built the same day: MM-253 (the direction and the panel pass), MM-254 Dashboard, MM-255 Food, MM-256 Coach, MM-257 Progress, MM-258 Train, MM-259 Settings; with them the panel's bugs MM-283 (the coach line said "on Today"), MM-284 (a field's unit not heard), MM-285 (weight event dates and default).
 - Placed 2026-10-13 (left by the hierarchy panel, step 11): MM-286, MM-287, MM-288, MM-289.
 - Placed 2026-10-13 in step 1: MM-260 (the date dialog's chevron and flat surface; the phone's date control follows the palette and the dialog floats).
