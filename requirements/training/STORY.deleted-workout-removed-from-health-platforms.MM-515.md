@@ -1,6 +1,6 @@
 ---
 id: MM-515
-status: in-progress
+status: done
 component: training
 related: [MM-489, MM-189, MM-70]
 ---
@@ -42,4 +42,10 @@ Scenario: Off
   by the app's source and sync identifier; `test/native/mmHealthWrites.test.ts`). Only the workout under the current
   write namespace (MM-522) is removed: the app holds no workout written before an erase. Terms section 9 says a deleted
   workout is removed (terms version 4).
-- Device checks owed: a finished workout deleted in the app is gone from Health Connect and Apple Health.
+
+## Progress
+Done (2026-10-21, PR #238): both scenarios are built and held by the tests named in the notes; not run locally, CI
+validates.
+
+## Owed on a phone
+- A finished workout deleted in the app is gone from Health Connect and Apple Health.

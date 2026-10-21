@@ -1,4 +1,5 @@
 import { Micronutrients } from '../micros/Micronutrients';
+import type { LabelField } from './LabelField';
 
 interface LabelReadingInit {
   servingText?: string | undefined;
@@ -11,6 +12,7 @@ interface LabelReadingInit {
   sugarAlcoholsG?: number | undefined;
   sodiumMg?: number | undefined;
   micros?: Micronutrients;
+  unsure?: Iterable<LabelField>;
 }
 
 /**
@@ -37,6 +39,13 @@ export class LabelReading {
    */
   readonly micros: Micronutrients;
 
+  /**
+   * The numbers the reader was unsure of, to be marked for checking: a digit
+   * repaired from a look-alike letter, a value paired with its label only by
+   * position in a column, or a value the serving's weight makes impossible.
+   */
+  readonly unsure: ReadonlySet<LabelField>;
+
   constructor(init: LabelReadingInit = {}) {
     this.servingText = init.servingText;
     this.servingGrams = init.servingGrams;
@@ -48,6 +57,7 @@ export class LabelReading {
     this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.sodiumMg = init.sodiumMg;
     this.micros = init.micros ?? Micronutrients.none;
+    this.unsure = new Set(init.unsure ?? []);
   }
 
   /** Whether nothing usable was found. */
