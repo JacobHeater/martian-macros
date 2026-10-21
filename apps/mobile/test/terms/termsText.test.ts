@@ -53,14 +53,19 @@ describe('the full terms', () => {
     expect(full).toMatch(/backup/i);
   });
 
-  // MM-70, MM-314, MM-489: the app writes to the health app, so the terms no longer say it never does.
+  // MM-70, MM-314, MM-513, MM-489: the app writes to the health app, so the terms no longer say it never does.
+  // MM-514, MM-515: turning writing off offers to remove what was written, and a deleted workout is removed.
   it('say what is written to the health app, that each kind is turned on by the person, and what stays there', () => {
     expect(full).not.toMatch(/never writes to/);
     expect(full).toContain('The app writes to Health Connect only the kinds you turn on in Settings, each with its own permission');
+    expect(full).toContain('the food you log, the water you log, the weight you type and the workouts you finish');
     expect(full).toContain('never changes or removes what another app wrote');
-    expect(full).toContain('What it wrote stays in Health Connect when you turn writing off or erase the app’s data');
+    expect(full).toContain('Food, water, weight or a workout you change or remove here is changed or removed there too.');
+    expect(full).toContain('the app asks whether to remove what it wrote of that kind or keep it there');
+    expect(full).toContain('What it wrote and you kept stays in Health Connect, also when you erase the app’s data');
+    expect(full).not.toContain('What it wrote stays in Health Connect when you turn writing off');
     expect(full).toContain('apart from what you turn on writing to your phone’s health app (section 9)');
-    expect(termsOfUse.changes.get(termsOfUse.version)?.join(' ')).toMatch(/write to your phone’s health app/);
+    expect(termsOfUse.changes.get(termsOfUse.version)?.join(' ')).toMatch(/write to your phone’s health app the weight you type/);
   });
 
   it('are numbered in order, each section with something to say', () => {

@@ -37,6 +37,7 @@ import { NoHealthWorkouts } from '../platform/NoHealthWorkouts';
 import { NoHealthWriting } from '../platform/NoHealthWriting';
 import { MirroredFoodLog } from '../healthWrite/MirroredFoodLog';
 import { MirroredWaterLog } from '../healthWrite/MirroredWaterLog';
+import { MirroredWeightLog } from '../healthWrite/MirroredWeightLog';
 import { MirroredWorkoutLog } from '../healthWrite/MirroredWorkoutLog';
 import { RenewingEraser } from '../healthWrite/RenewingEraser';
 import { RenewingRestorer } from '../healthWrite/RenewingRestorer';
@@ -75,7 +76,7 @@ export async function openAppServices(): Promise<AppServices> {
   const onlineFoods = new SqlOnlineFoodCache(sql);
   const platform = runningOn();
   // What is logged is written to the health platform only for the kinds turned on in Settings (MM-70, MM-314,
-  // MM-489); the plugin keeps which those are. Health Connect names a workout's exercises, Apple Health does not.
+  // MM-513, MM-489); the plugin keeps which those are. Health Connect names a workout's exercises, Apple Health does not.
   const healthWriting = native ? new NativeHealthWriting(mmHealth) : new NoHealthWriting();
   const healthWorkouts = native
     ? new NativeHealthWorkouts({ api: mmHealth, namesExercises: platform === 'android' })
@@ -85,7 +86,8 @@ export async function openAppServices(): Promise<AppServices> {
   return {
     clock,
     setup: repositories.setup,
-    weights: repositories.weights,
+    // Only a weigh-in typed in the app passes through here; one read from the platform never does (MM-513).
+    weights: new MirroredWeightLog({ log: repositories.weights, platform: healthWriting, clock }),
     weightEvents: repositories.weightEvents,
     waist: repositories.waist,
     flowDays: repositories.flowDays,

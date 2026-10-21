@@ -1,13 +1,14 @@
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
+import type { HealthWeightWriter } from '../healthIngest/HealthWeightWriter';
 import type { HealthWriteKind } from '../healthIngest/HealthWriteKind';
 import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
 
 /**
  * Where there is no health platform to write to: a browser, or a phone
- * without one (MM-70). Nothing can be turned on, and nothing is written.
+ * without one (MM-70, MM-513). Nothing can be turned on, and nothing is written.
  */
-export class NoHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWriteNamespace {
+export class NoHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWeightWriter, HealthWriteNamespace {
   /** Nothing is written here, so the namespace lives only as long as the page (MM-522). */
   private namespace = crypto.randomUUID();
 
@@ -32,6 +33,10 @@ export class NoHealthWriting implements HealthWriting, HealthIntakeWriter, Healt
     return Promise.resolve();
   }
 
+  removeWritten(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
   writeNutrition(): Promise<boolean> {
     return Promise.resolve(false);
   }
@@ -45,6 +50,14 @@ export class NoHealthWriting implements HealthWriting, HealthIntakeWriter, Healt
   }
 
   removeWater(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  writeWeight(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  removeWeight(): Promise<boolean> {
     return Promise.resolve(false);
   }
 }

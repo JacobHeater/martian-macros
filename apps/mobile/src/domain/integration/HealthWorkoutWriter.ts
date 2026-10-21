@@ -25,4 +25,11 @@ export interface HealthWorkoutWriter {
    * or the platform would not take it.
    */
   writeWorkout(workout: WorkoutForPlatform): Promise<boolean>;
+
+  /**
+   * Removes the workout written under `clientId` (MM-515), and nothing
+   * another app wrote. False, and nothing removed, when writing is not
+   * permitted or the platform would not remove it.
+   */
+  removeWorkout(clientId: string): Promise<boolean>;
 }

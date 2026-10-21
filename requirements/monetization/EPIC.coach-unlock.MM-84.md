@@ -12,6 +12,9 @@ The product owner's starting point was a one-week trial followed by a required o
 found a clash: the first week is calibration, with targets held, the first adaptive update around day 15 and the first report on day 28. A
 seven-day trial would put the paywall at the moment the user has done the most work and seen the least payoff.
 
+## On the backburner
+- **The owner, 2026-10-21:** "I don't actually intend to release to app stores and only intend to use this personally on my own phone through local builds." The owner tests the app on their own phone for weeks or months first, with every feature built and none paywalled; this is future vision (M5), built only if the owner decides to release.
+
 ## Decisions (made with the product owner)
 - **Logging is free forever; the coach is a one-time purchase, with a 21-day trial of the coach.** Accepted in place of the one-week trial.
 - **Gate the coaching, never the user's own data.** Nobody is locked out of what they logged.
