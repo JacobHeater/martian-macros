@@ -94,6 +94,8 @@ Built (2026-10-21), against this ticket's recommendations. Not run locally; CI v
   untrained, novice and returning ones), applied in `computeTargetsTraced` after the deficit cap; a capped target carries the
   `surplusCapped` flag, its message on the Coach screen, and the pace the cap gives. No rules-version bump: the cap binds only
   for heavy users or the faster gain with androgen use, and the next check-in applies it.
+  The safety floor wins over the cap: a heavy, lean body's energy-availability floor (30 kcal per kg fat-free mass) can sit
+  above it, and the target is then the floor, flagged as such.
 - **Too fast** is the ordinary loop: the lower measured expenditure brings the target down by the weekly step, and the card says
   why, with both paces.
 - **The three advisory rules** are `leanGainReviewOf`, with its figures in `LeanGainRule` and the evidence register; the card is

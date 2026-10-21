@@ -77,11 +77,13 @@ const gain = ({
   });
 
 describe('the surplus cap', () => {
-  it('an intermediate lifter with an expenditure of 2,800 on lean gain is never above 3,080', () => {
+  it('an intermediate lifter with an expenditure of 2,800 on lean gain is never above 3,080, unless the safety floor is', () => {
     for (const weightKg of [60, 80, 100, 130, 160]) {
       for (const bodyFat of [10, 20, 35]) {
         for (const screening of [new ScreeningAnswers(), new ScreeningAnswers({ androgenUse: true })]) {
           const t = computeTargets(gain({ weightKg, bodyFat, screening }));
+          // A lean, heavy body's energy-availability floor (30 kcal per kg fat-free mass) can sit above the cap: the floor wins.
+          if (t.flags.has('flooredAtSafetyMinimum')) continue;
           expect(t.kcal, `${weightKg} kg at ${bodyFat}%`).toBeLessThanOrEqual(3080 + 1e-9);
         }
       }

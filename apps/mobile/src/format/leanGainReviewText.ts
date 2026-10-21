@@ -18,17 +18,17 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
     case 'bodyFat':
       said.push(
         `Your estimated body fat has reached about ${roundHalfAwayFromZero(review.bodyFatPercent)}%, the line where the ` +
-          `app calls body fat high. It is a good time to end the gain: ${end}`,
+          `app calls body fat high. The coach recommends ending the gain now: ${end}`,
       );
       break;
     case 'waist':
       said.push(
         `Your waist is up about ${roundHalfAwayFromZero((review.waistRiseFraction ?? 0) * 100)}% since the gain began. ` +
-          `It is a good time to end it: ${end}`,
+          `The coach recommends ending it now: ${end}`,
       );
       break;
     case 'weeks':
-      said.push(`You have been on lean gain for ${review.weeks} weeks. It is a good time to end it: ${end}`);
+      said.push(`You have been on lean gain for ${review.weeks} weeks. The coach recommends ending it now: ${end}`);
       break;
     case undefined:
       break;
