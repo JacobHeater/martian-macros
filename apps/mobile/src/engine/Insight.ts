@@ -8,6 +8,7 @@ interface InsightInit {
   to: CalendarDate;
   figures?: Readonly<Record<string, number>>;
   stall?: StallAssessment | undefined;
+  examples?: readonly string[];
 }
 
 /**
@@ -31,12 +32,16 @@ export class Insight {
   /** The diagnosis, for the stall rule. */
   readonly stall: StallAssessment | undefined;
 
+  /** Foods from the user's own log the words may name, for the fiber rule (MM-126). */
+  readonly examples: readonly string[];
+
   constructor(init: InsightInit) {
     this.rule = init.rule;
     this.from = init.from;
     this.to = init.to;
     this.figures = init.figures ?? {};
     this.stall = init.stall;
+    this.examples = init.examples ?? [];
   }
 
   get basisDays(): number {

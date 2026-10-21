@@ -45,6 +45,7 @@ import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
+import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
 import { defaultMeal } from './defaultMeal';
@@ -648,13 +649,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         <div className="app-gap-small" />
         {askAlcohol || form.alcohol !== '' ? (
           <>
-            <MmTextField
-              label="Alcohol g"
-              kind="number"
-              value={form.alcohol}
-              helper="One standard drink is 14 g. Counted at 7 kcal per gram."
-              onChange={(alcohol) => set({ alcohol })}
-            />
+            {/* Grams, or standard drinks that fill them in (MM-127). */}
+            <AlcoholFields grams={form.alcohol} onGrams={(alcohol) => set({ alcohol })} />
             <div className="app-gap-small" />
           </>
         ) : (
