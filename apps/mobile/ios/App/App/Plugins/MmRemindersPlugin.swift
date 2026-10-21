@@ -17,7 +17,23 @@ public class MmRemindersPlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "replaceAll", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "exactAlarms", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openExactAlarmSetting", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "skipExactAlarms", returnType: CAPPluginReturnPromise),
     ]
+
+    /// A calendar trigger is already on the minute, so there is nothing to ask for (MM-248's Android permission).
+    @objc func exactAlarms(_ call: CAPPluginCall) {
+        call.resolve(["timing": "onTheMinute"])
+    }
+
+    @objc func openExactAlarmSetting(_ call: CAPPluginCall) {
+        call.resolve(["timing": "onTheMinute"])
+    }
+
+    @objc func skipExactAlarms(_ call: CAPPluginCall) {
+        call.resolve(["timing": "onTheMinute"])
+    }
 
     @objc func requestPermission(_ call: CAPPluginCall) {
         let center = UNUserNotificationCenter.current()

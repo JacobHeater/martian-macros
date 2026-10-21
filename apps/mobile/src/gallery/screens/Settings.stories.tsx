@@ -12,6 +12,7 @@ import { FoodSourcesScreen } from '../../foodPacks/FoodSourcesScreen';
 import { onlineFoods } from './onlineFoods';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { ReminderSetting } from '../../domain/ReminderSetting';
+import { InMemoryExactAlarms } from '../../fixtures/InMemoryExactAlarms';
 import { screen, userEvent, within } from 'storybook/test';
 import { EvidenceQuestionScreen } from '../../about/EvidenceQuestionScreen';
 import { CalendarDate } from '../../domain/CalendarDate';
@@ -588,7 +589,7 @@ export const ChangeHeightMetric = screenStory({
   walk: pressAnywhere(/^Height/),
 });
 
-/** MM-321: a reminder switched on shows the time it comes at. */
+/** MM-321: a reminder switched on shows the time it comes at; on the minute, as exact alarms are allowed (MM-248). */
 export const ReminderOn = screenStory({
   covers: ['SettingsScreen'],
   shows: /^At /,
@@ -597,6 +598,31 @@ export const ReminderOn = screenStory({
     await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
   },
   open: settingsAt('reminders'),
+});
+
+/** MM-248: exact alarms declined: reminders come within an hour, and the row leads to the phone's setting. */
+export const ReminderWithinAnHour = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Within an hour',
+  device: async (services) => ({ ...services, exactAlarms: new InMemoryExactAlarms({ held: false, asked: true }) }),
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: settingsAt('reminders'),
+});
+
+/** MM-248: not asked yet: the one line of reason, shown before the phone's own page. */
+export const ReminderOnTheMinuteAsked = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'So a reminder arrives at the time you set.',
+  device: async (services) => ({ ...services, exactAlarms: new InMemoryExactAlarms({ held: false }) }),
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.reminders.saveReminder(new ReminderSetting({ kind: 'weighIn', minuteOfDay: 7 * 60, enabled: true }));
+  },
+  open: settingsAt('reminders'),
+  walk: pressAnywhere(/^Within an hour/),
 });
 
 /** MM-321: a new look chosen, and the save failing: it says so and keeps the old one. */
