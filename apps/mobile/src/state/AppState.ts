@@ -1269,7 +1269,9 @@ export class AppState {
           const permitted = available.size === 0 ? new Set<HealthDataType>() : await s.healthSource.permitted();
           const imported = new Map<HealthDataType, readonly HealthSample[]>();
           for (const type of permitted) imported.set(type, await s.healthSamples.samples(type));
-          return { available, permitted, imported };
+          // Said beside the estimate it weakens when refused (MM-523); not known is not refused.
+          const history = available.size === 0 ? false : await s.healthSource.historyPermitted().catch(() => true);
+          return { available, permitted, imported, history };
         } catch {
           // No platform on this kind of device, or its plugin is not there.
           return undefined;
@@ -1628,6 +1630,8 @@ export class AppState {
           pauses: of(this.pauses) ?? [],
           // As the app would recommend today: body fat then is not kept.
           recommendation: coach?.recommendation,
+          // The body-fat range from the measurements (MM-450), and the eating-disorder answer that withholds its change.
+          setup: of(this.setup),
         });
       });
       this.reportByIndex.set(index, cell);

@@ -105,10 +105,16 @@ Order within a workstream follows four milestones, starting with M0. A step's `m
 2. **M2, a closed beta.** Real food search and barcodes, the dashboard and
    design system, honest measurement, and a coach that handles stalls, gaps
    and under-eating: enough for a small group to use daily for two months.
-3. **M3, public release in the United States.** Everything the listing
-   promises, every external review recorded, the free tier and the Coach
-   unlock working as sold.
+3. **M3, my phone.** The app the owner tests every day on their own phone,
+   through local builds, for weeks or months before any release decision
+   (the owner, 2026-10-21). Every feature is built and used, none paywalled
+   or held back for a review.
 4. **M4** is everything else, in each workstream's own order.
+5. **M5, store release: future vision, on the backburner.** Only the release
+   gates: the Coach unlock's paywall (free tier, trial, purchase), the store
+   listing, and the professional, health-claims and legal sign-offs. A feature
+   whose wording waits on a sign-off is built now; the sign-off waits here.
+   It comes alive if the owner decides to release.
 
 ## How order is decided
 
@@ -251,8 +257,8 @@ Progress to be sure.
   `test/layers.test.ts` keeps the layers apart.
 - **No screen without a story** (`test/gallery/stories.test.tsx` fails it)
   and no design verified anywhere but a browser.
-- **No purchase or trial code** until MM-88 has answered how each store allows
-  a trial for a one-time purchase.
+- **No purchase or trial code**: monetization is on the backburner (M5) since
+  the owner decided on 2026-10-21 that the app is for personal use.
 - **No sentence that says nothing leaves the phone** until MM-244 has watched
   a release build; the terms of use (MM-242) are worded for either answer.
 

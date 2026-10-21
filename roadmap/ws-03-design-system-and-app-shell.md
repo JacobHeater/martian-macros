@@ -111,7 +111,7 @@ WS-13, which needs accessibility, both themes and the icon.
 Steps 3 and 4 can swap or overlap; the dashboard's weight card wants the small
 trend line.
 7. **Storybook as the design register (MM-237).** M0. Placed 2026-10-13.
-8. **The terms of use before anything else (MM-242).** M3. Placed 2026-10-13. MM-453 (the terms and the Apple Health permission text still say no copy leaves the phone, which the backup contradicts; wording for the owner and the attorney) placed here 2026-10-21.
+8. **The terms of use before anything else (MM-242).** M5 (backburner since 2026-10-21; the terms screen stays in the app). Placed 2026-10-13. MM-453 (the terms and the Apple Health permission text still say no copy leaves the phone, which the backup contradicts; wording for the owner and the attorney) placed here 2026-10-21.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-181, MM-184, MM-185, MM-186, MM-236, MM-239, MM-240; step 3: MM-176, MM-179, MM-183, MM-206, MM-208; step 4: MM-187.
 9. **Hierarchy and wayfinding (MM-224; MM-253 to MM-259).** M2. The owner's diagnosis of 2026-10-13: monolithic views, no iconography, cognitive overload. The direction and the panel pass (MM-253) first, then Dashboard, Food, Coach, Progress, Train and Settings, each with before and after stories. **Built 2026-10-13** in one pull request: the direction in design/screen-direction.md, the panel pass in docs/agent-runs/mm253-hierarchy, the six destinations in tiers with MmSection, MmRhythmStrip and the icon set, the checkable rule in test/gallery/hierarchy.test.tsx, and the three bugs the panel found (MM-283 to MM-285). The step is done.
 11. **What the hierarchy panel left for later (MM-286 to MM-289).** M2. Destinations keep their state across tabs (MM-286), Progress with one figure and the lifts as rows (MM-287), the Ember budget for text actions, an owner decision (MM-288), a demo seed that shows every mark (MM-289).
@@ -141,6 +141,7 @@ conflicts with this one.
 - Built (2026-10-13): MM-103 (the owner left measurements, training and the health check grouped on one screen each).
 - Built 2026-10-21 (step 18): MM-391 (one way into the check-in on Coach, done); MM-392 (an unmarked day says what the estimate does with it, done).
 - Added 2026-10-14 (steps 15, 16): MM-320 (Settings' Health Connect rows drawn and rebuilt as their own section, done); MM-321 (every part of a screen drawn by a story: the check and its register); MM-322 (hairlines between rows in every list group, done); MM-324 (one text column for list rows).
+- Added 2026-10-21 (step 15): MM-546 (the app's three startup spinners each drawn by a story that holds its read out, so `npm run unseen` no longer depends on timing, done).
 - Placed 2026-10-13 (the hierarchy pass) and built the same day: MM-253 (the direction and the panel pass), MM-254 Dashboard, MM-255 Food, MM-256 Coach, MM-257 Progress, MM-258 Train, MM-259 Settings; with them the panel's bugs MM-283 (the coach line said "on Today"), MM-284 (a field's unit not heard), MM-285 (weight event dates and default).
 - Placed 2026-10-13 (left by the hierarchy panel, step 11): MM-286, MM-287, MM-288, MM-289.
 - Placed 2026-10-13 in step 1: MM-260 (the date dialog's chevron and flat surface; the phone's date control follows the palette and the dialog floats).

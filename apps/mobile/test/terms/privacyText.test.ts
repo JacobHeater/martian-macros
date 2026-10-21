@@ -94,6 +94,9 @@ describe('the policy matches the app', () => {
     expect(android).toContain('The app writes to Health Connect only the kinds you turn on in Settings');
     expect(ios).toContain('The app writes to Apple Health only the kinds you turn on in Settings');
     expect(both).toContain('never changes or removes what another app wrote');
+    // MM-513, MM-514: weight is written too, and turning writing off offers to remove what was written.
+    expect(both).toContain('the weight you type');
+    expect(both).toContain('the app asks whether to remove what it wrote of that kind');
   });
 });
 

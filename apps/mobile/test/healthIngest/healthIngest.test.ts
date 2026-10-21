@@ -9,6 +9,7 @@ import {
 } from '../../src/healthIngest';
 import { healthBackfillMarksContract } from '../contracts/healthBackfillMarksContract';
 import { healthHistoryAccessContract } from '../contracts/healthHistoryAccessContract';
+import { healthPermissionsPlaceContract } from '../contracts/healthPermissionsPlaceContract';
 import { healthSampleStoreContract } from '../contracts/healthSampleStoreContract';
 import { healthSourceContract } from '../contracts/healthSourceContract';
 
@@ -49,6 +50,18 @@ healthHistoryAccessContract('the fake with history already granted', async () =>
   const source = await permitted();
   source.historyFrom = new Date(2026, 8, 5);
   source.permitHistory();
+  return source;
+});
+// MM-323: where to allow what the platform no longer asks about.
+healthPermissionsPlaceContract('the fake, asking', async () => FakeHealthSource.fromJson(recordedHealthHistory));
+healthPermissionsPlaceContract('the fake, no longer asking about weight', async () => {
+  const source = FakeHealthSource.fromJson(recordedHealthHistory);
+  source.stopsAsking = new Set<HealthDataType>(['weight']);
+  return source;
+});
+healthPermissionsPlaceContract('the fake, with no screen to open', async () => {
+  const source = FakeHealthSource.fromJson(recordedHealthHistory);
+  source.opensPermissions = false;
   return source;
 });
 

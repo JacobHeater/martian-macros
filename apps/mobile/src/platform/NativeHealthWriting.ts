@@ -1,6 +1,9 @@
+import type { BodyWeightRecord } from '../healthIngest/BodyWeightRecord';
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
+import type { HealthWeightWriter } from '../healthIngest/HealthWeightWriter';
 import { HealthWriteKind } from '../healthIngest/HealthWriteKind';
 import type { HealthWriteNamespace } from '../healthIngest/HealthWriteNamespace';
+import { healthWritePrefix } from '../healthIngest/healthWritePrefix';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
 import type { NutritionRecord } from '../healthIngest/NutritionRecord';
 import type { WaterRecord } from '../healthIngest/WaterRecord';
@@ -27,14 +30,15 @@ function nutrition(record: NutritionRecord): MmHealthNutrition {
 }
 
 /**
- * Writing food and water to Health Connect or Apple Health (MM-70,
- * MM-314), over the app's own plugin. Which kinds are on is kept by the
+ * Writing food, water and weight to Health Connect or Apple Health (MM-70,
+ * MM-314, MM-513), over the app's own plugin. Which kinds are on is kept by the
  * plugin, on the phone; each kind is asked for by itself. A write the
  * platform refuses is false here, and the entry in the app is the same
  * either way: the health app is told, never relied on. The write namespace
- * every id carries is the plugin's too (MM-522).
+ * every id carries is the plugin's too (MM-522). Turned off, a kind's
+ * records can be removed by the app's prefix for them (MM-514).
  */
-export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWriteNamespace {
+export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter, HealthWeightWriter, HealthWriteNamespace {
   private readonly api: MmHealthWritingApi;
 
   constructor(api: MmHealthWritingApi) {
@@ -74,6 +78,14 @@ export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter, H
     await this.api.stopWriting({ kind }).catch(() => undefined);
   }
 
+  async removeWritten(kind: HealthWriteKind): Promise<boolean> {
+    try {
+      return (await this.api.removeWritten({ kind, prefix: healthWritePrefix[kind] })).removed;
+    } catch {
+      return false;
+    }
+  }
+
   /** Runs `step` only while `kind` is on; a refusal from the platform is false. */
   private async whileOn(kind: HealthWriteKind, step: () => Promise<boolean>): Promise<boolean> {
     if (!(await this.writing()).has(kind)) return false;
@@ -103,5 +115,17 @@ export class NativeHealthWriting implements HealthWriting, HealthIntakeWriter, H
 
   removeWater(id: string): Promise<boolean> {
     return this.whileOn('water', async () => (await this.api.removeWater({ id })).removed);
+  }
+
+  writeWeight(record: BodyWeightRecord): Promise<boolean> {
+    if (!(record.kg > 0)) return Promise.resolve(false);
+    return this.whileOn(
+      'weight',
+      async () => (await this.api.writeWeight({ id: record.id, atMs: record.at.getTime(), kg: record.kg })).written,
+    );
+  }
+
+  removeWeight(id: string): Promise<boolean> {
+    return this.whileOn('weight', async () => (await this.api.removeWeight({ id })).removed);
   }
 }

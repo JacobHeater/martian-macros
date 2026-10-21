@@ -93,7 +93,7 @@ to declare.
 6. **Write nutrition (MM-70, MM-513, MM-514).** M4. Needs entries with real nutrient data
    (WS-08 step 4) to be worth doing. MM-70 and water (MM-314) built 2026-10-21 in both
    shells, device checks owed; typed weight written (MM-513) and the offer to remove what was
-   written when writing is turned off (MM-514) remain.
+   written when writing is turned off (MM-514) built 2026-10-21 in both shells, device checks owed.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
    biological-sex value may pre-fill the onboarding question when it is male
    or female; other values are ignored and the user always confirms.
@@ -123,7 +123,7 @@ can run during group A.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).
 - Added 2026-10-21 (step 6): MM-522 (written ids made unique across an erase or a restore, done).
 - Added 2026-10-21 (step 6): MM-513 (body weight typed in the app written to the health app) and MM-514 (turning writing off offers to remove what was written), split out of MM-70 when its write path was built.
-- Added 2026-10-14 (step 10): MM-323 (after Health Connect stops asking, say where to allow a kind).
+- Added 2026-10-14 (step 10): MM-323 (after Health Connect stops asking, say where to allow a kind). Built 2026-10-21 with the way to open Health Connect's page of the app's permissions, which MM-523's history line uses too; device checks owed.
 - Started 2026-10-19 (step 7): MM-69 (import from Apple Health), in the iOS shell of MM-403; the owner's decisions of 2026-10-19 on the name and on what HealthKit cannot say are in the ticket.
 
 ## Notes for whoever builds it

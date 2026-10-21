@@ -5,6 +5,7 @@ import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthDataType as Types } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
+import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPlace';
 import { HealthReadFailure } from '../healthIngest/HealthReadFailure';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSource } from '../healthIngest/HealthSource';
@@ -27,20 +28,26 @@ const sorted = (samples: HealthSample[]): HealthSample[] =>
  *
  * It also says whether the history permission is granted (MM-73), and asks
  * for it once, and reads a day's steps as the platform totals them
- * (MM-442), never by adding up its readings.
+ * (MM-442), never by adding up its readings. It remembers, while the
+ * app runs, which kinds came back refused without the question being
+ * shown (MM-323), and opens Health Connect's screen of the app's
+ * permissions where `opensPermissions` says the shell has one (Android,
+ * not an iPhone).
  */
-export class NativeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps {
+export class NativeHealthSource implements HealthSource, HealthHistoryAccess, HealthDailySteps, HealthPermissionsPlace {
   /** How far back Health Connect reads without the history permission (MM-498). */
   static readonly windowDays = 30;
 
   private readonly api: MmHealthApi;
-
   /** The app's clock (MM-190): the window is counted back from its now. */
   private readonly clock: Pick<Clock, 'now'>;
+  private readonly opensPermissions: boolean;
+  private readonly unshown = new Set<HealthDataType>();
 
-  constructor(api: MmHealthApi, clock: Pick<Clock, 'now'>) {
+  constructor(api: MmHealthApi, clock: Pick<Clock, 'now'>, { opensPermissions = false }: { opensPermissions?: boolean } = {}) {
     this.api = api;
     this.clock = clock;
+    this.opensPermissions = opensPermissions;
   }
 
   private async asked<T>(what: string, step: () => Promise<T>): Promise<T> {
@@ -66,8 +73,29 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess, He
   async requestPermission(types: ReadonlySet<HealthDataType>): Promise<Set<HealthDataType>> {
     const here = await this.available();
     const asked = [...types].filter((type) => here.has(type));
-    if (asked.length > 0) await this.api.requestPermission({ types: asked });
-    return this.permitted();
+    if (asked.length === 0) return this.permitted();
+    const { shown } = await this.api.requestPermission({ types: asked });
+    const after = await this.permitted();
+    for (const type of asked) {
+      // Only a refusal that came back unshown means the platform stopped asking (MM-323).
+      if (shown === false && !after.has(type)) this.unshown.add(type);
+      else this.unshown.delete(type);
+    }
+    return after;
+  }
+
+  async stoppedAsking(type: HealthDataType): Promise<boolean> {
+    return this.unshown.has(type);
+  }
+
+  async openPermissions(): Promise<boolean> {
+    if (!this.opensPermissions) return false;
+    try {
+      const { opened } = await this.api.openPermissions();
+      return opened;
+    } catch {
+      return false;
+    }
   }
 
   async historyPermitted(): Promise<boolean> {
