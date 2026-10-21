@@ -89,7 +89,7 @@ Built:
   apart, so one week answered twice is one check-in, and the latest must be within 7 days. Not during a pause.
 - **An offer, never a change**: a notice on the dashboard and the Coach screen with three choices, and which the coach would pick and
   why. Eight or more weeks into the deficit, or with no slower pace left, it suggests the maintenance week; earlier, the slower pace.
-  The suggested choice is the prominent button.
+  The suggested choice is the prominent button (superseded 2026-10-21: both are secondary; see below).
 - **A maintenance week now**: targets go to maintenance at once, beyond the weekly step limit, flagged as the week the user chose
   (`TargetFlag.requestedBreak`, explained as such in the target-change summary). The next check-in is a week later. Being at
   maintenance it ends the unbroken deficit, so the count restarts when the deficit resumes.
@@ -126,13 +126,24 @@ Built (2026-10-21):
   week". Tests: "the slower pace is named, with what it costs" in `test/coach/reliefOffer.test.tsx`, and the words in
   `test/format/templates.test.ts`. Not run locally; CI validates.
 
+Fixed 2026-10-21 (the panel's review, blocking): **both choices are secondary**. On the Dashboard the offer sits above
+the day's own action, and the Ember fill on the suggested choice made it a second primary. The coach's suggestion is
+now marked by order (it comes first) and wording (the text says which the coach would pick, and the button is heard
+as "…, the coach's suggestion"), not by the fill; the same on Coach. After "Take a two-week break" a snack says "Break
+started: maintenance until {the day of the next check-in}", and after "Slow to …" "Pace slowed to …", each with Undo,
+which on that day puts back the setup and that day's targets as they were (`TargetsHistoryWriter.removeTargets`, new,
+for a day that had no targets before the choice). Story: `DashboardReliefOffer` (Today), now under the hierarchy
+rules in `test/gallery/hierarchy.test.tsx`. Tests in `test/coach/reliefOffer.test.tsx`: "both choices are secondary,
+the coach's suggestion first and heard as the suggestion", "on a long deficit the break comes first", and the two
+Undo tests; `removeTargets` in the targets-history contract. Not run locally; CI validates.
+
 Left as decided:
 - It is a notice, not an entry in the insight catalog (MM-141), so it is not rationed with insights. It is a safety offer and should
   not be.
 
 ## Owed on a phone
-- The offer on a device, from hard check-ins and from falling lifts, and a look at CoachReliefOffer and
-  CoachReliefOfferLifts in the three palettes with the pace line.
+- The offer on a device, from hard check-ins and from falling lifts, and a look at CoachReliefOffer,
+  CoachReliefOfferLifts and DashboardReliefOffer in the three palettes with the pace line, and the snack's Undo.
 
 ## Note (2026-10-13, MM-249)
 "Short sleep adds a line, not a trigger" is superseded: MM-252 makes a fourteen-night average under six hours a recovery signal of its own in this rule, and the offer names the gentler pace. The sentence stays worded "appears to" until the panel pass MM-249 asks for.

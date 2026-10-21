@@ -116,7 +116,8 @@ Built (2026-10-21, feat/mm-116-recovery-check-in):
 
 Built since (2026-10-21):
 - **Its reminder** (MM-146): "How you are holding up" in Settings, Reminders, sent at 9:00 am on the day the questions
-  fall due and weekly while they wait, until seven go unanswered. See MM-146's Progress.
+  fall due and weekly while they wait, until seven go unanswered. Its prompt names this section, "Time for “How you
+  are holding up” on Coach?", from the section's own title (2026-10-21). See MM-146's Progress.
 - **Sleep hours pre-filled** from the last fourteen nights recorded (MM-252), in `RecoveryCheckInScreen`.
 - **Offered with the check-in**: when it is due it is the Coach screen's one thing to do (MM-299), and the card opens
   expanded.
