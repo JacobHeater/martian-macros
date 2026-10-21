@@ -1,12 +1,14 @@
 import { byStartThenId } from '../byStartThenId';
+import type { HealthBackfillMarks } from '../HealthBackfillMarks';
 import type { HealthDataType } from '../HealthDataType';
 import type { HealthSample } from '../HealthSample';
 import type { HealthSampleStore } from '../HealthSampleStore';
 
-/** `HealthSampleStore` held in memory. */
-export class InMemoryHealthSampleStore implements HealthSampleStore {
+/** `HealthSampleStore` and `HealthBackfillMarks` held in memory. */
+export class InMemoryHealthSampleStore implements HealthSampleStore, HealthBackfillMarks {
   private readonly byType = new Map<HealthDataType, Map<string, HealthSample>>();
   private readonly tokens = new Map<HealthDataType, string>();
+  private readonly backfilled = new Map<HealthDataType, Date>();
 
   private of(type: HealthDataType): Map<string, HealthSample> {
     let stored = this.byType.get(type);
@@ -46,9 +48,19 @@ export class InMemoryHealthSampleStore implements HealthSampleStore {
     this.tokens.set(type, token);
   }
 
+  async backfilledFrom(type: HealthDataType): Promise<Date | undefined> {
+    const from = this.backfilled.get(type);
+    return from === undefined ? undefined : new Date(from.getTime());
+  }
+
+  async saveBackfilledFrom(type: HealthDataType, from: Date): Promise<void> {
+    this.backfilled.set(type, new Date(from.getTime()));
+  }
+
   /** Forgets everything, as erasing the app's data does. */
   clear(): void {
     this.byType.clear();
     this.tokens.clear();
+    this.backfilled.clear();
   }
 }

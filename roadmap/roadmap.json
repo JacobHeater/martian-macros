@@ -701,6 +701,7 @@
             "MM-71",
             "MM-68",
             "MM-73",
+            "MM-498",
             "MM-188"
           ]
         },
@@ -3030,6 +3031,7 @@
           "MM-442",
           "MM-72",
           "MM-73",
+          "MM-498",
           "MM-314",
           "MM-323"
         ]
@@ -3061,9 +3063,10 @@
         },
         {
           "step": 4,
-          "title": "History backfill on first connection",
+          "title": "History backfill on first connection, and keeping it through a re-read (MM-498)",
           "tickets": [
-            "MM-73"
+            "MM-73",
+            "MM-498"
           ],
           "milestone": "M3"
         },
