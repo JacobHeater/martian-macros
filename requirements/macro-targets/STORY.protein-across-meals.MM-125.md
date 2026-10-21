@@ -1,6 +1,6 @@
 ---
 id: MM-125
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-41, MM-121, MM-141, MM-143, MM-144]
 ---
@@ -47,6 +47,11 @@ Scenario: The marker
   Given an 80 kg user on Full detail and a lunch with 30 g of protein
   Then lunch carries the marker
 
+Scenario: The marker is per kg of reference weight
+  Given a 130 kg user 180 cm tall on Full detail and a lunch with 30 g of protein
+  Then lunch carries the marker
+  # Reference weight as the protein minimum uses it: about 93 kg here, so about 28 g, not 39 g.
+
 Scenario: Not at Standard detail
   Given Standard detail
   Then no marker is shown on any meal
@@ -71,18 +76,23 @@ Scenario: No per-meal targets
 ## Progress
 Built:
 - **At Full detail each meal's header shows its protein** beside its calories, and a quiet check mark when the meal has at least
-  0.3 g per kg of trend weight (`mealHasSolidProtein`). A meal without it shows nothing in its place. At Standard and Simple neither
+  0.3 g per kg of reference weight (`mealHasSolidProtein`): the trend weight up to BMI 25, then a quarter of the excess
+  (`SafetyBounds.referenceWeightKg`, the weight the protein minimum scales with), so a heavy person's marker is not out of
+  reach. A meal without it shows nothing in its place. At Standard and Simple neither
   is shown. (The header showed calories only; the ticket's "it already does" was true of the entries, not the meal.)
 - **One insight** (`InsightRule.proteinByMeal`): when the protein minimum was missed on more than half of the fully logged days of
   the last two weeks, and on more than half of those days one main meal had under 10 g. It names the earliest such meal of breakfast,
   lunch and dinner, never snacks, in the ticket's words, and grades itself: "Spreading protein over the day may help slightly; your
   daily total matters much more." It ranks below every other insight and, like all of them, is not repeated for 28 days.
 - **No per-meal target** anywhere: a test checks the meal headers for one.
-- Thresholds are in `ProteinSpreadRule`. Tests: `protein_across_meals_test.dart` (engine and app), `insight_card_test.dart`.
+- Thresholds are in `ProteinSpreadRule`. Tests: `test/engine/proteinAcrossMeals.test.ts` (the marker, including reference
+  weight, and the insight), `test/food/proteinAcrossMeals.test.tsx` (the meal headers at Full and Standard, the heavy
+  person's marker, no target), `test/coach/insightCard.test.tsx`; the 28-day quiet period is `test/engine/insights.test.ts`
+  ("dismissed, a rule stays away for 28 days").
 
-Not built:
+Not built, and limits:
 - The insight reads meals from the last 14 days of the food log, so it needs those days logged by meal; a day with no entries is not
   counted as a day with an empty breakfast unless it was a fully logged day under the minimum.
-- "Reference weight" is the trend weight; before the first weigh-in there is no marker.
+- Before the first weigh-in there is no trend weight, so no marker.
 - Not seen on a device: the emulator had no food logged. The header's subtotal shortens with an ellipsis before it can push the
   add button off a narrow screen, which a test found it would otherwise do.
