@@ -18,6 +18,7 @@ const removesOutline = /(?:^|;|\s)outline:\s*(?:0|none)\b/;
 const notContainers: Record<string, string> = {
   '.mm-visually-hidden': 'A 1 px box that hides text from sight.',
   '.mm-progress': 'A bar that clips its fill; nothing in it is pressed.',
+  '.mm-progress-wave': 'The fill’s ripple, clipped to its round end (MM-329); nothing in it is pressed.',
   '.mm-picker-value': 'A line of text that ends in an ellipsis.',
 };
 
