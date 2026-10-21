@@ -41,6 +41,16 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
         [period, ['Fully logged days', `${n('wholeDays')}`], ['Calories from estimates', `${share}%`]],
       ];
     }
+    case 'weighProtein': {
+      const share = roundHalfAwayFromZero((i.figures['palmProteinShare'] ?? 0) * 100) + 0;
+      return [
+        'Weigh your main protein for a week',
+        `About ${share}% of your protein over the last two weeks was logged by palm, and protein ` +
+          'matters for your goal. Weighing the protein food you eat most for one week shows what ' +
+          'your palms really hold, so the palms after are closer. Then log by palm again if you like.',
+        [period, ['Fully logged days', `${n('wholeDays')}`], ['Protein logged by palm', `${share}%`]],
+      ];
+    }
     case 'weighInTiming':
       return [
         'Weigh-ins have been sparse',
