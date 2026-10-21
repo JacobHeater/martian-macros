@@ -24,6 +24,9 @@ Choices I made without asking (say if any is wrong):
   then "Future vision (not scheduled)", each with its own rows and bars by area. An area appears in each group it has
   tickets in.
 - **The milestone card of a future-vision milestone says so** in its tag.
+- **The release gates are filed under `release`** (the owner, 2026-10-21: a clinician's review and the terms' legal pass showed
+  as "adaptive coach" and "app shell" below the cut). MM-29, MM-242 and MM-453 moved from `adaptive-coach` and
+  `app-shell` to `requirements/release/`, so only monetization and release sit below the cut.
 
 ## Acceptance Criteria
 ```gherkin
