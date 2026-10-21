@@ -6,6 +6,12 @@
 The Coach unlock and its trial, the external reviews, the stores' obligations,
 and the release itself.
 
+**On the backburner (the owner, 2026-10-21):** the owner tests the app on their
+own phone through local builds for weeks or months before any release
+decision. Every step here is a release gate, tagged M5, and waits for that
+decision. Features are never held back for these gates: a feature whose wording
+waits on a sign-off here is built and used now.
+
 ## Why this is a workstream
 Releasing a health app with an in-app purchase in the United States involves
 obligations that are easy to discover late: a professional's signature on the
@@ -90,7 +96,7 @@ Nothing further. It is the end of the graph.
   same for free users.
 
 ## Sequence
-1. **Long-lead items (MM-88, MM-95).** M3. Start now. Begin looking for the
+1. **Long-lead items (MM-88, MM-95).** M5. Start now. Begin looking for the
    reviewer for step 2 at the same time; the ticket for the review cannot
    start, but the search can.
    Since 2026-10-21 the privacy policy is drafted (MM-95, in progress: the
@@ -99,14 +105,14 @@ Nothing further. It is the end of the graph.
    progress until the owner merges the workflow and turns Pages on). The
    link from the app's About rows to that page is MM-454, built (in
    progress until the owner confirms the address).
-2. **Professional review (MM-29).** M3. Recorded against rows of the evidence
+2. **Professional review (MM-29).** M5. Recorded against rows of the evidence
    register, with name, credential and date.
-3. **Free tier and entitlements (MM-85).** M3. Decide the boundary feature by
+3. **Free tier and entitlements (MM-85).** M5. Decide the boundary feature by
    feature, then implement the interface for real.
-4. **Trial and purchase (MM-86, MM-87).** M3.
-5. **Health-claims review (MM-96).** M3. Best done with the reviewer from
+4. **Trial and purchase (MM-86, MM-87).** M5.
+5. **Health-claims review (MM-96).** M5. Best done with the reviewer from
    step 2.
-6. **Release (MM-94).** M3.
+6. **Release (MM-94).** M5.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-244.
 
 ## Done enough to unblock others

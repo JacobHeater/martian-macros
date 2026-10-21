@@ -14,12 +14,13 @@ import HealthKit
  * preferences. An anchored query's anchor is the change token.
  *
  * It writes only what the person turned on in Settings (MM-70, MM-314,
- * MM-489): food, water and finished workouts, each asked for by itself with
- * share authorization alone, never with reading. HealthKit does say whether
+ * MM-513, MM-489): food, water, typed weight and finished workouts, each
+ * asked for by itself with share authorization alone, never with reading. HealthKit does say whether
  * sharing was allowed, so a kind is written only while it is on (kept in
  * the app's preferences) and allowed. Every object it writes carries the
  * app's id for it, so writing again replaces it and removing it removes
- * only the app's own.
+ * only the app's own. Turned off, a kind's samples the app wrote can be
+ * removed, found by the app's prefix among its own (MM-514).
  */
 @objc(MmHealthPlugin)
 public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
@@ -39,14 +40,18 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "writing", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startWriting", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopWriting", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeWritten", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeNamespace", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "renewWriteNamespace", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeNutrition", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "removeNutrition", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeWater", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "removeWater", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeWeight", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeWeight", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readWorkouts", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeWorkout", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeWorkout", returnType: CAPPluginReturnPromise),
     ]
 
     private static let askedKey = "mm_health_asked"
@@ -279,7 +284,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             ])
         }
     }
-    // MARK: Writing (MM-70, MM-314, MM-489)
+    // MARK: Writing (MM-70, MM-314, MM-513, MM-489)
 
     private static let writingKey = "mm_health_writing"
 
@@ -300,11 +305,18 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private static let water = HKQuantityType(.dietaryWater)
 
+    /// A weigh-in typed in the app (MM-513), written as body mass: the kind the app also reads, never read back as a reading.
+    private static let bodyMass = HKQuantityType(.bodyMass)
+
+    /// What every id the app writes starts with (MM-514): a removal by prefix reaches nothing else.
+    private static let ownPrefix = "martian-macros-"
+
     /// What each kind asks to share. Food is allowed once its energy is; a nutrient not allowed is left out.
     private static func shared(_ kind: String) -> [HKSampleType] {
         switch kind {
         case "food": return nutrients.map(\.type)
         case "water": return [water]
+        case "weight": return [bodyMass]
         case "workouts": return [HKObjectType.workoutType()]
         default: return []
         }
@@ -458,6 +470,88 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// Writes one weigh-in typed in the app (MM-513) as body mass at the moment it is said to be from, replacing what was written for it before.
+    @objc func writeWeight(_ call: CAPPluginCall) {
+        guard let id = call.getString("id") else { return call.reject("writeWeight needs an id.") }
+        guard writes("weight") else { return call.resolve(["written": false]) }
+        let at = dateArgument(call, "atMs")
+        let kg = call.getDouble("kg") ?? 0
+        var metadata = owned(id, "weight")
+        metadata[HKMetadataKeyWasUserEntered] = true
+        let sample = HKQuantitySample(type: Self.bodyMass, quantity: HKQuantity(unit: .gramUnit(with: .kilo), doubleValue: kg), start: at, end: at, metadata: metadata)
+        removeOwn(id, [Self.bodyMass]) { error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            self.store.save(sample) { saved, error in
+                if let error = error { return call.reject(error.localizedDescription) }
+                call.resolve(["written": saved])
+            }
+        }
+    }
+
+    @objc func removeWeight(_ call: CAPPluginCall) {
+        guard let id = call.getString("id") else { return call.reject("removeWeight needs an id.") }
+        guard writes("weight") else { return call.resolve(["removed": false]) }
+        removeOwn(id, [Self.bodyMass]) { error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            call.resolve(["removed": true])
+        }
+    }
+
+    /// Removes every sample of `types` this app wrote whose id under `key` starts with `prefix`, under any namespace (MM-514), then runs `then`.
+    private func removeOwnPrefixed(_ prefix: String, key: String, _ types: [HKSampleType], then: @escaping (Error?) -> Void) {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            HKQuery.predicateForObjects(from: HKSource.default()),
+            HKQuery.predicateForObjects(withMetadataKey: key),
+        ])
+        let group = DispatchGroup()
+        var failure: Error?
+        let lock = NSLock()
+        let failed: (Error) -> Void = { error in
+            lock.lock()
+            failure = error
+            lock.unlock()
+        }
+        for type in types where allowed(type) {
+            group.enter()
+            let query = HKSampleQuery(sampleType: type, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
+                if let error = error {
+                    failed(error)
+                    group.leave()
+                    return
+                }
+                let ours = (samples ?? []).filter { ($0.metadata?[key] as? String)?.hasPrefix(prefix) == true }
+                if ours.isEmpty {
+                    group.leave()
+                    return
+                }
+                self.store.delete(ours) { _, error in
+                    if let error = error { failed(error) }
+                    group.leave()
+                }
+            }
+            store.execute(query)
+        }
+        group.notify(queue: .global()) { then(failure) }
+    }
+
+    /// Removes what the app wrote of `kind` (MM-514): only its own samples, found by `prefix`. Needs the kind's share authorization, not the kind on, so it can follow turning it off.
+    @objc func removeWritten(_ call: CAPPluginCall) {
+        guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
+        guard let kind = call.getString("kind") else { return call.reject("removeWritten needs a kind.") }
+        guard let prefix = call.getString("prefix"), prefix.hasPrefix(Self.ownPrefix) else {
+            return call.reject("removeWritten needs a prefix of the app's own.")
+        }
+        let types = Self.shared(kind)
+        guard let first = types.first else { return call.reject("Not a kind this app writes: \(kind).") }
+        guard allowed(first) else { return call.resolve(["removed": false]) }
+        // A workout carries the app's id as its sync identifier; every other sample under the app's own key.
+        let key = kind == "workouts" ? HKMetadataKeySyncIdentifier : Self.entryKey
+        removeOwnPrefixed(prefix, key: key, types) { error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            call.resolve(["removed": true])
+        }
+    }
+
     /// MM-188's strength types: a workout of one of these is imported as strength.
     private static let strengthTypes: Set<HKWorkoutActivityType> = [.traditionalStrengthTraining, .functionalStrengthTraining, .coreTraining]
 
@@ -512,6 +606,20 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
                     }
                 }
             }
+        }
+    }
+
+    /// Removes the app's own workout written under `clientId` (MM-515), when it is deleted in the app; another app's cannot be reached.
+    @objc func removeWorkout(_ call: CAPPluginCall) {
+        guard let clientId = call.getString("clientId") else { return call.reject("removeWorkout needs a clientId.") }
+        guard writes("workouts") else { return call.resolve(["removed": false]) }
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            HKQuery.predicateForObjects(from: HKSource.default()),
+            HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeySyncIdentifier, allowedValues: [clientId]),
+        ])
+        store.deleteObjects(of: HKObjectType.workoutType(), predicate: predicate) { _, _, error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            call.resolve(["removed": true])
         }
     }
 }

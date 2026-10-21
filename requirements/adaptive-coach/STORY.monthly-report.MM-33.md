@@ -73,9 +73,10 @@ Built:
   streak's rule, within the month), and a "Personal records" card listing each record set in the month with its day. Strength
   as at the end of the month, so a later session does not add a record to an old report. Tests: `monthlyReport.test.ts`,
   `longestLoggingRun.test.ts`, `coach/monthlyReport.test.tsx`; gallery `MonthlyReportWithRecords`.
+- **The body-fat range if one has settled** (MM-450, 2026-10-21): a "Body fat" row in "What your body did" once a range from the
+  waist has settled, at the end of the month and when it began, as it stood on each day.
 
 Not built:
-- **The body-fat range if one has settled**: needs the body-fat estimate from measurements (MM-34); carried as MM-450.
 - **The short weekly version** at the weekly check-in: the existing target-change summary (MM-138) already says what changed and why.
 - **Photos** (MM-157): no room is left on the screen yet.
 - Adherence is shown as counts and protein; the report does not repeat the adherence summary's intake-against-target line, because

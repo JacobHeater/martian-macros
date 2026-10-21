@@ -1,6 +1,6 @@
 ---
 id: MM-514
-status: proposed
+status: in-progress
 component: health-sync
 related: [MM-70, MM-314, MM-489]
 ---
@@ -16,10 +16,18 @@ Choices I made without asking (say if any is wrong):
 - **Asked once, when the switch is turned off**, with "Keep" first and "Remove" second; keeping is the default.
 - **Only the app's own records of that kind** are removed: Health Connect lets an app delete only what it wrote, and
   HealthKit the same; the removal is by the app's source, not by a time range.
+- **Found by the app's prefix for that kind, under every namespace** (`healthWritePrefix`): the plugin reads only the
+  app's own records of that kind (Health Connect's data-origin filter, HealthKit's source predicate) and deletes those
+  whose id starts with the prefix, so what was written before an erase (MM-522) goes too. A prefix not the app's own is
+  refused by the plugin (2026-10-21, the builder).
+- **The switch is off before the question**: turning it off stops writing at once, then the question is asked with the
+  app's confirmation dialog, "Keep" the safe choice and first; closing it unanswered keeps. Removing needs the kind's
+  write permission, not the kind on.
+- **Weight (MM-513) and workouts are asked about too**, as food and water are.
 
 ## Description
-Turning off "Send food you log to …", "Send water you log to …" or "Send workouts you finish to …" asks whether to remove what the
-app wrote of that kind. Removing deletes only the app's own records of that kind from the platform; keeping leaves them.
+Turning off "Send food you log to …", "Send water you log to …", "Send weight you type to …" or "Send workouts you finish
+to …" asks whether to remove what the app wrote of that kind. Removing deletes only the app's own records of that kind from the platform; keeping leaves them.
 
 ## Acceptance Criteria
 ```gherkin
@@ -35,3 +43,10 @@ Scenario: Removed
 
 ## Notes
 - The terms (MM-242, section 9) say what was written stays when writing is turned off; they change with this ticket.
+- Built 2026-10-21: `HealthWriting.removeWritten` (contract `healthWritingContract`), the plugins' `removeWritten`
+  (`test/native/mmHealthWrites.test.ts`; `test/platform/nativeHealthWriting.test.ts` for another app's records and every
+  namespace), the question in `HealthWritingGroup` (`test/settings/healthWriting.test.tsx`, stories
+  `HealthConnectWritingOff` and `HealthConnectWritingRemoved`). Terms section 9 and the privacy policy say the app asks
+  (terms version 4).
+- Device checks owed: that Health Connect lets the app read its own records of a kind it may only write (and older than
+  thirty days) for the removal, and that HealthKit's delete removes the app's own samples and no other app's.
