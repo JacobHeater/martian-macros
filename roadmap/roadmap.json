@@ -758,6 +758,8 @@
             "MM-118",
             "MM-156",
             "MM-34",
+            "MM-501",
+            "MM-502",
             "MM-157"
           ]
         },
@@ -2212,11 +2214,13 @@
           "MM-20",
           "MM-136",
           "MM-142",
-          "MM-155"
+          "MM-155",
+          "MM-34"
         ],
         "remaining": [
           "MM-15",
-          "MM-34",
+          "MM-501",
+          "MM-502",
           "MM-118",
           "MM-154",
           "MM-156",
@@ -2276,7 +2280,9 @@
           "step": 7,
           "title": "Body-fat range from the user's own measurements",
           "tickets": [
-            "MM-34"
+            "MM-34",
+            "MM-501",
+            "MM-502"
           ],
           "milestone": "M4"
         },

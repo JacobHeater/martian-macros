@@ -5,23 +5,23 @@ import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { Pause } from '../domain/Pause';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
+import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
 import { activityGaps } from './activityGaps';
 import { assessCoachConfidence } from './assessCoachConfidence';
-import { BodyFatEstimate } from './BodyFatEstimate';
 import { CoachSnapshot } from './CoachSnapshot';
 import { combineTrendShifts } from './combineTrendShifts';
 import { creatineEventShift } from './creatineEventShift';
 import { creatineWeightEvents } from './creatineWeightEvents';
 import { cycleNoiseMultiplier } from './cycleNoiseMultiplier';
-import { deurenbergBodyFat } from './deurenbergBodyFat';
 import { effectiveWeightEvents } from './effectiveWeightEvents';
 import { gapPrior } from './gapPrior';
 import { GapRule } from './GapRule';
 import { initialTdeePrior } from './initialTdeePrior';
 import { mifflinStJeorKcal } from './mifflinStJeorKcal';
 import { energyDensityForSlope } from './energyDensityForSlope';
+import { estimateBodyFat } from './estimateBodyFat';
 import { passingWeightEventNoise } from './passingWeightEventNoise';
 import { pauseDeficitRestartOn } from './pauseDeficitRestartOn';
 import { recommendMode } from './recommendMode';
@@ -61,6 +61,7 @@ export function analyze({
   weightEvents = [],
   history = [],
   pauses = [],
+  waists = [],
   trendModel = new WeightTrendModel(),
   estimator = new TdeeEstimator(),
 }: {
@@ -72,6 +73,7 @@ export function analyze({
   weightEvents?: readonly WeightEvent[];
   history?: readonly TargetsRecord[];
   pauses?: readonly Pause[];
+  waists?: readonly WaistObservation[];
   trendModel?: WeightTrendModel;
   estimator?: TdeeEstimator;
 }): CoachSnapshot | undefined {
@@ -111,11 +113,9 @@ export function analyze({
   });
   const age = profile.ageOn(today);
 
-  const measured = setup.bodyFatPercent;
-  const bodyFat =
-    measured !== undefined
-      ? new BodyFatEstimate({ percent: measured, sigmaPercent: 4 })
-      : deurenbergBodyFat({ sex: profile.sex, weightKg: trendWeight, heightCm: profile.heightCm, ageYears: age });
+  // The user's figure, or the formula joined by their waist entries (MM-34).
+  const estimatedBodyFat = estimateBodyFat({ setup, trendWeightKg: trendWeight, waists, today });
+  const bodyFat = estimatedBodyFat.estimate;
 
   const bmr = mifflinStJeorKcal({ sex: profile.sex, weightKg: trendWeight, heightCm: profile.heightCm, ageYears: age });
 
@@ -177,6 +177,7 @@ export function analyze({
     trend,
     trendWeightKg: trendWeight,
     bodyFat,
+    bodyFatBasis: estimatedBodyFat.basis,
     bmrKcal: bmr,
     calorieFloorKcal: SafetyBounds.calorieFloorKcal({
       sex: profile.sex,
