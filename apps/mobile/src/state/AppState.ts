@@ -1263,7 +1263,9 @@ export class AppState {
           const permitted = available.size === 0 ? new Set<HealthDataType>() : await s.healthSource.permitted();
           const imported = new Map<HealthDataType, readonly HealthSample[]>();
           for (const type of permitted) imported.set(type, await s.healthSamples.samples(type));
-          return { available, permitted, imported };
+          // Said beside the estimate it weakens when refused (MM-523); not known is not refused.
+          const history = available.size === 0 ? false : await s.healthSource.historyPermitted().catch(() => true);
+          return { available, permitted, imported, history };
         } catch {
           // No platform on this kind of device, or its plugin is not there.
           return undefined;

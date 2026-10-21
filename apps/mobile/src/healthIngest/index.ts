@@ -23,6 +23,7 @@ export * from './HealthImporter';
 export * from './HealthImportResult';
 export * from './HealthImportStatus';
 export * from './HealthIntakeWriter';
+export * from './HealthPermissionsPlace';
 export * from './HealthWeightWriter';
 export * from './HealthReadFailure';
 export * from './HealthSample';

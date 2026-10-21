@@ -9,7 +9,18 @@ import type { MmHealthRecord } from './MmHealthRecord';
 export interface MmHealthApi {
   status(): Promise<{ status: 'available' | 'unavailable' | 'updateRequired' }>;
   permitted(options: { types: string[] }): Promise<{ types: string[] }>;
-  requestPermission(options: { types: string[] }): Promise<{ types: string[] }>;
+  /**
+   * `shown` is false when the answer came back without the platform's
+   * question having been shown, as Health Connect does once a request has
+   * been refused more than twice (MM-323). Apple Health does not say.
+   */
+  requestPermission(options: { types: string[] }): Promise<{ types: string[]; shown?: boolean }>;
+  /**
+   * Opens Health Connect's screen of this app's permissions (MM-323),
+   * answering once the person is back; `opened` is false where it could not
+   * be opened. Health Connect only: an iPhone has no such screen to open.
+   */
+  openPermissions(): Promise<{ opened: boolean }>;
   /**
    * Whether readings from before the platform's default window can be read
    * (MM-73): Health Connect's history permission; always on Apple Health.
