@@ -1,7 +1,7 @@
 ---
 id: MM-29
 status: proposed
-component: adaptive-coach
+component: release
 related: [MM-22, MM-11, MM-28, MM-96, MM-110, MM-112, MM-143]
 ---
 
