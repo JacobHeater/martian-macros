@@ -199,6 +199,11 @@ export class AppState {
    * been read and kept. Empty when nothing has been imported.
    */
   readonly importedWeighIns: Cell<Loadable<DayWeighIn[]>>;
+  /**
+   * The scale the person chose in Settings (MM-71), or undefined while the
+   * one with the most weigh-ins in thirty days counts.
+   */
+  readonly primaryScale: Cell<Loadable<string | undefined>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -506,16 +511,20 @@ export class AppState {
       onKept: () => this.packsChanged(),
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
+    this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
+      // And here so that choosing a scale does.
+      const chosen = of(this.primaryScale);
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
           s.healthSamples.samples('weight').then(
             (samples) => {
               if (stopped) return;
-              listener(dailyWeighIns(samples, { primarySourceId: primaryWeightSource(samples, { asOf: s.clock.now() }) }));
+              const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
+              listener(dailyWeighIns(samples, { primarySourceId }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
