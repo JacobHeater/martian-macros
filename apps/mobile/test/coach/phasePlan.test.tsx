@@ -83,3 +83,24 @@ it('with an eating-disorder history the phase shows, and nothing is projected or
   expect(within(section).queryByText('Projected end')).not.toBeInTheDocument();
   expect(within(section).queryByText(/^Next:/)).not.toBeInTheDocument();
 });
+
+it('a gain past its line: the end is said once, on the lean-gain card, and the goal section gives only what follows', async () => {
+  // Ten weeks of lean gain from 80 kg to 83 kg; the estimate from body mass index is past 20% (as MM-129's card test).
+  await repos.setup.saveSetup(
+    typicalSetup({ onboardedOn: today.addDays(-90), goalMode: 'leanGain', healthCheckConfirmedOn: today }).copyWith({ unitSystem: 'metric' }),
+  );
+  for (let d = 80; d >= 0; d--) await repos.weights.saveWeight(today.addDays(-d), d >= 70 ? 80 : 80 + (3 * (70 - d)) / 70);
+  for (let d = 70; d >= 0; d -= 7) {
+    await repos.targets.saveTargets(
+      targetsFrom(today.addDays(-d), { mode: 'leanGain', kcal: 2900, tdeeKcal: 2650, tdeeSigmaKcal: 150, tdeeStatus: 'updated', weeklyRateFraction: 0.0035 }),
+    );
+  }
+  renderApp(repos, today);
+  await openTab('Coach');
+  await screen.findByRole('heading', { name: /^Lean gain, week/ });
+  expect(screen.getAllByText(/recommends ending/)).toHaveLength(1);
+  expect(screen.getAllByText(/^Next: Maintenance, then Fat loss$/)).toHaveLength(1);
+  const notice = within(await goalSection()).getByText('Next: Maintenance, then Fat loss').closest('.mm-notice') as HTMLElement;
+  expect(within(notice).queryByText(/end|body fat|waist/i)).not.toBeInTheDocument();
+  expect(within(await goalSection()).queryByText('Projected end')).not.toBeInTheDocument();
+});

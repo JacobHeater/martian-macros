@@ -3,7 +3,6 @@ import type { GoalBodyFat } from '../domain/GoalBodyFat';
 import type { GoalMode } from '../domain/GoalMode';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
-import { clamp } from '../lang/clamp';
 import { cautiousBodyFatPercent } from './cautiousBodyFatPercent';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { consecutiveDeficitWeeks } from './consecutiveDeficitWeeks';
@@ -11,16 +10,23 @@ import { deficitStartOn } from './deficitStartOn';
 import type { GoalBodyFatCheck } from './GoalBodyFatCheck';
 import { leanFractionOfChange } from './leanFractionOfChange';
 import { LeanGainRule } from './LeanGainRule';
+import type { LeanGainStopReason } from './LeanGainStopReason';
 import { MaintenanceRule } from './MaintenanceRule';
 import type { PhaseEndReason } from './PhaseEndReason';
 import type { PhasePlan } from './PhasePlan';
 import type { PhaseRecommendation } from './PhaseRecommendation';
 import { PhaseRule } from './PhaseRule';
-import { quartileSigmas } from './safetyBodyFatConstants';
 import { SafetyBounds } from './SafetyBounds';
 import type { StallAssessment } from './StallAssessment';
 import { suggestedMaintenanceWeeks } from './suggestedMaintenanceWeeks';
 import type { TargetsRecord } from './TargetsRecord';
+
+/** How each of MM-129's stops ends the phase. */
+const gainEndReasons: Readonly<Record<LeanGainStopReason, PhaseEndReason>> = {
+  bodyFat: 'gainLine',
+  waist: 'gainWaist',
+  weeks: 'longestGain',
+};
 
 /** The earlier of two projected ends, with its reason. */
 function earlier(
@@ -62,11 +68,14 @@ function kgToLine({
  * fat is always read as a range (MM-34): a cut ends once the lower end of
  * the range, the estimate less `quartileSigmas` deviations, reaches its
  * goal, so the app stops a cut as soon as the goal is plausibly reached,
- * as the safety rules read a threshold (MM-132); a gain ends once the
- * upper end reaches its line. A cut also ends at `PhaseRule.longestCutWeeks`
- * of unbroken deficit or when it has stalled at the calorie floor; a gain at
- * `LeanGainRule.stopWeeks` (MM-129); maintenance after either once it has run
- * the weeks MM-130 suggests. Then the next phase is recommended from the
+ * as the safety rules read a threshold (MM-132). A cut also ends at
+ * `PhaseRule.longestCutWeeks` of unbroken deficit or when it has stalled at
+ * the calorie floor. When a lean gain ends is MM-129's to say
+ * (`leanGainStop`, from `leanGainReviewOf`): its body-fat line, its waist
+ * rise or its weeks, so the plan and the lean-gain card never disagree; the
+ * gain's projected end reads the estimate against that line, as MM-129
+ * does (MM-132: ending a gain is not a safety rule). Maintenance after a cut
+ * or a gain ends once it has run the weeks MM-130 suggests. Then the next phase is recommended from the
  * range: maintenance, and after it a lean gain if the lower end is at the
  * cut's goal, another cut if not. Recomp is reviewed by MM-133, and
  * maintenance chosen for itself is open-ended; both show only how long
@@ -83,6 +92,7 @@ export function planPhases({
   snapshot,
   history,
   stall,
+  leanGainStop,
   goal,
   today,
 }: {
@@ -90,6 +100,8 @@ export function planPhases({
   snapshot: Pick<CoachSnapshot, 'policy' | 'trend' | 'trendWeightKg' | 'bodyFat' | 'deficitRestartOn'>;
   history: readonly TargetsRecord[];
   stall?: StallAssessment | undefined;
+  /** Why MM-129's review recommends ending the lean gain, if it does. */
+  leanGainStop?: LeanGainStopReason | undefined;
   goal?: GoalBodyFat | undefined;
   today: CalendarDate;
 }): PhasePlan | undefined {
@@ -126,7 +138,6 @@ export function planPhases({
   const sex = setup.profile.sex;
   const estimate = snapshot.bodyFat;
   const lowerPercent = cautiousBodyFatPercent(estimate);
-  const upperPercent = clamp(estimate.percent + quartileSigmas * estimate.sigmaPercent, 2, 70);
   const check: GoalBodyFatCheck | undefined = goal === undefined ? undefined : SafetyBounds.checkGoalBodyFat(sex, goal.percent);
   const cutGoal = goal !== undefined && check !== 'rejected' ? goal.percent : PhaseRule.cutGoalPercent(sex);
   const atCutGoal = lowerPercent <= cutGoal;
@@ -180,9 +191,7 @@ export function planPhases({
     }
     case 'leanGain': {
       const line = LeanGainRule.stopBodyFatPercent[sex];
-      let reason: PhaseEndReason | undefined;
-      if (upperPercent >= line) reason = 'gainLine';
-      else if (weeks >= LeanGainRule.stopWeeks) reason = 'longestGain';
+      const reason = leanGainStop === undefined ? undefined : gainEndReasons[leanGainStop];
       if (reason !== undefined) {
         return plan({
           linePercent: line,
@@ -190,7 +199,7 @@ export function planPhases({
         });
       }
       const cap = [startedOn.addDays(LeanGainRule.stopWeeks * 7), 'longestGain'] as const;
-      const kg = kgToLine({ weightKg, fatPercent: upperPercent, linePercent: line, losing: false, resistanceTrained });
+      const kg = kgToLine({ weightKg, fatPercent: estimate.percent, linePercent: line, losing: false, resistanceTrained });
       const reachedOn = projectTo(kg, steadyKgPerWeek(1));
       return plan({ linePercent: line, end: earlier(cap, reachedOn === undefined ? undefined : [reachedOn, 'gainLine']) });
     }

@@ -14,7 +14,7 @@ export function phaseEndText(plan: PhasePlan): string | undefined {
     case 'longestCut':
       return `At ${PhaseRule.longestCutWeeks} weeks in a deficit, the longest the plan runs a cut.`;
     case 'gainLine':
-      return `At your current pace, when the upper end of your body-fat range reaches ${line}%.`;
+      return `At your current pace, when your estimated body fat reaches ${line}%.`;
     case 'longestGain':
       return `At ${LeanGainRule.stopWeeks} weeks, the longest the plan runs a gain.`;
     case 'holdDone': {
@@ -23,6 +23,7 @@ export function phaseEndText(plan: PhasePlan): string | undefined {
       return `After ${weeks} weeks at maintenance, then the next phase.`;
     }
     case 'stalledAtFloor':
+    case 'gainWaist':
     case undefined:
       return undefined;
   }

@@ -412,7 +412,10 @@ export const CoachLeanGainFatHeavy = screenStory({
   walk: pressOnCoach('Choose a goal'),
 });
 
-/** MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. */
+/**
+ * MM-129: the same gain with estimated body fat past 20%: the coach recommends ending it, and the goal stays. The
+ * reason is said once, here; the goal section gives only the next phase and its buttons (MM-36).
+ */
 export const CoachLeanGainTimeToStop = screenStory({
   covers: ['CoachScreen'],
   shows: /The coach recommends ending the gain now/,

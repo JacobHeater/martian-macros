@@ -15,7 +15,7 @@ export interface PhasePlan {
 
   /**
    * The body fat this phase runs to: the cut's goal, read against the lower
-   * end of the range, or the gain's line, read against the upper end. For a
+   * end of the range, or the gain's line (MM-129). For a
    * hold after a cut or a gain, the cut's goal, which decides what follows.
    * Undefined for a phase that has none.
    */
