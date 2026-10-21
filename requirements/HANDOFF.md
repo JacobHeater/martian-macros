@@ -20,7 +20,7 @@ per worktree and PR. This handoff is updated once per session, in its own PR.
 **Open PRs at the end of Session 41.** Waiting on CI, then merged by Claude:
 #205 (MM-45), #208 (MM-116, MM-117), #210 (MM-46), #213 (MM-329), #214
 (MM-129), #216 (MM-191), #217 (MM-34), #219 (MM-73), #222 (MM-113, unwired),
-and #223 (MM-36, on #217) when it opens. Waiting on the owner: #203 (MM-95,
+and MM-36's PR (on #217) when it opens; this handoff is #223. Waiting on the owner: #203 (MM-95,
 MM-247: the owner merges the Pages workflow), #218 (MM-454, on #203: confirm
 the address), #220 (MM-432, schema v16: go or no-go). Held by Claude: #221
 (MM-122, MM-124) until MM-486 gives the shapes a table, since on the phone they
