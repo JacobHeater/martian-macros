@@ -917,6 +917,7 @@
             "MM-454",
             "MM-247",
             "MM-29",
+            "MM-84",
             "MM-85",
             "MM-86",
             "MM-87",
@@ -3370,6 +3371,7 @@
           "step": 3,
           "title": "Free tier boundary and the real entitlement implementation",
           "tickets": [
+            "MM-84",
             "MM-85"
           ],
           "milestone": "M5"
