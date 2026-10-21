@@ -1,0 +1,21 @@
+const values = [
+  /** The lower end of the body-fat range has reached the cut's goal. */
+  'goalReached',
+  /** The cut has run `PhaseRule.longestCutWeeks` of unbroken deficit. */
+  'longestCut',
+  /** Progress has stalled with the target already at the calorie floor (MM-140). */
+  'stalledAtFloor',
+  /** Estimated body fat has reached the lean gain's line (MM-129). */
+  'gainLine',
+  /** The waist is up `LeanGainRule.stopWaistRiseFraction` since the gain began (MM-129). */
+  'gainWaist',
+  /** The lean gain has run `LeanGainRule.stopWeeks` (MM-129). */
+  'longestGain',
+  /** Maintenance after a cut or a gain has run its weeks. */
+  'holdDone',
+] as const;
+
+/** Why a phase ends (MM-36). */
+export type PhaseEndReason = (typeof values)[number];
+
+export const PhaseEndReason = { values } as const;

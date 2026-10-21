@@ -1,6 +1,9 @@
 import type { BiologicalSex } from '../domain/BiologicalSex';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { WaistObservation } from '../domain/WaistObservation';
+import type { BodyFatBasis } from './BodyFatBasis';
+import type { BodyFatEstimate } from './BodyFatEstimate';
+import { gainLineBodyFatPercent } from './gainLineBodyFatPercent';
 import { LeanGainReview } from './LeanGainReview';
 import { LeanGainRule } from './LeanGainRule';
 import type { LeanGainStopReason } from './LeanGainStopReason';
@@ -24,8 +27,9 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  *   over the stretch (`waistChangeOf`, MM-155) from at least
  *   `minWaistEntries` entries, by more than `fatHeavyWaistCmPerKg` per
  *   kilogram of trend weight gained.
- * - **Time to stop**, the first that applies: estimated body fat at
- *   `stopBodyFatPercent`; the waist up `stopWaistRiseFraction` beyond its
+ * - **Time to stop**, the first that applies: the upper end of the
+ *   body-fat range at `stopBodyFatPercent` (`gainLineBodyFatPercent`; a
+ *   figure the user entered counts as exact); the waist up `stopWaistRiseFraction` beyond its
  *   noise; `stopWeeks` on the goal.
  * - **Strength flat**: from `strengthMinWeeks`, trend weight up by
  *   `strengthWeightGainFraction` or more and no judged lift's smoothed
@@ -41,7 +45,8 @@ export function leanGainReviewOf({
   waist,
   strengthTrends,
   sex,
-  bodyFatPercent,
+  bodyFat,
+  bodyFatBasis,
   today,
   weightSignals = true,
 }: {
@@ -50,12 +55,14 @@ export function leanGainReviewOf({
   waist: Iterable<WaistObservation>;
   strengthTrends: Iterable<StrengthTrend>;
   sex: BiologicalSex;
-  /** The point estimate, as MM-12 judges "high". */
-  bodyFatPercent: number;
+  /** The estimate with its uncertainty (MM-34), and what it rests on. */
+  bodyFat: BodyFatEstimate;
+  bodyFatBasis: BodyFatBasis;
   today: CalendarDate;
   weightSignals?: boolean;
 }): LeanGainReview | undefined {
   const ago = (date: CalendarDate) => date.daysUntil(today);
+  const bodyFatPercent = gainLineBodyFatPercent(bodyFat, bodyFatBasis);
 
   // The unbroken stretch on lean gain that is still running.
   const records = history
@@ -151,6 +158,7 @@ export function leanGainReviewOf({
     fatHeavy,
     stop,
     bodyFatPercent,
+    bodyFatFromRange: bodyFatBasis !== 'yourFigure',
     waistRiseFraction,
     strengthFlat,
     liftsJudged: judged,

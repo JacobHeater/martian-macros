@@ -22,6 +22,8 @@ import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { PauseScreen } from '../pause/PauseScreen';
 import { PrivacyPolicyScreen } from '../terms/PrivacyPolicyScreen';
 import { privacyPolicy } from '../terms/privacyPolicy';
+import { publicPageAddress } from '../terms/publicPageAddress';
+import { shownAddress } from '../format/shownAddress';
 import { TermsScreen } from '../terms/TermsScreen';
 import { termsOfUse } from '../terms/termsOfUse';
 import { Screen } from '../app/Screen';
@@ -85,6 +87,15 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
     if (!confirmed) return;
     navigator.closeAll();
     await services.eraser.eraseAll();
+  };
+
+  // The public page of the terms and the policy (MM-454): the phone's browser fetches it, the app nothing.
+  const openPublicPage = async () => {
+    try {
+      await services.externalLinks.openInBrowser(publicPageAddress);
+    } catch {
+      overlays.snack(`The browser could not be opened. The page is at ${shownAddress(publicPageAddress)}.`);
+    }
   };
 
   const chooseActivity = () =>
@@ -314,6 +325,12 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
               subtitle={`Version ${privacyPolicy.version}: what the app keeps, and what it sends`}
               opens
               onPress={() => void navigator.push(() => <PrivacyPolicyScreen />)}
+            />
+            <MmListRow
+              leadingIcon="document"
+              title="On the web"
+              subtitle={`Opens ${shownAddress(publicPageAddress)} in your browser`}
+              onPress={() => void openPublicPage()}
             />
           </MmListGroup>
         </MmSection>
