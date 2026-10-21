@@ -1,7 +1,6 @@
 import type { HealthChanges } from './HealthChanges';
 import type { HealthDataType } from './HealthDataType';
 import type { HealthSample } from './HealthSample';
-import type { NutritionRecord } from './NutritionRecord';
 
 /**
  * A phone's health platform, as the app sees it (MM-67). Health Connect,
@@ -11,6 +10,9 @@ import type { NutritionRecord } from './NutritionRecord';
  * A source that cannot read the platform just now throws
  * `HealthReadFailure` from `read` and `changesSince`. It never answers
  * with nothing instead: nothing means there are no readings.
+ *
+ * It only reads. Writing is `HealthWriting` and `HealthIntakeWriter`
+ * (MM-70), each kind with a permission of its own.
  */
 export interface HealthSource {
   /** The types this platform has on this device at all. */
@@ -34,10 +36,4 @@ export interface HealthSource {
    * the platform no longer honors gives an expired `HealthChanges`.
    */
   changesSince(type: HealthDataType, token: string | undefined): Promise<HealthChanges>;
-
-  /**
-   * Writes what was eaten. False when the platform would not take it
-   * (no permission to write, or none to give).
-   */
-  writeNutrition(record: NutritionRecord): Promise<boolean>;
 }

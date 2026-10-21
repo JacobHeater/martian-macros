@@ -81,9 +81,12 @@ describe('the policy matches the app', () => {
     expect(ios).toContain('the iPhone’s share sheet');
   });
 
-  it('names the health platform of each phone, read only', () => {
-    expect(android).toContain('It never writes to Health Connect.');
-    expect(ios).toContain('It never writes to Apple Health.');
+  // MM-70, MM-314, MM-489: the app writes to the health platform what the person turns on, so the policy says so.
+  it('names the health platform of each phone, and writes to it only what the person turns on', () => {
+    expect(both).not.toMatch(/never writes to/);
+    expect(android).toContain('The app writes to Health Connect only the kinds you turn on in Settings');
+    expect(ios).toContain('The app writes to Apple Health only the kinds you turn on in Settings');
+    expect(both).toContain('never changes or removes what another app wrote');
   });
 });
 

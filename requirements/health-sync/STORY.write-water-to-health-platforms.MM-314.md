@@ -1,8 +1,8 @@
 ---
 id: MM-314
-status: proposed
+status: in-progress
 component: health-sync
-related: [MM-305, MM-313, MM-70, MM-66]
+related: [MM-305, MM-313, MM-70, MM-66, MM-242]
 ---
 
 # Story: Water I log is written to my phone's health app
@@ -22,6 +22,11 @@ Choices I made without asking (say if any is wrong):
 - **One record per water entry**, at the entry's time, so a removal in the app deletes that record.
 - **No hydration is read back** from the platform in this ticket; another app's water would need its own
   rule for double counting.
+- **Its own switch and permission** (2026-10-21), "Send water you log to …", beside MM-70's food switch rather than the same
+  one: each write is asked for by itself, apart from reading.
+- **A drink is a minute on Health Connect**, which keeps hydration over a span: from the time it was logged, a minute
+  long. On iOS it is a dietary water sample at that time. Its id is `martian-macros-water-<entry id>`; a change of amount
+  writes it again under that id.
 
 ## Description
 Each water entry is written to Health Connect (and HealthKit when iOS exists) as it is logged, and removed
@@ -45,3 +50,7 @@ Scenario: Not allowed
 
 ## Notes
 - Waits for MM-70 (WS-11 step 6). Verifying it needs a device or emulator with Health Connect.
+- Built 2026-10-21 with MM-70, not run locally; CI validates: `MirroredWaterLog` with the water repository contract
+  (`test/healthWrite/mirroredLogs.test.ts`), `writeWater` and `removeWater` of both plugins, `WRITE_HYDRATION` in the
+  manifest.
+- Owed on a device: a glass shows as 250 ml at its time in Health Connect and Apple Health; removing it removes it.

@@ -53,6 +53,16 @@ describe('the full terms', () => {
     expect(full).toMatch(/backup/i);
   });
 
+  // MM-70, MM-314, MM-489: the app writes to the health app, so the terms no longer say it never does.
+  it('say what is written to the health app, that each kind is turned on by the person, and what stays there', () => {
+    expect(full).not.toMatch(/never writes to/);
+    expect(full).toContain('The app writes to Health Connect only the kinds you turn on in Settings, each with its own permission');
+    expect(full).toContain('never changes or removes what another app wrote');
+    expect(full).toContain('What it wrote stays in Health Connect when you turn writing off or erase the app’s data');
+    expect(full).toContain('apart from what you turn on writing to your phone’s health app (section 9)');
+    expect(termsOfUse.changes.get(termsOfUse.version)?.join(' ')).toMatch(/write to your phone’s health app/);
+  });
+
   it('are numbered in order, each section with something to say', () => {
     termsOfUse.sections.forEach((section, index) => {
       expect(section.heading.startsWith(`${index + 1}. `), section.heading).toBe(true);
@@ -87,7 +97,7 @@ describe('on an iPhone (MM-403)', () => {
   it('name Apple Health and Apple’s own reader, and nothing of Health Connect or ML Kit', () => {
     expect(ios).toContain('anything you let the app read from Apple Health');
     expect(ios).toContain('Apple Health is optional.');
-    expect(ios).toContain('never writes to Apple Health');
+    expect(ios).toContain('The app writes to Apple Health only the kinds you turn on in Settings');
     expect(ios).toContain('read on the phone by software that is part of iOS');
     expect(ios).not.toMatch(/Health Connect|ML Kit|Google/);
     expect(ios).not.toMatch(/nothing (is|ever) (uploaded|leaves)|never leaves?/i);

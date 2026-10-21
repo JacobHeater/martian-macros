@@ -7,19 +7,27 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BodyFatRecord
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeightRecord
+import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MealType
 import androidx.health.connect.client.records.MenstruationFlowRecord
+import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
+import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Mass
+import androidx.health.connect.client.units.Volume
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -32,13 +40,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
 import kotlin.reflect.KClass
 
 /**
- * Android's Health Connect (MM-68). It only reads, and only what the user
- * grants one by one: nothing read leaves the device, and the app writes
- * nothing to the user's health data. A read the platform refuses is
- * rejected, never answered with nothing.
+ * Android's Health Connect (MM-68). It reads only what the user grants one
+ * by one, and nothing read leaves the device. A read the platform refuses
+ * is rejected, never answered with nothing.
+ *
+ * It writes only what the user turned on in Settings (MM-70, MM-314,
+ * MM-489): food, water and finished workouts, each with its own write
+ * permission, never asked for with reading. Which kinds are on is kept in
+ * this plugin's preferences. Every record it writes carries the app's own
+ * id as its client record id, so writing again replaces it and removing it
+ * removes only the app's own record. What the app wrote is never read back
+ * as a reading.
  */
 @CapacitorPlugin(name = "MmHealth")
 class MmHealthPlugin : Plugin() {
@@ -90,6 +107,23 @@ class MmHealthPlugin : Plugin() {
 
     private fun preferences() = context.getSharedPreferences("MmHealth", Context.MODE_PRIVATE)
 
+    /** What the app writes, by the name the app calls it, and the record Health Connect keeps it as (MM-70, MM-314, MM-489). */
+    private val writeTypes: Map<String, KClass<out Record>> = mapOf(
+        "food" to NutritionRecord::class,
+        "water" to HydrationRecord::class,
+        "workouts" to ExerciseSessionRecord::class,
+    )
+
+    /** MM-188's strength types: a workout of one of these is imported as strength. */
+    private val strengthTypes = setOf(
+        ExerciseSessionRecord.EXERCISE_TYPE_STRENGTH_TRAINING,
+        ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING,
+        ExerciseSessionRecord.EXERCISE_TYPE_CALISTHENICS,
+    )
+
+    /** Where the plugin keeps that writing `kind` is on (MM-70). */
+    private fun writingKey(kind: String) = "writing_$kind"
+
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private fun client() = HealthConnectClient.getOrCreate(context)
@@ -107,8 +141,8 @@ class MmHealthPlugin : Plugin() {
     private fun readPermissions(names: List<String>): Map<String, String> =
         names.mapNotNull { name -> types[name]?.let { name to HealthPermission.getReadPermission(it) } }.toMap()
 
-    private fun typeNames(call: PluginCall): List<String> {
-        val asked = call.getArray("types") ?: JSArray()
+    private fun typeNames(call: PluginCall, key: String = "types"): List<String> {
+        val asked = call.getArray(key) ?: JSArray()
         return (0 until asked.length()).map { asked.getString(it) }
     }
 
@@ -219,6 +253,9 @@ class MmHealthPlugin : Plugin() {
     private fun JSObject.span(start: Instant, end: Instant): JSObject =
         put("startMs", start.toEpochMilli()).put("endMs", end.toEpochMilli())
 
+    /** Whether this app wrote `record` (MM-70): what the app wrote is never read back as a reading. */
+    private fun ours(record: Record): Boolean = record.metadata.dataOrigin.packageName == context.packageName
+
     private fun nameOf(record: Record): String? =
         types.entries.firstOrNull { it.value.isInstance(record) }?.key
 
@@ -238,7 +275,7 @@ class MmHealthPlugin : Plugin() {
                     pageToken = pageToken,
                 ),
             )
-            for (record in response.records) records.put(raw(name, record))
+            for (record in response.records) if (!ours(record)) records.put(raw(name, record))
             pageToken = response.pageToken
         } while (pageToken != null)
         call.resolve(JSObject().put("records", records))
@@ -262,7 +299,9 @@ class MmHealthPlugin : Plugin() {
                 val deleted = JSArray()
                 for (change in response.changes) {
                     when (change) {
-                        is UpsertionChange -> nameOf(change.record)?.let { upserted.put(raw(it, change.record)) }
+                        is UpsertionChange -> if (!ours(change.record)) {
+                            nameOf(change.record)?.let { upserted.put(raw(it, change.record)) }
+                        }
                         is DeletionChange -> deleted.put(change.recordId)
                     }
                 }
@@ -289,5 +328,213 @@ class MmHealthPlugin : Plugin() {
                 call.reject(error.message ?: error.toString())
             }
         }
+    }
+
+    /** Whether `kind` is on and its write permission is granted, so it may be written now (MM-70). */
+    private suspend fun writes(kind: String): Boolean {
+        val type = writeTypes[kind] ?: return false
+        if (!preferences().getBoolean(writingKey(kind), false)) return false
+        return client().permissionController.getGrantedPermissions().contains(HealthPermission.getWritePermission(type))
+    }
+
+    /** Of the kinds asked about, those on and permitted now (MM-70). */
+    @PluginMethod
+    fun writing(call: PluginCall) = asked(call) {
+        val granted = client().permissionController.getGrantedPermissions()
+        val prefs = preferences()
+        val on = JSArray()
+        for (kind in typeNames(call, "kinds")) {
+            val type = writeTypes[kind] ?: continue
+            if (prefs.getBoolean(writingKey(kind), false) && granted.contains(HealthPermission.getWritePermission(type))) on.put(kind)
+        }
+        call.resolve(JSObject().put("kinds", on))
+    }
+
+    /**
+     * Turns writing `kind` on (MM-70): its write permission alone is asked
+     * for, never with reading. Refused, it stays off.
+     */
+    @PluginMethod
+    fun startWriting(call: PluginCall) {
+        val kind = call.getString("kind") ?: return call.reject("startWriting needs a kind.")
+        val type = writeTypes[kind] ?: return call.reject("Not a kind this app writes: $kind.")
+        val contract = PermissionController.createRequestPermissionResultContract()
+        startActivityForResult(call, contract.createIntent(context, setOf(HealthPermission.getWritePermission(type))), "writeAnswered")
+    }
+
+    @ActivityCallback
+    fun writeAnswered(call: PluginCall?, result: ActivityResult) {
+        if (call == null) return
+        val kind = call.getString("kind") ?: return call.reject("startWriting needs a kind.")
+        val type = writeTypes[kind] ?: return call.reject("Not a kind this app writes: $kind.")
+        asked(call) {
+            val granted = client().permissionController.getGrantedPermissions().contains(HealthPermission.getWritePermission(type))
+            if (granted) preferences().edit().putBoolean(writingKey(kind), true).apply()
+            call.resolve(JSObject().put("on", granted))
+        }
+    }
+
+    /** Turns writing `kind` off (MM-70): nothing more is written, and nothing written is changed. */
+    @PluginMethod
+    fun stopWriting(call: PluginCall) {
+        val kind = call.getString("kind") ?: return call.reject("stopWriting needs a kind.")
+        preferences().edit().putBoolean(writingKey(kind), false).apply()
+        call.resolve(JSObject().put("on", false))
+    }
+
+    private fun offsetAt(time: Instant): ZoneOffset = ZoneId.systemDefault().rules.getOffset(time)
+
+    /** The app's id for a record, with a version that grows, so writing it again replaces what was there. */
+    private fun ownedBy(clientId: String): Metadata = Metadata.manualEntry(clientId, System.currentTimeMillis())
+
+    private fun grams(call: PluginCall, key: String): Mass? = call.getDouble(key)?.let { Mass.grams(it) }
+
+    private val mealTypes = mapOf(
+        "breakfast" to MealType.MEAL_TYPE_BREAKFAST,
+        "lunch" to MealType.MEAL_TYPE_LUNCH,
+        "dinner" to MealType.MEAL_TYPE_DINNER,
+        "snack" to MealType.MEAL_TYPE_SNACK,
+    )
+
+    /** Writes one logged food (MM-70), replacing what was written under its id. A nutrient not given is not written. */
+    @PluginMethod
+    fun writeNutrition(call: PluginCall) = asked(call) {
+        val id = call.getString("id") ?: return@asked call.reject("writeNutrition needs an id.")
+        if (!writes("food")) return@asked call.resolve(JSObject().put("written", false))
+        val start = Instant.ofEpochMilli(call.getLong("startMs") ?: 0L)
+        val end = Instant.ofEpochMilli(call.getLong("endMs") ?: 0L)
+        val record = NutritionRecord(
+            startTime = start,
+            startZoneOffset = offsetAt(start),
+            endTime = end,
+            endZoneOffset = offsetAt(end),
+            metadata = ownedBy(id),
+            energy = call.getDouble("kcal")?.let { Energy.kilocalories(it) },
+            protein = grams(call, "proteinG"),
+            totalCarbohydrate = grams(call, "carbsG"),
+            totalFat = grams(call, "fatG"),
+            dietaryFiber = grams(call, "fiberG"),
+            sugar = grams(call, "sugarsG"),
+            saturatedFat = grams(call, "saturatedFatG"),
+            sodium = call.getDouble("sodiumMg")?.let { Mass.milligrams(it) },
+            name = call.getString("name"),
+            mealType = call.getString("meal")?.let { mealTypes[it] } ?: MealType.MEAL_TYPE_UNKNOWN,
+        )
+        client().insertRecords(listOf(record))
+        call.resolve(JSObject().put("written", true))
+    }
+
+    /** Removes the app's own record of a food (MM-70); another app's records cannot be reached. */
+    @PluginMethod
+    fun removeNutrition(call: PluginCall) = removeOwn(call, "food", NutritionRecord::class)
+
+    /** Writes one drink of water (MM-314) as a minute's hydration at the time it was logged. */
+    @PluginMethod
+    fun writeWater(call: PluginCall) = asked(call) {
+        val id = call.getString("id") ?: return@asked call.reject("writeWater needs an id.")
+        if (!writes("water")) return@asked call.resolve(JSObject().put("written", false))
+        val at = Instant.ofEpochMilli(call.getLong("atMs") ?: 0L)
+        // Health Connect keeps hydration over a span, so a drink takes the minute it was logged in.
+        val end = at.plusSeconds(60)
+        val record = HydrationRecord(
+            startTime = at,
+            startZoneOffset = offsetAt(at),
+            endTime = end,
+            endZoneOffset = offsetAt(end),
+            volume = Volume.milliliters(call.getDouble("ml") ?: 0.0),
+            metadata = ownedBy(id),
+        )
+        client().insertRecords(listOf(record))
+        call.resolve(JSObject().put("written", true))
+    }
+
+    @PluginMethod
+    fun removeWater(call: PluginCall) = removeOwn(call, "water", HydrationRecord::class)
+
+    private fun removeOwn(call: PluginCall, kind: String, type: KClass<out Record>) = asked(call) {
+        val id = call.getString("id") ?: return@asked call.reject("A removal needs an id.")
+        if (!writes(kind)) return@asked call.resolve(JSObject().put("removed", false))
+        client().deleteRecords(type, emptyList(), listOf(id))
+        call.resolve(JSObject().put("removed", true))
+    }
+
+    /** A workout as the adapter receives it (MM-489): its type said as strength or not, its segments with their repetitions. */
+    private fun rawWorkout(record: ExerciseSessionRecord): JSObject {
+        val segments = JSArray()
+        for (segment in record.segments) {
+            val json = JSObject()
+                .put("segmentId", segment.segmentType)
+                .put("startMs", segment.startTime.toEpochMilli())
+                .put("endMs", segment.endTime.toEpochMilli())
+            // Health Connect gives 0 for a segment with no repetitions.
+            if (segment.repetitions > 0) json.put("repetitions", segment.repetitions)
+            segments.put(json)
+        }
+        return JSObject()
+            .put("id", record.metadata.id)
+            .put("clientId", record.metadata.clientRecordId ?: "")
+            .put("strength", record.exerciseType in strengthTypes)
+            .put("startMs", record.startTime.toEpochMilli())
+            .put("endMs", record.endTime.toEpochMilli())
+            .put("sourceId", record.metadata.dataOrigin.packageName)
+            .put("sourceName", appName(record.metadata.dataOrigin.packageName))
+            .put("segments", segments)
+    }
+
+    /** Workouts with their segments (MM-489), this app's own among them: the adapter knows them by their client id. */
+    @PluginMethod
+    fun readWorkouts(call: PluginCall) = asked(call) {
+        val from = Instant.ofEpochMilli(call.getLong("fromMs") ?: 0L)
+        val to = Instant.ofEpochMilli(call.getLong("toMs") ?: 0L)
+        val workouts = JSArray()
+        var pageToken: String? = null
+        do {
+            val response = client().readRecords(
+                ReadRecordsRequest(
+                    recordType = ExerciseSessionRecord::class,
+                    timeRangeFilter = TimeRangeFilter.between(from, to),
+                    pageToken = pageToken,
+                ),
+            )
+            for (record in response.records) workouts.put(rawWorkout(record))
+            pageToken = response.pageToken
+        } while (pageToken != null)
+        call.resolve(JSObject().put("workouts", workouts))
+    }
+
+    /**
+     * Writes a finished workout (MM-489) as strength training under the
+     * app's id for it, so writing again replaces it, with its timed sets as
+     * segments. Weight is never written (MM-188).
+     */
+    @PluginMethod
+    fun writeWorkout(call: PluginCall) = asked(call) {
+        val clientId = call.getString("clientId") ?: return@asked call.reject("writeWorkout needs a clientId.")
+        if (!writes("workouts")) return@asked call.resolve(JSObject().put("written", false))
+        val start = Instant.ofEpochMilli(call.getLong("startMs") ?: 0L)
+        val end = Instant.ofEpochMilli(call.getLong("endMs") ?: 0L)
+        val given = call.getArray("segments") ?: JSArray()
+        val segments = (0 until given.length()).map { index ->
+            val segment = given.getJSONObject(index)
+            ExerciseSegment(
+                startTime = Instant.ofEpochMilli(segment.getLong("startMs")),
+                endTime = Instant.ofEpochMilli(segment.getLong("endMs")),
+                segmentType = segment.getInt("segmentId"),
+                repetitions = segment.optInt("repetitions", 0),
+            )
+        }
+        val record = ExerciseSessionRecord(
+            startTime = start,
+            startZoneOffset = offsetAt(start),
+            endTime = end,
+            endZoneOffset = offsetAt(end),
+            metadata = ownedBy(clientId),
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_STRENGTH_TRAINING,
+            title = null,
+            notes = null,
+            segments = segments,
+        )
+        client().insertRecords(listOf(record))
+        call.resolve(JSObject().put("written", true))
     }
 }

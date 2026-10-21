@@ -20,6 +20,8 @@ const allowed: Record<string, readonly string[]> = {
   data: ['lang', 'domain', 'engine', 'healthIngest', 'sql'],
   format: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog'],
   platform: ['lang', 'domain', 'healthIngest'],
+  // The logs as they are told to the health platform (MM-70, MM-314, MM-489): over the domain's repositories and the writers' seams.
+  healthWrite: ['lang', 'domain', 'engine', 'healthIngest'],
   // The backup's format, cipher and the phone's part of it (MM-63): over the database connection and the plugin's API.
   backup: ['lang', 'domain', 'sql', 'platform'],
   state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'foodOnline', 'platform', 'backup'],
