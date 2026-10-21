@@ -41,7 +41,7 @@ export function RecipeLineWeight({ line, onDone }: RecipeLineWeightProps) {
     return (
       <div className="food-ingredient-adder">
         <p className="app-caption">Its food is not installed, so this line keeps its totals.</p>
-        <MmButton label="Close" kind="text" onPress={() => onDone()} />
+        <MmButton label="Keep its totals" kind="text" onPress={() => onDone()} />
       </div>
     );
   }
