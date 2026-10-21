@@ -26,6 +26,7 @@ import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
+import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -44,6 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.reflect.KClass
@@ -327,6 +330,38 @@ class MmHealthPlugin : Plugin() {
             pageToken = response.pageToken
         } while (pageToken != null)
         call.resolve(JSObject().put("records", records))
+    }
+
+    /**
+     * Each local day's steps from `fromMs` up to `toMs` (MM-442), as Health
+     * Connect totals them: its aggregate applies the source priority the
+     * person set, so a walk the phone and a watch both counted is counted
+     * once. `startMs` is each day's local midnight.
+     */
+    @PluginMethod
+    fun dailySteps(call: PluginCall) = asked(call) {
+        val zone = ZoneId.systemDefault()
+        val from = LocalDateTime.ofInstant(Instant.ofEpochMilli(call.getLong("fromMs") ?: 0L), zone)
+        val to = LocalDateTime.ofInstant(Instant.ofEpochMilli(call.getLong("toMs") ?: 0L), zone)
+        val days = JSArray()
+        if (from.isBefore(to)) {
+            val groups = client().aggregateGroupByPeriod(
+                AggregateGroupByPeriodRequest(
+                    metrics = setOf(StepsRecord.COUNT_TOTAL),
+                    timeRangeFilter = TimeRangeFilter.between(from, to),
+                    timeRangeSlicer = Period.ofDays(1),
+                ),
+            )
+            for (group in groups) {
+                val steps = group.result[StepsRecord.COUNT_TOTAL] ?: continue
+                days.put(
+                    JSObject()
+                        .put("startMs", group.startTime.atZone(zone).toInstant().toEpochMilli())
+                        .put("steps", steps.toDouble()),
+                )
+            }
+        }
+        call.resolve(JSObject().put("days", days))
     }
 
     @PluginMethod

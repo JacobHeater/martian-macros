@@ -35,6 +35,7 @@ import type { PackHttp } from '../foodCatalog/download/PackHttp';
 import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
+import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPlace';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -129,10 +130,11 @@ export interface AppServices {
   readonly exactAlarms: ExactAlarms;
 
   /**
-   * The phone's health platform, read (MM-68), and where to allow what it
-   * no longer asks about (MM-323).
+   * The phone's health platform, read (MM-68), with a day's steps as it
+   * totals them (MM-442), and where to allow what it no longer asks about
+   * (MM-323).
    */
-  readonly healthSource: HealthSource & HealthHistoryAccess & HealthPermissionsPlace;
+  readonly healthSource: HealthSource & HealthHistoryAccess & HealthDailySteps & HealthPermissionsPlace;
 
   /**
    * Which kinds the app writes to the health platform, each turned on in

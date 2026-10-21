@@ -1,4 +1,6 @@
 import { HealthChanges } from '../healthIngest/HealthChanges';
+import type { DaySteps } from '../healthIngest/DaySteps';
+import type { HealthDailySteps } from '../healthIngest/HealthDailySteps';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
 import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPlace';
@@ -11,7 +13,7 @@ import type { HealthSource } from '../healthIngest/HealthSource';
  * and nothing is read, history included (MM-73), and there is no screen of
  * permissions to open (MM-323).
  */
-export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, HealthPermissionsPlace {
+export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, HealthDailySteps, HealthPermissionsPlace {
   available(): Promise<Set<HealthDataType>> {
     return Promise.resolve(new Set());
   }
@@ -46,5 +48,9 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, Heal
 
   changesSince(): Promise<HealthChanges> {
     return Promise.resolve(new HealthChanges({ nextToken: '' }));
+  }
+
+  dailySteps(): Promise<DaySteps[]> {
+    return Promise.resolve([]);
   }
 }

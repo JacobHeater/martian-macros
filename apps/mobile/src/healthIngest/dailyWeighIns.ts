@@ -2,6 +2,7 @@ import { byStartThenId } from './byStartThenId';
 import { healthSourceName } from './healthSourceName';
 import type { DayWeighIn } from './DayWeighIn';
 import type { HealthSample } from './HealthSample';
+import { WeighInWindow } from './WeighInWindow';
 
 /**
  * The imported weigh-in that counts for each day (MM-71), oldest day
@@ -9,16 +10,20 @@ import type { HealthSample } from './HealthSample';
  *
  * A day's readings from `primarySourceId` count before any other
  * source's; with none from it that day, the others' do. Among those, the
- * first reading between 04:00 and 12:00 local time counts; with no
- * morning reading, the middle value of them does. The same readings in
- * any order give the same answer.
+ * first reading inside `window` (local time; 04:00 to 12:00 unless the
+ * person moved it, MM-441) counts; with no reading in the window, the
+ * middle value of them does. The same readings in any order give the same
+ * answer.
  *
  * A value the user typed for a day overrules all of this; that is the
  * caller's to apply, since this knows only what was imported.
  */
 export function dailyWeighIns(
   samples: Iterable<HealthSample>,
-  { primarySourceId }: { primarySourceId?: string | undefined } = {},
+  {
+    primarySourceId,
+    window = WeighInWindow.usual,
+  }: { primarySourceId?: string | undefined; window?: WeighInWindow | undefined } = {},
 ): DayWeighIn[] {
   // Keyed by the time of local midnight, since two Date objects for the
   // same moment are not the same key.
@@ -44,7 +49,7 @@ export function dailyWeighIns(
     const names = new Set(group.map((sample) => healthSourceName(sample) ?? ''));
     const day = new Date(midnight);
 
-    const first = group.find((sample) => sample.start.getHours() >= 4 && sample.start.getHours() < 12);
+    const first = group.find((sample) => window.contains(sample.start));
     if (first !== undefined) {
       result.push({
         day,
