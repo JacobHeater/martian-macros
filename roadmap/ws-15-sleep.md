@@ -75,6 +75,7 @@ WS-09 and WS-11, with the coordination in `coordinationHotspots`.
 
 ## Requirement sources
 - Remaining: MM-250, MM-251, MM-252. Epic: MM-249.
+- Built since: MM-440 (the iOS 15 build of the sleep values).
 
 ## Notes for whoever builds it
 - The night belongs to the day it ends on.
