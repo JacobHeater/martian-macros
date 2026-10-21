@@ -1585,6 +1585,8 @@ export class AppState {
           pauses: of(this.pauses) ?? [],
           // As the app would recommend today: body fat then is not kept.
           recommendation: coach?.recommendation,
+          // The body-fat range from the measurements (MM-450), and the eating-disorder answer that withholds its change.
+          setup: of(this.setup),
         });
       });
       this.reportByIndex.set(index, cell);

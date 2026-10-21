@@ -5,6 +5,7 @@ import {
   type Exercise,
   type GoalMode,
   IntakeDay,
+  ScreeningAnswers,
   WaistObservation,
   type WeightObservation,
   Workout,
@@ -26,6 +27,7 @@ import {
   type TdeeStatus,
   WeightTrendPoint,
 } from '../../src/engine';
+import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { expectClose } from '../support/expectClose';
 import { upTo } from '../support/upTo';
 
@@ -481,5 +483,82 @@ describe('the recomp review', () => {
   it('there is none on another goal, or when no recommendation is given', () => {
     expect(reportFrom(42, { mode: 'fatLoss' }).recompReview).toBeUndefined();
     expect(reportFrom(42, { recommendation: undefined }).recompReview).toBeUndefined();
+  });
+});
+
+/** MM-450: the body-fat range from the user's measurements, as it stood at each end of the month. */
+describe('body fat', () => {
+  // A man, 180 cm, born 1990.
+  const setup = typicalSetup();
+  const waistOn = (...days: number[]) =>
+    days.map((day) => new WaistObservation({ date: start.addDays(day), waistCm: 92 - day * 0.02, readings: [92, 92, 92] }));
+  // Weigh-ins every other day from a month before the report to its end.
+  const weighIns = () => upTo(29).map((i) => weighed(i * 2 - 30, 90 - i * 0.02));
+  const withBodyFat = ({
+    waist,
+    weights = weighIns(),
+    s = setup,
+  }: {
+    waist: WaistObservation[];
+    weights?: WeightObservation[];
+    /** `null` for a report built without the setup. */
+    s?: typeof setup | null;
+  }) =>
+    buildMonthlyReport({
+      period: month,
+      intake: everyDay(),
+      weights,
+      waist,
+      history: [record(14)],
+      trend: upTo(28).map((d) => point(d, 90 - d * 0.04)),
+      setup: s === null ? undefined : s,
+    });
+
+  it('says nothing until a range from the waist has settled', () => {
+    expect(withBodyFat({ waist: [] }).bodyFat).toBeUndefined();
+    // Two entries in the last four weeks are not enough.
+    expect(withBodyFat({ waist: waistOn(20, 27) }).bodyFat).toBeUndefined();
+    // Three entries, but all more than four weeks before the end.
+    expect(withBodyFat({ waist: waistOn(-21, -14, -7) }).bodyFat).toBeUndefined();
+    expect(withBodyFat({ waist: waistOn(6, 13, 20, 27), s: null }).bodyFat).toBeUndefined();
+  });
+
+  it('a settled range is a range from the waist at the end of the month', () => {
+    const fat = withBodyFat({ waist: waistOn(6, 13, 20, 27) }).bodyFat;
+    expect(fat?.end.basis).toBe('waist');
+    expect(fat?.end.waistEntries).toBe(4);
+    expect((fat?.end.estimate.upperPercent ?? 0) - (fat?.end.estimate.lowerPercent ?? 0)).toBeGreaterThan(5);
+    // No range had settled when the month began.
+    expect(fat?.start).toBeUndefined();
+  });
+
+  it('the range when the month began is the one at the end of the day before', () => {
+    const fat = withBodyFat({ waist: waistOn(-21, -14, -7, 6, 13, 20, 27) }).bodyFat;
+    expect(fat?.start?.basis).toBe('waist');
+    expect(fat?.start?.waistEntries).toBe(3);
+    expect(fat?.end.waistEntries).toBe(4);
+  });
+
+  it('a later entry does not change an old report', () => {
+    const waist = waistOn(-21, -14, -7, 6, 13, 20, 27);
+    const then = withBodyFat({ waist }).bodyFat;
+    const later = withBodyFat({
+      waist: [...waist, ...waistOn(30, 35)],
+      weights: [...weighIns(), weighed(29, 80), weighed(31, 80), weighed(33, 80)],
+    }).bodyFat;
+    expectClose(later?.end.estimate.percent, then?.end.estimate.percent ?? 0, 1e-9);
+    expectClose(later?.end.estimate.sigmaPercent, then?.end.estimate.sigmaPercent ?? 0, 1e-9);
+    expectClose(later?.start?.estimate.percent, then?.start?.estimate.percent ?? 0, 1e-9);
+  });
+
+  it('with an eating-disorder history it shows no change: the end only', () => {
+    const s = typicalSetup({ screening: new ScreeningAnswers({ eatingDisorderHistory: true }) });
+    const fat = withBodyFat({ waist: waistOn(-21, -14, -7, 6, 13, 20, 27), s }).bodyFat;
+    expect(fat?.end.basis).toBe('waist');
+    expect(fat?.start).toBeUndefined();
+  });
+
+  it('the user’s own figure is not a range from measurements', () => {
+    expect(withBodyFat({ waist: waistOn(6, 13, 20, 27), s: setup.copyWith({ bodyFatPercent: 18 }) }).bodyFat).toBeUndefined();
   });
 });

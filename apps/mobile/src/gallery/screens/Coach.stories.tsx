@@ -521,6 +521,41 @@ export const MonthlyReportWithRecords = screenStory({
   },
 });
 
+/**
+ * A month in, with weekly waist entries from three weeks before it to its last week and weigh-ins from a month
+ * before it: a body-fat range from the waist had settled at both ends of the month (MM-450).
+ */
+const waistMonthScenario =
+  ({ eatingDisorderHistory = false }: { eatingDisorderHistory?: boolean } = {}): StoryScenario =>
+  async (repos, today) => {
+    const onboardedOn = today.addDays(-31);
+    await monthInScenario(repos, today);
+    if (eatingDisorderHistory) {
+      const setup = typicalSetup({ onboardedOn, healthCheckConfirmedOn: today });
+      await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, eatingDisorderHistory: true }) }));
+    }
+    for (let day = 60; day > 31; day -= 3) await repos.weights.saveWeight(today.addDays(-day), 88.5 - (60 - day) * 0.02);
+    for (const day of [-21, -14, -7, 6, 13, 20, 27]) {
+      await repos.waist.saveWaist(onboardedOn.addDays(day), 93 - day * 0.03, { readings: [93, 93, 93] });
+    }
+  };
+
+/** MM-450: the report's body fat, the range at the end of the month and the range when it began. */
+export const MonthlyReportBodyFat = screenStory({
+  covers: ['MonthlyReportScreen'],
+  shows: /when the month began; a tape narrows the range/,
+  scenario: waistMonthScenario(),
+  open: ({ navigator }) => void navigator.push(() => <MonthlyReportScreen index={0} />),
+});
+
+/** MM-450: an eating-disorder history: the range at the end of the month only, no change in body fat. */
+export const MonthlyReportBodyFatEatingDisorder = screenStory({
+  covers: ['MonthlyReportScreen'],
+  shows: /^At the end of the month; a tape narrows the range/,
+  scenario: waistMonthScenario({ eatingDisorderHistory: true }),
+  open: ({ navigator }) => void navigator.push(() => <MonthlyReportScreen index={0} />),
+});
+
 /** MM-321: the one thing to do is this week's check-in, and it opens. */
 export const OneThingCheckIn = screenStory({
   covers: ['CoachScreen', 'RecoveryCheckInScreen'],

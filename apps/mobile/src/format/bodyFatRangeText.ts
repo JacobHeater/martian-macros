@@ -1,5 +1,6 @@
 import type { BodyFatBasis, BodyFatEstimate } from '../engine';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { bodyFatRange } from './bodyFatRange';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 
@@ -11,6 +12,6 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
  */
 export function bodyFatRangeText(estimate: BodyFatEstimate, basis: BodyFatBasis): string {
   if (basis === 'yourFigure') return `~${whole(estimate.percent)}% (your estimate)`;
-  const range = `${whole(estimate.lowerPercent)}–${whole(estimate.upperPercent)}%`;
+  const range = bodyFatRange(estimate);
   return basis === 'waist' ? `${range} (from your waist)` : `${range} (rough estimate)`;
 }

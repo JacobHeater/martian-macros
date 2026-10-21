@@ -1,6 +1,8 @@
 import type { CalendarDate } from '../domain';
 import { calibrationDays, type MeasuredChange, type MonthlyReport, ReportPeriod, StreakRule } from '../engine';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
+import { bodyFatRange } from './bodyFatRange';
+import { bodyFatRangeText } from './bodyFatRangeText';
 import { explanationLineText } from './explanationLineText';
 import { Fmt } from './Fmt';
 import { waistAmount } from './waistAmount';
@@ -108,6 +110,17 @@ export class MonthlyReportText {
       };
       const [value, detail] = said[waist.direction];
       lines.push(['Waist', value, detail]);
+    }
+    // The body-fat range from the measurements (MM-450): a range, never one number, at the end of the month as the value,
+    // and the start's range as the row's detail when there is one, like the waist's ends. Nothing until one has settled.
+    const fat = report.bodyFat;
+    if (fat !== undefined) {
+      const when = fat.start === undefined ? 'At the end of the month' : `${bodyFatRange(fat.start.estimate)} when the month began`;
+      lines.push([
+        'Body fat',
+        bodyFatRangeText(fat.end.estimate, fat.end.basis),
+        `${when}; a tape narrows the range but cannot pin body fat down`,
+      ]);
     }
     return lines;
   }
