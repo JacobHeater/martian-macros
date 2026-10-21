@@ -343,6 +343,10 @@ export function OnboardingScreen() {
         onTyped={(changed) => {
           // A weight typed over the platform's is the person's own.
           if (changed.weight !== typed.weight) setUsedImport(false);
+          // So is a height: a change of units no longer puts Apple Health's back over it (the panel review of MM-69).
+          if (changed.cm !== typed.cm || changed.feet !== typed.feet || changed.inches !== typed.inches) {
+            setHeightFromHealthCm(undefined);
+          }
           setTyped(changed);
         }}
         health={health}

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -25,7 +25,8 @@ async function begin({
 
 const holding = (profile: Partial<HealthProfile>) => new InMemoryHealthProfile({ profile });
 const next = () => screen.getByRole('button', { name: 'Next' });
-const fill = () => userEvent.click(screen.getByRole('button', { name: 'Fill in from Apple Health' }));
+const offer = /^Fill in from Apple Health/;
+const fill = () => userEvent.click(screen.getByRole('button', { name: offer }));
 const card = (name: 'Female' | 'Male') => screen.getByRole('button', { name });
 
 describe('pre-filling sex', () => {
@@ -84,5 +85,57 @@ it('a height Apple Health holds outside what onboarding takes is not filled in',
 
 it('an Android phone is not offered Apple Health', async () => {
   await begin({ platform: 'android' });
-  expect(screen.queryByRole('button', { name: 'Fill in from Apple Health' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: offer })).not.toBeInTheDocument();
+});
+
+/** Apple Health's answers held back until `release` is called, to see the step while it reads. */
+class SlowHealthProfile extends InMemoryHealthProfile {
+  release: () => void = () => undefined;
+  override readProfile(): Promise<HealthProfile> {
+    const answer = super.readProfile();
+    return new Promise((resolve) => {
+      this.release = () => resolve(answer);
+    });
+  }
+}
+
+describe('the offer (the panel review of MM-69)', () => {
+  it('is a row naming what it fills in, and says it is reading while Apple Health is asked', async () => {
+    const health = new SlowHealthProfile({ profile: { sex: 'female' } });
+    await begin({ health });
+    expect(screen.getByRole('button', { name: /Your sex, date of birth and height/ })).toBeInTheDocument();
+    await fill();
+    expect(await screen.findByText('Reading Apple Health…')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: offer })).not.toBeInTheDocument();
+    await act(async () => {
+      health.release();
+      await Promise.resolve();
+    });
+    const said = await screen.findByText(/Filled in from Apple Health where it had an answer/);
+    const region = said.closest('[aria-live="polite"]');
+    expect(region, 'the outcome is said when it comes').not.toBeNull();
+    expect(document.activeElement, 'focus moves to the outcome, since the row pressed went away').toBe(region);
+  });
+
+  it('a read that found nothing is said and focused, and can be tried again', async () => {
+    await begin({ health: holding({}) });
+    await fill();
+    const said = await screen.findByText(/Apple Health had nothing to fill in/);
+    expect(document.activeElement).toBe(said.closest('[aria-live="polite"]'));
+    expect(screen.getByRole('button', { name: offer })).toBeEnabled();
+  });
+});
+
+it('changing units keeps a height the person typed over the one from Apple Health', async () => {
+  await begin({ health: holding({ sex: 'male', birthDate: CalendarDate.of(1990, 4, 12), heightCm: 180.3 }) });
+  await fill();
+  await screen.findByText(/Filled in from Apple Health/);
+  await userEvent.click(next());
+  await userEvent.click(next());
+  const feet = screen.getByRole('textbox', { name: 'Feet' });
+  await userEvent.clear(feet);
+  await userEvent.type(feet, '6');
+  await userEvent.click(screen.getByRole('button', { name: 'kg / cm' }));
+  // The Apple Health height is not put back over the person's own: the change of units starts the height afresh.
+  expect(screen.getByRole('textbox', { name: 'Centimeters' })).toHaveValue('');
 });
