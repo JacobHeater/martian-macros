@@ -149,7 +149,7 @@ independent of step 3.
   card on the Coach screen; its options are text because the things they offer
   are not built), MM-141 (the insight framework, rationing and five of the ten
   rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
-  the estimator, the deficit count and the resume screen; streaks do not exist to be frozen), MM-146 (three local
+  the estimator, the deficit count, the resume screen, the streak held and the glycogen shift at both ends; done), MM-146 (three local
   reminders with their own times, the two-a-day cap, the quiet period, the stop after a week unanswered and the
   onboarding offer; not the check-in or recovery ones; iOS untried), MM-248 (exact alarms when allowed, asked once
   with a reason from Settings, "On the minute" or "Within an hour"; checking on a phone is open), MM-116 (the five weekly questions, skipping, the
