@@ -1,6 +1,6 @@
 ---
 id: MM-242
-component: app-shell
+component: release
 status: in-progress
 related: [MM-11, MM-13, MM-29, MM-57, MM-62, MM-94, MM-95, MM-96, MM-110, MM-112, MM-114, MM-147, MM-165, MM-184, MM-244, MM-453]
 ---
