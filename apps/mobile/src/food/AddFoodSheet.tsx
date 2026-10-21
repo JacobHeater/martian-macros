@@ -39,13 +39,13 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { DayStepper } from '../ui/DayStepper';
-import { MmActionChip } from '../ui/MmActionChip';
 import { MmButton } from '../ui/MmButton';
 import { useOverlays } from '../ui/useOverlays';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
+import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
 import { defaultMeal } from './defaultMeal';
@@ -57,6 +57,7 @@ import { FoodSearchResults } from './FoodSearchResults';
 import { copyOfPackFood } from './custom/copyOfPackFood';
 import { OnlineSearchResults } from './online/OnlineSearchResults';
 import { MealChips } from './MealChips';
+import { RecentFoodRow } from './RecentFoodRow';
 import { BarcodeScanStep } from './scan/BarcodeScanStep';
 import './food.css';
 
@@ -199,6 +200,9 @@ function editing(entry: FoodEntry): Form {
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 
+/** How many recent foods the sheet lists before "More recent foods" (MM-439). */
+const recentsFirst = 5;
+
 const calculatedUnits: readonly PortionUnit[] = [
   'serving',
   'gram',
@@ -242,6 +246,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const overlays = useOverlays();
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
+  const [allRecents, setAllRecents] = useState(false);
   const customFoods = useLoaded(state.customFoods) ?? [];
   // The form shows the fields for the chosen level and stores what it holds (MM-49).
   const level = useLoaded(state.detailLevel) ?? 'standard';
@@ -644,13 +649,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         <div className="app-gap-small" />
         {askAlcohol || form.alcohol !== '' ? (
           <>
-            <MmTextField
-              label="Alcohol g"
-              kind="number"
-              value={form.alcohol}
-              helper="One standard drink is 14 g. Counted at 7 kcal per gram."
-              onChange={(alcohol) => set({ alcohol })}
-            />
+            {/* Grams, or standard drinks that fill them in (MM-127). */}
+            <AlcoholFields grams={form.alcohol} onGrams={(alcohol) => set({ alcohol })} />
             <div className="app-gap-small" />
           </>
         ) : (
@@ -821,14 +821,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               {recents
                 .filter((e) => matches(e.name))
                 .map((e) => (
-                  <MmListRow
-                    key={`recent-${e.id}`}
-                    title={e.name}
-                    // An estimated meal keeps its mark when it comes back from recents (MM-150).
-                    subtitle={`Your recent food · ${e.source === 'quickAdd' ? 'estimated · ' : ''}${whole(e.kcal)} kcal`}
-                    onPress={() => fill(e)}
-                    trailingAction={gradeBeside(e.name)}
-                  />
+                  <RecentFoodRow key={`recent-${e.id}`} entry={e} onPress={() => fill(e)} trailingAction={gradeBeside(e.name)} />
                 ))}
               <FoodSearchResults
                 query={query}
@@ -841,12 +834,19 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           ) : recents.length > 0 ? (
             <>
               <p className="food-label food-label-spaced">Recent foods</p>
-              <div className="food-recents">
-                {recents.map((e) => (
-                  // An estimate keeps its mark where the one-tap path is (MM-150).
-                  <MmActionChip key={e.id} label={e.source === 'quickAdd' ? `${e.name} · estimated` : e.name} onPress={() => fill(e)} />
-                ))}
-              </div>
+              {/* Rows, never a sideways scroller: a long name wraps (MM-439). The five newest first, as search pages its results (MM-410). */}
+              {(allRecents ? recents : recents.slice(0, recentsFirst)).map((e, index) => (
+                <RecentFoodRow
+                  key={e.id}
+                  entry={e}
+                  onPress={() => fill(e)}
+                  trailingAction={gradeBeside(e.name)}
+                  autoFocus={allRecents && index === recentsFirst}
+                />
+              ))}
+              {allRecents || recents.length <= recentsFirst ? null : (
+                <MmButton label="More recent foods" kind="text" expand onPress={() => setAllRecents(true)} />
+              )}
             </>
           ) : null}
           <div className="app-gap-small" />

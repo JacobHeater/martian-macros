@@ -1,9 +1,8 @@
-import { CalendarDate } from '../domain/CalendarDate';
+import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
 import type { LoggingStreak } from './LoggingStreak';
-import { pauseOn } from './pauseOn';
-import { StreakRule } from './StreakRule';
+import { streakEndingOn } from './streakEndingOn';
 import { usableIntakeDays } from './usableIntakeDays';
 
 /**
@@ -30,30 +29,9 @@ export function loggingStreakOf({
   intake: readonly IntakeDay[];
   pauses?: Iterable<Pause>;
 }): LoggingStreak {
-  const whole = new Set(
+  const wholeDays = new Set(
     usableIntakeDays(intake.filter((d) => d.kcal > 0 && !d.date.isAfter(today))).map((d) => d.date.epochDay),
   );
-  if (whole.size === 0) return { days: 0 };
-  const first = Math.min(...whole);
-  const all = [...pauses];
-  let days = 0;
-  let lastMiss: number | undefined;
-  let forgiven: number | undefined;
-  const start = whole.has(today.epochDay) ? today.epochDay : today.epochDay - 1;
-  for (let day = start; day >= first; day--) {
-    if (pauseOn(all, CalendarDate.fromEpochDay(day)) !== undefined) continue;
-    if (whole.has(day)) {
-      days++;
-      continue;
-    }
-    if (lastMiss !== undefined && lastMiss - day < StreakRule.forgiveWithinDays) {
-      break;
-    }
-    lastMiss = day;
-    forgiven ??= day;
-  }
-  return {
-    days,
-    forgivenOn: forgiven === undefined ? undefined : CalendarDate.fromEpochDay(forgiven),
-  };
+  const startEpochDay = wholeDays.has(today.epochDay) ? today.epochDay : today.epochDay - 1;
+  return streakEndingOn({ wholeDays, startEpochDay, pauses: [...pauses] });
 }

@@ -3,6 +3,8 @@ import type { IntakeDay } from '../domain/IntakeDay';
 import { Meal } from '../domain/Meal';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightObservation } from '../domain/WeightObservation';
+import type { FiberPattern } from './FiberPattern';
+import { fiberInsight } from './fiberInsight';
 import { Insight } from './Insight';
 import { InsightPriority } from './InsightPriority';
 import { InsightRationing } from './InsightRationing';
@@ -45,6 +47,7 @@ export function findInsights({
   waist = [],
   limitToProteinAndLogging = false,
   sleepAverage,
+  fiber,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
@@ -60,6 +63,8 @@ export function findInsights({
   limitToProteinAndLogging?: boolean;
   /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
   sleepAverage?: SleepAverage | undefined;
+  /** Each day's entries, the sex and the check-ins, at Full detail only (MM-126). */
+  fiber?: FiberPattern | undefined;
 }): Insight[] {
   const days = InsightRationing.patternDays;
   const minimum = InsightRationing.minimumBasisDays;
@@ -271,6 +276,12 @@ export function findInsights({
         figures: { averageMinutes: sleepAverage.averageMinutes, nights: sleepAverage.nights },
       }),
     );
+  }
+
+  // On a deficit, fiber well under the guide and hunger hard or unasked (MM-126).
+  if (fiber !== undefined) {
+    const insight = fiberInsight({ pattern: fiber, whole, from, through, current: recordOn(through) });
+    if (insight !== undefined) found.push(insight);
   }
 
   const allowed = found.filter(

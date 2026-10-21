@@ -24,6 +24,8 @@ import type { OnlineLookupReader } from './OnlineLookupReader';
 import type { OnlineLookupWriter } from './OnlineLookupWriter';
 import type { PreferencesReader } from './PreferencesReader';
 import type { PreferencesWriter } from './PreferencesWriter';
+import type { PrimaryScaleReader } from './PrimaryScaleReader';
+import type { PrimaryScaleWriter } from './PrimaryScaleWriter';
 import type { RecoverySkipReader } from './RecoverySkipReader';
 import type { RecoverySkipWriter } from './RecoverySkipWriter';
 import type { ReturnScreenReader } from './ReturnScreenReader';
@@ -71,4 +73,6 @@ export interface PreferencesRepository
     OnlineLookupReader,
     OnlineLookupWriter,
     CookingFatReader,
-    CookingFatWriter {}
+    CookingFatWriter,
+    PrimaryScaleReader,
+    PrimaryScaleWriter {}
