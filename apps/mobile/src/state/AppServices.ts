@@ -41,6 +41,7 @@ import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPl
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
+import type { HealthProfileReader } from '../domain/integration/HealthProfileReader';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { Watched } from '../lang/Watched';
 import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
@@ -146,6 +147,9 @@ export interface AppServices {
 
   /** Workouts on the health platform with their segments (MM-489), for importing them (MM-490). */
   readonly healthWorkouts: HealthWorkoutReader;
+
+  /** Sex, date of birth and height from Apple Health, offered on onboarding's first step (MM-69). */
+  readonly healthProfile: HealthProfileReader;
 
   /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
   readonly evidence: () => Promise<string>;
