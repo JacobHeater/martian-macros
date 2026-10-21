@@ -667,6 +667,8 @@ export const ProgressMeasurementsLimbs = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Upper arm (left) up 1.0 cm in 12 weeks while waist held.',
   scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
   open: onProgress,
   walk: openMeasurements,
 });
@@ -684,6 +686,8 @@ export const MeasurementSessionSites = screenStory({
   covers: ['MeasurementSessionScreen'],
   shows: 'Thigh (left)',
   scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
 });
 
@@ -699,6 +703,8 @@ export const MeasurementSitesChosen = screenStory({
   covers: ['MeasurementSitesScreen'],
   shows: 'Limbs are measured on the left side.',
   scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
 });
 
@@ -707,6 +713,8 @@ export const SiteHistory = screenStory({
   covers: ['SiteHistoryScreen'],
   shows: 'Upper arm (left) over time',
   scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="upperArm" />),
 });
 
@@ -715,6 +723,8 @@ export const SiteHistoryEmpty = screenStory({
   covers: ['SiteHistoryScreen'],
   shows: 'Not measured yet.',
   scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="calf" />),
 });
 
