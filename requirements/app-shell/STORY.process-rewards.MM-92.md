@@ -104,3 +104,9 @@ Not built:
 - **The weekly summary** does not mention the streak or records (see Decisions).
 - A streak is computed from the last 60 days of food, so it cannot read past 60.
 - Not checked on a device.
+
+## Shaped weeks (MM-124), 2026-10-21
+The streak and the monthly report's longest run count whole days by the same plan-aware rule as the expenditure
+estimate, so a planned lower day eaten as planned (a little under, with ordinary noise) never breaks the streak. A
+genuinely half-logged day is a missed day as before. Tests: `test/engine/plannedShareReaders.test.ts`,
+`test/dashboard/processRewards.test.tsx`.
