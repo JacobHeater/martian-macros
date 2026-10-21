@@ -82,6 +82,7 @@ export function OnboardingScreen() {
   const importedWeighIns = useLoaded(state.importedWeighIns);
   const [healthReading, setHealthReading] = useState(false);
   const [usedImport, setUsedImport] = useState(false);
+  const [focusWeight, setFocusWeight] = useState(0);
 
   // The numbers the typed measurements mean, in what is stored.
   const fmt = new Fmt(units);
@@ -182,6 +183,8 @@ export function OnboardingScreen() {
    * the person types the weight as before; Settings can allow it later.
    */
   const allowWeight = async () => {
+    // The row pressed goes away once weight is allowed: the weight field is where a reader goes on.
+    setFocusWeight((n) => n + 1);
     const after = await services.healthSource.requestPermission(new Set<HealthDataType>(['weight']));
     state.refreshHealthConnection();
     if (!after.has('weight')) {
@@ -206,11 +209,13 @@ export function OnboardingScreen() {
           reading: healthReading,
           today: importedToday === undefined ? undefined : { kg: importedToday.kg, sourceName: importedToday.sourceName },
           used: usedImport,
+          focusWeight,
           onAllow: () => void allowWeight(),
           onUse: () => {
             if (importedToday === undefined) return;
             setTyped({ ...typed, weight: toStringAsFixed(fmt.weightFromKg(importedToday.kg), 1) });
             setUsedImport(true);
+            setFocusWeight((n) => n + 1);
           },
         };
 

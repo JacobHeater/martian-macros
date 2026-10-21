@@ -144,6 +144,19 @@ export const MeasurementsWeighInUsed = screenStory({
   },
 });
 
+/** MM-73: weight just allowed, and Health Connect still being read: the row says so, and the weight field has focus. */
+export const MeasurementsReadingHealth = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: 'Reading Health Connect…',
+  scenario: newInstallScenario,
+  device: healthPlatform({ weighInToday: true, readsHang: true }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 3);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /Read weight from Health Connect/ }));
+    await within(canvas).findByText('Reading Health Connect…');
+  },
+});
+
 /** MM-73: weight allowed and nothing weighed today: the person types it, and the history still fills the trend. */
 export const MeasurementsNoWeighInToday = screenStory({
   covers: ['MeasurementsStep'],

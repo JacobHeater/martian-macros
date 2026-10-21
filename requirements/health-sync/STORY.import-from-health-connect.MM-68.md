@@ -100,8 +100,9 @@ Closed or another ticket's:
 
 - **The offer in onboarding** (with MM-73): "Read weight from Health Connect" under the weight question
   (`WeightFromHealthRows`; `test/app/onboardingHealth.test.tsx`; stories `MeasurementsHealthConnectOffered`,
-  `MeasurementsWeighInOffered`, `MeasurementsWeighInUsed`, `MeasurementsNoWeighInToday`). The rows and the caption
-  under the weight are said when they change (the UX-accessibility review).
+  `MeasurementsWeighInOffered`, `MeasurementsWeighInUsed`, `MeasurementsReadingHealth`, `MeasurementsNoWeighInToday`).
+  The rows and the caption under the weight are said when they change, and when a pressed row goes away the weight
+  field takes focus (the UX-accessibility review).
 
 Done (2026-10-21): every scenario is built and tested against the fake. Google Play's declaration and the
 privacy-policy page are release gates (MM-95, M5) and do not hold this.

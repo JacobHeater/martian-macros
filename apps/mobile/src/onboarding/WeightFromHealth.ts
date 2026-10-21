@@ -14,6 +14,11 @@ export interface WeightFromHealth {
   readonly today?: { readonly kg: number; readonly sourceName: string } | undefined;
   /** Whether the weight in the field is today's imported weigh-in, put there with `onUse`. */
   readonly used: boolean;
+  /**
+   * Counts the times the weight field is to take focus: the offer's row
+   * that was pressed goes away, so the field is where a reader goes on.
+   */
+  readonly focusWeight: number;
   /** Asks to read weight, with its history, and reads it. */
   readonly onAllow: () => void;
   /** Puts today's imported weigh-in in the field. */
