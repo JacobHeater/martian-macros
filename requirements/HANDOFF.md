@@ -27,8 +27,8 @@ feature PR of the session is merged or closed; a new session still checks
   pace), MM-456 (a recipe ingredient keeps its food), MM-490 (platform
   workouts in the app), MM-507 (a goal body fat).
 - After #227's writes: MM-513 (typed weight written), MM-514 (offer to remove what was
-  written), MM-515 (a deleted workout removed); MM-516 (scheduled background
-  sync), MM-323, MM-442.
+  written), MM-515 (a deleted workout removed); MM-523 (a data gap says what it
+  costs), MM-498, MM-323, MM-441, MM-442.
 - M4 left: MM-157 (photos), MM-35 (one body model, a spike), MM-450 (body fat
   in the monthly report), MM-441, MM-447 (owner's decisions).
 - The owner's to-dos for M2: a FoodData Central API key in
@@ -65,7 +65,8 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   and MM-124.
 - Decided by the owner in Session 41: no one-week break (MM-432 closed); the
   planet icon rejected and MM-109 closed with the owner's art; no sleep
-  insights, as medical advice (MM-368 closed).
+  insights, as medical advice (MM-368 closed); no background sync, ever: where missing data weakens coaching the
+  app says so and the user decides (MM-516 closed, MM-523, #229).
 - The clinician (MM-29): every MM-113 string marked "pending MM-29", its
   escalation line and its five-day threshold; MM-368's evidence rows.
 - Coaching insights: no paywall for any of MM-361 to MM-371 (not behind
