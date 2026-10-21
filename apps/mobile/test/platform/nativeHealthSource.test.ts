@@ -1,6 +1,8 @@
 import { expect, it } from 'vitest';
 import { NativeHealthSource } from '../../src/platform/NativeHealthSource';
 import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
+import { NoHealthPlatform } from '../../src/platform/NoHealthPlatform';
+import { healthHistoryAccessContract } from '../contracts/healthHistoryAccessContract';
 import { healthSourceContract } from '../contracts/healthSourceContract';
 import { fakeMmHealth } from '../support/fakeMmHealth';
 
@@ -14,6 +16,35 @@ const held: MmHealthRecord[] = [
 
 // MM-68: the adapter the phone uses, with the plugin stood in for.
 healthSourceContract('Health Connect (bridge stood in for)', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+
+// MM-73: the history permission, through the plugin and where there is none.
+healthHistoryAccessContract('Health Connect, history granted when asked', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+healthHistoryAccessContract(
+  'Health Connect, history refused',
+  async () => new NativeHealthSource(fakeMmHealth([...held], { grantsHistory: false }).api),
+);
+healthHistoryAccessContract(
+  'Health Connect, history granted already',
+  async () => new NativeHealthSource(fakeMmHealth([...held], { history: true }).api),
+);
+healthHistoryAccessContract('no health platform', async () => new NoHealthPlatform());
+
+it('the history is asked for through the plugin, which shows the question once (MM-73)', async () => {
+  const fake = fakeMmHealth([...held], { grantsHistory: false });
+  const source = new NativeHealthSource(fake.api);
+  expect(await source.historyPermitted()).toBe(false);
+  expect(await source.requestHistory()).toBe(false);
+  expect(await source.requestHistory()).toBe(false);
+  expect(fake.historyAsked()).toBe(1);
+});
+
+it('a phone without Health Connect has no history to ask for (MM-73)', async () => {
+  const fake = fakeMmHealth([...held], { history: true });
+  const source = new NativeHealthSource({ ...fake.api, status: async () => ({ status: 'unavailable' }) });
+  expect(await source.historyPermitted()).toBe(false);
+  expect(await source.requestHistory()).toBe(false);
+  expect(fake.historyAsked()).toBe(0);
+});
 
 it('a change after the token is told, and a deletion is told as one', async () => {
   const fake = fakeMmHealth([...held]);
