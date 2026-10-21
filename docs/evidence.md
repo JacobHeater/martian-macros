@@ -127,11 +127,14 @@ Rows: underweightBmi, lowWeightCautionBmi, lowWeightMaxLossFraction, DietBreakRu
 ### How sure is the app about my body fat?
 
 Body fat is estimated from height, weight, age and sex unless you give your own
-figure, and either way it is only an estimate, off by several points. Where a
-safety limit depends on it, the app takes the cautious side when you could
-plausibly be on it, and does not switch back and forth on a small change.
+figure. Once you have measured your waist a few times in four weeks, a second
+formula from your height and waist joins the first and the range narrows a
+little; it stays a range, because both formulas can be off by several points
+for the same build. Where a safety limit depends on it, the app takes the
+cautious side when you could plausibly be on it, and does not switch back and
+forth on a small change.
 
-Rows: deurenbergBodyFat, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
+Rows: deurenbergBodyFat, relativeFatMass, BodyFatRule.waistFormulaSigmaPercent, BodyFatRule.formulaErrorCorrelation, BodyFatRule.waistWindowDays, BodyFatRule.minWaistEntries, combineBodyFatEstimates, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
 
 ### When does the app ask about my health?
 
@@ -233,6 +236,12 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `activityFactor` | Daily activity 1.20, 1.30, 1.40 or 1.50, plus 0.025 per training day | engine activityFactor.ts | The starting estimate of energy use | Product judgement, cross-checked against the common published multipliers (MM-164) | judgement | None directly | No |
 | `initialTdeePrior` | Resting energy x the activity factor, with 15% uncertainty | engine initialTdeePrior.ts | The estimate of energy use before there is data | Product judgement; replaced by a measurement after about two weeks | judgement | None directly | No |
 | `deurenbergBodyFat` | 1.20 x BMI + 0.23 x age - 10.8 (men) - 5.4, with 5 points of uncertainty | engine deurenbergBodyFat.ts | The body-fat estimate when the user gives none | Deurenberg 1991, as cited; BMI-based equations are off by about 4 to 5 points | moderate | Adults, mostly white; poorer in muscular, older and some ethnic groups | No |
+| `relativeFatMass` | 64 - 20 x height / waist (men), 76 - 20 x height / waist (women), with the waist's noise carried through | engine relativeFatMass.ts | The body-fat estimate from the user's waist entries (MM-34) | Woolcott and Bergman 2018 (relative fat mass), as cited: derived and validated against a body scan (DXA) in a national survey sample; not yet read in the primary paper | moderate | US adults of several ethnic groups; less sure in muscular builds and outside that survey | No |
+| `BodyFatRule.waistFormulaSigmaPercent` | 4.5 points, one standard deviation | engine BodyFatRule.ts | How wide the waist formula's own error is taken to be (MM-34) | Product judgement near the 3.5 to 5 points that waist and BMI equations usually miss a body scan by; the paper's own figure is not yet confirmed | judgement | Adults; wider in muscular builds | No |
+| `BodyFatRule.formulaErrorCorrelation` | 0.5 | engine BodyFatRule.ts | How much the waist formula's and the BMI formula's errors go together, so two outside formulas never narrow the range as if they were independent (MM-34) | Product judgement: both read the body from outside and both miss a muscular build the same way; no study measured the figure | judgement | None | No |
+| `BodyFatRule.waistWindowDays` | 28 days | engine BodyFatRule.ts | How far back waist entries count toward body fat (MM-34) | Product judgement: four weekly entries, so the range moves weekly and slowly, never on one day | judgement | None | No |
+| `BodyFatRule.minWaistEntries` | 3 entries | engine BodyFatRule.ts | How many waist entries in the window before the waist joins the formula; the middle value is used, so one mistyped entry moves nothing (MM-34) | Product judgement | judgement | None | No |
+| `combineBodyFatEstimates` | Minimum-variance weighting of two estimates with correlated errors, the weight kept between 0 and 1 | engine combineBodyFatEstimates.ts | How the formula and the waist are joined into one range (MM-34) | Statistics: the best linear combination of two correlated unbiased estimates | strong | Not applicable | No |
 | `TdeeEstimator.windowDays` | 28 days | engine TdeeEstimator.ts | How far back the measurement looks | Product judgement tested in simulation | judgement | None | No |
 | `TdeeEstimator.minSpanDays` | 14 days | engine TdeeEstimator.ts | The shortest span that can produce a measurement | Product judgement tested in simulation | judgement | None | No |
 | `TdeeEstimator.minIntakeDays` | 10 days | engine TdeeEstimator.ts | The fewest usable food days before measuring | Product judgement tested in simulation | judgement | None | No |

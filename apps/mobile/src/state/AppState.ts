@@ -600,6 +600,8 @@ export class AppState {
       const pauses = of(this.pauses);
       // Period days widen the trend's noise around each start (MM-19, MM-20); none until read, as with no marked days.
       const flowDays = of(this.flowDays) ?? [];
+      // Waist entries join the body-fat formula (MM-34); none until read, as with no entries.
+      const waists = of(this.waist) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -611,7 +613,7 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, today });
     });
 
     this.maintenanceGuide = derived(() => {

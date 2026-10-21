@@ -122,6 +122,33 @@ export const CoachFirstDay = screenStory({
   open: onCoach,
 });
 
+/** MM-34: no waist yet: the rough formula range, and what would narrow it. */
+export const CoachBodyFatRough = screenStory({
+  covers: ['CoachScreen'],
+  shows: /waist measurements within 4 weeks narrow this range\.$/,
+  scenario: firstDayScenario,
+  open: onCoach,
+});
+
+/** MM-34: four weekly waist entries: the range from the tape and the formula, and what it cannot say. */
+export const CoachBodyFatFromWaist = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^From your height, weight and waist\./,
+  open: onCoach,
+});
+
+/** MM-34: an eating-disorder history: the rough range, and no ask to measure more. */
+export const CoachBodyFatRoughEatingDisorder = screenStory({
+  covers: ['CoachScreen'],
+  shows: /\(rough estimate\)$/,
+  scenario: async (repos, today) => {
+    const setup = typicalSetup({ goalMode: 'maintenance', onboardedOn: today, healthCheckConfirmedOn: today });
+    await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, eatingDisorderHistory: true }) }));
+    await repos.weights.saveWeight(today, 86);
+  },
+  open: onCoach,
+});
+
 /** MM-321: no weigh-in kept (each one deleted): nothing for the coach to work from. */
 export const CoachNoWeighIn = screenStory({
   covers: ['CoachScreen'],
