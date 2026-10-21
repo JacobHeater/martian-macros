@@ -6,12 +6,13 @@ import { failingRead } from './failingRead';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { CalendarDate } from '../../domain/CalendarDate';
 import { Pause } from '../../domain/Pause';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { HealthRecheckScreen } from '../../app/HealthRecheckScreen';
 import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
 import { newInstallScenario } from './newInstallScenario';
 import { appleHealthProfile } from './appleHealthProfile';
 import { onIos } from './onIos';
+import { healthPlatform } from './healthPlatform';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import { storyToday } from './storyToday';
@@ -22,7 +23,7 @@ const meta = { title: 'Screens/First run and gates', ...screensMeta } satisfies 
 export default meta;
 
 /** Presses a button of the screen, once it is there. */
-const press = (name: string) => async (canvas: HTMLElement) =>
+const press = (name: string | RegExp) => async (canvas: HTMLElement) =>
   userEvent.click(await within(canvas).findByRole('button', { name }));
 
 /**
@@ -115,7 +116,10 @@ export const BiologicalSexFilledFromHealth = screenStory({
   device: appleHealthProfile({ profile: fromAppleHealth }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
+    // The outcome is said and focused, since the row pressed went away (the panel review of MM-69).
+    const said = await within(canvas).findByText(/Filled in from Apple Health/);
+    await waitFor(() => expect(canvas.ownerDocument.activeElement).toBe(said.closest('[aria-live="polite"]')));
   },
 });
 
@@ -127,7 +131,7 @@ export const BiologicalSexNothingInHealth = screenStory({
   device: appleHealthProfile(),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
   },
 });
 
@@ -138,7 +142,7 @@ export const BiologicalSexHealthUnreadable = screenStory({
   device: appleHealthProfile({ unreadable: true }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
   },
 });
 
@@ -150,7 +154,7 @@ export const DateOfBirthFromHealth = screenStory({
   device: appleHealthProfile({ profile: fromAppleHealth }),
   walk: async (canvas) => {
     await walkOnboarding(canvas, 1);
-    await press('Fill in from Apple Health')(canvas);
+    await press(/^Fill in from Apple Health/)(canvas);
     await within(canvas).findByText(/Filled in from Apple Health/);
     await press('Next')(canvas);
   },
@@ -168,6 +172,67 @@ export const Measurements = screenStory({
   shows: 'Your measurements',
   scenario: newInstallScenario,
   walk: (canvas) => walkOnboarding(canvas, 3),
+});
+
+/** MM-68, MM-73: on a phone with Health Connect, reading weight is offered under the weight, never required. */
+export const MeasurementsHealthConnectOffered = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: 'Read weight from Health Connect',
+  scenario: newInstallScenario,
+  device: healthPlatform({ weighInToday: true }),
+  walk: (canvas) => walkOnboarding(canvas, 3),
+});
+
+/** MM-73: weight allowed, with this morning's weigh-in on the platform: it is offered as the current weight. */
+export const MeasurementsWeighInOffered = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: /^Use 181\.7 lb$/,
+  scenario: newInstallScenario,
+  device: healthPlatform({ weighInToday: true }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 3);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /Read weight from Health Connect/ }));
+    await within(canvas).findByRole('button', { name: /^Use 181\.7 lb/ });
+  },
+});
+
+/** MM-73: today's weigh-in used: it is in the field, and the caption says where it came from. */
+export const MeasurementsWeighInUsed = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: /Today’s weigh-in from Bathroom scale, in Health Connect/,
+  scenario: newInstallScenario,
+  device: healthPlatform({ weighInToday: true }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 3);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /Read weight from Health Connect/ }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Use 181\.7 lb/ }));
+  },
+});
+
+/** MM-73: weight just allowed, and Health Connect still being read: the row says so, and the weight field has focus. */
+export const MeasurementsReadingHealth = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: 'Reading Health Connect…',
+  scenario: newInstallScenario,
+  device: healthPlatform({ weighInToday: true, readsHang: true }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 3);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /Read weight from Health Connect/ }));
+    await within(canvas).findByText('Reading Health Connect…');
+  },
+});
+
+/** MM-73: weight allowed and nothing weighed today: the person types it, and the history still fills the trend. */
+export const MeasurementsNoWeighInToday = screenStory({
+  covers: ['MeasurementsStep'],
+  shows: 'No weigh-in in Health Connect today',
+  scenario: newInstallScenario,
+  device: healthPlatform(),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 3);
+    await userEvent.click(await within(canvas).findByRole('button', { name: /Read weight from Health Connect/ }));
+    await within(canvas).findByText('No weigh-in in Health Connect today');
+  },
 });
 
 export const Activity = screenStory({

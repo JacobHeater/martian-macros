@@ -277,4 +277,16 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_food_id INTEGER NULL');
     },
   ],
+  // 20 to 21 (MM-507): the goal body fat the user set (MM-36), one row; none yet, so the plan runs to its default line.
+  [
+    20,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "goal_body_fat" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1), ' +
+          '"percent" REAL NOT NULL CHECK("percent" > 0.0 AND "percent" < 100.0), ' +
+          '"set_epoch_day" INTEGER NOT NULL)',
+      );
+    },
+  ],
 ]);
