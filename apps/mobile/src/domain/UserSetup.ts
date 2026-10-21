@@ -22,6 +22,7 @@ interface UserSetupInit {
   healthCheckSkipCount?: number;
   creatineStartedOn?: CalendarDate | undefined;
   maintenanceWeekFrom?: CalendarDate | undefined;
+  breakWeeks?: 1 | 2;
   reliefAnsweredOn?: CalendarDate | undefined;
   paceChangedOn?: CalendarDate | undefined;
   maintenanceAnchorOn?: CalendarDate | undefined;
@@ -50,6 +51,7 @@ interface UserSetupChanges {
   healthCheckSkipCount?: number;
   creatineStartedOn?: CalendarDate | undefined;
   maintenanceWeekFrom?: CalendarDate;
+  breakWeeks?: 1 | 2;
   reliefAnsweredOn?: CalendarDate;
   paceChangedOn?: CalendarDate;
   maintenanceAnchorOn?: CalendarDate | undefined;
@@ -99,8 +101,15 @@ export class UserSetup {
   /** When the user started taking creatine, if they currently take it (MM-136). */
   readonly creatineStartedOn: CalendarDate | undefined;
 
-  /** The day the user last chose to take a diet break (MM-117, MM-135): two weeks at maintenance from it. */
+  /** The day the user last chose to take a diet break (MM-117, MM-135): `breakWeeks` at maintenance from it. */
   readonly maintenanceWeekFrom: CalendarDate | undefined;
+
+  /**
+   * How long the break chosen on `maintenanceWeekFrom` is, in weeks: two
+   * unless one was chosen (MM-432). Read when the break starts; the break's
+   * own records carry it from then on.
+   */
+  readonly breakWeeks: 1 | 2;
 
   /**
    * The day the user last answered the offer to ease a deficit, whatever
@@ -143,6 +152,7 @@ export class UserSetup {
     this.healthCheckSkipCount = init.healthCheckSkipCount ?? 0;
     this.creatineStartedOn = init.creatineStartedOn;
     this.maintenanceWeekFrom = init.maintenanceWeekFrom;
+    this.breakWeeks = init.breakWeeks ?? 2;
     this.reliefAnsweredOn = init.reliefAnsweredOn;
     this.paceChangedOn = init.paceChangedOn;
     this.maintenanceAnchorOn = init.maintenanceAnchorOn;
@@ -173,6 +183,7 @@ export class UserSetup {
       healthCheckSkipCount: changes.healthCheckSkipCount ?? this.healthCheckSkipCount,
       creatineStartedOn: 'creatineStartedOn' in changes ? changes.creatineStartedOn : this.creatineStartedOn,
       maintenanceWeekFrom: changes.maintenanceWeekFrom ?? this.maintenanceWeekFrom,
+      breakWeeks: changes.breakWeeks ?? this.breakWeeks,
       reliefAnsweredOn: changes.reliefAnsweredOn ?? this.reliefAnsweredOn,
       paceChangedOn: changes.paceChangedOn ?? this.paceChangedOn,
       maintenanceAnchorOn: 'maintenanceAnchorOn' in changes ? changes.maintenanceAnchorOn : this.maintenanceAnchorOn,

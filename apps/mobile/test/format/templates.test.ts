@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CalendarDate, FoodEntry, NutritionTotals, type Portion, Workout, WorkoutExercise, WorkoutSet } from '../../src/domain';
-import { CoachConfidence, ExplanationLine, type ProgressionSuggestion, TargetsExplanation } from '../../src/engine';
+import { BreakFlag, CoachConfidence, ExplanationLine, type ProgressionSuggestion, TargetsExplanation } from '../../src/engine';
 import { CatalogFood } from '../../src/foodCatalog';
 import { confidenceNextStepText } from '../../src/format/confidenceNextStepText';
 import { explanationLineText } from '../../src/format/explanationLineText';
@@ -9,6 +9,7 @@ import { Fmt } from '../../src/format/Fmt';
 import { foodSourceLabel } from '../../src/format/foodSourceLabel';
 import { importedWeighInText } from '../../src/format/importedWeighInText';
 import { loggingStreakText } from '../../src/format/loggingStreakText';
+import { oneWeekBreakText } from '../../src/format/oneWeekBreakText';
 import { personalRecordText } from '../../src/format/personalRecordText';
 import { portionSummary } from '../../src/format/portionSummary';
 import { progressionSettingsText } from '../../src/format/progressionSettingsText';
@@ -17,6 +18,7 @@ import { reliefOfferText } from '../../src/format/reliefOfferText';
 import { restTargetText } from '../../src/format/restTargetText';
 import { roundedToZeroNote } from '../../src/format/roundedToZeroNote';
 import { setText } from '../../src/format/setText';
+import { targetFlagMessage } from '../../src/format/targetFlagMessage';
 import { underEatingText } from '../../src/format/underEatingText';
 import { whatWouldChangeIt } from '../../src/format/whatWouldChangeIt';
 import { workoutSummaryText } from '../../src/format/workoutSummaryText';
@@ -422,5 +424,14 @@ describe('notices', () => {
     expect(at(17)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 3 weeks, at 20 weeks.');
     expect(at(18)).toBe('The coach would take the break now. If you carry on, the app plans the break itself in 2 weeks, at 20 weeks.');
     expect(at(19)).toBe('The coach would take the break now. If you carry on, the app plans the break itself at the next check-in, at 20 weeks.');
+  });
+
+  // MM-432: the one-week break's question and flag say its length and what a week gives up, and claim nothing about metabolism.
+  it('a one-week break: the question and the flag', () => {
+    expect(oneWeekBreakText.message).toContain('stored carbohydrate and water coming back');
+    expect(targetFlagMessage('requestedOneWeekBreak')).toMatch(/^This is the one-week break you chose/);
+    for (const text of [oneWeekBreakText.title, oneWeekBreakText.message, ...BreakFlag.values.map(targetFlagMessage)]) {
+      expect(text.toLowerCase()).not.toMatch(/metabol|reset|recover|repair/);
+    }
   });
 });

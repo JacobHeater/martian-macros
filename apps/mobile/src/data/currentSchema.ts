@@ -39,6 +39,7 @@ CREATE TABLE "setups" (
   "maintenance_anchor_epoch_day" INTEGER NULL,
   "maintenance_correction_from_epoch_day" INTEGER NULL,
   "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),
+  "break_weeks" INTEGER NOT NULL DEFAULT 2 CHECK ("break_weeks" IN (1, 2)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (

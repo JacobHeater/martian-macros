@@ -172,6 +172,8 @@ Tests:
 
 Not built: the one-week choice (MM-432, a `setups` column); MM-117's strength trigger (MM-75, MM-77, as before); the
 forced cap at 16 for the lean bands of MM-28 (not adopted by the owner). Not verified on a phone.
+Since built (2026-10-21, MM-432): the one-week choice, "One week instead" on the offer, kept in `setups.break_weeks`
+and carried by its own flag; the planned break is still two weeks.
 
 ## Notes
 - Priority: decide before any user reaches week twelve. Decided and built.

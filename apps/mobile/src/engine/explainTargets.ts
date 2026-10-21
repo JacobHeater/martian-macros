@@ -80,7 +80,7 @@ export function explainTargets({
     add('expenditureEstimate', expenditure, { from: previous.tdeeKcal, to: tdee.kcal });
     const rest = trace.formulaKcal - base - expenditure;
     add(
-      targets.flags.has('requestedBreak')
+      targets.flags.has('requestedBreak') || targets.flags.has('requestedOneWeekBreak')
         ? 'requestedBreak'
         : targets.flags.has('dietBreak')
           ? 'dietBreak'

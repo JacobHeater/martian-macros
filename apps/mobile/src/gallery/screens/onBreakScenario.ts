@@ -5,8 +5,9 @@ import { storyTargets } from './storyTargets';
 
 /**
  * A diet break in its first week (MM-135): the one the person chose
- * (`requestedBreak`) or the one the app planned at twenty weeks
- * (`dietBreak`). Targets at maintenance, the next check-in two weeks out.
+ * (`requestedBreak`, or `requestedOneWeekBreak`, MM-432) or the one the app
+ * planned at twenty weeks (`dietBreak`). Targets at maintenance, the next
+ * check-in the break's length out.
  */
 export const onBreakScenario =
   (flag: BreakFlag): StoryScenario =>

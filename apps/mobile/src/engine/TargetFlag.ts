@@ -37,6 +37,8 @@ const values = [
    * (MM-117).
    */
   'requestedBreak',
+  /** The user chose a one-week break in place of the two weeks (MM-432). */
+  'requestedOneWeekBreak',
   /**
    * The deficit was capped at a share of expenditure (MM-128): the pace
    * chosen asked for more than a body this size spends.

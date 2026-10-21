@@ -50,13 +50,14 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'primary_scale_source_id',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
-  // Version 13 (MM-251): a diagnosed sleep disorder.
+  // Version 13 (MM-251): a diagnosed sleep disorder. Version 16 (MM-432): the length of the break chosen.
   setups: [
     'fluid_limited_by_clinician',
     'pace_changed_epoch_day',
     'maintenance_anchor_epoch_day',
     'maintenance_correction_from_epoch_day',
     'sleep_disorder',
+    'break_weeks',
   ],
   // Version 11 (MM-128): the pace each record of targets was asked for.
   targets_history: ['requested_loss_fraction'],

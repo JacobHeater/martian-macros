@@ -1,6 +1,7 @@
 import type { GoalMode } from '../domain/GoalMode';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import { clamp } from '../lang/clamp';
+import { breakFlagOf } from './breakFlagOf';
 import { DailyTargets } from './DailyTargets';
 import { DietBreakRule } from './DietBreakRule';
 import { energyDensityKcalPerKg } from './energyDensityKcalPerKg';
@@ -37,7 +38,8 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
   // or the one the app plans at the cap. Each is maintenance for its length.
   if (rate < 0 && i.breakRequested) {
     rate = 0;
-    flags.add('requestedBreak');
+    // The length chosen travels on the flag (MM-432).
+    flags.add(i.requestedBreakWeeks === 1 ? 'requestedOneWeekBreak' : 'requestedBreak');
   } else if (rate < 0 && i.continuingBreak !== undefined) {
     rate = 0;
     flags.add(i.continuingBreak);
@@ -81,8 +83,7 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
     // allows all exist to put calories back now. Reductions and
     // ordinary changes keep the limit.
     const exemptRaise =
-      (flags.has('dietBreak') ||
-        flags.has('requestedBreak') ||
+      (breakFlagOf(flags) !== undefined ||
         flags.has('underweightMaintenance') ||
         flags.has('modeNotAllowed')) &&
       kcal > previous.kcal;

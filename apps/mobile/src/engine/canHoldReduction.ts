@@ -15,6 +15,7 @@ const safetyFlags: ReadonlySet<TargetFlag> = new Set([
   'modeNotAllowed',
   'dietBreak',
   'requestedBreak',
+  'requestedOneWeekBreak',
   'heldByUser',
 ]);
 
