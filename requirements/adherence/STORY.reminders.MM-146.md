@@ -2,7 +2,7 @@
 id: MM-146
 status: in-progress
 component: adherence
-related: [MM-145, MM-16, MM-24, MM-80, MM-92, MM-95, MM-108, MM-116, MM-118, MM-138, MM-144, MM-147, MM-148, MM-155]
+related: [MM-145, MM-16, MM-24, MM-80, MM-92, MM-95, MM-108, MM-116, MM-118, MM-138, MM-144, MM-147, MM-148, MM-155, MM-248]
 ---
 
 # Story: Reminders I choose, that give up politely
@@ -102,14 +102,19 @@ Built:
 - **Permission** is asked of the phone only when a reminder is switched on. If it is refused the reminder stays off and a line says
   why. Starting the app asks for nothing.
 - **Scheduled on the device** (`ReminderScheduler`, implemented over the phone's own scheduled notifications; an in-memory one for
-  tests). No push service and no token; the plugin makes no network request. On Android they are scheduled inexactly, so no
-  exact-alarm permission is needed and a reminder can be up to an hour late.
+  tests). No push service and no token; the plugin makes no network request. On Android they are scheduled exactly when the
+  person allowed exact alarms, asked once from Settings with a reason, and inexactly, up to an hour late, otherwise
+  (MM-248).
 - **The plan** (`planReminders`, a pure function): whenever the app is opened or anything changes, what the phone has scheduled is
   replaced by the plan. A weigh-in at 6:40 removes that morning's reminder; logging food removes that evening's.
 - **Ignored for a week, it stops.** Nothing is recorded when a reminder fires. The count is the run of days since the reminder was
   turned on (or last kept) on which it was due and the thing was not done (`reminderIgnoredStreak`). Each reminder is only ever
   scheduled as far as seven sends, so a user who stops opening the app hears seven and then nothing: nothing is sent because someone
   is away. On next opening the dashboard shows one line, "Weigh-in reminders are paused. Keep them or turn them off?".
+  Doing the thing restarts a reminder that had paused itself, without the question (guarded by "weighing in starts them again,
+  without the question" in `test/settings/reminders.test.tsx`).
+- **Offered once in onboarding**: the last step offers the weigh-in reminder (MM-158; story FirstRun in
+  `apps/mobile/src/gallery/screens/FirstRun.stories.tsx`), and asks the phone only if it is taken.
 - **At most two a day.** When three fall on a Sunday the weekly one is kept and the evening food reminder is dropped, because a daily
   one comes round again tomorrow.
 - **Quiet from 9 pm to 7 am**: a time in that period cannot be chosen, and none is planned in it.
@@ -123,9 +128,7 @@ Not built:
 - The check-in-ready notification: a check-in runs when the app is opened, so there is nothing to announce beforehand without
   predicting whether the targets will change. The summary on opening (MM-138) is what exists.
 - The weekly recovery check-in reminder: MM-116 is not built.
-- The offer of the weigh-in reminder at the end of onboarding.
 - A quiet period the user can change: it is fixed at 9 pm to 7 am.
-- Doing the thing restarts a reminder that had paused itself, without the question being asked.
 - Checked on the Android emulator: the Reminders group, the permission prompt appearing only when a reminder is switched on, seven
   alarms held by Android for 8:00 pm on the next seven days, and all of them gone when it is switched off. Android gives each a
   one-hour window, so a reminder can be up to an hour late. A reminder actually appearing was not seen (it was night, inside the
