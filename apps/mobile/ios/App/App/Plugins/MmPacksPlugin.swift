@@ -32,11 +32,13 @@ public class MmPacksPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "httpGet", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "httpAbort", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "httpGetToFile", returnType: CAPPluginReturnPromise),
     ]
 
     private let lock = NSLock()
     private var writers: [Int: FileHandle] = [:]
     private var requests: [Int: PackFetch] = [:]
+    private var fileRequests: [Int: PackFileTransfer] = [:]
     private var nextId = 1
 
     private func allocate() -> Int {
@@ -254,11 +256,41 @@ public class MmPacksPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func httpAbort(_ call: CAPPluginCall) {
+        let request = call.getInt("request") ?? -1
         lock.lock()
-        let fetch = requests.removeValue(forKey: call.getInt("request") ?? -1)
+        let fetch = requests.removeValue(forKey: request)
+        let transfer = fileRequests.removeValue(forKey: request)
         lock.unlock()
         fetch?.abort()
+        transfer?.abort()
         call.resolve()
+    }
+
+    /// A pack file fetched straight into its partial (MM-387): no byte crosses into the WebView, only `packFileProgress` counts.
+    @objc func httpGetToFile(_ call: CAPPluginCall) {
+        guard let given = call.getString("url"), let url = URL(string: given) else { return call.reject("httpGetToFile needs a url.") }
+        guard let id = fileId(call, "id"), let version = fileId(call, "version") else { return }
+        answered(call) {
+            let file = try partialFile(id, version)
+            let request = allocate()
+            let transfer = PackFileTransfer(request: request, call: call, plugin: self, url: url,
+                                            rangeStart: call.getInt("rangeStart"), file: file)
+            lock.lock()
+            fileRequests[request] = transfer
+            lock.unlock()
+            transfer.start()
+        }
+    }
+
+    /// How much of a pack file is in its partial, or its end, or its failure, as an event.
+    fileprivate func fileProgress(_ data: JSObject) {
+        notifyListeners("packFileProgress", data: data)
+    }
+
+    fileprivate func finishedFile(_ request: Int) {
+        lock.lock()
+        fileRequests.removeValue(forKey: request)
+        lock.unlock()
     }
 
     /// A response's bytes, or its end, or its failure, as an event.
@@ -325,6 +357,144 @@ private final class PackFetch: NSObject, URLSessionDataDelegate {
             plugin?.chunk(["request": request, "done": true])
         }
         plugin?.finished(request)
+        session.finishTasksAndInvalidate()
+    }
+}
+
+/// One pack file fetched into its partial as it arrives (MM-387): no cookies, no cache, no identifiers, and no byte
+/// handed to the WebView. Nothing is written for a status other than 200 or 206; on 206 the partial is cut to
+/// `rangeStart` and carried on from there, on 200 begun again. The session's delegate queue is serial, so the file
+/// is only touched from it.
+private final class PackFileTransfer: NSObject, URLSessionDataDelegate {
+    private let request: Int
+    private let call: CAPPluginCall
+    private weak var plugin: MmPacksPlugin?
+    private let file: URL
+    private let rangeStart: Int?
+    private var session: URLSession!
+    private var task: URLSessionDataTask!
+    private var resolved = false
+    /// The status was neither 200 nor 206, and its end has been told.
+    private var refused = false
+    private var handle: FileHandle?
+    private var written = 0
+    private var told = 0
+    /// Why the partial could not be written, when it could not.
+    private var fileFailure: String?
+    private let abortLock = NSLock()
+    private var aborted = false
+
+    init(request: Int, call: CAPPluginCall, plugin: MmPacksPlugin, url: URL, rangeStart: Int?, file: URL) {
+        self.request = request
+        self.call = call
+        self.plugin = plugin
+        self.file = file
+        self.rangeStart = rangeStart
+        super.init()
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.httpShouldSetCookies = false
+        configuration.httpCookieAcceptPolicy = .never
+        configuration.urlCache = nil
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 24 * 60 * 60
+        session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        var urlRequest = URLRequest(url: url, timeoutInterval: 20)
+        if let start = rangeStart { urlRequest.setValue("bytes=\(start)-", forHTTPHeaderField: "Range") }
+        task = session.dataTask(with: urlRequest)
+    }
+
+    func start() { task.resume() }
+
+    func abort() {
+        abortLock.lock()
+        aborted = true
+        abortLock.unlock()
+        task.cancel()
+    }
+
+    private var isAborted: Bool {
+        abortLock.lock()
+        defer { abortLock.unlock() }
+        return aborted
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        resolved = true
+        call.resolve(["request": request, "status": status])
+        guard status == 200 || status == 206 else {
+            refused = true
+            plugin?.fileProgress(["request": request, "bytes": 0, "done": true])
+            completionHandler(.cancel)
+            return
+        }
+        let from = status == 206 ? max(rangeStart ?? 0, 0) : 0
+        do {
+            if !FileManager.default.fileExists(atPath: file.path) {
+                FileManager.default.createFile(atPath: file.path, contents: nil)
+            }
+            let opened = try FileHandle(forWritingTo: file)
+            let length = try opened.seekToEnd()
+            if length < UInt64(from) {
+                try? opened.close()
+                throw MmFailure("The partial is shorter than the range asked for.")
+            }
+            try opened.truncate(atOffset: UInt64(from))
+            try opened.seek(toOffset: UInt64(from))
+            handle = opened
+            completionHandler(.allow)
+        } catch {
+            fileFailure = mmMessage(error)
+            completionHandler(.cancel)
+        }
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        guard !isAborted, fileFailure == nil, let handle = handle else { return }
+        do {
+            try handle.write(contentsOf: data)
+        } catch {
+            fileFailure = mmMessage(error)
+            dataTask.cancel()
+            return
+        }
+        written += data.count
+        // A count every 256 KiB is plenty for a progress bar, and keeps the events few.
+        if written - told >= 256 * 1024 {
+            told = written
+            plugin?.fileProgress(["request": request, "bytes": written])
+        }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let writing = handle {
+            handle = nil
+            do {
+                try writing.synchronize()
+                try writing.close()
+            } catch {
+                if fileFailure == nil { fileFailure = mmMessage(error) }
+            }
+        }
+        if refused {
+            // Its end was told when the status came.
+        } else if let failure = fileFailure {
+            if resolved {
+                plugin?.fileProgress(["request": request, "error": failure, "writeFailed": true])
+            } else {
+                call.reject(failure)
+            }
+        } else if let error = error {
+            if resolved {
+                plugin?.fileProgress(["request": request, "error": error.localizedDescription])
+            } else {
+                call.reject(error.localizedDescription)
+            }
+        } else {
+            plugin?.fileProgress(["request": request, "bytes": written, "done": true])
+        }
+        plugin?.finishedFile(request)
         session.finishTasksAndInvalidate()
     }
 }

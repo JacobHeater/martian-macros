@@ -53,8 +53,10 @@ export function FoodCompletenessRow({ day, entries }: FoodCompletenessRowProps) 
       leadingIcon={completenessIcon(completeness)}
       title={completeness === 'unmarked' ? 'Is this day fully logged?' : completenessLabel(completeness)}
       subtitle={
+        // Each state says what the estimate does with the day; an unmarked one counts unless it is far below the
+        // usual (MM-27, MM-392), worded for the log and not the eating, as the coaching and safety roles asked.
         completeness === 'unmarked'
-          ? 'Mark it complete or partial.'
+          ? 'Counted unless it looks unfinished.'
           : completeness === 'complete'
             ? 'Counted as a whole day.'
             : 'Left out of your metabolism estimate.'

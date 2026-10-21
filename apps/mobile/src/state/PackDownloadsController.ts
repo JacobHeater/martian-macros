@@ -2,7 +2,7 @@ import { PackDownload } from '../foodCatalog/download/PackDownload';
 import { PackDownloadCancelled } from '../foodCatalog/download/PackDownloadCancelled';
 import { PackDownloadFailed } from '../foodCatalog/download/PackDownloadFailed';
 import { PackDownloadProgress } from '../foodCatalog/download/PackDownloadProgress';
-import type { PackHttp } from '../foodCatalog/download/PackHttp';
+import type { PackFileFetch } from '../foodCatalog/download/PackFileFetch';
 import type { PackListing } from '../foodCatalog/download/PackListing';
 import type { PackStore } from '../foodCatalog/download/PackStore';
 import type { Cell } from './Cell';
@@ -27,12 +27,12 @@ export class PackDownloadsController {
   private readonly order = new ValueCell<readonly string[]>([]);
   private readonly running = new Map<string, PackDownload>();
   private readonly starting = new Set<string>();
-  private readonly http: PackHttp;
+  private readonly fetch: PackFileFetch;
   private readonly store: PackStore;
   private readonly onInstalled: () => void;
 
-  constructor({ http, store, onInstalled }: { http: PackHttp; store: PackStore; onInstalled: () => void }) {
-    this.http = http;
+  constructor({ fetch, store, onInstalled }: { fetch: PackFileFetch; store: PackStore; onInstalled: () => void }) {
+    this.fetch = fetch;
     this.store = store;
     this.onInstalled = onInstalled;
     this.downloads = new DerivedCell<readonly PackDownloadState[]>(() => this.order.value.map((id) => this.cellOf(id).value).filter((d) => d.status !== 'idle'));
@@ -66,7 +66,7 @@ export class PackDownloadsController {
       this.starting.delete(id);
     }
     if (this.running.has(id)) return;
-    const download = PackDownload.start({ listing, http: this.http, store: this.store });
+    const download = PackDownload.start({ listing, fetch: this.fetch, store: this.store });
     this.running.set(id, download);
     this.put({
       status: 'running',
