@@ -1,6 +1,6 @@
 ---
 id: MM-146
-status: in-progress
+status: done
 component: adherence
 related: [MM-145, MM-16, MM-24, MM-80, MM-92, MM-95, MM-108, MM-116, MM-118, MM-138, MM-144, MM-147, MM-148, MM-155, MM-248]
 ---
@@ -124,15 +124,33 @@ Built:
 - Rules are in `ReminderRule`. Schema version 21 stores the settings. Tests: `reminders_test.dart` (engine), `reminders_test.dart`
   (app), the reminder repository contract against both implementations, and the migration test.
 
-Not built:
+Built (2026-10-21, React app):
+- **The weekly recovery check-in reminder** (MM-116): "How you are holding up" in Settings, Reminders, off until turned on,
+  at 9:00 am (the time the table gives the check-in's own notification). It is sent on the day the five questions fall due,
+  a week after they were last answered or skipped, or a week after setup, and once a week on that weekday while they wait;
+  answering or skipping moves it a week on (`ReminderFacts`, with the days answered or skipped and the day of setup). Its
+  prompt is "Five quick questions on the week?". Seven unanswered sends and it stops, as the others do; on a Sunday that
+  is also the measurement's, the two weekly ones are kept under the cap. Tests: "the recovery check-in reminder" in
+  `test/engine/reminders.test.ts`, "the recovery check-in reminder waits for its day, and answering moves it a week on"
+  in `test/settings/reminders.test.tsx`. No schema change: the reminders table is keyed by a kind's name. Not run
+  locally; CI validates.
+
+Left as decided:
 - The check-in-ready notification: a check-in runs when the app is opened, so there is nothing to announce beforehand without
-  predicting whether the targets will change. The summary on opening (MM-138) is what exists.
-- The weekly recovery check-in reminder: MM-116 is not built.
-- A quiet period the user can change: it is fixed at 9 pm to 7 am.
+  predicting whether the targets will change. The table's own words, "on opening is enough", are what is built: the
+  summary on opening (MM-138).
+
+Needs a schema change (not in this ticket's acceptance criteria; the schema lane's):
+- A quiet period the user can change: it is fixed at 9 pm to 7 am (`ReminderRule`). Keeping a chosen one needs two
+  columns on `user_preferences` (the minute it starts and the minute it ends), a migration, and the preferences
+  repository and contract to carry them.
+
+## Owed on a phone
 - Checked on the Android emulator: the Reminders group, the permission prompt appearing only when a reminder is switched on, seven
   alarms held by Android for 8:00 pm on the next seven days, and all of them gone when it is switched off. Android gives each a
   one-hour window, so a reminder can be up to an hour late. A reminder actually appearing was not seen (it was night, inside the
   quiet period).
-- iOS: untried. The app delegate has not been changed to show a reminder while the app is in the foreground.
+- iOS: reminders there are MM-405's (the plugin over `UNUserNotificationCenter`).
+- A reminder actually appearing at its time, the recovery check-in's included.
 - A phone restart: Android forgets scheduled notifications; the plugin's boot receiver is declared so they are set again, which has not
   been tested.

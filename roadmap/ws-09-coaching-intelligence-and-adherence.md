@@ -149,12 +149,11 @@ independent of step 3.
   card on the Coach screen; its options are text because the things they offer
   are not built), MM-141 (the insight framework, rationing and five of the ten
   rules, on the dashboard), MM-148 (pauses: setting, extending and ending one, the maintenance guide,
-  the estimator, the deficit count, the resume screen, the streak held and the glycogen shift at both ends; done), MM-146 (three local
-  reminders with their own times, the two-a-day cap, the quiet period, the stop after a week unanswered and the
-  onboarding offer; not the check-in or recovery ones; iOS untried), MM-248 (exact alarms when allowed, asked once
+  the estimator, the deficit count, the resume screen, the streak held and the glycogen shift at both ends; done), MM-146 (four local
+  reminders with their own times, the recovery check-in's included, the two-a-day cap, the quiet period, the stop after
+  a week unanswered and the onboarding offer; done, a quiet period the user can change needs a schema change), MM-248 (exact alarms when allowed, asked once
   with a reason from Settings, "On the minute" or "Within an hour"; checking on a phone is open), MM-116 (the five weekly questions, skipping, the
-  eight-week lines on the Coach screen, and the missed-period question from marked period days; not its reminder or a
-  place in the target-change summary), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
+  eight-week lines on the Coach screen, the missed-period question from marked period days, and its reminder; done), MM-117 (the offer after two hard check-ins or two lifts falling: a two-week
   break, a slower pace, or carry on; not the pace names, and not checked on a device), MM-33 (a report every 28 days: the
   work, the body, the measured expenditure or why there is none, each target change, strength, the longest logging run
   and the month's personal records; photos MM-157), MM-450 (the body-fat range from the waist in the report, at the end
