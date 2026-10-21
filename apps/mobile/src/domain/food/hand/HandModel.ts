@@ -53,10 +53,13 @@ function millilitersOf(unit: PortionUnit, hand: HandSize): number | undefined {
  * Version 2: a palm or thumb of a food with no stated density takes the
  * density of its makeup per 100 g (`compositionDensity`), so a palm of
  * salmon and a palm of chicken breast weigh differently.
+ *
+ * Version 3: only a moist food or one mostly fat takes its makeup's density;
+ * a dry, porous one (crisps, bread) takes the portion's default.
  */
 export const HandModel = {
   /** Stored with a hand-portion entry so old entries stay explicable. */
-  version: 2,
+  version: 3,
 
   millilitersOf,
 
