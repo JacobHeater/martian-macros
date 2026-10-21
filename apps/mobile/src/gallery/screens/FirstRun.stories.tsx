@@ -4,11 +4,13 @@ import { minorScenario } from './minorScenario';
 import { failingWrite } from './failingWrite';
 import { failingRead } from './failingRead';
 import { typicalSetup } from '../../fixtures/typicalSetup';
+import { CalendarDate } from '../../domain/CalendarDate';
 import { Pause } from '../../domain/Pause';
 import { userEvent, within } from 'storybook/test';
 import { HealthRecheckScreen } from '../../app/HealthRecheckScreen';
 import { WelcomeBackScreen } from '../../app/WelcomeBackScreen';
 import { newInstallScenario } from './newInstallScenario';
+import { appleHealthProfile } from './appleHealthProfile';
 import { onIos } from './onIos';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
@@ -92,6 +94,66 @@ export const BiologicalSex = screenStory({
   shows: 'Biological sex',
   scenario: newInstallScenario,
   walk: (canvas) => walkOnboarding(canvas, 1),
+});
+
+/** MM-69: on an iPhone, the first step offers to fill in from Apple Health. */
+export const BiologicalSexOnIos = screenStory({
+  covers: ['SexStep'],
+  shows: 'Fill in from Apple Health',
+  scenario: newInstallScenario,
+  device: appleHealthProfile(),
+  walk: (canvas) => walkOnboarding(canvas, 1),
+});
+
+/** What Apple Health holds, filled in from it; the sex selected, still to be confirmed with Next. */
+const fromAppleHealth = { sex: 'female', birthDate: CalendarDate.of(1990, 4, 12), heightCm: 168 } as const;
+
+export const BiologicalSexFilledFromHealth = screenStory({
+  covers: ['SexStep'],
+  shows: /Filled in from Apple Health/,
+  scenario: newInstallScenario,
+  device: appleHealthProfile({ profile: fromAppleHealth }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 1);
+    await press('Fill in from Apple Health')(canvas);
+  },
+});
+
+/** Apple Health had none of the answers, or reading was refused, which it does not tell: where to allow it. */
+export const BiologicalSexNothingInHealth = screenStory({
+  covers: ['SexStep'],
+  shows: /Apple Health had nothing to fill in/,
+  scenario: newInstallScenario,
+  device: appleHealthProfile(),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 1);
+    await press('Fill in from Apple Health')(canvas);
+  },
+});
+
+export const BiologicalSexHealthUnreadable = screenStory({
+  covers: ['SexStep'],
+  shows: /Apple Health could not be read just now/,
+  scenario: newInstallScenario,
+  device: appleHealthProfile({ unreadable: true }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 1);
+    await press('Fill in from Apple Health')(canvas);
+  },
+});
+
+/** The date of birth Apple Health held, filled in on the next step. */
+export const DateOfBirthFromHealth = screenStory({
+  covers: ['BirthDateStep'],
+  shows: /April 12, 1990/,
+  scenario: newInstallScenario,
+  device: appleHealthProfile({ profile: fromAppleHealth }),
+  walk: async (canvas) => {
+    await walkOnboarding(canvas, 1);
+    await press('Fill in from Apple Health')(canvas);
+    await within(canvas).findByText(/Filled in from Apple Health/);
+    await press('Next')(canvas);
+  },
 });
 
 export const DateOfBirth = screenStory({
