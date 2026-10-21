@@ -148,7 +148,7 @@ then a lean gain if you are at the cut's goal or another cut if not. Body fat
 is read as a range, never as one figure, and nothing changes until you choose.
 The weeks and lines are the app's judgement.
 
-Rows: PhaseRule.longestCutWeeks, PhaseRule.longestGainWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, PhaseRule.gainEndPercent, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
+Rows: PhaseRule.longestCutWeeks, PhaseRule.lowGoalHoldWeeks, PhaseRule.steadyPaceSigmas, PhaseRule.cutGoalPercent, LeanGainRule.stopBodyFatPercent, LeanGainRule.stopWeeks, planPhases, SafetyBounds.goalBodyFatFloorsPercent, SafetyBounds.checkGoalBodyFat
 
 ### When does the app ask about my health?
 
@@ -244,11 +244,9 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `SafetyBounds.checkGoalBodyFat` | Rejected under 8% men or 16% women; warned under 10% or 18% | engine SafetyBounds.ts | Whether a goal body fat is accepted | Product judgement | judgement | None | No |
 | `SafetyBounds.goalBodyFatFloorsPercent` | Hard 8% men, 16% women; soft 10% men, 18% women | engine SafetyBounds.ts | The floors `checkGoalBodyFat` applies and the words of a refused or limited goal say (MM-28, MM-36) | Product judgement, the table MM-28 accepted | judgement | None | No |
 | `PhaseRule.longestCutWeeks` | 16 whole weeks of unbroken deficit | engine PhaseRule.ts | When a cut ends and maintenance is recommended (MM-36); a recommendation, unlike the planned diet break at 20 weeks (MM-135) | MM-36's decision with the product owner, from the 16-week cap MM-28 accepted; no trial sets how long a cut should run | judgement | None | No |
-| `PhaseRule.longestGainWeeks` | 26 whole weeks | engine PhaseRule.ts | When a lean gain ends and maintenance is recommended (MM-36) | MM-129's proposed stop, not yet built there; muscle-gain rates by training age are coaches' rules of thumb | judgement | None | No |
 | `PhaseRule.lowGoalHoldWeeks` | 4 weeks | engine PhaseRule.ts | The time limit on a goal under the soft floor: once reached it is held at most this long, then a lean gain is recommended (MM-28, MM-36) | Product judgement; to be confirmed in MM-29 | judgement | None | No |
 | `PhaseRule.steadyPaceSigmas` | 2 standard deviations of the trend's slope | engine PhaseRule.ts | When the pace is steady enough to project the end of a phase from it (MM-36) | Product judgement, the two-deviation width the body-fat range is shown at | judgement | None | No |
 | `PhaseRule.cutGoalPercent` | 15% men, 23% women | engine PhaseRule.ts | The body fat a cut runs to when no goal is set (MM-36): the line under which the starting recommendation is a lean gain | Product judgement, the line of `recommendMode` (MM-12), informed by Barakat 2020 | judgement | None directly | No |
-| `PhaseRule.gainEndPercent` | 20% men, 30% women | engine PhaseRule.ts | The body fat at which a lean gain ends (MM-36, MM-129) | Product judgement, the line MM-12 calls high | judgement | None directly | No |
 | `planPhases` | A cut ends when the lower end of the range (the estimate less 0.6745 deviations) reaches its goal; a gain when the upper end reaches its line | engine planPhases.ts | Which end of the body-fat range each phase reads, so a plan never rests on one figure (MM-36, MM-34) | The quarter-chance rule MM-132 applies to safety thresholds, read in the cautious direction for each phase | judgement | None | No |
 | `fatMassKcalPerKg` | 9,440 kcal per kg (39.5 MJ) | engine partitionConstants.ts | The energy in a kilogram of fat | Hall 2008, as cited | strong | Adults | No |
 | `fatFreeMassKcalPerKg` | 1,815 kcal per kg (7.6 MJ) | engine partitionConstants.ts | The energy in a kilogram of lean tissue | Hall 2008, as cited | moderate | Adults | No |

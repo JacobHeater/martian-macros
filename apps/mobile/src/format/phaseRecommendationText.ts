@@ -1,5 +1,6 @@
 import type { PhaseEndReason } from '../engine/PhaseEndReason';
 import type { PhaseRecommendation } from '../engine/PhaseRecommendation';
+import { LeanGainRule } from '../engine/LeanGainRule';
 import { PhaseRule } from '../engine/PhaseRule';
 
 function endedBecause(reason: PhaseEndReason, line: number | undefined): string {
@@ -13,7 +14,7 @@ function endedBecause(reason: PhaseEndReason, line: number | undefined): string 
     case 'gainLine':
       return `The upper end of your body-fat range has reached ${line}%, where the plan ends a gain.`;
     case 'longestGain':
-      return `This gain has run ${PhaseRule.longestGainWeeks} weeks, the longest the plan runs one.`;
+      return `This gain has run ${LeanGainRule.stopWeeks} weeks, the longest the plan runs one.`;
     case 'holdDone':
       return 'This hold at maintenance has run its weeks.';
   }

@@ -7,7 +7,7 @@ const values = [
   'stalledAtFloor',
   /** The upper end of the body-fat range has reached the lean gain's line. */
   'gainLine',
-  /** The lean gain has run `PhaseRule.longestGainWeeks`. */
+  /** The lean gain has run `LeanGainRule.stopWeeks` (MM-129). */
   'longestGain',
   /** Maintenance after a cut or a gain has run its weeks. */
   'holdDone',

@@ -47,4 +47,4 @@ Scenario: An eating-disorder history
 ```
 
 ## Notes
-- MM-129's end of a gain should read `PhaseRule.gainEndPercent` and `PhaseRule.longestGainWeeks` rather than repeat them.
+- A gain's end is MM-129's `LeanGainRule.stopBodyFatPercent` and `stopWeeks`, which `planPhases` reads; the goal does not change it.

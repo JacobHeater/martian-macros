@@ -12,6 +12,7 @@ import {
 import {
   BodyFatEstimate,
   DailyTargets,
+  LeanGainRule,
   MaintenanceRule,
   PhaseRule,
   planPhases,
@@ -152,7 +153,7 @@ describe('the next phase', () => {
       then: 'fatLoss',
     });
     expect(gain(15, 70)?.recommendation).toBeUndefined();
-    expect(gain(15, PhaseRule.longestGainWeeks * 7)?.recommendation?.reason).toBe('longestGain');
+    expect(gain(15, LeanGainRule.stopWeeks * 7)?.recommendation?.reason).toBe('longestGain');
   });
 
   it('maintenance after a cut runs the weeks MM-130 suggests, then the range decides what follows', () => {
@@ -226,7 +227,7 @@ describe('a projected end', () => {
     const setup = setupFor({ goal: 'leanGain' });
     const at = (kgPerWeek: number) =>
       planPhases({ setup, snapshot: snapshotFor(setup, { percent: 15, kgPerWeek }), history: [record(70, 'leanGain')], today });
-    expect(at(0.25)).toMatchObject({ projectedEndReason: 'longestGain', projectedEndOn: today.addDays(PhaseRule.longestGainWeeks * 7 - 70) });
+    expect(at(0.25)).toMatchObject({ projectedEndReason: 'longestGain', projectedEndOn: today.addDays(LeanGainRule.stopWeeks * 7 - 70) });
     expect(at(0.5)).toMatchObject({ projectedEndReason: 'gainLine', projectedEndOn: today.addDays(69) });
   });
 });
