@@ -1,6 +1,7 @@
 import type { Clock } from '../domain/integration/Clock';
 import type { Platform } from '../domain/integration/Platform';
 import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
+import type { ExactAlarms } from '../domain/integration/ExactAlarms';
 import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
@@ -102,6 +103,9 @@ export interface AppServices {
 
   /** The phone's own scheduled notifications (MM-146). Nothing here uses the network. */
   readonly reminderScheduler: ReminderScheduler;
+
+  /** Whether a reminder arrives on the minute or within an hour (MM-248). */
+  readonly exactAlarms: ExactAlarms;
 
   /** The phone's health platform (MM-68). The app only reads from it. */
   readonly healthSource: HealthSource;

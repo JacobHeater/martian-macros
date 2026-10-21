@@ -208,4 +208,11 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute("ALTER TABLE user_preferences ADD COLUMN usual_cooking_fat TEXT NOT NULL DEFAULT 'oil'");
     },
   ],
+  // 14 to 15 (MM-71): the scale chosen as primary in Settings, none (automatic) until chosen.
+  [
+    14,
+    async (db) => {
+      await db.execute('ALTER TABLE user_preferences ADD COLUMN primary_scale_source_id TEXT NULL');
+    },
+  ],
 ]);

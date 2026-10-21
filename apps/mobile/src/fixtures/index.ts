@@ -12,6 +12,7 @@ export * from './InMemoryCustomFoodRepository';
 export * from './InMemoryDataEraser';
 export * from './InMemoryDayMarkRepository';
 export * from './InMemoryEntitlement';
+export * from './InMemoryExactAlarms';
 export * from './InMemoryExerciseProgressionRepository';
 export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
