@@ -34,7 +34,7 @@ export function AppRoot() {
         />
       </div>
     ) : (
-      <div className="app-centered app-centered-page app-centered-middle">
+      <div className="app-centered app-centered-page app-centered-middle" data-testid="waiting-setup">
         <MmSpinner />
       </div>
     );
@@ -45,7 +45,7 @@ export function AppRoot() {
         <ReadFailedNotice title="Could not load your theme preference" onRetry={() => state.themePreference.retry()} />
       </div>
     ) : (
-      <div className="app-centered app-centered-page app-centered-middle">
+      <div className="app-centered app-centered-page app-centered-middle" data-testid="waiting-theme">
         <MmSpinner />
       </div>
     );
@@ -61,7 +61,7 @@ export function AppRoot() {
         />
       </div>
     ) : (
-      <div className="app-centered app-centered-page app-centered-middle">
+      <div className="app-centered app-centered-page app-centered-middle" data-testid="waiting-terms">
         <MmSpinner />
       </div>
     );
