@@ -913,17 +913,31 @@ export const EditRecipeLineWeight = screenStory({
   },
 });
 
-/** MM-456: a found line whose food is no longer installed keeps its totals and says so. */
+/** MM-456: a found line whose food is no longer installed keeps its totals, says so, and its menu offers no weight change. */
 export const EditRecipeLineFoodGone = screenStory({
   covers: ['MyFoodsStep'],
-  shows: 'Its food is not installed, so this line keeps its totals.',
+  shows: '200 g · 730 kcal · food not installed',
   scenario: withRiceBowl('a-pack-since-removed'),
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
     await press(/^Demo rice bowl/)(canvas);
     await press('More actions for White rice, raw')(canvas);
-    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
+  },
+});
+
+/** MM-456: an ingredient just added: focus back in the search, and "Added …" said politely. */
+export const NewRecipeIngredientAdded = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Added White rice, cooked',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New recipe')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
+    await press('Add ingredient')(canvas);
   },
 });
 

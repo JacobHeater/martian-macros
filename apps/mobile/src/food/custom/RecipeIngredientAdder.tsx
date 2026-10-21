@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { RecipeIngredient } from '../../domain/food/custom/RecipeIngredient';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
 import type { CatalogFood } from '../../foodCatalog/CatalogFood';
@@ -22,6 +22,8 @@ const per100g = (food: CatalogFood) => `${roundHalfAwayFromZero(food.kcal) + 0} 
  * or a name and the totals typed in. Calls `onAdd` with the line and
  * clears. A found food the pack has raw and cooked asks which state was
  * weighed, as the amount step does (MM-151), and the line is of that state.
+ * Once a line is added, focus goes back to the first field for the next one
+ * and "Added {name}" is said politely (MM-456).
  */
 export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredient) => void }) {
   const { state } = useApp();
@@ -36,6 +38,12 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
   const [picked, setPicked] = useState<CatalogFood>();
   const [byNumbers, setByNumbers] = useState(false);
   const [useAlternate, setUseAlternate] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  // The last line added, said politely; and how many have been, so focus returns after each.
+  const [added, setAdded] = useState<{ name: string; count: number }>();
+  useEffect(() => {
+    if (added !== undefined) root.current?.querySelector<HTMLInputElement>('input')?.focus();
+  }, [added?.count]);
 
   const searching = !byNumbers && picked === undefined && query.trim() !== '';
   const hits =
@@ -90,12 +98,13 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
   const add = () => {
     if (ready === undefined) return;
     onAdd(ready);
+    setAdded({ name: ready.name, count: (added?.count ?? 0) + 1 });
     choose(undefined);
     for (const clear of [setQuery, setGrams, setName, setKcal, setProtein, setCarbs, setFat]) clear('');
   };
 
   return (
-    <div className="food-ingredient-adder">
+    <div ref={root} className="food-ingredient-adder">
       <p className="food-label">Add an ingredient</p>
       {byNumbers ? (
         <>
@@ -159,13 +168,16 @@ export function RecipeIngredientAdder({ onAdd }: { onAdd: (line: RecipeIngredien
       ) : null}
       <div className="app-gap-small" />
       <div className="app-row">
-        <MmButton label="Add" kind="secondary" onPress={ready === undefined ? undefined : add} />
+        <MmButton label="Add ingredient" kind="secondary" onPress={ready === undefined ? undefined : add} />
         <MmButton
           label={byNumbers ? 'Search instead' : 'Enter numbers instead'}
           kind="text"
           onPress={() => setByNumbers(!byNumbers)}
         />
       </div>
+      <p className="app-caption" role="status">
+        {added === undefined ? '' : `Added ${added.name}`}
+      </p>
     </div>
   );
 }
