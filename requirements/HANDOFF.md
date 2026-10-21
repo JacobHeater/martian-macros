@@ -180,7 +180,7 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
-## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 29 PRs merged)
+## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 30 PRs merged)
 
 - **The owner's words this session:** "I want all milestones done in rapid fire. No more excuses, and no more
   delays." The owner allowed `gh pr merge` and lifted the subagent cap for this push. On #211: "I reject #211 icons."
@@ -204,7 +204,8 @@ MM-242, a draft by non-lawyers that blocks release.
 - **Lessons:** a ticket placed in a step must also be in that milestone's `requires` list, or `mm check` fails (twice
   today). Scripted edits failed silently three times (a reminder toggle, a swallowed comment, an emptied ticket):
   re-read every scripted edit. The shared "Built" and "In progress" lines in the workstream files conflict on almost
-  every merge; record status in `roadmap.json` and touch only a step's own lines. `gh` lives in `~/.local/bin`, and
+  every merge; record status in `roadmap.json` and touch only a step's own lines. Two green PRs can still break `main`
+  together (#221 and #227 crossed on the eraser contract; #228 fixed it): check `main`'s run after a burst of merges. `gh` lives in `~/.local/bin`, and
   `/usr/bin/git` (not `/usr/local/bin`'s 2.10) pushes with `-c credential.helper='!gh auth git-credential'`.
 - **Not run:** nothing was run locally; CI validated every merge.
 
