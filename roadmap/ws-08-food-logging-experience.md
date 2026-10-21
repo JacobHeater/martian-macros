@@ -93,8 +93,7 @@ and WS-09 steps 1 and 8.
    is a new `QuantitySource` value with 40% uncertainty; teach the
    estimator's style rule about it in the same change. The "cooked with oil"
    control in the prompt ticket needs generic foods and waits for step 4.
-3. **Custom foods and recipes (MM-45, MM-456).** M3. First schema change here. MM-456 adds the source food to
-   `recipe_ingredients` and waits for a free schema version.
+3. **Custom foods and recipes (MM-45).** M3. First schema change here.
 4. **Search; store every nutrient; detail level; quantity, unit and basis
    (MM-42, MM-49, MM-167).** M2. Build
    against the fixture pack. Storing nutrients is one migration, and the quantity, unit and nutrition-basis
@@ -112,6 +111,7 @@ and WS-09 steps 1 and 8.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
 - Placed 2026-10-19 in step 4: MM-408 (the search results flashed on every keystroke; the packs are now asked once the typing pauses and the last results stay until the next arrive, done); MM-410 ("More results" lengthens the list by twenty while there are more, the first new row focused and announced, now that the 2026-10-19 packs give a common word hundreds of matches; done); MM-411 (a failed page of results says so; proposed, from the panel's review of MM-410).
 13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's.
+14. **A recipe ingredient keeps the food it came from (MM-456).** M4. Adds the source food to `recipe_ingredients`, so a weight can change without re-adding; waits for a free schema version.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
