@@ -102,6 +102,7 @@ export async function openAppServices(): Promise<AppServices> {
     targets: repositories.targets,
     targetShapes: repositories.targetShapes,
     preferences: repositories.preferences,
+    weighInWindow: repositories.weighInWindow,
     insightLog: repositories.insightLog,
     inlineInsightLog: repositories.inlineInsightLog,
     insightSnoozes: repositories.insightSnoozes,
