@@ -934,11 +934,13 @@ export const WhyYourTargetsOnWeightLossMedication = screenStory({
 // ---- MM-507: the goal body fat, set from the goal section ----
 
 /** Opens the goal body fat sheet and types `percent`, when given. */
-const goalBodyFat = (percent?: string) => async (canvas: HTMLElement) => {
+const goalBodyFat = (percent?: string, { leave = false }: { leave?: boolean } = {}) => async (canvas: HTMLElement) => {
   await pressOnCoach(/^Goal body fat/)(canvas);
   if (percent === undefined) return;
   const field = await within(canvas.ownerDocument.body).findByRole('textbox', { name: /^Goal body fat/ }, { timeout: 5000 });
   await userEvent.type(field, percent);
+  // A refusal is said once the value is left, never while it is typed (MM-507).
+  if (leave) await userEvent.tab();
 };
 
 /** MM-507: the goal body fat sheet with nothing set: what it is, and the plan's own line. */
@@ -949,12 +951,12 @@ export const CoachGoalBodyFat = screenStory({
   walk: goalBodyFat(),
 });
 
-/** MM-507: a goal under the hard floor: refused with the reason, and it cannot be set. */
+/** MM-507: a goal under the hard floor, once left: refused with the reason, and it cannot be set. */
 export const CoachGoalBodyFatRefused = screenStory({
   covers: ['CoachScreen', 'GoalBodyFatSheet'],
   shows: '6% is under 8%, the lowest goal body fat the app plans toward for men.',
   open: onCoach,
-  walk: goalBodyFat('6'),
+  walk: goalBodyFat('6', { leave: true }),
 });
 
 /** MM-507: a goal under the soft floor: it can be set, with its warning and time limit. */
@@ -972,6 +974,14 @@ export const CoachGoalBodyFatSet = screenStory({
   scenario: demoWith({ then: async (repos, today) => repos.goalBodyFat.saveGoalBodyFat({ percent: 13, setOn: today.addDays(-10) }) }),
   open: onCoach,
   walk: goalBodyFat(),
+});
+
+/** MM-507: a goal set under the soft floor: the row stays short, and the warning is a caution notice under it. */
+export const CoachGoalBodyFatSetLow = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^9% is under 10%, low enough that it is hard to hold/,
+  scenario: demoWith({ then: async (repos, today) => repos.goalBodyFat.saveGoalBodyFat({ percent: 9, setOn: today.addDays(-10) }) }),
+  open: onCoach,
 });
 
 // ---- MM-118: the weight display ----

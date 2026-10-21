@@ -18,6 +18,7 @@ import { displayTargets } from '../format/displayTargets';
 import { FatLossPace } from '../engine/FatLossPace';
 import { PhaseRule } from '../engine/PhaseRule';
 import { SafetyBounds } from '../engine/SafetyBounds';
+import { goalBodyFatCheckText } from '../format/goalBodyFatCheckText';
 import { goalBodyFatSubtitle } from '../format/goalBodyFatSubtitle';
 import { quantityText } from '../format/quantityText';
 import { leanGainPaceName } from '../format/leanGainPaceName';
@@ -227,12 +228,17 @@ export function CoachScreen() {
     if (answer === undefined) return;
     if (answer === 'default') {
       await services.goalBodyFat.clearGoalBodyFat();
-      overlays.snack(`The plan runs to its own line, ${PhaseRule.cutGoalPercent(sex)}%.`);
+      overlays.snack(`The plan’s own goal, ${PhaseRule.cutGoalPercent(sex)}%, is back.`);
       return;
     }
     if (SafetyBounds.checkGoalBodyFat(sex, answer) === 'rejected') return;
     await services.goalBodyFat.saveGoalBodyFat({ percent: answer, setOn: today });
-    overlays.snack(`Goal body fat set to ${quantityText(answer)}%.`);
+    // Under the soft floor the snack restates the limit the sheet said (MM-507).
+    overlays.snack(
+      SafetyBounds.checkGoalBodyFat(sex, answer) === 'warnAndTimeLimit'
+        ? `Goal body fat set to ${quantityText(answer)}%, held ${PhaseRule.lowGoalHoldWeeks} weeks at most once reached.`
+        : `Goal body fat set to ${quantityText(answer)}%.`,
+    );
   };
 
   const detail = current === undefined ? undefined : paceDetail(snapshot, current.targets.weeklyRateFraction, fmt);
@@ -246,6 +252,11 @@ export function CoachScreen() {
   // On a weight-loss medication (MM-113, MM-510): the fast pace is for the prescriber, and training keeps muscle.
   const paceNote = current === undefined ? undefined : weightLossMedicationPaceNote(setup.screening, current.targets.flags);
   const trainingNote = weightLossMedicationTrainingNote(setup.screening, setup.trainingDaysPerWeek);
+  // The goal body fat row (MM-507): only in fat loss and recomp, and never with an eating-disorder history.
+  const goalBodyFatOffered =
+    !setup.screening.eatingDisorderHistory && (setup.goalMode === 'fatLoss' || setup.goalMode === 'recomp');
+  const goalBodyFatWarning =
+    goalBodyFat === undefined ? undefined : goalBodyFatCheckText(setup.profile.sex, goalBodyFat.percent);
   // What the health platform's gaps cost, each beside the estimate it weakens (MM-523).
   const gaps = dataGapsOf({
     connection,
@@ -316,17 +327,28 @@ export function CoachScreen() {
             onChooseAnother={() => void changeGoal()}
           />
         )}
-        {/* The goal body fat (MM-507); never offered with an eating-disorder history, as MM-36 projects nothing from body fat for it. */}
-        {setup.screening.eatingDisorderHistory ? null : (
-          <MmListRow
-            leadingIcon="percent"
-            title="Goal body fat"
-            subtitle={goalBodyFatSubtitle(setup.profile.sex, goalBodyFat)}
-            dense
-            flush
-            opens
-            onPress={() => void changeGoalBodyFat()}
-          />
+        {/*
+          The goal body fat (MM-507): offered only while losing fat (fat loss or recomp), where a cut runs to it;
+          never with an eating-disorder history, as MM-36 projects nothing from body fat for it.
+          Its subtitle stays short; a soft-floor warning is a caution notice under it.
+        */}
+        {!goalBodyFatOffered ? null : (
+          <>
+            <MmListRow
+              leadingIcon="percent"
+              title="Goal body fat"
+              subtitle={goalBodyFatSubtitle(setup.profile.sex, goalBodyFat)}
+              dense
+              flush
+              opens
+              onPress={() => void changeGoalBodyFat()}
+            />
+            {goalBodyFatWarning === undefined ? null : (
+              <div className="app-stack-item">
+                <Notice kind="caution" text={goalBodyFatWarning} />
+              </div>
+            )}
+          </>
         )}
         {/* What the first month looks like, reread any time (MM-158). */}
         <MmListRow
