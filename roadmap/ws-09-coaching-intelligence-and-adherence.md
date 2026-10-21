@@ -160,7 +160,9 @@ independent of step 3.
   and the month's personal records; photos MM-157), MM-450 (the body-fat range from the waist in the report, at the end
   of the month and when it began, as it stood then; no change with an eating-disorder history), MM-92 (the logging streak, forgiving one missed
   day in seven, as a quiet Dashboard line; personal records on the workout, and both in the monthly report).
-- Remaining: MM-133, MM-32, MM-36, MM-507. Epic: MM-145.
+- Remaining: MM-133, MM-32, MM-507. Epic: MM-145.
+- Done 2026-10-21: MM-36 (phase planning; setting the goal body fat is MM-507), MM-361 (every child built or
+  closed), MM-248 (reminders on the minute; what is owed is on a phone).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-168 (The insight card's Dismiss button sat under the Add food button, done).
 - Placed 2026-10-13 in step 4: MM-248 (reminders on the minute: the exact-alarm permission, asked once with a reason; the owner's call).
 - Added 2026-10-14 (step 9): MM-312 (the sodium-over-the-limit insight, after MM-311).
