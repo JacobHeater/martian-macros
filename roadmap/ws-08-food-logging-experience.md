@@ -103,13 +103,16 @@ and WS-09 steps 1 and 8.
    source and trust tier here.
 5. **Barcode; raw or cooked (MM-43, MM-151).** M2.
 6. **Alcohol and fiber (MM-127, MM-126).** M4. Both read nutrient fields from
-   step 4. Fiber is a guide and is never judged.
+   step 4. Fiber is a guide and is never judged. Done 2026-10-21: alcohol typed
+   in grams or standard drinks, its line on Food and Today; the fiber line at
+   Full detail and its one insight, at most monthly.
 7. **Hand portions (MM-46).** M4. Needs food densities in the pack and a
    third logging style in the estimator.
 8. **Label scanning; live lookup (MM-44, MM-58).** M4.
 9. **The Food screen and Add food hierarchy (MM-224) (MM-180, MM-213, MM-223, MM-225, MM-226, MM-227, MM-218, MM-219, MM-220, MM-221).** M2. Placed 2026-10-13.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
 - Placed 2026-10-19 in step 4: MM-408 (the search results flashed on every keystroke; the packs are now asked once the typing pauses and the last results stay until the next arrive, done); MM-410 ("More results" lengthens the list by twenty while there are more, the first new row focused and announced, now that the 2026-10-19 packs give a common word hundreds of matches; done); MM-411 (a failed page of results says so; proposed, from the panel's review of MM-410).
+12. **The grade, the packs' sources and their downloads (MM-380 to MM-388, MM-471).** M4. Of the download follow-ups: re-opening the catalog closes the packs of the one it replaces (MM-386, done); a pack file streams into its partial natively and only counts reach the app (MM-387, built, the release-build memory check on the phone owed); a cancelled native download settles (MM-471, done).
 13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's.
 14. **A recipe ingredient keeps the food it came from (MM-456).** M4. Adds the source food to `recipe_ingredients`, so a weight can change without re-adding; waits for a free schema version.
 
@@ -134,13 +137,15 @@ workstream's.
   barcode), MM-150 (estimate a meal; the estimator already restarts its window when weighing gives way to estimates, tested; adherence reporting and simulator users are open),
   MM-152 (the easy-to-miss line and its setting; the cooking-fat control is open), MM-151 (raw or cooked switch; the published packs
   need a rebuild), MM-167 (quantity, unit and nutrition basis; the source food is stored, the raw/cooked state is not), MM-49 (detail level Simple/Standard/Full, fiber, sodium and alcohol stored; entry rows and the day's hero follow it; sugars and saturated fat are not in the packs), MM-46 (hand portions through a judgement-based hand model; the nudge to weigh protein and the estimator's separate hand style are open), MM-44 (a label is read on the device into a saved food; not yet tried with the real camera). Epic: MM-37.
-- Remaining: MM-127, MM-126, MM-58, MM-456 (a recipe's ingredient keeps the food it came from; needs a schema change).
+- Remaining: MM-58, MM-456 (a recipe's ingredient keeps the food it came from; needs a schema change).
+- Built 2026-10-21: MM-127 (alcohol in standard drinks, its line on Today too), MM-126 (the fiber insight).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-207 (Food entry deletion lacks a visible alternative to swipe, done); MM-169 (Editing a logged pack food dropped the record of which food it came from, done); MM-170 (Choosing "Raw" while weighing, then a serving, logged the raw food, done); MM-202 (An unchanged food edit rounds stored quantity and totals, done); MM-203 (Per-serving alcohol grams are not scaled with consumed energy, done); MM-204 (Converting a calculated entry to typed totals drops alcohol, done); MM-216 (Changing how a food was measured clears the amount without saying so, done); MM-217 (A found food logged by palm, cupped hand or thumb reads as an exact amount, done); MM-171 (The fiber and alcohol lines sat against the meals card, done); MM-172 (The Android release build failed after the label reader was added, done); MM-180 (Give each meal its own card); MM-213 (Saved and Estimate break mid-word at the top of the Add food sheet, done); MM-223 (Add food search and manual entry compete on the opening screen, done); MM-225 (Preview the macro-energy split before logging food, done); MM-226 (Manual nutrition does not explain what the entered values represent, done); MM-227 (Add food reference incorrectly centers Back to search, done); MM-218 (Before logging, the sheet says what it will log); MM-219 (Finding a food and typing one are told apart, and every way in stays in reach); MM-220 (The action that finishes a step is in view, says what it is waiting for, and the sheet can be left); MM-221 (Editing an entry shows what was typed, and says what its day control does).
 - Placed 2026-10-19: MM-408 (The search results flash on every keystroke, done); MM-410 (See more than the first twenty results, done); MM-411 (A failed page of search results says so, proposed).
 - Added 2026-10-14 (the owner, MM-305 water, sodium and micronutrients; step 10): MM-305 (epic), MM-306 (the micronutrient
   non-goal overruled), MM-308 (the log keeps micronutrients), MM-309 (labels and own foods), MM-310 (the Micros segment),
   MM-311 (the sodium limit), MM-313 (water).
 - Built 2026-10-14: MM-325 (version 5: the sodium limit's column for a phone that ran the first version 4).
+- Added 2026-10-21 (step 12): MM-471 (cancelling a pack download on the phone never settled it, done).
 - Added 2026-10-19 (step 13): MM-406 (the camera on iOS).
 
 ## Notes for whoever builds it

@@ -282,7 +282,8 @@ export function CoachScreen() {
       <StallCard />
       <RecompReviewCard />
       <AdherenceCard />
-      <RecoveryCard />
+      {/* The one-thing row above is the way into a due check-in (MM-391). */}
+      <RecoveryCard answeredAbove />
       <ReportsCard />
       <MmSection icon="bolt" title="Your metabolism">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
