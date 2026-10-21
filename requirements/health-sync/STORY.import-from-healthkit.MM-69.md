@@ -118,6 +118,10 @@ uncompiled until it is built on the Mac.
   nothing and cannot be skipped; a failed read; the date of birth and height on their steps; Android not offered).
 - What MM-68 itself has not built (the offer at the end of onboarding, sessions in the training log, background
   reading, which the owner ruled out) is MM-68's for both platforms, not this ticket's.
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): HealthKit's handlers are `@Sendable`, so none adds to
+  a captured `var` any more. `profile` copies what it found to `let known` before the height query and adds the height
+  to its own copy; `changes` gathers into a locked `ChangesGathered` box and `removeOwn` into a locked `FirstFailure`.
+  Test: `test/ios/healthProfileOnIos.test.ts` (reads the Swift). Not built: CI builds no iOS app.
 
 ## Owed on a phone
 - The shared health-source suite (MM-67) against HealthKit on the iPhone, with readings of each kind.
@@ -126,3 +130,4 @@ uncompiled until it is built on the Mac.
   reading refused, nothing is selected and the step waits.
 - No weight in Apple Health: Settings says none was found and where to check.
 - The first iOS build of `profile` in `MmHealthPlugin.swift`.
+- The first iOS build of the `@Sendable` fixes in `profile`, `changes` and `removeOwn` (no warning under strict concurrency).

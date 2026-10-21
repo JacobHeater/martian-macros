@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
+import { healthWritePrefix } from '../../src/healthIngest/healthWritePrefix';
 
 /**
  * MM-70, MM-314, MM-513, MM-514, MM-515, MM-489: both shells write to the health platform. CI
@@ -81,4 +82,26 @@ it('removing what was written reaches only the app’s own records, by its prefi
 it('a workout deleted in the app is removed only while writing workouts is on, and only the app’s own (MM-515)', () => {
   expect(kotlin).toContain('client().deleteRecords(ExerciseSessionRecord::class, emptyList(), listOf(clientId))');
   expect(swift).toContain('HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeySyncIdentifier, allowedValues: [clientId])');
+});
+
+it('both plugins mark the app’s own workouts by their source, for the adapter to skip (MM-489, MM-490)', () => {
+  expect(kotlin).toContain('.put("ours", ours(record))');
+  expect(swift).toContain('"ours": workout.sourceRevision.source == HKSource.default()');
+});
+
+it('removing a whole kind deletes by time, which is not held to thirty days; a narrower prefix falls back (MM-514)', () => {
+  expect(kotlin).toContain('if (prefix == kindPrefixes[kind])');
+  expect(kotlin).toContain('client().deleteRecords(type, everything)');
+  expect(kotlin).toContain('ownIdsWith(type, prefix, TimeRangeFilter.after(Instant.now().minus(Duration.ofDays(30))))');
+  for (const [kind, prefix] of Object.entries(healthWritePrefix)) expect(kotlin).toContain(`"${kind}" to "${prefix}"`);
+});
+
+it('the history is asked for only where Health Connect offers it, and an erase forgets it was asked (MM-73)', () => {
+  const request = kotlin.slice(kotlin.indexOf('fun requestHistory('), kotlin.indexOf('fun historyAnswered('));
+  const check = request.indexOf('HealthConnectFeatures.FEATURE_READ_HEALTH_DATA_HISTORY');
+  expect(check).toBeGreaterThan(-1);
+  expect(check, 'checked before it is marked asked').toBeLessThan(request.indexOf('putBoolean(historyAskedKey, true)'));
+  expect(request).toContain('.put("unavailable", true)');
+  const renew = kotlin.slice(kotlin.indexOf('fun renewWriteNamespace('));
+  expect(renew.slice(0, renew.indexOf('\n    }\n'))).toContain('.remove(historyAskedKey)');
 });

@@ -253,35 +253,27 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         // The anchor carries its type with it, so every kind is asked and sorted by name here.
         let group = DispatchGroup()
-        var upserted: JSArray = []
-        var deleted: JSArray = []
-        var failure: Error?
-        var next = anchor
-        let lock = NSLock()
+        // Gathered in a locked box, never in a captured var, since HealthKit's handlers are @Sendable and run on its threads.
+        let gathered = ChangesGathered(anchor: anchor)
         for (name, type) in Self.types {
             group.enter()
             let query = HKAnchoredObjectQuery(type: type, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { _, added, removed, newAnchor, error in
-                lock.lock()
-                if let error = error {
-                    failure = error
-                } else {
-                    upserted.append(contentsOf: (added ?? []).compactMap { self.raw(name, $0) })
-                    deleted.append(contentsOf: (removed ?? []).map { $0.uuid.uuidString })
-                    if let newAnchor = newAnchor { next = newAnchor }
-                }
-                lock.unlock()
+                let rows: JSArray = error == nil ? (added ?? []).compactMap { self.raw(name, $0) } : []
+                let gone: JSArray = error == nil ? (removed ?? []).map { $0.uuid.uuidString } : []
+                gathered.add(rows, gone, newAnchor, error)
                 group.leave()
             }
             store.execute(query)
         }
         group.notify(queue: .global()) {
-            if let failure = failure { return call.reject(failure.localizedDescription) }
+            let result = gathered.result()
+            if let failure = result.failure { return call.reject(failure.localizedDescription) }
             call.resolve([
                 "expired": false,
-                "nextToken": Self.token(of: next),
+                "nextToken": Self.token(of: result.next),
                 "hasMore": false,
-                "upserted": upserted,
-                "deletedIds": deleted,
+                "upserted": result.upserted,
+                "deletedIds": result.deleted,
             ])
         }
     }
@@ -400,18 +392,16 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             HKQuery.predicateForObjects(withMetadataKey: Self.entryKey, allowedValues: [id]),
         ])
         let group = DispatchGroup()
-        var failure: Error?
-        let lock = NSLock()
+        // A locked box, not a captured var: the handlers are @Sendable.
+        let failed = FirstFailure()
         for type in types where allowed(type) {
             group.enter()
             store.deleteObjects(of: type, predicate: predicate) { _, _, error in
-                lock.lock()
-                if let error = error { failure = error }
-                lock.unlock()
+                failed.note(error)
                 group.leave()
             }
         }
-        group.notify(queue: .global()) { then(failure) }
+        group.notify(queue: .global()) { then(failed.value) }
     }
 
     /// Writes one logged food (MM-70): a sample for each nutrient given and allowed, what was written for it before removed first. A nutrient not given is not written.
@@ -556,7 +546,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
     /// MM-188's strength types: a workout of one of these is imported as strength.
     private static let strengthTypes: Set<HKWorkoutActivityType> = [.traditionalStrengthTraining, .functionalStrengthTraining, .coreTraining]
 
-    /// Workouts (MM-489), this app's own among them: the adapter knows them by their sync identifier. HealthKit has no segments.
+    /// Workouts (MM-489), this app's own among them, marked `ours` by their source: the adapter skips them. HealthKit has no segments.
     @objc func readWorkouts(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
         let predicate = HKQuery.predicateForSamples(withStart: dateArgument(call, "fromMs"), end: dateArgument(call, "toMs"), options: .strictStartDate)
@@ -574,6 +564,8 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
                     "sourceId": workout.sourceRevision.source.bundleIdentifier,
                     "sourceName": workout.sourceRevision.source.name,
                     "segments": [] as JSArray,
+                    // The app's own, said by its source, so it is never taken for one to import (MM-489, MM-490).
+                    "ours": workout.sourceRevision.source == HKSource.default(),
                 ]
                 return json
             }
@@ -637,24 +629,27 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         if let born = HKObjectType.characteristicType(forIdentifier: .dateOfBirth) { wanted.insert(born) }
         store.requestAuthorization(toShare: nil, read: wanted) { _, error in
             if let error = error { return call.reject(error.localizedDescription) }
-            var answer: JSObject = [:]
+            var found: JSObject = [:]
             // Each characteristic throws when it cannot be read; that is no answer, as a refusal is.
             if let sex = try? self.store.biologicalSex().biologicalSex {
                 switch sex {
-                case .female: answer["sex"] = "female"
-                case .male: answer["sex"] = "male"
-                case .other: answer["sex"] = "other"
+                case .female: found["sex"] = "female"
+                case .male: found["sex"] = "male"
+                case .other: found["sex"] = "other"
                 default: break
                 }
             }
             if let born = try? self.store.dateOfBirthComponents(), let year = born.year, let month = born.month, let day = born.day {
-                answer["birthYear"] = year
-                answer["birthMonth"] = month
-                answer["birthDay"] = day
+                found["birthYear"] = year
+                found["birthMonth"] = month
+                found["birthDay"] = day
             }
+            // Copied before the @Sendable handler below, which takes its own copy to add to, never the captured var.
+            let known = found
             let latest = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
             let query = HKSampleQuery(sampleType: HKQuantityType(.height), predicate: nil, limit: 1, sortDescriptors: [latest]) { _, samples, _ in
                 // A height that cannot be read is no answer either; the sex and date of birth still are.
+                var answer = known
                 if let height = samples?.first as? HKQuantitySample {
                     answer["heightM"] = height.quantity.doubleValue(for: .meter())
                 }
@@ -662,5 +657,55 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             self.store.execute(query)
         }
+    }
+}
+
+/// What the anchored queries of `changes` gather, from HealthKit's threads, behind a lock (MM-69).
+private final class ChangesGathered: @unchecked Sendable {
+    private let lock = NSLock()
+    private var upserted: JSArray = []
+    private var deleted: JSArray = []
+    private var next: HKQueryAnchor
+    private var failure: Error?
+
+    init(anchor: HKQueryAnchor) {
+        next = anchor
+    }
+
+    func add(_ rows: JSArray, _ gone: JSArray, _ newAnchor: HKQueryAnchor?, _ error: Error?) {
+        lock.lock()
+        defer { lock.unlock() }
+        if let error = error {
+            failure = error
+            return
+        }
+        upserted.append(contentsOf: rows)
+        deleted.append(contentsOf: gone)
+        if let newAnchor = newAnchor { next = newAnchor }
+    }
+
+    func result() -> (upserted: JSArray, deleted: JSArray, next: HKQueryAnchor, failure: Error?) {
+        lock.lock()
+        defer { lock.unlock() }
+        return (upserted, deleted, next, failure)
+    }
+}
+
+/// The first error any of several HealthKit handlers reports, behind a lock (MM-69).
+private final class FirstFailure: @unchecked Sendable {
+    private let lock = NSLock()
+    private var failure: Error?
+
+    func note(_ error: Error?) {
+        guard let error = error else { return }
+        lock.lock()
+        defer { lock.unlock() }
+        failure = error
+    }
+
+    var value: Error? {
+        lock.lock()
+        defer { lock.unlock() }
+        return failure
     }
 }
