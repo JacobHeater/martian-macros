@@ -1,10 +1,10 @@
 # WS-12: Backup and portability
 
-**Order** 12 · **Group** C · **State** not started · **Risk** medium
+**Order** 12 · **Group** C · **State** in progress (every step built; the epic MM-59 stays open for MM-404) · **Risk** medium
 
 ## Summary
 A user-initiated, encrypted snapshot of the user's data that they can restore,
-on storage they chose.
+on storage they chose through the system share sheet.
 
 ## Why this is a workstream, and why it is this late
 The app is offline-only, with no account and no server. That is its privacy
@@ -31,8 +31,8 @@ ever holding their data on a server.
 - A spike on what each platform allows for health data in device and cloud
   backup.
 - Encrypted backup to a file and restore from it.
-- Storage providers: Google Drive, Dropbox, OneDrive, WebDAV or S3, and a
-  share-sheet export.
+- The share sheet as the only way out and the document picker the only way
+  back (MM-64, decided 2026-10-20).
 
 ## Excluded or deferred
 - iCloud as a provider: the founding decision is no, because of the App Store
@@ -43,6 +43,10 @@ ever holding their data on a server.
 - Progress photos in a backup: off by default, specified in the photos ticket
   in WS-07.
 - The food pack: never included. It is downloadable and large.
+- Connectors to storage services (Google Drive, Dropbox, OneDrive, WebDAV,
+  S3): dropped by the owner on 2026-10-20. The share sheet reaches all of
+  them through the apps the person has installed.
+- Export for reading outside the app or for other logging apps: not a goal.
 
 ## Prerequisites
 - **WS-01 (MM-61)** from step 2. Absolute: restore runs migrations on the
@@ -56,9 +60,7 @@ feed the privacy declarations.
 
 ## Packages and surfaces
 - `apps/mobile/src/data` (snapshot with `VACUUM INTO`, encryption, restore)
-- a backup providers package (new), one adapter per provider
 - `apps/mobile` settings: a backup screen
-- OAuth configuration for each cloud provider (outside the repository)
 
 ## Risks
 - **Cryptography is easy to get subtly wrong.** The design names the
@@ -68,11 +70,9 @@ feed the privacy declarations.
 - **Restore replaces everything.** It is the most destructive action in the
   app after erase. Confirm it, validate the file fully before touching the
   live database, and keep the old database until the new one opens.
-- **Provider sprawl.** Five providers are five OAuth registrations, five
-  SDKs or REST clients and five review surfaces. File export through the
-  share sheet covers every provider imperfectly and should ship first.
-- **Network requests.** Each provider is a destination the privacy policy
-  must list. The app otherwise makes almost none.
+- **Provider sprawl** (five OAuth registrations, SDKs and review surfaces,
+  each a destination the privacy policy must list) is gone: the owner chose
+  the share sheet alone on 2026-10-20.
 
 ## Sequence
 1. **Platform backup rules spike (MM-65).** M3. It also decides whether the
@@ -80,8 +80,8 @@ feed the privacy declarations.
    backup.
 2. **Encrypted backup and restore to a file (MM-63).** M3. Include restoring
    a backup made at an earlier schema version in the tests from the start.
-3. **Storage providers (MM-64).** M3. Share-sheet export first, then one
-   cloud provider end to end, then the rest.
+3. **Where the file goes (MM-64).** M2. The share sheet and the document
+   picker only; no provider connectors.
 
 ## Done enough to unblock others
 MM-63 is done: a backup written at one schema version restores correctly at a
@@ -97,7 +97,8 @@ Everything in group C. It touches the schema lane only to read the version.
 - Built: MM-65 (the backup-rules spike, answered 2026-10-13: no iCloud or
   Drive as a provider; the database excluded from OS backups on both
   platforms; one encrypted file the person places).
-- Remaining: MM-63, MM-64. Epic: MM-59.
+- Built: MM-63 (2026-10-19), MM-64 (closed 2026-10-20 by the owner's
+  decision: the share sheet only). Epic: MM-59, open for MM-404.
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app

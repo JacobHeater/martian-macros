@@ -43,15 +43,16 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// The sleep analysis values that are sleep (MM-250): not in bed, not awake. The staged values exist from iOS 16; before it every asleep segment is unspecified.
     private static var asleepValues: Set<Int> {
-        var values: Set<Int> = [HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue]
         if #available(iOS 16.0, *) {
-            values.formUnion([
+            return [
+                HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
                 HKCategoryValueSleepAnalysis.asleepCore.rawValue,
                 HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
                 HKCategoryValueSleepAnalysis.asleepREM.rawValue,
-            ])
+            ]
         }
-        return values
+        // iOS 16 renamed .asleep to .asleepUnspecified; the raw value is the same.
+        return [HKCategoryValueSleepAnalysis.asleep.rawValue]
     }
 
     private static func type(named name: String) -> HKSampleType? { types.first { $0.name == name }?.type }
