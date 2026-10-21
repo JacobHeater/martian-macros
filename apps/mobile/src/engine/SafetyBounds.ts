@@ -26,6 +26,11 @@ function energyAvailabilityThresholdPercent(sex: BiologicalSex): number {
   return sex === 'male' ? 15 : 25;
 }
 
+/** The goal body-fat floors: under `hard` a goal is refused, under `soft` warned and time-limited (MM-28, MM-36). */
+function goalBodyFatFloorsPercent(sex: BiologicalSex): { hard: number; soft: number } {
+  return sex === 'male' ? { hard: 8, soft: 10 } : { hard: 16, soft: 18 };
+}
+
 /**
  * The weight per-kilogram macro rules scale with: body weight up to
  * BMI 25, then the BMI-25 weight plus a quarter of the excess (the
@@ -56,6 +61,7 @@ export const SafetyBounds = {
   excessWeightFraction,
   absoluteFloorKcal,
   energyAvailabilityThresholdPercent,
+  goalBodyFatFloorsPercent,
   referenceWeightKg,
 
   /**
@@ -205,7 +211,7 @@ export const SafetyBounds = {
 
   /** Validates a user-chosen goal body fat. */
   checkGoalBodyFat(sex: BiologicalSex, percent: number): GoalBodyFatCheck {
-    const [hardFloor, softFloor] = sex === 'male' ? [8, 10] : [16, 18];
+    const { hard: hardFloor, soft: softFloor } = goalBodyFatFloorsPercent(sex);
     if (percent < hardFloor) return 'rejected';
     if (percent < softFloor) return 'warnAndTimeLimit';
     return 'accepted';

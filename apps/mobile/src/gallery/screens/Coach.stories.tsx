@@ -22,6 +22,7 @@ import { breakOfferScenario } from './breakOfferScenario';
 import { onBreakScenario } from './onBreakScenario';
 import { reveal } from './reveal';
 import { maintenanceScenario } from './maintenanceScenario';
+import { phaseEndScenario } from './phaseEndScenario';
 import { stalledScenario } from './stalledScenario';
 import { storyWorkout } from './storyWorkout';
 import type { StoryScenario } from './StoryScenario';
@@ -150,6 +151,30 @@ export const CoachBodyFatRoughEatingDisorder = screenStory({
     await repos.weights.saveWeight(today, 86);
   },
   open: onCoach,
+});
+
+/** MM-36: ten weeks into the demo's cut: the phase, how long it has run, and about when it ends. */
+export const CoachPhaseProjected = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Projected end',
+  open: onCoach,
+});
+
+/** MM-36: a man cut to 12%: the cut has ended, and the coach recommends maintenance, then a lean gain, with why. */
+export const CoachPhaseNext = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Next: Maintenance, then Lean gain',
+  scenario: phaseEndScenario,
+  open: onCoach,
+});
+
+/** MM-36: "Choose another" beside the recommendation opens the goal sheet. */
+export const CoachPhaseChooseAnother = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Choose a goal',
+  scenario: phaseEndScenario,
+  open: onCoach,
+  walk: pressOnCoach('Choose another'),
 });
 
 /** MM-321: no weigh-in kept (each one deleted): nothing for the coach to work from. */

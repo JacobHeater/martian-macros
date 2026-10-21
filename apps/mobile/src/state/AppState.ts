@@ -41,6 +41,8 @@ import { assessTrainingLapse } from '../engine/assessTrainingLapse';
 import type { TrainingLapse } from '../engine/TrainingLapse';
 import { trainingSuspended } from '../engine/trainingSuspended';
 import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
+import type { PhasePlan } from '../engine/PhasePlan';
+import { planPhases } from '../engine/planPhases';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
 import type { PaceOption } from '../engine/PaceOption';
@@ -312,6 +314,12 @@ export class AppState {
   readonly stallAssessment: Cell<StallAssessment | undefined>;
   /** Where the person stands at maintenance (MM-130); undefined when the targets in force are not maintenance. */
   readonly maintenance: Cell<MaintenanceStatus | undefined>;
+  /**
+   * The current phase, how long it has run, its projected end and, once it
+   * has ended, the next phase recommended (MM-36). Derived each time, never
+   * stored; undefined before any targets.
+   */
+  readonly phasePlan: Cell<PhasePlan | undefined>;
   /** Whether training has lapsed against a goal that needs it (MM-134). */
   readonly trainingLapse: Cell<TrainingLapse | undefined>;
 
@@ -697,6 +705,17 @@ export class AppState {
         sleepAverage: this.sleepAverage.value,
         today: this.today.value,
       });
+    });
+
+    this.phasePlan = derived(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const history = of(this.targetsHistory);
+      if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
+        return undefined;
+      }
+      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
+      return planPhases({ setup, snapshot, history, stall: this.stallAssessment.value, today: this.today.value });
     });
 
     this.mealProtein = derived<ReadonlyMap<CalendarDate, ReadonlyMap<Meal, number>>>(() => {
