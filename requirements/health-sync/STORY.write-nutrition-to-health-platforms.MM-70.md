@@ -1,6 +1,6 @@
 ---
 id: MM-70
-status: in-progress
+status: done
 component: health-sync
 related: [MM-66, MM-67, MM-38, MM-48, MM-242, MM-314, MM-489, MM-513, MM-514]
 ---
@@ -70,9 +70,17 @@ Scenario: Its own permission
   (`test/healthWrite/mirroredLogs.test.ts`); the switches in `HealthWritingGroup` (stories `HealthConnectWriting`,
   `AppleHealthWriting`; `test/settings/healthWriting.test.tsx`); `WRITE_NUTRITION` in the manifest; the terms, version 3
   (`test/terms/termsText.test.ts`).
-- Owed on a device: a logged food shows in Health Connect and Apple Health at its meal's time with its nutrients; an edit
-  leaves one record; a deletion removes it; the switch is still on after the app is closed; refusing leaves it off.
 - "Erase all data" leaves what was written (the terms and the privacy policy say so). Entry ids start again after an erase
   or a restore, so every written id carries a write namespace that is renewed then (MM-522).
 - The privacy policy draft (MM-95), section 3 and the erase paragraph, now says what is written, as the terms do
   (`test/terms/privacyText.test.ts`). Its version stays 1: it took effect the same day and has not been released.
+
+## Progress
+Done (2026-10-21): every scenario is built and held by the tests named in the notes; not run locally, CI validates.
+Weight typed in the app is MM-513, the question when writing is turned off is MM-514, workouts are MM-489. The
+privacy-policy page and Play's declarations are release gates (MM-95, M5) and do not hold this.
+
+## Owed on a phone
+- A logged food shows in Health Connect and Apple Health at its meal's time with its nutrients.
+- An edit leaves one record, with the new values; a deletion removes it.
+- The switch is still on after the app is closed; refusing the permission leaves it off.
