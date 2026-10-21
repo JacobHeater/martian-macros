@@ -32,7 +32,8 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * or training started in the last days), intake off target, and the
  * estimate being wrong. Sleep that averaged short is recorded beside the
  * diagnosis (MM-252), whichever it is, as a cause the person can act on.
- * Nothing here changes a target.
+ * Intake is judged as the adherence summary judges it, a shaped week against
+ * its plan (MM-124, `plannedShare`). Nothing here changes a target.
  */
 export function assessStall({
   setup,
@@ -46,6 +47,7 @@ export function assessStall({
   workouts = [],
   hasCycleData = false,
   sleepAverage,
+  plannedShare,
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
@@ -60,6 +62,8 @@ export function assessStall({
   hasCycleData?: boolean;
   /** The fourteen-night average from the nights recorded (MM-250); undefined with none. */
   sleepAverage?: SleepAverage | undefined;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): StallAssessment {
   const window =
     setup.profile.sex === 'female' && !hasCycleData ? StallRule.windowDaysWithoutCycleData : StallRule.windowDays;
@@ -117,6 +121,7 @@ export function assessStall({
     history,
     floorKcal: snapshot.calorieFloorKcal,
     days: window,
+    plannedShare,
   });
 
   if (!stalled) {

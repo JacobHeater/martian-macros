@@ -1,8 +1,11 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
+import { TargetShape } from '../domain/TargetShape';
 import type { WeightObservation } from '../domain/WeightObservation';
 import { pauseOn } from '../engine/pauseOn';
+import { shapedTargets } from '../engine/shapedTargets';
+import type { TargetShapeLimits } from '../engine/TargetShapeLimits';
 import type { TargetsRecord } from '../engine/TargetsRecord';
 
 const mean = (values: Iterable<number>): number | undefined => {
@@ -35,6 +38,8 @@ export class DashboardHistory {
     weights,
     onboardedOn,
     targetsAllowed,
+    shapes = [],
+    limits,
   }: {
     today: CalendarDate;
     days: number;
@@ -44,6 +49,10 @@ export class DashboardHistory {
     weights: readonly WeightObservation[];
     onboardedOn: CalendarDate;
     targetsAllowed: boolean;
+    /** How the user shaped their weeks (MM-124): each day's target line is the day's own, as Food shows it. */
+    shapes?: readonly TargetShape[];
+    /** The shape limits; the line stays flat while they are not known. */
+    limits?: TargetShapeLimits | undefined;
   }) {
     this.today = today;
     this.days = days;
@@ -62,7 +71,12 @@ export class DashboardHistory {
         if (!candidate.effectiveFrom.isAfter(date)) record = candidate;
       }
       if (record === undefined) continue;
-      this.calorieTargets.set(date, record.targets.kcal);
+      // A planned higher or lower day is drawn against its own target, never the flat figure (MM-124).
+      const day =
+        limits === undefined
+          ? record.targets
+          : shapedTargets({ targets: record.targets, weekday: date.weekday, shape: TargetShape.on(shapes, date), limits });
+      this.calorieTargets.set(date, day.kcal);
       this.proteinTargets.set(date, record.targets.proteinMinimumG ?? record.targets.proteinG);
     }
 

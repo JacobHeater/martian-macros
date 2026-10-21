@@ -38,6 +38,9 @@ export function DashboardMetrics() {
   const history = useCell(state.targetsHistory);
   const pauses = useCell(state.pauses);
   const recovery = useCell(state.recoveryCheckIns);
+  // Each day's target line is the day's own under a shaped week (MM-124); flat until the shapes are read.
+  const shapes = Loadable.valueOf(useCell(state.targetShapes)) ?? [];
+  const shapeLimits = useCell(state.targetShapeLimits);
   const snapshot = useCell(state.coach);
   if (setup === undefined) return null;
   if ([intake, weights, waist, history, pauses, recovery].some((source) => Loadable.hasFailed(source))) {
@@ -58,6 +61,8 @@ export function DashboardMetrics() {
     weights: weights.value,
     onboardedOn: setup.onboardedOn,
     targetsAllowed: allowed,
+    shapes,
+    limits: shapeLimits,
   });
   const fmt = new Fmt(setup.unitSystem);
   const waists = waist.value.filter((w) => !w.date.isBefore(facts.start) && !w.date.isAfter(today));

@@ -82,6 +82,7 @@ import type { PersonalRecord } from '../engine/PersonalRecord';
 import { personalRecordsOf } from '../engine/personalRecordsOf';
 import { pauseOn } from '../engine/pauseOn';
 import { pauseToResume } from '../engine/pauseToResume';
+import { plannedDayShare } from '../engine/plannedDayShare';
 import { planReminders } from '../engine/planReminders';
 import type { RecompReview } from '../engine/RecompReview';
 import type { RecompSignal } from '../engine/RecompSignal';
@@ -694,6 +695,8 @@ export class AppState {
         floorKcal: snapshot.calorieFloorKcal,
         // The week's workouts, the fifth fact, now that the training log exists (MM-149).
         workouts: of(this.workouts),
+        // A shaped week's days read against their plan, as the estimate reads them (MM-124).
+        plannedShare: this.plannedShare(),
       });
     });
 
@@ -748,6 +751,7 @@ export class AppState {
         hasCycleData,
         sleepAverage: this.sleepAverage.value,
         today: this.today.value,
+        plannedShare: this.plannedShare(),
       });
     });
 
@@ -821,7 +825,12 @@ export class AppState {
     });
 
     this.loggingStreak = derived(() =>
-      loggingStreakOf({ today: this.today.value, intake: of(this.intakeDays) ?? [], pauses: of(this.pauses) ?? [] }),
+      loggingStreakOf({
+        today: this.today.value,
+        intake: of(this.intakeDays) ?? [],
+        pauses: of(this.pauses) ?? [],
+        plannedShare: this.plannedShare(),
+      }),
     );
 
     this.insightLog = stream(() => s.insightLog.watchInsightLog());
@@ -860,6 +869,7 @@ export class AppState {
           limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
           sleepAverage: this.sleepAverage.value,
           fiber: this.fiberPattern.value,
+          plannedShare: this.plannedShare(),
         }),
         log,
         today,
@@ -971,6 +981,7 @@ export class AppState {
         floorKcal: snapshot.calorieFloorKcal,
         // MM-113: on a weight-loss medication, fewer whole days are enough (MM-510).
         weightLossMedication: setup.screening.weightLossMedication,
+        plannedShare: this.plannedShare(),
       });
     });
 
@@ -1547,6 +1558,16 @@ export class AppState {
     return pausedDaysBetween(of(this.pauses) ?? [], today.addDays(-days), today) > 0;
   }
 
+  /**
+   * The share of the flat figure the user's week shapes planned for each day
+   * (MM-124), read inside a derived cell so it follows the shapes. Every
+   * reader that judges a day's intake uses it, as the expenditure estimate
+   * does; flat until the shapes are read.
+   */
+  private plannedShare(): (date: CalendarDate) => number {
+    return plannedDayShare(of(this.targetShapes) ?? []);
+  }
+
   /** What was logged on `date`. */
   foodForDay(date: CalendarDate): Cell<Loadable<FoodEntry[]>> {
     let cell = this.foodByDay.get(date.epochDay);
@@ -1641,6 +1662,7 @@ export class AppState {
           recommendation: coach?.recommendation,
           // The body-fat range from the measurements (MM-450), and the eating-disorder answer that withholds its change.
           setup: of(this.setup),
+          plannedShare: this.plannedShare(),
         });
       });
       this.reportByIndex.set(index, cell);

@@ -48,3 +48,8 @@ built:
 - With nothing finished, or one weigh-in, or one waist measurement, the chart is left out and the summary says so.
 - Protein carries a shaker bottle, drawn for the app at the owner's choice (`ShakerBottleOutlined`).
 - The recovery line outside its section was a defect of its own: MM-353.
+
+## Shaped weeks (MM-124), 2026-10-21
+The intake chart's "Target in force" line is each day's own target under the week shape then, as Food shows it, so a
+planned higher or lower day is drawn against its plan rather than the flat figure. Flat until the shape limits are
+known. Test: `test/dashboard/dashboardHistory.test.ts`.

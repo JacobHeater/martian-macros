@@ -142,3 +142,8 @@ Decided here (say if wrong):
 
 Not in this ticket's milestone, left to their own tickets: hiding weight (MM-118), an action attached to an insight (MM-124's
 shaping the week), the Coach unlock (MM-85).
+
+## Shaped weeks (MM-124), 2026-10-21
+A shaped week is read against its plan: planned lower days are not counted as partial days, and "weekends run higher"
+and "your highest day" compare each day's intake divided by its planned share, so a planned higher weekend or day is
+not pointed out. The figures the insights show stay in real calories. Test: `test/engine/plannedShareReaders.test.ts`.
