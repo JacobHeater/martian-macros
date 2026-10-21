@@ -4,12 +4,16 @@ import type { CalendarDate } from './CalendarDate';
 
 /** The user's stable physiological identity. */
 export class Profile {
+  /** The plausible range of a height, in centimetres. */
+  static readonly minHeightCm = 100;
+  static readonly maxHeightCm = 250;
+
   readonly sex: BiologicalSex;
   readonly birthDate: CalendarDate;
   readonly heightCm: number;
 
   constructor(init: { sex: BiologicalSex; birthDate: CalendarDate; heightCm: number }) {
-    if (init.heightCm < 100 || init.heightCm > 250) {
+    if (init.heightCm < Profile.minHeightCm || init.heightCm > Profile.maxHeightCm) {
       throw new ArgumentError(`Invalid heightCm (${init.heightCm}): Must be 100–250 cm`);
     }
     this.sex = init.sex;
