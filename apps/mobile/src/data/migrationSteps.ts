@@ -244,4 +244,14 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 17 to 18 (MM-510): the answer "I take a prescription weight-loss medication" (MM-113), kept apart from the
+  // broader weight-affecting medication answer; not ticked on what is already there.
+  [
+    17,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE setups ADD COLUMN weight_loss_medication INTEGER NOT NULL DEFAULT 0 CHECK (weight_loss_medication IN (0, 1))',
+      );
+    },
+  ],
 ]);

@@ -40,6 +40,7 @@ CREATE TABLE "setups" (
   "maintenance_correction_from_epoch_day" INTEGER NULL,
   "sleep_disorder" INTEGER NOT NULL DEFAULT 0 CHECK ("sleep_disorder" IN (0, 1)),
   "lean_gain_pace" TEXT NOT NULL DEFAULT 'standard' CHECK ("lean_gain_pace" IN ('standard', 'slower')),
+  "weight_loss_medication" INTEGER NOT NULL DEFAULT 0 CHECK ("weight_loss_medication" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_entries" (

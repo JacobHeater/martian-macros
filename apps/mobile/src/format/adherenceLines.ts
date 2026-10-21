@@ -49,10 +49,17 @@ function intakeLine(s: AdherenceSummary, floorKcal: number, underEatingNotice: b
  * what the figure rests on are the line's detail (MM-342). Over and under
  * are worded the same way; below the app's minimum is its own wording and
  * is never "under target".
+ *
+ * With `weightLossMedication` (MM-113, MM-510), the protein-minimum days are
+ * the first line: protein is the headline number for that user.
  */
 export function adherenceLines(
   s: AdherenceSummary,
-  { floorKcal, underEatingNotice = false }: { floorKcal: number; underEatingNotice?: boolean },
+  {
+    floorKcal,
+    underEatingNotice = false,
+    weightLossMedication = false,
+  }: { floorKcal: number; underEatingNotice?: boolean; weightLossMedication?: boolean },
 ): AdherenceLine[] {
   const days: AdherenceLine =
     s.daysLogged === 0
@@ -66,7 +73,9 @@ export function adherenceLines(
   if (s.workouts !== undefined) lines.push({ label: 'Workouts', value: `${s.workouts}` });
   const protein = s.proteinDays;
   if (protein !== undefined) {
-    lines.push({ label: 'Protein minimum met', value: `${protein} of ${s.completeDays} ${daysWord(s.completeDays)}` });
+    const line: AdherenceLine = { label: 'Protein minimum met', value: `${protein} of ${s.completeDays} ${daysWord(s.completeDays)}` };
+    if (weightLossMedication) lines.unshift(line);
+    else lines.push(line);
   }
   return lines;
 }

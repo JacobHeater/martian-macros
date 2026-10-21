@@ -16,6 +16,7 @@ type Answer =
   | 'insulinCareTeamConfirmed'
   | 'bariatricSurgery'
   | 'weightAffectingMedication'
+  | 'weightLossMedication'
   | 'fluidLimitedByClinician'
   | 'sleepDisorder';
 
@@ -32,6 +33,7 @@ const answers: readonly Answer[] = [
   'insulinCareTeamConfirmed',
   'bariatricSurgery',
   'weightAffectingMedication',
+  'weightLossMedication',
   'fluidLimitedByClinician',
   'sleepDisorder',
 ];
@@ -81,6 +83,8 @@ export function HealthStep({ screening, female, onChange, heading = true }: Heal
         : null}
       {item('I have had bariatric surgery', 'bariatricSurgery')}
       {item('A medication I take can change my weight or water retention', 'weightAffectingMedication')}
+      {/* MM-113, MM-510: its own answer, never read from the broader one above. */}
+      {item('I take a prescription weight-loss medication', 'weightLossMedication')}
       {item('A clinician has told me to limit my fluids', 'fluidLimitedByClinician')}
       {item('A diagnosed sleep disorder (sleep apnea, insomnia, a shift-work or other circadian disorder)', 'sleepDisorder')}
       {/* Refer-only (MM-251): the caution here and on Coach, and nothing in the numbers. */}
