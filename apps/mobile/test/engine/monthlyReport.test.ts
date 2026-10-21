@@ -361,6 +361,31 @@ describe('strength', () => {
     expect(r.lifts).toEqual([]);
   });
 
+  it('the personal records set in the month are listed, oldest first (MM-92)', () => {
+    const r = withWorkouts([
+      trained(-7, [[squat.id, 95]]),
+      trained(1, [[squat.id, 100]]),
+      trained(8, [[squat.id, 100]]),
+      trained(15, [[squat.id, 105]]),
+      trained(35, [[squat.id, 120]]),
+    ]);
+    // Day 1 beats the session before the month; matching the best on day 8 is not one; day 35 is in a later month.
+    expect(r.personalRecords.map((p) => p.date)).toEqual([start.addDays(1), start.addDays(15)]);
+    const [first] = r.personalRecords;
+    expect(first?.name).toBe(squat.name);
+    expectClose(
+      first?.previousBestKg,
+      estimatedOneRepMax(new WorkoutSet({ reps: 6, loadKg: 95 }), { load: squat.load }) as number,
+      1e-9,
+    );
+    expect(first?.estimateKg).toBeGreaterThan(first?.previousBestKg as number);
+  });
+
+  it('a lift first done in the month sets no record, and a month with no training has none', () => {
+    expect(withWorkouts([trained(1, [[squat.id, 100]])]).personalRecords).toEqual([]);
+    expect(report().personalRecords).toEqual([]);
+  });
+
   it('a later session does not change what an old report says', () => {
     const inMonth = [trained(1, [[squat.id, 100]]), trained(22, [[squat.id, 105]])];
     const then = withWorkouts(inMonth).lifts;
@@ -369,6 +394,26 @@ describe('strength', () => {
     expect(later).toHaveLength(1);
     expect(later[0]?.fromKg).toBe(then[0]?.fromKg);
     expect(later[0]?.toKg).toBe(then[0]?.toKg);
+  });
+});
+
+describe('the longest logging run (MM-92)', () => {
+  it('a month of whole days is one run of 28', () => {
+    expect(report().longestRunDays).toBe(28);
+  });
+
+  it('eating under the target earns nothing extra: the run is the same', () => {
+    const under = upTo(28).map((d) => ate(d, { kcal: d % 2 === 0 ? 2100 : 1500 }));
+    expect(report({ intake: under }).longestRunDays).toBe(report().longestRunDays);
+  });
+
+  it('one missed day in a week is forgiven; a second breaks the run', () => {
+    // Days 0-9, misses on 10 and 11, then 12-27.
+    const intake = upTo(28)
+      .filter((d) => d !== 10 && d !== 11)
+      .map((d) => ate(d));
+    expect(report({ intake }).longestRunDays).toBe(16);
+    expect(report({ intake: upTo(28).filter((d) => d !== 10).map((d) => ate(d)) }).longestRunDays).toBe(27);
   });
 });
 

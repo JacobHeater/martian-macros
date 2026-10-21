@@ -80,7 +80,7 @@ export function MmTextField({
           className="mm-field-input"
           autoFocus={autoFocus}
           type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
-          inputMode={kind === 'number' ? 'decimal' : 'text'}
+          inputMode={kind === 'number' ? 'decimal' : kind === 'count' ? 'numeric' : 'text'}
           autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
           autoComplete={kind === 'passphrase' ? (secret === 'existing' ? 'current-password' : 'new-password') : 'off'}
           aria-label={spoken}
