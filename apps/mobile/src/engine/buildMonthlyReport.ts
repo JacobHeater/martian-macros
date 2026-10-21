@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
+import type { Pause } from '../domain/Pause';
 import type { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
 import type { WaistObservation } from '../domain/WaistObservation';
@@ -7,14 +8,17 @@ import type { WeightObservation } from '../domain/WeightObservation';
 import { compareStrings } from '../lang/compareStrings';
 import { buildStrengthTrends } from './buildStrengthTrends';
 import { calibrationDays } from './coachConstants';
+import { longestLoggingRunOf } from './longestLoggingRunOf';
 import type { ModeRecommendation } from './ModeRecommendation';
 import { MonthlyReport } from './MonthlyReport';
+import { personalRecordsOf } from './personalRecordsOf';
 import type { RecompReview } from './RecompReview';
 import { recompReviewOf } from './recompReviewOf';
 import type { ReportEstimate } from './ReportEstimate';
 import type { ReportEstimateGap } from './ReportEstimateGap';
 import type { ReportLift } from './ReportLift';
 import { ReportPeriod } from './ReportPeriod';
+import type { ReportPersonalRecord } from './ReportPersonalRecord';
 import type { ReportTargetChange } from './ReportTargetChange';
 import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
@@ -37,6 +41,7 @@ export function buildMonthlyReport({
   trend,
   workouts = [],
   exercises = [],
+  pauses = [],
   recommendation,
 }: {
   period: ReportPeriod;
@@ -47,6 +52,7 @@ export function buildMonthlyReport({
   trend: readonly WeightTrendPoint[];
   workouts?: readonly Workout[];
   exercises?: readonly Exercise[];
+  pauses?: readonly Pause[];
   recommendation?: ModeRecommendation | undefined;
 }): MonthlyReport {
   const inPeriod = (d: CalendarDate) => !d.isBefore(period.from) && !d.isAfter(period.to);
@@ -123,8 +129,9 @@ export function buildMonthlyReport({
 
   // Strength as it stood at the end of the month, so a report reread later
   // says what it said then.
+  const strength = buildStrengthTrends({ workouts, exercises, weights, today: period.to });
   const lifts: ReportLift[] = [];
-  for (const lift of buildStrengthTrends({ workouts, exercises, weights, today: period.to })) {
+  for (const lift of strength) {
     const month = lift.points.filter((p) => inPeriod(p.date));
     const from = month[0];
     const to = month[month.length - 1];
@@ -136,6 +143,17 @@ export function buildMonthlyReport({
     const sessions = b.sessions - a.sessions;
     return sessions !== 0 ? sessions : compareStrings(a.name, b.name);
   });
+
+  // The month's personal records (MM-92), each against every session of
+  // the lift before it, in or before the month.
+  const finished = workouts
+    .filter((w) => !w.inProgress && inPeriod(w.date))
+    .sort((a, b) => a.date.compareTo(b.date) || a.startedAt.getTime() - b.startedAt.getTime() || a.id - b.id);
+  const recordsByWorkout = personalRecordsOf(strength);
+  const personalRecords: ReportPersonalRecord[] = [];
+  for (const w of finished) {
+    for (const r of recordsByWorkout.get(w.id) ?? []) personalRecords.push({ ...r, date: w.date });
+  }
 
   // The recomp review that fell due in the month (MM-133): due on the
   // first day of the month it would have been shown, and read on the last,
@@ -193,8 +211,10 @@ export function buildMonthlyReport({
   return new MonthlyReport({
     period,
     recompReview,
-    workouts: workouts.filter((w) => !w.inProgress && inPeriod(w.date)).length,
+    workouts: finished.length,
     lifts,
+    personalRecords,
+    longestRunDays: longestLoggingRunOf({ from: period.from, to: period.to, wholeDays: whole.map((d) => d.date), pauses }),
     daysLogged: logged.length,
     completeDays: whole.length,
     weighIns,

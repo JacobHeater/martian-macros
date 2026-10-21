@@ -28,9 +28,13 @@ export function MonthlyReportScreen({ index }: { index: number }) {
   const fmt = new Fmt(setup.unitSystem);
   const words = new MonthlyReportText(report, fmt, today);
   const rows = (pairs: readonly (readonly [label: string, value: string, detail?: string])[]) =>
-    pairs.map(([label, value, detail]) => <StatRow key={label} label={label} value={value} detail={detail} />);
+    pairs.map(([label, value, detail]) => (
+      // A lift can set two records in a month (MM-92): the label alone is not unique.
+      <StatRow key={`${label} ${value}`} label={label} value={value} detail={detail} />
+    ));
   const review = report.recompReview;
   const lifts = words.lifts;
+  const records = words.personalRecords;
   const changes = words.targetChanges;
   return (
     <Screen title={words.title}>
@@ -48,6 +52,13 @@ export function MonthlyReportScreen({ index }: { index: number }) {
             Estimated one-rep max, smoothed over recent sessions, at the first and the last session of the month. It is
             worked out from reps and load, not tested.
           </p>
+        </InfoCard>
+      )}
+      {records.length === 0 ? null : (
+        // MM-92: the month's records, quiet like the rest of the report; built like "Your lifts" above.
+        <InfoCard title={records.length === 1 ? 'Personal record' : 'Personal records'}>
+          {rows(records)}
+          <p className="app-caption">A session whose estimated one-rep max beat every session of that lift before it.</p>
         </InfoCard>
       )}
       <InfoCard title="What the coach measured">

@@ -1,8 +1,8 @@
 ---
 id: MM-33
-status: in-progress
+status: done
 component: adaptive-coach
-related: [MM-22, MM-17, MM-21, MM-23, MM-24, MM-77, MM-86]
+related: [MM-22, MM-17, MM-21, MM-23, MM-24, MM-77, MM-86, MM-92, MM-450]
 ---
 
 # Story: A monthly report
@@ -20,6 +20,8 @@ Choices I made without asking (say if any is wrong):
   target, and each target change in the month with its reason.
 - **Reports are kept** and can be reread.
 - **The weekly check-in gets a short version**: what changed in the targets and why.
+- **The month's process rewards are in it** (MM-92, 2026-10-21): the longest logging run in "What you did", and the month's
+  personal records in their own card after "Your lifts", built like it.
 
 ## Description
 A report screen generated from stored history for a date range, reachable from the Coach screen, with a notice when a new one is ready.
@@ -67,8 +69,13 @@ Built:
   out from reps and load, not tested.
 - **The recomp review** (MM-133, 2026-10-11) is in the report of the month it fell due in.
 
+- **Process rewards** (MM-92, 2026-10-21): "Longest logging run" in "What you did" (from three days, by the Dashboard
+  streak's rule, within the month), and a "Personal records" card listing each record set in the month with its day. Strength
+  as at the end of the month, so a later session does not add a record to an old report. Tests: `monthlyReport.test.ts`,
+  `longestLoggingRun.test.ts`, `coach/monthlyReport.test.tsx`; gallery `MonthlyReportWithRecords`.
+
 Not built:
-- **The body-fat range if one has settled** (needs the body-fat estimate from measurements, MM-34).
+- **The body-fat range if one has settled**: needs the body-fat estimate from measurements (MM-34); carried as MM-450.
 - **The short weekly version** at the weekly check-in: the existing target-change summary (MM-138) already says what changed and why.
 - **Photos** (MM-157): no room is left on the screen yet.
 - Adherence is shown as counts and protein; the report does not repeat the adherence summary's intake-against-target line, because
