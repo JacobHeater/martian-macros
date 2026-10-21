@@ -641,15 +641,13 @@
     },
     {
       "id": "M3",
-      "name": "Public release (United States)",
-      "intent": "Everything the store listing promises exists, every external review is recorded, and the free tier and the Coach unlock work as sold.",
+      "name": "My phone (personal use)",
+      "intent": "The app the owner tests every day on their own phone, through local builds, for weeks or months before any release decision: every feature M3 held, with nothing release-gated or paywalled. Monetization and the store, legal and review sign-offs moved to M5 on 2026-10-21. A feature whose wording waits on a review is still built and used now; the review itself is in M5.",
       "requires": [
         {
           "workstream": "WS-03",
           "tickets": [
-            "MM-109",
-            "MM-242",
-            "MM-453"
+            "MM-109"
           ]
         },
         {
@@ -711,22 +709,6 @@
           "workstream": "WS-12",
           "tickets": [
             "MM-65"
-          ]
-        },
-        {
-          "workstream": "WS-13",
-          "tickets": [
-            "MM-88",
-            "MM-95",
-            "MM-244",
-            "MM-29",
-            "MM-85",
-            "MM-86",
-            "MM-87",
-            "MM-96",
-            "MM-94",
-            "MM-454",
-            "MM-247"
           ]
         }
       ]
@@ -909,6 +891,36 @@
           "workstream": "WS-14",
           "tickets": [
             "MM-404"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M5",
+      "name": "Store release (future vision, backburner)",
+      "intent": "Not scheduled. The owner tests the app on their own phone for weeks or months before deciding on a release (2026-10-21). This holds only the release gates: the Coach unlock and its paywall (MM-84 to MM-87), the store listing and release (MM-94), the professional, health-claims and legal sign-offs (MM-29, MM-96, MM-242, MM-453), the store declarations (MM-95), the public legal page (MM-247, MM-454) and the reader's data watch (MM-244). Features are never held back for these: every feature is built and used now, without a paywall, and these gates come alive if the owner decides to release.",
+      "requires": [
+        {
+          "workstream": "WS-03",
+          "tickets": [
+            "MM-242",
+            "MM-453"
+          ]
+        },
+        {
+          "workstream": "WS-13",
+          "tickets": [
+            "MM-88",
+            "MM-95",
+            "MM-244",
+            "MM-454",
+            "MM-247",
+            "MM-29",
+            "MM-85",
+            "MM-86",
+            "MM-87",
+            "MM-96",
+            "MM-94"
           ]
         }
       ]
@@ -1622,7 +1634,7 @@
         {
           "step": 8,
           "title": "The terms of use before anything else",
-          "milestone": "M3",
+          "milestone": "M5",
           "tickets": [
             "MM-242",
             "MM-453"
@@ -3340,7 +3352,7 @@
             "MM-454",
             "MM-247"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         },
         {
           "step": 2,
@@ -3348,7 +3360,7 @@
           "tickets": [
             "MM-29"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         },
         {
           "step": 3,
@@ -3356,7 +3368,7 @@
           "tickets": [
             "MM-85"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         },
         {
           "step": 4,
@@ -3365,7 +3377,7 @@
             "MM-86",
             "MM-87"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         },
         {
           "step": 5,
@@ -3373,7 +3385,7 @@
           "tickets": [
             "MM-96"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         },
         {
           "step": 6,
@@ -3381,7 +3393,7 @@
           "tickets": [
             "MM-94"
           ],
-          "milestone": "M3"
+          "milestone": "M5"
         }
       ],
       "gate": {
