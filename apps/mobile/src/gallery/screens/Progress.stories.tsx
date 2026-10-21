@@ -9,12 +9,16 @@ import { InMemoryDeviceLock } from '../../fixtures/InMemoryDeviceLock';
 import { PhotoCameraScreen } from '../../progress/PhotoCameraScreen';
 import { PhotoCompareScreen } from '../../progress/PhotoCompareScreen';
 import { ProgressPhotosScreen } from '../../progress/ProgressPhotosScreen';
+import { MeasurementSessionScreen } from '../../progress/MeasurementSessionScreen';
+import { MeasurementSitesScreen } from '../../progress/MeasurementSitesScreen';
+import { SiteHistoryScreen } from '../../progress/SiteHistoryScreen';
 import { StrengthHistoryScreen } from '../../progress/StrengthHistoryScreen';
 import { StrengthLiftsScreen } from '../../progress/StrengthLiftsScreen';
 import { WeightEventEntrySheet } from '../../progress/WeightEventEntrySheet';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { healthPlatform } from './healthPlatform';
+import { measurementSitesScenario } from './measurementSitesScenario';
 import { oldLiftsScenario } from './oldLiftsScenario';
 import { oldWaistScenario } from './oldWaistScenario';
 import { reveal } from './reveal';
@@ -619,4 +623,96 @@ export const PhotoCompareOneDay = screenStory({
     const back = await within(canvas.ownerDocument.body).findByRole('button', { name: 'Back', pressed: false }, { timeout: 5000 });
     await userEvent.click(back);
   },
+});
+
+// ---- MM-156: measuring more than the waist ----
+
+const openMeasurements = async (canvas: HTMLElement) => {
+  const header = await within(canvas).findByRole('button', { name: /^More measurements/ }, { timeout: 5000 });
+  reveal(header);
+  await userEvent.click(header);
+};
+
+/** The demo as a woman on recomp who measures only her waist (MM-156). */
+const suggestionScenario: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  const setup = await repos.setup.loadSetup();
+  if (setup !== undefined) {
+    await repos.setup.saveSetup(
+      setup.copyWith({ goalMode: 'recomp', profile: typicalSetup({ sex: 'female' }).profile }),
+    );
+  }
+};
+
+/** MM-156: a woman on recomp who has only waist: hips, upper arm and thigh suggested once. */
+export const ProgressMeasurementsSuggested = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Suggested for your goal: hips, upper arm and thigh/,
+  scenario: suggestionScenario,
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: the demo's waist only, no suggestion for a man cutting: the section's way to add sites and measure. */
+export const ProgressMeasurementsWaistOnly = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Choose sites',
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: upper arm and thigh measured in a lean gain: each site's line, the arm's change beside the waist's as two facts, and the pair. */
+export const ProgressMeasurementsLimbs = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Upper arm (left) up 1.0 cm in 12 weeks while waist held.',
+  scenario: measurementSitesScenario,
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: the first measuring session: the waist alone, drawn in full. */
+export const MeasurementSessionFirst = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'Save measurements',
+  scenario: firstDayScenario,
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+});
+
+/** MM-156: a session of waist, upper arm and thigh in their fixed order, each drawing one tap down after three measurements. */
+export const MeasurementSessionSites = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'Thigh (left)',
+  scenario: measurementSitesScenario,
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+});
+
+/** MM-156: choosing sites, none added yet. */
+export const MeasurementSites = screenStory({
+  covers: ['MeasurementSitesScreen'],
+  shows: 'Measurement sites',
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+});
+
+/** MM-156: sites chosen, limbs on the left side. */
+export const MeasurementSitesChosen = screenStory({
+  covers: ['MeasurementSitesScreen'],
+  shows: 'Limbs are measured on the left side.',
+  scenario: measurementSitesScenario,
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+});
+
+/** MM-156: one site over time: the upper arm's chart with its own noise band. */
+export const SiteHistory = screenStory({
+  covers: ['SiteHistoryScreen'],
+  shows: 'Upper arm (left) over time',
+  scenario: measurementSitesScenario,
+  open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="upperArm" />),
+});
+
+/** MM-156: a site added and not measured yet. */
+export const SiteHistoryEmpty = screenStory({
+  covers: ['SiteHistoryScreen'],
+  shows: 'Not measured yet.',
+  scenario: measurementSitesScenario,
+  open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="calf" />),
 });

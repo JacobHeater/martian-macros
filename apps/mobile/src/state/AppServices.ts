@@ -23,6 +23,8 @@ import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRe
 import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { MeasurementRepository } from '../domain/repositories/MeasurementRepository';
+import type { MeasurementSettingsRepository } from '../domain/repositories/MeasurementSettingsRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
@@ -67,6 +69,10 @@ export interface AppServices {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  /** Every site's tape measurements, the waist's among them (MM-156). */
+  readonly measurements: MeasurementRepository;
+  /** Which sites beyond the waist are measured, the limb side, and the suggestion's answer (MM-156). */
+  readonly measurementSettings: MeasurementSettingsRepository;
   /** The days marked with menstrual flow (MM-20). */
   readonly flowDays: MenstruationRepository;
   /** The nights of sleep the person typed (MM-250); imported nights come through `healthSamples`. */

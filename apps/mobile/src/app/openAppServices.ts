@@ -102,6 +102,8 @@ export async function openAppServices(): Promise<AppServices> {
     weights: new MirroredWeightLog({ log: repositories.weights, platform: healthWriting, clock }),
     weightEvents: repositories.weightEvents,
     waist: repositories.waist,
+    measurements: repositories.measurements,
+    measurementSettings: repositories.measurementSettings,
     flowDays: repositories.flowDays,
     sleep: repositories.sleep,
     water: new MirroredWaterLog({ log: repositories.water, platform: healthWriting }),
