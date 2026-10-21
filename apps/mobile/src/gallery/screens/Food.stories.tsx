@@ -732,7 +732,7 @@ export const DayCompleteness = screenStory({
   shows: 'Not marked',
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: /(Mark it complete or partial|Counted as a whole day|Left out of your metabolism estimate)/ }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /(Counted unless it looks unfinished|Counted as a whole day|Left out of your metabolism estimate)/ }));
   },
 });
 
