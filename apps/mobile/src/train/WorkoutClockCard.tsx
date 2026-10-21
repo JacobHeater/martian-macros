@@ -1,6 +1,7 @@
 import type { Workout } from '../domain/training/Workout';
 import { clockTimeText } from '../format/clockTimeText';
 import { elapsedText } from '../format/elapsedText';
+import { spokenDuration } from '../format/spokenDuration';
 import { useNavigator } from '../app/useNavigator';
 import { MmButton } from '../ui/MmButton';
 import { MmSurface } from '../ui/MmSurface';
@@ -13,13 +14,20 @@ import './train.css';
 /** The clock of a workout in progress: read again every second. */
 function RunningTime({ workout }: { workout: Workout }) {
   const now = useNow();
-  return <p className="train-clock-time">{elapsedText(workout.activeMs(now))}</p>;
+  const ms = workout.activeMs(now);
+  return (
+    <p className="train-clock-time" aria-label={`Workout time ${spokenDuration(ms)}`}>
+      {elapsedText(ms)}
+    </p>
+  );
 }
 
 /**
  * How long a workout has run, or ran (MM-191): a clock that runs while it
  * is in progress and can be paused, its start, end and length once
- * finished, and the way to change them. Time paused is left out.
+ * finished, and the way to change them. Time paused is left out. While
+ * paused the card says so and offers no button: "Resume" lives on the set
+ * timer bar, so the screen has one primary way on (MM-447).
  */
 export function WorkoutClockCard({ workout }: { workout: Workout }) {
   const controller = useWorkoutController();
@@ -46,7 +54,9 @@ export function WorkoutClockCard({ workout }: { workout: Workout }) {
             </>
           ) : (
             <>
-              <p className="train-clock-time">{elapsedText(workout.activeMs(ended))}</p>
+              <p className="train-clock-time" aria-label={`Workout time ${spokenDuration(workout.activeMs(ended))}`}>
+                {elapsedText(workout.activeMs(ended))}
+              </p>
               <p className="app-muted train-clock-line">
                 {clockTimeText(workout.startedAt)} to {clockTimeText(ended)}
               </p>
@@ -56,13 +66,8 @@ export function WorkoutClockCard({ workout }: { workout: Workout }) {
             </>
           )}
         </div>
-        {ended === undefined ? (
-          <MmButton
-            label={workout.paused ? 'Resume' : 'Pause'}
-            icon={workout.paused ? 'play' : 'pause'}
-            kind={workout.paused ? 'primary' : 'secondary'}
-            onPress={() => void (workout.paused ? controller.resume(workout) : pause())}
-          />
+        {ended === undefined && !workout.paused ? (
+          <MmButton label="Pause" icon="pause" kind="secondary" onPress={() => void pause()} />
         ) : null}
       </div>
       <MmButton
