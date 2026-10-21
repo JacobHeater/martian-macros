@@ -203,6 +203,7 @@ dataEraserContract('Erasing that renews the write namespace', () => {
     preferences: r.preferences,
     workouts: r.workouts,
     customExercises: r.customExercises,
+    targetShapes: r.targetShapes,
   };
 });
 
