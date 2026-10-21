@@ -970,6 +970,7 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-404",
           "MM-160",
           "MM-161",
           "MM-162",
@@ -985,8 +986,7 @@
         ],
         "remaining": [
           "MM-159",
-          "MM-228",
-          "MM-404"
+          "MM-228"
         ]
       },
       "sequence": [
@@ -3236,7 +3236,7 @@
       "file": "ws-12-backup-and-portability.md",
       "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose through the system share sheet.",
       "recommendedOrder": 13,
-      "status": "in-progress",
+      "status": "built",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3259,13 +3259,12 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-59",
           "MM-65",
           "MM-63",
           "MM-64"
         ],
-        "remaining": [
-          "MM-59"
-        ]
+        "remaining": []
       },
       "sequence": [
         {
