@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { GoalMode } from '../domain/GoalMode';
+import type { LeanGainPace } from '../domain/LeanGainPace';
 import { currentTargetRulesVersion } from './currentTargetRulesVersion';
 import type { DailyTargets } from './DailyTargets';
 import type { TargetsExplanation } from './TargetsExplanation';
@@ -18,6 +19,7 @@ interface TargetsRecordInit {
   explanation?: TargetsExplanation | undefined;
   summarySeen?: boolean;
   requestedLossFraction?: number | undefined;
+  leanGainPace?: LeanGainPace | undefined;
 }
 
 /** Targets in force from `effectiveFrom`, with the TDEE they were based on. */
@@ -67,6 +69,13 @@ export class TargetsRecord {
    */
   readonly requestedLossFraction: number | undefined;
 
+  /**
+   * The lean-gain pace these targets were asked for, as the setup held it
+   * (MM-480); undefined for the standard pace, or on records made before it
+   * was kept. A setup asking for another gets new targets at once.
+   */
+  readonly leanGainPace: LeanGainPace | undefined;
+
   constructor(init: TargetsRecordInit) {
     this.effectiveFrom = init.effectiveFrom;
     this.targets = init.targets;
@@ -76,6 +85,7 @@ export class TargetsRecord {
     this.tdeeStatus = init.tdeeStatus;
     this.safetyBodyFatPercent = init.safetyBodyFatPercent;
     this.requestedLossFraction = init.requestedLossFraction;
+    this.leanGainPace = init.leanGainPace;
     this.profileRevision = init.profileRevision ?? 0;
     this.targetRulesVersion = init.targetRulesVersion ?? currentTargetRulesVersion;
     this.explanation = init.explanation;
@@ -93,6 +103,7 @@ export class TargetsRecord {
       safetyBodyFatPercent: this.safetyBodyFatPercent,
       // MM-495: the pace asked for is kept, or a record marked seen asks for a pace change.
       requestedLossFraction: this.requestedLossFraction,
+      leanGainPace: this.leanGainPace,
       profileRevision: this.profileRevision,
       targetRulesVersion: this.targetRulesVersion,
       explanation: this.explanation,

@@ -5,6 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { GoalMode } from '../../src/domain/GoalMode';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
+import { leanGainScenario } from '../../src/gallery/screens/leanGainScenario';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
@@ -66,6 +67,39 @@ describe('the lean-gain card', () => {
     await openCoach();
 
     expect(card()).toBeNull();
+  });
+
+  // MM-480: the slower gain, offered beside maintenance, and chosen in the same sheet as the targets section's pace row.
+  it('a fat-heavy gain is offered the slower gain beside a goal; choosing it changes the targets now, inside the weekly step', async () => {
+    repos = new InMemoryRepositories();
+    await repos.preferences.saveThemePreference('martian');
+    await leanGainScenario({ bodyFatPercent: 15 })(repos, today);
+    await openCoach();
+
+    const shown = within(card() as HTMLElement);
+    expect(shown.getByText(/The gain looks fat-heavy/)).toBeInTheDocument();
+    expect(shown.getByText(/A slower gain, or maintenance for a while, would suit\./)).toBeInTheDocument();
+    expect(shown.getByRole('button', { name: 'Choose a goal' })).toBeInTheDocument();
+    await userEvent.click(shown.getByRole('button', { name: 'Gain more slowly' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Choose a gain pace' });
+    expect(within(sheet).getByRole('button', { name: /^Standard · 0\.35% a week/ })).toBeInTheDocument();
+    expect(within(sheet).getAllByText(/kcal a day over your expenditure, for a target of/)).toHaveLength(2);
+    await userEvent.click(within(sheet).getByRole('button', { name: /^Slower · 0\.175% a week/ }));
+
+    await expect.poll(async () => (await repos.setup.loadSetup())?.leanGainPace).toBe('slower');
+    await expect.poll(async () => (await first(repos.targets.watchTargetsHistory())).at(-1)?.leanGainPace).toBe('slower');
+    const latest = (await first(repos.targets.watchTargetsHistory())).at(-1);
+    expect(latest?.effectiveFrom).toBe(today);
+    expect(latest?.targets.weeklyRateFraction).toBeCloseTo(0.00175, 9);
+    expect(latest?.targets.kcal).toBeLessThan(2900);
+    expect(latest?.targets.kcal, 'inside the weekly step').toBeGreaterThanOrEqual(2800 - 1e-9);
+    expect(latest?.tdeeKcal, 'on the estimate the targets rested on').toBe(2650);
+    expect((await first(repos.setup.watchSetup()))?.goalMode, 'the goal stays').toBe('leanGain');
+    expect(await screen.findByText(/Gain pace set to Slower/)).toBeInTheDocument();
+    // Already slower: the card offers only the goal, and says so.
+    expect(await within(card() as HTMLElement).findByText(/You are already on the slower gain/)).toBeInTheDocument();
+    expect(within(card() as HTMLElement).queryByRole('button', { name: 'Gain more slowly' })).toBeNull();
+    expect(screen.getByText('Slower')).toBeInTheDocument();
   });
 
   it('there is no card on another goal', async () => {

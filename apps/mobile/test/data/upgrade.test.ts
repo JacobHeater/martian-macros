@@ -141,8 +141,13 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 16 left it: without the lean-gain pace, chosen or asked for (MM-480). */
+const versionSixteen = currentSchema
+  .replace(`  "lean_gain_pace" TEXT NOT NULL DEFAULT 'standard' CHECK ("lean_gain_pace" IN ('standard', 'slower')),\n`, '')
+  .replace(`  "lean_gain_pace" TEXT NULL CHECK ("lean_gain_pace" IS NULL OR "lean_gain_pace" IN ('standard', 'slower')),\n`, '');
+
 /** The schema as version 15 left it: without the target shapes (MM-486). */
-const versionFifteen = currentSchema.replace(/CREATE TABLE "target_shapes" \([\s\S]*?\n\);\n/, '');
+const versionFifteen = versionSixteen.replace(/CREATE TABLE "target_shapes" \([\s\S]*?\n\);\n/, '');
 
 /** The schema as version 14 left it: without the scale chosen as primary (MM-71). */
 const versionFourteen = versionFifteen.replace('  "primary_scale_source_id" TEXT NULL,\n', '');
@@ -469,4 +474,38 @@ it('a version 15 database comes up to date with no target shape set, and keeps o
   expect(shape?.balance?.fatShare).toBe(CarbFatBalance.moreFatFatShare);
   expect([...(shape?.week.higherDays ?? [])]).toEqual([0, 6]);
   expect(shape?.week.raise).toBe(0.2);
+});
+
+// MM-480: a version 16 database comes up to date with the standard lean-gain pace, and its records of targets
+// asked for none (the standard pace); what it held is kept, and a pace chosen from then on is kept.
+it('a version 16 database comes up to date on the standard lean-gain pace, and keeps one chosen after', async () => {
+  expect(versionSixteen).not.toContain('lean_gain_pace');
+  expect(versionSixteen).toContain('target_shapes');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 16, schema: versionSixteen });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 180, 'intermediate', 4, 'leanGain', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute(
+    'INSERT INTO targets_history (effective_epoch_day, mode, kcal, protein_g, fat_g, carbs_g, weekly_rate_fraction, tdee_kcal, tdee_sigma_kcal, tdee_status) ' +
+      "VALUES (?, 'leanGain', 2900, 150, 80, 340, 0.0015, 2700, 150, 'updated')",
+    [day.epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  const setup = await repos.setup.loadSetup();
+  expect(setup?.goalMode).toBe('leanGain');
+  expect(setup?.leanGainPace).toBe('standard');
+  const [record] = await first(repos.targets.watchTargetsHistory());
+  expect(record?.targets.kcal).toBe(2900);
+  expect(record?.leanGainPace, 'none asked for: the standard pace').toBeUndefined();
+  if (setup === undefined) throw new Error('No setup was loaded.');
+  await repos.setup.saveSetup(setup.copyWith({ leanGainPace: 'slower' }));
+  expect((await repos.setup.loadSetup())?.leanGainPace).toBe('slower');
 });

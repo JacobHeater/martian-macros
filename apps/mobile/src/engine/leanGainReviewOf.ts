@@ -150,6 +150,7 @@ export function leanGainReviewOf({
     startedOn: since,
     days,
     intendedFraction: intended,
+    slowerPace: latest.leanGainPace === 'slower',
     gainFraction,
     gainingFast,
     weightChangeKg,

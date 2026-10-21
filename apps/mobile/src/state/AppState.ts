@@ -46,6 +46,8 @@ import type { PhasePlan } from '../engine/PhasePlan';
 import { planPhases } from '../engine/planPhases';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
+import { describeLeanGainPaces } from '../engine/describeLeanGainPaces';
+import type { LeanGainPaceOption } from '../engine/LeanGainPaceOption';
 import type { PaceOption } from '../engine/PaceOption';
 import { TargetInputs } from '../engine/TargetInputs';
 import { TargetShapeLimits } from '../engine/TargetShapeLimits';
@@ -312,6 +314,12 @@ export class AppState {
   readonly coach: Cell<CoachSnapshot | undefined>;
   /** The three fat-loss paces as they would apply today (MM-128); undefined until the coach exists. */
   readonly paceOptions: Cell<readonly PaceOption[] | undefined>;
+  /**
+   * The two lean-gain paces as they would apply today (MM-480), on the
+   * estimate the current targets rest on, as a change of pace is; undefined
+   * until the coach exists.
+   */
+  readonly leanGainPaceOptions: Cell<readonly LeanGainPaceOption[] | undefined>;
 
   /**
    * The guide shown in place of targets on a paused day (MM-148):
@@ -1096,6 +1104,28 @@ export class AppState {
           trainingDaysPerWeek: setup.trainingDaysPerWeek,
           policy: snapshot.policy,
           tdeeKcal: snapshot.tdee.kcal,
+          bmrKcal: snapshot.bmrKcal,
+          safetyBodyFatPercent: current?.safetyBodyFatPercent,
+        }),
+      );
+    });
+
+    this.leanGainPaceOptions = derived<readonly LeanGainPaceOption[] | undefined>(() => {
+      const setup = of(this.setup);
+      const snapshot = this.coach.value;
+      const current = this.currentTargets.value;
+      if (setup === undefined || snapshot === undefined || !snapshot.policy.targetsAllowed) return undefined;
+      return describeLeanGainPaces(
+        new TargetInputs({
+          sex: setup.profile.sex,
+          heightCm: setup.profile.heightCm,
+          trendWeightKg: snapshot.trendWeightKg,
+          bodyFat: snapshot.bodyFat,
+          mode: 'leanGain',
+          trainingStatus: setup.trainingStatus,
+          trainingDaysPerWeek: setup.trainingDaysPerWeek,
+          policy: snapshot.policy,
+          tdeeKcal: current?.tdeeKcal ?? snapshot.tdee.kcal,
           bmrKcal: snapshot.bmrKcal,
           safetyBodyFatPercent: current?.safetyBodyFatPercent,
         }),

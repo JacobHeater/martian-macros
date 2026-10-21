@@ -73,6 +73,18 @@ export function setupRepositoryContract(name: string, create: () => SetupReposit
       expect((await loaded()).maintenanceCorrectionFrom).toBeUndefined();
     });
 
+    // MM-480: the lean-gain pace chosen; standard until one is.
+    it('keeps the lean-gain pace, standard until chosen', async () => {
+      await repo.saveSetup(typicalSetup({ goalMode: 'leanGain' }));
+      expect((await loaded()).leanGainPace).toBe('standard');
+      await repo.saveSetup((await loaded()).copyWith({ leanGainPace: 'slower' }));
+      expect((await loaded()).leanGainPace).toBe('slower');
+      await repo.saveSetup((await loaded()).copyWith({ goalMode: 'maintenance' }));
+      expect((await loaded()).leanGainPace, 'kept across a change of goal').toBe('slower');
+      await repo.saveSetup((await loaded()).copyWith({ leanGainPace: 'standard' }));
+      expect((await loaded()).leanGainPace).toBe('standard');
+    });
+
     it('keeps the creatine start date', async () => {
       const startedOn = CalendarDate.of(2026, 1, 1);
       await repo.saveSetup(typicalSetup().copyWith({ creatineStartedOn: startedOn }));
