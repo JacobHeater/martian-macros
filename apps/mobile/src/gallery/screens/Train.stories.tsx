@@ -442,5 +442,23 @@ export const ImportedWorkoutOtherExercise = screenStory({
     const workout = (await valueOf(stage.services.workouts.watchWorkouts())).find((w) => w.imported !== undefined);
     if (workout !== undefined) void stage.navigator.push(() => <WorkoutScreen workoutId={workout.id} />);
   },
-  walk: pressNamed('Move sets to an exercise'),
+  walk: pressNamed('Say which exercise'),
+});
+
+/** MM-490: the sets moved: said with an Undo, and focus on the card's title, now the exercise's name. */
+export const ImportedWorkoutOtherExerciseMoved = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: /^Moved \d+ sets? to Deadlift/,
+  scenario: importedScenario,
+  open: async (stage) => {
+    const workout = (await valueOf(stage.services.workouts.watchWorkouts())).find((w) => w.imported !== undefined);
+    if (workout !== undefined) void stage.navigator.push(() => <WorkoutScreen workoutId={workout.id} />);
+  },
+  walk: async (canvas) => {
+    await pressNamed('Say which exercise')(canvas);
+    const body = within(canvas.ownerDocument.body);
+    await userEvent.type(await body.findByRole('textbox', { name: 'Search exercises' }, { timeout: 5000 }), 'deadlift');
+    const [first] = await body.findAllByRole('button', { name: /^Deadlift/ }, { timeout: 5000 });
+    if (first !== undefined) await userEvent.click(first);
+  },
 });
