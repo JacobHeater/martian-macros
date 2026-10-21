@@ -164,6 +164,7 @@ export * from './reminderCountFrom';
 export * from './ReminderFacts';
 export * from './reminderIgnoredStreak';
 export * from './ReminderRule';
+export * from './ReportBodyFat';
 export * from './ReportEstimate';
 export * from './ReportEstimateGap';
 export * from './ReportLift';

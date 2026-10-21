@@ -3,17 +3,21 @@ import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
 import type { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
+import type { UserSetup } from '../domain/UserSetup';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightObservation } from '../domain/WeightObservation';
 import { compareStrings } from '../lang/compareStrings';
 import { buildStrengthTrends } from './buildStrengthTrends';
 import { calibrationDays } from './coachConstants';
+import { estimateBodyFat } from './estimateBodyFat';
+import type { EstimatedBodyFat } from './EstimatedBodyFat';
 import { longestLoggingRunOf } from './longestLoggingRunOf';
 import type { ModeRecommendation } from './ModeRecommendation';
 import { MonthlyReport } from './MonthlyReport';
 import { personalRecordsOf } from './personalRecordsOf';
 import type { RecompReview } from './RecompReview';
 import { recompReviewOf } from './recompReviewOf';
+import type { ReportBodyFat } from './ReportBodyFat';
 import type { ReportEstimate } from './ReportEstimate';
 import type { ReportEstimateGap } from './ReportEstimateGap';
 import type { ReportLift } from './ReportLift';
@@ -23,6 +27,7 @@ import type { ReportTargetChange } from './ReportTargetChange';
 import type { TargetsRecord } from './TargetsRecord';
 import { usableIntakeDays } from './usableIntakeDays';
 import { waistChangeOf } from './waistChangeOf';
+import { WeightTrendModel } from './WeightTrendModel';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
 /**
@@ -31,6 +36,8 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * With fewer whole days of food than the coach needs to start measuring
  * (`calibrationDays`) the report says the expenditure estimate could not be
  * measured, and why, instead of showing a number.
+ *
+ * Without `setup` the report has no body fat (MM-450).
  */
 export function buildMonthlyReport({
   period,
@@ -43,6 +50,7 @@ export function buildMonthlyReport({
   exercises = [],
   pauses = [],
   recommendation,
+  setup,
 }: {
   period: ReportPeriod;
   intake: readonly IntakeDay[];
@@ -54,6 +62,7 @@ export function buildMonthlyReport({
   exercises?: readonly Exercise[];
   pauses?: readonly Pause[];
   recommendation?: ModeRecommendation | undefined;
+  setup?: UserSetup | undefined;
 }): MonthlyReport {
   const inPeriod = (d: CalendarDate) => !d.isBefore(period.from) && !d.isAfter(period.to);
 
@@ -194,6 +203,32 @@ export function buildMonthlyReport({
     if (shownUntil !== undefined) recompReview = on(shownUntil);
   }
 
+  // The body-fat range from the user's measurements (MM-450), each end as it
+  // stood on its day: the waist entries up to that day, and the trend weight
+  // from the weigh-ins up to it (the last point of a smoother is the filter's,
+  // so a later weigh-in cannot move it). Only a range that rests on the waist
+  // has settled from measurements; the formula alone, or the user's own
+  // figure, puts nothing about body fat in the report.
+  const trendModel = new WeightTrendModel();
+  const bodyFatOn = (day: CalendarDate): EstimatedBodyFat | undefined => {
+    if (setup === undefined) return undefined;
+    const upTo = trendModel.smooth(weights.filter((w) => !w.date.isAfter(day)), { through: day });
+    const level = upTo[upTo.length - 1]?.levelKg;
+    if (level === undefined) return undefined;
+    const estimated = estimateBodyFat({ setup, trendWeightKg: level, waists: waist, today: day });
+    return estimated.basis === 'waist' ? estimated : undefined;
+  };
+  const bodyFatAtEnd = bodyFatOn(period.to);
+  // With an eating-disorder history the report shows no change in body fat
+  // (MM-450, as weight-based rewards are withheld, MM-92): the end only.
+  const bodyFat: ReportBodyFat | undefined =
+    bodyFatAtEnd === undefined
+      ? undefined
+      : {
+          end: bodyFatAtEnd,
+          start: setup?.screening.eatingDisorderHistory === true ? undefined : bodyFatOn(period.from.addDays(-1)),
+        };
+
   const targetChanges: ReportTargetChange[] = [];
   for (const r of inMonth) {
     if (r.explanation === undefined) continue;
@@ -224,6 +259,7 @@ export function buildMonthlyReport({
     averageProteinTargetG: averageProteinTarget,
     // The waist over the month by the one rule (MM-155): the latest three entries against the three nearest its start.
     waistChange: waistChangeOf({ waist, asOf: period.to, days: ReportPeriod.days }),
+    bodyFat,
     estimate,
     estimateGap: gap,
     targetChanges,
