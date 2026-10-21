@@ -15,7 +15,8 @@ const asked = async <T>(step: () => Promise<T>): Promise<T> => {
 
 /**
  * The phone's camera behind `BarcodeScanner` and `LabelTextReader` (MM-43,
- * MM-44): ML Kit reads both on the device, and nothing is sent anywhere.
+ * MM-44): read on the device, by ML Kit on Android and by AVFoundation and
+ * Vision on iOS (MM-406), and nothing is sent anywhere.
  */
 export class NativeCamera implements BarcodeScanner, LabelTextReader {
   private readonly api: MmScannerApi;

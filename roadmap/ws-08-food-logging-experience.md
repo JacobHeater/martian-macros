@@ -113,7 +113,7 @@ and WS-09 steps 1 and 8.
 - Also placed 2026-10-13 in earlier steps: step 1: MM-207; step 4: MM-169, MM-170, MM-202, MM-203, MM-204, MM-216, MM-217; step 6: MM-171; step 8: MM-172.
 - Placed 2026-10-19 in step 4: MM-408 (the search results flashed on every keystroke; the packs are now asked once the typing pauses and the last results stay until the next arrive, done); MM-410 ("More results" lengthens the list by twenty while there are more, the first new row focused and announced, now that the 2026-10-19 packs give a common word hundreds of matches; done); MM-411 (a failed page of results says so; proposed, from the panel's review of MM-410).
 12. **The grade, the packs' sources and their downloads (MM-380 to MM-388, MM-471).** M4. Of the download follow-ups: re-opening the catalog closes the packs of the one it replaces (MM-386, done); a pack file streams into its partial natively and only counts reach the app (MM-387, built, the release-build memory check on the phone owed); a cancelled native download settles (MM-471, done).
-13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's.
+13. **The camera on iOS (MM-406).** M4. `MmScanner` in Swift in the iOS shell of MM-403: a live barcode scan with AVFoundation and a label read with Vision, both on the device; the ML Kit sentences of the terms are Android's. Done 2026-10-21; its phone checks are owed.
 14. **A recipe ingredient keeps the food it came from (MM-456).** M4. Adds the source food to `recipe_ingredients`, so a weight can change without re-adding; waits for a free schema version.
 
 ## Done enough to unblock others
