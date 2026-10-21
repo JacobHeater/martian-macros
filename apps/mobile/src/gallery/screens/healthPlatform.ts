@@ -12,7 +12,8 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * `refuses` are turned down when asked; `unreadable` fails every read;
  * `empty` are on the platform with nothing in them (a reading added and deleted).
  * `stepsUnnamed` has the steps counted by the phone itself, which the
- * platform names by a package id and no app name (MM-395).
+ * platform names by a package id and no app name (MM-395). `secondScale`
+ * adds evening weigh-ins from a gym's scale on two of the days (MM-71).
  */
 export function healthPlatform({
   allowed = [],
@@ -20,12 +21,14 @@ export function healthPlatform({
   unreadable = false,
   empty = [],
   stepsUnnamed = false,
+  secondScale = false,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
   unreadable?: boolean;
   empty?: readonly HealthDataType[];
   stepsUnnamed?: boolean;
+  secondScale?: boolean;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
@@ -55,7 +58,15 @@ export function healthPlatform({
             : 'scale',
     })),
   );
-  const kept = events.filter((event) => !empty.includes(event.type));
+  const gym = (secondScale ? [1, 2] : []).map((day) => ({
+    op: 'add',
+    type: 'weight' as const,
+    id: `weight-gym-${day}`,
+    value: 83.1,
+    start: `${storyToday.addDays(-day).toString()}T18:30:00`,
+    source: 'gym',
+  }));
+  const kept = [...events, ...gym].filter((event) => !empty.includes(event.type));
   const emptied = empty.flatMap((type) => [
     { op: 'add', type, id: `${type}-gone`, value: values[type], start: morning(1), source: 'scale' },
     { op: 'delete', type, id: `${type}-gone` },
@@ -66,6 +77,7 @@ export function healthPlatform({
         sources: [
           { id: 'scale', name: 'Bathroom scale' },
           { id: 'watch', name: 'Watch' },
+          { id: 'gym', name: 'Gym scale' },
         ],
         events: [...kept, ...emptied],
       }),
