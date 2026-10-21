@@ -228,6 +228,8 @@ export * from './TdeeEstimate';
 export * from './TdeeEstimator';
 export * from './TdeePrior';
 export * from './TdeeStatus';
+export * from './TimedSet';
+export * from './timedSetsOf';
 export * from './TimeSpanProblem';
 export * from './TrendShift';
 export * from './UnderEatingFinding';

@@ -162,13 +162,22 @@ Built (2026-10-11), schema 28:
 - **A set's start and end are typed to the second**, in an entry of the app's own.
 - **A workout can end after midnight**, and so can a set in it; changing the workout's day keeps the end on the day after.
 
+Built (2026-10-21), in the React app, no schema change:
+- **A workout's own start and end are typed to the second**, in the same clock entry as a set's (`WorkoutTimesScreen`), and a
+  time that cannot be the workout's is refused inside the clock with the reason, which stays open on what was chosen (MM-222).
+  The row shows the time to the second. The day is still chosen on the calendar and moves both times.
+- **Which sets can be segments**: `timedSetsOf` (engine) gives the sets of a workout with both times, in the order they began;
+  a set missing either is left out and nothing is invented. Writing them to Health Connect is MM-189's.
+- Guarded by `test/engine/workoutTimes.test.ts` ("sets that can be written as segments") and `test/train/workoutTimes.test.tsx`
+  ("a start and an end can be typed to the second"). Not run locally; CI validates.
+
 Not built:
-- **A sound at the end of a rest.** Flutter has no system alert sound on Android or iOS, so a sound needs an audio package and a
-  sound file: a new dependency, left for the product owner to decide. Only the vibration is given.
+- **A sound at the end of a rest.** Closed by the owner's decision below: vibration only.
 - A signal when the app is in the background (MM-146's scheduler), and a rest length typed freely.
-- A workout's own start and end are still typed to the minute (the phone's time picker).
-- Seen on the Android emulator (2026-10-11): choosing a target, the countdown, the bar at the target, and the time entry.
-  Not seen with a screen reader, and the vibration was not felt on a phone.
+- The paused bar and "Edit times" wait on the owner in MM-447.
+- Seen on the Android emulator (2026-10-11, the Flutter app): choosing a target, the countdown, the bar at the target, and the
+  time entry. Owed on a phone with the React app: the vibration felt at the target, the bar with a screen reader (the label said
+  when it changes, not the figure every second), and the clock entry of the workout's times.
 
 ## Notes
 - Builds on MM-75; adds two nullable columns to the set and one to the workout (the running set timer), in schema 26; pausing adds two more to the workout in schema 27; the target rest adds one to the workout's exercise in schema 28.
