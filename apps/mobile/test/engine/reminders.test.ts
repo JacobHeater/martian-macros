@@ -160,3 +160,19 @@ it('the plan is in time order', () => {
     expect(a.date.isBefore(b.date) || (a.date === b.date && a.minuteOfDay <= b.minuteOfDay)).toBe(true);
   }
 });
+
+describe('the most pending at once (MM-405: iOS keeps only the soonest 64)', () => {
+  it('keeps the soonest when the plan holds more', () => {
+    const settings = [on('weighIn'), on('logFood'), on('weeklyMeasurement')];
+    const all = planReminders({ settings, facts: new ReminderFacts(), today, minuteNow: 6 * 60 });
+    const few = planReminders({ settings, facts: new ReminderFacts(), today, minuteNow: 6 * 60, mostPending: 5 });
+    expect(all.length).toBeGreaterThan(5);
+    expect(few).toEqual(all.slice(0, 5));
+  });
+
+  it('every plan the rules allow fits what iOS keeps', () => {
+    const settings = ReminderKind.values.map((kind) => on(kind));
+    expect(plan(settings).length).toBeLessThanOrEqual(64);
+    expect(ReminderRule.mostPending).toBe(64);
+  });
+});
