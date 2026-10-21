@@ -7,6 +7,9 @@ export interface HealthImportResult {
   /** Readings added or brought up to date. */
   readonly upserted: number;
 
-  /** Readings the platform reported as deleted. */
+  /**
+   * Readings removed: those the platform reported as deleted, or after a
+   * re-read those it no longer has within what it shows (MM-498).
+   */
   readonly deleted: number;
 }

@@ -38,8 +38,10 @@ Scenario: History permission taken away, then a token expires
 - Fixed 2026-10-21: `HealthHistoryAccess.readableFrom()` says where what the platform shows starts
   (undefined when it shows everything). `HealthImporter`'s re-read still makes the store match the
   platform exactly when nothing limits it; otherwise it keeps what it read, and removes only stored
-  readings from that moment on that the platform no longer has.
+  readings from that moment on that the platform no longer has. The result's `deleted` counts the
+  readings the re-read removed.
 - Health Connect's plugin does not say when the first permission was granted, so
-  `NativeHealthSource` answers thirty days before now, never earlier than the real window. A
+  `NativeHealthSource` answers thirty days before the app clock's now (MM-190), never earlier than
+  the real window; `nativeHealthSource.test.ts` checks it with a fixed clock. A
   reading deleted on the platform between the real window's start and that moment is kept by such
   a re-read; keeping too much is the safe side.

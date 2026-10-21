@@ -205,6 +205,7 @@ describe('MM-498', () => {
     source.expireTokens();
     const result = await new HealthImporter({ source, store }).import('weight');
     expect(result.status).toBe('readAgain');
+    expect(result.deleted).toBe(0);
     expect(await weights()).toHaveLength(198);
   });
 
@@ -226,7 +227,9 @@ describe('MM-498', () => {
     scale.revokeHistory();
     scale.letAllHappen();
     scale.expireTokens();
-    expect((await importer.import('weight')).status).toBe('readAgain');
+    const result = await importer.import('weight');
+    expect(result.status).toBe('readAgain');
+    expect(result.deleted).toBe(1);
     expect((await kept.samples('weight')).map((s) => s.platformId)).toEqual(['w-100', 'w-6']);
   });
 });
