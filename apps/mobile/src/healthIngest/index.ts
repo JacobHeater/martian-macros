@@ -20,6 +20,7 @@ export * from './HealthImporter';
 export * from './HealthImportResult';
 export * from './HealthImportStatus';
 export * from './HealthIntakeWriter';
+export * from './HealthPermissionsPlace';
 export * from './HealthReadFailure';
 export * from './HealthSample';
 export * from './HealthSampleStore';

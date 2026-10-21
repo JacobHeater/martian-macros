@@ -16,6 +16,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
 import { HealthWritingGroup } from './HealthWritingGroup';
 import { PrimaryScaleRow } from './PrimaryScaleRow';
+import { useOpenHealthPermissions } from './useOpenHealthPermissions';
 import { useSettingsSection } from './useSettingsSection';
 
 /**
@@ -61,6 +62,7 @@ export function HealthPlatformSection() {
   const [reading, setReading] = useState(false);
   // Folds like every other section (MM-398); dropped once and found by the panel (MM-407).
   const fold = useSettingsSection('healthConnect');
+  const openPermissions = useOpenHealthPermissions();
   const ios = services.platform === 'ios';
   const name = healthPlatformName(services.platform);
   if (connection === undefined || setup === undefined) return null;
@@ -106,6 +108,14 @@ export function HealthPlatformSection() {
     state.refreshHealthConnection();
     const label = healthDataTypeLabel(type);
     if (!after.has(type)) {
+      // Refused more than twice, Health Connect stops showing the request: "here" would be a circle (MM-323).
+      if (await services.healthSource.stoppedAsking(type)) {
+        overlays.snack(`${name} no longer asks for ${label.toLowerCase()} here. You can allow it in ${name} instead.`, {
+          label: `Open ${name}`,
+          onAction: () => void openPermissions(),
+        });
+        return;
+      }
       overlays.snack(`${label} was not allowed. You can allow it here, or in ${name}, whenever you like.`);
       return;
     }

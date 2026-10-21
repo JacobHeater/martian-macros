@@ -31,6 +31,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "historyPermitted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestHistory", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openPermissions", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "read", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changesToken", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "changes", returnType: CAPPluginReturnPromise),
@@ -122,6 +123,11 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
     /// Nothing to ask on Apple Health (MM-73): it says how it stands, which is granted.
     @objc func requestHistory(_ call: CAPPluginCall) {
         historyPermitted(call)
+    }
+
+    /// Apple Health has no screen of one app's permissions that an app can open (MM-323): the route is said in words instead.
+    @objc func openPermissions(_ call: CAPPluginCall) {
+        call.resolve(["opened": false])
     }
 
     private func ms(_ date: Date) -> Int { Int((date.timeIntervalSince1970 * 1000).rounded()) }

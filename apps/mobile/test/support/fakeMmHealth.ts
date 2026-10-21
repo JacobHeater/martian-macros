@@ -6,21 +6,37 @@ import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
  * with a change log, so the adapter's token flow runs without a phone.
  * The history permission (MM-73) is granted when `history` says so, or
  * when asked for the first time if `grantsHistory`; it is asked once.
+ * Kinds in `stopsAsking` come back refused without the question shown, as
+ * Health Connect answers once it stops asking (MM-323); `opens` says
+ * whether its screen of the app's permissions opens.
  */
 export function fakeMmHealth(
   records: MmHealthRecord[],
-  { permitted, history = false, grantsHistory = true }: { permitted?: string[]; history?: boolean; grantsHistory?: boolean } = {},
+  {
+    permitted,
+    history = false,
+    grantsHistory = true,
+    stopsAsking = [],
+    opens = true,
+  }: { permitted?: string[]; history?: boolean; grantsHistory?: boolean; stopsAsking?: string[]; opens?: boolean } = {},
 ) {
   const log: { record?: MmHealthRecord; deletedId?: string }[] = records.map((record) => ({ record }));
   const granted = new Set(permitted ?? ['weight', 'bodyFat', 'leanMass', 'height', 'workout', 'menstruation', 'steps']);
   let historyGranted = history;
   let historyAsked = 0;
+  let permissionsOpened = 0;
   const api: MmHealthApi = {
     status: async () => ({ status: 'available' }),
     permitted: async ({ types }) => ({ types: types.filter((type) => granted.has(type)) }),
     requestPermission: async ({ types }) => {
-      for (const type of types) granted.add(type);
-      return { types: [...granted] };
+      // Health Connect shows nothing when every kind asked for is one it stopped asking about.
+      const shown = types.some((type) => !stopsAsking.includes(type));
+      for (const type of types) if (!stopsAsking.includes(type)) granted.add(type);
+      return { types: [...granted], shown };
+    },
+    openPermissions: async () => {
+      if (opens) permissionsOpened++;
+      return { opened: opens };
     },
     historyPermitted: async () => ({ granted: historyGranted }),
     requestHistory: async () => {
@@ -58,6 +74,8 @@ export function fakeMmHealth(
     api,
     /** How many times the history question was shown. */
     historyAsked: () => historyAsked,
+    /** How many times Health Connect's screen of the app's permissions was opened (MM-323). */
+    permissionsOpened: () => permissionsOpened,
     change: (entry: { record?: MmHealthRecord; deletedId?: string }) => log.push(entry),
   };
 }

@@ -145,7 +145,10 @@ export async function openAppServices(): Promise<AppServices> {
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),
     exactAlarms: native ? new NativeExactAlarms(mmReminders) : new NoExactAlarmPermission(),
-    healthSource: native ? new NativeHealthSource(mmHealth) : new NoHealthPlatform(),
+    // Only Health Connect has a screen of the app's permissions to open (MM-323).
+    healthSource: native
+      ? new NativeHealthSource(mmHealth, { opensPermissions: platform === 'android' })
+      : new NoHealthPlatform(),
     healthWriting,
     healthWorkouts,
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),

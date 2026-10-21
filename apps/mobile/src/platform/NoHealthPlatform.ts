@@ -1,15 +1,17 @@
 import { HealthChanges } from '../healthIngest/HealthChanges';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthHistoryAccess } from '../healthIngest/HealthHistoryAccess';
+import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPlace';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSource } from '../healthIngest/HealthSource';
 
 /**
  * Where there is no health platform to read: a browser, or a build without
  * the Health Connect plugin. Nothing is available, so nothing is asked for
- * and nothing is read, history included (MM-73).
+ * and nothing is read, history included (MM-73), and there is no screen of
+ * permissions to open (MM-323).
  */
-export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
+export class NoHealthPlatform implements HealthSource, HealthHistoryAccess, HealthPermissionsPlace {
   available(): Promise<Set<HealthDataType>> {
     return Promise.resolve(new Set());
   }
@@ -27,6 +29,14 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
   }
 
   requestHistory(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  stoppedAsking(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  openPermissions(): Promise<boolean> {
     return Promise.resolve(false);
   }
 

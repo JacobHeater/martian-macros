@@ -1,8 +1,10 @@
 import { expect, it } from 'vitest';
+import type { HealthDataType } from '../../src/healthIngest/HealthDataType';
 import { NativeHealthSource } from '../../src/platform/NativeHealthSource';
 import type { MmHealthRecord } from '../../src/platform/MmHealthRecord';
 import { NoHealthPlatform } from '../../src/platform/NoHealthPlatform';
 import { healthHistoryAccessContract } from '../contracts/healthHistoryAccessContract';
+import { healthPermissionsPlaceContract } from '../contracts/healthPermissionsPlaceContract';
 import { healthSourceContract } from '../contracts/healthSourceContract';
 import { fakeMmHealth } from '../support/fakeMmHealth';
 
@@ -28,6 +30,45 @@ healthHistoryAccessContract(
   async () => new NativeHealthSource(fakeMmHealth([...held], { history: true }).api),
 );
 healthHistoryAccessContract('no health platform', async () => new NoHealthPlatform());
+
+// MM-323: where to allow what Health Connect no longer asks about, through the plugin and where there is none.
+healthPermissionsPlaceContract(
+  'Health Connect, asking',
+  async () => new NativeHealthSource(fakeMmHealth([...held], { permitted: [] }).api, { opensPermissions: true }),
+);
+healthPermissionsPlaceContract(
+  'Health Connect, no longer asking about weight',
+  async () =>
+    new NativeHealthSource(fakeMmHealth([...held], { permitted: [], stopsAsking: ['weight'] }).api, { opensPermissions: true }),
+);
+healthPermissionsPlaceContract('an iPhone, with no screen to open', async () => new NativeHealthSource(fakeMmHealth([...held]).api));
+healthPermissionsPlaceContract('no health platform', async () => new NoHealthPlatform());
+
+it('a refusal that came back without the question shown is one Health Connect stopped asking about (MM-323)', async () => {
+  const fake = fakeMmHealth([...held], { permitted: [], stopsAsking: ['weight'] });
+  const source = new NativeHealthSource(fake.api, { opensPermissions: true });
+  expect(await source.requestPermission(new Set<HealthDataType>(['weight']))).toEqual(new Set());
+  expect(await source.stoppedAsking('weight')).toBe(true);
+  // Asked for again with a kind it still asks about, the question is shown: weight is no longer counted as unshown.
+  await source.requestPermission(new Set<HealthDataType>(['weight', 'steps']));
+  expect(await source.stoppedAsking('weight')).toBe(false);
+  expect(await source.stoppedAsking('steps')).toBe(false);
+});
+
+it('Health Connect’s screen of the app’s permissions is opened only where the shell has one (MM-323)', async () => {
+  const android = fakeMmHealth([...held]);
+  expect(await new NativeHealthSource(android.api, { opensPermissions: true }).openPermissions()).toBe(true);
+  expect(android.permissionsOpened()).toBe(1);
+  const iphone = fakeMmHealth([...held]);
+  expect(await new NativeHealthSource(iphone.api).openPermissions()).toBe(false);
+  expect(iphone.permissionsOpened()).toBe(0);
+  const failing = fakeMmHealth([...held]);
+  const rejects = new NativeHealthSource(
+    { ...failing.api, openPermissions: () => Promise.reject(new Error('no activity')) },
+    { opensPermissions: true },
+  );
+  expect(await rejects.openPermissions()).toBe(false);
+});
 
 it('the history is asked for through the plugin, which shows the question once (MM-73)', async () => {
   const fake = fakeMmHealth([...held], { grantsHistory: false });

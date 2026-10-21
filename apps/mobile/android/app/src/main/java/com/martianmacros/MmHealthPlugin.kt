@@ -1,7 +1,11 @@
 package com.martianmacros
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.SystemClock
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -165,26 +169,70 @@ class MmHealthPlugin : Plugin() {
         call.resolve(JSObject().put("types", have))
     }
 
+    /** When the last request for read permissions was started (MM-323). */
+    private var requestStartedAt = 0L
+
+    /**
+     * An answer quicker than this came back without the question shown
+     * (MM-323): once a request has been refused more than twice, Health
+     * Connect answers at once and shows nothing. Nobody reads the question
+     * and answers it this fast.
+     */
+    private val unshownWithinMs = 800L
+
     @PluginMethod
     fun requestPermission(call: PluginCall) {
         val wanted = readPermissions(typeNames(call))
         if (wanted.isEmpty()) return call.resolve(JSObject().put("types", JSArray()))
         val contract = PermissionController.createRequestPermissionResultContract()
         val intent = contract.createIntent(context, wanted.values.toSet())
+        requestStartedAt = SystemClock.elapsedRealtime()
         startActivityForResult(call, intent, "permissionAnswered")
     }
 
     @ActivityCallback
     fun permissionAnswered(call: PluginCall?, result: ActivityResult) {
         if (call == null) return
+        val shown = SystemClock.elapsedRealtime() - requestStartedAt >= unshownWithinMs
         asked(call) {
             val granted = client().permissionController.getGrantedPermissions()
             val have = JSArray()
             for ((name, permission) in readPermissions(types.keys.toList())) {
                 if (granted.contains(permission)) have.put(name)
             }
-            call.resolve(JSObject().put("types", have))
+            call.resolve(JSObject().put("types", have).put("shown", shown))
         }
+    }
+
+    /**
+     * Opens Health Connect's screen of this app's permissions (MM-323),
+     * where a kind it no longer asks about, or the history (MM-73), is
+     * allowed: the app's own page on Android 14 and later, Health Connect's
+     * settings before. Answers once the person is back, or with `opened`
+     * false when neither opens.
+     */
+    @PluginMethod
+    fun openPermissions(call: PluginCall) {
+        val ownPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Intent("android.health.connect.action.MANAGE_HEALTH_PERMISSIONS")
+                .putExtra(Intent.EXTRA_PACKAGE_NAME, context.packageName)
+        } else {
+            null
+        }
+        for (intent in listOfNotNull(ownPage, Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))) {
+            try {
+                startActivityForResult(call, intent, "permissionsClosed")
+                return
+            } catch (missing: ActivityNotFoundException) {
+                // The next way in, if there is one.
+            }
+        }
+        call.resolve(JSObject().put("opened", false))
+    }
+
+    @ActivityCallback
+    fun permissionsClosed(call: PluginCall?, result: ActivityResult) {
+        call?.resolve(JSObject().put("opened", true))
     }
 
     /** Whether readings older than the thirty days before the first grant can be read (MM-73). */

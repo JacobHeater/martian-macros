@@ -1,8 +1,8 @@
 ---
 id: MM-323
-status: proposed
+status: in-progress
 component: health-sync
-related: [MM-68, MM-320]
+related: [MM-68, MM-320, MM-73, MM-523]
 ---
 
 # Story: after Health Connect stops asking, say where to allow a kind
@@ -12,6 +12,20 @@ The panel's UX guard on MM-320 (UX-4): Health Connect stops showing an app's req
 refused more than twice ("your app gets locked out… permission requests will no longer appear", the
 Health Connect codelab, read 2026-10-14). The refusal snack then says "You can allow it here", which sends
 the person round in a circle.
+
+## Decisions
+Choices I made without asking (say if any is wrong):
+- **"Stopped asking" is told by time (builder, 2026-10-21).** Health Connect gives no sign that it showed nothing; the
+  plugin times the request, and a refusal that comes back in under 0.8 s is counted as never shown. Nobody reads the
+  question and answers that fast; a slow phone that takes longer to come back is told the usual refusal, which is no worse
+  than before. The answer is kept only while the app runs, so after a restart the first press tries again.
+- **What opens.** On Android 14 and later, the app's own page of Health Connect's permissions
+  (`MANAGE_HEALTH_PERMISSIONS` with the app's package); before, Health Connect's settings. Where neither opens, a snack says
+  to allow it in Health Connect from the phone's settings. Back from it, what is allowed is read at once.
+- **A refusal that was shown keeps its words** ("You can allow it here, or in Health Connect"): asking again still works
+  then. Only the locked-out snack offers "Open Health Connect".
+- **The same way in serves MM-523.** The history permission (MM-73) is asked for once, so its line on Coach opens the same
+  page. An iPhone has no such page: its plugin answers that nothing opened, and its words stay MM-69's route.
 
 ## Description
 When a request comes back unchanged without the platform's dialog having been shown, the app says to allow
@@ -25,4 +39,25 @@ Scenario: Locked out
   Given Health Connect no longer shows the app's request for weight
   When the Weight row is pressed
   Then the app says to allow it in Health Connect, and offers to open it
+
+Scenario: Health Connect cannot be opened
+  Given Health Connect no longer shows the app's request for weight
+  And its permissions cannot be opened from the app
+  When "Open Health Connect" is pressed
+  Then the app says to allow it in Health Connect from the phone's settings
 ```
+
+## UI/UX
+- HealthConnectStoppedAsking, HealthConnectStoppedAskingCannotOpen — apps/mobile/src/gallery/screens/Settings.stories.tsx.
+
+## Notes
+- The question above, answered: the plugin cannot be told outright; it times the request (Decisions). It can open Health
+  Connect's permissions for the app.
+- Built 2026-10-21: `HealthPermissionsPlace` (`stoppedAsking`, `openPermissions`) beside `HealthSource`, in the fake, the
+  adapter and the platform that is not there, held to `healthPermissionsPlaceContract`; `MmHealthPlugin.kt` says `shown`
+  and has `openPermissions`; the Swift plugin answers `opened: false`; `settings/useOpenHealthPermissions.ts` is the one way
+  in. Tests: `test/settings/healthConnect.test.tsx`, `test/platform/nativeHealthSource.test.ts`,
+  `test/native/mmHealthPermissions.test.ts`. Not run locally; CI validates.
+- Device check owed: refuse Weight three times on the owner's phone; the third press says Health Connect no longer asks,
+  "Open Health Connect" opens the app's page, and Weight allowed there is read on coming back. Also that a person's
+  refusal at normal speed is not taken for a lockout.
