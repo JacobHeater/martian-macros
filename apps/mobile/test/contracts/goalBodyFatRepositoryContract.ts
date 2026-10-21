@@ -3,7 +3,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { GoalBodyFatRepository } from '../../src/domain/repositories/GoalBodyFatRepository';
 import { first } from '../support/first';
 
-/** What every `GoalBodyFatRepository` must do (MM-36). */
+/** What every `GoalBodyFatRepository` must do (MM-36), in memory and in the database (MM-507). */
 export function goalBodyFatRepositoryContract(
   name: string,
   create: () => GoalBodyFatRepository | Promise<GoalBodyFatRepository>,

@@ -18,4 +18,9 @@ export class InMemoryGoalBodyFatRepository implements GoalBodyFatRepository {
   async clearGoalBodyFat(): Promise<void> {
     this.goal.value = undefined;
   }
+
+  /** Forgets the goal, as erasing all data does. */
+  clear(): void {
+    this.goal.value = undefined;
+  }
 }

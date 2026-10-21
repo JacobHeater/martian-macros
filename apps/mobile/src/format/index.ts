@@ -8,6 +8,7 @@ export * from './bodyFatNote';
 export * from './bodyFatRange';
 export * from './bodyFatRangeText';
 export * from './goalBodyFatCheckText';
+export * from './goalBodyFatSubtitle';
 export * from './phaseEndText';
 export * from './phaseNextTitle';
 export * from './phaseRecommendationText';

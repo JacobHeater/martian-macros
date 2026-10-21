@@ -164,8 +164,11 @@ describe('pausing the workout clock', () => {
     expect(clockLines()).toEqual(['Paused']);
     await wait(minutes(5));
     expect(elapsed()).toBe('10:00');
-    // Resume is on the clock card and, while paused, on the timer bar too (MM-447): the card's is pressed here.
-    await user.click(layer().getAllByRole('button', { name: 'Resume' })[0] as HTMLElement);
+    expect(layer().getByLabelText(/^Workout time 10 minutes/)).toBeInTheDocument();
+    // Resume is on the timer bar only (MM-447 review): the clock card says "Paused" and offers no second Resume.
+    expect(layer().getAllByRole('button', { name: 'Resume' })).toHaveLength(1);
+    expect(layer().queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument();
+    await user.click(layer().getByRole('button', { name: 'Resume' }));
     await settle();
     expect(clockLines()).toEqual(['Started 12:00 PM']);
     await wait(minutes(2));
@@ -188,6 +191,8 @@ describe('pausing the workout clock', () => {
     expect(within(bar).getByText('Tap Resume to start the clock again.')).toBeInTheDocument();
     expect(timerButton()).toHaveAccessibleName('Resume');
     expect(timerButton()).toBeEnabled();
+    // No figure while paused: a 0:00 would read as a reset (MM-447 review).
+    expect(timerTime()).toBeUndefined();
     await pressTimer();
     expect((await only()).paused).toBe(false);
     expect(within(bar).getByRole('button', { name: 'Start set' })).toBeEnabled();

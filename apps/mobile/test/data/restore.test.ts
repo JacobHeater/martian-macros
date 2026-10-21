@@ -48,6 +48,8 @@ it('round trip: a backup from one phone restored on another holds everything', a
       week: new WeekShape({ higherDays: [6, 0], raise: 0.2 }),
     }),
   );
+  // MM-507: the goal body fat goes with the backup.
+  await a.repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: today.addDays(-3) });
   const snapshot = await a.db.exportBytes();
 
   const b = await phone();
@@ -76,6 +78,7 @@ it('round trip: a backup from one phone restored on another holds everything', a
   expect(shapes.map((s) => s.since.toString())).toEqual([today.addDays(-21).toString(), today.toString()]);
   expect(shapes.map((s) => s.balance?.fatShare)).toEqual([CarbFatBalance.moreFatFatShare, CarbFatBalance.moreFatFatShare]);
   expect(shapes.map((s) => [...s.week.higherDays])).toEqual([[], [0, 6]]);
+  expect(await valueOf(b.repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: today.addDays(-3) });
 });
 
 it('what this phone holds is described before a restore replaces it', async () => {

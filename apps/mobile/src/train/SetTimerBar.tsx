@@ -21,7 +21,9 @@ import './train.css';
  * down to the target rest of the exercise just done, and up again once
  * that is reached. While the workout is paused the bar offers "Resume"
  * where "Start set" was, so the way on is where the eye already is
- * (MM-447).
+ * (MM-447). It is the screen's only "Resume": the clock card above says
+ * "Paused" and leaves the way on to this bar. No figure shows while paused,
+ * since a 0:00 would read as a reset.
  */
 export function SetTimerBar({ workout }: { workout: Workout }) {
   const { state } = useApp();
@@ -63,9 +65,11 @@ export function SetTimerBar({ workout }: { workout: Workout }) {
         <p className="train-timer-label" aria-live="polite">
           {label}
         </p>
-        <p className="train-timer-time" aria-label={down ? `${spokenDuration(shownMs)} left` : spokenDuration(shownMs)}>
-          {elapsedText(shownMs)}
-        </p>
+        {workout.paused ? null : (
+          <p className="train-timer-time" aria-label={down ? `${spokenDuration(shownMs)} left` : spokenDuration(shownMs)}>
+            {elapsedText(shownMs)}
+          </p>
+        )}
         {instruction === undefined ? null : <p className="train-timer-label">{instruction}</p>}
       </div>
       {workout.paused ? (
