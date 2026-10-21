@@ -47,35 +47,37 @@ public class MmRemindersPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     /// Cancels everything scheduled before and schedules exactly these; a time already passed is let go.
+    /// The whole plan is read before anything changes, so a plan the app got wrong leaves what was pending alone.
     @objc func replaceAll(_ call: CAPPluginCall) {
         guard let reminders = call.getArray("reminders") else { return call.reject("replaceAll needs reminders.") }
+        var plan: [(title: String, atMs: Double)] = []
+        for entry in reminders {
+            guard let reminder = entry as? JSObject, let title = reminder["title"] as? String, let at = Self.instant(reminder["atMs"]) else {
+                return call.reject("A reminder needs a title and a time.")
+            }
+            plan.append((title: title, atMs: at))
+        }
         let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
         let now = Date().timeIntervalSince1970 * 1000
         let group = DispatchGroup()
+        let lock = NSLock()
         var failure: Error?
-        for (index, entry) in reminders.enumerated() {
-            guard let reminder = entry as? JSObject, let title = reminder["title"] as? String else {
-                return call.reject("A reminder needs a title and a time.")
-            }
-            let at: Double
-            if let whole = reminder["atMs"] as? Int {
-                at = Double(whole)
-            } else if let real = reminder["atMs"] as? Double {
-                at = real
-            } else {
-                return call.reject("A reminder needs a title and a time.")
-            }
-            if at < now { continue }
+        for (index, reminder) in plan.enumerated() where reminder.atMs >= now {
+            // The prompt is the whole notification: a title and no body (MM-146).
             let content = UNMutableNotificationContent()
-            content.title = title
+            content.title = reminder.title
             content.sound = .default
-            let date = Date(timeIntervalSince1970: at / 1000)
+            let date = Date(timeIntervalSince1970: reminder.atMs / 1000)
             let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
             let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             group.enter()
             center.add(UNNotificationRequest(identifier: "mm-reminder-\(index)", content: content, trigger: trigger)) { error in
-                if let error = error { failure = error }
+                if let error = error {
+                    lock.lock()
+                    failure = error
+                    lock.unlock()
+                }
                 group.leave()
             }
         }
@@ -86,5 +88,13 @@ public class MmRemindersPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.resolve()
             }
         }
+    }
+
+    /// A reminder's instant in milliseconds, however the bridge carried the number.
+    private static func instant(_ value: Any?) -> Double? {
+        if let whole = value as? Int { return Double(whole) }
+        if let real = value as? Double { return real }
+        if let number = value as? NSNumber { return number.doubleValue }
+        return nil
     }
 }
