@@ -17,7 +17,8 @@ export function leanGainReviewText(review: LeanGainReview, fmt: Fmt): string[] {
   switch (review.stop) {
     case 'bodyFat':
       said.push(
-        `Your estimated body fat has reached about ${roundHalfAwayFromZero(review.bodyFatPercent)}%, the line where the ` +
+        `${review.bodyFatFromRange ? 'The upper end of your body-fat range' : 'Your estimated body fat'} has reached about ` +
+          `${roundHalfAwayFromZero(review.bodyFatPercent)}%, the line where the ` +
           `app calls body fat high. The coach recommends ending the gain now: ${end}`,
       );
       break;

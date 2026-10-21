@@ -17,6 +17,7 @@ export * from './InMemoryExerciseProgressionRepository';
 export * from './InMemoryExternalLinks';
 export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
+export * from './InMemoryGoalBodyFatRepository';
 export * from './InMemoryHealthWorkouts';
 export * from './InMemoryInlineInsightLogRepository';
 export * from './InMemoryInsightLogRepository';
