@@ -753,6 +753,7 @@
           "workstream": "WS-06",
           "tickets": [
             "MM-122",
+            "MM-486",
             "MM-124",
             "MM-129",
             "MM-480"
@@ -848,6 +849,7 @@
             "MM-79",
             "MM-189",
             "MM-489",
+            "MM-515",
             "MM-490",
             "MM-191",
             "MM-196"
@@ -859,6 +861,9 @@
             "MM-72",
             "MM-516",
             "MM-70",
+            "MM-522",
+            "MM-513",
+            "MM-514",
             "MM-69",
             "MM-441",
             "MM-442",
@@ -2093,7 +2098,8 @@
           "MM-123",
           "MM-128",
           "MM-130",
-          "MM-129"
+          "MM-129",
+          "MM-486"
         ],
         "remaining": [
           "MM-119",
@@ -2159,6 +2165,7 @@
           "title": "Carbohydrate and fat preference; week shape with higher days",
           "tickets": [
             "MM-122",
+            "MM-486",
             "MM-124"
           ],
           "milestone": "M4"
@@ -2922,6 +2929,7 @@
           "MM-74",
           "MM-189",
           "MM-489",
+          "MM-515",
           "MM-490",
           "MM-191",
           "MM-447"
@@ -2978,6 +2986,7 @@
           "tickets": [
             "MM-189",
             "MM-489",
+            "MM-515",
             "MM-490"
           ],
           "milestone": "M4"
@@ -3048,13 +3057,16 @@
           "MM-71",
           "MM-72",
           "MM-188",
-          "MM-395"
+          "MM-395",
+          "MM-522"
         ],
         "remaining": [
           "MM-66",
           "MM-68",
           "MM-69",
           "MM-70",
+          "MM-513",
+          "MM-514",
           "MM-441",
           "MM-442",
           "MM-516",
@@ -3111,7 +3123,10 @@
           "step": 6,
           "title": "Write nutrition to the health platform",
           "tickets": [
-            "MM-70"
+            "MM-70",
+            "MM-522",
+            "MM-513",
+            "MM-514"
           ],
           "milestone": "M4"
         },

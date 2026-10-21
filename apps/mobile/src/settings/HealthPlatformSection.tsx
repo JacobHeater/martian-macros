@@ -14,6 +14,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { healthDataTypeIcon } from './healthDataTypeIcon';
+import { HealthWritingGroup } from './HealthWritingGroup';
 import { PrimaryScaleRow } from './PrimaryScaleRow';
 import { useSettingsSection } from './useSettingsSection';
 
@@ -43,8 +44,9 @@ function count(samples: readonly HealthSample[], { name, ios }: { name: string; 
  * Reminders is (MM-320, rule 9): one card of rows, a row for each kind of
  * reading with what it is for and "Read from … now" last, and the note as a
  * caption under the card. Connecting is offered, never required: each kind
- * is allowed by itself, and refusing one does not block the others. The
- * app only reads.
+ * is allowed by itself, and refusing one does not block the others.
+ * Writing is a card of switches of its own under the rows (MM-70, MM-314,
+ * MM-489), each asked for apart from reading.
  *
  * On Android the platform is Health Connect and says which kinds are
  * allowed. On an iPhone it is Apple Health, which never tells an app that
@@ -166,11 +168,14 @@ export function HealthPlatformSection() {
           />
         )}
       </MmListGroup>
+      {/* Writing, each kind by itself and apart from reading (MM-70, MM-314, MM-489). */}
+      <HealthWritingGroup />
       <p className="app-caption settings-note">
-        The app only reads. Nothing is written to your health data, and nothing read leaves this phone. One weigh-in
-        counts for a day: the first of the morning, or the middle of the day’s readings, from your primary scale when it
-        weighed you that day. A value you type for a day is used instead. To stop, take the permission away in{' '}
-        {ios ? healthPath : name}: what was read is kept until you erase your data.
+        Nothing read leaves this phone. The app writes to {name} only what you turn on above, from what you log here,
+        and changes or removes only what it wrote. One weigh-in counts for a day: the first of the morning, or the middle
+        of the day’s readings, from your primary scale when it weighed you that day. A value you type for a day is used
+        instead. To stop reading, take the permission away in {ios ? healthPath : name}: what was read is kept until you
+        erase your data.
       </p>
     </MmSection>
   );

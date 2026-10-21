@@ -1,5 +1,7 @@
 import { HealthDataType } from '../../healthIngest/HealthDataType';
+import type { HealthWriteKind } from '../../healthIngest/HealthWriteKind';
 import { FakeHealthSource } from '../../healthIngest/testing/FakeHealthSource';
+import { InMemoryHealthWriting } from '../../fixtures/InMemoryHealthWriting';
 import type { StoryDevice } from './StoryDevice';
 import { storyToday } from './storyToday';
 
@@ -14,6 +16,7 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * `stepsUnnamed` has the steps counted by the phone itself, which the
  * platform names by a package id and no app name (MM-395). `secondScale`
  * adds evening weigh-ins from a gym's scale on two of the days (MM-71).
+ * `writing` are the kinds the app writes to it, turned on already (MM-70).
  */
 export function healthPlatform({
   allowed = [],
@@ -22,6 +25,7 @@ export function healthPlatform({
   empty = [],
   stepsUnnamed = false,
   secondScale = false,
+  writing = [],
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
@@ -29,6 +33,7 @@ export function healthPlatform({
   empty?: readonly HealthDataType[];
   stepsUnnamed?: boolean;
   secondScale?: boolean;
+  writing?: readonly HealthWriteKind[];
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
@@ -85,6 +90,6 @@ export function healthPlatform({
     await source.permit(new Set(allowed));
     source.willPermit = new Set(HealthDataType.values.filter((type) => !refuses.includes(type)));
     source.unreadable = unreadable;
-    return { ...services, healthSource: source };
+    return { ...services, healthSource: source, healthWriting: new InMemoryHealthWriting({ on: writing }) };
   };
 }

@@ -100,7 +100,10 @@ register, and the paywall gates features built here.
 6. **Maintenance band and leaving a deficit (MM-130).** M2. After WS-02
    step 2.
 7. **Carbohydrate and fat preference; week shape (MM-122, MM-124).** M4.
-   One migration for both settings.
+   Built 2026-10-21 against `TargetShapeRepository`; MM-486 added the table
+   (schema 16), one migration for both settings. An unchosen balance stays
+   as issued (MM-24's split; coordinator 2026-10-21). Remaining: a look at the stories in all three palettes, and
+   MM-124's simulator suite over shaped intake.
 8. **Lean-gain guardrails (MM-129, MM-480).** M4. Its waist signal needs WS-07 step 1
    and its strength signal WS-10 step 3; the surplus cap needs neither.
    MM-129 is built (2026-10-21); a slower lean-gain pace to choose (MM-480)
@@ -130,6 +133,8 @@ beside anything.
 - Built (2026-10-21): MM-129 (lean-gain guardrails: the surplus cap and the Coach
   screen's lean-gain card). Remaining from it: MM-480 (a slower gain pace).
 - Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
+- Built (2026-10-21): MM-486 (the table for MM-122's and MM-124's settings,
+  schema 16, after MM-71's version 15).
 
 ## Notes for whoever builds it
 - The explanation is data, not prose: a list of signed contributions with
