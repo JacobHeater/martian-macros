@@ -14,6 +14,7 @@ export * from './InMemoryDayMarkRepository';
 export * from './InMemoryEntitlement';
 export * from './InMemoryExactAlarms';
 export * from './InMemoryExerciseProgressionRepository';
+export * from './InMemoryExternalLinks';
 export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
 export * from './InMemoryHealthWorkouts';
