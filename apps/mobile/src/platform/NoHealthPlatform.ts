@@ -30,6 +30,11 @@ export class NoHealthPlatform implements HealthSource, HealthHistoryAccess {
     return Promise.resolve(false);
   }
 
+  /** Nothing can be read, so nothing older than now is ever shown (MM-498). */
+  readableFrom(): Promise<Date | undefined> {
+    return Promise.resolve(new Date());
+  }
+
   read(): Promise<HealthSample[]> {
     return Promise.resolve([]);
   }
