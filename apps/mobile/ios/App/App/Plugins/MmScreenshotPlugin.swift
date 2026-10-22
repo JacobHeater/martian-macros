@@ -27,7 +27,9 @@ public class MmScreenshotPlugin: CAPPlugin, CAPBridgedPlugin {
     /// Whether this build may take screenshots: a twin (`com.martianmacros.dev`, `.demo`), never the real app.
     static var isAllowed: Bool {
         guard let id = Bundle.main.bundleIdentifier else { return false }
-        return id != prodBundleId && id.hasPrefix(prodBundleId + ".")
+        // Every identity, the real app too (owner, 2026-10-22: the only user for now, MM-536). Blocked again in the
+        // real app before any release (MM-552, M5).
+        return id == prodBundleId || id.hasPrefix(prodBundleId + ".")
     }
 
     static var notificationName: String { (Bundle.main.bundleIdentifier ?? prodBundleId) + ".mm-screenshot" }
