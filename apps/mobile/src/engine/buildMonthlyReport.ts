@@ -1,3 +1,4 @@
+import type { BodyFatObservation } from '../domain/BodyFatObservation';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
@@ -44,6 +45,7 @@ export function buildMonthlyReport({
   intake,
   weights,
   waist,
+  bodyFatReadings = [],
   history,
   trend,
   workouts = [],
@@ -56,6 +58,8 @@ export function buildMonthlyReport({
   intake: readonly IntakeDay[];
   weights: readonly WeightObservation[];
   waist: readonly WaistObservation[];
+  /** Smart-scale body-fat readings (MM-502). */
+  bodyFatReadings?: readonly BodyFatObservation[];
   history: readonly TargetsRecord[];
   trend: readonly WeightTrendPoint[];
   workouts?: readonly Workout[];
@@ -215,8 +219,9 @@ export function buildMonthlyReport({
     const upTo = trendModel.smooth(weights.filter((w) => !w.date.isAfter(day)), { through: day });
     const level = upTo[upTo.length - 1]?.levelKg;
     if (level === undefined) return undefined;
-    const estimated = estimateBodyFat({ setup, trendWeightKg: level, waists: waist, today: day });
-    return estimated.basis === 'waist' ? estimated : undefined;
+    const estimated = estimateBodyFat({ setup, trendWeightKg: level, waists: waist, bodyFatReadings, today: day });
+    // The waist, or a smart scale's settled readings (MM-502): ranges from measurements.
+    return estimated.basis === 'waist' || estimated.basis === 'scale' ? estimated : undefined;
   };
   const bodyFatAtEnd = bodyFatOn(period.to);
   // With an eating-disorder history the report shows no change in body fat
