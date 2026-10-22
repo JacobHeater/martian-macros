@@ -23,8 +23,10 @@ import {
   pausedDaysBetween,
   pausedGuide,
   pauseOn,
+  pauseSettlingWindows,
   pauseToResume,
   pauseWeightEvents,
+  settlingDays,
   TargetsRecord,
   withoutPausedDays,
 } from '../../src/engine';
@@ -153,6 +155,54 @@ describe('the unbroken-deficit count', () => {
   });
 });
 
+describe('the glycogen shift at both ends (MM-131)', () => {
+  const window = (first: number) => ({ start: start.addDays(first), end: start.addDays(first + settlingDays - 1) });
+  const windowsOf = (pauses: Pause[], today: number, history = [record(0)]) =>
+    pauseSettlingWindows({ pauses, history, today: start.addDays(today) }).map((w) => ({ start: w.start, end: w.end }));
+
+  it('a pause from a deficit settles on its first day and on the day after it', () => {
+    expect(windowsOf([pause(20, 29)], 45)).toEqual([window(20), window(30)]);
+  });
+
+  it('a pause still running has only its first day so far', () => {
+    expect(windowsOf([pause(20, 29)], 25)).toEqual([window(20)]);
+  });
+
+  it('a pause too short to be a break, or not yet started, moves nothing', () => {
+    expect(windowsOf([pause(20, 25)], 45)).toEqual([]);
+    expect(windowsOf([pause(50, 60)], 45)).toEqual([]);
+  });
+
+  it('a pause from targets at maintenance moves nothing, and neither does one before any targets', () => {
+    const atMaintenance = new TargetsRecord({
+      effectiveFrom: start,
+      targets: new DailyTargets({ kcal: 2650, proteinG: 160, fatG: 70, carbsG: 280, weeklyRateFraction: 0 }),
+      mode: 'maintenance',
+      tdeeKcal: 2700,
+      tdeeSigmaKcal: 150,
+      tdeeStatus: 'updated',
+    });
+    expect(windowsOf([pause(20, 29)], 45, [atMaintenance])).toEqual([]);
+    expect(windowsOf([pause(20, 29)], 45, [])).toEqual([]);
+  });
+
+  it('the estimate waits for the water to settle after a pause, as after any change of phase', () => {
+    const today = start.addDays(37);
+    const input = {
+      setup,
+      weights: upTo(38).map((i) => weigh(i)),
+      intake: upTo(37).map((i) => ate(i)),
+      history: [record(0)],
+      today,
+    };
+    const plain = analyze(input) as CoachSnapshot;
+    expect(plain.tdee.settlingUntil).toBeUndefined();
+    const paused = analyze({ ...input, pauses: [pause(14, 23)] }) as CoachSnapshot;
+    expect(paused.tdee.status).toBe('held');
+    expect(paused.tdee.settlingUntil).toEqual(start.addDays(33));
+  });
+});
+
 describe('illness and injury', () => {
   it('an illness pause records illness events across its days', () => {
     const events = pauseWeightEvents(pause(10, 19, 'illness'));
@@ -194,8 +244,9 @@ describe('the check-in', () => {
     ).toBeUndefined();
   });
 
+  // Six days: too short to be a change of phase, so only the week's wait applies.
   it('waits seven days after a pause ends', () => {
-    const pauses = [pause(40, 50)];
+    const pauses = [pause(40, 45)];
     const on = (day: number) =>
       nextTargets({
         setup,
@@ -204,9 +255,17 @@ describe('the check-in', () => {
         today: start.addDays(day),
         pauses,
       });
-    expect(on(51)).toBeUndefined();
-    expect(on(57)).toBeUndefined();
-    expect(on(58)).toBeDefined();
+    expect(on(46)).toBeUndefined();
+    expect(on(52)).toBeUndefined();
+    expect(on(53)).toBeDefined();
+  });
+
+  it('after a pause of a week or more, the week is up but nothing moves while the water settles (MM-131)', () => {
+    const pauses = [pause(40, 50)];
+    const today = start.addDays(58);
+    const snapshot = snapshotOn(today, pauses);
+    expect(snapshot.tdee.settlingUntil).toEqual(start.addDays(60));
+    expect(nextTargets({ setup, snapshot, history: [record(0)], today, pauses })).toBeUndefined();
   });
 
   it('first targets are still issued to someone who starts paused', () => {

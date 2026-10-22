@@ -154,6 +154,7 @@ it('reps in reserve', () => {
 describe('every label of every kind', () => {
   const all = <T extends string>(values: readonly T[], label: (value: T) => unknown) =>
     Object.fromEntries(values.map((value) => [value, label(value)]));
+  const dartReminderKinds = ReminderKind.values.filter((kind) => kind in dart.labels.reminder);
 
   it.each([
     ['meal', all(Meal.values, mealLabel)],
@@ -177,10 +178,11 @@ describe('every label of every kind', () => {
     ['healthDataType', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataType), healthDataTypeLabel)],
     ['healthDataTypePurpose', all(HealthDataType.values.filter((type) => type in dart.labels.healthDataTypePurpose), healthDataTypePurpose)],
     ['confidence', all(ConfidenceLevel.values, confidenceLabel)],
-    ['reminder', all(ReminderKind.values, reminderLabel)],
-    ['reminderSentWhen', all(ReminderKind.values, reminderSentWhen)],
-    ['reminderPrompt', all(ReminderKind.values, reminderPrompt)],
-    ['reminderPausedLine', all(ReminderKind.values, reminderPausedLine)],
+    // The kind added since the Flutter app (MM-116's recovery check-in) has no Dart words to match.
+    ['reminder', all(dartReminderKinds, reminderLabel)],
+    ['reminderSentWhen', all(dartReminderKinds, reminderSentWhen)],
+    ['reminderPrompt', all(dartReminderKinds, reminderPrompt)],
+    ['reminderPausedLine', all(dartReminderKinds, reminderPausedLine)],
     ['portionUnitChip', all(PortionUnit.values, portionUnitChipLabel)],
     ['portionUnitOf', all(PortionUnit.values, (unit) => dart.quantities.map((q) => portionUnitOf(unit, q)))],
     ['recoveryLabel', all(RecoveryQuestion.values, recoveryQuestionLabel)],

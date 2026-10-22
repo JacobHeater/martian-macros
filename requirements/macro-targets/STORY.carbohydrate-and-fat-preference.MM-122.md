@@ -1,6 +1,6 @@
 ---
 id: MM-122
-status: in-progress
+status: done
 component: macro-targets
 related: [MM-119, MM-24, MM-28, MM-49, MM-121, MM-123, MM-124, MM-143, MM-486]
 ---
@@ -124,9 +124,12 @@ kept on the phone, erased, backed up and restored with everything else. An uncho
   after a choice; the floor switched off only on purpose.
 - `test/contracts/targetShapeRepositoryContract.ts`, run in `test/fixtures/inMemoryContracts.test.ts` and
   `test/data/sqlContracts.test.ts` (MM-486).
-Still owed: a look at the stories in all three palettes
-(the panel's fast review was source-only; its blocking findings were fixed). Open question for the safety
-role: whether the "very low carb on purpose" switch needs a caution line.
+The code is complete (2026-10-21). Open question for the safety role, not blocking: whether the "very low
+carb on purpose" switch needs a caution line.
+
+## Owed on a phone
+- A look at the stories (CoachRows, BalanceUnchosen, BalanceMoreFat, BalanceHeldByCarbFloor, FoodWithMoreFat)
+  in all three palettes; the panel's fast review was source-only, and its blocking findings were fixed.
 
 ## Notes
 - Priority: should-have. Cheap to build and the first thing an experienced user looks for.

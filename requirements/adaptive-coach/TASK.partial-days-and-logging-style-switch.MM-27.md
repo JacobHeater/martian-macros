@@ -57,3 +57,6 @@ Scenario: Logging collapses and targets do not
   `mm_domain`. Tests in `tdee_estimator_test.dart` and the "no death spiral" test in `closed_loop_test.dart`.
 - A legitimately light, unmarked day is excluded too, which biases the estimate slightly high. That is the safer direction.
 - The style-switch rule only sees weighed versus not weighed. Hand portions (MM-46) will need it to tell more styles apart.
+- A shaped week's planned lower days (MM-124) are read against their plan: `usableIntakeDays` takes an optional `plannedShare`
+  (`plannedDayShare(shapes)`) and divides each day's intake by it before the comparison, so a planned lower day eaten a little
+  under plan is not dropped. The estimator gets it from `analyze`; the other callers still read every day as flat (a follow-up).

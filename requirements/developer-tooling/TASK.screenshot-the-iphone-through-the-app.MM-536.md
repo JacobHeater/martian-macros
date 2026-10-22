@@ -1,6 +1,6 @@
 ---
 id: MM-536
-status: in-progress
+status: done
 component: developer-tooling
 related: [MM-238, MM-412, MM-403, MM-8]
 ---
@@ -113,12 +113,20 @@ Scenario: No answer
   file names and notification agree with the runner's.
 
 ## Progress
-Built 2026-10-21. Not run locally; CI validates the unit tests. Not
-verified: anything on a phone. The devicectl flags relied on are from
-`xcrun devicectl ... --help` on Xcode 26.3: `device copy to` and `copy from`
-with `--domain-type appDataContainer --domain-identifier <bundle id>` and a
-container-relative `--source` / `--destination`; `device process launch`
-of an app already running without `--terminate-existing`; and
-`device notification post --name`. The owner runs
-`mm run --ios --phone --env dev`, then `mm screenshot --phone`, with the
-phone plugged in and unlocked.
+Done 2026-10-21 (#235). Not run locally; CI validates the unit tests, and CI builds no iOS app, so the Swift
+(`ios/App/App/Plugins/MmScreenshotPlugin.swift`, registered from `MainViewController` behind `isAllowed`) is held
+only by `tool/test/iphoneScreenshotSwift.test.ts` until it is built on the Mac. The devicectl flags relied on are
+from `xcrun devicectl ... --help` on Xcode 26.3: `device copy to` and `copy from` with `--domain-type
+appDataContainer --domain-identifier <bundle id>` and a container-relative `--source` / `--destination`;
+`device process launch` of an app already running without `--terminate-existing`; and
+`device notification post --name`.
+
+## Owed on a phone
+With the phone plugged in and unlocked, after `mm run --ios --phone --env dev`:
+- `mm screenshot --phone` brings the app to the front and writes its web view as `mm-screenshot-<stamp>.png`, with
+  no status bar; `mm screenshot --phone shot.png --clipboard` writes `shot.png` and puts it on the clipboard.
+- `mm screenshot -d "<the phone's name>"` takes the phone path.
+- With the phone unplugged, the command says it is paired but not connected; with the phone locked, it stops after
+  20 seconds and says why.
+- The real app (`--prod`) is refused before anything is sent (covered by the unit test; the phone shows nothing).
+- The first iOS build of `MmScreenshotPlugin.swift`.
