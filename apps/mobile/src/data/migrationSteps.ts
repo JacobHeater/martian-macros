@@ -300,4 +300,31 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('CREATE TABLE "deleted_platform_workouts" ("platform_id" TEXT NOT NULL PRIMARY KEY)');
     },
   ],
+  // 22 to 23 (MM-156): every body measurement in one store keyed by site, the waist moved into it with its dates,
+  // values and readings, and which sites are measured, the limb side and the suggestion answered; none yet.
+  [
+    22,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "body_measurements" (' +
+          '"site" TEXT NOT NULL CHECK ("site" IN (\'waist\', \'neck\', \'chest\', \'hips\', \'upperArm\', \'thigh\', \'calf\')), ' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"value_cm" REAL NOT NULL CHECK("value_cm" BETWEEN 10.0 AND 300.0), ' +
+          '"reading1_cm" REAL NULL, "reading2_cm" REAL NULL, "reading3_cm" REAL NULL, ' +
+          'PRIMARY KEY ("site", "epoch_day"))',
+      );
+      await db.execute(
+        "INSERT INTO body_measurements (site, epoch_day, value_cm, reading1_cm, reading2_cm, reading3_cm) " +
+          "SELECT 'waist', epoch_day, waist_cm, reading1_cm, reading2_cm, reading3_cm FROM waist_entries",
+      );
+      await db.execute('DROP TABLE waist_entries');
+      await db.execute(
+        'CREATE TABLE "measurement_settings" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1), ' +
+          '"sites" TEXT NOT NULL DEFAULT \'\', ' +
+          '"limb_side" TEXT NULL CHECK ("limb_side" IS NULL OR "limb_side" IN (\'left\', \'right\')), ' +
+          '"suggestion_answered" INTEGER NOT NULL DEFAULT 0 CHECK ("suggestion_answered" IN (0, 1)))',
+      );
+    },
+  ],
 ]);
