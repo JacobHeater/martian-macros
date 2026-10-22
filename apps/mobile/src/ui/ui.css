@@ -323,7 +323,6 @@
   box-shadow: none;
 }
 .theme-martian .mm-button-primary:not(:disabled),
-.theme-martian .mm-fab,
 .theme-martian .mm-segment-selected,
 .theme-martian .mm-chip-selected,
 .theme-martian .mm-nav-destination-current .mm-nav-indicator,

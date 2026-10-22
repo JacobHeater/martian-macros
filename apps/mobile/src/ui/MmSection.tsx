@@ -44,7 +44,8 @@ interface MmSectionProps {
  * A section of a screen (MM-253, rule 1): an icon and a heading on the
  * canvas with its rows beneath, where a card used to be. It is the second
  * tier; the hero is the first and a disclosure inside it the third. A
- * section is never drawn on a surface, so nothing nests in a card.
+ * section is never drawn on a surface, so nothing nests in a card; a framed
+ * section is the card itself (the Coach, MM-558).
  */
 export function MmSection({
   icon,
