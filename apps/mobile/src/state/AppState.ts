@@ -709,6 +709,8 @@ export class AppState {
       const waists = of(this.waist) ?? [];
       // A smart scale's readings join it too (MM-502); none until read.
       const bodyFatReadings = of(this.bodyFatReadings) ?? [];
+      // And the tape at the neck and hip, by the Navy method (MM-501); none until read.
+      const sites = of(this.measurements) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -722,7 +724,7 @@ export class AppState {
       }
       // A shaped week's lower days are read against their plan (MM-124); flat until read.
       const shapes = of(this.targetShapes) ?? [];
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, shapes, bodyFatReadings, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, shapes, bodyFatReadings, sites, today });
     });
 
     this.targetShapeLimits = derived(() => {
@@ -1724,6 +1726,7 @@ export class AppState {
           weights,
           waist,
           bodyFatReadings: of(this.bodyFatReadings) ?? [],
+          sites: of(this.measurements) ?? [],
           history,
           trend: coach?.trend ?? [],
           workouts,
