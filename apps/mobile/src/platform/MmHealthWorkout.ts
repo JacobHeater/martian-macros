@@ -14,4 +14,10 @@ export interface MmHealthWorkout {
   readonly sourceId: string;
   readonly sourceName: string;
   readonly segments: readonly MmHealthSegment[];
+  /**
+   * Written by this app, as the platform says by its source (MM-489,
+   * MM-490): never imported, whatever its client id. Absent from an older
+   * plugin, where the client id alone tells.
+   */
+  readonly ours?: boolean;
 }

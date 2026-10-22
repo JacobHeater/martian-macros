@@ -4,6 +4,7 @@ const lines: Readonly<Record<ReminderKind, string>> = {
   weighIn: 'Weigh-in reminders are paused.',
   logFood: 'Food reminders are paused.',
   weeklyMeasurement: 'Measurement reminders are paused.',
+  recoveryCheckIn: 'Reminders for the weekly questions are paused.',
 };
 
 /** The line shown when it has paused itself. */

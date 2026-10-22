@@ -5,6 +5,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { Pause } from '../domain/Pause';
+import type { TargetShape } from '../domain/TargetShape';
 import { TrainingStatus } from '../domain/TrainingStatus';
 import type { UserSetup } from '../domain/UserSetup';
 import type { WaistObservation } from '../domain/WaistObservation';
@@ -26,6 +27,8 @@ import { energyDensityForSlope } from './energyDensityForSlope';
 import { estimateBodyFat } from './estimateBodyFat';
 import { passingWeightEventNoise } from './passingWeightEventNoise';
 import { pauseDeficitRestartOn } from './pauseDeficitRestartOn';
+import { pauseSettlingWindows } from './pauseSettlingWindows';
+import { plannedDayShare } from './plannedDayShare';
 import { recommendMode } from './recommendMode';
 import { safetyBodyFatPercent } from './safetyBodyFatPercent';
 import { SafetyBounds } from './SafetyBounds';
@@ -64,6 +67,7 @@ export function analyze({
   history = [],
   pauses = [],
   waists = [],
+  shapes = [],
   bodyFatReadings = [],
   sites = [],
   trendModel = new WeightTrendModel(),
@@ -78,6 +82,8 @@ export function analyze({
   history?: readonly TargetsRecord[];
   pauses?: readonly Pause[];
   waists?: readonly WaistObservation[];
+  /** How the user shaped their weeks, oldest first (MM-124): a planned lower day is not a partial one. */
+  shapes?: readonly TargetShape[];
   /** Smart-scale body-fat readings (MM-502). */
   bodyFatReadings?: readonly BodyFatObservation[];
   /** Every site's tape measurements (MM-156): neck and hip join the range by the Navy method (MM-501). */
@@ -94,7 +100,8 @@ export function analyze({
     creatineEvents.filter((event) => !event.date.isAfter(today)).map((event) => event.date),
   );
   const passingEvents = effectiveWeightEvents(weightEvents);
-  const phaseSettling = settlingWindows(history);
+  // A pause is a change of phase at both ends (MM-148, MM-131).
+  const phaseSettling = [...settlingWindows(history), ...pauseSettlingWindows({ pauses, history, today })];
   const settling = [...phaseSettling, ...weightEventSettlingWindows(creatineEvents)];
   const cycleNoise = flowDays.length === 0 ? undefined : cycleNoiseMultiplier(flowDays);
   const eventNoise = passingEvents.length === 0 ? undefined : passingWeightEventNoise(passingEvents);
@@ -173,6 +180,7 @@ export function analyze({
         resistanceTrained: TrainingStatus.isResistanceTrained(setup.trainingStatus),
       }),
     settling,
+    plannedShare: plannedDayShare(shapes),
   });
 
   return new CoachSnapshot({
