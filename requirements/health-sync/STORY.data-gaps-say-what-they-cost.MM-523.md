@@ -1,6 +1,6 @@
 ---
 id: MM-523
-status: in-progress
+status: done
 component: health-sync
 related: [MM-72, MM-516, MM-73, MM-68, MM-69, MM-23, MM-27, MM-323, MM-123, MM-378]
 ---
@@ -87,5 +87,14 @@ Scenario: Eating-disorder history
 - Built 2026-10-21: `coach/dataGapsOf.ts` decides the gaps, `coach/DataGapNote.tsx` says one and keeps its dismissal,
   `CoachScreen` places them; `HealthConnection.history` says whether the history permission is granted. Tests:
   `test/coach/dataGaps.test.tsx` (each scenario above, the eating-disorder case included). Not run locally; CI validates.
-- Device check owed: on the owner's phone, with weight not allowed and with the history refused, each line shows once in
-  its place, "Open Health Connect" opens the app's page there, and a dismissal survives closing the app.
+
+## Progress
+Done 2026-10-21. Built and merged in PR #233 (see Notes); every scenario above is held by `test/coach/dataGaps.test.tsx`
+and drawn in the stories under UI/UX, validated by CI. What only a phone can show is listed below.
+
+## Owed on a phone
+- With weight not allowed in Health Connect and few weigh-ins typed: the weigh-ins line shows once, under the trend.
+- With the history permission refused: the history line shows once, under the expenditure estimate, and says it rests on
+  the last 30 days.
+- "Open Health Connect" on either line opens the app's own page in Health Connect.
+- A dismissed line stays dismissed after the app is closed and opened again.
