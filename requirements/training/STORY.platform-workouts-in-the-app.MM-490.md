@@ -18,6 +18,15 @@ Choices I made without asking (say if any is wrong):
   second (MM-71). That is a schema change, made after the health-sync settings change in flight takes its own.
 - **"Other exercise" is shown by name, and its sets can be moved to an exercise the user chooses.** It is not in the picker and
   counts toward no muscle group.
+- **Only strength sessions are imported (coordinator's decision, 2026-10-21, from the integrations review).** MM-188's
+  strength types (Health Connect's strength training, weightlifting and calisthenics types; HealthKit's traditional and
+  functional strength training and core training), which both shells already flag as `strength`; the walks and runs a
+  watch detects are not brought into the training log. The filter is in `workoutFromPlatform`, so the shells read as before.
+- **The same session recorded twice is imported once (panel review, 2026-10-21).** A new import whose span overlaps
+  80% or more of the shorter of its span and that of a workout logged in the app, or of one imported from another
+  source, is left out: the session timed live in the app and recorded by a watch, or written by two apps.
+- **A re-read moves a workout only when its start or end changed (panel review, 2026-10-21)**; the same instants keep
+  the stored day, which the user may have set.
 
 ## Description
 - A switch for writing workouts in the health platform's settings, off until the user turns it on; turning it on asks the
@@ -71,6 +80,14 @@ Built 2026-10-21. Not run locally; CI validates.
   nothing with reading not allowed); `test/data/upgrade.test.ts` (from 21). Writing off until turned on stays
   guarded by MM-489's tests.
 - Stories: `TrainImportedWorkout`, `ImportedWorkoutOtherExercise` in `Train.stories.tsx`.
+
+Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
+- `workoutFromPlatform`: nothing for a session that is not strength. `platformWorkoutImports`: moved only on changed
+  instants; a new import overlapping 80% of an app-logged workout or another source's import is left out.
+- Tests: `test/engine/platformWorkoutImports.test.ts` (same instants with a different stored day: no change; another
+  source's session overlapping 80%: not imported, in the log or in one read, and one overlapping 50% is; a live app
+  session and a watch's recording: one; a walk: not imported); `test/engine/platformWorkouts.test.ts` (a non-strength
+  session gives nothing; a HealthKit strength session with no segments is a session).
 
 ## Owed on a phone
 - Health Connect: a strength workout recorded by another app (a watch) appears in Train after opening the app, once,

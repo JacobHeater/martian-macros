@@ -7,7 +7,9 @@ import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { bodyFatRange } from './bodyFatRange';
 import { bodyFatRangeText } from './bodyFatRangeText';
 import { explanationLineText } from './explanationLineText';
+import { liftChangeWords } from './liftChangeWords';
 import { paceInWordsText } from './paceInWordsText';
+import { setText } from './setText';
 import { Fmt } from './Fmt';
 import { waistAmount } from './waistAmount';
 import { wholeDaysLogged } from './wholeDaysLogged';
@@ -72,7 +74,10 @@ export class MonthlyReportText {
       .slice(0, 6)
       .map((lift) => [
         lift.name,
-        `${fmt.load(lift.fromKg)} to ${fmt.load(lift.toKg)} (${fmt.loadDelta(lift.toKg - lift.fromKg)})`,
+        // A bodyweight lift's estimate carries the body weight: with the weight hidden, its change in words (MM-118).
+        lift.load === 'bodyweight' && fmt.weightHidden
+          ? `${liftChangeWords(lift.toKg - lift.fromKg)} over the month`
+          : `${fmt.load(lift.fromKg)} to ${fmt.load(lift.toKg)} (${fmt.loadDelta(lift.toKg - lift.fromKg)})`,
       ]);
   }
 
@@ -84,7 +89,12 @@ export class MonthlyReportText {
     const { report, fmt } = this;
     return report.personalRecords.map((record) => [
       record.name,
-      `${fmt.load(record.estimateKg)}, up from ${fmt.load(record.previousBestKg)}`,
+      // With the weight hidden, a bodyweight lift's record is the set that made it (MM-118).
+      record.load === 'bodyweight' && fmt.weightHidden
+        ? record.bestSet === undefined
+          ? 'A new best'
+          : `A new best, ${setText(record.bestSet, fmt, 'bodyweight')}`
+        : `${fmt.load(record.estimateKg)}, up from ${fmt.load(record.previousBestKg)}`,
       Fmt.shortDay(record.date),
     ]);
   }

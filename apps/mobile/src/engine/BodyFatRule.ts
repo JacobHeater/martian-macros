@@ -66,9 +66,13 @@ export const BodyFatRule = {
   /**
    * The fixed error, one standard deviation in percentage points, left in
    * a scale's level however many readings are averaged: filtering removes
-   * scatter, not a scale's bias against a body scan.
+   * scatter, not a scale's bias against a body scan. Consumer foot-to-foot
+   * scales against DXA: limits of agreement about -14.5 to +8.6 points
+   * (Bosy-Westphal 2008, Obes Facts 1:319) and about +/-9.5 points
+   * (Pateyjohns 2006, Obesity 14:2064); a 95% half-width of about 9 points
+   * is one sigma of about 4.5.
    */
-  scaleBiasSigmaPercent: 2,
+  scaleBiasSigmaPercent: 4.5,
 
   /**
    * The least day-to-day scatter, one standard deviation in points, a
@@ -79,8 +83,14 @@ export const BodyFatRule = {
 
   /**
    * How far a scale's error goes together with the formulas' (from outside
-   * measurements). A scale reads current through the body, not its shape,
-   * so they are taken as independent.
+   * measurements). A consumer scale's equation predicts body fat largely
+   * from the same height, weight, age and sex the formulas use, with the
+   * impedance adding only part of the information, so their errors are
+   * shared in part. The correlation is the shared variance over the product
+   * of the two sigmas: rho = s_shared^2 / (s_scale * s_outside). With the
+   * shared part about 2.5 points (one sigma), s_scale 4.5 and s_outside
+   * about 3.5 to 5: rho = 6.25 / (4.5 * 3.5 to 5) = 0.28 to 0.40, and the
+   * upper end is taken so the range is never too narrow. Judgement.
    */
-  scaleErrorCorrelation: 0,
+  scaleErrorCorrelation: 0.4,
 } as const;

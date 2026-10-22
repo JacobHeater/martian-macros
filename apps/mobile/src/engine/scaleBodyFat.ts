@@ -17,7 +17,8 @@ interface Day {
   readonly percent: number;
 }
 
-function daysOf(readings: readonly BodyFatObservation[]): Day[] {
+/** One figure a calendar day: the middle of that day's figures, sorted by day. */
+function daysOf(readings: readonly { readonly date: CalendarDate; readonly percent: number }[]): Day[] {
   const byDay = new Map<number, { date: CalendarDate; values: number[] }>();
   for (const reading of readings) {
     const day = byDay.get(reading.date.epochDay);
@@ -30,6 +31,21 @@ function daysOf(readings: readonly BodyFatObservation[]): Day[] {
 }
 
 /**
+ * The first day of the readings' current run: after a gap longer than
+ * `BodyFatRule.scaleWindowDays` with no reading, the scale settles again
+ * from its first reading after the gap.
+ */
+function runStart(readings: readonly BodyFatObservation[]): CalendarDate {
+  const days = daysOf(readings);
+  let start = (days[0] as Day).date;
+  for (let i = 1; i < days.length; i++) {
+    const day = (days[i] as Day).date;
+    if ((days[i - 1] as Day).date.daysUntil(day) > BodyFatRule.scaleWindowDays) start = day;
+  }
+  return start;
+}
+
+/**
  * What smart-scale body-fat readings say (MM-502), or undefined before they
  * can say anything.
  *
@@ -38,7 +54,10 @@ function daysOf(readings: readonly BodyFatObservation[]): Day[] {
  * the middle of the last `BodyFatRule.scaleWindowDays` days up to the
  * week's update day (so one spike moves nothing, and the range changes
  * once a week), and only once the first scale's readings span
- * `BodyFatRule.scaleSettleDays`.
+ * `BodyFatRule.scaleSettleDays`. After a gap longer than the window with
+ * no reading, the readings settle again from the first after the gap. The
+ * days counted are calendar days: the scales' figures for one day (after
+ * each scale's offset) are taken as one, their middle.
  *
  * Each scale has its own bias. The first is taken as it reads, its fixed
  * error (`scaleBiasSigmaPercent`) left in the uncertainty for the formula
@@ -57,9 +76,11 @@ export function scaleBodyFat({
   readings: readonly BodyFatObservation[];
   today: CalendarDate;
 }): ScaleLevel | undefined {
-  const known = readings.filter((r) => !r.date.isAfter(today) && Number.isFinite(r.percent) && r.percent > 0 && r.percent < 100);
-  if (known.length === 0) return undefined;
-  const first = known.reduce((a, b) => (b.date.isBefore(a.date) ? b : a)).date;
+  const valid = readings.filter((r) => !r.date.isAfter(today) && Number.isFinite(r.percent) && r.percent > 0 && r.percent < 100);
+  if (valid.length === 0) return undefined;
+  // Only the current run counts: a scale back after a long gap settles again.
+  const first = runStart(valid);
+  const known = valid.filter((r) => !r.date.isBefore(first));
   // The update day: a whole number of weeks after the first reading.
   const asOf = today.addDays(-(first.daysUntil(today) % 7));
   if (first.daysUntil(asOf) < BodyFatRule.scaleSettleDays) return undefined;
@@ -90,7 +111,9 @@ export function scaleBodyFat({
     for (const day of days) series.push({ date: day.date, percent: day.percent - offset });
   }
 
-  const window = series.filter((d) => !d.date.isAfter(asOf) && d.date.daysUntil(asOf) < BodyFatRule.scaleWindowDays);
+  // One figure a calendar day across scales and sources, so a reading copied
+  // by a second app, or two scales on one morning, counts as one day.
+  const window = daysOf(series).filter((d) => !d.date.isAfter(asOf) && d.date.daysUntil(asOf) < BodyFatRule.scaleWindowDays);
   if (window.length < BodyFatRule.minScaleDays) return undefined;
   const values = window.map((d) => d.percent);
   const level = median(values);

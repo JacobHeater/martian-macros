@@ -1,11 +1,23 @@
-import { cleanup, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { Exercise } from '../../src/domain/training/Exercise';
+import { WorkoutSet } from '../../src/domain/training/WorkoutSet';
+import { MonthlyReport } from '../../src/engine/MonthlyReport';
+import { ReportPeriod } from '../../src/engine/ReportPeriod';
+import { StrengthTrend } from '../../src/engine/StrengthTrend';
+import { WeightJumpExplanation } from '../../src/engine/WeightJumpExplanation';
+import { Fmt } from '../../src/format/Fmt';
+import { liftSummary } from '../../src/format/liftSummary';
+import { MonthlyReportText } from '../../src/format/MonthlyReportText';
+import { personalRecordText } from '../../src/format/personalRecordText';
+import { weightJumpText } from '../../src/format/weightJumpText';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import type { WeightDisplay } from '../../src/domain/WeightDisplay';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { StrengthTrendCard } from '../../src/ui/StrengthTrendCard';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
 import { openTab } from '../support/openTab';
@@ -150,4 +162,83 @@ it('offered once, with no comment, after more than one weigh-in a day on five da
   renderApp(repos, today);
   await screen.findByRole('textbox', { name: 'Today’s weigh-in' });
   expect(screen.queryByText('How much of your weight to show')).not.toBeInTheDocument();
+});
+
+describe('Hidden: a bodyweight lift says its best set, not an estimate that carries the body weight', () => {
+  const hidden = new Fmt('metric', { weightDisplay: 'hidden' });
+  const everything = new Fmt('metric');
+  const pullUp = new Exercise({ id: 'pull-up', name: 'Pull-up', equipment: 'bodyweight', primary: 'back', load: 'bodyweight' });
+  // Body weight 80 kg plus 10 kg for 8: an estimate near 110 kg, which would give the body weight away.
+  const best = new WorkoutSet({ reps: 8, loadKg: 10 });
+  const trend = new StrengthTrend({
+    exerciseId: 'pull-up',
+    exercise: pullUp,
+    points: [0, 7, 14, 21, 28].map((d, i) => ({
+      workoutId: i + 1,
+      date: today.addDays(-28 + d),
+      estimateKg: 105 + i,
+      trendKg: 104.5 + i,
+      bestSet: best,
+    })),
+    loggedSessions: 5,
+    recentSessions: 5,
+  });
+  /** Any figure of the estimates (104.5 to 109.0 kg); no word boundary, since a card's text runs its title into it. */
+  const estimateFigure = /10\d\.\d kg/;
+
+  it('the lift line: the best set, and its change in words', () => {
+    expect(liftSummary(trend, everything)).toMatch(/^Est\. max 108\.5 kg with body weight · .4\.0 kg in 4 weeks$/);
+    const line = liftSummary(trend, hidden);
+    expect(line).toBe('Best set 8 × +10 kg · up over 4 weeks');
+    expect(line).not.toMatch(estimateFigure);
+  });
+
+  it('a personal record: the set that made it', () => {
+    const record = { exerciseId: 'pull-up', name: 'Pull-up', estimateKg: 109, previousBestKg: 107, load: 'bodyweight' as const, bestSet: best };
+    expect(personalRecordText(record, hidden)).toBe('Pull-up: a new best, 8 × +10 kg.');
+    expect(personalRecordText(record, everything)).toBe('Pull-up: estimated max 109.0 kg, up from 107.0 kg.');
+  });
+
+  it('the strength card: no estimate, no chart of it; the best set and the change in words', () => {
+    const { container } = render(<StrengthTrendCard trend={trend} fmt={hidden} today={today} />);
+    expect(container.textContent).not.toMatch(estimateFigure);
+    expect(container.textContent).toContain('8 × +10 kg');
+    expect(container.textContent).toContain('4 weeks: up');
+    expect(container.querySelector('.chart')).toBeNull();
+    // With everything shown, the estimate and its chart are there.
+    cleanup();
+    const shown = render(<StrengthTrendCard trend={trend} fmt={everything} today={today} />);
+    expect(shown.container.textContent).toMatch(estimateFigure);
+    expect(shown.container.querySelector('.chart')).not.toBeNull();
+  });
+
+  it('the monthly report: the lift’s change in words, and a record as its set', () => {
+    const words = new MonthlyReportText(
+      new MonthlyReport({
+        period: new ReportPeriod({ index: 0, from: today.addDays(-31) }),
+        daysLogged: 20,
+        completeDays: 20,
+        weighIns: 10,
+        targetChanges: [],
+        workouts: 8,
+        lifts: [{ name: 'Pull-up', sessions: 4, fromKg: 104, toKg: 108, load: 'bodyweight' }],
+        personalRecords: [
+          { exerciseId: 'pull-up', name: 'Pull-up', estimateKg: 109, previousBestKg: 107, load: 'bodyweight', bestSet: best, date: today.addDays(-3) },
+        ],
+      }),
+      hidden,
+      today,
+    );
+    expect(words.lifts).toEqual([['Pull-up', 'up over the month']]);
+    expect(words.personalRecords[0]?.[1]).toBe('A new best, 8 × +10 kg');
+    expect(JSON.stringify([words.lifts, words.personalRecords])).not.toMatch(estimateFigure);
+  });
+
+  it('a weigh-in far off the trend: no energy figure, which is the difference in weight times a constant', () => {
+    const jump = new WeightJumpExplanation({ date: today, readingKg: 81.1, trendKg: 80, thresholdKg: 0.48, causes: [], fatKcal: 1.1 * 9440 });
+    const { evidence } = weightJumpText(jump, hidden, today);
+    expect(JSON.stringify(evidence)).not.toMatch(/kcal/);
+    expect(evidence).toContainEqual(['For this to be fat', 'Far more over your expenditure than one day can be']);
+    expect(JSON.stringify(weightJumpText(jump, everything, today).evidence)).toMatch(/kcal/);
+  });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { type BodyFatObservation, CalendarDate, WaistObservation, type WeightObservation } from '../../src/domain';
-import { analyze, BodyFatRule, estimateBodyFat, scaleBodyFat } from '../../src/engine';
+import { analyze, BodyFatRule, cautiousBodyFatPercent, estimateBodyFat, SafetyBounds, scaleBodyFat } from '../../src/engine';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 
 /** MM-502: a smart scale's body-fat readings narrow the range, with each scale's own bias. */
@@ -42,17 +42,63 @@ describe('estimateBodyFat with a smart scale', () => {
     expect(scaleBodyFat({ readings: week, today })).toBeUndefined();
   });
 
-  it('A settled range: eight weeks from one scale and weekly tape give a range a few points wide', () => {
+  it('A settled range: eight weeks from one scale and weekly tape narrow the range, never past what the scale’s bias allows', () => {
     const readings = daily('scale-a', 55, 0, scattered);
     const result = on(today, readings);
     const without = on(today, []);
     expect(result.basis).toBe('scale');
     expect(result.scaleDays).toBe(BodyFatRule.scaleWindowDays);
     const width = result.estimate.upperPercent - result.estimate.lowerPercent;
-    expect(width).toBeLessThan(8);
     expect(width).toBeLessThan(without.estimate.upperPercent - without.estimate.lowerPercent);
-    // Filtering removes scatter, not the scale's fixed bias: never narrower than that bias allows.
-    expect(result.estimate.sigmaPercent).toBeGreaterThan(1);
+    // Filtering removes scatter, not the scale's fixed bias (4.5 points against a scan, with its error
+    // partly shared with the formulas'): the joined range stays at least three points either side.
+    expect(result.estimate.sigmaPercent).toBeGreaterThan(3);
+  });
+
+  it('A scale may only make safety stricter: one reading 5 points above the formula lifts no safety figure', () => {
+    const without = on(today, []);
+    const high = daily('scale-a', 55, 0, () => without.estimate.percent + 5);
+    const result = on(today, high);
+    expect(result.basis).toBe('scale');
+    // The shown middle moves toward the scale ...
+    expect(result.estimate.percent).toBeGreaterThan(without.estimate.percent);
+    // ... but the figure the safety thresholds read does not rise, and the fat-free mass the floor uses does not fall.
+    expect(cautiousBodyFatPercent(result.estimate)).toBeLessThanOrEqual(cautiousBodyFatPercent(without.estimate));
+    expect(result.estimate.fatFreeMassUpperKg(85)).toBeGreaterThanOrEqual(without.estimate.fatFreeMassUpperKg(85));
+    const floor = (estimate: typeof result.estimate) =>
+      SafetyBounds.calorieFloorKcal({
+        sex: 'male',
+        bmrKcal: 0,
+        bodyFatPercent: cautiousBodyFatPercent(estimate),
+        fatFreeMassUpperKg: estimate.fatFreeMassUpperKg(85),
+        trainingKcalPerDay: 0,
+      });
+    expect(floor(result.estimate)).toBeGreaterThanOrEqual(floor(without.estimate));
+  });
+
+  it('A scale reading lower than the formula may make safety stricter', () => {
+    const without = on(today, []);
+    const result = on(today, daily('scale-a', 55, 0, () => without.estimate.percent - 5));
+    expect(cautiousBodyFatPercent(result.estimate)).toBeLessThan(cautiousBodyFatPercent(without.estimate));
+  });
+
+  it('A scale back after a gap longer than the window settles again before it counts', () => {
+    // Six weeks of readings ending 50 days ago, then ten days of readings up to today.
+    const readings = [...daily('scale-a', 90, 50, () => 20), ...daily('scale-a', 9, 0, () => 20)];
+    expect(scaleBodyFat({ readings, today })).toBeUndefined();
+    expect(on(today, readings).estimate).toEqual(on(today, []).estimate);
+    // Once the resumed run spans the settling time, it counts again.
+    const resumed = [...daily('scale-a', 90, 50, () => 20), ...daily('scale-a', 21, 0, () => 20)];
+    expect(scaleBodyFat({ readings: resumed, today })).toBeDefined();
+  });
+
+  it('The same readings from a second source count as the same days, not twice as many', () => {
+    const once = daily('scale-a', 55, 0, scattered);
+    const copied = [...once, ...daily('health-copy', 55, 0, scattered)];
+    const single = scaleBodyFat({ readings: once, today });
+    const both = scaleBodyFat({ readings: copied, today });
+    expect(both?.days).toBe(single?.days);
+    expect(both?.estimate).toEqual(single?.estimate);
   });
 
   it('updated weekly: between update days the range does not change', () => {
@@ -79,12 +125,13 @@ describe('estimateBodyFat with a smart scale', () => {
     }
   });
 
-  it('One overnight spike 3 points above the day before does not move the shown range, then or at the next update', () => {
-    // The first reading 55 days ago: the update day was 6 days ago, and is next tomorrow.
-    const steady = daily('scale-a', 55, -1, () => 20);
-    const spiked = steady.map((r) => (r.date === today ? { ...r, percent: 23 } : r));
+  it('One overnight spike 3 points above the day before does not move the shown range, on its update day or the next', () => {
+    // The first reading 56 days ago: today is an update day, so the spike is inside the window that counts.
+    const steady = daily('scale-a', 56, -7, () => 20);
+    const spiked = steady.map((r) => (r.date.epochDay === today.epochDay ? { ...r, percent: 23 } : r));
+    expect(scaleBodyFat({ readings: spiked, today })?.asOf.epochDay).toBe(today.epochDay);
     expect(on(today, spiked).estimate).toEqual(on(today, steady).estimate);
-    expect(on(today.addDays(1), spiked).estimate).toEqual(on(today.addDays(1), steady).estimate);
+    expect(on(today.addDays(7), spiked).estimate).toEqual(on(today.addDays(7), steady).estimate);
   });
 
   it('the user’s own figure still comes first', () => {
