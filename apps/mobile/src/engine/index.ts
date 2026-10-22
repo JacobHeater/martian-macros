@@ -16,6 +16,7 @@ export * from './BodyFatRule';
 export * from './combineBodyFatEstimates';
 export * from './EstimatedBodyFat';
 export * from './estimateBodyFat';
+export * from './navyBodyFat';
 export * from './scaleBodyFat';
 export * from './ScaleLevel';
 export * from './gainLineBodyFatPercent';

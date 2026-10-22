@@ -27,6 +27,20 @@ export const BodyFatRule = {
   formulaErrorCorrelation: 0.5,
 
   /**
+   * The error, one standard deviation in percentage points, of the US Navy
+   * circumference method (`navyBodyFat`) against a body scan (MM-501).
+   */
+  navySigmaPercent: 4,
+
+  /**
+   * How far the Navy method's error goes together with the waist formula
+   * and the BMI formula already combined (MM-501). It reads the same waist
+   * and the same outside shape, so its error is largely shared with theirs;
+   * only the neck (and hip) it adds is new.
+   */
+  navyErrorCorrelation: 0.6,
+
+  /**
    * A smart scale's readings join the range only once its own span reaches
    * this many days (MM-502): a week of readings shows the range without
    * them, never a number from the scale.
