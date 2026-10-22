@@ -82,7 +82,7 @@ Scenario: Checked automatically where possible
   (expenditure, trend weight, body fat, resting energy, estimated max, meal
   estimates, projected end, pace) and for each glossary term and its
   never-called names. Found and fixed: on Coach, the Body section's trend
-  weight had no uncertainty (it now says "Most likely within ±…", the two-sigma
+  weight had no uncertainty (it now says "Probably between … and …", in words as Coach states every range, the two-sigma
   band the trend chart draws) and resting energy (BMR, from the Mifflin-St Jeor
   equation) was a bare number (now "About … kcal", with what it is estimated
   from); the strength card and session history said "e1RM", a third name
