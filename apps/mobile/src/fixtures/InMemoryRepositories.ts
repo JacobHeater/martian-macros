@@ -16,6 +16,9 @@ import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { MeasurementSettingsRepository } from '../domain/repositories/MeasurementSettingsRepository';
+import type { MeasurementRepository } from '../domain/repositories/MeasurementRepository';
+import { WaistFromMeasurements } from '../domain/measurements/WaistFromMeasurements';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
@@ -49,7 +52,8 @@ import { InMemoryTargetShapeRepository } from './InMemoryTargetShapeRepository';
 import { InMemoryGoalBodyFatRepository } from './InMemoryGoalBodyFatRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
-import { InMemoryWaistRepository } from './InMemoryWaistRepository';
+import { InMemoryMeasurementRepository } from './InMemoryMeasurementRepository';
+import { InMemoryMeasurementSettingsRepository } from './InMemoryMeasurementSettingsRepository';
 import { InMemoryWaterRepository } from './InMemoryWaterRepository';
 import { InMemoryWeightEventRepository } from './InMemoryWeightEventRepository';
 import { InMemoryWeightRepository } from './InMemoryWeightRepository';
@@ -64,7 +68,10 @@ export class InMemoryRepositories {
   readonly setup: SetupRepository;
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
+  /** The waist, one site of `measurements` (MM-156). */
   readonly waist: WaistRepository;
+  readonly measurements: MeasurementRepository;
+  readonly measurementSettings: MeasurementSettingsRepository;
   readonly flowDays: MenstruationRepository;
   readonly sleep: SleepRepository;
   readonly water: WaterRepository;
@@ -96,7 +103,8 @@ export class InMemoryRepositories {
     const setup = new InMemorySetupRepository();
     const weights = new InMemoryWeightRepository();
     const weightEvents = new InMemoryWeightEventRepository();
-    const waist = new InMemoryWaistRepository();
+    const measurements = new InMemoryMeasurementRepository();
+    const measurementSettings = new InMemoryMeasurementSettingsRepository();
     const flowDays = new InMemoryMenstruationRepository();
     const sleep = new InMemorySleepRepository();
     const water = new InMemoryWaterRepository();
@@ -122,7 +130,9 @@ export class InMemoryRepositories {
     this.setup = setup;
     this.weights = weights;
     this.weightEvents = weightEvents;
-    this.waist = waist;
+    this.waist = new WaistFromMeasurements(measurements);
+    this.measurements = measurements;
+    this.measurementSettings = measurementSettings;
     this.flowDays = flowDays;
     this.sleep = sleep;
     this.water = water;
@@ -150,7 +160,8 @@ export class InMemoryRepositories {
       () => setup.clear(),
       () => weights.clear(),
       () => weightEvents.clear(),
-      () => waist.clear(),
+      () => measurements.clear(),
+      () => measurementSettings.clear(),
       () => flowDays.clear(),
       () => sleep.clear(),
       () => water.clear(),
