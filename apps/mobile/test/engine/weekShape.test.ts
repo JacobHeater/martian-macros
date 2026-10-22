@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { IntakeDay } from '../../src/domain/IntakeDay';
+import { TargetShape } from '../../src/domain/TargetShape';
 import { WeekShape } from '../../src/domain/WeekShape';
+import { plannedDayShare } from '../../src/engine/plannedDayShare';
 import { shapeWeek } from '../../src/engine/shapeWeek';
 import { usableIntakeDays } from '../../src/engine/usableIntakeDays';
 
@@ -71,4 +73,48 @@ describe('a shaped week and the partial-day rule', () => {
       });
     }
   }
+});
+
+/**
+ * MM-124 on MM-27 with noise: three higher days put the 75th percentile on a higher day, so a lower day eaten a
+ * little under plan fell below the flat rule's line and was dropped. Read against its plan it is kept, and a real
+ * half day on a lower day is still caught.
+ */
+describe('the partial-day rule read against the plan', () => {
+  const start = CalendarDate.of(2026, 9, 7);
+  const week = new WeekShape({ higherDays: [1, 3, 5], raise: 0.3 });
+  const shapes = [new TargetShape({ since: start, week })];
+  const share = plannedDayShare(shapes);
+  const shaped = shapeWeek({ flatKcal: 2000, floorKcal: 1200, week });
+  const day = (date: CalendarDate, kcal: number) =>
+    new IntakeDay({ date, kcal, proteinG: 150, carbsG: (kcal - 600 - 600) / 4, fatG: 600 / 9 });
+  const lowerDates = Array.from({ length: 28 }, (_, i) => start.addDays(i)).filter((d) => !week.higherDays.has(d.weekday));
+  const under = lowerDates[0] as CalendarDate;
+  const half = lowerDates[1] as CalendarDate;
+  const days = Array.from({ length: 28 }, (_, i) => {
+    const date = start.addDays(i);
+    if (date === under) return day(date, shaped.lowerKcal - 200);
+    if (date === half) return day(date, shaped.lowerKcal / 2);
+    return day(date, week.higherDays.has(date.weekday) ? shaped.higherKcal : shaped.lowerKcal);
+  });
+
+  it('gives each day its planned share of the flat figure', () => {
+    expect(share(start.addDays(-1))).toBe(1);
+    const higher = Array.from({ length: 7 }, (_, i) => start.addDays(i)).find((d) => week.higherDays.has(d.weekday)) as CalendarDate;
+    expect(share(higher) * 2000).toBeCloseTo(shaped.higherKcal);
+    expect(share(under) * 2000).toBeCloseTo(shaped.lowerKcal);
+    expect(plannedDayShare([])(under)).toBe(1);
+  });
+
+  it('drops the lower day eaten a little under plan when every day is read as flat', () => {
+    const kept = usableIntakeDays(days).map((d) => d.date);
+    expect(kept).not.toContain(under);
+  });
+
+  it('keeps it read against the plan, and still drops the half day', () => {
+    const kept = usableIntakeDays(days, { plannedShare: share }).map((d) => d.date);
+    expect(kept).toContain(under);
+    expect(kept).not.toContain(half);
+    expect(kept).toHaveLength(27);
+  });
 });
