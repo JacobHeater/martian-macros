@@ -36,6 +36,8 @@ import type { ProgressPhoto } from '../domain/photos/ProgressPhoto';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { SleepNight } from '../domain/SleepNight';
+import type { MeasurementSettings } from '../domain/measurements/MeasurementSettings';
+import type { SiteObservation } from '../domain/measurements/SiteObservation';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
@@ -267,6 +269,12 @@ export class AppState {
   /** Intake for anything that judges a day: paused days are left out. */
   readonly judgedIntake: Cell<readonly IntakeDay[] | undefined>;
   readonly waist: Cell<Loadable<WaistObservation[]>>;
+
+  /** Every site's tape measurements, oldest first, the waist's among them (MM-156). */
+  readonly measurements: Cell<Loadable<SiteObservation[]>>;
+
+  /** Which sites beyond the waist are measured, the limb side, and the suggestion's answer (MM-156). */
+  readonly measurementSettings: Cell<Loadable<MeasurementSettings>>;
 
   /** The nights of sleep the person typed, and nothing imported (MM-250). */
   readonly typedSleep: Cell<Loadable<SleepNight[]>>;
@@ -639,6 +647,8 @@ export class AppState {
       return withoutPausedDays(intake, pauses, { keepComplete: false });
     });
     this.waist = stream(() => s.waist.watchWaist());
+    this.measurements = stream(() => s.measurements.watchMeasurements());
+    this.measurementSettings = stream(() => s.measurementSettings.watchMeasurementSettings());
     this.typedSleep = stream(() => s.sleep.watchSleepNights());
     this.importedSleep = stream(() => this.importedSamples('sleep', nightlySleep));
     this.bodyFatReadings = stream(() => this.importedSamples('bodyFat', bodyFatReadingsOf));
