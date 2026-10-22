@@ -1920,9 +1920,10 @@
   width: 100%;
   margin: var(--space-12) 0 0;
 }
-/* Closed headers stacked are one list, 4 px apart; an opened section stands 24 px from them (MM-402). */
+/* Closed headers stacked are one list, 12 px apart (owner: 4 px was smashed together); an opened section stands 24 px
+   from them (MM-402). */
 .mm-section-closed + .mm-section-closed {
-  margin-top: var(--space-4);
+  margin-top: var(--space-12);
 }
 .mm-section-closed + .mm-section:not(.mm-section-closed) {
   margin-top: var(--space-24);
