@@ -20,8 +20,8 @@
   --outline: #5f43b5;
   --outline-strong: #b49bff;
   --text: #fff8e9;
-  --text2: #e3d9d0;
-  --text3: #d2cbe0;
+  --text2: #ddd4cc;
+  --text3: #cbc6d6;
   --ember: #dff701;
   --on-ember: #1c2000;
   --ion: #45e9f2;
@@ -29,16 +29,16 @@
   --energy: #fff8e9;
   --protein: #45e9f2;
   --carbs: #ff7a1c;
-  --fat: #e8329e;
+  --fat: #eb3da5;
   --positive: #8fe02a;
   --caution: #ffc23d;
   --info: #8cc8ff;
   --water: #4f95ff;
-  --danger: #ff6970;
+  --danger: #ff858b;
   --on-danger: #0e0233;
   /* Food grades (MM-370): one solid fill per letter band, categorical, never red; the letter on it in ink. */
   --grade-a: #3fd896;
-  --grade-b: #ffe14d;
+  --grade-b: #ffd24a;
   --grade-c: #b4a6ff;
   --grade-d: #ff94dc;
   --on-grade: #0e0233;
