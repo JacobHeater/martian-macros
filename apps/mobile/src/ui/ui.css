@@ -282,25 +282,23 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
-/* Martian's sheen (owner: "it needs some sheen"): light from above, never a glow. A card is a touch lighter at its
-   top, with a crisp highlight along its top edge and a soft shadow under it; a neon fill is glossy in its top half. */
+/* Martian's sheen (owner: "it needs some sheen", then "it looks forced"): only a hint of light from above. A card is
+   faintly lighter at its top with a dim highlight on its top edge and a small shadow under it; a neon fill keeps a faint
+   top edge. No gloss bands, no glow. */
 .theme-martian .mm-surface,
 .theme-martian .mm-list-group,
 .theme-martian .mm-hero,
 .theme-martian .mm-section-framed,
 .theme-martian .mm-dialog {
-  background-image: linear-gradient(180deg, color-mix(in srgb, var(--text) 7%, transparent), transparent 70%);
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--text) 3%, transparent), transparent 50%);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--text) 16%, transparent),
-    0 8px 20px rgb(0 0 0 / 40%);
+    inset 0 1px 0 color-mix(in srgb, var(--text) 9%, transparent),
+    0 4px 12px rgb(0 0 0 / 30%);
 }
 .theme-martian .mm-section-framed .mm-list-group,
 .theme-martian .mm-section-framed .mm-surface {
   background-image: none;
   box-shadow: none;
-}
-.theme-martian .mm-navigation-bar {
-  background-image: linear-gradient(180deg, color-mix(in srgb, var(--text) 8%, transparent), transparent 60%);
 }
 .theme-martian .mm-button-primary:not(:disabled),
 .theme-martian .mm-fab,
@@ -308,8 +306,7 @@
 .theme-martian .mm-chip-selected,
 .theme-martian .mm-nav-destination-current .mm-nav-indicator,
 .theme-martian .mm-icon-button-plate {
-  background-image: linear-gradient(180deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 6%) 50%, transparent 51%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
 }
 /* Martian's hero is edged in the frame violet (MM-556, MM-558). */
 .theme-martian .mm-hero {
