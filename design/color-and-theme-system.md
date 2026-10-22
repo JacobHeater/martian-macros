@@ -22,15 +22,40 @@ Martian keeps the same semantic roles and accessibility thresholds:
 
 | Roles | Martian values |
 |---|---|
-| canvas / surface / raised / overlay | `#110C35` / `#1D1752` / `#282066` / `#342A78` |
-| sunken / track / selected | `#0C082B` / `#342D6C` / `#3F3684` |
-| outline / outlineStrong | `#4F4890` / `#9D9AD9` |
-| text / text2 / text3 | `#FFF8E9` / `#DDD4CC` / `#CBC6D6` |
-| action / on-action | `#C4FF48` / `#172500` |
-| measurement / on-measurement | `#43F5E0` / `#110C35` |
-| protein / carbs / fat | `#43F5E0` / `#FF9A3D` / `#E84FAE` |
-| positive / caution / info | `#C4FF48` / `#FFD166` / `#85CFFF` |
-| danger / on-danger | `#FF938E` / `#110C35` |
+| canvas / surface / raised / overlay | `#0E0233` / `#1F0B5F` / `#2E187B` / `#3E2697` |
+| sunken / track / selected | `#070120` / `#372182` / `#4B31A8` |
+| outline / outlineStrong | `#5F43B5` / `#B49BFF` |
+| text / text2 / text3 | `#FFF8E9` / `#E3D9D0` / `#D2CBE0` |
+| action / on-action | `#DFF701` / `#1C2000` |
+| measurement / on-measurement | `#45E9F2` / `#0E0233` |
+| protein / carbs / fat | `#45E9F2` / `#FF7A1C` / `#E8329E` |
+| positive / caution / info | `#8FE02A` / `#FFC23D` / `#8CC8FF` |
+| water | `#4F95FF` |
+| danger / on-danger | `#FF6970` / `#0E0233` |
+
+**From the brand art (MM-554, the owner 2026-10-22).** "The icon set and splash screen now will drive the tokens for
+martian color scheme." The art is recorded in [brand/splash-art.png](brand/splash-art.png) and
+[brand/icon-art.png](brand/icon-art.png), and every Martian token above is drawn from it
+(`requirements/design-system/STORY.martian-from-the-brand-art.MM-554.md` has the measured art colours and the old and new
+values side by side):
+- **The levels climb from the night sky into the mountains' purple**: the canvas is the sky (`#0E0233`, CIE hue 303°),
+  and surface, raised and overlay step towards the mountains' electric violet at L* 3.4 / 11.7 / 18.6 / 25.7, larger steps
+  than MM-375's (5.8 / 12.5 / 17.7 / 22.8), at chroma 57-71, more saturated than MM-375's but well under the art's 65-89,
+  so text stays calm on them.
+- **The action is the "MARTIAN" lettering's lime-yellow** (`#DFF701`, the art's own value). Positive, which was the
+  action colour, takes the art's lime stripe (`#8FE02A`), so success no longer looks like a button.
+- **Carbs are the "MACROS" tangerine** (`#FF7A1C`) and **fat the stripes' and rims' hot magenta** (`#E8329E`, the art's
+  `#D40F9C` lifted to hold 3:1 on the track). Danger is the ringed planet's red, lifted to `#FF6970` for 4.5:1 text.
+- **Ion and protein stay one colour, as MM-375 decided**, now the splash's cyan stars (`#45E9F2`).
+- Cream text stays (`#FFF8E9`); text2 and text3 are a step lighter than MM-375's to hold their margin on the brighter overlay.
+
+Computed (WCAG): text 18.5 / 15.6 / 13.0 / 10.3, text2 14.0 / 11.9 / 9.9 / 7.8, text3 12.4 / 10.5 / 8.7 / 6.9 on canvas /
+surface / raised / overlay; ion 13.2 / 11.2 / 9.3 / 7.4; outlineStrong 8.4 / 7.1 / 5.9 / 4.7; the action as text 16.2 / 13.7 /
+11.4; danger 7.0 / 5.9 / 4.9; on-action 13.9, on-measurement 13.2, on-danger 7.0. Bars on the track: protein 8.3, carbs
+4.7, fat 3.2, water 4.2. Macro L*: protein 85.0, carbs 66.0, fat 53.9 (gaps 19.0, 31.1, 12.0). Colour-blind ΔE (Machado
+2009, normal / protan / deutan / tritan): protein-carbs 121 / 80 / 91 / 120, protein-fat 117 / 48 / 27 / 133, carbs-fat
+89 / 96 / 79 / 18; carbs and fat under tritan rest on the 12.0 L* gap and the labels, as before. The MM-375 figures below
+are that palette's, kept as its record.
 
 **Warmer, without the washout (MM-375, approved by the owner 2026-10-17).** The first Martian put every neutral, both
 secondary text colours, the tracks, the selected state and the fat macro in one violet band (CIE hue 301-309°, chroma
@@ -67,24 +92,26 @@ printed and carries the meaning.
 
 | Band | Martian | Dark | Light | Letter on fill (M / D / L) |
 |---|---|---|---|---|
-| A mint | `#3FD08A` | `#3FC98A` | `#3DBD7F` | 9.4 / 9.2 / 7.8 |
-| B sunflower | `#FFE45E` | `#F7DC5A` | `#F2D23C` | 14.6 / 14.2 / 12.5 |
-| C periwinkle | `#A6B4FF` | `#A3B1FF` | `#97A6F2` | 9.4 / 9.5 / 8.1 |
-| D orchid | `#FF9EDB` | `#F79BD6` | `#EE8FCC` | 9.9 / 9.8 / 8.4 |
+| A mint | `#3FD896` | `#3FC98A` | `#3DBD7F` | 10.7 / 9.2 / 7.8 |
+| B sunflower | `#FFE14D` | `#F7DC5A` | `#F2D23C` | 15.0 / 14.2 / 12.5 |
+| C periwinkle | `#B4A6FF` | `#A3B1FF` | `#97A6F2` | 9.2 / 9.5 / 8.1 |
+| D orchid | `#FF94DC` | `#F79BD6` | `#EE8FCC` | 9.8 / 9.8 / 8.4 |
 
 A and B were swapped at the UX guard's UX-2: with sunflower on A, the best grade wore the app's caution gold and the
 second wore a "good" green. The letter is in the palette's canvas ink (`--on-grade`). In light the fills are pale against
 white, so the badge keeps an `outlineStrong` edge (`--grade-edge`). Pressed, a badge keeps its fill and letter and shows a
 ring (MM-376).
 
-Close pairs (Machado 2009 ΔE, Martian, normal / protan / deutan / tritan): B against caution 14 / 13 / 9 / 10; B against
-the lime action 39 / 19 / 6 / 38; A against info under tritan 14; C against info 25 / 13 / 8 / 23; D against fat
-30 / 24 / 17 / 32; A and the dark palette's positive 11 / 11 / 10 / 6; adjacent grades A-B 67 / 41 / 49 / 70, B-C
-108 / 110 / 107 / 46, C-D 39 / 16 / 28 / 60. These rest on form, not colour: a grade is always a lettered pill, never a
+Close pairs (Machado 2009 ΔE, Martian since MM-554, normal / protan / deutan / tritan): B against caution 17 / 10 / 7 / 16;
+B against the lime-yellow action 31 / 14 / 14 / 17; A against info under tritan 17; C against info 31 / 15 / 9 / 30; C
+against water 23 / 15 / 24 / 30; D against fat 33 / 25 / 20 / 43; A and the dark palette's positive 11 / 11 / 10 / 6;
+adjacent grades A-B 72 / 50 / 56 / 65, B-C 120 / 121 / 115 / 32, C-D 34 / 15 / 28 / 48. Martian's grade fills moved a
+little with MM-554 (C to a violet periwinkle from the mountains, the others re-tuned on the new levels); their roles and
+order are MM-370's. These rest on form, not colour: a grade is always a lettered pill, never a
 bar, an action or a chart mark, and caution is never a fill.
 
-Energy uses cream text. The existing `ember` semantic role now means an
-acid-lime action in Martian; it does not imply orange. Deep grape and cream
+Energy uses cream text. The existing `ember` semantic role now means a
+lime-yellow action in Martian (MM-554, from the brand art's lettering); it does not imply orange. Night-sky violet and cream
 are intentional exceptions to the old neutral restrictions, scoped to this
 palette. Cards and primary floating actions use 12 dp corners and navigation
 indicators use 8 dp corners. Primary actions remain flat: no glow, halo or
