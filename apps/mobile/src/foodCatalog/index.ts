@@ -4,6 +4,7 @@
  */
 export * from './CatalogBarcodeLookup';
 export * from './CatalogFood';
+export * from './CatalogFoodLookup';
 export * from './CatalogPairLookup';
 export * from './CatalogSearch';
 export * from './CatalogServing';

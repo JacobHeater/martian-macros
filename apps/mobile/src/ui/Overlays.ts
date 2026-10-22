@@ -45,6 +45,8 @@ export interface Overlays {
    * Asks for a time of day. Gives minutes after midnight. With `first` and
    * `last` (minutes after midnight) a time outside them is refused with the
    * range said; `everyMinute` offers every minute rather than every fifth.
+   * With `refuse`, a time it gives a reason for is refused with that reason
+   * while the dialog stays open on it (MM-222, MM-441).
    */
   timeOfDay(question: {
     initialMinuteOfDay: number;
@@ -52,6 +54,7 @@ export interface Overlays {
     first?: number | undefined;
     last?: number | undefined;
     everyMinute?: boolean;
+    refuse?: ((minuteOfDay: number) => string | undefined) | undefined;
   }): Promise<number | undefined>;
 
   /**

@@ -20,7 +20,10 @@ const morning = (daysBefore: number) => `${storyToday.addDays(-daysBefore).toStr
  * `historyRefused` keeps the app to the thirty days before the story's
  * week (MM-73), the history permission refused. `stopsAsking` are kinds
  * the platform no longer shows the request for, and `opensPermissions`
- * whether its screen of the app's permissions opens (MM-323).
+ * whether its screen of the app's permissions opens (MM-323). `heightCm`
+ * is the height the platform holds (MM-68), and `weighInToday` adds this
+ * morning's weigh-in from the bathroom scale (MM-73). `readsHang` keeps
+ * every read waiting, for the moment a read is out.
  */
 export function healthPlatform({
   allowed = [],
@@ -33,6 +36,9 @@ export function healthPlatform({
   historyRefused = false,
   stopsAsking = [],
   opensPermissions = true,
+  heightCm = 180,
+  weighInToday = false,
+  readsHang = false,
 }: {
   allowed?: readonly HealthDataType[];
   refuses?: readonly HealthDataType[];
@@ -44,12 +50,15 @@ export function healthPlatform({
   historyRefused?: boolean;
   stopsAsking?: readonly HealthDataType[];
   opensPermissions?: boolean;
+  heightCm?: number;
+  weighInToday?: boolean;
+  readsHang?: boolean;
 } = {}): StoryDevice {
   const values: Record<HealthDataType, number> = {
     weight: 82.4,
     bodyFat: 21.5,
     leanMass: 64.7,
-    height: 180,
+    height: heightCm,
     workout: 50,
     menstruation: 1,
     steps: 8400,
@@ -81,7 +90,10 @@ export function healthPlatform({
     start: `${storyToday.addDays(-day).toString()}T18:30:00`,
     source: 'gym',
   }));
-  const kept = [...events, ...gym].filter((event) => !empty.includes(event.type));
+  const thisMorning = weighInToday
+    ? [{ op: 'add', type: 'weight' as const, id: 'weight-today', value: 82.4, start: morning(0), source: 'scale' }]
+    : [];
+  const kept = [...events, ...gym, ...thisMorning].filter((event) => !empty.includes(event.type));
   const emptied = empty.flatMap((type) => [
     { op: 'add', type, id: `${type}-gone`, value: values[type], start: morning(1), source: 'scale' },
     { op: 'delete', type, id: `${type}-gone` },
@@ -102,6 +114,11 @@ export function healthPlatform({
     source.unreadable = unreadable;
     source.stopsAsking = new Set(stopsAsking);
     source.opensPermissions = opensPermissions;
+    if (readsHang) {
+      const waiting = () => new Promise<never>(() => undefined);
+      source.read = waiting;
+      source.changesSince = waiting;
+    }
     if (historyRefused) {
       source.historyFrom = new Date(`${storyToday.addDays(-30).toString()}T00:00:00`);
       source.willPermitHistory = false;

@@ -73,6 +73,22 @@ it('a clear label fills the form to be checked', async () => {
   expect(within(sheet).queryByText(/Double-check the label/)).not.toBeInTheDocument();
 });
 
+it('a panel read in columns fills the form with each number marked unsure until changed (MM-44)', async () => {
+  const sheet = await openForm(
+    'Serving size 1 bar (40g)\nCalories 180\nTotal Fat\nSodium\nTotal Carbohydrate\nProtein\n6g\n95mg\n24g\n8g',
+  );
+  await press(sheet, 'Read the nutrition label');
+  expect(await within(sheet).findByText(/Numbers marked unsure were hard to read/)).toBeInTheDocument();
+  expect(field(sheet, 'Fat g')).toHaveValue('6');
+  expect(field(sheet, 'Carbs g')).toHaveValue('24');
+  expect(field(sheet, 'Protein g')).toHaveValue('8');
+  expect(field(sheet, 'Calories')).toHaveValue('180');
+  // Fat, carbs, protein and sodium are marked; the calories, read beside their label, are not.
+  expect(within(sheet).getAllByText('Unsure: check it')).toHaveLength(4);
+  await typeIn(sheet, 'Protein g', '9');
+  expect(within(sheet).getAllByText('Unsure: check it')).toHaveLength(3);
+});
+
 it('a misread calorie figure is flagged', async () => {
   const sheet = await openForm(misread);
   await press(sheet, 'Read the nutrition label');

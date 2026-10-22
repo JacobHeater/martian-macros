@@ -321,7 +321,7 @@ describe('a workout that ends after midnight', () => {
   async function openTimes(): Promise<void> {
     await saveLateWorkout();
     await openFinished();
-    await press('Edit times');
+    await press('Edit workout times');
     await layer().findByRole('heading', { name: 'Workout times' });
   }
 

@@ -55,6 +55,10 @@ export class InMemoryOnlineFoodCache implements OnlineFoodCache {
     return undefined;
   }
 
+  async foodById(packId: string, foodId: number): Promise<CatalogFood | undefined> {
+    return packId === onlinePackId ? this.entries.get(foodId)?.food : undefined;
+  }
+
   async servingsOf(food: CatalogFood): Promise<CatalogServing[]> {
     if (food.packId !== onlinePackId) return [];
     return [...(this.entries.get(food.id)?.servings ?? [])];

@@ -131,7 +131,7 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         ));
       },
 
-      timeOfDay({ initialMinuteOfDay, helpText, first, last, everyMinute }) {
+      timeOfDay({ initialMinuteOfDay, helpText, first, last, everyMinute, refuse }) {
         return ask((finish) => (
           <MmTimeOfDayDialog
             initialMinuteOfDay={initialMinuteOfDay}
@@ -139,6 +139,7 @@ export function MmOverlays({ children }: { children: ReactNode }) {
             first={first}
             last={last}
             everyMinute={everyMinute ?? false}
+            refuse={refuse}
             onDone={finish}
           />
         ));
