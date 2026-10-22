@@ -33,6 +33,14 @@ nothing installed beyond Xcode.
   screenshot taken on the phone itself (side button and volume up) is the
   way.
 
+## Decisions (owner, 2026-10-22)
+- **The real app takes screenshots too, while the owner is the only user.** The owner lives with the prod identity on the
+  iPhone, so a dev-only plugin answered nothing ("could not be reached… Is it installed?"). The plugin is now registered in
+  every identity, and `mm screenshot --phone` asks the real app unless `--env dev|demo` says, as `mm run --ios --phone`
+  does (MM-412). It still answers only a request file that only the Mac can put in the app's container, and opens nothing
+  to the web app. **Blocked again in the real app before any release: MM-552 (M5).** This replaces "Never the real app"
+  above for now.
+
 ## Decisions (made by the author, easy to overrule)
 - **The request is a file, not a URL.** `mm` copies
   `Library/Caches/mm-screenshot-<stamp>.request` into the app's container
