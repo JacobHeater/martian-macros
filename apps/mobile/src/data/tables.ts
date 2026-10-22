@@ -4,7 +4,6 @@ export const tables = [
   'weight_entries',
   'food_entries',
   'day_marks',
-  'waist_entries',
   'targets_history',
   'user_preferences',
   'weight_events',
@@ -28,4 +27,8 @@ export const tables = [
   'online_foods',
   'sleep_nights',
   'target_shapes',
+  'goal_body_fat',
+  'deleted_platform_workouts',
+  'body_measurements',
+  'measurement_settings',
 ] as const;

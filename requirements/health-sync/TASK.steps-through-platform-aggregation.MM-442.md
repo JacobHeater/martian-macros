@@ -1,6 +1,6 @@
 ---
 id: MM-442
-status: in-progress
+status: done
 component: health-sync
 related: [MM-71, MM-66, MM-68, MM-69]
 ---
@@ -49,7 +49,12 @@ Scenario: The fake answers as a platform does
   `test/contracts/healthDailyStepsContract.ts`, run on the fake, the adapter and no platform; the scenarios are
   `test/healthIngest/dailySteps.test.ts` and `test/platform/nativeHealthSource.test.ts`; `test/ios/dailySteps.test.ts`
   reads the Swift source (registered, iOS 15's query).
-- **Left: the device checks.** On the owner's phone, with a phone and a watch (or a second app) both writing steps for the
-  same walk: the day's total from `dailySteps` matches what Health Connect and Apple Health show for that day, and changes
-  when the source order is changed in the platform's settings. Nothing in the app reads steps yet, so nothing on a screen
-  shows it.
+
+## Progress
+Done (2026-10-21): both scenarios are built and held by the tests named in the notes; not run locally, CI validates.
+Nothing in the app reads steps yet, so nothing on a screen shows them.
+
+## Owed on a phone
+- With a phone and a watch (or a second app) both writing steps for the same walk, the day's total from `dailySteps`
+  matches what Health Connect and Apple Health show for that day.
+- It changes when the source order is changed in the platform's settings.

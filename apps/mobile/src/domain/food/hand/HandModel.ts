@@ -1,5 +1,7 @@
 import type { BiologicalSex } from '../../BiologicalSex';
+import type { NutritionTotals } from '../portion/NutritionTotals';
 import type { PortionUnit } from '../portion/PortionUnit';
+import { compositionDensity } from './compositionDensity';
 import type { HandSize } from './HandSize';
 
 const referenceHeightCm: Record<BiologicalSex, number> = { male: 178, female: 165 };
@@ -10,6 +12,12 @@ const referenceMl: Partial<Record<PortionUnit, Record<BiologicalSex, number>>> =
   cuppedHand: { male: 130, female: 100 },
   thumb: { male: 15, female: 11 },
 };
+
+/**
+ * The portions of a solid piece of food, whose density follows from its
+ * makeup. A cupped hand is a heap with air in it, so it keeps its default.
+ */
+const solidPortions: ReadonlySet<PortionUnit> = new Set<PortionUnit>(['palm', 'thumb']);
 
 /**
  * Grams per millilitre to use when the food has no density of its own:
@@ -41,25 +49,33 @@ function millilitersOf(unit: PortionUnit, hand: HandSize): number | undefined {
  * from a reference person of each sex. The result is only ever used with the
  * method's stated uncertainty (25%, 30%, 40%), and a steady bias is absorbed
  * by the adaptive estimate. Change a number here and raise `version`.
+ *
+ * Version 2: a palm or thumb of a food with no stated density takes the
+ * density of its makeup per 100 g (`compositionDensity`), so a palm of
+ * salmon and a palm of chicken breast weigh differently.
+ *
+ * Version 3: only a moist food or one mostly fat takes its makeup's density;
+ * a dry, porous one (crisps, bread) takes the portion's default.
  */
 export const HandModel = {
   /** Stored with a hand-portion entry so old entries stay explicable. */
-  version: 1,
+  version: 3,
 
   millilitersOf,
 
   /**
-   * Grams in one `unit` of a food with `densityGPerMl` (or the portion's
-   * default when the food states none), or undefined if `unit` is not a
-   * hand unit.
+   * Grams in one `unit` of a food with `densityGPerMl`, or for a palm or a
+   * thumb the density of its makeup `per100g`, or else the portion's
+   * default; undefined if `unit` is not a hand unit.
    */
   gramsOf(
     unit: PortionUnit,
     hand: HandSize,
-    { densityGPerMl }: { densityGPerMl?: number | undefined } = {},
+    { densityGPerMl, per100g }: { densityGPerMl?: number | undefined; per100g?: NutritionTotals | undefined } = {},
   ): number | undefined {
     const ml = millilitersOf(unit, hand);
-    const density = densityGPerMl ?? defaultDensity[unit];
+    const fromMakeup = per100g !== undefined && solidPortions.has(unit) ? compositionDensity(per100g) : undefined;
+    const density = densityGPerMl ?? fromMakeup ?? defaultDensity[unit];
     if (ml === undefined || density === undefined) return undefined;
     return ml * density;
   },

@@ -197,6 +197,37 @@ export function workoutRepositoryContract(
       expect(only.setCount).toBe(1);
     });
 
+    // MM-490: an imported workout keeps where it came from through a change; deleting it remembers its platform id.
+    it('an imported workout keeps its platform id and source, through a change', async () => {
+      const imported = { platformId: 'hc-1', sourceName: 'Watch' };
+      const id = await repo.saveWorkout(
+        new Workout({ id: 0, date: day, startedAt: six, endedAt: later(six, hourMs), exercises: [squats(set(8, 100))], imported }),
+      );
+      expect((await onlyWorkout()).imported).toEqual(imported);
+      await repo.saveWorkout((await onlyWorkout()).copyWith({ exercises: [squats(set(10, 100))] }));
+      const changed = await onlyWorkout();
+      expect(changed.id).toBe(id);
+      expect(changed.imported).toEqual(imported);
+      expect(single(changed.exercises).sets[0]?.reps).toBe(10);
+    });
+
+    it('a workout logged in the app has no platform id', async () => {
+      await repo.saveWorkout(workout({ endedAt: later(six, hourMs) }));
+      expect((await onlyWorkout()).imported).toBeUndefined();
+    });
+
+    it('deleting an imported workout remembers its platform id; deleting one logged in the app does not', async () => {
+      expect(await repo.deletedPlatformIds()).toEqual(new Set());
+      const own = await repo.saveWorkout(workout({ endedAt: later(six, hourMs) }));
+      const imported = await repo.saveWorkout(
+        new Workout({ id: 0, date: day, startedAt: later(six, dayMs), endedAt: later(six, dayMs + hourMs), imported: { platformId: 'hc-2', sourceName: 'Watch' } }),
+      );
+      await repo.deleteWorkout(own);
+      await repo.deleteWorkout(imported);
+      expect(await first(repo.watchWorkouts())).toEqual([]);
+      expect(await repo.deletedPlatformIds()).toEqual(new Set(['hc-2']));
+    });
+
     it('emits the current list first, then each change', async () => {
       await expectChangeEmits(repo.watchWorkouts(), {
         see: (all) => all.length,

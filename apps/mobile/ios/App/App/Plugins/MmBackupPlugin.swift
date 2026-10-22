@@ -1,5 +1,6 @@
 import Capacitor
 import Foundation
+import LocalAuthentication
 import SQLite3
 import UIKit
 import UniformTypeIdentifiers
@@ -9,7 +10,9 @@ import UniformTypeIdentifiers
 /// to save or send a file, and the document picker to choose one. The bytes
 /// cross the bridge as base64; the app encrypts before it shares. It also
 /// hands an https address to the phone's browser (MM-454): the browser
-/// fetches the page, the app nothing.
+/// fetches the page, the app nothing. It keeps the progress photos private
+/// (MM-157): the phone's own lock is asked before they show, and while they
+/// do the app switcher shows a blank screen in their place.
 @objc(MmBackupPlugin)
 public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "MmBackupPlugin"
@@ -21,9 +24,13 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "share", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pick", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openInBrowser", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "unlock", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "protectScreen", returnType: CAPPluginReturnPromise),
     ]
 
     private var picker: PickDelegate?
+    private var cover: UIView?
+    private var observers: [NSObjectProtocol] = []
 
     private func tempUrl(_ name: String) -> URL {
         FileManager.default.temporaryDirectory.appendingPathComponent("mm-backup-\(UUID().uuidString)-\(name)")
@@ -131,6 +138,58 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
             picker.delegate = delegate
             presenter.present(picker, animated: true)
         }
+    }
+
+    @objc func unlock(_ call: CAPPluginCall) {
+        let context = LAContext()
+        var problem: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &problem) else {
+            return call.resolve(["outcome": "noLock"])
+        }
+        let asked = call.getString("reason") ?? ""
+        let reason = asked.isEmpty ? "Unlock to see your progress photos." : asked
+        // Face ID, Touch ID or the passcode, whichever the phone is locked with.
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { passed, _ in
+            call.resolve(["outcome": passed ? "unlocked" : "refused"])
+        }
+    }
+
+    @objc func protectScreen(_ call: CAPPluginCall) {
+        let on = call.getBool("on") ?? false
+        DispatchQueue.main.async {
+            for observer in self.observers {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            self.observers = []
+            self.uncover()
+            if on {
+                let center = NotificationCenter.default
+                self.observers = [
+                    center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                        self?.coverScreen()
+                    },
+                    center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                        self?.uncover()
+                    },
+                ]
+            }
+            call.resolve()
+        }
+    }
+
+    /// A plain screen over the app while it is in the switcher, so a photo is never in its snapshot.
+    private func coverScreen() {
+        guard cover == nil, let window = bridge?.viewController?.view.window else { return }
+        let blank = UIView(frame: window.bounds)
+        blank.backgroundColor = .systemBackground
+        blank.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        window.addSubview(blank)
+        cover = blank
+    }
+
+    private func uncover() {
+        cover?.removeFromSuperview()
+        cover = nil
     }
 
     private final class PickDelegate: NSObject, UIDocumentPickerDelegate {

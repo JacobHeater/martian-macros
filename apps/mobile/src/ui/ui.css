@@ -2147,3 +2147,44 @@
 .mm-waist-figure-level {
   stroke: var(--outline);
 }
+
+/* MM-157: progress photos, kept on the phone and drawn whole in a portrait frame. */
+.mm-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  background: var(--sunken);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-group);
+}
+.mm-photo-empty {
+  background: var(--sunken);
+}
+.mm-photo-thumbnail {
+  width: 64px;
+  flex: none;
+}
+
+/* MM-157: the camera's picture, with the last photo of the pose laid over it faintly. */
+.mm-camera {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--sunken);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-group);
+}
+.mm-camera-video,
+.mm-camera-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mm-camera-overlay {
+  opacity: 0.35;
+  pointer-events: none;
+}

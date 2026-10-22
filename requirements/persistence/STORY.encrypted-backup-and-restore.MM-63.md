@@ -89,3 +89,9 @@ Built 2026-10-19: `src/backup/` (the file format, the cipher behind an interface
 The product owner settled the last open part (MM-64): the share sheet and the document picker are the only way a backup leaves or comes
 back, with no provider connectors; the file stays `.mmbackup`; there is no export for reading the data outside the app. Still to be done on
 a phone, as for every native path: a backup saved through the share sheet and restored through the picker on each platform.
+
+## Review fix 2026-10-21 (`fix/privacy-housekeeping`)
+On Android the encrypted copy handed to the send chooser was left in the cache. It is now written to
+`cacheDir/mm-backup-shared/` and that folder is deleted when the plugin loads (the next start) and before the next
+backup is shared. It is not deleted as soon as the chooser returns, because the app it was sent to may still be reading
+it. CI builds no Android app; owed on a phone: after a backup is shared and the app restarted, the folder is gone.
