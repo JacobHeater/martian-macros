@@ -252,4 +252,5 @@ export * from './integration/CapturedPhoto';
 export * from './integration/DeviceLock';
 export * from './integration/DeviceLockOutcome';
 export * from './integration/PhotoCamera';
+export * from './integration/PhotoCameraProblem';
 export * from './integration/PrivateScreen';
