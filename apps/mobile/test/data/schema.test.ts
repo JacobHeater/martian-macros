@@ -103,6 +103,15 @@ const tablesAddedSince: readonly string[] = [
   'goal_body_fat',
   // Version 22 (MM-490): the imported workouts deleted in the app.
   'deleted_platform_workouts',
+  // Version 23 (MM-156): every body measurement by site, and which sites are measured.
+  'body_measurements',
+  'measurement_settings',
+];
+
+/** The Dart database's tables since removed. */
+const tablesRemovedSince: readonly string[] = [
+  // Version 23 (MM-156): the waist moved into the measurements of every site.
+  'waist_entries',
 ];
 
 // MM-231: `dartSchemaV31.json` is every column of every table as the Dart
@@ -110,8 +119,11 @@ const tablesAddedSince: readonly string[] = [
 // on 2026-10-12. Anything since is named in `addedSince`, and nothing else.
 it('every table has the columns the Dart database had, in the same order, of the same kind, then what was added', async () => {
   const { sql } = await opened();
-  expect([...tables].sort()).toEqual([...Object.keys(dartTables), ...tablesAddedSince].sort());
+  expect([...tables].sort()).toEqual(
+    [...Object.keys(dartTables).filter((table) => !tablesRemovedSince.includes(table)), ...tablesAddedSince].sort(),
+  );
   for (const [table, columns] of Object.entries(dartTables)) {
+    if (tablesRemovedSince.includes(table)) continue;
     const found = await sql.select(`PRAGMA table_info("${table}")`);
     expect(found.slice(0, columns.length), table).toEqual(columns);
     expect(found.slice(columns.length).map((column) => column['name']), table).toEqual(addedSince[table] ?? []);
