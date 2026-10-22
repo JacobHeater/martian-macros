@@ -3,12 +3,22 @@ import { storyWorkout } from './storyWorkout';
 import { userEvent, within } from 'storybook/test';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
+import { FixturePhotoCamera } from '../../fixtures/FixturePhotoCamera';
+import { fixturePhotoJpeg } from '../../fixtures/fixturePhotoJpeg';
+import { InMemoryDeviceLock } from '../../fixtures/InMemoryDeviceLock';
+import { PhotoCameraScreen } from '../../progress/PhotoCameraScreen';
+import { PhotoCompareScreen } from '../../progress/PhotoCompareScreen';
+import { ProgressPhotosScreen } from '../../progress/ProgressPhotosScreen';
+import { MeasurementSessionScreen } from '../../progress/MeasurementSessionScreen';
+import { MeasurementSitesScreen } from '../../progress/MeasurementSitesScreen';
+import { SiteHistoryScreen } from '../../progress/SiteHistoryScreen';
 import { StrengthHistoryScreen } from '../../progress/StrengthHistoryScreen';
 import { StrengthLiftsScreen } from '../../progress/StrengthLiftsScreen';
 import { WeightEventEntrySheet } from '../../progress/WeightEventEntrySheet';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { healthPlatform } from './healthPlatform';
+import { measurementSitesScenario } from './measurementSitesScenario';
 import { oldLiftsScenario } from './oldLiftsScenario';
 import { oldWaistScenario } from './oldWaistScenario';
 import { reveal } from './reveal';
@@ -515,5 +525,299 @@ export const SleepSaved = screenStory({
     await userEvent.type(hours, '7');
     await userEvent.type(within(canvas).getByRole('textbox', { name: 'Last night, Minutes' }), '20');
     await userEvent.click(within(canvas).getByRole('button', { name: 'Save night' }));
+  },
+});
+
+// ---- MM-157: progress photos, private to the phone ----
+
+/** The demo, with a set of photos a month ago and front and side ones today. */
+const photosScenario: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  const kept = (pose: 'front' | 'side' | 'back', daysAgo: number) =>
+    repos.progressPhotos.savePhoto({
+      date: today.addDays(-daysAgo),
+      pose,
+      takenAt: new Date(Date.UTC(2026, 9, 1, 7)),
+      width: 1200,
+      height: 1600,
+      jpeg: fixturePhotoJpeg,
+    });
+  for (const pose of ['front', 'side', 'back'] as const) await kept(pose, 28);
+  await kept('front', 0);
+  await kept('side', 0);
+};
+
+/** Opens the photos from Progress. */
+const openPhotos = ({ navigator }: StoryStage) => void navigator.push(() => <ProgressPhotosScreen />);
+
+/** MM-157: Progress with the photos' line, saying when the last set was taken. */
+export const ProgressWithPhotos = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Last set /,
+  scenario: photosScenario,
+  open: ({ state }) => state.homeTab.put('progress'),
+});
+
+/** MM-157: no photos yet: what a set is, and how often is enough. */
+export const ProgressPhotosNone = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'No photos yet. Each pose is optional; take what you are comfortable with.',
+  open: openPhotos,
+});
+
+/** MM-157: two sets, newest first, each to delete; Take photos and Compare. */
+export const ProgressPhotosSets = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'Compare two days',
+  scenario: photosScenario,
+  open: openPhotos,
+});
+
+/** MM-157: the photos opened from Progress's own line, after the phone's lock. */
+export const ProgressPhotosFromProgress = screenStory({
+  covers: ['ProgressScreen', 'ProgressPhotosScreen'],
+  shows: 'Compare two days',
+  scenario: photosScenario,
+  open: ({ state }) => state.homeTab.put('progress'),
+  walk: pressNamed(/^Progress photos/),
+});
+
+/** MM-157: "Take photos" opens the camera, with the last front photo laid over it. */
+export const ProgressPhotosTakePhotos = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCameraScreen'],
+  shows: 'Line yourself up with the faint photo: the same distance and the same framing.',
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Take photos'),
+});
+
+/** MM-157: "Compare two days" opens the comparison. */
+export const ProgressPhotosCompare = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCompareScreen'],
+  shows: /Trend|Waist/,
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Compare two days'),
+});
+
+/** MM-157: the phone's lock was not passed: nothing shows until it is. */
+export const ProgressPhotosLocked = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'Locked',
+  scenario: photosScenario,
+  device: async (services) => ({ ...services, deviceLock: new InMemoryDeviceLock('refused') }),
+  open: openPhotos,
+});
+
+/** MM-157: the camera on a first set: the checklist, and no earlier photo to line up with. */
+export const PhotoCameraFirstTime = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'Each time, the same way',
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: the camera with the last front photo laid over it faintly. */
+export const PhotoCameraOverlay = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'Line yourself up with the faint photo: the same distance and the same framing.',
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: no camera allowed: how to allow it. */
+export const PhotoCameraUnavailable = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'The camera could not be opened',
+  device: async (services) => ({ ...services, photoCamera: new FixturePhotoCamera({ available: false }) }),
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: two days side by side, the same pose, with each day's trend weight and waist. */
+export const PhotoCompare = screenStory({
+  covers: ['PhotoCompareScreen'],
+  shows: /Trend|Waist/,
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCompareScreen />),
+});
+
+/** MM-157: a pose with one day only: two are needed to compare. */
+export const PhotoCompareOneDay = screenStory({
+  covers: ['PhotoCompareScreen'],
+  shows: 'Two days with a back photo are needed to compare.',
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCompareScreen />),
+  walk: async (canvas) => {
+    const back = await within(canvas.ownerDocument.body).findByRole('button', { name: 'Back', pressed: false }, { timeout: 5000 });
+    await userEvent.click(back);
+  },
+});
+
+// ---- MM-156: measuring more than the waist ----
+
+const openMeasurements = async (canvas: HTMLElement) => {
+  const header = await within(canvas).findByRole('button', { name: /^More measurements/ }, { timeout: 5000 });
+  reveal(header);
+  await userEvent.click(header);
+};
+
+/** The demo as a woman on recomp who measures only her waist (MM-156). */
+const suggestionScenario: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  const setup = await repos.setup.loadSetup();
+  if (setup !== undefined) {
+    await repos.setup.saveSetup(
+      setup.copyWith({ goalMode: 'recomp', profile: typicalSetup({ sex: 'female' }).profile }),
+    );
+  }
+};
+
+/** MM-156: a woman on recomp who has only waist: hips, upper arm and thigh suggested once. */
+export const ProgressMeasurementsSuggested = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Suggested for your goal: hips, upper arm and thigh/,
+  scenario: suggestionScenario,
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: the demo's waist only, no suggestion for a man cutting: the section's way to add sites and measure. */
+export const ProgressMeasurementsWaistOnly = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Choose sites',
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: upper arm and thigh measured in a lean gain: each site's line, the arm's change beside the waist's as two facts, and the pair. */
+export const ProgressMeasurementsLimbs = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Upper arm (left) up 1.0 cm in 12 weeks while waist held.',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: onProgress,
+  walk: openMeasurements,
+});
+
+/** MM-156: the first measuring session: the waist alone, drawn in full. */
+export const MeasurementSessionFirst = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'Save measurements',
+  scenario: firstDayScenario,
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+});
+
+/** MM-156: a session of waist, upper arm and thigh in their fixed order, each drawing one tap down after three measurements. */
+export const MeasurementSessionSites = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'Thigh (left)',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+});
+
+/** MM-156: choosing sites, none added yet. */
+export const MeasurementSites = screenStory({
+  covers: ['MeasurementSitesScreen'],
+  shows: 'Measurement sites',
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+});
+
+/** MM-156: sites chosen, limbs on the left side. */
+export const MeasurementSitesChosen = screenStory({
+  covers: ['MeasurementSitesScreen'],
+  shows: 'Limbs are measured on the left side.',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+});
+
+/** MM-156: one site over time: the upper arm's chart with its own noise band. */
+export const SiteHistory = screenStory({
+  covers: ['SiteHistoryScreen'],
+  shows: 'Upper arm (left) over time',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="upperArm" />),
+});
+
+/** MM-156: a site added and not measured yet. */
+export const SiteHistoryEmpty = screenStory({
+  covers: ['SiteHistoryScreen'],
+  shows: 'Not measured yet.',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="calf" />),
+});
+
+// ---- MM-156: the measurements section's ways in, pressed ----
+
+/** Presses the first button named `name`, wherever it is drawn: the side question is an overlay over the screen. */
+const pressAnywhereNamed = (name: string | RegExp) => async (canvas: HTMLElement) => {
+  const [button] = await within(canvas.ownerDocument.body).findAllByRole('button', { name }, { timeout: 5000 });
+  if (button === undefined) return;
+  reveal(button);
+  await userEvent.click(button);
+};
+
+/** MM-156: the suggestion taken, with a limb in it and no side yet: the side is asked, and the sites are added. */
+export const ProgressMeasurementsSuggestionTaken = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Upper arm (left)',
+  scenario: suggestionScenario,
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressNamed('Add them')(canvas);
+    await pressAnywhereNamed('Left')(canvas);
+  },
+});
+
+/** MM-156: "Measure" from the section opens the session with every site the person measures. */
+export const ProgressMeasurementsToSession = screenStory({
+  covers: ['ProgressScreen', 'MeasurementSessionScreen'],
+  shows: 'Thigh (left)',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressNamed('Measure')(canvas);
+  },
+});
+
+/** MM-156: "Choose sites" from the section, a limb turned on with no side yet: the side is asked, then said. */
+export const ProgressMeasurementsToSites = screenStory({
+  covers: ['ProgressScreen', 'MeasurementSitesScreen'],
+  shows: 'Limbs are measured on the left side.',
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressAnywhereNamed(/^Choose sites/)(canvas);
+    const [arm] = await within(canvas.ownerDocument.body).findAllByRole('switch', { name: /^Upper arm/ }, { timeout: 5000 });
+    if (arm !== undefined) {
+      reveal(arm);
+      await userEvent.click(arm);
+    }
+    await pressAnywhereNamed('Left')(canvas);
+  },
+});
+
+/** MM-156: a site's line on the section opens its history and chart. */
+export const ProgressMeasurementsToHistory = screenStory({
+  covers: ['ProgressScreen', 'SiteHistoryScreen'],
+  shows: 'Upper arm (left) over time',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressAnywhereNamed(/^Upper arm \(left\)/)(canvas);
   },
 });

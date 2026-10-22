@@ -1,5 +1,6 @@
 import type { CatalogBarcodeLookup } from './CatalogBarcodeLookup';
 import type { CatalogFood } from './CatalogFood';
+import type { CatalogFoodLookup } from './CatalogFoodLookup';
 import type { CatalogPairLookup } from './CatalogPairLookup';
 import type { CatalogSearch } from './CatalogSearch';
 import type { CatalogServing } from './CatalogServing';
@@ -28,7 +29,7 @@ function byReliabilityThenMatch(a: SearchHit, b: SearchHit): number {
  * (MM-386): the pack files, never a pack it was lent, such as the foods
  * found online, which live in the user's own database.
  */
-export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, CatalogServingLookup, CatalogPairLookup {
+export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, CatalogServingLookup, CatalogPairLookup, CatalogFoodLookup {
   readonly packs: readonly FoodPack[];
   private readonly owned: readonly { close(): Promise<void> }[];
   private closing: Promise<void> | undefined;
@@ -73,6 +74,13 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
   async pairOf(food: CatalogFood): Promise<CatalogFood | undefined> {
     for (const pack of this.packs) {
       if (pack.packId === food.packId) return pack.pairOf(food);
+    }
+    return undefined;
+  }
+
+  async foodById(packId: string, foodId: number): Promise<CatalogFood | undefined> {
+    for (const pack of this.packs) {
+      if (pack.packId === packId) return pack.foodById(packId, foodId);
     }
     return undefined;
   }

@@ -93,13 +93,19 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
 5. **Weight display setting (MM-118).** M4. Touches every component that
    shows weight; cheap if WS-03's chart components have one switch for raw
    readings.
-6. **More sites (MM-156).** M4.
+6. **More sites (MM-156).** M4. Done 2026-10-21: one store by site (schema 23, the
+   waist moved in), the measuring session, the sites and limb side, the
+   suggestion offered once, per-site charts and the limb facts.
 7. **Body-fat range (MM-34, MM-501, MM-502).** M4. MM-34 is built: the
    formula joined by the waist, shown as a range. The Navy method (MM-501)
    needs neck and hip from step 6; scale readings with a per-device bias
-   (MM-502) need WS-11's ingest and the model decision.
-8. **Progress photos (MM-157).** M4. Privacy rules are fixed in the ticket
-   now so it is built correctly later.
+   (MM-502) need WS-11's ingest and the model decision. MM-502 done
+   2026-10-21: stored scale readings join the range weekly, each scale's
+   offset learned against the earlier ones.
+8. **Progress photos (MM-157).** M4. Done 2026-10-21: a private photo store in a
+   database file of its own, a guided camera with the last pose as an overlay,
+   side-by-side comparison, the device lock and a private screen, and photo
+   backup only when switched on. Phone checks owed.
 
 ## Done enough to unblock others
 MM-155 is done: every caller that asks whether waist changed over a period
@@ -116,8 +122,10 @@ storage rules above.
 ## Requirement sources
 - Built: MM-16, MM-17 (weigh-in, trend chart); MM-21 (waist, built but
   unverified); MM-34 (body-fat range from the waist).
-- Remaining: MM-155, MM-136, MM-20, MM-142, MM-118, MM-156, MM-501, MM-502,
-  MM-157.
+- Remaining: MM-155, MM-136, MM-20, MM-142, MM-118, MM-501.
+- Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed), MM-502 (smart-scale
+  readings in the body-fat range, each scale's own bias), MM-156 (more measurement sites; the waist moved
+  into one store by site).
   Epics: MM-15, MM-154.
 
 ## Notes for whoever builds it

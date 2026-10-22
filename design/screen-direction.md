@@ -293,6 +293,22 @@ else only if it applies. Safety and calibration state use the notice family
 (below), at most one prominent at a time, ordered by importance.
 **Never:** "AI insight" cards, certainty framing, a notice style per feature.
 
+## Train and a workout (MM-447)
+
+**Tone:** quick, between sets. **Density:** medium. **Primary action:** "Start
+workout" on Train; in a workout, the one primary on the timer bar.
+
+Train is the strip of the last seven days, the weekly volume and the workouts
+grouped by week (the register above). A workout in progress is its clock card
+(length, start, Pause or Resume, "Edit workout times"), its exercises, then
+"Finish workout"; the timer bar stays at the bottom with one primary for the
+moment: "Start set", "Set done", or "Resume" while paused. Every instruction
+on the bar names a button on the bar (MM-222). Pausing says what it dropped (a
+set being timed). Times are named for whose they are: the workout's on the
+clock card, a set's on the set. Starting the clock again from now asks first.
+**Never:** a disabled control with no word on why, a change to the workout's
+clock that is neither asked nor undoable, rest or set timers shown as a score.
+
 ## Notice family (replaces the single `Notice`)
 
 One component, three structures, no colored fills:

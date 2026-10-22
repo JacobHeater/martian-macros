@@ -254,4 +254,77 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 18 to 19 (MM-441): the weigh-in window chosen in Settings, in minutes after midnight, within one day; none
+  // (04:00 to 12:00, MM-71) until chosen.
+  [
+    18,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN weigh_in_window_start_minute INTEGER NULL ' +
+          'CHECK (weigh_in_window_start_minute IS NULL OR weigh_in_window_start_minute BETWEEN 0 AND 1439)',
+      );
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN weigh_in_window_end_minute INTEGER NULL ' +
+          'CHECK (weigh_in_window_end_minute IS NULL OR weigh_in_window_end_minute BETWEEN 1 AND 1440)',
+      );
+    },
+  ],
+  // 19 to 20 (MM-456): the pack food a recipe's ingredient was found as, none for what is already there.
+  [
+    19,
+    async (db) => {
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_pack_id TEXT NULL');
+      await db.execute('ALTER TABLE recipe_ingredients ADD COLUMN source_food_id INTEGER NULL');
+    },
+  ],
+  // 20 to 21 (MM-507): the goal body fat the user set (MM-36), one row; none yet, so the plan runs to its default line.
+  [
+    20,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "goal_body_fat" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1), ' +
+          '"percent" REAL NOT NULL CHECK("percent" > 0.0 AND "percent" < 100.0), ' +
+          '"set_epoch_day" INTEGER NOT NULL)',
+      );
+    },
+  ],
+  // 21 to 22 (MM-490): the platform id and source of a workout imported from the health platform, none for what is
+  // already logged; and the imported workouts deleted in the app, so a later read does not bring them back.
+  [
+    21,
+    async (db) => {
+      await db.execute('ALTER TABLE workouts ADD COLUMN platform_id TEXT NULL');
+      await db.execute('ALTER TABLE workouts ADD COLUMN platform_source_name TEXT NULL');
+      await db.execute('CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id")');
+      await db.execute('CREATE TABLE "deleted_platform_workouts" ("platform_id" TEXT NOT NULL PRIMARY KEY)');
+    },
+  ],
+  // 22 to 23 (MM-156): every body measurement in one store keyed by site, the waist moved into it with its dates,
+  // values and readings, and which sites are measured, the limb side and the suggestion answered; none yet.
+  [
+    22,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "body_measurements" (' +
+          '"site" TEXT NOT NULL CHECK ("site" IN (\'waist\', \'neck\', \'chest\', \'hips\', \'upperArm\', \'thigh\', \'calf\')), ' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"value_cm" REAL NOT NULL CHECK("value_cm" BETWEEN 10.0 AND 300.0), ' +
+          '"reading1_cm" REAL NULL, "reading2_cm" REAL NULL, "reading3_cm" REAL NULL, ' +
+          'PRIMARY KEY ("site", "epoch_day"))',
+      );
+      await db.execute(
+        "INSERT INTO body_measurements (site, epoch_day, value_cm, reading1_cm, reading2_cm, reading3_cm) " +
+          "SELECT 'waist', epoch_day, waist_cm, reading1_cm, reading2_cm, reading3_cm FROM waist_entries",
+      );
+      await db.execute('DROP TABLE waist_entries');
+      await db.execute(
+        'CREATE TABLE "measurement_settings" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1), ' +
+          '"sites" TEXT NOT NULL DEFAULT \'\', ' +
+          '"limb_side" TEXT NULL CHECK ("limb_side" IS NULL OR "limb_side" IN (\'left\', \'right\')), ' +
+          '"suggestion_answered" INTEGER NOT NULL DEFAULT 0 CHECK ("suggestion_answered" IN (0, 1)))',
+      );
+    },
+  ],
 ]);

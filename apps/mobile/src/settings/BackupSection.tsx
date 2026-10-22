@@ -14,6 +14,7 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import { PassphraseSheet } from './PassphraseSheet';
+import { ProgressPhotoSwitches } from './ProgressPhotoSwitches';
 import { passphraseHeadline } from './passphraseHeadline';
 import { useSettingsSection } from './useSettingsSection';
 
@@ -35,6 +36,7 @@ export function BackupSection() {
   const overlays = useOverlays();
   const fold = useSettingsSection('backup');
   const lastBackup = useLoaded(state.lastBackupOn);
+  const photoSettings = useLoaded(state.photoSettings);
   const setup = useLoaded(state.setup);
   const [busy, setBusy] = useState<'backup' | 'restore' | undefined>();
 
@@ -50,7 +52,14 @@ export function BackupSection() {
     try {
       const today = services.clock.today();
       const snapshot = await services.backup.snapshot();
-      const file = await BackupFile.write(snapshot, typed, { schemaVersion: currentSchemaVersion, createdOn: today.toString() }, cipher);
+      // The photos are kept apart from the database and join the backup only when the person has chosen that (MM-157).
+      const photos = photoSettings?.backUp === true ? await services.progressPhotos.exportArchive() : undefined;
+      const file = await BackupFile.write(
+        snapshot,
+        typed,
+        { schemaVersion: currentSchemaVersion, createdOn: today.toString(), photos },
+        cipher,
+      );
       const outcome = await services.backup.save(file, backupFileName(today));
       if (outcome === 'cancelled') return;
       await services.preferences.saveLastBackupOn(today);
@@ -79,7 +88,7 @@ export function BackupSection() {
       if (typed === undefined) return;
       setBusy('restore');
       try {
-        const { snapshot } = await BackupFile.read(picked, typed, cipher);
+        const { snapshot, photos } = await BackupFile.read(picked, typed, cipher);
         const contents = await services.restorer.describe(snapshot);
         const here = await services.restorer.describeHere();
         const confirmed = await overlays.confirm({
@@ -89,6 +98,8 @@ export function BackupSection() {
         });
         if (!confirmed) return;
         await services.restorer.restoreFrom(snapshot);
+        // A backup with photos brings them back (MM-157); one without leaves this phone's photos as they are.
+        if (photos !== undefined) await services.progressPhotos.restoreArchive(photos);
         overlays.snack('Restored. Everything is as it was on that backup.');
         return;
       } catch (problem) {
@@ -125,6 +136,7 @@ export function BackupSection() {
             if (busy === undefined) void restore();
           }}
         />
+        <ProgressPhotoSwitches backup />
       </MmListGroup>
       {/* What is being done, for a reader: the row's words change, and this region says so. */}
       <span className="mm-visually-hidden" role="status">
@@ -132,7 +144,8 @@ export function BackupSection() {
       </span>
       <p className="app-caption">
         Your records are not in your phone’s own cloud backup: a new phone starts empty unless you restore a backup file.
-        Downloaded food databases are not in the file, since they can be fetched again.
+        Downloaded food databases are not in the file, since they can be fetched again. Progress photos are in it only
+        when Back up photos is on; restoring a file without them leaves this phone’s photos as they are.
       </p>
     </MmSection>
   );
