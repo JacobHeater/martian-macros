@@ -1,3 +1,4 @@
+import type { SiteObservation } from '../domain/measurements/SiteObservation';
 import type { BodyFatObservation } from '../domain/BodyFatObservation';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
@@ -50,6 +51,7 @@ export function buildMonthlyReport({
   weights,
   waist,
   bodyFatReadings = [],
+  sites = [],
   history,
   trend,
   workouts = [],
@@ -65,6 +67,8 @@ export function buildMonthlyReport({
   waist: readonly WaistObservation[];
   /** Smart-scale body-fat readings (MM-502). */
   bodyFatReadings?: readonly BodyFatObservation[];
+  /** Every site's tape measurements (MM-156), for the Navy method (MM-501). */
+  sites?: readonly SiteObservation[];
   history: readonly TargetsRecord[];
   trend: readonly WeightTrendPoint[];
   workouts?: readonly Workout[];
@@ -156,7 +160,7 @@ export function buildMonthlyReport({
     const from = month[0];
     const to = month[month.length - 1];
     if (month.length >= 2 && from !== undefined && to !== undefined) {
-      lifts.push({ name: lift.name, sessions: month.length, fromKg: from.trendKg, toKg: to.trendKg });
+      lifts.push({ name: lift.name, sessions: month.length, fromKg: from.trendKg, toKg: to.trendKg, load: lift.exercise?.load });
     }
   }
   lifts.sort((a, b) => {
@@ -226,9 +230,9 @@ export function buildMonthlyReport({
     const upTo = trendModel.smooth(weights.filter((w) => !w.date.isAfter(day)), { through: day });
     const level = upTo[upTo.length - 1]?.levelKg;
     if (level === undefined) return undefined;
-    const estimated = estimateBodyFat({ setup, trendWeightKg: level, waists: waist, bodyFatReadings, today: day });
-    // The waist, or a smart scale's settled readings (MM-502): ranges from measurements.
-    return estimated.basis === 'waist' || estimated.basis === 'scale' ? estimated : undefined;
+    const estimated = estimateBodyFat({ setup, trendWeightKg: level, waists: waist, bodyFatReadings, sites, today: day });
+    // The waist, the Navy tape (MM-501), or a smart scale's settled readings (MM-502): ranges from measurements.
+    return estimated.basis === 'waist' || estimated.basis === 'tape' || estimated.basis === 'scale' ? estimated : undefined;
   };
   const bodyFatAtEnd = bodyFatOn(period.to);
   // With an eating-disorder history the report shows no change in body fat

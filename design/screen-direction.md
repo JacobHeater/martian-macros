@@ -97,7 +97,7 @@ qualifies (the weight trend's band), and a held or settling estimate says
 so in the line that is visible when its disclosure is closed.
 
 **"One tap down" means:** unfold in place when the content is rows or one
-chart (Waist, Strength, Recovery, Reports, "More about this week"); push a
+chart (Waist, Strength, Recovery, Reports, "History" ("More about this week" until MM-176)); push a
 screen when it is a list that scrolls or has its own actions (a lift's
 history, the weekly volume).
 
@@ -123,7 +123,7 @@ MM-254 to MM-259. The story names are the register's.
 
 | Destination | Before | After |
 |---|---|---|
-| Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Split switch and the confidence word labelled; the rhythm strip of the last seven days; the insight as a section; weight (or, on a morning before the weigh-in, the weigh-in row with its field, MM-291), waist (or, with none this week, the waist row with its field and a secondary Save, MM-301), next check-in, training and the streak as rows of one group; the history behind "More about this week". |
+| Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Split switch and the confidence word labelled; the rhythm strip of the last seven days; the insight as a section; weight (or, on a morning before the weigh-in, the weigh-in row with its field, MM-291), waist (or, with none this week, the waist row with its field and a secondary Save, MM-301), next check-in, training and the streak as rows of one group; the history behind the "History" disclosure ("More about this week" until MM-176). |
 | Food (`Screens/Food`, Food and NothingLogged) | A hero, a second macro picture, four meal cards, a segmented completeness control at the foot. | The hero with the switch; the meals as sections with their icons, subtotal and add button, entries as rows with a method icon beside its word; the completeness row after the last meal with its state in words, the mark repeated in the day header; "More about today" one tap down. |
 | Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the goal with "Change goal" (MM-299); the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, body), recovery and reports folded to one line when nothing is due. |
 | Progress (`Screens/Progress`, Progress) | An entry card, a chart card with a four-line caption, an events card with a four-line paragraph, a waist card with the technique inline, strength cards. | One hero: the weigh-in and the trend with its range switch, one line about the band, "How to read this" one tap down; weight events as rows with an icon and the day in words, the add action in the header; Waist and Strength folded to their lines. |

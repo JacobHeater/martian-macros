@@ -37,9 +37,14 @@ export function whatToExpectPoints({
   const oneDecimal = (kg: number) => toStringAsFixed(inUnit(kg), 1);
   const whole = (kg: number) => roundHalfAwayFromZero(inUnit(kg)) + 0;
   const weekly = Math.abs(paceFraction) * weightKg;
-  const aim = `about ${oneDecimal(weekly * (2 / 3))} to ${oneDecimal(weekly * (4 / 3))} ${unit} a week`;
+  // With the weight hidden (MM-118) the aim is a share of body weight and the noise is said without a figure.
+  const aim = fmt.weightHidden
+    ? `about ${toStringAsFixed(Math.abs(paceFraction) * 100, 2)}% of your body weight a week`
+    : `about ${oneDecimal(weekly * (2 / 3))} to ${oneDecimal(weekly * (4 / 3))} ${unit} a week`;
   const sigma = new WeightTrendModel().relativeWaterSigma * weightKg;
-  const noise = `Day to day, the scale will move by ${Math.max(1, whole(sigma))} to ${Math.max(2, whole(2 * sigma))} ${unit} for reasons that are not fat. The trend line is what counts.`;
+  const noise = fmt.weightHidden
+    ? 'Day to day, the scale moves for reasons that are not fat. The trend is what counts, and the coach reads it for you.'
+    : `Day to day, the scale will move by ${Math.max(1, whole(sigma))} to ${Math.max(2, whole(2 * sigma))} ${unit} for reasons that are not fat. The trend line is what counts.`;
   const calibration = `For ${calibrationDays} days your targets stay put while the coach learns your expenditure. The first change comes around day ${calibrationDays + 1} and will be small.`;
   const creatine = 'If you take creatine, or start it later, tell the app. It moves the scale.';
   const points: string[] = [];

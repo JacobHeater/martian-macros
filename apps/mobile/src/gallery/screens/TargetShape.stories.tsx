@@ -91,7 +91,7 @@ export const WeekShapeReduced = screenStory({
 /** MM-124: Today on a lower day of a weekend-higher week: the hero's target is the day's own. */
 export const TodayOnALowerDay = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'More about this week',
+  shows: 'History',
   scenario: shaped({ week: new WeekShape({ higherDays: [6, 0], raise: 0.2 }) }),
 });
 

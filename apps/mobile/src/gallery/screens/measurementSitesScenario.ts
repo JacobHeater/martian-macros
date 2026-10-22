@@ -4,9 +4,9 @@ import type { StoryScenario } from './StoryScenario';
 
 /**
  * Twelve weeks into a lean gain, measuring waist, upper arm (left) and
- * thigh weekly (MM-156): the arm up a centimetre, the waist and thigh
- * held, so the limb's line is two facts and the pair is consistent with
- * the gain.
+ * thigh weekly (MM-156): the arm up a centimetre and the thigh one and a
+ * half, the waist held, so each limb's line is two facts and, with two
+ * limbs up, the pair is consistent with the gain.
  */
 export const measurementSitesScenario: StoryScenario = async (repos, today) => {
   await repos.setup.saveSetup(
@@ -21,6 +21,7 @@ export const measurementSitesScenario: StoryScenario = async (repos, today) => {
     await repos.measurements.saveMeasurement('waist', day, 84, { readings: [83.8, 84, 84.2] });
     const arm = 33 + i / 12;
     await repos.measurements.saveMeasurement('upperArm', day, arm, { readings: [arm - 0.2, arm, arm + 0.2] });
-    await repos.measurements.saveMeasurement('thigh', day, 57, { readings: [56.8, 57, 57.2] });
+    const thigh = 57 + (1.5 * i) / 12;
+    await repos.measurements.saveMeasurement('thigh', day, thigh, { readings: [thigh - 0.2, thigh, thigh + 0.2] });
   }
 };

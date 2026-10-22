@@ -23,7 +23,8 @@ export function WeighInRow({ fmt, lastTrendKg, onSaveWeight, note }: WeighInRowP
     <MmListRow
       leadingIcon="scale"
       title="Weigh-in"
-      subtitle={lastTrendKg === undefined ? note : `Trend so far ${fmt.weight(lastTrendKg)}`}
+      // No figure with the weight hidden (MM-118).
+      subtitle={lastTrendKg === undefined || fmt.weightHidden ? note : `Trend so far ${fmt.weight(lastTrendKg)}`}
       entry={
         <NumberEntry
           title="Today’s weigh-in"

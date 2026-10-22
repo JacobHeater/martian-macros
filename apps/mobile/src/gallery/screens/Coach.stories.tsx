@@ -38,6 +38,7 @@ import { showTargetChangeSheet } from '../../coach/showTargetChangeSheet';
 import { TargetsHistoryScreen } from '../../coach/TargetsHistoryScreen';
 import { checkInDueScenario } from './checkInDueScenario';
 import { screensMeta } from './screensMeta';
+import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
@@ -228,6 +229,26 @@ export const CoachHistoryGapCannotOpen = screenStory({
   shows: /Health Connect could not be opened from here/,
   scenario: firstDayScenario,
   device: healthPlatform({ allowed: ['weight'], historyRefused: true, opensPermissions: false }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
+});
+
+/** MM-523, MM-323: back from Health Connect with past data allowed there: a snack says so, and the line goes. */
+export const CoachHistoryGapAllowedThere = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Past data allowed. The estimate will use it.',
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true, allowsThere: ['history'] }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
+});
+
+/** MM-523, MM-323: back from Health Connect with nothing allowed there: a snack says nothing changed, and the line stays. */
+export const CoachHistoryGapNothingChanged = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Nothing changed.',
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true }),
   open: onCoach,
   walk: pressOnCoach('Open Health Connect'),
 });
@@ -971,4 +992,14 @@ export const CoachGoalBodyFatSet = screenStory({
   scenario: demoWith({ then: async (repos, today) => repos.goalBodyFat.saveGoalBodyFat({ percent: 13, setOn: today.addDays(-10) }) }),
   open: onCoach,
   walk: goalBodyFat(),
+});
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: Hidden: the Body section says the trend's pace in words in place of the trend weight. */
+export const CoachWeightHidden = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Against your plan’s pace',
+  scenario: weightDisplayScenario('hidden'),
+  open: ({ state }) => state.homeTab.put('coach'),
 });

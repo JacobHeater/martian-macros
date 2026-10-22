@@ -65,7 +65,7 @@ it('Simple hides carbohydrate and fat, not the data', async () => {
   await repos.preferences.saveDetailLevel('simple');
   await openFood();
   expect(await screen.findByText('P 18')).toBeInTheDocument();
-  // The hero shows protein alone; the macronutrient split still names all three.
+  // The hero shows protein alone, with no Grams/Split switch (MM-179): carbs and fat are named nowhere in it.
   const hero = document.querySelector('.mm-hero');
   expect(hero).not.toHaveTextContent('Carbs');
   expect(hero).not.toHaveTextContent('Fat');
@@ -74,6 +74,19 @@ it('Simple hides carbohydrate and fat, not the data', async () => {
   expect(stored).toHaveLength(1);
   expect(stored[0]?.carbsG).toBe(40);
   expect(stored[0]?.fatG).toBe(1);
+});
+
+it('MM-179: Simple offers no Split, and a remembered Split falls back to the protein bar', async () => {
+  await repos.preferences.saveDetailLevel('simple');
+  await repos.preferences.saveMacroPicture('donut');
+  await openFood();
+  const hero = document.querySelector('.mm-hero');
+  expect(hero).not.toBeNull();
+  expect(within(hero as HTMLElement).queryByRole('button', { name: 'Split' })).not.toBeInTheDocument();
+  expect(document.querySelector('.chart-split-ring')).toBeNull();
+  expect(hero?.querySelector('.mm-progress-protein')).not.toBeNull();
+  // The choice is kept for when Standard or Full is chosen again.
+  expect(await first(repos.preferences.watchMacroPicture())).toBe('donut');
 });
 
 it('the fiber line shows at Full, with its guide, never at Standard', async () => {

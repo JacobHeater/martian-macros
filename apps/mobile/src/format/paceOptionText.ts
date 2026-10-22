@@ -15,7 +15,10 @@ export function paceOptionText(
   { weightKg, fmt }: { weightKg: number; fmt: Fmt },
 ): { label: string; detail: string } {
   const perWeek = fmt.weightDelta(-option.fraction * weightKg);
-  const label = `${paceName(option.pace)} · ${paceLabel(option.fraction)} · about ${perWeek.replace(/^[−-]/, '')}`;
+  // The weight a week is left out with the weight hidden (MM-118); the percent says the pace.
+  const label = fmt.weightHidden
+    ? `${paceName(option.pace)} · ${paceLabel(option.fraction)}`
+    : `${paceName(option.pace)} · ${paceLabel(option.fraction)} · about ${perWeek.replace(/^[−-]/, '')}`;
   if (!option.offered) {
     const why =
       option.withheld === 'caution'

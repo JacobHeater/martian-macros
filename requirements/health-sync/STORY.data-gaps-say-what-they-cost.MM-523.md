@@ -1,6 +1,6 @@
 ---
 id: MM-523
-status: in-progress
+status: done
 component: health-sync
 related: [MM-72, MM-516, MM-73, MM-68, MM-69, MM-23, MM-27, MM-323, MM-123, MM-378]
 ---
@@ -81,11 +81,31 @@ Scenario: Eating-disorder history
   The weigh-ins line under the trend, where it leads, and dismissed.
 - CoachHistoryGap, CoachHistoryGapCannotOpen — apps/mobile/src/gallery/screens/Coach.stories.tsx. The history line under the
   estimate, and Health Connect that cannot be opened.
+- CoachHistoryGapAllowedThere, CoachHistoryGapNothingChanged — apps/mobile/src/gallery/screens/Coach.stories.tsx. Back from
+  Health Connect: "Past data allowed. The estimate will use it." and the line goes, the focus moved to the nearest control
+  that stays (MM-379); or "Nothing changed." and the line stays.
 
 ## Notes
 - No background read, ever (MM-516 declined). Opening the app reads what the platform has (MM-72).
 - Built 2026-10-21: `coach/dataGapsOf.ts` decides the gaps, `coach/DataGapNote.tsx` says one and keeps its dismissal,
   `CoachScreen` places them; `HealthConnection.history` says whether the history permission is granted. Tests:
   `test/coach/dataGaps.test.tsx` (each scenario above, the eating-disorder case included). Not run locally; CI validates.
-- Device check owed: on the owner's phone, with weight not allowed and with the history refused, each line shows once in
-  its place, "Open Health Connect" opens the app's page there, and a dismissal survives closing the app.
+- Panel review of PR #283: the dismissal is shown to survive the app opened again, a dismissed weigh-ins line leaves the
+  history line, the history line holds with an eating-disorder history, and coming back from Health Connect says what
+  changed (`useOpenHealthPermissions` takes what was wanted) and moves the focus when the line goes.
+
+## Progress
+Done 2026-10-21. Built and merged in PR #233 (see Notes); every scenario above is held by `test/coach/dataGaps.test.tsx`
+and drawn in the stories under UI/UX, validated by CI. What only a phone can show is listed below.
+
+## Owed on a phone
+- With weight not allowed in Health Connect and few weigh-ins typed: the weigh-ins line shows once, under the trend.
+- With the history permission refused: the history line shows once, under the expenditure estimate, and says Health
+  Connect lets the app read only from 30 days before it connected (the words in Decisions).
+- "Open Settings" on the weigh-ins line opens Settings at Health Connect; "Open Health Connect" on the history line opens
+  the app's own page in Health Connect.
+- Past data allowed on that page: back in the app, the snack says "Past data allowed. The estimate will use it.", the line
+  goes, and TalkBack is on the next control, not lost; nothing allowed there, it says "Nothing changed.".
+- The phone's own label for the platform reads "Health Connect", as the lines and buttons call it, so the person can find
+  it from the phone's settings.
+- A dismissed line stays dismissed after the app is closed and opened again.

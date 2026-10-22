@@ -327,4 +327,17 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 23 to 24 (MM-118): the weight display chosen, none until chosen (Everything, or Trend only with an eating-disorder
+  // history), and whether it has been offered once.
+  [
+    23,
+    async (db) => {
+      await db.execute(
+        "ALTER TABLE user_preferences ADD COLUMN weight_display TEXT NULL CHECK (weight_display IS NULL OR weight_display IN ('everything', 'trendOnly', 'hidden'))",
+      );
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN weight_display_offered INTEGER NOT NULL DEFAULT 0 CHECK (weight_display_offered IN (0, 1))',
+      );
+    },
+  ],
 ]);

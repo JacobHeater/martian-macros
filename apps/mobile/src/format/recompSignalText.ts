@@ -34,7 +34,7 @@ export function recompSignalText(signal: RecompSignal, fmt: Fmt): string | undef
     const named =
       lifts.length <= 2 ? lifts.join(' and ') : `${lifts.slice(0, 2).join(', ')} and ${lifts.length - 2} more`;
     return (
-      `Trend weight held near ${fmt.weight(trendWeightKg)}. ` +
+      (fmt.weightHidden ? 'Trend weight held steady. ' : `Trend weight held near ${fmt.weight(trendWeightKg)}. `) +
       `Waist down about ${waistAmount(waistChangeCm, fmt)}. ` +
       `Estimated maxes are up on ${named}. ` +
       'This pattern is consistent with losing fat while keeping or gaining ' +

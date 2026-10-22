@@ -48,7 +48,7 @@ export function MeasurementSitesScreen() {
       <p className="app-text">
         Waist is always measured. Add any of these to measure in the same session; each is off until you add it.
       </p>
-      <p className="app-caption">Neck, and hips for a female profile, are what the tape method of estimating body fat needs.</p>
+      <p className="app-caption">The neck is what the tape method of estimating body fat needs. It is used for men only: for women it needs a different waist measurement.</p>
       <MmListGroup>
         {MeasurementSite.optional.map((site) => (
           <MmSwitchRow

@@ -34,6 +34,8 @@ import type { TermsAcceptanceReader } from './TermsAcceptanceReader';
 import type { TermsAcceptanceWriter } from './TermsAcceptanceWriter';
 import type { UnderEatingNoticeReader } from './UnderEatingNoticeReader';
 import type { UnderEatingNoticeWriter } from './UnderEatingNoticeWriter';
+import type { WeightDisplayReader } from './WeightDisplayReader';
+import type { WeightDisplayWriter } from './WeightDisplayWriter';
 
 /**
  * Reads and writes display preferences. Not health data and not part of the
@@ -75,4 +77,6 @@ export interface PreferencesRepository
     CookingFatReader,
     CookingFatWriter,
     PrimaryScaleReader,
-    PrimaryScaleWriter {}
+    PrimaryScaleWriter,
+    WeightDisplayReader,
+    WeightDisplayWriter {}

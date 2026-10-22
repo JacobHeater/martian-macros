@@ -1,3 +1,4 @@
+import { usePaceInWords } from '../coach/usePaceInWords';
 import { HistoryChart } from '../charts/HistoryChart';
 import type { HistorySeries } from '../charts/HistorySeries';
 import { TrendChart } from '../charts/TrendChart';
@@ -21,14 +22,26 @@ import { ScreenLoading } from '../ui/ScreenLoading';
 import { StatRow } from '../ui/StatRow';
 import { DashboardHistory } from './DashboardHistory';
 
+interface DashboardMetricsProps {
+  /**
+   * Whether the Dashboard could not read the pauses, or is reading them
+   * again after it could not: the history is drawn without targets or
+   * coverage, and the Dashboard's own notice is the one alert and the one
+   * retry (MM-183, MM-334).
+   */
+  pausesUnchecked?: boolean;
+}
+
 /**
  * The history under the Dashboard: what was recorded over 7 or 30 days, as
  * sections of the Dashboard's hierarchy, each a summary line and its chart
  * (MM-335). Today, still being logged, is drawn apart and kept out of the
  * averages.
  */
-export function DashboardMetrics() {
+export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsProps) {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const setup = Loadable.valueOf(useCell(state.setup));
   const today = useCell(state.today);
   const days = useCell(state.dashboardRange);
@@ -42,13 +55,17 @@ export function DashboardMetrics() {
   const shapes = Loadable.valueOf(useCell(state.targetShapes)) ?? [];
   const shapeLimits = useCell(state.targetShapeLimits);
   const snapshot = useCell(state.coach);
+  const paceInWords = usePaceInWords();
   if (setup === undefined) return null;
-  if ([intake, weights, waist, history, pauses, recovery].some((source) => Loadable.hasFailed(source))) {
+  // Pauses that cannot be read take out only what they decide: targets and coverage (MM-183, MM-334).
+  const unchecked = pausesUnchecked || Loadable.hasFailed(pauses);
+  if ([intake, weights, waist, history, recovery].some((source) => Loadable.hasFailed(source))) {
     return <ReadFailedNotice title="Could not read your history" onRetry={() => state.retryHistory()} />;
   }
-  if (!intake.ready || !weights.ready || !waist.ready || !history.ready || !pauses.ready || !recovery.ready) {
+  if (!intake.ready || !weights.ready || !waist.ready || !history.ready || (!pauses.ready && !unchecked) || !recovery.ready) {
     return <ScreenLoading />;
   }
+  const knownPauses = unchecked ? [] : (Loadable.valueOf(pauses) ?? []);
   const allowed =
     snapshot?.policy.targetsAllowed ??
     CoachingPolicy.derive({ profile: setup.profile, screening: setup.screening, today }).targetsAllowed;
@@ -57,14 +74,14 @@ export function DashboardMetrics() {
     days,
     intake: intake.value,
     history: history.value,
-    pauses: pauses.value,
+    pauses: knownPauses,
     weights: weights.value,
     onboardedOn: setup.onboardedOn,
-    targetsAllowed: allowed,
+    targetsAllowed: allowed && !unchecked,
     shapes,
     limits: shapeLimits,
   });
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const waists = waist.value.filter((w) => !w.date.isBefore(facts.start) && !w.date.isAfter(today));
   const latestWaist = waists[waists.length - 1];
   const estimates = new Map<CalendarDate, number>();
@@ -87,24 +104,35 @@ export function DashboardMetrics() {
   const signed = (text: string, value: number) => (text.startsWith('0 ') ? text : `${value < 0 ? '−' : '+'}${text}`);
 
   // A summary says what the chosen days add, never a figure the rows above already give (MM-335).
+  // Every average says how many logged days it uses, the days the Logging row counts: paused days are left out (MM-176).
+  const onlyPaused = 'Only paused days logged in these days';
   let intakeSummary = 'Nothing logged in these days yet';
   if (facts.meanCalories !== undefined) {
-    intakeSummary = `${Fmt.kcal(facts.meanCalories)} a day on average, over ${plural(facts.finishedDays, 'day', 'days')}`;
+    intakeSummary = `${Fmt.kcal(facts.meanCalories)} a day on average, across ${plural(facts.finishedDays, 'logged day', 'logged days')}`;
   } else if (sofar !== undefined) intakeSummary = `Today so far: ${Fmt.kcal(sofar)} · counts once marked complete`;
+  else if (facts.pausedDays > 0) intakeSummary = onlyPaused;
   let proteinSummary = 'No protein logged in these days yet';
-  if (facts.meanProtein !== undefined) proteinSummary = `${Fmt.grams(facts.meanProtein)} a day on average`;
-  else if (sofarProtein !== undefined) proteinSummary = `Today so far: ${Fmt.grams(sofarProtein)}`;
+  if (facts.meanProtein !== undefined) {
+    proteinSummary = `${Fmt.grams(facts.meanProtein)} a day on average, across ${plural(facts.proteinDays, 'logged day', 'logged days')}`;
+  } else if (sofarProtein !== undefined) proteinSummary = `Today so far: ${Fmt.grams(sofarProtein)}`;
+  else if (facts.pausedDays > 0) proteinSummary = onlyPaused;
+  // A chart is drawn once a day is finished, or a paused day was logged.
+  const charted = facts.finishedDays + facts.pausedDays > 0;
   let weightSummary = 'No weigh-ins in these days yet';
   if (firstTrend !== undefined && lastTrend !== undefined && trend.length > 1 && weighIns > 1) {
-    weightSummary = `${fmt.weightDelta(lastTrend.levelKg - firstTrend.levelKg)} since ${Fmt.shortDay(firstTrend.date)}`;
+    // With the weight hidden (MM-118), the pace in words against the plan's.
+    weightSummary = fmt.weightHidden
+      ? (paceInWords ?? 'Weighed in; the trend is still being worked out')
+      : `${fmt.weightDelta(lastTrend.levelKg - firstTrend.levelKg)} since ${Fmt.shortDay(firstTrend.date)}`;
   } else if (weighIns > 0) weightSummary = 'One weigh-in so far: the trend needs two';
   let waistSummary = 'Not measured in these days';
   if (firstWaist !== undefined && latestWaist !== undefined && waists.length > 1) {
     const change = latestWaist.waistCm - firstWaist.waistCm;
     waistSummary = `${signed(waistAmount(change, fmt), change)} since ${Fmt.shortDay(firstWaist.date)}`;
   } else if (latestWaist !== undefined) waistSummary = 'Measured once in these days';
-  const loggingSummary =
-    facts.activeDays === 1
+  const loggingSummary = unchecked
+    ? 'Paused days could not be checked'
+    : facts.activeDays === 1
       ? facts.loggedDays === 1
         ? 'Food logged today'
         : 'No food logged yet today'
@@ -135,7 +163,7 @@ export function DashboardMetrics() {
       </MmListGroup>
       <MmSection icon="food" title="Intake" summary={intakeSummary} onPress={open('food')} opens="Opens Food">
         {/* Nothing finished: the summary says so, with no near-empty grid under it. */}
-        {facts.finishedDays === 0 ? null : (
+        {!charted ? null : (
           <>
             {chart(
               [
@@ -146,15 +174,17 @@ export function DashboardMetrics() {
             )}
             <p className="app-caption">
               Missing days are gaps, not zero intake. Today counts in the average once it is marked complete.
-              {pauses.value.some((p) => !p.to.isBefore(facts.start) && !p.from.isAfter(today))
-                ? ' Paused days are shown; targets and coverage leave them out.'
-                : ''}
+              {unchecked
+                ? ' Paused days could not be checked, so targets are not shown.'
+                : knownPauses.some((p) => !p.to.isBefore(facts.start) && !p.from.isAfter(today))
+                  ? ' Paused days are shown; targets, coverage and the averages leave them out.'
+                  : ''}
             </p>
           </>
         )}
       </MmSection>
       <MmSection icon="protein" title="Protein" summary={proteinSummary} onPress={open('food')} opens="Opens Food">
-        {facts.finishedDays === 0
+        {!charted
           ? null
           : chart(
               [
@@ -165,17 +195,26 @@ export function DashboardMetrics() {
             )}
       </MmSection>
       <MmSection icon="scale" title="Weight trend" summary={weightSummary} onPress={open('progress')} opens="Opens Progress">
-        {weighIns < 2 ? null : (
+        {/* No chart with the weight hidden; with the trend only, the line and band without the dots (MM-118). */}
+        {weighIns < 2 || fmt.weightHidden ? null : (
           <>
             <TrendChart
               trend={snapshot?.trend ?? []}
-              weights={weights.value}
+              weights={fmt.readingsShown ? weights.value : []}
               today={today}
               rangeDays={days}
               fmt={fmt}
-              label={`Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`}
+              label={
+                fmt.readingsShown
+                  ? `Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`
+                  : `Weight trend in ${fmt.weightUnit}, ${days} days, with its uncertainty band.`
+              }
             />
-            <p className="app-caption">Dots are weigh-ins; the line is the trend. The band shows its uncertainty.</p>
+            <p className="app-caption">
+              {fmt.readingsShown
+                ? 'Dots are weigh-ins; the line is the trend. The band shows its uncertainty.'
+                : 'The line is the trend. The band shows its uncertainty.'}
+            </p>
           </>
         )}
       </MmSection>
@@ -195,14 +234,27 @@ export function DashboardMetrics() {
             )}
       </MmSection>
       <MmSection icon="checklist" title="Logging" summary={loggingSummary}>
-        <StatRow label="Days marked complete" value={`${facts.completeDays} of ${facts.activeDays}`} />
-        <StatRow label="Days weighed in" value={`${facts.weighInDays} of ${facts.activeDays}`} />
-        <p className="app-caption">What was recorded, not a score. Paused days and days before you started are left out.</p>
+        {unchecked ? (
+          <p className="app-caption">Coverage leaves paused days out, so it is shown once they can be read.</p>
+        ) : (
+          <>
+            <StatRow label="Days marked complete" value={`${facts.completeDays} of ${facts.activeDays}`} />
+            <StatRow label="Days weighed in" value={`${facts.weighInDays} of ${facts.activeDays}`} />
+            <p className="app-caption">What was recorded, not a score. Paused days and days before you started are left out.</p>
+          </>
+        )}
       </MmSection>
       <MmSection
         icon="coach"
         title="Coach and expenditure"
-        summary={coached ? `Confidence: ${confidenceLabel(snapshot.confidence.level)}` : 'No estimate yet'}
+        summary={
+          coached
+            ? `Confidence: ${confidenceLabel(snapshot.confidence.level)}`
+            : // Why there is none, never a bare "No estimate yet" (MM-176).
+              allowed
+              ? 'Needs two weeks of logs and weigh-ins'
+              : 'Targets are off for your profile'
+        }
         onPress={open('coach')}
         opens="Opens Coach"
       >
