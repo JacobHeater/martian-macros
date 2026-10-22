@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -80,8 +80,8 @@ it('two hard weeks on a cut bring the offer, with its reasons', async () => {
   expect(offer()).not.toBeNull();
   expect(offer()).toHaveTextContent('The coach would');
   expect(offer()).toHaveTextContent('appears to shift loss');
-  expect(screen.getByRole('button', { name: 'Take a two-week break' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Slow to 0.5% a week' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /^Take a two-week break/ })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /^Slow to 0\.5% a week/ })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
 });
 
@@ -102,7 +102,7 @@ it('twelve weeks in a deficit bring the break offer, a break or carry on', async
   const long = screen.getByText('12 weeks in a deficit').closest('.mm-notice');
   expect(long).toHaveTextContent('at 20 weeks it plans a break itself');
   expect(long?.textContent?.toLowerCase()).not.toMatch(/metabol|good/);
-  expect(screen.getByRole('button', { name: 'Take a two-week break' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /^Take a two-week break/ })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /^Slow to/ })).toBeNull();
   expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
 });
@@ -163,7 +163,7 @@ it('two lifts falling over three weeks on a cut bring the offer, and say a light
   const card = screen.getByText('Your lifts are falling').closest('.mm-notice');
   expect(card).toHaveTextContent('back squat and barbell row');
   expect(card).toHaveTextContent('if that is it, carry on');
-  expect(screen.getByRole('button', { name: 'Slow to 0.5% a week' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /^Slow to 0\.5% a week/ })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
 });
 
@@ -196,7 +196,7 @@ it('Carry on changes nothing and the offer goes', async () => {
 it('a break puts targets at maintenance at once, for two weeks', async () => {
   await seed();
   const before = await open();
-  await userEvent.click(screen.getByRole('button', { name: 'Take a two-week break' }));
+  await userEvent.click(screen.getByRole('button', { name: /^Take a two-week break/ }));
   await expect.poll(offer).toBeNull();
   expect((await repos.setup.loadSetup())?.maintenanceWeekFrom).toBe(today);
   await expect.poll(async () => (await history()).length).toBe(before.length + 1);
@@ -213,11 +213,61 @@ it('a break puts targets at maintenance at once, for two weeks', async () => {
 it('a slower pace is stored, and never a lower target', async () => {
   await seed();
   const before = await open();
-  await userEvent.click(screen.getByRole('button', { name: 'Slow to 0.5% a week' }));
+  await userEvent.click(screen.getByRole('button', { name: /^Slow to 0\.5% a week/ }));
   await expect.poll(offer).toBeNull();
   const after = await repos.setup.loadSetup();
   expect(after?.requestedLossFraction).toBe(0.005);
   expect(after?.reliefAnsweredOn).toBe(today);
   const now = await history();
   expect(now[now.length - 1]?.targets.kcal ?? 0).toBeGreaterThanOrEqual(before[before.length - 1]?.targets.kcal ?? 0);
+});
+
+/** The panel's MM-117 review: on the Dashboard the offer must not take the screen's one primary. */
+it('both choices are secondary, the coach’s suggestion first and heard as the suggestion', async () => {
+  await seed();
+  await open();
+  const choices = within(offer() as HTMLElement)
+    .getAllByRole('button')
+    .filter((button) => /^(Slow to|Take a)/.test(button.textContent ?? ''));
+  expect(choices.map((button) => button.textContent)).toEqual(['Slow to 0.5% a week', 'Take a two-week break']);
+  for (const button of choices) expect(button).toHaveClass('mm-button-secondary');
+  expect(choices[0]).toHaveAccessibleName('Slow to 0.5% a week, the coach’s suggestion');
+  expect(choices[1]).toHaveAccessibleName('Take a two-week break');
+});
+
+it('on a long deficit the break comes first, as the suggestion', async () => {
+  await seed({ hardWeeks: 0, deficitDays: 90 });
+  await open();
+  const button = screen.getByRole('button', { name: 'Take a two-week break, the coach’s suggestion' });
+  expect(button).toHaveClass('mm-button-secondary');
+});
+
+it('a break is confirmed with the day it ends, and Undo that day puts the targets and the offer back', async () => {
+  await seed();
+  const before = await open();
+  await userEvent.click(screen.getByRole('button', { name: /^Take a two-week break/ }));
+  expect(await screen.findByText(`Break started: maintenance until ${Fmt.shortDay(today.addDays(14))}`)).toBeInTheDocument();
+  await expect.poll(async () => (await history()).length).toBe(before.length + 1);
+  await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
+  await expect.poll(async () => (await history()).length).toBe(before.length);
+  const after = await repos.setup.loadSetup();
+  expect(after?.maintenanceWeekFrom).toBeUndefined();
+  expect(after?.reliefAnsweredOn).toBeUndefined();
+  const now = await history();
+  expect(now[now.length - 1]?.targets.kcal).toBe(before[before.length - 1]?.targets.kcal);
+  await expect.poll(offer).not.toBeNull();
+});
+
+it('a slower pace is confirmed with the pace, and Undo that day puts the pace and the targets back', async () => {
+  await seed();
+  const before = await open();
+  await userEvent.click(screen.getByRole('button', { name: /^Slow to 0\.5% a week/ }));
+  expect(await screen.findByText('Pace slowed to 0.5% a week')).toBeInTheDocument();
+  await expect.poll(async () => (await history()).length).toBe(before.length + 1);
+  await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
+  await expect.poll(async () => (await repos.setup.loadSetup())?.requestedLossFraction).toBeUndefined();
+  await expect.poll(async () => (await history()).length).toBe(before.length);
+  const now = await history();
+  expect(now[now.length - 1]?.targets.kcal).toBe(before[before.length - 1]?.targets.kcal);
+  await expect.poll(offer).not.toBeNull();
 });

@@ -101,7 +101,7 @@ it('short sleep alone brings the offer with the sentence and the gentler pace, a
   ).toBeInTheDocument();
   const before = await history();
   expect((await repos.setup.loadSetup())?.requestedLossFraction).toBeUndefined();
-  await userEvent.click(within(offer).getByRole('button', { name: 'Slow to 0.5% a week' }));
+  await userEvent.click(within(offer).getByRole('button', { name: /^Slow to 0\.5% a week/ }));
   await expect.poll(async () => (await repos.setup.loadSetup())?.requestedLossFraction).toBe(0.005);
   expect((await repos.setup.loadSetup())?.reliefAnsweredOn).toBe(today);
   // The pace change issues targets at once (MM-128); the sleep alone had issued none.

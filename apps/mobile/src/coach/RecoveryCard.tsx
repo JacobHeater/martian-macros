@@ -5,6 +5,7 @@ import { RecoveryRule } from '../engine/RecoveryRule';
 import { SleepRule } from '../engine/SleepRule';
 import { Fmt } from '../format/Fmt';
 import { recoveryQuestionLabel } from '../format/recoveryQuestionLabel';
+import { recoverySectionTitle } from '../format/recoverySectionTitle';
 import { sleepDurationText } from '../format/sleepDurationText';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -70,7 +71,7 @@ export function RecoveryCard({ answeredAbove = false }: RecoveryCardProps) {
   return (
     // Drawn anew each time it falls due, which may be after the check-ins are read, so it opens then;
     // answering leaves it open with the answers (MM-339).
-    <MmSection key={timesDue} icon="heart" title="How you are holding up" summary={summary} collapsible initiallyExpanded={due} remember={`coach.recovery.${timesDue}`}>
+    <MmSection key={timesDue} icon="heart" title={recoverySectionTitle} summary={summary} collapsible initiallyExpanded={due} remember={`coach.recovery.${timesDue}`}>
       {/* The record, not the check-in's word for it (MM-250): typed on Progress or read from the health platform. */}
       <StatRow label={`Sleep, last ${SleepRule.windowNights} nights`} value={sleepValue} detail={sleepDetail} />
       {latest === undefined ? (
