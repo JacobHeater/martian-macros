@@ -150,6 +150,28 @@ it('with no camera allowed, nothing can be taken, the screen says how to allow i
   expect(await layer().findByRole('button', { name: 'Take front photo' })).toBeEnabled();
 });
 
+// MM-560: on the iPhone's live reload the web view gives no camera at all; the screen sent the owner to settings, where
+// the camera was already allowed. Each reason is said as itself.
+it('a camera that cannot open for another reason than permission says so, not to change the settings', async () => {
+  camera.available = false;
+  camera.problem = 'insecurePage';
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+  expect(await layer().findByText('The camera could not be opened')).toBeInTheDocument();
+  expect(layer().getByText(/loaded from a development server over the network/)).toBeInTheDocument();
+  expect(layer().queryByText(/Allow the camera for Martian Macros in your phone’s settings/)).not.toBeInTheDocument();
+});
+
+it('a camera another app holds says to close it', async () => {
+  camera.available = false;
+  camera.problem = 'busy';
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+  expect(await layer().findByText('Another app or a call is using the camera. Close it, then try again.')).toBeInTheDocument();
+});
+
 it('a camera allowed in the phone’s settings meanwhile opens on coming back to the app', async () => {
   camera.available = false;
   render();

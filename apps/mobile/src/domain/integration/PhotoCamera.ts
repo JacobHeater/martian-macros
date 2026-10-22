@@ -1,4 +1,5 @@
 import type { CameraPreview } from './CameraPreview';
+import type { PhotoCameraProblem } from './PhotoCameraProblem';
 
 /**
  * The phone's camera for progress photos (MM-157). Photos are taken inside
@@ -7,8 +8,9 @@ import type { CameraPreview } from './CameraPreview';
  */
 export interface PhotoCamera {
   /**
-   * Starts the camera facing `facing`; undefined when there is no camera
-   * or the person did not allow it.
+   * Starts the camera facing `facing`, or says why it did not (MM-560):
+   * not allowed, no camera, busy, or a page that may use none. Never
+   * throws.
    */
-  start(facing: 'user' | 'environment'): Promise<CameraPreview | undefined>;
+  start(facing: 'user' | 'environment'): Promise<CameraPreview | PhotoCameraProblem>;
 }
