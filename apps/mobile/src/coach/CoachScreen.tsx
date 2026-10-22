@@ -248,6 +248,7 @@ export function CoachScreen() {
   // Rounded as every screen shows them, unless the person asked for exact ones (MM-123).
   const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
+  const trendSigma = snapshot.trend[snapshot.trend.length - 1]?.levelSigmaKg;
   const bodyFatLine = bodyFatNote(snapshot.bodyFatBasis, { eatingDisorderHistory: setup.screening.eatingDisorderHistory });
   // On a weight-loss medication (MM-113, MM-510): the fast pace is for the prescriber, and training keeps muscle.
   const paceNote = current === undefined ? undefined : weightLossMedicationPaceNote(setup.screening, current.targets.flags);
@@ -420,15 +421,28 @@ export function CoachScreen() {
         </MmDisclosure>
       </MmSection>
       <MmSection icon="body" title="Body">
-        {/* With the weight hidden, the pace in words in place of the figure (MM-118). */}
+        {/* An estimate is shown with its uncertainty, in words rather than "±" (MM-108): the trend's band, as the trend
+            chart draws it (two sigma). With the weight hidden, the pace in words in place of the figure (MM-118). */}
         {fmt.weightHidden ? (
           paceInWords === undefined ? null : <StatRow label="Your trend" value={paceInWords} detail="Against your plan’s pace" />
         ) : (
-          <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
+          <StatRow
+            label="Trend weight"
+            value={fmt.weight(snapshot.trendWeightKg)}
+            detail={
+              trendSigma === undefined
+                ? undefined
+                : `Likely between ${fmt.weight(snapshot.trendWeightKg - 2 * trendSigma)} and ${fmt.weight(snapshot.trendWeightKg + 2 * trendSigma)}`
+            }
+          />
         )}
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
-        <StatRow label="Resting energy (BMR)" value={Fmt.kcal(snapshot.bmrKcal)} />
+        <StatRow
+          label="Resting energy (BMR)"
+          value={`About ${Fmt.kcal(snapshot.bmrKcal)}`}
+          detail="Estimated from your sex, age, height and trend weight."
+        />
       </MmSection>
     </>
   );

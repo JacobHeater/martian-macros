@@ -41,7 +41,7 @@ export function StrengthHistoryScreen({ exerciseId }: { exerciseId: string }) {
                     ? point.bestSet === undefined
                       ? 'Best set'
                       : `Best set ${setText(point.bestSet, fmt, 'bodyweight')}`
-                    : `Best set e1RM ${fmt.load(point.estimateKg)} · smoothed ${fmt.load(point.trendKg)}`
+                    : `Best set: estimated max ${fmt.load(point.estimateKg)} · smoothed ${fmt.load(point.trendKg)}`
                 }
               />
             ))}

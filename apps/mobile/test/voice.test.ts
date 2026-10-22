@@ -7,8 +7,9 @@ import { describe, expect, it } from 'vitest';
  * not appear in any text the app shows. Carried over from voice_test.dart.
  *
  * Text the app shows is found two ways: quoted strings, and the words
- * written between the tags of a screen. A quoted string that is one
- * lower-case word is a name the code uses (a kind, a key), not text.
+ * written between the tags of a screen. A quoted string with no space (a
+ * kind, a key, a path) or whose every word carries a hyphen (a class list)
+ * is a name the code uses, not text.
  */
 const banned = [
   'good',
@@ -56,36 +57,46 @@ const notShown = [
 const quoted = [/'((?:[^'\\\n]|\\.)+)'/g, /"((?:[^"\\\n]|\\.)+)"/g, /`((?:[^`\\]|\\.)+)`/g];
 const code = /^(import |export |const |let |return |if |else|for |while |switch |case |type |interface |function |await |void |throw |try |catch |new |\/\/|\/\*|\*)/;
 
-function texts(): (readonly [file: string, text: string])[] {
-  const found: (readonly [string, string])[] = [];
-  for (const path of filesIn(src)) {
-    const file = within(path);
-    if (notShown.some((folder) => file.startsWith(folder))) continue;
-    const jsx = path.endsWith('.tsx');
-    let commented = false;
-    for (const line of readFileSync(path, 'utf8').split('\n')) {
-      const t = line.trim();
-      if (t.startsWith('/*')) commented = !t.includes('*/');
-      else if (commented) {
-        if (t.includes('*/')) commented = false;
-        continue;
-      }
-      if (t.startsWith('import ') || t.startsWith('//') || t.startsWith('/*') || t.startsWith('*')) continue;
-      for (const pattern of quoted) {
-        for (const match of line.matchAll(pattern)) {
-          const text = match[1] ?? '';
-          // One lower-case word is a name the code uses, and a path or a class name is not text.
-          if (/^[a-z][A-Za-z0-9]*$/.test(text) || /^[.@/]/.test(text) || /^[a-z0-9-]+( [a-z0-9-]+)*$/.test(text)) continue;
-          if (text.length >= 3 && /[A-Za-z]{3}/.test(text)) found.push([file, text]);
-        }
-      }
-      if (!jsx) continue;
-      // Words written between tags: on the line of a tag, or on lines of their own.
-      for (const match of line.matchAll(/>([^<>{}]*[A-Za-z]{3}[^<>{}]*)</g)) found.push([file, match[1] ?? '']);
-      if (/^[A-Z][^=;]*[a-z.,]$/.test(t) && t.includes(' ') && !code.test(t)) found.push([file, t]);
+/** A quoted string the code uses as a name, not as text: no space, a path, or a class list. */
+const isName = (text: string) =>
+  /^[a-z][A-Za-z0-9]*$/.test(text) ||
+  /^[.@/]/.test(text) ||
+  /^[a-z0-9-]+$/.test(text) ||
+  /^[a-z0-9]*-[a-z0-9-]*( [a-z0-9]*-[a-z0-9-]*)+$/.test(text);
+
+/** The text in one file's source; `jsx` adds the words written between tags. */
+function textsOf(source: string, jsx: boolean): string[] {
+  const found: string[] = [];
+  let commented = false;
+  for (const line of source.split('\n')) {
+    const t = line.trim();
+    if (t.startsWith('/*')) commented = !t.includes('*/');
+    else if (commented) {
+      if (t.includes('*/')) commented = false;
+      continue;
     }
+    if (t.startsWith('import ') || t.startsWith('//') || t.startsWith('/*') || t.startsWith('*')) continue;
+    for (const pattern of quoted) {
+      for (const match of line.matchAll(pattern)) {
+        const text = match[1] ?? '';
+        if (isName(text)) continue;
+        if (text.length >= 3 && /[A-Za-z]{3}/.test(text)) found.push(text);
+      }
+    }
+    if (!jsx) continue;
+    // Words written between tags: on the line of a tag, or on lines of their own.
+    for (const match of line.matchAll(/>([^<>{}]*[A-Za-z]{3}[^<>{}]*)</g)) found.push(match[1] ?? '');
+    if (/^[A-Z][^=;]*[a-z.,]$/.test(t) && t.includes(' ') && !code.test(t)) found.push(t);
   }
   return found;
+}
+
+function texts(): (readonly [file: string, text: string])[] {
+  return filesIn(src).flatMap((path) => {
+    const file = within(path);
+    if (notShown.some((folder) => file.startsWith(folder))) return [];
+    return textsOf(readFileSync(path, 'utf8'), path.endsWith('.tsx')).map((text) => [file, text] as const);
+  });
 }
 
 const all = texts();
@@ -97,10 +108,20 @@ it('the text is found', () => {
   expect(all.some(([, text]) => text.startsWith('Partial days are left out of your metabolism estimate'))).toBe(true);
 });
 
+// QA-6: a lower-case phrase is text; only a name with no space, or a class list, is passed over.
+it('a lower-case phrase is found, a name and a class list are not', () => {
+  expect(textsOf("subtitle: 'a bad day',\nlabel: 'your real weight',", false)).toEqual(['a bad day', 'your real weight']);
+  expect(textsOf("kind: 'weigh-in', path: './x', className: 'app-text coach-range',", false)).toEqual([]);
+});
+
+/** How a banned word is matched: a short one as a whole word, a longer one anywhere. */
+const bannedPattern = (word: string) => new RegExp(word.length <= 4 ? `\\b${word}\\b` : word, 'i');
+const bannedIn = (text: string) => banned.filter((word) => bannedPattern(word).test(text));
+
 describe('no text uses', () => {
   for (const word of banned) {
     it(`"${word}"`, () => {
-      const pattern = new RegExp(word.length <= 4 ? `\\b${word}\\b` : word, 'i');
+      const pattern = bannedPattern(word);
       const hits = all
         .filter(
           ([file, text]) =>
@@ -110,6 +131,27 @@ describe('no text uses', () => {
         )
         .map(([file, text]) => `${file}: "${text}"`);
       expect(hits).toEqual([]);
+    });
+  }
+});
+
+/**
+ * MM-108, "Consistent terms": each glossary term in design/voice-and-wording.md
+ * is the one name for its thing. The names it is never called are checked
+ * here, where a test can tell them apart from the code's own names.
+ */
+const neverCalled: readonly (readonly [term: string, pattern: RegExp])[] = [
+  ['trend weight', /\b(true|real) weight\b/i],
+  ['energy expenditure', /\bTDEE\b/],
+  ['calibration', /\bsetup period\b/i],
+  ['goal', /\bplan type\b/i],
+  ['targets', /\b(calorie|protein|daily|macro) goals?\b/i],
+];
+
+describe('the glossary is kept', () => {
+  for (const [term, pattern] of neverCalled) {
+    it(`"${term}" is never called ${String(pattern)}`, () => {
+      expect(all.filter(([, text]) => pattern.test(text)).map(([file, text]) => `${file}: "${text}"`)).toEqual([]);
     });
   }
 });
@@ -146,9 +188,10 @@ describe('no text is filler', () => {
   }
 });
 
-// MM-371: a grade letter is allowed; a banned word beside it is still caught.
+// MM-371: a grade letter is allowed; a banned word beside it is still caught, by the test's own pattern.
 it('a grade letter passes and a banned word beside it does not', () => {
-  const hits = (text: string) => banned.filter((word) => text.toLowerCase().includes(word));
-  expect(hits('Grade D')).toEqual([]);
-  expect(hits('Grade D: junk')).toEqual(['junk']);
+  expect(bannedIn('Grade D')).toEqual([]);
+  expect(bannedIn('Grade D-')).toEqual([]);
+  expect(bannedIn('Grade D: junk')).toEqual(['junk']);
+  expect(textsOf("detail: 'Grade D: junk',", false).flatMap(bannedIn)).toEqual(['junk']);
 });

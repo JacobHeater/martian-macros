@@ -45,7 +45,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
             {bodyHidden ? (latest.bestSet === undefined ? 'Best set' : setText(latest.bestSet, fmt, 'bodyweight')) : fmt.load(latest.trendKg)}
           </p>
           <p className="mm-card-caption">
-            {bodyHidden ? 'Best set' : 'Smoothed e1RM'} · {Fmt.longDate(latest.date)}
+            {bodyHidden ? 'Best set' : 'Smoothed estimated max'} · {Fmt.longDate(latest.date)}
           </p>
           <p className="mm-card-facts">
             {[4, 12].map((weeks) => (
@@ -59,7 +59,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
               unit={fmt.weightUnit}
               series={[
                 {
-                  label: 'Session best e1RM',
+                  label: 'Session best estimated max',
                   kind: 'target',
                   dashed: true,
                   connectRecordedPoints: true,
@@ -67,7 +67,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
                   values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.estimateKg)])),
                 },
                 {
-                  label: 'Smoothed e1RM',
+                  label: 'Smoothed estimated max',
                   kind: 'estimate',
                   connectRecordedPoints: true,
                   maximumGapDays: 28,
