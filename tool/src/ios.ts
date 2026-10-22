@@ -1,8 +1,7 @@
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
-import { readFileSync, writeFileSync } from 'node:fs';
 import { webBuildEnv } from './android.ts';
 import { iosLivePlan } from './iosLivePlan.ts';
 import { appIdOf, displayNameOf, identityOf, iosSuffixOf, type Identity } from './identity.ts';
