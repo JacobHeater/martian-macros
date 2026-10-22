@@ -96,7 +96,7 @@
     {
       "id": "SC-ui-kit",
       "name": "Tokens, component library, chart components and strings",
-      "location": "apps/mobile/src/ui/ (the component library, MM-104) and format/; localization files after MM-108",
+      "location": "apps/mobile/src/ui/ (the component library, MM-104) and format/",
       "rule": "After WS-03 steps 1 and 2, screens use library components and localized strings only. No inline colors, spacing or user-facing text."
     },
     {
@@ -204,7 +204,7 @@
         "WS-09",
         "WS-10"
       ],
-      "rule": "MM-108 moves every string into localization files in one pass. Do it while only four screens exist. Until it lands, new UI work should be limited to what the milestone needs."
+      "rule": "Text the app shows follows design/voice-and-wording.md; apps/mobile/test/voice.test.ts reads it in place (MM-108). Strings are not moved into localization files."
     },
     {
       "id": "HS-coach-screen",
@@ -1401,7 +1401,6 @@
         "apps/mobile/src/ui/",
         "apps/mobile/src/format/",
         "a shared UI component package (new)",
-        "localization files (new)",
         "a dashboard screen (new)"
       ],
       "sharedContracts": [
@@ -1542,6 +1541,7 @@
           "MM-436",
           "MM-437",
           "MM-417",
+          "MM-108",
           "MM-109",
           "MM-375"
         ],
@@ -1549,7 +1549,6 @@
           "MM-89",
           "MM-97",
           "MM-101",
-          "MM-108",
           "MM-176",
           "MM-179",
           "MM-183",
@@ -1581,7 +1580,7 @@
         },
         {
           "step": 2,
-          "title": "Move all text into localization files; glossary and banned-word test",
+          "title": "The voice guide, glossary, and the banned-word and glossary tests",
           "tickets": [
             "MM-108"
           ],
