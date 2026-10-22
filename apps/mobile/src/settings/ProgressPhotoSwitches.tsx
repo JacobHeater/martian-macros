@@ -4,6 +4,7 @@ import { useLoaded } from '../app/useLoaded';
 import { photosOffered } from '../domain/photos/photosOffered';
 import { byteSizeText } from '../format/byteSizeText';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
+import { useOverlays } from '../ui/useOverlays';
 
 /**
  * The progress photo choices in Settings (MM-157): whether the photos are
@@ -13,12 +14,22 @@ import { MmSwitchRow } from '../ui/MmSwitchRow';
  */
 export function ProgressPhotoSwitches({ backup = false }: { backup?: boolean }) {
   const { services, state } = useApp();
+  const overlays = useOverlays();
   const settings = useLoaded(state.photoSettings);
   const setup = useLoaded(state.setup);
   const photos = useLoaded(state.progressPhotos) ?? [];
   const size = useAsync(() => services.progressPhotos.totalBytes(), `${photos.length}:${photos.at(-1)?.id ?? 0}`);
   if (settings === undefined || setup === undefined) return null;
   if (backup) {
+    // Putting the photos in backups lets them leave the phone in a file, so it asks for the phone's lock first,
+    // as opening them does; not passed, the switch stays off. Turning it off asks nothing.
+    const chooseBackUp = async (backUp: boolean) => {
+      if (backUp && (await services.deviceLock.unlock('Unlock to put your progress photos in backups.')) === 'refused') {
+        overlays.snack('Your progress photos stayed locked: Back up photos is still off.');
+        return;
+      }
+      await services.progressPhotos.savePhotoSettings({ ...settings, backUp });
+    };
     const sizeWords = size === undefined || size === 0 ? 'Your photos' : `Your photos (${byteSizeText(size)})`;
     return (
       <MmSwitchRow
@@ -30,7 +41,7 @@ export function ProgressPhotoSwitches({ backup = false }: { backup?: boolean }) 
             : 'Off: progress photos stay only on this phone and are not in a backup.'
         }
         value={settings.backUp}
-        onChange={(backUp) => void services.progressPhotos.savePhotoSettings({ ...settings, backUp })}
+        onChange={(backUp) => void chooseBackUp(backUp)}
       />
     );
   }

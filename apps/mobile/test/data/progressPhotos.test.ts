@@ -41,3 +41,17 @@ it('erasing leaves nothing of a picture in the file', async () => {
   const file = new TextDecoder('latin1').decode(await db.exportBytes());
   expect(file).not.toContain('PICTURE-BYTES-THAT-MUST-GO');
 });
+
+it('a deleted photo leaves nothing of its picture in the file, while the others stay (secure_delete)', async () => {
+  const db = await WasmSqlDatabase.open();
+  const repo = await SqlProgressPhotoRepository.open(db);
+  const gone = new TextEncoder().encode('DELETED-PICTURE-BYTES-MUST-GO');
+  const kept = new TextEncoder().encode('KEPT-PICTURE-BYTES-STAY');
+  const doomed = await repo.savePhoto({ date: CalendarDate.of(2026, 10, 5), pose: 'front', takenAt: new Date(2026, 9, 5, 7), width: 10, height: 10, jpeg: gone });
+  await repo.savePhoto({ date: CalendarDate.of(2026, 10, 5), pose: 'side', takenAt: new Date(2026, 9, 5, 7), width: 10, height: 10, jpeg: kept });
+  await repo.deletePhoto(doomed);
+  expect((await db.select('PRAGMA secure_delete'))[0]?.['secure_delete']).toBe(1);
+  const file = new TextDecoder('latin1').decode(await db.exportBytes());
+  expect(file).not.toContain('DELETED-PICTURE-BYTES-MUST-GO');
+  expect(file).toContain('KEPT-PICTURE-BYTES-STAY');
+});

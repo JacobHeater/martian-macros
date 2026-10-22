@@ -13,9 +13,20 @@ interface MmPhotoProps {
 /**
  * A progress photo (MM-157), drawn from the bytes kept on the phone: never
  * a file address, never fetched. Portrait frame, the whole photo shown.
+ * It cannot be dragged out, selected, or long-pressed into the phone's
+ * "Save to Photos" or "Share" menu: nothing offers the picture to leave the
+ * app (the stylesheet's `.mm-photo` and this element's own handlers).
  */
 export function MmPhoto({ jpeg, label, thumbnail = false }: MmPhotoProps) {
   const size = thumbnail ? ' mm-photo-thumbnail' : '';
   if (jpeg === undefined) return <div className={`mm-photo mm-photo-empty${size}`} role="img" aria-label={label} />;
-  return <img className={`mm-photo${size}`} src={`data:image/jpeg;base64,${base64OfBytes(jpeg)}`} alt={label} />;
+  return (
+    <img
+      className={`mm-photo${size}`}
+      src={`data:image/jpeg;base64,${base64OfBytes(jpeg)}`}
+      alt={label}
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
+    />
+  );
 }

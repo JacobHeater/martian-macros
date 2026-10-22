@@ -73,7 +73,10 @@ public class MmDbPlugin: CAPPlugin, CAPBridgedPlugin {
         let queue = DispatchQueue(label: "mm-db-\(path)")
         queue.async {
             var connection: OpaquePointer?
-            let flags = (readOnly ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) | SQLITE_OPEN_FULLMUTEX
+            var flags = (readOnly ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) | SQLITE_OPEN_FULLMUTEX
+            // The progress photos (MM-157) are unreadable while the phone is locked, unless already open:
+            // the file, and every journal SQLite makes beside it, by Apple's own SQLite open flag.
+            if MmFiles.isPhotoDatabase(path) { flags |= MmFiles.sqliteProtectionUnlessOpen }
             guard sqlite3_open_v2(path, &connection, flags, nil) == SQLITE_OK, let db = connection else {
                 let message = connection.map { String(cString: sqlite3_errmsg($0)) } ?? "The database could not be opened."
                 if let db = connection { sqlite3_close_v2(db) }
@@ -88,6 +91,7 @@ public class MmDbPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             // The app's own database is kept out of iCloud and iTunes backups, file and folder (MM-404).
             if ownFile { try? MmFiles.excludeFromBackup(path) }
+            if MmFiles.isPhotoDatabase(path) { MmFiles.protectUnlessOpen(path) }
             call.resolve(["db": self.register(OpenDb(connection: db, queue: queue))])
         }
     }
