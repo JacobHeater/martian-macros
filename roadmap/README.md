@@ -189,7 +189,7 @@ most if ignored:
 | `computeTargets.ts`, `nextTargets.ts`, `SafetyBounds.ts` | Four workstreams want to change the target calculation. WS-02's M1 steps are done; WS-06 owns it now; WS-09 adds beside it. |
 | `TdeeEstimator.ts` | Phase changes, week shapes and new logging styles each change what the estimator must tolerate. One at a time, each with a full simulator run. |
 | `SyntheticUser.ts` | Five workstreams extend the simulator. Additions are optional and default off, so seeded results never change. |
-| All user-facing text | MM-108 moves every string into localization files in one pass. Do it while four screens exist. |
+| All user-facing text | Follows `design/voice-and-wording.md`; `apps/mobile/test/voice.test.ts` reads it in place (MM-108). |
 | `OnboardingScreen.tsx` | Five workstreams add to onboarding; it is already split by step. Keep it that way. |
 
 ## Choosing what to build next

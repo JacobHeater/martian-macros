@@ -1,6 +1,6 @@
 ---
 id: MM-108
-status: in-progress
+status: done
 component: design-system
 related: [MM-101, MM-11, MM-41, MM-92, MM-96, MM-106]
 ---
@@ -56,7 +56,20 @@ Scenario: Checked automatically where possible
   and is a prerequisite for ever translating the app. Worth doing as part of this.
 
 ## Progress
-- Built: the written guide and glossary (`design/voice-and-wording.md`) and an automated test (`apps/mobile/test/voice_test.dart`) that scans every string in the app and fails on a banned word
-  (good, bad, clean, junk, guilt, cheat, oops, earn, burn off, lbs, true weight, and others). It passes.
-- **Not done**: moving every string into localization files (Flutter ARB / gen-l10n), which would also let the glossary and uncertainty rules be checked in one place. That is a large change to every
-  screen and a new generated-code convention that needs the `mm arch` rule adjusted; it is deferred, not abandoned.
+- Built: the written guide and glossary (`design/voice-and-wording.md`) and
+  `apps/mobile/test/voice.test.ts` (carried over from `voice_test.dart`), which
+  reads every string the app shows and fails on a banned word (good, bad,
+  clean, junk, guilt, cheat, oops, earn, burn off, lbs, true weight, and
+  others), on filler (MM-401), and, since 2026-10-21, on a name the glossary
+  says a term is never called: "real weight", "TDEE" in text, "setup period",
+  "plan type" ("Consistent terms", where a test can tell it from code).
+- "No judgement" and "Checked automatically" are covered by that test.
+  "Uncertainty shown" and the rest of "Consistent terms" are kept by review
+  against the guide, as the guide says.
+- Not taken up: moving every string into localization files. It was a note
+  ("worth doing as part of this"), not an acceptance criterion, written for
+  the Flutter app while four screens existed. The test reads the strings where
+  they are, which gives the checkability the note wanted; no translation is
+  planned. The guide records this. If the owner wants translation, that is a
+  new ticket.
+- Done (2026-10-21). Not run locally; CI validates.

@@ -115,6 +115,26 @@ describe('no text uses', () => {
 });
 
 /**
+ * MM-108, "Consistent terms": each glossary term in design/voice-and-wording.md
+ * is the one name for its thing. The names it is never called are checked
+ * here, where a test can tell them apart from the code's own names.
+ */
+const neverCalled: readonly (readonly [term: string, pattern: RegExp])[] = [
+  ['trend weight', /\b(true|real) weight\b/i],
+  ['energy expenditure', /\bTDEE\b/],
+  ['calibration', /\bsetup period\b/i],
+  ['goal', /\bplan type\b/i],
+];
+
+describe('the glossary is kept', () => {
+  for (const [term, pattern] of neverCalled) {
+    it(`"${term}" is never called ${String(pattern)}`, () => {
+      expect(all.filter(([, text]) => pattern.test(text)).map(([file, text]) => `${file}: "${text}"`)).toEqual([]);
+    });
+  }
+});
+
+/**
  * MM-401: filler. Lines that narrate what the screen already shows, tell a
  * person to press what is plainly pressable, promise what is coming, or
  * cheer them on (design/anti-cruft-and-anti-slop.md, "No narration"). The
