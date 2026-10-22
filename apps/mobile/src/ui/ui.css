@@ -1928,6 +1928,26 @@
 .mm-section-closed + .mm-section:not(.mm-section-closed) {
   margin-top: var(--space-24);
 }
+/* A framed section (the Coach, owner): header and rows on one card, so a screen of words reads in clear blocks. What
+   was a card inside it lies flat on it, so nothing nests. */
+.mm-section-framed {
+  padding: var(--space-4) var(--space-16) var(--space-16);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-group);
+  background: var(--surface);
+}
+.mm-section-framed.mm-section-closed {
+  padding-bottom: var(--space-4);
+}
+.mm-section-framed + .mm-section-framed {
+  margin-top: var(--space-12);
+}
+.mm-section-framed .mm-list-group,
+.mm-section-framed .mm-surface {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
 /* A header, or a disclosure, sits 8 px above the card it opens (MM-402). */
 .mm-disclosure-body > .mm-list-group:first-child,
 .mm-disclosure-body > .mm-surface:first-child,

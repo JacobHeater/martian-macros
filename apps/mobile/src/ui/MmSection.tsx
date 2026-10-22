@@ -14,6 +14,8 @@ interface MmSectionProps {
    * caution colour on its icon, so it never reads as routine, folded or open (MM-553).
    */
   kind?: 'caution';
+  /** The section, header and rows, sits on one card: for a screen of many sections whose rows are words (the Coach, owner). */
+  framed?: boolean;
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
   /**
@@ -48,6 +50,7 @@ export function MmSection({
   icon,
   title,
   kind,
+  framed = false,
   summary,
   meter,
   trailing,
@@ -143,7 +146,7 @@ export function MmSection({
   return (
     // A header that opens a screen has no rows under it, so it stacks with the folded headers as one list (MM-402).
     <section
-      className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${open && onPress === undefined ? '' : ' mm-section-closed'}`}
+      className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${framed ? ' mm-section-framed' : ''}${open && onPress === undefined ? '' : ' mm-section-closed'}`}
       aria-labelledby={`${id}-title`}
     >
       <div className="mm-section-head">

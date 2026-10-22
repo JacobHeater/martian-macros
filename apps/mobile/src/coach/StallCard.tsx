@@ -29,7 +29,7 @@ export function StallCard() {
   const actionFor = (option: string): (() => void) | undefined =>
     /gentler pace/.test(option) && openPaceSheet !== undefined ? () => void openPaceSheet() : undefined;
   return (
-    <MmSection icon="trend" title="Progress has slowed">
+    <MmSection framed icon="trend" title="Progress has slowed">
       <p className="app-text">{body}</p>
       {options.length === 0 ? null : (
         <>
