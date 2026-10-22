@@ -830,7 +830,8 @@
             "MM-378",
             "MM-379",
             "MM-393",
-            "MM-405"
+            "MM-405",
+            "MM-553"
           ]
         },
         {
@@ -2769,7 +2770,8 @@
           "MM-141",
           "MM-368",
           "MM-405",
-          "MM-507"
+          "MM-507",
+          "MM-553"
         ],
         "remaining": [
           "MM-145"
@@ -2900,6 +2902,14 @@
           "title": "Reminders on iOS (MM-405): the plugin over UNUserNotificationCenter, the plan as exactly what is pending",
           "tickets": [
             "MM-405"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 14,
+          "title": "Coach's cautions and target flags in one \"Heads up\" section under the hero, folded to its count (MM-553)",
+          "tickets": [
+            "MM-553"
           ],
           "milestone": "M4"
         }

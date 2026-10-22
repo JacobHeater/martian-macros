@@ -7,6 +7,7 @@ import { Pause } from '../../src/domain/Pause';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
@@ -93,6 +94,7 @@ it('training lapses on a gain: targets go to maintenance at the check-in, flagge
   expect(last?.targets.flags.has('trainingLapsed')).toBe(true);
   expect(last?.targets.weeklyRateFraction).toBe(0);
   expect(last?.targets.kcal).toBeLessThan(2900);
+  await openHeadsUp();
   expect(await screen.findByText(/The surplus is paused: no workout has been logged for three weeks/)).toBeInTheDocument();
 });
 
