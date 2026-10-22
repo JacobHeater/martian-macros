@@ -28,22 +28,28 @@ def gtin14(raw):
 def main(pack, codes_file):
     db = sqlite3.connect(f"file:{pack}?mode=ro", uri=True)
     found = missing = invalid = 0
-    for line in open(codes_file, encoding="utf-8"):
-        line = line.strip()
-        if not line:
-            continue
-        g = gtin14(line)
-        if g is None:
-            invalid += 1
-            print("invalid   ", line)
-        elif db.execute("select 1 from barcodes where gtin = ?", (g,)).fetchone():
-            found += 1
-        else:
-            missing += 1
-            print("not found ", line)
+    try:
+        with open(codes_file, encoding="utf-8") as codes:
+            for line in codes:
+                line = line.strip()
+                if not line:
+                    continue
+                g = gtin14(line)
+                if g is None:
+                    invalid += 1
+                    print("invalid   ", line)
+                elif db.execute("select 1 from barcodes where gtin = ?", (g,)).fetchone():
+                    found += 1
+                else:
+                    missing += 1
+                    print("not found ", line)
+    finally:
+        db.close()
     total = found + missing + invalid
     print(f"{found} of {total} found, {missing} not found, {invalid} invalid")
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        sys.exit("usage: python3 pantry_coverage.py PACK barcodes.txt")
     main(sys.argv[1], sys.argv[2])

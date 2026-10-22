@@ -43,8 +43,8 @@ Scenario: A decision on conflicts
 - Planning suggested preferring USDA Branded on conflict (it is label data submitted by manufacturers); the product owner prefers Open Food
   Facts as primary. Question 3 is how to settle it with evidence.
 
-## Findings (measured 2026-10-09; status stays in-progress)
-Scripts: `tool/spikes/food_sources/` (README there). Data: USDA FoodData Central branded, foundation and SR Legacy CSV downloads (branded and foundation dated 2025-04-24, SR Legacy 2018-04: **not confirmed to be the newest**), and Open Food Facts' own CSV export from static.openfoodfacts.org (4,535,553 rows, built that day). **Deviation**: the ticket names the Hugging Face Parquet export; it rate-limited this machine (HTTP 429) and the CSV is the same data from the source, with about 5% fewer rows than the Parquet's 4,786,290 (some of that may be lines the CSV reader skipped; not investigated). The nutrition check used here is a SQL copy of MM-53's rules.
+## Findings (measured 2026-10-09; history: status was in-progress)
+Scripts: `tool/spikes/food_sources/` (README there; scripts 1 to 4 and the README were removed in MM-232, commit 50e187d8, and restored from its parent on 2026-10-21). Data: USDA FoodData Central branded, foundation and SR Legacy CSV downloads (branded and foundation dated 2025-04-24, SR Legacy 2018-04: **not confirmed to be the newest**), and Open Food Facts' own CSV export from static.openfoodfacts.org (4,535,553 rows, built that day). **Deviation**: the ticket names the Hugging Face Parquet export; it rate-limited this machine (HTTP 429) and the CSV is the same data from the source, with about 5% fewer rows than the Parquet's 4,786,290 (some of that may be lines the CSV reader skipped; not investigated). The nutrition check used here is a SQL copy of MM-53's rules.
 
 1. **Open Food Facts, United States**: 910,135 products (countries tag `en:united-states`), all with a barcode, 849,563 with a valid check digit. **Only about 100,900 have any nutrition values; 98,880 have energy, protein, carbohydrate and fat.** The plan's "about a million" is right for products and wrong for usable products: roughly nine in ten have no nutrition at all.
 2. **USDA Branded**: 1,977,398 rows, but **441,179 distinct barcodes** (the file keeps several versions of a product; I kept the newest per barcode). 430,418 distinct valid barcodes. **357,839 barcodes are in both sources** (valid barcodes); 33,740 when both records pass the checks.
@@ -62,7 +62,7 @@ The product owner approved the proposals on pack shipping and delegated the conf
   - Where both are consistent and still disagree (7,346 products), **Open Food Facts' record is the more recent in all 7,346** (USDA: 0). USDA's Branded data is a snapshot with a median modification date of January 2020 and none after April 2025; Open Food Facts' median is August 2024, and its most recent is May 2026. Freshness is the only measured reason to prefer either, so it decides.
   - **What this does not show**: that the newer record is right. Open Food Facts is crowd-edited, which is why it is marked "check this" in the pack (MM-153) and why a disagreement is flagged. The fifty-product hand check against real packages is still the way to test the rule, and the rule is one line to change if it fails.
 - Result on the real data: Open Food Facts wins all 33,736 shared barcodes; 7,401 foods carry the disagreement mark.
-- **Still open**: the hand check (fifty products, `sample50_disagreements.csv`), the pantry coverage test (fifty barcodes), and the licensing questions below. The ticket stays in progress.
+- **Still open** (history; see the Conclusion): the hand check (fifty products, `sample50_disagreements.csv`), the pantry coverage test (fifty barcodes), and the licensing questions below. The ticket stayed in progress then.
 
 ## License facts found (for MM-57; not a legal reading)
 - The Hugging Face dataset page lists the license tags **agpl-3.0 and odbl** and says nothing more on the visible page; which applies to the data was **not established**. Open Food Facts' own terms of use say the database is under ODbL, individual contents under the Database Contents License, and images under CC BY-SA, that reusers must credit Open Food Facts with a link to openfoodfacts.org, and that derivative works must be shared under the same conditions.
@@ -71,11 +71,11 @@ The product owner approved the proposals on pack shipping and delegated the conf
 ## Sourcing barcodes online (tried 2026-10-13)
 The product owner asked whether the fifty pantry barcodes could be sourced online instead of from a real pantry. Tried: Wikidata's GTIN property (P3962) through SPARQL; of the first four hundred items with a GTIN almost none is a food, and the values are mixed (ISBNs, hex strings, spaced digits). Not tried, because each is circular or not cleanly usable: Open Food Facts and USDA Branded themselves (they are the sources being measured), and retailer product pages (scraping, and terms of use). No independent public list of US pantry barcodes was found, so the coverage test still needs a real pantry, and the ticket stays open as the owner said.
 
-## Re-measured 2026-10-19 (MM-409; status stays in-progress)
-The export of 2026-10-19 read whole with DuckDB 1.5.6 (`strict_mode = false`): 4,848,211 rows. The 2026-10-09 read had skipped about 250,000 rows that are not standard CSV, which is where the gap to the Parquet's count came from. Products tagged United States: 987,217; with a name, energy and the three macros: **184,356** (against 98,880 before). A cut by GS1 United States or Canada prefix without the country tag would add 68,358 complete products, but they are tagged France, Ireland, the United Kingdom, Italy and Spain for the most part and only 256 carry no country, so the prefix was declined as a rule. Canada-only products with complete macros: 110,340, declined for a US launch. Energy stated only in kilojoules, or a name only in another field: six products, no rule. Queries and the table are in `docs/food-packs-data.md`. The hand check and the pantry test are still open.
+## Re-measured 2026-10-19 (MM-409; history: status was in-progress)
+The export of 2026-10-19 read whole with DuckDB 1.5.6 (`strict_mode = false`): 4,848,211 rows. The 2026-10-09 read had skipped about 250,000 rows that are not standard CSV, which is where the gap to the Parquet's count came from. Products tagged United States: 987,217; with a name, energy and the three macros: **184,356** (against 98,880 before). A cut by GS1 United States or Canada prefix without the country tag would add 68,358 complete products, but they are tagged France, Ireland, the United Kingdom, Italy and Spain for the most part and only 256 carry no country, so the prefix was declined as a rule. Canada-only products with complete macros: 110,340, declined for a US launch. Energy stated only in kilojoules, or a name only in another field: six products, no rule. The table is in `docs/food-packs-data.md`; the query is the build's extract, `apps/mobile/src/foodPipeline/node/extract.sql`, and the counts are in the build's `report.txt` and `coverage.txt` (release `2026-10-19`). The hand check and the pantry test are still open.
 **Pack sizes on 2026-10-19** (format 3, the thirteen MM-307 nutrients and sugar alcohols as integer columns): `barcode_us` 520,988 foods, 171 MB as SQLite, 53.8 MB gzip (the 2026-10-09 pack: 456,191 foods, 46.7 MB gzip); `generic` 13,285 foods (5,315 of them FNDDS), 4.9 MB as SQLite, 1.5 MB gzip (was 8,088 and 0.76 MB). The barcode pack stays a download and the generic pack stays small enough to bundle.
 
-## Additional sources, decided 2026-10-20 (feat/m2; status stays in-progress as the owner said)
+## Additional sources, decided 2026-10-20 (feat/m2; history: status was in-progress as the owner said)
 The owner asked for a food-data solution "including additional sources". Candidates read on 2026-10-20 and the decision on each:
 - **Open Food Facts, live, by barcode and by name** (MM-58): **added**, as the app's online source when the person allows it. It
   is the same database as the pack's, read at the moment of the scan, so a product added or corrected since the pack was built
@@ -97,11 +97,15 @@ lookup, an unknown barcode in a real pantry is now looked up rather than lost, w
 the test is run.
 
 ## Conclusion (2026-10-21)
-The spike's deliverable is these findings, and every acceptance criterion has its answer above with the query behind it
-(`docs/food-packs-data.md` holds the queries and tables). Closed on the owner's direction of 2026-10-21; the two checks that
+The spike's deliverable is these findings, and every acceptance criterion has its answer above with the query behind it:
+for the 2026-10-09 figures, the scripts in `tool/spikes/food_sources/` (restored from commit 50e187d8's parent); for the
+2026-10-19 figures, the build's `apps/mobile/src/foodPipeline/node/extract.sql` and its `report.txt` and `coverage.txt`
+(release `2026-10-19`), with the tables in `docs/food-packs-data.md`. Closed on the owner's direction of 2026-10-21; the two checks that
 need real packages are owed by the owner, below. What was decided:
 - **Sources.** USDA FoodData Central (Branded, Foundation, SR Legacy, FNDDS) and the United States slice of Open Food Facts
-  (184,356 complete products after the 2026-10-19 re-read). Live lookups of both by barcode and name when the person allows it
+  (184,356 complete products after the 2026-10-19 re-read; 121,038 in the pack after the checks and 42,656 shared barcodes
+  lost to USDA Branded). Records that fail the nutrition checks (MM-53), or have no valid barcode, are dropped before
+  `ReliabilityPolicy` compares two sources (`PackBuilder.build`). Live lookups of both by barcode and name when the person allows it
   (MM-58). MenuStat, the Canadian, UK and Australian tables and OpenNutrition are declined for a US launch.
 - **Packs.** The generic pack ships inside the app; the US barcode pack is downloaded (MM-55, MM-56). The build of 2026-10-19
   measured 13,285 generic foods (1.5 MB gzip) and 520,988 barcode foods (53.8 MB gzip).
@@ -113,6 +117,13 @@ need real packages are owed by the owner, below. What was decided:
 - **Coverage.** A barcode the pack lacks is looked up live (MM-58), so an unknown pantry item is found online rather than lost;
   the pantry measurement below says how often the pack alone suffices.
 - **Licences.** Handed to MM-57 (USDA public domain with a requested citation; Open Food Facts ODbL and DbCL).
+
+## Progress (2026-10-21, panel review of PR #284)
+- The spike's scripts 1 to 4 and README restored to `tool/spikes/food_sources/` from commit 50e187d8's parent (removed with
+  the Flutter tree in MM-232); the README says which parts are history and where the 2026-10-19 figures come from.
+- `pantry_coverage.py` closes the barcode file, closes the pack, and refuses a wrong argument count.
+  `apps/mobile/test/foodPipeline/pantryCoverage.test.ts` reads it and checks `FoodPackFormat`'s schema still has
+  `barcodes(gtin TEXT …)` and the script queries `from barcodes where gtin`. Not run locally; CI validates.
 
 ## Owed by the owner
 - **Pantry coverage (question 7).** Fifty barcodes from the owner's real pantry, typed one per line as printed under each
