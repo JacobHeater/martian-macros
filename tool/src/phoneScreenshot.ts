@@ -37,21 +37,15 @@ const sizeOf = (path: string) => {
 };
 
 /**
- * `mm screenshot --phone` (MM-536): asks the dev or demo app on the iPhone
+ * `mm screenshot --phone` (MM-536): asks the app on the iPhone (the real one
+ * unless `--env dev|demo` says, as `mm run --ios --phone`)
  * for a picture of its own screen through `xcrun devicectl` alone, waits
  * for it, and copies it to `path`. Gives the exit code; the phone's name
  * when it worked is the caller's to print.
  */
 export async function phoneScreenshot(request: PhoneScreenshotRequest): Promise<{ code: number; phone?: Phone }> {
   const { identity, say } = request;
-  if (identity === 'prod') {
-    say(
-      'The real app (com.martianmacros) takes no screenshots: the plugin is in the dev and demo apps only (MM-536). ' +
-        'Leave out --prod for the dev twin, or say --env demo; mm run --ios --phone --env dev installs it.',
-    );
-    return { code: 64 };
-  }
-  if (identity !== 'dev' && identity !== 'demo') {
+  if (identity !== 'dev' && identity !== 'demo' && identity !== 'prod') {
     say(identity);
     return { code: 64 };
   }
