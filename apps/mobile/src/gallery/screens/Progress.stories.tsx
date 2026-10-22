@@ -753,3 +753,71 @@ export const SiteHistoryEmpty = screenStory({
   about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="calf" />),
 });
+
+// ---- MM-156: the measurements section's ways in, pressed ----
+
+/** Presses the first button named `name`, wherever it is drawn: the side question is an overlay over the screen. */
+const pressAnywhereNamed = (name: string | RegExp) => async (canvas: HTMLElement) => {
+  const [button] = await within(canvas.ownerDocument.body).findAllByRole('button', { name }, { timeout: 5000 });
+  if (button === undefined) return;
+  reveal(button);
+  await userEvent.click(button);
+};
+
+/** MM-156: the suggestion taken, with a limb in it and no side yet: the side is asked, and the sites are added. */
+export const ProgressMeasurementsSuggestionTaken = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Upper arm (left)',
+  scenario: suggestionScenario,
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressNamed('Add them')(canvas);
+    await pressAnywhereNamed('Left')(canvas);
+  },
+});
+
+/** MM-156: "Measure" from the section opens the session with every site the person measures. */
+export const ProgressMeasurementsToSession = screenStory({
+  covers: ['ProgressScreen', 'MeasurementSessionScreen'],
+  shows: 'Thigh (left)',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressNamed('Measure')(canvas);
+  },
+});
+
+/** MM-156: "Choose sites" from the section, a limb turned on with no side yet: the side is asked, then said. */
+export const ProgressMeasurementsToSites = screenStory({
+  covers: ['ProgressScreen', 'MeasurementSitesScreen'],
+  shows: 'Limbs are measured on the left side.',
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressAnywhereNamed(/^Choose sites/)(canvas);
+    const [arm] = await within(canvas.ownerDocument.body).findAllByRole('switch', { name: /^Upper arm/ }, { timeout: 5000 });
+    if (arm !== undefined) {
+      reveal(arm);
+      await userEvent.click(arm);
+    }
+    await pressAnywhereNamed('Left')(canvas);
+  },
+});
+
+/** MM-156: a site's line on the section opens its history and chart. */
+export const ProgressMeasurementsToHistory = screenStory({
+  covers: ['ProgressScreen', 'SiteHistoryScreen'],
+  shows: 'Upper arm (left) over time',
+  scenario: measurementSitesScenario,
+  // A tape is read in centimetres here, so this person is metric.
+  about: ['units'],
+  open: onProgress,
+  walk: async (canvas) => {
+    await openMeasurements(canvas);
+    await pressAnywhereNamed(/^Upper arm \(left\)/)(canvas);
+  },
+});
