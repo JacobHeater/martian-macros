@@ -736,6 +736,13 @@ export const ProgressWeightTrendOnly = screenStory({
   shows: /single weigh-ins are not shown/,
   scenario: weightDisplayScenario('trendOnly'),
   open: ({ state }) => state.homeTab.put('progress'),
+  // The words are under the chart's "How to read this", folded until opened.
+  walk: async (canvas) => {
+    const [header] = await within(canvas).findAllByRole('button', { name: /^How to read this/ }, { timeout: 5000 });
+    if (header === undefined) return;
+    reveal(header);
+    await userEvent.click(header);
+  },
 });
 
 /** MM-118: Hidden: no figure and no chart; the pace in words against the plan's. */

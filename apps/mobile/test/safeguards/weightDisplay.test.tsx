@@ -183,8 +183,8 @@ describe('Hidden: a bodyweight lift says its best set, not an estimate that carr
     loggedSessions: 5,
     recentSessions: 5,
   });
-  /** Any figure of the estimates, in kilograms. */
-  const estimateFigure = /\b10\d\.\d kg\b/;
+  /** Any figure of the estimates (104.5 to 109.0 kg); no word boundary, since a card's text runs its title into it. */
+  const estimateFigure = /10\d\.\d kg/;
 
   it('the lift line: the best set, and its change in words', () => {
     expect(liftSummary(trend, everything)).toMatch(/^Est\. max 108\.5 kg with body weight · .4\.0 kg in 4 weeks$/);
