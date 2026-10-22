@@ -29,9 +29,11 @@ export interface MmHealthApi {
   /**
    * Asks for the history permission (MM-73), the first time only: the
    * plugin keeps in its own preferences that it asked, and after that only
-   * says how it stands.
+   * says how it stands. A Health Connect too old to offer it answers not
+   * granted and `unavailable`, and is not marked asked. Erasing the app's
+   * data (`renewWriteNamespace`) forgets that it asked.
    */
-  requestHistory(): Promise<{ granted: boolean }>;
+  requestHistory(): Promise<{ granted: boolean; unavailable?: boolean }>;
   read(options: { type: string; fromMs: number; toMs: number }): Promise<{ records: MmHealthRecord[] }>;
   /**
    * Each local day's steps from `fromMs` up to `toMs`, both local

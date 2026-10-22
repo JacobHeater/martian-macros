@@ -61,7 +61,7 @@ barcode read and saved), with the camera and recogniser faked.
 Not built or not verified: the real camera and ML Kit have not been run on the emulator or a phone, so how well the parser copes with
 real photographs is unknown; panels whose labels and values sit in separate columns are not read; sugars and saturated fat are not
 read (a saved food has no place for them yet); unsure fields are not individually marked, only the calories-versus-macros check and
-the missing-fields note; the iOS build with ML Kit is untried; contributing to Open Food Facts is undecided.
+the missing-fields note; on iOS the label is read with Apple's Vision (MM-406, built, untried on a phone); contributing to Open Food Facts is undecided.
 
 Built (2026-10-21, React app): **columnar panels and per-field unsure marks.** `readLabelColumns` reads a panel whose
 labels and values the recogniser returned in separate columns: a run of three or more label lines, then the value
