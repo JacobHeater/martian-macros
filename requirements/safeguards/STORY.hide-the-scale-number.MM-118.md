@@ -96,6 +96,14 @@ Scenario: Switching back
 - **The offer** is a notice on the Dashboard (built as the relief offer is) only while no display has been chosen;
   "Choose" opens the same sheet, "Not now" or a choice remembers it, and it never shows again.
 - Already true and now tested: no notification carries a figure (MM-146's prompts).
+- **A bodyweight lift's estimate is body weight (safety panel review, 2026-10-21).** `estimatedOneRepMax` adds the
+  body weight for a bodyweight exercise, and that estimate was shown through `Fmt.load`, which is never hidden; with
+  two sessions it gives the body weight back. With Hidden, a bodyweight lift shows only its best set (added load and
+  reps, as `setText` says it) and its change in words ("up", "down", "about the same"; `liftChangeWords`), and no
+  chart of the estimate: the lift line, the strength card, the session history, a personal record and the monthly
+  report. Lifts with an added weight are unchanged (strength is shown normally).
+- **A weigh-in's explanation says no energy figure with Hidden**: the energy it would take to be fat is the
+  difference in weight times a constant, so it says "far more than one day can be" instead.
 
 ## Progress
 Built 2026-10-21. Not run locally; CI validates.
@@ -124,6 +132,14 @@ Built 2026-10-21. Not run locally; CI validates.
   `ProgressWeightTrendOnly`, `ProgressWeightHidden`, `CoachWeightHidden`, `ChangeWeightDisplay`,
   `WeightDisplayTrendOnlyByDefault`, `HealthCheckEatingDisorderWeightDisplay`.
 - Not built: a weekly report outside the app does not exist, so "report" is the in-app monthly report.
+
+Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
+- `StrengthPoint.bestSet` and `PersonalRecord.load`/`bestSet` (from `buildStrengthTrends`, `personalRecordsOf`),
+  `ReportLift.load` (`buildMonthlyReport`); `liftChangeWords`; `liftSummary`, `StrengthTrendCard`,
+  `StrengthHistoryScreen`, `personalRecordText`, `MonthlyReportText` and `weightJumpText` honour Hidden for them.
+- Tests: `test/safeguards/weightDisplay.test.tsx` (a bodyweight lift with Hidden: the line, a record, the card with no
+  estimate and no chart, the report's lift and record, all with no estimate figure; a weigh-in's explanation with no
+  kcal figure; Everything unchanged).
 
 ## Owed on a phone
 - With Hidden, the morning weigh-in reminder on the lock screen shows no weight (it never had one; check it there).

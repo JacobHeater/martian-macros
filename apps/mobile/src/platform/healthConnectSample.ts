@@ -12,6 +12,12 @@ import type { MmHealthRecord } from './MmHealthRecord';
  * platform says about either beyond that is not imported. A sleep session
  * is kept as its minutes asleep: what the plugin summed from its stages,
  * or its whole span when the platform recorded no stages (MM-250).
+ *
+ * A body-fat reading is a scale's (MM-502): one typed in by hand is not
+ * imported, and its source is its app and its device joined (`app|device`),
+ * so two scales writing through one app keep their own bias. No schema
+ * change: the stored source id carries both. Other kinds keep the app
+ * alone as their source (the primary scale for weight is stored by it).
  */
 export function healthConnectSample(record: MmHealthRecord): HealthSample | undefined {
   if (!(HealthDataType.values as readonly string[]).includes(record.type)) return undefined;
@@ -26,6 +32,10 @@ export function healthConnectSample(record: MmHealthRecord): HealthSample | unde
       break;
     case 'sleep':
       value = record.value ?? (record.endMs - record.startMs) / 60000;
+      break;
+    case 'bodyFat':
+      if (record.value === undefined || record.manual === true) return undefined;
+      value = record.value;
       break;
     case 'height':
       if (record.value === undefined) return undefined;
@@ -42,7 +52,7 @@ export function healthConnectSample(record: MmHealthRecord): HealthSample | unde
     value,
     start: new Date(record.startMs),
     end: spans ? new Date(record.endMs) : undefined,
-    sourceId: record.sourceId,
+    sourceId: type === 'bodyFat' && record.deviceId !== undefined && record.deviceId !== '' ? `${record.sourceId}|${record.deviceId}` : record.sourceId,
     // No name stays none: a package id is never shown as one (MM-395).
     sourceName: record.sourceName,
   };

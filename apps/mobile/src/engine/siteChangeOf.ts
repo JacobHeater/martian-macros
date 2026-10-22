@@ -4,14 +4,13 @@ import type { SiteObservation } from '../domain/measurements/SiteObservation';
 import { WaistObservation } from '../domain/WaistObservation';
 import type { WaistChange } from './WaistChange';
 import { waistChangeOf } from './waistChangeOf';
-import { WaistRule } from './WaistRule';
 
 /**
  * Whether `site` changed over the `days` up to `asOf` (MM-156), by the one
  * rule every feature uses for the waist (MM-155): the middle of three
  * entries at each end, a change only beyond the noise of a difference. Each
  * site has its own noise figure (`MeasurementSite.facts`), half as much again
- * when either end rests on a single reading; the waist keeps its own
+ * when either of the two ends compared rests on a single reading; the waist keeps its own
  * figure, the user's once there is one. Undefined without an entry at both
  * ends to compare.
  */
@@ -32,7 +31,6 @@ export function siteChangeOf({
     .filter((o) => o.site === site)
     .map((o) => new WaistObservation({ date: o.date, waistCm: o.valueCm, readings: o.readings }));
   if (site === 'waist') return waistChangeOf({ waist: entries, asOf, days, sinceStart });
-  const single = entries.some((e) => e.isSingleReading);
-  const noiseCm = MeasurementSite.facts(site).noiseCm * (single ? WaistRule.singleReadingFactor : 1);
-  return waistChangeOf({ waist: entries, asOf, days, sinceStart, noiseCm });
+  // The single-reading factor is applied there, to the two ends compared only.
+  return waistChangeOf({ waist: entries, asOf, days, sinceStart, siteNoiseCm: MeasurementSite.facts(site).noiseCm });
 }

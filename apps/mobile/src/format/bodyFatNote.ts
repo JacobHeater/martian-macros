@@ -17,7 +17,7 @@ export function bodyFatNote(basis: BodyFatBasis, { eatingDisorderHistory }: { ea
     case 'waist':
       return 'From your height, weight and waist. A tape narrows the range but cannot pin body fat down.';
     case 'tape':
-      return 'From your height, weight, waist and neck, and hips for women, by the Navy tape method. A tape narrows the range but cannot pin body fat down.';
+      return 'From your height, weight, waist and neck, by the Navy tape method. A tape narrows the range but cannot pin body fat down.';
     case 'scale':
       return (
         'Your scale’s readings over weeks join your height and weight. Averaging removes the day-to-day scatter, ' +
