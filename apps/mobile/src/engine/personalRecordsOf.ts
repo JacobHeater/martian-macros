@@ -24,6 +24,8 @@ export function personalRecordsOf(trends: Iterable<StrengthTrend>): Map<number, 
           name: trend.name,
           estimateKg: point.estimateKg,
           previousBestKg: before,
+          load: trend.exercise?.load,
+          bestSet: point.bestSet,
         };
         const sameWorkout = records.get(point.workoutId);
         if (sameWorkout === undefined) {

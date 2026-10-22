@@ -9,7 +9,7 @@ interface ReadFailedNoticeProps {
   /** Said after the reassurance: what to do if trying again does not help. */
   otherwise?: string;
   onRetry: () => void;
-  /** Whether a retry is under way: the action is then inert and says so (MM-411). */
+  /** Whether a retry is under way: the action is then inert, keeps its focus and says so (MM-411, MM-183). */
   pending?: boolean;
 }
 
@@ -21,12 +21,14 @@ interface ReadFailedNoticeProps {
  */
 export function ReadFailedNotice({ title, consequence, otherwise, onRetry, pending = false }: ReadFailedNoticeProps) {
   const body = [consequence, 'Nothing you logged has been changed.', otherwise].filter((part) => part !== undefined);
+  // While pending the button stays enabled but does nothing: a disabled one would drop the focus it holds (MM-183).
+  const inert = () => undefined;
   return (
     <div className="app-stack-item" role="alert">
       <Notice
         title={title}
         text={body.join(' ')}
-        action={<MmButton label={pending ? 'Trying…' : 'Try again'} kind="secondary" onPress={pending ? undefined : onRetry} />}
+        action={<MmButton label={pending ? 'Trying…' : 'Try again'} kind="secondary" onPress={pending ? inert : onRetry} />}
       />
     </div>
   );

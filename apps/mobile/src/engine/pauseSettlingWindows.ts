@@ -15,6 +15,11 @@ function recordOn(history: readonly TargetsRecord[], date: CalendarDate): Target
   return found;
 }
 
+/** Whether `record`'s targets are a deficit or a surplus: more than `phaseChangeFraction` from its expenditure. */
+function offMaintenance(record: TargetsRecord | undefined): boolean {
+  return record !== undefined && Math.abs(record.targets.kcal - record.tdeeKcal) > phaseChangeFraction * record.tdeeKcal;
+}
+
 /**
  * The settling windows a pause makes (MM-148, MM-131): a pause is a change
  * of phase at both ends. During it the guide is maintenance, so a deficit
@@ -23,10 +28,14 @@ function recordOn(history: readonly TargetsRecord[], date: CalendarDate): Target
  * contents each time.
  *
  * A pause counts when it is long enough to be a diet break
- * (`PauseRule.deficitBreakDays`) and the targets in force on its first day
- * differ from the expenditure they were based on by more than
+ * (`PauseRule.deficitBreakDays`, so seven days counts). Each end is judged
+ * on the targets in force on it: the first day on the targets the pause
+ * began from, the day after on the targets it resumes to (a change of goal
+ * while paused can make the return a maintenance one). An end settles when
+ * its targets differ from the expenditure they were based on by more than
  * `phaseChangeFraction`, the test `settlingWindows` makes of a target
- * change. A window is made only once its first day has come.
+ * change; exactly on the line is not a change. A window is made only once
+ * its first day has come.
  */
 export function pauseSettlingWindows({
   pauses,
@@ -40,11 +49,10 @@ export function pauseSettlingWindows({
   const windows: SettlingWindow[] = [];
   for (const pause of pauses) {
     if (pause.days < PauseRule.deficitBreakDays || pause.from.isAfter(today)) continue;
-    const record = recordOn(history, pause.from);
-    if (record === undefined) continue;
-    if (Math.abs(record.targets.kcal - record.tdeeKcal) <= phaseChangeFraction * record.tdeeKcal) continue;
-    windows.push(new SettlingWindow(pause.from, pause.from.addDays(settlingDays - 1)));
-    if (!pause.resumesOn.isAfter(today)) {
+    if (offMaintenance(recordOn(history, pause.from))) {
+      windows.push(new SettlingWindow(pause.from, pause.from.addDays(settlingDays - 1)));
+    }
+    if (!pause.resumesOn.isAfter(today) && offMaintenance(recordOn(history, pause.resumesOn))) {
       windows.push(new SettlingWindow(pause.resumesOn, pause.resumesOn.addDays(settlingDays - 1)));
     }
   }

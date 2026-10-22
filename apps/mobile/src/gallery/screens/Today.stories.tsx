@@ -10,6 +10,7 @@ import { firstDayScenario } from './firstDayScenario';
 import { maintenanceScenario } from './maintenanceScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { pausedScenario } from './pausedScenario';
+import { reliefScenario } from './reliefScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { frequentWeighingScenario } from './frequentWeighingScenario';
@@ -31,13 +32,13 @@ import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 const meta = { title: 'Screens/Today', ...screensMeta } satisfies Meta;
 export default meta;
 
-export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week' });
+export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'History' });
 
 /** MM-91: the Dashboard on a 360 px phone: the hero, its macro rows and the strip inside the width. */
-export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', viewport: 'smallPhone' });
+export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'History', viewport: 'smallPhone' });
 
 /** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the title and Settings share the width. */
-export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', textScale: 2 });
+export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'History', textScale: 2 });
 
 /** MM-91: the morning before the weigh-in at 200% text: the field, its Save and the hint inside the row. */
 export const NotWeighedTodayLargeText = screenStory({
@@ -58,6 +59,16 @@ export const NotWeighedToday = screenStory({
   covers: ['DashboardScreen'],
   shows: 'First thing in the morning, after the bathroom.',
   scenario: notWeighedTodayScenario,
+});
+
+/**
+ * MM-117: two hard weeks on a cut, on the Dashboard: the offer to ease the deficit above the day's own action, both
+ * choices secondary so the screen keeps one primary (checked by the hierarchy rules).
+ */
+export const DashboardReliefOffer = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Two hard weeks in a row',
+  scenario: reliefScenario,
 });
 
 /** MM-127: a glass of wine today, at Standard detail: the alcohol's energy as a row of the hero, said as part of the total. */
@@ -163,9 +174,9 @@ export const MicrosRemembered = screenStory({
   scenario: demoWith({ detail: 'full', picture: 'micros' }),
 });
 
-/** Opens "More about this week", once the Dashboard is there. */
+/** Opens the history ("History", named for 7 or 30 days since MM-176), once the Dashboard is there. */
 const openHistory = async (canvas: HTMLElement) => {
-  const more = await within(canvas).findByRole('button', { name: /More about this week/ });
+  const more = await within(canvas).findByRole('button', { name: /^History/ });
   await userEvent.click(more);
   reveal(more);
 };
@@ -255,18 +266,34 @@ export const Paused = screenStory({
 /** MM-321: the history while paused: paused days stay as observations. */
 export const HistoryPaused = screenStory({
   covers: ['DashboardScreen'],
-  shows: /Paused days are shown; targets and coverage leave them out.$/,
+  shows: /Paused days are shown; targets, coverage and the averages leave them out.$/,
   scenario: pausedScenario,
   walk: openHistory,
 });
 
-/** MM-321: the history with no weigh-in kept (each one deleted): no coaching estimate yet. */
+/** MM-321: the history with no weigh-in kept (each one deleted): no coaching estimate yet, and what it needs (MM-176). */
 export const HistoryNoWeighIn = screenStory({
   covers: ['DashboardScreen'],
-  shows: 'No estimate yet',
+  shows: 'Needs two weeks of logs and weigh-ins',
   scenario: async (repos, today) => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   },
+  walk: openHistory,
+});
+
+/** MM-176: targets off for the profile (bariatric surgery): the coach section says so, not "no estimate". */
+export const HistoryTargetsOff = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Targets are off for your profile',
+  scenario: demoWith({ screening: { bariatricSurgery: true } }),
+  walk: openHistory,
+});
+
+/** MM-183, MM-334: the pauses could not be read: the history stays, without targets or coverage, under the Dashboard's one alert. */
+export const HistoryPausesFailed = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Paused days could not be checked',
+  stores: failingRead('pauses', 'watchPauses'),
   walk: openHistory,
 });
 

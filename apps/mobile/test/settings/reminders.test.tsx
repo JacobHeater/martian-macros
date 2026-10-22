@@ -10,6 +10,7 @@ import { InMemoryExactAlarms } from '../../src/fixtures/InMemoryExactAlarms';
 import { InMemoryReminderScheduler } from '../../src/fixtures/InMemoryReminderScheduler';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { recoverySectionTitle } from '../../src/format/recoverySectionTitle';
 import { reminderPrompt } from '../../src/format/reminderPrompt';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
@@ -43,7 +44,8 @@ const stored = () => first(repos.reminders.watchReminders());
 
 it('no notification carries health data or pressure', () => {
   for (const kind of ReminderKind.values) {
-    const prompt = reminderPrompt(kind).toLowerCase();
+    // The recovery check-in's prompt names its section on Coach (MM-116), the one place "you" appears.
+    const prompt = reminderPrompt(kind).toLowerCase().replace(recoverySectionTitle.toLowerCase(), '');
     expect(prompt).not.toMatch(/\d/);
     for (const word of [
       'kcal',
@@ -64,6 +66,11 @@ it('no notification carries health data or pressure', () => {
     }
     expect(prompt.endsWith('?'), 'a plain prompt').toBe(true);
   }
+});
+
+it('the recovery reminder names the section it opens, not a count of questions (MM-146, MM-116)', () => {
+  expect(reminderPrompt('recoveryCheckIn')).toBe('Time for “How you are holding up” on Coach?');
+  expect(reminderPrompt('recoveryCheckIn')).not.toMatch(/five|questions/i);
 });
 
 it('nothing is on, scheduled or asked for until the user acts', async () => {

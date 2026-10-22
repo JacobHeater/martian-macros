@@ -6,6 +6,7 @@ import { Loadable } from '../state/Loadable';
 import { dayTargetsOn } from '../state/dayTargetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useHeldFailure } from '../app/useHeldFailure';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
@@ -35,6 +36,8 @@ import './food.css';
 export function FoodScreen() {
   const { services, state } = useApp();
   const pausesState = useCell(state.pauses);
+  // Asked again after a failure, the day stays drawn and the button keeps its place (MM-183).
+  const pausesRead = useHeldFailure(pausesState, () => state.retryPauses());
   const day = useShownDay();
   const today = useCell(state.today);
   const entries = useLoaded(state.foodForDay(day)) ?? [];
@@ -48,7 +51,7 @@ export function FoodScreen() {
   const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
 
   // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
-  const pausesFailed = Loadable.hasFailed(pausesState);
+  const pausesFailed = pausesRead.failed;
   if (!pausesState.ready && !pausesFailed) return <ScreenLoading />;
 
   const targetsAllowed =
@@ -66,7 +69,8 @@ export function FoodScreen() {
         <ReadFailedNotice
           title="Could not check whether this day is paused"
           consequence="This day’s targets are not shown until it can."
-          onRetry={() => state.retryPauses()}
+          onRetry={pausesRead.retry}
+          pending={pausesRead.pending}
         />
       ) : null}
       <CalorieHero

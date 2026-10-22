@@ -31,5 +31,5 @@ it('with an eating-disorder history it never asks for more measuring', () => {
 
 it('a range with the Navy tape says it rests on the tape, and how (MM-501)', () => {
   expect(bodyFatRangeText(estimate, 'tape')).toBe('16–32% (from your tape)');
-  expect(bodyFatNote('tape', { eatingDisorderHistory: false })).toMatch(/^From your height, weight, waist and neck, and hips for women, by the Navy tape method\./);
+  expect(bodyFatNote('tape', { eatingDisorderHistory: false })).toMatch(/^From your height, weight, waist and neck, by the Navy tape method\./);
 });

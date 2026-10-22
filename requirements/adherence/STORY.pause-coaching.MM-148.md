@@ -132,6 +132,11 @@ Built since (checked 2026-10-21, React app):
   once the water has settled. Tests: "the glycogen shift at both ends" and "after a pause of a week or more, the week is
   up but nothing moves while the water settles" in `test/engine/pause.test.ts` (the week's wait itself is now shown
   with a six-day pause, too short to be a change of phase). Not run locally; CI validates.
+- **Review fixes** (2026-10-21): each end is now judged on the targets in force on it, the first day on the targets the
+  pause began from and the day after on those it resumes to, so a pause whose goal was changed to maintenance while it
+  ran does not settle on its return. New tests in "the glycogen shift at both ends": a pause of exactly seven days
+  (`pause(20, 26)`) counts; targets exactly on the 10% line are not a change and just past it are; each end on its
+  own record. Not run locally; CI validates.
 
 Left as they are (not in the acceptance criteria):
 - The guide for a past paused day is today's maintenance estimate, not that day's.

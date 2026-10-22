@@ -22,6 +22,7 @@ import { Loadable } from '../state/Loadable';
 import { dayTargetsOn } from '../state/dayTargetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useHeldFailure } from '../app/useHeldFailure';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { AlcoholLine } from '../food/AlcoholLine';
@@ -61,6 +62,8 @@ export function DashboardScreen() {
   const navigator = useNavigator();
   const setupState = useCell(state.setup);
   const pausesState = useCell(state.pauses);
+  // Asked again after a failure, the day stays drawn and the button keeps its place (MM-183).
+  const pausesRead = useHeldFailure(pausesState, () => state.retryPauses());
   const today = useCell(state.today);
   const foodState = useCell(state.foodForDay(today));
   const historyState = useCell(state.targetsHistory);
@@ -105,7 +108,7 @@ export function DashboardScreen() {
   const setup = Loadable.valueOf(setupState);
   if (setup === undefined) return null;
   // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
-  const pausesFailed = Loadable.hasFailed(pausesState);
+  const pausesFailed = pausesRead.failed;
   if ([foodState, historyState, weightsState].some((source) => Loadable.hasFailed(source))) {
     return (
       <ReadFailedNotice
@@ -188,7 +191,8 @@ export function DashboardScreen() {
         <ReadFailedNotice
           title="Could not check whether today is paused"
           consequence="Today’s targets are not shown until it can."
-          onRetry={() => state.retryPauses()}
+          onRetry={pausesRead.retry}
+          pending={pausesRead.pending}
         />
       ) : null}
       <UnderEatingNotice />
@@ -315,8 +319,9 @@ export function DashboardScreen() {
         />
         <ProcessCard />
       </MmListGroup>
-      <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
-        <DashboardMetrics />
+      {/* Named for 7 or 30 days, not for a week (MM-176). */}
+      <MmDisclosure title="History" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
+        <DashboardMetrics pausesUnchecked={pausesFailed} />
       </MmDisclosure>
     </>
   );

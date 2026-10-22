@@ -74,4 +74,20 @@ describe('healthConnectSample', () => {
   it('a kind of reading the app does not import gives nothing', () => {
     expect(healthConnectSample(record('BLOOD_GLUCOSE', 5.5))).toBeUndefined();
   });
+
+  it('a body-fat reading is its app and its device: two scales through one app keep their own source (MM-502)', () => {
+    const a = healthConnectSample(record('bodyFat', 21.5, { deviceId: 'Withings Body+' }));
+    const b = healthConnectSample(record('bodyFat', 24, { deviceId: 'Withings Body Cardio' }));
+    expect(a?.sourceId).toBe('com.example.scale|Withings Body+');
+    expect(b?.sourceId).toBe('com.example.scale|Withings Body Cardio');
+    // No device named: the app alone, as before.
+    expect(healthConnectSample(record('bodyFat', 21.5, { deviceId: '' }))?.sourceId).toBe('com.example.scale');
+    // A weight keeps the app alone as its source, whatever device it names.
+    expect(healthConnectSample(record('weight', 82.4, { deviceId: 'Withings Body+' }))?.sourceId).toBe('com.example.scale');
+  });
+
+  it('a body-fat figure typed in by hand is not a scale reading and is not imported (MM-502)', () => {
+    expect(healthConnectSample(record('bodyFat', 18, { manual: true }))).toBeUndefined();
+    expect(healthConnectSample(record('bodyFat', 18, { manual: false }))?.value).toBe(18);
+  });
 });

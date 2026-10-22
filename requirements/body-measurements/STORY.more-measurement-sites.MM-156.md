@@ -96,6 +96,11 @@ Choices I made without asking (say if any is wrong):
 - **The tape body-fat sites** (neck, and hips for a female profile) are named on the sites screen; the one-time
   suggestion is by goal and sex only, since nothing says who wants a tape estimate (`suggestedSites`' `tapeBodyFat`
   is there for MM-501 to use).
+- **Review fixes (panel review, 2026-10-21).** The single-reading factor applies only to the two ends compared, in
+  `waistChangeOf` once the ends are chosen (`siteNoiseCm`), so an old single entry outside both leaves the threshold
+  at 1.4 times the site's noise. In a lean gain, limbs count as up when two or more are past their thresholds, or one
+  is past 1.5 times its own (judgement: with several limbs measured, one past its threshold is easily noise). The
+  sites screen now says the tape body-fat method uses the neck and is for men only (MM-501).
 - **The side is asked once**, when the first limb is added (from the suggestion or the sites screen), with the
   two-answer question (`overlays.choice`).
 - Siblings (rule 9): the "More measurements" section is built as the Waist section beside it (`WaistEntryCard`,
@@ -142,6 +147,13 @@ Built 2026-10-21. Not run locally; CI validates.
   implausible value on its field with focus; two of three said once the site is left; the drawing from the second
   session; "3 of 6"; changing the limb side). Stories: `MeasurementSessionTwoOfThree`, `MeasurementSessionLooksOff`,
   `MeasurementSitesLimbSide`.
+
+Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
+- `waistChangeOf` takes `siteNoiseCm`; `siteChangeOf` passes the site's figure and no longer applies the factor itself.
+  `leanGainPairOf`: two limbs up, or one by 1.5 times its threshold. `measurementSitesScenario`: the thigh rises too,
+  so the pair still shows in `ProgressMeasurementsLimbs`.
+- Tests: `test/engine/measurementSites.test.ts` (an old single entry outside both ends leaves 1.4 times the noise; at
+  an end, 1.5 times that; one limb just past its threshold says nothing together, one well past it or two limbs up do).
 
 ## Owed on a phone
 - The upgrade on the owner's phone brings every waist entry into the new store with its date, value and readings,
