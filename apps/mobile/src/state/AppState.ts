@@ -29,9 +29,15 @@ import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
 import type { Workout } from '../domain/training/Workout';
 import type { TargetShape } from '../domain/TargetShape';
+import type { BodyFatObservation } from '../domain/BodyFatObservation';
+import type { GoalBodyFat } from '../domain/GoalBodyFat';
+import type { PhotoSettings } from '../domain/photos/PhotoSettings';
+import type { ProgressPhoto } from '../domain/photos/ProgressPhoto';
 import type { UserSetup } from '../domain/UserSetup';
 import type { MenstruationDay } from '../domain/MenstruationDay';
 import type { SleepNight } from '../domain/SleepNight';
+import type { MeasurementSettings } from '../domain/measurements/MeasurementSettings';
+import type { SiteObservation } from '../domain/measurements/SiteObservation';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
@@ -43,7 +49,9 @@ import type { TrainingLapse } from '../engine/TrainingLapse';
 import { trainingSuspended } from '../engine/trainingSuspended';
 import type { MaintenanceStatus } from '../engine/MaintenanceStatus';
 import type { PhasePlan } from '../engine/PhasePlan';
+import { bodyFatReadingsOf } from './bodyFatReadingsOf';
 import { planPhases } from '../engine/planPhases';
+import { platformWorkoutImports } from '../engine/platformWorkoutImports';
 import { assessStall } from '../engine/assessStall';
 import { describePaces } from '../engine/describePaces';
 import { describeLeanGainPaces } from '../engine/describeLeanGainPaces';
@@ -118,6 +126,7 @@ import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
 import type { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { dailyWeighIns } from '../healthIngest/dailyWeighIns';
+import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { DayWeighIn } from '../healthIngest/DayWeighIn';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
 import { HealthBackfill } from '../healthIngest/HealthBackfill';
@@ -125,10 +134,12 @@ import { HealthImporter } from '../healthIngest/HealthImporter';
 import type { NightOfSleep } from '../healthIngest/NightOfSleep';
 import { nightlySleep } from '../healthIngest/nightlySleep';
 import type { HealthSample } from '../healthIngest/HealthSample';
+import { newestReading } from '../healthIngest/newestReading';
 import type { HealthSyncReason } from '../healthIngest/HealthSyncReason';
 import { HealthSyncSchedule } from '../healthIngest/HealthSyncSchedule';
 import { primaryWeightSource } from '../healthIngest/primaryWeightSource';
 import type { Watched } from '../lang/Watched';
+import { currentValueOf } from '../lang/currentValueOf';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
@@ -137,6 +148,7 @@ import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
 import { Loadable } from './Loadable';
 import { mergeSleepNights } from './mergeSleepNights';
+import { mergeFlowDays } from './mergeFlowDays';
 import { mergeWeighIns } from './mergeWeighIns';
 import { minuteOfDayNow } from './minuteOfDayNow';
 import { once } from './once';
@@ -152,6 +164,10 @@ const derived = <T>(compute: () => T) => new DerivedCell(compute);
 
 /** The value of a cell that loads, or undefined while it has not. */
 const of = <T>(cell: Cell<Loadable<T>>) => Loadable.valueOf(cell.value);
+
+/** How far back each read of the platform looks for workouts to import (MM-490). */
+const workoutImportDays = 30;
+const dayMs = 24 * 60 * 60 * 1000;
 
 /**
  * Everything the screens show that is worked out from what is stored: the
@@ -220,6 +236,8 @@ export class AppState {
    * one with the most weigh-ins in thirty days counts.
    */
   readonly primaryScale: Cell<Loadable<string | undefined>>;
+  /** The hours in which an imported reading counts as the morning weigh-in (MM-441): 04:00 to 12:00 until moved. */
+  readonly weighInWindow: Cell<Loadable<WeighInWindow>>;
 
   /**
    * The weigh-ins everything works from: what the user typed and, for any
@@ -253,23 +271,50 @@ export class AppState {
   readonly judgedIntake: Cell<readonly IntakeDay[] | undefined>;
   readonly waist: Cell<Loadable<WaistObservation[]>>;
 
+  /** Every site's tape measurements, oldest first, the waist's among them (MM-156). */
+  readonly measurements: Cell<Loadable<SiteObservation[]>>;
+
+  /** Which sites beyond the waist are measured, the limb side, and the suggestion's answer (MM-156). */
+  readonly measurementSettings: Cell<Loadable<MeasurementSettings>>;
+
   /** The nights of sleep the person typed, and nothing imported (MM-250). */
   readonly typedSleep: Cell<Loadable<SleepNight[]>>;
 
   /** The imported sleep that counts for each night (MM-250), from what has been read and kept. Empty when nothing has been imported. */
   readonly importedSleep: Cell<Loadable<NightOfSleep[]>>;
 
+  /** Smart-scale body-fat readings read from the health platform (MM-502), for the body-fat range. */
+  readonly bodyFatReadings: Cell<Loadable<BodyFatObservation[]>>;
+
   /** The nights the app works from: typed over imported, oldest first (MM-250). */
   readonly sleepNights: Cell<Loadable<SleepNight[]>>;
 
   /** The fourteen-night average (MM-252); undefined before the nights are read, or with none in the window. */
   readonly sleepAverage: Cell<SleepAverage | undefined>;
-  /** The days marked with menstrual flow (MM-20). */
+  /** The days the person marked with menstrual flow (MM-20), and nothing imported. */
+  readonly typedFlowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The menstruation readings read and kept from the health platform (MM-68). Empty when nothing has been imported. */
+  readonly importedFlow: Cell<Loadable<HealthSample[]>>;
+
+  /** The days of flow the trend works from: marked and imported, each once, oldest first (MM-20, MM-68). */
   readonly flowDays: Cell<Loadable<MenstruationDay[]>>;
+
+  /** The newest height read from the health platform (MM-68), offered in Settings, never saved by itself. */
+  readonly importedHeight: Cell<Loadable<HealthSample | undefined>>;
   readonly targetsHistory: Cell<Loadable<TargetsRecord[]>>;
 
   /** How the user shapes their targets, oldest first (MM-122, MM-124). */
   readonly targetShapes: Cell<Loadable<TargetShape[]>>;
+
+  /** The progress photos kept on this phone, oldest first, without their pictures (MM-157). */
+  readonly progressPhotos: Cell<Loadable<ProgressPhoto[]>>;
+
+  /** The choices about progress photos (MM-157). */
+  readonly photoSettings: Cell<Loadable<PhotoSettings>>;
+
+  /** The goal body fat the user set (MM-36, MM-507), or undefined with none. */
+  readonly goalBodyFat: Cell<Loadable<GoalBodyFat | undefined>>;
 
   /** The calorie floor and fat minimum a shaped day keeps to; undefined until the coach has a view. */
   readonly targetShapeLimits: Cell<TargetShapeLimits | undefined>;
@@ -553,11 +598,14 @@ export class AppState {
     });
     this.typedWeights = stream(() => s.weights.watchWeights());
     this.primaryScale = stream(() => s.preferences.watchPrimaryScale());
+    this.weighInWindow = stream(() => s.weighInWindow.watchWeighInWindow());
     this.importedWeighIns = stream(() => {
       // Read here so that an import makes this ask again.
       void this.imports.value;
       // And here so that choosing a scale does.
       const chosen = of(this.primaryScale);
+      // And here so that moving the weigh-in window does (MM-441).
+      const morning = of(this.weighInWindow) ?? WeighInWindow.usual;
       return {
         subscribe: (listener, onError) => {
           let stopped = false;
@@ -565,7 +613,7 @@ export class AppState {
             (samples) => {
               if (stopped) return;
               const primarySourceId = chosen ?? primaryWeightSource(samples, { asOf: s.clock.now() });
-              listener(dailyWeighIns(samples, { primarySourceId }));
+              listener(dailyWeighIns(samples, { primarySourceId, window: morning }));
             },
             (error: unknown) => {
               if (!stopped) onError?.(error);
@@ -600,8 +648,11 @@ export class AppState {
       return withoutPausedDays(intake, pauses, { keepComplete: false });
     });
     this.waist = stream(() => s.waist.watchWaist());
+    this.measurements = stream(() => s.measurements.watchMeasurements());
+    this.measurementSettings = stream(() => s.measurementSettings.watchMeasurementSettings());
     this.typedSleep = stream(() => s.sleep.watchSleepNights());
     this.importedSleep = stream(() => this.importedSamples('sleep', nightlySleep));
+    this.bodyFatReadings = stream(() => this.importedSamples('bodyFat', bodyFatReadingsOf));
     this.sleepNights = derived(() => {
       const typed = this.typedSleep.value;
       const imported = of(this.importedSleep) ?? [];
@@ -614,9 +665,22 @@ export class AppState {
       const nights = of(this.sleepNights);
       return nights === undefined ? undefined : sleepAverageOf({ nights, through: this.today.value });
     });
-    this.flowDays = stream(() => s.flowDays.watchFlowDays());
+    this.typedFlowDays = stream(() => s.flowDays.watchFlowDays());
+    this.importedFlow = stream(() => this.importedSamples('menstruation', (samples) => samples));
+    this.flowDays = derived(() => {
+      const typed = this.typedFlowDays.value;
+      const imported = of(this.importedFlow) ?? [];
+      const today = this.today.value;
+      // A read that went wrong stays wrong here, as for weights.
+      if (!typed.ready) return typed;
+      return Loadable.of(mergeFlowDays({ typed: typed.value, imported, today }));
+    });
+    this.importedHeight = stream(() => this.importedSamples('height', newestReading));
     this.targetsHistory = stream(() => s.targets.watchTargetsHistory());
     this.targetShapes = stream(() => s.targetShapes.watchTargetShapes());
+    this.goalBodyFat = stream(() => s.goalBodyFat.watchGoalBodyFat());
+    this.progressPhotos = stream(() => s.progressPhotos.watchPhotos());
+    this.photoSettings = stream(() => s.progressPhotos.watchPhotoSettings());
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
@@ -644,6 +708,8 @@ export class AppState {
       const flowDays = of(this.flowDays) ?? [];
       // Waist entries join the body-fat formula (MM-34); none until read, as with no entries.
       const waists = of(this.waist) ?? [];
+      // A smart scale's readings join it too (MM-502); none until read.
+      const bodyFatReadings = of(this.bodyFatReadings) ?? [];
       const today = this.today.value;
       if (
         setup === undefined ||
@@ -657,7 +723,7 @@ export class AppState {
       }
       // A shaped week's lower days are read against their plan (MM-124); flat until read.
       const shapes = of(this.targetShapes) ?? [];
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, shapes, today });
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, shapes, bodyFatReadings, today });
     });
 
     this.targetShapeLimits = derived(() => {
@@ -1256,7 +1322,7 @@ export class AppState {
       if (setup === undefined || snapshot === undefined || history === undefined || !snapshot.policy.targetsAllowed) {
         return undefined;
       }
-      // No goal body fat yet: it waits on its table (MM-507), so the plan runs to its default lines.
+      // The goal body fat the user set (MM-507) replaces the cut's default line; none, the plan runs to it.
       // When a lean gain ends is MM-129's to say, so the plan and the lean-gain card agree.
       return planPhases({
         setup,
@@ -1264,6 +1330,7 @@ export class AppState {
         history,
         stall: this.stallAssessment.value,
         leanGainStop: this.leanGainReview.value?.stop,
+        goal: of(this.goalBodyFat),
         today: this.today.value,
       });
     });
@@ -1397,9 +1464,34 @@ export class AppState {
       return false;
     }
     if (changed) this.healthImported();
+    await this.importWorkouts();
     await this.backfillHealth();
     this.refreshHealthConnection();
     return true;
+  }
+
+  /**
+   * Brings the platform's workouts of the last `workoutImportDays` days into
+   * the log (MM-490), as `platformWorkoutImports` says: each once, kept with
+   * its platform id; one this app wrote, or one deleted in the app, is not
+   * brought in. A platform that cannot be read changes nothing.
+   */
+  private async importWorkouts(): Promise<void> {
+    const { healthWorkouts, workouts, clock } = this.services;
+    try {
+      const now = clock.now();
+      const read = await healthWorkouts.readWorkouts({ from: new Date(now.getTime() - workoutImportDays * dayMs), to: now });
+      if (read.length === 0) return;
+      const changes = platformWorkoutImports({
+        platform: read,
+        logged: await currentValueOf(workouts.watchWorkouts()),
+        deleted: await workouts.deletedPlatformIds(),
+        library: this.exercises.value,
+      });
+      for (const workout of changes) await workouts.saveWorkout(workout);
+    } catch {
+      // Not read this time; the next read tries again.
+    }
   }
 
   private backfilling: Promise<void> | undefined;
@@ -1652,6 +1744,7 @@ export class AppState {
           intake,
           weights,
           waist,
+          bodyFatReadings: of(this.bodyFatReadings) ?? [],
           history,
           trend: coach?.trend ?? [],
           workouts,

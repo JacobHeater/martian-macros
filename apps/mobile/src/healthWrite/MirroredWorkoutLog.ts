@@ -39,7 +39,8 @@ function now<T>(watched: Watched<T>): Promise<T> {
  * the same whatever the platform does; writing only happens while writing
  * workouts is on (`writeWorkoutToPlatform`). A workout deleted in the app
  * is removed from the platform, only while writing workouts is on
- * (MM-515).
+ * (MM-515). A workout imported from the platform is never written back
+ * (MM-490).
  */
 export class MirroredWorkoutLog implements WorkoutRepository {
   private readonly log: WorkoutRepository;
@@ -71,8 +72,15 @@ export class MirroredWorkoutLog implements WorkoutRepository {
 
   async saveWorkout(workout: Workout): Promise<number> {
     const id = await this.log.saveWorkout(workout);
-    if (workout.endedAt !== undefined) await this.written(workout.id === id ? workout : workout.copyWith({ id }));
+    // One imported from the platform is another app's there: it is never written back (MM-490).
+    if (workout.endedAt !== undefined && workout.imported === undefined) {
+      await this.written(workout.id === id ? workout : workout.copyWith({ id }));
+    }
     return id;
+  }
+
+  deletedPlatformIds(): Promise<ReadonlySet<string>> {
+    return this.log.deletedPlatformIds();
   }
 
   async deleteWorkout(id: number): Promise<void> {

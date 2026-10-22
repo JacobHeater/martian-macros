@@ -152,7 +152,7 @@ Needs a schema change (not in this ticket's acceptance criteria; the schema lane
   alarms held by Android for 8:00 pm on the next seven days, and all of them gone when it is switched off. Android gives each a
   one-hour window, so a reminder can be up to an hour late. A reminder actually appearing was not seen (it was night, inside the
   quiet period).
-- iOS: reminders there are MM-405's (the plugin over `UNUserNotificationCenter`).
+- iOS: built in MM-405, untried on a phone. The app delegate shows a reminder due while the app is in the foreground.
 - A reminder actually appearing at its time, the recovery check-in's included.
 - A phone restart: Android forgets scheduled notifications; the plugin's boot receiver is declared so they are set again, which has not
   been tested.

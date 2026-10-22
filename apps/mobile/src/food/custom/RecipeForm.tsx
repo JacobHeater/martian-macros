@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import type { RecipeIngredient } from '../../domain/food/custom/RecipeIngredient';
 import { recipePerServing } from '../../domain/food/custom/recipePerServing';
@@ -15,6 +15,7 @@ import { MmMenuButton } from '../../ui/MmMenuButton';
 import type { MmMenuItem } from '../../ui/MmMenuItem';
 import { MmTextField } from '../../ui/MmTextField';
 import { RecipeIngredientAdder } from './RecipeIngredientAdder';
+import { RecipeLineWeight } from './RecipeLineWeight';
 import '../food.css';
 
 interface RecipeFormProps {
@@ -25,10 +26,14 @@ interface RecipeFormProps {
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 
-type LineAction = 'up' | 'down' | 'remove';
+type LineAction = 'weight' | 'up' | 'down' | 'remove';
 
-/** What can be done to the line at `at` of `count`: move it, where there is room, or remove it (MM-45). */
-const lineActions = (at: number, count: number): MmMenuItem<LineAction>[] => [
+/**
+ * What can be done to the line at `at` of `count`: change its weight, when it was found in a pack (MM-456);
+ * move it, where there is room; or remove it (MM-45).
+ */
+const lineActions = (line: RecipeIngredient, at: number, count: number): MmMenuItem<LineAction>[] => [
+  ...(line.source !== undefined ? [{ value: 'weight' as const, label: 'Change weight' }] : []),
   ...(at > 0 ? [{ value: 'up' as const, label: 'Move up' }] : []),
   ...(at < count - 1 ? [{ value: 'down' as const, label: 'Move down' }] : []),
   { value: 'remove', label: 'Remove' },
@@ -38,7 +43,9 @@ const lineActions = (at: number, count: number): MmMenuItem<LineAction>[] => [
  * Define a recipe: its ingredients, how many servings it makes, and
  * optionally the cooked weight of the whole pot (MM-45). One serving is the
  * summed ingredients divided by the servings. Ingredients are kept in the
- * order they are put in, and each line's menu moves or removes it.
+ * order they are put in, and each line's menu moves or removes it. A line
+ * found in a pack can have its weight changed in place (MM-456); its stored
+ * totals are the record until then, whatever the pack later says.
  */
 export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
   const { services } = useApp();
@@ -54,8 +61,16 @@ export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
   const per = servingCount === undefined ? undefined : recipePerServing(ingredients, servingCount);
   const valid = name.trim() !== '' && ingredients.length > 0 && (per?.kcal ?? 0) > 0;
 
+  const [reweighing, setReweighing] = useState<number>();
+  const reweighed = (at: number, line?: RecipeIngredient) => {
+    if (line !== undefined) setIngredients(ingredients.map((old, i) => (i === at ? line : old)));
+    setReweighing(undefined);
+  };
+
   const act = (at: number, action: LineAction) => {
-    if (action === 'remove') setIngredients(ingredients.filter((_, i) => i !== at));
+    setReweighing(undefined);
+    if (action === 'weight') setReweighing(at);
+    else if (action === 'remove') setIngredients(ingredients.filter((_, i) => i !== at));
     else setIngredients(moved(ingredients, at, action === 'up' ? at - 1 : at + 1));
   };
 
@@ -92,22 +107,24 @@ export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
       </p>
       <div className="app-gap-small" />
       {ingredients.map((ingredient, i) => (
-        <MmListRow
-          key={`${i}-${ingredient.name}`}
-          title={ingredient.name}
-          subtitle={
-            `${ingredient.grams === undefined ? '' : `${quantityText(ingredient.grams)} g · `}` +
-            Fmt.kcal(ingredient.totals.kcal)
-          }
-          trailingAction={
-            <MmMenuButton<LineAction>
-              icon="more"
-              label={`More actions for ${ingredient.name}`}
-              items={lineActions(i, ingredients.length)}
-              onSelect={(action) => act(i, action)}
-            />
-          }
-        />
+        <Fragment key={`${i}-${ingredient.name}`}>
+          <MmListRow
+            title={ingredient.name}
+            subtitle={
+              `${ingredient.grams === undefined ? '' : `${quantityText(ingredient.grams)} g · `}` +
+              Fmt.kcal(ingredient.totals.kcal)
+            }
+            trailingAction={
+              <MmMenuButton<LineAction>
+                icon="more"
+                label={`More actions for ${ingredient.name}`}
+                items={lineActions(ingredient, i, ingredients.length)}
+                onSelect={(action) => act(i, action)}
+              />
+            }
+          />
+          {reweighing === i ? <RecipeLineWeight line={ingredient} onDone={(line) => reweighed(i, line)} /> : null}
+        </Fragment>
       ))}
       <RecipeIngredientAdder onAdd={(line) => setIngredients([...ingredients, line])} />
       <p className="app-subhead food-totals">

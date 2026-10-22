@@ -10,6 +10,9 @@ export interface EstimatedBodyFat {
   readonly estimate: BodyFatEstimate;
   readonly basis: BodyFatBasis;
 
-  /** How many waist entries went into it; 0 unless `basis` is `waist`. */
+  /** How many waist entries went into it; 0 unless the waist joined. */
   readonly waistEntries: number;
+
+  /** How many days of smart-scale readings went into it (MM-502); none unless `basis` is `scale`. */
+  readonly scaleDays?: number | undefined;
 }

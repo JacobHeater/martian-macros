@@ -25,4 +25,48 @@ export const BodyFatRule = {
    * treated as independent.
    */
   formulaErrorCorrelation: 0.5,
+
+  /**
+   * A smart scale's readings join the range only once its own span reaches
+   * this many days (MM-502): a week of readings shows the range without
+   * them, never a number from the scale.
+   */
+  scaleSettleDays: 14,
+
+  /**
+   * A further scale's offset from the ones before it is learned from its
+   * first this many days against their readings, and it joins after them,
+   * so a new scale that reads higher is not read as a change in the body.
+   */
+  scaleOffsetDays: 7,
+
+  /**
+   * The scale readings that count are those of this many days up to the
+   * week's update day: the range moves once a week, as the waist's does.
+   */
+  scaleWindowDays: 14,
+
+  /** How many days with a reading the window needs before the scale counts at all. */
+  minScaleDays: 4,
+
+  /**
+   * The fixed error, one standard deviation in percentage points, left in
+   * a scale's level however many readings are averaged: filtering removes
+   * scatter, not a scale's bias against a body scan.
+   */
+  scaleBiasSigmaPercent: 2,
+
+  /**
+   * The least day-to-day scatter, one standard deviation in points, a
+   * scale's readings are taken to have, however steady they look: body
+   * water moves a reading even when the body does not.
+   */
+  scaleScatterFloorPercent: 1,
+
+  /**
+   * How far a scale's error goes together with the formulas' (from outside
+   * measurements). A scale reads current through the body, not its shape,
+   * so they are taken as independent.
+   */
+  scaleErrorCorrelation: 0,
 } as const;
