@@ -1,5 +1,6 @@
 import { onlineSourceName } from '../format/onlineSourceName';
 import { onlineSourceNames } from '../format/onlineSourceNames';
+import { fnddsCitation, usdaFdcCitation } from '../foodPipeline/packTerms';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { GroupHeader } from '../ui/GroupHeader';
@@ -36,15 +37,16 @@ export function FoodSourcesScreen() {
         <MmListRow
           leadingIcon="document"
           title="Open Food Facts"
-          subtitle="Database: Open Database License 1.0 · contents: Database Contents License 1.0 · openfoodfacts.org"
+          subtitle="Database: Open Database License 1.0 (opendatacommons.org/licenses/odbl/1-0/) · contents: Database Contents License 1.0 (opendatacommons.org/licenses/dbcl/1-0/) · openfoodfacts.org"
         />
       </MmListGroup>
       <p className="app-text app-muted">
         FoodData Central is the US Department of Agriculture’s database: its Foundation Foods, SR Legacy, FNDDS survey
-        foods and Branded Foods. USDA asks only to be named as the source. Open Food Facts is a collaborative database
-        of packaged foods; its records are under the Database Contents License, and its product images are not used.
-        The databases the app downloads are built from these sources and published under the Open Database License,
-        with their attribution, at github.com/JacobHeater/martian-macros-food-data.
+        foods and Branded Foods. USDA asks to be named as the source and, where possible, told of products that use its
+        data. Open Food Facts is a collaborative database of packaged foods; its records are under the Database Contents
+        License, and its product images are not used. The food databases the app carries and downloads are built from
+        these sources and published under the Open Database License, with their attribution, at
+        github.com/JacobHeater/martian-macros-food-data.
       </p>
       <GroupHeader text="Online lookup" />
       {sources.length === 0 ? (
@@ -73,11 +75,11 @@ export function FoodSourcesScreen() {
       )}
       <GroupHeader text="Attribution" />
       <p className="app-text app-muted">
-        Food data from Open Food Facts (openfoodfacts.org), available under the Open Database License, and from USDA
-        FoodData Central (fdc.nal.usda.gov), US Department of Agriculture, Agricultural Research Service, including the
-        USDA Food and Nutrient Database for Dietary Studies 2021-2023. FoodData Central is cited as USDA asks: U.S.
-        Department of Agriculture, Agricultural Research Service. FoodData Central, 2019. fdc.nal.usda.gov. The
-        licensing reading behind this screen has not been reviewed by a lawyer.
+        Food data from Open Food Facts (openfoodfacts.org), available under the Open Database License
+        (opendatacommons.org/licenses/odbl/1-0/), its records under the Database Contents License
+        (opendatacommons.org/licenses/dbcl/1-0/), and from USDA FoodData Central (fdc.nal.usda.gov). FoodData Central is
+        cited as USDA asks: {usdaFdcCitation} Its survey foods are cited as the Agricultural Research Service asks:{' '}
+        {fnddsCitation}. The licensing reading behind this screen has not been reviewed by a lawyer.
       </p>
     </Screen>
   );
