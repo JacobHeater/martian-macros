@@ -1,6 +1,6 @@
 ---
 id: MM-36
-status: in-progress
+status: done
 component: adaptive-coach
 related: [MM-22, MM-25, MM-28, MM-31, MM-33, MM-34, MM-129, MM-130, MM-132, MM-133, MM-135, MM-140, MM-507]
 ---
@@ -93,4 +93,10 @@ Scenario: The next phase
   gain's end taken from MM-129's review, its words saying only what follows, the hold and what follows it, the projections, the goal floors and the time limit, an eating-disorder history,
   the policy), `test/coach/phasePlan.test.tsx` (the Coach rows, the recommendation and taking it, a gain's end said exactly once). Not run locally; CI validates. Not
   seen on a phone.
-- Remaining: setting the goal (MM-507).
+- Setting the goal is MM-507's scope (it needs a table, in the schema lane), not this ticket's: the refusal
+  below the hard floor and the warning below the soft one are built and tested here
+  (`SafetyBounds.goalBodyFatFloorsPercent`, `goalBodyFatCheckText`), and MM-507 puts them on a screen. With that, this ticket's code is complete (2026-10-21).
+
+## Owed on a phone
+- A look at CoachPhaseProjected, CoachPhaseNext and CoachPhaseChooseAnother in the three palettes, and the
+  goal section on a phone.
