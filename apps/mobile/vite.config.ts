@@ -53,11 +53,12 @@ export default defineConfig({
   // The evidence register is one file, docs/evidence.md at the top of the
   // repository, and the app is built with it; nothing else is read from
   // outside this folder.
-  // `mm run --live` (MM-300) builds the Android shell while the server runs;
-  // its outputs, the Storybook build and dist are never sources to reload on.
+  // `mm run --live` (MM-300, MM-557) builds the Android or iOS shell while the
+  // server runs; their outputs, the Storybook build and dist are never sources
+  // to reload on.
   server: {
     fs: { allow: ['.', '../../docs'] },
-    watch: { ignored: ['**/android/**', '**/storybook-static/**', '**/dist/**'] },
+    watch: { ignored: ['**/android/**', '**/ios/**', '**/storybook-static/**', '**/dist/**'] },
   },
   test: {
     // What the stories draw (MM-321, `npm run unseen`): the app's components,
