@@ -36,8 +36,15 @@ it('no HealthKit handler adds to a var it captured: each takes its own copy (the
   expect(profile).toContain('let known = found');
   expect(profile).toContain('var answer = known');
   const changes = swift.slice(swift.indexOf('@objc func changes('), swift.indexOf('// MARK: Writing'));
-  expect(changes).toContain('let gathered = ChangesGathered(anchor: anchor)');
   expect(changes).not.toMatch(/\bvar (upserted|deleted|failure|next)\b/);
   const removeOwn = swift.slice(swift.indexOf('private func removeOwn('));
   expect(removeOwn.slice(0, removeOwn.indexOf('\n    }\n'))).toContain('let failed = FirstFailure()');
+});
+
+it('reads changes in the one kind asked for, never every kind with one anchor (MM-551)', () => {
+  const changes = swift.slice(swift.indexOf('@objc func changes('), swift.indexOf('// MARK: Writing'));
+  expect(changes).toContain('guard let name = call.getString("type")');
+  expect(changes).toContain('HKAnchoredObjectQuery(type: type, predicate: nil, anchor: anchor');
+  expect(changes).not.toContain('for (name, type) in Self.types');
+  expect(swift).not.toContain('ChangesGathered');
 });
