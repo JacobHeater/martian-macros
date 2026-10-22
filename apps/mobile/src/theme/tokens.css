@@ -6,42 +6,42 @@
 :root,
 .theme-martian {
   /*
-   * MM-375: a royal 90s violet, bluer than the old grape (never plum, which reads maroon), with larger steps between
-   * the levels so cards and the navigation bar stand off the canvas; secondary text near-neutral, not lilac.
+   * MM-554: drawn from the brand art (design/brand/splash-art.png, icon-art.png). The levels climb from the night sky
+   * into the mountains' electric purple, with larger steps than MM-375's so cards and the navigation bar stand off the
+   * canvas; the action is the "MARTIAN" lime-yellow, carbs the "MACROS" tangerine, fat the stripes' hot magenta.
    */
-  --canvas: #110c35;
-  --surface: #1d1752;
-  --raised: #282066;
-  --overlay: #342a78;
-  --sunken: #0c082b;
-  --track: #342d6c;
-  --selected: #3f3684;
-  --outline: #4f4890;
-  --outline-strong: #9d9ad9;
+  --canvas: #0e0233;
+  --surface: #1f0b5f;
+  --raised: #2e187b;
+  --overlay: #3e2697;
+  --sunken: #070120;
+  --track: #372182;
+  --selected: #4b31a8;
+  --outline: #5f43b5;
+  --outline-strong: #b49bff;
   --text: #fff8e9;
   --text2: #ddd4cc;
   --text3: #cbc6d6;
-  --ember: #c4ff48;
-  --on-ember: #172500;
-  --ion: #43f5e0;
-  --on-ion: #110c35;
+  --ember: #dff701;
+  --on-ember: #1c2000;
+  --ion: #45e9f2;
+  --on-ion: #0e0233;
   --energy: #fff8e9;
-  --protein: #43f5e0;
-  /* MM-375: the warm voice, a 90s tangerine, and fat out of the neutrals' hue as hot magenta. */
-  --carbs: #ff9a3d;
-  --fat: #e84fae;
-  --positive: #c4ff48;
-  --caution: #ffd166;
-  --info: #85cfff;
-  --water: #4f9dff;
-  --danger: #ff938e;
-  --on-danger: #110c35;
+  --protein: #45e9f2;
+  --carbs: #ff7a1c;
+  --fat: #eb3da5;
+  --positive: #8fe02a;
+  --caution: #ffc23d;
+  --info: #8cc8ff;
+  --water: #4f95ff;
+  --danger: #ff858b;
+  --on-danger: #0e0233;
   /* Food grades (MM-370): one solid fill per letter band, categorical, never red; the letter on it in ink. */
-  --grade-a: #3fd08a;
-  --grade-b: #ffe45e;
-  --grade-c: #a6b4ff;
-  --grade-d: #ff9edb;
-  --on-grade: #110c35;
+  --grade-a: #3fd896;
+  --grade-b: #ffd24a;
+  --grade-c: #b4a6ff;
+  --grade-d: #ff94dc;
+  --on-grade: #0e0233;
   --grade-edge: transparent;
   --radius-group: 12px;
   --radius-nav-indicator: 8px;

@@ -93,8 +93,8 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
     <div className="chart">
       <div className="chart-legend" aria-hidden="true">
         {series.map((item) => (
-          <span key={item.label} className={`chart-${item.kind}`}>
-            {item.dashed === true ? '– –' : '●'} {item.label}
+          <span key={item.label}>
+            <span className={`chart-${item.kind}`}>{item.dashed === true ? '– –' : '●'}</span> {item.label}
           </span>
         ))}
         {stillLogged ? (

@@ -2,7 +2,7 @@
 id: MM-375
 status: done
 component: design-system
-related: [MM-184, MM-102, MM-103, MM-106, MM-108, MM-362, MM-370, MM-237, MM-293]
+related: [MM-184, MM-102, MM-103, MM-106, MM-108, MM-362, MM-370, MM-237, MM-293, MM-554]
 ---
 
 # Story: A warmer Martian, without the purple washout
@@ -104,6 +104,9 @@ never on the same chart. The product designer's way out was to part the two hues
 free one: every colour that holds 4.5:1 as caption text on overlay lies within about 37 ΔE of a role Martian already
 uses, and the farthest are lime-greens beside the action or violets in the canvas's own band, which would bring back the
 washout. Parting them would mean moving protein or another role, which is the owner's call. Say if it reads wrong.
+
+Superseded in its values (2026-10-22): MM-554 re-derives every Martian token from the brand art, at the owner's word;
+the decisions above stand, ion equal to protein included (`STORY.martian-from-the-brand-art.MM-554.md`).
 
 ## Owed on a phone
 - Martian at low screen brightness: cards, the navigation bar and the canvas still told apart (UX-6).
