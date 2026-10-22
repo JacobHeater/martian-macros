@@ -1915,6 +1915,10 @@
   flex: none;
   color: var(--text2);
 }
+/* A caution's section keeps the caution's colour on its mark, folded or open (MM-553). */
+.mm-section-caution .mm-section-icon {
+  color: var(--caution);
+}
 .mm-section-words {
   display: flex;
   flex: 1;

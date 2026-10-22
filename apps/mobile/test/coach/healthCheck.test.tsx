@@ -6,6 +6,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { openTab } from '../support/openTab';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -51,6 +52,7 @@ it('Coach shows insulin and weight-affecting medication cautions', async () => {
   renderApp(repos, today);
 
   await openTab('Coach');
+  await openHeadsUp();
   expect(await screen.findByText(/limits loss to the gentlest pace/)).toBeInTheDocument();
   expect(screen.getByText(/Some medications can change weight or water retention/)).toBeInTheDocument();
 });

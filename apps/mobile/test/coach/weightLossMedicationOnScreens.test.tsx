@@ -6,6 +6,7 @@ import type { TargetFlag } from '../../src/engine/TargetFlag';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
@@ -132,6 +133,7 @@ it('ticked with an eating-disorder history, the prescriber lines come before the
 it('ticked, a pace raised for safety adds the prescriber line, and never a dose', async () => {
   await seed({ screening: ticked, raisedForSafePace: true });
   await openCoach();
+  await openHeadsUp();
   const notice = screen.getByText(/^You were losing weight faster than the app aims for/);
   expect(notice.textContent).toMatch(/Targets went up\. This pace is faster than the app would set, and faster loss can cost more muscle\. It is worth raising with your prescriber\.$/);
   expect(notice.textContent?.toLowerCase()).not.toContain('dose');
@@ -140,6 +142,7 @@ it('ticked, a pace raised for safety adds the prescriber line, and never a dose'
 it('not ticked, the pace message is the usual one', async () => {
   await seed({ raisedForSafePace: true });
   await openCoach();
+  await openHeadsUp();
   expect(screen.getByText(/^You were losing weight faster than the app aims for/).textContent).toMatch(/Targets went up\.$/);
   expect(screen.queryByText(/raising with your prescriber/)).not.toBeInTheDocument();
 });
