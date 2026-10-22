@@ -54,6 +54,13 @@ one when several are connected. The team: `MM_APPLE_TEAM=<id>` in the shell,
 else the project's own `DEVELOPMENT_TEAM` line from step 5, which stays
 uncommitted. `mm build ios --phone` is the signed build alone.
 
+For hot reload while you work, `mm run --ios --phone --live` builds the app
+once to load from the Vite dev server on this Mac's Wi-Fi address, then
+keeps the server running: save a file and the phone reloads (MM-557). The
+phone and the Mac must be on the same Wi-Fi; the first time, allow the app to
+find devices on the local network. While the session is off the app cannot
+load, so run `mm run --ios --phone` afterwards to put the bundled app back.
+
 The first time, iOS refuses to open the app until the developer is trusted
 (Settings, General, VPN & Device Management, your Apple ID, Trust); the
 command says so when the launch is refused after the install. Underneath it
