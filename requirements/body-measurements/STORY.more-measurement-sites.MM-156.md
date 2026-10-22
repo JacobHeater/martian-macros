@@ -1,6 +1,6 @@
 ---
 id: MM-156
-status: proposed
+status: done
 component: body-measurements
 related: [MM-154, MM-14, MM-21, MM-34, MM-61, MM-107, MM-129, MM-133, MM-144, MM-155]
 ---
@@ -82,3 +82,55 @@ Scenario: Waist is unchanged
 - Priority: could-have; neck (and hips for female profiles) become necessary when MM-34 is built.
 - Skinfold calipers were considered. In practiced hands they are good; self-measured they are not, and most sites cannot be reached
   alone. Not offered; a user may record a caliper-derived body-fat figure as their own estimate (MM-82).
+
+## Decisions (built 2026-10-21)
+Choices I made without asking (say if any is wrong):
+- **Waist moved into the generic store** (`body_measurements`, site `waist`); `WaistRepository` stays as an adapter
+  (`WaistFromMeasurements`) so every waist reader is unchanged. The table holds 10 to 300 cm; each site's plausible
+  range is checked where it is typed.
+- **Noise figures per site** (judgement, `MeasurementSite.facts`): waist 1.0 cm (the user's own once known, MM-155),
+  neck 0.5, chest 1.0, hips 1.0, upper arm 0.5, thigh 0.8, calf 0.5; half as much again when an end rests on a single
+  reading. A site's change is the waist's rule (`siteChangeOf` over `waistChangeOf`).
+- **Limb statements look back twelve weeks** and are two facts: "Upper arm (left) up 1.0 cm in 12 weeks while waist
+  held." In a lean gain, the pair is said as "consistent with" (`leanGainPairOf`), never as tissue.
+- **The tape body-fat sites** (neck, and hips for a female profile) are named on the sites screen; the one-time
+  suggestion is by goal and sex only, since nothing says who wants a tape estimate (`suggestedSites`' `tapeBodyFat`
+  is there for MM-501 to use).
+- **The side is asked once**, when the first limb is added (from the suggestion or the sites screen), with the
+  two-answer question (`overlays.choice`).
+- Siblings (rule 9): the "More measurements" section is built as the Waist section beside it (`WaistEntryCard`,
+  folded to its line); the session's entry per site is the waist's three fields and its drawing
+  (`MeasurementSiteFigure`, in `WaistProtocolFigure`'s strokes); the sites screen is a list of `MmSwitchRow`s as
+  Nutrition goals' switches are; a site's history screen draws `WaistChart` with the site's noise, as Progress draws
+  the waist's.
+
+## Progress
+Built 2026-10-21. Not run locally; CI validates.
+- Domain: `MeasurementSite` (sites, instructions, ranges, noise, limbs), `SiteObservation`, `LimbSide`,
+  `MeasurementSettings`; `MeasurementReader`/`MeasurementWriter`/`MeasurementRepository` and
+  `MeasurementSettingsRepository`; `WaistFromMeasurements`.
+- Data: `SqlMeasurementRepository` (`body_measurements`), `SqlMeasurementSettingsRepository`
+  (`measurement_settings`); in-memory fixtures; both in `SqlRepositories`, `InMemoryRepositories` (and its eraser),
+  `AppServices`, `openAppServices` and the gallery's services; `state.measurements`, `state.measurementSettings`.
+  The schema change (the two tables, waist rows copied over, `waist_entries` dropped) is added with the migration.
+- Engine: `siteChangeOf`, `suggestedSites`, `limbFactsOf`, `leanGainPairOf`. Format: `siteLabel`, `siteAmount`,
+  `siteSummary`, `siteListText`, `limbFactText`, `leanGainPairText`.
+- Screens: Progress' "More measurements" section (`MeasurementsCard`) with the suggestion once, each site's line and
+  chart (`SiteHistoryScreen`), the limb facts and the lean-gain pair; `MeasurementSessionScreen` (every site in the
+  fixed order, waist first, the middle of three kept, a site left empty skipped, an implausible value refusing the
+  save); `MeasurementSitesScreen`. `WaistChart` takes another site's noise.
+- Guarding tests: `measurementRepositoryContract` and `measurementSettingsRepositoryContract` (in memory and SQL);
+  `dataEraserContract` (no measurement or site left); `test/data/restore.test.ts`;
+  `test/engine/measurementSites.test.ts` (the suggestions by goal and sex, none with an eating-disorder history; a
+  site's own noise; Limits of a tape; the lean-gain pair); `test/progress/measurementSites.test.tsx` (Adding a site,
+  A session, Suggested once, Sex-specific suggestion, Eating-disorder history, Limits of a tape); the upgrade test for
+  "Waist is unchanged" is with the migration.
+- Stories: `ProgressMeasurementsSuggested`, `ProgressMeasurementsWaistOnly`, `ProgressMeasurementsLimbs`,
+  `MeasurementSessionFirst`, `MeasurementSessionSites`, `MeasurementSites`, `MeasurementSitesChosen`, `SiteHistory`,
+  `SiteHistoryEmpty`.
+
+## Owed on a phone
+- The upgrade on the owner's phone brings every waist entry into the new store with its date, value and readings,
+  and the Waist section and chart show them as before.
+- A measuring session of three sites saves each and survives a restart.
+
