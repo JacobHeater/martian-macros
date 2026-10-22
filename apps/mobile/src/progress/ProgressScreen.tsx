@@ -17,6 +17,7 @@ import { MmSurface } from '../ui/MmSurface';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSpinner } from '../ui/MmSpinner';
 import { NumberEntry } from '../ui/NumberEntry';
+import { MeasurementsCard } from './MeasurementsCard';
 import { RecompSignalCard } from './RecompSignalCard';
 import { SleepNightCard } from './SleepNightCard';
 import { StrengthSection } from './StrengthSection';
@@ -224,6 +225,7 @@ export function ProgressScreen() {
           onSave={saveWaist}
         />
       </div>
+      <MeasurementsCard fmt={fmt} />
       <RecompSignalCard fmt={fmt} />
       <StrengthSection />
       <ProgressPhotosCard />
