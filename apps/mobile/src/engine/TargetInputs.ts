@@ -30,6 +30,7 @@ interface TargetInputsInit {
   correctionRateFraction?: number | undefined;
   easeFromKcal?: number | undefined;
   trainingLapsed?: boolean;
+  stepLimited?: boolean;
 }
 
 export class TargetInputs {
@@ -109,6 +110,13 @@ export class TargetInputs {
    */
   readonly trainingLapsed: boolean;
 
+  /**
+   * Whether a change from `previous` keeps the weekly step limit. Off only
+   * when the person recalculates (MM-559); a safety raise and the hold
+   * after one still apply.
+   */
+  readonly stepLimited: boolean;
+
   constructor(init: TargetInputsInit) {
     this.sex = init.sex;
     this.heightCm = init.heightCm;
@@ -132,5 +140,6 @@ export class TargetInputs {
     this.trainingLapsed = init.trainingLapsed ?? false;
     this.breakRequested = init.breakRequested ?? false;
     this.continuingBreak = init.continuingBreak;
+    this.stepLimited = init.stepLimited ?? true;
   }
 }

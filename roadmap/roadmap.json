@@ -749,7 +749,8 @@
             "MM-124",
             "MM-129",
             "MM-480",
-            "MM-533"
+            "MM-533",
+            "MM-559"
           ]
         },
         {
@@ -2154,6 +2155,7 @@
           "MM-123",
           "MM-124",
           "MM-128",
+          "MM-559",
           "MM-130",
           "MM-129",
           "MM-480",
@@ -2233,6 +2235,14 @@
             "MM-129",
             "MM-480",
             "MM-533"
+          ],
+          "milestone": "M4"
+        },
+        {
+          "step": 9,
+          "title": "Check in now, from the latest weigh-in",
+          "tickets": [
+            "MM-559"
           ],
           "milestone": "M4"
         }

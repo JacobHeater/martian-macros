@@ -149,6 +149,8 @@ export * from './ProgressionSuggestion';
 export * from './ProteinRange';
 export * from './ProteinSpreadRule';
 export * from './ProteinTargets';
+export * from './RecalculationWithheldReason';
+export * from './recalculationWithheld';
 export * from './recentExerciseIds';
 export * from './recommendMode';
 export * from './RecompMeasure';

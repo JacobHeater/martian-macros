@@ -110,6 +110,9 @@ register, and the paywall gates features built here.
    pace to choose, stored in schema 17, offered on the lean-gain card and the
    targets section. MM-533, found while building it: a held reduction lost
    its pace.
+9. **Check in now (MM-559).** M4. A check-in the person starts from the
+   Coach, from the latest weigh-in, without the weekly step limit; off with
+   an info notice without a weigh-in in the last week. Built 2026-10-22.
 
 ## Done enough to unblock others
 MM-121 is done: target records carry a protein minimum and goal-specific
@@ -136,6 +139,8 @@ beside anything.
   screen's lean-gain card).
 - Built (2026-10-21): MM-480 (a slower lean-gain pace, schema 17) and MM-533
   (a held reduction kept its pace).
+- Built (2026-10-22): MM-559 (check in now: targets from the latest weigh-in,
+  without the weekly step limit, off without a weigh-in in the last week).
 - Built (2026-10-13): MM-138 (the explained check-in; the owner confirmed holding a reduction as built). WS-06's M1 steps are complete.
 - Built (2026-10-21): MM-486 (the table for MM-122's and MM-124's settings,
   schema 16, after MM-71's version 15).
