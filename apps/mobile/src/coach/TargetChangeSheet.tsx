@@ -47,6 +47,8 @@ function change(label: string, before: number | undefined, after: number, unit: 
  */
 export function TargetChangeSheet({ current, previous, onHold }: TargetChangeSheetProps) {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   // The week the check-in read, as five facts beside its reasons (MM-149): the person and the coach look at one account.
   const week = useCell(state.adherenceSummary);
   const floor = useCell(state.coach)?.calorieFloorKcal;
@@ -77,7 +79,7 @@ export function TargetChangeSheet({ current, previous, onHold }: TargetChangeShe
       <div className="app-gap-small" />
       <SectionLabel text="What changed" />
       <p className="app-text">{changes.join('. ')}</p>
-      {leftDeficit ? <p className="app-text">{reboundText(new Fmt(units))}</p> : null}
+      {leftDeficit ? <p className="app-text">{reboundText(new Fmt(units, { weightDisplay }))}</p> : null}
       {week === undefined || floor === undefined ? null : (
         <>
           <div className="app-gap-small" />

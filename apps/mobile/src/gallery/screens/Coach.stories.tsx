@@ -38,6 +38,7 @@ import { showTargetChangeSheet } from '../../coach/showTargetChangeSheet';
 import { TargetsHistoryScreen } from '../../coach/TargetsHistoryScreen';
 import { checkInDueScenario } from './checkInDueScenario';
 import { screensMeta } from './screensMeta';
+import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
@@ -991,4 +992,14 @@ export const CoachGoalBodyFatSet = screenStory({
   scenario: demoWith({ then: async (repos, today) => repos.goalBodyFat.saveGoalBodyFat({ percent: 13, setOn: today.addDays(-10) }) }),
   open: onCoach,
   walk: goalBodyFat(),
+});
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: Hidden: the Body section says the trend's pace in words in place of the trend weight. */
+export const CoachWeightHidden = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Against your plan’s pace',
+  scenario: weightDisplayScenario('hidden'),
+  open: ({ state }) => state.homeTab.put('coach'),
 });

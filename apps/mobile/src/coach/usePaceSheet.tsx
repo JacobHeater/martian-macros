@@ -14,13 +14,15 @@ import { PaceSheet } from './PaceSheet';
  */
 export function usePaceSheet(): (() => Promise<void>) | undefined {
   const { services, state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const overlays = useOverlays();
   const setup = useLoaded(state.setup);
   const options = useCell(state.paceOptions);
   const snapshot = useCell(state.coach);
   const today = useCell(state.today);
   if (setup === undefined || options === undefined || snapshot === undefined) return undefined;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   return async () => {
     const chosen = await overlays.sheet<FatLossPace>('Choose a pace', (close) => (
       <PaceSheet

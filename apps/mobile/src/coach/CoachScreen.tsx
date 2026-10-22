@@ -74,14 +74,15 @@ import { TrainingLapseNotice } from './TrainingLapseNotice';
 import { UnderEatingNotice } from './UnderEatingNotice';
 import { WhatToExpectScreen } from './WhatToExpectScreen';
 import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
+import { usePaceInWords } from './usePaceInWords';
 import { usePaceSheet } from './usePaceSheet';
 import './coach.css';
 
 const more = (count: number, what: string) => `${count} more ${what}${count === 1 ? '' : 's'}`;
 
-/** The pace in weight, worded as approximate until the coach is sure. */
+/** The pace in weight, worded as approximate until the coach is sure; none with the weight hidden (MM-118). */
 function paceDetail(snapshot: CoachSnapshot, rate: number, fmt: Fmt): string | undefined {
-  if (rate === 0) return undefined;
+  if (rate === 0 || fmt.weightHidden) return undefined;
   const change = `${fmt.weightDelta(rate * snapshot.trendWeightKg)} a week`;
   return snapshot.confidence.level === 'good' ? change : `About ${change} so far`;
 }
@@ -115,6 +116,9 @@ function holdNote(setup: UserSetup, snapshot: CoachSnapshot, today: CalendarDate
  */
 export function CoachScreen() {
   const { services, state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
+  const paceInWords = usePaceInWords();
   const navigator = useNavigator();
   const overlays = useOverlays();
   const openPaceSheet = usePaceSheet();
@@ -145,7 +149,7 @@ export function CoachScreen() {
     }
     if (Loadable.valueOf(weights)?.length !== 0) return <ScreenLoading />;
     // Nothing to coach from yet: the weigh-in it asks for, in the row the Dashboard asks with (MM-340).
-    const fmt = new Fmt(setup.unitSystem);
+    const fmt = new Fmt(setup.unitSystem, { weightDisplay });
     return (
       <MmListGroup>
         <WeighInRow
@@ -154,7 +158,7 @@ export function CoachScreen() {
           note="The coach starts from your first weigh-in."
           onSaveWeight={async (kg) => {
             await services.weights.saveWeight(today, kg);
-            overlays.snack(`Saved ${fmt.weight(kg)} for today`, {
+            overlays.snack(fmt.readingsShown ? `Saved ${fmt.weight(kg)} for today` : 'Saved', {
               label: 'Open Progress',
               onAction: () => state.homeTab.put('progress'),
             });
@@ -163,7 +167,7 @@ export function CoachScreen() {
       </MmListGroup>
     );
   }
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
 
   // Someone who does not train yet sees what a gain or recomp rests on (MM-134).
   const notTraining = trainsNotYet(setup);
@@ -394,7 +398,12 @@ export function CoachScreen() {
         </MmDisclosure>
       </MmSection>
       <MmSection icon="body" title="Body">
-        <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
+        {/* With the weight hidden, the pace in words in place of the figure (MM-118). */}
+        {fmt.weightHidden ? (
+          paceInWords === undefined ? null : <StatRow label="Your trend" value={paceInWords} detail="Against your plan’s pace" />
+        ) : (
+          <StatRow label="Trend weight" value={fmt.weight(snapshot.trendWeightKg)} />
+        )}
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
         <StatRow label="Resting energy (BMR)" value={Fmt.kcal(snapshot.bmrKcal)} />

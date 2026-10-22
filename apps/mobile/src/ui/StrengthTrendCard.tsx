@@ -21,7 +21,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
   const latest = points[points.length - 1];
   const changeLabel = (weeks: number) => {
     const change = trend.changeOverDays(weeks * 7);
-    return `${weeks} weeks: ${change === undefined ? 'Not enough history' : fmt.weightDelta(change)}`;
+    return `${weeks} weeks: ${change === undefined ? 'Not enough history' : fmt.loadDelta(change)}`;
   };
   const sinceFirst = first === undefined ? 0 : first.date.daysUntil(today);
   return (
@@ -37,7 +37,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
         </p>
       ) : (
         <>
-          <p className="mm-card-figure">{fmt.weight(latest.trendKg)}</p>
+          <p className="mm-card-figure">{fmt.load(latest.trendKg)}</p>
           <p className="mm-card-caption">Smoothed e1RM · {Fmt.longDate(latest.date)}</p>
           <p className="mm-card-facts">
             {[4, 12].map((weeks) => (

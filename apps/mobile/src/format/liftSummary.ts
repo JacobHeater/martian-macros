@@ -14,7 +14,7 @@ export function liftSummary(trend: StrengthTrend, fmt: Fmt): string {
   }
   const latest = trend.points[trend.points.length - 1];
   if (latest === undefined) return 'No usable estimate yet';
-  const max = `Est. max ${fmt.weight(latest.trendKg)}${trend.exercise.load === 'bodyweight' ? ' with body weight' : ''}`;
+  const max = `Est. max ${fmt.load(latest.trendKg)}${trend.exercise.load === 'bodyweight' ? ' with body weight' : ''}`;
   const change = trend.changeOverDays(28);
-  return `${max} · ${change === undefined ? '4-week change not ready yet' : `${fmt.weightDelta(change)} in 4 weeks`}`;
+  return `${max} · ${change === undefined ? '4-week change not ready yet' : `${fmt.loadDelta(change)} in 4 weeks`}`;
 }
