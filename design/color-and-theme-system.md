@@ -22,26 +22,29 @@ Martian keeps the same semantic roles and accessibility thresholds:
 
 | Roles | Martian values |
 |---|---|
-| canvas / surface / raised / overlay | `#0E0233` / `#1F0B5F` / `#2E187B` / `#3E2697` |
-| sunken / track / selected | `#070120` / `#372182` / `#4B31A8` |
-| outline / outlineStrong | `#5F43B5` / `#B49BFF` |
+| canvas / surface / raised / overlay | `#0A081B` / `#16122E` / `#211B3F` / `#2C2550` |
+| sunken / track / selected | `#050410` / `#2E2752` / `#3A3166` |
+| chosen / on-chosen | `#C4F24F` / `#0A081B` |
+| outline / outlineStrong | `#3F3670` / `#A99BE6` |
 | text / text2 / text3 | `#FFF8E9` / `#DDD4CC` / `#CBC6D6` |
 | action / on-action | `#DFF701` / `#1C2000` |
-| measurement / on-measurement | `#45E9F2` / `#0E0233` |
+| measurement / on-measurement | `#45E9F2` / `#0A081B` |
 | protein / carbs / fat | `#45E9F2` / `#FF7A1C` / `#EB3DA5` |
 | positive / caution / info | `#8FE02A` / `#FFC23D` / `#8CC8FF` |
 | water | `#4F95FF` |
-| danger / on-danger | `#FF858B` / `#0E0233` |
+| danger / on-danger | `#FF858B` / `#0A081B` |
 
 **From the brand art (MM-554, the owner 2026-10-22).** "The icon set and splash screen now will drive the tokens for
 martian color scheme." The art is recorded in [brand/splash-art.png](brand/splash-art.png) and
 [brand/icon-art.png](brand/icon-art.png), and every Martian token above is drawn from it
 (`requirements/design-system/STORY.martian-from-the-brand-art.MM-554.md` has the measured art colours and the old and new
 values side by side):
-- **The levels climb from the night sky into the mountains' purple**: the canvas is the sky (`#0E0233`, CIE hue 303°),
-  and surface, raised and overlay step towards the mountains' electric violet at L* 3.4 / 11.7 / 18.6 / 25.7, larger steps
-  than MM-375's (5.8 / 12.5 / 17.7 / 22.8), at chroma 57-71, more saturated than MM-375's but well under the art's 65-89,
-  so text stays calm on them.
+- **The levels sit on the near-black behind the lettering (MM-555, the owner 2026-10-22).** The canvas is `#0A081B`,
+  and surface, raised and overlay step up from it in the same hue at L* 2.9 / 7.2 / 12.4 / 17.6, at low chroma, so no
+  level reads purple and the brights carry the colour. (MM-554 had climbed from the sky's indigo into the mountains'
+  purple; the owner: "i want that to be the base bg color and the brights to be the accents, button bg colors".)
+- **The brights are the fills.** A chosen segment and the current tab's plate are lit in the stripes' lime (`chosen`,
+  `#C4F24F`) with the canvas as ink (`on-chosen`); in Dark and Light `chosen` is their `selected`.
 - **The action is the "MARTIAN" lettering's lime-yellow** (`#DFF701`, the art's own value). Positive, which was the
   action colour, takes the art's lime stripe (`#8FE02A`), so success no longer looks like a button.
 - **Carbs are the "MACROS" tangerine** (`#FF7A1C`) and **fat the stripes' and rims' hot magenta** (`#EB3DA5`, the art's
@@ -55,11 +58,11 @@ values side by side):
 - **Positive is an icon or text colour only, never a filled control**: under protanopia it is 12 ΔE from the action, so
   a positive fill could pass for a button.
 
-Computed (WCAG, on canvas / surface / raised / overlay): text 18.5 / 15.6 / 13.0 / 10.3, text2 13.4 / 11.3 / 9.4 / 7.4,
-text3 11.7 / 9.9 / 8.2 / 6.5; ion 13.2 / 11.2 / 9.3 / 7.4; outlineStrong 8.4 / 7.1 / 5.9 / 4.7; the action as text 16.2 /
-13.7 / 11.4 / 9.0; danger 8.4 / 7.1 / 5.9 / 4.7; caution 12.1 / 10.3 / 8.5 / 6.8; info 11.0 / 9.3 / 7.7 / 6.1; positive
-12.0 / 10.1 / 8.4 / 6.7; carbs 7.5 / 6.3 / 5.3 / 4.2 and fat 5.3 / 4.5 / 3.7 / 3.0 (graphics). On-action 13.9,
-on-measurement 13.2, on-danger 8.4. Bars on the track: protein 8.3, carbs 4.7, fat 3.4, water 4.2. Macro L*: protein 85.0,
+Computed (WCAG, on canvas / surface / raised / overlay; MM-555): text 18.7 / 17.1 / 15.4 / 13.3, text2 13.5 / 12.4 / 11.1 / 9.7,
+text3 11.8 / 10.9 / 9.7 / 8.5; ion 13.3 / 12.2 / 11.0 / 9.5; outlineStrong 8.0 / 7.3 / 6.6 / 5.7; the action as text 16.4 / 15.0 / 13.5 / 11.7;
+danger 8.4 / 7.7 / 6.9 / 6.0; caution 12.3 / 11.2 / 10.1 / 8.8; info 11.1 / 10.2 / 9.1 / 7.9; positive 12.1 / 11.1 / 9.9 / 8.6; carbs 7.6 / 6.9 / 6.2 / 5.4
+and fat 5.4 / 5.0 / 4.4 / 3.9 (graphics). On-action 13.9, on-measurement 13.3, on-danger 8.4, on-chosen 15.2. Bars on the track:
+protein 9.3, carbs 5.3, fat 3.8, water 4.6. Macro L*: protein 85.0,
 carbs 66.0, fat 55.8 (gaps 19.0, 29.2, 10.2). Colour-blind ΔE (Machado 2009, normal / protan / deutan / tritan):
 protein-carbs 121 / 80 / 91 / 120, protein-fat 115 / 46 / 25 / 130, carbs-fat 90 / 96 / 80 / 16; carbs and fat under
 tritan rest on the 10.2 L* gap and the labels, as before. The MM-375 figures below

@@ -877,6 +877,7 @@
           "tickets": [
             "MM-375",
             "MM-554",
+            "MM-555",
             "MM-376",
             "MM-389",
             "MM-390",
@@ -1549,6 +1550,7 @@
           "MM-109",
           "MM-375",
           "MM-554",
+          "MM-555",
           "MM-176",
           "MM-179",
           "MM-183"
@@ -1790,10 +1792,11 @@
         },
         {
           "step": 17,
-          "title": "A warmer Martian without the purple washout (MM-375): 90s research, revised tokens, every screen redrawn, the UX guard; Martian drawn from the brand art (MM-554)",
+          "title": "A warmer Martian without the purple washout (MM-375): 90s research, revised tokens, every screen redrawn, the UX guard; Martian drawn from the brand art (MM-554), on its near-black (MM-555)",
           "tickets": [
             "MM-375",
             "MM-554",
+            "MM-555",
             "MM-376"
           ],
           "milestone": "M4"
