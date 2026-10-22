@@ -142,6 +142,26 @@ describe('the field border', () => {
       }
     });
 
+    // MM-556: a screen's title is drawn from title-from into title-to on the canvas, so both ends are readable there;
+    // a section's mark and the navigation bar's line are graphics (3:1), and Dark and Light show no line or glow.
+    it(`gives the title, the section mark and the bar's line their contrast in ${palette}`, () => {
+      const tokens = cssBlock(`.theme-${palette}`);
+      for (const end of ['title-from', 'title-to']) {
+        expect(ratio(tokens.get(end)!, tokens.get('canvas')!), `${palette} ${end} on canvas`).toBeGreaterThanOrEqual(4.5);
+      }
+      for (const level of ['canvas', 'surface', 'raised']) {
+        expect(ratio(tokens.get('mark')!, tokens.get(level)!), `${palette} mark on ${level}`).toBeGreaterThanOrEqual(3);
+      }
+      if (palette === 'martian') {
+        expect(ratio(tokens.get('accent-line')!, tokens.get('raised')!), 'martian line on raised').toBeGreaterThanOrEqual(3);
+      } else {
+        expect(tokens.get('accent-line')).toBe('transparent');
+        expect(tokens.get('glow')).toBe('transparent');
+        expect(tokens.get('title-from')).toBe(tokens.get('text'));
+        expect(tokens.get('title-to')).toBe(tokens.get('text'));
+      }
+    });
+
     // MM-370: the letter carries a grade's meaning, so it holds 4.5:1 on its band's fill.
     it(`gives every grade letter 4.5:1 on its fill in ${palette}`, () => {
       const tokens = cssBlock(`.theme-${palette}`);
