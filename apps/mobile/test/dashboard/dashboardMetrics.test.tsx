@@ -62,6 +62,8 @@ it('the range control changes the chart and the recorded-day window', async () =
   await openDashboardHistory();
   expect(await screen.findByText('30 of 30 days with food logged')).toBeInTheDocument();
   expect(screen.getByText('2,300 kcal a day on average, over 30 days')).toBeInTheDocument();
+  // MM-176: every average says how many recorded days it uses.
+  expect(screen.getByText('170 g a day on average, over 30 days')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '7 days' }));
   expect(await screen.findByText('7 of 7 days with food logged')).toBeInTheDocument();
   expect(screen.getAllByText('7 of 7')).toHaveLength(2);
@@ -143,6 +145,7 @@ it('MM-335: today, still being logged, is an open dot apart from the line, not a
   expect((await screen.findAllByText(/^○ Today so far/)).length).toBeGreaterThan(0);
   expect(document.querySelectorAll('.chart-energy .chart-dot-unfinished')).toHaveLength(1);
   expect(screen.getByText('2,300 kcal a day on average, over 29 days')).toBeInTheDocument();
+  expect(screen.getByText('170 g a day on average, over 29 days')).toBeInTheDocument();
 });
 
 it('MM-335: today alone, still being logged, is said as today so far, not as nothing', async () => {

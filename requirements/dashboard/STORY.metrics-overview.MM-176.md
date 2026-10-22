@@ -1,6 +1,6 @@
 ---
 id: MM-176
-status: in-progress
+status: done
 component: dashboard
 related: [MM-98, MM-149, MM-139, MM-116]
 ---
@@ -61,3 +61,20 @@ both themes. The integrated workspace passed `mm check` with exit 0 and
 "All checks passed." Populated summary, nutrition, measurements and coaching
 sections were inspected on the Android emulator using MM-177 synthetic data.
 Linux screenshot regeneration and PR checks remain delivery gates.
+
+Since MM-254 the history sits one tap under the Dashboard's hero, as sections
+of the Dashboard's own hierarchy (MM-335), each opening its home tab.
+
+### Closed (2026-10-21)
+- Gap found against "averages say how many recorded days they use": the
+  protein average gave no day count. It now reads "170 g a day on average,
+  over 30 days", counted from the recorded days it uses
+  (`DashboardHistory.proteinDays`); `dashboardMetrics.test.tsx` checks both
+  ranges and the unfinished-today case.
+- Every other criterion is built and tested in
+  `apps/mobile/test/dashboard/dashboardMetrics.test.tsx` (sections, 7/30-day
+  range, empty, loading, error, pauses) and drawn in `Today.stories.tsx`.
+- Not run locally; CI validates.
+
+### Owed on a phone
+- Chart labels at a narrow phone width in both themes, read on a device.
