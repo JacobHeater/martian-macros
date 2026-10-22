@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { failing } from '../support/failing';
@@ -61,9 +62,13 @@ it('the range control changes the chart and the recorded-day window', async () =
   renderApp(repos, today);
   await openDashboardHistory();
   expect(await screen.findByText('30 of 30 days with food logged')).toBeInTheDocument();
-  expect(screen.getByText('2,300 kcal a day on average, over 30 days')).toBeInTheDocument();
+  expect(screen.getByText('2,300 kcal a day on average, across 30 logged days')).toBeInTheDocument();
+  // MM-176: every average says how many logged days it uses.
+  expect(screen.getByText('170 g a day on average, across 30 logged days')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '7 days' }));
   expect(await screen.findByText('7 of 7 days with food logged')).toBeInTheDocument();
+  expect(screen.getByText('2,300 kcal a day on average, across 7 logged days')).toBeInTheDocument();
+  expect(screen.getByText('170 g a day on average, across 7 logged days')).toBeInTheDocument();
   expect(screen.getAllByText('7 of 7')).toHaveLength(2);
   expect(screen.getByRole('img', { name: /Weight trend in lb, 7 days/ })).toBeInTheDocument();
 });
@@ -78,7 +83,8 @@ it('empty histories explain how to populate the sections', async () => {
   expect(screen.getByText('No protein logged in these days yet')).toBeInTheDocument();
   expect(screen.getByText('Not measured in these days')).toBeInTheDocument();
   expect(screen.getByText('No food logged yet today')).toBeInTheDocument();
-  expect(screen.getByText('No estimate yet')).toBeInTheDocument();
+  // MM-176: why there is no estimate, never a bare "No estimate yet".
+  expect(screen.getByText('Needs two weeks of logs and weigh-ins')).toBeInTheDocument();
   expect(document.querySelector('.mm-disclosure svg.chart-plot')).toBeNull();
 });
 
@@ -113,21 +119,28 @@ for (const failed of [false, true]) {
   it(`MM-183: the target display waits for pauses (${failed ? 'failed' : 'loading'})`, async () => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
     await repos.targets.saveTargets(targetsFrom(today.addDays(-3), { kcal: 2000 }));
+    // The read goes wrong until it is asked again.
+    let broken = true;
     renderApp(repos, today, {
       change: (services) => ({
         ...services,
         pauses: {
           savePause: (pause) => services.pauses.savePause(pause),
           deletePause: (pause) => services.pauses.deletePause(pause),
-          watchPauses: () => (failed ? failing() : never()),
+          watchPauses: () => (!failed ? never() : broken ? failing() : services.pauses.watchPauses()),
         },
       }),
     });
     if (failed) {
       // MM-334: the day stays, its targets withheld and the reason said.
       expect(await screen.findByText('Could not check whether today is paused')).toBeInTheDocument();
-      expect(screen.queryByText(/^kcal (left|over) of/)).toBeNull();
+      expect(screen.queryByText(/^kcal (left of|over) /)).toBeNull();
       expect(screen.getByText('kcal logged')).toBeInTheDocument();
+      const retry = screen.getByRole('button', { name: 'Try again' });
+      broken = false;
+      await userEvent.click(retry);
+      expect(await screen.findByText(/kcal left of 2,000/)).toBeInTheDocument();
+      expect(screen.queryByText('Could not check whether today is paused')).toBeNull();
     } else {
       expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
       expect(document.querySelector('.mm-horizon')).toBeNull();
@@ -142,7 +155,8 @@ it('MM-335: today, still being logged, is an open dot apart from the line, not a
   await openDashboardHistory();
   expect((await screen.findAllByText(/^○ Today so far/)).length).toBeGreaterThan(0);
   expect(document.querySelectorAll('.chart-energy .chart-dot-unfinished')).toHaveLength(1);
-  expect(screen.getByText('2,300 kcal a day on average, over 29 days')).toBeInTheDocument();
+  expect(screen.getByText('2,300 kcal a day on average, across 29 logged days')).toBeInTheDocument();
+  expect(screen.getByText('170 g a day on average, across 29 logged days')).toBeInTheDocument();
 });
 
 it('MM-335: today alone, still being logged, is said as today so far, not as nothing', async () => {
@@ -159,7 +173,7 @@ it('MM-335: a header that opens a tab stays a heading, and says where it goes', 
   renderApp(repos, today);
   await openDashboardHistory();
   const intake = await screen.findByRole('button', { name: 'Intake' });
-  expect(intake).toHaveAccessibleDescription(/a day on average, over 30 days Opens Food$/);
+  expect(intake).toHaveAccessibleDescription(/a day on average, across 30 logged days Opens Food$/);
   expect(intake.closest('h2')).not.toBeNull();
 });
 
@@ -170,4 +184,33 @@ it('MM-353: nothing of the recovery section is drawn outside it', async () => {
   await openDashboardHistory();
   await screen.findByText('How you are holding up', { selector: '.mm-section-title' });
   expect(screen.queryByText(/^Recovery observations:/)).not.toBeInTheDocument();
+});
+
+it('MM-183, MM-334: pauses that cannot be read leave the history drawn, without targets or coverage, under one alert', async () => {
+  await seed();
+  renderApp(repos, today, {
+    change: (services) => ({
+      ...services,
+      pauses: { ...services.pauses, watchPauses: () => failing() },
+    }),
+  });
+  await openDashboardHistory();
+  expect((await screen.findAllByText('Paused days could not be checked')).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Paused days could not be checked, so targets are not shown\.$/)).toBeInTheDocument();
+  expect(screen.queryByText('Could not read your history')).toBeNull();
+  expect(screen.getAllByRole('alert')).toHaveLength(1);
+  expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
+  expect(screen.queryByText('Days marked complete')).toBeNull();
+  expect(screen.getByText('2,300 kcal a day on average, across 30 logged days')).toBeInTheDocument();
+  // No target line is drawn for a day that may have been paused.
+  for (const line of document.querySelectorAll('g.chart-target .chart-line')) expect(line.getAttribute('d')).toBe('');
+});
+
+it('MM-176: with targets off for the profile, the coach section says so', async () => {
+  await seed();
+  const setup = typicalSetup({ onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today });
+  await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ ...setup.screening, bariatricSurgery: true }) }));
+  renderApp(repos, today);
+  await openDashboardHistory();
+  expect(await screen.findByText('Targets are off for your profile')).toBeInTheDocument();
 });

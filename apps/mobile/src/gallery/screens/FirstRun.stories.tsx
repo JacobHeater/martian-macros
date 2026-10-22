@@ -352,7 +352,7 @@ export const AdultsOnlyOpensSettings = screenStory({
 });
 
 /** MM-321: the demo build, its notice around every screen. */
-export const DemoBuild = screenStory({ covers: ['DashboardScreen'], shows: 'More about this week', demo: true });
+export const DemoBuild = screenStory({ covers: ['DashboardScreen'], shows: 'History', demo: true });
 
 /** MM-546: the person's data still being opened: the app waits on its spinner. */
 export const SetupLoading = screenStory({
