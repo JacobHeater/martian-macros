@@ -722,7 +722,9 @@ export class AppState {
       ) {
         return undefined;
       }
-      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, bodyFatReadings, sites, today });
+      // A shaped week's lower days are read against their plan (MM-124); flat until read.
+      const shapes = of(this.targetShapes) ?? [];
+      return analyze({ setup, weights, intake, history, weightEvents, pauses, flowDays, waists, shapes, bodyFatReadings, sites, today });
     });
 
     this.targetShapeLimits = derived(() => {

@@ -139,6 +139,7 @@ export * from './planPhases';
 export * from './platformWorkoutImports';
 export * from './personalRecordsOf';
 export * from './placeTimeOfDay';
+export * from './plannedDayShare';
 export * from './planReminders';
 export * from './previousSetsOf';
 export * from './ProgressionKind';
