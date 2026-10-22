@@ -37,6 +37,7 @@ import { RecoveryCheckInScreen } from '../../coach/RecoveryCheckInScreen';
 import { showTargetChangeSheet } from '../../coach/showTargetChangeSheet';
 import { TargetsHistoryScreen } from '../../coach/TargetsHistoryScreen';
 import { checkInDueScenario } from './checkInDueScenario';
+import { checkInNowScenario } from './checkInNowScenario';
 import { screensMeta } from './screensMeta';
 import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
@@ -391,6 +392,23 @@ export const ChoosePace = screenStory({
   shows: 'Choose a pace',
   open: onCoach,
   walk: pressOnCoach('Change pace'),
+});
+
+/** MM-559: "Check in now": the targets worked out from the latest weigh-in beside the ones in force, with why. */
+export const CheckInNow = screenStory({
+  covers: ['CoachScreen', 'CheckInNowSheet'],
+  shows: 'What would change',
+  scenario: checkInNowScenario(0),
+  open: onCoach,
+  walk: pressOnCoach('Check in now'),
+});
+
+/** MM-559: no weigh-in in the last seven days: "Check in now" is off, and the info notice under it says why. */
+export const CheckInNowOff = screenStory({
+  covers: ['CoachScreen'],
+  shows: /your last weigh-in is more than 7 days old/,
+  scenario: checkInNowScenario(9),
+  open: onCoach,
 });
 
 /** MM-321: a new goal with a deficit is confirmed against the health check first. */

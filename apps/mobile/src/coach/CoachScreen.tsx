@@ -21,6 +21,7 @@ import { SafetyBounds } from '../engine/SafetyBounds';
 import { goalBodyFatCheckText } from '../format/goalBodyFatCheckText';
 import { goalBodyFatSubtitle } from '../format/goalBodyFatSubtitle';
 import { quantityText } from '../format/quantityText';
+import { recalculationWithheldText } from '../format/recalculationWithheldText';
 import { leanGainPaceName } from '../format/leanGainPaceName';
 import { paceName } from '../format/paceName';
 import { reboundText } from '../format/reboundText';
@@ -78,6 +79,7 @@ import { WhatToExpectScreen } from './WhatToExpectScreen';
 import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
 import { usePaceInWords } from './usePaceInWords';
 import { usePaceSheet } from './usePaceSheet';
+import { useCheckInNow } from './useCheckInNow';
 import './coach.css';
 
 const more = (count: number, what: string) => `${count} more ${what}${count === 1 ? '' : 's'}`;
@@ -125,6 +127,8 @@ export function CoachScreen() {
   const overlays = useOverlays();
   const openPaceSheet = usePaceSheet();
   const openLeanGainPaceSheet = useLeanGainPaceSheet();
+  // Targets worked out again now from the latest weigh-in (MM-559).
+  const checkInNow = useCheckInNow();
   const setup = useLoaded(state.setup);
   const snapshot = useCell(state.coach);
   const current = useCell(state.currentTargets);
@@ -381,6 +385,31 @@ export function CoachScreen() {
               <MmButton label="Change pace" kind="text" onPress={() => void openLeanGainPaceSheet()} />
             </div>
           ) : null}
+          {/*
+            A check-in the person starts, from the latest weigh-in, rather than wait for the weekly one (MM-559). Off, with what keeps it
+            off in an info notice under it, without a weigh-in from the last week (and during a pause or a break).
+          */}
+          {checkInNow === undefined ? null : (
+            <div className="coach-check-in-now">
+              <MmButton
+                label="Check in now"
+                kind="secondary"
+                icon="sync"
+                expand
+                onPress={checkInNow.withheld === undefined ? () => void checkInNow.checkIn() : undefined}
+                describedBy="coach-check-in-now-note"
+              />
+              {checkInNow.withheld === undefined ? (
+                <p id="coach-check-in-now-note" className="app-caption">
+                  Works your targets out now from your latest weigh-in, instead of waiting for the weekly check-in.
+                </p>
+              ) : (
+                <div id="coach-check-in-now-note">
+                  <Notice text={recalculationWithheldText(checkInNow.withheld)} />
+                </div>
+              )}
+            </div>
+          )}
         </MmSection>
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />

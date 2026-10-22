@@ -23,6 +23,13 @@ export const safetyRaiseCapKcal = 400;
 export const checkInIntervalDays = 7;
 
 /**
+ * Days a weigh-in stays recent enough to recalculate targets from (MM-559):
+ * a recalculation works from the latest weight, so one older than this is
+ * not the person's weight now.
+ */
+export const recalculationWeighInDays = 7;
+
+/**
  * Days after a change in intake level during which the scale is moved by
  * glycogen, water and gut contents, not tissue.
  */

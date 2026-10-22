@@ -137,3 +137,10 @@
 .coach-pace-row > :last-child {
   margin-inline-end: calc(-1 * var(--space-12));
 }
+/* "Check in now" under the figures it changes, with its caption or what keeps it off (MM-559). */
+.coach-check-in-now {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
