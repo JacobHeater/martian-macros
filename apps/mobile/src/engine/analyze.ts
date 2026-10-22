@@ -25,6 +25,7 @@ import { energyDensityForSlope } from './energyDensityForSlope';
 import { estimateBodyFat } from './estimateBodyFat';
 import { passingWeightEventNoise } from './passingWeightEventNoise';
 import { pauseDeficitRestartOn } from './pauseDeficitRestartOn';
+import { pauseSettlingWindows } from './pauseSettlingWindows';
 import { recommendMode } from './recommendMode';
 import { safetyBodyFatPercent } from './safetyBodyFatPercent';
 import { SafetyBounds } from './SafetyBounds';
@@ -90,7 +91,8 @@ export function analyze({
     creatineEvents.filter((event) => !event.date.isAfter(today)).map((event) => event.date),
   );
   const passingEvents = effectiveWeightEvents(weightEvents);
-  const phaseSettling = settlingWindows(history);
+  // A pause is a change of phase at both ends (MM-148, MM-131).
+  const phaseSettling = [...settlingWindows(history), ...pauseSettlingWindows({ pauses, history, today })];
   const settling = [...phaseSettling, ...weightEventSettlingWindows(creatineEvents)];
   const cycleNoise = flowDays.length === 0 ? undefined : cycleNoiseMultiplier(flowDays);
   const eventNoise = passingEvents.length === 0 ? undefined : passingWeightEventNoise(passingEvents);

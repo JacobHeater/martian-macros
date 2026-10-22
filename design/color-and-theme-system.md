@@ -266,6 +266,10 @@ taller all independently carry the distinction. Do not remove any of the three.
 `ion` vs. `protein` is ΔE 35-39 under deutan/protan but 21 (dark) and 18 (light)
 under tritan; they are never plotted on the same chart and differ in form (line vs.
 bar). Verify with a real simulator in the gallery (MM-105).
+In Martian they are one aqua (MM-375, settled by default on 2026-10-21): no free hue
+holds 4.5:1 as caption text on overlay without sitting next to the action or in the
+canvas's violet band, so they are told apart by form alone: the insight is a sentence
+with its icon, protein a bar beside its "P".
 
 ## 7. Theme structure
 
