@@ -8,17 +8,17 @@ name: Legal page
 #
 # Needs, once, in the repository's settings: Pages, "Build and deployment",
 # source "GitHub Actions".
+#
+# Paused (owner, 2026-10-22): Pages is not on, so every push failed at the
+# deploy step. The public page is a release item (M5, MM-247, MM-454); until a
+# release is decided it runs only when started by hand. To resume, turn Pages
+# on and put back the push trigger:
+#   push: { branches: [main], paths: [apps/mobile/src/terms/**,
+#     apps/mobile/src/format/**, apps/mobile/src/domain/**,
+#     apps/mobile/src/lang/**, apps/mobile/scripts/legal-page.mjs,
+#     .github/workflows/legal-pages.yml] }
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/mobile/src/terms/**'
-      - 'apps/mobile/src/format/**'
-      - 'apps/mobile/src/domain/**'
-      - 'apps/mobile/src/lang/**'
-      - 'apps/mobile/scripts/legal-page.mjs'
-      - '.github/workflows/legal-pages.yml'
   workflow_dispatch:
 
 permissions:
