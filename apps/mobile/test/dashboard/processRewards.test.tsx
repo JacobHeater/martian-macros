@@ -3,6 +3,8 @@ import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Pause } from '../../src/domain/Pause';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
+import { TargetShape } from '../../src/domain/TargetShape';
+import { WeekShape } from '../../src/domain/WeekShape';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { foodOn } from '../support/foodOn';
@@ -60,6 +62,20 @@ it('two days at 1,700 and 2,800 kcal earn the same', async () => {
   await logWholeDay(2, 2800);
   await logWholeDay(3);
   expect(await card()).toContain('3 whole days logged in a row.');
+});
+
+it('the lower days of a shaped week, eaten a little under plan and not marked, keep the run going (MM-124)', async () => {
+  await seed();
+  // Monday, Wednesday and Friday 30% higher on 2,000 kcal: 2,400 on those, 1,700 planned on the rest, eaten at 1,550.
+  const week = new WeekShape({ higherDays: [1, 3, 5], raise: 0.3 });
+  await repos.targetShapes.saveTargetShape(new TargetShape({ since: today.addDays(-60), week }));
+  for (let d = 1; d <= 14; d++) {
+    const date = today.addDays(-d);
+    await repos.food.addFood(foodOn(date, { kcal: week.higherDays.has(date.weekday) ? 2400 : 1550 }));
+  }
+  const text = await card();
+  expect(text).toContain('14 whole days logged in a row.');
+  expect(text).not.toContain('forgiven');
 });
 
 it('a short run says nothing at all', async () => {

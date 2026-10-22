@@ -150,8 +150,31 @@ rule now reads each day against its plan. `plannedDayShare(shapes)` gives the sh
 shape in force planned for the day; `usableIntakeDays` divides a day's intake by it before the comparison
 (flat when not given), and `analyze` passes the user's shapes to the estimator. Guarded by "the partial-day
 rule read against the plan" in `test/engine/weekShape.test.ts` (a lower day 200 kcal under plan is dropped
-read flat, kept read against the plan; a half day is still dropped). The adherence summary, the under-eating
-notice, insights, the monthly report and the logging streak still read every day as flat: a follow-up.
+read flat, kept read against the plan; a half day is still dropped).
+
+Every other reader now agrees with the estimator (2026-10-21). `AppState` passes `plannedDayShare(shapes)` to
+each reader that judges a day's intake:
+- **Which days are whole** (MM-27): the adherence summary (MM-149) and the stall diagnosis that reads it (MM-140),
+  the under-eating notice (MM-114), the insights' partial-days count (MM-141), the monthly report's whole days
+  and longest run (MM-33), and the logging streak (MM-92). A planned lower day eaten a little under plan is
+  whole; a genuinely half-logged day is still partial.
+- **The adherence summary's target**: the week's target times the mean planned share of the whole days the
+  average rests on. Over a whole shaped week that is the flat figure; a week resting on its lower days alone is
+  held to the lower days' plan, not read as under (nor one resting on its higher days as over).
+- **The under-eating notice** keeps its average and low days in real calories: the floor is about what was
+  eaten, not about the plan. Read against the plan it no longer misses someone eating far under on a shaped
+  week because the lower days were taken for partial.
+- **Insights about the shape of the week** (MM-141): "weekends run higher" and "your highest day" compare days
+  as planned, so a planned higher weekend or day is not pointed out; the figures they show stay in real
+  calories.
+- **Day-by-day judgements** use the day's own shaped target, as Food does (`shapedTargets`): yesterday's
+  calories as a cause of a weight jump (MM-142), and the Dashboard history's target line (MM-335).
+Left as they were: the Food hero and the week-shape screen already read `dayTargetsOn`; the rhythm strip
+(MM-254) and the complete-day prompt (MM-114, under half the floor) do not judge against a target or the plan.
+The plan's share leaves out the calorie floor, so a lower day the floor holds up reads a little fuller than
+planned in the summary's target; the day-by-day judgements use the real figure. Tests:
+`test/engine/plannedShareReaders.test.ts`, the weight-jump and Dashboard history tests, and the streak
+through the app in `test/dashboard/processRewards.test.tsx`. Not run locally; CI validates.
 
 The measurement review's points on the suite, applied: each trial starts on a different weekday (seed % 7,
 70 trials, ten per weekday), so the window's ends fall on higher and lower days alike; the window is checked

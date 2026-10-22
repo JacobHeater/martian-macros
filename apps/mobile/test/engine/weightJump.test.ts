@@ -3,10 +3,13 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { IntakeDay } from '../../src/domain/IntakeDay';
 import { Workout } from '../../src/domain/training/Workout';
+import { TargetShape } from '../../src/domain/TargetShape';
 import type { WeightEvent } from '../../src/domain/WeightEvent';
+import { WeekShape } from '../../src/domain/WeekShape';
 import { DailyTargets } from '../../src/engine/DailyTargets';
 import { explainWeightJump } from '../../src/engine/explainWeightJump';
 import { fatMassKcalPerKg } from '../../src/engine/partitionConstants';
+import { TargetShapeLimits } from '../../src/engine/TargetShapeLimits';
 import { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { WeightJumpRule } from '../../src/engine/WeightJumpRule';
 import { weightJumpWithheld } from '../../src/engine/weightJumpWithheld';
@@ -167,6 +170,18 @@ describe('the causes', () => {
     const low = explain(79, { intake: intakeWith({ kcal: 1200 }), history: [targets(2100)] })?.calories;
     expect(low?.figures['overTargetKcal']).toBe(-900);
     expectClose(low?.figures['fatAtMostKg'], 1300 / fatMassKcalPerKg, 1e-9);
+  });
+
+  it('a planned higher day eaten as planned is judged against its own target, not the flat one (MM-124)', () => {
+    const yesterday = today.addDays(-1);
+    const shapes = [new TargetShape({ since: today.addDays(-40), week: new WeekShape({ higherDays: [yesterday.weekday], raise: 0.2 }) })];
+    const limits = new TargetShapeLimits({ floorKcal: 1500, sex: 'male', trendWeightKg: 80, heightCm: 180 });
+    const rest = { intake: intakeWith({ kcal: 2400 }), history: [targets(2000)] };
+    expect(explain(81.1, rest)?.calories?.figures['targetKcal']).toBe(2000);
+    expect(explain(81.1, { ...rest, shapes, limits })?.calories).toBeUndefined();
+    // Well over the day's own target is still a cause, said against that target.
+    const over = explain(81.1, { ...rest, intake: intakeWith({ kcal: 3400 }), shapes, limits })?.calories;
+    expectClose(over?.figures['targetKcal'], 2400, 1);
   });
 
   it('a low reading mirrors the carbohydrate rule: a day well under the usual', () => {

@@ -173,3 +173,8 @@ Decided here (say if wrong):
 - Sodium is carried patchily by the food sources; the rule must not fire on missing data treated as zero (the same coverage check as
   fiber, MM-126).
 - The 30% and 9 pm thresholds are **judgement** and should be tuned.
+
+## Shaped weeks (MM-124), 2026-10-21
+Yesterday's calories are judged against that day's own target under the week shape then (`shapedTargets`, as Food
+shows it), so a planned higher day eaten as planned is not a cause; the cause's figures name that day's target. Test:
+`test/engine/weightJump.test.ts`.

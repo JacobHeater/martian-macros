@@ -113,3 +113,9 @@ Open, and needing the owner or MM-29:
 - **"Targets are untouched" is now proved by a test**: `apps/mobile/test/engine/nextTargetsSafety.test.ts`, "confirmed low days never pull the target below the floor (MM-114)": six weeks of days confirmed complete at 1,000 kcal inform the expenditure estimate, as MM-27 decided, and the issued target stays at or above the floor and within a weekly step. Decided: confirmed-low days are not withheld from the estimator; the floor and the step are the protection, and the notice is the response.
 - **The adherence summary points to this notice** while it is showing: "below the app's minimum of 1,500; see the notice about your logged days" (MM-149).
 - **Still the owner's or MM-29's**: the support line's wording for a person with the eating-disorder-history answer has not been through the professional review; it stays as written until MM-29.
+
+## Shaped weeks (MM-124), 2026-10-21
+Whole days are judged against the plan, as the expenditure estimate judges them, so a shaped week's planned lower days
+are not left out as partial. The average and the low days stay in real calories against the floor. Read flat, someone
+eating far under on a shaped week was missed because the lower days were dropped; now they are not. A genuinely
+half-logged day is still left out. Test: `test/engine/plannedShareReaders.test.ts`.

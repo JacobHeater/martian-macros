@@ -26,6 +26,9 @@ export function useWeightJump(date: CalendarDate | undefined): WeightJumpExplana
   const flowDays = useLoaded(state.flowDays) ?? [];
   const weightEvents = useLoaded(state.weightEvents) ?? [];
   const history = useLoaded(state.targetsHistory) ?? [];
+  // Yesterday is judged against its own target under a shaped week (MM-124).
+  const shapes = useLoaded(state.targetShapes) ?? [];
+  const limits = useCell(state.targetShapeLimits);
   const safeguards = useCell(state.insightSafeguards);
   // The same number of cells is read on every draw, whatever the date.
   const through = date ?? state.today.value;
@@ -36,5 +39,16 @@ export function useWeightJump(date: CalendarDate | undefined): WeightJumpExplana
   if (date === undefined || coach === undefined || safeguards === undefined || weightJumpWithheld(safeguards)) return undefined;
   const reading = weights.find((w) => w.date === date);
   if (reading === undefined) return undefined;
-  return explainWeightJump({ reading, trend: coach.trend, intake, entries, workouts, flowDays, weightEvents, history });
+  return explainWeightJump({
+    reading,
+    trend: coach.trend,
+    intake,
+    entries,
+    workouts,
+    flowDays,
+    weightEvents,
+    history,
+    shapes,
+    limits,
+  });
 }
