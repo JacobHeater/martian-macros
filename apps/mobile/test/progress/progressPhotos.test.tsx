@@ -71,6 +71,14 @@ afterEach(() => {
   delete (document as { visibilityState?: unknown }).visibilityState;
 });
 
+/**
+ * Waits until the photo `name` is drawn from its bytes. While they are read `MmPhoto` is an empty frame with the same
+ * name, which the picture then replaces, so the frame found first can be gone by the time it is looked at.
+ */
+async function photoDrawn(name: string): Promise<void> {
+  await waitFor(() => expect(layer().getByRole('img', { name }).tagName).toBe('IMG'));
+}
+
 /** Opens Progress, then its photos. */
 async function openPhotos(): Promise<void> {
   await openTab('Progress');
@@ -229,7 +237,7 @@ it('the photos lock when the app goes to the background, and the lock is asked a
   expect(lock.asked).toBe(2);
   lock.answer = 'unlocked';
   await userEvent.click(layer().getByRole('button', { name: 'Unlock' }));
-  expect(await layer().findByRole('img', { name: 'Front photo, October 19, 2026' })).toBeInTheDocument();
+  await photoDrawn('Front photo, October 19, 2026');
 });
 
 it('the camera and the comparison above the photos lock too, and ask once on the way back', async () => {
@@ -243,7 +251,7 @@ it('the camera and the comparison above the photos lock too, and ask once on the
   goAway();
   await waitFor(() => expect(layer().queryByRole('img', { name: /^Front photo/ })).not.toBeInTheDocument());
   comeBack();
-  expect(await layer().findByRole('img', { name: 'Front photo, October 19, 2026' })).toBeInTheDocument();
+  await photoDrawn('Front photo, October 19, 2026');
   // The photos beneath and the comparison share one lock: asked once, not once a screen.
   expect(lock.asked).toBe(2);
 });
