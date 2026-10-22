@@ -29,7 +29,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 4 (MM-311, MM-313): the sodium limit and the water goal. Version 6 (MM-358): the goal switched off.
   // Version 7 (MM-364): the switches of Settings > Coach. Version 9 (MM-396): net carbs. Version 10 (MM-63): the last backup.
   // Version 11 (MM-123, MM-130): exact targets, the label note, easing into maintenance. Version 12 (MM-58): the online lookup choice. Version 14 (MM-152): the usual cooking fat.
-  // Version 15 (MM-71): the scale chosen as primary. Version 19 (MM-441): the weigh-in window.
+  // Version 15 (MM-71): the scale chosen as primary. Version 19 (MM-441): the weigh-in window. Version 24 (MM-118): the weight display.
   user_preferences: [
     'terms_accepted_version',
     'terms_accepted_epoch_day',
@@ -51,6 +51,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'primary_scale_source_id',
     'weigh_in_window_start_minute',
     'weigh_in_window_end_minute',
+    'weight_display',
+    'weight_display_offered',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   // Version 13 (MM-251): a diagnosed sleep disorder. Version 17 (MM-480): the lean-gain pace chosen.

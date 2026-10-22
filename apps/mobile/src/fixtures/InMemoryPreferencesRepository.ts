@@ -8,6 +8,7 @@ import type { MacroPicture } from '../domain/MacroPicture';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import type { TermsAcceptance } from '../domain/TermsAcceptance';
+import type { WeightDisplay } from '../domain/WeightDisplay';
 import type { ThemePreference } from '../domain/ThemePreference';
 import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
@@ -36,6 +37,8 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
   private readonly usualCookingFat = new ObservableValue<CookingFatKind>('oil');
   private readonly primaryScale = new ObservableValue<string | undefined>(undefined);
   private readonly weighInWindow = new ObservableValue(WeighInWindow.usual);
+  private readonly weightDisplay = new ObservableValue<WeightDisplay | undefined>(undefined);
+  private readonly weightDisplayOffered = new ObservableValue(false);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -188,6 +191,22 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
     this.primaryScale.value = sourceId;
   }
 
+  watchWeightDisplay(): Watched<WeightDisplay | undefined> {
+    return this.weightDisplay.watch();
+  }
+
+  async saveWeightDisplay(display: WeightDisplay | undefined): Promise<void> {
+    this.weightDisplay.value = display;
+  }
+
+  watchWeightDisplayOffered(): Watched<boolean> {
+    return this.weightDisplayOffered.watch();
+  }
+
+  async markWeightDisplayOffered(): Promise<void> {
+    this.weightDisplayOffered.value = true;
+  }
+
   watchWeighInWindow(): Watched<WeighInWindow> {
     return this.weighInWindow.watch();
   }
@@ -201,6 +220,8 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
     this.usualCookingFat.value = 'oil';
     this.primaryScale.value = undefined;
     this.weighInWindow.value = WeighInWindow.usual;
+    this.weightDisplay.value = undefined;
+    this.weightDisplayOffered.value = false;
     this.exactTargets.value = false;
     this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;

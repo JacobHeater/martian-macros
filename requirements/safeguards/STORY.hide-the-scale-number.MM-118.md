@@ -1,6 +1,6 @@
 ---
 id: MM-118
-status: proposed
+status: done
 component: safeguards
 related: [MM-110, MM-11, MM-16, MM-17, MM-68, MM-92, MM-98, MM-107, MM-146]
 ---
@@ -78,3 +78,55 @@ Scenario: Switching back
 - Priority: should-have.
 - The unit and backup exports still contain the numbers; say so in the setting's description.
 - Calories have the same problem for some users. A "macros without calories" display was discussed and not specified; note it if asked.
+
+## Decisions (made while building, 2026-10-21; say if any is wrong)
+- **The setting is kept unchosen until the person chooses** (`weight_display` null): the default then follows the
+  health check, so ticking or unticking an eating-disorder history moves an unchosen display between Everything and
+  Trend only. The health check says so under that answer, at onboarding and in Settings.
+- **The row lives in Settings, Appearance**, beside Units (rule 9), and opens a sheet of three choice cards built like
+  the pace sheets; the sheet says the backup and exports still contain the numbers.
+- **One formatting rule guards every screen**: `Fmt.weight` and `weightDelta` are the person's body weight and give no
+  figure with Hidden ("hidden"), `Fmt.reading` is one weigh-in and gives a figure only with Everything, and a lifted
+  load is `Fmt.load`, always shown (strength is shown normally). The main screens then word each place properly.
+- **Pace in words** (`paceInWordsOf`): with a pace intended, under half of it (or the other way) is "slower than
+  planned", over one and a half times it "faster than planned", between "on pace"; with none intended, within 0.1% of
+  body weight a week is "steady", more is "faster than planned". "So far, ..." until the coach's confidence is good.
+- **Hidden shows no weight chart** (its axis is a weight); Trend only draws the line and band without dots, and
+  nothing can be picked on it.
+- **The offer** is a notice on the Dashboard (built as the relief offer is) only while no display has been chosen;
+  "Choose" opens the same sheet, "Not now" or a choice remembers it, and it never shows again.
+- Already true and now tested: no notification carries a figure (MM-146's prompts).
+
+## Progress
+Built 2026-10-21. Not run locally; CI validates.
+- Schema 24 (stacked on MM-156's 23): `user_preferences.weight_display` (null until chosen) and
+  `weight_display_offered`; the step keyed 23, the fingerprint for 24, and an upgrade test from 23 (none chosen, other
+  preferences kept, one chosen after is kept).
+- Progress photos (MM-157) follow it: no weight under the compared photos when Hidden.
+- `WeightDisplay` and `WeightDisplayReader`/`Writer` on `PreferencesRepository` (in memory and SQL, the contract
+  suite run against both); `state.chosenWeightDisplay`, `state.weightDisplay` (`weightDisplayOf`), and
+  `state.weightDisplayOffered`. The SQL columns (`user_preferences.weight_display`, `weight_display_offered`) are
+  added by the schema lane's migration on the stacked branch.
+- `Fmt` takes the display; every body-weight screen builds its `Fmt` with it (Dashboard and its history, Progress,
+  Coach and its cards, insights, the monthly report, what to expect, the pace and target-change sheets). Texts that
+  carry a weight say it in words when hidden (weight jump, recomp signal, lean-gain review, rebound, stall, waist
+  insight, what to expect); lift loads moved to `Fmt.load`.
+- `usePaceInWords` on the Dashboard's weight row and history, Progress's hero and the Coach's Body section.
+- A typed weigh-in is confirmed "Saved" with no echo unless Everything; Progress does not put today's reading back
+  in its field.
+- Guarding tests: `test/engine/weightDisplay.test.ts` (words follow the data: 0.2% against 0.75% is slower than
+  planned; the default; the offer's pattern; Fmt hides; no notification has a figure);
+  `test/safeguards/weightDisplay.test.tsx` (Trend only: no dots and no raw reading; switching back shows the dots;
+  Hidden: no weight in any unit on Dashboard, Progress or Coach, pace in words; the coach's figures are the same as
+  with Everything; "Saved" with no echo; the eating-disorder default, said and changeable; the offer once, remembered);
+  `preferencesRepositoryContract` (both implementations).
+- Stories: `DashboardWeightTrendOnly`, `DashboardWeightHidden`, `DashboardWeightDisplayOffer`,
+  `ProgressWeightTrendOnly`, `ProgressWeightHidden`, `CoachWeightHidden`, `ChangeWeightDisplay`,
+  `WeightDisplayTrendOnlyByDefault`, `HealthCheckEatingDisorderWeightDisplay`.
+- Not built: a weekly report outside the app does not exist, so "report" is the in-app monthly report.
+
+## Owed on a phone
+- With Hidden, the morning weigh-in reminder on the lock screen shows no weight (it never had one; check it there).
+- With Hidden and a connected scale, a morning's synced weigh-in shows nowhere in the app.
+- The upgrade that adds the two preference columns keeps every other preference on the owner's phone.
+

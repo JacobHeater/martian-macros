@@ -24,10 +24,12 @@ export function LeanGainCard({
   onSlowerGain?: (() => void) | undefined;
 }) {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const review = useCell(state.leanGainReview);
   const setup = useLoaded(state.setup);
   if (review === undefined || setup === undefined) return null;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   return (
     <MmSection icon="insight" title={`Lean gain, week ${review.weeks}`}>
       {leanGainReviewText(review, fmt).map((text) => (
@@ -35,10 +37,13 @@ export function LeanGainCard({
           {text}
         </p>
       ))}
-      <StatRow
-        label="Trend weight"
-        value={review.weightChangeKg === undefined ? 'Not enough logged' : fmt.weightDelta(review.weightChangeKg)}
-      />
+      {/* A weight change: not shown with the weight hidden (MM-118). */}
+      {fmt.weightHidden ? null : (
+        <StatRow
+          label="Trend weight"
+          value={review.weightChangeKg === undefined ? 'Not enough logged' : fmt.weightDelta(review.weightChangeKg)}
+        />
+      )}
       <StatRow label="Intended pace" value={Fmt.percentPerWeek(review.intendedFraction)} />
       {review.offersSlowerGain && onSlowerGain !== undefined ? (
         <div className="app-row">

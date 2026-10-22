@@ -46,6 +46,7 @@ import { ProfileSection } from './ProfileSection';
 import { BackupSection } from './BackupSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
+import { WeightDisplayRow } from './WeightDisplayRow';
 import { SettingsOpenSectionContext } from './SettingsOpenSectionContext';
 import type { SettingsSectionId } from './SettingsSectionId';
 import './settings.css';
@@ -290,6 +291,8 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
         <MmSection icon="palette" title="Appearance" {...fold('appearance')}>
           <MmListGroup>
             <ThemeSettings />
+            {/* How much of the person's weight is shown (MM-118). */}
+            <WeightDisplayRow />
             <MmListRow
               leadingIcon="ruler"
               title="Units"

@@ -32,6 +32,8 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
   const waist = useLoaded(state.waist) ?? [];
   const trend = useCell(state.coach)?.trend ?? [];
   const units = useLoaded(state.setup)?.unitSystem ?? 'imperial';
+  // No weight under the photos when the weight display is Hidden (MM-118); the trend's is shown otherwise.
+  const weightDisplay = useCell(state.weightDisplay);
   const [pose, setPose] = useState<PhotoPose>('front');
   const [chosen, setChosen] = useState<{ earlier?: CalendarDate | undefined; later?: CalendarDate | undefined }>({});
 
@@ -46,8 +48,9 @@ export function PhotoCompareScreen({ showWeight = true }: PhotoCompareScreenProp
   const photoOn = (day: CalendarDate | undefined) => [...ofPose].reverse().find((photo) => photo.date === day);
   const left = photoOn(earlier);
   const right = photoOn(later);
-  const fmt = new Fmt(units);
-  const lines = (date: CalendarDate) => comparedPhotoLines({ date, trend, waist, fmt, showWeight });
+  const fmt = new Fmt(units, { weightDisplay });
+  const lines = (date: CalendarDate) =>
+    comparedPhotoLines({ date, trend, waist, fmt, showWeight: showWeight && weightDisplay !== 'hidden' });
 
   const choose = async (side: 'earlier' | 'later') => {
     const picked = await overlays.options<number>({

@@ -92,7 +92,8 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
    once entries carry sodium (WS-08 step 4) and workouts exist (WS-10).
 5. **Weight display setting (MM-118).** M4. Touches every component that
    shows weight; cheap if WS-03's chart components have one switch for raw
-   readings.
+   readings. Done 2026-10-21: Everything, Trend only or Hidden (schema 24),
+   carried by `Fmt`, with the pace in words when Hidden.
 6. **More sites (MM-156).** M4. Done 2026-10-21: one store by site (schema 23, the
    waist moved in), the measuring session, the sites and limb side, the
    suggestion offered once, per-site charts and the limb facts.
@@ -123,10 +124,11 @@ storage rules above.
 ## Requirement sources
 - Built: MM-16, MM-17 (weigh-in, trend chart); MM-21 (waist, built but
   unverified); MM-34 (body-fat range from the waist).
-- Remaining: MM-155, MM-136, MM-20, MM-142, MM-118.
+- Remaining: MM-155, MM-136, MM-20, MM-142.
 - Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed), MM-502 (smart-scale
   readings in the body-fat range, each scale's own bias), MM-156 (more measurement sites; the waist moved
-  into one store by site), MM-501 (the Navy tape method in the body-fat range).
+  into one store by site), MM-501 (the Navy tape method in the body-fat range),
+  MM-118 (the weight display: Everything, Trend only or Hidden).
   Epics: MM-15, MM-154.
 
 ## Notes for whoever builds it

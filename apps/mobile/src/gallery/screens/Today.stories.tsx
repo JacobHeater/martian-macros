@@ -12,6 +12,8 @@ import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { pausedScenario } from './pausedScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
+import { frequentWeighingScenario } from './frequentWeighingScenario';
+import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
@@ -404,4 +406,27 @@ export const DashboardOnWeightLossMedication = screenStory({
   covers: ['DashboardScreen'],
   shows: /^so far, aiming for about 2,100 kcal/,
   scenario: weightLossMedicationScenario(),
+});
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: Trend only: the weight row says the trend and its week, never today's reading. */
+export const DashboardWeightTrendOnly = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /^Trend [\d.]+ (lb|kg)$/,
+  scenario: weightDisplayScenario('trendOnly'),
+});
+
+/** MM-118: Hidden: no weight figure; the weight row and the history say the pace in words. */
+export const DashboardWeightHidden = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Weighed in today · against your plan’s pace',
+  scenario: weightDisplayScenario('hidden'),
+});
+
+/** MM-118: the weight display offered once, after several weigh-ins a day on five days in two weeks. */
+export const DashboardWeightDisplayOffer = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'How much of your weight to show',
+  scenario: frequentWeighingScenario,
 });

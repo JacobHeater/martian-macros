@@ -7,6 +7,7 @@ import type { PreferencesRepository } from '../../src/domain/repositories/Prefer
 import { TermsAcceptance } from '../../src/domain/TermsAcceptance';
 import { ThemePreference } from '../../src/domain/ThemePreference';
 import { expectChangeEmits } from '../support/expectChangeEmits';
+import { WeightDisplay } from '../../src/domain/WeightDisplay';
 import { first } from '../support/first';
 
 /** What every `PreferencesRepository` must do. */
@@ -231,6 +232,30 @@ export function preferencesRepositoryContract(
       await repo.saveThemePreference('dark');
       expect(await first(repo.watchUsualCookingFat()), 'other preferences leave it alone').toBe('butter');
       expect(await first(repo.watchDetailLevel())).toBe('full');
+    });
+
+    // MM-118: no weight display chosen until one is; each is kept apart from the rest, and undefined goes back.
+    it('no weight display until one is chosen; each is kept apart from the rest and can be undone', async () => {
+      expect(await first(repo.watchWeightDisplay())).toBeUndefined();
+      for (const display of WeightDisplay.values) {
+        await repo.saveWeightDisplay(display);
+        expect(await first(repo.watchWeightDisplay())).toBe(display);
+      }
+      await repo.saveWeightDisplay('hidden');
+      await repo.saveThemePreference('dark');
+      expect(await first(repo.watchWeightDisplay()), 'other preferences leave it alone').toBe('hidden');
+      await repo.saveWeightDisplay(undefined);
+      expect(await first(repo.watchWeightDisplay())).toBeUndefined();
+      expect(await first(repo.watchThemePreference())).toBe('dark');
+    });
+
+    it('the weight display offer is not answered until marked, and stays answered', async () => {
+      expect(await first(repo.watchWeightDisplayOffered())).toBe(false);
+      await repo.markWeightDisplayOffered();
+      await repo.saveWeightDisplay('trendOnly');
+      expect(await first(repo.watchWeightDisplayOffered())).toBe(true);
+      await repo.markWeightDisplayOffered();
+      expect(await first(repo.watchWeightDisplayOffered())).toBe(true);
     });
 
     // MM-71: the primary scale is chosen automatically until the person names one, and "Automatic" goes back.
