@@ -26,7 +26,8 @@ interface DataGapNoteProps {
  * been read, so it never flashes.
  *
  * Weigh-ins are allowed from their row in Settings; the history, which the
- * platform asks for only once (MM-73), in Health Connect itself (MM-323).
+ * platform asks for only once (MM-73), in Health Connect itself (MM-323),
+ * and a snack says on coming back whether it was allowed.
  */
 export function DataGapNote({ gap }: DataGapNoteProps) {
   const { services, state } = useApp();
@@ -73,7 +74,12 @@ export function DataGapNote({ gap }: DataGapNoteProps) {
           text={`${name} lets the app read only from 30 days before you connected, so this estimate has less to go on. Allowing past data in ${name} would give it more. It is up to you.`}
           action={
             <div className="app-row">
-              <MmButton label={`Open ${name}`} kind="text" onPress={() => void openPermissions()} />
+              <MmButton
+                label={`Open ${name}`}
+                kind="text"
+                // Allowed there, the note goes on coming back, and the focus with it (MM-379).
+                onPress={() => void openPermissions('history', () => focusNeighbourOf(host.current))}
+              />
               {gotIt}
             </div>
           }

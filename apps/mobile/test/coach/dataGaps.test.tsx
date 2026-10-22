@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { cleanup, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { dataGapsOf } from '../../src/coach/dataGapsOf';
@@ -71,6 +71,12 @@ describe('which gaps are said', () => {
     expect(dataGapsOf({ connection: connection(['weight'], true), confidence: confidence(), eatingDisorderHistory: false })).toEqual([]);
   });
 
+  it('the history line is not about weighing, so it is said with an eating-disorder history', () => {
+    expect(dataGapsOf({ connection: connection(['weight'], false), confidence: confidence(), eatingDisorderHistory: true })).toEqual([
+      'history',
+    ]);
+  });
+
   it('nothing on a phone without a health platform', () => {
     const none: HealthConnection = { available: new Set(), permitted: new Set(), imported: new Map(), history: false };
     expect(dataGapsOf({ connection: none, confidence: confidence(), eatingDisorderHistory: false })).toEqual([]);
@@ -116,6 +122,27 @@ describe('on Coach', () => {
     expect(snoozes).toEqual([{ kind: 'dataGap', subject: 'weight', item: 'Weigh-ins from Health Connect', resumesOn: undefined }]);
     expect(await repos.setup.loadSetup()).toEqual(setupBefore);
     expect(await source.permitted()).toEqual(new Set());
+    // Kept, not just hidden: closed and opened again over the same data, it is still gone.
+    cleanup();
+    await openCoach();
+    await screen.findByRole('heading', { name: 'Body' });
+    await screen.findByText(/Trend weight/);
+    expect(screen.queryByText(weighInsLine)).not.toBeInTheDocument();
+  });
+
+  it('dismissing the weigh-ins line leaves the history line, a gap of its own', async () => {
+    await openCoach();
+    await screen.findByText(weighInsLine);
+    await userEvent.click(screen.getByRole('button', { name: 'Got it: weigh-ins' }));
+    await expect.poll(() => screen.queryByText(weighInsLine)).toBeNull();
+    // Later weight is allowed and the history refused: that gap is said, the dismissal notwithstanding.
+    await source.permit(new Set<HealthDataType>(['weight']));
+    source.historyFrom = new Date(2026, 8, 5);
+    source.willPermitHistory = false;
+    await source.requestHistory();
+    cleanup();
+    await openCoach();
+    expect(await screen.findByText(historyLine)).toBeInTheDocument();
   });
 
   it('an eating-disorder history: no line asks for more weighing', async () => {
@@ -139,5 +166,24 @@ describe('on Coach', () => {
     expect(screen.queryByText(weighInsLine)).not.toBeInTheDocument();
     await userEvent.click(within(metabolism).getByRole('button', { name: 'Open Health Connect' }));
     await expect.poll(() => source.permissionsOpened).toBe(1);
+    // Nothing allowed there: said on coming back, and the line stays.
+    expect(await screen.findByText('Nothing changed.')).toBeInTheDocument();
+    expect(screen.getByText(historyLine)).toBeInTheDocument();
+  });
+
+  it('past data allowed in Health Connect: said on coming back, the line goes and the focus stays on the screen', async () => {
+    await source.permit(new Set<HealthDataType>(['weight']));
+    source.historyFrom = new Date(2026, 8, 5);
+    source.willPermitHistory = false;
+    await source.requestHistory();
+    source.allowsThere = new Set(['history']);
+    await openCoach();
+    const line = await screen.findByText(historyLine);
+    const metabolism = line.closest('.mm-section') as HTMLElement;
+    await userEvent.click(within(metabolism).getByRole('button', { name: 'Open Health Connect' }));
+    expect(await screen.findByText('Past data allowed. The estimate will use it.')).toBeInTheDocument();
+    await expect.poll(() => screen.queryByText(historyLine)).toBeNull();
+    await expect.poll(() => document.activeElement === document.body || document.activeElement === null).toBe(false);
+    expect(document.activeElement?.isConnected).toBe(true);
   });
 });

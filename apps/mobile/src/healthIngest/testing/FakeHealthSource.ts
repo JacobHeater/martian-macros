@@ -85,6 +85,9 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess, Heal
   /** How many times that screen was opened. */
   permissionsOpened = 0;
 
+  /** What the person allows on that screen when it is opened: kinds, and `history` for the history permission. */
+  allowsThere: ReadonlySet<HealthDataType | 'history'> = new Set();
+
   /** The kinds whose last request came back without being shown. */
   private readonly unshown = new Set<HealthDataType>();
 
@@ -229,6 +232,10 @@ export class FakeHealthSource implements HealthSource, HealthHistoryAccess, Heal
   async openPermissions(): Promise<boolean> {
     if (!this.opensPermissions) return false;
     this.permissionsOpened++;
+    for (const allowed of this.allowsThere) {
+      if (allowed === 'history') this.historyAllowed = true;
+      else if ((await this.available()).has(allowed)) this.allowed.add(allowed);
+    }
     return true;
   }
 
