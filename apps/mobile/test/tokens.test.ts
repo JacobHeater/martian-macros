@@ -142,23 +142,19 @@ describe('the field border', () => {
       }
     });
 
-    // MM-556: a screen's title is drawn from title-from into title-to on the canvas, so both ends are readable there;
-    // a section's mark and the navigation bar's line are graphics (3:1), and Dark and Light show no line or glow.
-    it(`gives the title, the section mark and the bar's line their contrast in ${palette}`, () => {
+    // MM-556, MM-558: a section's mark, the calorie arc and the navigation bar's line are graphics (3:1), the ink holds
+    // 4.5:1 on the neon-orange fill, and Dark and Light show no line.
+    it(`gives the section mark, the arc and the bar's line their contrast in ${palette}`, () => {
       const tokens = cssBlock(`.theme-${palette}`);
-      for (const end of ['title-from', 'title-to']) {
-        expect(ratio(tokens.get(end)!, tokens.get('canvas')!), `${palette} ${end} on canvas`).toBeGreaterThanOrEqual(4.5);
-      }
       for (const level of ['canvas', 'surface', 'raised']) {
         expect(ratio(tokens.get('mark')!, tokens.get(level)!), `${palette} mark on ${level}`).toBeGreaterThanOrEqual(3);
       }
+      expect(ratio(tokens.get('arc')!, tokens.get('track')!), `${palette} arc on track`).toBeGreaterThanOrEqual(3);
+      expect(ratio(tokens.get('on-flare')!, tokens.get('flare')!), `${palette} on-flare on flare`).toBeGreaterThanOrEqual(4.5);
       if (palette === 'martian') {
         expect(ratio(tokens.get('accent-line')!, tokens.get('raised')!), 'martian line on raised').toBeGreaterThanOrEqual(3);
       } else {
         expect(tokens.get('accent-line')).toBe('transparent');
-        expect(tokens.get('glow')).toBe('transparent');
-        expect(tokens.get('title-from')).toBe(tokens.get('text'));
-        expect(tokens.get('title-to')).toBe(tokens.get('text'));
       }
     });
 

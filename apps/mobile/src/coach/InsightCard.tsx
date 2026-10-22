@@ -34,7 +34,7 @@ export function InsightCard() {
   const insight = selection.insight;
   const [title, body, evidence] = insightText(insight, new Fmt(setup.unitSystem, { weightDisplay }));
   return (
-    <MmSection
+    <MmSection framed
       icon="insight"
       title={title}
       trailing={

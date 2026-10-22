@@ -133,3 +133,7 @@
 .coach-pace-row > :first-child {
   flex: 1;
 }
+/* "Change pace" ends at the values' right edge: its padding hangs out, its tap area stays. */
+.coach-pace-row > :last-child {
+  margin-inline-end: calc(-1 * var(--space-12));
+}

@@ -44,7 +44,7 @@ export function MaintenanceCard() {
     );
   }
   return (
-    <MmSection icon="flag" title="Maintaining">
+    <MmSection framed icon="flag" title="Maintaining">
       {rebound ? <Notice text={reboundText(fmt)} /> : null}
       {lines.map((line) => (
         <p key={line} className="app-text">

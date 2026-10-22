@@ -14,6 +14,8 @@ interface MmSectionProps {
    * caution colour on its icon, so it never reads as routine, folded or open (MM-553).
    */
   kind?: 'caution';
+  /** The section, header and rows, sits on one card: for a screen of many sections whose rows are words (the Coach, owner). */
+  framed?: boolean;
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
   /**
@@ -42,12 +44,14 @@ interface MmSectionProps {
  * A section of a screen (MM-253, rule 1): an icon and a heading on the
  * canvas with its rows beneath, where a card used to be. It is the second
  * tier; the hero is the first and a disclosure inside it the third. A
- * section is never drawn on a surface, so nothing nests in a card.
+ * section is never drawn on a surface, so nothing nests in a card; a framed
+ * section is the card itself (the Coach, MM-558).
  */
 export function MmSection({
   icon,
   title,
   kind,
+  framed = false,
   summary,
   meter,
   trailing,
@@ -141,7 +145,11 @@ export function MmSection({
     header = <span className="mm-section-head-body">{head}</span>;
   }
   return (
-    <section className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${open ? '' : ' mm-section-closed'}`} aria-labelledby={`${id}-title`}>
+    // A header that opens a screen has no rows under it, so it stacks with the folded headers as one list (MM-402).
+    <section
+      className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${framed ? ' mm-section-framed' : ''}${open && onPress === undefined ? '' : ' mm-section-closed'}`}
+      aria-labelledby={`${id}-title`}
+    >
       <div className="mm-section-head">
         <div className="mm-section-head-main">{header}</div>
         {trailing}

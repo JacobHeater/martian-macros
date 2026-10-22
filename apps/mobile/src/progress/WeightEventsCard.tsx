@@ -46,7 +46,7 @@ export function WeightEventsCard() {
     });
     if (all.length === 0) {
       return (
-        <p className="app-text">
+        <p className="app-caption">
           Note illness, travel, a training change, a big meal or creatine here, so the trend can tell water from
           tissue.
         </p>
@@ -101,9 +101,9 @@ export function WeightEventsCard() {
       {events.ready ? (
         list(events.value)
       ) : Loadable.hasFailed(events) ? (
-        <p className="app-text">Could not load weight events.</p>
+        <p className="app-caption">Could not load weight events.</p>
       ) : (
-        <p className="app-text">Loading weight events...</p>
+        <p className="app-caption">Loading weight events...</p>
       )}
     </MmSection>
   );

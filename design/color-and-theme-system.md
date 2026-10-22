@@ -22,18 +22,16 @@ Martian keeps the same semantic roles and accessibility thresholds:
 
 | Roles | Martian values |
 |---|---|
-| canvas / surface / raised / overlay | `#0A081B` / `#16122E` / `#211B3F` / `#2C2550` |
-| sunken / track / selected | `#050410` / `#331A70` / `#4824AD` |
-| chosen / on-chosen | `#C4F24F` / `#0A081B` |
-| outline / outlineStrong | `#3F3670` / `#C77DFF` |
-| edge / glow | `#6B3DF5` / edge at 45% |
-| accent-line | `#FF3D8B` |
-| title-from / title-to | `#F3F552` / `#FF6A2C` |
-| mark | `#B98CFF` |
+| canvas / surface / raised / overlay | `#0A081B` / `#150F30` / `#1F1548` / `#2A1D5C` |
+| sunken / track / selected | `#050410` / `#2A1F58` / `#4A22C4` |
+| chosen / on-chosen (hot pink: chosen) | `#FF40A0` / `#0A081B` |
+| flare, arc / on-flare (neon orange: food going in) | `#FF7420` / `#0A081B` |
+| outline, edge / outlineStrong | `#3D2D78` / `#B762FF` |
+| accent-line (the violet frame) / mark | `#8A5CFF` / `#FF40A0` |
 | text / text2 / text3 | `#FFF8E9` / `#DDD4CC` / `#CBC6D6` |
-| action / on-action | `#DFF701` / `#1C2000` |
+| action / on-action (lime-yellow: do it) | `#E8FF1A` / `#1C2000` |
 | measurement / on-measurement | `#45E9F2` / `#0A081B` |
-| protein / carbs / fat | `#45E9F2` / `#FF7A1C` / `#EB3DA5` |
+| protein / carbs / fat | `#45E9F2` / `#FFA024` / `#9A6BFF` |
 | positive / caution / info | `#8FE02A` / `#FFC23D` / `#8CC8FF` |
 | water | `#4F95FF` |
 | danger / on-danger | `#FF858B` / `#0A081B` |
@@ -47,20 +45,15 @@ values side by side):
   and surface, raised and overlay step up from it in the same hue at L* 2.9 / 7.2 / 12.4 / 17.6, at low chroma, so no
   level reads purple and the brights carry the colour. (MM-554 had climbed from the sky's indigo into the mountains'
   purple; the owner: "i want that to be the base bg color and the brights to be the accents, button bg colors".)
-- **The blacklight (MM-556, the owner 2026-10-22: "more of that high contrast, 90's, blacklight look ... more of these
-  colors in the palette as first class citizens").** The art's violets, purples and hot pink, which had no role, are the
-  structure: cards, groups, choice cards and dialogs wear a violet edge (`edge`) that glows (`glow`); the hero and the
-  navigation bar a hot-pink line (`accent-line`) with its glow; a screen's title runs from the lettering's lime-yellow into
-  tangerine (`title-from` / `title-to`, 16.9 and 6.9 on the canvas); a section's mark is the mountains' lilac (`mark`,
-  6.4 on raised); the track, the chosen fill and the field edge are deeper, more saturated violets. In Dark and Light the
-  new roles equal their outline, text and secondary text, with no line or glow.
-- **The brights are the fills.** A chosen segment and the current tab's plate are lit in the stripes' lime (`chosen`,
-  `#C4F24F`) with the canvas as ink (`on-chosen`); in Dark and Light `chosen` is their `selected`.
-- **The action is the "MARTIAN" lettering's lime-yellow** (`#DFF701`, the art's own value). Positive, which was the
-  action colour, takes the art's lime stripe (`#8FE02A`), so success no longer looks like a button.
-- **Carbs are the "MACROS" tangerine** (`#FF7A1C`) and **fat the stripes' and rims' hot magenta** (`#EB3DA5`, the art's
-  `#D40F9C` lifted to hold 3:1 on the track). Danger is the ringed planet's red, lifted to `#FF858B` for 4.5:1 text on
-  overlay, where dialogs show their errors.
+- **Three neons, one meaning each (MM-558, the owner 2026-10-22: the theme "lacks cohesion").** Lime-yellow
+  (`#E8FF1A`) is *do it*: the action's fills only. Hot pink (`chosen`, `#FF40A0`) is *chosen*: a chosen segment, chip
+  and card, and the current tab's plate, whose label is the text colour; the owner also asked for it on the section
+  marks (`mark`). Neon orange (`flare` and `arc`, `#FF7420`) is *food going in*: a meal's add plate and the calorie arc it
+  fills. Violet (`accent-line`, `#8A5CFF`) is the frame and means nothing: the hero's edge, the navigation bar's stripe
+  set, the calorie arc's track. Cards keep a quiet edge (`edge` = outline). No gradients in text, no glow.
+- **No macro collides with a neon.** Carbs are the planet's amber (`#FFA024`), apart from the arc's orange beside them
+  in the hero; fat is violet (`#9A6BFF`), as in Dark, so it never reads as *chosen*. Protein stays the cyan stars.
+- **Danger is the ringed planet's red**, lifted to `#FF858B` for 4.5:1 text on overlay, where dialogs show their errors.
 - **Ion and protein stay one colour, as MM-375 decided**, now the splash's cyan stars (`#45E9F2`).
 - Cream text and MM-375's secondary text stay (`#FFF8E9`, `#DDD4CC`, `#CBC6D6`).
 - **A macro colour is a graphic colour, never text.** Fat is 3.7:1 on raised and 3.0:1 on overlay, so a macro's name and
@@ -69,11 +62,11 @@ values side by side):
 - **Positive is an icon or text colour only, never a filled control**: under protanopia it is 12 ΔE from the action, so
   a positive fill could pass for a button.
 
-Computed (WCAG, on canvas / surface / raised / overlay; MM-555): text 18.7 / 17.1 / 15.4 / 13.3, text2 13.5 / 12.4 / 11.1 / 9.7,
-text3 11.8 / 10.9 / 9.7 / 8.5; ion 13.3 / 12.2 / 11.0 / 9.5; outlineStrong 8.0 / 7.3 / 6.6 / 5.7; the action as text 16.4 / 15.0 / 13.5 / 11.7;
-danger 8.4 / 7.7 / 6.9 / 6.0; caution 12.3 / 11.2 / 10.1 / 8.8; info 11.1 / 10.2 / 9.1 / 7.9; positive 12.1 / 11.1 / 9.9 / 8.6; carbs 7.6 / 6.9 / 6.2 / 5.4
-and fat 5.4 / 5.0 / 4.4 / 3.9 (graphics). On-action 13.9, on-measurement 13.3, on-danger 8.4, on-chosen 15.2. Bars on the track:
-protein 9.3, carbs 5.3, fat 3.8, water 4.6. Macro L*: protein 85.0,
+Computed (WCAG, on canvas / surface / raised / overlay; MM-558): text 18.7 / 17.4 / 15.8 / 13.9, text2 13.5 / 12.6 / 11.4 / 10.1,
+text3 11.8 / 11.0 / 10.0 / 8.8; ion 13.3 / 12.4 / 11.3 / 9.9; outlineStrong 5.8 / 5.4 / 4.9 / 4.3; the action as text 17.6 / 16.4 / 14.9 / 13.1;
+danger 8.4 / 7.9 / 7.1 / 6.3; caution 12.3 / 11.4 / 10.4 / 9.1; info 11.1 / 10.3 / 9.4 / 8.3; positive 12.1 / 11.3 / 10.2 / 9.0; carbs 9.7 / 9.0 / 8.2 / 7.2
+and fat 5.6 / 5.2 / 4.7 / 4.1 (graphics); the section mark 6.1 / 5.7 / 5.2 / 4.5. On-action 14.9, on-chosen 6.1, on-flare 7.3, on-danger 8.4. Bars on the track:
+protein 9.9, carbs 7.2, fat 4.1, water 4.9, the calorie arc 5.4. Macro L*: protein 85.0,
 carbs 66.0, fat 55.8 (gaps 19.0, 29.2, 10.2). Colour-blind ΔE (Machado 2009, normal / protan / deutan / tritan):
 protein-carbs 121 / 80 / 91 / 120, protein-fat 115 / 46 / 25 / 130, carbs-fat 90 / 96 / 80 / 16; carbs and fat under
 tritan rest on the 10.2 L* gap and the labels, as before. The MM-375 figures below
