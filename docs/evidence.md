@@ -130,11 +130,17 @@ Body fat is estimated from height, weight, age and sex unless you give your own
 figure. Once you have measured your waist a few times in four weeks, a second
 formula from your height and waist joins the first and the range narrows a
 little; it stays a range, because both formulas can be off by several points
-for the same build. Where a safety limit depends on it, the app takes the
+for the same build. A smart scale's body-fat readings join once they span two
+weeks: the middle of the last two weeks, updated once a week, so an overnight
+swing moves nothing. Averaging removes a scale's day-to-day scatter, not its
+fixed bias, so the range narrows to a few points and no further. Each scale has
+its own bias: a new scale is learned against the one before it over its first
+week, so switching scales is not read as a change in your body. Where a safety
+limit depends on it, the app takes the
 cautious side when you could plausibly be on it, and does not switch back and
 forth on a small change.
 
-Rows: deurenbergBodyFat, relativeFatMass, BodyFatRule.waistFormulaSigmaPercent, BodyFatRule.formulaErrorCorrelation, BodyFatRule.waistWindowDays, BodyFatRule.minWaistEntries, combineBodyFatEstimates, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
+Rows: deurenbergBodyFat, relativeFatMass, BodyFatRule.waistFormulaSigmaPercent, BodyFatRule.formulaErrorCorrelation, BodyFatRule.waistWindowDays, BodyFatRule.minWaistEntries, scaleBodyFat, BodyFatRule.scaleSettleDays, BodyFatRule.scaleOffsetDays, BodyFatRule.scaleWindowDays, BodyFatRule.minScaleDays, BodyFatRule.scaleBiasSigmaPercent, BodyFatRule.scaleScatterFloorPercent, BodyFatRule.scaleErrorCorrelation, combineBodyFatEstimates, quartileSigmas, safetyBodyFatDeadbandPercent, SafetyBounds.checkGoalBodyFat
 
 ### How does the app plan the phases ahead?
 
@@ -267,6 +273,14 @@ Rows: sourceReliability, SourceReliabilityRule.bases, SourceReliabilityRule.base
 | `BodyFatRule.formulaErrorCorrelation` | 0.5 | engine BodyFatRule.ts | How much the waist formula's and the BMI formula's errors go together, so two outside formulas never narrow the range as if they were independent (MM-34) | Product judgement: both read the body from outside and both miss a muscular build the same way; no study measured the figure | judgement | None | No |
 | `BodyFatRule.waistWindowDays` | 28 days | engine BodyFatRule.ts | How far back waist entries count toward body fat (MM-34) | Product judgement: four weekly entries, so the range moves weekly and slowly, never on one day | judgement | None | No |
 | `BodyFatRule.minWaistEntries` | 3 entries | engine BodyFatRule.ts | How many waist entries in the window before the waist joins the formula; the middle value is used, so one mistyped entry moves nothing (MM-34) | Product judgement | judgement | None | No |
+| `scaleBodyFat` | One figure a day per scale; the middle of the last 14 days up to the weekly update day; a later scale's offset from its first week against the readings before it | engine scaleBodyFat.ts | How a smart scale's body-fat readings join the range, each scale with its own bias (MM-502) | Product decision with the owner (MM-34): consumer bioimpedance scales mostly read body water and swing two to five points overnight, and differ from one another by a fixed amount; a robust middle and a learned offset are the usual answers | judgement | Adults with a consumer smart scale | No |
+| `BodyFatRule.scaleSettleDays` | 14 days | engine BodyFatRule.ts | How long a scale's readings must span before they join the range; a week shows the range without them (MM-502) | Product judgement: two weeks of overnight swings before the scale's level is believed | judgement | None | No |
+| `BodyFatRule.scaleOffsetDays` | 7 days | engine BodyFatRule.ts | How long a new scale is learned against the one before it, and counts for nothing (MM-502) | Product judgement: a week of the new scale's middle against the old one's, short enough that the old readings still cover it | judgement | None | No |
+| `BodyFatRule.scaleWindowDays` | 14 days | engine BodyFatRule.ts | Which scale readings count: those of the two weeks up to the weekly update day (MM-502) | Product judgement: the middle of about fourteen readings, so one spike moves nothing, and the range moves weekly | judgement | None | No |
+| `BodyFatRule.minScaleDays` | 4 days | engine BodyFatRule.ts | How many days with a reading the window needs before the scale counts (MM-502) | Product judgement | judgement | None | No |
+| `BodyFatRule.scaleBiasSigmaPercent` | 2 points, one standard deviation | engine BodyFatRule.ts | The fixed error left in a scale's level however many readings are averaged, so filtering never narrows the range below what a scale's bias allows (MM-502) | Product judgement below the 3 to 5 points consumer bioimpedance misses a body scan by in single readings, since the day-to-day part of that is averaged out; not confirmed against a scan | judgement | Adults; wider in very lean or very muscular builds | No |
+| `BodyFatRule.scaleScatterFloorPercent` | 1 point, one standard deviation | engine BodyFatRule.ts | The least overnight scatter a scale's readings are taken to have, however steady they look (MM-502) | Product judgement: body water moves a reading even when the body does not | judgement | None | No |
+| `BodyFatRule.scaleErrorCorrelation` | 0 | engine BodyFatRule.ts | How far a scale's error goes with the formulas' (MM-502) | Product judgement: a scale reads current through the body, the formulas its size and shape; no study measured the figure | judgement | None | No |
 | `combineBodyFatEstimates` | Minimum-variance weighting of two estimates with correlated errors, the weight kept between 0 and 1 | engine combineBodyFatEstimates.ts | How the formula and the waist are joined into one range (MM-34) | Statistics: the best linear combination of two correlated unbiased estimates | strong | Not applicable | No |
 | `TdeeEstimator.windowDays` | 28 days | engine TdeeEstimator.ts | How far back the measurement looks | Product judgement tested in simulation | judgement | None | No |
 | `TdeeEstimator.minSpanDays` | 14 days | engine TdeeEstimator.ts | The shortest span that can produce a measurement | Product judgement tested in simulation | judgement | None | No |

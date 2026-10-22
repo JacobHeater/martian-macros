@@ -1,6 +1,6 @@
 ---
 id: MM-68
-status: in-progress
+status: done
 component: health-sync
 related: [MM-66, MM-67, MM-16, MM-19, MM-20, MM-34, MM-71, MM-72, MM-73, MM-188, MM-189, MM-498]
 ---
@@ -13,10 +13,20 @@ See MM-66.
 ## Decisions
 Choices I made without asking (say if any is wrong):
 - **Connecting is offered, never required**: at the end of onboarding and in Settings.
+  (2026-10-21, the builder) **In onboarding it is offered at the weight question, not at the end**, so that today's
+  weigh-in can be offered as the current weight (MM-73). Only weight is asked for there, with its history; the other
+  kinds are allowed in Settings. Built like Settings' health rows (rule 9): a list row under the weight field.
 - **Permissions are requested per data type**, with a sentence for each saying what it is used for. Refusing one does not block the others.
 - **Each imported weigh-in shows where it came from**, and the user can type a value for a day to overrule it.
 - **Menstruation data is requested only for female profiles.**
 - **Height from the platform is offered as a suggestion** if it differs from the profile; it never overwrites silently.
+- (2026-10-21, the builder) **Where the height is offered**: the newest height read, when it shows differently from the
+  profile's in the person's units, is said under the Height row of Settings' You section ("Health Connect says 5′ 9″",
+  built like the Date of birth row's subtitle, rule 9) and offered in the Height sheet with "Use 5′ 9″", which fills the
+  fields; only Save keeps it.
+- (2026-10-21, the builder) **Imported days of flow join the marked ones** wherever period days are used (the trend's
+  noise, the chart's shading, a weight jump's explanation, the missed-period question). The Period days card still marks
+  only what was marked in the app, since an imported day cannot be unmarked there.
 
 ## Description
 On Android, the user connects Health Connect and grants read access to any of: weight, body fat, lean mass, height, exercise sessions,
@@ -78,15 +88,42 @@ Built next (2026-10-11), on the rule of MM-71:
   cannot be read, what was kept is still used. Screens reload only when an import changed something.
 - The weigh-in card says where today's weigh-in came from and that typing overrules it.
 
-Not built:
-- Keeping up to date in the background (MM-72: Health Connect refuses reads off screen without a further permission). Reading
-  back further than Health Connect's first month is built in MM-73 (2026-10-21); a re-read after an expired token can drop
-  that history (MM-498).
-- The offer at the end of onboarding; the height suggestion; menstruation feeding the trend's noise; sessions in the training log.
-- The permission screen itself was not seen: permissions were granted over adb.
+Built (2026-10-21), not run locally; CI validates:
+- **Menstruation feeds the trend's noise**: `mergeFlowDays` joins the platform's days of flow to the marked ones in the
+  app's `flowDays` (`test/state/mergeFlowDays.test.ts`, `test/state/importedFlowDays.test.ts`).
+- **The height suggestion** (`test/settings/heightFromHealthPlatform.test.tsx`, story `HeightFromHealthConnect`).
+
+Closed or another ticket's:
+- Keeping up to date in the background: never, by the owner's decision of 2026-10-21 (MM-72, MM-516 closed). Reading back
+  further than Health Connect's first month is MM-73; a re-read after an expired token keeps it (MM-498).
+- Sessions in the training log: MM-490 (importing a platform's workouts needs a stored platform id, a schema change).
+
+- **The offer in onboarding** (with MM-73): "Read weight from Health Connect" under the weight question
+  (`WeightFromHealthRows`; `test/app/onboardingHealth.test.tsx`; stories `MeasurementsHealthConnectOffered`,
+  `MeasurementsWeighInOffered`, `MeasurementsWeighInUsed`, `MeasurementsReadingHealth`, `MeasurementsNoWeighInToday`).
+  The rows and the caption under the weight are said when they change, and when a pressed row goes away the weight
+  field takes focus (the UX-accessibility review).
+
+Done (2026-10-21): every scenario is built and tested against the fake. Google Play's declaration and the
+privacy-policy page are release gates (MM-95, M5) and do not hold this.
 - Google Play's health-permission declaration (MM-95), and the privacy-policy screen Health Connect links to: the rationale intent
   opens the app's main screen for now.
+
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): `height` is one of `HealthBackfill.types`, so a
+  height recorded more than thirty days ago (up to a year) is read and offered. Granting height now asks for the
+  history permission too, as weight does. Test: `test/healthIngest/healthBackfill.test.ts`.
+
+## Owed on a phone
+- A cycle app that writes only `MenstruationPeriodRecord` (no flow records): Android reads flow records only, so check
+  what Settings and the cycle-aware trend show; nothing is expected to be read today.
 
 ## Notes
 - Health Connect has no biological-sex record, so nothing here touches MM-14.
 - Google Play requires a declaration of each health permission and why it is needed (MM-95).
+
+## Owed on a phone
+- Health Connect's permission sheet for each kind, and for weight from onboarding, as a person sees it (it was only
+  granted over adb).
+- A scale's real reading arrives as today's weigh-in with its source name and units, and the trend includes it.
+- A permission taken away in the phone's settings is noticed, reading stops, and what was read is kept.
+- Imported days of flow shade the Progress chart; a platform height that differs is offered under Height.

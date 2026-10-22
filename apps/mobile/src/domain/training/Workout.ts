@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../CalendarDate';
+import type { ImportedWorkout } from './ImportedWorkout';
 import type { WorkoutExercise } from './WorkoutExercise';
 
 interface WorkoutInit {
@@ -10,6 +11,7 @@ interface WorkoutInit {
   pausedForMs?: number;
   setStartedAt?: Date | undefined;
   exercises?: readonly WorkoutExercise[];
+  imported?: ImportedWorkout | undefined;
 }
 
 /**
@@ -59,6 +61,12 @@ export class Workout {
   readonly setStartedAt: Date | undefined;
   readonly exercises: readonly WorkoutExercise[];
 
+  /**
+   * Where it came from, for one imported from the health platform (MM-490);
+   * undefined for one logged in the app. It is kept through every change.
+   */
+  readonly imported: ImportedWorkout | undefined;
+
   constructor(init: WorkoutInit) {
     this.id = init.id;
     this.date = init.date;
@@ -68,6 +76,7 @@ export class Workout {
     this.pausedForMs = init.pausedForMs ?? 0;
     this.setStartedAt = init.setStartedAt;
     this.exercises = init.exercises ?? [];
+    this.imported = init.imported;
   }
 
   get inProgress(): boolean {
@@ -102,6 +111,7 @@ export class Workout {
       pausedForMs: changes.pausedForMs ?? this.pausedForMs,
       setStartedAt: 'setStartedAt' in changes ? changes.setStartedAt : this.setStartedAt,
       exercises: changes.exercises ?? this.exercises,
+      imported: this.imported,
     });
   }
 }

@@ -20,8 +20,11 @@ import type { ReminderRepository } from '../domain/repositories/ReminderReposito
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
 import type { SleepRepository } from '../domain/repositories/SleepRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
+import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { MeasurementRepository } from '../domain/repositories/MeasurementRepository';
+import type { MeasurementSettingsRepository } from '../domain/repositories/MeasurementSettingsRepository';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
@@ -41,7 +44,14 @@ import type { HealthPermissionsPlace } from '../healthIngest/HealthPermissionsPl
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { HealthSource } from '../healthIngest/HealthSource';
 import type { HealthWriting } from '../healthIngest/HealthWriting';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
+import type { HealthProfileReader } from '../domain/integration/HealthProfileReader';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
+import type { DeviceLock } from '../domain/integration/DeviceLock';
+import type { PhotoCamera } from '../domain/integration/PhotoCamera';
+import type { PrivateScreen } from '../domain/integration/PrivateScreen';
+import type { ProgressPhotoRepository } from '../domain/repositories/ProgressPhotoRepository';
 import type { Watched } from '../lang/Watched';
 import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
 import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
@@ -60,6 +70,10 @@ export interface AppServices {
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
   readonly waist: WaistRepository;
+  /** Every site's tape measurements, the waist's among them (MM-156). */
+  readonly measurements: MeasurementRepository;
+  /** Which sites beyond the waist are measured, the limb side, and the suggestion's answer (MM-156). */
+  readonly measurementSettings: MeasurementSettingsRepository;
   /** The days marked with menstrual flow (MM-20). */
   readonly flowDays: MenstruationRepository;
   /** The nights of sleep the person typed (MM-250); imported nights come through `healthSamples`. */
@@ -72,7 +86,11 @@ export interface AppServices {
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */
   readonly targetShapes: TargetShapeRepository;
+  /** The goal body fat the user set (MM-36), kept in the database (MM-507). */
+  readonly goalBodyFat: GoalBodyFatRepository;
   readonly preferences: PreferencesRepository;
+  /** The hours in which an imported reading counts as the morning weigh-in (MM-441). */
+  readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
@@ -144,8 +162,23 @@ export interface AppServices {
    */
   readonly healthWriting: HealthWriting;
 
+  /** The progress photos, kept apart from the rest of the data (MM-157). */
+  readonly progressPhotos: ProgressPhotoRepository;
+
+  /** The camera progress photos are taken with, inside the app (MM-157). */
+  readonly photoCamera: PhotoCamera;
+
+  /** The phone's own lock, asked each time the photos are opened (MM-157). */
+  readonly deviceLock: DeviceLock;
+
+  /** Keeps a photo out of the app switcher and screenshots while it shows (MM-157). */
+  readonly privateScreen: PrivateScreen;
+
   /** Workouts on the health platform with their segments (MM-489), for importing them (MM-490). */
   readonly healthWorkouts: HealthWorkoutReader;
+
+  /** Sex, date of birth and height from Apple Health, offered on onboarding's first step (MM-69). */
+  readonly healthProfile: HealthProfileReader;
 
   /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
   readonly evidence: () => Promise<string>;

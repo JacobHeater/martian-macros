@@ -10,6 +10,7 @@ import { ObservableValue } from './ObservableValue';
 export class InMemoryWorkoutRepository implements WorkoutRepository {
   private readonly workouts = new ObservableValue<readonly Workout[]>([]);
   private nextId = 1;
+  private readonly deleted = new Set<string>();
 
   watchWorkouts(): Watched<Workout[]> {
     return this.workouts.watchAs((all) =>
@@ -31,7 +32,13 @@ export class InMemoryWorkoutRepository implements WorkoutRepository {
   }
 
   async deleteWorkout(id: number): Promise<void> {
+    const platformId = this.workouts.value.find((existing) => existing.id === id)?.imported?.platformId;
+    if (platformId !== undefined) this.deleted.add(platformId);
     this.workouts.value = this.workouts.value.filter((existing) => existing.id !== id);
+  }
+
+  async deletedPlatformIds(): Promise<ReadonlySet<string>> {
+    return new Set(this.deleted);
   }
 
   /**
@@ -40,5 +47,6 @@ export class InMemoryWorkoutRepository implements WorkoutRepository {
    */
   clear(): void {
     this.workouts.value = [];
+    this.deleted.clear();
   }
 }

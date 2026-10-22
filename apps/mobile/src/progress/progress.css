@@ -110,3 +110,33 @@
   gap: var(--space-12);
   margin: var(--space-8) 0 0;
 }
+
+/* MM-157: progress photos: a set's thumbnails in a row, and two photos side by side to compare. */
+.progress-photo-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+}
+.progress-photo-thumbnail {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+.progress-photo-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-8);
+}
+.progress-photo-compared {
+  margin: 0;
+}
+.progress-photo-compared figcaption {
+  margin-top: var(--space-4);
+}
+
+/* One site of the measuring session (MM-156): spaced as the sections of a screen are. */
+.progress-session-site {
+  margin: var(--space-16) 0 0;
+}

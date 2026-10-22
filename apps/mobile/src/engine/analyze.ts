@@ -1,3 +1,4 @@
+import type { BodyFatObservation } from '../domain/BodyFatObservation';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { IntakeDay } from '../domain/IntakeDay';
@@ -66,6 +67,7 @@ export function analyze({
   pauses = [],
   waists = [],
   shapes = [],
+  bodyFatReadings = [],
   trendModel = new WeightTrendModel(),
   estimator = new TdeeEstimator(),
 }: {
@@ -80,6 +82,8 @@ export function analyze({
   waists?: readonly WaistObservation[];
   /** How the user shaped their weeks, oldest first (MM-124): a planned lower day is not a partial one. */
   shapes?: readonly TargetShape[];
+  /** Smart-scale body-fat readings (MM-502). */
+  bodyFatReadings?: readonly BodyFatObservation[];
   trendModel?: WeightTrendModel;
   estimator?: TdeeEstimator;
 }): CoachSnapshot | undefined {
@@ -120,8 +124,8 @@ export function analyze({
   });
   const age = profile.ageOn(today);
 
-  // The user's figure, or the formula joined by their waist entries (MM-34).
-  const estimatedBodyFat = estimateBodyFat({ setup, trendWeightKg: trendWeight, waists, today });
+  // The user's figure, or the formula joined by their waist entries (MM-34) and a smart scale's readings (MM-502).
+  const estimatedBodyFat = estimateBodyFat({ setup, trendWeightKg: trendWeight, waists, bodyFatReadings, today });
   const bodyFat = estimatedBodyFat.estimate;
 
   const bmr = mifflinStJeorKcal({ sex: profile.sex, weightKg: trendWeight, heightCm: profile.heightCm, ageYears: age });

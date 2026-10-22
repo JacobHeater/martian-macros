@@ -105,14 +105,6 @@ CREATE TABLE "day_marks" (
   "completeness" TEXT NOT NULL,
   PRIMARY KEY ("epoch_day")
 );
-CREATE TABLE "waist_entries" (
-  "epoch_day" INTEGER NOT NULL,
-  "waist_cm" REAL NOT NULL CHECK("waist_cm" BETWEEN 30.0 AND 300.0),
-  "reading1_cm" REAL NULL,
-  "reading2_cm" REAL NULL,
-  "reading3_cm" REAL NULL,
-  PRIMARY KEY ("epoch_day")
-);
 CREATE TABLE "targets_history" (
   "effective_epoch_day" INTEGER NOT NULL,
   "mode" TEXT NOT NULL,
@@ -162,6 +154,8 @@ CREATE TABLE "user_preferences" (
   "online_lookup" TEXT NOT NULL DEFAULT 'ask' CHECK ("online_lookup" IN ('ask', 'always', 'never')),
   "usual_cooking_fat" TEXT NOT NULL DEFAULT 'oil',
   "primary_scale_source_id" TEXT NULL,
+  "weigh_in_window_start_minute" INTEGER NULL CHECK ("weigh_in_window_start_minute" IS NULL OR "weigh_in_window_start_minute" BETWEEN 0 AND 1439),
+  "weigh_in_window_end_minute" INTEGER NULL CHECK ("weigh_in_window_end_minute" IS NULL OR "weigh_in_window_end_minute" BETWEEN 1 AND 1440),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -208,7 +202,9 @@ CREATE TABLE "recipe_ingredients" (
   "kcal" REAL NOT NULL,
   "protein_g" REAL NOT NULL,
   "carbs_g" REAL NOT NULL,
-  "fat_g" REAL NOT NULL
+  "fat_g" REAL NOT NULL,
+  "source_pack_id" TEXT NULL,
+  "source_food_id" INTEGER NULL
 );
 CREATE TABLE "insight_log" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -247,7 +243,9 @@ CREATE TABLE "workouts" (
   "ended_at_ms" INTEGER NULL,
   "paused_at_ms" INTEGER NULL,
   "paused_for_ms" INTEGER NOT NULL DEFAULT 0,
-  "set_started_at_ms" INTEGER NULL
+  "set_started_at_ms" INTEGER NULL,
+  "platform_id" TEXT NULL,
+  "platform_source_name" TEXT NULL
 );
 CREATE TABLE "workout_exercises" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -362,5 +360,29 @@ CREATE TABLE "target_shapes" (
   "higher_days" TEXT NOT NULL DEFAULT '',
   "raise_share" REAL NOT NULL CHECK("raise_share" > 0.0 AND "raise_share" < 1.0),
   PRIMARY KEY ("since_epoch_day")
+);
+CREATE TABLE "goal_body_fat" (
+  "id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1),
+  "percent" REAL NOT NULL CHECK("percent" > 0.0 AND "percent" < 100.0),
+  "set_epoch_day" INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX "workouts_platform_id" ON "workouts" ("platform_id");
+CREATE TABLE "deleted_platform_workouts" (
+  "platform_id" TEXT NOT NULL PRIMARY KEY
+);
+CREATE TABLE "body_measurements" (
+  "site" TEXT NOT NULL CHECK ("site" IN ('waist', 'neck', 'chest', 'hips', 'upperArm', 'thigh', 'calf')),
+  "epoch_day" INTEGER NOT NULL,
+  "value_cm" REAL NOT NULL CHECK("value_cm" BETWEEN 10.0 AND 300.0),
+  "reading1_cm" REAL NULL,
+  "reading2_cm" REAL NULL,
+  "reading3_cm" REAL NULL,
+  PRIMARY KEY ("site", "epoch_day")
+);
+CREATE TABLE "measurement_settings" (
+  "id" INTEGER NOT NULL PRIMARY KEY CHECK("id" = 1),
+  "sites" TEXT NOT NULL DEFAULT '',
+  "limb_side" TEXT NULL CHECK ("limb_side" IS NULL OR "limb_side" IN ('left', 'right')),
+  "suggestion_answered" INTEGER NOT NULL DEFAULT 0 CHECK ("suggestion_answered" IN (0, 1))
 );
 `;
