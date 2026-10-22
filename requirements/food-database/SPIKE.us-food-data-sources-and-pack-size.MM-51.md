@@ -1,6 +1,6 @@
 ---
 id: MM-51
-status: in-progress
+status: done
 component: food-database
 related: [MM-50, MM-52, MM-55, MM-56, MM-57]
 ---
@@ -95,3 +95,36 @@ The owner asked for a food-data solution "including additional sources". Candida
 The spike's hand check (question 3) and pantry test (question 7) still need real packages, as recorded above; with the live
 lookup, an unknown barcode in a real pantry is now looked up rather than lost, which is the practical answer to coverage until
 the test is run.
+
+## Conclusion (2026-10-21)
+The spike's deliverable is these findings, and every acceptance criterion has its answer above with the query behind it
+(`docs/food-packs-data.md` holds the queries and tables). Closed on the owner's direction of 2026-10-21; the two checks that
+need real packages are owed by the owner, below. What was decided:
+- **Sources.** USDA FoodData Central (Branded, Foundation, SR Legacy, FNDDS) and the United States slice of Open Food Facts
+  (184,356 complete products after the 2026-10-19 re-read). Live lookups of both by barcode and name when the person allows it
+  (MM-58). MenuStat, the Canadian, UK and Australian tables and OpenNutrition are declined for a US launch.
+- **Packs.** The generic pack ships inside the app; the US barcode pack is downloaded (MM-55, MM-56). The build of 2026-10-19
+  measured 13,285 generic foods (1.5 MB gzip) and 520,988 barcode foods (53.8 MB gzip).
+- **Conflicts.** This spike's rule (a record failing the nutrition checks of MM-53 loses; of two passing records the more
+  recently changed wins) was superseded as the build's default by MM-383's `ReliabilityPolicy`: the more reliable source
+  wins a shared barcode, so the manufacturer's label (USDA Branded) is written over Open Food Facts, and two records of one
+  reliability fall to recency. A difference over 10% still marks the food "check this" (MM-153); `./mm food build --prefer
+  recent` reproduces this spike's rule. The hand check below is what would test either.
+- **Coverage.** A barcode the pack lacks is looked up live (MM-58), so an unknown pantry item is found online rather than lost;
+  the pantry measurement below says how often the pack alone suffices.
+- **Licences.** Handed to MM-57 (USDA public domain with a requested citation; Open Food Facts ODbL and DbCL).
+
+## Owed by the owner
+- **Pantry coverage (question 7).** Fifty barcodes from the owner's real pantry, typed one per line as printed under each
+  barcode into `barcodes.txt` (UPC-A, EAN-13 or EAN-8; for a short UPC-E give the UPC-A). Then, with Python 3 (standard
+  library only):
+  1. Download the `barcode_us-*.pack.gz` asset of the latest release of `JacobHeater/martian-macros-food-data` (or build
+     `barcode_us.pack` with `./mm food fetch` and `./mm food build`, which writes it to `.food_cache/packs/`).
+  2. `gunzip barcode_us-*.pack.gz`.
+  3. `python3 tool/spikes/food_sources/pantry_coverage.py barcode_us-<date>.pack barcodes.txt`
+  It prints each barcode not found or invalid, then "N of 50 found". Record that line and the build date here under
+  Findings, question 7.
+- **Hand check of the conflict rule (question 3).** For the products in `tool/spikes/food_sources/sample50_disagreements.csv`
+  that the owner can find on a shelf, compare the package's label (energy, protein, carbohydrate, fat per 100 g) with the
+  Open Food Facts (`o*`) and USDA (`u*`) columns, and record which source matched more often. If USDA matches more
+  often, the build's default (`ReliabilityPolicy`) stands; if Open Food Facts does, `--prefer recent` is the one-line change.
