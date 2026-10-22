@@ -166,11 +166,6 @@
   min-width: 0;
   margin: 0;
   font: var(--type-title);
-  /* Martian's title is the lettering's lime-yellow into tangerine (MM-556); elsewhere both ends are the text colour. */
-  background: linear-gradient(100deg, var(--title-from), var(--title-to));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
   /* A one-word title at 200% text breaks inside the word rather than over the bar's action (MM-374), hyphenated as the navigation labels are. */
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -184,7 +179,7 @@
   min-height: 72px;
   padding: var(--space-8) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
   background: var(--raised);
-  /* Martian's hot-pink line along the top (MM-556); none elsewhere. */
+  /* Martian's violet frame line along the top (MM-556, MM-558); none elsewhere. */
   box-shadow: 0 -1px 0 var(--accent-line);
 }
 .mm-nav-destination {
@@ -228,9 +223,13 @@
 .mm-nav-destination-current .mm-nav-indicator {
   background: var(--chosen);
 }
-/* Martian lights the current tab's plate (MM-555), so its icon takes the ink; the label stays in Ember. */
+/* Martian lights the current tab's plate in hot pink (MM-555, MM-558), so its icon takes the ink and its label the text
+   colour: one neon per destination, and lime stays the action's. */
 .theme-martian .mm-nav-destination-current .mm-nav-indicator {
   color: var(--on-chosen);
+}
+.theme-martian .mm-nav-destination-current {
+  color: var(--text);
 }
 
 /* ---- Surfaces (MM-277: cards carry their per-theme elevation) ---- */
@@ -283,12 +282,12 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
-/* Martian's hero is edged in the stripes' hot pink (MM-556). */
+/* Martian's hero is edged in the frame violet (MM-556, MM-558). */
 .theme-martian .mm-hero {
   border-color: var(--accent-line);
 }
 .theme-martian .mm-hero-backdrop {
-  --mm-limb: color-mix(in srgb, var(--edge) 30%, transparent);
+  --mm-limb: color-mix(in srgb, var(--accent-line) 30%, transparent);
 }
 .mm-hero-backdrop {
   position: absolute;
@@ -763,12 +762,12 @@
   transition: background var(--motion-fast);
 }
 .mm-chip-selected {
-  background: var(--pop);
-  color: var(--on-pop);
+  background: var(--chosen);
+  color: var(--on-chosen);
 }
-/* On Martian's hot-pink fill the check takes the ink (MM-556). */
+/* On Martian's hot-pink fill the check takes the ink (MM-558). */
 .theme-martian .mm-chip-selected .mm-chip-check {
-  color: var(--on-pop);
+  color: var(--on-chosen);
 }
 .mm-chip-check {
   display: grid;
@@ -1230,6 +1229,14 @@
 .mm-choice-card-check {
   display: grid;
   color: var(--ember);
+}
+/* A chosen card is chosen, not an action, so Martian marks it in hot pink (MM-558). */
+.theme-martian .mm-choice-card-selected {
+  border-color: var(--chosen);
+  box-shadow: inset 0 0 0 1px var(--chosen);
+}
+.theme-martian .mm-choice-card-check {
+  color: var(--chosen);
 }
 .mm-badge {
   padding: 2px var(--space-8);
