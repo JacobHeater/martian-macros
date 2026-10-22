@@ -3,33 +3,55 @@ import type { BackupHeader } from './BackupHeader';
 import { BackupProblem } from './BackupProblem';
 
 const magic = new Uint8Array([0x4d, 0x4d, 0x42, 0x4b]); // "MMBK"
-const formatVersion = 1;
+/** The newest format this app writes and reads: 2 carries the progress photos (MM-157). */
+const formatVersion = 2;
+
+/** The database and the photo archive as one sealed part (MM-157): the database's length, the database, the archive. */
+function withPhotos(snapshot: Uint8Array, photos: Uint8Array): Uint8Array {
+  const out = new Uint8Array(4 + snapshot.length + photos.length);
+  new DataView(out.buffer).setUint32(0, snapshot.length);
+  out.set(snapshot, 4);
+  out.set(photos, 4 + snapshot.length);
+  return out;
+}
+
+/** The two parts `withPhotos` joined. */
+function withoutPhotos(opened: Uint8Array): { snapshot: Uint8Array; photos: Uint8Array } {
+  if (opened.length < 4) throw new BackupProblem('notABackup');
+  const length = new DataView(opened.buffer, opened.byteOffset).getUint32(0);
+  if (4 + length > opened.length) throw new BackupProblem('notABackup');
+  return { snapshot: opened.slice(4, 4 + length), photos: opened.slice(4 + length) };
+}
 
 /**
  * The backup file's layout (MM-63): "MMBK", one byte of format version, the
  * header's length, the header as JSON, the nonce, then the database sealed
  * with the header bound to it, so a changed header is refused too. Nothing
- * readable from the person's data is outside the sealed part.
+ * readable from the person's data is outside the sealed part. A backup
+ * without photos is format 1, as before; with them (MM-157) it is format 2,
+ * and the sealed part is the database's length, the database, then the
+ * photo archive.
  */
 export const BackupFile = {
   /** Encrypts `snapshot` under `passphrase` into a file. */
   async write(
     snapshot: Uint8Array,
     passphrase: string,
-    { schemaVersion, createdOn }: { schemaVersion: number; createdOn: string },
+    { schemaVersion, createdOn, photos }: { schemaVersion: number; createdOn: string; photos?: Uint8Array | undefined },
     cipher: BackupCipher,
   ): Promise<Uint8Array> {
     const kdf = await cipher.newKdf();
-    const header: BackupHeader = { format: 1, app: 'martian-macros', schemaVersion, createdOn, kdf };
+    const format = photos === undefined ? 1 : 2;
+    const header: BackupHeader = { format, app: 'martian-macros', schemaVersion, createdOn, kdf };
     const headerBytes = new TextEncoder().encode(JSON.stringify(header));
     const nonce = await cipher.randomBytes(cipher.nonceBytes);
     const key = await cipher.deriveKey(passphrase, kdf);
-    const sealed = await cipher.seal(snapshot, nonce, key, headerBytes);
+    const sealed = await cipher.seal(photos === undefined ? snapshot : withPhotos(snapshot, photos), nonce, key, headerBytes);
     const out = new Uint8Array(magic.length + 1 + 4 + headerBytes.length + nonce.length + sealed.length);
     let at = 0;
     out.set(magic, at);
     at += magic.length;
-    out[at++] = formatVersion;
+    out[at++] = format;
     new DataView(out.buffer).setUint32(at, headerBytes.length);
     at += 4;
     out.set(headerBytes, at);
@@ -50,7 +72,9 @@ export const BackupFile = {
     if (start + length > file.length) throw new BackupProblem('notABackup');
     try {
       const header = JSON.parse(new TextDecoder().decode(file.subarray(start, start + length))) as BackupHeader;
-      if (header.app !== 'martian-macros' || header.format !== 1 || typeof header.schemaVersion !== 'number') throw new Error();
+      if (header.app !== 'martian-macros' || (header.format !== 1 && header.format !== 2) || typeof header.schemaVersion !== 'number') {
+        throw new Error();
+      }
       return header;
     } catch {
       throw new BackupProblem('notABackup');
@@ -58,7 +82,11 @@ export const BackupFile = {
   },
 
   /** The database inside `file`, or a `BackupProblem`: wrong passphrase and a changed file are told apart from a file that is no backup. */
-  async read(file: Uint8Array, passphrase: string, cipher: BackupCipher): Promise<{ header: BackupHeader; snapshot: Uint8Array }> {
+  async read(
+    file: Uint8Array,
+    passphrase: string,
+    cipher: BackupCipher,
+  ): Promise<{ header: BackupHeader; snapshot: Uint8Array; photos?: Uint8Array | undefined }> {
     const header = BackupFile.header(file);
     const length = new DataView(file.buffer, file.byteOffset).getUint32(magic.length + 1);
     const headerStart = magic.length + 5;
@@ -68,8 +96,8 @@ export const BackupFile = {
     const sealed = file.subarray(nonceStart + cipher.nonceBytes);
     if (nonce.length < cipher.nonceBytes || sealed.length === 0) throw new BackupProblem('notABackup');
     const key = await cipher.deriveKey(passphrase, header.kdf);
-    const snapshot = await cipher.open(sealed, nonce, key, headerBytes);
-    if (snapshot !== undefined) return { header, snapshot };
+    const opened = await cipher.open(sealed, nonce, key, headerBytes);
+    if (opened !== undefined) return header.format === 2 ? { header, ...withoutPhotos(opened) } : { header, snapshot: opened };
     // The cipher cannot tell a wrong key from a changed byte; a passphrase that opened nothing is the likelier, so the
     // person is asked again, and a file whose sealed part was changed is caught when the database inside is opened.
     throw new BackupProblem('wrongPassphrase');

@@ -5,6 +5,9 @@
  */
 export * from './adherenceLines';
 export * from './bodyFatNote';
+export * from './byteSizeText';
+export * from './comparedPhotoLines';
+export * from './photoPoseLabel';
 export * from './bodyFatRange';
 export * from './bodyFatRangeText';
 export * from './goalBodyFatCheckText';

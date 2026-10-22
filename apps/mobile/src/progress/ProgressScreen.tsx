@@ -27,6 +27,7 @@ import { onboardingCreatine } from './onboardingCreatine';
 import { saveWaistReadings } from './saveWaistReadings';
 import { WeightEventsCard } from './WeightEventsCard';
 import { PeriodDaysCard } from './PeriodDaysCard';
+import { ProgressPhotosCard } from './ProgressPhotosCard';
 import { cycleWindows } from '../engine/cycleWindows';
 import './progress.css';
 
@@ -225,6 +226,7 @@ export function ProgressScreen() {
       </div>
       <RecompSignalCard fmt={fmt} />
       <StrengthSection />
+      <ProgressPhotosCard />
     </>
   );
 }

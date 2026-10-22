@@ -42,3 +42,25 @@ describe('a backup file', () => {
     expect(text).toContain('martian-macros');
   }, 60000);
 });
+
+// MM-157: with photo backup on, the photos are sealed beside the database; without it, the file is as before.
+describe('a backup file with progress photos', () => {
+  const photos = new TextEncoder().encode('MMPA a front photo of Jacob');
+
+  it('carries the photos beside the database, sealed with it, and says so in its format', async () => {
+    const file = await BackupFile.write(snapshot, 'correct horse battery', { ...made, photos }, cipher);
+    expect(BackupFile.header(file).format).toBe(2);
+    const opened = await BackupFile.read(file, 'correct horse battery', cipher);
+    expect(opened.snapshot).toEqual(snapshot);
+    expect(opened.photos).toEqual(photos);
+    expect(new TextDecoder('utf-8', { fatal: false }).decode(file)).not.toContain('front photo');
+  }, 60000);
+
+  it('Backup: with photo backup off, a backup holds no photos', async () => {
+    const file = await BackupFile.write(snapshot, 'correct horse battery', made, cipher);
+    expect(BackupFile.header(file).format).toBe(1);
+    const opened = await BackupFile.read(file, 'correct horse battery', cipher);
+    expect(opened.photos).toBeUndefined();
+    expect(opened.snapshot).toEqual(snapshot);
+  }, 60000);
+});
