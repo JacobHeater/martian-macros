@@ -1,3 +1,4 @@
+import type { CalendarDate } from '../domain/CalendarDate';
 import type { IntakeDay } from '../domain/IntakeDay';
 
 /**
@@ -13,16 +14,30 @@ import type { IntakeDay } from '../domain/IntakeDay';
  * against the 75th), which half-logged days do not reach even when a third
  * of days are half-logged, so a steady logger's half day is still caught.
  *
+ * Each day is read against its plan (MM-124): `plannedShare` gives the
+ * share of the flat figure the user planned for the day (`plannedDayShare`),
+ * and a day's intake is divided by it before the comparison, so a planned
+ * lower day eaten as planned sits with the rest rather than below them.
+ * Without it every day is planned flat.
+ *
  * One rule for the expenditure estimate, the adherence summary (MM-149) and
  * the under-eating notice (MM-114), so they always agree on which days count.
  */
 export function usableIntakeDays(
   days: readonly IntakeDay[],
-  { partialDayFraction = 0.65, spreadSigmas = 2.5 }: { partialDayFraction?: number; spreadSigmas?: number } = {},
+  {
+    partialDayFraction = 0.65,
+    spreadSigmas = 2.5,
+    plannedShare,
+  }: { partialDayFraction?: number; spreadSigmas?: number; plannedShare?: ((date: CalendarDate) => number) | undefined } = {},
 ): IntakeDay[] {
   const candidates = days.filter((d) => d.completeness !== 'partial');
   if (candidates.length === 0) return [];
-  const kcal = candidates.map((d) => d.kcal);
+  const asPlanned = (d: IntakeDay) => {
+    const share = plannedShare?.(d.date) ?? 1;
+    return share > 0 ? d.kcal / share : d.kcal;
+  };
+  const kcal = candidates.map(asPlanned);
   const typical = percentile(kcal, 0.75);
   const fixed = typical * partialDayFraction;
   // The top's spread as a standard deviation: for a normal spread the 90th percentile sits 0.607 sigma above the 75th,
@@ -31,7 +46,7 @@ export function usableIntakeDays(
   const middle = typical - 0.674 * sigma;
   const widened = candidates.length >= 7 ? middle - spreadSigmas * sigma : fixed;
   const threshold = Math.min(fixed, widened);
-  return candidates.filter((d) => d.completeness === 'complete' || (d.kcal > 0 && d.kcal >= threshold));
+  return candidates.filter((d) => d.completeness === 'complete' || (d.kcal > 0 && asPlanned(d) >= threshold));
 }
 
 /** Linear-interpolated percentile, `p` in 0–1. */
