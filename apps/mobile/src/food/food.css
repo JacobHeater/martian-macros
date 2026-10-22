@@ -189,6 +189,13 @@
   margin-top: var(--space-12);
 }
 
+/* A recipe line's weight, seated under its row as the row's entry slot (MM-456): indented to the row's text. */
+.food-line-weight {
+  margin-block: var(--space-4) var(--space-12);
+  padding-inline-start: var(--space-16);
+  border-inline-start: 2px solid var(--outline);
+}
+
 /* The Add water sheet's one-tap amounts (MM-318). */
 .food-water-actions {
   display: grid;

@@ -108,7 +108,9 @@ One grammar, shared by every chart (WS-03/WS-07):
   Ember is for actions.
 - One reading is one dot and a sentence, never an invented flat trend.
 - Every chart has a caption that doubles as the screen-reader summary.
-- 30- and 90-day ranges only, as a two-option selector.
+- 30- and 90-day ranges only, as a two-option selector. Body measurements
+  (MM-156), taken weekly at most, use 90-day and one-year ranges ("90d",
+  "1y") instead, as a tape changes too slowly for 30 days to show a line.
 - Draw-in animation: line draws left to right in 400 ms on first appearance
   only; skipped under reduce motion.
 

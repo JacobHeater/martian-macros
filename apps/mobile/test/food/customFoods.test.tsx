@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -147,7 +147,7 @@ it('a recipe divides its ingredients into servings', async () => {
     await typeIn(sheet, 'Ingredient', name);
     await typeIn(sheet, 'kcal', kcal);
     await typeIn(sheet, 'Protein g', protein);
-    await press(sheet, 'Add');
+    await press(sheet, 'Add ingredient');
   }
   expect(within(sheet).getByText(/One serving: 400 kcal/)).toBeInTheDocument();
   expect(within(sheet).getByText(/35 g protein/)).toBeInTheDocument();
@@ -248,7 +248,7 @@ it('an ingredient the pack has raw and cooked asks which was weighed', async () 
   expect(within(sheet).getByText('200 g cooked is about 260 kcal. 200 g raw is about 730 kcal.')).toBeInTheDocument();
   await press(sheet, 'Raw');
   expect(within(sheet).getByText('200 g raw is about 730 kcal. 200 g cooked is about 260 kcal.')).toBeInTheDocument();
-  await press(sheet, 'Add');
+  await press(sheet, 'Add ingredient');
   await typeIn(sheet, 'Makes servings', '2');
   expect(within(sheet).getByText(/One serving: 365 kcal/)).toBeInTheDocument();
   await press(sheet, 'Save recipe');
@@ -299,11 +299,11 @@ it('an ingredient found in the pack keeps the food it came from; one typed keeps
   await userEvent.click(await within(sheet).findByRole('button', { name: /^White rice, cooked/ }));
   await typeIn(sheet, 'Weight g', '200');
   await press(sheet, 'Raw');
-  await press(sheet, 'Add');
+  await press(sheet, 'Add ingredient');
   await press(sheet, 'Enter numbers instead');
   await typeIn(sheet, 'Ingredient', 'Butter');
   await typeIn(sheet, 'kcal', '72');
-  await press(sheet, 'Add');
+  await press(sheet, 'Add ingredient');
   await press(sheet, 'Save recipe');
   await expect.poll(async () => (await saved()).length).toBe(1);
   const [rice, butter] = (await saved())[0]?.ingredients ?? [];
@@ -316,12 +316,15 @@ it("a found line's weight is changed in place, from the food as installed (MM-45
   const sheet = await editRecipe('Rice bowl');
   await press(sheet, 'More actions for White rice, raw');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
-  // The food is looked up in the pack first.
-  await within(sheet).findByRole('textbox', { name: 'New weight g for White rice, raw' });
-  await typeIn(sheet, 'New weight g for White rice, raw', '100');
+  // The food is looked up in the pack first; the field takes focus as it opens.
+  const field = await within(sheet).findByRole('textbox', { name: 'Weight g for White rice, raw' });
+  await waitFor(() => expect(field).toHaveFocus());
+  await typeIn(sheet, 'Weight g for White rice, raw', '100');
   expect(within(sheet).getByText('100 g is about 365 kcal.')).toBeInTheDocument();
   await press(sheet, 'Save weight');
   expect(within(sheet).getByText('100 g · 365 kcal')).toBeInTheDocument();
+  // Focus goes back to that line's menu button.
+  await waitFor(() => expect(within(sheet).getByRole('button', { name: 'More actions for White rice, raw' })).toHaveFocus());
   await press(sheet, 'Save recipe');
   await expect.poll(async () => (await saved())[0]?.ingredients[0]?.grams).toBe(100);
   const [rice] = (await saved())[0]?.ingredients ?? [];
@@ -346,15 +349,35 @@ it("a pack's change does not rewrite a saved recipe until its line is edited (MM
   await expect.poll(async () => (await saved())[0]?.ingredients[0]?.totals.kcal).toBe(700);
 });
 
-it('a line whose food is no longer installed keeps its totals and says so (MM-456)', async () => {
+it('a line whose food is no longer installed cannot be weighed again, and keeps its totals (MM-456)', async () => {
   await saveRiceBowl('a-pack-since-removed');
   const sheet = await editRecipe('Rice bowl');
   await press(sheet, 'More actions for White rice, raw');
+  expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+  expect(screen.queryByRole('menuitem', { name: 'Change weight' })).not.toBeInTheDocument();
+  expect(within(sheet).getByText('200 g · 730 kcal · food not installed')).toBeInTheDocument();
+});
+
+it('cancelling a weight change returns focus to the line (MM-456)', async () => {
+  await saveRiceBowl('fixture');
+  const sheet = await editRecipe('Rice bowl');
+  await press(sheet, 'More actions for White rice, raw');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
-  expect(await within(sheet).findByText('Its food is not installed, so this line keeps its totals.')).toBeInTheDocument();
-  expect(within(sheet).queryByRole('textbox', { name: /^New weight g/ })).not.toBeInTheDocument();
-  await press(sheet, 'Keep its totals');
+  await within(sheet).findByRole('textbox', { name: 'Weight g for White rice, raw' });
+  // The line's own Cancel, drawn under it, before the form's.
+  await userEvent.click(within(sheet).getAllByRole('button', { name: 'Cancel' })[0] as HTMLElement);
+  await waitFor(() => expect(within(sheet).getByRole('button', { name: 'More actions for White rice, raw' })).toHaveFocus());
   expect(within(sheet).getByText('200 g · 730 kcal')).toBeInTheDocument();
+});
+
+it('after an ingredient is added, focus is back in the search and the addition is said (MM-456)', async () => {
+  const sheet = await newRecipe('Rice bowl');
+  await typeIn(sheet, 'Search ingredients', 'white rice');
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^White rice, cooked/ }));
+  await typeIn(sheet, 'Weight g', '200');
+  await press(sheet, 'Add ingredient');
+  await waitFor(() => expect(within(sheet).getByRole('textbox', { name: 'Search ingredients' })).toHaveFocus());
+  expect(within(sheet).getByText('Added White rice, cooked').closest('[role="status"]')).not.toBeNull();
 });
 
 it("a recipe's ingredients can be put in another order", async () => {
@@ -367,7 +390,7 @@ it("a recipe's ingredients can be put in another order", async () => {
   ] as const) {
     await typeIn(sheet, 'Ingredient', name);
     await typeIn(sheet, 'kcal', kcal);
-    await press(sheet, 'Add');
+    await press(sheet, 'Add ingredient');
   }
   await press(sheet, 'More actions for Beef');
   const down = await screen.findByRole('menuitem', { name: 'Move down' });

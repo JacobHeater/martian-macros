@@ -722,7 +722,7 @@ export const MeasurementSessionFirst = screenStory({
   open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
 });
 
-/** MM-156: a session of waist, upper arm and thigh in their fixed order, each drawing one tap down after three measurements. */
+/** MM-156: a session of waist, upper arm and thigh in their fixed order, each a section, its drawing one tap down from the second session. */
 export const MeasurementSessionSites = screenStory({
   covers: ['MeasurementSessionScreen'],
   shows: 'Thigh (left)',
@@ -730,6 +730,40 @@ export const MeasurementSessionSites = screenStory({
   // A tape is read in centimetres here, so this person is metric.
   about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+});
+
+/** Types `readings` into the measuring session's site called `site`. */
+const typeReadings = async (canvas: HTMLElement, site: string, readings: readonly string[]) => {
+  const region = await within(canvas.ownerDocument.body).findByRole('region', { name: site }, { timeout: 5000 });
+  for (const [i, reading] of readings.entries()) {
+    await userEvent.type(within(region).getAllByRole('textbox')[i] as HTMLElement, reading);
+  }
+};
+
+/** MM-156: a site left with two of three readings: its field says why Save is off. */
+export const MeasurementSessionTwoOfThree = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'Type one reading, or all three.',
+  scenario: measurementSitesScenario,
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+  walk: async (canvas) => {
+    await typeReadings(canvas, 'Waist', ['80', '81']);
+    await typeReadings(canvas, 'Upper arm (left)', ['33']);
+  },
+});
+
+/** MM-156: a reading no waist can be: said on its field, which takes focus, and nothing is saved. */
+export const MeasurementSessionLooksOff = screenStory({
+  covers: ['MeasurementSessionScreen'],
+  shows: 'That waist reading looks off. Check it.',
+  scenario: measurementSitesScenario,
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSessionScreen />),
+  walk: async (canvas) => {
+    await typeReadings(canvas, 'Waist', ['9']);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('button', { name: 'Save measurements' }));
+  },
 });
 
 /** MM-156: choosing sites, none added yet. */
@@ -747,6 +781,18 @@ export const MeasurementSitesChosen = screenStory({
   // A tape is read in centimetres here, so this person is metric.
   about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+});
+
+/** MM-156: the limb side being changed from the "Limb side" row. */
+export const MeasurementSitesLimbSide = screenStory({
+  covers: ['MeasurementSitesScreen'],
+  shows: 'Right',
+  scenario: measurementSitesScenario,
+  about: ['units'],
+  open: ({ navigator }) => void navigator.push(() => <MeasurementSitesScreen />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('button', { name: /^Limb side/ }, { timeout: 5000 }));
+  },
 });
 
 /** MM-156: one site over time: the upper arm's chart with its own noise band. */
