@@ -395,11 +395,16 @@ export function CoachScreen() {
         </MmDisclosure>
       </MmSection>
       <MmSection icon="body" title="Body">
-        {/* An estimate is shown with its uncertainty (MM-108): the trend's band, as the trend chart draws it (two sigma). */}
+        {/* An estimate is shown with its uncertainty, in words rather than "±" (MM-108): the trend's band, as the trend
+            chart draws it (two sigma). */}
         <StatRow
           label="Trend weight"
           value={fmt.weight(snapshot.trendWeightKg)}
-          detail={trendSigma === undefined ? undefined : `Most likely within ±${fmt.weight(2 * trendSigma)}`}
+          detail={
+            trendSigma === undefined
+              ? undefined
+              : `Probably between ${fmt.weight(snapshot.trendWeightKg - 2 * trendSigma)} and ${fmt.weight(snapshot.trendWeightKg + 2 * trendSigma)}`
+          }
         />
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
