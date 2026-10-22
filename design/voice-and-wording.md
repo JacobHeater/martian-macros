@@ -38,18 +38,27 @@ One term for one thing, used everywhere.
 | energy expenditure | the same thing, in explanations | TDEE (in text) |
 | estimate | any value the engine inferred | score, reading |
 
+- **passphrase**: the secret that seals a backup (MM-63); a few words with spaces are fine. Never "password" (the phone's own lock, in the terms), "key" or "PIN".
+
 ## Checked automatically
 
-`apps/mobile/test/voice_test.dart` scans every string in the app and fails if any
+`apps/mobile/test/voice.test.ts` scans every string in the app and fails if any
 contains a banned word (good, bad, clean, junk, guilt, cheat, oops, earn, burn
-off, lbs, true weight, and a few others). Add a word there when a review finds
-one; the test is the memory of this guide.
+off, lbs, true weight, and a few others), a line of filler (MM-401), or a name
+the glossary says a term is never called (true or real weight, TDEE in text,
+setup period, plan type, and calorie, protein, daily or macro goals for the
+targets). Every quoted string with a space is read as text, lower-case or not;
+only a name with no space, a path, or a class list is passed over. Add a word
+there when a review finds one; the test is the memory of this guide.
 
-## Not yet done
+## Not checked by a test
 
-- Strings still live in the screen files. Moving them into localization files is
-  worthwhile (it also makes every rule here checkable in one place and is the
-  prerequisite for translation) and is tracked in MM-108; it has not been done.
-- "Consistent terms" and "uncertainty shown" are reviewed by people, not tests.
-
-- **passphrase**: the secret that seals a backup (MM-63); a few words with spaces are fine. Never "password" (the phone's own lock, in the terms), "key" or "PIN".
+- Reviewed by people, not tests: "Uncertainty shown" (rule 3: an estimate
+  carries "about", "probably", a range or "±"), the rest of "Consistent terms"
+  (a term used for something else, or a name not on the list above, such as
+  "e1RM" for the estimated max), rules 1, 4 and 6 (plain, explain the body,
+  no scolding), "no praise for eating under target", and the number format
+  in rule 7 beyond "lbs".
+- Strings live in the screen and format files, not in localization files. The
+  test above reads them where they are, so the rules are checked without that
+  move; translation is not planned (MM-108).

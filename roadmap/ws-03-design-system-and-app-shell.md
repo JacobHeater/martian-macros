@@ -16,8 +16,8 @@ already made will change every one of those surfaces:
 - the app starts on a dashboard, "Today" becomes "Food", and a Train
   destination joins later;
 - the look moves to shared tokens and components;
-- all text moves to localization files, with a glossary and a banned-word
-  test.
+- all text follows one voice guide, with a glossary and a banned-word
+  test (strings stay in place; no localization files, MM-108).
 
 Each of these is a one-time migration whose cost is proportional to the amount
 of UI that exists. That amount is at its minimum now.
@@ -30,8 +30,7 @@ navigation structure that will not move under them.
 - Color, type and spacing tokens; light and dark themes.
 - A component library (cards, notices, bars, number-with-unit, entry fields,
   the measurement card) and the migration of existing screens onto it.
-- Localization files for every string, the glossary, and the banned-word
-  test.
+- The voice guide, the glossary, and the banned-word and glossary tests.
 - Navigation with the dashboard first; the dashboard; quick actions.
 - Chart components: trend line with band, small trend line, range bar,
   weekly bars.
@@ -62,7 +61,6 @@ WS-13, which needs accessibility, both themes and the icon.
 - every existing screen file, once, for the migration
 - a shared component package (new; the gallery ticket decides whether it is a
   package or a folder)
-- localization files (new)
 - `apps/mobile/src/dashboard/` (new)
 
 ## Risks
@@ -95,9 +93,10 @@ WS-13, which needs accessibility, both themes and the icon.
      review is completed), then migrate screens. Split `OnboardingScreen.tsx` (531 lines)
    into one file per step as part of the migration; five workstreams add to
    onboarding later.
-2. **Strings (MM-108).** M0. One pass over all text into localization files,
-   with the glossary and the banned-word test. Do it immediately after step 1
-   while the screens are fresh.
+2. **Strings (MM-108).** M0. The voice guide and glossary, and a test that
+   reads every string in place and fails on a banned word, filler or a name
+   the glossary forbids. Moving strings into localization files was not taken
+   up: no translation is planned.
 3. **Navigation and dashboard (MM-99, MM-98, MM-100).** M0. Includes the Today
    redesign in `design/screen-direction.md`. Rename Today to
    Food, move the calibration banner to the dashboard, keep each destination's

@@ -1,6 +1,6 @@
 ---
 id: MM-108
-status: in-progress
+status: done
 component: design-system
 related: [MM-101, MM-11, MM-41, MM-92, MM-96, MM-106]
 ---
@@ -56,7 +56,50 @@ Scenario: Checked automatically where possible
   and is a prerequisite for ever translating the app. Worth doing as part of this.
 
 ## Progress
-- Built: the written guide and glossary (`design/voice-and-wording.md`) and an automated test (`apps/mobile/test/voice_test.dart`) that scans every string in the app and fails on a banned word
-  (good, bad, clean, junk, guilt, cheat, oops, earn, burn off, lbs, true weight, and others). It passes.
-- **Not done**: moving every string into localization files (Flutter ARB / gen-l10n), which would also let the glossary and uncertainty rules be checked in one place. That is a large change to every
-  screen and a new generated-code convention that needs the `mm arch` rule adjusted; it is deferred, not abandoned.
+- Built: the written guide and glossary (`design/voice-and-wording.md`) and
+  `apps/mobile/test/voice.test.ts` (carried over from `voice_test.dart`), which
+  reads every string the app shows and fails on a banned word (good, bad,
+  clean, junk, guilt, cheat, oops, earn, burn off, lbs, true weight, and
+  others), on filler (MM-401), and, since 2026-10-21, on a name the glossary
+  says a term is never called: "real weight", "TDEE" in text, "setup period",
+  "plan type" ("Consistent terms", where a test can tell it from code).
+- "No judgement" and "Checked automatically" are covered by that test.
+  "Uncertainty shown" and the rest of "Consistent terms" are kept by review
+  against the guide, as the guide says.
+- Review fixes (2026-10-21, PR #286): the test had passed over every
+  all-lower-case quoted string, so "a bad day" or "your real weight" would
+  never have been seen. Now only a string with no space, a path, or a class
+  list (every word hyphenated) is passed over, and a self-test feeds it both
+  phrases. Widening it found no new hits in `apps/mobile/src`. The grade-letter
+  test uses the test's own banned-word pattern. "Calorie, protein, daily or
+  macro goals" joined the never-called list (no hits).
+- Stays review-checked, not tested: "Uncertainty shown"; the rest of
+  "Consistent terms" (a term used for a second thing, or a new name for a
+  term); rules 1, 4 and 6; "no praise for eating under target"; number format
+  beyond "lbs". The guide's "Not checked by a test" lists them.
+- Pass over existing text (2026-10-21), against "Uncertainty shown" and
+  "Consistent terms", by grepping `apps/mobile/src` for every estimate shown
+  (expenditure, trend weight, body fat, resting energy, estimated max, meal
+  estimates, projected end, pace) and for each glossary term and its
+  never-called names. Found and fixed: on Coach, the Body section's trend
+  weight had no uncertainty (it now says "Likely between … and …", in words as Coach states every range, the two-sigma
+  band the trend chart draws) and resting energy (BMR, from the Mifflin-St Jeor
+  equation) was a bare number (now "About … kcal", with what it is estimated
+  from); the strength card and session history said "e1RM", a third name
+  for the estimated max (now "estimated max"). Already in line: expenditure
+  (a range, or "give or take"), body fat (a range, or "~" for the person's own
+  figure), meal estimates ("about"), projected end ("About"), pace ("About …
+  so far" until confidence is good), the estimated max ("a comparison, not a
+  real max"). Left as is: the Dashboard's weight row and the Progress hero show
+  the trend weight without "±"; both are labelled "Trend", the hero sits on the
+  chart with its band, and the row opens it. Terms were otherwise consistent:
+  no "goals" for targets, no "update" or "reset" for a check-in, no "trial",
+  no "score" or "reading" for an estimate, "password" only for the phone's
+  lock in the terms.
+- Not taken up: moving every string into localization files. It was a note
+  ("worth doing as part of this"), not an acceptance criterion, written for
+  the Flutter app while four screens existed. The test reads the strings where
+  they are, which gives the checkability the note wanted; no translation is
+  planned. The guide records this. If the owner wants translation, that is a
+  new ticket.
+- Done (2026-10-21). Not run locally; CI validates.
