@@ -1,6 +1,6 @@
 ---
 id: MM-406
-status: in-progress
+status: done
 component: food-logging
 related: [MM-43, MM-44, MM-54, MM-403]
 ---
@@ -64,3 +64,26 @@ Scenario: A label is read on the device
 ## Notes
 - Barcodes and labels need a phone; on the simulator only the refusal path
   runs. On the owner's checklist.
+
+## Progress
+Done 2026-10-21. Not run locally; CI validates the TypeScript tests. CI builds no iOS app, so the Swift is held by
+`test/ios/cameraOnIos.test.ts`, which reads it, until it is built on the Mac.
+- `ios/App/App/Plugins/MmScannerPlugin.swift` and `ScanViewController.swift`: a full-screen live scan with
+  AVFoundation that ends at the first EAN-13, EAN-8 or UPC-E with its symbology, and Cancel; a label photographed
+  with the camera app and read with Vision's text recognition on the device, the photo kept in memory only. Camera
+  permission is asked for once; a refusal or a missing camera is rejected and the screens say so.
+- Fixed while finishing: a camera that could not be started was reported from `viewDidLoad`, while the scan was
+  still being presented, so the dismissal could fail and the app never hear back. It is now reported once the scan
+  is on screen.
+- MM-44's label read on iOS is this plugin's `readLabel`: Apple's Vision, not ML Kit, as decided above.
+
+## Owed on a phone
+- A retail barcode in view ends the scan with its digits and its kind; a UPC-A arrives as an EAN-13 beginning with 0
+  and is found by the same lookup; a UPC-E arrives as its eight digits (whether AVFoundation gives eight digits for a
+  UPC-E is the first thing to check).
+- Cancel returns to the app with nothing looked up.
+- The simulator, and a phone with the camera refused in Settings: the scan and the label read say the camera cannot
+  be used.
+- A Nutrition Facts panel photographed is read as text on the phone, and nothing is added to Photos or the app's
+  files.
+- The first iOS build of the two files.

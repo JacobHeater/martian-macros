@@ -573,6 +573,33 @@ export const ProgressPhotosSets = screenStory({
   open: openPhotos,
 });
 
+/** MM-157: the photos opened from Progress's own line, after the phone's lock. */
+export const ProgressPhotosFromProgress = screenStory({
+  covers: ['ProgressScreen', 'ProgressPhotosScreen'],
+  shows: 'Compare two days',
+  scenario: photosScenario,
+  open: ({ state }) => state.homeTab.put('progress'),
+  walk: pressNamed(/^Progress photos/),
+});
+
+/** MM-157: "Take photos" opens the camera, with the last front photo laid over it. */
+export const ProgressPhotosTakePhotos = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCameraScreen'],
+  shows: 'Line yourself up with the faint photo: the same distance and the same framing.',
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Take photos'),
+});
+
+/** MM-157: "Compare two days" opens the comparison. */
+export const ProgressPhotosCompare = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCompareScreen'],
+  shows: /Trend|Waist/,
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Compare two days'),
+});
+
 /** MM-157: the phone's lock was not passed: nothing shows until it is. */
 export const ProgressPhotosLocked = screenStory({
   covers: ['ProgressPhotosScreen'],
