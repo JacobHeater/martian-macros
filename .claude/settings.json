@@ -8,6 +8,10 @@
       "Read(./**/*.pem)",
       "Read(./**/*.key)"
     ],
-    "allow": ["Bash(gh:*)"]
+    "allow": [
+      "Bash(gh:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh run view:*)"
+    ]
   }
 }
