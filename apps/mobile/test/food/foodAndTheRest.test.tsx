@@ -85,13 +85,17 @@ for (const failed of [false, true]) {
   /** From pause_state_display_test.dart. */
   it(`MM-183: the Food screen's targets wait for pauses (${failed ? 'failed' : 'loading'})`, async () => {
     await seed();
+    // Targets exist, so their absence is the pauses' doing (QA-1).
+    await repos.targets.saveTargets(targetsFrom(today.addDays(-3), { kcal: 2000 }));
+    // The read goes wrong until it is asked again.
+    let broken = true;
     renderApp(repos, today, {
       change: (services) => ({
         ...services,
         pauses: {
           savePause: (pause) => services.pauses.savePause(pause),
           deletePause: (pause) => services.pauses.deletePause(pause),
-          watchPauses: () => (failed ? failing() : never()),
+          watchPauses: () => (!failed ? never() : broken ? failing() : services.pauses.watchPauses()),
         },
       }),
     });
@@ -99,8 +103,13 @@ for (const failed of [false, true]) {
     if (failed) {
       // MM-334: the day stays, its targets withheld and the reason said.
       expect(await screen.findByText('Could not check whether this day is paused')).toBeInTheDocument();
-      expect(screen.queryByText(/^kcal (left|over) of/)).toBeNull();
+      expect(screen.queryByText(/^kcal (left of|over) /)).toBeNull();
       expect(screen.getByText('kcal logged')).toBeInTheDocument();
+      const retry = screen.getByRole('button', { name: 'Try again' });
+      broken = false;
+      await userEvent.click(retry);
+      expect(await screen.findByText(/kcal left of 2,000/)).toBeInTheDocument();
+      expect(screen.queryByText('Could not check whether this day is paused')).toBeNull();
     } else {
       expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
       expect(document.querySelector('.mm-horizon')).toBeNull();

@@ -72,10 +72,22 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
   const stillLogged = todays !== undefined;
   const offScale = series.some((item) => sofar(item) !== undefined && unfinished(item) === undefined);
 
+  // Spoken as it is seen: each line's lowest and highest finished day, and today so far (MM-176).
+  const spread = (item: HistorySeries): string => {
+    const finished = recorded(item)
+      .filter(([date]) => date !== item.unfinished)
+      .map(([, value]) => value);
+    if (finished.length === 0) return '';
+    const lowest = Math.min(...finished);
+    const highest = Math.max(...finished);
+    return lowest === highest
+      ? `, at ${Fmt.whole(lowest)}`
+      : `, lowest ${Fmt.whole(lowest)}, highest ${Fmt.whole(highest)}`;
+  };
   const label =
     `${unit} history, ${Fmt.shortDay(start)} to ${Fmt.shortDay(today)}. ` +
-    series.map((item) => `${item.label}: ${recorded(item).length} recorded points`).join('. ') +
-    (stillLogged ? '. Today is still being logged.' : '');
+    series.map((item) => `${item.label}: ${recorded(item).length} recorded points${spread(item)}`).join('. ') +
+    (stillLogged ? `. Today so far: ${Fmt.whole(todays)} ${unit}, still being logged.` : '');
 
   return (
     <div className="chart">

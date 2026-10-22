@@ -88,10 +88,26 @@ describe('a history chart', () => {
       />,
     );
     expect(screen.getByRole('img')).toHaveAccessibleName(
-      'kcal history, Oct 4 to Oct 10. Logged intake: 2 recorded points. Target in force: 2 recorded points',
+      'kcal history, Oct 4 to Oct 10. Logged intake: 2 recorded points, lowest 1,900, highest 2,100. ' +
+        'Target in force: 2 recorded points, at 2,300',
     );
     // A dot for each recorded day of the solid line, none for the dashed one or the day out of range.
     expect(document.querySelectorAll('.chart-dot').length).toBe(2);
+  });
+
+  it('MM-176: says today so far, apart from the finished days it gives the lowest and highest of', () => {
+    render(
+      <HistoryChart
+        today={today}
+        days={7}
+        unit="kcal"
+        series={[{ label: 'Logged intake', kind: 'energy', unfinished: today, values: days([[0, 600], [1, 2000], [2, 1800]]) }]}
+      />,
+    );
+    expect(screen.getByRole('img')).toHaveAccessibleName(
+      'kcal history, Oct 4 to Oct 10. Logged intake: 3 recorded points, lowest 1,800, highest 2,000. ' +
+        'Today so far: 600 kcal, still being logged.',
+    );
   });
 
   it('leaves a gap for a day with no record', () => {

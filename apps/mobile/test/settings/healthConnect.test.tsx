@@ -96,10 +96,24 @@ it('once Health Connect stops asking for a kind, it says to allow it there and o
   expect(await screen.findByText('Health Connect no longer asks for weight here. You can allow it in Health Connect instead.')).toBeInTheDocument();
   // Not "You can allow it here": that would send the person round in a circle.
   expect(screen.queryByText(/You can allow it here/)).not.toBeInTheDocument();
+  // The person allows weight on Health Connect's own page.
+  source.allowsThere = new Set<HealthDataType>(['weight']);
   await userEvent.click(screen.getByRole('button', { name: 'Open Health Connect' }));
   await expect.poll(() => source.permissionsOpened).toBe(1);
-  // Nothing was allowed there, so the row still offers it.
+  // Coming back, what is allowed now is read: the row says so, the readings are kept, and a snack says it.
+  expect(await screen.findByText('Weight allowed.')).toBeInTheDocument();
+  await expect.poll(() => row(settings, 'Weight')?.textContent ?? '').toContain('Allowed.');
+  await expect.poll(async () => (await stored('weight')).length).toBe(5);
+});
+
+it('back from Health Connect with nothing allowed there, it says nothing changed and still offers the kind (MM-323)', async () => {
+  source.stopsAsking = new Set<HealthDataType>(['weight']);
+  const settings = await open();
+  await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Open Health Connect' }));
+  expect(await screen.findByText('Nothing changed.')).toBeInTheDocument();
   expect(row(settings, 'Weight')).toHaveTextContent('Not allowed.');
+  expect(await stored('weight')).toEqual([]);
 });
 
 it('where Health Connect cannot be opened, it says where to allow the kind instead (MM-323)', async () => {
@@ -108,7 +122,9 @@ it('where Health Connect cannot be opened, it says where to allow the kind inste
   const settings = await open();
   await userEvent.click(await settings.findByRole('button', { name: /^Weight/ }));
   await userEvent.click(await screen.findByRole('button', { name: 'Open Health Connect' }));
-  expect(await screen.findByText(/Health Connect could not be opened from here\./)).toBeInTheDocument();
+  expect(
+    await screen.findByText('Health Connect could not be opened from here. You can allow it in Health Connect, from your phone’s settings.'),
+  ).toBeInTheDocument();
 });
 
 it('reading again brings an edit and a deletion made since', async () => {
