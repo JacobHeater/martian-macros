@@ -13,6 +13,7 @@ import { readBuildProvenance } from '../../src/foodPipeline/node/readBuildProven
 import { readExtract } from '../../src/foodPipeline/node/readExtract';
 import { writePacks } from '../../src/foodPipeline/node/writePacks';
 import { PackBuilder } from '../../src/foodPipeline/PackBuilder';
+import { packAttribution, packLicense } from '../../src/foodPipeline/packTerms';
 import { PreferredSourcePolicy } from '../../src/foodPipeline/PreferredSourcePolicy';
 import { FormatError } from '../../src/lang/FormatError';
 
@@ -281,6 +282,14 @@ it('written packs are byte-identical across runs and readable', async () => {
   expect(pack.header.builtOn).toBe('2026-10-09');
   expect((await pack.byBarcode(gtinA))?.sourceId).toBe('1');
   await pack.close();
+  // Each written pack states its terms and its sources in its header (MM-57's second scenario).
+  for (const file of ['generic.pack', 'barcode_us.pack']) {
+    const written = await openPackFile(join(dir, 'one', file));
+    expect(written.header.license, file).toBe(packLicense);
+    expect(written.header.attribution, file).toBe(packAttribution);
+    expect(written.header.sources, file).toEqual(provenance.sources);
+    await written.close();
+  }
   expect(readFileSync(join(dir, 'one', 'report.txt'), 'utf8')).toContain('total: read 3, written 3, dropped 0');
 });
 
