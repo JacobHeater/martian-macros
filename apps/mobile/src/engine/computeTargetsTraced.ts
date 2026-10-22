@@ -96,7 +96,8 @@ export function computeTargetsTraced(i: TargetInputs): { targets: DailyTargets; 
         flags.has('underweightMaintenance') ||
         flags.has('modeNotAllowed')) &&
       kcal > previous.kcal;
-    if (!exemptRaise) {
+    // A recalculation the person asked for (MM-559) is not step-limited either.
+    if (!exemptRaise && i.stepLimited) {
       const maxStep = SafetyBounds.maxWeeklyTargetChange(previous.kcal);
       const limited = clamp(kcal, previous.kcal - maxStep, previous.kcal + maxStep);
       if (limited !== kcal) flags.add('rateLimited');

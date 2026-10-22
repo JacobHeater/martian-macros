@@ -45,32 +45,54 @@ export class CheckIn {
 
   constructor(inputs: CheckInInputs) {
     this.inputs = inputs;
-    this.due = new DerivedCell(() => {
-      const setup = inputs.setup();
-      const snapshot = inputs.coach.value;
-      const history = inputs.history();
-      const pauses = inputs.pauses();
-      const today = inputs.today.value;
-      if (setup === undefined || snapshot === undefined || history === undefined) return undefined;
-      // Nothing is decided before everything it rests on is read: a check-in
-      // made before the training log or the preferences arrived would be
-      // made from the wrong facts, and the day would then be taken.
-      const easeIntoMaintenance = inputs.easeIntoMaintenance === undefined ? false : inputs.easeIntoMaintenance();
-      const trainingLapsed = inputs.trainingLapsed === undefined ? false : inputs.trainingLapsed();
-      const sleepNights = inputs.sleepNights === undefined ? [] : inputs.sleepNights();
-      if (easeIntoMaintenance === undefined || trainingLapsed === undefined || sleepNights === undefined) return undefined;
-      return nextTargets({
-        setup,
-        snapshot,
-        history,
-        today,
-        pauses,
-        easeIntoMaintenance,
-        trainingLapsed,
-        // Said in the explanation when it averaged short (MM-252); it moves no number.
-        sleepAverage: sleepAverageOf({ nights: sleepNights, through: today }),
-      });
+    this.due = new DerivedCell(() => this.decide(false));
+  }
+
+  /**
+   * The engine's decision from what is read now: the targets due, or with
+   * `recalculate` the ones the person asked for (MM-559).
+   */
+  private decide(recalculate: boolean): TargetsRecord | undefined {
+    const inputs = this.inputs;
+    const setup = inputs.setup();
+    const snapshot = inputs.coach.value;
+    const history = inputs.history();
+    const pauses = inputs.pauses();
+    const today = inputs.today.value;
+    if (setup === undefined || snapshot === undefined || history === undefined) return undefined;
+    // Nothing is decided before everything it rests on is read: a check-in
+    // made before the training log or the preferences arrived would be
+    // made from the wrong facts, and the day would then be taken.
+    const easeIntoMaintenance = inputs.easeIntoMaintenance === undefined ? false : inputs.easeIntoMaintenance();
+    const trainingLapsed = inputs.trainingLapsed === undefined ? false : inputs.trainingLapsed();
+    const sleepNights = inputs.sleepNights === undefined ? [] : inputs.sleepNights();
+    if (easeIntoMaintenance === undefined || trainingLapsed === undefined || sleepNights === undefined) return undefined;
+    return nextTargets({
+      setup,
+      snapshot,
+      history,
+      today,
+      pauses,
+      easeIntoMaintenance,
+      trainingLapsed,
+      // Said in the explanation when it averaged short (MM-252); it moves no number.
+      sleepAverage: sleepAverageOf({ nights: sleepNights, through: today }),
+      recalculate,
     });
+  }
+
+  /**
+   * Targets worked out again now from the latest weight and estimate
+   * (MM-559), for the person to accept or not; undefined when none can be
+   * (`recalculationWithheld` says why) or the facts are still being read.
+   */
+  recalculation(): TargetsRecord | undefined {
+    return this.decide(true);
+  }
+
+  /** Keeps a recalculation the person accepted. Its account was on screen, so no summary follows it. */
+  acceptRecalculation(record: TargetsRecord): Promise<void> {
+    return this.save(record.copyWith({ summarySeen: true }));
   }
 
   /** The days (as epoch days) whose targets were issued this launch as a change from earlier ones. */
@@ -90,7 +112,7 @@ export class CheckIn {
     if (this.saving) return;
     this.saving = true;
     try {
-      if (next.explanation?.previousKcal !== undefined) {
+      if (next.explanation?.previousKcal !== undefined && !next.summarySeen) {
         this.made.put(new Set([...this.made.value, next.effectiveFrom.epochDay]));
       }
       const setup = this.inputs.setup();
