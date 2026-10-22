@@ -51,14 +51,17 @@
   padding: var(--space-24);
 }
 /* Martian's pages end on ground: a faint violet mountain ridge after the last of the content, seen only once
-   everything is read. Its empty top is the gap above it; on a short page it sits at the bottom. */
+   everything is read, with a little green alien peeking over its tallest peak (owner). The ridge is drawn opaque (the
+   accent line at 16% over the canvas) so the alien hides behind it; its empty top is the gap above it, and on a short
+   page it sits at the bottom. */
 .theme-martian .app-body::after {
   content: '';
   flex: none;
   height: 56px;
   margin: auto calc(-1 * var(--space-16)) calc(-1 * var(--space-24));
-  background: color-mix(in srgb, var(--accent-line) 16%, transparent);
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 56' preserveAspectRatio='none'%3E%3Cpath d='M0 56V46L22 40L38 44L60 30L74 38L96 34L118 42L140 36L156 24L170 34L196 40L220 32L240 38L262 28L280 36L304 42L326 34L344 40L360 36V56Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 56' preserveAspectRatio='none'%3E%3Cpath fill='%231f153f' d='M0 56V46L22 40L38 44L60 30L74 38L96 34L118 42L140 36L156 24L170 34L196 40L220 32L240 38L262 28L280 36L304 42L326 34L344 40L360 36V56Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 26'%3E%3Cg stroke='%2376e83a' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M10 7L8 2M18 7L20 2'/%3E%3C/g%3E%3Cg fill='%2376e83a'%3E%3Ccircle cx='8' cy='1.8' r='1.4'/%3E%3Ccircle cx='20' cy='1.8' r='1.4'/%3E%3Cellipse cx='14' cy='14' rx='9' ry='8'/%3E%3C/g%3E%3Cg fill='%230a081b'%3E%3Cellipse cx='10.3' cy='13.6' rx='2.7' ry='1.7' transform='rotate(20 10.3 13.6)'/%3E%3Cellipse cx='17.7' cy='13.6' rx='2.7' ry='1.7' transform='rotate(-20 17.7 13.6)'/%3E%3C/g%3E%3C/svg%3E") calc(156 / 360 * 100%) 6px / 28px 26px no-repeat;
   pointer-events: none;
 }
 .theme-martian .app-body-roomy::after {
