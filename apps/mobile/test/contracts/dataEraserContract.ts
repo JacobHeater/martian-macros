@@ -9,6 +9,9 @@ import type { FoodRepository } from '../../src/domain/repositories/FoodRepositor
 import type { PreferencesRepository } from '../../src/domain/repositories/PreferencesRepository';
 import type { SetupRepository } from '../../src/domain/repositories/SetupRepository';
 import type { TargetShapeRepository } from '../../src/domain/repositories/TargetShapeRepository';
+import type { MeasurementRepository } from '../../src/domain/repositories/MeasurementRepository';
+import type { MeasurementSettingsRepository } from '../../src/domain/repositories/MeasurementSettingsRepository';
+import { MeasurementSettings } from '../../src/domain/measurements/MeasurementSettings';
 import type { GoalBodyFatRepository } from '../../src/domain/repositories/GoalBodyFatRepository';
 import type { WeightEventRepository } from '../../src/domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../../src/domain/repositories/WeightRepository';
@@ -36,6 +39,8 @@ interface Erasable {
   targets: TargetsHistoryRepository;
   targetShapes: TargetShapeRepository;
   goalBodyFat: GoalBodyFatRepository;
+  measurements: MeasurementRepository;
+  measurementSettings: MeasurementSettingsRepository;
   preferences: PreferencesRepository;
   weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   workouts: WorkoutRepository;
@@ -82,6 +87,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       );
       await r.targetShapes.saveTargetShape(new TargetShape({ since: day, balance: CarbFatBalance.balanced }));
       await r.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: day });
+      await r.measurements.saveMeasurement('thigh', day, 58);
+      await r.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'left' }));
       await r.workouts.saveWorkout(
         new Workout({
           id: 0,
@@ -108,6 +115,9 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.targetShapes.watchTargetShapes())).toEqual([]);
       // MM-507: no goal body fat is left.
       expect(await first(r.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
+      // MM-156: no measurement of any site, and no site chosen.
+      expect(await first(r.measurements.watchMeasurements())).toEqual([]);
+      expect([...(await first(r.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);
       expect(await first(r.workouts.watchWorkouts())).toEqual([]);
       expect(await first(r.customExercises.watchCustomExercises())).toEqual([]);
       expect(await first(r.preferences.watchThemePreference())).toBe('unselected');

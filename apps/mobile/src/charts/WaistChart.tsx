@@ -16,6 +16,13 @@ interface WaistChartProps {
   fmt: Fmt;
   /** What the chart says, for a screen reader (the chart itself is drawn). */
   label: string;
+  /**
+   * Another site's noise figure (MM-156), drawn in the same way; the waist's
+   * own figure, the user's once there is one, when not given.
+   */
+  noiseCm?: number | undefined;
+  /** What is said when the range holds nothing. */
+  emptyText?: string;
 }
 
 const width = 320;
@@ -38,14 +45,23 @@ function middle(values: readonly number[]): number {
  * neighbouring entries (what the change function compares), and a band of
  * the noise figure either side of it, wider where an entry is a single
  * reading. A difference inside the band is within what a tape can tell.
+ * Any other site is drawn the same way with its own noise figure (MM-156).
  */
-export function WaistChart({ waist, today, rangeDays, fmt, label }: WaistChartProps) {
+export function WaistChart({
+  waist,
+  today,
+  rangeDays,
+  fmt,
+  label,
+  noiseCm,
+  emptyText = 'No waist measurements in this range.',
+}: WaistChartProps) {
   const start = today.addDays(1 - rangeDays);
   const all = [...waist].filter((w) => !w.date.isAfter(today)).sort((a, b) => a.date.compareTo(b.date));
   const shown = all.filter((w) => !w.date.isBefore(start));
-  if (shown.length === 0) return <p className="chart-empty chart-empty-tall">No waist measurements in this range.</p>;
+  if (shown.length === 0) return <p className="chart-empty chart-empty-tall">{emptyText}</p>;
 
-  const noise = waistNoiseOf(all);
+  const noise = noiseCm ?? waistNoiseOf(all);
   const dayOf = (date: CalendarDate) => start.daysUntil(date);
   const value = (cm: number) => fmt.lengthFromCm(cm);
   // Smoothed over the neighbours in the whole record, so the line does not bend at the range's edge.
