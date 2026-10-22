@@ -129,7 +129,9 @@ Built (2026-10-21, React app):
   at 9:00 am (the time the table gives the check-in's own notification). It is sent on the day the five questions fall due,
   a week after they were last answered or skipped, or a week after setup, and once a week on that weekday while they wait;
   answering or skipping moves it a week on (`ReminderFacts`, with the days answered or skipped and the day of setup). Its
-  prompt is "Five quick questions on the week?". Seven unanswered sends and it stops, as the others do; on a Sunday that
+  prompt was "Five quick questions on the week?"; since the review (2026-10-21) it names the section it opens, "Time for
+  “How you are holding up” on Coach?" (`recoverySectionTitle`, shared with the section, so the two cannot drift), and a
+  test checks it carries no count of questions. Seven unanswered sends and it stops, as the others do; on a Sunday that
   is also the measurement's, the two weekly ones are kept under the cap. Tests: "the recovery check-in reminder" in
   `test/engine/reminders.test.ts`, "the recovery check-in reminder waits for its day, and answering moves it a week on"
   in `test/settings/reminders.test.tsx`. No schema change: the reminders table is keyed by a kind's name. Not run

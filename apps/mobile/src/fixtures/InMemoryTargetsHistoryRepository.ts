@@ -18,6 +18,11 @@ export class InMemoryTargetsHistoryRepository implements TargetsHistoryRepositor
     this.byDay.value = new Map(this.byDay.value).set(record.effectiveFrom.epochDay, record);
   }
 
+  async removeTargets(effectiveFrom: CalendarDate): Promise<void> {
+    const byDay = new Map(this.byDay.value);
+    if (byDay.delete(effectiveFrom.epochDay)) this.byDay.value = byDay;
+  }
+
   async markSummariesSeenThrough(effectiveFrom: CalendarDate): Promise<void> {
     this.byDay.value = new Map(
       [...this.byDay.value].map(([day, record]) => [

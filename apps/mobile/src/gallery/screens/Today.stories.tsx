@@ -10,6 +10,7 @@ import { firstDayScenario } from './firstDayScenario';
 import { maintenanceScenario } from './maintenanceScenario';
 import { notWeighedTodayScenario } from './notWeighedTodayScenario';
 import { pausedScenario } from './pausedScenario';
+import { reliefScenario } from './reliefScenario';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { frequentWeighingScenario } from './frequentWeighingScenario';
@@ -58,6 +59,16 @@ export const NotWeighedToday = screenStory({
   covers: ['DashboardScreen'],
   shows: 'First thing in the morning, after the bathroom.',
   scenario: notWeighedTodayScenario,
+});
+
+/**
+ * MM-117: two hard weeks on a cut, on the Dashboard: the offer to ease the deficit above the day's own action, both
+ * choices secondary so the screen keeps one primary (checked by the hierarchy rules).
+ */
+export const DashboardReliefOffer = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Two hard weeks in a row',
+  scenario: reliefScenario,
 });
 
 /** MM-127: a glass of wine today, at Standard detail: the alcohol's energy as a row of the hero, said as part of the total. */
