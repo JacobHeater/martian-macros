@@ -1,6 +1,6 @@
 ---
 id: MM-323
-status: in-progress
+status: done
 component: health-sync
 related: [MM-68, MM-320, MM-73, MM-523]
 ---
@@ -58,6 +58,15 @@ Scenario: Health Connect cannot be opened
   and has `openPermissions`; the Swift plugin answers `opened: false`; `settings/useOpenHealthPermissions.ts` is the one way
   in. Tests: `test/settings/healthConnect.test.tsx`, `test/platform/nativeHealthSource.test.ts`,
   `test/native/mmHealthPermissions.test.ts`. Not run locally; CI validates.
-- Device check owed: refuse Weight three times on the owner's phone; the third press says Health Connect no longer asks,
-  "Open Health Connect" opens the app's page, and Weight allowed there is read on coming back. Also that a person's
-  refusal at normal speed is not taken for a lockout.
+
+## Progress
+Done 2026-10-21. Built and merged in PR #233 (see Notes); both scenarios above are held by
+`test/settings/healthConnect.test.tsx`, `test/platform/nativeHealthSource.test.ts` and
+`test/native/mmHealthPermissions.test.ts` and drawn in the stories under UI/UX, validated by CI. What only a phone can
+show is listed below.
+
+## Owed on a phone
+- Refuse Weight three times on the owner's phone: the third press says Health Connect no longer asks and offers to open it.
+- "Open Health Connect" opens the app's own page there, and Weight allowed there is read on coming back to the app.
+- A refusal made at a person's normal speed (reading the question first) is told as a refusal, not as a lockout (the
+  0.8 s threshold in Decisions).
