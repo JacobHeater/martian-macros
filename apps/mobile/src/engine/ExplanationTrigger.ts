@@ -13,6 +13,8 @@ const values = [
   'trainingLapse',
   /** A diet break ran its length and the deficit resumed (MM-135). */
   'breakEnded',
+  /** The person asked for their targets worked out again now (MM-559). */
+  'recalculation',
 ] as const;
 
 /**

@@ -32,7 +32,7 @@ One term for one thing, used everywhere.
 | weigh-in | one reading of the scale | weigh, entry (for weight) |
 | targets | the daily numbers (calories, protein, carbs, fat) | goals |
 | goal | fat loss, recomp, lean gain or maintenance; also an amount a person chooses to aim for and switches on (the water goal, the Nutrition goals section; owner, 2026-10-14, MM-313) | plan type, mode (in text) |
-| check-in | the weekly review of targets | update, reset |
+| check-in | the review of targets: the weekly one, or one the person starts with "Check in now" (MM-559) | update, reset, recalculation (in text) |
 | calibration | the first fourteen days | trial, setup period |
 | metabolism | the friendly title of the energy-expenditure card | burn |
 | energy expenditure | the same thing, in explanations | TDEE (in text) |

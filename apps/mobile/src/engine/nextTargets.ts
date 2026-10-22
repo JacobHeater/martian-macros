@@ -52,6 +52,12 @@ import { TdeeEstimate } from './TdeeEstimate';
  *   until the user answers; a correction they chose runs a gentle pace back
  *   toward the anchor. Leaving a deficit with the two-step option on stops
  *   halfway for a week.
+ * - A recalculation the person asked for (`recalculate`, MM-559): at once,
+ *   from today's trend weight and estimate, without the weekly step limit.
+ *   A safety raise, the hold after one, the floor, a running break and a
+ *   maintenance correction all apply as at a check-in. None during a
+ *   pause, a break, the first of two steps out of a deficit, or on a day
+ *   that already has new targets.
  */
 export function nextTargets({
   setup,
@@ -62,6 +68,7 @@ export function nextTargets({
   easeIntoMaintenance = false,
   trainingLapsed = false,
   sleepAverage,
+  recalculate = false,
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
@@ -74,6 +81,8 @@ export function nextTargets({
   trainingLapsed?: boolean;
   /** The fourteen-night average from the nights recorded (MM-250), noted in the explanation when short (MM-252). */
   sleepAverage?: SleepAverage | undefined;
+  /** The person asked for their targets worked out again now (MM-559). */
+  recalculate?: boolean;
 }): TargetsRecord | undefined {
   if (snapshot.policy.blocked || !snapshot.policy.targetsAllowed) return undefined;
 
@@ -93,6 +102,7 @@ export function nextTargets({
     restingOn,
     correctionRateFraction,
     easeFromKcal,
+    stepLimited = true,
   }: {
     previous?: DailyTargets;
     deficitWeeks?: number;
@@ -106,6 +116,8 @@ export function nextTargets({
     correctionRateFraction?: number;
     /** The target before leaving a deficit, for the first of two steps (MM-130). */
     easeFromKcal?: number | undefined;
+    /** False only for a recalculation (MM-559). */
+    stepLimited?: boolean;
   } = {}): TargetsRecord => {
     // The estimate these targets rest on: today's, or the one the current targets were built on.
     const tdee =
@@ -146,6 +158,7 @@ export function nextTargets({
         correctionRateFraction,
         easeFromKcal,
         trainingLapsed,
+        stepLimited,
       }),
     );
     const targets = traced.targets;
@@ -278,6 +291,38 @@ export function nextTargets({
     return build({ previous: last.targets, breakRequested: true });
   }
 
+  // Losing faster than the safe pace is not noise: the raise a check-in would make.
+  const safetyRaise = () =>
+    lossSafetyRaiseKcal({
+      trend: snapshot.trend,
+      history,
+      sex: setup.profile.sex,
+      bodyFat: snapshot.bodyFat,
+      safetyBodyFatPercent: safetyBf,
+      resistanceTrained: TrainingStatus.isResistanceTrained(setup.trainingStatus),
+    });
+
+  // A recalculation the person asked for (MM-559): today's trend weight and
+  // estimate, with no weekly step limit. Nothing safety asks for is skipped:
+  // the raise for a too-fast loss and the hold after it, the floor, and a
+  // maintenance correction already running. A break, the first step out of
+  // a deficit, and a day with new targets already are left as they are.
+  if (recalculate) {
+    if (running !== undefined || last.targets.flags.has('easingIn') || !last.effectiveFrom.isBefore(today)) {
+      return undefined;
+    }
+    const next = build({
+      previous: last.targets,
+      deficitWeeks: deficitWeeks(),
+      safetyRaiseKcal: safetyRaise(),
+      trigger: 'recalculation',
+      stepLimited: false,
+      ...(last.targets.flags.has('maintenanceCorrection') ? { correctionRateFraction: last.targets.weeklyRateFraction } : {}),
+    });
+    // Calorie reductions wait while a creatine change settles, as at a check-in.
+    return snapshot.creatineReductionPausedOn(today) && next.targets.kcal < last.targets.kcal ? undefined : next;
+  }
+
   if (last.effectiveFrom.daysUntil(today) < checkInIntervalDays) return undefined;
   // A diet break holds for its length (MM-135)...
   if (running !== undefined) return undefined;
@@ -292,16 +337,8 @@ export function nextTargets({
     return build({ trigger: 'breakEnded' });
   }
 
-  // Losing faster than the safe pace is not noise, so this runs through
-  // calibration and while the estimate is held.
-  const raise = lossSafetyRaiseKcal({
-    trend: snapshot.trend,
-    history,
-    sex: setup.profile.sex,
-    bodyFat: snapshot.bodyFat,
-    safetyBodyFatPercent: safetyBf,
-    resistanceTrained: TrainingStatus.isResistanceTrained(setup.trainingStatus),
-  });
+  // The safety raise runs through calibration and while the estimate is held.
+  const raise = safetyRaise();
   // A deficit the policy no longer allows (body weight has fallen into the
   // underweight range, MM-111) ends at this check-in, calibration or not.
   const deficitNoLongerAllowed =

@@ -69,5 +69,7 @@ export function explanationLineText(line: ExplanationLine): string {
       return `The surplus paused for want of training (${size}).`;
     case 'breakEnded':
       return `The break ended and the deficit resumed (${size}).`;
+    case 'recalculation':
+      return `You checked in from your latest weight (${size}).`;
   }
 }

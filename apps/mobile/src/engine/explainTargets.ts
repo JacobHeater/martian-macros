@@ -31,6 +31,8 @@ function reasonFor(trigger: ExplanationTrigger): ExplanationReason {
       return 'trainingLapse';
     case 'breakEnded':
       return 'breakEnded';
+    case 'recalculation':
+      return 'recalculation';
     default:
       return 'paceAndWeight';
   }
