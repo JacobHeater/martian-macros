@@ -40,9 +40,9 @@
 .food-micros-line {
   margin: 0;
 }
+/* Space, not a rule, sets the coach's line off the bars: a hairline under the last bar read as one more empty bar (owner). */
 .food-hero-status {
-  margin-top: var(--space-12);
-  border-top: 1px solid var(--outline);
+  margin-top: var(--space-24);
 }
 /* The day's fiber and alcohol, inside the hero as rows shaped like the macro rows' heads (MM-336). */
 .food-hero-lines {
