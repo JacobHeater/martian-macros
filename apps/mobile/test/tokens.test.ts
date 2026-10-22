@@ -118,12 +118,13 @@ describe('the field border', () => {
     });
 
     // MM-106: Ember carries the one primary action: its label on its fill, and as the lead text action and the
-    // current destination on the canvas and the surface; the semantic colours are text and icons on every level.
+    // current destination on the canvas and the surface; the semantic colours are text and icons on every level, overlay
+    // included, where dialogs show their errors (MM-554).
     it(`gives Ember's label, Ember as text and the semantic colours their contrast in ${palette}`, () => {
       const tokens = cssBlock(`.theme-${palette}`);
       expect(ratio(tokens.get('on-ember')!, tokens.get('ember')!), `${palette} on-ember on ember`).toBeGreaterThanOrEqual(4.5);
       expect(ratio(tokens.get('on-danger')!, tokens.get('danger')!), `${palette} on-danger on danger`).toBeGreaterThanOrEqual(4.5);
-      for (const level of ['canvas', 'surface', 'raised']) {
+      for (const level of ['canvas', 'surface', 'raised', 'overlay']) {
         expect(ratio(tokens.get('ember')!, tokens.get(level)!), `${palette} ember on ${level}`).toBeGreaterThanOrEqual(4.5);
         for (const meaning of ['caution', 'info', 'danger', 'positive']) {
           expect(ratio(tokens.get(meaning)!, tokens.get(level)!), `${palette} ${meaning} on ${level}`).toBeGreaterThanOrEqual(4.5);

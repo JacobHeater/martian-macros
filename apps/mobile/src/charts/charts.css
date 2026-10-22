@@ -9,6 +9,7 @@
   flex-wrap: wrap;
   gap: var(--space-4) var(--space-12);
   margin-bottom: var(--space-12);
+  color: var(--text);
   font: var(--type-caption);
 }
 .chart-energy {
@@ -175,17 +176,27 @@
   align-items: center;
   padding: var(--space-4) 0;
   font: var(--type-label);
+  color: var(--text);
   line-height: var(--split-figure-line);
   white-space: nowrap;
 }
-.chart-text-protein {
-  color: var(--protein);
+/* MM-554: a macro's name and figure are text; its colour is the key before the name, a graphic like the sector. */
+.chart-key {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-4);
+  border-radius: 50%;
+  vertical-align: middle;
 }
-.chart-text-carbs {
-  color: var(--carbs);
+.chart-key-protein {
+  background: var(--protein);
 }
-.chart-text-fat {
-  color: var(--fat);
+.chart-key-carbs {
+  background: var(--carbs);
+}
+.chart-key-fat {
+  background: var(--fat);
 }
 .chart-mini {
   flex: none;

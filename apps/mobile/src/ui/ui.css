@@ -356,7 +356,8 @@
 }
 .mm-field-box:focus-within {
   border-color: var(--text);
-  box-shadow: inset 0 0 0 1px var(--text);
+  /* MM-554: a 2px inset on top of the border, so focus reads as a clear change of state. */
+  box-shadow: inset 0 0 0 2px var(--text);
 }
 /* A field with an error (MM-279): the danger colour on the box and the
    message beneath, which is also spoken. */
