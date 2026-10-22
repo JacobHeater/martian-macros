@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-21, by Claude, Session 41.
+Last updated: 2026-10-22, by Claude, Session 42.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -17,25 +17,24 @@ protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
 
-**Open PRs at the end of Session 41:** none besides this handoff (#223). Every
-feature PR of the session is merged or closed; a new session still checks
+**Open PRs at the end of Session 42:** #288 (the legal page workflow runs only by hand until Pages
+is on; a workflow change, so the owner merges it) and this handoff. A new session still checks
 `gh pr list` first.
 
-**What to build next.**
-- The schema lane, one at a time (main is at v16 since #221): MM-510 (the
-  weight-loss-medication answer, then wire MM-113), MM-480 (a slower lean-gain
-  pace), MM-456 (a recipe ingredient keeps its food), MM-490 (platform
-  workouts in the app), MM-507 (a goal body fat).
-- After #227's writes: MM-513 (typed weight written), MM-514 (offer to remove what was
-  written), MM-515 (a deleted workout removed); MM-523 (a data gap says what it
-  costs), MM-498, MM-323, MM-441, MM-442.
-- M4 left: MM-157 (photos), MM-35 (one body model, a spike), MM-450 (body fat
-  in the monthly report), MM-441, MM-447 (owner's decisions).
-- The owner's to-dos for M2: a FoodData Central API key in
-  `config/prod.local.json` (`MM_FDC_API_KEY`); a pantry and fifty packages for
-  MM-51; a qualified reader for MM-57 and the terms (MM-242).
-- A pack rebuild (`mm food fetch`, `build`, `package`, then a release in
-  martian-macros-food-data) puts MM-153's community tiers into the packs.
+**M0 to M4 are done (2026-10-22): every one of the 376 tickets in their `requires` lists is `done` on
+main.** What stays open is owed by people, not code, and is listed in each ticket:
+- **Owed on a phone** (the owner's device pass, see the phone checklist below and each ticket's
+  "Owed on a phone"): most of M3/M4, including every iOS ticket's first build (CI compiles no Swift).
+- **Owed by the owner:** MM-57's qualified reading of the licences (seven points in the ticket) and
+  the optional note to USDA; MM-51's fifty-barcode pantry check and the hand check of
+  `sample50_disagreements.csv` (`tool/spikes/food_sources/README.md`).
+
+**What to build next.** M5 only when the owner decides to release (the paywall, store, sign-offs and
+the public legal page). Otherwise: follow-ups the panel left as notes (each in its ticket): RIR in
+strength captions (MM-108), "±" on the Dashboard weight row and Progress hero (MM-108, design call),
+earlier limb entries carrying their side (needs a schema change, MM-156), the photo database opened
+only when first needed if iOS ever launches the app in the background (MM-157), translation as its
+own ticket if wanted (MM-108).
 
 **Decided by the product owner on 2026-10-13** (each recorded in its
 ticket): the hold-a-reduction stays as built (MM-138 closed; M1 is
@@ -181,6 +180,32 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 42: 2026-10-22, Claude (M0 to M4 finished: five builder lanes, a panel review of everything, ~50 PRs)
+
+- **The owner's words:** "M3 and M4 are both nearly done. Get them finished ASAP"; "Have the subagents now do their
+  reviews"; "I want any ticket that's not done in M0-M4 done tonight and reviewed with the panel. The status must be
+  done." On the failing Pages deploys the owner chose to pause the workflow (#288).
+- **Built and merged:** five lanes in parallel (schema, coaching, health sync, iOS, food/training), then seven panel
+  roles (designer, UX, safety, privacy, measurement, integrations, React) over all of it, then fix PRs for every
+  blocking and should-fix finding, then the last eight M0-M4 tickets (MM-108, 176, 179, 183, 51, 57, 323, 523) with
+  a second panel pass (product, QA, UX, integrations) and its fixes. Schema is at v24 (MM-441 19, MM-456 20, MM-507
+  21, MM-490 22, MM-156 23, MM-118 24).
+- **Decisions taken as defaults, each recorded in its ticket ("say if any is wrong"):** goal body fat shown only in
+  fat loss and recomp; the soft-floor warning announced, not confirmed; a photo self-timer and the front camera on the
+  first set; a smart scale may only make safety stricter (bias 4.5 points, correlation 0.4); only strength workouts
+  imported; Navy tape for men only (no natural-waist site); MM-108's localization files not built (a note, not a
+  criterion; translation would be its own ticket); "No estimate yet" says what fills it.
+- **Bugs found by the panel and CI, fixed:** planned lower days on a shaped week dropped as partial (the estimator
+  and every adherence reader now read a day against its plan, MM-124); a consumer scale narrowing the body-fat range
+  and loosening safety (MM-502); photos savable by long press on iOS, no lock before a photo backup, no Android
+  device-transfer exclusion (MM-157); two Resume buttons while paused (MM-447).
+- **Lessons:** GitHub skips PR CI while a PR conflicts, and a stale branch keeps failing on fixes already on main:
+  merge main into every open branch after a burst of merges. A cancelled run is not a failure: rerun it. The
+  architecture test's import scanner reads `from '…'` inside strings. Coach states ranges in words, never "±", and
+  two "Probably between" on one screen break a test. Never share a worktree between agents (one reset another's
+  branch; nothing was lost). Pushing straight to main is refused by auto mode: merge through PRs.
+- **Not run:** nothing was run locally; CI validated every merge. Main's CI is green at 86744579.
+
 ## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 30 PRs merged)
 
 - **The owner's words this session:** "I want all milestones done in rapid fire. No more excuses, and no more
@@ -230,45 +255,3 @@ MM-242, a draft by non-lawyers that blocks release.
 - **Roadmap:** WS-08 gained MM-438 and MM-439 as built; WS-15 gained MM-440. No milestone moved.
 - **Follow-ups suggested to the owner:** `mm req add` to write and place a ticket in one step; CI that commits the
   regenerated progress page; auto-merge of green PRs (`gh pr merge --auto` needs the owner's permission rule).
-
-## Session 39: 2026-10-20, Claude (M2 closed on feat/m2: food data online, sleep, the weight jump, the diet break, WS-03 and WS-08, history rewritten)
-
-- **The owner's words this session:** "I do expect you to have a solution for the food data including additional
-  sources. The present sources are in martian-macros-food-data. ... I expect this work to be done when I sign back on in
-  the morning and the indication of done will be that we're back on main." Then, asked, "Yes, please rewrite the commit
-  history, then continue on with other work."
-- **History rewritten (owner's go-ahead):** two commits on `feat/m2` had carried `DEVELOPMENT_TEAM` in the Xcode project,
-  the owner's local `.claude/settings.json` edit and a Vitest cache under a stray root `node_modules`. They were rebuilt
-  without them (`535f71b`, `0ee0e75`) through a temporary index, and pushed with a lease. The root `/node_modules/` is now
-  ignored. The old commits may stay reachable on GitHub by SHA until GitHub collects them; nothing references them.
-  **Standing rule kept:** the team id and the settings edit stay unstaged in the working tree.
-- **Food data, with additional sources (MM-58, MM-57, MM-51, MM-153):** an unknown barcode, or a search on request, is
-  looked up online if the person allows it (ask, always, just for now, never; Settings, Data): Open Food Facts' API, and
-  USDA FoodData Central's API in a build given `MM_FDC_API_KEY` (free from api.data.gov; set it in the environment or the
-  git-ignored `config/prod.local.json`; **not set yet, the owner's to obtain**). Answers pass the pack's own nutrition
-  checks and tiers and are kept on the phone (`online_foods`, schema 12). A Food data sources screen names each source and
-  licence. Community records are now judged by MM-153's rule (label, or "Check this" with the reason), and "Fix this
-  food" keeps a corrected copy. MenuStat, CNF, OpenNutrition were read and declined (MM-51). The food-data repository's
-  README says the app can ask online (committed there locally, **not pushed**). The published packs of 2026-10-19 keep the
-  old community tiers until the next `mm food build`.
-- **Built by six lanes in worktrees (`/Users/jacobheater/dev/mm-wt/`), integrated by cherry-pick:** sleep (MM-250, 251,
-  252, 414, 415; schema 13; Kotlin and Swift readers unbuilt and unverified on a device), the weight jump and the waist
-  (MM-142, 155, 418), WS-03 (MM-91, 106, 286, 287, 288 option (a), 289, 304, 357, 422, 436, 437; the accessibility
-  checklist), WS-08 (MM-42, 43, 49, 150, 151, 152, 167, 428, 429; schema 14, renumbered from the lane's 15), the diet
-  break (MM-135, offered at 12 weeks and planned at 20, two weeks long; MM-31 superseded in part; merged with sleep's
-  short-sleep signal), MM-55, MM-56, MM-417 (seven unseen places), MM-416 (Progress entries onto a surface), MM-435.
-  Every design change went through the product-designer and UX-accessibility roles (`docs/agent-runs/`), blocking
-  findings fixed with bug tickets and regression tests.
-- **Decided under the owner's blanket instruction, each recorded "say if wrong" on its ticket:** the Ember budget is
-  option (a), text actions underlined (MM-288); "Just for now" lasts until the app is closed (MM-58); FoodData Central as
-  the second online source and a name search on request (MM-58); MM-304's three owner questions; MM-416 follows rule 1
-  rather than an exception; MM-135's open points (two weeks, seven days at maintenance resets, exempt from the step
-  limit); community records that are complete and consistent are a label (MM-153).
-- **Where M2 stands:** every buildable ticket done. Left, and only people can close them: MM-51 (the fifty-product hand
-  check and the pantry test need real packages), MM-57 (a qualified reader of the licensing). MM-63 and MM-64 closed after the
-  owner decided (2026-10-20): the share sheet is the only way a backup leaves, no storage-service connectors, the file stays
-  `.mmbackup` rather than a password zip, and no export for reading the data outside the app or for other logging apps.
-  Outside M2 and the owner's: MM-432 (a one-week break option). Unverified on a device: the native sleep
-  readers, the online lookup through the shell's HTTP, a backup through the share sheet and back through the picker, screen
-  readers, the phone's largest text.
-- Roadmap: WS-15, WS-07, WS-08, WS-03, WS-04, WS-02 steps tagged M2 are built; `mm roadmap` regenerated.
