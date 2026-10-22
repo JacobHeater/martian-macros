@@ -6,26 +6,30 @@
 :root,
 .theme-martian {
   /*
-   * MM-554: drawn from the brand art (design/brand/splash-art.png, icon-art.png). The levels climb from the night sky
-   * into the mountains' electric purple, with larger steps than MM-375's so cards and the navigation bar stand off the
-   * canvas; the action is the "MARTIAN" lime-yellow, carbs the "MACROS" tangerine, fat the stripes' hot magenta.
+   * MM-554: drawn from the brand art (design/brand/splash-art.png, icon-art.png). MM-555: the base is the near-black
+   * behind the lettering (#0a081b), and the levels step up from it in the same hue, so the brights carry the colour: the
+   * action is the "MARTIAN" lime-yellow, a chosen segment and the current tab the stripes' lime, carbs the "MACROS"
+   * tangerine, fat the stripes' hot magenta.
    */
-  --canvas: #0e0233;
-  --surface: #1f0b5f;
-  --raised: #2e187b;
-  --overlay: #3e2697;
-  --sunken: #070120;
-  --track: #372182;
-  --selected: #4b31a8;
-  --outline: #5f43b5;
-  --outline-strong: #b49bff;
+  --canvas: #0a081b;
+  --surface: #16122e;
+  --raised: #211b3f;
+  --overlay: #2c2550;
+  --sunken: #050410;
+  --track: #2e2752;
+  --selected: #3a3166;
+  --outline: #3f3670;
+  --outline-strong: #a99be6;
   --text: #fff8e9;
   --text2: #ddd4cc;
   --text3: #cbc6d6;
   --ember: #dff701;
   --on-ember: #1c2000;
+  /* A chosen segment and the current tab are lit (MM-555); the ink on them. */
+  --chosen: #c4f24f;
+  --on-chosen: #0a081b;
   --ion: #45e9f2;
-  --on-ion: #0e0233;
+  --on-ion: #0a081b;
   --energy: #fff8e9;
   --protein: #45e9f2;
   --carbs: #ff7a1c;
@@ -35,13 +39,13 @@
   --info: #8cc8ff;
   --water: #4f95ff;
   --danger: #ff858b;
-  --on-danger: #0e0233;
+  --on-danger: #0a081b;
   /* Food grades (MM-370): one solid fill per letter band, categorical, never red; the letter on it in ink. */
   --grade-a: #3fd896;
   --grade-b: #ffd24a;
   --grade-c: #b4a6ff;
   --grade-d: #ff94dc;
-  --on-grade: #0e0233;
+  --on-grade: #0a081b;
   --grade-edge: transparent;
   --radius-group: 12px;
   --radius-nav-indicator: 8px;
@@ -63,6 +67,8 @@
   --text3: #8f9bb5;
   --ember: #ff6a45;
   --on-ember: #1a0802;
+  --chosen: #1c2842;
+  --on-chosen: #ecf0f8;
   --ion: #3fd8f0;
   --on-ion: #031a20;
   --energy: #ecf0f8;
@@ -101,6 +107,8 @@
   --text3: #5a6680;
   --ember: #cc3210;
   --on-ember: #ffffff;
+  --chosen: #e3e8f5;
+  --on-chosen: #0c1220;
   --ion: #0a7890;
   --on-ion: #ffffff;
   --energy: #0c1220;

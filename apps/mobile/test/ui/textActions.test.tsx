@@ -37,9 +37,10 @@ describe('text actions and the Ember budget', () => {
     expect(plate).not.toMatch(/color:\s*var\(--ember\)/);
   });
 
-  it('MM-437: a chosen segment is in the text colour, not Ember on the selected fill', () => {
+  it('MM-437, MM-555: a chosen segment is its ink on the chosen fill, not Ember', () => {
     const chosen = declarationsOf(ui, '.mm-segment-selected');
-    expect(chosen).toMatch(/color:\s*var\(--text\)/);
+    expect(chosen).toMatch(/background:\s*var\(--chosen\)/);
+    expect(chosen).toMatch(/color:\s*var\(--on-chosen\)/);
     expect(chosen).not.toMatch(/var\(--ember\)/);
   });
 
