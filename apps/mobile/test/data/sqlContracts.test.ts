@@ -24,6 +24,8 @@ import { goalBodyFatRepositoryContract } from '../contracts/goalBodyFatRepositor
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
+import { measurementRepositoryContract } from '../contracts/measurementRepositoryContract';
+import { measurementSettingsRepositoryContract } from '../contracts/measurementSettingsRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { weightEventRepositoryContract } from '../contracts/weightEventRepositoryContract';
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
@@ -44,6 +46,8 @@ setupRepositoryContract('SQLite', async () => (await open()).setup);
 weightRepositoryContract('SQLite', async () => (await open()).weights);
 weightEventRepositoryContract('SQLite', async () => (await open()).weightEvents);
 waistRepositoryContract('SQLite', async () => (await open()).waist);
+measurementRepositoryContract('SQLite', async () => (await open()).measurements);
+measurementSettingsRepositoryContract('SQLite', async () => (await open()).measurementSettings);
 menstruationRepositoryContract('SQLite', async () => (await open()).flowDays);
 onlineFoodCacheContract('SQLite', async () => {
   const sql = await openSql();
@@ -86,6 +90,8 @@ dataEraserContract('SQLite', async () => {
     targets: r.targets,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    measurements: r.measurements,
+    measurementSettings: r.measurementSettings,
     preferences: r.preferences,
     weighInWindow: r.weighInWindow,
     workouts: r.workouts,

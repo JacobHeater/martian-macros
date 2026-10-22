@@ -23,6 +23,8 @@ import { menstruationRepositoryContract } from '../contracts/menstruationReposit
 import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
 import { InMemoryOnlineFoodCache } from '../../src/foodCatalog/online/InMemoryOnlineFoodCache';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
+import { measurementRepositoryContract } from '../contracts/measurementRepositoryContract';
+import { measurementSettingsRepositoryContract } from '../contracts/measurementSettingsRepositoryContract';
 import { waterRepositoryContract } from '../contracts/waterRepositoryContract';
 import { weightEventRepositoryContract } from '../contracts/weightEventRepositoryContract';
 import { weightRepositoryContract } from '../contracts/weightRepositoryContract';
@@ -37,6 +39,8 @@ setupRepositoryContract('In-memory', () => new InMemoryRepositories().setup);
 weightRepositoryContract('In-memory', () => new InMemoryRepositories().weights);
 weightEventRepositoryContract('In-memory', () => new InMemoryRepositories().weightEvents);
 waistRepositoryContract('In-memory', () => new InMemoryRepositories().waist);
+measurementRepositoryContract('In-memory', () => new InMemoryRepositories().measurements);
+measurementSettingsRepositoryContract('In-memory', () => new InMemoryRepositories().measurementSettings);
 menstruationRepositoryContract('In-memory', () => new InMemoryRepositories().flowDays);
 onlineFoodCacheContract('In-memory', () => new InMemoryOnlineFoodCache());
 sleepRepositoryContract('In-memory', () => new InMemoryRepositories().sleep);
@@ -74,6 +78,8 @@ dataEraserContract('In-memory', () => {
     targets: r.targets,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    measurements: r.measurements,
+    measurementSettings: r.measurementSettings,
     preferences: r.preferences,
     weighInWindow: r.weighInWindow,
     workouts: r.workouts,

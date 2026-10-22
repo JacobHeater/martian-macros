@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
+import { MeasurementSettings } from '../../src/domain/measurements/MeasurementSettings';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { FoodEntry } from '../../src/domain/FoodEntry';
@@ -48,6 +49,9 @@ it('round trip: a backup from one phone restored on another holds everything', a
       week: new WeekShape({ higherDays: [6, 0], raise: 0.2 }),
     }),
   );
+  // MM-156: every site's measurements and the sites chosen go with the backup.
+  await a.repos.measurements.saveMeasurement('thigh', today.addDays(-2), 58, { readings: [57.5, 58, 58.5] });
+  await a.repos.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'right', suggestionAnswered: true }));
   // MM-507: the goal body fat goes with the backup.
   await a.repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: today.addDays(-3) });
   const snapshot = await a.db.exportBytes();
@@ -79,6 +83,9 @@ it('round trip: a backup from one phone restored on another holds everything', a
   expect(shapes.map((s) => s.balance?.fatShare)).toEqual([CarbFatBalance.moreFatFatShare, CarbFatBalance.moreFatFatShare]);
   expect(shapes.map((s) => [...s.week.higherDays])).toEqual([[], [0, 6]]);
   expect(await valueOf(b.repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: today.addDays(-3) });
+  expect((await valueOf(b.repos.measurements.watchSite('thigh'))).map((o) => [o.valueCm, [...o.readings]])).toEqual([[58, [57.5, 58, 58.5]]]);
+  const sites = await valueOf(b.repos.measurementSettings.watchMeasurementSettings());
+  expect([[...sites.sites], sites.limbSide, sites.suggestionAnswered]).toEqual([['thigh'], 'right', true]);
 });
 
 it('what this phone holds is described before a restore replaces it', async () => {
