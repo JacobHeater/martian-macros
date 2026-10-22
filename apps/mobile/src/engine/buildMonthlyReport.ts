@@ -40,6 +40,10 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * measured, and why, instead of showing a number.
  *
  * Without `setup` the report has no body fat (MM-450).
+ *
+ * Whole days are judged against the plan (MM-124, `plannedShare`), as the
+ * expenditure estimate judges them, so a shaped month's planned lower days
+ * count as whole days and keep the longest logging run going.
  */
 export function buildMonthlyReport({
   period,
@@ -55,6 +59,7 @@ export function buildMonthlyReport({
   pauses = [],
   recommendation,
   setup,
+  plannedShare,
 }: {
   period: ReportPeriod;
   intake: readonly IntakeDay[];
@@ -71,11 +76,13 @@ export function buildMonthlyReport({
   pauses?: readonly Pause[];
   recommendation?: ModeRecommendation | undefined;
   setup?: UserSetup | undefined;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): MonthlyReport {
   const inPeriod = (d: CalendarDate) => !d.isBefore(period.from) && !d.isAfter(period.to);
 
   const logged = intake.filter((d) => inPeriod(d.date) && d.kcal > 0);
-  const whole = usableIntakeDays(logged);
+  const whole = usableIntakeDays(logged, { plannedShare });
   const weighIns = weights.filter((w) => inPeriod(w.date)).length;
 
   const sorted = [...history].sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));

@@ -14,6 +14,11 @@ import { usableIntakeDays } from './usableIntakeDays';
  * count, so someone logging only part of what they eat is not told they are
  * under-eating once they say so. It never changes a target.
  *
+ * A shaped week's planned lower days (MM-124) are judged whole against their
+ * plan (`plannedShare`), as the expenditure estimate judges them, so they are
+ * not left out as partial. The average and the low days stay in real
+ * calories: the floor is about what was eaten, not about the plan.
+ *
  * With `weightLossMedication`, `UnderEatingRule.minimumDaysOnWeightLossMedication`
  * whole days are enough (MM-113).
  */
@@ -22,15 +27,18 @@ export function findUnderEating({
   intake,
   floorKcal,
   weightLossMedication = false,
+  plannedShare,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
   floorKcal: number;
   weightLossMedication?: boolean;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): UnderEatingFinding | undefined {
   const from = through.addDays(1 - UnderEatingRule.windowDays);
   const window = intake.filter((d) => !d.date.isBefore(from) && !d.date.isAfter(through));
-  const whole = usableIntakeDays(window);
+  const whole = usableIntakeDays(window, { plannedShare });
   const minimumDays = weightLossMedication
     ? UnderEatingRule.minimumDaysOnWeightLossMedication
     : UnderEatingRule.minimumDays;

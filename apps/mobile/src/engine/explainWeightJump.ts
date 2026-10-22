@@ -3,6 +3,7 @@ import type { FoodEntry } from '../domain/FoodEntry';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { MenstruationDay } from '../domain/MenstruationDay';
+import { TargetShape } from '../domain/TargetShape';
 import type { Workout } from '../domain/training/Workout';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
@@ -10,6 +11,8 @@ import { CalorieBand } from './CalorieBand';
 import { cycleWindows } from './cycleWindows';
 import { fatMassKcalPerKg } from './partitionConstants';
 import { settlingWindows } from './settlingWindows';
+import { shapedTargets } from './shapedTargets';
+import type { TargetShapeLimits } from './TargetShapeLimits';
 import type { TargetsRecord } from './TargetsRecord';
 import type { WeightJumpCause } from './WeightJumpCause';
 import { WeightJumpCauseKind } from './WeightJumpCauseKind';
@@ -32,7 +35,8 @@ function mean(values: readonly number[]): number | undefined {
  * are then searched for likely causes, listed in `WeightJumpCauseKind`'s
  * order and capped at three: a weight event they noted; a day's
  * carbohydrate or sodium well above the usual (below it for a low reading);
- * yesterday's calories outside the target band; alcohol; a workout; a cycle
+ * yesterday's calories outside the band of that day's own target (shaped by
+ * the week shape then, MM-124, when `limits` are given); alcohol; a workout; a cycle
  * window; the first days after a change of phase. Sodium is judged only on
  * days where enough of the food states it, so a missing value is never
  * read as zero (MM-126). With nothing found the causes are empty, which the
@@ -50,6 +54,8 @@ export function explainWeightJump({
   flowDays = [],
   weightEvents = [],
   history = [],
+  shapes = [],
+  limits,
 }: {
   reading: WeightObservation;
   trend: readonly WeightTrendPoint[];
@@ -59,6 +65,10 @@ export function explainWeightJump({
   flowDays?: readonly MenstruationDay[];
   weightEvents?: readonly WeightEvent[];
   history?: readonly TargetsRecord[];
+  /** How the user shaped their weeks (MM-124): a planned higher day is judged against its own target. */
+  shapes?: readonly TargetShape[];
+  /** The shape limits; every day is judged against the flat target without them. */
+  limits?: TargetShapeLimits | undefined;
 }): WeightJumpExplanation | undefined {
   const day = reading.date;
   const point = trend.find((p) => p.date === day);
@@ -126,7 +136,12 @@ export function explainWeightJump({
   const inForce = [...history].filter((r) => !r.effectiveFrom.isAfter(dayAgo(1))).sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));
   const record = inForce[inForce.length - 1];
   if (yesterday !== undefined && record !== undefined) {
-    const band = new CalorieBand(record.targets.kcal);
+    // The day's own target: a planned higher day is not "over" (MM-124).
+    const shape = TargetShape.on(shapes, dayAgo(1));
+    const targetKcal = (
+      limits === undefined ? record.targets : shapedTargets({ targets: record.targets, weekday: dayAgo(1).weekday, shape, limits })
+    ).kcal;
+    const band = new CalorieBand(targetKcal);
     // A partial day under target says nothing: the food may simply be missing.
     const holds = above ? yesterday.kcal > band.highKcal : yesterday.kcal < band.lowKcal && yesterday.completeness === 'complete';
     if (holds) {
@@ -136,8 +151,8 @@ export function explainWeightJump({
         kind: 'calories',
         figures: {
           kcal: yesterday.kcal,
-          targetKcal: record.targets.kcal,
-          overTargetKcal: yesterday.kcal - record.targets.kcal,
+          targetKcal,
+          overTargetKcal: yesterday.kcal - targetKcal,
           overExpenditureKcal: overExpenditure,
           fatAtMostKg: fatAtMost,
         },

@@ -14,6 +14,14 @@ import { usableIntakeDays } from './usableIntakeDays';
  * estimate uses, judged over the four weeks ending on `through` so one thin
  * week cannot set its own standard. `floorKcal` is the lowest target the app
  * would suggest; an average below it is never "on target".
+ *
+ * A shaped week (MM-124) is read against its plan: `plannedShare`
+ * (`plannedDayShare(shapes)`) decides which days are whole as the
+ * expenditure estimate does, and the target the average is held to is the
+ * plan for the whole days it rests on (the week's target times their mean
+ * share), so a week whose whole days lean on its planned lower days is not
+ * read as under, nor one that leans on its higher days as over. Without it
+ * every day is planned flat.
  */
 export function summarizeAdherence({
   through,
@@ -23,6 +31,7 @@ export function summarizeAdherence({
   floorKcal,
   workouts,
   days = 7,
+  plannedShare,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
@@ -32,13 +41,15 @@ export function summarizeAdherence({
   /** The training log's workouts; undefined when the log is not read, so the fact is left out rather than said as zero. */
   workouts?: readonly Workout[] | undefined;
   days?: number;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): AdherenceSummary {
   const from = through.addDays(1 - days);
   const inWeek = (d: CalendarDate) => !d.isBefore(from) && !d.isAfter(through);
 
   const contextFrom = through.addDays(-27);
   const context = intake.filter((d) => !d.date.isBefore(contextFrom) && !d.date.isAfter(through));
-  const complete = usableIntakeDays(context).filter((d) => inWeek(d.date));
+  const complete = usableIntakeDays(context, { plannedShare }).filter((d) => inWeek(d.date));
   const logged = intake.filter((d) => inWeek(d.date) && d.kcal > 0).length;
 
   const sorted = [...history].sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));
@@ -60,7 +71,12 @@ export function summarizeAdherence({
       targetDays++;
     }
   }
-  const averageTarget = targetDays === 0 ? undefined : targetSum / targetDays;
+  // The plan for the whole days the average rests on: 1 on a flat week, and over a whole shaped week too.
+  const meanShare =
+    plannedShare === undefined || complete.length === 0
+      ? 1
+      : complete.reduce((s, d) => s + plannedShare(d.date), 0) / complete.length;
+  const averageTarget = targetDays === 0 ? undefined : (targetSum / targetDays) * meanShare;
 
   let averageIntake: number | undefined;
   let mostlyEstimated = false;

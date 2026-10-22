@@ -3,8 +3,11 @@ import { DashboardHistory } from '../../src/dashboard/DashboardHistory';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { IntakeDay } from '../../src/domain/IntakeDay';
 import { Pause } from '../../src/domain/Pause';
+import { TargetShape } from '../../src/domain/TargetShape';
 import type { WeightObservation } from '../../src/domain/WeightObservation';
+import { WeekShape } from '../../src/domain/WeekShape';
 import { DailyTargets } from '../../src/engine/DailyTargets';
+import { TargetShapeLimits } from '../../src/engine/TargetShapeLimits';
 import { TargetsRecord } from '../../src/engine/TargetsRecord';
 
 /** Carried over from dashboard_history_test.dart. */
@@ -151,4 +154,25 @@ it('MM-335: today still being logged is drawn apart and kept out of the averages
   const complete = facts({ intake: [food(0, 600, { complete: true }), food(1, 2000)] });
   expect(complete.unfinished).toBeUndefined();
   expect(complete.meanCalories).toBe(1300);
+});
+
+it('a shaped week draws each day against its own target, as Food shows it (MM-124)', () => {
+  // Today is a Saturday: Saturday and Sunday 20% higher on 2,000 kcal.
+  const week = new WeekShape({ higherDays: [6, 0], raise: 0.2 });
+  const result = new DashboardHistory({
+    today,
+    days: 7,
+    intake: [],
+    history: [target(30, 2000)],
+    pauses: [],
+    weights: [],
+    onboardedOn: today.addDays(-60),
+    targetsAllowed: true,
+    shapes: [new TargetShape({ since: today.addDays(-30), week })],
+    limits: new TargetShapeLimits({ floorKcal: 1500, sex: 'male', trendWeightKg: 80, heightCm: 180 }),
+  });
+  expect(result.calorieTargets.get(today)).toBeCloseTo(2400, 6);
+  expect(result.calorieTargets.get(today.addDays(-1))).toBeCloseTo(1840, 6);
+  // Without the limits the line stays flat.
+  expect(facts({ history: [target(30, 2000)] }).calorieTargets.get(today)).toBe(2000);
 });

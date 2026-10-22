@@ -12,7 +12,8 @@ import { usableIntakeDays } from './usableIntakeDays';
  * and the expenditure estimate use (`usableIntakeDays`), so the app never
  * rewards what it does not count elsewhere. Nothing about how much was
  * eaten, or whether it was under target, matters: a whole day is a whole
- * day.
+ * day. A shaped week's planned lower day (MM-124) is read against its plan
+ * (`plannedShare`), so eating it as planned never breaks the streak.
  *
  * - One missed day in any `StreakRule.forgiveWithinDays` is forgiven; a
  *   second breaks the streak.
@@ -24,14 +25,16 @@ export function loggingStreakOf({
   today,
   intake,
   pauses = [],
+  plannedShare,
 }: {
   today: CalendarDate;
   intake: readonly IntakeDay[];
   pauses?: Iterable<Pause>;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): LoggingStreak {
-  const wholeDays = new Set(
-    usableIntakeDays(intake.filter((d) => d.kcal > 0 && !d.date.isAfter(today))).map((d) => d.date.epochDay),
-  );
+  const logged = intake.filter((d) => d.kcal > 0 && !d.date.isAfter(today));
+  const wholeDays = new Set(usableIntakeDays(logged, { plannedShare }).map((d) => d.date.epochDay));
   const startEpochDay = wholeDays.has(today.epochDay) ? today.epochDay : today.epochDay - 1;
   return streakEndingOn({ wholeDays, startEpochDay, pauses: [...pauses] });
 }

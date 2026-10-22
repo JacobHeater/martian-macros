@@ -59,4 +59,8 @@ Scenario: Logging collapses and targets do not
 - The style-switch rule only sees weighed versus not weighed. Hand portions (MM-46) will need it to tell more styles apart.
 - A shaped week's planned lower days (MM-124) are read against their plan: `usableIntakeDays` takes an optional `plannedShare`
   (`plannedDayShare(shapes)`) and divides each day's intake by it before the comparison, so a planned lower day eaten a little
-  under plan is not dropped. The estimator gets it from `analyze`; the other callers still read every day as flat (a follow-up).
+  under plan is not dropped. The estimator gets it from `analyze`. Every other caller gets the same share from `AppState`
+  (2026-10-21): the adherence summary and the stall diagnosis that reads it (MM-149, MM-140), the under-eating notice (MM-114),
+  the insights' partial-days count (MM-141), the monthly report's whole days and longest run (MM-33) and the logging streak
+  (MM-92), so all of them agree on which days are whole. A genuinely half-logged day is still partial everywhere. Tests:
+  `test/engine/plannedShareReaders.test.ts`, and the streak through the app in `test/dashboard/processRewards.test.tsx`.

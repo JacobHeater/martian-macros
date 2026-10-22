@@ -82,3 +82,8 @@ Not built:
 - Adherence is shown as counts and protein; the report does not repeat the adherence summary's intake-against-target line, because
   that wording is for a week and the report restates nothing it can avoid.
 - Not checked on a device.
+
+## Shaped weeks (MM-124), 2026-10-21
+The month's whole days, and the longest logging run drawn from them, are judged against the plan, as the expenditure
+estimate judges them: planned lower days are whole, a half-logged day is not. Test:
+`test/engine/plannedShareReaders.test.ts`.

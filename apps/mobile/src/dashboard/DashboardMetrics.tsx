@@ -51,6 +51,9 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
   const history = useCell(state.targetsHistory);
   const pauses = useCell(state.pauses);
   const recovery = useCell(state.recoveryCheckIns);
+  // Each day's target line is the day's own under a shaped week (MM-124); flat until the shapes are read.
+  const shapes = Loadable.valueOf(useCell(state.targetShapes)) ?? [];
+  const shapeLimits = useCell(state.targetShapeLimits);
   const snapshot = useCell(state.coach);
   const paceInWords = usePaceInWords();
   if (setup === undefined) return null;
@@ -75,6 +78,8 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
     weights: weights.value,
     onboardedOn: setup.onboardedOn,
     targetsAllowed: allowed && !unchecked,
+    shapes,
+    limits: shapeLimits,
   });
   const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const waists = waist.value.filter((w) => !w.date.isBefore(facts.start) && !w.date.isAfter(today));

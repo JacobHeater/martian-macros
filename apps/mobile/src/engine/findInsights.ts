@@ -31,9 +31,13 @@ const upToSeven = [0, 1, 2, 3, 4, 5, 6] as const;
  *
  * Each rule is a pattern over `InsightRationing.patternDays` days resting on
  * at least `InsightRationing.minimumBasisDays` days of data, so nothing here
- * can be about a single day or a single weigh-in. For a user with an
- * eating-disorder history (`limitToProteinAndLogging`) rules about weight,
- * and about intake other than protein and logging, are left out entirely.
+ * can be about a single day or a single weigh-in. A shaped week (MM-124) is
+ * read against its plan (`plannedShare`): which days are whole, as the
+ * expenditure estimate judges them, and how high a day ran, so planned lower
+ * days are not partial and planned higher days are not a pattern to point
+ * out. For a user with an eating-disorder history
+ * (`limitToProteinAndLogging`) rules about weight, and about intake other
+ * than protein and logging, are left out entirely.
  */
 export function findInsights({
   through,
@@ -48,6 +52,7 @@ export function findInsights({
   limitToProteinAndLogging = false,
   sleepAverage,
   fiber,
+  plannedShare,
 }: {
   through: CalendarDate;
   intake: readonly IntakeDay[];
@@ -65,6 +70,8 @@ export function findInsights({
   sleepAverage?: SleepAverage | undefined;
   /** Each day's entries, the sex and the check-ins, at Full detail only (MM-126). */
   fiber?: FiberPattern | undefined;
+  /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
+  plannedShare?: ((date: CalendarDate) => number) | undefined;
 }): Insight[] {
   const days = InsightRationing.patternDays;
   const minimum = InsightRationing.minimumBasisDays;
@@ -72,7 +79,7 @@ export function findInsights({
   const inPeriod = (d: CalendarDate) => !d.isBefore(from) && !d.isAfter(through);
 
   const logged = intake.filter((d) => inPeriod(d.date) && d.kcal > 0);
-  const whole = usableIntakeDays(logged);
+  const whole = usableIntakeDays(logged, { plannedShare });
   const found: Insight[] = [];
   const add = (rule: InsightRule, figures: Record<string, number>) => {
     found.push(new Insight({ rule, from, to: through, figures }));
@@ -184,8 +191,13 @@ export function findInsights({
     }
   }
 
-  // Weekend days average a fifth of the target or more above weekdays.
+  // Weekend days average a fifth of the target or more above weekdays, each day read against its plan (MM-124).
+  const asPlanned = (d: IntakeDay) => {
+    const share = plannedShare?.(d.date) ?? 1;
+    return share > 0 ? d.kcal / share : d.kcal;
+  };
   const average = (of: readonly IntakeDay[]) => of.reduce((s, d) => s + d.kcal, 0) / of.length;
+  const averageAsPlanned = (of: readonly IntakeDay[]) => of.reduce((s, d) => s + asPlanned(d), 0) / of.length;
   const weekend = whole.filter((d) => d.date.isWeekend);
   const weekdays = whole.filter((d) => !d.date.isWeekend);
   const targeted = whole.map((d) => recordOn(d.date)?.targets.kcal).filter((k): k is number => k !== undefined);
@@ -196,7 +208,7 @@ export function findInsights({
     targeted.length === whole.length
   ) {
     const target = targeted.reduce((s, k) => s + k, 0) / targeted.length;
-    const excess = average(weekend) - average(weekdays);
+    const excess = averageAsPlanned(weekend) - averageAsPlanned(weekdays);
     if (excess >= WeekPatternRule.weekendExcessOfTarget * target) {
       add('weekendHigher', {
         weekdayDays: weekdays.length,
@@ -231,16 +243,19 @@ export function findInsights({
       const loggedDates = new Set(logged.filter((d) => within(d.date)).map((d) => d.date));
       const wholeDays = whole.filter((d) => within(d.date));
       const unlogged = upToSeven.map((i) => first.addDays(i)).filter((d) => !loggedDates.has(d));
-      // The highest day stands out: alone at the top, and well above the rest.
-      const top = wholeDays.reduce<IntakeDay | undefined>((h, d) => (h === undefined || d.kcal > h.kcal ? d : h), undefined);
+      // The highest day against its plan stands out: alone at the top, and well above the rest.
+      const top = wholeDays.reduce<IntakeDay | undefined>(
+        (h, d) => (h === undefined || asPlanned(d) > asPlanned(h) ? d : h),
+        undefined,
+      );
       const rest = wholeDays.filter((d) => d !== top);
       const target = top === undefined ? undefined : recordOn(top.date)?.targets.kcal;
       const standsOut =
         top !== undefined &&
         target !== undefined &&
         rest.length > 0 &&
-        top.kcal - average(rest) >= WeekPatternRule.highestDayExcessOfTarget * target &&
-        rest.every((d) => d.kcal < top.kcal);
+        asPlanned(top) - averageAsPlanned(rest) >= WeekPatternRule.highestDayExcessOfTarget * target &&
+        rest.every((d) => asPlanned(d) < asPlanned(top));
       return { loggedDays: loggedDates.size, wholeDays: wholeDays.length, unlogged, highest: standsOut ? top : undefined };
     });
     const [one, two] = halves as [(typeof halves)[0], (typeof halves)[0]];

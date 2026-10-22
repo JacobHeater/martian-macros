@@ -102,3 +102,9 @@ yesterday, not the seven days before each check-in. The stall diagnosis and conf
 
 ## Built 2026-10-19
 The week's workouts are the fifth fact once the training log is read (left out, not said as zero, when it is not); an average below the floor points to the notice about those days while it is showing (MM-114); the five facts stand beside the check-in's reasons in "Why your targets are what they are" (MM-138), as "Your last 7 days". Decided: the week is the seven days to yesterday, which is what the check-in reads. Left to their own tickets: higher days against their own targets (MM-124, M4); the monthly report's month (MM-33); the stall diagnosis and confidence reading the summary's figures (MM-140, MM-139). Tests: `test/coach/adherenceSummary.test.tsx`, `test/coach/lastChange.test.tsx`.
+
+## Shaped weeks (MM-124), 2026-10-21
+Higher and lower days are judged against their plan. Which days are whole uses the plan's share, as the expenditure
+estimate does, and the target the average is held to is the week's target times the mean planned share of the whole
+days it rests on: the flat figure over a whole shaped week, the lower days' plan for a week that rests on them alone.
+The stall diagnosis reads the summary the same way (MM-140). Test: `test/engine/plannedShareReaders.test.ts`.
