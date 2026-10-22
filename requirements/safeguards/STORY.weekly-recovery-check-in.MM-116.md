@@ -1,6 +1,6 @@
 ---
 id: MM-116
-status: in-progress
+status: done
 component: safeguards
 related: [MM-110, MM-20, MM-24, MM-33, MM-61, MM-68, MM-117, MM-140, MM-146]
 ---
@@ -114,14 +114,22 @@ Built (2026-10-21, feat/mm-116-recovery-check-in):
   schema change. Tests: `missedPeriod.test.ts` (engine), `recoveryCheckIn.test.tsx` (the question, the notice, none off a deficit
   goal, none for a male profile). Story: `RecoveryCheckInMissedPeriod` (Coach).
 
-Not built:
-- The missed-period answer is not kept, so "Menopause" does not change the health check's answer, and the question is not
-  repeated later in a long gap. Not checked on a device.
-- Shown "with the check-in": it is a card on the Coach screen, not part of the target-change summary.
-- Sleep hours pre-filled from a health platform (MM-68, not built), and step count beside the lines.
-- Its reminder (MM-146 lists one; that ticket's build left it out).
+Built since (2026-10-21):
+- **Its reminder** (MM-146): "How you are holding up" in Settings, Reminders, sent at 9:00 am on the day the questions
+  fall due and weekly while they wait, until seven go unanswered. See MM-146's Progress.
+- **Sleep hours pre-filled** from the last fourteen nights recorded (MM-252), in `RecoveryCheckInScreen`.
+- **Offered with the check-in**: when it is due it is the Coach screen's one thing to do (MM-299), and the card opens
+  expanded.
+
+Left as decided:
+- The missed-period answer is not kept (the acceptance criteria say so), so "Menopause" does not change the health
+  check's answer, and the question is not repeated later in a long gap.
+- Step count beside the lines: the Notes put it in a future phase, display only.
 - The offer of relief that the answers lead to is MM-117.
-- Checked on the Android emulator: the card, the five questions, saving, and the lines for one check-in. iOS untried.
+
+## Owed on a phone
+- Checked on the Android emulator (Flutter build): the card, the five questions, saving, and the lines for one check-in.
+  Still to look at: the missed-period question and its notice, the reminder arriving, and all of it on iOS.
 
 ## Note (2026-10-13, MM-249)
 The "emerging" grade this ticket gave short sleep was overruled by the product owner with the evidence in MM-249: the one trial cited here was the right one and was not alone. Sleep becomes a first-class signal (WS-15); the optional typed hours here are pre-filled from the nightly record (MM-252), and the sleep-quality question stays.

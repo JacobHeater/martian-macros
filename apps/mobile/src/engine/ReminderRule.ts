@@ -7,6 +7,8 @@ const defaultMinutes: Record<ReminderKind, number> = {
   weighIn: 7 * 60,
   logFood: 20 * 60,
   weeklyMeasurement: 8 * 60,
+  // The table in MM-146 sends it "with the check-in", whose own notification it puts at 9 am.
+  recoveryCheckIn: 9 * 60,
 };
 
 /** The rules reminders obey (MM-146). Judgement: tune them here. */
@@ -26,6 +28,12 @@ export const ReminderRule = {
 
   /** The waist counts as measured for this many days. */
   measurementEveryDays: 7,
+
+  /**
+   * The most reminders planned at once: iOS keeps only the soonest 64
+   * pending local notifications and drops the rest without a word (MM-405).
+   */
+  mostPending: 64,
 
   /** How far ahead reminders are planned. Long enough for seven weekly ones. */
   horizonDays: 49,

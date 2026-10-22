@@ -53,7 +53,15 @@ Scenario: Removed
 Done (2026-10-21, PR #238): both scenarios are built and held by the tests named in the notes; not run locally, CI
 validates.
 
+- Integrations review fix 2026-10-21 (`fix/health-plugins-review`): on Android, a removal of a whole kind (the
+  kind's prefix, which every record of its type the app writes carries) is `deleteRecords(type, TimeRangeFilter)` from
+  the epoch to 400 days ahead: Health Connect deletes only the caller's own records, and a delete is not held to the
+  thirty days a read is. A narrower prefix still reads the app's records, and when a read over everything is refused,
+  falls back to the last thirty days. Test: `test/native/mmHealthWrites.test.ts`.
+
 ## Owed on a phone
 - Health Connect lets the app read its own records of a kind it may only write, including ones older than thirty days,
   so "Remove" finds them.
 - HealthKit's delete removes the app's own samples and no other app's.
+- Android, without the history permission: a food written more than thirty days ago is removed when "food" is turned
+  off and the removal accepted (the delete by time), and another app's nutrition records are untouched.

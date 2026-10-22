@@ -75,6 +75,10 @@ Done 2026-10-21. Not run locally; CI validates the TypeScript tests. CI builds n
   open as a banner with its sound, as Android does.
 - Fixed while finishing: the scheduling callbacks wrote their failure from several threads at once; it is now
   locked.
+- Review fix 2026-10-21 (`fix/privacy-housekeeping`): iOS keeps only the soonest 64 pending notifications and drops
+  the rest unsaid, so `planReminders` caps the plan at `ReminderRule.mostPending` (64), the soonest first, on every
+  platform. Today's rules plan at most 21 (three kinds, seven each), so the cap is a guard. Test:
+  `test/engine/reminders.test.ts` ("the most pending at once").
 
 ## Owed on a phone
 - With the weigh-in reminder on for 7:00 am, the pending requests are the plan's reminders and nothing else (the
