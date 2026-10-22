@@ -1,3 +1,4 @@
+import { ProgressPhotoSwitches } from './ProgressPhotoSwitches';
 import { HowThisWorksScreen } from '../about/HowThisWorksScreen';
 import { useInsightKinds } from '../coach/useInsightKinds';
 import { FoodDatabaseScreen } from '../foodPacks/FoodDatabaseScreen';
@@ -281,6 +282,8 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
                   : 'Nothing about you is uploaded. Only a barcode or search words ever go online, and only if you allow it.'
               }
             />
+            {/* Offered or not (MM-157): off to begin with for an eating-disorder history, and turned on here. */}
+            <ProgressPhotoSwitches />
           </MmListGroup>
         </MmSection>
         <BackupSection />

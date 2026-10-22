@@ -1,6 +1,6 @@
 ---
 id: MM-375
-status: in-progress
+status: done
 component: design-system
 related: [MM-184, MM-102, MM-103, MM-106, MM-108, MM-362, MM-370, MM-237, MM-293]
 ---
@@ -88,3 +88,24 @@ Scenario: The tests hold the values
 ## Notes
 - The colour doc said automated tests held text contrast on all four levels and the macro L* gaps; those were the Flutter
   app's and were not carried over. They are now in `apps/mobile/test/tokens.test.ts` for every palette.
+
+## Progress
+Built (2026-10-17, MM-375's panel run): the revised Martian tokens in `tokens.css`, the colour doc §1, and the token
+tests; drawn in every screen story; the owner approved the royal violet ("Yes, that's it") and kept lime; the UX guard
+passed on its second pass (`docs/agent-runs/mm375-warm-martian/decision.md`).
+
+Added (2026-10-21): the token tests now also hold the criteria they did not: every grade badge has a 3:1 boundary on
+canvas, surface and raised (its fill, or in light its edge), no macro colour is water or a grade fill, and no grade fill
+is the action colour (`test/tokens.test.ts`). Not run locally; CI validates.
+
+**Ion and protein (P-3, UX-4), settled by default.** Built as the Decisions above state: Martian's ion and protein stay
+the same aqua, told apart by form (the insight is a sentence with its own icon, protein a bar beside its "P" label), and
+never on the same chart. The product designer's way out was to part the two hues; a search of the colour space found no
+free one: every colour that holds 4.5:1 as caption text on overlay lies within about 37 ΔE of a role Martian already
+uses, and the farthest are lime-greens beside the action or violets in the canvas's own band, which would bring back the
+washout. Parting them would mean moving protein or another role, which is the owner's call. Say if it reads wrong.
+
+## Owed on a phone
+- Martian at low screen brightness: cards, the navigation bar and the canvas still told apart (UX-6).
+- The Food, Dashboard, Workout, Coach and Settings stories looked at in the three palettes and through a colour-blind
+  simulator, beyond the computed Machado figures.

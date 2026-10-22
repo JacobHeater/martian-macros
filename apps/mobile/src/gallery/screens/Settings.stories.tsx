@@ -36,6 +36,8 @@ import { typicalSetup } from '../../fixtures/typicalSetup';
 import { storyToday } from './storyToday';
 import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
+import type { StoryScenario } from './StoryScenario';
+import { WeighInWindow } from '../../healthIngest/WeighInWindow';
 
 /**
  * Everything the person set up and can change, and what the app says about
@@ -83,6 +85,18 @@ export const EditHeight = screenStory({
     void overlays.sheet<void>('Height', (close) => (
       <EditHeightSheet initialCm={180} imperial onSave={() => close()} />
     ));
+  },
+});
+
+/** MM-68: Health Connect holds a height that shows differently from the profile's: said under the row, offered in the sheet. */
+export const HeightFromHealthConnect = screenStory({
+  covers: ['SettingsScreen', 'EditHeightSheet'],
+  shows: 'Health Connect says 5′ 9″',
+  device: healthPlatform({ allowed: ['height'], heightCm: 176 }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="profile" />),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Height/ }));
+    await screen.findByRole('button', { name: 'Use 5′ 9″' });
   },
 });
 
@@ -542,6 +556,75 @@ export const HealthConnectPrimaryScaleFails = screenStory({
     reveal(change);
     await userEvent.click(change);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('option', { name: 'Gym scale' }));
+  },
+});
+
+/** MM-441: weight allowed and no window moved: the usual morning, 4:00 AM to 12:00 PM, beside the primary scale. */
+export const HealthConnectWeighInWindow = screenStory({
+  covers: ['SettingsScreen'],
+  shows: '4:00 AM to 12:00 PM, the usual morning. The first reading in it counts as the day’s weigh-in.',
+  device: healthPlatform({ allowed: ['weight'], secondScale: true }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Weigh-in window'));
+  },
+});
+
+/** The window a night-shift worker moved to after waking, up to midnight (MM-441). */
+const lateWindow: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  await repos.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 14 * 60 + 30, endMinute: 24 * 60 }));
+};
+
+/** Presses "Change weigh-in window", and OK on when it starts, so the question of when it ends is up. */
+const askWhenItEnds = async (canvas: HTMLElement) => {
+  const change = await within(canvas).findByRole('button', { name: 'Change weigh-in window' });
+  reveal(change);
+  await userEvent.click(change);
+  const body = within(canvas.ownerDocument.body);
+  await body.findByRole('dialog', { name: 'Weigh-in window starts' });
+  await userEvent.click(await body.findByRole('button', { name: 'OK' }));
+  return body.findByRole('dialog', { name: 'Weigh-in window ends' });
+};
+
+/** MM-441: a window moved to the afternoon, to the minute, ending at midnight. */
+export const HealthConnectWeighInWindowMoved = screenStory({
+  covers: ['SettingsScreen'],
+  shows: '2:30 PM to midnight. The first reading in it counts as the day’s weigh-in.',
+  scenario: lateWindow,
+  device: healthPlatform({ allowed: ['weight'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Weigh-in window'));
+  },
+});
+
+/** MM-441: an end before the start is refused while the drums stay on it: the window never crosses midnight. */
+export const HealthConnectWeighInWindowEndRefused = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Choose a time after 2:30 PM, or 12:00 AM for midnight.',
+  scenario: lateWindow,
+  device: healthPlatform({ allowed: ['weight'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const ends = await askWhenItEnds(canvas);
+    const hour = within(ends).getByRole('spinbutton', { name: 'Hour' });
+    hour.focus();
+    await userEvent.keyboard('9');
+  },
+});
+
+/** MM-441: moving the window and the save failing: it says so and keeps the window in force. */
+export const HealthConnectWeighInWindowFails = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Your weigh-in window could not be saved. Nothing was changed.',
+  scenario: lateWindow,
+  device: healthPlatform({ allowed: ['weight'] }),
+  stores: failingWrite('weighInWindow', 'saveWeighInWindow'),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const ends = await askWhenItEnds(canvas);
+    await userEvent.click(within(ends).getByRole('button', { name: 'OK' }));
   },
 });
 
@@ -1133,4 +1216,17 @@ export const FoodDatabaseOpensSources = screenStory({
   shows: 'The sources',
   open: ({ navigator }) => void navigator.push(() => <FoodDatabaseScreen />),
   walk: pressAnywhere(/^Food data sources/),
+});
+
+/** MM-157: Back up photos turned on: what the photos add to each backup. */
+export const SettingsBackupPhotos = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /go into each backup/,
+  scenario: demoWith({
+    then: async (repos, today) => {
+      await repos.progressPhotos.savePhoto({ date: today, pose: 'front', takenAt: new Date(Date.UTC(2026, 9, 1, 7)), width: 1200, height: 1600, jpeg: new Uint8Array(2_400_000) });
+      await repos.progressPhotos.savePhotoSettings({ offered: undefined, backUp: true });
+    },
+  }),
+  open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
 });

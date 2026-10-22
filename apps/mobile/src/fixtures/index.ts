@@ -40,3 +40,8 @@ export * from './InMemoryWeightRepository';
 export * from './InMemoryWorkoutRepository';
 export * from './ObservableValue';
 export * from './typicalSetup';
+export * from './FixturePhotoCamera';
+export * from './InMemoryDeviceLock';
+export * from './InMemoryPrivateScreen';
+export * from './InMemoryProgressPhotoRepository';
+export * from './fixturePhotoJpeg';

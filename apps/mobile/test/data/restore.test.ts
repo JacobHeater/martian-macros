@@ -6,6 +6,7 @@ import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { TargetShape } from '../../src/domain/TargetShape';
 import { WeekShape } from '../../src/domain/WeekShape';
+import { WeighInWindow } from '../../src/healthIngest/WeighInWindow';
 import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { WasmSqlDatabase } from '../../src/sql/wasm/WasmSqlDatabase';
@@ -34,6 +35,8 @@ it('round trip: a backup from one phone restored on another holds everything', a
     new CustomFood({ id: 0, name: 'Protein oats', kind: 'food', servingDescription: '1 bowl', perServing: new NutritionTotals({ kcal: 410, proteinG: 24, carbsG: 52, fatG: 11 }) }),
   );
   await a.repos.preferences.saveWaterGoal(2500);
+  // MM-441: the weigh-in window goes with the backup.
+  await a.repos.weighInWindow.saveWeighInWindow(new WeighInWindow({ startMinute: 14 * 60 + 30, endMinute: 24 * 60 }));
   // MM-486: the shapes go with the backup.
   await a.repos.targetShapes.saveTargetShape(
     new TargetShape({ since: today.addDays(-21), balance: new CarbFatBalance({ fatShare: CarbFatBalance.moreFatFatShare }) }),
@@ -45,6 +48,8 @@ it('round trip: a backup from one phone restored on another holds everything', a
       week: new WeekShape({ higherDays: [6, 0], raise: 0.2 }),
     }),
   );
+  // MM-507: the goal body fat goes with the backup.
+  await a.repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: today.addDays(-3) });
   const snapshot = await a.db.exportBytes();
 
   const b = await phone();
@@ -67,10 +72,13 @@ it('round trip: a backup from one phone restored on another holds everything', a
   expect((await valueOf(b.repos.food.watchFood(today))).map((e) => e.name)).toEqual(['Oats']);
   expect((await valueOf(b.repos.customFoods.watchCustomFoods())).map((f) => f.name)).toEqual(['Protein oats']);
   expect((await valueOf(b.repos.preferences.watchNutritionGoals())).waterGoalMl).toBe(2500);
+  const kept = await valueOf(b.repos.weighInWindow.watchWeighInWindow());
+  expect([kept.startMinute, kept.endMinute]).toEqual([14 * 60 + 30, 24 * 60]);
   const shapes = await valueOf(b.repos.targetShapes.watchTargetShapes());
   expect(shapes.map((s) => s.since.toString())).toEqual([today.addDays(-21).toString(), today.toString()]);
   expect(shapes.map((s) => s.balance?.fatShare)).toEqual([CarbFatBalance.moreFatFatShare, CarbFatBalance.moreFatFatShare]);
   expect(shapes.map((s) => [...s.week.higherDays])).toEqual([[], [0, 6]]);
+  expect(await valueOf(b.repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: today.addDays(-3) });
 });
 
 it('what this phone holds is described before a restore replaces it', async () => {

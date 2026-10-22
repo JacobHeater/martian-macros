@@ -127,3 +127,13 @@ it('turned off, every workout the app wrote can be removed by its prefix, and no
   expect(await new NativeHealthWriting(fake.api).removeWritten('workouts')).toBe(true);
   expect([...fake.workouts.keys()].sort()).toEqual(['hc-walk-1', 'hc-watch-1']);
 });
+
+it('a workout the platform says the app wrote is never read as one to import, whatever its client id (MM-489, MM-490)', async () => {
+  const ownWithOddId: MmHealthWorkout = { ...fromWatch, id: 'hc-own-1', clientId: 'not-our-prefix', ours: true };
+  const { fake, workouts } = android({ workouts: [fromWatch, ownWithOddId] });
+  await workouts.requestWritePermission();
+  expect(await workouts.writeWorkout(workout)).toBe(true);
+  expect(fake.workouts.has('hc-martian-macros-workout-7'), 'written, and held by the platform').toBe(true);
+  const read = await workouts.readWorkouts({ from: new Date(2000, 0, 1), to: new Date(2100, 0, 1) });
+  expect(read.map((w) => w.platformId)).toEqual(['hc-watch-1']);
+});

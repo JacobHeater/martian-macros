@@ -28,4 +28,6 @@ export const tables = [
   'online_foods',
   'sleep_nights',
   'target_shapes',
+  'goal_body_fat',
+  'deleted_platform_workouts',
 ] as const;

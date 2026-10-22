@@ -4,16 +4,24 @@ import { MmSegmented } from '../ui/MmSegmented';
 import { MmTextField } from '../ui/MmTextField';
 import { SectionLabel } from '../ui/SectionLabel';
 import type { MeasurementsTyped } from './MeasurementsTyped';
+import type { WeightFromHealth } from './WeightFromHealth';
+import { WeightFromHealthRows } from './WeightFromHealthRows';
 
 interface MeasurementsStepProps {
   units: UnitSystem;
   typed: MeasurementsTyped;
   onUnits: (units: UnitSystem) => void;
   onTyped: (typed: MeasurementsTyped) => void;
+  /** The health platform's offer, where there is one on this phone (MM-68, MM-73). */
+  health?: WeightFromHealth | undefined;
 }
 
-/** Step 3: units, height and current weight. */
-export function MeasurementsStep({ units, typed, onUnits, onTyped }: MeasurementsStepProps) {
+/**
+ * Step 3: units, height and current weight. Where the phone has a health
+ * platform, reading weight from it is offered under the weight, never
+ * required, and today's weigh-in from it is offered as the current weight.
+ */
+export function MeasurementsStep({ units, typed, onUnits, onTyped, health }: MeasurementsStepProps) {
   const fmt = new Fmt(units);
   const field = (key: keyof MeasurementsTyped, label: string) => (
     <MmTextField label={label} kind="number" value={typed[key]} onChange={(value) => onTyped({ ...typed, [key]: value })} />
@@ -45,8 +53,23 @@ export function MeasurementsStep({ units, typed, onUnits, onTyped }: Measurement
       )}
       <div className="app-gap" />
       <SectionLabel text="Current weight" />
-      {field('weight', fmt.weightUnit)}
-      <p className="app-caption">This becomes your first weigh-in.</p>
+      {/* Drawn again, and focused, each time a row of the offer that was pressed goes away (the panel's review). */}
+      <MmTextField
+        key={`weight-${health?.focusWeight ?? 0}`}
+        label={fmt.weightUnit}
+        kind="number"
+        value={typed.weight}
+        onChange={(value) => onTyped({ ...typed, weight: value })}
+        autoFocus={(health?.focusWeight ?? 0) > 0}
+      />
+      {/* Said when it changes, as the offer under it does, since the row pressed goes away (the panel's review). */}
+      <p className="app-caption" aria-live="polite">
+        {health?.used === true && health.today !== undefined
+          ? `Today’s weigh-in from ${health.today.sourceName === '' ? health.platform : health.today.sourceName}, in ${health.platform}. Type to change it.`
+          : 'This becomes your first weigh-in.'}
+      </p>
+      <div aria-live="polite">{health === undefined ? null : <WeightFromHealthRows health={health} fmt={fmt} />}</div>
     </>
   );
 }
+

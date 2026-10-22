@@ -1,3 +1,4 @@
+import { InMemoryProgressPhotoRepository } from './InMemoryProgressPhotoRepository';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
@@ -7,6 +8,8 @@ import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { IntakeReader } from '../domain/repositories/IntakeReader';
 import type { PauseRepository } from '../domain/repositories/PauseRepository';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { RecoveryCheckInRepository } from '../domain/repositories/RecoveryCheckInRepository';
 import type { ReminderRepository } from '../domain/repositories/ReminderRepository';
 import type { SetupRepository } from '../domain/repositories/SetupRepository';
@@ -21,6 +24,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
+import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -42,6 +46,7 @@ import { InMemoryReminderRepository } from './InMemoryReminderRepository';
 import { InMemorySetupRepository } from './InMemorySetupRepository';
 import { InMemorySleepRepository } from './InMemorySleepRepository';
 import { InMemoryTargetShapeRepository } from './InMemoryTargetShapeRepository';
+import { InMemoryGoalBodyFatRepository } from './InMemoryGoalBodyFatRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
 import { InMemoryWaistRepository } from './InMemoryWaistRepository';
@@ -69,7 +74,10 @@ export class InMemoryRepositories {
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   readonly targetShapes: TargetShapeRepository;
+  readonly goalBodyFat: GoalBodyFatRepository;
   readonly preferences: PreferencesRepository;
+  /** The weigh-in window (MM-441), kept with the preferences and erased with them. */
+  readonly weighInWindow: WeighInWindowReader & WeighInWindowWriter;
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
@@ -80,6 +88,8 @@ export class InMemoryRepositories {
   readonly customExercises: CustomExerciseRepository;
   readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
+  /** The progress photos (MM-157), erased with everything else. */
+  readonly progressPhotos: InMemoryProgressPhotoRepository;
   readonly eraser: DataEraser;
 
   constructor() {
@@ -95,6 +105,7 @@ export class InMemoryRepositories {
     const dayMarks = new InMemoryDayMarkRepository();
     const targets = new InMemoryTargetsHistoryRepository();
     const targetShapes = new InMemoryTargetShapeRepository();
+    const goalBodyFat = new InMemoryGoalBodyFatRepository();
     const preferences = new InMemoryPreferencesRepository();
     const insightLog = new InMemoryInsightLogRepository();
     const inlineInsightLog = new InMemoryInlineInsightLogRepository();
@@ -106,6 +117,7 @@ export class InMemoryRepositories {
     const customExercises = new InMemoryCustomExerciseRepository();
     const healthSamples = new InMemoryHealthSampleStore();
     const exerciseProgressions = new InMemoryExerciseProgressionRepository();
+    const progressPhotos = new InMemoryProgressPhotoRepository();
 
     this.setup = setup;
     this.weights = weights;
@@ -120,7 +132,9 @@ export class InMemoryRepositories {
     this.intake = new InMemoryIntakeReader(food, dayMarks);
     this.targets = targets;
     this.targetShapes = targetShapes;
+    this.goalBodyFat = goalBodyFat;
     this.preferences = preferences;
+    this.weighInWindow = preferences;
     this.insightLog = insightLog;
     this.inlineInsightLog = inlineInsightLog;
     this.insightSnoozes = insightSnoozes;
@@ -131,6 +145,7 @@ export class InMemoryRepositories {
     this.customExercises = customExercises;
     this.healthSamples = healthSamples;
     this.exerciseProgressions = exerciseProgressions;
+    this.progressPhotos = progressPhotos;
     this.eraser = new InMemoryDataEraser([
       () => setup.clear(),
       () => weights.clear(),
@@ -144,6 +159,7 @@ export class InMemoryRepositories {
       () => dayMarks.clear(),
       () => targets.clear(),
       () => targetShapes.clear(),
+      () => goalBodyFat.clear(),
       () => preferences.clear(),
       () => insightLog.clear(),
       () => inlineInsightLog.clear(),
@@ -155,6 +171,7 @@ export class InMemoryRepositories {
       () => customExercises.clear(),
       () => healthSamples.clear(),
       () => exerciseProgressions.clear(),
+      () => progressPhotos.eraseAll(),
     ]);
   }
 
