@@ -23,9 +23,13 @@ Martian keeps the same semantic roles and accessibility thresholds:
 | Roles | Martian values |
 |---|---|
 | canvas / surface / raised / overlay | `#0A081B` / `#16122E` / `#211B3F` / `#2C2550` |
-| sunken / track / selected | `#050410` / `#2E2752` / `#3A3166` |
+| sunken / track / selected | `#050410` / `#331A70` / `#4824AD` |
 | chosen / on-chosen | `#C4F24F` / `#0A081B` |
-| outline / outlineStrong | `#3F3670` / `#A99BE6` |
+| outline / outlineStrong | `#3F3670` / `#C77DFF` |
+| edge / glow | `#6B3DF5` / edge at 45% |
+| accent-line | `#FF3D8B` |
+| title-from / title-to | `#F3F552` / `#FF6A2C` |
+| mark | `#B98CFF` |
 | text / text2 / text3 | `#FFF8E9` / `#DDD4CC` / `#CBC6D6` |
 | action / on-action | `#DFF701` / `#1C2000` |
 | measurement / on-measurement | `#45E9F2` / `#0A081B` |
@@ -43,6 +47,13 @@ values side by side):
   and surface, raised and overlay step up from it in the same hue at L* 2.9 / 7.2 / 12.4 / 17.6, at low chroma, so no
   level reads purple and the brights carry the colour. (MM-554 had climbed from the sky's indigo into the mountains'
   purple; the owner: "i want that to be the base bg color and the brights to be the accents, button bg colors".)
+- **The blacklight (MM-556, the owner 2026-10-22: "more of that high contrast, 90's, blacklight look ... more of these
+  colors in the palette as first class citizens").** The art's violets, purples and hot pink, which had no role, are the
+  structure: cards, groups, choice cards and dialogs wear a violet edge (`edge`) that glows (`glow`); the hero and the
+  navigation bar a hot-pink line (`accent-line`) with its glow; a screen's title runs from the lettering's lime-yellow into
+  tangerine (`title-from` / `title-to`, 16.9 and 6.9 on the canvas); a section's mark is the mountains' lilac (`mark`,
+  6.4 on raised); the track, the chosen fill and the field edge are deeper, more saturated violets. In Dark and Light the
+  new roles equal their outline, text and secondary text, with no line or glow.
 - **The brights are the fills.** A chosen segment and the current tab's plate are lit in the stripes' lime (`chosen`,
   `#C4F24F`) with the canvas as ink (`on-chosen`); in Dark and Light `chosen` is their `selected`.
 - **The action is the "MARTIAN" lettering's lime-yellow** (`#DFF701`, the art's own value). Positive, which was the
