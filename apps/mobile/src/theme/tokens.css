@@ -9,8 +9,9 @@
    * MM-554, MM-555: drawn from the brand art (design/brand/), on the near-black behind the lettering (#0a081b), with
    * levels that step up from it in the same hue. MM-558: three neons, one meaning each. Lime-yellow is "do it" (the
    * action); hot pink is "chosen" (a chosen segment, chip or card, the current tab); neon orange is "fuel" (a meal's
-   * add plate and the calorie arc it fills). Violet is the frame (the hero's edge, the navigation bar's line, a field's
-   * edge, a section's mark) and means nothing. Macro, water and grade colours stay inside the data. No gradients, no glow.
+   * add plate and the calorie arc it fills); the owner put the pink on the section marks too. Violet is the frame (the
+   * hero's edge, the navigation bar's stripes, the arc's track, a field's edge) and means nothing. Macro, water and
+   * grade colours stay inside the data. No gradients, no glow.
    */
   --canvas: #0a081b;
   --surface: #150f30;
@@ -182,6 +183,8 @@
   --motion-turn: 1000ms;
   /* Water poured into its bar (MM-326): the fill moves and its edge settles. */
   --motion-pour: 1200ms;
+  /* The ridge's alien, rising, looking about and ducking (owner): a slow idle loop, stopped under reduced motion. */
+  --motion-idle: 9000ms;
 
   /* Type roles (MmType), in rem so text follows the phone's text size:
      size / line height, at 16px to the rem. */
@@ -207,5 +210,6 @@
     --motion-reveal: 0ms;
     --motion-turn: 4000ms;
     --motion-pour: 0ms;
+    --motion-idle: 0ms;
   }
 }
