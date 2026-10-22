@@ -1,6 +1,6 @@
 ---
 id: MM-361
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-137, MM-141, MM-108, MM-144, MM-11, MM-118, MM-148, MM-143, MM-85, MM-250, MM-362, MM-363, MM-364, MM-365, MM-366, MM-367, MM-368, MM-369, MM-370, MM-371, MM-377]
 ---
@@ -93,3 +93,9 @@ food composition.
   the phone checks (MM-366, MM-364, MM-378, MM-370, MM-382) wait for the owner's device pass.
 - 2026-10-21 (later): the owner declined MM-368 (sleep insights under a night) as medical advice; it is closed unbuilt.
   The epic has no sleep part.
+- 2026-10-21 (closed): every child is done or closed (MM-362 to MM-367, MM-369 to MM-371, MM-377, MM-378, MM-382;
+  MM-368 closed unbuilt). The narrative holds for a food, an exercise, a waist reading and the water section, food
+  grades with their question mark, the Coach tab's fourteen-day list and Settings > Coach. The epic is done.
+
+## Owed on a phone
+- The device checks its children list: MM-366, MM-364, MM-378, MM-370 and MM-382, in the owner's device pass.
