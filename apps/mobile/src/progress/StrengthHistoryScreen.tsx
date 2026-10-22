@@ -34,7 +34,7 @@ export function StrengthHistoryScreen({ exerciseId }: { exerciseId: string }) {
               <MmListRow
                 key={point.workoutId}
                 title={Fmt.longDate(point.date)}
-                subtitle={`Best set e1RM ${fmt.weight(point.estimateKg)} · smoothed ${fmt.weight(point.trendKg)}`}
+                subtitle={`Best set: estimated max ${fmt.weight(point.estimateKg)} · smoothed ${fmt.weight(point.trendKg)}`}
               />
             ))}
           </InfoCard>

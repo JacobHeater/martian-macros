@@ -38,7 +38,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
       ) : (
         <>
           <p className="mm-card-figure">{fmt.weight(latest.trendKg)}</p>
-          <p className="mm-card-caption">Smoothed e1RM · {Fmt.longDate(latest.date)}</p>
+          <p className="mm-card-caption">Smoothed estimated max · {Fmt.longDate(latest.date)}</p>
           <p className="mm-card-facts">
             {[4, 12].map((weeks) => (
               <span key={weeks}>{changeLabel(weeks)}</span>
@@ -50,7 +50,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
             unit={fmt.weightUnit}
             series={[
               {
-                label: 'Session best e1RM',
+                label: 'Session best estimated max',
                 kind: 'target',
                 dashed: true,
                 connectRecordedPoints: true,
@@ -58,7 +58,7 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
                 values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.estimateKg)])),
               },
               {
-                label: 'Smoothed e1RM',
+                label: 'Smoothed estimated max',
                 kind: 'estimate',
                 connectRecordedPoints: true,
                 maximumGapDays: 28,
