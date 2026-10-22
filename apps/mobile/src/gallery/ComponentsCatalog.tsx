@@ -39,6 +39,7 @@ import { NumberEntry } from '../ui/NumberEntry';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { WaistProtocolFigure } from '../ui/WaistProtocolFigure';
+import { MeasurementSiteFigure } from '../ui/MeasurementSiteFigure';
 import { MmCameraPreview } from '../ui/MmCameraPreview';
 import { MmPhoto } from '../ui/MmPhoto';
 import { fixturePhotoJpeg } from '../fixtures/fixturePhotoJpeg';
@@ -154,6 +155,12 @@ export function ComponentsCatalog() {
       {/* How to measure the waist, drawn (MM-155): shown for the first three measurements and from "How to measure" after. */}
       <div className="gallery-row">
         <WaistProtocolFigure />
+      </div>
+      {/* Every other site, drawn where the tape sits (MM-156). */}
+      <div className="gallery-row">
+        {(['neck', 'chest', 'hips', 'upperArm', 'thigh', 'calf'] as const).map((site) => (
+          <MeasurementSiteFigure key={site} site={site} />
+        ))}
       </div>
       <MmRhythmStrip
         name="Last seven days"
