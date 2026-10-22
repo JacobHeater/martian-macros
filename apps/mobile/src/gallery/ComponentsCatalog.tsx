@@ -86,7 +86,17 @@ export function ComponentsCatalog() {
         </div>
       </InfoCard>
       <InfoCard title="Micros">
-        <MmNutrientRow name="Iron" figures="9 mg" note="Reference 18 mg" amount={9} reference={18} />
+        <MmNutrientRow
+          name="Iron"
+          figures="9 mg"
+          note="Reference 18 mg"
+          amount={9}
+          reference={18}
+          sources={[
+            { name: 'Lentils', figures: '7 mg' },
+            { name: 'Spinach', figures: '2 mg' },
+          ]}
+        />
         <MmNutrientRow name="Potassium" figures="1,200 mg" note="from 4 of 7 foods · reference 2,600 mg" amount={1200} reference={2600} />
         <MmNutrientRow name="Vitamin C" figures="140 mg" note="Reference 75 mg" amount={140} reference={75} />
         <MmNutrientRow name="Vitamin B12" figures="No data yet" />
