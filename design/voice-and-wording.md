@@ -45,14 +45,20 @@ One term for one thing, used everywhere.
 `apps/mobile/test/voice.test.ts` scans every string in the app and fails if any
 contains a banned word (good, bad, clean, junk, guilt, cheat, oops, earn, burn
 off, lbs, true weight, and a few others), a line of filler (MM-401), or a name
-the glossary says a term is never called (real weight, TDEE in text, setup
-period, plan type). Add a word there when a review finds one; the test is the
-memory of this guide.
+the glossary says a term is never called (true or real weight, TDEE in text,
+setup period, plan type, and calorie, protein, daily or macro goals for the
+targets). Every quoted string with a space is read as text, lower-case or not;
+only a name with no space, a path, or a class list is passed over. Add a word
+there when a review finds one; the test is the memory of this guide.
 
 ## Not checked by a test
 
-- "Uncertainty shown" and the rest of "consistent terms" are reviewed by
-  people, not tests.
+- Reviewed by people, not tests: "Uncertainty shown" (rule 3: an estimate
+  carries "about", "probably", a range or "±"), the rest of "Consistent terms"
+  (a term used for something else, or a name not on the list above, such as
+  "e1RM" for the estimated max), rules 1, 4 and 6 (plain, explain the body,
+  no scolding), "no praise for eating under target", and the number format
+  in rule 7 beyond "lbs".
 - Strings live in the screen and format files, not in localization files. The
   test above reads them where they are, so the rules are checked without that
   move; translation is not planned (MM-108).
