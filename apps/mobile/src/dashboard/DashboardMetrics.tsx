@@ -87,7 +87,10 @@ export function DashboardMetrics() {
     intakeSummary = `${Fmt.kcal(facts.meanCalories)} a day on average, over ${plural(facts.finishedDays, 'day', 'days')}`;
   } else if (sofar !== undefined) intakeSummary = `Today so far: ${Fmt.kcal(sofar)} · counts once marked complete`;
   let proteinSummary = 'No protein logged in these days yet';
-  if (facts.meanProtein !== undefined) proteinSummary = `${Fmt.grams(facts.meanProtein)} a day on average`;
+  // Every average says how many recorded days it uses (MM-176).
+  if (facts.meanProtein !== undefined) {
+    proteinSummary = `${Fmt.grams(facts.meanProtein)} a day on average, over ${plural(facts.proteinDays, 'day', 'days')}`;
+  }
   else if (sofarProtein !== undefined) proteinSummary = `Today so far: ${Fmt.grams(sofarProtein)}`;
   let weightSummary = 'No weigh-ins in these days yet';
   if (firstTrend !== undefined && lastTrend !== undefined && trend.length > 1 && weighIns > 1) {

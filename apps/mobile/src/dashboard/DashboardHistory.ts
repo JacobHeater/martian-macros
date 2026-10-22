@@ -105,6 +105,11 @@ export class DashboardHistory {
     return mean(this.finished(this.calories));
   }
 
+  /** How many recorded days the protein average uses (MM-176). */
+  get proteinDays(): number {
+    return this.finished(this.protein).length;
+  }
+
   get meanProtein(): number | undefined {
     return mean(this.finished(this.protein));
   }
