@@ -35,6 +35,25 @@ enum MmFiles {
         try url.setResourceValues(values)
     }
 
+    /// Apple's SQLite flag that opens a database, and makes its journals, with
+    /// `FileProtectionType.completeUnlessOpen` (`SQLITE_OPEN_FILEPROTECTION_COMPLETEUNLESSOPEN`).
+    static let sqliteProtectionUnlessOpen: Int32 = 0x0020_0000
+
+    /// Whether `path` is the progress photo database (MM-157), `<user database>-photos`.
+    static func isPhotoDatabase(_ path: String) -> Bool {
+        URL(fileURLWithPath: path).lastPathComponent.hasSuffix("-photos")
+    }
+
+    /// Gives the database at `path`, and any journal beside it, `.completeUnlessOpen`
+    /// protection (MM-157): unreadable while the phone is locked unless the app already
+    /// has it open. A file that is not there yet is left; SQLite's flag covers it when made.
+    static func protectUnlessOpen(_ path: String) {
+        let protection: [FileAttributeKey: Any] = [.protectionKey: FileProtectionType.completeUnlessOpen]
+        for file in [path, path + "-journal", path + "-wal", path + "-shm"] where FileManager.default.fileExists(atPath: file) {
+            try? FileManager.default.setAttributes(protection, ofItemAtPath: file)
+        }
+    }
+
     /// The app's own database `name`, as Android's `getDatabasePath(name)`.
     static func databasePath(_ name: String) throws -> String {
         try supportDirectory("databases").appendingPathComponent(name).path

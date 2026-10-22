@@ -37,8 +37,14 @@ export class SqlProgressPhotoRepository implements ProgressPhotoRepository {
     this.db = db;
   }
 
-  /** Opens the photo database `db`, making its tables the first time. */
+  /**
+   * Opens the photo database `db`, making its tables the first time. A
+   * deleted photo is overwritten in the file, not only unlinked
+   * (`secure_delete`, set on each connection), so nothing of a picture
+   * stays in its free pages (the panel's privacy finding 4).
+   */
   static async open(db: SqlDatabase): Promise<SqlProgressPhotoRepository> {
+    await db.execute('PRAGMA secure_delete = ON');
     const found = Number((await db.select('PRAGMA user_version'))[0]?.['user_version'] ?? 0);
     if (found > version) throw new FormatError(`The photos were saved by a newer version of the app (${found}).`);
     if (found < version) {

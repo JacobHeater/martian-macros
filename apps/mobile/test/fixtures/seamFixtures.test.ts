@@ -7,12 +7,18 @@ import { Succeeded } from '../../src/domain/integration/Succeeded';
 import { SystemClock } from '../../src/domain/integration/SystemClock';
 import { Unavailable } from '../../src/domain/integration/Unavailable';
 import { FixedClock } from '../../src/fixtures/FixedClock';
+import { FixturePhotoCamera } from '../../src/fixtures/FixturePhotoCamera';
 import { InMemoryBackupStorage } from '../../src/fixtures/InMemoryBackupStorage';
+import { InMemoryDeviceLock } from '../../src/fixtures/InMemoryDeviceLock';
+import { InMemoryPrivateScreen } from '../../src/fixtures/InMemoryPrivateScreen';
 import { InMemoryEntitlement } from '../../src/fixtures/InMemoryEntitlement';
 import { InMemoryExactAlarms } from '../../src/fixtures/InMemoryExactAlarms';
 import { InMemoryFoodCatalog } from '../../src/fixtures/InMemoryFoodCatalog';
 import { backupStorageContract } from '../contracts/backupStorageContract';
 import { clockContract } from '../contracts/clockContract';
+import { deviceLockContract } from '../contracts/deviceLockContract';
+import { photoCameraContract } from '../contracts/photoCameraContract';
+import { privateScreenContract } from '../contracts/privateScreenContract';
 import { entitlementReaderContract } from '../contracts/entitlementReaderContract';
 import { exactAlarmsContract } from '../contracts/exactAlarmsContract';
 import { foodBarcodeLookupContract } from '../contracts/foodBarcodeLookupContract';
@@ -34,6 +40,16 @@ exactAlarmsContract('In-memory, declined in the setting', () => new InMemoryExac
 exactAlarmsContract('In-memory, declined before', () => new InMemoryExactAlarms({ held: false, asked: true }));
 clockContract('System', () => new SystemClock());
 clockContract('Fixed', () => new FixedClock(CalendarDate.of(2026, 10, 8)));
+// MM-157: the photos' lock, private screen and camera.
+for (const answer of ['unlocked', 'refused', 'noLock'] as const) {
+  deviceLockContract(`In-memory, ${answer}`, () => new InMemoryDeviceLock(answer), answer);
+}
+privateScreenContract('In-memory', () => {
+  const screen = new InMemoryPrivateScreen();
+  return { screen, hidden: async () => screen.hidden };
+});
+photoCameraContract('Fixture, allowed', () => new FixturePhotoCamera(), { available: true, captures: true });
+photoCameraContract('Fixture, not allowed', () => new FixturePhotoCamera({ available: false }), { available: false, captures: false });
 
 describe('scripted failures', () => {
   it('a catalog that is offline answers Unavailable to every call', async () => {

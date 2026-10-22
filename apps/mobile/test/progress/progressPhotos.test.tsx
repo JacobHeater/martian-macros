@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EraserWithPhotos } from '../../src/data/EraserWithPhotos';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { PhotoPose } from '../../src/domain/photos/PhotoPose';
@@ -47,6 +47,38 @@ function render(): void {
   renderApp(repos, today, { change: (services) => ({ ...services, deviceLock: lock, privateScreen, photoCamera: camera }) });
 }
 
+let visibility: DocumentVisibilityState = 'visible';
+
+/** The app goes to the background, as the web view tells it. */
+function goAway(): void {
+  visibility = 'hidden';
+  document.dispatchEvent(new Event('visibilitychange'));
+}
+
+/** The app comes back to the front. */
+function comeBack(): void {
+  visibility = 'visible';
+  document.dispatchEvent(new Event('visibilitychange'));
+}
+
+beforeEach(() => {
+  visibility = 'visible';
+  Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => visibility });
+});
+
+afterEach(() => {
+  // The document's own again.
+  delete (document as { visibilityState?: unknown }).visibilityState;
+});
+
+/**
+ * Waits until the photo `name` is drawn from its bytes. While they are read `MmPhoto` is an empty frame with the same
+ * name, which the picture then replaces, so the frame found first can be gone by the time it is looked at.
+ */
+async function photoDrawn(name: string): Promise<void> {
+  await waitFor(() => expect(layer().getByRole('img', { name }).tagName).toBe('IMG'));
+}
+
 /** Opens Progress, then its photos. */
 async function openPhotos(): Promise<void> {
   await openTab('Progress');
@@ -77,7 +109,10 @@ it('Matching the last one: the camera for a front photo shows the last front pho
   await openPhotos();
   await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
   expect(await layer().findByRole('img', { name: 'Your last front photo, faint, to line this one up with' })).toBeInTheDocument();
-  // The first sets: what makes two photos comparable.
+  // The first sets: what makes two photos comparable, folded after the very first, so the picture and the shutter come first.
+  const checklist = layer().getByRole('button', { name: 'Each time, the same way' });
+  expect(checklist).toHaveAttribute('aria-expanded', 'false');
+  await userEvent.click(checklist);
   expect(layer().getByText('The same light: no window behind you.')).toBeInTheDocument();
   await userEvent.click(layer().getByRole('button', { name: 'Take front photo' }));
   expect(await screen.findByText('Front photo kept.')).toBeInTheDocument();
@@ -101,13 +136,80 @@ it('a set within a week of the last is kept, and gently noted', async () => {
   expect(await first(repos.progressPhotos.watchPhotos())).toHaveLength(2);
 });
 
-it('with no camera allowed, nothing can be taken and the screen says how to allow it', async () => {
+it('with no camera allowed, nothing can be taken, the screen says how to allow it, and Try again opens it', async () => {
   camera.available = false;
   render();
   await openPhotos();
   await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
   expect(await layer().findByText('The camera could not be opened')).toBeInTheDocument();
-  expect(layer().getByRole('button', { name: 'Take front photo' })).toBeDisabled();
+  // No shutter and no camera switch that cannot do anything.
+  expect(layer().queryByRole('button', { name: 'Take front photo' })).not.toBeInTheDocument();
+  expect(layer().queryByRole('button', { name: /^Use the (front|back) camera$/ })).not.toBeInTheDocument();
+  camera.available = true;
+  await userEvent.click(layer().getByRole('button', { name: 'Try again' }));
+  expect(await layer().findByRole('button', { name: 'Take front photo' })).toBeEnabled();
+});
+
+it('a camera allowed in the phone’s settings meanwhile opens on coming back to the app', async () => {
+  camera.available = false;
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+  await layer().findByText('The camera could not be opened');
+  camera.available = true;
+  goAway();
+  comeBack();
+  expect(await layer().findByRole('button', { name: 'Take front photo' })).toBeEnabled();
+});
+
+it('the very first set starts on the front camera; later ones on the back', async () => {
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+  await layer().findByRole('button', { name: 'Use the back camera' });
+  await waitFor(() => expect(camera.facings).toEqual(['user']));
+  // The checklist is open on the very first set.
+  expect(layer().getByRole('button', { name: 'Each time, the same way' })).toHaveAttribute('aria-expanded', 'true');
+  // Switching stops the one camera and starts the other: never two at once.
+  await userEvent.click(layer().getByRole('button', { name: 'Use the back camera' }));
+  await waitFor(() => expect(camera.facings).toEqual(['user', 'environment']));
+  expect(camera.running).toBe(1);
+});
+
+it('later sets start on the back camera', async () => {
+  await kept('front', today.addDays(-21));
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+  await layer().findByRole('button', { name: 'Use the front camera' });
+  await waitFor(() => expect(camera.facings).toEqual(['environment']));
+});
+
+describe('the self-timer', () => {
+  it('counts down aloud and can be cancelled: nothing is taken', async () => {
+    render();
+    await openPhotos();
+    await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+    await userEvent.click(await layer().findByRole('button', { name: '5 s timer' }));
+    await userEvent.click(layer().getByRole('button', { name: 'Take front photo' }));
+    expect(await layer().findByText('Photo in 5 seconds.')).toBeInTheDocument();
+    expect(await layer().findByText('Photo in 4 seconds.', {}, { timeout: 3000 })).toBeInTheDocument();
+    await userEvent.click(layer().getByRole('button', { name: 'Cancel timer' }));
+    expect(layer().queryByText(/^Photo in /)).not.toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    expect(await first(repos.progressPhotos.watchPhotos())).toEqual([]);
+    expect(layer().getByRole('button', { name: 'Take front photo' })).toBeEnabled();
+  });
+
+  it('takes the photo when it reaches none', async () => {
+    render();
+    await openPhotos();
+    await userEvent.click(await layer().findByRole('button', { name: 'Take photos' }));
+    await userEvent.click(await layer().findByRole('button', { name: '5 s timer' }));
+    await userEvent.click(layer().getByRole('button', { name: 'Take front photo' }));
+    expect(await screen.findByText('Front photo kept.', {}, { timeout: 9000 })).toBeInTheDocument();
+    expect((await first(repos.progressPhotos.watchPhotos())).map((p) => p.pose)).toEqual(['front']);
+  }, 20000);
 });
 
 it('the camera is off once its screen is left', async () => {
@@ -119,6 +221,39 @@ it('the camera is off once its screen is left', async () => {
   // The top bar's back, the first of the screen's ways back.
   await userEvent.click(layer().getAllByRole('button', { name: 'Back' })[0] as HTMLElement);
   await waitFor(() => expect(camera.running).toBe(0));
+});
+
+it('the photos lock when the app goes to the background, and the lock is asked again on the way back', async () => {
+  await kept('front', today);
+  render();
+  await openPhotos();
+  await layer().findByRole('button', { name: 'Take photos' });
+  expect(lock.asked).toBe(1);
+  goAway();
+  await waitFor(() => expect(layer().queryByRole('img', { name: /^Front photo/ })).not.toBeInTheDocument());
+  lock.answer = 'refused';
+  comeBack();
+  expect(await layer().findByText('Locked')).toBeInTheDocument();
+  expect(lock.asked).toBe(2);
+  lock.answer = 'unlocked';
+  await userEvent.click(layer().getByRole('button', { name: 'Unlock' }));
+  await photoDrawn('Front photo, October 19, 2026');
+});
+
+it('the camera and the comparison above the photos lock too, and ask once on the way back', async () => {
+  await kept('front', today.addDays(-28));
+  await kept('front', today);
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Compare two days' }));
+  await layer().findByRole('img', { name: 'Front photo, October 19, 2026' });
+  expect(lock.asked).toBe(1);
+  goAway();
+  await waitFor(() => expect(layer().queryByRole('img', { name: /^Front photo/ })).not.toBeInTheDocument());
+  comeBack();
+  await photoDrawn('Front photo, October 19, 2026');
+  // The photos beneath and the comparison share one lock: asked once, not once a screen.
+  expect(lock.asked).toBe(2);
 });
 
 it('Comparing: the same pose from two days side by side, each with its day, trend weight and waist', async () => {
@@ -143,9 +278,35 @@ it('a set is deleted after asking', async () => {
   await kept('front', today);
   render();
   await openPhotos();
-  await userEvent.click(await layer().findByRole('button', { name: 'Delete the photos of October 19, 2026' }));
+  // A month to a section; each set a dated row, its delete in the row's menu.
+  expect(await layer().findByRole('heading', { name: 'October 2026' })).toBeInTheDocument();
+  await userEvent.click(await layer().findByRole('button', { name: 'More actions for the photos of October 19, 2026' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
   await userEvent.click(await screen.findByRole('button', { name: 'Delete' }));
   await waitFor(async () => expect(await first(repos.progressPhotos.watchPhotos())).toEqual([]));
+});
+
+it('with the weight display Everything, the trend weight is said under each compared photo', async () => {
+  for (let day = -30; day <= 0; day++) await repos.weights.saveWeight(today.addDays(day), 82);
+  await repos.preferences.saveWeightDisplay('everything');
+  await kept('front', today.addDays(-28));
+  await kept('front', today);
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Compare two days' }));
+  await layer().findByRole('img', { name: 'Front photo, October 19, 2026' });
+  expect((await layer().findAllByText(/^Trend /)).length).toBeGreaterThan(0);
+});
+
+it('the days are changed by which is earlier and which later, never left and right', async () => {
+  await kept('front', today.addDays(-28));
+  await kept('front', today);
+  render();
+  await openPhotos();
+  await userEvent.click(await layer().findByRole('button', { name: 'Compare two days' }));
+  expect(await layer().findByRole('button', { name: 'Change earlier day' })).toBeInTheDocument();
+  expect(layer().getByRole('button', { name: 'Change later day' })).toBeInTheDocument();
+  expect(layer().queryByRole('button', { name: /left|right/ })).not.toBeInTheDocument();
 });
 
 describe('Eating-disorder history', () => {
@@ -165,6 +326,19 @@ describe('Eating-disorder history', () => {
     expect(offered).not.toBeChecked();
     await userEvent.click(offered);
     await waitFor(async () => expect((await first(repos.progressPhotos.watchPhotoSettings())).offered).toBe(true));
+  });
+
+  it('no weight is said under compared photos, whatever the weight display', async () => {
+    for (let day = -30; day <= 0; day++) await repos.weights.saveWeight(today.addDays(day), 82);
+    await repos.preferences.saveWeightDisplay('everything');
+    await repos.progressPhotos.savePhotoSettings({ offered: true, backUp: false });
+    await kept('front', today.addDays(-28));
+    await kept('front', today);
+    render();
+    await openPhotos();
+    await userEvent.click(await layer().findByRole('button', { name: 'Compare two days' }));
+    await layer().findByRole('img', { name: 'Front photo, October 19, 2026' });
+    expect(layer().queryByText(/^Trend /)).not.toBeInTheDocument();
   });
 
   it('turned on, they are offered on Progress', async () => {

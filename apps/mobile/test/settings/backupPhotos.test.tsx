@@ -9,6 +9,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { decodePhotoArchive } from '../../src/domain/photos/decodePhotoArchive';
 import { encodePhotoArchive } from '../../src/domain/photos/encodePhotoArchive';
 import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
+import { InMemoryDeviceLock } from '../../src/fixtures/InMemoryDeviceLock';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
@@ -27,6 +28,7 @@ const cipher = new SodiumBackupCipher();
 let repos: InMemoryRepositories;
 let backup: FakeBackupPlatform;
 let restorer: FakeDataRestorer;
+let lock: InMemoryDeviceLock;
 
 beforeEach(async () => {
   repos = new InMemoryRepositories();
@@ -44,9 +46,10 @@ beforeEach(async () => {
   restorer = new FakeDataRestorer();
   restorer.toDescribe = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: true };
   restorer.here = restorer.toDescribe;
+  lock = new InMemoryDeviceLock();
 });
 
-const render = () => renderApp(repos, today, { change: (services) => ({ ...services, backup, restorer }) });
+const render = () => renderApp(repos, today, { change: (services) => ({ ...services, backup, restorer, deviceLock: lock }) });
 
 async function backUp(settings: Awaited<ReturnType<typeof openSettings>>): Promise<Uint8Array> {
   await userEvent.click(settings.getByRole('button', { name: /^Back up now/ }));
@@ -103,4 +106,94 @@ it('a backup that carries photos brings them back; one without leaves this phone
     await waitFor(async () => expect((await first(repos.progressPhotos.watchPhotos())).map((p) => p.pose)).toEqual(expected), slowly);
     view.unmount();
   }
+}, 120000);
+
+// ---- The panel's privacy finding 2: the photos leave the phone in a file only past its lock ----
+
+/** Opens a backup holding `photos` (or none) up to its confirmation; gives the confirmation. */
+async function openRestore(photos: Uint8Array | undefined): Promise<HTMLElement> {
+  const records = new TextEncoder().encode('SQLite format 3\0 the records');
+  backup.toPick = await BackupFile.write(records, 'correct horse battery', { schemaVersion: currentSchemaVersion, createdOn: '2026-10-12', photos }, cipher);
+  render();
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Restore from a backup/ }));
+  const sheet = within(await screen.findByRole('dialog', { name: 'The backup’s passphrase' }, slowly));
+  await userEvent.type(await sheet.findByLabelText('Passphrase', {}, slowly), 'correct horse battery');
+  await userEvent.click(sheet.getByRole('button', { name: 'Open' }));
+  return screen.findByRole('dialog', { name: 'Restore this backup?' }, slowly);
+}
+
+const sideArchive = () =>
+  encodePhotoArchive([
+    { date: today.addDays(-30), pose: 'side', takenAt: new Date(2026, 8, 19, 7), width: 900, height: 1200, jpeg: new Uint8Array([1, 2]) },
+  ]);
+
+it('Back up photos is turned on only past the phone’s lock; refused, it stays off', async () => {
+  lock.answer = 'refused';
+  render();
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('switch', { name: /^Back up photos/ }));
+  expect(await screen.findByText('Your progress photos stayed locked: Back up photos is still off.', {}, slowly)).toBeInTheDocument();
+  expect(lock.asked).toBe(1);
+  expect((await first(repos.progressPhotos.watchPhotoSettings())).backUp).toBe(false);
+  lock.answer = 'unlocked';
+  await userEvent.click(settings.getByRole('switch', { name: /^Back up photos/ }));
+  await waitFor(async () => expect((await first(repos.progressPhotos.watchPhotoSettings())).backUp).toBe(true), slowly);
+  expect(lock.asked).toBe(2);
+  // Turning it off asks nothing.
+  await userEvent.click(settings.getByRole('switch', { name: /^Back up photos/ }));
+  await waitFor(async () => expect((await first(repos.progressPhotos.watchPhotoSettings())).backUp).toBe(false), slowly);
+  expect(lock.asked).toBe(2);
+}, 90000);
+
+it('a backup that would carry the photos asks for the phone’s lock first; refused, no backup is made', async () => {
+  await repos.progressPhotos.savePhotoSettings({ offered: undefined, backUp: true });
+  lock.answer = 'refused';
+  render();
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Back up now/ }));
+  expect(await screen.findByText('Your progress photos stayed locked, so no backup was made.', {}, slowly)).toBeInTheDocument();
+  expect(screen.queryByRole('dialog', { name: 'A passphrase for this backup' })).not.toBeInTheDocument();
+  expect(backup.saved).toEqual([]);
+}, 90000);
+
+it('a backup without the photos asks for no lock', async () => {
+  lock.answer = 'refused';
+  render();
+  const settings = await openSettings();
+  await backUp(settings);
+  expect(lock.asked).toBe(0);
+}, 90000);
+
+it('a restore that replaces the photos says so, and asks for the lock first; refused, nothing is restored', async () => {
+  lock.answer = 'refused';
+  const asks = await openRestore(sideArchive());
+  expect(within(asks).getByText(/It holds progress photos too: they replace every progress photo on this phone\./)).toBeInTheDocument();
+  await userEvent.click(within(asks).getByRole('button', { name: 'Restore' }));
+  expect(await screen.findByText('Your progress photos stayed locked, so nothing was restored.', {}, slowly)).toBeInTheDocument();
+  expect(lock.asked).toBe(1);
+  expect(restorer.restoredFrom).toEqual([]);
+  expect((await first(repos.progressPhotos.watchPhotos())).map((p) => p.pose)).toEqual(['front']);
+}, 120000);
+
+it('a restore without photos neither names them nor asks for the lock', async () => {
+  lock.answer = 'refused';
+  const asks = await openRestore(undefined);
+  expect(within(asks).queryByText(/progress photo/)).not.toBeInTheDocument();
+  await userEvent.click(within(asks).getByRole('button', { name: 'Restore' }));
+  expect(await screen.findByText(/^Restored\./, {}, slowly)).toBeInTheDocument();
+  expect(lock.asked).toBe(0);
+}, 120000);
+
+it('records restored but the photos not: the message says so truthfully', async () => {
+  repos.progressPhotos.restoreArchive = async () => {
+    throw new Error('disk full');
+  };
+  const asks = await openRestore(sideArchive());
+  await userEvent.click(within(asks).getByRole('button', { name: 'Restore' }));
+  expect(
+    await screen.findByText('Your records were restored, but the backup’s photos could not be. This phone’s photos are as they were.', {}, slowly),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/^Restored\./)).not.toBeInTheDocument();
+  expect((await first(repos.progressPhotos.watchPhotos())).map((p) => p.pose)).toEqual(['front']);
 }, 120000);

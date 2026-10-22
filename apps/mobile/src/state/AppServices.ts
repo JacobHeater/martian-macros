@@ -171,7 +171,10 @@ export interface AppServices {
   /** The phone's own lock, asked each time the photos are opened (MM-157). */
   readonly deviceLock: DeviceLock;
 
-  /** Keeps a photo out of the app switcher and screenshots while it shows (MM-157). */
+  /**
+   * Keeps a photo out of the app switcher while it shows (MM-157). Android also refuses a screenshot of it; iOS
+   * cannot refuse one, so there it covers the app switcher only.
+   */
   readonly privateScreen: PrivateScreen;
 
   /** Workouts on the health platform with their segments (MM-489), for importing them (MM-490). */
