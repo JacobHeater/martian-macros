@@ -85,6 +85,15 @@ it('two hard weeks on a cut bring the offer, with its reasons', async () => {
   expect(screen.getByRole('button', { name: 'Carry on' })).toBeInTheDocument();
 });
 
+/** MM-128's names and costs: the slower pace is said as the pace choice says it. */
+it('the slower pace is named, with what it costs', async () => {
+  await seed();
+  await open();
+  expect(offer()).toHaveTextContent(
+    /Gentle is 0\.5% a week: about [\d,]+ kcal a day under your expenditure, for a target of [\d,]+ kcal\./,
+  );
+});
+
 /** MM-135: twelve unbroken weeks bring the offer with no recovery check-in answered, and without the slower pace. */
 it('twelve weeks in a deficit bring the break offer, a break or carry on', async () => {
   await seed({ hardWeeks: 0, deficitDays: 90 });

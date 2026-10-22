@@ -10,8 +10,12 @@ import type { MmHealthWorkout } from './MmHealthWorkout';
 import type { MmHealthWorkoutsApi } from './MmHealthWorkoutsApi';
 import type { MmHealthWritingApi } from './MmHealthWritingApi';
 
-/** A workout read from the plugin, its segments inside it and oldest first; undefined for one with no span. */
+/**
+ * A workout read from the plugin, its segments inside it and oldest first; undefined for one with no span, and for
+ * one the app wrote itself, as the platform says by its source, not by the client id alone (MM-489, MM-490).
+ */
 function platformWorkout(raw: MmHealthWorkout): PlatformWorkout | undefined {
+  if (raw.ours === true) return undefined;
   if (raw.id === '' || raw.endMs < raw.startMs) return undefined;
   const segments: PlatformWorkoutSegment[] = raw.segments
     .filter((s) => s.endMs > s.startMs && s.startMs >= raw.startMs && s.endMs <= raw.endMs)

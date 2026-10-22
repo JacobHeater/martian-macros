@@ -30,6 +30,7 @@ import { mmReminders } from '../platform/mmReminders';
 import { mmScanner } from '../platform/mmScanner';
 import { NativeCamera } from '../platform/NativeCamera';
 import { NativeExternalLinks } from '../platform/NativeExternalLinks';
+import { NativeHealthProfile } from '../platform/NativeHealthProfile';
 import { NativeHealthSource } from '../platform/NativeHealthSource';
 import { NativeHealthWorkouts } from '../platform/NativeHealthWorkouts';
 import { NativeHealthWriting } from '../platform/NativeHealthWriting';
@@ -40,6 +41,7 @@ import { NoCamera } from '../platform/NoCamera';
 import { runningNatively } from '../platform/runningNatively';
 import { runningOn } from '../platform/runningOn';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
+import { NoHealthProfile } from '../platform/NoHealthProfile';
 import { NoHealthWorkouts } from '../platform/NoHealthWorkouts';
 import { NoHealthWriting } from '../platform/NoHealthWriting';
 import { MirroredFoodLog } from '../healthWrite/MirroredFoodLog';
@@ -177,6 +179,8 @@ export async function openAppServices(): Promise<AppServices> {
     photoCamera: new MediaDevicesPhotoCamera(),
     deviceLock: native ? new NativeDeviceLock(mmBackup) : new NoDeviceLock(),
     privateScreen: native ? new NativePrivateScreen(mmBackup) : new NoPrivateScreen(),
+    // Only Apple Health keeps a sex and a date of birth to fill onboarding in from (MM-69).
+    healthProfile: native && platform === 'ios' ? new NativeHealthProfile(mmHealth) : new NoHealthProfile(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
     platform,

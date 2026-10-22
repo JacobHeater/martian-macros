@@ -95,3 +95,6 @@ Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI valid
 - Apple Health: a workout from another app imports as a session with its span and no exercises.
 - A workout finished in the app with writing on is not imported back on the next read.
 
+## Notes
+- 2026-10-21 (`fix/health-plugins-review`): a workout the platform says the app wrote is never offered for import,
+  whatever its client id (MM-489's `ours` mark).
