@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { Exercise } from '../../domain/training/Exercise';
 import { Workout } from '../../domain/training/Workout';
@@ -217,6 +217,39 @@ export const WorkoutTimingASet = screenStory({
 });
 
 /**
+ * MM-447: paused while a set was being timed: the screen says the set was dropped, and the bar offers Resume where
+ * "Start set" was.
+ */
+export const WorkoutPausedDroppedSet = screenStory({
+  covers: ['WorkoutScreen'],
+  shows: 'Tap Resume to start the clock again.',
+  open: (stage) => midWorkout(stage, { setRunning: true })(),
+  walk: async (canvas) => {
+    await pressNamed('Pause')(canvas);
+    await within(canvas.ownerDocument.body).findByText(/The set being timed was dropped/);
+    await within(canvas).findByText('Tap Resume to start the clock again.');
+    // One way on: the bar's Resume is the screen's only Resume and the bar's only primary, and no 0:00 shows while
+    // paused (MM-447). "Finish workout" keeps its own place at the foot of the screen.
+    await within(canvas).findByRole('button', { name: 'Resume' });
+    expect(within(canvas).getAllByRole('button', { name: 'Resume' })).toHaveLength(1);
+    expect(canvas.querySelectorAll('.train-timer .mm-button-primary')).toHaveLength(1);
+    expect(within(canvas).queryByText('0:00')).toBeNull();
+  },
+});
+
+/** MM-447: starting the workout's clock again from now asks first, since it cannot be taken back. */
+export const WorkoutTimesRestartAsks = screenStory({
+  covers: ['WorkoutTimesScreen'],
+  shows: 'Start the clock again from now',
+  open: startFromLast,
+  walk: async (canvas) => {
+    await pressNamed('Edit workout times')(canvas);
+    await pressNamed('Start the clock again from now')(canvas);
+    await within(canvas.ownerDocument.body).findByText('Start the clock again from now?');
+  },
+});
+
+/**
  * MM-222: on a 360 px phone, a set being timed with the previous set's
  * controls open: the control that records the set is on the bar, in view.
  */
@@ -285,12 +318,12 @@ export const WorkoutOpensSuggestions = screenStory({
   },
 });
 
-/** MM-321: "Edit times" on a workout under way: the times, and starting the clock again. */
+/** MM-321: "Edit workout times" on a workout under way: the times, and starting the clock again. */
 export const WorkoutOpensTimes = screenStory({
   covers: ['WorkoutScreen', 'WorkoutTimesScreen'],
   shows: 'Start the clock again from now',
   open: startFromLast,
-  walk: pressNamed('Edit times'),
+  walk: pressNamed('Edit workout times'),
 });
 
 /** MM-321: a workout that is not there (deleted elsewhere): the screen keeps its title and draws nothing. */

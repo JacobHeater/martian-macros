@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BodyFatRecord
@@ -258,6 +259,15 @@ class MmHealthPlugin : Plugin() {
     fun requestHistory(call: PluginCall) {
         val prefs = preferences()
         if (prefs.getBoolean(historyAskedKey, false)) return historyPermitted(call)
+        // A Health Connect too old to offer the history has nothing to ask: it is not marked asked, so a later
+        // version still asks once (the integrations review of MM-73).
+        val offered = try {
+            client().features.getFeatureStatus(HealthConnectFeatures.FEATURE_READ_HEALTH_DATA_HISTORY) ==
+                HealthConnectFeatures.FEATURE_STATUS_AVAILABLE
+        } catch (error: Throwable) {
+            false
+        }
+        if (!offered) return call.resolve(JSObject().put("granted", false).put("unavailable", true))
         prefs.edit().putBoolean(historyAskedKey, true).apply()
         val contract = PermissionController.createRequestPermissionResultContract()
         startActivityForResult(call, contract.createIntent(context, setOf(historyPermission)), "historyAnswered")
@@ -491,11 +501,14 @@ class MmHealthPlugin : Plugin() {
         call.resolve(JSObject().put("namespace", namespace))
     }
 
-    /** A new write namespace (MM-522), kept before it answers, after the app's data is erased or restored. */
+    /**
+     * A new write namespace (MM-522), kept before it answers, after the app's data is erased or restored. The
+     * history question is forgotten with it (MM-73, MM-62): an erased app asks again, once, as a new one does.
+     */
     @PluginMethod
     fun renewWriteNamespace(call: PluginCall) {
         val namespace = newNamespace()
-        preferences().edit().putString(namespaceKey, namespace).commit()
+        preferences().edit().putString(namespaceKey, namespace).remove(historyAskedKey).commit()
         call.resolve(JSObject().put("namespace", namespace))
     }
 
@@ -590,6 +603,17 @@ class MmHealthPlugin : Plugin() {
     /** What every id the app writes starts with (MM-514): a removal by prefix reaches nothing else. */
     private val ownPrefix = "martian-macros-"
 
+    /**
+     * Each kind's whole prefix (`healthWritePrefix` in the app). Every record of the kind's type the app writes
+     * carries it, so a removal of all of it is all of the app's records of that type.
+     */
+    private val kindPrefixes: Map<String, String> = mapOf(
+        "food" to "martian-macros-food-",
+        "water" to "martian-macros-water-",
+        "weight" to "martian-macros-weight-",
+        "workouts" to "martian-macros-workout-",
+    )
+
     /** Health Connect is given this many ids to delete at once. */
     private val deleteBatch = 100
 
@@ -608,13 +632,32 @@ class MmHealthPlugin : Plugin() {
         if (!prefix.startsWith(ownPrefix)) return@asked call.reject("Not a prefix of the app's own: $prefix.")
         val granted = client().permissionController.getGrantedPermissions().contains(HealthPermission.getWritePermission(type))
         if (!granted) return@asked call.resolve(JSObject().put("removed", false))
+        val everything = TimeRangeFilter.between(Instant.EPOCH, Instant.now().plus(Duration.ofDays(400)))
+        if (prefix == kindPrefixes[kind]) {
+            // The whole kind is the app's: deleted by time, which Health Connect limits to the caller's own records and
+            // which, unlike a read, is not held to the thirty days before the first grant (the review of MM-514).
+            client().deleteRecords(type, everything)
+            return@asked call.resolve(JSObject().put("removed", true))
+        }
+        val ids = try {
+            ownIdsWith(type, prefix, everything)
+        } catch (error: Throwable) {
+            // Reading further back than thirty days can be refused without the history permission: what can be read is.
+            ownIdsWith(type, prefix, TimeRangeFilter.after(Instant.now().minus(Duration.ofDays(30))))
+        }
+        for (batch in ids.chunked(deleteBatch)) client().deleteRecords(type, batch, emptyList())
+        call.resolve(JSObject().put("removed", true))
+    }
+
+    /** The platform ids of the app's own records of `type` in `range` whose client id starts with `prefix` (MM-514). */
+    private suspend fun ownIdsWith(type: KClass<out Record>, prefix: String, range: TimeRangeFilter): List<String> {
         val ids = mutableListOf<String>()
         var pageToken: String? = null
         do {
             val response = client().readRecords(
                 ReadRecordsRequest(
                     recordType = type,
-                    timeRangeFilter = TimeRangeFilter.between(Instant.EPOCH, Instant.now().plus(Duration.ofDays(400))),
+                    timeRangeFilter = range,
                     dataOriginFilter = setOf(DataOrigin(context.packageName)),
                     pageToken = pageToken,
                 ),
@@ -625,8 +668,7 @@ class MmHealthPlugin : Plugin() {
             }
             pageToken = response.pageToken
         } while (pageToken != null)
-        for (batch in ids.chunked(deleteBatch)) client().deleteRecords(type, batch, emptyList())
-        call.resolve(JSObject().put("removed", true))
+        return ids
     }
 
     private fun removeOwn(call: PluginCall, kind: String, type: KClass<out Record>) = asked(call) {
@@ -657,9 +699,11 @@ class MmHealthPlugin : Plugin() {
             .put("sourceId", record.metadata.dataOrigin.packageName)
             .put("sourceName", appName(record.metadata.dataOrigin.packageName))
             .put("segments", segments)
+            // The app's own, said by its origin, so it is never taken for one to import (MM-489, MM-490).
+            .put("ours", ours(record))
     }
 
-    /** Workouts with their segments (MM-489), this app's own among them: the adapter knows them by their client id. */
+    /** Workouts with their segments (MM-489), this app's own among them, marked `ours` by their origin: the adapter skips them. */
     @PluginMethod
     fun readWorkouts(call: PluginCall) = asked(call) {
         val from = Instant.ofEpochMilli(call.getLong("fromMs") ?: 0L)
