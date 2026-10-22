@@ -9,6 +9,11 @@ interface MmSectionProps {
   /** The section's mark (MM-253, rule 2): 24 dp beside its title, never alone. */
   icon: MmIconName;
   title: string;
+  /**
+   * What the section is about, beyond routine: a caution's section keeps the
+   * caution colour on its icon, so it never reads as routine, folded or open (MM-553).
+   */
+  kind?: 'caution';
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
   /**
@@ -42,6 +47,7 @@ interface MmSectionProps {
 export function MmSection({
   icon,
   title,
+  kind,
   summary,
   meter,
   trailing,
@@ -135,7 +141,7 @@ export function MmSection({
     header = <span className="mm-section-head-body">{head}</span>;
   }
   return (
-    <section className={`mm-section${open ? '' : ' mm-section-closed'}`} aria-labelledby={`${id}-title`}>
+    <section className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${open ? '' : ' mm-section-closed'}`} aria-labelledby={`${id}-title`}>
       <div className="mm-section-head">
         <div className="mm-section-head-main">{header}</div>
         {trailing}

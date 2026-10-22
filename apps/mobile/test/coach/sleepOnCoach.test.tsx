@@ -9,6 +9,7 @@ import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { failing } from '../support/failing';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
@@ -120,6 +121,7 @@ it('a diagnosed sleep disorder is a caution with a clinician pointer, and the ta
   if (setup === undefined) throw new Error('set up');
   await repos.setup.saveSetup(setup.copyWith({ screening: new ScreeningAnswers({ sleepDisorder: true }) }));
   await openCoach();
+  await openHeadsUp();
   expect(
     await screen.findByText(
       'Sleep disorders change how a deficit works for you; keep your care team in the loop. The app changes none of your numbers for this.',
