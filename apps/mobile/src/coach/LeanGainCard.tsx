@@ -31,7 +31,7 @@ export function LeanGainCard({
   if (review === undefined || setup === undefined) return null;
   const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   return (
-    <MmSection icon="insight" title={`Lean gain, week ${review.weeks}`}>
+    <MmSection framed icon="insight" title={`Lean gain, week ${review.weeks}`}>
       {leanGainReviewText(review, fmt).map((text) => (
         <p key={text} className="app-text">
           {text}

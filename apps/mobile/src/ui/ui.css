@@ -119,6 +119,11 @@
     background var(--motion-fast),
     color var(--motion-fast);
 }
+/* Martian's add plate is a neon-orange fill at rest (MM-556); pressed, hovered or focused it still fills Ember. */
+.theme-martian .mm-icon-button-plate {
+  background: var(--flare);
+  color: var(--on-flare);
+}
 .mm-icon-button-add:not(:disabled):hover .mm-icon-button-plate,
 .mm-icon-button-add:not(:disabled):focus-visible .mm-icon-button-plate,
 .mm-icon-button-add:not(:disabled):active .mm-icon-button-plate,
@@ -161,11 +166,6 @@
   min-width: 0;
   margin: 0;
   font: var(--type-title);
-  /* Martian's title is the lettering's lime-yellow into tangerine (MM-556); elsewhere both ends are the text colour. */
-  background: linear-gradient(100deg, var(--title-from), var(--title-to));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
   /* A one-word title at 200% text breaks inside the word rather than over the bar's action (MM-374), hyphenated as the navigation labels are. */
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -179,10 +179,8 @@
   min-height: 72px;
   padding: var(--space-8) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
   background: var(--raised);
-  /* Martian's hot-pink line and its glow along the top (MM-556); none elsewhere. */
-  box-shadow:
-    0 -1px 0 var(--accent-line),
-    0 -6px 18px color-mix(in srgb, var(--accent-line) 30%, transparent);
+  /* Martian's violet frame line along the top (MM-556, MM-558); none elsewhere. */
+  box-shadow: 0 -1px 0 var(--accent-line);
 }
 .mm-nav-destination {
   display: flex;
@@ -225,9 +223,13 @@
 .mm-nav-destination-current .mm-nav-indicator {
   background: var(--chosen);
 }
-/* Martian lights the current tab's plate (MM-555), so its icon takes the ink; the label stays in Ember. */
+/* Martian lights the current tab's plate in hot pink (MM-555, MM-558), so its icon takes the ink and its label the text
+   colour: one neon per destination, and lime stays the action's. */
 .theme-martian .mm-nav-destination-current .mm-nav-indicator {
   color: var(--on-chosen);
+}
+.theme-martian .mm-nav-destination-current {
+  color: var(--text);
 }
 
 /* ---- Surfaces (MM-277: cards carry their per-theme elevation) ---- */
@@ -280,21 +282,59 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
-/* Martian's cards glow under blacklight (MM-556); the hero's glow is the stripes' hot pink. */
-.theme-martian .mm-surface,
-.theme-martian .mm-list-group {
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent),
-    0 0 14px var(--glow);
+/* Martian's frame: the stripe set beside the brand lettering along the navigation bar's top, three violet lines, each
+   fainter. One solid colour per line; no text behind them, as the bar's top padding clears them. */
+.theme-martian .mm-navigation-bar {
+  box-shadow: none;
+  background-image:
+    linear-gradient(var(--accent-line), var(--accent-line)),
+    linear-gradient(color-mix(in srgb, var(--accent-line) 50%, transparent), color-mix(in srgb, var(--accent-line) 50%, transparent)),
+    linear-gradient(color-mix(in srgb, var(--accent-line) 22%, transparent), color-mix(in srgb, var(--accent-line) 22%, transparent));
+  background-size: 100% 1px, 100% 1px, 100% 1px;
+  background-position: 0 0, 0 3px, 0 6px;
+  background-repeat: no-repeat;
 }
+/* With more contrast asked for, decoration goes: the stripes become one plain line, the hero's rings and limb go. */
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .mm-navigation-bar {
+    background-image: none;
+    box-shadow: 0 -1px 0 var(--accent-line);
+  }
+  .mm-hero-backdrop {
+    display: none;
+  }
+}
+/* Martian's sheen (owner: "it needs some sheen", then "it looks forced"): only a hint of light from above. A card is
+   faintly lighter at its top with a dim highlight on its top edge and a small shadow under it; a neon fill keeps a faint
+   top edge. No gloss bands, no glow. */
+.theme-martian .mm-surface,
+.theme-martian .mm-list-group,
+.theme-martian .mm-hero,
+.theme-martian .mm-section-framed,
+.theme-martian .mm-dialog {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--text) 3%, transparent), transparent 50%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 9%, transparent),
+    0 4px 12px rgb(0 0 0 / 30%);
+}
+.theme-martian .mm-section-framed .mm-list-group,
+.theme-martian .mm-section-framed .mm-surface {
+  background-image: none;
+  box-shadow: none;
+}
+.theme-martian .mm-button-primary:not(:disabled),
+.theme-martian .mm-segment-selected,
+.theme-martian .mm-chip-selected,
+.theme-martian .mm-nav-destination-current .mm-nav-indicator,
+.theme-martian .mm-icon-button-plate {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
+}
+/* Martian's hero is edged in the frame violet (MM-556, MM-558). */
 .theme-martian .mm-hero {
   border-color: var(--accent-line);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent),
-    0 0 18px color-mix(in srgb, var(--accent-line) 40%, transparent);
 }
 .theme-martian .mm-hero-backdrop {
-  --mm-limb: color-mix(in srgb, var(--edge) 30%, transparent);
+  --mm-limb: color-mix(in srgb, var(--accent-line) 30%, transparent);
 }
 .mm-hero-backdrop {
   position: absolute;
@@ -769,7 +809,12 @@
   transition: background var(--motion-fast);
 }
 .mm-chip-selected {
-  background: var(--selected);
+  background: var(--chosen);
+  color: var(--on-chosen);
+}
+/* On Martian's hot-pink fill the check takes the ink (MM-558). */
+.theme-martian .mm-chip-selected .mm-chip-check {
+  color: var(--on-chosen);
 }
 .mm-chip-check {
   display: grid;
@@ -1232,6 +1277,14 @@
   display: grid;
   color: var(--ember);
 }
+/* A chosen card is chosen, not an action, so Martian marks it in hot pink (MM-558). */
+.theme-martian .mm-choice-card-selected {
+  border-color: var(--chosen);
+  box-shadow: inset 0 0 0 1px var(--chosen);
+}
+.theme-martian .mm-choice-card-check {
+  color: var(--chosen);
+}
 .mm-badge {
   padding: 2px var(--space-8);
   border-radius: var(--radius-chip);
@@ -1565,15 +1618,20 @@
 .mm-horizon-track {
   stroke: var(--track);
 }
+/* On Martian's violet hero the track is the frame violet, so the arc reads before anything is eaten (owner). */
+.theme-martian .mm-horizon-track {
+  stroke: color-mix(in srgb, var(--accent-line) 60%, transparent);
+}
 /* The on-target zone (MM-123): a wider, quiet band the track runs through; square ends so it reads as a stretch, not a second arc. */
 .mm-horizon-band {
   fill: none;
   stroke: color-mix(in srgb, var(--energy) 22%, transparent);
   stroke-linecap: butt;
 }
+/* The calorie arc: neon orange in Martian, the energy colour elsewhere (MM-556). */
 .mm-horizon-fill,
 .mm-horizon-ring {
-  stroke: var(--energy);
+  stroke: var(--arc);
 }
 .mm-horizon-dot {
   fill: var(--energy);
@@ -1582,8 +1640,7 @@
   fill: var(--surface);
 }
 .mm-horizon-glow {
-  fill: color-mix(in srgb, var(--ion) 50%, transparent);
-  filter: blur(4px);
+  fill: color-mix(in srgb, var(--ion) 80%, transparent);
 }
 .theme-light .mm-horizon-glow {
   display: none;
@@ -1910,12 +1967,46 @@
   width: 100%;
   margin: var(--space-12) 0 0;
 }
-/* Closed headers stacked are one list, 4 px apart; an opened section stands 24 px from them (MM-402). */
+/* Closed headers stacked are one list, 12 px apart (owner: 4 px was smashed together); an opened section stands 24 px
+   from them (MM-402). */
 .mm-section-closed + .mm-section-closed {
-  margin-top: var(--space-4);
+  margin-top: var(--space-12);
 }
 .mm-section-closed + .mm-section:not(.mm-section-closed) {
   margin-top: var(--space-24);
+}
+/* A framed section (the Coach, owner): header and rows on one card, so a screen of words reads in clear blocks. What
+   was a card inside it lies flat on it, so nothing nests. */
+.mm-section-framed {
+  padding: var(--space-4) var(--space-16) var(--space-16);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-group);
+  background: var(--surface);
+}
+.mm-section-framed.mm-section-closed {
+  padding-bottom: var(--space-4);
+}
+/* Cards stand 12 px apart, folded or open; this outranks the open-after-closed 24 px above. */
+.mm-section.mm-section-framed + .mm-section.mm-section-framed {
+  margin-top: var(--space-12);
+}
+/* The card's padding ends it, not the last line's own margin. */
+.mm-section-framed .mm-section-body > :last-child {
+  margin-bottom: 0;
+}
+/* A text button's label lines up with the words beside it: the button keeps its tap area, its padding hangs out. */
+.mm-section-body > .mm-button-text:first-child,
+.mm-section-body > p + .mm-button-text {
+  margin-inline-start: calc(-1 * var(--space-12));
+}
+.mm-section-head > .mm-button-text:last-child {
+  margin-inline-end: calc(-1 * var(--space-12));
+}
+.mm-section-framed .mm-list-group,
+.mm-section-framed .mm-surface {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 /* A header, or a disclosure, sits 8 px above the card it opens (MM-402). */
 .mm-disclosure-body > .mm-list-group:first-child,
@@ -1996,7 +2087,8 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
-  margin: var(--space-4) 0;
+  /* The week stands apart from the cards above and below it (owner). */
+  margin: var(--space-16) 0 var(--space-20);
 }
 .mm-rhythm-day {
   display: flex;

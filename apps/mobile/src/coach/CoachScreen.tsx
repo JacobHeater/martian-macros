@@ -305,7 +305,7 @@ export function CoachScreen() {
         </div>
       )}
       {/* The goal first, under the figures and the warnings (MM-299). */}
-      <MmSection
+      <MmSection framed
         icon="flag"
         title={`Goal: ${goalModeLabel(setup.goalMode)}`}
         trailing={<MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />}
@@ -356,7 +356,7 @@ export function CoachScreen() {
       </MmSection>
       <OneThingRow />
       {current === undefined ? null : (
-        <MmSection icon="tune" title="Your targets">
+        <MmSection framed icon="tune" title="Your targets">
           {shownTargets?.proteinMinimumG === undefined ? null : (
             <StatRow label="Protein minimum" value={Fmt.grams(shownTargets.proteinMinimumG)} />
           )}
@@ -396,11 +396,11 @@ export function CoachScreen() {
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />
       <ReportsCard />
-      <MmSection icon="bolt" title="Your metabolism">
+      <MmSection framed icon="bolt" title="Your metabolism">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
         {gaps.includes('history') ? <DataGapNote gap="history" /> : null}
       </MmSection>
-      <MmSection icon="coach" title={`Coach confidence · ${confidence}`}>
+      <MmSection framed icon="coach" title={`Coach confidence · ${confidence}`}>
         {snapshot.confidence.level === 'learning' ? (
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
@@ -412,7 +412,7 @@ export function CoachScreen() {
           <StatRow label="Stability" value={confidenceLabel(snapshot.confidence.stability)} />
         </MmDisclosure>
       </MmSection>
-      <MmSection icon="body" title="Body">
+      <MmSection framed icon="body" title="Body">
         {/* An estimate is shown with its uncertainty, in words rather than "±" (MM-108): the trend's band, as the trend
             chart draws it (two sigma). With the weight hidden, the pace in words in place of the figure (MM-118). */}
         {fmt.weightHidden ? (
