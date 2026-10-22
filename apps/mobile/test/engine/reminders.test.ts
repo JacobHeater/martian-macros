@@ -160,3 +160,71 @@ it('the plan is in time order', () => {
     expect(a.date.isBefore(b.date) || (a.date === b.date && a.minuteOfDay <= b.minuteOfDay)).toBe(true);
   }
 });
+
+describe('the most pending at once (MM-405: iOS keeps only the soonest 64)', () => {
+  it('keeps the soonest when the plan holds more', () => {
+    const settings = [on('weighIn'), on('logFood'), on('weeklyMeasurement')];
+    const all = planReminders({ settings, facts: new ReminderFacts(), today, minuteNow: 6 * 60 });
+    const few = planReminders({ settings, facts: new ReminderFacts(), today, minuteNow: 6 * 60, mostPending: 5 });
+    expect(all.length).toBeGreaterThan(5);
+    expect(few).toEqual(all.slice(0, 5));
+  });
+
+  it('every plan the rules allow fits what iOS keeps', () => {
+    const settings = ReminderKind.values.map((kind) => on(kind));
+    expect(plan(settings).length).toBeLessThanOrEqual(64);
+    expect(ReminderRule.mostPending).toBe(64);
+  });
+});
+
+/** MM-116's reminder, listed in MM-146: the weekly recovery check-in. */
+describe('the recovery check-in reminder', () => {
+  const nineAm = 9 * 60;
+  const facts = (init: { recoveryDays?: CalendarDate[]; recoveryFrom?: CalendarDate; pauses?: Pause[] }) =>
+    new ReminderFacts(init);
+
+  it('is sent at 9 am on the day it falls due, a week after setup', () => {
+    expect(ReminderRule.defaultMinuteOfDay('recoveryCheckIn')).toBe(nineAm);
+    const planned = plan([on('recoveryCheckIn')], { facts: facts({ recoveryFrom: today.addDays(-7) }) });
+    expect(planned[0]).toEqual({ kind: 'recoveryCheckIn', date: today, minuteOfDay: nineAm });
+  });
+
+  it('then once a week while it waits, and stops after seven', () => {
+    const planned = plan([on('recoveryCheckIn')], { facts: facts({ recoveryFrom: today.addDays(-7) }) });
+    expect(planned.map((r) => today.daysUntil(r.date))).toEqual([0, 7, 14, 21, 28, 35, 42]);
+    const ignored = on('recoveryCheckIn', { since: 49 });
+    const longAgo = facts({ recoveryFrom: today.addDays(-56) });
+    expect(reminderIgnoredStreak({ setting: ignored, facts: longAgo, today, minuteNow: 6 * 60 })).toBe(7);
+    expect(plan([ignored], { facts: longAgo })).toEqual([]);
+  });
+
+  it('is not due in the first week after setup', () => {
+    const planned = plan([on('recoveryCheckIn')], { facts: facts({ recoveryFrom: today.addDays(-3) }) });
+    expect(planned[0]?.date).toBe(today.addDays(4));
+  });
+
+  it('answered or skipped, it waits a week from that day', () => {
+    const answered = facts({ recoveryFrom: today.addDays(-100), recoveryDays: [today.addDays(-2)] });
+    expect(answered.done('recoveryCheckIn', today)).toBe(true);
+    expect(plan([on('recoveryCheckIn')], { facts: answered })[0]?.date).toBe(today.addDays(5));
+  });
+
+  it('is never sent before setup is known', () => {
+    expect(plan([on('recoveryCheckIn')], { facts: facts({}) })).toEqual([]);
+  });
+
+  it('a pause silences it', () => {
+    const pause = new Pause({ from: today, to: today.addDays(2), reason: 'travel' });
+    const planned = plan([on('recoveryCheckIn')], { facts: facts({ recoveryFrom: today.addDays(-7), pauses: [pause] }) });
+    expect(planned[0]?.date).toBe(today.addDays(7));
+  });
+
+  it('on a crowded Sunday the two weekly ones are kept', () => {
+    // Setup was a Sunday, so the check-in falls on Sundays too.
+    const sunday = CalendarDate.of(2026, 10, 11);
+    const planned = plan([on('weighIn'), on('logFood'), on('weeklyMeasurement'), on('recoveryCheckIn')], {
+      facts: facts({ recoveryFrom: sunday.addDays(-14) }),
+    });
+    expect(planned.filter((r) => r.date === sunday).map((r) => r.kind)).toEqual(['weeklyMeasurement', 'recoveryCheckIn']);
+  });
+});

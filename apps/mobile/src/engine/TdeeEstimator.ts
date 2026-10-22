@@ -104,6 +104,7 @@ export class TdeeEstimator {
     bmrKcal,
     energyDensityForSlope,
     settling = [],
+    plannedShare,
   }: {
     asOf: CalendarDate;
     intake: Iterable<IntakeDay>;
@@ -112,6 +113,12 @@ export class TdeeEstimator {
     bmrKcal: number;
     energyDensityForSlope: (slopeKgPerDay: number) => number;
     settling?: readonly SettlingWindow[];
+    /**
+     * The share of the flat figure planned for each day (MM-124,
+     * `plannedDayShare`), so a planned lower day is not taken for a partial
+     * one. Flat when not given.
+     */
+    plannedShare?: ((date: CalendarDate) => number) | undefined;
   }): TdeeEstimate {
     const held = ({
       usable = 0,
@@ -169,7 +176,7 @@ export class TdeeEstimator {
     const clean = (day: CalendarDate) => segments.some(([from, to]) => !day.isBefore(from) && !day.isAfter(to));
     days = days.filter((d) => clean(d.date));
 
-    const [usable, partialCount] = this.usableDays(days);
+    const [usable, partialCount] = this.usableDays(days, plannedShare);
     const trendByDay = new Map<number, WeightTrendPoint>();
     for (const p of trend) trendByDay.set(p.date.epochDay, p);
     let weighIns = 0;
@@ -267,8 +274,11 @@ export class TdeeEstimator {
   }
 
   /** Splits days into usable intake and a count of excluded partial days. */
-  private usableDays(days: readonly IntakeDay[]): readonly [IntakeDay[], number] {
-    const usable = usableIntakeDays(days, { partialDayFraction: this.partialDayFraction });
+  private usableDays(
+    days: readonly IntakeDay[],
+    plannedShare?: (date: CalendarDate) => number,
+  ): readonly [IntakeDay[], number] {
+    const usable = usableIntakeDays(days, { partialDayFraction: this.partialDayFraction, plannedShare });
     return [usable, days.length - usable.length];
   }
 

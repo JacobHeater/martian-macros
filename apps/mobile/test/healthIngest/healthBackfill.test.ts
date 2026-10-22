@@ -189,8 +189,9 @@ it('says after each month how far it has read and what was new', async () => {
   expect(told.reduce((sum, step) => sum + step.added, 0)).toBe(198 - 31);
 });
 
-it('the kinds read back are those the trend and the body-fat estimate use', () => {
-  expect(HealthBackfill.types).toEqual(['weight', 'bodyFat', 'leanMass', 'menstruation']);
+it('the kinds read back are those the trend and the body-fat estimate use, and the height (MM-68)', () => {
+  // A height is measured rarely: read only from the last thirty days, an older one would never be offered.
+  expect(HealthBackfill.types).toEqual(['weight', 'bodyFat', 'leanMass', 'menstruation', 'height']);
 });
 
 describe('MM-498', () => {

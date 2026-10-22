@@ -1,6 +1,6 @@
 ---
 id: MM-46
-status: in-progress
+status: done
 component: food-logging
 related: [MM-37, MM-27, MM-38, MM-42, MM-49, MM-167]
 ---
@@ -118,3 +118,36 @@ Choices I made without asking (say if any is wrong):
 - **The nudge does not name the food.** It says "the protein food you eat most"; insights carry figures, not names.
 - **The style test is one distance over three shares**, not a separate test per share, so a switch between any two styles counts
   once and the old behaviour is kept exactly.
+
+Built (2026-10-21, hand model version 2): **the food matters in weight, not only per gram.** A palm or a thumb of a food
+with no stated density now takes the density of its makeup per 100 g (`compositionDensity`: protein, fat and
+carbohydrate as stated, the rest water, each at its own density, the Choi and Okos mixture rule), so a palm of salmon
+(about 1.04 g/mL) weighs less than a palm of chicken breast (about 1.08 g/mL), and their macros differ. A cupped hand is
+a heap with air in it and keeps its default (0.65 g/mL). A food's own density still wins; a per-serving food has no
+makeup per 100 g and keeps the default. **The fitting portion is offered first** (`handUnitsFor`): 40 g of fat or more
+in 100 g is a spread (thumb first), 12 g of protein or more and no less than its carbohydrate is meat or fish (palm
+first), anything else a cupped hand first; all three stay offered. Tests: `handModel.test.ts` (salmon and chicken
+differ in weight and macros; density from makeup; a cupped hand keeps its default; the fitting portion first),
+`foodSearch.test.tsx` ("the hand portion a food suits is offered first"), `conversionFor.test.ts`. Not run locally; CI
+validates.
+
+Choices I made without asking (say if any is wrong):
+- **The food's makeup stands in for a measured density** for palms and thumbs. It ignores air and cooking structure,
+  so it separates lean from fatty foods but is not a measurement; the hand model's stated uncertainty covers it.
+- **The fitting portion is chosen from the food's makeup**, not a food group, because the packs carry no group. A fatty
+  meat such as bacon offers a thumb first; every portion is still one tap away.
+
+Review fixes (2026-10-21, panel review, hand model version 3). Not run locally; CI validates.
+- **Makeup density only where there is no air to speak of** (`compositionDensity`): more than half water (meat, fish,
+  cooked foods), or fat outweighing protein and carbohydrate together (spreads, butter, oil). A dry, porous food
+  (crisps, bread, crackers) came out three to ten times too heavy by its makeup; it now takes the portion's default.
+  Raised `HandModel.version` to 3, since such entries now imply other grams.
+- **Protein's density is 1.32 g/mL at 20 °C** (Choi and Okos: 1329.9 - 0.5184 T kg/m³), not 1.33.
+- **Nuts and seeds offer a cupped hand first, a thumb next** (`handUnitsFor`): mostly fat with 10 g or more of protein
+  and carbohydrate is nuts or seeds; under that, a fat or spread (thumb first). A nut butter has the same makeup as
+  nuts, so it is offered the same way; the thumb is one place down. Supersedes the "40 g of fat is a spread" rule above.
+- Tests: `test/domain/handModel.test.ts` (a palm of crisps or bread takes the default; makeup density for a moist food
+  or a spread and not at half water; protein at 1.32; nuts and macadamias cupped hand then thumb; oil still thumb).
+
+Owed on a phone: logging a palm of a pack food on the emulator and reading back its grams. The check of the reference
+volumes against a few real hands stays a judgement, as the code says.
