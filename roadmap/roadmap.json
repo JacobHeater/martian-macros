@@ -703,6 +703,7 @@
             "MM-68",
             "MM-73",
             "MM-498",
+            "MM-551",
             "MM-188"
           ]
         },
@@ -3098,6 +3099,7 @@
           "MM-68",
           "MM-73",
           "MM-498",
+          "MM-551",
           "MM-395",
           "MM-522",
           "MM-516",
@@ -3145,7 +3147,8 @@
           "title": "History backfill on first connection, and keeping it through a re-read (MM-498)",
           "tickets": [
             "MM-73",
-            "MM-498"
+            "MM-498",
+            "MM-551"
           ],
           "milestone": "M3"
         },

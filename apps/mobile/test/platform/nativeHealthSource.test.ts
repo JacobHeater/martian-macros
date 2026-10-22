@@ -145,6 +145,16 @@ it('a phone without Health Connect has no history to ask for (MM-73)', async () 
   expect(fake.historyAsked()).toBe(0);
 });
 
+it('asks the plugin for changes in the one kind it reads, never every kind (MM-551)', async () => {
+  const fake = fakeMmHealth([...held]);
+  const asked: { token: string; type: string }[] = [];
+  const api = { ...fake.api, changes: (options: { token: string; type: string }) => (asked.push(options), fake.api.changes(options)) };
+  const source = new NativeHealthSource(api, clock);
+  const first = await source.changesSince('weight', undefined);
+  await source.changesSince('weight', first.nextToken);
+  expect(asked).toEqual([{ token: first.nextToken, type: 'weight' }]);
+});
+
 it('a change after the token is told, and a deletion is told as one', async () => {
   const fake = fakeMmHealth([...held]);
   const source = new NativeHealthSource(fake.api, clock);

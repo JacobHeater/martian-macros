@@ -43,7 +43,8 @@ export interface MmHealthApi {
    */
   dailySteps(options: { fromMs: number; toMs: number }): Promise<{ days: { startMs: number; steps: number }[] }>;
   changesToken(options: { type: string }): Promise<{ token: string }>;
-  changes(options: { token: string }): Promise<{
+  /** What changed in one kind since `token`: the kind is named, since an anchor is one kind's (MM-551). */
+  changes(options: { token: string; type: string }): Promise<{
     expired: boolean;
     nextToken: string;
     hasMore: boolean;

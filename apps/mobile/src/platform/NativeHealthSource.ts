@@ -172,7 +172,7 @@ export class NativeHealthSource implements HealthSource, HealthHistoryAccess, He
     const deleted = new Set<string>();
     let at = token;
     for (;;) {
-      const page = await this.asked(`changes in ${type}`, () => this.api.changes({ token: at }));
+      const page = await this.asked(`changes in ${type}`, () => this.api.changes({ token: at, type }));
       if (page.expired) return HealthChanges.expired();
       for (const id of page.deletedIds) {
         deleted.add(id);
