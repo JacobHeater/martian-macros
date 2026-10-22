@@ -130,6 +130,8 @@ describe('the field border', () => {
           expect(ratio(tokens.get(meaning)!, tokens.get(level)!), `${palette} ${meaning} on ${level}`).toBeGreaterThanOrEqual(4.5);
         }
       }
+      // A chosen segment and the current tab wear chosen, their words and icon on-chosen (MM-555).
+      expect(ratio(tokens.get('on-chosen')!, tokens.get('chosen')!), `${palette} on-chosen on chosen`).toBeGreaterThanOrEqual(4.5);
       // A field sits on sunken, a chosen chip on selected: the text stays readable there.
       for (const level of ['sunken', 'selected']) {
         expect(ratio(tokens.get('text')!, tokens.get(level)!), `${palette} text on ${level}`).toBeGreaterThanOrEqual(4.5);

@@ -214,7 +214,11 @@
   font-weight: 700;
 }
 .mm-nav-destination-current .mm-nav-indicator {
-  background: var(--selected);
+  background: var(--chosen);
+}
+/* Martian lights the current tab's plate (MM-555), so its icon takes the ink; the label stays in Ember. */
+.theme-martian .mm-nav-destination-current .mm-nav-indicator {
+  color: var(--on-chosen);
 }
 
 /* ---- Surfaces (MM-277: cards carry their per-theme elevation) ---- */
@@ -785,8 +789,8 @@
   padding: 0 var(--space-12);
 }
 .mm-segment-selected {
-  background: var(--selected);
-  color: var(--text);
+  background: var(--chosen);
+  color: var(--on-chosen);
 }
 
 /* ---- Progress ---- */
