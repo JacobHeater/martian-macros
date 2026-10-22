@@ -1,8 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import type { CameraPreview } from '../domain/integration/CameraPreview';
+import type { PhotoCameraProblem } from '../domain/integration/PhotoCameraProblem';
 import { PhotoPose } from '../domain/photos/PhotoPose';
 import { photoSets } from '../domain/photos/photoSets';
 import { tooSoonForPhotos } from '../domain/photos/tooSoonForPhotos';
+import { photoCameraProblemText } from '../format/photoCameraProblemText';
 import { photoPoseLabel } from '../format/photoPoseLabel';
 import { CloseScreenContext } from '../app/CloseScreenContext';
 import { Screen } from '../app/Screen';
@@ -59,7 +61,8 @@ export function PhotoCameraScreen() {
   const [pose, setPose] = useState<PhotoPose>('front');
   const [chosenFacing, setFacing] = useState<'user' | 'environment'>();
   const [preview, setPreview] = useState<CameraPreview>();
-  const [unavailable, setUnavailable] = useState(false);
+  /** Why the camera did not start, when it did not (MM-560). */
+  const [problem, setProblem] = useState<PhotoCameraProblem>();
   /** Each try at opening the camera; a new one opens it again. */
   const [attempt, setAttempt] = useState(0);
   const [taking, setTaking] = useState(false);
@@ -80,13 +83,14 @@ export function PhotoCameraScreen() {
     let live = true;
     let started: CameraPreview | undefined;
     void services.photoCamera.start(facing).then((camera) => {
+      const preview = typeof camera === 'string' ? undefined : camera;
       if (!live) {
-        camera?.stop();
+        preview?.stop();
         return;
       }
-      started = camera;
-      setPreview(camera);
-      setUnavailable(camera === undefined);
+      started = preview;
+      setPreview(preview);
+      setProblem(typeof camera === 'string' ? camera : undefined);
     });
     return () => {
       live = false;
@@ -99,13 +103,13 @@ export function PhotoCameraScreen() {
 
   // Allowed in the phone's settings meanwhile, the camera opens on the way back.
   useEffect(() => {
-    if (!unavailable) return;
+    if (problem === undefined) return;
     const back = () => {
       if (document.visibilityState === 'visible') setAttempt((n) => n + 1);
     };
     document.addEventListener('visibilitychange', back);
     return () => document.removeEventListener('visibilitychange', back);
-  }, [unavailable]);
+  }, [problem]);
 
   const previous = [...photos].reverse().find((photo) => photo.pose === pose);
   const overlay = usePhotoBytes(previous?.id);
@@ -178,11 +182,11 @@ export function PhotoCameraScreen() {
         }}
       />
       <div className="app-gap-small" />
-      {unavailable ? (
+      {problem !== undefined ? (
         <Notice
           kind="caution"
           title="The camera could not be opened"
-          text="Allow the camera for Martian Macros in your phone’s settings, then come back. It is tried again when you do."
+          text={photoCameraProblemText(problem)}
           action={<MmButton label="Try again" kind="secondary" onPress={() => setAttempt((n) => n + 1)} />}
         />
       ) : (
@@ -197,7 +201,7 @@ export function PhotoCameraScreen() {
       <p className="app-caption" role="status">
         {countdown === undefined || countdown === 0 ? '' : `Photo in ${countdown} ${countdown === 1 ? 'second' : 'seconds'}.`}
       </p>
-      {unavailable ? null : (
+      {problem !== undefined ? null : (
         <>
           <p className="app-caption">
             {previous === undefined

@@ -107,7 +107,8 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
 8. **Progress photos (MM-157).** M4. Done 2026-10-21: a private photo store in a
    database file of its own, a guided camera with the last pose as an overlay,
    side-by-side comparison, the device lock and a private screen, and photo
-   backup only when switched on. Phone checks owed.
+   backup only when switched on. Phone checks owed. MM-560 (2026-10-22): a
+   camera that does not open says why, not always "allow it in settings".
 
 ## Done enough to unblock others
 MM-155 is done: every caller that asks whether waist changed over a period
