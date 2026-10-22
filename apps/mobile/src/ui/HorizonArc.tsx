@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { clamp } from '../lang/clamp';
 import './ui.css';
 
@@ -43,6 +44,8 @@ export function HorizonArc({ progress, label, band }: HorizonArcProps) {
   const zone = band === undefined ? undefined : ([clamp(band[0], 0, 1), clamp(band[1], 0, 1)] as const);
   const shown = clamp(progress, 0, 1);
   const [dotX, dotY] = at(shown);
+  // The body's glow is an SVG blur: WebKit draws a CSS blur on an SVG shape as a hard ring (found on the iPhone).
+  const glow = `mm-horizon-glow-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   return (
     <svg className="mm-horizon" viewBox={`0 0 ${width} ${height}`} {...(label === undefined ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label })}>
       {zone === undefined || zone[1] <= zone[0] ? null : (
@@ -50,7 +53,12 @@ export function HorizonArc({ progress, label, band }: HorizonArcProps) {
       )}
       <path className="mm-horizon-track" d={arcTo(1)} strokeWidth={stroke} />
       {shown > 0 ? <path className="mm-horizon-fill" d={arcTo(shown)} strokeWidth={stroke} /> : null}
-      <circle className="mm-horizon-glow" cx={dotX} cy={dotY} r={dotRadius + 4} />
+      <defs>
+        <filter id={glow} x="-150%" y="-150%" width="400%" height="400%">
+          <feGaussianBlur stdDeviation={5} />
+        </filter>
+      </defs>
+      <circle className="mm-horizon-glow" cx={dotX} cy={dotY} r={dotRadius + 5} filter={`url(#${glow})`} />
       {progress > 1 ? (
         <>
           <circle className="mm-horizon-hollow" cx={dotX} cy={dotY} r={dotRadius} />

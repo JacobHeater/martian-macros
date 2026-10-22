@@ -1589,8 +1589,7 @@
   fill: var(--surface);
 }
 .mm-horizon-glow {
-  fill: color-mix(in srgb, var(--ion) 50%, transparent);
-  filter: blur(4px);
+  fill: color-mix(in srgb, var(--ion) 80%, transparent);
 }
 .theme-light .mm-horizon-glow {
   display: none;
