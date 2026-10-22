@@ -20,7 +20,7 @@ test('--phone takes no value, so a path after it is a path; -d and --env values 
   assert.deepEqual(screenshotArgs(['--phone', 'shot.png', '--clipboard']), {
     device: undefined,
     phone: true,
-    identity: 'dev',
+    identity: 'prod',
     out: 'shot.png',
     clipboard: true,
   });
@@ -33,6 +33,7 @@ test('--phone takes no value, so a path after it is a path; -d and --env values 
   });
   assert.equal(screenshotArgs(['--phone', '--prod']).identity, 'prod');
   assert.equal(screenshotArgs(['--phone', '--env', 'prod']).identity, 'prod');
+  assert.equal(screenshotArgs(['--phone', '--env', 'dev']).identity, 'dev');
   assert.equal(screenshotArgs(['--phone']).out, undefined);
 });
 
@@ -121,12 +122,11 @@ async function attempt({
   return { result, ran, said, fetches, chooses, written };
 }
 
-test('the real app is refused before anything is chosen or sent', async () => {
-  const run = await attempt({ identity: 'prod' });
-  assert.equal(run.result.code, 64);
-  assert.equal(run.chooses, 0);
-  assert.deepEqual(run.ran, []);
-  assert.match(run.said.join('\n'), /real app \(com\.martianmacros\) takes no screenshots.*dev and demo apps only/);
+test('the real app is asked by its own id while the owner is the only user (MM-536, owner 2026-10-22)', async () => {
+  const run = await attempt({ identity: 'prod', pictureOnFetch: 1 });
+  assert.equal(run.result.code, 0);
+  assert.ok(run.ran[0]!.includes('com.martianmacros'));
+  assert.ok(!run.ran[0]!.includes('com.martianmacros.dev'));
 });
 
 test('a phone that is away or unpaired is said, and nothing is sent', async () => {

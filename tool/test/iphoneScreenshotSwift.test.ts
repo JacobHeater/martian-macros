@@ -5,21 +5,22 @@ import { phoneScreenshotCommands } from '../src/phoneScreenshotCommands.ts';
 
 /**
  * MM-536: CI builds no iOS, so this reads the Swift. The screenshot plugin
- * is registered only in the dev and demo apps, never the real one; it is
+ * is registered behind its check, which takes every identity while the owner
+ * is the only user (MM-536, owner 2026-10-22; blocked again by MM-552); it is
  * in the app target's sources; and it answers the names the runner sends.
  */
 const shell = (path: string) => readFileSync(new URL(`../../apps/mobile/ios/App/${path}`, import.meta.url), 'utf8');
 const plugin = shell('App/Plugins/MmScreenshotPlugin.swift');
 
-test('the plugin is registered only behind its dev-only check', () => {
+test('the plugin is registered only behind its check', () => {
   const main = shell('App/MainViewController.swift');
   assert.match(main, /if MmScreenshotPlugin\.isAllowed \{\s*bridge\?\.registerPluginInstance\(MmScreenshotPlugin\(\)\)\s*\}/);
   assert.equal(main.split('MmScreenshotPlugin()').length - 1, 1, 'registered once, inside the check');
 });
 
-test('the check refuses the real app, and the plugin checks again before it acts', () => {
+test('the check takes the real app and its twins, and the plugin checks again before it acts', () => {
   assert.match(plugin, /static let prodBundleId = "com\.martianmacros"\n/);
-  assert.match(plugin, /return id != prodBundleId && id\.hasPrefix\(prodBundleId \+ "\."\)/);
+  assert.match(plugin, /return id == prodBundleId \|\| id\.hasPrefix\(prodBundleId \+ "\."\)/);
   assert.match(plugin, /override public func load\(\) \{\s*guard MmScreenshotPlugin\.isAllowed else \{ return \}/);
   assert.match(plugin, /private func serveRequest\(\) \{\s*guard MmScreenshotPlugin\.isAllowed,/);
   assert.match(plugin, /pluginMethods: \[CAPPluginMethod\] = \[\]/, 'nothing is open to the web app');
