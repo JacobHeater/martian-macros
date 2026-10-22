@@ -141,7 +141,11 @@ export function MmSection({
     header = <span className="mm-section-head-body">{head}</span>;
   }
   return (
-    <section className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${open ? '' : ' mm-section-closed'}`} aria-labelledby={`${id}-title`}>
+    // A header that opens a screen has no rows under it, so it stacks with the folded headers as one list (MM-402).
+    <section
+      className={`mm-section${kind === undefined ? '' : ` mm-section-${kind}`}${open && onPress === undefined ? '' : ' mm-section-closed'}`}
+      aria-labelledby={`${id}-title`}
+    >
       <div className="mm-section-head">
         <div className="mm-section-head-main">{header}</div>
         {trailing}
