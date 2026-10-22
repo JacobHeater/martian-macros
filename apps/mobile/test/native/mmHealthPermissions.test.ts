@@ -18,6 +18,9 @@ it('both plugins offer openPermissions', () => {
 
 it('Android says whether the question was shown, and opens the app’s own page of Health Connect', () => {
   expect(kotlin).toContain('.put("shown", shown)');
+  // An answer back sooner than 0.8 s was never shown; a person reading the question takes longer (MM-323 Decisions).
+  expect(kotlin).toMatch(/unshownWithinMs = 800L/);
+  expect(kotlin).toContain('>= unshownWithinMs');
   expect(kotlin).toContain('android.health.connect.action.MANAGE_HEALTH_PERMISSIONS');
   expect(kotlin).toContain('putExtra(Intent.EXTRA_PACKAGE_NAME, context.packageName)');
   expect(kotlin).toContain('HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS');
