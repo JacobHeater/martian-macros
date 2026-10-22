@@ -25,6 +25,8 @@ interface SyntheticUserInit {
   glycogenSwingFraction?: number;
   glycogenTimeConstantDays?: number;
   glycogenFullDeficitFraction?: number;
+  /** Added to the partition's lean fraction of each change (MM-35): a body that partitions differently from the engine. */
+  leanFractionShift?: number;
 }
 
 /**
@@ -69,6 +71,13 @@ export class SyntheticUser {
    */
   readonly glycogenFullDeficitFraction: number;
 
+  /**
+   * How far this body's lean share of each change sits from the partition
+   * the engine assumes (MM-30's admitted weakness, MM-35). Zero is the
+   * engine's own model.
+   */
+  readonly leanFractionShift: number;
+
   // Mutable so tests can change behaviour mid-run.
   underReportFraction: number;
   skipLogProbability: number;
@@ -101,6 +110,7 @@ export class SyntheticUser {
     this.glycogenSwingFraction = init.glycogenSwingFraction ?? 0;
     this.glycogenTimeConstantDays = init.glycogenTimeConstantDays ?? 3;
     this.glycogenFullDeficitFraction = init.glycogenFullDeficitFraction ?? 0.2;
+    this.leanFractionShift = init.leanFractionShift ?? 0;
     this.today = init.start ?? CalendarDate.of(2026, 1, 1);
     this.weightKg = this.startWeightKg;
     this.fatMassKg = (this.startWeightKg * (init.bodyFatPercent ?? 25)) / 100;
@@ -158,11 +168,15 @@ export class SyntheticUser {
       const level = this.glycogenSwingFraction * this.startWeightKg * fill;
       this.glycogenKg += (level - this.glycogenKg) / this.glycogenTimeConstantDays;
     }
-    const leanFraction = leanFractionOfChange({
-      fatMassKg: this.fatMassKg,
-      losing: balance < 0,
-      resistanceTrained: this.resistanceTrained,
-    });
+    const leanFraction = clamp(
+      leanFractionOfChange({
+        fatMassKg: this.fatMassKg,
+        losing: balance < 0,
+        resistanceTrained: this.resistanceTrained,
+      }) + this.leanFractionShift,
+      0,
+      1,
+    );
     const deltaKg = balance / energyDensityKcalPerKg(leanFraction);
     this.weightKg += deltaKg;
     this.fatMassKg += deltaKg * (1 - leanFraction);
