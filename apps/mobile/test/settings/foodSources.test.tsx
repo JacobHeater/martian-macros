@@ -37,6 +37,25 @@ it('the sources screen names each source, its licence and its address, and what 
   expect(sources.getAllByText(/martian-macros-food-data/).length).toBeGreaterThan(0);
   expect(sources.getByText(/Those services see your IP address/)).toBeInTheDocument();
   expect(sources.getByText(/not been reviewed by a lawyer/)).toBeInTheDocument();
+  // Each source's terms on its own row: USDA public domain with its requested citation, Open Food Facts ODbL for the
+  // database and DbCL for its contents, each licence's address as text.
+  expect(sources.getByText(/Public domain, with a citation requested/)).toBeInTheDocument();
+  expect(
+    sources.getByText(
+      /Database: Open Database License 1\.0 \(opendatacommons\.org\/licenses\/odbl\/1-0\/\) · contents: Database Contents License 1\.0 \(opendatacommons\.org\/licenses\/dbcl\/1-0\/\)/,
+    ),
+  ).toBeInTheDocument();
+  // USDA's citation in the FoodData Central home page's current form, with its access date, and ARS's for FNDDS.
+  const attribution = sources.getByText(/^Food data from Open Food Facts/);
+  expect(attribution).toHaveTextContent(
+    'U.S. Department of Agriculture, Agricultural Research Service, Beltsville Human Nutrition Research Center. FoodData Central. [Internet]. [cited 2026-10-21]. Available from https://fdc.nal.usda.gov/.',
+  );
+  expect(attribution).toHaveTextContent('USDA Food and Nutrient Database for Dietary Studies 2021-2023');
+  expect(attribution).toHaveTextContent('opendatacommons.org/licenses/odbl/1-0/');
+  expect(attribution).toHaveTextContent('opendatacommons.org/licenses/dbcl/1-0/');
+  expect(sources.getByText(/told of products that use its data/)).toBeInTheDocument();
+  // Addresses are text: nothing on the screen opens a browser (MM-57's decision).
+  expect(topLayer().querySelector('a[href]')).toBeNull();
   // The licences are never called verified, and the records never promised right.
   expect(topLayer().textContent).not.toMatch(/verified/i);
 });

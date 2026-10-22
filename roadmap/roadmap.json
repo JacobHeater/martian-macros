@@ -1881,6 +1881,7 @@
       "coordinationHotspots": [],
       "sourceRequirements": {
         "built": [
+          "MM-57",
           "MM-52",
           "MM-53",
           "MM-54",
@@ -1892,8 +1893,7 @@
           "MM-51"
         ],
         "remaining": [
-          "MM-50",
-          "MM-57"
+          "MM-50"
         ]
       },
       "sequence": [
