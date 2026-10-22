@@ -9,6 +9,14 @@ it('a range, named for what it rests on', () => {
   expect(bodyFatRangeText(estimate, 'formula')).toBe('16–32% (rough estimate)');
   expect(bodyFatRangeText(estimate, 'waist')).toBe('16–32% (from your waist)');
   expect(bodyFatRangeText(estimate, 'yourFigure')).toBe('~24% (your estimate)');
+  // MM-502: a smart scale's settled readings.
+  expect(bodyFatRangeText(estimate, 'scale')).toBe('16–32% (from your scale)');
+});
+
+it('a range from the scale says that averaging removes scatter, not a scale’s fixed bias (MM-502)', () => {
+  expect(bodyFatNote('scale', { eatingDisorderHistory: false })).toBe(
+    'Your scale’s readings over weeks join your height and weight. Averaging removes the day-to-day scatter, not a scale’s fixed bias, so it stays a range.',
+  );
 });
 
 it('a rough range says what would narrow it', () => {
