@@ -2006,7 +2006,8 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
-  margin: var(--space-4) 0;
+  /* The week stands apart from the cards above and below it (owner). */
+  margin: var(--space-16) 0 var(--space-20);
 }
 .mm-rhythm-day {
   display: flex;
