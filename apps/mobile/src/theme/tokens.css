@@ -6,18 +6,18 @@
 :root,
 .theme-martian {
   /*
-   * MM-554: drawn from the brand art (design/brand/splash-art.png, icon-art.png). MM-555: the base is the near-black
-   * behind the lettering (#0a081b), and the levels step up from it in the same hue, so the brights carry the colour (MM-556: the track, the chosen fill and the
-   * field edge in the mountains' violets): the
-   * action is the "MARTIAN" lime-yellow, a chosen segment and the current tab the stripes' lime, carbs the "MACROS"
-   * tangerine, fat the stripes' hot magenta.
+   * MM-554, MM-555: drawn from the brand art (design/brand/), on the near-black behind the lettering (#0a081b), with
+   * levels that step up from it in the same hue. MM-558: three neons, one meaning each. Lime-yellow is "do it" (the
+   * action); hot pink is "chosen" (a chosen segment, chip or card, the current tab); neon orange is "fuel" (a meal's
+   * add plate and the calorie arc it fills). Violet is the frame (the hero's edge, the navigation bar's line, a field's
+   * edge, a section's mark) and means nothing. Macro, water and grade colours stay inside the data. No gradients, no glow.
    */
   --canvas: #0a081b;
   --surface: #16122e;
   --raised: #211b3f;
   --overlay: #2c2550;
   --sunken: #050410;
-  --track: #331a70;
+  --track: #2c2550;
   --selected: #4824ad;
   --outline: #3f3670;
   --outline-strong: #c77dff;
@@ -26,29 +26,20 @@
   --text3: #cbc6d6;
   --ember: #dff701;
   --on-ember: #1c2000;
-  /* A chosen segment and the current tab are lit (MM-555); the ink on them. */
-  --chosen: #c4f24f;
+  --chosen: #ff3d8b;
   --on-chosen: #0a081b;
-  /* The blacklight (MM-556): the art's violets and hot pink as the structure. Cards wear a violet edge, the
-     navigation bar a hot-pink line, a screen's title the lettering's lime-yellow into tangerine, a section's mark the
-     neon orange. The neons are fills too: the calorie arc is neon orange, a chosen chip hot pink, a meal's add plate
-     neon orange, each with the ink on it. */
-  --edge: #6b3df5;
-  --accent-line: #ff3d8b;
-  --title-from: #f3f552;
-  --title-to: #ff6a2c;
-  --mark: #ff8a3d;
+  --edge: #3f3670;
+  --accent-line: #7a4dff;
+  --mark: #c77dff;
   --arc: #ff6a2c;
-  --pop: #ff3d8b;
-  --on-pop: #0a081b;
   --flare: #ff6a2c;
   --on-flare: #0a081b;
   --ion: #45e9f2;
   --on-ion: #0a081b;
   --energy: #fff8e9;
   --protein: #45e9f2;
-  --carbs: #ff7a1c;
-  --fat: #eb3da5;
+  --carbs: #ffa024;
+  --fat: #9a6bff;
   --positive: #8fe02a;
   --caution: #ffc23d;
   --info: #8cc8ff;
@@ -86,12 +77,8 @@
   --on-chosen: #ecf0f8;
   --edge: #2b3853;
   --accent-line: transparent;
-  --title-from: #ecf0f8;
-  --title-to: #ecf0f8;
   --mark: #a9b4ca;
   --arc: #ecf0f8;
-  --pop: #1c2842;
-  --on-pop: #ecf0f8;
   --flare: #1c2842;
   --on-flare: #ecf0f8;
   --ion: #3fd8f0;
@@ -136,12 +123,8 @@
   --on-chosen: #0c1220;
   --edge: #cbd3e3;
   --accent-line: transparent;
-  --title-from: #0c1220;
-  --title-to: #0c1220;
   --mark: #46526b;
   --arc: #0c1220;
-  --pop: #e3e8f5;
-  --on-pop: #0c1220;
   --flare: #e3e8f5;
   --on-flare: #0c1220;
   --ion: #0a7890;
