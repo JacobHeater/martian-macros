@@ -403,7 +403,7 @@ export function CoachScreen() {
           detail={
             trendSigma === undefined
               ? undefined
-              : `Probably between ${fmt.weight(snapshot.trendWeightKg - 2 * trendSigma)} and ${fmt.weight(snapshot.trendWeightKg + 2 * trendSigma)}`
+              : `Likely between ${fmt.weight(snapshot.trendWeightKg - 2 * trendSigma)} and ${fmt.weight(snapshot.trendWeightKg + 2 * trendSigma)}`
           }
         />
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
