@@ -25,6 +25,8 @@ export class DashboardHistory {
   readonly weighInDays: number;
   /** Today, while its log is not marked complete: drawn apart and left out of the averages (MM-335). */
   readonly unfinished: CalendarDate | undefined;
+  /** Paused days with a log: drawn, but left out of the averages as they are out of coverage (MM-176). */
+  private readonly pausedLogs = new Set<CalendarDate>();
 
   constructor({
     today,
@@ -74,7 +76,10 @@ export class DashboardHistory {
         this.calories.set(day.date, day.kcal);
         this.protein.set(day.date, day.proteinG);
       }
-      if (paused(day.date)) continue;
+      if (paused(day.date)) {
+        this.pausedLogs.add(day.date);
+        continue;
+      }
       if (this.calories.has(day.date)) loggedDays++;
       if (day.completeness === 'complete') completeDays++;
     }
@@ -91,14 +96,25 @@ export class DashboardHistory {
     ).size;
   }
 
-  /** The days whose logs count: every recorded day but an unfinished today. */
+  /**
+   * The days whose logs count: every recorded day but an unfinished today
+   * and a paused day, so an average uses the days the Logging row counts
+   * (MM-176).
+   */
   private finished(values: ReadonlyMap<CalendarDate, number>): number[] {
-    return [...values].filter(([date]) => date !== this.unfinished).map(([, value]) => value);
+    return [...values]
+      .filter(([date]) => date !== this.unfinished && !this.pausedLogs.has(date))
+      .map(([, value]) => value);
   }
 
   /** How many recorded days the averages use. */
   get finishedDays(): number {
     return this.finished(this.calories).length;
+  }
+
+  /** How many paused days have a log: drawn, though no average uses them (MM-176). */
+  get pausedDays(): number {
+    return this.pausedLogs.size;
   }
 
   get meanCalories(): number | undefined {

@@ -16,6 +16,19 @@ are explicitly excluded from the macro-energy denominator.
 The pie always labels all three macro shares; Simple detail still limits the
 progress bars to protein.
 
+Superseded by MM-254/MM-255: the chart and the bars are one switch in the
+hero, not both on the screen (see the note below).
+
+Panel review of PR #285 (2026-10-21):
+- At Simple detail there is no Grams/Split switch, since the split needs all
+  three macros; a remembered Split falls back to the protein bar, and the
+  choice is kept for when Standard or Full is chosen again (QA-4).
+- The switch's group is named "Macro picture" (UX-4).
+- Inside the hero the split keeps one line, "Share of calories from each",
+  in its empty state too so the hero does not grow with the first food (UX-3).
+- A choice that could not be saved is said in a snack: "Could not keep that
+  choice." (UX-5).
+
 ## Acceptance Criteria
 ```gherkin
 Scenario: Energy shares, not gram shares
@@ -52,7 +65,7 @@ The donut repeats the hero's macro bars. The owner chose to keep both behind a s
 
 ## Progress (2026-10-21)
 - Built as the owner decided (MM-254, MM-255): `CalorieHero` shows bars or
-  the split donut (`MacroSplitChart`), never both, behind a "Bars / Split"
+  the split donut (`MacroSplitChart`), never both, behind a "Grams / Split"
   switch whose choice is a remembered preference shared by Dashboard and
   Food. The separate "Macronutrient split" card is gone.
 - Superseded, not built: "Food keeps the bars and adds the chart below them,
@@ -66,6 +79,11 @@ The donut repeats the hero's macro bars. The owner chose to keep both behind a s
   today), `test/charts/macroSplitRoundsToNothing.test.tsx`,
   `test/charts/splitDonutCentred.test.tsx`. Stories: `Food.stories.tsx`
   `FoodSplit` and `FoodSplitEmpty`. Not run locally; CI validates.
+- Panel fixes (2026-10-21): `test/charts/splitDonutCentred.test.tsx` checks
+  each sector uses its macro bar's colour token ("same colors as the bars")
+  and the hero's one line; `test/food/detailLevel.test.tsx` checks Simple
+  with a remembered Split (no switch, no ring, the protein bar); the
+  switch's group renamed and its failed save said in a snack.
 
 ### Owed on a phone
 - The donut's labels at a narrow phone width in both themes, read on a

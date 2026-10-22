@@ -8,7 +8,7 @@ interface MacroSplitChartProps {
   intake: IntakeDay;
   /** For a food that is about to be logged, not what has been. */
   isPreview?: boolean;
-  /** Inside the hero: the ring and its figures, without the caption about how the split is counted. */
+  /** Inside the hero: the ring, its figures and one line saying what they are shares of, without how the split is counted. */
   compact?: boolean;
   /** Carbs counted net of fiber and sugar alcohols, and named so (MM-396). */
   netCarbs?: boolean;
@@ -56,6 +56,8 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false, ne
           <circle className="chart-split-empty" cx={center} cy={center} r={(inner + outer) / 2} strokeWidth={outer - inner} />
         </svg>
         <p className="chart-split-needs">{needs}</p>
+        {/* The same line as with a split, so the hero does not grow with the first food. */}
+        {compact ? <p className="chart-caption">Share of calories from each</p> : null}
       </div>
     );
   }
@@ -92,7 +94,10 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false, ne
           ))}
         </ul>
       </div>
-      {compact ? null : (
+      {/* Inside the hero, one line says what the shares are of (MM-179). */}
+      {compact ? (
+        <p className="chart-caption">Share of calories from each</p>
+      ) : (
         <p className="chart-caption">
           {Fmt.kcal(total)} from {isPreview ? 'food' : 'recorded'} macros · protein/{netCarbs ? 'net carbs' : 'carbs'} 4 kcal/g,
           fat 9 kcal/g. Alcohol{netCarbs ? ', fiber, sugar alcohols' : ''} and other calorie differences are not part of this split.
