@@ -338,7 +338,8 @@ export const CoachHeadsUp = screenStory({
 /** MM-553: "Heads up" opened: each caution, then each flag, in full. */
 export const CoachHeadsUpOpened = screenStory({
   covers: ['CoachScreen'],
-  shows: /^Your deficit is capped at 35% of your expenditure/,
+  // The sleep disorder answer gives a fixed caution, whatever flags the coach ends up issuing.
+  shows: /^Sleep disorders change how a deficit works for you/,
   scenario: headsUpScenario,
   open: onCoach,
   walk: pressOnCoach(/^Heads up/),
