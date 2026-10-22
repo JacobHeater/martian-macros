@@ -1,4 +1,11 @@
 import { SqlRepositories } from '../data/SqlRepositories';
+import { EraserWithPhotos } from '../data/EraserWithPhotos';
+import { SqlProgressPhotoRepository } from '../data/SqlProgressPhotoRepository';
+import { MediaDevicesPhotoCamera } from '../platform/MediaDevicesPhotoCamera';
+import { NativeDeviceLock } from '../platform/NativeDeviceLock';
+import { NativePrivateScreen } from '../platform/NativePrivateScreen';
+import { NoDeviceLock } from '../platform/NoDeviceLock';
+import { NoPrivateScreen } from '../platform/NoPrivateScreen';
 import { NativeBackupPlatform } from '../backup/NativeBackupPlatform';
 import { openNativeSnapshot } from '../backup/openNativeSnapshot';
 import { WasmBackupPlatform } from '../backup/WasmBackupPlatform';
@@ -69,6 +76,11 @@ export async function openAppServices(): Promise<AppServices> {
   const sql = native ? await NativeSqlDatabase.open({ name: databaseName }, mmDb) : await WasmSqlDatabase.open();
   // A backup is the phone's copy of that database, encrypted before it leaves (MM-63); a restore opens a copy brought back.
   const repositories = await SqlRepositories.open(sql, native ? { openSnapshot: openNativeSnapshot({ api: mmBackup, db: mmDb }) } : {});
+  // The progress photos are a database file of their own (MM-157), so the user's database, and its snapshot for a
+  // backup, never holds one; a browser keeps them in memory.
+  const progressPhotos = await SqlProgressPhotoRepository.open(
+    native ? await NativeSqlDatabase.open({ name: `${databaseName}-photos` }, mmDb) : await WasmSqlDatabase.open(),
+  );
   const backup = sql instanceof WasmSqlDatabase ? new WasmBackupPlatform(sql) : new NativeBackupPlatform({ api: mmBackup, databaseName });
   const packStore = native
     ? new NativePackStore({ api: mmPacks, db: mmDb })
@@ -120,7 +132,8 @@ export async function openAppServices(): Promise<AppServices> {
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
     // Erasing or restoring starts entry ids again: a new write namespace keeps new writes from replacing old ones (MM-522).
-    eraser: new RenewingEraser({ eraser: repositories.eraser, ids: healthWriting }),
+    // Erasing all data erases the photos too (MM-157).
+    eraser: new RenewingEraser({ eraser: new EraserWithPhotos({ eraser: repositories.eraser, photos: progressPhotos }), ids: healthWriting }),
     restorer: new RenewingRestorer({ restorer: repositories.restorer, ids: healthWriting }),
     backup,
     // The packs on this phone as one catalog, read again on each
@@ -159,6 +172,11 @@ export async function openAppServices(): Promise<AppServices> {
       : new NoHealthPlatform(),
     healthWriting,
     healthWorkouts,
+    progressPhotos,
+    // Photos are taken inside the app, through the web view's camera, never the phone's camera app (MM-157).
+    photoCamera: new MediaDevicesPhotoCamera(),
+    deviceLock: native ? new NativeDeviceLock(mmBackup) : new NoDeviceLock(),
+    privateScreen: native ? new NativePrivateScreen(mmBackup) : new NoPrivateScreen(),
     // Only Apple Health keeps a sex and a date of birth to fill onboarding in from (MM-69).
     healthProfile: native && platform === 'ios' ? new NativeHealthProfile(mmHealth) : new NoHealthProfile(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),

@@ -1,3 +1,6 @@
+import { FixturePhotoCamera } from '../fixtures/FixturePhotoCamera';
+import { InMemoryDeviceLock } from '../fixtures/InMemoryDeviceLock';
+import { InMemoryPrivateScreen } from '../fixtures/InMemoryPrivateScreen';
 import type { FixedClock } from '../fixtures/FixedClock';
 import { InMemoryReminderScheduler } from '../fixtures/InMemoryReminderScheduler';
 import { InMemoryExactAlarms } from '../fixtures/InMemoryExactAlarms';
@@ -51,6 +54,11 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     // Nothing is written to it unless a story or a test turns a kind on (MM-70).
     healthWriting: new InMemoryHealthWriting(),
     healthWorkouts: new InMemoryHealthWorkouts({ namesExercises: true }),
+    // Never the device's camera or lock: a camera whose every photo is the fixture, a lock that opens (MM-157).
+    progressPhotos: repos.progressPhotos,
+    photoCamera: new FixturePhotoCamera(),
+    deviceLock: new InMemoryDeviceLock(),
+    privateScreen: new InMemoryPrivateScreen(),
     // Onboarding offers no platform to fill in from, unless a story or a test brings Apple Health (MM-69).
     healthProfile: new NoHealthProfile(),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),
