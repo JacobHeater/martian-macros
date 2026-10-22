@@ -17,6 +17,7 @@ import { MmSurface } from '../ui/MmSurface';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSpinner } from '../ui/MmSpinner';
 import { NumberEntry } from '../ui/NumberEntry';
+import { MeasurementsCard } from './MeasurementsCard';
 import { RecompSignalCard } from './RecompSignalCard';
 import { SleepNightCard } from './SleepNightCard';
 import { StrengthSection } from './StrengthSection';
@@ -27,6 +28,7 @@ import { onboardingCreatine } from './onboardingCreatine';
 import { saveWaistReadings } from './saveWaistReadings';
 import { WeightEventsCard } from './WeightEventsCard';
 import { PeriodDaysCard } from './PeriodDaysCard';
+import { ProgressPhotosCard } from './ProgressPhotosCard';
 import { cycleWindows } from '../engine/cycleWindows';
 import './progress.css';
 
@@ -223,8 +225,10 @@ export function ProgressScreen() {
           onSave={saveWaist}
         />
       </div>
+      <MeasurementsCard fmt={fmt} />
       <RecompSignalCard fmt={fmt} />
       <StrengthSection />
+      <ProgressPhotosCard />
     </>
   );
 }

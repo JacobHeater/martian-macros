@@ -33,6 +33,16 @@ const fingerprints: Readonly<Record<number, string>> = {
   17: '36d03cffa516cd7d4e701f2b0d274676262f1b68765f1ba7f494c93adec67970',
   // MM-510: the weight-loss medication answer (MM-113).
   18: '89f0d47164ae28802b39a9fd05d95ec3a8235c6d10890f82f21a1445fafa57d4',
+  // MM-441: the weigh-in window chosen in Settings.
+  19: '4420c0548b76f6c025290ee331d1d8753dc6caa19b66b61d7ca90f3dd0d40e49',
+  // MM-456: the pack food a recipe's ingredient was found as.
+  20: 'df49dc832ffb4fcaca2b7cf567671bf0bbff2d92b67424a932e864498df6045a',
+  // MM-507: the goal body fat the user set (MM-36).
+  21: '1706073ad4fc3ba0d1609ec4fd6fb4147ba5acbc956c988dfeef613a4ffed107',
+  // MM-490: the platform id and source of an imported workout, and the imported workouts deleted in the app.
+  22: '45937119313e69074c46dbb43fdb04aee5c4d70da682207a69e6e3cc402d3bb7',
+  // MM-156: every body measurement by site, the waist moved in, and which sites are measured.
+  23: '0c17338a660cc40ffe94ea47e22229acbfd0c31414dbdb0f67a17c5ec2ae3116',
 };
 
 it('the schema is the one recorded for its version', () => {

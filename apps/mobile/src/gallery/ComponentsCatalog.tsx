@@ -39,6 +39,10 @@ import { NumberEntry } from '../ui/NumberEntry';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { WaistProtocolFigure } from '../ui/WaistProtocolFigure';
+import { MeasurementSiteFigure } from '../ui/MeasurementSiteFigure';
+import { MmCameraPreview } from '../ui/MmCameraPreview';
+import { MmPhoto } from '../ui/MmPhoto';
+import { fixturePhotoJpeg } from '../fixtures/fixturePhotoJpeg';
 import { SectionLabel } from '../ui/SectionLabel';
 import { StatRow } from '../ui/StatRow';
 import { StepProgress } from '../ui/StepProgress';
@@ -152,6 +156,12 @@ export function ComponentsCatalog() {
       <div className="gallery-row">
         <WaistProtocolFigure />
       </div>
+      {/* Every other site, drawn where the tape sits (MM-156). */}
+      <div className="gallery-row">
+        {(['neck', 'chest', 'hips', 'upperArm', 'thigh', 'calf'] as const).map((site) => (
+          <MeasurementSiteFigure key={site} site={site} />
+        ))}
+      </div>
       <MmRhythmStrip
         name="Last seven days"
         days={['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'].map((letter, i) => ({
@@ -206,6 +216,12 @@ export function ComponentsCatalog() {
       <div className="app-fab-anchor">
         <MmFab label="Add food" icon="plus" onPress={nothing} />
       </div>
+      {/* MM-157: a progress photo, small and whole, and the camera's frame with the last photo laid over it. */}
+      <div className="app-row">
+        <MmPhoto jpeg={fixturePhotoJpeg} label="Front photo, October 5, 2026" thumbnail />
+        <MmPhoto jpeg={undefined} label="A photo being read" thumbnail />
+      </div>
+      <MmCameraPreview attach={undefined} overlay={fixturePhotoJpeg} />
     </MmOverlays>
   );
 }

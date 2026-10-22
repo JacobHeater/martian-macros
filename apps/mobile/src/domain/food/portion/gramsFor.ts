@@ -25,7 +25,10 @@ export function gramsFor(
   }
   if (PortionUnit.isHand(unit)) {
     if (hand === undefined) return undefined;
-    const each = HandModel.gramsOf(unit, hand, { densityGPerMl: reference.densityGPerMl });
+    const each = HandModel.gramsOf(unit, hand, {
+      densityGPerMl: reference.densityGPerMl,
+      per100g: reference.basis === 'per100g' ? reference.nutrition : undefined,
+    });
     return each === undefined ? undefined : quantity * each;
   }
   const weight = PortionUnit.grams(unit);
