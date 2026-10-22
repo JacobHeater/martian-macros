@@ -19,9 +19,13 @@ It uses recent entries' middle values, as the waist does. Every new figure gets 
 
 ## Acceptance Criteria
 ```gherkin
-Scenario: Neck and hip entered
-  Given three or more waist, neck and (for a female profile) hip entries in the last four weeks
+Scenario: Neck entered
+  Given a male profile with three or more waist and neck entries in the last four weeks
   Then the range rests on the Navy method as well, and is no wider than without it
+
+Scenario: A female profile
+  Given a female profile with waist, neck and hip entries
+  Then the Navy method is not used, and the range is MM-34's, unchanged
 
 Scenario: Only some sites
   Given waist entries but no neck entries
@@ -48,6 +52,13 @@ Choices I made without asking (say if any is wrong):
 - **No suggestion is switched on for it**: the app cannot tell who wants a tape estimate, so MM-156's sites screen
   names neck (and hips) for it and `suggestedSites`' `tapeBodyFat` stays unused.
 
+- **Not for a female profile (panel review, 2026-10-21).** The female Navy equation is fitted to the waist at its
+  narrowest (the natural waist) and the hip; the app's waist is at the navel (`MeasurementSite` has no natural-waist
+  entry), which reads larger and would raise her figure. Until a natural-waist entry exists, the method is used for
+  men only (whose equation reads the abdomen at the navel). The sites screen and the note say so.
+- **The neck's middle carries the neck's own noise** (`MeasurementSite.facts`, 0.5 cm per entry, half as much again
+  with a single reading), times sqrt(1.25) for a middle rather than a mean, over the square root of the entries.
+
 ## Progress
 Built 2026-10-21. Not run locally; CI validates.
 - `navyBodyFat` (engine): the published formulas in centimetres, with the tape's noise carried through; nothing for
@@ -61,7 +72,13 @@ Built 2026-10-21. Not run locally; CI validates.
   and is no wider; only some sites: MM-34's range unchanged; one mistyped neck entry moves nothing; old entries do not
   count; no waist, no tape); `test/format/bodyFatText.test.ts`.
 
+Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
+- `estimateBodyFat`: the Navy method for a male profile only; the neck's noise from `MeasurementSite.facts` x sqrt(1.25).
+- Copy: `bodyFatNote` ('tape') no longer names hips; `MeasurementSitesScreen` says the method is for men only.
+- Tests: `test/engine/navyBodyFat.test.ts` pins the formula to an independent reference worked by hand from the
+  imperial equation (19.93% for 180 cm, waist 90, neck 38; the metric form gives 19.81); a female profile is not
+  given the method; the neck's noise is carried as stated. `test/format/bodyFatText.test.ts` follows the note.
+
 ## Owed on a phone
-- With three weeks of waist and neck entries (and hips for a female profile), the Coach's Body row reads "(from your
-  tape)".
+- With three weeks of waist and neck entries on a male profile, the Coach's Body row reads "(from your tape)".
 

@@ -233,6 +233,26 @@ export const CoachHistoryGapCannotOpen = screenStory({
   walk: pressOnCoach('Open Health Connect'),
 });
 
+/** MM-523, MM-323: back from Health Connect with past data allowed there: a snack says so, and the line goes. */
+export const CoachHistoryGapAllowedThere = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Past data allowed. The estimate will use it.',
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true, allowsThere: ['history'] }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
+});
+
+/** MM-523, MM-323: back from Health Connect with nothing allowed there: a snack says nothing changed, and the line stays. */
+export const CoachHistoryGapNothingChanged = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Nothing changed.',
+  scenario: firstDayScenario,
+  device: healthPlatform({ allowed: ['weight'], historyRefused: true }),
+  open: onCoach,
+  walk: pressOnCoach('Open Health Connect'),
+});
+
 /** MM-36: a man cut to 12%: the cut has ended, and the coach recommends maintenance, then a lean gain, with why. */
 export const CoachPhaseNext = screenStory({
   covers: ['CoachScreen'],

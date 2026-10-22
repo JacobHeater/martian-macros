@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CalendarDate, type MeasurementSite, SiteObservation, WaistObservation } from '../../src/domain';
-import { BodyFatRule, estimateBodyFat, navyBodyFat } from '../../src/engine';
+import { BodyFatRule, combineBodyFatEstimates, estimateBodyFat, navyBodyFat } from '../../src/engine';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 
 /** MM-501: the Navy tape method joins the body-fat range. */
@@ -11,11 +11,12 @@ const site = (name: MeasurementSite, values: readonly number[]) =>
   values.map((cm, i) => new SiteObservation({ site: name, date: today.addDays(-7 * i), valueCm: cm, readings: [cm, cm, cm] }));
 
 describe('the Navy formula', () => {
-  it('gives the published figures: a man of 180 cm, waist 90, neck 38, about 18%', () => {
+  it('agrees with the published imperial equation: a man of 180 cm, waist 90, neck 38, 19.9%', () => {
+    // An independent reference, worked by hand from the imperial form (inches):
+    // 86.010 log10(35.433 - 14.961) - 70.041 log10(70.866) + 36.76 = 112.774 - 129.607 + 36.76 = 19.93.
+    // The metric form the app uses gives 19.81; the two published forms differ by about a tenth of a point.
     const man = navyBodyFat({ sex: 'male', heightCm: 180, waistCm: 90, neckCm: 38, circumferenceNoiseCm: 0 });
-    expect(man?.percent).toBeCloseTo(495 / (1.0324 - 0.19077 * Math.log10(52) + 0.15456 * Math.log10(180)) - 450, 9);
-    expect(man?.percent).toBeGreaterThan(16);
-    expect(man?.percent).toBeLessThan(20);
+    expect(Math.abs((man?.percent ?? 0) - 19.93)).toBeLessThan(0.2);
     expect(man?.sigmaPercent).toBeCloseTo(BodyFatRule.navySigmaPercent, 9);
   });
 
@@ -49,10 +50,33 @@ describe('estimateBodyFat with the tape (MM-501)', () => {
     expect(withNeck.basis).toBe('tape');
     expect(withNeck.estimate.sigmaPercent).toBeLessThanOrEqual(without.estimate.sigmaPercent + 1e-12);
 
+  });
+
+  it('A female profile: the Navy method is not used, since its waist is the narrowest and the app’s is at the navel', () => {
     const herWithout = estimate(woman, [], 78);
     const her = estimate(woman, [...site('neck', [33, 33, 33]), ...site('hips', [100, 100, 100])], 78);
-    expect(her.basis).toBe('tape');
-    expect(her.estimate.sigmaPercent).toBeLessThanOrEqual(herWithout.estimate.sigmaPercent + 1e-12);
+    expect(her.basis).toBe('waist');
+    expect(her).toEqual(herWithout);
+  });
+
+  it('the neck’s middle carries the neck’s own noise, a quarter less efficient than a mean', () => {
+    // Neck noise 0.5 cm per entry (MeasurementSite), x sqrt(1.25) for the middle of four, over sqrt(4);
+    // the waist's 1 cm over sqrt(4). The tape's part of the spread is that noise carried through the formula.
+    const fourNecks = estimate(man, site('neck', [38, 38, 38, 38]));
+    const neckNoise = (0.5 * Math.sqrt(1.25)) / 2;
+    const waistNoise = 1 / 2;
+    const expected = navyBodyFat({
+      sex: 'male',
+      heightCm: man.profile.heightCm,
+      waistCm: 90,
+      neckCm: 38,
+      circumferenceNoiseCm: Math.sqrt(waistNoise ** 2 + neckNoise ** 2),
+    });
+    if (expected === undefined) throw new Error('the Navy method reads these');
+    const joined = combineBodyFatEstimates(estimate(man, []).estimate, expected, BodyFatRule.navyErrorCorrelation);
+    expect(fourNecks.basis).toBe('tape');
+    expect(fourNecks.estimate.percent).toBeCloseTo(joined.percent, 9);
+    expect(fourNecks.estimate.sigmaPercent).toBeCloseTo(joined.sigmaPercent, 9);
   });
 
   it('Only some sites: waist but no neck leaves MM-34’s range unchanged; a woman’s neck without her hip does too', () => {

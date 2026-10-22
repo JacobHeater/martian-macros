@@ -22,6 +22,15 @@ Choices I made without asking (say if any is wrong):
   imported movement the library does not know; its sets count toward no muscle."), so it does not outweigh "Add set".
   After the move a snack says "Moved N sets to {exercise}" with Undo (sibling: "Removed set N" with Undo, MM-215),
   and focus goes to the card's title, now the exercise's name.
+- **Only strength sessions are imported (coordinator's decision, 2026-10-21, from the integrations review).** MM-188's
+  strength types (Health Connect's strength training, weightlifting and calisthenics types; HealthKit's traditional and
+  functional strength training and core training), which both shells already flag as `strength`; the walks and runs a
+  watch detects are not brought into the training log. The filter is in `workoutFromPlatform`, so the shells read as before.
+- **The same session recorded twice is imported once (panel review, 2026-10-21).** A new import whose span overlaps
+  80% or more of the shorter of its span and that of a workout logged in the app, or of one imported from another
+  source, is left out: the session timed live in the app and recorded by a watch, or written by two apps.
+- **A re-read moves a workout only when its start or end changed (panel review, 2026-10-21)**; the same instants keep
+  the stored day, which the user may have set.
 
 ## Description
 - A switch for writing workouts in the health platform's settings, off until the user turns it on; turning it on asks the
@@ -78,6 +87,14 @@ Built 2026-10-21. Not run locally; CI validates.
 - Panel review fixes (2026-10-21): `WorkoutExerciseCard`'s text action, snack with Undo (moves the exercise back to
   "Other exercise" unless it changed since) and focus on the title (`InfoCard`'s `titleId`). Tests in
   `test/train/importedWorkouts.test.tsx` (the snack and focus; Undo). Story `ImportedWorkoutOtherExerciseMoved`.
+
+Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
+- `workoutFromPlatform`: nothing for a session that is not strength. `platformWorkoutImports`: moved only on changed
+  instants; a new import overlapping 80% of an app-logged workout or another source's import is left out.
+- Tests: `test/engine/platformWorkoutImports.test.ts` (same instants with a different stored day: no change; another
+  source's session overlapping 80%: not imported, in the log or in one read, and one overlapping 50% is; a live app
+  session and a watch's recording: one; a walk: not imported); `test/engine/platformWorkouts.test.ts` (a non-strength
+  session gives nothing; a HealthKit strength session with no segments is a session).
 
 ## Owed on a phone
 - Health Connect: a strength workout recorded by another app (a watch) appears in Train after opening the app, once,

@@ -237,8 +237,12 @@ describe('importing a workout', () => {
     expect(workout?.exercises[0]?.sets[0]?.loadKg).toBe(80);
   });
 
-  it('iOS, or any session that is not strength: a workout with its span and no exercises, which sets can be added to', () => {
-    const workout = workoutFromPlatform(fromWatch([segment(benchPress, 5, 6, 8)], false));
+  it('a session that is not strength (a walk or a run a watch detected) is not imported (MM-490)', () => {
+    expect(workoutFromPlatform(fromWatch([segment(benchPress, 5, 6, 8)], false))).toBeUndefined();
+  });
+
+  it('iOS: a strength session with no segments is a workout with its span and no exercises, which sets can be added to', () => {
+    const workout = workoutFromPlatform(fromWatch([]));
     expect(workout?.exercises).toEqual([]);
     expect(workout?.activeMs(at(999))).toBe(60 * 60 * 1000);
     expect(workout?.date).toEqual(CalendarDate.fromDate(at(0)));

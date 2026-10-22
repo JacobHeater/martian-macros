@@ -34,3 +34,22 @@ it('the line saying what it needs is as tall as the figures, so the hero does no
   expect(declarationsOf(charts, '.chart-split-needs')).toMatch(/min-height: calc\(2 \* var\(--split-figure-line\) \+ 2 \* var\(--space-4\)\)/);
   expect(declarationsOf(charts, '.chart-split-item')).toMatch(/line-height: var\(--split-figure-line\)/);
 });
+
+/** MM-179: switching Grams to Split keeps each macro's colour: a sector is filled with the token its bar is. */
+it('each split sector uses the colour token of its macro bar', () => {
+  for (const macro of ['protein', 'carbs', 'fat']) {
+    const bar = declarationsOf('src/ui/ui.css', `.mm-progress-${macro} .mm-progress-fill`).match(/background: (var\(--[a-z0-9-]+\))/)?.[1];
+    const sector = declarationsOf(charts, `.chart-sector-${macro}`).match(/fill: (var\(--[a-z0-9-]+\))/)?.[1];
+    expect(bar, macro).toBe(`var(--${macro})`);
+    expect(sector, macro).toBe(bar);
+  }
+});
+
+it('MM-179: inside the hero the split keeps one line saying what its shares are of, empty or not', () => {
+  const empty = render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 0, proteinG: 0, carbsG: 0, fatG: 0 })} compact />);
+  expect(screen.getByText('Share of calories from each')).toBeInTheDocument();
+  empty.unmount();
+  render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 566, proteinG: 40, carbsG: 61, fatG: 18 })} compact />);
+  expect(screen.getByText('Share of calories from each')).toBeInTheDocument();
+  expect(screen.queryByText(/kcal\/g/)).toBeNull();
+});
