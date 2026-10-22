@@ -1,3 +1,4 @@
+import { usePaceInWords } from '../coach/usePaceInWords';
 import { useEffect, useRef, useState } from 'react';
 import { TrendChart } from '../charts/TrendChart';
 import { WaistChart } from '../charts/WaistChart';
@@ -42,6 +43,8 @@ import './progress.css';
  */
 export function ProgressScreen() {
   const { services, state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const rangeDays = useCell(state.progressRangeDays);
   const reveal = useCell(state.progressReveal);
   const waistSection = useRef<HTMLDivElement>(null);
@@ -70,8 +73,9 @@ export function ProgressScreen() {
   const noteDay = pickedDay ?? inRange[inRange.length - 1]?.date;
   const noteWeighIn = weights.find((w) => w.date === noteDay);
   const jump = useWeightJump(noteDay);
+  const paceInWords = usePaceInWords();
   if (setup === undefined) return null;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const fromOnboarding = onboardingCreatine(weightEvents, setup);
   const chartEvents = [...weightEvents, ...(fromOnboarding === undefined ? [] : [fromOnboarding])];
   const todays = [...weights].reverse().find((w) => w.date === today);
@@ -95,15 +99,20 @@ export function ProgressScreen() {
     <>
       <MmHeroSurface>
         <h2 className="progress-hero-title">Today’s weigh-in</h2>
+        {/* Unless every reading is shown, today's is not put back in the field: what was typed is seen, and nothing after (MM-118). */}
         <NumberEntry
-          key={`weight-${todays?.weightKg}-${setup.unitSystem}`}
+          key={fmt.readingsShown ? `weight-${todays?.weightKg}-${setup.unitSystem}` : `weight-${todays === undefined ? 'none' : todays.weightKg}`}
           title="Today’s weigh-in"
           unit={fmt.weightUnit}
-          initial={todays === undefined ? undefined : toStringAsFixed(fmt.weightFromKg(todays.weightKg), 1)}
+          initial={todays === undefined || !fmt.readingsShown ? undefined : toStringAsFixed(fmt.weightFromKg(todays.weightKg), 1)}
           hint={
-            importedToday === undefined
-              ? 'First thing in the morning, after the bathroom.'
-              : `${importedWeighInText(importedToday, services.platform)} Type a value to use yours instead.`
+            !fmt.readingsShown && todays !== undefined
+              ? 'Saved. Type a value to replace it.'
+              : importedToday === undefined
+                ? 'First thing in the morning, after the bathroom.'
+                : fmt.readingsShown
+                  ? `${importedWeighInText(importedToday, services.platform)} Type a value to use yours instead.`
+                  : 'Today’s weigh-in came from your scale. Type a value to use yours instead.'
           }
           onSave={(value) => services.weights.saveWeight(today, fmt.weightToKg(value))}
         />
@@ -129,13 +138,23 @@ export function ProgressScreen() {
             <MmSpinner />
           ) : last === undefined ? (
             <p className="app-text">No trend yet.</p>
+          ) : fmt.weightHidden ? (
+            // No figure and no chart with the weight hidden: the pace in words against the plan's (MM-118).
+            <>
+              <p className="app-subhead">{paceInWords ?? 'Your trend is being worked out.'}</p>
+              <p className="app-caption">
+                Against your plan’s pace. Your weight is hidden; the coach still uses every weigh-in. You can change this in
+                Settings.
+              </p>
+            </>
           ) : (
             <>
               <TrendStats trend={trend} fmt={fmt} />
               <div className="app-gap" />
               <TrendChart
                 trend={trend}
-                weights={weights}
+                // With the trend only, the line and band without the weigh-ins' dots (MM-118).
+                weights={fmt.readingsShown ? weights : []}
                 today={today}
                 rangeDays={rangeDays}
                 fmt={fmt}
@@ -145,8 +164,8 @@ export function ProgressScreen() {
                   `Weight trend over the last ${rangeDays} days. Trend weight ${fmt.weight(last.levelKg)}, ` +
                   `from ${weights.length} weigh-in${weights.length === 1 ? '' : 's'}.`
                 }
-                pickedDay={pickedDay}
-                onPickDay={setPickedDay}
+                pickedDay={fmt.readingsShown ? pickedDay : undefined}
+                onPickDay={fmt.readingsShown ? setPickedDay : undefined}
               />
               {weights.length < 2 ? <p className="app-text">A trend needs more weigh-ins.</p> : null}
               {/* The one line about uncertainty stays in view, with its chart; the rest is one tap down (UX-5, PD-19). */}
@@ -154,7 +173,7 @@ export function ProgressScreen() {
               {/* The reading under the chart (MM-142): the one picked, or the latest when it is far from the trend. A region
                   that is always there, so a reading picked with the keyboard is announced (the panel's UX-3). */}
               <div aria-live="polite">
-                {noteWeighIn !== undefined && (pickedDay !== undefined || jump !== undefined) ? (
+                {fmt.readingsShown && noteWeighIn !== undefined && (pickedDay !== undefined || jump !== undefined) ? (
                   <WeighInNote
                     weighIn={noteWeighIn}
                     trendKg={trend.find((p) => p.date === noteWeighIn.date)?.levelKg}
@@ -167,9 +186,13 @@ export function ProgressScreen() {
               </div>
               <MmDisclosure title="How to read this" remember="progress.how-to-read">
                 <p className="app-caption">
-                  Dots are weigh-ins. The line is your trend with water swings filtered out. Dashed markers show
-                  recorded weight events. A shaded stretch is the days around a period start, where the band is wider
-                  on purpose. Tap a dot, or move with the arrow keys, to see that weigh-in.
+                  {fmt.readingsShown
+                    ? 'Dots are weigh-ins. The line is your trend with water swings filtered out. Dashed markers show ' +
+                      'recorded weight events. A shaded stretch is the days around a period start, where the band is wider ' +
+                      'on purpose. Tap a dot, or move with the arrow keys, to see that weigh-in.'
+                    : 'The line is your trend with water swings filtered out; single weigh-ins are not shown. Dashed ' +
+                      'markers show recorded weight events. A shaded stretch is the days around a period start, where the ' +
+                      'band is wider on purpose.'}
                 </p>
               </MmDisclosure>
             </>

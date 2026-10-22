@@ -23,6 +23,7 @@ import { oldLiftsScenario } from './oldLiftsScenario';
 import { oldWaistScenario } from './oldWaistScenario';
 import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
+import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
@@ -752,6 +753,31 @@ export const SiteHistoryEmpty = screenStory({
   // A tape is read in centimetres here, so this person is metric.
   about: ['units'],
   open: ({ navigator }) => void navigator.push(() => <SiteHistoryScreen site="calf" />),
+});
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: Trend only: the chart's line and band with no dots, and no reading under it or in the field. */
+export const ProgressWeightTrendOnly = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /single weigh-ins are not shown/,
+  scenario: weightDisplayScenario('trendOnly'),
+  open: ({ state }) => state.homeTab.put('progress'),
+  // The words are under the chart's "How to read this", folded until opened.
+  walk: async (canvas) => {
+    const [header] = await within(canvas).findAllByRole('button', { name: /^How to read this/ }, { timeout: 5000 });
+    if (header === undefined) return;
+    reveal(header);
+    await userEvent.click(header);
+  },
+});
+
+/** MM-118: Hidden: no figure and no chart; the pace in words against the plan's. */
+export const ProgressWeightHidden = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /Your weight is hidden; the coach still uses every weigh-in/,
+  scenario: weightDisplayScenario('hidden'),
+  open: ({ state }) => state.homeTab.put('progress'),
 });
 
 // ---- MM-156: the measurements section's ways in, pressed ----

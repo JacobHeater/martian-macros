@@ -87,9 +87,9 @@ export function itemInsightText(insight: ItemInsight, fmt: Fmt): { line: string;
       return {
         line: fact + direction,
         evidence: [
-          ['Estimated max, smoothed, at the start', fmt.weight(figure('fromKg'))],
-          ['Now, smoothed', fmt.weight(figure('toKg'))],
-          ['Counted as held down to', fmt.weight(figure('heldDownToKg'))],
+          ['Estimated max, smoothed, at the start', fmt.load(figure('fromKg'))],
+          ['Now, smoothed', fmt.load(figure('toKg'))],
+          ['Counted as held down to', fmt.load(figure('heldDownToKg'))],
           ['Sessions', `${whole(figure('sessions'))} in ${weeks} weeks`],
           ['Fat-loss targets in force since', Fmt.shortDay(CalendarDate.fromEpochDay(figure('startEpochDay')))],
         ],

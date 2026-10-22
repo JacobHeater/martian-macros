@@ -13,39 +13,41 @@ const notExercises = new Set([39, 44]);
 
 /**
  * A workout from a health platform as the app logs it (MM-189), unsaved;
- * or undefined for one this app wrote, so it is not imported back.
+ * or undefined for one this app wrote, so it is not imported back, and for
+ * one that is not a strength session (MM-490): only MM-188's strength types
+ * are imported, not the walks and runs a watch detects.
  *
  * It keeps the session's span. In a strength session each segment becomes
  * a set of the exercise the library places it as, with the platform's
  * repetitions and weight where it gave them (zero where it did not, for
  * the user to edit), and back-to-back segments of one exercise are one
  * exercise's sets. A segment the library cannot place becomes "Other
- * exercise" with its time. Pauses and rests are not exercises. Any other
- * kind of session has no exercises; the user can add sets to it.
+ * exercise" with its time. Pauses and rests are not exercises. A strength
+ * session with no segments (HealthKit's) has no exercises; the user can add
+ * sets to it.
  */
 export function workoutFromPlatform(
   platform: PlatformWorkout,
   library: readonly Exercise[] = builtInExercises,
 ): Workout | undefined {
   if (platform.clientId?.startsWith(workoutClientIdPrefix) === true) return undefined;
+  if (!platform.strength) return undefined;
   const runs: { key: string; exerciseId: string; sets: WorkoutSet[] }[] = [];
-  if (platform.strength) {
-    const inOrder = [...platform.segments].sort((a, b) => a.start.getTime() - b.start.getTime());
-    for (const segment of inOrder) {
-      if (notExercises.has(segment.segmentId)) continue;
-      const placed = segmentExerciseId(segment.segmentId, library);
-      const exerciseId = placed ?? Exercise.otherId;
-      const key = placed ?? `${Exercise.otherId}:${segment.segmentId}`;
-      const set = new WorkoutSet({
-        reps: segment.repetitions ?? 0,
-        loadKg: segment.weightKg ?? 0,
-        startedAt: segment.start,
-        endedAt: segment.end,
-      });
-      const last = runs[runs.length - 1];
-      if (last !== undefined && last.key === key) last.sets.push(set);
-      else runs.push({ key, exerciseId, sets: [set] });
-    }
+  const inOrder = [...platform.segments].sort((a, b) => a.start.getTime() - b.start.getTime());
+  for (const segment of inOrder) {
+    if (notExercises.has(segment.segmentId)) continue;
+    const placed = segmentExerciseId(segment.segmentId, library);
+    const exerciseId = placed ?? Exercise.otherId;
+    const key = placed ?? `${Exercise.otherId}:${segment.segmentId}`;
+    const set = new WorkoutSet({
+      reps: segment.repetitions ?? 0,
+      loadKg: segment.weightKg ?? 0,
+      startedAt: segment.start,
+      endedAt: segment.end,
+    });
+    const last = runs[runs.length - 1];
+    if (last !== undefined && last.key === key) last.sets.push(set);
+    else runs.push({ key, exerciseId, sets: [set] });
   }
   return new Workout({
     id: 0,

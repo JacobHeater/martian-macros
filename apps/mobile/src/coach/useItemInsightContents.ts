@@ -19,11 +19,13 @@ const none: readonly ItemInsight[] = [];
  */
 export function useItemInsightContents(anchor: ItemAnchor, item: string): readonly InlineInsightContent[] {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const insights = useCell(state.itemInsights).get(Anchor.key(anchor)) ?? none;
   const units = useLoaded(state.setup)?.unitSystem ?? 'metric';
   return insights.flatMap((insight) => {
     const kind = itemInsightKinds.find((k) => k.id === insight.kind);
-    const text = itemInsightText(insight, new Fmt(units));
+    const text = itemInsightText(insight, new Fmt(units, { weightDisplay }));
     if (kind === undefined || text === undefined) return [];
     return [
       {

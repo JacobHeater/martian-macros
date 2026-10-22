@@ -129,14 +129,16 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
       return [
         'Your waist is down while the scale held',
         `Over the last two weeks your waist went from ${fmt.length(from)} to ${fmt.length(to)} ` +
-          `while your trend weight moved ${fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)}. ` +
+          (fmt.weightHidden
+            ? 'while your trend weight held. '
+            : `while your trend weight moved ${fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)}. `) +
           'A smaller waist at a steady weight is fat going and muscle or water staying; the tape sees what the scale cannot.',
         [
           period,
           ['Waist then', fmt.length(from)],
           ['Waist now', fmt.length(to)],
           ['Waist change', down],
-          ['Trend weight change', fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)],
+          ...(fmt.weightHidden ? [] : [['Trend weight change', fmt.weightDelta(i.figures['weightChangeKg'] ?? 0)] as const]),
         ],
       ];
     }
@@ -197,8 +199,9 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
         ['Fully logged days', `${stall.usableFoodDays}`],
         ['Weigh-ins', `${stall.weighIns}`],
       ];
-      if (stall.slopeKgPerWeek !== undefined) evidence.push(['Trend', `${fmt.weightDelta(stall.slopeKgPerWeek)} a week`]);
-      if (stall.intendedKgPerWeek !== undefined) {
+      // Weights a week are left out with the weight hidden (MM-118).
+      if (stall.slopeKgPerWeek !== undefined && !fmt.weightHidden) evidence.push(['Trend', `${fmt.weightDelta(stall.slopeKgPerWeek)} a week`]);
+      if (stall.intendedKgPerWeek !== undefined && !fmt.weightHidden) {
         evidence.push(['Intended', `${fmt.weightDelta(stall.intendedKgPerWeek)} a week`]);
       }
       return ['Progress has slowed', options.length === 0 ? body : `${body} Options: ${options.join('; ')}.`, evidence];

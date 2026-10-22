@@ -156,6 +156,8 @@ CREATE TABLE "user_preferences" (
   "primary_scale_source_id" TEXT NULL,
   "weigh_in_window_start_minute" INTEGER NULL CHECK ("weigh_in_window_start_minute" IS NULL OR "weigh_in_window_start_minute" BETWEEN 0 AND 1439),
   "weigh_in_window_end_minute" INTEGER NULL CHECK ("weigh_in_window_end_minute" IS NULL OR "weigh_in_window_end_minute" BETWEEN 1 AND 1440),
+  "weight_display" TEXT NULL CHECK ("weight_display" IS NULL OR "weight_display" IN ('everything', 'trendOnly', 'hidden')),
+  "weight_display_offered" INTEGER NOT NULL DEFAULT 0 CHECK ("weight_display_offered" IN (0, 1)),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (

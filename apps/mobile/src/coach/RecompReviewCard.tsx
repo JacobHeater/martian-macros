@@ -13,12 +13,14 @@ import { RecompReviewBody } from './RecompReviewBody';
  */
 export function RecompReviewCard() {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const review = useCell(state.recompReview);
   const setup = useLoaded(state.setup);
   if (review === undefined || setup === undefined) return null;
   return (
     <MmSection icon="insight" title={`Recomp review, week ${review.week}`}>
-      <RecompReviewBody review={review} fmt={new Fmt(setup.unitSystem)} />
+      <RecompReviewBody review={review} fmt={new Fmt(setup.unitSystem, { weightDisplay })} />
     </MmSection>
   );
 }
