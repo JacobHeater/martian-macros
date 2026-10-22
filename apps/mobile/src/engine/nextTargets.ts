@@ -317,7 +317,7 @@ export function nextTargets({
       safetyRaiseKcal: safetyRaise(),
       trigger: 'recalculation',
       stepLimited: false,
-      correctionRateFraction: last.targets.flags.has('maintenanceCorrection') ? last.targets.weeklyRateFraction : undefined,
+      ...(last.targets.flags.has('maintenanceCorrection') ? { correctionRateFraction: last.targets.weeklyRateFraction } : {}),
     });
     // Calorie reductions wait while a creatine change settles, as at a check-in.
     return snapshot.creatineReductionPausedOn(today) && next.targets.kcal < last.targets.kcal ? undefined : next;
