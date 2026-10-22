@@ -252,39 +252,31 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         store.execute(query)
     }
 
+    /// What changed in one kind since `token` (MM-551). Only the kind asked for is queried: an anchor is one kind's, and a kind
+    /// never put to the person (sleep, steps, a cycle) answers "authorization not determined", which once failed every read.
     @objc func changes(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
         guard let token = call.getString("token") else { return call.reject("changes needs a token.") }
+        guard let name = call.getString("type") else { return call.reject("changes needs a type.") }
+        guard let type = Self.type(named: name) else { return call.reject("Not a type this app reads: \(name).") }
         let expired: JSObject = ["expired": true, "nextToken": "", "hasMore": false, "upserted": [] as JSArray, "deletedIds": [] as JSArray]
         guard let anchor = Self.anchor(of: token) else {
             // A token this plugin did not write: everything is to be read again, which is not an error.
             return call.resolve(expired)
         }
-        // The anchor carries its type with it, so every kind is asked and sorted by name here.
-        let group = DispatchGroup()
-        // Gathered in a locked box, never in a captured var, since HealthKit's handlers are @Sendable and run on its threads.
-        let gathered = ChangesGathered(anchor: anchor)
-        for (name, type) in Self.types {
-            group.enter()
-            let query = HKAnchoredObjectQuery(type: type, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { _, added, removed, newAnchor, error in
-                let rows: JSArray = error == nil ? (added ?? []).compactMap { self.raw(name, $0) } : []
-                let gone: JSArray = error == nil ? (removed ?? []).map { $0.uuid.uuidString } : []
-                gathered.add(rows, gone, newAnchor, error)
-                group.leave()
-            }
-            store.execute(query)
-        }
-        group.notify(queue: .global()) {
-            let result = gathered.result()
-            if let failure = result.failure { return call.reject(failure.localizedDescription) }
+        let query = HKAnchoredObjectQuery(type: type, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { _, added, removed, newAnchor, error in
+            if let error = error { return call.reject(error.localizedDescription) }
+            let rows: JSArray = (added ?? []).compactMap { self.raw(name, $0) }
+            let gone: JSArray = (removed ?? []).map { $0.uuid.uuidString }
             call.resolve([
                 "expired": false,
-                "nextToken": Self.token(of: result.next),
+                "nextToken": Self.token(of: newAnchor ?? anchor),
                 "hasMore": false,
-                "upserted": result.upserted,
-                "deletedIds": result.deleted,
+                "upserted": rows,
+                "deletedIds": gone,
             ])
         }
+        store.execute(query)
     }
     // MARK: Writing (MM-70, MM-314, MM-513, MM-489)
 
@@ -666,37 +658,6 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             self.store.execute(query)
         }
-    }
-}
-
-/// What the anchored queries of `changes` gather, from HealthKit's threads, behind a lock (MM-69).
-private final class ChangesGathered: @unchecked Sendable {
-    private let lock = NSLock()
-    private var upserted: JSArray = []
-    private var deleted: JSArray = []
-    private var next: HKQueryAnchor
-    private var failure: Error?
-
-    init(anchor: HKQueryAnchor) {
-        next = anchor
-    }
-
-    func add(_ rows: JSArray, _ gone: JSArray, _ newAnchor: HKQueryAnchor?, _ error: Error?) {
-        lock.lock()
-        defer { lock.unlock() }
-        if let error = error {
-            failure = error
-            return
-        }
-        upserted.append(contentsOf: rows)
-        deleted.append(contentsOf: gone)
-        if let newAnchor = newAnchor { next = newAnchor }
-    }
-
-    func result() -> (upserted: JSArray, deleted: JSArray, next: HKQueryAnchor, failure: Error?) {
-        lock.lock()
-        defer { lock.unlock() }
-        return (upserted, deleted, next, failure)
     }
 }
 
